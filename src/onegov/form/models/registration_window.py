@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from onegov.core.orm import Base
@@ -20,7 +22,15 @@ from sqlalchemy.sql.elements import quoted_name
 from uuid import uuid4
 
 
-daterange = Column(quoted_name('DATERANGE("start", "end")', quote=False))
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from datetime import date, datetime
+    from onegov.form.models.definition import FormDefinition
+
+
+daterange = Column(  # type:ignore[call-overload]
+    quoted_name('DATERANGE("start", "end")', quote=False))
 
 
 class FormRegistrationWindow(Base, TimestampMixin):
@@ -37,31 +47,52 @@ class FormRegistrationWindow(Base, TimestampMixin):
     __tablename__ = 'registration_windows'
 
     #: the public id of the registraiton window
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: Column[uuid.UUID] = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the name of the form to which this registration window belongs
-    name = Column(Text, ForeignKey("forms.name"), nullable=False)
+    name: Column[str] = Column(
+        Text,
+        ForeignKey('forms.name'),
+        nullable=False
+    )
+
+    #: the form to which this registration window belongs
+    form: relationship[FormDefinition] = relationship(
+        'FormDefinition',
+        back_populates='registration_windows'
+    )
 
     #: true if the registration window is enabled
-    enabled = Column(Boolean, nullable=False, default=True)
+    enabled: Column[bool] = Column(Boolean, nullable=False, default=True)
 
     #: the start date of the window
-    start = Column(Date, nullable=False)
+    start: Column[date] = Column(Date, nullable=False)
 
     #: the end date of the window
-    end = Column(Date, nullable=False)
+    end: Column[date] = Column(Date, nullable=False)
 
     #: the timezone of the window
-    timezone = Column(Text, nullable=False, default='Europe/Zurich')
+    timezone: Column[str] = Column(
+        Text,
+        nullable=False,
+        default='Europe/Zurich'
+    )
 
     #: the number of spots (None => unlimited)
-    limit = Column(Integer, nullable=True)
+    limit: Column[int | None] = Column(Integer, nullable=True)
 
     #: enable an overflow of submissions
-    overflow = Column(Boolean, nullable=False, default=True)
+    overflow: Column[bool] = Column(Boolean, nullable=False, default=True)
 
-    #: submissions linked to this
-    submissions = relationship('FormSubmission', backref='registration_window')
+    #: submissions linked to this registration window
+    submissions: relationship[list[FormSubmission]] = relationship(
+        FormSubmission,
+        back_populates='registration_window'
+    )
 
     __table_args__ = (
 
@@ -88,7 +119,7 @@ class FormRegistrationWindow(Base, TimestampMixin):
     )
 
     @property
-    def localized_start(self):
+    def localized_start(self) -> datetime:
         return sedate.align_date_to_day(
             sedate.standardize_date(
                 sedate.as_datetime(self.start), self.timezone
@@ -96,14 +127,33 @@ class FormRegistrationWindow(Base, TimestampMixin):
         )
 
     @property
-    def localized_end(self):
+    def localized_end(self) -> datetime:
         return sedate.align_date_to_day(
             sedate.standardize_date(
                 sedate.as_datetime(self.end), self.timezone
             ), self.timezone, 'up'
         )
 
-    def accepts_submissions(self, required_spots=1):
+    def disassociate(self) -> None:
+        """ Disassociates all records linked to this window. """
+
+        for submission in self.submissions:
+            submission.disclaim()
+            submission.registration_window_id = None
+
+    @property
+    def in_the_future(self) -> bool:
+        return sedate.utcnow() <= self.localized_start
+
+    @property
+    def in_the_past(self) -> bool:
+        return self.localized_end <= sedate.utcnow()
+
+    @property
+    def in_the_present(self) -> bool:
+        return self.localized_start <= sedate.utcnow() <= self.localized_end
+
+    def accepts_submissions(self, required_spots: int = 1) -> bool:
         assert required_spots > 0
 
         if not self.enabled:
@@ -120,32 +170,45 @@ class FormRegistrationWindow(Base, TimestampMixin):
 
         return self.available_spots >= required_spots
 
-    def disassociate(self):
-        """ Disassociates all records linked to this window. """
+    @property
+    def next_submission(self) -> FormSubmission | None:
+        """ Returns the submission next in line. In other words, the next
+        submission in order of first come, first serve.
 
-        for submission in self.submissions:
-            submission.disclaim()
-            submission.registration_window_id = None
+        """
+
+        q = object_session(self).query(FormSubmission)
+        q = q.filter(FormSubmission.registration_window_id == self.id)
+        q = q.filter(FormSubmission.state == 'complete')
+        q = q.filter(or_(
+            FormSubmission.claimed == None,
+            and_(
+                FormSubmission.claimed > 0,
+                FormSubmission.claimed < FormSubmission.spots,
+            )
+        ))
+        q = q.order_by(FormSubmission.created)
+
+        return q.first()
 
     @property
-    def available_spots(self):
+    def available_spots(self) -> int:
+        assert self.limit is not None
         return max(self.limit - self.claimed_spots - self.requested_spots, 0)
 
     @property
-    def claimed_spots(self):
+    def claimed_spots(self) -> int:
         """ Returns the number of actually claimed spots. """
 
         return object_session(self).execute(text("""
-            SELECT SUM(
-                COALESCE(claimed, 0)
-            )
+            SELECT SUM(COALESCE(claimed, 0))
             FROM submissions
             WHERE registration_window_id = :id
             AND submissions.state = 'complete'
         """), {'id': self.id}).scalar() or 0
 
     @property
-    def requested_spots(self):
+    def requested_spots(self) -> int:
         """ Returns the number of requested spots.
 
         When the claim has not been made yet, `spots` are counted as
@@ -167,36 +230,3 @@ class FormRegistrationWindow(Base, TimestampMixin):
             WHERE registration_window_id = :id
             AND submissions.state = 'complete'
         """), {'id': self.id}).scalar() or 0
-
-    @property
-    def next_submission(self):
-        """ Returns the submission next in line. In other words, the next
-        submission in order of first come, first serve.
-
-        """
-
-        q = object_session(self).query(FormSubmission)
-        q = q.filter(FormSubmission.registration_window_id == self.id)
-        q = q.filter(FormSubmission.state == 'complete')
-        q = q.filter(or_(
-            FormSubmission.claimed == None,
-            and_(
-                FormSubmission.claimed > 0,
-                FormSubmission.claimed < FormSubmission.spots,
-            )
-        ))
-        q = q.order_by(FormSubmission.created)
-
-        return q.first()
-
-    @property
-    def in_the_future(self):
-        return sedate.utcnow() <= self.localized_start
-
-    @property
-    def in_the_past(self):
-        return self.localized_end <= sedate.utcnow()
-
-    @property
-    def in_the_present(self):
-        return self.localized_start <= sedate.utcnow() <= self.localized_end

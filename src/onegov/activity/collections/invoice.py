@@ -1,34 +1,60 @@
-from cached_property import cached_property
-from decimal import Decimal
-from onegov.activity.models import Invoice, InvoiceItem
-from onegov.activity.models.invoice import sync_invoice_items
-from onegov.activity.models.invoice_reference import KNOWN_SCHEMAS
-from onegov.core.collection import GenericCollection
-from sqlalchemy import func, and_, not_
-from sqlalchemy.orm import joinedload
+from __future__ import annotations
+
+from functools import cached_property
+from onegov.activity.models import BookingPeriodInvoice, ActivityInvoiceItem
+from onegov.pay.collections import InvoiceCollection
+from onegov.pay.models.invoice_reference import KNOWN_SCHEMAS, Schema
+from sqlalchemy import func
 from onegov.user import User
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 
-class InvoiceCollection(GenericCollection):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from sqlalchemy.orm import Query, Session
+    from typing import Self
 
-    def __init__(self, session, period_id=None, user_id=None,
-                 schema='feriennet-v1', schema_config=None):
-        super().__init__(session)
+
+class BookingPeriodInvoiceCollection(
+    InvoiceCollection[BookingPeriodInvoice, ActivityInvoiceItem]
+):
+
+    def __init__(
+        self,
+        session: Session,
+        period_id: UUID | None = None,
+        user_id: UUID | None = None,
+        schema: str = 'feriennet-v1',
+        schema_config: dict[str, Any] | None = None
+    ) -> None:
+
+        super().__init__(session, type='booking_period', item_type='activity')
         self.user_id = user_id
         self.period_id = period_id
 
         if schema not in KNOWN_SCHEMAS:
-            raise RuntimeError("Unknown schema: {schema}")
+            raise RuntimeError(f'Unknown schema: {schema}')
 
         self.schema_name = schema
         self.schema_config = (schema_config or {})
 
+    @property
+    def model_class(self) -> type[BookingPeriodInvoice]:
+        return BookingPeriodInvoice
+
+    @property
+    def item_model_class(self) -> type[ActivityInvoiceItem]:
+        return ActivityInvoiceItem
+
     @cached_property
-    def schema(self):
+    def schema(self) -> Schema:
         return KNOWN_SCHEMAS[self.schema_name](**self.schema_config)
 
-    def query(self, ignore_period_id=False):
+    def query(
+        self,
+        ignore_period_id: bool = False
+    ) -> Query[BookingPeriodInvoice]:
         q = super().query()
 
         if self.user_id:
@@ -39,94 +65,74 @@ class InvoiceCollection(GenericCollection):
 
         return q
 
-    def query_items(self):
-        return self.session.query(InvoiceItem)\
-            .filter(InvoiceItem.invoice_id.in_(
-                self.query().with_entities(Invoice.id).subquery()
-            ))
-
-    def for_user_id(self, user_id):
+    def for_user_id(self, user_id: UUID | None) -> Self:
         return self.__class__(self.session, self.period_id, user_id,
                               self.schema_name, self.schema_config)
 
-    def for_period_id(self, period_id):
+    def for_period_id(self, period_id: UUID | None) -> Self:
         return self.__class__(self.session, period_id, self.user_id,
                               self.schema_name, self.schema_config)
 
-    def for_schema(self, schema, schema_config=None):
+    def for_schema(
+        self,
+        schema: str,
+        schema_config: dict[str, Any] | None = None
+    ) -> Self:
         return self.__class__(self.session, self.period_id, self.user_id,
                               schema, schema_config)
 
+    def update_attendee_name(
+        self,
+        attendee_id: UUID,
+        attendee_name: str
+    ) -> None:
+
+        invoice_items = self.query_items()
+
+        for item in invoice_items:
+            if item.attendee_id == attendee_id:
+                item.group = attendee_name
+
     @cached_property
-    def invoice(self):
+    def invoice(self) -> str | None:
         # XXX used for compatibility with legacy implementation in Feriennet
         return self.period_id and self.period_id.hex or None
 
     @cached_property
-    def username(self):
+    def username(self) -> str | None:
         # XXX used for compatibility with legacy implementation in Feriennet
         if self.user_id:
-            user = self.session.query(User)\
-                .with_entities(User.username)\
-                .filter_by(id=self.user_id)\
-                .first()
+            user = self.session.query(User).with_entities(
+                User.username
+            ).filter_by(id=self.user_id).first()
 
             return user and user.username or None
+        return None
 
-    @property
-    def model_class(self):
-        return Invoice
+    def unpaid_count(
+        self,
+        excluded_period_ids: Collection[UUID] | None = None
+    ) -> int:
 
-    def _invoice_ids(self):
-        return self.query().with_entities(Invoice.id).subquery()
-
-    def _sum(self, condition):
-        q = self.session.query(func.sum(InvoiceItem.amount).label('amount'))
-        q = q.filter(condition)
-
-        return Decimal(q.scalar() or 0.0)
-
-    @property
-    def total_amount(self):
-        return self._sum(InvoiceItem.invoice_id.in_(self._invoice_ids()))
-
-    @property
-    def outstanding_amount(self):
-        return self._sum(and_(
-            InvoiceItem.invoice_id.in_(self._invoice_ids()),
-            InvoiceItem.paid == False
-        ))
-
-    @property
-    def paid_amount(self):
-        return self._sum(and_(
-            InvoiceItem.invoice_id.in_(self._invoice_ids()),
-            InvoiceItem.paid == True
-        ))
-
-    def unpaid_count(self, excluded_period_ids=None):
-        q = self.query().with_entities(func.count(Invoice.id))
+        q = self.query().with_entities(func.count(BookingPeriodInvoice.id))
 
         if excluded_period_ids:
-            q = q.filter(not_(Invoice.period_id.in_(excluded_period_ids)))
+            q = q.filter(
+                BookingPeriodInvoice.period_id.notin_(excluded_period_ids))
 
-        q = q.filter(Invoice.paid == False)
+        q = q.filter(BookingPeriodInvoice.paid == False)
 
         return q.scalar() or 0
 
-    def sync(self):
-        items = self.session.query(InvoiceItem).filter(and_(
-            InvoiceItem.source != None,
-            InvoiceItem.source != 'xml',
-            InvoiceItem.invoice_id.in_(
-                self.query().with_entities(Invoice.id).subquery()
-            )
-        )).options(joinedload(InvoiceItem.payments))
+    def add(  # type:ignore[override]
+        self,
+        period_id: UUID | None = None,
+        user_id: UUID | None = None,
+        flush: bool = True,
+        optimistic: bool = False
+    ) -> BookingPeriodInvoice:
 
-        sync_invoice_items(items, capture=False)
-
-    def add(self, period_id=None, user_id=None, flush=True, optimistic=False):
-        invoice = Invoice(
+        invoice = BookingPeriodInvoice(  # type: ignore[misc]
             id=uuid4(),
             period_id=period_id or self.period_id,
             user_id=user_id or self.user_id)

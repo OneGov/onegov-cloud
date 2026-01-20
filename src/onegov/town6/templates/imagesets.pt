@@ -5,11 +5,25 @@
     <tal:b metal:fill-slot="content">
         <p tal:condition="not:imagesets" i18n:translate="">No photo albums defined yet.</p>
 
-        <ul tal:condition="imagesets" class="with-lead">
-            <li tal:repeat="imageset imagesets">
-                <a class="list-title h5" tal:attributes="href request.link(imageset)">${imageset.title}</a><metal:hint use-macro="layout.macros['access_hint']" tal:define="item imageset" />
-                <div class="list-lead">${imageset.meta.get('lead')}</div>
-            </li>
-        </ul>
+        <div tal:condition="imagesets" class="with-lead grid-x grid-padding-x columns small-up-1 medium-up-2 large-up-3 subpage-cards">
+            <div class="cell" tal:repeat="imageset imagesets">
+                <a tal:attributes="href request.link(imageset)">
+                    <div class="card">
+                        <div class="grid-x columns small-up-2 image-card-grid">
+                            <tal:b tal:repeat="image imageset.ordered_files">
+                                <div tal:condition="repeat.image.number <= 4" class="cell">
+                                    <img src="${request.link(image)}" alt="${image.note}" width="${image.reference.size[0]}" height="${image.reference.size[1]}" />
+                                </div>
+                            </tal:b>
+                        </div>
+                        <div class="card-section">
+                            <h5>${imageset.title}</h5><metal:hint use-macro="layout.macros['access_hint']" tal:define="item imageset" />
+                            <div class="imageset-date">${layout.format_date(imageset.created, 'date')}</div>
+                            <div class="list-lead">${imageset.meta.get('lead')}</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
     </tal:b>
 </div>

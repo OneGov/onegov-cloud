@@ -1,13 +1,25 @@
+from __future__ import annotations
+
 import isodate
 import pycurl
 import sedate
 
-from cached_property import cached_property
 from datetime import datetime, timedelta
+from dogpile.cache.api import NO_VALUE
+from functools import cached_property
 from io import BytesIO
 from onegov.core.custom import json
+from operator import attrgetter
 from pathlib import Path
 from purl import URL
+from sedate import utcnow
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
+    from onegov.core.cache import RedisCacheRegion
+    from typing import Self
 
 
 class RoadworkError(Exception):
@@ -36,30 +48,36 @@ class RoadworkConfig:
 
     """
 
-    def __init__(self, hostname, endpoint, username, password):
+    def __init__(
+        self,
+        hostname: str | None,
+        endpoint: str | None,
+        username: str | None,
+        password: str | None
+    ) -> None:
         self.hostname = hostname
         self.endpoint = endpoint
         self.username = username
         self.password = password
 
     @classmethod
-    def lookup_paths(self):
+    def lookup_paths(cls) -> Iterator[Path]:
         yield Path('~/.pdb.secret').expanduser()
         yield Path('/etc/pdb.secret')
 
     @classmethod
-    def lookup(cls):
+    def lookup(cls) -> Self:
         for path in cls.lookup_paths():
             if path.exists():
                 return cls(**cls.parse(path))
 
         paths = ', '.join(str(p) for p in cls.lookup_paths())
         raise RoadworkError(
-            f"No pdb configuration found in {paths}")
+            f'No pdb configuration found in {paths}')
 
     @classmethod
-    def parse(cls, path):
-        result = {
+    def parse(cls, path: Path) -> dict[str, str | None]:
+        result: dict[str, str | None] = {
             'hostname': None,
             'endpoint': None,
             'username': None,
@@ -101,7 +119,14 @@ class RoadworkClient:
 
     """
 
-    def __init__(self, cache, hostname, username, password, endpoint=None):
+    def __init__(
+        self,
+        cache: RedisCacheRegion,
+        hostname: str,
+        username: str,
+        password: str,
+        endpoint: str | None = None
+    ) -> None:
         self.cache = cache
         self.hostname = hostname
         self.username = username
@@ -109,11 +134,12 @@ class RoadworkClient:
         self.endpoint = endpoint or hostname
 
     @cached_property
-    def curl(self):
+    def curl(self) -> pycurl.Curl:
         curl = pycurl.Curl()
         curl.setopt(pycurl.HTTPAUTH, pycurl.HTTPAUTH_NTLM)
-        curl.setopt(pycurl.USERPWD, f"{self.username}:{self.password}")
+        curl.setopt(pycurl.USERPWD, f'{self.username}:{self.password}')
         curl.setopt(pycurl.HTTPHEADER, [f'HOST: {self.hostname}'])
+        curl.setopt(pycurl.VERBOSE, True)
         # This is is not really a good idea as it disables TLS certificate
         # validation!
         curl.setopt(pycurl.SSL_VERIFYPEER, 0)
@@ -121,10 +147,15 @@ class RoadworkClient:
 
         return curl
 
-    def url(self, path):
+    def url(self, path: str) -> str:
         return f'https://{self.endpoint}/{path}'
 
-    def get(self, path, lifetime=5 * 60, downtime=60 * 60):
+    def get(
+        self,
+        path: str,
+        lifetime: float = 5 * 60,
+        downtime: float = 60 * 60
+    ) -> Any:
         """ Requests the given path, returning the resulting json if
         successful.
 
@@ -145,32 +176,32 @@ class RoadworkClient:
 
         """
         path = path.lstrip('/')
-
         cached = self.cache.get(path)
 
-        def refresh():
+        def refresh() -> Any:
             try:
                 status, body = self.get_uncached(path)
-            except pycurl.error:
+            except pycurl.error as exception:
                 raise RoadworkConnectionError(
-                    f"Could not connect to {self.hostname}")
+                    f'Could not connect to {self.hostname}'
+                ) from exception
 
             if status == 200:
                 self.cache.set(path, {
-                    'created': datetime.utcnow(),
+                    'created': utcnow(),
                     'status': status,
                     'body': body
                 })
 
                 return body
 
-            raise RoadworkError(f"{path} returned {status}")
+            raise RoadworkError(f'{path} returned {status}')
 
         # no cache yet, return result and cache it
-        if not cached:
+        if cached is NO_VALUE:
             return refresh()
 
-        now = datetime.utcnow()
+        now = utcnow()
         lifetime_horizon = cached['created'] + timedelta(seconds=lifetime)
         downtime_horizon = cached['created'] + timedelta(seconds=downtime)
 
@@ -189,7 +220,7 @@ class RoadworkClient:
         # outside the downtime lifetime, force refresh and raise errors
         return refresh()
 
-    def get_uncached(self, path):
+    def get_uncached(self, path: str) -> tuple[int, Any]:
         body = BytesIO()
 
         self.curl.setopt(pycurl.URL, self.url(path))
@@ -197,20 +228,25 @@ class RoadworkClient:
         self.curl.perform()
 
         status = self.curl.getinfo(pycurl.RESPONSE_CODE)
-        body = body.getvalue().decode('utf-8')
+        body_str = body.getvalue().decode('utf-8')
 
         if status == 200:
-            body = json.loads(body)
+            return status, json.loads(body_str)
 
-        return status, body
+        return status, body_str
 
-    def is_cacheable(self, response):
+    def is_cacheable(self, response: tuple[int, Any]) -> bool:
         return response[0] == 200
 
 
 class RoadworkCollection:
 
-    def __init__(self, client, letter=None, query=None):
+    def __init__(
+        self,
+        client: RoadworkClient,
+        letter: str | None = None,
+        query: str | None = None
+    ) -> None:
         self.client = client
         self.query = None
         self.letter = None
@@ -222,35 +258,30 @@ class RoadworkCollection:
             self.letter = letter.lower()
 
     @property
-    def letters(self):
-        letters = set()
+    def letters(self) -> list[str]:
+        return sorted({
+            letter
+            for roadwork in self.by_letter(None).roadwork
+            for letter in roadwork.letters
+        })
 
-        for roadwork in self.by_letter(None).roadwork:
-            for letter in roadwork.letters:
-                letters.add(letter)
-
-        letters = list(letters)
-        letters.sort()
-
-        return letters
-
-    def by_filter(self, filter):
+    def by_filter(self, filter: str) -> list[Roadwork]:
 
         # note: addGisLink doesn't work here
-        url = URL('odata/Baustellen')\
-            .query_param('addGisLink', 'False')\
+        url = (
+            URL('odata/Baustellen')
+            .query_param('addGisLink', 'False')
             .query_param('$filter', filter)
+        )
 
         records = self.client.get(url.as_string()).get('value', ())
-        records = (r for r in records if r['Internet'])
-
-        work = [Roadwork(r) for r in records]
-        work.sort(key=lambda r: r.title)
-
-        return work
+        return sorted((
+            Roadwork(r) for r in records
+            if r['Internet']
+        ), key=attrgetter('title'))
 
     @property
-    def roadwork(self):
+    def roadwork(self) -> list[Roadwork]:
         date = datetime.today()
 
         roadwork = self.by_filter(filter=' and '.join((
@@ -275,9 +306,10 @@ class RoadworkCollection:
 
         return roadwork
 
-    def by_id(self, id):
-        url = URL(f'odata/Baustellen({int(id)})')\
-            .query_param('addGisLink', 'True')
+    def by_id(self, id: int) -> Roadwork | None:
+        url = (
+            URL(f'odata/Baustellen({id})')
+            .query_param('addGisLink', 'True'))
 
         work = tuple(
             Roadwork(r) for r in self.client.get(
@@ -292,14 +324,17 @@ class RoadworkCollection:
             for section in r.sections:
                 if section.id == id:
                     return section
+        return None
 
-    def by_letter(self, letter):
+    def by_letter(self, letter: str | None) -> Self:
         return self.__class__(self.client, letter=letter, query=None)
 
 
 class Roadwork:
 
-    def __init__(self, data):
+    convertors: dict[str, Callable[[str | None], Any]]
+
+    def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
 
         self.convertors = {
@@ -308,20 +343,19 @@ class Roadwork:
         }
 
     @property
-    def id(self):
+    def id(self) -> int:
         return self['Id']
 
     @property
-    def letters(self):
+    def letters(self) -> Iterator[str]:
         for key in ('ProjektBezeichnung', 'ProjektBereich'):
-            if self[key]:
-                letter = self[key][0].lower()
-
-                if letter in ('abcdefghijklmnopqrstuvwxyz'):
+            if value := self[key]:
+                letter = value[0].lower()
+                if 97 <= ord(letter) <= 122:
                     yield letter
 
     @property
-    def title(self):
+    def title(self) -> str:
         parts = (self[key] for key in ('ProjektBezeichnung', 'ProjektBereich'))
         parts = (p.strip() for p in parts if p)
         parts = (p for p in parts)
@@ -329,7 +363,7 @@ class Roadwork:
         return ' '.join(parts)
 
     @property
-    def sections(self):
+    def sections(self) -> list[Self]:
         now = sedate.utcnow()
 
         sections = (
@@ -346,7 +380,7 @@ class Roadwork:
 
         return list(sections)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         value = self.data[key]
 
         if key in self.convertors:
@@ -354,5 +388,5 @@ class Roadwork:
 
         return value
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         return key in self.data

@@ -1,30 +1,37 @@
+from __future__ import annotations
+
 from datetime import date
-from onegov.ballot.models import Ballot
-from onegov.ballot.models import BallotResult
-from onegov.ballot.models import Election
-from onegov.ballot.models import ElectionCompound
-from onegov.ballot.models import ElectionResult
-from onegov.ballot.models import ProporzElection
-from onegov.ballot.models import Vote
+from freezegun import freeze_time
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_archived_result_collection(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_archived_result_collection(session: Session) -> None:
     archive = ArchivedResultCollection(session)
 
-    assert archive.for_date(2015).date == 2015
+    assert archive.for_date(2015).date == 2015  # type: ignore
     assert archive.for_date('2015').date == '2015'
     assert archive.for_date('2015-01-01').date == '2015-01-01'
 
     assert archive.get_years() == []
-    assert archive.latest() == ([], None)
-    assert archive.for_date(2015).by_date() == ([], None)
+    assert archive.current() == ([], None)
+    assert archive.for_date(2015).by_date() == ([], None)  # type: ignore[arg-type]
     assert archive.for_date('2015').by_date() == ([], None)
     assert archive.for_date('2015-01-01').by_date() == ([], None)
-    assert archive.for_date(2015).by_year(2015) == ([], None)
-    assert archive.for_date('2015').by_year('2015') == ([], None)
+    assert archive.for_date(2015).by_year(2015) == ([], None)  # type: ignore[arg-type]
+    assert archive.for_date('2015').by_year('2015') == ([], None)  # type: ignore[arg-type]
 
     for year in (2009, 2011, 2014, 2016):
         session.add(
@@ -53,67 +60,74 @@ def test_archived_result_collection(session):
 
     session.flush()
 
-    archive.update_all(DummyRequest())
+    archive.update_all(DummyRequest())  # type: ignore[arg-type]
 
     assert archive.get_years() == [
         2016, 2015, 2014, 2012, 2011, 2009, 2008, 2007
     ]
 
-    for date_ in (2016, '2016', '2016-01-01'):
-        assert archive.latest() == archive.for_date(date_).by_date()
+    with freeze_time('2006-08-31'):
+        assert archive.current() == archive.for_date('2007').by_date()
+    with freeze_time('2007-01-01'):
+        assert archive.current() == archive.for_date('2007').by_date()
+    with freeze_time('2007-01-02'):
+        assert archive.current() == archive.for_date('2008').by_date()
+    with freeze_time('2016-08-31'):
+        for date_ in (2016, '2016', '2016-01-01'):
+            assert archive.current() == archive.for_date(date_).by_date()  # type: ignore[arg-type]
 
     assert archive.for_date('2016-02-02').by_date() == ([], None)
 
     for year in (2009, 2011, 2014, 2016):
-        item = session.query(ArchivedResult)
-        item = item.filter_by(date=date(year, 1, 1), type='election').one()
-        items, modified = archive.for_date(year).by_date()
+        query = session.query(ArchivedResult)
+        item = query.filter_by(date=date(year, 1, 1), type='election').one()
+        items, modified = archive.for_date(year).by_date()  # type: ignore[arg-type]
         assert item in items
         items, modified = archive.for_date(str(year)).by_date()
         assert item in items
         items, modified = archive.by_year(year)
         assert item in items
-        items, modified = archive.by_year(str(year))
+        items, modified = archive.by_year(str(year))  # type: ignore[arg-type]
         assert item in items
 
-        groups = archive.group_items(items, DummyRequest())
-        assert groups[date(year, 1, 1)]['federation']['election'] == [item]
+        groups = archive.group_items(items, DummyRequest())  # type: ignore[arg-type]
+        assert groups[date(year, 1, 1)]['federation']['election'] == [item]  # type: ignore[index]
 
     for year in (2008, 2012):
-        item = session.query(ArchivedResult)
-        item = item.filter_by(
+        query = session.query(ArchivedResult)
+        item = query.filter_by(
             date=date(year, 1, 1), type='election_compound'
         ).one()
-        items, modified = archive.for_date(year).by_date()
+        items, modified = archive.for_date(year).by_date()  # type: ignore[arg-type]
         assert item in items
         items, modified = archive.for_date(str(year)).by_date()
         assert item in items
         items, modified = archive.by_year(year)
         assert item in items
-        items, modified = archive.by_year(str(year))
+        items, modified = archive.by_year(str(year))  # type: ignore[arg-type]
         assert item in items
 
-        groups = archive.group_items(items, DummyRequest())
+        groups = archive.group_items(items, DummyRequest())  # type: ignore[arg-type]
         # compounds are grouped as elections!
-        assert groups[date(year, 1, 1)]['federation']['election'] == [item]
+        assert groups[date(year, 1, 1)]['federation']['election'] == [item]  # type: ignore[index]
 
     for year in (2007, 2011, 2015, 2016):
-        item = session.query(ArchivedResult)
-        item = item.filter_by(date=date(year, 1, 1), type='vote').one()
-        items, modified = archive.for_date(year).by_date()
+        query = session.query(ArchivedResult)
+        item = query.filter_by(date=date(year, 1, 1), type='vote').one()
+        items, modified = archive.for_date(year).by_date()  # type: ignore[arg-type]
         assert item in items
         items, modified = archive.for_date(str(year)).by_date()
         assert item in items
         items, modified = archive.by_year(year)
         assert item in items
-        items, modified = archive.by_year(str(year))
+        items, modified = archive.by_year(str(year))  # type: ignore[arg-type]
         assert item in items
 
-        groups = archive.group_items(items, DummyRequest())
-        assert groups[date(year, 1, 1)]['federation']['vote'] == [item]
+        groups = archive.group_items(items, DummyRequest())  # type: ignore[arg-type]
+        assert groups[date(year, 1, 1)]['federation']['vote'] == [item]  # type: ignore[index]
 
 
-def test_archived_result_collection_grouping(session):
+def test_archived_result_collection_grouping(session: Session) -> None:
     # Add a vote and election for each domain on two dates
     for domain in (
         'federation', 'canton', 'region', 'district', 'none', 'municipality'
@@ -160,13 +174,13 @@ def test_archived_result_collection_grouping(session):
         'district-election-1',
         'none-election-1',
         'municipality-election-1'
-    ]))
+    ])).all()
     session.add(compound)
     session.flush()
 
     # Get the results for a year
-    archive = ArchivedResultCollection(session).for_date(2017)
-    request = DummyRequest()
+    archive = ArchivedResultCollection(session).for_date('2017')
+    request: Any = DummyRequest()
     archive.update_all(request)
     items, last_modified = archive.by_date()
 
@@ -174,19 +188,21 @@ def test_archived_result_collection_grouping(session):
     request.app.principal.domain = 'canton'
     expected = ['federation', 'canton', 'region', 'municipality']
     grouped = archive.group_items(items, request)
-    assert list(grouped) == [date(2017, 2, 12), date(2017, 5, 21)]
+    assert grouped is not None
+    assert list(grouped) == [date(2017, 5, 21), date(2017, 2, 12)]
     assert all([list(group) == expected for group in grouped.values()])
-    assert len(grouped[date(2017, 2, 12)]['region']['vote']) == 3
     assert len(grouped[date(2017, 5, 21)]['region']['election']) == 3
+    assert len(grouped[date(2017, 2, 12)]['region']['vote']) == 3
 
     # Test grouping of a communal instance
     request.app.principal.domain = 'municipality'
     expected = ['municipality', 'federation', 'canton', 'region']
     grouped = archive.group_items(items, request)
-    assert list(grouped) == [date(2017, 2, 12), date(2017, 5, 21)]
-    assert all([list(group) == expected for group in grouped.values()])
-    assert len(grouped[date(2017, 2, 12)]['region']['vote']) == 3
+    assert grouped is not None
+    assert list(grouped) == [date(2017, 5, 21), date(2017, 2, 12)]
+    assert all(list(group) == expected for group in grouped.values())
     assert len(grouped[date(2017, 5, 21)]['region']['election']) == 3
+    assert len(grouped[date(2017, 2, 12)]['region']['vote']) == 3
 
     # Test grouping with compounds
     assert 'election' not in grouped[date(2017, 2, 12)]['municipality']
@@ -200,9 +216,9 @@ def test_archived_result_collection_grouping(session):
     assert 'election' in grouped[date(2017, 5, 21)]['region']
 
 
-def test_archived_result_collection_updates(session):
+def test_archived_result_collection_updates(session: Session) -> None:
     archive = ArchivedResultCollection(session)
-    request = DummyRequest()
+    request: Any = DummyRequest()
 
     # Add elections and votes
     elections = {
@@ -248,7 +264,7 @@ def test_archived_result_collection_updates(session):
     assert archive.get_years() == [2001]
     assert archive.query().count() == 3
 
-    ids = sorted([r.external_id for r in archive.query()])
+    ids = sorted(r.external_id for r in archive.query())  # type: ignore[type-var]
     assert ids == ['election-2001', 'elections-2001', 'vote-2001']
 
     # ... update the rest (2002) as well
@@ -257,7 +273,7 @@ def test_archived_result_collection_updates(session):
     assert archive.get_years() == [2002, 2001]
     assert archive.query().count() == 6
 
-    ids = sorted([r.external_id for r in archive.query()])
+    ids = sorted(r.external_id for r in archive.query())  # type: ignore[type-var]
     assert ids == [
         'election-2001', 'election-2002',
         'elections-2001', 'elections-2002',
@@ -274,7 +290,7 @@ def test_archived_result_collection_updates(session):
     assert archive.get_years() == [2003, 2002, 2001]
     assert archive.query().count() == 9
 
-    ids = sorted([r.external_id for r in archive.query()])
+    ids = sorted(r.external_id for r in archive.query())  # type: ignore[type-var]
     assert ids == [
         'election-2001', 'election-2002', 'election-2003',
         'elections-2001', 'elections-2002', 'elections-2003',
@@ -283,6 +299,7 @@ def test_archived_result_collection_updates(session):
 
     # Delete 2002
     archive.delete(elections[2002], request)
+    session.expire(election_compounds[2002])
     archive.delete(election_compounds[2002], request)
     archive.delete(votes[2002], request)
 
@@ -359,9 +376,9 @@ def test_archived_result_collection_updates(session):
         )
     )
     elections[2001].last_result_change = elections[2001].timestamp()
-    for association in elections[2001].associations:
-        association.election_compound.last_result_change = \
-            elections[2001].last_result_change
+    if elections[2001].election_compound:
+        elections[2001].election_compound.last_result_change = (
+            elections[2001].last_result_change)
     result = archive.update(elections[2001], request)
     assert result.last_result_change is not None
 
@@ -408,7 +425,6 @@ def test_archived_result_collection_updates(session):
     assert result.title_translations == {'de_CH': 'Vote'}
     assert result.external_id == 'vote-2001'
 
-    votes[2001].ballots.append(Ballot(type='proposal'))
     votes[2001].proposal.results.append(
         BallotResult(
             name='x', yeas=100, nays=0, counted=True, entity_id=1
@@ -441,3 +457,9 @@ def test_archived_result_collection_updates(session):
     assert old not in [r.url for r in archive.query()]
 
     assert archive.query().count() == 6
+
+    # Test update with official host
+    request.link = lambda x: 'http://wab-test.testing.ch/vote/2001'
+    request.app.principal.official_host = 'https://wab.govikon.ch'
+    result = archive.update(votes[2001], request)
+    assert result.url == 'https://wab.govikon.ch/vote/2001'

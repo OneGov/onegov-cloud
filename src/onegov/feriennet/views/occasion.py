@@ -1,9 +1,14 @@
+from __future__ import annotations
+
+from datetime import date
+from markupsafe import Markup
 from onegov.activity import AttendeeCollection
 from onegov.activity import Booking, BookingCollection
-from onegov.activity import InvoiceCollection
+from onegov.activity import BookingPeriodCollection
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.activity import Occasion, OccasionCollection, OccasionNeed
-from onegov.activity import PeriodCollection
 from onegov.core.security import Private, Personal, Public
+from onegov.core.templates import render_template
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections.billing import BookingInvoiceBridge
@@ -12,14 +17,22 @@ from onegov.feriennet.forms import OccasionForm
 from onegov.feriennet.forms import OccasionNeedForm
 from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
+from onegov.org.layout import DefaultMailLayout
 from onegov.user import User, UserCollection
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.feriennet.request import FeriennetRequest
+    from webob import Response
 
 
 @FeriennetApp.view(
     model=Occasion,
     permission=Public,
 )
-def view_occasion(self, request):
+def view_occasion(self: Occasion, request: FeriennetRequest) -> Response:
     return request.redirect(request.link(self.activity))
 
 
@@ -29,26 +42,35 @@ def view_occasion(self, request):
     form=OccasionForm,
     permission=Private,
     name='new-occasion')
-def new_occasion(self, request, form):
+def new_occasion(
+    self: VacationActivity,
+    request: FeriennetRequest,
+    form: OccasionForm
+) -> RenderData | Response:
 
     if form.submitted(request):
         occasions = OccasionCollection(request.session)
-        periods = PeriodCollection(request.session)
+        periods = BookingPeriodCollection(request.session)
+        period = periods.by_id(form.period_id.data)
+        assert period is not None
 
         form.populate_obj(occasions.add(
             activity=self,
             start=form.parsed_dates[0].start,
             end=form.parsed_dates[0].end,
             timezone=form.timezone,
-            period=periods.by_id(form.period_id.data)
+            period=period
         ))
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
+    layout = OccasionFormLayout(self, request, _('New Occasion'))
+    layout.edit_mode = True
+
     return {
-        'layout': OccasionFormLayout(self, request, _("New Occasion")),
-        'title': _("New Occasion"),
+        'layout': layout,
+        'title': _('New Occasion'),
         'form': form
     }
 
@@ -59,30 +81,38 @@ def new_occasion(self, request, form):
     form=OccasionForm,
     permission=Private,
     name='clone')
-def clone_occasion(self, request, form):
+def clone_occasion(
+    self: Occasion,
+    request: FeriennetRequest,
+    form: OccasionForm
+) -> RenderData | Response:
 
     if form.submitted(request):
         occasions = OccasionCollection(request.session)
-        periods = PeriodCollection(request.session)
+        periods = BookingPeriodCollection(request.session)
+        period = periods.by_id(form.period_id.data)
+        assert period is not None
 
         form.populate_obj(occasions.add(
             activity=self.activity,
             start=form.parsed_dates[0].start,
             end=form.parsed_dates[0].end,
             timezone=form.timezone,
-            period=periods.by_id(form.period_id.data)
+            period=period
         ))
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self.activity))
     elif not request.POST:
         form.process(obj=self)
         form.dates.data = form.dates_to_json(dates=None)
 
+    layout = OccasionFormLayout(self.activity, request, _('Clone Occasion'))
+    layout.edit_mode = True
+
     return {
-        'layout': OccasionFormLayout(
-            self.activity, request, _("Clone Occasion")),
-        'title': _("Clone Occasion"),
+        'layout': layout,
+        'title': _('Clone Occasion'),
         'form': form
     }
 
@@ -93,28 +123,34 @@ def clone_occasion(self, request, form):
     form=OccasionForm,
     permission=Private,
     name='edit')
-def edit_occasion(self, request, form):
+def edit_occasion(
+    self: Occasion,
+    request: FeriennetRequest,
+    form: OccasionForm
+) -> RenderData | Response:
 
     if self.period.confirmed:
         warning = _(
-            "The period of this occasion has already been confirmed. "
-            "It is not recommended to change the period associated with "
-            "this occasion."
+            'The period of this occasion has already been confirmed. '
+            'It is not recommended to change the period associated with '
+            'this occasion.'
         )
     else:
         warning = None
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self.activity))
 
     elif not request.POST:
         form.process(obj=self)
 
+    layout = OccasionFormLayout(self.activity, request, _('Edit Occasion'))
+    layout.edit_mode = True
+
     return {
-        'layout': OccasionFormLayout(
-            self.activity, request, _("Edit Occasion")),
-        'title': _("Edit Occasion"),
+        'layout': layout,
+        'title': _('Edit Occasion'),
         'form': form,
         'callout': warning
     }
@@ -124,7 +160,7 @@ def edit_occasion(self, request, form):
     model=Occasion,
     permission=Private,
     request_method='DELETE')
-def delete_occasion(self, request):
+def delete_occasion(self: Occasion, request: FeriennetRequest) -> None:
     request.assert_valid_csrf_token()
 
     OccasionCollection(request.session).delete(self)
@@ -135,7 +171,7 @@ def delete_occasion(self, request):
     permission=Private,
     request_method='POST',
     name='cancel')
-def cancel_occasion(self, request):
+def cancel_occasion(self: Occasion, request: FeriennetRequest) -> None:
     request.assert_valid_csrf_token()
 
     self.cancel()
@@ -146,7 +182,7 @@ def cancel_occasion(self, request):
     permission=Private,
     request_method='POST',
     name='reinstate')
-def reinstate_occasion(self, request):
+def reinstate_occasion(self: Occasion, request: FeriennetRequest) -> None:
     request.assert_valid_csrf_token()
 
     self.cancelled = False
@@ -158,13 +194,17 @@ def reinstate_occasion(self, request):
     permission=Personal,
     name='book',
     template='enroll_form.pt')
-def book_occasion(self, request, form):
+def book_occasion(
+    self: Occasion,
+    request: FeriennetRequest,
+    form: AttendeeSignupForm
+) -> RenderData | Response:
 
     # for the "nth. occasion" title
-    number = request.session.execute("""
+    number: int = request.session.execute("""
         SELECT count(*) FROM occasions
-        WHERE activity_id = :activity_id \
-          AND "order" <= :order \
+        WHERE activity_id = :activity_id
+          AND "order" <= :order
           AND "period_id" = :period_id
     """, {
         'activity_id': self.activity_id,
@@ -177,15 +217,29 @@ def book_occasion(self, request, form):
         user = form.user
 
         if form.is_new_attendee:
+            assert user is not None
+            assert form.birth_date.data is not None
             attendee = attendees.add(
                 user=user,
                 name=form.name,
                 birth_date=form.birth_date.data,
                 gender=form.gender.data,
-                notes=form.notes.data
+                notes=form.notes.data,
+                swisspass=form.swisspass.data if form.swisspass else None,
+                differing_address=form.differing_address.data,
+                address=form.address.data
+                if form.differing_address.data else None,
+                zip_code=form.zip_code.data
+                if form.differing_address.data else None,
+                place=form.place.data if form.differing_address.data else None,
+                political_municipality=form.political_municipality.data if
+                form.political_municipality and form.differing_address.data
+                else None
             )
         else:
-            attendee = attendees.by_id(form.attendee.data)
+            existing_attendee = attendees.by_id(form.attendee.data)
+            assert existing_attendee is not None
+            attendee = existing_attendee
             assert attendee.username == form.username
 
         # should be caught by the form
@@ -198,21 +252,25 @@ def book_occasion(self, request, form):
         booking = None
 
         if not form.is_new_attendee:
-            booking = bookings.query()\
-                .filter(Booking.occasion_id == self.id)\
-                .filter(Booking.username == user.username)\
-                .filter(Booking.attendee == attendee)\
+            assert user is not None
+            booking = (
+                bookings.query()
+                .filter(Booking.occasion_id == self.id)
+                .filter(Booking.username == user.username)
+                .filter(Booking.attendee == attendee)
                 .filter(Booking.state.in_((
                     'cancelled',
                     'denied',
                     'blocked',
-                )))\
+                )))
                 .first()
+            )
 
             if booking:
                 booking.state = 'open'
 
         if booking is None:
+            assert user is not None
             booking = bookings.add(
                 user=user,
                 attendee=attendee,
@@ -226,6 +284,7 @@ def book_occasion(self, request, form):
         # if the TOS have been accepted, record this now
         if hasattr(form, 'accept_tos') and form.accept_tos:
             if form.accept_tos.data:
+                assert request.current_user is not None
                 request.current_user.data['tos_accepted'] = True
 
         # to get the final cost, we need to accept bookings without wishlist
@@ -240,14 +299,48 @@ def book_occasion(self, request, form):
             bridge = BookingInvoiceBridge(request.session, self.period)
             bridge.process(booking)
             bridge.complete(
-                all_inclusive_booking_text=request.translate(_("Passport")))
+                all_inclusive_booking_text=request.translate(_('Passport')))
 
         if self.period.confirmed:
             request.success(
-                _("The booking for ${name} was succesfull", mapping={
+                _('The booking for ${name} was succesfull', mapping={
                     'name': attendee.name
                 })
             )
+
+            bookings_link = Markup('<a href="{}">{}</a>').format(
+                request.class_link(BookingCollection, {
+                    'period_id': self.period.id
+                }),
+                request.translate(_('Bookings'))
+            )
+
+            subject = request.translate(
+                _('Booking of ${attendee} for "${title}"',
+                    mapping={
+                        'title': self.activity.title,
+                        'attendee': attendee.name
+                    }))
+            if self.period.booking_start <= date.today():
+                assert user is not None
+                cancellation_conditions = Markup(request.app.org.meta.get(
+                    'cancellation_conditions', ''))  # nosec 704
+
+                request.app.send_transactional_email(
+                    subject=subject,
+                    receivers=(user.username, ),
+                    content=render_template(
+                        'mail_booking_accepted.pt', request, {
+                            'layout': DefaultMailLayout(self, request),
+                            'title': subject,
+                            'model': self,
+                            'bookings_link': bookings_link,
+                            'cancellation_conditions': cancellation_conditions,
+                            'name': attendee.name,
+                            'dates': self.dates
+                        }
+                    )
+                )
         else:
             request.success(
                 _("The occasion was added to ${name}'s wishlist", mapping={
@@ -255,16 +348,22 @@ def book_occasion(self, request, form):
                 }))
 
         if self.period.finalized:
-            return request.redirect(request.class_link(InvoiceCollection))
+            return request.redirect(
+                request.class_link(BookingPeriodInvoiceCollection)
+            )
         else:
             return request.redirect(request.link(self.activity))
 
     # pre select the attendee if given
     if 'attendee_id' in request.params:
-        form.attendee.data = request.params['attendee_id'].replace('-', '')
-        form.group_code.data = request.params.get('group_code')
+        attendee_id = request.params['attendee_id']
+        assert isinstance(attendee_id, str)
+        form.attendee.data = attendee_id.replace('-', '')
+        group_code = request.params.get('group_code')
+        assert group_code is None or isinstance(group_code, str)
+        form.group_code.data = group_code
 
-    title = _("Enroll Attendee")
+    title = _('Enroll Attendee')
 
     users = []
 
@@ -273,7 +372,7 @@ def book_occasion(self, request, form):
         u = u.with_entities(User.username, User.title)
         u = u.order_by(User.title)
 
-        users = u
+        users = u.all()
 
     return {
         'layout': OccasionFormLayout(self.activity, request, title),
@@ -281,7 +380,7 @@ def book_occasion(self, request, form):
         'form': form,
         'occasion': self,
         'users': users,
-        'button_text': _("Enroll"),
+        'button_text': _('Enroll'),
         'number': number,
     }
 
@@ -292,9 +391,14 @@ def book_occasion(self, request, form):
     form=OccasionNeedForm,
     template='form.pt',
     name='add-need')
-def handle_new_occasion_need(self, request, form):
+def handle_new_occasion_need(
+    self: Occasion,
+    request: FeriennetRequest,
+    form: OccasionNeedForm
+) -> RenderData | Response:
 
     if form.submitted(request):
+        assert form.name.data is not None
         self.needs.append(OccasionNeed(
             occasion_id=self.id,
             name=form.name.data,
@@ -303,13 +407,13 @@ def handle_new_occasion_need(self, request, form):
             accept_signups=form.accept_signups.data,
         ))
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     return {
         'layout': OccasionFormLayout(
-            self.activity, request, _("New need")),
-        'title': _("New need"),
+            self.activity, request, _('New need')),
+        'title': _('New need'),
         'form': form
     }
 
@@ -320,7 +424,11 @@ def handle_new_occasion_need(self, request, form):
     form=OccasionNeedForm,
     template='form.pt',
     name='edit')
-def handle_occasion_need(self, request, form):
+def handle_occasion_need(
+    self: OccasionNeed,
+    request: FeriennetRequest,
+    form: OccasionNeedForm
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -329,7 +437,7 @@ def handle_occasion_need(self, request, form):
         # not when we change something inside the list
         self.occasion.observe_needs(self.occasion.needs)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self.occasion))
 
     elif not request.POST:
@@ -337,7 +445,7 @@ def handle_occasion_need(self, request, form):
 
     return {
         'layout': OccasionFormLayout(
-            self.occasion.activity, request, _("Edit need")),
+            self.occasion.activity, request, _('Edit need')),
         'title': self.name,
         'form': form
     }
@@ -347,7 +455,11 @@ def handle_occasion_need(self, request, form):
     model=OccasionNeed,
     permission=Private,
     request_method='DELETE')
-def delete_occasion_need(self, request):
+def delete_occasion_need(
+    self: OccasionNeed,
+    request: FeriennetRequest
+) -> None:
+
     request.assert_valid_csrf_token()
 
     # Likewise, before flushing the changes, the needs observer is not

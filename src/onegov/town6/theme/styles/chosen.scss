@@ -1,18 +1,23 @@
 // Todo: Make the chosen select fields look like the others
+.field-type-chosenselectfield .chosen-select,
+.field-type-peoplefield .people-select {
+    display: none !important;
+}
+
 .chosen-container {
+    box-shadow: none !important;
     margin: 0 0 1rem;
+
+    .chosen-choices {
+        @include smooth-edges;
+        box-shadow: inset 0 1px 2px rgba(15,15,15,0.1);
+        padding: .4rem !important;
+    }
 }
 
 .chosen-single {
     background: $input-shadow !important;
-    //border: {
-    //    color: $input-border-color !important;
-    //    radius: 0 !important;
-    //    style: $input-border-style !important;
-    //    width: $input-border-width !important;
-    //}
     border: $input-border !important;
-    box-shadow: $input-shadow !important;
     color: $input-color  !important;
     font-family: $input-font-family !important;
     font-size: $input-font-size !important;
@@ -26,4 +31,3 @@
         font-size: $input-font-size !important;
     }
 }
-

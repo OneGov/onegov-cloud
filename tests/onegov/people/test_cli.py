@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from click.testing import CliRunner
 from onegov.people.cli import cli
 from onegov.people.models import Person
@@ -5,7 +7,17 @@ from pathlib import Path
 from transaction import commit
 
 
-def test_cli(cfg_path, session_manager, temporary_directory):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import SessionManager
+
+
+def test_cli(
+    cfg_path: str,
+    session_manager: SessionManager,
+    temporary_directory: str
+) -> None:
+
     runner = CliRunner()
 
     # Clear
@@ -43,8 +55,11 @@ def test_cli(cfg_path, session_manager, temporary_directory):
             profession='Former Major',
             political_party='Republican Party',
             parliamentary_group='Republicans',
+            organisation='Super Org',
+            sub_organisation='Sub Org',
             website='https://foo.bar',
-            address='Fakestreet 123, Govikon',
+            postal_address='Fakestreet 123',
+            postal_code_city='1234 Govikon',
             picture_url='https://foo.bar/hans-molman/portrait.png',
             notes='Almost entirely blind',
         )
@@ -105,8 +120,11 @@ def test_cli(cfg_path, session_manager, temporary_directory):
     assert person.profession == 'Former Major'
     assert person.political_party == 'Republican Party'
     assert person.parliamentary_group == 'Republicans'
+    assert person.organisation == 'Super Org'
+    assert person.sub_organisation == 'Sub Org'
     assert person.website == 'https://foo.bar'
-    assert person.address == 'Fakestreet 123, Govikon'
+    assert person.postal_address == 'Fakestreet 123'
+    assert person.postal_code_city == '1234 Govikon'
     assert person.picture_url == 'https://foo.bar/hans-molman/portrait.png'
     assert person.notes == 'Almost entirely blind'
 
@@ -123,8 +141,10 @@ def test_cli(cfg_path, session_manager, temporary_directory):
     assert person.profession == 'Teacher'
     assert person.political_party is None
     assert person.parliamentary_group is None
+    assert person.organisation is None
+    assert person.sub_organisation is None
     assert person.website is None
-    assert person.address is None
+    assert person.postal_address is None
     assert person.picture_url is None
     assert person.notes is None
 

@@ -1,11 +1,21 @@
+from __future__ import annotations
+
 from base64 import b64encode
 from io import StringIO
 from onegov.feriennet import log
+from onegov.feriennet.utils import NAME_SEPARATOR
 from qrbill.bill import QRBill, IBAN_ALLOWED_COUNTRIES, QR_IID
 from stdnum import iban
 
 
-def beneficiary_to_creditor(value):
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.activity.models import BookingPeriodInvoice
+    from onegov.feriennet.request import FeriennetRequest
+    from onegov.user import User
+
+
+def beneficiary_to_creditor(value: str | None) -> dict[str, str] | None:
     value = value or ''
     lines = [line.strip() for line in value.split(',') if line.strip()]
     if len(lines) == 3:
@@ -17,21 +27,31 @@ def beneficiary_to_creditor(value):
     return None
 
 
-def swiss_iban(value):
+def swiss_iban(value: str) -> bool:
     value = iban.validate(value)
     if value[:2] in IBAN_ALLOWED_COUNTRIES:
         return True
     return False
 
 
-def qr_iban(value):
+def qr_iban(value: str) -> bool:
     value = iban.validate(value)
     if QR_IID['start'] <= int(value[4:9]) <= QR_IID['end']:
         return True
     return False
 
 
-def generate_qr_bill(schema, request, user, invoice):
+SUPPORTED_LANGUAGES: dict[str | None, Literal['en', 'de', 'fr', 'it']] = {
+    'de_CH': 'de', 'fr_CH': 'fr', 'it_CH': 'it'
+}
+
+
+def generate_qr_bill(
+    schema: str,
+    request: FeriennetRequest,
+    user: User,
+    invoice: BookingPeriodInvoice
+) -> bytes | None:
     """ Generates a QR Bill and returns it as base64 encoded SVG. """
 
     # Check if enabled
@@ -48,9 +68,10 @@ def generate_qr_bill(schema, request, user, invoice):
     # Reference number
     invoice_bucket = request.app.invoice_bucket()
     reference_number = None
-    additional_information = None
+    additional_information = ''
     if schema == 'feriennet-v1':
-        additional_information = invoice.readable_by_bucket(invoice_bucket)
+        additional_information = (
+            invoice.readable_by_bucket(invoice_bucket) or '')
     else:
         if not qr_iban(account):
             return None
@@ -65,8 +86,9 @@ def generate_qr_bill(schema, request, user, invoice):
         return None
 
     # Debtor
-    debtor = {
-        'name': user.data.get('organisation') or user.realname,
+    realname = (user.realname or '').replace(NAME_SEPARATOR, ' ')
+    debtor: dict[str, str | None] = {
+        'name': user.data.get('organisation') or realname,
         'street': user.data.get('address', None),
         'pcode': user.data.get('zip_code', None),
         'city': user.data.get('place', None),
@@ -76,11 +98,11 @@ def generate_qr_bill(schema, request, user, invoice):
         return None
     if debtor['street'] and len(debtor['street']) > 70:
         debtor['street'] = debtor['street'][:70]
+    if debtor['pcode'] and len(debtor['pcode']) > 16:
+        debtor['pcode'] = debtor['pcode'][:16]
 
     # Language
-    language = {'de_CH': 'de', 'fr_CH': 'fr', 'it_CH': 'it'}.get(
-        request.locale, 'en'
-    )
+    language = SUPPORTED_LANGUAGES.get(request.locale, 'en')
 
     # Create bill
     try:
@@ -100,8 +122,6 @@ def generate_qr_bill(schema, request, user, invoice):
     # Save as SVG
     svg = StringIO()
     bill.as_svg(svg)
-    svg.seek(0)
-    svg = svg.read()
 
     # Encode
-    return b64encode(svg.encode('utf-8'))
+    return b64encode(svg.getvalue().encode('utf-8'))

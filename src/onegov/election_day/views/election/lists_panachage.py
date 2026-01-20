@@ -1,18 +1,30 @@
-from onegov.ballot import Election
-from onegov.core.security import Public
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_lists_panachage_data
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
 
 
 @ElectionDayApp.json(
     model=Election,
     name='lists-panachage-data',
-    permission=Public
+    permission=MaybePublic
 )
-def view_election_lists_panachage_data(self, request):
-
+def view_election_lists_panachage_data(
+    self: Election,
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" View the panachage data as JSON. Used to for the panachage sankey
     chart.
 
@@ -25,14 +37,16 @@ def view_election_lists_panachage_data(self, request):
     model=Election,
     name='lists-panachage-chart',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
-def view_election_lists_panachage_chart(self, request):
-
+def view_election_lists_panachage_chart(
+    self: Election,
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the panachage data as sankey chart. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -46,10 +60,12 @@ def view_election_lists_panachage_chart(self, request):
     model=Election,
     name='lists-panachage',
     template='election/lists_panachage.pt',
-    permission=Public
+    permission=MaybePublic
 )
-def view_election_lists_panachage(self, request):
-
+def view_election_lists_panachage(
+    self: Election,
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
     layout = ElectionLayout(self, request, 'lists-panachage')
@@ -60,9 +76,15 @@ def view_election_lists_panachage(self, request):
     }
 
 
-@ElectionDayApp.svg_file(model=Election, name='lists-panachage-svg')
-def view_election_lists_panachage_svg(self, request):
-
+@ElectionDayApp.svg_file(
+    model=Election,
+    name='lists-panachage-svg',
+    permission=MaybePublic
+)
+def view_election_lists_panachage_svg(
+    self: Election,
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the panachage as SVG. """
 
     layout = ElectionLayout(self, request, 'lists-panachage')

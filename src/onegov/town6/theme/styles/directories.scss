@@ -3,7 +3,7 @@
 */
 
 .directories-map {
-    height: $full-width-banner-height;
+    border-radius: .7rem;
     margin-bottom: 1.4rem;
 }
 
@@ -11,43 +11,20 @@
     Directory thumbnails
 */
 .with-thumbnails {
-    list-style-type: none;
-    
-    .list-lead {
-        max-width: 90%;
-    }
+    li:not(.medium-6) {
+        border-top: 1px solid $vapor;
+        padding: 1rem .5rem;
 
-    li {
-        display: flex;
-
-        .thumbnail {
-            border-radius: 5px;
-            box-shadow: none;
-            flex: 2;
-            margin-right: 1rem;
-            overflow: hidden;
-            position: relative;
-
-            & + div {
-                flex: 10;
-            }
-
-            img {
-                border-radius: 5px;
-                max-height: 150px;
-                object-fit: cover;
-                vertical-align: top;
-                width: 100%;
-            }
+        a.list-link {
+            border-top: 0;
+            height: 100%;
         }
     }
 }
 
 .directories-list {
-
     .card-section a {
         display: block;
-        font-weight: bold;
     }
 
     .card-section small {
@@ -58,7 +35,6 @@
 .publication-nav {
 
     display: flex;
-    justify-content: flex-end;
 
     .dropdown-pane {
         max-width: 20ex;
@@ -70,6 +46,7 @@
 
         li:hover {
             @include primary-color-background;
+            @include smooth-edges;
             a { color: $white; }
         }
 
@@ -77,5 +54,26 @@
             font-size: .875rem;
             padding: .5rem;
         }
+    }
+}
+
+.further-information {
+    margin-bottom: 4rem;
+}
+
+.directory-list {
+    margin-bottom: 4rem;
+
+    .learn-more {
+        display: block;
+        text-align: center;
+        width: 100%;
+    }
+}
+
+#directory-lead {
+    margin-bottom: 2rem;
+    @media #{$medium-up} {
+        margin-bottom: 4rem;
     }
 }

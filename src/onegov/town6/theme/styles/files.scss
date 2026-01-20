@@ -29,7 +29,7 @@ $pdf-preview-max-width: 256px;
 /*
     Files list
 */
-.files {
+section#content .files {
     // used for better performance
     table-layout: fixed;
     width: 100%;
@@ -59,16 +59,16 @@ $pdf-preview-max-width: 256px;
         }
 
         &:nth-child(3) {
-            width: 5%;
+            width: 10%;
         }
 
         &:nth-child(4) {
             width: 15%;
         }
-    }
 
-    th:last-child {
-        text-align: right;
+        &:nth-child(5) {
+            width: 15%;
+        }
     }
 
     th span {
@@ -81,6 +81,8 @@ $pdf-preview-max-width: 256px;
     }
 
     tr.file-info {
+        border-bottom: .5rem solid $white;
+
         td:nth-child(1) {
             overflow: hidden;
             text-overflow: ellipsis;
@@ -107,12 +109,18 @@ $pdf-preview-max-width: 256px;
             display: inline;
             font-size: 90%;
             margin-left: .2em;
-
         }
 
         td:nth-child(4) {
-            text-align: right;
             white-space: nowrap;
+        }
+
+        td:nth-child(5) {
+            white-space: nowrap;
+        }
+
+        a[id^="button"] {
+            cursor: pointer;
         }
     }
 
@@ -144,9 +152,9 @@ $pdf-preview-max-width: 256px;
 }
 
 .file-actions {
-
     display: flex;
     flex-direction: column;
+    text-wrap: nowrap;
 
     a {
         margin-bottom: .5rem;
@@ -158,6 +166,7 @@ $pdf-preview-max-width: 256px;
 */
 
 .file-status {
+    margin: 0 0.6rem 0 0.6rem;
     flex-grow: 1;
 
     h3 {
@@ -172,7 +181,8 @@ $pdf-preview-max-width: 256px;
 .file-status-tag {
     font-size: .875rem;
     line-height: 1rem;
-    margin: .3rem 2rem .75rem 0;
+    margin: .3rem 1rem .75rem 0;
+    text-wrap: nowrap;
 
     .alert-box {
         margin-bottom: .5rem;

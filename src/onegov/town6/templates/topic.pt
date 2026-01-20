@@ -1,5 +1,13 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
-    <tal:b metal:fill-slot="title">
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6" tal:define="header layout.org.theme_options.get('page-image-position', False) == 'header' and page.show_page_image and (page.page_image or layout.org.meta.get('standard_image', False))">
+    <tal:b metal:fill-slot="header-image" tal:condition="header">
+        <div tal:condition="header" class="page-image" style="background-image: url(${page.page_image if (page.show_page_image and page.page_image) else layout.org.meta.get('standard_image', None)}); background-size: cover; padding-bottom: 30%;"></div>
+    </tal:b>
+    <tal:b tal:condition="header" metal:fill-slot="hi-title">
+        <h1 class="main-title with-header-image">
+            ${title}
+        </h1>
+    </tal:b>
+    <tal:b tal:condition="not header" metal:fill-slot="title">
         ${title}
     </tal:b>
 
@@ -10,14 +18,25 @@
 
         <tal:b condition="page.trait == 'page'">
 
+
             <tal:b metal:use-macro="layout.macros.page_content"
-             tal:define="lead layout.linkify(page.content.get('lead'));text page.content.get('text'); people page.people; contact layout.contact_html; coordinates page.coordinates">
+                     tal:define="lead layout.linkify(page.content.get('lead'));text page.text|None; people page.people; contact layout.contact_html; coordinates page.coordinates; files page.files; sidepanel_links page.sidepanel_links;">
                 <tal:b metal:fill-slot="after-text">
-                    <ul class="more-list page-links limit-line-width">
-                        <li tal:repeat="(lead, title, link, url, edit_link) children">
-                            <a href="${url}">${title}</a>
-                            <div class="list-lead" tal:condition="lead">${lead}</div>
-                            <a tal:condition="edit_link" class="edit-link" href="${edit_link}"><i class="far fa-edit"></i></a>
+                    <ul class="more-list page-links grid-x grid-padding-x">
+                        <li tal:repeat="(lead, title, link, url, edit_link, page_image, show_preview_image) children" class="small-12 ${'medium-6' if children_images else ''} cell" >
+                            <a href="${url}" class="list-link">
+                                <div class="page-image" tal:condition="children_images" style="background-image: url(${page_image if (show_preview_image and page_image) else layout.org.meta.get('standard_image', None)}); background-size: cover;"></div>
+                                <tal:block tal:switch="children_images">
+                                    <div class="list-title"  tal:case="True">
+                                        <div class="gradient"></div><span class="h5">${title}</span>
+                                    </div>
+                                    <span class="h5 list-title" tal:case="False">${title}</span>
+                                </tal:block>
+                            </a>
+                            <a href="${url}" tal:condition="lead and not children_images">
+                                <p class="list-lead preview">${lead}</p>
+                            </a>
+                            <a tal:condition="edit_link and request.is_logged_in" class="edit-link" href="${edit_link}"><i class="far fa-edit"></i></a>
                         </li>
                     </ul>
                 </tal:b>
@@ -38,6 +57,18 @@
                             You are not automatically redirected so you have a chance
                             to edit or delete this link.
                         </p>
+                    </div>
+                </div>
+            </div>
+        </tal:b>
+        <tal:b condition="page.trait == 'iframe'">
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="limit-line-width">
+                        <span class="page-lead h5" tal:condition="page.content.get('lead')" tal:content="layout.linkify(page.content.get('lead'))" />
+                    </div>
+                    <div class="${'iframe-panel' if page.as_card else ''}">
+                        <iframe src="${page.content.url}" width="100%" height="${page.height if page.height else '800'}" frameborder="0"></iframe>
                     </div>
                 </div>
             </div>

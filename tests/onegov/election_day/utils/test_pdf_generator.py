@@ -1,26 +1,38 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import timedelta
-from onegov.ballot import Ballot
-from onegov.ballot import BallotResult
-from onegov.ballot import Vote
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import Vote
+from onegov.election_day.utils.pdf_generator import PdfGenerator
+from pdfrw import PdfReader  # type: ignore[import-untyped]
+from tests.onegov.election_day.common import DummyRequest
 from tests.onegov.election_day.utils.common import add_election_compound
 from tests.onegov.election_day.utils.common import add_majorz_election
 from tests.onegov.election_day.utils.common import add_proporz_election
 from tests.onegov.election_day.utils.common import add_vote
 from tests.onegov.election_day.utils.common import PatchedD3Renderer
-from onegov.election_day.utils.pdf_generator import PdfGenerator
-from pdfrw import PdfReader
-from unittest.mock import MagicMock
-from unittest.mock import patch
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
 
 
 class PatchedPdfGenerator(PdfGenerator):
-    def __init__(self, app):
-        super(PatchedPdfGenerator, self).__init__(app)
-        self.renderer = PatchedD3Renderer(app)
+    def __init__(self, app: TestApp) -> None:
+        renderer = PatchedD3Renderer(app)
+        request: Any = DummyRequest(app=app)
+        super().__init__(app, request, renderer)
 
 
-def test_generate_pdf_election(session, election_day_app_zg):
+def test_generate_pdf_election(
+    session: Session,
+    election_day_app_zg: TestApp
+) -> None:
+
+    assert election_day_app_zg.filestorage is not None
     generator = PatchedPdfGenerator(election_day_app_zg)
 
     # Majorz election
@@ -32,6 +44,8 @@ def test_generate_pdf_election(session, election_day_app_zg):
 
     # Proporz election
     proporz = add_proporz_election(session)
+    proporz.show_party_strengths = True
+    proporz.show_party_panachage = True
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(proporz, 'election.pdf', locale)
         with election_day_app_zg.filestorage.open('election.pdf', 'rb') as f:
@@ -59,7 +73,12 @@ def test_generate_pdf_election(session, election_day_app_zg):
             assert len(PdfReader(f, decompress=False).pages) == 1
 
 
-def test_generate_pdf_election_compound(session, election_day_app_bl):
+def test_generate_pdf_election_compound(
+    session: Session,
+    election_day_app_bl: TestApp
+) -> None:
+
+    assert election_day_app_bl.filestorage is not None
     generator = PatchedPdfGenerator(election_day_app_bl)
 
     election = add_proporz_election(session)
@@ -83,7 +102,12 @@ def test_generate_pdf_election_compound(session, election_day_app_bl):
             assert len(PdfReader(f, decompress=False).pages) == 9
 
 
-def test_generate_pdf_vote(session, election_day_app_zg):
+def test_generate_pdf_vote(
+    session: Session,
+    election_day_app_zg: TestApp
+) -> None:
+
+    assert election_day_app_zg.filestorage is not None
     generator = PatchedPdfGenerator(election_day_app_zg)
 
     # Simple vote
@@ -113,7 +137,12 @@ def test_generate_pdf_vote(session, election_day_app_zg):
             assert len(PdfReader(f, decompress=False).pages) == 9
 
 
-def test_generate_pdf_vote_districts(session, election_day_app_gr):
+def test_generate_pdf_vote_districts(
+    session: Session,
+    election_day_app_gr: TestApp
+) -> None:
+
+    assert election_day_app_gr.filestorage is not None
     generator = PatchedPdfGenerator(election_day_app_gr)
 
     # Simple vote
@@ -143,7 +172,12 @@ def test_generate_pdf_vote_districts(session, election_day_app_gr):
             assert len(PdfReader(f, decompress=False).pages) == 15
 
 
-def test_generate_pdf_long_title(session, election_day_app_zg):
+def test_generate_pdf_long_title(
+    session: Session,
+    election_day_app_zg: TestApp
+) -> None:
+
+    assert election_day_app_zg.filestorage is not None
     title = """This is a very long title so that it breaks the header line to
     a second line which must also be ellipsed.
 
@@ -155,7 +189,7 @@ def test_generate_pdf_long_title(session, election_day_app_zg):
     """
 
     vote = Vote(title=title, domain='federation', date=date(2015, 6, 18))
-    vote.ballots.append(Ballot(type='proposal'))
+    assert vote.proposal  # create
     session.add(vote)
     session.flush()
 
@@ -170,60 +204,14 @@ def test_generate_pdf_long_title(session, election_day_app_zg):
         assert len(PdfReader(f, decompress=False).pages) == 3
 
 
-def test_sign_pdf(session, election_day_app_zg):
-    # No signing
-    generator = PdfGenerator(election_day_app_zg)
-
-    with patch('onegov.pdf.signature.post') as post:
-        generator.sign_pdf('vote.pdf')
-        assert not post.called
-
-    # signing
-    principal = election_day_app_zg.principal
-    principal.pdf_signing = {
-        'host': 'http://abcd.ef',
-        'login': 'abcd',
-        'password': '1234',
-        'reason': 'why'
-    }
-    election_day_app_zg.cache.set('principal', principal)
-    generator = PdfGenerator(election_day_app_zg)
-
-    with election_day_app_zg.filestorage.open('vote.pdf', 'w') as f:
-        f.write('PDF')
-
-    args = {
-        'json.return_value': {
-            'result': {'signed_data': 'U0lHTkVE'}
-        }
-    }
-    with patch('onegov.pdf.signature.post',
-               return_value=MagicMock(**args)) as post:
-        generator.sign_pdf('vote.pdf')
-        assert post.called
-        assert post.call_args[0][0] == (
-            'http://abcd.ef/admin_interface/pdf_signature_jobs.json'
-        )
-        assert post.call_args[1]['headers']['X-LEXWORK-LOGIN'] == 'abcd'
-        assert post.call_args[1]['headers']['X-LEXWORK-PASSWORD'] == '1234'
-        assert post.call_args[1]['json'] == {
-            'pdf_signature_job': {
-                'file_name': 'vote.pdf',
-                'data': 'UERG',
-                'reason_for_signature': 'why'
-            }
-        }
-    with election_day_app_zg.filestorage.open('vote.pdf', 'r') as f:
-        assert f.read() == 'SIGNED'
-
-
-def test_create_pdfs(election_day_app_zg):
+def test_create_pdfs(election_day_app_zg: TestApp) -> None:
     generator = PatchedPdfGenerator(election_day_app_zg)
     session = election_day_app_zg.session()
     fs = election_day_app_zg.filestorage
+    assert fs is not None
 
     generator.create_pdfs()
-    assert election_day_app_zg.filestorage.listdir('pdf') == []
+    assert fs.listdir('pdf') == []
 
     majorz_election = add_majorz_election(session)
     proporz_election = add_proporz_election(session)

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-19 06:59+0200\n"
+"POT-Creation-Date: 2025-07-29 00:11+0200\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -28,6 +28,33 @@ msgstr "Titel"
 msgid "Portrait"
 msgstr "Portrait"
 
+msgid "Location address"
+msgstr "Standortadresse"
+
+msgid "Location Code and City"
+msgstr "Standort Postleitzahl und Ort"
+
+msgid "Postal address"
+msgstr "Postadresse"
+
+msgid "Postal Code and City"
+msgstr "Postleitzahl und Ort"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Alternate Phone Number / Fax"
+msgstr "Alternative Telefonnummer / Fax"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Opening hours"
+msgstr "Öffnungszeiten"
+
 msgid "Organigram"
 msgstr "Organigramm"
 
@@ -35,24 +62,14 @@ msgid "Location"
 msgstr "Ort"
 
 msgid ""
-"Search for the exact address to set a marker. The address fields beneath are "
-"filled out automatically. The zoom of the map will be saved as well."
+"Search for the exact address to set a marker. The zoom of the map will be "
+"saved as well."
 msgstr ""
-"Suchen Sie nach der exakten Adresse, um einen Marker zu setzen. Die "
-"Adressfelder unterhalb werden automatisch ausgefüllt. Der Zoom der Karte "
-"wird ebenfalls gespeichert."
+"Suchen Sie nach der exakten Adresse, um einen Marker zu setzen. Der Zoom der "
+"Karte wird ebenfalls gespeichert."
 
-msgid "Address"
-msgstr "Adresse"
-
-msgid "Street and house number"
-msgstr "Strasse und Hausnummer"
-
-msgid "Zip Code"
-msgstr "PLZ"
-
-msgid "City"
-msgstr "Ort"
+msgid "Map"
+msgstr "Karte"
 
 msgid "Fields to include for each membership"
 msgstr "Zu berücksichtigende Felder der Mitgliedschaften"
@@ -87,8 +104,17 @@ msgstr "Person: akademischer Titel"
 msgid "Person: Profession"
 msgstr "Person: Beruf"
 
-msgid "Person: Address"
-msgstr "Person: Adresse"
+msgid "Person: Location address"
+msgstr "Person: Standortadresse"
+
+msgid "Person: Location Code and City"
+msgstr "Person: Standort Postleitzahl und Ort"
+
+msgid "Person: Postal address"
+msgstr "Person: Postadresse"
+
+msgid "Person: Postal Code and City"
+msgstr "Person: Postleitzahl und Ort"
 
 msgid "Person: Political Party"
 msgstr "Person: politische Partei"
@@ -105,18 +131,14 @@ msgstr "Person: Direktnummer"
 msgid "PDF Export"
 msgstr "PDF Export"
 
-msgid ""
-"Search for the exact address to set a marker. The address fields beneath are "
-"filled out automatically."
-msgstr ""
-"Suchen Sie nach der exakten Adresse, um einen Marker zu setzen. Die "
-"Adressfelder unterhalb werden automatisch ausgefüllt."
-
 msgid "Destination"
 msgstr "Ziel"
 
 msgid "- Root -"
 msgstr "- oberste Ebene -"
+
+msgid "Invalid destination selected"
+msgstr "Ungültiger Zielort gewählt"
 
 msgid "Person"
 msgstr "Person"
@@ -147,9 +169,6 @@ msgstr ""
 msgid "Your contact details"
 msgstr "Ihre Kontaktangaben"
 
-msgid "E-Mail"
-msgstr "E-Mail"
-
 msgid "Your message"
 msgstr "Ihre Nachricht"
 
@@ -163,6 +182,9 @@ msgstr ""
 
 msgid "Proposed changes"
 msgstr "Vorgeschlagene Änderungen"
+
+msgid "Direct Phone Number or Mobile"
+msgstr "Direktnummer oder Mobil"
 
 msgid "Salutation"
 msgstr "Anrede"
@@ -179,12 +201,6 @@ msgstr "Nachname"
 msgid "Function"
 msgstr "Funktion"
 
-msgid "Phone"
-msgstr "Telefon"
-
-msgid "Direct Phone Number"
-msgstr "Direktnummer"
-
 msgid "Born"
 msgstr "Jahrgang"
 
@@ -197,11 +213,20 @@ msgstr "Politische Partei"
 msgid "Parliamentary Group"
 msgstr "Fraktion"
 
-msgid "Website"
-msgstr "Webseite"
+msgid "Website 2"
+msgstr "Webseite 2"
 
 msgid "Notes"
 msgstr "Bemerkungen"
+
+msgid "External ID"
+msgstr "Externe ID"
+
+msgid "Personnel Number"
+msgstr "Personalnummer"
+
+msgid "Number"
+msgstr "Nummer"
 
 msgid "Immediate e-mail notification to members upon ticket submission"
 msgstr "Unmittelbare E-Mail-Benachrichtigung an Mitglieder bei Ticketeingang"
@@ -248,11 +273,21 @@ msgstr "Hinzufügen"
 msgid "Agency"
 msgstr "Organisation"
 
+msgid "This cannot be undone. Following agencies will be deleted as well:"
+msgstr ""
+"Dies kann nicht rückgängig gemacht werden. Folgende Organisationen werden "
+"ebenfalls gelöscht:"
+
 msgid "Do you really want to delete this agency?"
 msgstr "Möchten Sie die Organisation wirklich löschen?"
 
 msgid "Delete agency"
 msgstr "Organisation löschen"
+
+msgid "Please scroll to the bottom to enable the confirm button."
+msgstr ""
+"Bitte scrollen Sie bis zum Ende der Liste, um den Bestätigungsbutton zu "
+"aktivieren."
 
 msgid "Agency with memberships or suborganizations can't be deleted"
 msgstr "Organisationen mit Mitgliedschaften können nicht gelöscht werden"
@@ -301,6 +336,9 @@ msgstr "Excel erstellen"
 msgid "Member"
 msgstr "Mitglied"
 
+msgid "Alternate Phone Number or Fax"
+msgstr "Weitere Telefonnummer oder Fax"
+
 msgid "Mutation"
 msgstr "Mutation"
 
@@ -325,11 +363,21 @@ msgstr "Gesamter Staatskalender als PDF"
 msgid "Export this agency and its children as a PDF"
 msgstr "Organisation als PDF speichern"
 
+msgid "Changes"
+msgstr "Änderungen"
+
+msgid ""
+"The contact form can be used to report changes to incorrect information of "
+"the persons or organizations listed. The form is not intended for contacting "
+"or sending messages to the respective persons and organizations."
+msgstr ""
+"Über das Kontaktformular können Änderungen zu inkorrekten Angaben der "
+"verzeichneten Personen oder Organisationen gemeldet werden. Das Formular "
+"dient nicht zur Kontaktaufnahme mit den jeweiligen Personen und "
+"Organisationen oder zur Übermittlung von Nachrichten an diese."
+
 msgid "Report change"
 msgstr "Mutation melden"
-
-msgid "Report a change"
-msgstr "Eine Mutation melden"
 
 msgid ""
 "Sort the items using drag and drop. The new positions are automatically "
@@ -482,12 +530,6 @@ msgstr "Farbe Hyperlinks im PDF"
 msgid "Underline pdf links"
 msgstr "Hyperlinks unterstreichen"
 
-msgid "Map for Agency Adresses"
-msgstr "Karte für die Adressen"
-
-msgid "Map"
-msgstr "Karte"
-
 msgid "Show additional agencies to search results"
 msgstr "Zusätzliche Organisation in den Suchresultaten anzeigen"
 
@@ -525,6 +567,45 @@ msgstr "Daten"
 #, python-format
 msgid "Level ${lvl}"
 msgstr "Ebene ${lvl}"
+
+#~ msgid "Address"
+#~ msgstr "Adresse"
+
+#~ msgid "Report a change"
+#~ msgstr "Eine Mutation melden"
+
+#~ msgid "Moves the topic and all its sub topics to the given destination."
+#~ msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
+
+#~ msgid "Street and house number"
+#~ msgstr "Strasse und Hausnummer"
+
+#~ msgid "Zip Code"
+#~ msgstr "PLZ"
+
+#~ msgid "City"
+#~ msgstr "Ort"
+
+#~ msgid ""
+#~ "Search for the exact address to set a marker. The address fields beneath "
+#~ "are filled out automatically."
+#~ msgstr ""
+#~ "Suchen Sie nach der exakten Adresse, um einen Marker zu setzen. Die "
+#~ "Adressfelder unterhalb werden automatisch ausgefüllt."
+
+#~ msgid ""
+#~ "The contact form can be used to report changes to incorrect information "
+#~ "of the persons or organizations listed. The form is <i>not</i> intended "
+#~ "for contacting or sending messages to the respective persons and "
+#~ "organizations."
+#~ msgstr ""
+#~ "Über das Kontaktformular können Änderungen zu inkorrekten Angaben der "
+#~ "verzeichneten Personen oder Organisationen gemeldet werden. Das Formular "
+#~ "dient <i>nicht</i> zur Kontaktaufnahme mit den jeweiligen Personen und "
+#~ "Organisationen oder zur Übermittlung von Nachrichten an diese."
+
+#~ msgid "Map for Agency Adresses"
+#~ msgstr "Karte für die Adressen"
 
 #~ msgid "Layout"
 #~ msgstr "Layout"

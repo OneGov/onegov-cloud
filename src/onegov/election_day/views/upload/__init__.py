@@ -1,16 +1,24 @@
+from __future__ import annotations
+
 from onegov.election_day import _
-from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.imports.common import FileImportError
 
 
-def unsupported_year_error(year):
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.request import ElectionDayRequest
+
+
+def unsupported_year_error(year: int) -> FileImportError:
     return FileImportError(
         _(
-            "The year ${year} is not yet supported", mapping={'year': year}
+            'The year ${year} is not yet supported', mapping={'year': year}
         )
     )
 
 
-def set_locale(request):
+def set_locale(request: ElectionDayRequest) -> None:
     """ Sets the locale of the request by the Accept-Language header. """
 
     locale = request.headers.get('Accept-Language') or 'en'
@@ -18,24 +26,14 @@ def set_locale(request):
     request.locale = locale
 
 
-def translate_errors(errors, request):
-    """ Translates and interpolates the given error messages. """
-    if isinstance(errors, list):
-        # List of line errors or FileImportErrors
-        for ix, value in enumerate(errors):
-            translation_string = getattr(value, 'error', value)
-            result = {
-                'message': request.translate(translation_string),
-            }
-            if hasattr(value, 'filename'):
-                result['filename'] = value.filename
-            if hasattr(value, 'line'):
-                result['line'] = value.line
-            errors[ix] = result
-        return
+def translate_errors(
+    errors: dict[str, list[Any]],
+    request: ElectionDayRequest
+) -> None:
 
+    """ Translates and interpolates the given error messages. """
     for key, values in errors.items():
-        errors[key] = []
+        errors[key] = new_values = []
         for value in values:
             result = {
                 'message': request.translate(getattr(value, 'error', value)),
@@ -44,4 +42,4 @@ def translate_errors(errors, request):
                 result['filename'] = value.filename
             if hasattr(value, 'line'):
                 result['line'] = value.line
-            errors[key].append(result)
+            new_values.append(result)

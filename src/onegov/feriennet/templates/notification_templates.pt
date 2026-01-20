@@ -3,32 +3,36 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="panel callout" tal:condition="not request.app.active_period" i18n:translate>
-            Notification templates can only be used with an active period.
+            <div class="grid-x grid-padding-x">
+            <div class="cell small-12 large-10">
+                <div class="panel callout" tal:condition="not request.app.active_period" i18n:translate>
+                    Notification templates can only be used with an active period.
+                </div>
+
+                <p i18n:translate tal:condition="not:notifications">
+                    No notification templates yet.
+                </p>
+
+                <ul class="dense notifications" tal:condition="notifications">
+                    <li tal:repeat="notification notifications" id="${notification.id.hex}">
+                        <h2>${notification.subject}</h2>
+
+                        <div class="last-sent">
+                            <tal:b condition="notification.last_sent" i18n:translate>
+                                sent <tal:b i18n:name="time_ago">${layout.format_date(notification.last_sent, 'relative')}</tal:b>
+                            </tal:b>
+
+                            <tal:b condition="not:notification.last_sent" i18n:translate>
+                                Not sent yet
+                            </tal:b>
+                        </div>
+
+                        <div class="text-links">
+                            <tal:b repeat="link get_links(notification)" replace="link(layout)" />
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
-
-        <p i18n:translate tal:condition="not:notifications">
-            No notification templates yet.
-        </p>
-
-        <ul class="dense notifications" tal:condition="notifications">
-            <li tal:repeat="notification notifications" id="${notification.id.hex}">
-                <h2>${notification.subject}</h2>
-
-                <div class="last-sent">
-                    <tal:b condition="notification.last_sent" i18n:translate>
-                        sent <tal:b i18n:name="time_ago">${layout.format_date(notification.last_sent, 'relative')}</tal:b>
-                    </tal:b>
-
-                    <tal:b condition="not:notification.last_sent" i18n:translate>
-                        Not sent yet
-                    </tal:b>
-                </div>
-
-                <div class="text-links">
-                    <tal:b repeat="link get_links(notification)" replace="structure link(layout)" />
-                </div>
-            </li>
-        </ul>
     </tal:b>
 </div>

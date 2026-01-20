@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import re
 import time
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 
 import transaction
 from aiohttp import ClientTimeout
@@ -13,17 +15,35 @@ from onegov.org.models import SiteCollection
 from onegov.people import AgencyCollection
 
 
+from typing import Literal, NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator, Sequence
+    from onegov.form import Form
+    from onegov.org.request import OrgRequest
+    from onegov.page import Page
+    from typing import Self
+
+
 class ModelsWithLinksMixin:
     fields_with_urls = ('lead', 'text', 'url')
 
+    if TYPE_CHECKING:
+        request: OrgRequest
+
     @property
-    def site_collection(self):
+    def site_collection(self) -> SiteCollection:
         return SiteCollection(self.request.session)
 
 
 class LinkMigration(ModelsWithLinksMixin):
 
-    def __init__(self, request, old_uri, new_uri=None):
+    def __init__(
+        self,
+        request: OrgRequest,
+        old_uri: str,
+        new_uri: str = ''
+    ) -> None:
+
         self.request = request
         self.old_uri = old_uri
         self.new_uri = new_uri
@@ -37,16 +57,16 @@ class LinkMigration(ModelsWithLinksMixin):
         self.use_domain = old_is_domain
 
     def migrate_url(
-            self,
-            item,
-            fields,
-            test=False,
-            group_by=None,
-            count_obj=None
-    ):
+        self,
+        item: object,
+        fields: Iterable[str],
+        test: bool = False,
+        group_by: str | None = None,
+        count_obj: dict[str, dict[str, int]] | None = None
+    ) -> tuple[int, dict[str, dict[str, int]]]:
         """Supports replacing url's and domain names.
 
-         """
+        """
         count = 0
         count_by_id = count_obj or {}
 
@@ -54,7 +74,7 @@ class LinkMigration(ModelsWithLinksMixin):
         new_uri = self.new_uri
         group_by = group_by or item.__class__.__name__
 
-        def repl(matchobj):
+        def repl(matchobj: re.Match[str]) -> str:
             if self.use_domain:
                 return f'{matchobj.group(1)}{new_uri}'
             return new_uri
@@ -86,11 +106,15 @@ class LinkMigration(ModelsWithLinksMixin):
                     )
         return count, count_by_id
 
-    def migrate_site_collection(self, test=False):
-        grouped = {}
+    def migrate_site_collection(
+        self,
+        test: bool = False
+    ) -> tuple[int, dict[str, dict[str, int]]]:
+
+        grouped: dict[str, dict[str, int]] = {}
         total = 0
 
-        for name, entries in self.site_collection.get().items():
+        for entries in self.site_collection.get().values():
             for item in entries:
                 count, grouped_count = self.migrate_url(
                     item, self.fields_with_urls,
@@ -104,7 +128,13 @@ class LinkMigration(ModelsWithLinksMixin):
 
 class PageNameChange(ModelsWithLinksMixin):
 
-    def __init__(self, request, page, new_name):
+    def __init__(
+        self,
+        request: OrgRequest,
+        page: Page,
+        new_name: str
+    ) -> None:
+
         assert new_name == normalize_for_url(new_name)
         assert page.name != new_name
 
@@ -113,10 +143,10 @@ class PageNameChange(ModelsWithLinksMixin):
         self.new_name = new_name
 
     @property
-    def subpages(self):
-        pages = []
+    def subpages(self) -> list[Page]:
+        pages: list[Page] = []
 
-        def add(page):
+        def add(page: Page) -> None:
             nonlocal pages
             pages.append(page)
             for child in page.children:
@@ -127,7 +157,7 @@ class PageNameChange(ModelsWithLinksMixin):
 
         return pages
 
-    def execute(self, test=False):
+    def execute(self, test: bool = False) -> int:
         """ Executes a page name change. All subpages' urls are changed by
         this action. For all subpages, the old and new url must be swapped in
         all possible fields of all sites of the SiteCollection.
@@ -137,18 +167,18 @@ class PageNameChange(ModelsWithLinksMixin):
         subpages = self.subpages
         old_name = page.name
 
-        def run():
+        def run() -> int:
             # Make sure the order before and after is the same
             urls_before = tuple(
-                self.request.link(p) for p in subpages + [page])
+                self.request.link(p) for p in (*subpages, page))
             page.name = self.new_name
-            urls_after = tuple(self.request.link(p) for p in subpages + [page])
+            urls_after = tuple(self.request.link(p) for p in (*subpages, page))
             assert urls_before != urls_after
 
             count = 0
             for before, after in zip(urls_before, urls_after):
                 migration = LinkMigration(self.request, before, after)
-                total, grouped = migration.migrate_site_collection(test=test)
+                total, _grouped = migration.migrate_site_collection(test=test)
                 count += total
             return count
 
@@ -161,19 +191,19 @@ class PageNameChange(ModelsWithLinksMixin):
         return run()
 
     @classmethod
-    def from_form(cls, model, form):
-        return cls(form.request, model, form.name.data)
+    def from_form(cls, model: Page, form: Form) -> Self:
+        return cls(form.request, model, form['name'].data)  # type:ignore
 
 
 class LinkCheck:
-    def __init__(self, name, link, url):
+    def __init__(self, name: str, link: str, url: str) -> None:
         self.name = name
         self.link = link
         self.url = self.ensure_protocol(url)
-        self.status = None
-        self.message = None
+        self.status: int | None = None
+        self.message: str | None = None
 
-    def ensure_protocol(self, url):
+    def ensure_protocol(self, url: str) -> str:
         if not url.startswith('http'):
             return 'https://' + url
         return url
@@ -184,15 +214,19 @@ class LinkHealthCheck(ModelsWithLinksMixin):
     Check either internal or external urls for status 200.
     """
 
-    Statistic = namedtuple(
-        'UnhealthyStats', ['total', 'ok', 'nok', 'error', 'duration'])
+    class Statistic(NamedTuple):
+        total: int
+        ok: int
+        nok: int
+        error: int
+        duration: float
 
     def __init__(
-            self,
-            request,
-            link_type=None,
-            total_timout=30
-    ):
+        self,
+        request: OrgRequest,
+        link_type: Literal['internal', 'external', ''] | None = None,
+        total_timout: float = 30
+    ) -> None:
         """
         :param request: morepath request object
         :param external_only: check external links not matching current domain
@@ -211,25 +245,25 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         )
 
     @property
-    def internal_only(self):
+    def internal_only(self) -> bool:
         return self.link_type == 'internal'
 
     @property
-    def external_only(self):
+    def external_only(self) -> bool:
         return self.link_type == 'external'
 
-    def internal_link(self, url):
+    def internal_link(self, url: str) -> bool:
         return self.domain in url
 
-    def filter_urls(self, urls):
+    def filter_urls(self, urls: Sequence[str]) -> Sequence[str]:
         if self.external_only:
             return tuple(url for url in urls if not self.internal_link(url))
         if self.internal_only:
             return tuple(url for url in urls if self.internal_link(url))
         return urls
 
-    def find_urls(self):
-        for name, entries in self.site_collection.get().items():
+    def find_urls(self) -> Iterator[tuple[str, str, Sequence[str]]]:
+        for entries in self.site_collection.get().values():
             for entry in entries:
                 urls = []
                 for field in self.fields_with_urls:
@@ -255,17 +289,17 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                     self.filter_urls(urls)
                 )
 
-    def url_list_generator(self):
+    def url_list_generator(self) -> Iterator[LinkCheck]:
         for name, model_link, urls in self.find_urls():
             for url in urls:
                 yield LinkCheck(name, model_link, url)
 
-    def unhealthy_urls(self):
+    def unhealthy_urls(self) -> tuple[Statistic, Sequence[LinkCheck]]:
         """ We check the urls in the backend, unless they are internal.
-         In that case, we can not do that since we do not have async support.
-         Otherwise returns the LinkChecks with empty statistics for use in
-         the frontend.
-         """
+        In that case, we can not do that since we do not have async support.
+        Otherwise returns the LinkChecks with empty statistics for use in
+        the frontend.
+        """
         assert self.link_type, 'link_type must be set'
         started = time.time()
 
@@ -273,24 +307,23 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         error_count = 0
         not_okay_status = 0
 
-        def handle_errors(check, exception):
-            nonlocal total_count
-            nonlocal error_count
+        def handle_errors(check: LinkCheck, exception: Exception) -> LinkCheck:
+            nonlocal total_count, error_count
             check.message = str(exception)
             total_count += 1
             error_count += 1
             return check
 
-        def on_success(check, status):
-            nonlocal total_count
-            nonlocal not_okay_status
+        def on_success(check: LinkCheck, status: int) -> LinkCheck:
+            nonlocal total_count, not_okay_status
             check.status = status
             check.message = f'Status {status}'
             total_count += 1
-            if not status == 200:
+            if status != 200:
                 not_okay_status += 1
             return check
 
+        urls: Sequence[LinkCheck]
         if self.link_type == 'external':
             urls = async_aiohttp_get_all(
                 urls=tuple(self.url_list_generator()),

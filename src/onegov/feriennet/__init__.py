@@ -1,9 +1,11 @@
-import logging
-log = logging.getLogger('onegov.feriennet')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+from __future__ import annotations
 
-from translationstring import TranslationStringFactory  # noqa
-_ = TranslationStringFactory('onegov.feriennet')  # noqa
+import logging
+log = logging.getLogger('onegov.feriennet')
+log.addHandler(logging.NullHandler())
+
+from onegov.core.i18n.translation_string import TranslationStringFactory
+_ = TranslationStringFactory('onegov.feriennet')
 
 from onegov.feriennet.app import FeriennetApp
 

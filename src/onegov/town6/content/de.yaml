@@ -98,24 +98,35 @@ organisation:
     opening_hours_html: Montag - Freitag 09:00 - 17:00
     twitter_url: https://twitter.com/seantis
     homepage_structure: |
-      <row-wide>
-          <column span="12">
-              <slider />
-          </column>
+      <slider />
+      <row-wide bgcolor="gray">
+        <row class="columns small-up-1 medium-up-2 large-up-3 align-center">
+            <column class="cell">
+                <icon_link
+                    icon="fa-concierge-bell"
+                    title="Online-Schalter"
+                    link="/forms"
+                    text="Nehmen Sie online bequem Dienstleistungen in Anspruch"
+                />
+            </column>
+            <column class="cell">
+                <icon_link
+                    icon="fa-ticket-alt"
+                    link="/resource/sbb-tageskarte?view=month"
+                    title="SBB-Tageskarten"
+                    text="Reservieren Sie sich Ihre SBB-Tageskarten für Ihren nächsten Ausflug"
+                />
+            </column>
+            <column class="cell">
+                <icon_link
+                    icon="fa-building"
+                    link="/resources"
+                    title="Alle Reservationen"
+                    text="Erhalten Sie einen Überblick über alle Reservationen"
+                />
+            </column>
+        </row>
       </row-wide>
-      <row>
-          <column span="8">
-              <focus />
-          </column>
-          <column span="4">
-              <panel>
-                  <services />
-              </panel>
-              <panel>
-                <contacts_and_albums />
-              </panel>
-          </column>
-      </row>
       <row-wide bgcolor="gray">
           <column span="12">
               <row>

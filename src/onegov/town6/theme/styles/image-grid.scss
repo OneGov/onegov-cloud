@@ -1,5 +1,4 @@
 .image-grid {
-
     align-content: center;
     display: flex;
     flex-wrap: wrap;
@@ -34,9 +33,7 @@
         @include breakpoint(large up) {
             width: 24%;
         }
-
     }
-
 }
 
 /*
@@ -102,4 +99,29 @@
             }
         }
     }
+}
+
+$image-padding: 1px;
+
+.image-card-grid {
+    .cell:nth-child(1) {
+        padding-bottom: $image-padding;
+        padding-right: $image-padding;
+    }
+
+    .cell:nth-child(2) {
+        padding-bottom: $image-padding;
+        padding-left: $image-padding;
+    }
+
+    .cell:nth-child(3) {
+        padding-right: $image-padding;
+        padding-top: $image-padding;
+    }
+
+    .cell:nth-child(4) {
+        padding-left: $image-padding;
+        padding-top: $image-padding;
+    }
+
 }

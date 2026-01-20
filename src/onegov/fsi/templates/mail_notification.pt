@@ -2,7 +2,14 @@
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
+    <tal:b metal:fill-slot="info">
+            <div tal:condition="information|None" class="panel">
+            <tal:b replace="information" />
+        </div>
+    </tal:b>
     <tal:b metal:fill-slot="body">
-        <tal:b replace="structure notification" />
+        <div tal:condition="notification|None">
+            <tal:b replace="notification" />
+        </div>
     </tal:b>
 </div>

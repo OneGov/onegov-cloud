@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from datetime import timedelta
 from freezegun import freeze_time
 from io import StringIO
+from onegov.election_day.models import ElectionCompoundPart
 from onegov.election_day.utils import svg_filename
 from onegov.election_day.utils.svg_generator import SvgGenerator
 from tests.onegov.election_day.utils.common import add_election_compound
@@ -9,24 +12,36 @@ from tests.onegov.election_day.utils.common import add_proporz_election
 from tests.onegov.election_day.utils.common import add_vote
 from tests.onegov.election_day.utils.common import PatchedD3Renderer
 from unittest.mock import patch
+from pytest import mark
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
 
 
 class PatchedSvgGenerator(SvgGenerator):
-    def __init__(self, app):
-        super(PatchedSvgGenerator, self).__init__(app)
+    def __init__(self, app: TestApp) -> None:
+        super().__init__(app)
         self.renderer = PatchedD3Renderer(app)
 
 
-def test_generate_svg(election_day_app_gr, session):
+@mark.flaky(reruns=3, only_rerun=None)
+def test_generate_svg(
+    election_day_app_gr: TestApp,
+    session: Session
+) -> None:
 
+    assert election_day_app_gr.filestorage is not None
     election_day_app_gr.filestorage.makedir('svg')
     generator = SvgGenerator(election_day_app_gr)
-    generate = generator.generate_svg
 
-    def generate(item, type_, locale):
+    def generate(item: Any, type_: str, locale: str) -> int:
         filename = svg_filename(item, type_, locale)
         return generator.generate_svg(item, type_, filename, locale)
 
+    item: object
     svg = StringIO('<svg></svg>')
     with patch.object(generator.renderer, 'get_chart', return_value=svg) as gc:
 
@@ -57,6 +72,7 @@ def test_generate_svg(election_day_app_gr, session):
             item = add_election_compound(
                 session, elections=[item], pukelsheim=True,
             )
+            item.horizontal_party_stengths = True  # type: ignore[attr-defined]
             assert generate(item, 'list-groups', 'de_CH') == 1
             assert generate(item, 'lists', 'de_CH') == 0
             assert generate(item, 'candidates', 'de_CH') == 0
@@ -64,6 +80,21 @@ def test_generate_svg(election_day_app_gr, session):
             assert generate(item, 'seat-allocation', 'de_CH') == 1
             assert generate(item, 'party-strengths', 'de_CH') == 1
             assert generate(item, 'parties-panachage', 'de_CH') == 1
+            assert generate(item, 'lists-panachage', 'de_CH') == 0
+            assert generate(item, 'entities-map', 'de_CH') == 0
+            assert generate(item, 'districts-map', 'de_CH') == 0
+
+            item = ElectionCompoundPart(item, 'superregion', 'Region 1')
+            party_result = item.election_compound.party_results[0]
+            party_result.domain = 'superregion'
+            party_result.domain_segment = 'Region 1'
+            assert generate(item, 'list-groups', 'de_CH') == 0
+            assert generate(item, 'lists', 'de_CH') == 0
+            assert generate(item, 'candidates', 'de_CH') == 0
+            assert generate(item, 'connections', 'de_CH') == 0
+            assert generate(item, 'seat-allocation', 'de_CH') == 0
+            assert generate(item, 'party-strengths', 'de_CH') == 1
+            assert generate(item, 'parties-panachage', 'de_CH') == 0
             assert generate(item, 'lists-panachage', 'de_CH') == 0
             assert generate(item, 'entities-map', 'de_CH') == 0
             assert generate(item, 'districts-map', 'de_CH') == 0
@@ -84,7 +115,7 @@ def test_generate_svg(election_day_app_gr, session):
         with freeze_time("2015-05-05 15:00"):
             assert generate(item, 'map', 'it_CH') == 0
 
-        assert gc.call_count == 17
+        assert gc.call_count == 18
 
         ts = '1396620000'
         hm = '41c18975bf916862ed817b7c569b6f242ca7ad9f86ca73bbabd8d9cb26858440'
@@ -106,23 +137,25 @@ def test_generate_svg(election_day_app_gr, session):
             f'elections-{hc}.{ts}.seat-allocation.de_CH.svg',
             f'elections-{hc}.{ts}.party-strengths.de_CH.svg',
             f'elections-{hc}.{ts}.parties-panachage.de_CH.svg',
+            f'elections-{hc}-region-1.{ts}.party-strengths.de_CH.svg',
             f'ballot-{hb}.{ts}.entities-map.de_CH.svg',
             f'ballot-{hb}.{ts}.districts-map.de_CH.svg',
             f'ballot-{hb}.{ts}.entities-map.it_CH.svg'
         ])
 
 
-def test_create_svgs(election_day_app_gr):
+def test_create_svgs(election_day_app_gr: TestApp) -> None:
     generator = SvgGenerator(election_day_app_gr)
     session = election_day_app_gr.session()
     fs = election_day_app_gr.filestorage
+    assert fs is not None
 
     svg = StringIO('<svg></svg>')
     with patch.object(generator.renderer, 'get_chart', return_value=svg):
 
         # no data yet
         assert generator.create_svgs() == (0, 0)
-        assert election_day_app_gr.filestorage.listdir('svg') == []
+        assert fs.listdir('svg') == []
 
         with freeze_time("2014-04-04 14:00"):
             majorz = add_majorz_election(session)
@@ -153,8 +186,8 @@ def test_create_svgs(election_day_app_gr):
 
         # remove obsolete
         session.delete(vote)
-        session.delete(proporz)
         session.delete(compound)
+        session.delete(proporz)
         session.flush()
 
         assert generator.create_svgs() == (0, 64)

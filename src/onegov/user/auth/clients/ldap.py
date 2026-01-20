@@ -1,26 +1,48 @@
+from __future__ import annotations
+
 import socket
 
 from attr import attrs, attrib
-from cached_property import cached_property
 from contextlib import suppress
-from ldap3 import Connection, Server, NONE, RESTARTABLE
+from functools import cached_property, wraps
+from ldap3 import Connection, Server, AUTO_BIND_DEFAULT, NONE, RESTARTABLE
 from ldap3.core.exceptions import LDAPCommunicationError
 from time import sleep
 
 
-def auto_retry(fn, max_tries=5, pause=0.1):
+from typing import Any, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+    from typing import Concatenate, ParamSpec
+
+    _P = ParamSpec('_P')
+
+_T = TypeVar('_T')
+
+
+def auto_retry(
+    fn: Callable[Concatenate[LDAPClient, _P], _T],
+    max_tries: int = 5,
+    pause: float = 0.1
+) -> Callable[Concatenate[LDAPClient, _P], _T]:
     """ Retries the decorated function if a LDAP connection error occurs, up
     to a given set of retries, using linear backoff.
 
     """
     tried = 0
 
-    def retry(self, *args, **kwargs):
+    @wraps(fn)
+    def retry(
+        self: LDAPClient,
+        /,
+        *args: _P.args,
+        **kwargs: _P.kwargs
+    ) -> _T:
         nonlocal tried
 
         try:
             return fn(self, *args, **kwargs)
-        except (LDAPCommunicationError, socket.error):
+        except (OSError, LDAPCommunicationError):
             tried += 1
 
             if tried >= max_tries:
@@ -37,7 +59,7 @@ def auto_retry(fn, max_tries=5, pause=0.1):
 
 
 @attrs()
-class LDAPClient():
+class LDAPClient:
 
     # The URL of the LDAP server
     url: str = attrib()
@@ -49,18 +71,18 @@ class LDAPClient():
     password: str = attrib()
 
     @property
-    def base_dn(self):
+    def base_dn(self) -> str:
         """ Extracts the distinguished name from the username. """
 
         name = self.username.lower()
 
         if 'dc=' in name:
-            return 'dc=' + name.split(",dc=", 1)[-1]
+            return 'dc=' + name.split(',dc=', 1)[-1]
 
         return ''
 
     @cached_property
-    def connection(self):
+    def connection(self) -> Connection:
         """ Returns the read-only connection to the LDAP server.
 
         Calling this property is not enough to ensure that the connection is
@@ -70,26 +92,31 @@ class LDAPClient():
         return Connection(
             server=Server(self.url, get_info=NONE),
             read_only=True,
-            auto_bind=False,
+            # this is the same as auto_bind=False in earlier versions
+            auto_bind=AUTO_BIND_DEFAULT,
             client_strategy=RESTARTABLE,
         )
 
-    def try_configuration(self):
+    def try_configuration(self) -> None:
         """ Verifies the connection to the LDAP server. """
 
         # disconnect if necessary
         with suppress(LDAPCommunicationError, socket.error):
-            self.connection.unbind()
+            self.connection.unbind()  # type: ignore[no-untyped-call]
 
         # clear cache
         del self.__dict__['connection']
 
         # reconnect
         if not self.connection.rebind(self.username, self.password):
-            raise ValueError(f"Failed to connect to {self.url}")
+            raise ValueError(f'Failed to connect to {self.url}')
 
     @auto_retry
-    def search(self, query, attributes=()):
+    def search(
+        self,
+        query: str,
+        attributes: Sequence[str] = ()
+    ) -> dict[str, dict[str, Any]]:
         """ Runs an LDAP query against the server and returns a dictionary
         with the distinguished name as key and the given attributes as values
         (also a dict).
@@ -103,7 +130,7 @@ class LDAPClient():
         }
 
     @auto_retry
-    def compare(self, name, attribute, value):
+    def compare(self, name: str, attribute: str, value: Any) -> bool:
         """ Returns true if given user's attribute has the expected value.
 
         :param name:
@@ -123,4 +150,4 @@ class LDAPClient():
 
         """
 
-        return self.connection.compare(name, attribute, value)
+        return self.connection.compare(name, attribute, value)  # type: ignore[no-untyped-call]

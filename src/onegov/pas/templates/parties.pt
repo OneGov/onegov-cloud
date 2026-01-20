@@ -1,0 +1,29 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="medium-7 cell main-content">
+                <p tal:condition="not:parties" i18n:translate="">No parties defined yet.</p>
+                <ul tal:condition="parties" class="more-list party-list">
+                    <li tal:repeat="party parties">
+                        <a class="list-link" tal:attributes="href request.link(party)">
+                            <h5 class="list-title">${party.name}</h5>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel">
+                        <h3 i18n:translate="">Filters</h3>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['active']" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </tal:b>
+</div>

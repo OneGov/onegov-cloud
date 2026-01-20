@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 
 from onegov.core.orm.abstract import associated
@@ -5,14 +7,25 @@ from onegov.pay.models.payment import Payment
 from sqlalchemy import inspect
 
 
-def hash_primary_key(text):
-    return hashlib.sha1(text.encode('utf-8')).hexdigest()
+from typing import ClassVar, TYPE_CHECKING
+
+
+def hash_primary_key(text: str) -> str:
+    return hashlib.new(  # nosec: B324
+        'sha1',
+        text.encode('utf-8'),
+        usedforsecurity=False
+    ).hexdigest()
 
 
 class PayableBase:
 
+    if TYPE_CHECKING:
+        # forward declare this attribute
+        __tablename__: ClassVar[str]
+
     @property
-    def payable_reference(self):
+    def payable_reference(self) -> str:
         """ A string which identifies this payable in payment lists. Do not
         join any values here as it can lead to an explosion of executed
         queries!
@@ -28,7 +41,7 @@ class PayableBase:
         tablename = self.__tablename__
 
         keys = inspect(self.__class__).primary_key
-        values = '/'.join((str(getattr(self, key.name, None)) for key in keys))
+        values = '/'.join(str(getattr(self, key.name, None)) for key in keys)
 
         return f'{tablename}/{hash_primary_key(values)}'
 

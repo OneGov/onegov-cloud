@@ -225,6 +225,18 @@
         text-align: left;
     }
 
+    .panel {
+        padding: .7rem;
+        margin-bottom: 1rem;
+        background: #fffbd4;
+        border: 1px solid #ffe16a;
+        color: #9b6e05;
+    }
+
+    .panel p:last-child {
+        margin-bottom: 0;
+    }
+
     </style>
 </head>
 <body bgcolor="#f6f6f6">
@@ -237,26 +249,30 @@
 
                 <!-- content -->
                 <div class="content">
-                <table>
-                    <tr>
-                        <td>
-                            <tal:b tal:define="msg_header layout.macros['email_header']" tal:condition="msg_header">
-                                <metal:b use-macro="msg_header" />
-                            </tal:b>
+                    <div class="logo">
+                        <img tal:condition="layout.org.logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
+                    </div>
+                    <table>
+                        <tr>
+                            <td>
+                                <tal:b tal:define="msg_header layout.macros['email_header']" tal:condition="msg_header">
+                                    <metal:b use-macro="msg_header" />
+                                </tal:b>
 
-                            <div metal:define-slot="body"></div>
+                                    <div metal:define-slot="info"></div>
+                                    <div metal:define-slot="body"></div>
 
-                            <tal:b tal:define="msg_footer layout.macros['email_footer']" tal:condition="msg_footer">
-                                <metal:b use-macro="msg_footer" />
-                            </tal:b>
-                        </td>
-                    </tr>
-                    <tr tal:define="signature layout.macros['email_signature']|nothing" tal:condition="signature">
-                        <td>
-                            <metal:b use-macro="signature" />
-                        </td>
-                    </tr>
-                </table>
+                                <tal:b tal:define="msg_footer layout.macros['email_footer']" tal:condition="msg_footer">
+                                    <metal:b use-macro="msg_footer" />
+                                </tal:b>
+                            </td>
+                        </tr>
+                        <tr tal:define="signature layout.macros['email_signature']|nothing" tal:condition="signature">
+                            <td>
+                                <metal:b use-macro="signature" />
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </td>
             <td></td>
@@ -278,7 +294,7 @@
                         <tr>
                             <td align="center">
                                 <p metal:define-slot="footer">
-                                    <tal:b replace="structure layout.contact_html|layout.org.title" />
+                                    <tal:b replace="layout.contact_html|layout.org.title" />
                                 </p>
                             </td>
                         </tr>

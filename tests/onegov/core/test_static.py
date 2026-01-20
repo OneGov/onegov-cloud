@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 import os.path
 import time
@@ -8,20 +10,20 @@ from onegov.core.static import StaticFile
 from webtest import TestApp as Client
 
 
-def test_static_file(temporary_directory):
+def test_static_file(temporary_directory: str) -> None:
 
     class App(Framework):
         serve_static_files = True
 
     @App.static_directory()
-    def get_static_files():
+    def get_static_files() -> str:
         return temporary_directory
 
     morepath.commit(App)
 
     app = App()
-    app.configure_application()
     app.namespace = 'test'
+    app.configure_application()
     app.set_application_id('test/test')
 
     with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
@@ -31,17 +33,17 @@ def test_static_file(temporary_directory):
     assert StaticFile.from_application(app, 'robots.txt') is None
 
     app.serve_static_files = True
-    assert StaticFile.from_application(app, 'robots.txt').path == 'robots.txt'
+    assert StaticFile.from_application(app, 'robots.txt').path == 'robots.txt'  # type: ignore[union-attr]
     assert StaticFile.from_application(app, '../robots.txt') is None
 
 
-def test_static_file_app(temporary_directory, redis_url):
+def test_static_file_app(temporary_directory: str, redis_url: str) -> None:
 
     class App(Framework):
         serve_static_files = True
 
     @App.static_directory()
-    def get_static_files():
+    def get_static_files() -> str:
         return temporary_directory
 
     utils.scan_morepath_modules(App)
@@ -51,8 +53,8 @@ def test_static_file_app(temporary_directory, redis_url):
         f.write('foobar')
 
     app = App()
-    app.configure_application(redis_url=redis_url)
     app.namespace = 'test'
+    app.configure_application(redis_url=redis_url)
     app.set_application_id('test/test')
 
     c = Client(app)
@@ -77,19 +79,19 @@ def test_static_file_app(temporary_directory, redis_url):
     assert response.headers['Cache-Control'] == 'max-age=31536000'
 
 
-def test_root_file_app(temporary_directory, redis_url):
+def test_root_file_app(temporary_directory: str, redis_url: str) -> None:
     class App(Framework):
         serve_static_files = True
 
     @App.static_directory()
-    def get_static_files():
+    def get_static_files() -> str:
         return temporary_directory
 
     class RobotsTxt(StaticFile):
         pass
 
     @App.path(model=RobotsTxt, path='robots.txt')
-    def get_favicon(app, absorb):
+    def get_favicon(app: App, absorb: str) -> StaticFile | None:
         return StaticFile.from_application(app, 'robots.txt')
 
     utils.scan_morepath_modules(App)
@@ -99,15 +101,18 @@ def test_root_file_app(temporary_directory, redis_url):
         f.write('foobar')
 
     app = App()
-    app.configure_application(redis_url=redis_url)
     app.namespace = 'test'
+    app.configure_application(redis_url=redis_url)
     app.set_application_id('test/test')
 
     c = Client(app)
     assert c.get('/robots.txt').text == 'foobar'
 
 
-def test_static_files_directive(temporary_directory, redis_url):
+def test_static_files_directive(
+    temporary_directory: str,
+    redis_url: str
+) -> None:
 
     a = os.path.join(temporary_directory, 'a')
     b = os.path.join(temporary_directory, 'b')
@@ -125,11 +130,11 @@ def test_static_files_directive(temporary_directory, redis_url):
         serve_static_files = True
 
     @A.static_directory()
-    def get_static_files_a():
+    def get_static_files_a() -> str:
         return a
 
     @B.static_directory()
-    def get_static_files_b():
+    def get_static_files_b() -> str:
         return b
 
     utils.scan_morepath_modules(A)
@@ -142,8 +147,8 @@ def test_static_files_directive(temporary_directory, redis_url):
     app_b = B()
 
     for app in (app_a, app_b):
-        app.configure_application(redis_url=redis_url)
         app.namespace = 'test'
+        app.configure_application(redis_url=redis_url)
         app.set_application_id('test/test')
 
     assert app_a.static_files == [a]

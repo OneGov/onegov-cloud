@@ -1,9 +1,20 @@
+from __future__ import annotations
+
 from onegov.core.utils import module_path
 from onegov.org.initial_content import load_content, add_pages
 from onegov.org.models import Organisation
 
 
-def create_new_organisation(app, name, locale='de_CH'):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.translator_directory.app import TranslatorDirectoryApp
+
+
+def create_new_organisation(
+    app: TranslatorDirectoryApp,
+    name: str,
+    locale: str = 'de_CH'
+) -> Organisation:
     # Todo: add default languages
     assert locale == 'de_CH'
 

@@ -6,7 +6,7 @@
         <p i18n:translate>Hello!</p>
         <p i18n:translate>Your activity has been published:</p>
         <p><b>${model.title}</b></p>
-        <tal:b tal:content="structure layout.paragraphify(layout.linkify(model.lead))"></tal:b>
+        <tal:b tal:content="layout.paragraphify(layout.linkify(model.lead))"></tal:b>
 
         <p>
             <a href="${request.link(ticket, 'status')}" i18n:translate>Check ticket status</a>

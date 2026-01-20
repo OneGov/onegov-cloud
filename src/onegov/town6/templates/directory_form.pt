@@ -47,18 +47,18 @@
                 </li>
             </ul>
 
-            <div class="button primary" onclick="$('#confirm-migration form').submit();" i18n:translate>
+            <div class="button primary" data-submits-form="#confirm-migration form" i18n:translate>
                 Confirm
             </div>
 
-            <div class="button secondary" onclick="window.history.back();" i18n:translate>
+            <div class="button secondary" data-back-link i18n:translate>
                 Cancel
             </div>
         </tal:b>
 
         <div class="grid-x" style="display: ${confirm_migration and 'none' or 'block'}">
             <div class="small-12 medium-10 large-8 cell" id="confirm-migration">
-                <div metal:use-macro="layout.macros['form']" />
+                <div metal:use-macro="layout.macros['form']" tal:define="form_id 'main-form'"/>
             </div>
         </div>
     </tal:b>

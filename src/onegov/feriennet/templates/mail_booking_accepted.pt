@@ -1,0 +1,27 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Thanks a lot!</p> <br>
+        <p i18n:translate>We received your booking for <tal:b i18n:name="name">${name}</tal:b>.</p>
+        <p>
+            <b>${model.activity.title}</b><br>
+            <tal:b tal:repeat="date dates">
+                ${layout.format_datetime_range(date.localized_start, date.localized_end)}<br>
+            </tal:b>
+        </p>
+        <p>
+            <tal:b i18n:translate>You can find an overview of all bookings here:</tal:b><br>
+            <tal:b tal:content="bookings_link"></tal:b>
+        </p>
+        <br>
+            <p i18n:translate>Best regards</p>
+            <metal:b use-macro="layout.macros['sender']|nothing" />
+            <tal:b condition="cancellation_conditions">
+                <hr>
+                <b i18n:translate>Cancellation conditions:</b>
+                <div tal:content="cancellation_conditions"></div>
+            </tal:b>
+    </tal:b>
+</div>

@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from onegov.core.orm.abstract import AdjacencyListCollection
 from onegov.page.model import Page
 
 
-class PageCollection(AdjacencyListCollection):
+class PageCollection(AdjacencyListCollection[Page]):
     """ Manages a hierarchy of pages.
 
     Use it like this:
@@ -14,7 +16,7 @@ class PageCollection(AdjacencyListCollection):
 
     __listclass__ = Page
 
-    def copy(self, page, parent):
+    def copy(self, page: Page, parent: Page | None) -> Page:
         """ Takes the given page and copies it to a given parent.
 
         The parent may be the same as the given page or another. If there's

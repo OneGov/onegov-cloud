@@ -1,0 +1,15 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p i18n:translate>The rejection of your directory application has been withdrawn:</p>
+
+        <p><b>${ticket.group} - ${ticket.title}</b></p>
+
+        <p>
+            <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
+        </p>
+    </tal:b>
+</div>

@@ -1,0 +1,5 @@
+# Error: is not present at runtime
+# =============================
+# Since Config can contain arbitrary values we added __getattr__
+# to let mypy know that arbitrary attribute access is possible
+dectate.app.Config.__getattr__

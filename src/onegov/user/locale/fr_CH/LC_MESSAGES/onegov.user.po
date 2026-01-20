@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-20 09:54+0100\n"
+"POT-Creation-Date: 2024-07-25 09:34+0200\n"
 "PO-Revision-Date: 2022-03-07 13:38+0100\n"
 "Last-Translator: Marc Sommerhalder <info@seantis.ch>\n"
 "Language-Team: French\n"
@@ -35,11 +35,11 @@ msgstr "Échec de l'authentification"
 
 #, python-format
 msgid "User «${user}» is not authorized"
-msgstr "L'utilisateur « ${user} » n'est pas autorisé"
+msgstr "L'utilisateur «${user}» n'est pas autorisé"
 
 #, python-format
 msgid "Successfully logged in as «${user}»"
-msgstr "Connecté avec succès en tant que « ${user} »"
+msgstr "Connecté avec succès en tant que «${user}»"
 
 msgid "AzureAD"
 msgstr "AzureAD"
@@ -60,11 +60,40 @@ msgstr ""
 "Vous ne pouvez pas vous connecter car votre utilisateur n'a pas de groupes. "
 "Contactez votre administrateur système AzureAD."
 
+msgid "SAML2"
+msgstr "SAML2"
+
+msgid ""
+"Can't login because your user has no groups. Contact your SAML2 system "
+"administrator"
+msgstr ""
+"Vous ne pouvez pas vous connecter car votre utilisateur n'a pas de groupes. "
+"Contactez votre administrateur système SAML2."
+
+msgid "OpenID Connect"
+msgstr "OpenID Connect"
+
+msgid ""
+"Can't login because your user has no group. Contact your OpenID system "
+"administrator"
+msgstr ""
+
+#, python-format
+msgid "${mtan} - mTAN for ${organisation}."
+msgstr "${mtan} - mTAN pour ${organisation}."
+
+msgid ""
+"We sent an mTAN to the number linked with this account. Please enter it "
+"below."
+msgstr ""
+"Nous avons envoyé un mTAN au numéro lié à ce compte. Veuillez le saisir ci-"
+"dessous."
+
 msgid "Name"
 msgstr "Nom"
 
 msgid "E-Mail Address"
-msgstr "E-mail"
+msgstr "Adresse e-mail"
 
 msgid "Password"
 msgstr "Mot de passe"
@@ -75,8 +104,14 @@ msgstr "YubiKey"
 msgid "Plug your YubiKey into a USB slot and press it."
 msgstr "Branchez votre YubiKey sur un port USB et appuyez dessus."
 
-msgid "The password must be at least eight characters long"
-msgstr "Le mot de passe doit comporter au minimum 8 caractères"
+msgid "mTAN"
+msgstr "mTAN"
+
+msgid "Phone number"
+msgstr "Numéro de téléphone"
+
+msgid "The password must be at least ten characters long"
+msgstr "Le mot de passe doit comporter au minimum 10 caractères"
 
 msgid "Password Confirmation"
 msgstr "Confirmation du mot de passe"
@@ -97,7 +132,7 @@ msgid "Role"
 msgstr "Rôle"
 
 msgid "Editor"
-msgstr "Éditeur"
+msgstr "Rédacteur"
 
 msgid "Admin"
 msgstr "Admin"
@@ -119,3 +154,9 @@ msgstr "30 jours"
 
 msgid "Number of Signups"
 msgstr "Nombre d'inscriptions"
+
+msgid "Code"
+msgstr "Code"
+
+msgid "Users"
+msgstr "Utilisateurs"

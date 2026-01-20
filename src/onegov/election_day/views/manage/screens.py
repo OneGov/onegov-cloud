@@ -1,4 +1,5 @@
 """ The manage screen views. """
+from __future__ import annotations
 
 from morepath import redirect
 from onegov.core.security import Private
@@ -10,12 +11,22 @@ from onegov.election_day.layouts import ManageScreensLayout
 from onegov.election_day.models import Screen
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.forms import EmptyForm
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 @ElectionDayApp.manage_html(
     model=ScreenCollection,
     template='manage/screens.pt'
 )
-def view_screens(self, request):
-
+def view_screens(
+    self: ScreenCollection,
+    request: ElectionDayRequest
+) -> RenderData:
     """ View all screens as a list. """
 
     return {
@@ -32,8 +43,10 @@ def view_screens(self, request):
     name='export',
     permission=Private
 )
-def export_screens(self, request):
-
+def export_screens(
+    self: ScreenCollection,
+    request: ElectionDayRequest
+) -> RenderData:
     """ Export all screens as a CSV file. """
 
     return {
@@ -47,8 +60,11 @@ def export_screens(self, request):
     name='new-screen',
     form=ScreenForm
 )
-def create_screen(self, request, form):
-
+def create_screen(
+    self: ScreenCollection,
+    request: ElectionDayRequest,
+    form: ScreenForm
+) -> RenderData | Response:
     """ Create a new screen. """
 
     layout = ManageScreensLayout(self, request)
@@ -74,8 +90,11 @@ def create_screen(self, request, form):
     name='edit',
     form=ScreenForm
 )
-def edit_screen_item(self, request, form):
-
+def edit_screen_item(
+    self: Screen,
+    request: ElectionDayRequest,
+    form: ScreenForm
+) -> RenderData | Response:
     """ Edit a screen. """
 
     layout = ManageScreensLayout(self, request)
@@ -93,7 +112,7 @@ def edit_screen_item(self, request, form):
         'layout': layout,
         'form': form,
         'title': _(
-            "Screen ${number}",
+            'Screen ${number}',
             mapping={'number': self.number}
         ),
         'subtitle': _('Edit screen'),
@@ -105,8 +124,11 @@ def edit_screen_item(self, request, form):
     model=Screen,
     name='delete'
 )
-def delete_screen(self, request, form):
-
+def delete_screen(
+    self: Screen,
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Delete a screen. """
 
     layout = ManageScreensLayout(self, request)
@@ -121,13 +143,13 @@ def delete_screen(self, request, form):
         'message': _(
             'Do you really want to delete "${item}"?',
             mapping={
-                'item': self.id
+                'item': self.number
             }
         ),
         'layout': layout,
         'form': form,
         'title': _(
-            "Screen ${number}",
+            'Screen ${number}',
             mapping={'number': self.number}
         ),
         'subtitle': _('Delete screen'),

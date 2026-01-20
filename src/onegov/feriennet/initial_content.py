@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import textwrap
 
 from onegov.core.utils import module_path
@@ -6,8 +8,19 @@ from onegov.org.initial_content import add_filesets, load_content, add_pages
 from onegov.org.models import Organisation
 
 
-def create_new_organisation(app, name, create_files=True, path=None,
-                            locale='de_CH'):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.feriennet.app import FeriennetApp
+
+
+def create_new_organisation(
+    app: FeriennetApp,
+    name: str,
+    create_files: bool = True,
+    path: str | None = None,
+    locale: str = 'de_CH'
+) -> Organisation:
+
     locales = {
         'de_CH': 'content/de.yaml',
         'fr_CH': 'content/fr.yaml',
@@ -30,12 +43,12 @@ def create_new_organisation(app, name, create_files=True, path=None,
     if locale == 'de_CH':
         forms.add(
             name='kontakt',
-            title="Kontakt",
+            title='Kontakt',
             meta={
                 'lead': (
-                    "Haben Sie Fragen oder eine Anregung? "
-                    "Rufen Sie uns einfach an oder benutzen Sie dieses "
-                    "Formular."
+                    'Haben Sie Fragen oder eine Anregung? '
+                    'Rufen Sie uns einfach an oder benutzen Sie dieses '
+                    'Formular.'
                 )
             },
             definition=textwrap.dedent("""\
@@ -50,12 +63,12 @@ def create_new_organisation(app, name, create_files=True, path=None,
     elif locale == 'fr_CH':
         forms.add(
             name='contact',
-            title="Contact",
+            title='Contact',
             meta={
                 'lead': (
-                    "Avez-vous des questions ou des commentaires ? "
-                    "Appelez-nous simplement, ou utilisez le formulaire "
-                    "suivant."
+                    'Avez-vous des questions ou des commentaires ? '
+                    'Appelez-nous simplement, ou utilisez le formulaire '
+                    'suivant.'
                 )
             },
             definition=textwrap.dedent("""\
@@ -70,11 +83,11 @@ def create_new_organisation(app, name, create_files=True, path=None,
     elif locale == 'it_CH':
         forms.add(
             name='contatto',
-            title="Contatto",
+            title='Contatto',
             meta={
                 'lead': (
-                    "Avete domande o suggerimenti? "
-                    "Potete telefonarci o riempire questo formulario."
+                    'Avete domande o suggerimenti? '
+                    'Potete telefonarci o riempire questo formulario.'
                 )
             },
             definition=textwrap.dedent("""\

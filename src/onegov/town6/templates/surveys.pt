@@ -1,0 +1,28 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b metal:use-macro="layout.macros.page_content"
+                 tal:define="lead None; text None; people None; coordinates None; contact layout.org.contact_html|nothing">
+            <tal:b metal:fill-slot="after-text">
+                <p tal:condition="not:surveys" i18n:translate="">No surveys defined yet.</p>
+                <metal:b use-macro="layout.macros['group_by_column']" tal:condition="surveys" tal:define="grouped surveys; add_pagerefs request.is_logged_in" />
+            </tal:b>
+            <tal:b metal:fill-slot="before-panels">
+                <div class="side-panel" tal:condition="surveys">
+                    <h3 i18n:translate="">Categories</h3>
+                    <div class="side-panel-with-bg">
+                        <ul class="more-list">
+                            <li tal:repeat="survey surveys">
+                                <a class="list-link" href="#${survey}">
+                                    <span class="list-title">${survey}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </tal:b>
+        </tal:b>
+    </tal:b>
+</div>

@@ -1,7 +1,17 @@
-form_extensions = {}
+from __future__ import annotations
+
+from typing import Any, Generic, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from onegov.form import Form
+
+_FormT = TypeVar('_FormT', bound='Form')
 
 
-class FormExtension:
+form_extensions: dict[str, type[FormExtension[Any]]] = {}
+
+
+class FormExtension(Generic[_FormT]):
     """ Enables the extension of form definitions/submissions.
 
     When either of those models create a form class they will take the
@@ -38,19 +48,19 @@ class FormExtension:
 
     """
 
-    def __init__(self, form_class):
+    def __init__(self, form_class: type[_FormT]):
         self.form_class = form_class
 
-    def __init_subclass__(cls, name, **kwargs):
+    def __init_subclass__(cls, name: str, **kwargs: object):
         super().__init_subclass__(**kwargs)
 
         assert name not in form_extensions, (
-            f"A form extension named {name} already exists"
+            f'A form extension named {name} already exists'
         )
 
         form_extensions[name] = cls
 
-    def create(self):
+    def create(self) -> type[_FormT]:
         raise NotImplementedError
 
 
@@ -61,13 +71,17 @@ class Extendable:
 
     """
 
-    def extend_form_class(self, form_class, extensions):
+    def extend_form_class(
+        self,
+        form_class: type[_FormT],
+        extensions: Collection[str]
+    ) -> type[_FormT]:
         if not extensions:
             return form_class
 
         for extension in extensions:
             if extension not in form_extensions:
-                raise KeyError(f"Unknown form extension: {extension}")
+                raise KeyError(f'Unknown form extension: {extension}')
 
             form_class = form_extensions[extension](form_class).create()
 

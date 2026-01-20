@@ -4,6 +4,8 @@
 
 small.error,
 span.error {
+    @include smooth-edges;
+
     background: $alert-color;
     color: $white;
     display: block;
@@ -27,20 +29,50 @@ form {
         &[type="checkbox"],
         &[type="radio"] {
             margin-bottom: .25rem;
+
+            &:checked + label .with-count::before {
+                background-color: $primary-color;
+                color: $white;
+            }
+
+            + label .with-count::before {
+                background-color: $secondary-color;
+                color: $body-font-color;
+                border: 0px solid #000;
+                border-radius: 1000px;
+                box-sizing: content-box;
+                content: attr(data-count);
+                display: inline-block;
+                font-size: .75rem;
+                line-height: 22px;
+                min-width: 4ex;
+                padding: 0 .5rem;
+                text-align: right;
+                margin-right: 1ex;
+            }
+        }
+    }
+
+    .two-columns ul {
+        -moz-column-count: 2;
+        -moz-column-gap: 2em;
+        -webkit-column-count: 2;
+        -webkit-column-gap: 2em;
+        column-count: 2;
+        column-gap: 2em;
+        max-width: calc(100% - 2em);
+        margin-left: 0;
+
+        li {
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
     }
 
     label {
 
-        min-width: 75%;
-
-        &.error {
+        &.error, .upload-widget.error {
             color: $alert-color;
-
-            & input,
-            & .button {
-                margin-bottom: 0;
-            }
         }
     }
 
@@ -57,6 +89,18 @@ form {
         li input[type="checkbox"],
         li input[type="radio"] {
             margin-bottom: .25rem;
+        }
+    }
+
+    .duration-widget label {
+        display: inline-block;
+        white-space: nowrap;
+        margin-right: .5rem;
+
+        input {
+            display: inline-block;
+            width: auto;
+            margin-right: .25rem;
         }
     }
 
@@ -78,11 +122,11 @@ form {
     .field-help {
         color: $steel;
         font-size: .8rem;
-        margin-left: 1.6rem;
+        margin-left: 25px;
     }
 
     input + .label-text + .field-help {
-        margin-left: 1.8rem;
+        margin-left: 25px;
     }
 
     .long-field-help,
@@ -156,6 +200,12 @@ form {
         }
     }
 
+    .upload-options {
+        div input {
+            margin-bottom: 0;
+        }
+    }
+
     .redactor-box {
         margin-bottom: .75rem;
     }
@@ -206,6 +256,10 @@ form {
         position: absolute;
     }
 
+    textarea.formcode-select {
+        display: none !important;
+    }
+
     .formcode-select {
         @include form-element;
         height: 100%;
@@ -215,6 +269,64 @@ form {
             margin-top: .25rem !important;
         }
     }
+
+    .redactor-editor li {
+        display: list-item;
+    }
+
+    li {
+        align-items: baseline;
+        display: flex;
+        margin-bottom: .3rem;
+    }
+
+    .file-preview-wrapper {
+        &:not(:empty) {
+            @include smooth-edges;
+            border: $input-border;
+            margin-bottom: 1rem;
+            padding: .5rem;
+        }
+
+        .file-details {
+            /* FIXME:
+                temporary to ensure a somewhat reasonable display
+                within the form. Once this widget is more responsive
+                we may be able to get away with displaying this
+            */
+            display: none;
+        }
+
+        .file-actions .button {
+            padding: 0.85em .15em !important;
+            margin-bottom: .5rem !important;
+
+            &.delete {
+                /* FIXME:
+                    the delete button does not work well, since we
+                    would need to remove the input after deletion
+                    in order to not cause any issues.
+
+                    All the actions assume a tabular layout, so
+                    we either need to change the widget to adhere
+                    to that layout or make the delete action more
+                    flexible, so we can specify which elements
+                    should be removed.
+
+                    The rename button also has a small issue, in
+                    that the name displayed above the file-preview-wrapper
+                    will not be updated currently, so that should
+                    be fixed as well, but it's not large enough of
+                    an issue to hide that button as well...
+                */
+                display: none;
+            }
+        }
+    }
+}
+
+form .icon-widget li {
+    display: block;
 }
 
 /*
@@ -251,8 +363,20 @@ input.has-field-help {
 
 .input-with-button {
 
-    .button {
+    input[type='text'] {
+        border-radius: .7rem 0 0 .7rem !important;
+    }
+
+    .button.secondary{
         @include input-button;
+        border-radius: 0 10rem 10rem 0 !important;
+        height: 2.6rem !important;
+        line-height: 1.5rem;
+        padding: .5rem !important;
+
+        &:hover {
+            padding: .5rem !important;
+        }
     }
 
     #redactor-modal-link-insert {
@@ -263,15 +387,27 @@ input.has-field-help {
     }
 }
 
-.button.datetimepicker {
+.many-plus-minus {
+    align-items: center;
+    display:flex;
+}
+
+.many-fields a.button.datetimepicker {
     @include input-button;
+    padding: 0 !important;
+    margin: 0 .5rem !important;
+
+    &:hover {
+        padding: 0 !important;
+        margin: 0 .5rem !important;
+    }
 }
 
 .fieldset-display {
     margin-bottom: 1em;
 
     .thumbnail {
-        border-radius: 5px;
+        @include smooth-edges;
         flex: 2;
         margin-right: 1rem;
         overflow: hidden;
@@ -282,11 +418,29 @@ input.has-field-help {
         }
 
         img {
-            border-radius: 5px;
+            @include smooth-edges;
             max-height: 150px;
             object-fit: cover;
             vertical-align: top;
             width: 100%;
+        }
+    }
+}
+
+.directory-fields .field-display p.thumbnail {
+    border: 0;
+    @include smooth-edges;
+    cursor: zoom-in;
+
+    img {
+        border: 0;
+        @include smooth-edges;
+        margin: 0;
+        transition: filter .25s ease-in-out;
+
+        &:hover {
+            filter: brightness(.9);
+            transition: filter .25s ease-in-out;
         }
     }
 }
@@ -362,6 +516,12 @@ dl.field-display > dt {
             padding-right: .75ex;
         }
     }
+
+    .button:hover {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 1rem 1.5rem !important;
+    }
 }
 
 /*
@@ -385,7 +545,13 @@ dl.field-display > dt {
 }
 
 .many-fields a.button {
-    margin-bottom: 0;
+    margin: 1rem .2rem !important;
+    padding: .5rem !important;
+
+    &:hover {
+        margin: 1rem .2rem !important;
+        padding: .5rem !important;
+    }
 }
 
 /*
@@ -400,21 +566,28 @@ dl.field-display > dt {
     }
 }
 
-/*
-Fix for very long fieldset of people
-*/
+.checkout-button {
+    margin-right: 1rem;
 
-#fieldset-people .formfields {
-    max-height: 600px;
-    overflow-y: scroll;
-    @include breakpoint(small only) {
-        max-height: 300px;
+    &:hover {
+        margin-right: .5rem;
     }
 }
 
-a.category-anchor {
-    display: block;
-    position: relative;
-    top: -150px;
-    visibility: hidden;
+p.file-title {
+    margin-bottom: .5rem;
+    margin-top: 1.2rem;
+}
+
+.file-edit {
+    background: $smoke;
+    border-radius: .7rem;
+    margin-left: .5rem;
+    padding: .5rem;
+    transition: all 200ms linear;
+
+    &:hover {
+        background: $iron;
+        cursor: pointer !important;
+    }
 }

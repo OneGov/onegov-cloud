@@ -1,15 +1,35 @@
+from __future__ import annotations
+
 import babel
 import os
 import transaction
 
 from datetime import date, timedelta
 from onegov.event import Event
+from tempfile import TemporaryDirectory
 from tests.onegov.town6.common import step_class
+from tests.shared.utils import create_pdf
+from unittest.mock import patch
+from webtest import Upload
 
 
-def test_event_steps(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from unittest.mock import MagicMock
+    from .conftest import Client
 
-    form_page = client.get('/events').click("Veranstaltung melden")
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_event_steps(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
+    form_page = client.get('/events').click("Veranstaltung erfassen")
     start_date = date.today() + timedelta(days=1)
     end_date = start_date + timedelta(days=4)
 
@@ -88,9 +108,17 @@ def test_event_steps(client):
     assert message['To'] == "test@example.org"
     assert ticket_nr in message['TextBody']
 
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
+
     # Make corrections
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
     form_page.form['description'] = "My event is exceptional."
+    form_page.form['organizer_email'] = "a@b.ch"
     preview_page = form_page.form.submit().follow()
     assert "My event is exceptional." in preview_page
 
@@ -123,6 +151,7 @@ def test_event_steps(client):
     assert "Ausstellung" in ticket_page
     assert "Bibliothek" in ticket_page
     assert "Veranstaltung bearbeitet" in ticket_page
+    assert "a@b.ch" in ticket_page
 
     assert "{} 18:00 - 22:00".format(
         babel.dates.format_date(
@@ -141,7 +170,8 @@ def test_event_steps(client):
 
     # Make some more corrections
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
-    form_page.form['organizer'] = "A carful organizer"
+    form_page.form['organizer'] = "A careful organizer"
+    form_page.form['organizer_phone'] = "079 123 45 56"
     preview_page = form_page.form.submit().follow()
     assert "My event is exceptional." in preview_page
 
@@ -171,7 +201,9 @@ def test_event_steps(client):
     assert "A special place" in message
     assert "Ausstellung" in message
     assert "Bibliothek" in message
-    assert "A carful organizer" in message
+    assert "A careful organizer" in message
+    assert "+41 79 123 45 56" in ticket_page
+    assert "a@b.ch" in ticket_page
     assert "{} 18:00 - 22:00".format(
         start_date.strftime('%d.%m.%Y')) in message
     for days in range(5):
@@ -195,3 +227,98 @@ def test_event_steps(client):
     assert "Bearbeiten Sie diese Veranstaltung." not in confirmation_page
     assert client.get(form_page.request.url, expect_errors=True).status_code \
         == 403
+
+
+def test_create_events_directly(client: Client) -> None:
+    client.login_admin()
+    form_page = client.get('/events').click("^Veranstaltung$")
+    # As admin or editor, the progress indicator should not be displayed.
+    # This only makes sense in the publishing process for visitors.
+    assert 'progress-indicator' not in form_page
+
+    start_date = date.today() + timedelta(days=1)
+    end_date = start_date + timedelta(days=4)
+
+    # Fill out event
+    form_page.form['email'] = "test@example.org"
+    form_page.form['title'] = "My Event"
+    form_page.form['description'] = "My event is an event."
+    form_page.form['location'] = "Location"
+    form_page.form['organizer'] = "The Organizer"
+    form_page.form['organizer_email'] = "a@b.ch"
+    form_page.form['organizer_phone'] = "+41 41 123 45 67"
+    form_page.form.set('tags', True, index=0)
+    form_page.form.set('tags', True, index=1)
+    form_page.form['start_date'] = start_date.isoformat()
+    form_page.form['start_time'] = "18:00"
+    form_page.form['end_time'] = "22:00"
+    form_page.form['end_date'] = end_date.isoformat()
+    form_page.form['repeat'] = 'weekly'
+    form_page.form.set('weekly', True, index=0)
+    form_page.form.set('weekly', True, index=1)
+    form_page.form.set('weekly', True, index=2)
+    form_page.form.set('weekly', True, index=3)
+    form_page.form.set('weekly', True, index=4)
+    form_page.form.set('weekly', True, index=5)
+    form_page.form.set('weekly', True, index=6)
+
+    events_redirect = form_page.form.submit().follow().follow()
+    assert "Event 'My Event' erfolgreich erstellt" in events_redirect
+
+
+def test_hide_event_submission_option(client: Client) -> None:
+    events_page = client.get('/events')
+    assert "Veranstaltung erfassen" in events_page
+
+    client.login_admin()
+    settings = client.get('/event-settings')
+    settings.form['submit_events_visible'] = False
+    settings.form.submit()
+
+    events_page = client.get('/events')
+    assert "Veranstaltung erfassen" not in events_page
+
+    settings.form['submit_events_visible'] = True
+    settings.form.submit()
+
+    events_page = client.get('/events')
+    assert "Veranstaltung erfassen" in events_page
+
+
+def test_view_occurrences_event_documents(client: Client) -> None:
+    page = client.get('/events')
+    assert "Dokumente" not in page
+
+    with (TemporaryDirectory() as td):
+        client.login_admin()
+        settings = client.get('/event-settings')
+        filename_1 = os.path.join(td, 'zoo-programm-saison-2024.pdf')
+        create_pdf(filename_1)
+        settings.form.set('event_files', [Upload(filename_1)], -1)
+        settings = settings.form.submit().follow()
+        assert settings.status_code == 200
+
+        settings = client.get('/event-settings')
+        assert "Verknüpfte Datei" in settings
+        assert "zoo-programm-saison-2024.pdf" in settings
+        client.logout()
+
+        page = client.get('/events')
+        assert "Dokumente" in page
+        assert "zoo-programm-saison-2024.pdf" in page
+
+
+def test_view_occurrences_event_information(client: Client) -> None:
+    client.login_admin()
+    settings = client.get('/event-settings')
+    settings.form['event_header_html'] = (
+        '<em>My <strong>bold</strong> Header</em>')
+    settings.form['event_footer_html'] = (
+        '<em>My\n<strong>bold</strong>\nFooter</em>')
+    settings.form.submit()
+
+    client.logout()
+
+    page = client.get('/events')
+    assert 'My bold Header' in page.pyquery('.event-header').text()
+    assert 'My bold Footer' in page.pyquery('.event-footer').text()

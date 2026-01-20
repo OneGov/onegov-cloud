@@ -3,7 +3,7 @@
 OneGov Cloud is a Swiss initiative to provide municipalities with open-source
 web-applications.
 
-[![Screenshot](docs/_static/govikon.png?raw=true)]()
+[![Screenshot](docs/_static/wil-sg.png?raw=true)]()
 
 ---
 
@@ -13,7 +13,7 @@ looking for, you might appreciate these links:
 - **[Marketing site](https://admin.digital)**
 <br>For an executive summary (in German)
 
-- **[Developer docs](https://docs.onegovcloud.ch)**
+- **[Developer docs](https://onegov.github.io/onegov-cloud/)**
 <br>For a technical overview and Python API docs
 
 - **[Changelog](CHANGES.md)**
@@ -23,8 +23,7 @@ looking for, you might appreciate these links:
 <br>Where you can start your own free instance of our solution for muncipalities
 
 ---
-
-[![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg)](https://buildkite.com/seantis/onegov-cloud) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![Netlify Status](https://api.netlify.com/api/v1/badges/ac49d4ad-681d-499f-a3e5-b60c89d98c74/deploy-status)](https://app.netlify.com/sites/onegov-cloud-docs/deploys)
+[![Tests](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml) [![Build status](https://github.com/OneGov/onegov-cloud/actions/workflows/build-and-push.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/build-and-push.yml) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 ## Developing
 
@@ -52,6 +51,7 @@ up in the release history, it needs to be written as follows:
 
     TYPE: <Feature|Bugfix>
     LINK: <Ticket-Number>
+    HINT: <Optional upgrade hint>
 
 For example:
 
@@ -61,8 +61,10 @@ For example:
 
     TYPE: Feature
     LINK: OGC-101
+    HINT: Run `ongegov-election --select /onegov_election_day/* migrate` after upgrade
 
-Commits that do not follow this scheme are not included in the changelog.
+> Commits that do not follow this schema are not included in the changelog.
+
 
 **Pull request messages** should contain the first line of the commit message (`<Module>: <Message>`) for the title and the rest for the message.
 
@@ -100,15 +102,36 @@ changelog in markdown. Your commit should be somewhere at the top.
 If the commit you did does not show up, check to make sure that the module
 name is valid (first character must be uppercase!).
 
+### Type hints code of conduct
+
+Some of our modules have increasingly strict requirements for writing type hints, sometimes this can be a distraction, especially for hot fixes, which need to happen quick.
+
+In order to avoid degrading the quality of our type hints over time, here are some rules for how to deal with situations where you don't know what the correct type hint for a function/attribute should look like:
+
+    from typing import Any as Incomplete
+
+    def foo(x: Incomplete) -> Incomplete:
+        y: Incomplete = bar(x)
+        ...  # type error further below because of y
+
+
+`Incomplete` indicates that a type annotation isn't finished, so we can easily
+search for it and fix it later on. Please avoid using `type:ignore` comments unless you are absolutely certain that the error is fine to ignore, it's a lot more difficult to clean up later on and can hide genuine problems with the code.
+
 ## Requirements
 
 To run OneGov Cloud locally, you must meet the following requirements:
 
 * Linux/MacOS
 * Postgres 10+
-* Python 3.10+
+* Python 3.11+
 * Redis 5+
 * NodeJS 9+
+* Docker Compose
+
+To install the requirements for Ubuntu do:
+
+    sudo apt install postgresql postgresql-contrib redis-server nodejs python3 docker-compose
 
 ### Libraries
 
@@ -117,14 +140,15 @@ dependencies:
 
 #### MacOS
 ```shell
-brew install curl libffi libjpeg libpq libxml2 libxslt zlib libev poppler pv libxmlsec1
+brew install curl libffi libjpeg libpq libxml2 libxslt zlib libev poppler pv libxmlsec1 weasyprint
 ```
 
 #### Ubuntu
 ```shell
 sudo apt-get install libcurl4-openssl-dev libffi-dev libjpeg-dev libpq-dev \
 libxml2-dev libxslt1-dev zlib1g-dev libev-dev libgnutls28-dev libkrb5-dev \
-libpoppler-cpp-dev pv libzbar0 openssl libssl-dev xmlsec1 libxmlsec1-openssl
+libpoppler-cpp-dev pv libzbar0 openssl libssl-dev xmlsec1 libxmlsec1-openssl \
+weasyprint
 ```
 
 ## Installation
@@ -179,16 +203,37 @@ in `onegov.yml`:
     GRANT ALL PRIVILEGES ON DATABASE onegov TO dev;
     ALTER DATABASE onegov SET timezone TO 'UTC';
 
+Use the 'exit' command once your done to quit the postgres cli.
+
+    postgres=# exit
+
+
 Onegov cloud uses one database for all applications and instances.
 
-## Setting up the application(s)
+
+## Setting up the application(s) locally
+
+### Create folder structure for local storage and change owner accordingly
+
+    sudo mkdir -p /usr/local/var/onegov/depot
+    sudo mkdir -p /usr/local/var/onegov/files
+    sudo chown -R $USER:$USER /usr/local/var/onegov
+
+### Configure token
+
+add the mapbox token to you onegov.yml (generic)
+
+    mapbox_token: '<token>'
+
+> NOTE: Make sure you don't miss the single quotes
 
 **Org, Town, Town6, Agency, FSI and Translator Directory**
 
-Create a new organisation in the database together with a new admin (adjust the path according to your configuration):
+Create a new organization in the database together with a new admin (adjust the path according to your configuration):
 
     onegov-org --select /onegov_town6/govikon add "Gemeinde Govikon"
     onegov-user --select /onegov_town6/govikon add admin admin@example.org --password test --no-prompt
+
 
 **Election Day and Swissvotes**
 
@@ -196,11 +241,11 @@ Create the `principal.yaml` and flush redis. You may want to add a user (see abo
 
 ## Running the instance(s)
 
-Run the server:
+Run your local setup - start onegov server:
 
     onegov-server
 
-And open the local url in your browser:
+And open the local url in your browser (depending on what you setup, a new community or an existing by transferring from a remote server, see above):
 
     http://localhost:8080/onegov_town6/govikon
 
@@ -208,11 +253,12 @@ To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variabl
 
     export ONEGOV_DEVELOPMENT='1'
 
-Run the elastic search cluster, D3renderer and the SMTP server:
+**Optional**
+Run the D3renderer and the SMTP server: (for me sudo was required)
 
-    docker-compose up -d
+    docker compose up -d
 
-## Updates
+## Update your local setup
 
 To run updates, you want to first update your sources:
 
@@ -291,10 +337,10 @@ To synchronize between different modules:
 Additionally, you can use <https://gengo.com> to translate English messages
 to other languages, like German, French or Italian.
 
-For this to work, you need to set the following variables:
+For this to work, you need to set the following variables (note the single quotes!):
 
-    export GENGO_PUBLIC_KEY="my gengo public key"
-    export GENGO_PRIVATE_KEY="my gengo private key"
+    export GENGO_PUBLIC_KEY='my gengo public key'
+    export GENGO_PRIVATE_KEY='my gengo private key'
 
 To push a translation job to Gengo, run:
 

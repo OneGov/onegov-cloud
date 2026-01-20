@@ -1,5 +1,12 @@
+from __future__ import annotations
+
 from onegov.chat import Message
 from sqlalchemy.orm import object_session
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.file import File
 
 
 class FileMessage(Message):
@@ -8,7 +15,7 @@ class FileMessage(Message):
     }
 
     @classmethod
-    def log_signature(cls, file, signee):
+    def log_signature(cls, file: File, signee: str) -> None:
         cls.bound_messages(object_session(file)).add(
             channel_id=file.id,
             owner=signee,
@@ -20,7 +27,11 @@ class FileMessage(Message):
         )
 
     @classmethod
-    def log_signed_file_removal(cls, file, username):
+    def log_signed_file_removal(
+        cls,
+        file: File,
+        username: str | None
+    ) -> None:
         cls.bound_messages(object_session(file)).add(
             channel_id=file.id,
             owner=username,

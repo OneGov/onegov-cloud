@@ -69,7 +69,7 @@ var initGroupedChart = function(el) {
 };
 
 var python_to_bool = function(val) {
-    return val === "false" ? false : !!val;
+    return (val === true || val === "true" || val === "True") ? true : false;
 };
 
 var initEntitiesMap = function(el) {

@@ -327,6 +327,7 @@
 				deleted: 'Deleted',
 				anchor: 'Anchor',
 				link_new_tab: 'Open link in new tab',
+				link_select_page: 'Select a page...',
 				underline: 'Underline',
 				alignment: 'Alignment',
 				filename: 'Name (optional)',
@@ -346,6 +347,12 @@
 
 		codemirror: false
 	};
+
+	// Offset for toolbar for town6
+	if (document.body.classList.contains('town-6')) {
+		var header = document.querySelector('#header .nav-bar-sticky')
+		$.Redactor.opts.toolbarFixedTopOffset = header.offsetHeight - 20;
+	}
 
 	// Functionality
 	Redactor.fn = $.Redactor.prototype = {
@@ -6553,9 +6560,9 @@
 						file: String()
 						+ '<section id="redactor-modal-file-insert">'
 							+ '<div id="redactor-modal-file-upload-box">'
+								+ '<div id="redactor-modal-file-upload"></div>'
 								+ '<label>' + this.lang.get('filename') + '</label>'
 								+ '<input type="text" id="redactor-filename" aria-label="' + this.lang.get('filename') + '" /><br><br>'
-								+ '<div id="redactor-modal-file-upload"></div>'
 							+ '</div>'
 						+ '</section>',
 
@@ -7696,7 +7703,11 @@
 						node = node[0] || node;
 
 						var range = document.createRange();
-						range.selectNodeContents(node);
+						try {
+							range.selectNodeContents(node);
+						} catch (e) {
+							console.error("Catched Error: " + e.message);
+						}
 					}
 					else
 					{

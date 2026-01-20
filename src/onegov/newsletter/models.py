@@ -1,6 +1,11 @@
+from __future__ import annotations
+
+from email_validator import validate_email
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin, TimestampMixin
+from onegov.core.orm.mixins import (ContentMixin, TimestampMixin,
+                                    content_property, dict_markup_property,
+                                    dict_property)
 from onegov.core.orm.types import UTCDateTime, UUID
 from onegov.core.utils import normalize_for_url
 from onegov.search import SearchableContent
@@ -16,12 +21,20 @@ from sqlalchemy import Table
 from sqlalchemy import Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session, validates, relationship
+from translationstring import TranslationString
 from uuid import uuid4
-from validate_email import validate_email
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from datetime import datetime
+
 
 # Newsletters and recipients are joined in a many to many relationship
 newsletter_recipients = Table(
-    'newsletter_recipients', Base.metadata,
+    'newsletter_recipients',
+    Base.metadata,
     Column('newsletter_id', Text, ForeignKey('newsletters.name')),
     Column('recipient_id', UUID, ForeignKey('recipients.id'))
 )
@@ -38,56 +51,68 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
 
     __tablename__ = 'newsletters'
 
-    es_id = 'name'
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'html': {'type': 'localized_html'}
+    # HACK: We don't want to set up translations in this module for this single
+    #       string, we know we already have a translation in a different domain
+    #       so we just manually specify it for now.
+    fts_type_title = TranslationString('Newsletter', domain='onegov.org')
+    fts_id = 'name'
+    fts_title_property = 'title'
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        'html': {'type': 'localized', 'weight': 'C'}
     }
 
     @property
-    def es_public(self):
+    def fts_public(self) -> bool:
         return self.sent is not None
 
     #: the name of the newsletter, derived from the title
-    name = Column(Text, nullable=False, primary_key=True)
+    name: Column[str] = Column(Text, nullable=False, primary_key=True)
 
     @validates('name')
-    def validate_name(self, key, name):
+    def validate_name(self, key: str, name: str) -> str:
         assert normalize_for_url(name) == name, (
-            "The given name was not normalized"
+            'The given name was not normalized'
         )
 
         return name
 
     #: the title of the newsletter
-    title = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
 
     #: the optional lead or editorial of the newsletter
-    lead = Column(Text, nullable=True)
+    lead: Column[str | None] = Column(Text, nullable=True)
 
     #: the content of the newsletter in html, this is not just the partial
     #: content, but the actual, fully rendered html content.
-    html = Column(Text, nullable=False)
+    html: Column[str] = Column(Text, nullable=False)
+
+    #: the closing remark of the newsletter
+    closing_remark = dict_markup_property('content')
 
     #: null if not sent yet, otherwise the date this newsletter was first sent
-    sent = Column(UTCDateTime, nullable=True)
+    sent: Column[datetime | None] = Column(UTCDateTime, nullable=True)
 
     #: time the newsletter is scheduled to be sent (in UTC)
-    scheduled = Column(UTCDateTime, nullable=True)
+    scheduled: Column[datetime | None] = Column(UTCDateTime, nullable=True)
 
     #: the recipients of this newsletter, meant in part as a tracking feature
     #: to answer the question "who got which newsletters?" - for this to work
     #: the user of onegov.newsletter has to make sure that sent out
     #: newsletters can't have actual recipients removed from them.
     #: onegov.newsletter does not make any guarantees here
-    recipients = relationship(
+    recipients: relationship[list[Recipient]] = relationship(
         'Recipient',
         secondary=newsletter_recipients,
         back_populates='newsletters')
 
+    #: whether the newsletter should only show previews instead of full text
+    show_only_previews: Column[bool] = Column(
+        Boolean, nullable=False, default=True)
+
     @property
-    def open_recipients(self):
+    def open_recipients(self) -> tuple[Recipient, ...]:
         received = select([newsletter_recipients.c.recipient_id]).where(
             newsletter_recipients.c.newsletter_id == self.name)
 
@@ -100,8 +125,11 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
             )
         ))
 
+    #: categories the newsletter reports on
+    newsletter_categories: dict_property[list[str] | None] = content_property()
 
-class Recipient(Base, TimestampMixin):
+
+class Recipient(Base, TimestampMixin, ContentMixin):
     """ Represents a single recipient.
 
     Recipients may be grouped by any kind of string. Only inside their groups
@@ -115,35 +143,46 @@ class Recipient(Base, TimestampMixin):
     __tablename__ = 'recipients'
 
     #: the id of the recipient, used in the url
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: Column[uuid.UUID] = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the email address of the recipient, unique per group
-    address = Column(Text, nullable=False)
+    address: Column[str] = Column(Text, nullable=False)
 
     @validates('address')
-    def validate_address(self, key, address):
+    def validate_address(self, key: str, address: str) -> str:
         assert validate_email(address)
         return address
 
     #: the recipient group, a freely choosable string - may be null
-    group = Column(Text, nullable=True)
+    group: Column[str | None] = Column(Text, nullable=True)
 
     #: the newsletters that this recipient received
-    newsletters = relationship(
+    newsletters: relationship[list[Newsletter]] = relationship(
         'Newsletter',
         secondary=newsletter_recipients,
         back_populates='recipients')
 
     #: this token is used for confirm and unsubscribe
-    token = Column(Text, nullable=False, default=random_token)
+    token: Column[str] = Column(Text, nullable=False, default=random_token)
 
     #: when recipients are added, they are unconfirmed. At this point they get
     #: one e-mail with a confirmation link. If they ignore said e-mail they
     #: should not get another one.
-    confirmed = Column(Boolean, nullable=False, default=False)
+    confirmed: Column[bool] = Column(Boolean, nullable=False, default=False)
+
+    #: subscribed newsletter categories. For legacy reasons, no selection
+    # means all topics are subscribed to.
+    subscribed_categories: dict_property[list[str] | None] = content_property()
+
+    daily_newsletter: Column[bool] = Column(
+        Boolean, nullable=False, default=False)
 
     @declared_attr
-    def __table_args__(cls):
+    def __table_args__(cls) -> tuple[Index, ...]:
         return (
             Index(
                 'recipient_address_in_group', 'address', 'group',
@@ -156,29 +195,58 @@ class Recipient(Base, TimestampMixin):
         )
 
     @property
-    def subscription(self):
+    def subscription(self) -> Subscription:
         return Subscription(self, self.token)
+
+    @property
+    def is_inactive(self) -> bool:
+        """
+        Checks if the recipient's email address is marked as inactive.
+
+        Returns:
+            bool: True if the email address is marked as inactive, False
+            otherwise.
+        """
+        return self.meta.get('inactive', False)
+
+    def mark_inactive(self) -> None:
+        """
+        Marks the recipient's email address as inactive.
+
+        This method sets the 'inactive' flag in the recipient's metadata to
+        True. It is typically used when a bounce event causes the email
+        address to be deactivated by Postmark.
+        """
+        self.meta['inactive'] = True
+
+    def reactivate(self) -> None:
+        """
+        Marks a previously `inactive` recipient as active again.
+        """
+        self.meta['inactive'] = False
 
 
 class Subscription:
     """ Adds subscription management to a recipient. """
 
-    def __init__(self, recipient, token):
+    def __init__(self, recipient: Recipient, token: str):
         self.recipient = recipient
         self.token = token
 
     @property
-    def recipient_id(self):
+    def recipient_id(self) -> uuid.UUID:
+        # even though this seems redundant, we need this property
+        # for morepath, so it can match it to the path variable
         return self.recipient.id
 
-    def confirm(self):
+    def confirm(self) -> bool:
         if self.recipient.token != self.token:
             return False
 
         self.recipient.confirmed = True
         return True
 
-    def unsubscribe(self):
+    def unsubscribe(self) -> bool:
         if self.recipient.token != self.token:
             return False
 

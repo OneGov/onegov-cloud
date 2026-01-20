@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from onegov.core.orm.types import UUID
 from onegov.core.security import Private
@@ -16,36 +18,66 @@ from sedate import align_range_to_day, as_datetime, standardize_date
 from sqlalchemy import and_
 
 
+from typing import Any, NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Collection, Sequence
+    from datetime import date, datetime
+    from onegov.core.types import RenderData
+    from onegov.form.types import RegistrationState
+    from onegov.org.request import OrgRequest
+    from onegov.pay.types import PaymentMethod
+    from sedate.types import DateLike, TzInfoOrName
+    from sqlalchemy.orm import Query
+    from webob import Response
+
+    class FormSubmissionRow(NamedTuple):
+        title: str
+        email: str | None
+        received: datetime
+        payment_method: PaymentMethod | None
+        data: dict[str, Any]
+        ticket_number: str
+        registration_state: RegistrationState | None
+        registration_window_start: date
+        registration_window_end: date
+
+
 @OrgApp.form(
     model=FormDefinition,
     name='export',
     permission=Private,
     form=FormSubmissionsExport,
-    template='export.pt')
-def handle_form_submissions_export(self, request, form, layout=None):
+    template='export.pt'
+)
+def handle_form_submissions_export(
+    self: FormDefinition,
+    request: OrgRequest,
+    form: FormSubmissionsExport,
+    layout: FormSubmissionLayout | None = None
+) -> RenderData | Response:
 
     layout = layout or FormSubmissionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Export"), '#'))
+    layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None
 
     if form.submitted(request):
         submissions = FormSubmissionCollection(request.session, name=self.name)
 
         if form.data['selection'] == 'date':
-            subset = subset_by_date(
+            query = subset_by_date(
                 submissions=submissions,
                 start=form.data['start'],
                 end=form.data['end'],
                 timezone=layout.timezone)
 
         elif form.data['selection'] == 'window':
-            subset = subset_by_window(
+            query = subset_by_window(
                 submissions=submissions,
                 window_ids=form.data['registration_window'])
         else:
             raise NotImplementedError
 
-        subset = configure_subset(subset)
+        subset = configure_subset(query)
 
         field_order, results = run_export(
             subset=subset,
@@ -55,34 +87,49 @@ def handle_form_submissions_export(self, request, form, layout=None):
         return form.as_export_response(results, self.title, key=field_order)
 
     return {
-        'title': _("Export"),
+        'title': _('Export'),
         'layout': layout,
         'form': form,
-        'explanation': _("Exports the submissions of the given date range.")
+        'explanation': _('Exports the submissions of the given date range.')
     }
 
 
-def subset_by_date(submissions, start, end, timezone):
+def subset_by_date(
+    submissions: FormSubmissionCollection,
+    start: DateLike,
+    end: DateLike,
+    timezone: TzInfoOrName
+) -> Query[FormSubmission]:
+
     start, end = align_range_to_day(
         standardize_date(as_datetime(start), timezone),
         standardize_date(as_datetime(end), timezone),
         timezone)
 
-    subset = submissions.query().filter_by(state='complete').filter(and_(
-        FormSubmission.received >= start,
-        FormSubmission.received <= end))
-
-    return subset
-
-
-def subset_by_window(submissions, window_ids):
-    subset = submissions.query().filter_by(state='complete').filter(
-        FormSubmission.registration_window_id.in_(window_ids))
-
-    return subset
+    return (
+        submissions.query()
+        .filter_by(state='complete')
+        .filter(and_(
+            FormSubmission.received >= start,
+            FormSubmission.received <= end)
+        )
+    )
 
 
-def configure_subset(subset):
+def subset_by_window(
+    submissions: FormSubmissionCollection,
+    window_ids: Collection[UUID]
+) -> Query[FormSubmission]:
+    return (
+        submissions.query()
+        .filter_by(state='complete')
+        .filter(FormSubmission.registration_window_id.in_(window_ids))
+    )
+
+
+def configure_subset(
+    subset: Query[FormSubmission]
+) -> Query[FormSubmissionRow]:
     subset = subset.join(
         Ticket,
         FormSubmission.id == Ticket.handler_id.cast(UUID)
@@ -94,7 +141,7 @@ def configure_subset(subset):
         isouter=True
     )
 
-    subset = subset.with_entities(
+    return subset.with_entities(
         FormSubmission.title,
         FormSubmission.email,
         FormSubmission.received,
@@ -106,10 +153,13 @@ def configure_subset(subset):
         FormRegistrationWindow.end.label('registration_window_end'),
     )
 
-    return subset
 
+def run_export(
+    subset: Query[FormSubmissionRow],
+    nested: bool,
+    formatter: Callable[[object], Any]
+) -> tuple[Callable[[str], tuple[int, str]], Sequence[dict[str, Any]]]:
 
-def run_export(subset, nested, formatter):
     keywords = (
         'ticket_number',
         'title',
@@ -121,7 +171,7 @@ def run_export(subset, nested, formatter):
         'registration_window_end'
     )
 
-    def transform(submission):
+    def transform(submission: FormSubmissionRow) -> dict[str, Any]:
         r = OrderedDict()
 
         for keyword in keywords:

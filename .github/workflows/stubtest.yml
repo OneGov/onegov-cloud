@@ -1,0 +1,67 @@
+name: Run stubtest on embedded stubs
+
+on:
+  workflow_dispatch:  # allow to run manually
+  schedule:
+    - cron: '0 7 * * 1'  # run once a week on monday morning
+
+jobs:
+  stubtest:
+    runs-on: ubuntu-24.04
+
+    # we always use the latest container from the master branch
+    # this is fine because we still run all our installs just in case
+    container:
+      image: ghcr.io/onegov/onegov-cloud:master
+      credentials:
+         username: ${{ github.actor }}
+         password: ${{ secrets.GITHUB_TOKEN }}
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Install packages
+      run: |
+        apt-get update
+        apt-get install -y \
+          wget \
+          apparmor \
+          curl \
+          git-core \
+          postgresql \
+          redis \
+          gcc \
+          libc-dev \
+          fonts-liberation \
+          libappindicator3-1 \
+          libasound2t64 \
+          libcairo2-dev \
+          libdrm2 \
+          libgbm1 \
+          libnspr4 \
+          libnss3 \
+          libu2f-udev \
+          libvulkan1 \
+          libx11-xcb1 \
+          libxcb-dri3-0 \
+          libxshmfence1 \
+          libxss1 \
+          libxt-dev \
+          xdg-utils
+
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        source /app/bin/activate
+        python -m pip install --upgrade uv
+        uv pip compile setup.cfg -U \
+        | uv pip install .[mypy] -r /dev/stdin
+
+    - name: Stubtest
+      run:  |
+        source /app/bin/activate
+        bash stubtest.sh

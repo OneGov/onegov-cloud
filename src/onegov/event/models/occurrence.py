@@ -1,15 +1,25 @@
-from datetime import datetime
+from __future__ import annotations
+
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.event.models.mixins import OccurrenceMixin
+from onegov.gis import Coordinates
 from pytz import UTC
 from sedate import to_timezone
+from sedate import utcnow
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 from uuid import uuid4
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from onegov.event.models import Event
 
 
 class Occurrence(Base, OccurrenceMixin, TimestampMixin):
@@ -18,15 +28,28 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
     __tablename__ = 'event_occurrences'
 
     #: Internal number of the occurence
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: Column[uuid.UUID] = Column(
+        UUID,  # type: ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: Event this occurrence belongs to
-    event_id = Column(UUID, ForeignKey('events.id'), nullable=False)
+    event_id: Column[uuid.UUID] = Column(
+        UUID,  # type: ignore[arg-type]
+        ForeignKey('events.id'),
+        nullable=False
+    )
 
-    def as_ical(self, url=None):
+    event: relationship[Event] = relationship(
+        'Event',
+        back_populates='occurrences',
+    )
+
+    def as_ical(self, url: str | None = None) -> bytes:
         """ Returns the occurrence as iCalendar string. """
 
-        modified = self.modified or self.created or datetime.utcnow()
+        modified = self.modified or self.created or utcnow()
         event = self.event
 
         vevent = vEvent()
@@ -40,6 +63,7 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
         vevent.add('description', event.description)
         vevent.add('categories', event.tags)
         if event.coordinates:
+            assert isinstance(event.coordinates, Coordinates)
             vevent.add('geo', (event.coordinates.lat, event.coordinates.lon))
         if url:
             vevent.add('url', url)
@@ -51,5 +75,5 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
         return vcalendar.to_ical()
 
     @property
-    def access(self):
+    def access(self) -> str:
         return self.event.access

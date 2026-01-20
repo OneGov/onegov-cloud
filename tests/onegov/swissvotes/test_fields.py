@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from cgi import FieldStorage
 from datetime import date
 from decimal import Decimal
@@ -11,18 +13,21 @@ from onegov.swissvotes.models import ColumnMapperMetadata
 from xlsxwriter.workbook import Workbook
 
 
-class DummyPostData(dict):
-    def getlist(self, key):
+from typing import Any
+
+
+class DummyPostData(dict[str, Any]):
+    def getlist(self, key: str) -> list[Any]:
         v = self[key]
         if not isinstance(v, (list, tuple)):
             v = [v]
         return v
 
 
-def test_swissvotes_dataset_field_corrupt():
+def test_swissvotes_dataset_field_corrupt() -> None:
     form = Form()
     field = SwissvoteDatasetField()
-    field = field.bind(form, 'dataset')
+    field = field.bind(form, 'dataset')  # type: ignore[attr-defined]
 
     field_storage = FieldStorage()
     field_storage.type = 'application/excel'
@@ -34,10 +39,10 @@ def test_swissvotes_dataset_field_corrupt():
     assert "Not a valid XLSX file." in field.errors
 
 
-def test_swissvotes_dataset_field_missing_sheet():
+def test_swissvotes_dataset_field_missing_sheet() -> None:
     form = Form()
     field = SwissvoteDatasetField()
-    field = field.bind(form, 'dataset')
+    field = field.bind(form, 'dataset')  # type: ignore[attr-defined]
 
     file = BytesIO()
     workbook = Workbook(file)
@@ -55,10 +60,10 @@ def test_swissvotes_dataset_field_missing_sheet():
     assert "Sheet DATA is missing." in field.errors
 
 
-def test_swissvotes_dataset_field_empty():
+def test_swissvotes_dataset_field_empty() -> None:
     form = Form()
     field = SwissvoteDatasetField()
-    field = field.bind(form, 'dataset')
+    field = field.bind(form, 'dataset')  # type: ignore[attr-defined]
 
     file = BytesIO()
     workbook = Workbook(file)
@@ -76,10 +81,10 @@ def test_swissvotes_dataset_field_empty():
     assert "No data." in field.errors
 
 
-def test_swissvotes_dataset_field_missing_columns():
+def test_swissvotes_dataset_field_missing_columns() -> None:
     form = Form()
     field = SwissvoteDatasetField()
-    field = field.bind(form, 'dataset')
+    field = field.bind(form, 'dataset')  # type: ignore[attr-defined]
     mapper = ColumnMapperDataset()
     columns = [
         column for column in mapper.columns.values()
@@ -107,10 +112,10 @@ def test_swissvotes_dataset_field_missing_columns():
     assert 'Some columns are missing: anr.' in errors
 
 
-def test_swissvotes_dataset_field_types_and_missing_values():
+def test_swissvotes_dataset_field_types_and_missing_values() -> None:
     form = Form()
     field = SwissvoteDatasetField()
-    field = field.bind(form, 'dataset')
+    field = field.bind(form, 'dataset')  # type: ignore[attr-defined]
     mapper = ColumnMapperDataset()
     file = BytesIO()
     workbook = Workbook(file)
@@ -122,6 +127,7 @@ def test_swissvotes_dataset_field_types_and_missing_values():
             content,  # datum / DATE
             content,  # short_title_de / TEXT
             content,  # short_title_fr / TEXT
+            content,  # short_title_en / TEXT
             content,  # title_de / TEXT
             content,  # title_fr / TEXT
             content,  # stichwort / TEXT
@@ -173,10 +179,10 @@ def test_swissvotes_dataset_field_types_and_missing_values():
     assert "4:datum 'x' ≠ date" in error
 
 
-def test_swissvotes_dataset_field_all_okay():
+def test_swissvotes_dataset_field_all_okay() -> None:
     form = Form()
     field = SwissvoteDatasetField()
-    field = field.bind(form, 'dataset')
+    field = field.bind(form, 'dataset')  # type: ignore[attr-defined]
     mapper = ColumnMapperDataset()
     file = BytesIO()
     workbook = Workbook(file)
@@ -187,6 +193,7 @@ def test_swissvotes_dataset_field_all_okay():
         '1.2.2008',  # datum / DATE
         'titel_kurz_d',  # short_title_de / TEXT
         'titel_kurz_f',  # short_title_fr / TEXT
+        'titel_kurz_e',  # short_title_en / TEXT
         'titel_off_d',  # title_de / TEXT
         'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
@@ -210,6 +217,7 @@ def test_swissvotes_dataset_field_all_okay():
         date(2008, 2, 1),  # datum / DATE
         'titel_kurz_d',  # short_title_de / TEXT
         'titel_kurz_f',  # short_title_fr / TEXT
+        'titel_kurz_e',  # short_title_en / TEXT
         'titel_off_d',  # title_de / TEXT
         'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
@@ -259,10 +267,10 @@ def test_swissvotes_dataset_field_all_okay():
     assert field.data[1]._legal_form == 3
 
 
-def test_swissvotes_dataset_skip_empty_columns():
+def test_swissvotes_dataset_skip_empty_columns() -> None:
     form = Form()
     field = SwissvoteDatasetField()
-    field = field.bind(form, 'dataset')
+    field = field.bind(form, 'dataset')  # type: ignore[attr-defined]
 
     mapper = ColumnMapperDataset()
 
@@ -275,6 +283,7 @@ def test_swissvotes_dataset_skip_empty_columns():
         '1.2.2008',  # datum / DATE
         'titel_kurz_d',  # short_title_de / TEXT
         'titel_kurz_f',  # short_title_fr / TEXT
+        'titel_kurz_e',  # short_title_en / TEXT
         'titel_off_d',  # title_de / TEXT
         'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
@@ -315,10 +324,10 @@ def test_swissvotes_dataset_skip_empty_columns():
     assert field.data[0]._legal_form == 3
 
 
-def test_swissvotes_metadata_field_corrupt():
+def test_swissvotes_metadata_field_corrupt() -> None:
     form = Form()
     field = SwissvoteMetadataField()
-    field = field.bind(form, 'metadata')
+    field = field.bind(form, 'metadata')  # type: ignore[attr-defined]
 
     field_storage = FieldStorage()
     field_storage.type = 'application/excel'
@@ -330,10 +339,10 @@ def test_swissvotes_metadata_field_corrupt():
     assert "Not a valid XLSX file." in field.errors
 
 
-def test_swissvotes_metadata_field_missing_sheet():
+def test_swissvotes_metadata_field_missing_sheet() -> None:
     form = Form()
     field = SwissvoteMetadataField()
-    field = field.bind(form, 'metadata')
+    field = field.bind(form, 'metadata')  # type: ignore[attr-defined]
 
     file = BytesIO()
     workbook = Workbook(file)
@@ -351,10 +360,10 @@ def test_swissvotes_metadata_field_missing_sheet():
     assert "Sheet 'Metadaten zu Scans' is missing." in field.errors
 
 
-def test_swissvotes_metadata_field_empty():
+def test_swissvotes_metadata_field_empty() -> None:
     form = Form()
     field = SwissvoteMetadataField()
-    field = field.bind(form, 'metadata')
+    field = field.bind(form, 'metadata')  # type: ignore[attr-defined]
 
     file = BytesIO()
     workbook = Workbook(file)
@@ -372,10 +381,10 @@ def test_swissvotes_metadata_field_empty():
     assert "No data." in field.errors
 
 
-def test_swissvotes_metadata_field_missing_columns():
+def test_swissvotes_metadata_field_missing_columns() -> None:
     form = Form()
     field = SwissvoteMetadataField()
-    field = field.bind(form, 'metadata')
+    field = field.bind(form, 'metadata')  # type: ignore[attr-defined]
     mapper = ColumnMapperMetadata()
     columns = [
         column for column in mapper.columns.values()
@@ -403,10 +412,10 @@ def test_swissvotes_metadata_field_missing_columns():
     assert 'Some columns are missing: Dateiname.' in errors
 
 
-def test_swissvotes_metadata_field_types_and_missing_values():
+def test_swissvotes_metadata_field_types_and_missing_values() -> None:
     form = Form()
     field = SwissvoteMetadataField()
-    field = field.bind(form, 'metadata')
+    field = field.bind(form, 'metadata')  # type: ignore[attr-defined]
     mapper = ColumnMapperMetadata()
     file = BytesIO()
     workbook = Workbook(file)
@@ -466,10 +475,10 @@ def test_swissvotes_metadata_field_types_and_missing_values():
     assert "4:Datum Tag 'x' ≠ integer" in error
 
 
-def test_swissvotes_metadata_field_all_okay():
+def test_swissvotes_metadata_field_all_okay() -> None:
     form = Form()
     field = SwissvoteMetadataField()
-    field = field.bind(form, 'metadata')
+    field = field.bind(form, 'metadata')  # type: ignore[attr-defined]
     mapper = ColumnMapperMetadata()
     file = BytesIO()
     workbook = Workbook(file)
@@ -503,6 +512,7 @@ def test_swissvotes_metadata_field_all_okay():
         'x',  # Typ REFERATSTEXT
         'x',  # Typ STATISTIK
         'x',  # Typ ANDERES
+        'x',  # Typ WEBSITE
     ])
     worksheet.write_row(2, 0, [
         '100.1',  # Abst-Nummer
@@ -532,6 +542,7 @@ def test_swissvotes_metadata_field_all_okay():
         '',  # Typ REFERATSTEXT
         '',  # Typ STATISTIK
         '',  # Typ ANDERES
+        '',  # Typ WEBSITE
     ])
     worksheet.write_row(3, 0, [
         '100.2',  # Abst-Nummer
@@ -561,6 +572,7 @@ def test_swissvotes_metadata_field_all_okay():
         '',  # Typ REFERATSTEXT
         '',  # Typ STATISTIK
         '',  # Typ ANDERES
+        '',  # Typ WEBSITE
     ])
     workbook.close()
     file.seek(0)
@@ -592,7 +604,8 @@ def test_swissvotes_metadata_field_all_okay():
                     'legal',
                     'lecture',
                     'statistics',
-                    'other'
+                    'other',
+                    'website'
                 ],
                 'editor': 'Herausgeber',
                 'filename': 'letter.pdf',
@@ -640,10 +653,10 @@ def test_swissvotes_metadata_field_all_okay():
     }
 
 
-def test_swissvotes_metadata_skip_empty_columns():
+def test_swissvotes_metadata_skip_empty_columns() -> None:
     form = Form()
     field = SwissvoteMetadataField()
-    field = field.bind(form, 'metadata')
+    field = field.bind(form, 'metadata')  # type: ignore[attr-defined]
 
     mapper = ColumnMapperMetadata()
 
@@ -679,6 +692,7 @@ def test_swissvotes_metadata_skip_empty_columns():
         '',  # Typ REFERATSTEXT
         '',  # Typ STATISTIK
         '',  # Typ ANDERES
+        '',  # Typ WEBSITE
     ])
     workbook.close()
     file.seek(0)
@@ -710,10 +724,10 @@ def test_swissvotes_metadata_skip_empty_columns():
     }
 
 
-def test_policy_area_field():
+def test_policy_area_field() -> None:
     form = Form()
-    field = PolicyAreaField(choices=[])
-    field = field.bind(form, 'policy_area')
+    field = PolicyAreaField()
+    field = field.bind(form, 'policy_area')  # type: ignore[attr-defined]
 
     html = field()
     assert 'class="policy-selector"' in html

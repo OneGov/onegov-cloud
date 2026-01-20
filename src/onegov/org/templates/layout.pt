@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html class="no-js" lang="${request.html_lang}"
-      xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      xmlns:tal="http://xml.zope.org/namespaces/tal"
-      i18n:domain="onegov.org"
-      metal:define-macro="layout">
+<html
+    class="no-js"
+    lang="${request.html_lang}"
+    tal:attributes="layout.custom_html_attributes|{}"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    i18n:domain="onegov.org"
+    metal:define-macro="layout">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -32,51 +35,13 @@
     <tal:b metal:use-macro="layout.macros.favicon" />
     <tal:b metal:use-macro="layout.macros.open_graph_tags" />
 
-    <tal:b condition="layout.app.sentry_dsn">
-      <script src="https://browser.sentry-cdn.com/5.6.2/bundle.min.js" crossorigin="anonymous"></script>
-      <script>
-        Sentry.init({
-            dsn: '${layout.app.sentry_dsn}',
-            release: '${layout.app.sentry_version}',
-            username: '${request.current_username}',
-            environment: '${layout.app.sentry_environment}',
-            role: '${request.current_role}',
-            ignoreUrls: [/\/(gtm|ga|analytics)\.js/i],
-            shouldSendCallback: function(data) {
-                var crumbs = (data.breadcrumbs && data.breadcrumbs.values || []);
-                var errors = (data.exception.values && data.exception.values || []);
+    <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/7.54.0/bundle.min.js" integrity="sha384-EmlJLN9Q0yu0/2UUCIYnEM88jpQ7xUhtNI2ZeXb/ci3cwoAoIQl350N4PQPlMbP5" crossorigin="anonymous"></script>
+    <script tal:condition="layout.app.sentry_dsn" src="${layout.sentry_init_path}"></script>
+    <tal:b tal:content="request.analytics_code|nothing" />
 
-                if (crumbs.length > 0 && errors.length > 0) {
-
-                  // if the last occurrence in the breadcrumbs is an XHR error
-                  // and the error itself is by intercooler we can ignore it
-                  // as we would see the error in the backend and we will
-                  // have informed the user in the frontend
-                  if (crumbs[crumbs.length - 1].category === 'xhr') {
-                    if ((errors[errors.length - 1].value || {}).namespace === 'ic') {
-                        return false;
-                    }
-                  }
-                }
-
-                return true;
-            }
-        });
-      </script>
-      <!--! Adds a 'framed' class to the body if this document is shown inside an iframe -->
-      <script>
-          let params = new URLSearchParams(window.location.search)
-          if (window !== window.parent || params.get('framed') === 'true') { document.querySelector('body').className += " framed"; }
-      </script>
-    </tal:b>
 </head>
 
 <body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)}" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}" tal:attributes="layout.custom_body_attributes">
-    <!--! Adds a 'framed' class to the body if this document is shown inside an iframe -->
-    <script>
-        let params = new URLSearchParams(window.location.search);
-        if (window !== window.parent || params.get('framed') === 'true') { document.querySelector('body').className += " framed"; }
-    </script>
     <!--! Skip navigation link for screenreaders -->
     <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
 
@@ -84,12 +49,35 @@
       <main>
 
         <header tal:define="header_options request.app.org.header_options or {}" >
-          <div tal:condition="header_options.get('left_header_announcement', '')"
-               id="announcement"
-               style="color: ${header_options.get('left_header_announcement_font_color', '#000000')};
-                      background-color: ${header_options.get('left_header_announcement_bg_color', '#FBBC05')};">
-              <div class="grid-container">
-                ${header_options['left_header_announcement']}
+          <div tal:condition="header_options.get('announcement', '') and (request.is_logged_in or not header_options.get('announcement_is_private'))"
+                id="header_announcement"
+                style="background-color: ${header_options.get('announcement_bg_color', '#FBBC05')};">
+                    <div class="row" tal:define="url header_options.get('announcement_url');">
+                      <div class="columns small-12">
+                          <a style="color: ${header_options.get('announcement_font_color', '#000000')}"
+                              tal:condition="url" href="${url}">
+                              <i class="fa fa-link"></i> ${header_options['announcement']}</a>
+                          <p style="color: ${header_options.get('announcement_font_color', '#000000')}"
+                              tal:condition="not url">${header_options['announcement']}</p>
+                      </div>
+                    </div>
+          </div>
+          <div id="header_links" class="text-center row" tal:define="links header_options.get('header_links')" tal:condition="links">
+              <div class="columns small-12">
+                <nav class="top-bar" data-topbar="" role="navigation">
+                  <ul class="title-area">
+                      <li class="name" style="width: 0;"></li>
+                      <li class="toggle-topbar">
+                          <a href="#"><i class="fa fa-bars"></i> <span i18n:translate="">Straight to ...</span></a>
+                      </li>
+                  </ul>
+
+                  <section class="top-bar-section" id="quicklinks" style="left: 0%;">
+                    <ul id="quicklinks-submenu">
+                      <li tal:repeat="link links"><a href="${link[1]}">${link[0] if link[0] else link[1]}</a></li>
+                    </ul>
+                  </section>
+              </nav>
               </div>
           </div>
           <div class="globals">
@@ -108,12 +96,12 @@
                       <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
                       <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
                           <li tal:repeat="link tool.links">
-                              <tal:b replace="structure link(layout)" />
+                              <tal:b replace="link(layout)" />
                           </li>
                       </ul>
                     </tal:b>
                     <tal:b condition="tool.url|tool.id|nothing" define="link tool">
-                      <tal:b replace="structure link(layout)" />
+                      <tal:b replace="link(layout)" />
                     </tal:b>
                   </li>
                 </ul>
@@ -207,8 +195,6 @@
 
       </main>
     </div>
-
-    <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
 </body>
 
 </html>

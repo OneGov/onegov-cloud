@@ -70,6 +70,16 @@
                                        href="${request.link(model.for_order('date'))}"
                                        i18n:translate>Upload Date</a>
                                 </th>
+                                <th>
+                                    <span tal:condition="model.order_by == 'publish_end_date'">
+                                        ${group}
+                                    </span>
+                                    <a tal:condition="model.order_by != 'publish_end_date'"
+                                       href="${request.link(model.for_order('publish_end_date'))}"
+                                       i18n:translate>
+                                       Published until
+                                    </a>
+                                </th>
                             </tr>
 
                             <tal:b tal:repeat="file files">

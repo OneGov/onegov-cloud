@@ -6,7 +6,99 @@
     to {box-shadow: none;}
 }
 
-.calendar {
+.occupancy-calendar {
+    .fc-view:not(.fc-list) .fc-event,
+    .fc-view:not(.fc-list) + .fc-popover .fc-event,
+    .fc-view-harness:has(.fc-view:not(.fc-list)) ~ .fc-event-dragging {
+        &.event-accepted,
+        &.event-accepted .fc-bg,
+        &.event-accepted .fc-content {
+            border-width: 0;
+            background-color: $blue-dark;
+        }
+
+        &.event-pending,
+        &.event-pending .fc-bg,
+        &.event-pending .fc-content {
+            border-width: 0;
+            background-color: lighten(desaturate($blue-dark, 50%), 10%);
+        }
+
+        &.event-blocker, &.fc-event-mirror:not(.event-accepted,.event-pending) {
+            border-width: 0;
+            background-color: $red;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0, 0, 0, 0.1) 10px,
+                rgba(0, 0, 0, 0.1) 20px
+            );
+
+            & .fc-event-main {
+                position: relative;
+                padding: 2px 4px !important;
+                padding-right: 20px !important;
+                font-weight: bold;
+                font-size: .875rem;
+            }
+
+            & .delete-blocker {
+                display: inline-block;
+                position: absolute;
+                padding: 2px 6px;
+                top: 0;
+                right: 0;
+                font-size: .75rem;
+
+                &:hover {
+                    opacity: .75;
+                }
+            }
+        }
+    }
+
+    .fc-event, .fc-event-main {
+        padding: 0 !important;
+    }
+
+    .fc-event .fc-content {
+        position: relative;
+        z-index: 2;
+        padding: 2px 4px;
+        border-top-right-radius: 1.2rem;
+        white-space: nowrap;
+
+        &::first-line {
+            font-weight: bold;
+        }
+    }
+
+    .fc-event.fc-timegrid-event-short .fc-title {
+        font-weight: bold;
+    }
+
+    .fc-list-item-title::first-line {
+        font-weight: bold;
+    }
+
+    &[data-editable="true"] .fc-list-item {
+        cursor: pointer;
+    }
+
+    .fc-bg {
+        opacity: 1 !important;
+        border-top-right-radius: 1.5rem;
+    }
+
+    .fc-bg-event {
+        background-color: $green;
+        opacity: .15;
+        cursor: default !important;
+    }
+}
+
+.calendar, .occupancy-calendar {
 
     margin-bottom: 1.5rem;
 
@@ -22,30 +114,34 @@
         outline: none;
     }
 
-    .fc-content {
-        // pass through pointer events to the background, where we have the
-        // hover and javascript handling
-        pointer-events: none;
-    }
-
     .fc-toolbar {
-        margin-bottom: 0;
+        align-items: end;
+
+        &.fc-header-toolbar {
+            margin-bottom: 2rem;
+        }
 
         h2 {
             clear: both;
             display: block;
             float: none;
             margin-bottom: 1rem;
+            max-width: 0;
+            overflow: visible;
             text-align: left;
+            white-space: nowrap;
+
+            &:hover .fa {
+                color: $primary-color;
+            }
         }
 
-        .fc-left {
-            float: none;
+        h2 + button {
+            margin-left: 0 !important;
+        }
 
-            button {
-                margin-bottom: 15px;
-                margin-left: 0;
-            }
+        select {
+            margin: 0;
         }
     }
 
@@ -77,10 +173,23 @@
         background-color: $primary-color !important;
     }
 
-    .fc-month-view {
-        .fc-day-number {
+    .fc-dayGridMonth-view, .fc-multimonth {
+        .fc-daygrid-day-number {
             font-size: .875rem;
             padding: .25rem .5rem;
+        }
+    }
+
+    .fc-view.fc-multimonth {
+        max-height: 850px;
+
+        .fc-event .fc-content {
+            max-height: 2.5rem;
+            overflow-y: hidden;
+
+            .fc-title {
+                font-size: .675rem;
+            }
         }
     }
 
@@ -106,16 +215,18 @@
             }
         }
 
-        .event-in-past {
+        .event-in-past, .event-outside-booking-window {
             filter: grayscale(1);
         }
 
-        .fc-day-header,
-        .fc-day-number {
+        .fc-daygrid-day-header,
+        .fc-daygrid-day-number {
             font-size: .9em;
+            text-align: center !important;
         }
 
         .fc-event {
+            overflow: hidden;
             border: 0;
             border-radius: 2px;
             margin: 0 0 2px;
@@ -123,7 +234,13 @@
         }
 
         .fc-bg {
-            background: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            opacity: .25;
         }
 
         .event-unavailable {
@@ -145,20 +262,19 @@
     }
 
     .fc-event {
-        div.fc-time,
-        span.fc-time {
+        div.fc-event-time,
+        span.fc-event-time {
             display: none;
         }
 
         .fc-title {
             font-size: .8rem;
             padding: 0;
+            text-overflow: ellipsis;
         }
 
-        &.fc-short .fc-title {
+        &.fc-timegrid-event-short .fc-title {
             display: inline-block;
-            overflow: hidden;
-            text-overflow: ellipsis;
 
             br {
                 display: none;
@@ -175,25 +291,47 @@
         }
     }
 
-    .fc button,
-    .fc-button {
-        //@include button(
-        //    $padding: $button-tny,
-        //    $bg: $smoke
-        //);
+    .fc-more-link {
+        font-size: .8rem;
+    }
+
+    &.fc button,
+    &.fc .fc-button {
+        appearance: none;
+        border-radius: .7rem;
         background-image: none;
-        box-shadow: none;
+        box-shadow: none !important;
         font-size: .9rem;
         height: 2.25rem;
         text-shadow: none;
 
-        &.fc-state-active,
-        &.fc-state-disabled {
-            background: $charcoal;
-            color: $white;
+        &.fc-button-active,
+        &:disabled {
+            background: $charcoal !important;
+            color: $white !important;
             opacity: 1;
         }
+
+        &:hover,
+        &:focus,
+        &:active {
+          color: #333;
+          background-color: #e6e6e6;
+        }
     }
+
+    &.fc .fc-button-primary {
+        background-color: #f5f5f5;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        border-bottom-color: rgba(0, 0, 0, 0.25) !important;
+        color: #333;
+    }
+}
+
+.calendar .fc-event-main {
+    // pass through pointer events to the background, where we have the
+    // hover and javascript handling
+    pointer-events: none;
 }
 
 .calendar-footer {
@@ -212,39 +350,49 @@
     Fullcalendar responsive design
 */
 @include breakpoint(medium only) {
-    .fc .fc-toolbar {
+    .calendar .fc-toolbar {
         width: 100%;
     }
 }
 
 @include breakpoint(large up) {
-    .fc .fc-toolbar {
+    .calendar .fc-toolbar {
         width: 80%;
     }
 }
 
 @media screen and (max-width: 850px) {
-    .fc-center {
-        display: block;
-        width: 100%;
-    }
-}
+    .calendar {
+        .fc-toolbar {
+            flex-direction: column;
+            align-items: start;
+        }
 
-@media screen and (min-width: 850px) {
-    .fc-center {
-        display: inline-block;
-        width: 40%;
+        .fc-toolbar-chunk {
+            margin-bottom: .5rem;
+        }
     }
 }
 
 @include breakpoint(small only) {
-    .calendar-footer {
+    .calendar .calendar-footer {
         display: none !important;
+    }
+
+    .occupancy-calendar {
+        .fc-toolbar {
+            flex-direction: column;
+            align-items: start;
+        }
+
+        .fc-toolbar-chunk {
+            margin-bottom: .5rem;
+        }
     }
 }
 
 @include breakpoint(medium only) {
-    .calendar-footer {
+    .calendar .calendar-footer {
         width: 75%;
     }
 }
@@ -309,7 +457,7 @@
             position: absolute;
             text-overflow: ellipsis;
             white-space: nowrap;
-            width: 60%;
+            width: auto;
 
             .long-month {
                 display: inline;
@@ -391,7 +539,11 @@
     .button {
         border-radius: 3px;
         display: block;
-        margin: 0;
+        margin-left: 0;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
     }
 
     .failed {
@@ -440,6 +592,7 @@
     }
 
     a,
+    .reservation-resource,
     .reservation-time,
     .reservation-price {
         display: block;
@@ -462,6 +615,7 @@
             width: 24px;
         }
 
+        .reservation-resource,
         .reservation-time,
         .reservation-price {
             margin-left: 2.3rem;
@@ -523,7 +677,7 @@
         width: 20%;
     }
 
-    .fc-view-container, .reservation-list {
+    .calendar .fc-view, .reservation-list {
         display: inline-block;
         float: left;
         width: 80%;
@@ -539,7 +693,7 @@
         }
     }
 
-    .fc-view-container, .reservation-list {
+    .calendar .fc-view, .reservation-list {
         width: 75%;
     }
 }
@@ -551,7 +705,7 @@
         width: 100%;
     }
 
-    .fc-view-container, .reservation-list {
+    .calendar .fc-view, .reservation-list {
         display: block;
         width: 100%;
     }
@@ -561,12 +715,6 @@
         .fc-button-group {
             display: inline-block;
             font-size: .7rem;
-        }
-
-        .fc-right {
-            left: -7px;
-            margin-bottom: 1rem;
-            position: relative;
         }
     }
 
@@ -637,6 +785,10 @@
         }
     }
 
+    .checkbox {
+        margin-top: .75rem;
+    }
+
     .split > div {
         display: inline-block;
         position: relative;
@@ -683,6 +835,9 @@ a#results {
              to fix this. This is dumb, but this bug has been around for
              almost a decade and still hasn't been fixed... */
     filter: blur(0);
+    /* NOTE: Since we allow shift as a modifier key, text-selection would
+             become annoying, rather than helpful. */
+    user-select: none;
 
     table {
         margin-bottom: 0;
@@ -724,7 +879,6 @@ a#results {
             }
 
             &.selected {
-                cursor: default;
                 background-image: repeating-linear-gradient(
                     45deg,
                     rgba($steel, .25),
@@ -732,6 +886,11 @@ a#results {
                     rgba($iron, .25) 10px,
                     rgba($iron, .25) 20px
                 );
+                cursor: default;
+
+                &.event-available.event-adjustable {
+                    cursor: pointer;
+                }
             }
 
             &.not-selected:not(:hover) {
@@ -753,6 +912,13 @@ a#results {
         .event-available {
             cursor: pointer;
             background-color: $green;
+        }
+
+        .event-adjustable::before {
+            float: right;
+            color: white;
+            font-size: 1.5rem;
+            @include icon($edit-link-icon);
         }
     }
 }

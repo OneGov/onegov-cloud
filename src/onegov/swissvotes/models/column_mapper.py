@@ -1,6 +1,24 @@
-from cached_property import cached_property
+from __future__ import annotations
+
+from functools import cached_property
 from collections import OrderedDict
 from onegov.swissvotes.models.vote import SwissVote
+
+
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from typing import TypeAlias
+
+    ColumnItem: TypeAlias = tuple[
+        str,         # attribute
+        str,         # column
+        str | None,  # type
+        bool,        # nullable
+        int | None,  # precision
+        int | None   # scale
+    ]
 
 
 class ColumnMapperDataset:
@@ -13,7 +31,7 @@ class ColumnMapperDataset:
     """
 
     @cached_property
-    def columns(self):
+    def columns(self) -> dict[str, str]:
         """ The SwissVote attribute name and its column in the dataset.
 
         Attribute names starting with an ``!`` are used to indicate JSON
@@ -25,6 +43,7 @@ class ColumnMapperDataset:
             ('date', 'datum'),
             ('short_title_de', 'titel_kurz_d'),
             ('short_title_fr', 'titel_kurz_f'),
+            ('short_title_en', 'titel_kurz_e'),
             ('title_de', 'titel_off_d'),
             ('title_fr', 'titel_off_f'),
             ('keyword', 'stichwort'),
@@ -55,7 +74,9 @@ class ColumnMapperDataset:
             ('duration_initative_collection', 'i-dauer_samm'),
             ('duration_referendum_collection', 'fr-dauer_samm'),
             ('signatures_valid', 'unter_g'),
-            ('initiator', 'urheber'),
+            ('_parliamentary_initiated', 'pa-iv'),
+            ('initiator_de', 'urheber'),
+            ('initiator_fr', 'urheber-fr'),
             ('!i!recommendations!fdp', 'p-fdp'),
             ('!i!recommendations!cvp', 'p-cvp'),
             ('!i!recommendations!sps', 'p-sps'),
@@ -102,11 +123,18 @@ class ColumnMapperDataset:
             ('!i!recommendations!fdk', 'p-fdk'),
             ('!i!recommendations!edk', 'p-edk'),
             ('!i!recommendations!bpuk', 'p-bpuk'),
-            ('recommendations_other_yes', 'p-others_yes'),
-            ('recommendations_other_no', 'p-others_no'),
-            ('recommendations_other_free', 'p-others_free'),
-            ('recommendations_other_counter_proposal', 'p-others_counterp'),
-            ('recommendations_other_popular_initiative', 'p-others_init'),
+            ('recommendations_other_yes_de', 'p-others_yes'),
+            ('recommendations_other_yes_fr', 'p-others_yes-fr'),
+            ('recommendations_other_no_de', 'p-others_no'),
+            ('recommendations_other_no_fr', 'p-others_no-fr'),
+            ('recommendations_other_free_de', 'p-others_free'),
+            ('recommendations_other_free_fr', 'p-others_free-fr'),
+            ('recommendations_other_counter_proposal_de', 'p-others_counterp'),
+            ('recommendations_other_counter_proposal_fr',
+             'p-others_counterp-fr'),
+            ('recommendations_other_popular_initiative_de', 'p-others_init'),
+            ('recommendations_other_popular_initiative_fr',
+             'p-others_init-fr'),
             ('!i!recommendations_divergent!bdp_ag', 'pdev-bdp_AG'),
             ('!i!recommendations_divergent!bdp_ai', 'pdev-bdp_AI'),
             ('!i!recommendations_divergent!bdp_ar', 'pdev-bdp_AR'),
@@ -580,6 +608,8 @@ class ColumnMapperDataset:
             ('national_council_share_unknown', 'unbekannt-summe'),
             ('posters_mfg_yea', 'poster_ja_mfg'),
             ('posters_mfg_nay', 'poster_nein_mfg'),
+            ('posters_bs_yea', 'poster_ja_bs'),
+            ('posters_bs_nay', 'poster_nein_bs'),
             ('posters_sa_yea', 'poster_ja_sa'),
             ('posters_sa_nay', 'poster_nein_sa'),
             ('_result_people_accepted', 'volk'),
@@ -628,6 +658,10 @@ class ColumnMapperDataset:
             ('!t!content!link_federal_office_en', 'info_amt-en'),
             ('bfs_map_de', 'bfsmap-de'),
             ('bfs_map_fr', 'bfsmap-fr'),
+            ('bfs_map_en', 'bfsmap-en'),
+            ('bfs_dashboard_de', 'bfsdash-de'),
+            ('bfs_dashboard_fr', 'bfsdash-fr'),
+            ('bfs_dashboard_en', 'bfsdash-en'),
             ('media_ads_total', 'inserate-total'),
             ('media_ads_yea_p', 'inserate-jaanteil'),
             ('media_coverage_articles_total', 'mediares-tot'),
@@ -637,40 +671,64 @@ class ColumnMapperDataset:
             ('!t!content!link_post_vote_poll_en', 'nach_cockpit_e'),
             ('procedure_number', 'gesch_nr'),
             ('brief_description_title', 'kurzbetitel'),
+            ('!t!content!link_easyvote_de', 'easyvideo_de'),
+            ('!t!content!link_easyvote_fr', 'easyvideo_fr'),
+            ('!t!content!link_campaign_yes_1_de', 'web-yes-1-de'),
+            ('!t!content!link_campaign_yes_1_fr', 'web-yes-1-fr'),
+            ('!t!content!link_campaign_yes_2_de', 'web-yes-2-de'),
+            ('!t!content!link_campaign_yes_2_fr', 'web-yes-2-fr'),
+            ('!t!content!link_campaign_yes_3_de', 'web-yes-3-de'),
+            ('!t!content!link_campaign_yes_3_fr', 'web-yes-3-fr'),
+            ('!t!content!link_campaign_no_1_de', 'web-no-1-de'),
+            ('!t!content!link_campaign_no_1_fr', 'web-no-1-fr'),
+            ('!t!content!link_campaign_no_2_de', 'web-no-2-de'),
+            ('!t!content!link_campaign_no_2_fr', 'web-no-2-fr'),
+            ('!t!content!link_campaign_no_3_de', 'web-no-3-de'),
+            ('!t!content!link_campaign_no_3_fr', 'web-no-3-fr'),
+            ('campaign_finances_yea_total', 'finanz-ja-tot'),
+            ('campaign_finances_nay_total', 'finanz-nein-tot'),
+            ('!t!content!campaign_finances_yea_donors_de', 'finanz-ja-gr-de'),
+            ('!t!content!campaign_finances_yea_donors_fr', 'finanz-ja-gr-fr'),
+            ('!t!content!campaign_finances_nay_donors_de',
+             'finanz-nein-gr-de'),
+            ('!t!content!campaign_finances_nay_donors_fr',
+             'finanz-nein-gr-fr'),
+            ('!t!content!campaign_finances_link_de', 'finanz-link-de'),
+            ('!t!content!campaign_finances_link_fr', 'finanz-link-fr'),
         ))
 
-    def set_value(self, vote, attribute, value):
+    def set_value(self, vote: SwissVote, attribute: str, value: Any) -> None:
         """ Set the given value of a vote. """
 
         if attribute.startswith('!'):
-            unused, type_, attribute, key = attribute.split('!')
+            _, _type, attribute, key = attribute.split('!')
             if getattr(vote, attribute) is None:
                 setattr(vote, attribute, {})
             getattr(vote, attribute)[key] = value
         else:
             setattr(vote, attribute, value)
 
-    def get_value(self, vote, attribute):
+    def get_value(self, vote: SwissVote, attribute: str) -> Any:
         """ Get the given value of a vote. """
 
         if attribute.startswith('!'):
-            unused, type_, attribute, key = attribute.split('!')
+            _, _type, attribute, key = attribute.split('!')
             return (getattr(vote, attribute) or {}).get(key)
         return getattr(vote, attribute)
 
-    def get_values(self, vote):
+    def get_values(self, vote: SwissVote) -> Iterator[Any]:
         """ Get all values of a vote in order. """
 
         for attribute in self.columns.keys():
             yield self.get_value(vote, attribute)
 
-    def get_items(self, vote):
+    def get_items(self, vote: SwissVote) -> Iterator[tuple[str, Any]]:
         """ Get all names and values of a vote in order. """
 
         for attribute in self.columns.keys():
             yield attribute, self.get_value(vote, attribute)
 
-    def items(self):
+    def items(self) -> Iterator[ColumnItem]:
         """ Returns the attributes and column names together with additional
         information (type, nullable, precision, scale).
 
@@ -705,7 +763,7 @@ class ColumnMapperMetadata:
     """
 
     @cached_property
-    def columns(self):
+    def columns(self) -> dict[str, str]:
         """ The SwissVote attribute name and its column in the metadata file.
 
         Each line contains a type hint, a nullable hint, an attribute and
@@ -719,8 +777,8 @@ class ColumnMapperMetadata:
             ('t:t:title', 'Titel des Dokuments'),
             ('t:t:position', 'Position zur Vorlage'),
             ('t:t:author', 'AutorIn (Nachname Vorname) des Dokuments'),
-            ('t:t:editor', 'AuftraggeberIn/HerausgeberIn des Dokuments '
-                           '(typischerweise Komitee/Verband/Partei)'),
+            ('t:t:editor', ('AuftraggeberIn/HerausgeberIn des Dokuments '
+                           '(typischerweise Komitee/Verband/Partei)')),
             ('i:t:date_year', 'Datum Jahr'),
             ('i:t:date_month', 'Datum Monat'),
             ('i:t:date_day', 'Datum Tag'),
@@ -742,9 +800,15 @@ class ColumnMapperMetadata:
             ('t:t:doctype!lecture', 'Typ REFERATSTEXT'),
             ('t:t:doctype!statistics', 'Typ STATISTIK'),
             ('t:t:doctype!other', 'Typ ANDERES'),
+            ('t:t:doctype!website', 'Typ WEBSITE'),
         ))
 
-    def set_value(self, data, attribute, value):
+    def set_value(
+        self,
+        data: dict[str, Any],
+        attribute: str,
+        value: Any
+    ) -> None:
         """ Set the given value to the metadata dict of a single line. """
 
         attribute = attribute.split(':')[2]
@@ -765,17 +829,25 @@ class ColumnMapperMetadata:
         else:
             data[attribute] = value
 
-    def items(self):
+    def items(self) -> Iterator[ColumnItem]:
         """ Returns the attributes and column names together with additional
         information (type, nullable, precision, scale).
 
         """
 
         for attribute, column in self.columns.items():
-            type_, nullable, name = attribute.split(':')
-            nullable = {'t': True, 'f': False}.get(nullable, True)
-            precision = {'n': 8}.get(type_, None)
-            scale = {'n': 2}.get(type_, None)
-            type_ = {'n': 'NUMERIC', 'i': 'INTEGER', 't': 'TEXT'}.get(type_)
+            type_hint, nullable_hint, _name = attribute.split(':')
+            nullable = nullable_hint != 'f'
+            precision = 8 if type_hint == 'n' else None
+            scale = 2 if type_hint == 'n' else None
+            match type_hint:
+                case 'n':
+                    type_ = 'NUMERIC'
+                case 'i':
+                    type_ = 'INTEGER'
+                case 't':
+                    type_ = 'TEXT'
+                case _:
+                    raise AssertionError('unreachable')
 
             yield attribute, column, type_, nullable, precision, scale

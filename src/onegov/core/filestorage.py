@@ -6,6 +6,7 @@ Based on `<https://docs.pyfilesystem.org/en/latest/>`_
 See :attr:`onegov.core.framework.Framework.filestorage` for more information.
 
 """
+from __future__ import annotations
 
 from fs.errors import IllegalBackReference
 from onegov.core.framework import Framework
@@ -14,7 +15,12 @@ from onegov.core.utils import render_file
 from onegov.core.security import Public, Private
 
 
-def random_filename():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .request import CoreRequest
+
+
+def random_filename() -> str:
     """ Returns a random filename that can't be guessed. """
     return random_token()
 
@@ -37,32 +43,40 @@ class FilestorageFile:
     """
     storage = 'filestorage'
 
-    def __init__(self, path):
+    def __init__(self, path: str):
         self.path = path
 
     @property
-    def absorb(self):
+    def absorb(self) -> str:
         return self.path
 
 
 @Framework.path(model=FilestorageFile, path='/files', absorb=True)
-def get_filestorage_file(app, absorb):
+def get_filestorage_file(
+    app: Framework,
+    absorb: str
+) -> FilestorageFile | None:
     try:
+        assert app.filestorage is not None
         if app.filestorage.isfile(absorb):
             return FilestorageFile(absorb)
     except IllegalBackReference:
-        return None
+        pass
+    return None
 
 
 @Framework.view(model=FilestorageFile, render=render_file, permission=Public)
-def view_filestorage_file(self, request):
+def view_filestorage_file(
+    self: FilestorageFile,
+    request: CoreRequest
+) -> str:
     """ Renders the given filestorage file in the browser. """
     return getattr(request.app, self.storage).getsyspath(self.path)
 
 
 @Framework.view(
     model=FilestorageFile, request_method='DELETE', permission=Private)
-def delete_static_file(self, request):
+def delete_static_file(self: FilestorageFile, request: CoreRequest) -> None:
     """ Deletes the given filestorage file. By default the permission is
     ``Private``. An application using the framework can override this though.
 
@@ -78,4 +92,5 @@ def delete_static_file(self, request):
 
     """
     request.assert_valid_csrf_token()
+    assert request.app.filestorage is not None
     request.app.filestorage.remove(self.path)

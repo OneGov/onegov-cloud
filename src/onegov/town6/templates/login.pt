@@ -2,21 +2,31 @@
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
-    <tal:b metal:fill-slot="content">
+    <tal:b metal:fill-slot="content" tal:define="primary_separate next((p for p in providers if p.kind == 'separate' and p.is_primary(request.app)), None)">
+        <div class="grid-x" tal:condition="primary_separate">
+            <div class="small-12 medium-7 large-5 columns">
+                <div class="provider-login">
+                    <a href="${provider_login(primary_separate)}" class="button">
+                        <tal:b replace="render_untrusted_markdown(request.translate(primary_separate.button_text(request)))" />
+                    </a>
+                </div>
+            </div>
+        </div>
         <div class="grid-x">
             <div class="small-12 medium-8 cell">
+                <h2 class="${'ogc-login' if primary_separate else ''}" tal:condition="primary_separate" i18n:translate>Alternatives</h2>
                 <tal:b define="integrated [p for p in providers if p.kind == 'integrated']">
                     <tal:b tal:repeat="provider integrated">
                         <div class="panel" tal:define="hint provider.hint(request)" tal:condition="hint">
-                            <tal:b replace="structure render_untrusted_markdown(request.translate(provider.hint(request)))" />
+                            <tal:b replace="render_untrusted_markdown(request.translate(provider.hint(request)))" />
                         </div>
                     </tal:b>
                 </tal:b>
             </div>
         </div>
-        <div class="grid-x">
-            <div class="small-12 medium-7 large-5 cell">
-                <div metal:use-macro="layout.macros['form']" />
+        <div class="grid-x ${'ogc-login' if primary_separate else ''}">
+            <div class="small-12 medium-7 large-5">
+                <div metal:use-macro="layout.macros['form']" tal:define="form_id 'main-form'"/>
             </div>
         </div>
         <div class="grid-x no-account-yet" tal:condition="may_register">
@@ -31,25 +41,23 @@
                 </span>
             </div>
         </div>
-        <div class="grid-x">
+        <div class="grid-x ${'ogc-login' if primary_separate else ''}">
             <div class="small-12 cell" tal:condition="not: request.app.disable_password_reset">
-                <span i18n:translate>
-                    Forgot your password?
-                </span>
-                <span>
+                <p>
+                    <span id="text" i18n:translate>Forgot your password?</span><br/>
                     <a href="${password_reset_link}" i18n:translate>
                         Reset password
-                    </a>.
-                </span>
+                    </a>
+                </p>
             </div>
         </div>
         <div class="grid-x" tal:condition="providers">
-            <tal:b define="separate [p for p in providers if p.kind == 'separate']" condition="separate">
+            <tal:b define="separate [p for p in providers if p.kind == 'separate' and (primary_separate is None or p.name != primary_separate.name) and p.available(request.app)]" condition="separate">
                 <div class="small-12 medium-7 large-5 cell alternatives">
-                    <h2 i18n:translate>Alternatives</h2>
+                    <h2 tal:condition="not primary_separate" i18n:translate>Alternatives</h2>
                     <div tal:repeat="provider separate" class="provider-login">
                         <a href="${provider_login(provider)}" class="button">
-                            <tal:b replace="structure render_untrusted_markdown(request.translate(provider.button_text(request)))" />
+                            <tal:b replace="render_untrusted_markdown(request.translate(provider.button_text(request)))" />
                         </a>
                     </div>
                 </div>

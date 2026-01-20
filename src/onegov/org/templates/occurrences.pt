@@ -20,12 +20,26 @@
 
             <div class="large-4 medium-4 columns">
 
+                <div class="grid-x borderless-side-panel" tal:condition="search_widget">
+                    <h2 i18n:translate>Search in Events</h2>
+                    <div class="cell medium-12">
+                        <tal:b replace="search_widget.html(layout)"/>
+                    </div>
+                </div>
+
+                <div class="filter-panel" tal:condition="filters">
+                    <div tal:repeat="filter filters" class="filter-periods">
+                        <h2 class="filter-title">${filter.title}</h2>
+                        <div metal:use-macro="layout.macros['tags_collapsed']" tal:define="tags filter.tags" />
+                    </div>
+                </div>
+
                 <div class="tag-filters borderless-side-panel" tal:condition="tags">
                     <h2 i18n:translate>Tag</h2>
                     <div class="occurrences-filter-tags">
                         <tal:b tal:repeat="tag tags">
                             <span class="blank-label click-through ${tag.active and 'active' or ''}">
-                                <tal:b replace="structure tag(request)"></tal:b>
+                                <tal:b replace="tag(request)"></tal:b>
                             </span>
                         </tal:b>
                     </div>
@@ -38,7 +52,7 @@
                             <ul class="tags">
                                 <li tal:repeat="location locations">
                                     <span class="blank-label click-through ${location.active and 'active' or ''}">
-                                        <tal:b replace="structure location(request)"></tal:b>
+                                        <tal:b replace="location(request)"></tal:b>
                                     </span>
                                 </li>
                             </ul>
@@ -53,7 +67,7 @@
                             <ul class="tags">
                                 <li tal:repeat="range ranges">
                                     <span class="blank-label click-through rounded ${range.active and 'active' or ''}">
-                                        <tal:b replace="structure range(request)"></tal:b>
+                                        <tal:b replace="range(request)"></tal:b>
                                     </span>
                                 </li>
                             </ul>
@@ -68,6 +82,18 @@
                             </tal:b>
                         </tal:b>
                     </metal:b>
+                </div>
+
+                <div class="side-panel files-panel occurrence-documents" tal:condition="files">
+                    <h3 i18n:translate>Documents</h3>
+                    <ul class="more-list">
+                        <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
+                            <a class="list-link" title="${file.name}" href="${request.link(file)}">
+                                <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
+                                <span class="list-title">${layout.get_filename_without_extension(file.name)}</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
                 <div class="occurrence-exports borderless-side-panel">

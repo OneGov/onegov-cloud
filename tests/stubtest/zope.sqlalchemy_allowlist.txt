@@ -1,0 +1,11 @@
+# Error: is not present in stub
+# ================================
+# Internal zope.interface attributes we don't care about
+zope.sqlalchemy\.[.\w]+\.__implemented__
+zope.sqlalchemy\.[.\w]+\.__provides__
+zope.sqlalchemy\.[.\w]+\.__providedBy__
+
+# Error: failed to find stubs
+# ================================
+# Tests should not be part of the stubs
+zope.sqlalchemy.tests.*

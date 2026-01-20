@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 import sass
 
@@ -5,6 +7,11 @@ from collections import OrderedDict
 from itertools import chain
 from io import StringIO
 from onegov.core.theme import Theme as CoreTheme
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Mapping, Sequence
 
 
 class BaseTheme(CoreTheme):
@@ -44,7 +51,7 @@ class BaseTheme(CoreTheme):
 
     """
 
-    def __init__(self, compress=True):
+    def __init__(self, compress: bool = True):
         """ Initializes the theme.
 
         :compress:
@@ -55,7 +62,7 @@ class BaseTheme(CoreTheme):
         self.compress = compress
 
     @property
-    def default_options(self):
+    def default_options(self) -> dict[str, Any]:
         """ Default options used when compiling the theme. """
         # return an ordered dict, in case someone overrides the compile options
         # with an ordered dict - this would otherwise result in an unordered
@@ -63,7 +70,7 @@ class BaseTheme(CoreTheme):
         return OrderedDict()
 
     @property
-    def pre_imports(self):
+    def pre_imports(self) -> list[str]:
         """ Imports added before the foundation import. The imports must be
         found in one of the paths (see :attr:`extra_search_paths`).
 
@@ -74,7 +81,7 @@ class BaseTheme(CoreTheme):
         return []
 
     @property
-    def foundation_components(self):
+    def foundation_components(self) -> Sequence[str]:
         """ All used foundation components. """
         return (
             'grid',
@@ -117,7 +124,7 @@ class BaseTheme(CoreTheme):
         )
 
     @property
-    def imports(self):
+    def imports(self) -> Iterator[str]:
         """ All imports, including the foundation ones. Override with care. """
         return chain(
             self.pre_imports,
@@ -131,7 +138,7 @@ class BaseTheme(CoreTheme):
         )
 
     @property
-    def post_imports(self):
+    def post_imports(self) -> list[str]:
         """
         Imports added after the foundation import. The imports must be found
         in one of the paths (see :attr:`extra_search_paths`).
@@ -143,7 +150,7 @@ class BaseTheme(CoreTheme):
         return []
 
     @property
-    def extra_search_paths(self):
+    def extra_search_paths(self) -> list[str]:
         """ A list of absolute search paths added before the actual foundation
         search path.
 
@@ -151,25 +158,25 @@ class BaseTheme(CoreTheme):
         return []
 
     @property
-    def foundation_path(self):
+    def foundation_path(self) -> str:
         """ The search path for the foundation files included in this module.
 
         """
         return os.path.join(os.path.dirname(__file__), 'foundation')
 
-    def compile(self, options={}):
+    def compile(self, options: Mapping[str, Any] | None = None) -> str:
         """ Compiles the theme with the given options. """
 
         # copy, because the dict may be static if it's a basic property
         _options = self.default_options.copy()
-        _options.update(options)
+        _options.update(options or {})
 
         theme = StringIO()
 
         print("@import 'foundation/functions';", file=theme)
 
         for key, value in _options.items():
-            print("${}: {};".format(key, value), file=theme)
+            print('${}: {};'.format(key, value), file=theme)
 
         for i in self.imports:
             print("@import '{}';".format(i), file=theme)

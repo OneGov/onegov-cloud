@@ -32,18 +32,32 @@ The folder can either be a directory relative to the app class or an absolute
 path.
 
 """
+from __future__ import annotations
 
 import os.path
 
-from cached_property import cached_property
 from chameleon import PageTemplate as PageTemplateBase
 from chameleon import PageTemplateFile as PageTemplateFileBase
 from chameleon import PageTemplateLoader
 from chameleon import PageTextTemplateFile
 from chameleon.astutil import Builtin
 from chameleon.tal import RepeatDict
-from chameleon.utils import Scope, decode_string
+from chameleon.utils import Scope
+from functools import cached_property
+from markupsafe import escape, Markup
+
 from onegov.core.framework import Framework
+
+
+from typing import Any, Literal, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import StrPath
+    from chameleon.zpt.template import Macro
+    from collections.abc import Callable, Iterable, Mapping
+
+    from .request import CoreRequest
+
+_T = TypeVar('_T')
 
 
 AUTO_RELOAD = os.environ.get('ONEGOV_DEVELOPMENT') == '1'
@@ -53,41 +67,47 @@ BOOLEAN_HTML_ATTRS = frozenset(
         # List of Boolean attributes in HTML that should be rendered in
         # minimized form (e.g. <img ismap> rather than <img ismap="">)
         # From http://www.w3.org/TR/xhtml1/#guidelines (C.10)
-        "compact",
-        "nowrap",
-        "ismap",
-        "declare",
-        "noshade",
-        "checked",
-        "disabled",
-        "readonly",
-        "multiple",
-        "selected",
-        "noresize",
-        "defer",
+        'compact',
+        'nowrap',
+        'ismap',
+        'declare',
+        'noshade',
+        'checked',
+        'disabled',
+        'readonly',
+        'multiple',
+        'selected',
+        'noresize',
+        'defer',
     ]
 )
 
 
 class PageTemplate(PageTemplateBase):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any):
         kwargs.setdefault('boolean_attributes', BOOLEAN_HTML_ATTRS)
         super().__init__(*args, **kwargs)
 
 
 class PageTemplateFile(PageTemplateFileBase):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any):
         kwargs.setdefault('boolean_attributes', BOOLEAN_HTML_ATTRS)
         super().__init__(*args, **kwargs)
 
 
-def get_default_vars(request, content, suppress_global_variables=False):
+def get_default_vars(
+    request: CoreRequest,
+    content: Mapping[str, Any],
+    suppress_global_variables: bool = False
+) -> dict[str, Any]:
 
     default = {
         'request': request,
-        'translate': request.get_translate(for_chameleon=True)
+        'translate': request.get_translate(for_chameleon=True),
+        'escape': escape,
+        'Markup': Markup
     }
 
     default.update(content)
@@ -111,11 +131,11 @@ class TemplateLoader(PageTemplateLoader):
     }
 
     @cached_property
-    def macros(self):
+    def macros(self) -> MacrosLookup:
         return MacrosLookup(self.search_path, name='macros.pt')
 
     @cached_property
-    def mail_macros(self):
+    def mail_macros(self) -> MacrosLookup:
         return MacrosLookup(self.search_path, name='mail_macros.pt')
 
 
@@ -137,7 +157,11 @@ class MacrosLookup:
 
     """
 
-    def __init__(self, search_paths, name='macros.pt'):
+    def __init__(
+        self,
+        search_paths: Iterable[StrPath],
+        name: str = 'macros.pt'
+    ):
         paths = (os.path.join(base, name) for base in search_paths)
         paths = (path for path in paths if os.path.isfile(path))
 
@@ -147,7 +171,7 @@ class MacrosLookup:
             for template in (
                 PageTemplateFile(
                     path,
-                    search_paths,
+                    search_path=search_paths,
                     auto_reload=AUTO_RELOAD,
                 )
                 for path in reversed(list(paths))
@@ -155,7 +179,7 @@ class MacrosLookup:
             for name in template.macros.names
         }
 
-    def __getitem__(self, name):
+    def __getitem__(self, name: str) -> Macro:
         # macro names in chameleon are normalized internally and we need
         # to do the same to get the correct name in any case:
         name = name.replace('-', '_')
@@ -163,7 +187,10 @@ class MacrosLookup:
 
 
 @Framework.template_loader(extension='.pt')
-def get_template_loader(template_directories, settings):
+def get_template_loader(
+    template_directories: list[str],
+    settings: dict[str, Any]
+) -> TemplateLoader:
     """ Returns the Chameleon template loader for templates with the extension
     ``.pt``.
 
@@ -178,13 +205,17 @@ def get_template_loader(template_directories, settings):
 
 
 @Framework.template_render(extension='.pt')
-def get_chameleon_render(loader, name, original_render):
+def get_chameleon_render(
+    loader: TemplateLoader,
+    name: str,
+    original_render: Callable[[str, CoreRequest], _T]
+) -> Callable[[dict[str, Any], CoreRequest], _T]:
     """ Returns the Chameleon template renderer for the required template.
 
     """
     template = loader.load(name, 'xml')
 
-    def render(content, request):
+    def render(content: dict[str, Any], request: CoreRequest) -> Any:
 
         variables = get_default_vars(request, content)
         return original_render(template.render(**variables), request)
@@ -192,8 +223,12 @@ def get_chameleon_render(loader, name, original_render):
     return render
 
 
-def render_template(template, request, content,
-                    suppress_global_variables='infer'):
+def render_template(
+    template: str,
+    request: CoreRequest,
+    content: dict[str, Any],
+    suppress_global_variables: bool | Literal['infer'] = 'infer'
+) -> Markup:
     """ Renders the given template. Use this if you need to get the rendered
     value directly. If oyu render a view, this is not needed!
 
@@ -207,15 +242,20 @@ def render_template(template, request, content,
         suppress_global_variables = template.startswith('mail_')
 
     registry = request.app.config.template_engine_registry
-    template = registry._template_loaders['.pt'][template]
+    page_template = registry._template_loaders['.pt'][template]
 
     variables = get_default_vars(
         request, content, suppress_global_variables=suppress_global_variables)
 
-    return template.render(**variables)
+    return Markup(page_template.render(**variables))  # nosec: B704
 
 
-def render_macro(macro, request, content, suppress_global_variables=True):
+def render_macro(
+    macro: Macro,
+    request: CoreRequest,
+    content: dict[str, Any],
+    suppress_global_variables: bool = True
+) -> Markup:
     """ Renders a :class:`chameleon.zpt.template.Macro` like this::
 
         layout.render_macro(layout.macros['my_macro'], **vars)
@@ -240,17 +280,17 @@ def render_macro(macro, request, content, suppress_global_variables=True):
 
         variables.setdefault('__translate', variables['translate'])
         variables.setdefault('__convert', variables['translate'])
-        variables.setdefault('__decode', decode_string)
+        variables.setdefault('__decode', bytes.decode)
         variables.setdefault('__on_error_handler', Builtin('str'))
         variables.setdefault('target_language', None)
-        request._macro_variables = variables
+        request._macro_variables = variables  # type:ignore[attr-defined]
     else:
         variables = request._macro_variables.copy()
 
     variables.update(content)
     variables['repeat'] = RepeatDict({})
 
-    stream = list()
+    stream: list[str] = []
     macro.include(stream, Scope(variables), {})
 
-    return ''.join(stream)
+    return Markup(''.join(stream))  # nosec: B704

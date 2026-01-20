@@ -29,6 +29,10 @@
                             linkify_display True;
                         "
                     />
+                    <dl class="field-display" tal:condition="request.is_manager and entry.internal_notes">
+                        <dt i18n:translate>Internal Notes</dt>
+                        <dd>${entry.internal_notes}</dd>
+                    </dl>
                 </div>
 
                 <dl tal:define="link entry.external_link_visible and entry.external_link" tal:condition="link" class="field-display">
@@ -42,18 +46,19 @@
                 </dl>
             </div>
 
-            <div metal:fill-slot="after-panels" tal:condition="request.is_manager or layout.model.directory.enable_change_requests|nothing">
-                <div class="submit-yours">
-                    <dl>
-                        <dt>
-                            <a href="${request.link(layout.model, 'change-request')}">
-                                <tal:b tal:condition="request.is_manager" metal:use-macro="layout.macros.access_hint" tal:define="item layout.model.directory"/>
-                                <tal:b tal:condition="request.is_manager" metal:use-macro="layout.macros.publication_hint" tal:define="item layout.model"/>
-                                <h2 i18n:translate>Change Request</h2>
-                            </a>
-                        </dt>
-                        <dd i18n:translate>Found an error? Propose a change to this entry.</dd>
-                    </dl>
+            <div metal:fill-slot="after-panels" tal:condition="layout.model.directory.enable_change_requests|nothing">
+                <div class="side-panel" tal:condition="layout.model.directory.enable_change_requests|nothing">
+                    <h3 i18n:translate>Actions</h3>
+                    <div class="side-panel-with-bg">
+                        <ul class="more-list">
+                            <li class="icon-item" tal:condition="layout.model.directory.enable_change_requests|nothing">
+                                <a class="list-link" href="${request.link(layout.model, 'change-request')}">
+                                    <i class="fa fa-folder-open"></i>
+                                    <span class="list-title" i18n:translate>Propose a change to this entry</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </tal:b>

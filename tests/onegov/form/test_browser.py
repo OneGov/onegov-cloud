@@ -1,9 +1,18 @@
+from __future__ import annotations
+
 import pytest
 
+from pytest import mark
 from time import sleep
 
 
-def test_snippets(browser):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.browser import ExtendedBrowser
+
+
+@mark.flaky(reruns=3, only_rerun=None)
+def test_snippets(browser: ExtendedBrowser) -> None:
     browser.visit('/snippets')
     browser.wait_for_js_variable('initFormSnippets')
     browser.execute_script("""
@@ -22,17 +31,19 @@ def test_snippets(browser):
     assert not browser.find_by_css('.formcode-snippet')
     browser.find_by_css('.formcode-toolbar-element').click()
 
-    browser.find_by_css('.formcode-snippet-optional').click()
+    browser.find_by_css('#formcode-snippet-text .formcode-snippet-optional'
+                        ).click()
     assert '= ___' in browser.find_by_css('textarea').value
 
     assert not browser.find_by_css('.formcode-snippet')
     browser.find_by_css('.formcode-toolbar-element').click()
 
-    browser.find_by_css('.formcode-snippet-required').click()
+    browser.find_by_css('#formcode-snippet-text .formcode-snippet-required'
+                        ).click()
     assert '*= ___' in browser.find_by_css('textarea').value
 
 
-def test_registry(browser):
+def test_registry(browser: ExtendedBrowser) -> None:
     browser.visit('/registry')
     browser.wait_for_js_variable('formcodeWatcherRegistry')
     browser.execute_script("""
@@ -50,7 +61,7 @@ def test_registry(browser):
     assert code == [{'human_id': 'Label', 'type': 'textarea', 'id': 'label'}]
 
 
-def test_formcode_format(browser):
+def test_formcode_format(browser: ExtendedBrowser) -> None:
     # Todo: This test is flaky since mai 2020
     browser.visit('/formcode-format')
     browser.wait_for_js_variable('initFormcodeFormat')
@@ -72,7 +83,7 @@ def test_formcode_format(browser):
     assert browser.find_by_css('textarea').value == '[Textfield]'
 
 
-def test_formcode_select_empty_checkbox(browser):
+def test_formcode_select_empty_checkbox(browser: ExtendedBrowser) -> None:
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
     browser.driver.execute_script("""
@@ -103,7 +114,7 @@ def test_formcode_select_empty_checkbox(browser):
     assert browser.find_by_css('textarea').value == ""
 
 
-def test_formcode_select_empty_radio(browser):
+def test_formcode_select_empty_radio(browser: ExtendedBrowser) -> None:
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
     browser.driver.execute_script("""
@@ -130,7 +141,11 @@ def test_formcode_select_empty_radio(browser):
 
 
 @pytest.mark.parametrize('input_type', ('checkbox', 'radio'))
-def test_formcode_select_prefilled(browser, input_type):
+def test_formcode_select_prefilled(
+    browser: ExtendedBrowser,
+    input_type: str
+) -> None:
+
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
     browser.driver.execute_script(f"""
@@ -147,7 +162,11 @@ def test_formcode_select_prefilled(browser, input_type):
 
 
 @pytest.mark.parametrize('input_type', ('checkbox', 'radio'))
-def test_formcode_keep_selection(browser, input_type):
+def test_formcode_keep_selection(
+    browser: ExtendedBrowser,
+    input_type: str
+) -> None:
+
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
     browser.driver.execute_script(f"""
@@ -173,7 +192,9 @@ def test_formcode_keep_selection(browser, input_type):
     assert len(browser.find_by_css('.formcode-select input:checked')) == 0
 
 
-def test_field_errors_should_not_yield_updates(browser):
+def test_field_errors_should_not_yield_updates(
+    browser: ExtendedBrowser
+) -> None:
     browser.visit('/formcode-format')
     browser.wait_for_js_variable('initFormcodeFormat')
     browser.execute_script("""

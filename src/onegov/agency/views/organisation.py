@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
@@ -13,13 +15,23 @@ from onegov.people import AgencyMembershipCollection
 from sqlalchemy import or_
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency.request import AgencyRequest
+    from onegov.core.types import RenderData
+
+
 @AgencyApp.html(
     model=Organisation,
     name='view-hidden',
     template='hidden.pt',
     permission=Private
 )
-def view_hidden_agencies(self, request):
+def view_hidden_agencies(
+    self: Organisation,
+    request: AgencyRequest
+) -> RenderData:
+
     session = request.session
 
     agencies = ExtendedAgencyCollection(session).query()
@@ -30,7 +42,6 @@ def view_hidden_agencies(self, request):
         )
     )
     agencies = agencies.order_by(None).order_by(ExtendedAgency.title)
-    agencies = agencies.all()
 
     memberships = AgencyMembershipCollection(session).query(
         order_by='order_within_agency'
@@ -42,7 +53,6 @@ def view_hidden_agencies(self, request):
         )
     )
     memberships = memberships.order_by(None).order_by(AgencyMembership.title)
-    memberships = memberships.all()
 
     people = ExtendedPersonCollection(session).query()
     people = people.filter(
@@ -55,15 +65,15 @@ def view_hidden_agencies(self, request):
         ExtendedPerson.last_name,
         ExtendedPerson.first_name
     )
-    people = people.all()
 
     layout = DefaultLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Hidden contents"), '#'))
+    assert isinstance(layout.breadcrumbs, list)
+    layout.breadcrumbs.append(Link(_('Hidden contents'), '#'))
 
     return {
-        'title': _("Hidden contents"),
-        'agencies': agencies,
-        'memberships': memberships,
-        'people': people,
+        'title': _('Hidden contents'),
+        'agencies': agencies.all(),
+        'memberships': memberships.all(),
+        'people': people.all(),
         'layout': layout
     }

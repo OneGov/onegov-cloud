@@ -8,29 +8,29 @@
 <body>
 
 <metal:intercooler_btn define-macro="intercooler_btn">
-    <tal:b tal:define="link intercooler_btn|layout.intercooler_btn" tal:condition="link" tal:content="structure link(layout)" />
+    <tal:b tal:define="link intercooler_btn|layout.intercooler_btn" tal:condition="link" tal:content="link(layout)" />
 </metal:intercooler_btn>
 
 <metal:intercooler_btn_for_item define-macro="intercooler_btn_for_item">
-    <tal:b tal:define="link intercooler_btn_for_item|layout.intercooler_btn_for_item" tal:condition="link and item" tal:content="structure link(item)(layout)" />
+    <tal:b tal:define="link intercooler_btn_for_item|layout.intercooler_btn_for_item" tal:condition="link and item" tal:content="link(item)(layout)" />
 </metal:intercooler_btn_for_item>
 
 <metal:accordion define-macro="accordion">
     <tal:b tal:condition="items|nothing">
-        <dl class="accordion" data-accordion>
+        <dl class="accordion" data-accordion="" data-allow-all-closed="true">
             <tal:b tal:repeat="item items">
-                <dd class="accordion-navigation"
+                <dd class="accordion-item" data-accordion-item=""
                     tal:define="accordion_id 'accordion-panel-{}'.format(repeat.item.number)"
                 >
-                    <a href="${'#'+ accordion_id}"><i class="fa fa-plus fa-fw" aria-hidden="true"></i> <strong>${item['title']}</strong></a>
-                    <div id="${accordion_id}" class="content page-text"  tal:define="lazy_load item.get('listing_url')">
-                        <div tal:condition="item['content']" tal:content="structure item['content']"/>
+                    <a class="accordion-title" href="${'#'+ accordion_id}"><strong>${item['title']}</strong></a>
+                    <div id="${accordion_id}" class="content page-text accordion-content"  tal:define="lazy_load item.get('listing_url')" data-tab-content="">
+                        <div tal:condition="item['content']" tal:content="item['content']"/>
                         <tal:b tal:condition="request.is_manager and item.get('url')">
                             <a href="${item['url']}" class="button hollow" i18n:translate="">Details</a>
                         </tal:b>
                         <tal:b tal:condition="not: lazy_load" metal:use-macro="layout.macros['course_event_listing']" tal:define="events item.get('events')" />
                         <tal:b tal:condition="lazy_load">
-                            <div id="${accordion_id + '-event-listing'}" tal:attributes="ic-get-from item['listing_url']|nothing; ic-target '#'+accordion_id +'-event-listing';" ic-trigger-on="scrolled-into-view">
+                            <div class="course-list" id="${accordion_id + '-event-listing'}" tal:attributes="ic-get-from item['listing_url']|nothing; ic-target '#'+accordion_id +'-event-listing';" ic-trigger-on="scrolled-into-view">
                                 <a class="button" tal:attributes="ic-get-from item['listing_url']|nothing; ic-target '#'+accordion_id +'-event-listing';" ic-trigger-on="click once" i18n:translate="">Show events</a>
                             </div>
                         </tal:b>
@@ -45,12 +45,12 @@
     <tal:b tal:condition="email|layout.model|nothing" tal:define="mail email|layout.model">
         <dl class="field-display">
             <dt i18n:translate="">Subject: </dt>
-            <dd>${mail.subject}</dd>
+            <dd><p>${mail.subject}</p></dd>
             <div class="clearfix"></div>
         </dl>
         <dl class="field-display">
             <dt i18n:translate="">Text: </dt>
-            <iframe class="resizeable" src="${iframe_link|request.link(mail, name='embed')}" frameborder="0" width="100%" height="600px" onload="autoResize()"></iframe>
+            <iframe class="resizeable" src="${iframe_link|request.link(mail, name='embed')}" frameborder="0" width="100%" height="600px"></iframe>
             <div class="clearfix"></div>
         </dl>
     </tal:b>
@@ -61,9 +61,11 @@
         <dl class="field-display">
             <dt i18n:translate="">Recipients: </dt>
             <dd>
-                <tal:b tal:repeat="email layout.model.course_event.email_recipients">
-                    ${email}<br>
-                </tal:b>
+                <p>
+                    <tal:b tal:repeat="email layout.model.course_event.email_recipients">
+                        ${email}<br>
+                    </tal:b>
+                </p>
             </dd>
             <div class="clearfix"></div>
         </dl>
@@ -134,16 +136,17 @@
 </metal:course_event>
 
 <metal:course define-macro="course_details">
+    <a tal:condition="model.evaluation_url|None" class="button" i18n:translate="" href="${model.evaluation_url}">Course Evaluation</a>
     <h3 i18n:translate="">Description:</h3>
     <div class="page-text course-page-text">
-        <p tal:content="structure model.description_html"></p>
+        <p tal:content="model.description_html"></p>
     </div>
 </metal:course>
 
 <metal:course_event_listing define-macro="course_event_listing">
     <tal:b tal:switch="events and True or False" tal:define="for_email for_email|False">
         <tal:b tal:case="True">
-            <table class="tablesaw hover events-table fullwidth">
+            <table class="hover events-table fullwidth">
                 <thead>
                     <th i18n:translate>Date</th>
                     <th i18n:translate class="text-left">Start</th>
@@ -186,7 +189,7 @@
     <tal:b tal:switch="events and True or False" tal:define="for_email for_email|False; show_course layout.model.course_id is None">
         <tal:b tal:case="True">
             <tal:b tal:condition="events">
-                <table class="tablesaw hover events-table fullwidth">
+                <table class="hover events-table fullwidth">
                     <thead>
                         <th i18n:translate tal:condition="show_course">Course</th>
                         <th i18n:translate>Date</th>
@@ -256,6 +259,5 @@
         <dd i18n:translate="">Attendee should have attended the course already, but didn't.</dd>
     </dl>
 </metal:color_code_snippet>
-
 </body>
 </html>

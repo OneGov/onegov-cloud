@@ -1,9 +1,12 @@
-import collections
-import morepath
+from __future__ import annotations
 
-from cached_property import cached_property
+import morepath
+import ua_parser
+
 from datetime import timedelta
-from onegov.core.cache import lru_cache
+from functools import cached_property
+from onegov.core.cache import instance_lru_cache
+from onegov.core.custom import msgpack
 from onegov.core.utils import append_query_param
 from itsdangerous import (
     BadSignature,
@@ -12,20 +15,82 @@ from itsdangerous import (
     URLSafeSerializer,
     URLSafeTimedSerializer
 )
-from more.content_security import ContentSecurityRequest
+from more.content_security import ContentSecurityRequest, UNSAFE_EVAL
 from more.webassets.core import IncludeRequest
 from morepath.authentication import NO_IDENTITY
+from morepath.error import LinkError
+from morepath.request import SAME_APP
 from onegov.core import utils
 from onegov.core.crypto import random_token
-from ua_parser import user_agent_parser
 from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
 
 
-Message = collections.namedtuple('Message', ['text', 'type'])
+from typing import cast, overload, Any, NamedTuple, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import SupportsItems
+    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from dectate import Sentinel
+    from gettext import GNUTranslations
+    from markupsafe import Markup
+    from morepath import App
+    from morepath.authentication import Identity, NoIdentity
+    from onegov.core import Framework
+    from onegov.core.browser_session import BrowserSession
+    from onegov.core.i18n.translation_string import TranslationMarkup
+    from onegov.core.security.permissions import Intent
+    from onegov.core.types import MessageType
+    from sqlalchemy import Column
+    from sqlalchemy.orm import relationship, Session
+    from translationstring import _ChameleonTranslate
+    from typing import Literal, Protocol, TypeGuard
+    from webob import Response
+    from webob.multidict import MultiDict
+    from webob.request import _FieldStorageWithFile
+    from wtforms import Form
+    from uuid import UUID
+
+    from .analytics import AnalyticsProvider
+    from .templates import TemplateLoader
+
+    _BaseRequest = morepath.Request
+
+    # NOTE: To avoid a dependency between onegov.core and onegov.user
+    #       we use a UserLike Protocol to define the properties we need
+    #       to be present on a user.
+    class GroupLike(Protocol):
+        @property
+        def id(self) -> UUID | Column[UUID]: ...
+        @property
+        def name(self) -> str | Column[str | None] | None: ...
+
+    class UserLike(Protocol):
+        @property
+        def id(self) -> UUID | Column[UUID]: ...
+        @property
+        def username(self) -> str | Column[str]: ...
+        @property
+        def groups(self) -> (
+            Sequence[GroupLike]
+            | relationship[Sequence[GroupLike]]
+        ): ...
+        @property
+        def role(self) -> str | Column[str]: ...
+
+else:
+    _BaseRequest = object
+
+_T = TypeVar('_T')
+_F = TypeVar('_F', bound='Form')
 
 
-class ReturnToMixin:
+@msgpack.make_serializable(tag=11)
+class Message(NamedTuple):
+    text: str
+    type: MessageType
+
+
+class ReturnToMixin(_BaseRequest):
     """ Provides a safe and convenient way of using return-to links.
 
     Return-to links are links with an added 'return-to' query parameter
@@ -57,25 +122,25 @@ class ReturnToMixin:
     """
 
     @property
-    def identity_secret(self):
+    def identity_secret(self) -> str:
         raise NotImplementedError
 
     @property
-    def redirect_signer(self):
+    def redirect_signer(self) -> URLSafeSerializer:
         return URLSafeSerializer(self.identity_secret, 'return-to')
 
-    @lru_cache(maxsize=16)
-    def sign_url_for_redirect(self, url):
+    @instance_lru_cache(maxsize=16)
+    def sign_url_for_redirect(self, url: str) -> str:
         return self.redirect_signer.dumps(url)
 
-    def return_to(self, url, redirect):
+    def return_to(self, url: str, redirect: str) -> str:
         signed = self.sign_url_for_redirect(redirect)
         return utils.append_query_param(url, 'return-to', signed)
 
-    def return_here(self, url):
+    def return_here(self, url: str) -> str:
         return self.return_to(url, self.url)
 
-    def redirect(self, url):
+    def redirect(self, url: str) -> Response:
         if 'return-to' in self.GET:
             try:
                 url = self.redirect_signer.loads(self.GET['return-to'])
@@ -83,6 +148,10 @@ class ReturnToMixin:
                 pass
 
         return morepath.redirect(url)
+
+
+def is_logged_in(identity: Identity | NoIdentity) -> TypeGuard[Identity]:
+    return identity is not NO_IDENTITY
 
 
 class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
@@ -94,25 +163,30 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
     """
 
+    app: Framework
+
     @cached_property
-    def identity_secret(self):
+    def identity_secret(self) -> str:
         return self.app.identity_secret
 
     @cached_property
-    def session(self):
+    def session(self) -> Session:
         return self.app.session()
 
-    def link_prefix(self, *args, **kwargs):
+    def link_prefix(
+        self,
+        app: Framework | None = None  # type:ignore[override]
+    ) -> str:
         """ Override the `link_prefix` with the application base path provided
         by onegov.server, because the default link_prefix contains the
         hostname, which is not useful in our case - we'll add the hostname
         ourselves later.
 
         """
-        return getattr(self.app, 'application_base_path', '')
+        return getattr(app or self.app, 'application_base_path', '')
 
     @cached_property
-    def x_vhm_host(self):
+    def x_vhm_host(self) -> str:
         """ Return the X_VHM_HOST variable or an empty string.
 
         X_VHM_HOST acts like a prefix to all links generated by Morepath.
@@ -122,7 +196,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return self.headers.get('X_VHM_HOST', '').rstrip('/')
 
     @cached_property
-    def x_vhm_root(self):
+    def x_vhm_root(self) -> str:
         """ Return the X_VHM_ROOT variable or an empty string.
 
         X_VHM_ROOT is a bit more tricky than X_VHM_HOST. It tells Morepath
@@ -151,29 +225,24 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return self.headers.get('X_VHM_ROOT', '').rstrip('/')
 
     @cached_property
-    def url(self):
-        """ Returns the current url, taking the virtual hosting in account. """
-        url = self.transform(self.path)
-
-        if self.query_string:
-            url += '?' + self.query_string
-
-        return url
+    def path_url(self) -> str:
+        """ Returns the path_url, taking the virtual hosting in account. """
+        return self.transform(self.path)
 
     @cached_property
-    def application_url(self):
+    def application_url(self) -> str:
         """ Extends the default application_url with virtual host suport. """
         # FIXME: Technically this is not guaranteed to be URL safe, but the
         #        same is already true for X_VHM_ROOT and X_VHM_HOST, if we
         #        want to be able to deal with this properly we should add
         #        a function that does the same thing webob does internally
-        return self.transform(self.script_name)
+        return self.transform(self.script_name).rstrip('/')
 
-    def transform(self, url):
+    def transform(self, url: str) -> str:
         """ Applies X_VHM_HOST and X_VHM_ROOT to the given url (which is
         expected to not contain a host yet!). """
         if self.x_vhm_root:
-            url = '/' + utils.lchop(url, self.x_vhm_root).lstrip('/')
+            url = '/' + url.removeprefix(self.x_vhm_root).lstrip('/')
 
         if self.x_vhm_host:
             url = self.x_vhm_host + url
@@ -182,19 +251,78 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         return url
 
-    def link(self, *args, query_params={}, **kwargs):
+    @overload  # type:ignore[override]
+    def link(
+        self,
+        obj: None,
+        name: str = ...,
+        default: None = ...,
+        app: Framework | Sentinel = ...,
+        query_params: SupportsItems[str, str] | None = ...,
+        fragment: str | None = ...,
+    ) -> None: ...
+
+    @overload
+    def link(
+        self,
+        obj: None,
+        name: str,
+        default: _T,
+        app: Framework | Sentinel = ...,
+        query_params: SupportsItems[str, str] | None = ...,
+        fragment: str | None = ...,
+    ) -> _T: ...
+
+    @overload
+    def link(
+        self,
+        obj: object,
+        name: str = ...,
+        default: Any = ...,
+        app: Framework | Sentinel = ...,
+        query_params: SupportsItems[str, str] | None = ...,
+        fragment: str | None = ...,
+    ) -> str: ...
+
+    def link(
+        self,
+        obj: object,
+        name: str = '',
+        default: _T | None = None,
+        app: Framework | Sentinel = SAME_APP,
+        query_params: SupportsItems[str, str] | None = None,
+        fragment: str | None = None,
+    ) -> str | _T | None:
         """ Extends the default link generating function of Morepath. """
-        result = self.transform(super().link(*args, **kwargs))
+        query_params = query_params or {}
+        if hasattr(obj, '__link_alias__'):
+            result = obj.__link_alias__()
+        else:
+            result = self.transform(
+                super().link(obj, name=name, default=default, app=app)
+            )
         for key, value in query_params.items():
             result = append_query_param(result, key, value)
-            pass
+        if fragment:
+            result += f'#{fragment}'
         return result
 
-    def class_link(self, *args, **kwargs):
+    def class_link(
+        self,
+        model: type[Any],
+        variables: dict[str, Any] | None = None,
+        name: str = '',
+        app: Framework | Sentinel = SAME_APP,  # type:ignore[override]
+    ) -> str:
         """ Extends the default class link generating function of Morepath. """
-        return self.transform(super().class_link(*args, **kwargs))
+        return self.transform(super().class_link(
+            model,
+            variables=variables,
+            name=name,
+            app=app
+        ))
 
-    def filestorage_link(self, path):
+    def filestorage_link(self, path: str) -> str | None:
         """ Takes the given filestorage path and returns an url if the path
         exists. The url might point to the local server or it might point to
         somehwere else on the web.
@@ -202,6 +330,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """
 
         app = self.app
+        if app.filestorage is None:
+            return None
 
         if not app.filestorage.exists(path):
             return None
@@ -215,7 +345,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return self.link(app.modules.filestorage.FilestorageFile(path))
 
     @cached_property
-    def theme_link(self):
+    def theme_link(self) -> str:
         """ Returns the link to the current theme. Computed once per request.
 
         The theme is automatically compiled and stored if it doesn't exist yet,
@@ -223,7 +353,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         """
         theme = self.app.settings.core.theme
-        assert theme is not None, "Do not call if no theme is used"
+        assert theme is not None, 'Do not call if no theme is used'
 
         force = self.app.always_compile_theme or (
             self.app.allow_shift_f5_compile
@@ -237,8 +367,20 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         return self.link(self.app.modules.theme.ThemeFile(filename))
 
+    def get_session_nonce(self) -> str:
+        """ Returns a nonce that can be passed as a POST parameter
+        to restore a session in a context where the session cookie
+        is unavailable, due to `SameSite=Lax`.
+        """
+        nonce = random_token()
+        self.app.cache.set(
+            nonce,
+            self.app.sign(self.browser_session._token, nonce),
+        )
+        return self.app.sign(nonce)
+
     @cached_property
-    def browser_session(self):
+    def browser_session(self) -> BrowserSession:
         """ Returns a browser_session bound to the request. Works via cookies,
         so requests without cookies won't be able to use the browser_session.
 
@@ -256,11 +398,29 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         if 'session_id' in self.cookies:
             session_id = self.app.unsign(self.cookies['session_id'])
-            session_id = session_id or random_token()
+            if session_id is None:
+                # NOTE: this ensures the new session_id actually gets stored
+                #       since on_dirty does nothing if the cookie exists
+                #       otherwise we'll be stuck with an invalid session_id
+                #       until we delete the cookie manually and will get
+                #       infinite CSRF errors
+                del self.cookies['session_id']
+                session_id = random_token()
+
+        elif isinstance(signed_nonce := self.POST.get('session_nonce'), str):
+            nonce = self.app.unsign(signed_nonce)
+            session_id = random_token()
+            if nonce:
+                # restore the session in a non SameSite context
+                signed_session_id = self.app.cache.get(nonce)
+                if signed_session_id:
+                    # make sure this nonce can't be reused
+                    self.app.cache.delete(nonce)
+                    session_id = self.app.unsign(signed_session_id, nonce)
         else:
             session_id = random_token()
 
-        def on_dirty(session, token):
+        def on_dirty(session: BrowserSession, token: str) -> None:
 
             if 'session_id' in self.cookies:
                 return
@@ -268,13 +428,13 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             self.cookies['session_id'] = self.app.sign(token)
 
             @self.after
-            def store_session(response):
+            def store_session(response: morepath.Response) -> None:
                 response.set_cookie(
                     'session_id',
                     self.cookies['session_id'],
                     secure=self.app.identity_secure,
                     httponly=True,
-                    samesite=self.app.same_site_cookie_policy
+                    samesite=self.app.same_site_cookie_policy  # type:ignore
                 )
 
         return self.app.modules.browser_session.BrowserSession(
@@ -283,8 +443,16 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             on_dirty=on_dirty
         )
 
-    def get_form(self, form_class, i18n_support=True, csrf_support=True,
-                 data=None, model=None):
+    def get_form(
+        self,
+        form_class: type[_F],
+        i18n_support: bool = True,
+        csrf_support: bool = True,
+        data: dict[str, Any] | None = None,
+        model: object = None,
+        formdata: MultiDict[str, str | _FieldStorageWithFile] | None = None,
+        pass_model: bool = False,
+    ) -> _F:
         """ Returns an instance of the given form class, set up with the
         correct translator and with CSRF protection enabled (the latter
         doesn't work yet).
@@ -295,7 +463,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         the view function is called.
 
         """
-        meta = {}
+        meta: dict[str, Any] = {}
 
         if i18n_support:
             translate = self.get_translate(for_chameleon=False)
@@ -316,39 +484,53 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         # instead of adding it to the form like it is done below - the meta
         # can also be accessed by form widgets
         meta['request'] = self
+        meta['model'] = model
 
-        formdata = self.POST and self.POST or None
-        form = form_class(formdata=formdata, meta=meta, data=data)
+        # by default use POST data as formdata, but this can be overriden
+        # by passing in something else as formdata
+        if formdata is None and self.POST:
+            formdata = self.POST
+        form = form_class(
+            formdata=formdata,
+            meta=meta,
+            data=data,
+            obj=model if pass_model else None,
+        )
 
         assert not hasattr(form, 'request')
-        form.request = self
-        form.model = model
+        form.request = self  # type:ignore[attr-defined]
+        form.model = model  # type:ignore[attr-defined]
 
         if hasattr(form, 'on_request'):
             form.on_request()
 
         return form
 
-    def translate(self, text):
+    @overload
+    def translate(self, text: Markup | TranslationMarkup) -> Markup: ...
+    @overload
+    def translate(self, text: str) -> str: ...
+
+    def translate(self, text: str) -> str:
         """ Translates the given text, if it's a translatable text. Also
         translates mappings. """
 
         if not hasattr(text, 'domain'):
             return text
 
-        if getattr(text, 'mapping', None):
-            for key, value in text.mapping.items():
+        if (mapping := getattr(text, 'mapping', None)) is not None:
+            for key, value in mapping.items():
                 if hasattr(text, 'domain'):
-                    text.mapping[key] = self.translator(value)
+                    mapping[key] = self.translator(value)
 
         return self.translator(text)
 
     @cached_property
-    def translator(self):
+    def translator(self) -> Callable[[str], str]:
         """ Returns the translate function for basic string translations. """
         translator = self.get_translate()
 
-        def translate(text):
+        def translate(text: str) -> str:
             if not hasattr(text, 'interpolate'):
                 return text
             if translator:
@@ -358,12 +540,12 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return translate
 
     @cached_property
-    def default_locale(self):
+    def default_locale(self) -> str | None:
         """ Returns the default locale. """
         return self.app.default_locale
 
     @cached_property
-    def locale(self):
+    def locale(self) -> str | None:
         """ Returns the current locale of this request. """
         settings = self.app.settings
 
@@ -372,11 +554,26 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return locale or self.app.default_locale
 
     @cached_property
-    def html_lang(self):
+    def html_lang(self) -> str:
         """ The language code for the html tag. """
         return self.locale and self.locale.replace('_', '-') or ''
 
-    def get_translate(self, for_chameleon=False):
+    @overload
+    def get_translate(
+        self,
+        for_chameleon: Literal[False] = False
+    ) -> GNUTranslations | None: ...
+
+    @overload
+    def get_translate(
+        self,
+        for_chameleon: Literal[True]
+    ) -> _ChameleonTranslate | None: ...
+
+    def get_translate(
+        self,
+        for_chameleon: bool = False
+    ) -> GNUTranslations | _ChameleonTranslate | None:
         """ Returns the translate method to the given request, or None
         if no such method is availabe.
 
@@ -389,17 +586,21 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         if not self.app.locales:
             return None
 
-        if for_chameleon:
-            return self.app.chameleon_translations.get(self.locale)
-        else:
-            return self.app.translations.get(self.locale)
+        locale = self.locale
+        if locale is None:
+            return None
 
-    def message(self, text, type):
+        if for_chameleon:
+            return self.app.chameleon_translations.get(locale)
+        else:
+            return self.app.translations.get(locale)
+
+    def message(self, text: str, type: MessageType) -> None:
         """ Adds a message with the given type to the messages list. This
         messages list may then be displayed by an application building on
         onegov.core.
 
-        For example:
+        For example::
 
             http://foundation.zurb.com/docs/components/alert_boxes.html
 
@@ -419,11 +620,12 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         else:
             # this is a bit akward, but I don't see an easy way for this atm.
             # (otoh, usually there's going to be one message only)
-            self.browser_session.messages = self.browser_session.messages + [
+            self.browser_session.messages = [
+                *self.browser_session.messages,
                 Message(text, type)
             ]
 
-    def consume_messages(self):
+    def consume_messages(self) -> Iterator[Message]:
         """ Returns the messages, removing them from the session in the
         process. Call only if you can be reasonably sure that the user
         will see the messages.
@@ -431,33 +633,38 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """
         yield from self.browser_session.pop('messages', ())
 
-    def success(self, text):
+    def success(self, text: str) -> None:
         """ Adds a success message. """
         self.message(text, 'success')
 
-    def warning(self, text):
+    def warning(self, text: str) -> None:
         """ Adds a warning message. """
         self.message(text, 'warning')
 
-    def info(self, text):
+    def info(self, text: str) -> None:
         """ Adds an info message. """
         self.message(text, 'info')
 
-    def alert(self, text):
+    def alert(self, text: str) -> None:
         """ Adds an alert message. """
         self.message(text, 'alert')
 
     @cached_property
-    def is_logged_in(self):
+    def is_logged_in(self) -> bool:
         """ Returns True if the current request is logged in at all. """
         return self.identity is not NO_IDENTITY
 
     @cached_property
-    def agent(self):
+    def agent(self) -> ua_parser.DefaultedResult:
         """ Returns the user agent, parsed by ua-parser. """
-        return user_agent_parser.Parse(self.user_agent or "")
+        return ua_parser.parse(self.user_agent or '').with_defaults()
 
-    def has_permission(self, model, permission, user=None):
+    def has_permission(
+        self,
+        model: object,
+        permission: type[Intent] | None,
+        user: UserLike | None = None
+    ) -> bool:
         """ Returns True if the current or given user has the given permission
         on the given model.
 
@@ -465,17 +672,16 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         if permission is None:
             return True
 
-        identity = self.identity
-        if user:
-            identity = self.app.application_bound_identity(
-                user.username,
-                user.group_id.hex if user.group_id else user.group_id,
-                user.role
-            )
+        identity = self.app.application_bound_identity(
+            user.username,
+            user.id.hex,
+            frozenset(group.id.hex for group in user.groups),
+            user.role
+        ) if user else self.identity
 
         return self.app._permits(identity, model, permission)
 
-    def has_access_to_url(self, url):
+    def has_access_to_url(self, url: str) -> bool:
         """ Returns true if the current user has access to the given url.
 
         The domain part of the url is completely ignored. This method should
@@ -497,11 +703,11 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         permission = self.app.permission_by_view(obj, view_name)
         return self.has_permission(obj, permission)
 
-    def exclude_invisible(self, models):
+    def exclude_invisible(self, models: Iterable[_T]) -> list[_T]:
         """ Excludes models invisble to the current user from the list. """
         return [m for m in models if self.is_visible(m)]
 
-    def is_visible(self, model):
+    def is_visible(self, model: object) -> bool:
         """ Returns True if the given model is visible to the current user.
 
         In addition to the `is_public` check, this checks if the model is
@@ -514,33 +720,33 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             return False
 
         if not self.is_private(model) and hasattr(model, 'access'):
-            if model.access == 'secret':
+            if model.access in ('secret', 'secret_mtan'):
                 return False
 
         return True
 
-    def is_public(self, model):
+    def is_public(self, model: object) -> bool:
         """ Returns True if the current user has the Public permission for
         the given model.
 
         """
         return self.has_permission(model, self.app.modules.security.Public)
 
-    def is_personal(self, model):
+    def is_personal(self, model: object) -> bool:
         """ Returns True if the current user has the Personal permission for
         the given model.
 
         """
         return self.has_permission(model, self.app.modules.security.Personal)
 
-    def is_private(self, model):
+    def is_private(self, model: object) -> bool:
         """ Returns True if the current user has the Private permission for
         the given model.
 
         """
         return self.has_permission(model, self.app.modules.security.Private)
 
-    def is_secret(self, model):
+    def is_secret(self, model: object) -> bool:
         """ Returns True if the current user has the Secret permission for
         the given model.
 
@@ -548,27 +754,27 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return self.has_permission(model, self.app.modules.security.Secret)
 
     @cached_property
-    def current_role(self):
+    def current_role(self) -> str | None:
         """ Returns the user-role of the current request, if logged in.
         Otherwise, None is returned.
 
         """
-        return self.is_logged_in and self.identity.role or None
+        return self.identity.role if is_logged_in(self.identity) else None
 
-    def has_role(self, *roles):
+    def has_role(self, *roles: str) -> bool:
         """ Returns true if the current user has any of the given roles. """
 
         assert roles and all(roles)
         return self.current_role in roles
 
     @cached_property
-    def csrf_salt(self):
+    def csrf_salt(self) -> str:
         if not self.browser_session.has('csrf_salt'):
             self.browser_session['csrf_salt'] = random_token()
 
         return self.browser_session['csrf_salt']
 
-    def new_csrf_token(self, salt=None):
+    def new_csrf_token(self, salt: str | bytes | None = None) -> bytes:
         """ Returns a new CSRF token. A CSRF token can be verified
         using :meth:`is_valid_csrf_token`.
 
@@ -589,11 +795,6 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         even prevents CSRF attack combined with XSS.
 
         """
-        # no csrf tokens for anonymous users (there's not really a point
-        # to doing this)
-        if not self.is_logged_in:
-            return ''
-
         assert salt or self.csrf_salt
         salt = salt or self.csrf_salt
 
@@ -603,7 +804,23 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         return signer.sign(random_token())
 
-    def assert_valid_csrf_token(self, signed_value=None, salt=None):
+    @cached_property
+    def csrf_token(self) -> str:
+        """ Returns a csrf token for use with DELETE links (forms do their
+        own thing automatically).
+
+        """
+        return self.new_csrf_token().decode('utf-8')
+
+    def csrf_protected_url(self, url: str) -> str:
+        """ Adds a csrf token to the given url. """
+        return utils.append_query_param(url, 'csrf-token', self.csrf_token)
+
+    def assert_valid_csrf_token(
+        self,
+        signed_value: str | bytes | None = None,
+        salt: str | bytes | None = None
+    ) -> None:
         """ Validates the given CSRF token and returns if it was
         created by :meth:`new_csrf_token`. If there's a mismatch, a 403 is
         raised.
@@ -612,10 +829,14 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         request.params.get('csrf-token').
 
         """
-        signed_value = signed_value or self.params.get('csrf-token')
+        _signed_value = signed_value or self.params.get('csrf-token')
         salt = salt or self.csrf_salt
+        if not _signed_value:
+            raise HTTPForbidden()
 
-        if not signed_value:
+        # params on request could contain a cgi.FieldStorage, so lets make
+        # sure we are dealing with str or bytes
+        if not isinstance(_signed_value, (str, bytes)):
             raise HTTPForbidden()
 
         if not salt:
@@ -623,11 +844,15 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         signer = TimestampSigner(self.identity_secret, salt=salt)
         try:
-            signer.unsign(signed_value, max_age=self.app.csrf_time_limit)
-        except (SignatureExpired, BadSignature):
-            raise HTTPForbidden()
+            signer.unsign(_signed_value, max_age=self.app.csrf_time_limit)
+        except (SignatureExpired, BadSignature) as exception:
+            raise HTTPForbidden() from exception
 
-    def new_url_safe_token(self, data, salt=None):
+    def new_url_safe_token(
+        self,
+        data: object,
+        salt: str | bytes | None = None
+    ) -> str:
         """ Returns a new URL safe token. A token can be deserialized
         using :meth:`load_url_safe_token`.
 
@@ -635,7 +860,12 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         serializer = URLSafeTimedSerializer(self.identity_secret)
         return serializer.dumps(data, salt=salt)
 
-    def load_url_safe_token(self, data, salt=None, max_age=3600):
+    def load_url_safe_token(
+        self,
+        data: str | bytes | None,
+        salt: str | bytes | None = None,
+        max_age: int | None = 3600
+    ) -> Any | None:
         """ Deserialize a token created by :meth:`new_url_safe_token`.
 
         If the token is invalid, None is returned.
@@ -648,3 +878,73 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             return serializer.loads(data, salt=salt, max_age=max_age)
         except (SignatureExpired, BadSignature):
             return None
+
+    @cached_property
+    def template_loader(self) -> TemplateLoader:
+        """ Returns the chameleon template loader. """
+        registry = self.app.config.template_engine_registry
+        return registry._template_loaders['.pt']
+
+    @property
+    def analytics_provider(self) -> AnalyticsProvider | None:
+        """ Returns the active analytics provider. """
+        return None
+
+    @property
+    def analytics_code(self) -> Markup | None:
+        """ Return the embeddable code for the active analytics provider. """
+        provider = self.analytics_provider
+        if provider is None:
+            return None
+
+        return provider.code(self)
+
+    def require_unsafe_eval(self) -> None:
+        # FIXME: We currently use some intercooler features in some views
+        #        that require unsafe-eval, we should try to get rid of them
+        #        by writing some custom JavaScript handlers (ic-on-XXX).
+        self.content_security_policy.script_src.add(UNSAFE_EVAL)
+
+    # NOTE: We override this so we pass an instance of ourselves
+    #       to resolve_model, rather than a base Request instance
+    #       like in the original implementation, the original
+    #       implementation also doesn't handle query params
+    #       correctly, which can lead to converter errors
+    def resolve_path(
+        self,
+        path: str,
+        app: App | Sentinel = SAME_APP
+    ) -> Any | None:
+        """Resolve a path to a model instance.
+
+        The resulting object is a model instance, or ``None`` if the
+        path could not be resolved.
+
+        :param path: URL path to resolve.
+        :param app: If set, change the application in which the
+          path is resolved. By default the path is resolved in the
+          current application.
+        :return: instance or ``None`` if no path could be resolved.
+        """
+        if app is None:
+            raise LinkError('Cannot path: app is None')
+
+        if app is SAME_APP:
+            app = self.app
+
+        path_info, __, query_string = path.partition('?')
+
+        environ = self.environ.copy()
+        environ.pop('webob._parsed_post_vars', None)
+        request = self.__class__(
+            environ,
+            cast('App', app),
+            method='GET',
+            path_info=path_info,
+            query_string=query_string,
+            body=b''
+        )
+        # try to resolve imports..
+        from morepath.publish import resolve_model
+
+        return resolve_model(request)

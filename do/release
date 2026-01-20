@@ -8,13 +8,13 @@ REPO="$(dirname "$SELF")"
 # sentry.io. This has been encrypted as follows:
 #
 # echo "my-token" | gpg --encrypt --armor \
-#   --recipient patrick.bucher@seantis.ch \
 #   --recipient fabian.reinhard@seantis.ch \
 #   --recipient tobias.reinhard@seantis.ch \
-#   --recipient marc.sommerhalder@seantis.ch \
 #   --recipient chantal.trutmann@seantis.ch \
 #   --recipient david.salvisberg@seantis.ch \
-#   --recipient claudio.pilotti@seantis.ch
+#   --recipient claudio.pilotti@seantis.ch \
+#   --recipient cyrill.kuettel@seantis.ch \
+#   --recipient reto.tschuppert@seantis.ch
 #
 # Be sure to update `configure-sentry` below and update the comment above
 # if the intended recipients change. You will also want to create a new
@@ -25,76 +25,65 @@ REPO="$(dirname "$SELF")"
 SENTRY_TOKEN_ENCRYPTED="
 -----BEGIN PGP MESSAGE-----
 
-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
-=qKTF
+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
+Y3UlZaCrAMsoFXF9
+=A93k
 -----END PGP MESSAGE-----
 "
 
@@ -108,10 +97,7 @@ function configure-sentry() {
 }
 
 function current-version() {
-    git ls-remote --tags origin \
-        | awk -F '/' '{print $NF}' \
-        | sort --reverse --version-sort\
-        | head -n 1
+    git tag --sort=version:refname --merged master | tail -n 1
 }
 
 function announce-release-on-sentry-io() {
@@ -177,7 +163,7 @@ function release() {
     pushd "$REPO" > /dev/null
     git add CHANGES.md
     git add src/onegov/core/__init__.py
-    git commit -m "Release $(new-version)"
+    git commit --no-verify -m "Release $(new-version)"
     git tag "$(new-version)"
     git push
     git push --tags

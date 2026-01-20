@@ -1,28 +1,45 @@
+from __future__ import annotations
+
 import pytest
 import transaction
 
 from datetime import datetime, timedelta, date
-
-from webob.multidict import MultiDict
-
+from decimal import Decimal
 from onegov.activity import ActivityCollection
 from onegov.activity import AttendeeCollection
 from onegov.activity import BookingCollection
-from onegov.activity import InvoiceCollection
+from onegov.activity import BookingPeriodCollection
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.activity import OccasionCollection
-from onegov.activity import PeriodCollection
 from onegov.core.utils import Bunch
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.forms import NotificationTemplateSendForm, PeriodForm
 from onegov.feriennet.forms import VacationActivityForm
 from onegov.user import UserCollection
+from webob.multidict import MultiDict
 
 
-def create_form(session, confirmable, start, delta=timedelta(days=10)):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.activity import BookingPeriod
+    from onegov.feriennet.models import VacationActivity
+    from sqlalchemy.orm import Session
+    from uuid import UUID
+    from .conftest import Scenario
+
+
+def create_form(
+    session: Session,
+    confirmable: bool,
+    start: date,
+    delta: timedelta | None = None
+) -> PeriodForm:
+
+    delta = delta or timedelta(days=10)
     fmt = "%Y-%m-%d"
     start_ = start
 
-    def iter_start():
+    def iter_start() -> str:
         nonlocal start_
         start_ += delta
         return start_.strftime(fmt)
@@ -38,18 +55,18 @@ def create_form(session, confirmable, start, delta=timedelta(days=10)):
         ('execution_start', iter_start()),
         ('execution_end', iter_start())
     ]))
-    form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
-    form.model = PeriodCollection(session)
+    form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)  # type: ignore[assignment]
+    form.model = BookingPeriodCollection(session)
     return form
 
 
-def add_period_by_form(form, session):
+def add_period_by_form(form: PeriodForm, session: Session) -> BookingPeriod:
     # add the period like in view name='new'
-    return PeriodCollection(session).add(
-        title=form.title.data,
+    return BookingPeriodCollection(session).add(
+        title=form.title.data,  # type: ignore[arg-type]
         prebooking=form.prebooking,
-        booking=form.booking,
-        execution=form.execution,
+        booking=form.booking,  # type: ignore[arg-type]
+        execution=form.execution,  # type: ignore[arg-type]
         minutes_between=form.minutes_between.data,
         confirmable=form.confirmable.data,
         finalizable=form.finalizable.data,
@@ -57,7 +74,7 @@ def add_period_by_form(form, session):
     )
 
 
-def edit_period_by_form(form, period):
+def edit_period_by_form(form: PeriodForm, period: BookingPeriod) -> None:
     # simulated the edit view
     form.model = period
 
@@ -66,7 +83,13 @@ def edit_period_by_form(form, period):
     (True, date(2020, 4, 1), timedelta(days=10)),
     (False, date(2020, 4, 1), timedelta(days=10)),
 ])
-def test_period_form(session, confirmable, start, delta):
+def test_period_form(
+    session: Session,
+    confirmable: bool,
+    start: date,
+    delta: timedelta
+) -> None:
+
     # Fixes issue FER-861
     booking_start = start + 2 * delta
 
@@ -120,7 +143,7 @@ def test_period_form(session, confirmable, start, delta):
     assert period.prebooking_end == new_booking_start
 
 
-def test_vacation_activity_form(session, test_password):
+def test_vacation_activity_form(session: Session, test_password: str) -> None:
     users = UserCollection(session)
     users.add(
         username='admin@example.org',
@@ -139,7 +162,7 @@ def test_vacation_activity_form(session, test_password):
         role='member')
 
     form = VacationActivityForm()
-    form.request = Bunch(
+    form.request = Bunch(  # type: ignore[assignment]
         is_admin=True,
         current_username='editor@example.org',
         session=session
@@ -159,11 +182,12 @@ def test_vacation_activity_form(session, test_password):
     assert form.username is None
 
 
-def test_notification_template_send_form(session):
+def test_notification_template_send_form(session: Session) -> None:
+    activities: ActivityCollection[VacationActivity]
     activities = ActivityCollection(session, type='vacation')
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
-    occasions = OccasionCollection(session)
+    periods = BookingPeriodCollection(session)
+    occasions_ = OccasionCollection(session)
     bookings = BookingCollection(session)
 
     users = UserCollection(session)
@@ -183,15 +207,15 @@ def test_notification_template_send_form(session):
         password='foobar',
         role='member')
 
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
+    prebooking = (
+        (datetime.now() - timedelta(days=1)).date(),
+        (datetime.now() + timedelta(days=1)).date()
+    )
 
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
+    execution = (
+        (datetime.now() + timedelta(days=10)).date(),
+        (datetime.now() + timedelta(days=12)).date()
+    )
 
     period = periods.add(
         title="Ferienpass 2016",
@@ -207,7 +231,7 @@ def test_notification_template_send_form(session):
     bar = activities.add("Bar", username='organiser@example.org')
     bar.propose().accept()
 
-    o1 = occasions.add(
+    o1 = occasions_.add(
         start=datetime(2016, 11, 25, 8),
         end=datetime(2016, 11, 25, 16),
         age=(0, 10),
@@ -216,9 +240,9 @@ def test_notification_template_send_form(session):
         activity=foo,
         period=period,
     )
-    o1.username = admin.username
+    o1.username = admin.username  # type: ignore[attr-defined]
 
-    o2 = occasions.add(
+    o2 = occasions_.add(
         start=datetime(2016, 11, 25, 17),
         end=datetime(2016, 11, 25, 20),
         age=(0, 10),
@@ -227,26 +251,33 @@ def test_notification_template_send_form(session):
         activity=bar,
         period=period,
     )
-    o2.username = organiser.username
+    o2.username = organiser.username  # type: ignore[attr-defined]
 
     a1 = attendees.add(admin, 'Dustin', date(2000, 1, 1), 'male')
     a2 = attendees.add(organiser, 'Mike', date(2000, 1, 1), 'female')
 
     b1 = bookings.add(admin, a1, o1)
     b1.state = 'accepted'
-    b1.cost = 100
+    b1.cost = Decimal('100')
 
     b2 = bookings.add(organiser, a2, o2)
     b2.state = 'accepted'
-    b2.cost = 100
+    b2.cost = Decimal('100')
 
     transaction.commit()
 
     # create a mock request
-    def invoice_collection(user_id=None, period_id=None):
-        return InvoiceCollection(session, user_id=user_id, period_id=period_id)
+    def invoice_collection(
+        user_id: UUID | None = None,
+        period_id: UUID | None = None
+    ) -> BookingPeriodInvoiceCollection:
+        return BookingPeriodInvoiceCollection(
+            session,
+            user_id=user_id,
+            period_id=period_id
+        )
 
-    def request(admin):
+    def request(admin: bool) -> Any:
         return Bunch(
             app=Bunch(
                 active_period=periods.active(),
@@ -256,6 +287,11 @@ def test_notification_template_send_form(session):
                 ),
                 invoice_collection=invoice_collection,
                 periods=periods.query().all(),
+                schema='',
+                websockets_private_channel='',
+                websockets_client_url=lambda *args: '',
+                version='1.0',
+                sentry_dsn=None
             ),
             session=session,
             include=lambda *args: None,
@@ -287,8 +323,8 @@ def test_notification_template_send_form(session):
 
     # if the period is not confirmed, we send to attendees wanting the occasion
     periods.query().one().confirmed = False
-    bookings.query().filter_by(username=admin.username)\
-        .one().state = 'denied'
+    bookings.query().filter_by(
+        username=admin.username).one().state = 'denied'
     transaction.commit()
 
     form = NotificationTemplateSendForm()
@@ -331,8 +367,8 @@ def test_notification_template_send_form(session):
     assert len(form.recipients_by_occasion(occasions)) == 2
 
     # only accepted bookings are counted
-    bookings.query().filter_by(username=admin.username)\
-        .one().state = 'cancelled'
+    bookings.query().filter_by(
+        username=admin.username).one().state = 'cancelled'
     transaction.commit()
 
     occasions = [c[0] for c in form.occasion.choices]
@@ -386,7 +422,7 @@ def test_notification_template_send_form(session):
     assert len(form.recipients_with_unpaid_bills()) == 0
 
     period = periods.query().one()
-    billing = BillingCollection(request=Bunch(
+    billing = BillingCollection(request=Bunch(  # type: ignore[arg-type]
         session=session,
         app=Bunch(invoice_collection=invoice_collection)
     ), period=period)
@@ -397,15 +433,15 @@ def test_notification_template_send_form(session):
     assert len(form.recipients_with_unpaid_bills()) == 1
 
     # organisers are not counted as active if the occasion has been cancelled
-    occasions = OccasionCollection(session)
+    occasions_ = OccasionCollection(session)
 
-    occasions.query().first().cancelled = True
+    occasions_.query().first().cancelled = True  # type: ignore[union-attr]
     transaction.commit()
 
     form.request = request(admin=True)
     assert len(form.recipients_which_are_active_organisers()) == 1
 
-    for occasion in occasions.query():
+    for occasion in occasions_.query():
         occasion.cancelled = False
 
     transaction.commit()
@@ -420,7 +456,11 @@ def test_notification_template_send_form(session):
     (1, ['editor'], ['inactive']),
 ])
 def test_notification_send_template_by_role(
-        scenario, recipient_count, roles, states):
+    scenario: Scenario,
+    recipient_count: int,
+    roles: list[str],
+    states: list[str]
+) -> None:
     # Check by_role with inactive users
     # in the beginning there are no recipients
 
@@ -441,6 +481,7 @@ def test_notification_send_template_by_role(
     scenario.commit()
     scenario.refresh()
     period = scenario.latest_period
+    assert period is not None
 
     form = NotificationTemplateSendForm(MultiDict([
         ('send_to', 'by_role'),
@@ -451,6 +492,6 @@ def test_notification_send_template_by_role(
     assert form.roles.data == roles
     assert form.state.data == states
 
-    form.request = Bunch(session=session)
+    form.request = Bunch(session=session)  # type: ignore[assignment]
     form.model = Bunch(period_id=period.id)
     assert len(form.recipients) == recipient_count

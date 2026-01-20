@@ -37,7 +37,7 @@
                     <input type="hidden" name="complete">
                     <input type="submit" value="Complete" class="button" i18n:attributes="value">
                 </form>
-                <a href="${edit_url}" class="button secondary" i18n:translate="">Edit</a>
+                <a href="${edit_url}" i18n:translate="">Edit</a>
             </div>
         </div>
     </tal:b>

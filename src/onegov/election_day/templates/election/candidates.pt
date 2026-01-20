@@ -21,6 +21,8 @@
             <h3 tal:content="layout.title()" />
             <h4 tal:condition="layout.subtitle()" i18n:translate="">${layout.subtitle()}</h4>
 
+            <div metal:use-macro="layout.macros['redirect-filters']" tal:condition="not election.tacit">
+
             <p tal:condition="not layout.has_candidates" i18n:translate="">
                 No candidacies.
             </p>
@@ -29,7 +31,7 @@
                 <div class="small-12 small-centered large-10 columns">
                     <figure>
                         <tal:block metal:use-macro="layout.macros['candidates-chart']" tal:define="embed True; model election"/>
-                        <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
+                        <a class="svg-download" tal:condition="layout.svg_path and not entity" href="${layout.svg_link}">
                             <i class="fa fa-download"></i><tal:block i18n:translate="">Download diagram</tal:block>
                         </a>
                     </figure>
@@ -37,7 +39,7 @@
                 <tal:block metal:use-macro="layout.macros['intermediate-results-popup']"/>
             </div>
             <tal:block metal:use-macro="layout.macros['election-candidates-table']"/>
-            <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link"/>
+            <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link({'entity': entity})"/>
 
 
         </tal:block>

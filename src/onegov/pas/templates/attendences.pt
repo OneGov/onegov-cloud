@@ -1,0 +1,58 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+            ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="medium-7 cell main-content">
+                <p tal:condition="python:len(attendences) == 0" i18n:translate="">No meeting defined yet.</p>
+                <table tal:condition="python:len(attendences) > 0" class="attendences hover">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>Date</th>
+                            <th i18n:translate>Duration</th>
+                            <th i18n:translate>Parliamentarian</th>
+                            <th i18n:translate>Type</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:repeat="attendence attendences">
+                            <td>${layout.format_date(attendence.date, 'date')}</td>
+                            <td>${(attendence.duration/60)} h</td>
+                            <td>${attendence.parliamentarian.title}</td>
+                            <td>${attendence.type_label}
+                                <tal:block tal:condition="attendence.commission"><br>
+                                    <i>${attendence.commission.title}</i></tal:block></td>
+                            <td><a href="${request.link(attendence)}"><i class="fa fa-edit"></i></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="medium-5 cell" tal:condition="python:any(group and group[0].bulk_edit_id for group in bulk_edit_groups)">
+                <h3 i18n:translate>Bulk edits</h3>
+                <ul class="more-list">
+                    <tal:b tal:repeat="group bulk_edit_groups">
+                        <li tal:define="attendence group[0]; name 'edit-plenary-bulk-attendences' if attendence.type == 'plenary' else 'edit-commission-bulk-attendences'" tal:condition="attendence.bulk_edit_id">
+                            <a class="list-link" href="${request.link(attendence, name)}">
+                                <i class="fa fa-edit"></i>
+                                <span class="list-title">${layout.format_date(attendence.date, 'date')}, <tal:b i18n:translate>${attendence.type_label}</tal:b></span>
+                            </a>
+                            <a href="${request.link(attendence, name)}">
+                                <p class="list-lead preview">
+                                    <tal:b tal:condition="attendence.commission">
+                                        ${attendence.commission.title}<br>
+                                    </tal:b>
+                                    ${len(group)} <tal:b i18n:translate>Attendences</tal:b>, ${attendence.duration/60} h<br>
+                                       <tal:b i18n:translate>edited</tal:b>: ${layout.format_date(attendence.modified or attendence.created, 'datetime')}
+                                </p>
+                            </a>
+                        </li>
+                    </tal:b>
+                </ul>
+            </div>
+
+        </div>
+
+    </tal:b>
+</div>

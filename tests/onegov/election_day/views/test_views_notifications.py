@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 
@@ -10,24 +12,29 @@ from tests.onegov.election_day.common import upload_vote
 from tests.shared import Client
 
 
-def test_view_notifications_votes(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_view_notifications_votes(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = "Vote"
+    new.form['title_de'] = "Vote"
     new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     # Test retrigger messages
-    assert "Benachrichtigungen auslösen" not in client.get('/manage/votes')
-    assert "Benachrichtigungen auszulösen" not in upload_vote(client, False)
+    assert "Benachrichtigungen auslösen" in client.get('/manage/votes')
+    assert "Benachrichtigungen auszulösen" in upload_vote(client, False)
 
     principal = election_day_app_zg.principal
-    principal.webhooks = {'http://example.com/1': None}
+    principal.webhooks = {'http://example.com/1': {}}
     election_day_app_zg.cache.set('principal', principal)
 
     assert "Benachrichtigungen auslösen" in client.get('/manage/votes')
@@ -45,7 +52,7 @@ def test_view_notifications_votes(election_day_app_zg):
     upload_vote(client, False)
     assert "erneut auslösen" not in client.get('/vote/vote/trigger')
 
-    # Test email
+    # Test email and last notified
     principal = election_day_app_zg.principal
     principal.email_notification = True
     election_day_app_zg.cache.set('principal', principal)
@@ -76,27 +83,28 @@ def test_view_notifications_votes(election_day_app_zg):
     assert "Vote - Refusé" in message
 
 
-def test_view_notifications_elections(election_day_app_gr):
+def test_view_notifications_elections(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "Majorz Election"
+    new.form['title_de'] = "Majorz Election"
     new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     # Test retrigger messages
-    assert "Benachrichtigungen auslösen" not in client.get('/manage/elections')
-    assert "Benachrichtigungen ausupload_election_compoundzulösen" not in \
-        upload_majorz_election(client, False)
+    assert "Benachrichtigungen auslösen" in client.get('/manage/elections')
+    assert "Benachrichtigungen auszulösen" in upload_majorz_election(
+        client, False
+    )
 
     principal = election_day_app_gr.principal
-    principal.webhooks = {'http://example.com/1': None}
+    principal.webhooks = {'http://example.com/1': {}}
     election_day_app_gr.cache.set('principal', principal)
 
     assert "Benachrichtigungen auslösen" in client.get('/manage/elections')
@@ -120,7 +128,7 @@ def test_view_notifications_elections(election_day_app_gr):
         '/election/majorz-election/trigger'
     )
 
-    # Test email
+    # Test email and last notified
     principal = election_day_app_gr.principal
     principal.email_notification = True
     election_day_app_gr.cache.set('principal', principal)
@@ -154,7 +162,9 @@ def test_view_notifications_elections(election_day_app_gr):
     assert "Majorz Election - Nouveaux résultats intermédiaires" in message
 
 
-def test_view_notifications_election_compouds(election_day_app_gr):
+def test_view_notifications_election_compouds(
+    election_day_app_gr: TestApp
+) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -163,15 +173,15 @@ def test_view_notifications_election_compouds(election_day_app_gr):
     create_election_compound(client)
 
     # Test retrigger messages
-    assert "Benachrichtigungen auslösen" not in client.get(
+    assert "Benachrichtigungen auslösen" in client.get(
         '/manage/election-compounds'
     )
-    assert "Benachrichtigungen auszulösen" not in upload_election_compound(
+    assert "Benachrichtigungen auszulösen" in upload_election_compound(
         client, False
     )
 
     principal = election_day_app_gr.principal
-    principal.webhooks = {'http://example.com/1': None}
+    principal.webhooks = {'http://example.com/1': {}}
     election_day_app_gr.cache.set('principal', principal)
 
     assert "Benachrichtigungen auslösen" in client.get(
@@ -193,7 +203,7 @@ def test_view_notifications_election_compouds(election_day_app_gr):
     upload_election_compound(client, False)
     assert "erneut auslösen" not in client.get('/elections/elections/trigger')
 
-    # Test email
+    # Test email and last notified
     principal = election_day_app_gr.principal
     principal.email_notification = True
     election_day_app_gr.cache.set('principal', principal)
@@ -229,9 +239,9 @@ def test_view_notifications_election_compouds(election_day_app_gr):
     assert 'Sieger Hans' in message
 
 
-def test_view_notifications_summarized(election_day_app_zg):
+def test_view_notifications_summarized(election_day_app_zg: TestApp) -> None:
     sms_path = os.path.join(
-        election_day_app_zg.configuration['sms_directory'],
+        election_day_app_zg.sms_directory,
         election_day_app_zg.schema
     )
 
@@ -241,21 +251,21 @@ def test_view_notifications_summarized(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = "Unternehmenssteuerreformgesetz"
+    new.form['title_de'] = "Unternehmenssteuerreformgesetz"
     new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "Regierungsratswahl"
+    new.form['title_de'] = "Regierungsratswahl"
     new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'municipality'
     new.form.submit()
 
     new = client.get('/manage/election-compounds/new-election-compound')
-    new.form['election_de'] = "Kantonsratswahl"
+    new.form['title_de'] = "Kantonsratswahl"
     new.form['date'] = '2013-01-01'
     new.form['municipality_elections'] = ['regierungsratswahl']
     new.form['domain'] = 'canton'
@@ -272,7 +282,7 @@ def test_view_notifications_summarized(election_day_app_zg):
 
     # Add configuration
     principal = election_day_app_zg.principal
-    principal.webhooks = {'http://example.com/1': None}
+    principal.webhooks = {'http://example.com/1': {}}
     principal.email_notification = True
     principal.sms_notification = 'http://example.com'
     election_day_app_zg.cache.set('principal', principal)
@@ -358,6 +368,6 @@ def test_view_notifications_summarized(election_day_app_zg):
 
     manage = client.get('/trigger-notifications')
     assert "erneut auslösen" in manage
-    assert ": email (" in manage
-    assert ": sms (" in manage
+    assert ": E-Mail (" in manage
+    assert ": SMS (" in manage
     assert ": webhooks (" in manage

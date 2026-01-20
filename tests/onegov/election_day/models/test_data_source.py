@@ -1,11 +1,18 @@
+from __future__ import annotations
+
 from datetime import date
-from onegov.ballot import Election
-from onegov.ballot import Vote
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
+from onegov.election_day.models import Election
+from onegov.election_day.models import Vote
 
 
-def test_data_source(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_data_source(session: Session) -> None:
     session.add(DataSource(name='ds_vote', type='vote'))
     session.add(DataSource(name='ds_majorz', type='majorz'))
     session.add(DataSource(name='ds_proporz', type='proporz'))

@@ -1,68 +1,96 @@
-from cached_property import cached_property
-from elasticsearch_dsl.query import MultiMatch
+from __future__ import annotations
+
+from functools import cached_property
+from itertools import islice
 from onegov.core.templates import render_macro
 from onegov.directory import DirectoryEntry
 from onegov.form import as_internal_id
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+from onegov.org.models.search import Search
+from onegov.search.search_index import SearchIndex
 from onegov.winterthur.app import WinterthurApp
-from sqlalchemy import cast, func, literal_column, Text
+from sqlalchemy import func
+from sqlalchemy import exc
 from sqlalchemy.dialects.postgresql import array
 
 
-def lines(value):
+from typing import ClassVar, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from markupsafe import Markup
+    from onegov.org.layout import DefaultLayout
+    from onegov.org.models import ExtendedDirectory
+    from onegov.winterthur.request import WinterthurRequest
+    from sqlalchemy.orm import Query
+    from typing import TypeVar
+    from uuid import UUID
+
+    T = TypeVar('T')
+
+
+def lines(value: str | tuple[str, ...] | list[str]) -> Iterator[str]:
     if isinstance(value, (tuple, list)):
         yield from value
 
-    for line in str(value).split('\n'):
-        yield line
+    yield from str(value).split('\n')
 
 
 @WinterthurApp.directory_search_widget('inline')
-class InlineSearch:
+class InlineDirectorySearch:
 
-    def __init__(self, request, directory, search_query):
+    name: ClassVar[Literal['inline']]
+
+    def __init__(
+        self,
+        request: WinterthurRequest,
+        directory: ExtendedDirectory,
+        search_query: dict[str, str] | None
+    ) -> None:
         self.app = request.app
         self.request = request
         self.directory = directory
         self.search_query = search_query
 
     @cached_property
-    def term(self):
+    def term(self) -> str | None:
         return (self.search_query or {}).get('term', None)
 
     @cached_property
-    def searchable(self):
-        return tuple(self.directory.configuration.searchable)
+    def searchable(self) -> tuple[str, ...]:
+        return tuple(self.directory.configuration.searchable or ())
 
     @cached_property
-    def hits(self):
+    def entry_ids(self) -> tuple[UUID, ...]:
         if not self.term:
-            return None
+            return ()
 
-        search = self.app.es_search_by_request(
-            request=self.request,
-            types=('extended_directory_entries', )
+        search = Search(
+            self.request,
+            query=self.term,
+            page=0
         )
+        query = search.generic_search().join(
+            DirectoryEntry,
+            (SearchIndex.owner_id_uuid == DirectoryEntry.id)
+            & (DirectoryEntry.directory_id == self.directory.id)
+        ).limit(100)  # TODO: We may be able to get rid of this limit
+        try:
+            return tuple(
+                entry_id
+                for entry_id, in query.with_entities(
+                    SearchIndex.owner_id_uuid
+                )
+            )
+        except exc.InternalError:
+            self.request.session.rollback()
+            return ()
 
-        search = search.filter('term', directory_id=str(self.directory.id))
-
-        fields = tuple(
-            f for f in DirectoryEntry.es_properties.keys()
-            if not f.startswith('es_') and not f == 'directory_id'
-        )
-
-        match = MultiMatch(query=self.term, fields=fields, fuzziness=1)
-        search = search.query(match)
-
-        for field in fields:
-            search = search.highlight(field)
-
-        return {hit.meta.id: hit for hit in search[0:100].execute()}
-
-    def html(self, layout):
-        return render_macro(layout.macros['inline_search'], self.request, {
+    def html(self, layout: DefaultLayout) -> Markup:
+        return render_macro(layout.macros['inline_search'],
+                            self.request, {
             'term': self.term,
             'directory': self.directory,
+            'title': self.directory.title,
             'action': self.request.class_link(
                 ExtendedDirectoryEntryCollection,
                 variables={
@@ -72,45 +100,56 @@ class InlineSearch:
             )
         })
 
-    def fragments(self, entry):
+    def fragments(
+        self,
+        entry: DirectoryEntry
+    ) -> Iterator[tuple[str, tuple[str, ...]]]:
+
+        assert self.term is not None
+
         for name in self.searchable:
             key = as_internal_id(name)
 
-            fragments = (
+            fragment_iter = (
                 f'{name}: {line.lstrip(" -")}'
                 for line in lines(entry.values[key])
                 if self.term in line
             )
 
-            fragments = tuple(f for ix, f in enumerate(fragments) if ix <= 2)
+            fragments = tuple(islice(fragment_iter, 3))
 
             if fragments:
                 yield name, fragments
 
-    def lead(self, layout, entry):
+    # FIXME: I think these fragments can contain Markup, so for now
+    #        we are being potentially unsafe here. The documentation
+    #        is unclear about what we get back here, but we used to
+    #        render this with the structure keyword
+    def lead(
+        self,
+        layout: DefaultLayout,
+        entry: DirectoryEntry
+    ) -> str | None:
+
         if not self.term:
             return None
 
-        hit = self.hits[str(entry.id)]
+        # FIXME: Implement result highlighting using Postgres
+        return None
 
-        for key in hit.meta.highlight:
-            for fragment in hit.meta.highlight[key]:
-                return fragment
-
-    def adapt(self, query):
+    def adapt(self, query: Query[T]) -> Query[T]:
         if not self.term:
             return query
 
-        ids = tuple(self.hits.keys())
-
+        ids = self.entry_ids
         query = query.filter(DirectoryEntry.id.in_(ids))
 
         if ids:
             query = query.order_by(False)
             query = query.order_by(
                 func.array_position(
-                    array(ids),
-                    cast(literal_column('id'), Text)
+                    array(ids),  # type:ignore[call-overload]
+                    DirectoryEntry.id
                 )
             )
 

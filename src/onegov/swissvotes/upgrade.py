@@ -2,8 +2,11 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
+from onegov.core.upgrade import UpgradeContext
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
@@ -12,12 +15,12 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 
 
 @upgrade_task('Rename recommendation columns')
-def rename_recommendation_columns(context):
+def rename_recommendation_columns(context: UpgradeContext) -> None:
     pass  # deleted later
 
 
 @upgrade_task('Add tsvector columns')
-def add_tsvector_columns(context):
+def add_tsvector_columns(context: UpgradeContext) -> None:
     for column in ('searchable_text_de_CH', 'searchable_text_fr_CH'):
         if not context.has_column('swissvotes', column):
             context.operations.add_column(
@@ -26,7 +29,7 @@ def add_tsvector_columns(context):
 
 
 @upgrade_task('Add parliament position columns')
-def add_parliament_position_columns(context):
+def add_parliament_position_columns(context: UpgradeContext) -> None:
     columns = ('position_national_council', 'position_council_of_states')
 
     for col in columns:
@@ -35,7 +38,7 @@ def add_parliament_position_columns(context):
 
 
 @upgrade_task('Add cantonal result columns')
-def add_cantonal_result_columns(context):
+def add_cantonal_result_columns(context: UpgradeContext) -> None:
     for canton in (
         'ag', 'ai', 'ar', 'be', 'bl', 'bs', 'fr', 'ge', 'gl', 'gr', 'ju', 'lu',
         'ne', 'nw', 'ow', 'sg', 'sh', 'so', 'sz', 'tg', 'ti', 'ur', 'vd', 'vs',
@@ -49,7 +52,7 @@ def add_cantonal_result_columns(context):
 
 
 @upgrade_task('Add order column to pages')
-def add_order_column_to_pagess(context):
+def add_order_column_to_pagess(context: UpgradeContext) -> None:
     if context.has_column('swissvotes_page', 'order'):
         context.operations.drop_column(
             'swissvotes_page', 'order'
@@ -62,7 +65,7 @@ def add_order_column_to_pagess(context):
 
 
 @upgrade_task('Add recommendations column')
-def add_recommendations_column(context):
+def add_recommendations_column(context: UpgradeContext) -> None:
     if not context.has_column('swissvotes', 'recommendations'):
         context.operations.add_column(
             'swissvotes',
@@ -107,7 +110,7 @@ def add_recommendations_column(context):
 
 
 @upgrade_task('Add BFS map link columns')
-def add_bfs_map_columns(context):
+def add_bfs_map_columns(context: UpgradeContext) -> None:
     if not context.has_column('swissvotes', 'bfs_map_de'):
         context.operations.add_column('swissvotes', Column('bfs_map_de', Text))
     if not context.has_column('swissvotes', 'bfs_map_fr'):
@@ -115,7 +118,7 @@ def add_bfs_map_columns(context):
 
 
 @upgrade_task('Add other recommendation columns')
-def add_other_recommendation_columns(context):
+def add_other_recommendation_columns(context: UpgradeContext) -> None:
     for name in ('yes', 'no', 'free'):
         column = f'recommendations_other_{name}'
         if not context.has_column('swissvotes', column):
@@ -123,7 +126,7 @@ def add_other_recommendation_columns(context):
 
 
 @upgrade_task('Add divergent recommendations column')
-def add_divergent_recommendations_column(context):
+def add_divergent_recommendations_column(context: UpgradeContext) -> None:
     if not context.has_column('swissvotes', 'recommendations_divergent'):
         context.operations.add_column(
             'swissvotes',
@@ -132,12 +135,12 @@ def add_divergent_recommendations_column(context):
 
 
 @upgrade_task('Rename sbv-usp column')
-def rename_sbv_usp_column(context):
+def rename_sbv_usp_column(context: UpgradeContext) -> None:
     pass
 
 
 @upgrade_task('Adds french and short titles')
-def add_french_and_short_title_columns(context):
+def add_french_and_short_title_columns(context: UpgradeContext) -> None:
     for column in ('title_de', 'title_fr', 'short_title_de', 'short_title_fr'):
         if not context.has_column('swissvotes', column):
             context.operations.add_column('swissvotes', Column(column, Text()))
@@ -146,7 +149,7 @@ def add_french_and_short_title_columns(context):
 
 
 @upgrade_task('Adds national council share parole columns')
-def add_national_council_share_parole_columns(context):
+def add_national_council_share_parole_columns(context: UpgradeContext) -> None:
     for column in (
         'national_council_share_none',
         'national_council_share_empty',
@@ -165,60 +168,60 @@ def add_national_council_share_parole_columns(context):
 
 
 @upgrade_task('Removes decade column')
-def remove_decade_column(context):
+def remove_decade_column(context: UpgradeContext) -> None:
     if context.has_column('swissvotes', 'decade'):
         context.operations.drop_column('swissvotes', 'decade')
 
 
 @upgrade_task('Adds links for extensions 2019')
-def add_curiavista_and_additional_links(context):
+def add_curiavista_and_additional_links(context: UpgradeContext) -> None:
     pass  # deleted
 
 
 @upgrade_task('Adds poster_yes and poster_no')
-def add_poster_yes_no(context):
+def add_poster_yes_no(context: UpgradeContext) -> None:
     for col in ('posters_yes', 'posters_no'):
         if not context.has_column('swissvotes', col):
             context.operations.add_column('swissvotes', Column(col, Text()))
 
 
 @upgrade_task('Adds meta and content for external data sources')
-def add_meta_content(context):
+def add_meta_content(context: UpgradeContext) -> None:
 
     if not context.has_column('swissvotes', 'meta'):
         context.add_column_with_defaults(
             'swissvotes',
             Column('meta', JSON, nullable=False),
-            default=dict()
+            default={}
         )
 
     if not context.has_column('swissvotes', 'content'):
         context.add_column_with_defaults(
             'swissvotes',
             Column('content', JSON, nullable=False),
-            default=dict()
+            default={}
         )
 
 
 @upgrade_task('Adds swissvoteslink')
-def add_swissvoteslink(context):
+def add_swissvoteslink(context: UpgradeContext) -> None:
     pass  # deleted later
 
 
 @upgrade_task('Changes procedure number type to text')
-def change_procedure_number_type(context):
+def change_procedure_number_type(context: UpgradeContext) -> None:
     context.operations.execute(
         'ALTER TABLE swissvotes ALTER COLUMN procedure_number TYPE TEXT'
     )
 
 
 @upgrade_task('Adds post-vote poll links')
-def add_post_vote_poll_links(context):
+def add_post_vote_poll_links(context: UpgradeContext) -> None:
     pass  # deleted later
 
 
 @upgrade_task('Adds media fields')
-def add_media_fields(context):
+def add_media_fields(context: UpgradeContext) -> None:
     columns = (
         ('media_ads_total', Integer()),
         ('media_ads_yea_p', Numeric(13, 10)),
@@ -234,7 +237,7 @@ def add_media_fields(context):
     'Add additional poster links',
     requires='onegov.swissvotes:Adds poster_yes and poster_no'
 )
-def add_additional_poster_links(context):
+def add_additional_poster_links(context: UpgradeContext) -> None:
     for old, new in (
         ('posters_yes', 'posters_mfg_yea'),
         ('posters_no', 'posters_mfg_nay')
@@ -255,7 +258,7 @@ def add_additional_poster_links(context):
     'Change media tonality types to numeric',
     requires='onegov.swissvotes:Adds media fields'
 )
-def change_media_tonality_types(context):
+def change_media_tonality_types(context: UpgradeContext) -> None:
     context.operations.execute(
         'ALTER TABLE swissvotes '
         'ALTER COLUMN media_coverage_tonality_total TYPE NUMERIC(13, 10)'
@@ -263,7 +266,7 @@ def change_media_tonality_types(context):
 
 
 @upgrade_task('Adds die Mitte columns')
-def add_die_mittel_columns(context):
+def add_die_mittel_columns(context: UpgradeContext) -> None:
     if not context.has_column('swissvotes', 'national_council_share_mitte'):
         context.operations.add_column(
             'swissvotes',
@@ -272,7 +275,7 @@ def add_die_mittel_columns(context):
 
 
 @upgrade_task('Adds brief description title column')
-def add_brief_description_title(context):
+def add_brief_description_title(context: UpgradeContext) -> None:
     if not context.has_column('swissvotes', 'brief_description_title'):
         context.operations.add_column(
             'swissvotes',
@@ -281,7 +284,7 @@ def add_brief_description_title(context):
 
 
 @upgrade_task('Moves links to meta')
-def move_links_to_meta(context):
+def move_links_to_meta(context: UpgradeContext) -> None:
     columns = (
         'bkchrono_de',
         'bkchrono_fr',
@@ -299,7 +302,7 @@ def move_links_to_meta(context):
 
 
 @upgrade_task('Drops unused columns')
-def drop_unused_columns(context):
+def drop_unused_columns(context: UpgradeContext) -> None:
     columns = (
         'media_ads_per_issue',
         'media_ads_yea',
@@ -515,7 +518,7 @@ def drop_unused_columns(context):
 
 
 @upgrade_task('Rename national council share sps column')
-def rename_national_council_share_sps_column(context):
+def rename_national_council_share_sps_column(context: UpgradeContext) -> None:
     old = 'national_council_share_sp'
     new = 'national_council_share_sps'
     if (
@@ -526,7 +529,7 @@ def rename_national_council_share_sps_column(context):
 
 
 @upgrade_task('Add more recommendation columns')
-def add_more_recommendation_columns(context):
+def add_more_recommendation_columns(context: UpgradeContext) -> None:
     for column in (
         'recommendations_other_counter_proposal',
         'recommendations_other_popular_initiative'
@@ -538,7 +541,7 @@ def add_more_recommendation_columns(context):
 
 
 @upgrade_task('Add campaign material meta column')
-def add_campaign_material_meta_column(context):
+def add_campaign_material_meta_column(context: UpgradeContext) -> None:
     if not context.has_column('swissvotes', 'campaign_material_metadata'):
         context.operations.add_column(
             'swissvotes',
@@ -547,7 +550,7 @@ def add_campaign_material_meta_column(context):
 
 
 @upgrade_task('Add tsvector column for italian')
-def add_tsvector_column_it(context):
+def add_tsvector_column_it(context: UpgradeContext) -> None:
     if not context.has_column('swissvotes', 'searchable_text_it_CH'):
         context.operations.add_column(
             'swissvotes', Column('searchable_text_it_CH', TSVECTOR())
@@ -555,8 +558,123 @@ def add_tsvector_column_it(context):
 
 
 @upgrade_task('Add tsvector column for english')
-def add_tsvector_column_en(context):
+def add_tsvector_column_en(context: UpgradeContext) -> None:
     if not context.has_column('swissvotes', 'searchable_text_en_US'):
         context.operations.add_column(
             'swissvotes', Column('searchable_text_en_US', TSVECTOR())
         )
+
+
+@upgrade_task('Drops department in charge column')
+def drop_departement_in_charge_columns(context: UpgradeContext) -> None:
+    if context.has_column('swissvotes', 'department_in_charge'):
+        context.operations.drop_column('swissvotes', 'department_in_charge')
+
+
+@upgrade_task('Adds english short title column')
+def add_english_short_title_column(context: UpgradeContext) -> None:
+    if not context.has_column('swissvotes', 'short_title_en'):
+        context.operations.add_column(
+            'swissvotes', Column('short_title_en', Text())
+        )
+
+
+@upgrade_task('Adds parliamentary initiative')
+def add_parliamentary_initiative(context: UpgradeContext) -> None:
+    if not context.has_column('swissvotes', 'parliamentary_initiated'):
+        context.operations.add_column(
+            'swissvotes', Column('parliamentary_initiated', Integer())
+        )
+
+
+@upgrade_task('Adds meta to pages')
+def add_meta_to_pages(context: UpgradeContext) -> None:
+    if not context.has_column('swissvotes_page', 'meta'):
+        context.add_column_with_defaults(
+            'swissvotes_page',
+            Column('meta', JSON, nullable=False),
+            default={}
+        )
+
+
+@upgrade_task('Adds french initiator and recommendations')
+def add_french_initiator_and_recommendations(context: UpgradeContext) -> None:
+    for old in (
+        'initiator',
+        'recommendations_other_yes',
+        'recommendations_other_no',
+        'recommendations_other_counter_proposal',
+        'recommendations_other_popular_initiative',
+        'recommendations_other_free',
+    ):
+        new = f'{old}_de'
+        if (
+            context.has_column('swissvotes', old)
+            and not context.has_column('swissvotes', new)
+        ):
+            context.operations.alter_column(
+                'swissvotes', old, new_column_name=new
+            )
+
+    for column in (
+        'initiator_fr',
+        'recommendations_other_yes_fr',
+        'recommendations_other_no_fr',
+        'recommendations_other_counter_proposal_fr',
+        'recommendations_other_popular_initiative_fr',
+        'recommendations_other_free_fr',
+    ):
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column(
+                'swissvotes', Column(column, Text())
+            )
+
+
+@upgrade_task('Add campaign finances')
+def add_campaign_finances(context: UpgradeContext) -> None:
+    for position in ('yea', 'nay'):
+        column = f'campaign_finances_{position}_total'
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column(
+                'swissvotes',
+                Column(column, Integer)
+            )
+
+
+@upgrade_task('Rename file association keys')
+def rename_file_associations_keys(context: UpgradeContext) -> None:
+    old = 'file_id'
+    for (table, new) in (
+        ('files_for_swissvotes_files', 'swissvotefile_id'),
+        ('files_for_swissvotes_page_files', 'translatablepagefile_id'),
+    ):
+        if (
+            context.has_table(table)
+            and context.has_column(table, old)
+            and not context.has_column(table, new)
+        ):
+            context.operations.alter_column(table, old, new_column_name=new)
+
+
+@upgrade_task('Add english bfs map')
+def add_english_bfs_map(context: UpgradeContext) -> None:
+    if not context.has_column('swissvotes', 'bfs_map_en'):
+        context.operations.add_column(
+            'swissvotes',
+            Column('bfs_map_en', Text)
+        )
+
+
+@upgrade_task('Add bfs dashboard')
+def add_bfs_dashboard(context: UpgradeContext) -> None:
+    for locale in ('de', 'en', 'fr'):
+        column = f'bfs_dashboard_{locale}'
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, Text))
+
+
+@upgrade_task('Add poster columns basel 2')
+def add_poster_columns_basel(context: UpgradeContext) -> None:
+    for column in ('posters_bs_yea', 'posters_bs_nay'):
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, Text))

@@ -1,20 +1,22 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
 from lxml import etree
-from onegov.ballot import ComplexVote
-from onegov.ballot import Vote
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import VoteLayout
+from onegov.election_day.models import ComplexVote
+from onegov.election_day.models import Vote
 from onegov.election_day.screen_widgets import (
-    ColumnWidget,
     CountedEntitiesWidget,
+    IfCompletedWidget,
+    IfNotCompletedWidget,
     LastResultChangeWidget,
+    ModelProgressWidget,
+    ModelTitleWidget,
     NumberOfCountedEntitiesWidget,
-    ProgressWidget,
-    RowWidget,
-    TitleWidget,
     TotalEntitiesWidget,
     VoteCounterProposalDistrictsMap,
     VoteCounterProposalEntitiesMap,
@@ -37,54 +39,44 @@ from onegov.election_day.screen_widgets import (
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_vote_widgets(election_day_app_zg, import_test_datasets):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.widgets import Widget
+    from ..conftest import ImportTestDatasets, TestApp
+
+
+def test_vote_widgets(
+    election_day_app_zg: TestApp,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+
     structure = """
-        <row>
-            <column span="1">
-                <title class="my-class-1"/>
-            </column>
-            <column span="1">
-                <progress class="my-class-2"/>
-            </column>
-            <column span="1">
-                <counted-entities class="my-class-3"/>
-            </column>
-            <column span="1">
-                <vote-proposal-entities-table class="my-class-4"/>
-            </column>
-            <column span="1">
-                <vote-proposal-result-bar class="my-class-5"/>
-            </column>
-            <column span="1">
-                <vote-proposal-entities-map class="my-class-6"/>
-            </column>
-            <column span="1">
-                <vote-proposal-districts-map class="my-class-7"/>
-            </column>
-            <column span="1">
-                <number-of-counted-entities class="my-class-8"/>
-            </column>
-            <column span="1">
-                <total-entities class="my-class-9"/>
-            </column>
-            <column span="1">
-                <last-result-change class="my-class-a"/>
-            </column>
-        </row>
+        <model-title class="my-class-1"/>
+        <model-progress class="my-class-2"/>
+        <counted-entities class="my-class-3"/>
+        <vote-proposal-entities-table class="my-class-4"/>
+        <vote-proposal-result-bar class="my-class-5"/>
+        <vote-proposal-entities-map class="my-class-6"/>
+        <vote-proposal-districts-map class="my-class-7"/>
+        <number-of-counted-entities class="my-class-8"/>
+        <total-entities class="my-class-9"/>
+        <last-result-change class="my-class-a"/>
+        <if-completed>is-completed</if-completed>
+        <if-not-completed>is-not-completed</if-not-completed>
     """
-    widgets = [
-        RowWidget(),
-        ColumnWidget(),
+    widgets: list[Widget] = [
         CountedEntitiesWidget(),
+        IfCompletedWidget(),
+        IfNotCompletedWidget(),
         LastResultChangeWidget(),
+        ModelProgressWidget(),
+        ModelTitleWidget(),
         NumberOfCountedEntitiesWidget(),
-        ProgressWidget(),
-        TitleWidget(),
         TotalEntitiesWidget(),
-        VoteProposalEntitiesTableWidget(),
-        VoteProposalResultBarWidget(),
         VoteProposalDistrictsMap(),
         VoteProposalEntitiesMap(),
+        VoteProposalEntitiesTableWidget(),
+        VoteProposalResultBarWidget(),
     ]
 
     # Empty
@@ -94,28 +86,30 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     )
     session.flush()
     model = session.query(Vote).one()
-    request = DummyRequest(app=election_day_app_zg, session=session)
+    request: Any = DummyRequest(app=election_day_app_zg, session=session)
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
+    result = transform_structure(widgets, structure)
+    result = PageTemplate(result)(**data)
+    etree.fromstring(result.encode('utf-8'))
+    data['proposal_results'] = [x.name for x in data['proposal_results']]
 
     assert data == {
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'proposal_results': [],
         'embed': False,
         'entities': '',
         'request': request
     }
-
-    result = transform_structure(widgets, structure)
-    result = PageTemplate(result)(**data)
-    etree.fromstring(result.encode('utf-8'))
-
     assert '>Vote</span>' in result
     assert 'Not yet counted' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -129,16 +123,17 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
 
     # Add intermediate results
     with freeze_time('2022-01-01 12:00'):
-        model, errors = import_test_datasets(
+        results = import_test_datasets(
             'internal',
             'vote',
             'zg',
             'federation',
             date_=date(2015, 10, 18),
-            number_of_mandates=2,
             dataset_name='ndg-intermediate',
             app_session=session
         )
+        assert len(results) == 1
+        model, errors = next(iter(results.values()))
         assert not errors
         session.add(model)
         session.flush()
@@ -146,20 +141,32 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
+    result = transform_structure(widgets, structure)
+    result = PageTemplate(result)(**data)
+    etree.fromstring(result.encode('utf-8'))
+    data['proposal_results'] = [x.name for x in data['proposal_results']]
 
     assert data == {
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'proposal_results': [
+            'Baar',
+            'Cham',
+            'Hünenberg',
+            'Menzingen',
+            'Neuheim',
+            'Oberägeri',
+            'Risch',
+            'Steinhausen',
+            'Unterägeri',
+            'Walchwil',
+            'Zug'
+        ],
         'embed': False,
         'entities': 'Baar',
         'request': request
     }
-
-    result = transform_structure(widgets, structure)
-    result = PageTemplate(result)(**data)
-    etree.fromstring(result.encode('utf-8'))
-
     assert '>simple_internal_ndg-intermediate</span>' in result
     assert '1 of 11' in result
     assert '>Baar</span>' in result
@@ -172,6 +179,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-dataurl="Ballot/by-district"' in result
     assert '1' in result
     assert '11' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert '01.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
@@ -186,16 +195,17 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
 
     # Add final results
     with freeze_time('2022-01-02 12:00'):
-        model, errors = import_test_datasets(
+        results = import_test_datasets(
             'internal',
             'vote',
             'zg',
             'federation',
             date_=date(2015, 10, 18),
-            number_of_mandates=2,
             dataset_name='ndg',
             app_session=session
         )
+        assert len(results) == 1
+        model, errors = next(iter(results.values()))
         assert not errors
         session.add(model)
         session.flush()
@@ -203,11 +213,28 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
+    result = transform_structure(widgets, structure)
+    result = PageTemplate(result)(**data)
+    etree.fromstring(result.encode('utf-8'))
+    data['proposal_results'] = [x.name for x in data['proposal_results']]
 
     assert data == {
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'proposal_results': [
+            'Baar',
+            'Cham',
+            'Hünenberg',
+            'Menzingen',
+            'Neuheim',
+            'Oberägeri',
+            'Risch',
+            'Steinhausen',
+            'Unterägeri',
+            'Walchwil',
+            'Zug'
+        ],
         'embed': False,
         'entities': (
             'Baar, Cham, Hünenberg, Menzingen, Neuheim, Oberägeri, Risch, '
@@ -215,11 +242,6 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
         ),
         'request': request
     }
-
-    result = transform_structure(widgets, structure)
-    result = PageTemplate(result)(**data)
-    etree.fromstring(result.encode('utf-8'))
-
     assert '>simple_internal_ndg</span>' in result
     assert '11 of 11' in result
     assert (
@@ -235,6 +257,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-dataurl="Ballot/by-district"' in result
     assert '11' in result
     assert '11' in result
+    assert 'is-completed' in result
+    assert 'is-not-completed' not in result
     assert '02.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
@@ -248,106 +272,64 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-a' in result
 
 
-def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
+def test_complex_vote_widgets(
+    election_day_app_zg: TestApp,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+
     structure = """
-        <row>
-            <column span="1">
-                <title class="my-class-1"/>
-            </column>
-            <column span="1">
-                <progress class="my-class-2"/>
-            </column>
-            <column span="1">
-                <counted-entities class="my-class-3"/>
-            </column>
-            <column span="1">
-                <vote-proposal-entities-table class="my-class-4"/>
-            </column>
-            <column span="1">
-                <vote-proposal-result-bar class="my-class-5"/>
-            </column>
-            <column span="1">
-                <vote-proposal-entities-map class="my-class-5"/>
-            </column>
-            <column span="1">
-                <vote-proposal-districts-map class="my-class-6"/>
-            </column>
-            <column span="1">
-                <vote-counter-proposal-title class="my-class-7"/>
-            </column>
-            <column span="1">
-                <vote-counter-proposal-entities-table class="my-class-8"/>
-            </column>
-            <column span="1">
-                <vote-counter-proposal-result-bar class="my-class-9"/>
-            </column>
-            <column span="1">
-                <vote-counter-proposal-entities-map class="my-class-a"/>
-            </column>
-            <column span="1">
-                <vote-counter-proposal-districts-map class="my-class-b"/>
-            </column>
-            <column span="1">
-                <vote-tie-breaker-title class="my-class-c"/>
-            </column>
-            <column span="1">
-                <vote-tie-breaker-entities-table class="my-class-d"/>
-            </column>
-            <column span="1">
-                <vote-tie-breaker-result-bar class="my-class-e"/>
-            </column>
-            <column span="1">
-                <vote-tie-breaker-entities-map class="my-class-f"/>
-            </column>
-            <column span="1">
-                <vote-tie-breaker-districts-map class="my-class-g"/>
-            </column>
-            <column span="1">
-                <number-of-counted-entities class="my-class-h"/>
-            </column>
-            <column span="1">
-                <total-entities class="my-class-i"/>
-            </column>
-            <column span="1">
-                <vote-counter-proposal-turnout class="my-class-j"/>
-            </column>
-            <column span="1">
-                <vote-proposal-turnout class="my-class-k"/>
-            </column>
-            <column span="1">
-                <vote-tie-breaker-turnout class="my-class-l"/>
-            </column>
-            <column span="1">
-                <last-result-change class="my-class-m"/>
-            </column>
-        </row>
+        <model-title class="my-class-1"/>
+        <model-progress class="my-class-2"/>
+        <counted-entities class="my-class-3"/>
+        <vote-proposal-entities-table class="my-class-4"/>
+        <vote-proposal-result-bar class="my-class-5"/>
+        <vote-proposal-entities-map class="my-class-5"/>
+        <vote-proposal-districts-map class="my-class-6"/>
+        <vote-counter-proposal-title class="my-class-7"/>
+        <vote-counter-proposal-entities-table class="my-class-8"/>
+        <vote-counter-proposal-result-bar class="my-class-9"/>
+        <vote-counter-proposal-entities-map class="my-class-a"/>
+        <vote-counter-proposal-districts-map class="my-class-b"/>
+        <vote-tie-breaker-title class="my-class-c"/>
+        <vote-tie-breaker-entities-table class="my-class-d"/>
+        <vote-tie-breaker-result-bar class="my-class-e"/>
+        <vote-tie-breaker-entities-map class="my-class-f"/>
+        <vote-tie-breaker-districts-map class="my-class-g"/>
+        <number-of-counted-entities class="my-class-h"/>
+        <total-entities class="my-class-i"/>
+        <vote-counter-proposal-turnout class="my-class-j"/>
+        <vote-proposal-turnout class="my-class-k"/>
+        <vote-tie-breaker-turnout class="my-class-l"/>
+        <last-result-change class="my-class-m"/>
+        <if-completed>is-completed</if-completed>
+        <if-not-completed>is-not-completed</if-not-completed>
     """
-    widgets = [
-        RowWidget(),
-        ColumnWidget(),
+    widgets: list[Widget] = [
         CountedEntitiesWidget(),
+        IfCompletedWidget(),
+        IfNotCompletedWidget(),
         LastResultChangeWidget(),
+        ModelProgressWidget(),
+        ModelTitleWidget(),
         NumberOfCountedEntitiesWidget(),
-        ProgressWidget(),
-        TitleWidget(),
         TotalEntitiesWidget(),
+        VoteCounterProposalDistrictsMap(),
+        VoteCounterProposalEntitiesMap(),
         VoteCounterProposalEntitiesTableWidget(),
         VoteCounterProposalResultBarWidget(),
         VoteCounterProposalTitleWidget(),
         VoteCounterProposalTurnoutWidget(),
+        VoteProposalDistrictsMap(),
+        VoteProposalEntitiesMap(),
         VoteProposalEntitiesTableWidget(),
         VoteProposalResultBarWidget(),
         VoteProposalTurnoutWidget(),
+        VoteTieBreakerDistrictsMap(),
+        VoteTieBreakerEntitiesMap(),
         VoteTieBreakerEntitiesTableWidget(),
         VoteTieBreakerResultBarWidget(),
         VoteTieBreakerTitleWidget(),
         VoteTieBreakerTurnoutWidget(),
-        VoteCounterProposalDistrictsMap(),
-        VoteCounterProposalEntitiesMap(),
-        VoteProposalDistrictsMap(),
-        VoteProposalEntitiesMap(),
-        VoteTieBreakerDistrictsMap(),
-        VoteTieBreakerEntitiesMap(),
     ]
 
     # Empty
@@ -358,32 +340,37 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     model = session.query(ComplexVote).one()
     model.counter_proposal.title = 'Counter Proposal'
     model.tie_breaker.title = 'Tie Breaker'
-    request = DummyRequest(app=election_day_app_zg, session=session)
+    request: Any = DummyRequest(app=election_day_app_zg, session=session)
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
+    result = transform_structure(widgets, structure)
+    result = PageTemplate(result)(**data)
+    etree.fromstring(result.encode('utf-8'))
+    for ballot in ('proposal', 'counter_proposal', 'tie_breaker'):
+        data[f'{ballot}_results'] = [x.name for x in data[f'{ballot}_results']]
 
     assert data == {
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'proposal_results': [],
         'counter_proposal': model.counter_proposal,
+        'counter_proposal_results': [],
         'tie_breaker': model.tie_breaker,
+        'tie_breaker_results': [],
         'embed': False,
         'entities': '',
         'request': request
     }
-
-    result = transform_structure(widgets, structure)
-    result = PageTemplate(result)(**data)
-    etree.fromstring(result.encode('utf-8'))
-
     assert '>Proposal</span>' in result
     assert '>Counter Proposal</span>' in result
     assert '>Tie Breaker</span>' in result
     assert 'Not yet counted' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -409,17 +396,18 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
 
     # Add intermediate results
     with freeze_time('2022-01-01 12:00'):
-        model, errors = import_test_datasets(
+        import_results = import_test_datasets(
             'internal',
             'vote',
             'zg',
             'federation',
             vote_type='complex',
             date_=date(2015, 10, 18),
-            number_of_mandates=2,
             dataset_name='mundart-intermediate',
             app_session=session
         )
+        assert len(import_results) == 1
+        model, errors = next(iter(import_results.values()))
         assert not errors
         session.add(model)
         session.flush()
@@ -427,22 +415,29 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
+    result = transform_structure(widgets, structure)
+    result = PageTemplate(result)(**data)
+    etree.fromstring(result.encode('utf-8'))
+    for ballot in ('proposal', 'counter_proposal', 'tie_breaker'):
+        data[f'{ballot}_results'] = [x.name for x in data[f'{ballot}_results']]
+    results = [
+        'Baar', 'Cham', 'Hünenberg', 'Menzingen', 'Neuheim', 'Oberägeri',
+        'Risch', 'Steinhausen', 'Unterägeri', 'Walchwil', 'Zug'
+    ]
 
     assert data == {
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'proposal_results': results,
         'counter_proposal': model.counter_proposal,
+        'counter_proposal_results': results,
         'tie_breaker': model.tie_breaker,
+        'tie_breaker_results': results,
         'embed': False,
         'entities': 'Baar',
         'request': request
     }
-
-    result = transform_structure(widgets, structure)
-    result = PageTemplate(result)(**data)
-    etree.fromstring(result.encode('utf-8'))
-
     assert '>complex_internal_mundart-intermediate</span>' in result
     assert '1 of 11' in result
     assert '>Baar</span>' in result
@@ -462,6 +457,8 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '42.21 %' in result
     assert '43.20 %' in result
     assert '42.32 %' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert '01.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
@@ -488,17 +485,18 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
 
     # Add final results
     with freeze_time('2022-01-02 12:00'):
-        model, errors = import_test_datasets(
+        import_results = import_test_datasets(
             'internal',
             'vote',
             'zg',
             'federation',
             vote_type='complex',
             date_=date(2015, 10, 18),
-            number_of_mandates=2,
             dataset_name='mundart',
             app_session=session
         )
+        assert len(import_results) == 1
+        model, errors = next(iter(import_results.values()))
         assert not errors
         session.add(model)
         session.flush()
@@ -506,13 +504,21 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
+    result = transform_structure(widgets, structure)
+    result = PageTemplate(result)(**data)
+    etree.fromstring(result.encode('utf-8'))
+    for ballot in ('proposal', 'counter_proposal', 'tie_breaker'):
+        data[f'{ballot}_results'] = [x.name for x in data[f'{ballot}_results']]
 
     assert data == {
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'proposal_results': results,
         'counter_proposal': model.counter_proposal,
+        'counter_proposal_results': results,
         'tie_breaker': model.tie_breaker,
+        'tie_breaker_results': results,
         'embed': False,
         'entities': (
             'Baar, Cham, Hünenberg, Menzingen, Neuheim, Oberägeri, Risch, '
@@ -520,11 +526,6 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         ),
         'request': request
     }
-
-    result = transform_structure(widgets, structure)
-    result = PageTemplate(result)(**data)
-    etree.fromstring(result.encode('utf-8'))
-
     assert '>complex_internal_mundart</span>' in result
     assert '11 of 11' in result
     assert (
@@ -547,6 +548,8 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '44.93 %' in result
     assert '45.92 %' in result
     assert '44.17 %' in result
+    assert 'is-completed' in result
+    assert 'is-not-completed' not in result
     assert '02.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result

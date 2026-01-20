@@ -10,9 +10,33 @@
              <p>${callout}</p>
         </div>
         <div class="panel">
+            <p i18n:translate>This will trigger the following notifications:</p>
+            <ul>
+                <li i18n:translate>
+                    Browser: A notice in browsers which have opened any affected pages.
+                </li>
+                <li tal:condition="request.app.principal.email_notification">
+                    <tal:block i18n:translate>Email: One email containing all the results. The subject will be </tal:block> <q>${subject}</q>.
+                </li>
+                <li tal:condition="request.app.principal.sms_notification">
+                    <tal:block i18n:translate>SMS: One SMS with the generic message</tal:block>
+                    <q i18n:translate>New results are available on <tal:block tal:replace="request.app.principal.sms_notification" i18n:name="url"/></q>.
+                </li>
+            </ul>
+            <p>
+                 <tal:block i18n:translate>There is also the possibility to trigger bundled notifications for the current election day:</tal:block>
+                 <a href="${request.link(request.app.principal, 'trigger-notifications')}" i18n:translate>Trigger notifications</a>.
+            </p>
+        </div>
+        <div class="panel">
             <p i18n:translate>Last notifications:</p>
             <ul tal:condition="last_notifications">
-                <li tal:repeat="last_notification last_notifications[:20]">${layout.format_date(last_notification.last_change, 'datetime_long')}: ${last_notification.type} (${layout.format_date(last_notification.last_modified, 'datetime_long')})</li>
+                <li tal:repeat="last_notification last_notifications[:20]">
+                    ${layout.format_date(last_notification.last_change, 'datetime_long')}: <metal:b use-macro="layout.macros['notification-type-translation']" tal:define="notification_type last_notification.type"/> (${layout.format_date(last_notification.last_modified, 'datetime_long')})
+                </li>
+            </ul>
+            <ul tal:condition="not last_notifications">
+                <li><i i18n:translate>No notifications yet.</i></li>
             </ul>
         </div>
         <p tal:condition="message|nothing">${message}</p>

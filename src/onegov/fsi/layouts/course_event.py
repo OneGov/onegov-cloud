@@ -1,33 +1,46 @@
-from cached_property import cached_property
+from __future__ import annotations
+
+from functools import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
 from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.collections.notification_template import \
-    CourseNotificationTemplateCollection
+from onegov.fsi.collections.notification_template import (
+    CourseNotificationTemplateCollection)
 from onegov.fsi.collections.subscription import SubscriptionsCollection
-from onegov.fsi.layout import DefaultLayout, FormatMixin
+from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.fsi.models import Course, CourseEvent
 
 
 class CourseEventCollectionLayout(DefaultLayout):
 
+    model: CourseEventCollection
+
     @cached_property
-    def course(self):
+    def course(self) -> Course | None:
+        if self.model.course_id is None:
+            return None
+
         return CourseCollection(self.request.session).by_id(
             self.model.course_id)
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         if self.model.past_only:
             return _('Past Course Events')
         return _('Course Events')
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         """ Returns the breadcrumbs for the current page. """
         links = super().breadcrumbs
+        assert isinstance(links, list)
         if self.course:
             links.append(
                 Link(
@@ -42,15 +55,15 @@ class CourseEventCollectionLayout(DefaultLayout):
         return links
 
     @cached_property
-    def editbar_links(self):
-        links = []
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
         if self.request.is_admin:
             links.append(
                 LinkGroup(
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_("Course Event"),
+                            text=_('Course Event'),
                             url=self.request.class_link(
                                 CourseEventCollection, name='add'
                             ),
@@ -62,13 +75,14 @@ class CourseEventCollectionLayout(DefaultLayout):
 
         return links
 
-    def subscriptions_link(self, event):
+    def subscriptions_link(self, event: CourseEvent) -> str:
         return self.request.link(SubscriptionsCollection(
             self.request.session, course_event_id=event.id))
 
-    def audit_link(self, course):
+    def audit_link(self, course: Course | None) -> str | None:
         if not course:
             return None
+        assert self.request.attendee is not None
         return self.request.link(AuditCollection(
             self.request.session,
             auth_attendee=self.request.attendee,
@@ -76,21 +90,23 @@ class CourseEventCollectionLayout(DefaultLayout):
         ))
 
 
-class CourseEventLayout(DefaultLayout, FormatMixin):
+class CourseEventLayout(DefaultLayout):
 
-    @cached_property
-    def title(self):
+    model: CourseEvent
+
+    @property
+    def title(self) -> str:
         return _('Course Event Details')
 
     @cached_property
-    def collection(self):
+    def collection(self) -> CourseEventCollection:
         return CourseEventCollection(
             self.request.session,
             show_hidden=True
         )
 
     @cached_property
-    def course_collection(self):
+    def course_collection(self) -> CourseEventCollection:
         return CourseEventCollection(
             self.request.session,
             show_hidden=True,
@@ -98,7 +114,7 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
         )
 
     @cached_property
-    def reservation_collection(self):
+    def reservation_collection(self) -> SubscriptionsCollection:
         return SubscriptionsCollection(
             self.request.session,
             course_event_id=self.model.id,
@@ -106,20 +122,21 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
         )
 
     @cached_property
-    def template_collection(self):
+    def template_collection(self) -> CourseNotificationTemplateCollection:
         return CourseNotificationTemplateCollection(
             self.request.session,
             course_event_id=self.model.id
         )
 
     @cached_property
-    def collection_url(self):
+    def collection_url(self) -> str:
         return self.request.class_link(CourseEventCollection)
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         """ Returns the breadcrumbs for the detail page. """
         links = super().breadcrumbs
+        assert isinstance(links, list)
         links.append(
             Link(
                 self.model.course.name,
@@ -134,7 +151,7 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
         return links
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup]:
 
         add_group_links = [
             Link(
@@ -181,7 +198,7 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
                 attrs={'class': 'add-external'}
             ),
             Link(
-                _("Placeholder"),
+                _('Placeholder'),
                 self.request.link(
                     self.reservation_collection,
                     name='add-placeholder'
@@ -214,10 +231,10 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
                 attrs={'class': 'delete-link'},
                 traits=(
                     Confirm(
-                        _("Do you really want to delete this course event ?"),
-                        _("This cannot be undone."),
-                        _("Delete course event"),
-                        _("Cancel")
+                        _('Do you really want to delete this course event ?'),
+                        _('This cannot be undone.'),
+                        _('Delete course event'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='DELETE',
@@ -242,10 +259,10 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
                 attrs={'class': 'cancel-icon'},
                 traits=(
                     Confirm(
-                        _("Do you really want to cancel this course event ?"),
-                        _("An email will be sent to all the subscribers"),
-                        _("Cancel course event"),
-                        _("Cancel")
+                        _('Do you really want to cancel this course event ?'),
+                        _('An email will be sent to all the subscribers'),
+                        _('Cancel course event'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='POST',
@@ -258,10 +275,10 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
         ]
 
     @cached_property
-    def intercooler_btn(self):
+    def intercooler_btn(self) -> Link:
         btn_class = f'button {"disabled" if self.model.booked else ""}'
         return Link(
-            text=_("Subscribe"),
+            text=_('Subscribe'),
             url=self.csrf_protected_url(
                 self.request.link(
                     SubscriptionsCollection(
@@ -276,10 +293,10 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
             attrs={'class': btn_class},
             traits=(
                 Confirm(
-                    _("Do you want to register for this course event ?"),
-                    _("A confirmation email will be sent to you later."),
-                    _("Register for course event"),
-                    _("Cancel")
+                    _('Do you want to register for this course event ?'),
+                    _('A confirmation email will be sent to you later.'),
+                    _('Register for course event'),
+                    _('Cancel')
                 ),
                 Intercooler(
                     request_method='POST',
@@ -293,27 +310,28 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
 
 class EditCourseEventLayout(CourseEventLayout):
 
-    @cached_property
-    def title(self):
+    @property
+    def title(self) -> str:
         return _('Edit course event')
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         breadcrumbs = super().breadcrumbs
         breadcrumbs.append(Link(_('Edit')))
         return breadcrumbs
 
 
 class AddCourseEventLayout(CourseEventCollectionLayout):
-    @cached_property
-    def title(self):
+
+    @property
+    def title(self) -> str:
         return _('Add course event')
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup]:
         return [
             Link(
-                text=_("Add Course Event"),
+                text=_('Add Course Event'),
                 url=self.request.class_link(
                     CourseEventCollection, name='add'
                 ),
@@ -322,17 +340,18 @@ class AddCourseEventLayout(CourseEventCollectionLayout):
         ]
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
         links.append(Link(_('Add')))
         return links
 
 
 class DuplicateCourseEventLayout(CourseEventLayout):
-    @cached_property
-    def title(self):
+
+    @property
+    def title(self) -> str:
         return _('Duplicate course event')
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup]:
         return [Link(_('Duplicate'), attrs={'class': 'copy-link'})]

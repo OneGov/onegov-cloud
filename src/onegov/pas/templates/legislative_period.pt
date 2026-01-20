@@ -1,0 +1,18 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <dl class="field-display">
+            <div tal:condition="legislative_period.start">
+                <dt i18n:translate>Start</dt>
+                <dd>${layout.format_date(legislative_period.start, 'date')}</dd>
+            </div>
+            <div tal:condition="legislative_period.end">
+                <dt i18n:translate>End</dt>
+                <dd>${layout.format_date(legislative_period.end, 'date')}</dd>
+            </div>
+        </dl>
+    </tal:b>
+</div>

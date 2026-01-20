@@ -1,15 +1,10 @@
-/*
-    hide the news in the topbar
-*/
-.top-bar-section {
-    ul {
-        width: 100%;
-    }
+$max-line-width: 45rem;
 
-    li:last-child {
-        display: none;
-    }
+
+.limit-line-width {
+    max-width: $max-line-width;
 }
+
 
 /*
     css animations keyframes
@@ -37,16 +32,25 @@ a > h6 {
 /*
     hide certain settings
 */
-.homepage-settings,
 .holiday-settings,
-.field-geo_provider,
-.field-about_url,
-.field-hide_onegov_footer,
-#fieldset-first-partner,
-#fieldset-second-partner,
-#fieldset-third-partner,
-#fieldset-fourth-partner {
+.event-settings,
+.chat-settings,
+.api-keys,
+.vat-settings,
+.gever-credentials,
+.grid-x.field-geo_provider,
+.grid-x.field-about_url,
+.grid-x.field-hide_onegov_footer,
+#fieldset-footer-division {
     display: none;
+}
+
+/*
+    hide ticket achiving options
+*/
+.archive-tickets,
+.ticket-archive {
+    display: none !important;
 }
 
 /*
@@ -78,20 +82,77 @@ svg {
 }
 
 /*
-    Hints in forms
+    Header
 */
+#feriennet-links {
+    background: $primary-color;
+
+    ul {
+        padding: .5rem 0;
+    }
+
+    li {
+        border-left: 1px solid scale-color($primary-color, $lightness: 30%, $saturation: -40%);
+        font-size: .9rem;
+
+        &:first-child {
+            border-left: 0;
+        }
+
+        &:nth-child(2) {
+            margin-left: 1rem;
+        }
+
+        a#help-us {
+            background: $smoke;
+            border-radius: 1rem;
+            color: $primary-color;
+
+            &:hover {
+                box-shadow: 0 0 .3rem .1rem rgba(0, 0, 0, .28) inset;
+            }
+        }
+
+        a {
+            border-radius: 1rem;
+            color: white;
+            padding: .3rem 1rem;
+            transition: all 200ms linear;
+        }
+
+        &:hover a {
+            background: rgba(250, 250, 250, .15);
+        }
+    }
+}
+
+#header_links + #feriennet-links,
+#header_text + #feriennet-links {
+    border-top: 1px solid darken($primary-color, 5%);
+    box-shadow: 0 15px 10px -15px rgba(0, 0, 0, .15) inset;
+}
+
+/*
+    Forms
+*/
+@media #{$medium-up} {
+    form.two-columns {
+        column-count: 2;
+        column-gap: 4rem;
+
+        form .formfields,
+        form fieldset {
+            break-inside: avoid;
+        }
+    }
+}
+
 form small {
-    color: $form-label-font-color;
+    color: $aluminum;
     display: block;
     font-size: .8rem;
 }
 
-/*
-    Small form fixes
-*/
-.field-ticket_statistics {
-    margin-bottom: 1rem !important;
-}
 
 /*
     Strikethrough text
@@ -116,39 +177,12 @@ p.tight {
 }
 
 /*
-    List items rendred on a single line
-*/
-ul.single-line {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    li {
-        display: inline;
-    }
-
-    &.pipe-separated li + li::before {
-        content: ' | ';
-    }
-}
-
-/*
-    Improve the look of the custom homepage settings
-*/
-
-.field-show_related_contacts,
-.field-show_political_municipality,
-.field-public_organiser_data {
-    padding-bottom: 1rem;
-}
-
-/*
     Generic icons (experimental, might replace other approaches in the future)
 */
 @mixin generic-icon($icon) {
     &.before::before,
     &.after::after {
-        @include icon($icon);
+        @include icon-bold($icon);
     }
 }
 
@@ -177,13 +211,6 @@ ul.single-line {
     font-size: .8rem;
 }
 
-.fixed-width::before,
-.fixed-width::after {
-    display: inline-block;
-    text-align: center;
-    width: 1.5ex;
-}
-
 .before::before {
     margin-right: 1ex;
 }
@@ -206,14 +233,22 @@ ul.single-line {
 
 .calendar-add-icon {
     @include generic-icon('\f271');
+
+    .fa-external-link-alt {
+        display: none;
+    }
 }
 
 .calendar-edit-icon {
-    @include generic-icon('\f040');
+    @include generic-icon('\f044');
+}
+
+.delete-icon {
+    @include generic-icon('\f1f8');
 }
 
 .location-icon {
-    @include generic-icon('\f041');
+    @include generic-icon('\f3c5');
 }
 
 .child-icon {
@@ -224,53 +259,49 @@ ul.single-line {
     @include generic-icon('\f02f');
 }
 
+.plus-icon {
+    @include generic-icon('\f067');
+}
+
+.minus-icon {
+    @include generic-icon('\f068');
+}
+
 /*
     global/editbar icons
 */
 #global-tools,
 .globals,
 .edit-bar {
-    .accept-activity::before { @include icon('\f087'); }
-    .archive-activity::before { @include icon('\f187'); }
+    .accept-activity::before { @include icon-bold('\f164'); }
+    .archive-activity::before { @include icon-bold('\f187'); }
     .feriennet-management::before { @include icon('\f274'); }
-    .import::before { @include icon('\f093'); }
-    .manage-billing::before { @include icon('\f0d6'); }
-    .manage-matches::before { @include icon('\f24e'); }
-    .manage-periods::before { @include icon('\f02d'); }
-    .new-activity::before { @include icon('\f135'); }
-    .new-booking::before { @include icon('\f1ec'); }
-    .new-notification::before { @include icon('\f003'); }
+    .import::before { @include icon-bold('\f093'); }
+    .manage-billing::before { @include icon-bold('\f0d6'); }
+    .manage-matches::before { @include icon-bold('\f24e'); }
+    .manage-periods::before { @include icon-bold('\f02d'); }
+    .new-activity::before { @include icon-bold('\f135'); }
+    .new-booking::before { @include icon-bold('\f1ec'); }
+    .paid-date::before { @include icon('\f274'); }
+    .new-notification::before { @include icon-bold('\f0e0'); }
     .new-occasion::before { @include icon('\f133'); }
-    .new-period::before { @include icon('\f055'); }
-    .offer-again::before { @include icon('\f087'); }
-    .remove-manual::before { @include icon('\f014'); }
-    .request-publication::before { @include icon('\f087'); }
+    .new-period::before { @include icon-bold('\f055'); }
+    .offer-again::before { @include icon('\f164'); }
+    .remove-manual::before { @include icon-bold('\f1f8'); }
+    .request-publication::before { @include icon('\f164'); }
     .reset-billing::before { @include icon('\f12d'); }
     .reset-matching::before { @include icon('\f12d'); }
     .run-matching::before { @include icon('\f0d0'); }
-    .show-activity::before { @include icon('\f135'); }
-    .show-attendees::before { @include icon('\f0c0'); }
-    .show-dashboard::before { @include icon('\f0e4'); }
-    .show-exports::before { @include icon('\f019'); }
-    .show-notifications::before { @include icon('\f003'); }
-    .show-ticket::before { @include icon('\f145'); }
-    .show-volunteers::before { @include icon('\f164'); }
+    .show-activity::before { @include icon-bold('\f135'); }
+    .show-attendees::before { @include icon-bold('\f0c0'); }
+    .show-dashboard::before { @include icon-bold('\f3fd'); }
+    .show-exports::before { @include icon-bold('\f019'); }
+    .show-notifications::before { @include icon-bold('\f0e0'); }
+    .show-ticket::before { @include icon-bold('\f3ff'); }
+    .show-volunteers::before { @include icon-bold('\f4fc'); }
     .volunteer::before { @include icon('\f164'); }
 }
 
-.globals .highlighted {
-    background: $success-color;
-    border: 1px solid darken($success-color, 5%);
-    border-radius: 3px;
-    height: 1.4rem !important;
-    line-height: 1.5 !important;
-    margin-top: .6rem;
-
-    &:hover,
-    &:active {
-        background: darken($success-color, 5%) !important;
-    }
-}
 
 /*
     Footer logo
@@ -280,6 +311,15 @@ ul.single-line {
     margin-bottom: 1.5rem;
     margin-top: .5rem;
     text-align: center;
+}
+
+.onegov-award,
+.pro-juventute-logo,
+.bosw-award,
+.social-media-links a {
+    &::before {
+        background: transparent !important;
+    }
 }
 
 .platform-awards {
@@ -296,6 +336,14 @@ ul.single-line {
 .platform-promotion > div {
     margin-bottom: .75rem;
     max-width: 70ex;
+
+    .fas.fa-external-link-alt.fa-xs {
+        display: inline;
+    }
+
+    a {
+        font-weight: bold;
+    }
 }
 
 .sponsor-footer {
@@ -314,8 +362,30 @@ ul.single-line {
         color: $primary-color;
     }
 
-    .sponsor img {
+
+    .sponsor {
         background: $white;
+
+        a div {
+            background: $white;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            padding-top: 50%;
+            width: 100%;
+        }
+    }
+
+}
+
+footer {
+    .cell ul.social-media-links {
+        margin-bottom: 1.5rem;
+    }
+
+    .footer-content > .cell.footer-links {
+        margin-top: 3rem;
+        text-align: center;
     }
 }
 
@@ -323,9 +393,9 @@ ul.single-line {
     activities list
 */
 .activity-list-item {
-    margin-bottom: 1.5rem;
 
     .page-lead {
+        color: $charcoal;
         font-size: 1rem;
         margin-bottom: .5rem;
     }
@@ -335,96 +405,64 @@ ul.single-line {
     }
 
     .factoids > span {
+        color: $charcoal;
         font-size: .875rem;
         line-height: .875rem;
+        margin-right: 3ex;
 
         + span {
-            margin-left: 3ex;
+            white-space: nowrap;
         }
 
-        &::before {
-            display: inline-block;
-            position: relative;
-        }
-
-        &.age::before {
-            top: -1px;
-        }
-
-        &.available-spots,
-        &.full {
-            font-weight: normal;
-        }
-
-        &.cost::before {
-            margin-right: 6px;
-        }
-
-        &.full::before {
-            margin-right: 1px;
-        }
-
-        &.available-spots::before {
-            margin-right: 3px;
-        }
-    }
-}
-
-.filter-periods ul.tags li,
-.filter-weeks ul.tags li {
-    display: block;
-
-    &:first-child {
-        padding-top: 1px;
-    }
-}
-
-.filter-ages ul {
-    display: flex;
-    flex-wrap: wrap;
-
-    li {
-        margin-right: .5ex;
-
-        span {
-            min-width: 45px;
-            text-align: center !important;
-        }
-    }
-}
-
-/*
-    Activity thumbnails
-*/
-.thumbnail-column {
-    padding: .5rem 1rem 0 .25rem !important;
-}
-
-.thumbnail {
-    display: block;
-    padding-bottom: 90%;
-    position: relative;
-    width: 100%;
-
-    > div {
-        background-position: center top;
-        background-size: cover;
-        border-radius: 4px;
-        bottom: 0;
-        height: 100%;
-        left: 0;
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 100%;
     }
 }
 
 /*
     Activity view
 */
-.page-content-main .tags {
-    margin-bottom: 1rem;
+
+.activity-active-period {
+    margin-bottom: 2rem;
+
+
+    @mixin arrow-hint {
+        @include icon-bold('\f061');
+    }
+
+    .hint {
+        font-size: inherit;
+
+        > span {
+            display: flex;
+            flex-wrap: wrap;
+
+            &::before {
+                @include arrow-hint;
+                margin-right: 1rem;
+            }
+        }
+
+        b {
+            margin-right: .5rem;
+        }
+    }
+}
+
+.panel.period-hint-panel {
+
+    margin-bottom: 4rem;
+
+    &:not(:has(.hint)) {
+        display: none;
+    }
+
+    .hints .hint {
+        margin-left: 2rem;
+
+        &::before {
+            @include icon-bold('\f061');
+        }
+    }
 }
 
 ul.tags {
@@ -433,16 +471,6 @@ ul.tags {
     li {
         font-size: .875rem;
         margin-bottom: 8px;
-    }
-}
-
-.side-panel {
-    .organiser {
-        padding: .5rem 1rem 1rem;
-
-        * {
-            font-weight: normal;
-        }
     }
 }
 
@@ -456,8 +484,6 @@ ul.tags {
 
 .activity-status-panel {
 
-    padding: 1rem 1rem 0;
-
     .field-display-label {
         font-weight: normal;
     }
@@ -465,30 +491,6 @@ ul.tags {
     .activity-state {
         font-size: .875rem;
     }
-}
-
-.hints {
-    .hint-prebooking::before { @include icon('\f133'); }
-    .hint-prebooking.active::before { @include icon('\f274'); }
-    .hint-prebooking.finish::before { @include icon('\f046'); }
-
-    .hint-booking::before { @include icon('\f133'); }
-    .hint-booking.active::before { @include icon('\f274'); }
-    .hint-booking.finish::before { @include icon('\f046'); }
-
-    .hint-max-activities::before { @include icon('\f2c3'); }
-    .hint-costs::before { @include icon('\f0d6'); }
-    .hint-favorites::before { @include icon('\f005'); }
-    .hint-matching::before { @include icon('\f12e'); }
-    .hint-fairness::before { @include icon('\f24e'); }
-    .hint-happiness::before { @include icon('\f118'); }
-    .hint-operability::before { @include icon('\f058'); }
-    .hint-nobble::before { @include icon('\f046'); }
-    .hint-outstanding::before { @include icon('\f200'); }
-    .hint-finalized::before { @include icon('\f256'); }
-    .hint-minutes::before { @include icon('\f017'); }
-    .hint-deadline::before { @include icon('\f05a'); }
-    .hint-cancellation::before { @include icon('\f1da'); }
 }
 
 /*
@@ -529,117 +531,17 @@ ul.tags {
         font-size: 1rem !important;
     }
 
-    a::before {
-        width: 2ex;
-    }
-
     ul {
         list-style: none;
         margin: 0;
     }
-
-    .organiser-name:first-child {
-        font-weight: bold;
-    }
-
-    .organiser-address {
-        margin-bottom: .5rem;
-    }
-
-    .organiser-name + .organiser-email,
-    .organiser-name + .organiser-phone,
-    .organiser-name + .organiser-website {
-        margin-top: .5rem;
-    }
-
-    .organiser-email a::before {
-        @include icon('\f0e0');
-    }
-
-    .organiser-phone a::before {
-        @include icon('\f095');
-    }
-
-    .organiser-website a::before {
-        @include icon('\f0c1');
-    }
-
-    .organiser-phone,
-    .organiser-email,
-    .organiser-website {
-        font-size: .875rem;
-    }
-
-    .organiser-phone a::before,
-    .organiser-email a::before,
-    .organiser-website a::before {
-        color: $body-font-color;
-        display: inline-block;
-        margin-right: 1ex;
-    }
 }
 
-/*
-    Occasions
-*/
-.occasions {
-    list-style: none;
-    margin: 0;
-    position: relative;
-
-    h2,
-    h3,
-    h4 {
-        font-size: 1.2rem;
-        font-weight: bold;
-        margin: 0 0 1rem;
-    }
-
-    h3 {
-        margin-bottom: 1rem;
-    }
-
-    h4 {
-        border-bottom: 1px solid transparentize($primary-color, .85);
-        padding-bottom: .5rem;
-    }
-
-    > * {
-        p {
-            font-size: .875rem;
-            font-style: italic;
-            max-width: $max-line-width;
-            white-space: pre-line;
-        }
-
-        div {
-            font-size: .875rem;
-        }
-
-        a {
-            display: inline-block;
-            font-size: .875rem;
-        }
-    }
-
-    .call-to-action {
-        margin-bottom: 1.5rem;
-    }
-}
-
-.field-attendee {
-    margin-bottom: 1rem !important;
-}
 
 /*
     Factoids
 */
 .factoids {
-    margin: 0 0 .5rem;
-
-    span {
-        font-size: .875rem;
-    }
 
     > div {
         margin-left: 1.5rem;
@@ -654,33 +556,6 @@ ul.tags {
         }
     }
 
-    @media #{$medium-up} {
-        > div {
-            max-width: 70%;
-        }
-
-        &.spacer {
-            min-height: 2.5rem;
-        }
-
-        &.right-align {
-            position: absolute;
-            right: 1.25rem;
-            text-align: right;
-            top: 0;
-
-            > div {
-                max-width: 100%;
-            }
-
-            > div::before {
-                left: 0;
-                margin-right: 1ex;
-                position: relative;
-            }
-        }
-    }
-
     ul {
         font-size: .875rem;
         list-style-type: none;
@@ -691,54 +566,33 @@ ul.tags {
         margin-top: .5rem;
     }
 
-    .available-spots,
-    .full {
-        font-weight: bold;
-        margin-bottom: .4rem;
-    }
-
     .dates::before {
         @include icon('\f133');
     }
 
     .full::before {
-        @include icon('\f00d');
+        @include icon-bold('\f00d');
     }
 
     .available-spots::before {
-        @include icon('\f00c');
+        @include icon-bold('\f00c');
     }
 
     .location::before {
-        @include icon('\f041');
-    }
-
-    .age::before {
-        @include icon('\f1ae');
-    }
-
-    .spots::before {
-        @include icon('\f105');
-    }
-
-    .cost::before {
-        @include icon('\f0d6');
-    }
-
-    .text-links::before {
-        @include icon('\f192');
+        @include icon-bold('\f3c5');
     }
 
     .overlap-check::before {
         @include icon('\f017');
     }
 
-    .note::before {
-        @include icon('\f24a');
-    }
-
     .bring-cash::before {
         @include icon('\f0a2');
+    }
+
+    .note p,
+    .location span {
+        white-space: pre-line;
     }
 }
 
@@ -821,13 +675,30 @@ ul.tags {
         }
 
         dd.finished::before {
-            @include icon('\f046');
+            @include icon('\f14a');
             margin-right: .5ex;
         }
 
         dd:not(.finished)::before {
-            @include icon('\f096');
+            @include icon('\f0c8');
             margin-right: .5ex;
+        }
+    }
+
+    thead tr {
+        background: $gainsboro !important;
+    }
+
+    tr {
+        background: $white !important;
+        border-top: 1px solid $gainsboro;
+    }
+
+    .archived {
+        background: $white-smoke !important;
+
+        td {
+            color: $aluminum;
         }
     }
 
@@ -872,63 +743,10 @@ ul.tags {
     }
 }
 
-.occasion {
-    margin-bottom: 2rem;
-    padding-bottom: .5rem;
-    position: relative;
-
-    .note p {
-        margin-bottom: 0;
-    }
-
-    .call-to-action {
-        margin-top: 1rem;
-    }
-
-    .overlap-check + .note,
-    .location + .note {
-        margin-top: .5rem;
-    }
-
-    .state > div {
-        @include smooth-edges;
-
-        background-color: $blue-pastel;
-        color: $blue-dark;
-        padding: 2px 9px;
-        position: absolute;
-        right: 1.25rem;
-        top: -2.75rem;
-
-        &::before {
-            @include icon('\f05a');
-            margin-right: .5ex;
-        }
-
-        &.cancelled {
-            background-color: $red-pastel;
-            color: $red-dark;
-
-            &::before {
-                content: '\f00d';
-            }
-        }
-
-        &.available-spots {
-            background-color: $green-pastel;
-            color: $green-dark;
-
-            &::before {
-                content: '\f00c';
-            }
-        }
-    }
-}
-
 /*
     My bookings
 */
-$booking-left-margin: 2rem;
+$booking-left-margin: 1.6rem;
 
 .my-bookings {
     $dark-foreground: scale-color($primary-color, $lightness: -62.5%, $saturation: -12.5%);
@@ -940,11 +758,19 @@ $booking-left-margin: 2rem;
         box-shadow: 0 0 1px $shadow-color;
         margin-bottom: 2rem;
 
+        .no-wishlist {
+            div {
+                margin-left: 0 !important;
+            }
+        }
+
         .alert-box {
             margin-bottom: 0;
         }
 
         .rega-widget {
+            border: 0;
+            border-radius: 0 !important;
             display: flex;
             width: 100% !important;
 
@@ -976,42 +802,14 @@ $booking-left-margin: 2rem;
             }
         }
 
-        .icons {
-            position: absolute;
-            right: 32px;
-            top: 24px;
-
-            a {
-                cursor: pointer;
-            }
-
-            a::before {
-                background-color: $light-background;
-                border-radius: 50px;
-                display: inline-block;
-                height: 24px;
-                line-height: 24px;
-                margin: 0;
-                padding-left: 2px;
-                text-align: center;
-                width: 24px;
-            }
-        }
-
         h3 {
-            background: $dark-background;
-            color: $dark-foreground;
             font-weight: 500;
             margin: 0;
-
-            // 8.3333% is 1000 (row-width) / 12 (number of rows)
-            // -> one column wide in percentage
-            padding: .75rem 1rem .75rem $column-gutter / 2;
         }
 
         .panel {
             font-size: .875rem;
-            padding: .5rem 1rem;
+            padding: 1rem;
             width: calc(100% - 1rem);
         }
 
@@ -1021,7 +819,7 @@ $booking-left-margin: 2rem;
             position: relative;
 
             .star {
-                flex: 0 0 2rem;
+                flex: 0 0 #{$booking-left-margin};
             }
 
             .title {
@@ -1038,18 +836,11 @@ $booking-left-margin: 2rem;
                 margin-bottom: .5rem;
                 margin-left: calc(#{$booking-left-margin} - .4rem);
             }
-
-            .actions {
-                flex: 0 0 100%;
-                margin-left: calc(#{$booking-left-margin} + 1px);
-            }
         }
 
         .booking-limit {
-            background: $light-background;
             font-size: .875rem;
             line-height: .875rem;
-            padding: .5rem $column-gutter / 2;
         }
 
         ul {
@@ -1063,7 +854,7 @@ $booking-left-margin: 2rem;
         }
 
         .bookings-by-state {
-            padding-left: $column-gutter / 2;
+            padding-top: 2rem;
 
             > ul {
                 margin-bottom: 0;
@@ -1071,24 +862,17 @@ $booking-left-margin: 2rem;
             }
         }
 
-        .last-state {
-            padding-bottom: 1rem;
-        }
-
         .total-costs {
-            background: $white-smoke;
-            font-family: $font-family-monospace;
+            border: 1px solid $gainsboro;
+            border-left: 0;
+            border-right: 0;
             margin-bottom: 1.5rem;
             margin-top: 0;
-            padding: .75rem 1.2rem .75rem $booking-left-margin + $column-gutter / 2;
+            padding: .75rem 1.2rem;
 
-            .columns:last-child {
+            .cell:last-child {
                 text-align: right;
             }
-        }
-
-        .no-total-costs {
-            margin-bottom: 1.5rem;
         }
 
         .total {
@@ -1099,61 +883,77 @@ $booking-left-margin: 2rem;
             font-family: $font-family-monospace;
             font-size: .875rem;
             position: absolute;
-            right: 1rem;
+            right: 0;
             top: .5rem;
         }
 
         .fa-star-o,
         .fa-star {
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             padding: 2px 0;
         }
 
-        .fa-star-o {
-            color: $base;
+    }
+
+    .title-section {
+        align-items: center;
+        background: $gainsboro;
+        display: flex;
+        padding: .5rem 1.5rem !important;
+
+        .attendee-title {
+            flex-grow: 1;
         }
 
-        .fa-star {
-            color: $yellow;
+        .icons {
+            display: block;
+            font-size: .9em;
+
+            a:hover::before {
+                background-color: $white;
+            }
+
+            a::before {
+                background-color: $white-smoke;
+                border-radius: 50px;
+                display: inline-block;
+                height: 2rem;
+                line-height: 2rem;
+                margin: 0;
+                text-align: center;
+                transition: background linear .2s;
+                width: 2rem;
+            }
         }
     }
 
     .state-title {
+        align-items: center;
         background: $white;
+        border-bottom: 1px solid $iron;
         cursor: pointer;
+        display: flex;
+        font-size: 1.3rem;
+        margin-bottom: .5rem;
         margin-top: 0;
-        padding: .75rem 1rem 0 0;
-        position: relative;
+        padding-bottom: .2rem;
 
         h4 {
-            border-bottom: 5px solid $steel;
-            color: $steel;
-            font-size: 1.1rem;
-            font-weight: bold;
-            padding-bottom: .5rem;
+            flex-grow: 1;
         }
 
-        &::after {
-            @include icon('\f055');
-
-            font-size: 1.2rem;
-            position: absolute;
-            right: 19px;
-            top: 12px;
+        .fa-chevron-down {
+            border-radius: 5rem;
+            padding: .5rem;
         }
 
-        &.toggled::after {
-            @include icon('\f056');
+        &:hover .fa-chevron-down {
+            background: $smoke;
         }
     }
 
     @mixin state-title-block($color) {
         $bleached: scale-color($color, $lightness: 70%, $saturation: -60%);
-
-        h4 {
-            border-color: $bleached;
-            color: $color;
-        }
 
         .state-title::after {
             color: $bleached;
@@ -1164,26 +964,8 @@ $booking-left-margin: 2rem;
         }
     }
 
-    .state-open,
-    .state-cancelled {
-        @include state-title-block($steel);
-    }
-
-    .state-accepted {
-        @include state-title-block($green-dark);
-    }
-
-    .state-blocked {
-        @include state-title-block($orange-dark);
-    }
-
-    .state-denied {
-        @include state-title-block($red-dark);
-    }
-
     h5 {
-        font-size: 1.2rem;
-        font-weight: 500;
+        font-size: 1.1rem;
         margin-bottom: .25rem;
         max-width: 80%;
     }
@@ -1208,7 +990,7 @@ $booking-left-margin: 2rem;
         padding-top: .15rem;
 
         &::before {
-            @include icon('\f06a');
+            @include icon-bold('\f06a');
             color: $orange-dark;
             margin: 0 1ex;
         }
@@ -1237,47 +1019,51 @@ $booking-left-margin: 2rem;
     }
 
     .actions {
-        ul {
-            left: -2.5ex;
-            margin: 0;
-            position: relative;
+        display: flex;
+        margin-left: calc(#{$booking-left-margin} + 1px);
+        padding-bottom: 1rem;
 
-            li {
+        .invite-link[data-group]::after {
+            @include group-code;
+            content: attr(data-group);
+            font-size: .8rem;
+            font-weight: normal;
+            margin-left: 1ex;
+        }
+
+        .cancel-link::before {
+            @include icon('\f256');
+        }
+
+        .delete-link::before {
+            @include icon-bold('\f00d');
+        }
+
+        .invite-link::before {
+            @include icon('\f004');
+            margin-right: .2rem;
+        }
+
+
+        a {
+            display: block;
+            font-size: .875rem;
+            margin-bottom: 0;
+            margin-right: 1.5rem;
+
+            &::before {
                 display: block;
-                font-size: .875rem;
-                margin: 0 0 .25rem;
-
-                a {
-                    display: block;
-
-                    &::before {
-                        display: block;
-                        margin-right: .25ex;
-                        width: 2ex !important;
-                    }
-                }
-
-                .invite-link[data-group]::after {
-                    @include group-code;
-                    content: attr(data-group);
-                    font-size: .8rem;
-                    font-weight: normal;
-                    margin-left: 1ex;
-                }
-
-                .cancel-link::before {
-                    @include icon('\f256');
-                }
-
-                .delete-link::before {
-                    @include icon('\f014');
-                }
-
-                .invite-link::before {
-                    @include icon('\f004');
-                }
+                margin-right: .25ex;
+                width: 2ex !important;
             }
         }
+    }
+
+    .all-action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: 1rem;
     }
 }
 
@@ -1285,7 +1071,7 @@ $booking-left-margin: 2rem;
     My Bookings Print View
 */
 @media print {
-    .sponsor-banner {
+    .banner-buchungen {
         display: none;
     }
 
@@ -1361,27 +1147,20 @@ $booking-left-margin: 2rem;
     }
 }
 
+.filter-panel dt {
+    margin-bottom: 0;
+}
+
+.legend-panel {
+    .legend {
+        margin-left: 1.6em;
+    }
+}
+
 /*
     Form panel on the right
 */
 .form-panel {
-    border: 0;
-    margin-bottom: .5rem;
-    padding: 0;
-
-    > h1,
-    > h2,
-    > h3,
-    > h4 {
-        border-bottom: 2px solid $primary-color;
-        font-size: $h4-font-size - $h4-font-reduction;
-        margin-bottom: 0;
-        padding-bottom: .875rem;
-    }
-
-    .form-panel-block {
-        padding: .75rem 0;
-    }
 
     form {
 
@@ -1438,7 +1217,13 @@ $booking-left-margin: 2rem;
     Matching view
 */
 .matched-occasion {
-    margin-bottom: 1rem;
+    margin-bottom: 3rem;
+
+    h3 {
+        border-top: 1px solid $gainsboro;
+        color: $oil;
+        padding-top: 1rem;
+    }
 
     h4 {
         margin-top: 1rem;
@@ -1459,17 +1244,17 @@ $booking-left-margin: 2rem;
 
         td:nth-child(3),
         th:nth-child(3) {
-            width: 2.5%;
+            width: 2%;
         }
 
         td:nth-child(4),
         th:nth-child(4) {
-            width: 18.5%;
+            width: 19.5%;
         }
 
         td:nth-child(5),
         th:nth-child(5) {
-            width: 17.5%;
+            width: 18.5%;
         }
 
         td:nth-child(6),
@@ -1485,8 +1270,7 @@ $booking-left-margin: 2rem;
         td {
             position: relative;
 
-            span,
-            div {
+            span {
                 display: inline-block;
                 left: 10px;
                 overflow: hidden;
@@ -1503,6 +1287,7 @@ $booking-left-margin: 2rem;
         }
 
         td:first-child {
+            padding-left: .5rem !important;
             padding-right: 0;
             text-align: center;
             width: 5px;
@@ -1517,9 +1302,13 @@ $booking-left-margin: 2rem;
             }
         }
 
-        td:last-child::before {
-            content: '';
-            display: none;
+        td:last-child {
+            padding-right: .5rem !important;
+
+            &::before {
+                content: '';
+                display: none;
+            }
         }
 
         ul li {
@@ -1554,34 +1343,11 @@ $booking-left-margin: 2rem;
         display: inline-block;
         width: 100%;
 
-        > button {
-            float: right;
-            font-size: 1.2rem;
-            height: 2.5rem;
-            line-height: 1.2rem;
-            margin-bottom: 0;
-            outline: 0;
-            padding: 0;
-            width: 2.5rem;
-
-            &.alert,
-            &.cancelled {
-                background-color: $red-light;
-
-                &:hover,
-                &.toggled {
-                    background-color: $red;
-                }
-            }
-
-            &.success {
-                background-color: $green-light;
-
-                &:hover,
-                &.toggled {
-                    background-color: $green;
-                }
-            }
+        > a {
+            align-items: center;
+            color: $oil;
+            display: flex;
+            margin-bottom: .5rem;
         }
 
         > button:not(.ic-use-transition) {
@@ -1590,29 +1356,20 @@ $booking-left-margin: 2rem;
     }
 }
 
+
 /*
     Progress bar
 */
 .progress {
+    background-color: $white-smoke;
     border: 0;
-    cursor: pointer;
+    border-radius: .7rem;
     display: inline-block;
     height: 2.5rem;
+    margin-right: .2rem;
     padding: 0;
     position: relative;
     width: calc(100% - 2.5rem);
-
-    .meter {
-        width: 100%;
-    }
-
-    &.success .meter {
-        background-color: $green-pastel;
-    }
-
-    &.alert .meter {
-        background-color: $red-pastel;
-    }
 
     &.cancelled {
         background: repeating-linear-gradient(
@@ -1628,7 +1385,7 @@ $booking-left-margin: 2rem;
         }
 
         .meter-text::before {
-            @include icon('\f00d');
+            @include icon-bold('\f058');
             color: $red;
             margin-right: 1ex;
         }
@@ -1638,14 +1395,29 @@ $booking-left-margin: 2rem;
         }
     }
 
+    .meter {
+        border-radius: .7rem;
+        height: 100%;
+        width: 100%;
+    }
+
+    &.success .meter {
+        background-color: $green-pastel;
+    }
+
+    &.alert .meter {
+        background-color: $red-pastel;
+    }
+
+
     &.success .meter-text::before {
-        @include icon('\f058');
+        @include icon-bold('\f058');
         color: $green;
         margin-right: 1ex;
     }
 
     &.alert .meter-text::before {
-        @include icon('\f06a');
+        @include icon-bold('\f06a');
         color: $red;
         margin-right: 1ex;
     }
@@ -1664,21 +1436,20 @@ $booking-left-margin: 2rem;
     Circular actions button
 */
 .actions-button {
-    background-color: $select-bg-color;
-    border: 1px solid $input-border-color;
-    color: $input-font-color;
+    background-color: $aluminum !important;
     float: right;
     font-size: 12px;
     height: 24px;
     line-height: 12px;
-    margin: 0;
+    margin: 0 !important;
     padding: 5px !important;
     width: 24px;
 
     &:hover {
-        background-color: $select-hover-bg-color;
-        border-color: $input-focus-border-color;
-        color: $input-font-color;
+        background-color: $monsoon !important;
+        color: $aluminum;
+        margin: 0 !important;
+        padding: 5px !important;
     }
 
     + .f-dropdown {
@@ -1689,47 +1460,190 @@ $booking-left-margin: 2rem;
             font-weight: normal;
         }
     }
-}
 
-/*
-    Billing View
-*/
-#page-billing .f-dropdown {
-    max-width: 350px;
-}
-
-.billing {
-    .bill {
-        > button:not(.ic-use-transition) {
-            animation: oscillate-opacity 1s infinite;
-        }
+    .fa,
+    .fas {
+        margin-left: .08rem !important;
     }
 }
 
-.bill {
-    border-radius: 2px;
+/*
+    Item list
+*/
+
+.item-wrapper {
+    color: $body-font-color;
     margin-bottom: 1rem;
     padding: 0;
     position: relative;
 
-    h3 {
-        color: $red-dark;
-        display: inline-block;
-        font-size: 1rem;
-        font-weight: bold;
-        line-height: 1.5rem;
-        margin: .5rem .25rem .5rem .75rem;
+    @mixin payment-state-color($pastel, $light, $dark) {
+        .item-header-bar {
+            background-color: $pastel;
+            border: 1px solid $pastel;
+        }
+
+        > .amount,
+        > .payment-status {
+            color: $dark;
+        }
+
+        .details-button {
+            background-color: $light;
+            color: $white;
+
+            &:has(.down),
+            &:hover {
+                background-color: $dark;
+            }
+        }
+
+        .total td {
+            border-top: 1px solid $black;
+            color: $dark;
+            font-weight: bold;
+            text-decoration: none;
+
+        }
     }
 
-    > button {
-        float: right;
-        height: 40px;
-        margin: 0;
-        padding: .25rem;
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 40px;
+    &.item-green {
+        @include payment-state-color($green-pastel, $green-light, $green-dark);
+    }
+
+    &.item-red {
+        @include payment-state-color($red-pastel, $red-light, $red-dark);
+    }
+
+    &.item-yellow {
+        @include payment-state-color($yellow-pastel, $yellow-light, $yellow-dark);
+    }
+
+    > .outstanding {
+        line-height: 1.5rem;
+        margin: .5rem calc(48px + .5rem) .5rem 0;
+
+        .button {
+            margin-left: 1rem;
+        }
+    }
+
+    .item-header {
+        align-items: center;
+        display: flex;
+        margin-bottom: .5rem;
+
+        > button {
+            height: 40px;
+            margin: 0;
+            padding: .25rem;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 40px;
+        }
+    }
+
+    a {
+        line-height: 1;
+    }
+
+    .item-header-bar {
+        align-items: center;
+        border-radius: .7rem;
+        display: flex;
+        flex-grow: 1;
+        margin-right: .2rem;
+
+        h3 {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: bold;
+            line-height: 1rem;
+            margin-bottom: 0;
+            padding: .75rem;
+        }
+
+        span {
+            flex-grow: 1;
+        }
+
+        button {
+            margin-right: .5rem !important;
+        }
+    }
+
+    .details-button {
+        border-radius: .7rem;
+        padding: .75rem;
+
+        .fa-chevron-down {
+            color: $white;
+        }
+
+    }
+
+    li {
+        &.item-group {
+            margin-top: 1rem;
+        }
+
+        .item-organizer {
+            font-style: italic;
+        }
+
+        &.item-red,
+        &.item-green {
+            border-top: 1px solid $smoke;
+            font-size: .9rem;
+        }
+
+        &.item-group + .item-red,
+        &.item-group + .item-green {
+            border-top: 1px solid $iron;
+        }
+
+        &.item-red .text-amount {
+            .item-amount,
+            .item-payment-status {
+                color: $red-dark;
+            }
+        }
+
+        &.item-green .text-amount {
+            .item-amount,
+            .item-payment-status {
+                color: $green-dark;
+            }
+        }
+
+        &.amount-total {
+            border-top: 0;
+            font-weight: bold;
+
+            .item-red {
+                .item-amount,
+                .item-payment-status {
+                    color: $red-dark;
+                }
+            }
+
+            .item-green {
+                .item-amount,
+                .item-payment-status {
+                    color: $green-dark;
+                }
+            }
+        }
+
+        &.invoice-total {
+            border-top: 1px solid $oil;
+            margin-top: 3rem;
+        }
+    }
+
+    .item-total > * {
+        display: flex;
     }
 
     table {
@@ -1738,26 +1652,34 @@ $booking-left-margin: 2rem;
         width: 100%;
 
         tr {
-            background-color: transparent;
+            background: transparent !important;
 
-            &.paid:hover {
-                background-color: $green-pastel !important;
+            &.group + .invoice-item {
+                border-top: 1px solid $iron;
             }
 
-            &.unpaid:hover {
-                background-color: $red-pastel !important;
+            &.invoice-item {
+                border-top: 1px solid $smoke;
+            }
+
+            td:first-child {
+                padding-left: 0;
+            }
+
+            td:last-child {
+                padding-right: 0;
             }
         }
 
         td {
             border: 0;
-            padding-bottom: .25rem;
+            padding-bottom: .4rem;
             padding-top: .25rem;
         }
 
         .group td {
-            padding-bottom: .75rem;
-            padding-top: .75rem;
+            padding-bottom: .25rem;
+            padding-top: 1rem;
         }
 
         .payment-status,
@@ -1765,7 +1687,6 @@ $booking-left-margin: 2rem;
         .actions {
             padding-left: 0;
             padding-right: 0;
-            width: 1%;
         }
 
         .total .amount {
@@ -1781,9 +1702,8 @@ $booking-left-margin: 2rem;
             padding-right: 1.5rem;
         }
 
-        .total td {
-            padding-bottom: .5rem;
-            padding-top: .5rem;
+        tr:has(+ tr.total) td {
+            padding-bottom: 2rem;
         }
 
         .total td:last-child {
@@ -1798,20 +1718,11 @@ $booking-left-margin: 2rem;
 
         .total td,
         .group td:first-child {
+            font-size: 1rem;
             font-weight: bold;
-            text-decoration: underline;
-            text-decoration-color: $body-font-color;
         }
 
-        tbody tr:nth-last-child(2) td {
-            // make sure the backgrounds of all item lines cover the same
-            // height, here we mask the extended height of the row with
-            // a white box-shadow
-            box-shadow: 0 -.75rem $white inset;
-            padding-bottom: 1rem;
-        }
-
-        .unpaid {
+        .item-red {
             .payment-status {
                 color: $red-dark;
                 text-align: left;
@@ -1822,7 +1733,7 @@ $booking-left-margin: 2rem;
             }
         }
 
-        .paid {
+        .item-green {
             .payment-status {
                 color: $green-dark;
                 text-align: left;
@@ -1832,6 +1743,34 @@ $booking-left-margin: 2rem;
                 color: $green-dark;
             }
         }
+    }
+
+}
+
+/*
+    Billing View
+*/
+#page-billing .is-submenu-item {
+    max-width: $max-line-width;
+
+    a {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.billing {
+    max-width: $max-line-width;
+}
+
+.bill {
+
+    .bill-details {
+        border: 1px solid $iron;
+        border-radius: .7rem;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
     }
 
     .mark-paid::before {
@@ -1840,7 +1779,7 @@ $booking-left-margin: 2rem;
     }
 
     .mark-unpaid::before {
-        @include icon('\f071');
+        @include icon-bold('\f071');
         margin-right: 1.25ex;
     }
 
@@ -1850,7 +1789,7 @@ $booking-left-margin: 2rem;
     }
 
     .remove-manual::before {
-        @include icon('\f014');
+        @include icon-bold('\f1f8');
         margin-right: 1.25ex;
     }
 
@@ -1860,64 +1799,20 @@ $booking-left-margin: 2rem;
     }
 
     .show-invoice::before {
-        @include icon('\f002');
+        @include icon-bold('\f002');
         margin-right: 1.25ex;
     }
 
     .new-booking::before {
-        @include icon('\f1ec');
+        @include icon-bold('\f1ec');
         margin-right: 1.25ex;
     }
 
-    @mixin payment-state-color($pastel, $light, $dark) {
-        background-color: $pastel;
-        border: 1px solid $pastel;
-
-        > * {
-            color: $dark;
-        }
-
-        button {
-            background-color: $light;
-            color: $white;
-            outline: 1px solid $light;
-        }
-
-        button.toggled,
-        button:hover {
-            background-color: $dark;
-            outline: 1px solid $dark;
-        }
-
-        .total td {
-            background-color: $pastel;
-            color: $dark;
-            font-size: 1rem;
-            text-decoration: none;
-        }
+    .paid-date::before {
+        @include icon('\f274');
+        margin-right: 1.25ex;
     }
 
-    &.paid {
-        @include payment-state-color($green-pastel, $green-light, $green-dark);
-    }
-
-    &.unpaid {
-        @include payment-state-color($red-pastel, $red-light, $red-dark);
-    }
-
-    &.overpaid {
-        @include payment-state-color($yellow-pastel, $yellow-light, $yellow-dark);
-    }
-
-    > .outstanding {
-        float: right;
-        line-height: 1.5rem;
-        margin: .5rem calc(48px + .5rem) .5rem 0;
-
-        .button {
-            margin-left: 1rem;
-        }
-    }
 
     .print-area {
         display: block;
@@ -1991,7 +1886,8 @@ $booking-left-margin: 2rem;
         }
 
         .invoice-items-list {
-            border-bottom-color: $black;
+            border: 1px solid $iron;
+            border-radius: .7rem;
         }
 
         .invoice-items-payment {
@@ -2009,17 +1905,12 @@ $booking-left-margin: 2rem;
     Invoices View
 */
 
-.paid .invoice-items-list {
-    border-bottom: 1px solid $green-pastel;
-}
-
-.unpaid .invoice-items-list {
-    border-bottom: 1px solid $red-pastel;
-}
-
 .invoice-items-list {
     background: $white;
-    padding: 1rem 3.5rem 1rem 1.5rem;
+    border: 1px solid $iron;
+    border-radius: .7rem;
+    margin-bottom: 2rem;
+    padding: 2rem;
     position: relative;
     top: 1px;
 
@@ -2028,31 +1919,31 @@ $booking-left-margin: 2rem;
         list-style: none;
         margin: 0;
 
-        li.unpaid,
-        li.paid {
+        .text-amount {
             align-items: end;
             display: flex;
             flex-wrap: wrap;
+
+            span:not(.item-text) {
+                margin-left: .5rem;
+
+            }
+        }
+
+        .item-organizer {
+            display: block;
+            line-height: .9rem;
+            padding-bottom: .5rem;
         }
     }
 
     .item-text {
-        -ms-flex-positive: 1 ;
-        -ms-flex-preferred-size: 0;
         flex-basis: 0;
         flex-grow: 1;
+        -ms-flex-positive: 1;
+        -ms-flex-preferred-size: 0;
     }
 
-    .donation-button {
-        margin: 0;
-        position: absolute;
-        right: -.5rem;
-    }
-
-    .item-group,
-    .item-total {
-        margin-top: 1rem;
-    }
 
     .item-group:first-child {
         margin-top: 0;
@@ -2062,27 +1953,30 @@ $booking-left-margin: 2rem;
         display: relative;
         float: right;
         font-family: $font-family-monospace;
+        margin-left: .5rem;
     }
 
-    li.paid .item-amount::after {
-        @include icon('\f05d');
-        color: $green-dark;
-        font-weight: normal;
-        position: absolute;
-        right: 33px;
+    li.paid {
+        .item-amount::after {
+            @include icon('\f05d');
+            color: $green-dark;
+            font-weight: normal;
+            position: absolute;
+            right: 33px;
+        }
+
+        &.datatrans,
+        &.stripe_connect,
+        &.worldline_saferpay {
+            .item-amount::after {
+                content: '\f09d';
+                font-size: .875rem;
+            }
+        }
     }
 
-    li.unpaid .item-amount::after {
-        @include icon('\f06a');
+    li.unpaid .text-amount > span:not(.item-text) {
         color: $red-dark;
-        font-weight: normal;
-        position: absolute;
-        right: 33px;
-    }
-
-    li.paid.stripe_connect .item-amount::after {
-        content: '\f09d';
-        font-size: .875rem;
     }
 
     .item-created {
@@ -2095,33 +1989,29 @@ $booking-left-margin: 2rem;
     }
 }
 
-.toggled + .invoice-items-list + .invoice-items-payment > div {
-    border-top: 1px dashed $red-pastel;
+.invoice-items-list:has( + .invoice-items-payment) {
+    border-radius: .7rem .7rem 0 0;
+    margin-bottom: 0;
 }
 
 .invoice-items-payment {
-    padding: 0 calc(1rem - 1px);
-
-    > div {
-        background-color: lighten($red-pastel, 8%);
-        padding: 1rem .5rem 1.25rem;
-        position: relative;
-    }
+    background-color: lighten($red-pastel, 8%);
+    border: 1px solid $iron;
+    border-radius: 0 0 .7rem .7rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
 
     h4 {
         font-size: 1rem;
         font-weight: bold;
     }
 
-    ul {
-        color: $body-font-color;
-        font-size: 1rem;
-        list-style: none;
-        margin: 0;
 
-        li span:first-child {
-            display: inline-block;
-            min-width: 9rem;
+    .bank-transfer {
+        font-size: .9rem;
+
+        .medium-4 {
+            font-weight: bold;
         }
     }
 
@@ -2134,13 +2024,6 @@ $booking-left-margin: 2rem;
 /*
     Occassion-Attendee View
 */
-
-.icons {
-    display: block;
-    font-size: .9em;
-    margin-bottom: .5rem;
-    margin-top: -.5rem;
-}
 
 .occasion-dates ul {
     font-size: 1em;
@@ -2168,7 +2051,7 @@ $booking-left-margin: 2rem;
         }
 
         h2 {
-            font-size: $h3-font-size - $h3-font-reduction;
+            font-size: 2rem;
         }
 
         .print-icon {
@@ -2180,9 +2063,16 @@ $booking-left-margin: 2rem;
         }
     }
 
+    .occurence-info {
+        margin-bottom: 1rem;
+    }
+
     .attendees {
         font-size: .9em;  // em for correct scaling in print
-        max-width: 70%;
+
+        @media #{$large-up} {
+            column-count: 2;
+        }
 
         li {
             margin-bottom: .5rem;
@@ -2190,12 +2080,12 @@ $booking-left-margin: 2rem;
         }
 
         strong.male::after {
-            @include icon('\f222');
+            @include icon-bold('\f222');
             margin-left: 1ex;
         }
 
         strong.female::after {
-            @include icon('\f221');
+            @include icon-bold('\f221');
             margin-left: 1ex;
         }
     }
@@ -2216,7 +2106,7 @@ $booking-left-margin: 2rem;
 */
 
 .emergency-contact {
-    @include panel($bg: $callout-panel-bg);
+
     border-color: scale-color($callout-panel-bg, $lightness: -11%);
 
     margin-bottom: 1.5rem;
@@ -2224,7 +2114,6 @@ $booking-left-margin: 2rem;
 
     div {
         margin-bottom: .5rem;
-        max-width: $max-line-width;
     }
 }
 
@@ -2241,10 +2130,30 @@ $booking-left-margin: 2rem;
     Notifications view
 */
 .notifications li {
-    margin-bottom: .5rem;
+    border-top: 1px solid $smoke;
+    margin-bottom: 1rem;
+    padding-top: .5rem;
+
+    .text-links {
+        display: flex;
+        margin-top: .5rem;
+
+        a {
+            padding-right: .3rem;
+
+            &:last-child {
+                margin-left: auto;
+
+                &::before {
+                    content: "";
+                    margin-right: .5rem;
+                }
+            }
+        }
+    }
 
     &::before {
-        @include icon('\f003');
+        @include icon-bold('\f0e0');
         display: inline-block;
         font-size: 1.1rem;
         margin-right: .5rem;
@@ -2292,11 +2201,13 @@ $booking-left-margin: 2rem;
 /*
     Notification Mailing
 */
+.notifications-sidebar .filter-panel.side-panel {
+    padding-left: 0;
+}
 
 .notification-preview {
     background: $white-smoke;
     margin-bottom: 1rem;
-    max-width: $max-line-width + 13ex;
     padding: .75rem 1rem;
     position: relative;
 
@@ -2309,7 +2220,6 @@ $booking-left-margin: 2rem;
 
     p {
         margin-bottom: .75rem;
-        max-width: $max-line-width;
     }
 
     p:last-child {
@@ -2344,15 +2254,11 @@ $booking-left-margin: 2rem;
     padding-bottom: .5rem;
 
     > div:first-child {
-        padding-left: 2rem !important;
 
         &::before {
-            font-family: 'FontAwesome';
-            font-size: 1.5rem;
             font-weight: normal;
             left: .25rem;
             line-height: 1.7rem;
-            position: absolute;
         }
     }
 
@@ -2366,8 +2272,8 @@ $booking-left-margin: 2rem;
         border-color: $green;
 
         > div:first-child::before {
+            @include icon('\f058');
             color: $green;
-            content: '\f058';
         }
     }
 }
@@ -2377,8 +2283,8 @@ $booking-left-margin: 2rem;
         border-color: $orange;
 
         > div:first-child::before {
+            @include icon('\f071');
             color: $orange;
-            content: '\f071';
         }
     }
 }
@@ -2388,8 +2294,8 @@ $booking-left-margin: 2rem;
         border-color: $gray-dark;
 
         > div:first-child::before {
+            @include icon('\f05d');
             color: $gray-dark;
-            content: '\f05d';
         }
     }
 }
@@ -2399,8 +2305,8 @@ $booking-left-margin: 2rem;
         border-color: $blue;
 
         > div:first-child::before {
+            @include icon('\f24d');
             color: $blue;
-            content: '\f24d';
         }
     }
 }
@@ -2410,8 +2316,8 @@ $booking-left-margin: 2rem;
         border-color: $red;
 
         > div:first-child::before {
+            @include icon('\f059');
             color: $red;
-            content: '\f059';
         }
 
         > div:last-child {
@@ -2465,6 +2371,7 @@ $booking-left-margin: 2rem;
 */
 .sponsor {
     border: 2px solid $smoke;
+    border-radius: .7rem;
     line-height: 100px;
     padding: 5px;
     text-align: center;
@@ -2485,6 +2392,7 @@ $booking-left-margin: 2rem;
 /*
     Sponsoring banners
 */
+
 .sponsor-banner {
     /*
         aspect ratio 16:5 (100/16*5 =31.25)
@@ -2492,9 +2400,8 @@ $booking-left-margin: 2rem;
     */
     position: relative;
 
-    div > img,
-    div > a > img {
-        border-radius: 2px;
+    img {
+        border-radius: .7rem;
     }
 
     a {
@@ -2502,6 +2409,10 @@ $booking-left-margin: 2rem;
         display: block;
         text-decoration: none;
         z-index: 2;
+
+        .fa-external-link-alt {
+            display: none;
+        }
     }
 
     p.banner-info {
@@ -2509,10 +2420,10 @@ $booking-left-margin: 2rem;
         margin: .25rem 0;
     }
 
-    & > div {
+    div {
         display: flex;
 
-        & > img {
+        img {
             bottom: 0;
             left: 0;
             position: absolute;
@@ -2522,6 +2433,13 @@ $booking-left-margin: 2rem;
         }
     }
 }
+
+.banner-buchungen,
+.banner-rechnungen,
+.banner-activities p.banner-info {
+    margin-bottom: 2rem;
+}
+
 
 /*
     Period messages
@@ -2543,7 +2461,6 @@ $booking-left-margin: 2rem;
         border: 1px solid $oil;
         border-radius: 2px;
         color: $body-font-color;
-        margin: .5rem 0 -.5rem;
         outline: none;
 
         &:hover {
@@ -2563,47 +2480,27 @@ $booking-left-margin: 2rem;
     Attendee Details in Bookings View
 */
 .attendees-toggle {
-    align-items: center;
-    border-top: 1px dashed $gainsboro;
-    display: flex;
-    justify-content: center;
-    margin-bottom: -.875rem;
-    margin-right: 1rem;
-    margin-top: 1rem;
+    border: 1px solid;
+    border-radius: 5rem;
+    color: $primary-color;
+    font-size: .875rem;
+    height: fit-content;
+    padding: .2rem .5rem;
+    transition: all linear .2s;
 
-    > div {
-        background: $white;
-        border: 1px dashed $base;
-        border-radius: 50px;
-        font-size: .875rem;
-        padding: 0 12px;
-        position: relative;
-        top: -.8rem;
-    }
-
-    :hover,
-    &.toggled {
-        color: $anchor-font-color;
-        cursor: pointer;
-    }
-
-    span:first-child::before {
-        @include icon('\f13a');
-        margin-right: .75ex;
-    }
-
-    &.toggled span:first-child::before {
-        content: '\f139';
+    &:hover,
+    &:has(i.down) {
+        background: $primary-color;
+        color: $white;
     }
 }
 
 .attendees-table {
-    $column-width: grid-calc(1, $total-columns);
-
+    $column-width: grid-calc(1, 12);
     font-size: .8rem;
     margin-left: $booking-left-margin;
     padding: .75rem 0 1rem;
-    width: calc(100% - #{$booking-left-margin} - #{$column-gutter / 2});
+    width: calc(100% - #{$booking-left-margin});
 
     table {
         margin: 0;
@@ -2621,40 +2518,254 @@ $booking-left-margin: 2rem;
     }
 }
 
+
 /*
-    Occasions toggle
+    Occasions
 */
+.occasions {
+
+    list-style: none;
+    margin: 0;
+    position: relative;
+
+    .state > div {
+        background-color: $blue-pastel;
+        border-radius: .7rem;
+        color: $blue-dark;
+        margin-bottom: .5rem;
+        padding: 2px 9px;
+
+        &::before {
+            @include icon-bold('\f05a');
+            margin-right: .5ex;
+        }
+
+        &.cancelled {
+            background-color: $red-pastel;
+            color: $red-dark;
+
+            &::before {
+                content: '\f00d';
+            }
+        }
+
+        &.available-spots {
+            background-color: $green-pastel;
+            color: $green-dark;
+
+            &::before {
+                content: '\f00c';
+            }
+        }
+    }
+
+    .occasion-title {
+        align-items: end;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    h2,
+    h3,
+    h4 {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin: 0 0 .5rem;
+    }
+
+    > * {
+        div {
+            font-size: .875rem;
+        }
+    }
+
+    .factoids a {
+        display: inline-block;
+        font-size: .875rem;
+        margin-right: 1rem;
+    }
+
+    > li {
+        margin-bottom: 2rem;
+    }
+
+    .call-to-action {
+        margin-bottom: 1.5rem;
+    }
+
+    .occasion.occasion-card {
+        .card-section {
+            padding-bottom: 0 !important;
+
+            p,
+            ul {
+                margin-bottom: .5rem;
+            }
+
+            &.info {
+                display: flex;
+                flex-wrap: wrap;
+
+                .factoids:first-child {
+                    flex-grow: 10;
+                }
+            }
+
+            p:last-child {
+                margin-bottom: 0;
+            }
+
+            &:last-child {
+                padding-bottom: 1.5rem !important;
+
+                &.enroll {
+                    text-align: right;
+                }
+            }
+        }
+    }
+
+}
+
+.field-attendee {
+    margin-bottom: 1rem !important;
+}
+
+
 .occasions-by-period {
     margin-bottom: .5rem;
-}
 
-.title-with-toggle {
-    display: flex;
-
-    .toggle {
-        color: $anchor-font-color;
-        font-size: 1.25rem;
-        line-height: 2.5rem;
-        margin-right: .5rem;
-        width: 1.25rem;
+    .accordion-title {
+        font-size: 1rem;
+        line-height: 1.5;
+        padding-right: 2.5rem;
     }
 
-    .fa {
-        cursor: pointer;
-    }
-
-    .toggle-off {
-        display: none;
-    }
-
-    .toggled .toggle-on {
-        display: none;
-    }
-
-    .toggled .toggle-off {
-        display: inline-block;
+    .panel.period-hint-panel {
+        margin-bottom: 0;
     }
 }
+
+.occasion-needs {
+    $gray: $silver;
+    $grayer: $gainsboro;
+    $grayest: $steel;
+
+    margin: 1.25rem 0 1.75rem;
+    position: relative;
+
+    .need-info {
+        background: $smoke;
+        border-radius: .7rem;
+        padding: 1rem;
+
+        span {
+            font-style: italic;
+        }
+
+        .fa {
+            margin-left: .1rem;
+            margin-right: .4rem;
+        }
+    }
+
+    .need-add {
+        color: $grayest;
+        display: block;
+        font-style: normal;
+        font-weight: bold;
+        margin-top: .75rem;
+        padding-bottom: .75rem;
+        padding-right: 1.25rem;
+        position: absolute;
+        right: 0;
+        text-align: right;
+        top: -.75rem;
+    }
+
+    h5 {
+        font-size: 1rem;
+        margin-bottom: .5rem;
+    }
+
+    > ul {
+        margin: 0;
+
+        li {
+            background: $smoke;
+            border-radius: .7rem;
+            display: flex;
+            flex-wrap: wrap;
+            margin: 1rem 0 0;
+            padding: 1rem;
+        }
+    }
+
+    .need-number {
+        background: $monsoon;
+        border-radius: .7rem;
+        color: $white;
+        flex: 1 0 8ex;
+        height: fit-content;
+        text-align: center;
+    }
+
+    .need-name {
+        flex: 1 0 calc(70% - 10ex);
+        font-weight: bold;
+        margin-left: 2ex;
+    }
+
+    .need-description {
+        flex: 1 0;
+        margin-left: 10ex;
+
+        p,
+        p * {
+            font-style: normal;
+            margin-bottom: 0 !important;
+        }
+
+        p:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    a {
+        margin-left: 1rem;
+        margin-right: 0;
+
+    }
+
+    .need-actions {
+        flex: 1 0 30%;
+        margin-bottom: .5rem;
+        text-align: right;
+    }
+
+    @media #{$small-only} {
+        .need-name {
+            flex: 1 0 calc(100% - 10ex);
+        }
+
+        .need-actions {
+            flex: 1 0 100%;
+            margin-top: .5rem;
+            text-align: left;
+
+            a::before {
+                content: '';
+            }
+        }
+
+        .need-description {
+            margin-left: 0;
+            margin-top: .5rem;
+        }
+    }
+}
+
+
 
 /*
     Group invites
@@ -2673,22 +2784,6 @@ $booking-left-margin: 2rem;
         }
     }
 
-    .occasion {
-        margin-bottom: 0;
-        margin-top: .75rem;
-
-        .state {
-            > div {
-                display: inline-block;
-                margin-bottom: 1rem;
-                position: static;
-            }
-        }
-
-        .state + .factoids + .factoids.right-align {
-            top: 2.35rem;
-        }
-    }
 }
 
 .with-icon {
@@ -2707,43 +2802,26 @@ $booking-left-margin: 2rem;
     margin-bottom: 1.5rem;
 }
 
-.inline-top-bar {
-    border-bottom: 2px solid $primary-color;
-    margin-bottom: 1rem;
-    padding-left: .5rem;
-    position: relative;
+.children-group {
+    margin-top: 2rem;
 
-    .button {
-        border-radius: 5px;
-        margin-top: .25rem;
-        padding-bottom: .5rem !important;
-        padding-top: .5rem !important;
-        width: 100%;
+    .more-list {
+        margin-bottom: 1rem;
 
-        i.fa-plus-circle {
-            color: $primary-color;
+        li {
+            border-top: 1px solid $white-smoke;
+            display: flex;
+            justify-content: space-between;
+            padding: .5rem;
+
+            a {
+                white-space: nowrap;
+            }
+
+            &.add-own-child {
+                text-align: center;
+            }
         }
-
-        i.fa-envelope {
-            color: $success-color;
-        }
-    }
-
-    @media #{$large-only} {
-        .button {
-            min-width: 15rem;
-            position: absolute !important;
-            right: .25rem;
-            width: auto;
-        }
-
-        h2 {
-            display: inline-block;
-        }
-    }
-
-    li + li {
-        border-top: 1px dashed $gray;
     }
 }
 
@@ -2767,10 +2845,10 @@ $booking-left-margin: 2rem;
 
         li {
             font-size: .875rem;
-        }
 
-        li + li {
-            margin-top: .5rem;
+            + li {
+                margin-top: .5rem;
+            }
         }
     }
 
@@ -2823,124 +2901,6 @@ $booking-left-margin: 2rem;
 }
 
 /*
-    Occasion Needs
-*/
-.occasion-needs {
-    $gray: $silver;
-    $grayer: $gainsboro;
-    $grayest: $steel;
-
-    margin: 1.25rem 0 1.75rem;
-    position: relative;
-
-    .need-info span {
-        font-style: italic;
-    }
-
-    .need-info .fa {
-        margin-left: .1rem;
-        margin-right: .4rem;
-    }
-
-    .need-add {
-        color: $grayest;
-        display: block;
-        font-size: .8rem;
-        font-style: normal;
-        font-weight: bold;
-        margin-top: .75rem;
-        padding-bottom: .75rem;
-        padding-right: 1.25rem;
-        position: absolute;
-        right: 0;
-        text-align: right;
-        top: -.75rem;
-    }
-
-    h5 {
-        border-bottom: 1px solid $gray;
-        padding-bottom: .5rem;
-    }
-
-    > ul {
-        font-size: .8rem;
-        margin: 0;
-        padding: 0 1.25rem 0 .75rem;
-
-        li {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 1rem 0 0;
-
-            &:hover {
-                background: $gray;
-                outline: .5rem solid $gray;
-            }
-        }
-    }
-
-    .need-number {
-        background: $gray;
-        border: 1px solid $grayer;
-        border-radius: 2px;
-        flex: 1 0 8ex;
-        text-align: center;
-    }
-
-    .need-name {
-        flex: 1 0 calc(70% - 10ex);
-        font-weight: bold;
-        margin-left: 2ex;
-    }
-
-    .need-description {
-        flex: 1 0 100%;
-        margin-left: 10ex;
-
-        p,
-        p * {
-            font-size: .8rem !important;
-            font-style: normal;
-            margin-bottom: 0 !important;
-        }
-    }
-
-    .need-actions {
-        flex: 1 0 30%;
-        text-align: right;
-
-        a {
-            font-size: .8rem;
-        }
-    }
-
-    .need-description p:last-child {
-        margin-bottom: 0;
-    }
-
-    @media #{$small-only} {
-        .need-name {
-            flex: 1 0 calc(100% - 10ex);
-        }
-
-        .need-actions {
-            flex: 1 0 100%;
-            margin-top: .5rem;
-            text-align: left;
-
-            a::before {
-                content: '';
-            }
-        }
-
-        .need-description {
-            margin-left: 0;
-            margin-top: .5rem;
-        }
-    }
-}
-
-/*
     Hide advanced occasion toggles from non-admins, show warning for admins
 */
 .occasion-form-layout {
@@ -2948,7 +2908,7 @@ $booking-left-margin: 2rem;
         display: none;
 
         .label-text::after {
-            @include icon('\f071');
+            @include icon-bold('\f071');
             margin-left: 1ex;
         }
     }
@@ -2976,10 +2936,6 @@ $booking-left-margin: 2rem;
         display: block;
         font-size: .875rem;
         margin-bottom: 1rem;
-
-        &::before {
-            @include icon('\f176');
-        }
     }
 }
 
@@ -2987,26 +2943,22 @@ $booking-left-margin: 2rem;
 /*
     Donation button
 */
-.donation-button {
-    @include button($bg: $green-pastel, $padding: .4rem);
+.donate {
+    text-align: right;
+}
 
-    border: 1px solid $green-light;
-    border-radius: 4px;
-    color: $green-dark;
+.donation-button {
     font-size: 1rem;
     font-weight: bold;
 
-    &:hover {
-        color: $green-dark;
-    }
-
     span::after {
-        @include icon('\f08a');
+        @include icon('\f004');
         margin-left: .75ex;
     }
 
     &:hover span::after {
         content: '\f004';
+        font-weight: bold;
     }
 }
 
@@ -3042,6 +2994,7 @@ $booking-left-margin: 2rem;
     background: $gray-pastel;
     border: 1px solid  $gray;
     border-radius: 3px;
+    margin-top: 1rem;
     padding: 0 .75rem .75rem;
 
     &:first-of-type {
@@ -3051,62 +3004,39 @@ $booking-left-margin: 2rem;
     h3 {
         font-size: .875rem;
         font-weight: bold;
-        margin-bottom: .75rem;
+        margin-bottom: 0;
         margin-top: .75rem;
-    }
-
-    h3 + .needs {
-        margin-top: -5px;
     }
 
     li {
         font-size: .875rem;
+        line-height: 1.2;
         margin-left: -3px;
         padding: 3px;
     }
 
-    & + .call-for-volunteers {
-        margin-top: 1rem;
-    }
 
     .dates::before {
         line-height: 1.25;
     }
 
-    .needs li {
-        display: flex;
-        justify-content: space-between;
+    .needs {
+        li:last-child .button {
+            margin-bottom: 0;
 
-        a {
-            align-self: flex-end;
-            flex-shrink: 0;
+            div {
+                margin-left: 3.25ex;
+            }
         }
-    }
 
-    .needs li:hover {
-        background: darken($gray-light, 1%);
-        border-radius: 3px;
-    }
-
-    .needs .button {
-        background: $success-color;
-        border: 1px solid darken($success-color, 5%);
-        border-radius: 3px;
-        float: right;
-        font-size: .875rem;
-        height: 22px;
-        line-height: 1.25;
-        margin: 0;
-        padding: 2px 5px;
-
-        &:hover,
-        &:active {
-            background: darken($success-color, 5%);
+        .button {
+            background: $success-color;
+            display: block;
+            font-size: .875rem;
+            margin-bottom: .5rem;
+            margin-top: .5rem;
+            width: fit-content;
         }
-    }
-
-    .needs div {
-        margin-left: 3.25ex;
     }
 
     .alert {
@@ -3143,7 +3073,17 @@ $booking-left-margin: 2rem;
     }
 
     .button {
-        margin-top: .5rem;
+        border-radius: .7rem !important;
+        margin: 0 !important;
+
+        &:hover {
+            margin: 0 !important;
+            padding: 1rem 1.5rem !important;
+        }
+
+        &.hover .fa-chevron-down {
+            transform: rotate(180deg);
+        }
     }
 }
 
@@ -3157,7 +3097,6 @@ $booking-left-margin: 2rem;
 */
 .volunteer-actions {
     .state-transitions {
-        background: $gray-light;
         border-top: 1px solid $gray;
 
         &:nth-last-child(1),
@@ -3168,7 +3107,7 @@ $booking-left-margin: 2rem;
 
     .show-details {
         a::before {
-            @include icon('\f05a');
+            @include icon-bold('\f05a');
             margin-right: 1.25ex;
         }
     }
@@ -3176,72 +3115,58 @@ $booking-left-margin: 2rem;
 
 .volunteers-list {
 
-    h2 {
-        font-size: $h3-font-size;
-        margin-bottom: 1rem;
-    }
-
-    h3 {
-        color: $tuatara;
-        font-size: 1.1rem;
-        margin-bottom: .5rem;
-        margin-top: 1.5rem;
-    }
-
-    h2 + h3 {
-        margin-top: 0;
-    }
-
     .right-aligned {
         float: right;
         font-weight: normal;
     }
 
     table {
-        margin-top: -1rem;
+        background: $snow;
+        border-radius: 0;
+        margin-top: -.5rem;
         width: 100%;
 
-        th:last-child {
-            width: 22.5%;
+        + h2 {
+            margin-top: 1.5rem;
         }
-    }
 
-    table + h2 {
-        margin-top: 1.5rem;
-    }
+        th:last-child {
+            width: 10%;
+        }
 
-    .progress + h2 {
-        margin-top: .5rem;
+        tbody tr:nth-last-child(2) {
+            td:first-child {
+                border-bottom-left-radius: .7rem;
+            }
+
+            td:last-child {
+                border-bottom-right-radius: .7rem;
+            }
+        }
     }
 
     .progress {
+        margin-bottom: .5rem;
         width: 100%;
 
-        & + .progress {
+        &:has(+ table) .meter {
+            border-radius: .7rem .7rem 0 0;
+        }
+
+        + .progress {
             margin-top: -1rem;
         }
-    }
-
-    .success + table {
-        border-top: 1px solid $green-light;
-    }
-
-    .alert + table {
-        border-top: 1px solid $gray-dark;
     }
 
     .state-cell {
         font-weight: bold;
     }
 
-    .volunteer-details {
-        * {
-            font-size: .875rem;
-        }
-    }
 
     .volunteer-confirmed {
-        background: lighten($green-pastel, 6%);
+        td {
+            background: lighten($green-pastel, 6%);
+        }
 
         .state-cell {
             color: $green-dark;
@@ -3270,4 +3195,62 @@ $booking-left-margin: 2rem;
 */
 .visually-hidden {
     @include element-invisible;
+}
+
+/* Occasion List */
+.occasion-list {
+    .occasion {
+        margin-bottom: 2rem;
+    }
+
+    div > * {
+        display: block;
+        max-width: $max-line-width;
+    }
+
+    h2.title {
+        border-top: 1px solid $smoke;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        padding-top: .5rem;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    .occasion-title {
+        margin-top: 1rem;
+    }
+}
+
+
+// Images
+
+.has-img {
+    img {
+        border-radius: .7rem;
+    }
+
+    img:has(+ .alt-text) {
+        border-radius: .7rem .7rem 0 0;
+    }
+
+    .alt-text {
+        border-radius: 0 0 .7rem .7rem;
+    }
+}
+
+.disabled {
+    cursor: not-allowed !important;
+    opacity: .5;
+}
+
+
+.vacation-activity-layout .content-panel {
+    display: none !important;
+}
+
+.subscribe-panel {
+    display: none;
 }

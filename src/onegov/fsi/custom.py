@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
+from onegov.core.utils import Bunch
+from onegov.form.collection import SurveyCollection
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.audit import AuditCollection
@@ -13,7 +17,14 @@ from onegov.org.models import GeneralFileCollection, ImageFileCollection
 from onegov.user import Auth, UserCollection
 
 
-def get_base_tools(request):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.fsi.request import FsiRequest
+    from onegov.town6.layout import NavigationEntry
+
+
+def get_base_tools(request: FsiRequest) -> Iterator[Link | LinkGroup]:
 
     if request.is_logged_in:
 
@@ -22,14 +33,14 @@ def get_base_tools(request):
 
         profile_links = [
             Link(
-                _("Profile"), request.link(usr),
+                _('Profile'), request.link(usr),
                 attrs={'class': 'profile'}
             )
         ] if usr else []
         if request.is_admin:
             profile_links.append(
                 Link(
-                    _("User Profile"),
+                    _('User Profile'),
                     request.link(request.app.org, name='userprofile'),
                     attrs={'class': 'profile'}
                 )
@@ -37,13 +48,14 @@ def get_base_tools(request):
 
         profile_links.append(
             Link(
-                _("Logout"), request.link(
+                _('Logout'), request.link(
                     Auth.from_request(
                         request, to=logout_path(request)), name='logout'
                 ), attrs={'class': 'logout'}
             ),
         )
 
+        assert request.current_username is not None
         yield LinkGroup(
             request.current_username, classes=('user',), links=profile_links)
 
@@ -68,24 +80,33 @@ def get_base_tools(request):
                 )
             )
 
+            links.append(
+                Link(
+                    _('Surveys'),
+                    request.class_link(
+                        SurveyCollection),
+                    attrs={'class': 'surveys'}
+                )
+            )
+
         if request.is_admin:
             links.append(
                 Link(
-                    _("Files"), request.class_link(GeneralFileCollection),
+                    _('Files'), request.class_link(GeneralFileCollection),
                     attrs={'class': 'files'}
                 )
             )
 
             links.append(
                 Link(
-                    _("Images"), request.class_link(ImageFileCollection),
+                    _('Images'), request.class_link(ImageFileCollection),
                     attrs={'class': 'images'}
                 )
             )
 
             links.append(
                 Link(
-                    _("Settings"), request.link(
+                    _('Settings'), request.link(
                         request.app.org, 'settings'
                     ), attrs={'class': 'settings'}
                 )
@@ -93,12 +114,12 @@ def get_base_tools(request):
 
             links.append(
                 Link(
-                    _("Users"), request.class_link(UserCollection),
+                    _('Users'), request.class_link(UserCollection),
                     attrs={'class': 'users'}
                 )
             )
         if request.is_manager:
-            yield LinkGroup(_("Management"), classes=('management',),
+            yield LinkGroup(_('Management'), classes=('management',),
                             links=links)
 
         if reservation_count:
@@ -107,8 +128,8 @@ def get_base_tools(request):
             css = 'no-tickets'
 
         yield Link(
-            reservation_count == 1 and _("Event Subscription")
-            or _("Event Subscriptions"),
+            reservation_count == 1 and _('Event Subscription')
+            or _('Event Subscriptions'),
             request.link(
                 SubscriptionsCollection(
                     request.session,
@@ -123,24 +144,24 @@ def get_base_tools(request):
         )
     else:
         yield Link(
-            _("Login"), request.link(
+            _('Login'), request.link(
                 Auth.from_request_path(request), name='login'
             ), attrs={'class': 'login'}
         )
 
         if request.app.enable_user_registration:
             yield Link(
-                _("Register"), request.link(
+                _('Register'), request.link(
                     Auth.from_request_path(request), name='register'
                 ), attrs={'class': 'register'})
 
 
-def get_global_tools(request):
+def get_global_tools(request: FsiRequest) -> Iterator[Link | LinkGroup]:
     yield from get_base_tools(request)
 
 
 @FsiApp.template_variables()
-def get_template_variables(request):
+def get_template_variables(request: FsiRequest) -> dict[str, Any]:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
@@ -148,22 +169,33 @@ def get_template_variables(request):
     }
 
 
-def get_top_navigation(request):
+def get_top_navigation(request: FsiRequest) -> Iterator[NavigationEntry]:
 
-    # inject an activites link in front of all top navigation links
-    yield Link(
-        text=_("Courses"),
-        url=request.class_link(CourseCollection)
+    yield (  # type:ignore[misc]
+        Bunch(id=-3, access='public', published=True),
+        Link(
+            text=_('Courses'),
+            url=request.class_link(CourseCollection)
+        ),
+        ()
     )
     if request.is_manager:
-        yield Link(
-            text=_("Audit"),
-            url=request.class_link(AuditCollection)
+        yield (  # type:ignore[misc]
+            Bunch(id=-2, access='public', published=True),
+            Link(
+                text=_('Audit'),
+                url=request.class_link(AuditCollection)
+            ),
+            ()
         )
-        yield Link(
-            text=_("Attendee Check"),
-            url=request.class_link(PastCourseEventCollection)
+        yield (  # type:ignore[misc]
+            Bunch(id=-1, access='public', published=True),
+            Link(
+                text=_('Attendee Check'),
+                url=request.class_link(PastCourseEventCollection)
+            ),
+            ()
         )
 
     layout = DefaultLayout(request.app.org, request)
-    yield from layout.top_navigation
+    yield from layout.top_navigation or ()

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.directory.models.directory_entry import DirectoryEntry
 from onegov.form import as_internal_id
 from onegov.form import flatten_fieldsets
@@ -5,6 +7,14 @@ from onegov.form import parse_form
 from onegov.form import parse_formcode
 from sqlalchemy.orm import object_session, joinedload, undefer
 from sqlalchemy.orm.attributes import get_history
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+    from datetime import date, datetime, time
+    from onegov.directory.models import Directory
+    from onegov.directory.types import DirectoryConfiguration
 
 
 class DirectoryMigration:
@@ -15,8 +25,13 @@ class DirectoryMigration:
 
     """
 
-    def __init__(self, directory, new_structure=None, new_configuration=None,
-                 old_structure=None):
+    def __init__(
+        self,
+        directory: Directory,
+        new_structure: str | None = None,
+        new_configuration: DirectoryConfiguration | None = None,
+        old_structure: str | None = None
+    ):
 
         self.directory = directory
         self.old_structure = old_structure or self.old_directory_structure
@@ -33,7 +48,7 @@ class DirectoryMigration:
         )
 
     @property
-    def old_directory_structure(self):
+    def old_directory_structure(self) -> str:
         history = get_history(self.directory, 'structure')
 
         if history.deleted:
@@ -42,7 +57,7 @@ class DirectoryMigration:
             return self.directory.structure
 
     @property
-    def possible(self):
+    def possible(self) -> bool:
         if not self.directory.entries:
             return True
 
@@ -71,7 +86,7 @@ class DirectoryMigration:
         return False
 
     @property
-    def entries(self):
+    def entries(self) -> Iterable[DirectoryEntry]:
         session = object_session(self.directory)
 
         if not session:
@@ -84,7 +99,7 @@ class DirectoryMigration:
 
         return e
 
-    def execute(self):
+    def execute(self) -> None:
         """ To run the migration, run this method. The other methods below
         should only be used if you know what you are doing.
 
@@ -99,11 +114,11 @@ class DirectoryMigration:
         for entry in self.entries:
             self.migrate_entry(entry)
 
-    def migrate_directory(self):
+    def migrate_directory(self) -> None:
         self.directory.structure = self.new_structure
         self.directory.configuration = self.new_configuration
 
-    def migrate_entry(self, entry):
+    def migrate_entry(self, entry: DirectoryEntry) -> None:
         """
         This function is called after an update to the directory structure.
         During execution of self.execute(), the directory is migrated.
@@ -122,34 +137,35 @@ class DirectoryMigration:
         self.migrate_values(entry.values)
         self.directory.update(entry, entry.values, force_update=update)
 
-    def migrate_values(self, values):
+    def migrate_values(self, values: dict[str, Any]) -> None:
         self.add_new_fields(values)
         self.remove_old_fields(values)
         self.rename_fields(values)
         self.convert_fields(values)
 
-    def add_new_fields(self, values):
+    def add_new_fields(self, values: dict[str, Any]) -> None:
         for added in self.changes.added_fields:
             added = as_internal_id(added)
             values[added] = None
 
-    def remove_old_fields(self, values):
+    def remove_old_fields(self, values: dict[str, Any]) -> None:
         for removed in self.changes.removed_fields:
             removed = as_internal_id(removed)
             del values[removed]
 
-    def rename_fields(self, values):
+    def rename_fields(self, values: dict[str, Any]) -> None:
         for old, new in self.changes.renamed_fields.items():
             old, new = as_internal_id(old), as_internal_id(new)
             values[new] = values[old]
             del values[old]
 
-    def convert_fields(self, values):
+    def convert_fields(self, values: dict[str, Any]) -> None:
         for changed in self.changes.changed_fields:
             convert = self.fieldtype_migrations.get_converter(
                 self.changes.old[changed].type,
                 self.changes.new[changed].type
             )
+            assert convert is not None
 
             changed = as_internal_id(changed)
             values[changed] = convert(values[changed])
@@ -158,54 +174,58 @@ class DirectoryMigration:
 class FieldTypeMigrations:
     """ Contains methods to migrate fields from one type to another. """
 
-    def possible(self, old_type, new_type):
+    def possible(self, old_type: str, new_type: str) -> bool:
         return self.get_converter(old_type, new_type) is not None
 
-    def get_converter(self, old_type, new_type):
+    def get_converter(
+        self,
+        old_type: str,
+        new_type: str
+    ) -> Callable[[Any], Any] | None:
 
         if old_type == 'password':
-            return  # disabled to avoid accidental leaks
+            return None  # disabled to avoid accidental leaks
 
         if old_type == new_type:
             return lambda v: v
 
-        explicit = '{}_to_{}'.format(old_type, new_type)
-        generic = 'any_to_{}'.format(new_type)
+        explicit = f'{old_type}_to_{new_type}'
+        generic = f'any_to_{new_type}'
 
-        if hasattr(self, explicit):
-            return getattr(self, explicit)
+        return getattr(self, explicit, getattr(self, generic, None))
 
-        if hasattr(self, generic):
-            return getattr(self, generic)
-
-    def any_to_text(self, value):
+    # FIXME: A lot of these converters currently don't work if the value
+    #        happens to be None, which should be possible for every field
+    #        as long as its optional, or do we skip converting None
+    #        explicitly somewhere?!
+    def any_to_text(self, value: Any) -> str:
         return str(value if value is not None else '').strip()
 
-    def any_to_textarea(self, value):
+    def any_to_textarea(self, value: Any) -> str:
         return self.any_to_text(value)
 
-    def textarea_to_text(self, value):
+    def textarea_to_text(self, value: str) -> str:
         return value.replace('\n', ' ').strip()
 
-    def textarea_to_code(self, value):
+    def textarea_to_code(self, value: str) -> str:
         return value
 
-    def text_to_code(self, value):
+    def text_to_code(self, value: str) -> str:
         return value
 
-    def date_to_text(self, value):
+    def date_to_text(self, value: date) -> str:
         return '{:%d.%m.%Y}'.format(value)
 
-    def datetime_to_text(self, value):
+    def datetime_to_text(self, value: datetime) -> str:
         return '{:%d.%m.%Y %H:%M}'.format(value)
 
-    def time_to_text(self, value):
+    def time_to_text(self, value: time) -> str:
         return '{:%H:%M}'.format(value)
 
-    def radio_to_checkbox(self, value):
+    def radio_to_checkbox(self, value: str) -> list[str]:
         return [value]
 
-    def text_to_url(self, value):
+    def text_to_url(self, value: str) -> str:
         return value
 
 
@@ -217,7 +237,7 @@ class StructuralChanges:
 
     """
 
-    def __init__(self, old_structure, new_structure):
+    def __init__(self, old_structure: str, new_structure: str) -> None:
         old_fieldsets = parse_formcode(old_structure)
         new_fieldsets = parse_formcode(new_structure)
         self.old = {
@@ -236,7 +256,7 @@ class StructuralChanges:
         self.detect_renamed_fields()  # modifies added/removed fields
         self.detect_changed_fields()
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return bool(
             self.added_fields
             or self.removed_fields
@@ -244,33 +264,33 @@ class StructuralChanges:
             or self.changed_fields
         )
 
-    def detect_removed_fieldsets(self):
+    def detect_removed_fieldsets(self) -> None:
         new_ids = tuple(f.human_id for f in self.new_fieldsets if f.human_id)
         self.removed_fieldsets = [
             f.human_id for f in self.old_fieldsets
             if f.human_id and f.human_id not in new_ids
         ]
 
-    def detect_added_fieldsets(self):
+    def detect_added_fieldsets(self) -> None:
         old_ids = tuple(f.human_id for f in self.old_fieldsets if f.human_id)
         self.added_fieldsets = [
             f.human_id for f in self.new_fieldsets
             if f.human_id and f.human_id not in old_ids
         ]
 
-    def detect_added_fields(self):
+    def detect_added_fields(self) -> None:
         self.added_fields = [
             f.human_id for f in self.new.values()
             if f.human_id not in {f.human_id for f in self.old.values()}
         ]
 
-    def detect_removed_fields(self):
+    def detect_removed_fields(self) -> None:
         self.removed_fields = [
             f.human_id for f in self.old.values()
             if f.human_id not in {f.human_id for f in self.new.values()}
         ]
 
-    def do_rename(self, removed, added):
+    def do_rename(self, removed: str, added: str) -> bool:
         if removed in self.renamed_fields:
             return False
         if added in set(self.renamed_fields.values()):
@@ -279,8 +299,8 @@ class StructuralChanges:
         if not same_type:
             return False
 
-        added_fs = "/".join(added.split('/')[:-1])
-        removed_fs = "/".join(removed.split('/')[:-1])
+        added_fs = '/'.join(added.split('/')[:-1])
+        removed_fs = '/'.join(removed.split('/')[:-1])
 
         # has no fieldset
         if not added_fs and not removed_fs:
@@ -324,7 +344,7 @@ class StructuralChanges:
         #     return True
         return True
 
-    def detect_renamed_fields(self):
+    def detect_renamed_fields(self) -> None:
         # renames are detected aggressively - we rather have an incorrect
         # rename than an add/remove combo. Renames lead to no data loss, while
         # a add/remove combo does.
@@ -344,19 +364,17 @@ class StructuralChanges:
             if f not in self.renamed_fields
         ]
 
-    def detect_changed_fields(self):
+    def detect_changed_fields(self) -> None:
         self.changed_fields = []
 
-        for old in self.old:
-            if old in self.renamed_fields:
-                new = self.renamed_fields[old]
-            elif old in self.new:
-                new = old
+        for old_id, old in self.old.items():
+            if old_id in self.renamed_fields:
+                new_id = self.renamed_fields[old_id]
+            elif old_id in self.new:
+                new_id = old_id
             else:
                 continue
 
-            if self.old[old].required != self.new[new].required:
-                self.changed_fields.append(new)
-
-            elif self.old[old].type != self.new[new].type:
-                self.changed_fields.append(new)
+            new = self.new[new_id]
+            if old.required != new.required or old.type != new.type:
+                self.changed_fields.append(new_id)

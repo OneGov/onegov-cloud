@@ -212,7 +212,9 @@ h2 small {
         }
     }
 
-    dl.recommendation:not(:last-child) {
+    dl.recommendation:not(:last-child),
+    dl.campaign-links:not(:last-child),
+    div.campaign-finances:not(:last-child) {
         margin-bottom: 1em;
     }
 
@@ -235,8 +237,7 @@ h2 small {
 
     ul.attachments {
         list-style: none;
-        margin-left: 0;
-        margin-top: 2em;
+        margin: 1em 0 2em;
     }
 }
 

@@ -7,7 +7,7 @@
             <div class="columns medium-9">
                 <table class="usermanagement">
                     <tal:b repeat="role roles">
-                        <tbody tal:condition="users.get(role)" tal:define="enable_yubikey request.app.enable_yubikey">
+                        <tbody tal:condition="users.get(role)" tal:define="enable_yubikey request.app.enable_yubikey; enable_mtan request.app.mtan_second_factor_enabled">
                             <tr class="subheader">
                                 <td>
                                     <tal:b metal:use-macro="layout.macros['role-plural']" />
@@ -16,6 +16,9 @@
                                 <td></td>
                                 <td tal:condition="enable_yubikey" i18n:translate>
                                     Yubikey
+                                </td>
+                                <td tal:condition="enable_mtan" i18n:translate>
+                                    mTAN
                                 </td>
                                 <td></td>
                             </tr>
@@ -41,6 +44,16 @@
                                         </span>
                                     </td>
                                     <td tal:condition="not:serial" i18n:translate></td>
+                                </tal:b>
+
+                                <tal:b define="phone_number user.mtan_phone_number" condition="enable_mtan">
+                                    <td tal:condition="phone_number">
+                                        <span class="yubikey">
+                                            <i class="fa fa-mobile" aria-hidden="true"></i>
+                                            ${phone_number}
+                                        </span>
+                                    </td>
+                                    <td tal:condition="not:phone_number" i18n:translate></td>
                                 </tal:b>
 
                                 <td class="text-links">

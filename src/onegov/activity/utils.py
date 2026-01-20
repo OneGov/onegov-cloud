@@ -1,12 +1,36 @@
-import lxml
+from __future__ import annotations
+
+import lxml.etree
+import lxml.html
 import random
 import re
 import sedate
 import string
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from functools import partial
-from pyquery import PyQuery as pq
+
+
+from typing import Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import SupportsGetItem, SupportsRichComparison
+    from collections.abc import Iterable
+    from typing import TypeAlias, TypeVar, TypeGuard
+
+    SupportsRichComparisonT = TypeVar(
+        'SupportsRichComparisonT',
+        bound=SupportsRichComparison
+    )
+    SupportsRichComparisonT_co = TypeVar(
+        'SupportsRichComparisonT_co',
+        bound=SupportsRichComparison,
+        covariant=True
+    )
+    RangeLike: TypeAlias = SupportsGetItem[int, SupportsRichComparisonT_co]
+    RangeTuple: TypeAlias = tuple[
+        SupportsRichComparisonT_co,
+        SupportsRichComparisonT_co
+    ]
 
 INTERNAL_IMAGE_EX = re.compile(r'.*/storage/[0-9a-z]{64}')
 
@@ -23,52 +47,61 @@ MUNICIPALITY_EX = re.compile(r"""
 GROUP_CODE_EX = re.compile(r'[A-Z]{3}-?[A-Z]{3}-?[A-Z]{3}')
 
 
-def random_group_code():
+def random_group_code() -> str:
     # 26^9 should be a decent amount of codes to randomly chose, without
     # having to check their uniqueness
-    raw = ''.join(random.choice(string.ascii_uppercase) for x in range(9))
+    raw = ''.join(
+        random.choice(string.ascii_uppercase) for x in range(9)  # nosec B311
+    )
 
     return '-'.join((raw[:3], raw[3:6], raw[-3:]))
 
 
-def is_valid_group_code(code):
-    return GROUP_CODE_EX.match(code) and True or False
+def is_valid_group_code(code: str) -> bool:
+    return True if GROUP_CODE_EX.match(code) else False
 
 
-def overlaps(range_a, range_b):
-    return range_b[0] <= range_a[0] and range_a[0] <= range_b[1] or\
-        range_a[0] <= range_b[0] and range_b[0] <= range_a[1]
+def overlaps(
+    range_a: RangeLike[SupportsRichComparisonT],
+    range_b: RangeLike[SupportsRichComparisonT]
+) -> bool:
+    return (range_b[0] <= range_a[0] <= range_b[1]) or (  # type:ignore
+        range_a[0] <= range_b[0] <= range_a[1])  # type:ignore[operator]
 
 
-def merge_ranges(ranges):
+def merge_ranges(
+    ranges: Iterable[RangeTuple[SupportsRichComparisonT]]
+) -> list[RangeTuple[SupportsRichComparisonT]]:
     """ Merges the given list of ranges into a list of ranges including only
     exclusive ranges. The ranges are turned into tuples to make them
     hashable.
 
     """
 
-    ranges = sorted(list(ranges))
+    ranges = sorted(ranges)
 
     # stack of merged values
-    merged = [tuple(ranges[0])]
+    merged = [(ranges[0][0], ranges[0][1])]
 
     for r in ranges:
         if overlaps(merged[-1], r):
             merged[-1] = (merged[-1][0], r[1])
         else:
-            merged.append(tuple(r))
+            merged.append((r[0], r[1]))
 
     return merged
 
 
-def num_range_decode(s):
+def num_range_decode(s: object) -> tuple[int, int] | None:
     if not isinstance(s, str):
         return None
 
     if not NUM_RANGE_RE.match(s):
         return None
 
+    # FIXME: Why not just use capturing groups in the regex?
     age_range = tuple(int(a) for a in s.split('-'))
+    assert len(age_range) == 2
 
     if age_range[0] <= age_range[1]:
         return age_range
@@ -76,11 +109,11 @@ def num_range_decode(s):
         return None
 
 
-def num_range_encode(a):
-    return '-'.join(str(n) for n in a)
+def num_range_encode(a: RangeLike[int]) -> str:
+    return f'{a[0]}-{a[1]}'
 
 
-def date_range_decode(s):
+def date_range_decode(s: object) -> tuple[date, date] | None:
     if not isinstance(s, str):
         return None
 
@@ -89,17 +122,14 @@ def date_range_decode(s):
 
     s, e = s.split(':')
 
-    return (
-        date(*tuple(int(p) for p in s.split('-'))),
-        date(*tuple(int(p) for p in e.split('-')))
-    )
+    return date.fromisoformat(s), date.fromisoformat(e)
 
 
-def date_range_encode(d):
+def date_range_encode(d: RangeLike[date]) -> str:
     return ':'.join((d[0].strftime('%Y-%m-%d'), d[1].strftime('%Y-%m-%d')))
 
 
-def generate_xml(payments):
+def generate_xml(payments: Iterable[dict[str, Any]]) -> str:
     """ Creates an xml for import through ISO20022. Used for testing only. """
 
     transactions = []
@@ -163,7 +193,13 @@ def generate_xml(payments):
     """.format('\n'.join(transactions))
 
 
-def dates_overlap(a, b, minutes_between=0, cut_end=True, alignment=None):
+def dates_overlap(
+    a: Iterable[RangeTuple[datetime]],
+    b: Iterable[RangeTuple[datetime]],
+    minutes_between: float = 0,
+    cut_end: bool = True,
+    alignment: Literal['day', 'week', 'month'] | None = None
+) -> bool:
     """ Returns true if any time tuple in the list of tuples in a overlaps
     with a time tuple in b.
 
@@ -176,6 +212,7 @@ def dates_overlap(a, b, minutes_between=0, cut_end=True, alignment=None):
     ms = cut_end and timedelta(microseconds=1) or timedelta()
 
     # make sure that 11:00 - 12:00 and 12:00 - 13:00 are not overlapping
+    # FIXME: What is the point of the above ms assignment?!
     ms = timedelta(microseconds=1)
 
     if alignment:
@@ -203,14 +240,15 @@ def dates_overlap(a, b, minutes_between=0, cut_end=True, alignment=None):
     return False
 
 
-def is_internal_image(url):
+def is_internal_image(url: str | None) -> TypeGuard[str]:
     return url and INTERNAL_IMAGE_EX.match(url) and True or False
 
 
-def extract_thumbnail(text):
+def extract_thumbnail(text: str | None) -> str | None:
 
     try:
-        first_image = next((img for img in pq(text or '')('img')), None)
+        root = lxml.html.fromstring(text or '')
+        first_image = root.find('.//img')
     except (lxml.etree.XMLSyntaxError, lxml.etree.ParserError):
         first_image = None
 
@@ -225,10 +263,14 @@ def extract_thumbnail(text):
     return url
 
 
-def extract_municipality(text):
+def extract_municipality(text: str | None) -> tuple[int, str] | None:
+    if text is None:
+        return None
+
     for line in text.splitlines():
         for fragment in line.split(','):
             match = MUNICIPALITY_EX.match(fragment.strip())
 
             if match:
                 return int(match.group('zipcode')), match.group('municipality')
+    return None

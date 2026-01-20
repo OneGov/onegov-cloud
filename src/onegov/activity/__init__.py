@@ -1,18 +1,20 @@
+from __future__ import annotations
+
 import logging
-log = logging.getLogger('onegov.activity')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.activity')
+log.addHandler(logging.NullHandler())
 
 from onegov.activity.models import (
     Activity,
     Attendee,
     Booking,
-    Invoice,
-    InvoiceItem,
-    InvoiceReference,
+    BookingPeriodInvoice,
+    ActivityInvoiceItem,
     Occasion,
     OccasionDate,
     OccasionNeed,
-    Period,
+    BookingPeriod,
+    BookingPeriodMeta,
     PublicationRequest,
     Volunteer
 )
@@ -21,34 +23,34 @@ from onegov.activity.collections import (
     ActivityFilter,
     AttendeeCollection,
     BookingCollection,
-    InvoiceCollection,
+    BookingPeriodCollection,
+    BookingPeriodInvoiceCollection,
     OccasionCollection,
-    PeriodCollection,
     PublicationRequestCollection,
     VolunteerCollection
 )
 
 
-__all__ = [
+__all__ = (
     'Activity',
     'ActivityFilter',
+    'ActivityInvoiceItem',
     'Attendee',
     'Booking',
-    'Invoice',
-    'InvoiceItem',
-    'InvoiceReference',
+    'BookingPeriod',
+    'BookingPeriodCollection',
+    'BookingPeriodInvoice',
+    'BookingPeriodMeta',
     'Occasion',
     'OccasionDate',
     'OccasionNeed',
-    'Period',
     'ActivityCollection',
     'AttendeeCollection',
     'BookingCollection',
-    'InvoiceCollection',
+    'BookingPeriodInvoiceCollection',
     'OccasionCollection',
-    'PeriodCollection',
     'PublicationRequest',
     'PublicationRequestCollection',
     'Volunteer',
     'VolunteerCollection',
-]
+)

@@ -1,7 +1,16 @@
-from furl import furl
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.user import User
+    from onegov.core.request import CoreRequest
 
 
-def password_reset_url(user, request, url):
+def password_reset_url(
+    user: User,
+    request: CoreRequest,
+    url: str
+) -> str | None:
     """ Appends the token needed by PasswordResetForm for a password reset.
 
     :user:
@@ -27,4 +36,7 @@ def password_reset_url(user, request, url):
         'modified': user.modified.isoformat() if user.modified else ''
     })
 
-    return furl(url).add({'token': token}).url
+    # we can skip a lot of complexity, because we know the token is
+    # already url safe, so we don't need to do a quote_plus
+    delimeter = '&' if '?' in url else '?'
+    return f'{url}{delimeter}token={token}'

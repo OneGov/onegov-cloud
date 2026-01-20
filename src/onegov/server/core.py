@@ -1,9 +1,37 @@
+from __future__ import annotations
+
 import logging.config
 
 from onegov.server.collection import ApplicationCollection
-from webob import BaseRequest
 from webob.exc import HTTPNotFound, HTTPForbidden
+from webob.request import BaseRequest
 from urllib.parse import urlparse
+
+
+from typing import cast, Any, Literal, TypedDict, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed.wsgi import StartResponse, WSGIEnvironment
+    from collections.abc import Callable, Iterable, Iterator
+    from logging.config import (
+        _DictConfigArgs,
+        _FormatterConfiguration,
+        _FilterConfiguration,
+        _HandlerConfiguration,
+        _LoggerConfiguration,
+        _RootLoggerConfiguration)
+
+    from .config import Config
+
+    # FIXME: This is pretty gross, all because we allow to omit the version
+    class _OptionalDictConfigArgs(TypedDict, total=False):
+        version: Literal[1]
+        formatters: dict[str, _FormatterConfiguration]
+        filters: dict[str, _FilterConfiguration]
+        handlers: dict[str, _HandlerConfiguration]
+        loggers: dict[str, _LoggerConfiguration]
+        root: _RootLoggerConfiguration
+        incremental: bool
+        disable_existing_loggers: bool
 
 
 local_hostnames = {
@@ -18,7 +46,7 @@ class Request(BaseRequest):
     hostname_keys = ('HTTP_HOST', 'HTTP_X_VHM_HOST')
 
     @property
-    def hostnames(self):
+    def hostnames(self) -> Iterator[str]:
         """ Iterates through the hostnames of the request. """
         for key in self.hostname_keys:
             if key in self.environ:
@@ -64,17 +92,21 @@ class Server:
     """
 
     def __init__(
-            self,
-            config,
-            configure_morepath=True,
-            configure_logging=True,
-            post_mortem=False,
-            environ_overrides=None,
-            exception_hook=None):
+        self,
+        config: Config,
+        configure_morepath: bool = True,
+        configure_logging: bool = True,
+        post_mortem: bool = False,
+        environ_overrides: dict[str, Any] | None = None,
+        exception_hook: Callable[[WSGIEnvironment], Any] | None = None
+    ):
 
         self.applications = ApplicationCollection(config.applications)
-        self.wildcard_applications = set(
-            a.root for a in config.applications if not a.is_static)
+        self.wildcard_applications = {
+            a.root
+            for a in config.applications
+            if not a.is_static
+        }
 
         if configure_logging:
             self.configure_logging(config.logging)
@@ -86,7 +118,10 @@ class Server:
         self.environ_overrides = environ_overrides
         self.exception_hook = exception_hook
 
-    def configure_logging(self, config):
+    def configure_logging(
+        self,
+        config: _OptionalDictConfigArgs | _DictConfigArgs
+    ) -> None:
         """ Configures the python logging.
 
         :config:
@@ -94,18 +129,25 @@ class Server:
             `logging.config.dictConfig` method.
 
         """
+        config = cast('_DictConfigArgs', config)
         config.setdefault('version', 1)
         logging.config.dictConfig(config)
 
-    def configure_morepath(self):
+    def configure_morepath(self) -> None:
         """ Configures morepath automatically, if any application uses it. """
 
         # morepath is only loaded if there's at lest one app depending on it
         if next(self.applications.morepath_applications(), None):
             import morepath
+            from onegov.server.utils import patch_morepath
+            patch_morepath()
             morepath.autoscan()
 
-    def handle_request(self, environ, start_response):
+    def handle_request(
+        self,
+        environ: WSGIEnvironment,
+        start_response: StartResponse
+    ) -> Iterable[bytes]:
 
         if self.environ_overrides:
             environ.update(self.environ_overrides)
@@ -159,14 +201,18 @@ class Server:
                 return HTTPNotFound()(environ, start_response)
 
             application.set_application_id(
-                application.namespace + '/' + application_id)
+                f'{application.namespace}/{application_id}')
 
             return application(environ, start_response)
 
         except Exception as e:
             return application.handle_exception(e, environ, start_response)
 
-    def __call__(self, environ, start_response):
+    def __call__(
+        self,
+        environ: WSGIEnvironment,
+        start_response: StartResponse
+    ) -> Iterable[bytes]:
         try:
             return self.handle_request(environ, start_response)
         except Exception:
@@ -174,6 +220,6 @@ class Server:
                 self.exception_hook(environ)
 
             if self.post_mortem:
-                import pdb; pdb.post_mortem()  # noqa
+                import pdb; pdb.post_mortem()  # noqa: E702, T100
 
             raise

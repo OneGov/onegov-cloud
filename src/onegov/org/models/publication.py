@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from datetime import datetime
@@ -6,17 +8,24 @@ from onegov.file import File
 from sqlalchemy import and_, text
 
 
-class PublicationCollection(GenericCollection):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sedate.types import TzInfoOrName
+    from sqlalchemy.orm import Query, Session
+    from typing import Self
 
-    def __init__(self, session, year=None):
+
+class PublicationCollection(GenericCollection[File]):
+
+    def __init__(self, session: Session, year: int | None = None) -> None:
         super().__init__(session)
         self.year = year
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[File]:
         return File
 
-    def query(self):
+    def query(self) -> Query[File]:
         query = super().query().filter(
             self.model_class.published.is_(True),
             self.model_class.publication.is_(True),
@@ -33,15 +42,18 @@ class PublicationCollection(GenericCollection):
 
         return query
 
-    def for_year(self, year):
+    def for_year(self, year: int | None) -> Self:
         return self.__class__(self.session, year)
 
-    def first_year(self, timezone):
-        query = self.for_year(None).query()\
-            .with_entities(File.created)\
+    def first_year(self, timezone: TzInfoOrName) -> int | None:
+        query = (
+            self.for_year(None).query()
+            .with_entities(File.created)
             .order_by(File.created)
+        )
 
         first_record = query.first()
 
         if first_record:
             return sedate.to_timezone(first_record.created, timezone).year
+        return None

@@ -3,7 +3,28 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <p tal:condition="not:people" i18n:translate="">No people added yet.</p>
+
+        <div class="row">
+            <div class="columns small-12 medium-6 large-4">
+                <form method="get" tal:condition="organisations" id="people-filters">
+                    <select name="organisation" i18n:attributes="title" title="Select organisation" data-auto-submit>
+                        <option value="" i18n:translate="">Select organisation</option>
+                        <tal:block tal:repeat="org organisations">
+                            <option tal:attributes="value org; selected python:org == selected_organisation">${org}</option>
+                        </tal:block>
+                    </select>
+                    <select name="sub_organisation" i18n:attributes="title" title="Select sub organisation" data-auto-submit>
+                        <option value="" i18n:translate="">Select sub organisation</option>
+                        <tal:block tal:repeat="sub_org sub_organisations">
+                            <option tal:attributes="value sub_org; selected python:sub_org == selected_sub_organisation">${sub_org}</option>
+                        </tal:block>
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        <p class="panel" tal:condition="not:people" i18n:translate="">No people found for current filter selection.</p>
+        <a class="button hollow" tal:condition="not:people" href="${request.class_link(layout.model.__class__)}" i18n:translate>Reset filter</a>
 
         <div tal:condition="people" class="people-list">
             <div metal:use-macro="layout.macros['atoz']" tal:define="items people">

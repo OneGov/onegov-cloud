@@ -10,12 +10,33 @@
              <p>${callout}</p>
         </div>
         <div class="panel">
+            <p i18n:translate>This will trigger the following notifications:</p>
+            <ul>
+                <li i18n:translate>
+                    Browser: A notice in browsers which have opened any affected pages.
+                </li>
+                <li tal:condition="request.app.principal.email_notification">
+                    <tal:block i18n:translate>Email: One email containing all the results of the selected elections and votes. The subject depends on whether all selected elections and votes are completed:</tal:block>
+                    <q i18n:translate>New results are available</q> / <q i18n:translate>The final results are available</q>.
+                </li>
+                <li tal:condition="request.app.principal.sms_notification">
+                    <tal:block i18n:translate>SMS: One SMS with the generic message</tal:block>
+                    <q i18n:translate>New results are available on <tal:block tal:replace="request.app.principal.sms_notification" i18n:name="url" /></q>
+                </li>
+            </ul>
+        </div>
+        <div class="panel">
             <p i18n:translate>Last notifications:</p>
             <ul tal:condition="last_notifications">
                 <tal:block tal:repeat="model last_notifications">
                     <li>${model.title}
                         <ul tal:condition="last_notifications[model]">
-                            <li tal:repeat="last_notification last_notifications[model]">${layout.format_date(last_notification.last_change, 'datetime_long')}: ${last_notification.type} (${layout.format_date(last_notification.last_modified, 'datetime_long')})</li>
+                            <li tal:repeat="last_notification last_notifications[model]">
+                                ${layout.format_date(last_notification.last_change, 'datetime_long')}: <metal:b use-macro="layout.macros['notification-type-translation']" tal:define="notification_type last_notification.type"/> (${layout.format_date(last_notification.last_modified, 'datetime_long')})
+                            </li>
+                        </ul>
+                        <ul tal:condition="not last_notifications[model]">
+                            <li><i i18n:translate>No notifications yet.</i></li>
                         </ul>
                     </li>
                 </tal:block>

@@ -1,17 +1,27 @@
-from cached_property import cached_property
+from __future__ import annotations
+
+from depot.io.utils import FileIntent
+from functools import cached_property
+from io import BytesIO
+from onegov.core.crypto import random_token
+from onegov.core.utils import dictionary_to_binary
+from onegov.file import File
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TagsField
+from onegov.form.fields import UploadField
+from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import Stdnum
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.validators import ValidSwissSocialSecurityNumber
+from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import Coordinates
 from onegov.gis import CoordinatesField
 from onegov.translator_directory import _
-from onegov.translator_directory.collections.certificate import \
-    LanguageCertificateCollection
+from onegov.translator_directory.collections.certificate import (
+    LanguageCertificateCollection)
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.constants import ADMISSIONS
 from onegov.translator_directory.constants import GENDERS
@@ -24,7 +34,18 @@ from wtforms.fields import FloatField
 from wtforms.fields import IntegerField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.validators import Optional
+from wtforms.fields.simple import EmailField
+from wtforms.validators import Optional, Email
+
+from typing import Any, TYPE_CHECKING
+
+from onegov.translator_directory.utils import nationality_choices
+
+if TYPE_CHECKING:
+    from onegov.translator_directory.models.mutation import TranslatorMutation
+    from onegov.translator_directory.request import TranslatorAppRequest
+    from wtforms import Field
+    from wtforms.fields.choices import _Choice
 
 
 BOOLS = [('True', _('Yes')), ('False', _('No'))]
@@ -32,15 +53,16 @@ BOOLS = [('True', _('Yes')), ('False', _('No'))]
 
 class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
+    request: TranslatorAppRequest
+
     hints = [
-        ('text', _('You can use this form to report mutations.')),
         ('bullet', _('You can either leave us a message or directly suggest '
                      'changes in the corresponding fields.')),
         ('bullet', _('You only need to specify the fields that are to be '
                      'changed. The current value is greyed out.')),
         ('bullet', _('Please note that the address must be entered via the '
                      'location.')),
-        ('bullet', _('Make sure that if you make multiple selections '
+       ('bullet', _('Make sure that if you make multiple selections '
                      '(e.g. languages) you select all options, not just those '
                      'you want changed.')),
         ('bullet', _('Expertise by professional guild (other) can be listed '
@@ -48,9 +70,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         ('bullet', _('If you would like to change the e-mail address, please '
                      'note this in the message.'))
     ]
+    locale: str = 'de_CH'
 
     @cached_property
-    def language_choices(self):
+    def language_choices(self) -> list[_Choice]:
         languages = LanguageCollection(self.request.session)
         return [
             (str(language.id), language.name)
@@ -58,21 +81,23 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         ]
 
     @cached_property
-    def certificate_choices(self):
+    def certificate_choices(self) -> list[_Choice]:
         certificates = LanguageCertificateCollection(self.request.session)
         return [
             (str(certificate.id), certificate.name)
             for certificate in certificates.query()
         ]
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.request.include('tags-input')
+        self.locale = self.request.locale if self.request.locale else 'de_CH'
 
         self.mother_tongues.choices = self.language_choices.copy()
         self.spoken_languages.choices = self.language_choices.copy()
         self.written_languages.choices = self.language_choices.copy()
         self.monitoring_languages.choices = self.language_choices.copy()
         self.certificates.choices = self.certificate_choices.copy()
+        self.nationalities.choices = nationality_choices(self.request.locale)
 
         self.hide(self.drive_distance)
 
@@ -84,51 +109,57 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
             value = getattr(self.model, name)
             if isinstance(field, ChosenSelectField):
+                assert isinstance(field.choices, list)
                 field.choices.insert(0, ('', ''))
                 field.choices = [
                     (choice[0], self.request.translate(choice[1]))
                     for choice in field.choices
                 ]
-                field.long_description = dict(field.choices).get(
+                choice_lookup = dict(field.choices)  # type:ignore
+                field.long_description = choice_lookup.get(  # type:ignore
                     str(value), ''
                 )
             elif isinstance(field, ChosenSelectMultipleField):
+                assert isinstance(field.choices, list)
                 field.choices.insert(0, ('', ''))
                 field.choices = [
                     (choice[0], self.request.translate(choice[1]))
                     for choice in field.choices
                 ]
-                field.long_description = ', '.join([
-                    dict(field.choices).get(str(getattr(v, 'id', v)), '')
+                choice_lookup = dict(field.choices)  # type:ignore
+                field.long_description = ', '.join(  # type:ignore
+                    choice_lookup.get(str(getattr(v, 'id', v)), '')
                     for v in value
-                ])
+                )
             elif isinstance(field, CoordinatesField):
                 pass
             elif isinstance(field, TagsField):
-                field.long_description = ', '.join(value)
+                field.long_description = ', '.join(value)  # type:ignore
             elif isinstance(field, DateField):
                 if value:
-                    field.long_description = layout.format_date(value, 'date')
+                    field.long_description = (  # type:ignore
+                        layout.format_date(value, 'date'))
             else:
-                field.long_description = str(value or '')
+                field.long_description = str(value or '')  # type:ignore
 
     @property
-    def proposal_fields(self):
+    def proposal_fields(self) -> dict[str, Field]:
         for fieldset in self.fieldsets:
             if fieldset.label == 'Proposed changes':
-                return fieldset.fields.copy()
+                # NOTE: There's no type checker support for proxy objects
+                return fieldset.fields.copy()  # type:ignore
         return {}
 
     @property
-    def proposed_changes(self):
-        def convert(data):
+    def proposed_changes(self) -> dict[str, Any]:
+        def convert(data: Any) -> Any:
             if isinstance(data, list):
                 return data
             if isinstance(data, Coordinates):
                 return data if data.lat and data.lon else None
             return {'None': None, 'True': True, 'False': False}.get(data, data)
 
-        def has_changed(name, value):
+        def has_changed(name: str, value: Any) -> bool:
             old = getattr(self.model, name)
             if name in ('mother_tongues', 'spoken_languages',
                         'written_languages', 'monitoring_languages',
@@ -151,20 +182,209 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         }
         return data
 
-    def ensure_has_content(self):
-        if not self.submitter_message.data and not self.proposed_changes:
+    def ensure_has_content(self) -> bool:
+        has_message = bool(self.submitter_message.data)
+        has_changes = bool(self.proposed_changes)
+        has_docs = any(
+            [
+                self.declaration_of_authorization.data,
+                self.letter_of_motivation.data,
+                self.resume.data,
+                self.uploaded_certificates.data,
+                self.social_security_card.data,
+                self.passport.data,
+                self.passport_photo.data,
+                self.debt_collection_register_extract.data,
+                self.criminal_register_extract.data,
+                self.certificate_of_capability.data,
+                self.confirmation_compensation_office.data,
+            ]
+        )
+        if not has_message and not has_changes and not has_docs:
+            assert isinstance(self.submitter_message.errors, list)
             self.submitter_message.errors.append(
                 _(
-                    'Please enter a message or suggest some changes '
-                    'using the fields below.'
+                    'Please enter a message, suggest changes, '
+                    'or upload documents.'
                 )
             )
             return False
+        return True
+
+    def get_files(self) -> list[File]:
+        """Convert uploaded files to File objects."""
+
+        def as_file(field: UploadField, category: str) -> File | None:
+            name = self.request.translate(field.label.text)
+            name = name.replace(' (PDF)', '')
+            if field.data:
+                return File(  # type:ignore[misc]
+                    id=random_token(),
+                    name=f'{name}.pdf',
+                    note=category,
+                    reference=FileIntent(
+                        BytesIO(dictionary_to_binary(
+                            field.data  # type:ignore[arg-type]
+                        )),
+                        field.data['filename'],
+                        field.data['mimetype'],
+                    ),
+                )
+            return None
+
+        result = [
+            as_file(self.declaration_of_authorization, 'Mutationsmeldung'),
+            as_file(self.letter_of_motivation, 'Mutationsmeldung'),
+            as_file(self.resume, 'Mutationsmeldung'),
+            as_file(self.uploaded_certificates, 'Mutationsmeldung'),
+            as_file(self.social_security_card, 'Mutationsmeldung'),
+            as_file(self.passport, 'Mutationsmeldung'),
+            as_file(self.passport_photo, 'Mutationsmeldung'),
+            as_file(self.debt_collection_register_extract, 'Mutationsmeldung'),
+            as_file(self.criminal_register_extract, 'Mutationsmeldung'),
+            as_file(self.certificate_of_capability, 'Mutationsmeldung'),
+            as_file(self.confirmation_compensation_office, 'Mutationsmeldung'),
+        ]
+        return [r for r in result if r is not None]
 
     submitter_message = TextAreaField(
         fieldset=_('Your message'),
         label=_('Message'),
         render_kw={'rows': 8}
+    )
+
+    declaration_of_authorization = UploadField(
+        label=_('Signed declaration of authorization (PDF)'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    letter_of_motivation = UploadField(
+        label=_('Short letter of motivation (PDF)'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    resume = UploadField(
+        label=_('Resume (PDF)'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    uploaded_certificates = UploadField(
+        label=_('Certificates (PDF)'),
+        description=_(
+            'For the last five years. Language proficiency certificates '
+            'level C2 are mandatory for non-native speakers.'
+        ),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    social_security_card = UploadField(
+        label=_('Social security card (PDF)'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    passport = UploadField(
+        label=_('Identity card, passport or foreigner identity card (PDF)'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    passport_photo = UploadField(
+        label=_('Current passport photo (PDF)'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    debt_collection_register_extract = UploadField(
+        label=_('Current extract from the debt collection register (PDF)'),
+        description=_('Maximum 6 months since issue.'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    criminal_register_extract = UploadField(
+        label=_('Current extract from the Central Criminal Register (PDF)'),
+        description=_(
+            'Maximum 6 months since issue. Online order at '
+            'www.strafregister.admin.ch'
+        ),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    certificate_of_capability = UploadField(
+        label=_('Certificate of Capability (PDF)'),
+        description=_('Available from the municipal or city administration.'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    confirmation_compensation_office = UploadField(
+        label=_(
+            'Confirmation from the compensation office regarding '
+            'self-employment'
+        ),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
     )
 
     first_name = StringField(
@@ -217,9 +437,16 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         validators=[Optional()]
     )
 
-    nationality = StringField(
-        label=_('Nationality'),
+    nationalities = ChosenSelectMultipleField(
+        label=_('Nationality(ies)'),
+        choices=[],  # will be filled in on_request
         fieldset=_('Proposed changes'),
+    )
+
+    hometown = StringField(
+        label=_('Hometown'),
+        fieldset=_('Proposed changes'),
+        validators=[Optional()],
     )
 
     coordinates = CoordinatesField(
@@ -280,9 +507,15 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         fieldset=_('Proposed changes'),
     )
 
+    email = EmailField(
+        label=_('Email'),
+        validators=[Optional(), Email()],
+        fieldset=_('Proposed changes'),
+    )
+
     tel_mobile = StringField(
         label=_('Mobile Number'),
-        validators=[ValidPhoneNumber()],
+        validators=[ValidPhoneNumber(), Optional()],
         fieldset=_('Proposed changes'),
     )
 
@@ -418,20 +651,23 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
 class ApplyMutationForm(Form):
 
+    model: TranslatorMutation
+    request: TranslatorAppRequest
+
     changes = MultiCheckboxField(
         label=_('Proposed changes'),
         choices=[]
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         choices = self.model.translated(self.request)
-        self.changes.choices = tuple(
+        self.changes.choices = [
             (name, f'{label}: {choice}')
             for name, (label, choice, original) in choices.items()
-        )
+        ]
 
-    def apply_model(self):
+    def apply_model(self) -> None:
         self.changes.data = list(self.model.changes.keys())
 
-    def update_model(self):
-        self.model.apply(self.changes.data)
+    def update_model(self) -> None:
+        self.model.apply(self.changes.data or ())

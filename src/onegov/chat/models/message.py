@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from onegov.core.orm import Base
@@ -6,8 +8,18 @@ from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.file import File
 from sqlalchemy import Column, Text
 from sqlalchemy import event
+from sqlalchemy import inspect
 from sqlalchemy.ext.hybrid import hybrid_property
-from ulid import ulid
+from ulid import ULID
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import datetime
+    from onegov.chat.collections import MessageCollection
+    from onegov.core.request import CoreRequest
+    from sqlalchemy.orm import Session
+    from typing import Self
 
 
 class MessageFile(File):
@@ -17,39 +29,51 @@ class MessageFile(File):
 class Message(Base):
     """ A single chat message bound to channel. """
 
+    __mapper_args__ = {
+        'polymorphic_on': 'type',
+        'polymorphic_identity': None
+    }
+
     __tablename__ = 'messages'
 
     #: the public id of the message - uses ulid for absolute ordering
-    id = Column(Text, primary_key=True, default=ulid)
+    id: Column[str] = Column(
+        Text,
+        primary_key=True,
+        default=lambda: str(ULID())
+    )
 
     #: channel to which this message belongs -> this might one day be
     #: linked to an actual channel record - for now it's just a string that
     #: binds all messages with the same string together
-    channel_id = Column(Text, index=True, nullable=False)
+    channel_id: Column[str] = Column(Text, index=True, nullable=False)
 
     #: optional owner of the message -> this is just an identifier, it isn't
     #: necessarily linked to the user table
-    owner = Column(Text, nullable=True)
+    owner: Column[str | None] = Column(Text, nullable=True)
 
     #: the polymorphic type of the message
-    type = Column(Text, nullable=True)
+    type: Column[str | None] = Column(Text, nullable=True)
 
     #: meta information specific to this message and maybe its type -> we
     #: don't use the meta/content mixin yet as we might not need the content
     #: property
-    meta = Column(JSON, nullable=False, default=dict)
+    meta: Column[dict[str, Any]] = Column(JSON, nullable=False, default=dict)
 
     #: the text of the message, maybe None for certain use cases (say if the
     # content of the message is generated from the meta property)
-    text = Column(Text, nullable=True)
+    text: Column[str | None] = Column(Text, nullable=True)
 
     #: the time this message was created - not taken from the timestamp mixin
     #: because here we don't want it to be deferred
-    created = Column(UTCDateTime, default=sedate.utcnow)
+    created: Column[datetime] = Column(UTCDateTime, default=sedate.utcnow)
 
     #: the time this message was modified - not taken from the timestamp mixin
     #: because here we don't want it to be deferred
-    modified = Column(UTCDateTime, onupdate=sedate.utcnow)
+    modified: Column[datetime | None] = Column(
+        UTCDateTime,
+        onupdate=sedate.utcnow
+    )
 
     #: a single optional file associated with this message
     file = associated(File, 'file', 'one-to-one')
@@ -58,20 +82,21 @@ class Message(Base):
     # polymorphic subclasses that differ - we need to compare the base class
     # with subclasses to work around a limitation of the association proxy
     # (see backref in onegov.core.orm.abstract.associable.associated)
-    def __hash__(self):
+    def __hash__(self) -> int:
         return super().__hash__()
 
-    def __eq__(self, other):
-        if isinstance(other, self.__class__) \
-                and self.id == other.id\
-                and self.channel_id == other.channel_id:
-
+    def __eq__(self, other: object) -> bool:
+        if (
+            isinstance(other, self.__class__)
+            and self.id == other.id
+            and self.channel_id == other.channel_id
+        ):
             return True
 
         return super().__eq__(other)
 
     @property
-    def subtype(self):
+    def subtype(self) -> str | None:
         """ An optional subtype for this message used for separating messages
         of a type further (currently for UI).
 
@@ -80,7 +105,7 @@ class Message(Base):
         """
         return None
 
-    def get(self, request):
+    def get(self, request: CoreRequest) -> str | None:
         """ Code rendering a message should call this method to get the
         actual text of the message. It might be rendered from meta or it
         might be returned directly from the text column.
@@ -90,13 +115,17 @@ class Message(Base):
         """
         return self.text
 
-    @hybrid_property
-    def edited(self):
-        # use != instead of "is not" as we want this translated into SQL
-        return self.modified != None
+    if TYPE_CHECKING:
+        # workaround for sqlalchemy-stubs
+        edited: Column[bool]
+    else:
+        @hybrid_property
+        def edited(self) -> bool:
+            # use != instead of "is None" as we want this translated into SQL
+            return self.modified != None
 
     @classmethod
-    def bound_messages(cls, session):
+    def bound_messages(cls, session: Session) -> MessageCollection[Self]:
         """ A message collection bound to the polymorphic identity of this
         message.
 
@@ -105,12 +134,16 @@ class Message(Base):
 
         return MessageCollection(
             session=session,
-            type=cls.__mapper_args__['polymorphic_identity']
+            type=inspect(cls).polymorphic_identity
         )
 
 
-@event.listens_for(Message, 'init')
-def init(target, args, kwargs):
+@event.listens_for(Message, 'init')  # type:ignore[untyped-decorator]
+def init(
+    target: Message,
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any]
+) -> None:
     """ Ensures that the message id is created upon instantiation. This helps
     to ensure that each message is ordered according to it's creation.
 
@@ -118,4 +151,4 @@ def init(target, args, kwargs):
     randomly.
 
     """
-    target.id = ulid()
+    target.id = str(ULID())

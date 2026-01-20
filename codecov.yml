@@ -1,2 +1,12 @@
 fixes:
-  - "app/lib/python3.8/site-packages/::src/"
+  - "app/lib/python3.11/site-packages/::src/"
+coverage:
+  status:
+    project:
+      default:
+        informational: true
+comment:
+  layout: "header, files, footer"
+  hide_project_coverage: false
+  after_n_builds: 6
+

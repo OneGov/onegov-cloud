@@ -1,8 +1,19 @@
+from __future__ import annotations
+
 import click
-import sys
 
 from onegov.core.cli import command_group
-from onegov.activity.models import Period
+from onegov.activity.models import BookingPeriod
+from onegov.activity.models import Occasion
+from sqlalchemy import text
+
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from onegov.feriennet.app import FeriennetApp
+    from onegov.feriennet.request import FeriennetRequest
 
 
 cli = command_group()
@@ -10,102 +21,154 @@ cli = command_group()
 
 @cli.command(name='delete-period', context_settings={'singular': True})
 @click.argument('title')
-def delete_period(title):
+def delete_period(
+    title: str
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
     """ Deletes all the data associated with a period, including:
 
-    - Payments
-    - Bookings
-    - Occasions
-    - Publication Requests
-    - Tickets
+    * Payments
+    * Bookings
+    * Occasions
+    * Publication Requests
+    * Tickets
 
     We usually don't allow for this, but there tends to be a request here and
     there about this, where a Ferienpass created a period for testing and
     tries to return to a semi-clean state.
 
-    Example:
+    Example::
 
         onegov-feriennet --select /foo/bar delete-period "Ferienpass Test"
 
     """
 
-    def delete_period(request, app):
-        period = request.session.query(Period).filter_by(title=title).first()
+    def delete_period(
+        request: FeriennetRequest,
+        app: FeriennetApp
+    ) -> None:
+
+        period = request.session.query(
+            BookingPeriod).filter_by(title=title).first()
 
         if not period:
-            print(f"Could not find period «{title}»")
-            sys.exit(1)
+            raise click.ClickException(f'Could not find period «{title}»')
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM payments WHERE payments.id IN (
                 SELECT payment_id FROM payments_for_invoice_items_payments
                 WHERE invoice_items_id IN (
                     SELECT id FROM invoice_items
                     WHERE invoice_id IN (
-                        SELECT id FROM invoices WHERE period_id = '{period.id}'
+                        SELECT id FROM invoices WHERE period_id = :period
                     )
                 )
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM payments_for_invoice_items_payments
             WHERE invoice_items_id IN (
                 SELECT id FROM invoice_items
                 WHERE invoice_id IN (
-                    SELECT id FROM invoices WHERE period_id = '{period.id}'
+                    SELECT id FROM invoices WHERE period_id = :period
                 )
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM invoice_items where invoice_id IN (
-                SELECT id FROM invoices WHERE period_id = '{period.id}'
+                SELECT id FROM invoices WHERE period_id = :period
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM invoice_references where invoice_id IN (
-                SELECT id FROM invoices WHERE period_id = '{period.id}'
+                SELECT id FROM invoices WHERE period_id = :period
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
-            DELETE FROM invoices WHERE period_id = '{period.id}'
-        """)
+        request.session.execute(text("""
+            DELETE FROM invoices WHERE period_id = :period
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM tickets WHERE handler_id::uuid IN (
                 SELECT id FROM publication_requests
-                WHERE period_id = '{period.id}'
+                WHERE period_id = :period
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
-            DELETE FROM publication_requests WHERE period_id = '{period.id}'
-        """)
+        request.session.execute(text("""
+            DELETE FROM publication_requests WHERE period_id = :period
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
-            DELETE FROM bookings WHERE period_id = '{period.id}'
-        """)
+        request.session.execute(text("""
+            DELETE FROM bookings WHERE period_id = :period
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM occasion_dates WHERE occasion_id IN (
-                SELECT id FROM occasions WHERE period_id = '{period.id}'
+                SELECT id FROM occasions WHERE period_id = :period
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM occasion_needs WHERE occasion_id IN (
-                SELECT id FROM occasions WHERE period_id = '{period.id}'
+                SELECT id FROM occasions WHERE period_id = :period
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
-            DELETE FROM occasions WHERE period_id = '{period.id}'
-        """)
+        request.session.execute(text("""
+            DELETE FROM occasions WHERE period_id = :period
+        """), {
+            'period': period.id
+        })
 
         # triggers a cache update
         request.session.delete(period)
 
     return delete_period
+
+
+@cli.command(name='compute-occasion-durations')
+def compute_occasion_durations(
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
+    """ Recomputes the durations of all occassions.
+
+    Example::
+
+        onegov-feriennet --select /foo/bar compute-occasion-durations
+
+    """
+
+    def compute_occasion_durations(
+        request: FeriennetRequest,
+        app: FeriennetApp
+    ) -> None:
+
+        occasions = request.session.query(Occasion)
+
+        for o in occasions:
+            o.duration = o.compute_duration(o.dates)
+
+    return compute_occasion_durations

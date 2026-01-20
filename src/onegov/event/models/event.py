@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import warnings
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import rrule
 from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
@@ -9,7 +11,6 @@ from icalendar import vRecur
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import content_property
-from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -17,31 +18,50 @@ from onegov.event.models.mixins import OccurrenceMixin
 from onegov.event.models.occurrence import Occurrence
 from onegov.file import File
 from onegov.file.utils import as_fileintent
+from onegov.gis import Coordinates
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
 from PIL.Image import DecompressionBombError
 from pytz import UTC
 from sedate import standardize_date
-from sedate import to_timezone
+from sedate import to_timezone, utcnow
 from sqlalchemy import and_
 from sqlalchemy import Column
 from sqlalchemy import desc
 from sqlalchemy import Enum
-from sqlalchemy import func
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
+from translationstring import TranslationString
 from uuid import uuid4
+
+
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from collections.abc import Iterator
+    from onegov.core.orm.mixins import dict_property
+    from onegov.core.request import CoreRequest
+    from sqlalchemy.orm import Query
+    from typing import Literal
+    from typing import TypeAlias
+
+    EventState: TypeAlias = Literal[
+        'initiated',
+        'submitted',
+        'published',
+        'withdrawn'
+    ]
 
 
 class EventFile(File):
     __mapper_args__ = {'polymorphic_identity': 'eventfile'}
 
 
-class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
-            SearchableContent, CoordinatesMixin):
+class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
+            CoordinatesMixin):
     """ Defines an event.
 
     Occurrences are stored in a seperate table containing only a minimal set
@@ -57,41 +77,56 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     occurrence_dates_year_limit = 2
 
     #: Internal number of the event
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: Column[uuid.UUID] = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: State of the event
-    state = Column(
-        Enum('initiated', 'submitted', 'published', 'withdrawn',
-             name='event_state'),
+    state: Column[EventState] = Column(
+        Enum(  # type: ignore[arg-type]
+            'initiated', 'submitted', 'published', 'withdrawn',
+            name='event_state'
+        ),
         nullable=False,
         default='initiated'
     )
 
     #: description of the event
-    description = content_property()
+    description: dict_property[str | None] = content_property()
 
     #: the event organizer
-    organizer = content_property()
+    organizer: dict_property[str | None] = content_property()
 
     #: the event organizer's public e-mail address
-    organizer_email = content_property()
+    organizer_email: dict_property[str | None] = content_property()
+
+    #: the event organizer's phone number
+    organizer_phone: dict_property[str | None] = content_property()
+
+    #: an external url for the event
+    external_event_url: dict_property[str | None] = content_property()
+
+    #: an external url for the event
+    event_registration_url: dict_property[str | None] = content_property()
 
     #: the price of the event (a text field, not an amount)
-    price = content_property()
+    price: dict_property[str | None] = content_property()
 
     #: the source of the event, if imported
-    source = meta_property()
+    source: dict_property[str | None] = meta_property()
 
     #: when the source of the event was last updated (if imported)
-    source_updated = meta_property()
+    source_updated: dict_property[str | None] = meta_property()
 
     #: Recurrence of the event (RRULE, see RFC2445)
-    recurrence = Column(Text, nullable=True)
+    recurrence: Column[str | None] = Column(Text, nullable=True)
 
     #: The access property of the event, taken from onegov.org. Not ideal to
     #: have this defined here, instead of using an AccessExtension, but that
     #: would only be possible with deeper changes to the Event model.
-    access = meta_property(default='public')
+    access: dict_property[str] = meta_property(default='public')
 
     #: The associated image
     image = associated(
@@ -103,13 +138,28 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         EventFile, 'pdf', 'one-to-one', uselist=False, backref_suffix='pdf'
     )
 
-    def set_image(self, content, filename=None):
+    def set_image(
+        self,
+        content: bytes | IO[bytes] | None,
+        filename: str | None = None
+    ) -> None:
+
         self.set_blob('image', content, filename)
 
-    def set_pdf(self, content, filename=None):
+    def set_pdf(
+        self,
+        content: bytes | IO[bytes] | None,
+        filename: str | None = None
+    ) -> None:
+
         self.set_blob('pdf', content, filename)
 
-    def set_blob(self, blob, content, filename=None):
+    def set_blob(
+        self,
+        blob: str,
+        content: bytes | IO[bytes] | None,
+        filename: str | None = None
+    ) -> None:
         """ Adds or removes the given blob. """
 
         filename = filename or 'file'
@@ -122,90 +172,121 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
         else:
             try:
-                setattr(self, blob, EventFile(
+                setattr(self, blob, EventFile(  # type: ignore[misc]
                     name=filename,
                     reference=as_fileintent(content, filename)
                 ))
             except DecompressionBombError:
                 setattr(self, blob, None)
 
-    #: Occurences of the event
-    occurrences = relationship(
-        "Occurrence",
-        cascade="all, delete-orphan",
-        backref=backref("event"),
+    #: Occurrences of the event
+    occurrences: relationship[list[Occurrence]] = relationship(
+        'Occurrence',
+        cascade='all, delete-orphan',
+        back_populates='event',
         lazy='joined',
     )
 
-    es_properties = {
-        'title': {'type': 'localized'},
-        'description': {'type': 'localized'},
-        'location': {'type': 'localized'},
-        'organizer': {'type': 'localized'}
+    # HACK: We don't want to set up translations in this module for this single
+    #       string, we know we already have a translation in a different domain
+    #       so we just manually specify it for now.
+    fts_type_title = TranslationString('Events', domain='onegov.org')
+    fts_title_property = 'title'
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'description': {'type': 'localized', 'weight': 'B'},
+        'location': {'type': 'localized', 'weight': 'B'},
+        'organizer': {'type': 'localized', 'weight': 'B'},
+        # FIXME: Should we move this to fts_tags?
+        'filter_keywords': {'type': 'keyword', 'weight': 'A'}
     }
 
     @property
-    def es_public(self):
+    def fts_public(self) -> bool:
         return self.state == 'published'
 
     @property
-    def es_skip(self):
+    def fts_skip(self) -> bool:
         return self.state != 'published' or getattr(self, '_es_skip', False)
 
-    def source_url(self, request):
+    @property
+    def fts_last_change(self) -> datetime:
+        latest = self.latest_occurrence
+        if latest is None:
+            # NOTE: if there are no occurrences at all we want to deprioritize
+            #       this by a lot, so we pretend the latest occurrence was four
+            #       years ago, which results in a factor of around 8%
+            return utcnow() - timedelta(days=1461)
+        elif latest.start < utcnow():
+            # NOTE: if the occurrence is in the past, we want to deprioritize
+            #       it over upcoming events, we use a gaussian time decay so
+            #       being in the future by x days would be deprioritized the
+            #       same as being in the past by x days, so we subtract one
+            #       year to make past events less relevant. For an event that
+            #       just happened this results in a factor of around 85%, so
+            #       still relevant, but not as relevant as the upcoming events.
+            return latest.start - timedelta(days=365)
+        return latest.start
+
+    def source_url(self, request: CoreRequest) -> str | None:
         """ Returns an url pointing to the external event if imported. """
-        if not self.source:
+        if not self.source or not self.source.startswith('guidle'):
             return None
 
-        if self.source.startswith('guidle'):
-            guidle_id = self.source.split('-')[-1].split('.')[0]
+        guidle_id = self.source.rsplit('-', 1)[-1].split('.', 1)[0]
+        return f'https://www.guidle.com/angebote/{guidle_id}'
 
-            return f"https://www.guidle.com/angebote/{guidle_id}"
-
-    def __setattr__(self, name, value):
-        """ Automatically update the occurrences if shared attributes change.
+    def __setattr__(self, name: str, value: object) -> None:
+        """ Automatically update the occurrences if shared attributes change
         """
 
         super().__setattr__(name, value)
         if name in ('state', 'title', 'name', 'location', 'tags',
-                    'start', 'end', 'timezone', 'recurrence'):
+                    'filter_keywords', 'start', 'end', 'timezone',
+                    'recurrence'):
             self._update_occurrences()
 
     @property
-    def base_query(self):
+    def base_query(self) -> Query[Occurrence]:
         session = object_session(self)
         return session.query(Occurrence).filter_by(event_id=self.id)
 
     @property
-    def latest_occurrence(self):
+    def latest_occurrence(self) -> Occurrence | None:
         """ Returns the occurrence which is presently occurring, the next
         one to occur or the last occurrence.
 
         """
 
+        now = utcnow()
         base = self.base_query
         current = base.filter(and_(
-            Occurrence.start <= func.now(),
-            Occurrence.end >= func.now()
+            Occurrence.start <= now,
+            Occurrence.end >= now
         )).order_by(Occurrence.start).limit(1)
 
         future = base.filter(
-            Occurrence.start >= func.now()
+            Occurrence.start >= now
         ).order_by(Occurrence.start).limit(1)
 
         past = base.filter(
-            Occurrence.end <= func.now()
+            Occurrence.end <= now
         ).order_by(desc(Occurrence.start))
 
         return current.union_all(future, past).first()
 
-    def future_occurrences(self, offset=0, limit=10):
+    def future_occurrences(
+        self,
+        offset: int = 0,
+        limit: int = 10
+    ) -> Query[Occurrence]:
+
         return self.base_query.filter(
-            Occurrence.start >= func.now()
+            Occurrence.start >= utcnow()
         ).order_by(Occurrence.start).offset(offset).limit(limit)
 
     @validates('recurrence')
-    def validate_recurrence(self, key, r):
+    def validate_recurrence(self, key: str, r: str | None) -> str | None:
         """ Our rrules are quite limited in their complexity. This validator
         makes sure that is actually the case.
 
@@ -231,7 +312,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
             # a rule must either have a frequency or be a list of rdates
             if not hasattr(rule, '_freq'):
-                if all((l.startswith('RDATE') for l in r.splitlines())):
+                if all(l.startswith('RDATE') for l in r.splitlines()):
                     return r
 
                 raise RuntimeError(f"'{r}' is too complex")
@@ -242,23 +323,28 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
                 raise RuntimeError(f"The frequency of '{r}' is not WEEKLY")
 
             # we require a definite end
-            if not getattr(rule, '_until'):
+            until: datetime | None = getattr(rule, '_until', None)
+            if until is None:
                 raise RuntimeError(f"'{r}' has no UNTIL")
 
             # we also want the end date to be timezone-aware
-            if rule._until.tzinfo is None:
+            if until.tzinfo is None:
                 raise RuntimeError(f"'{r}''s UNTIL is not timezone-aware")
 
         return r
 
-    def occurrence_dates(self, limit=True, localize=False):
+    def occurrence_dates(
+        self,
+        limit: bool = True,
+        localize: bool = False
+    ) -> list[datetime]:
         """ Returns the start dates of all occurrences.
 
         Returns non-localized dates per default. Limits the occurrences per
         default to this and the next year.
         """
 
-        def to_local(dt, timezone):
+        def to_local(dt: datetime, timezone: str) -> datetime:
             if dt.tzinfo:
                 return to_timezone(dt, timezone).replace(tzinfo=None)
             return dt
@@ -269,10 +355,13 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             start_local = to_local(self.start, self.timezone)
             try:
                 rule = rrulestr(self.recurrence, dtstart=self.start)
-                if getattr(rule, '_dtstart', None):
-                    rule._dtstart = to_local(rule._dtstart, self.timezone)
-                if getattr(rule, '_until', None):
-                    rule._until = to_local(rule._until, self.timezone)
+                if dtstart := getattr(rule, '_dtstart', None):
+                    rule._dtstart = to_local(  # type: ignore[union-attr]
+                        dtstart,
+                        self.timezone
+                    )
+                if until := getattr(rule, '_until', None):
+                    rule._until = to_local(until, self.timezone)  # type:ignore
                 rule = rrulestr(str(rule))
             except ValueError:
                 # This might happen if only RDATEs and EXDATEs are present
@@ -305,24 +394,25 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
         return dates
 
-    def spawn_occurrence(self, start):
+    def spawn_occurrence(self, start: datetime) -> Occurrence:
         """ Create an occurrence at the given date, without storing it. """
 
         end = start + (self.end - self.start)
-        name = '{0}-{1}'.format(self.name, start.date().isoformat())
+        name = f'{self.name}-{start.date().isoformat()}'
 
-        return Occurrence(
+        return Occurrence(  # type:ignore[misc]
             title=self.title,
             name=name,
             location=self.location,
             tags=self.tags,
+            filter_keywords=self.filter_keywords,
             start=start,
             end=end,
             timezone=self.timezone,
         )
 
     @property
-    def virtual_occurrence(self):
+    def virtual_occurrence(self) -> Occurrence:
         """ Before the event is accepted, there are no real occurrences stored
         in the database.
 
@@ -345,7 +435,9 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
             return occurrence
 
-    def _update_occurrences(self):
+        raise AssertionError('unreachable')
+
+    def _update_occurrences(self) -> None:
         """ Updates the occurrences.
 
         Removes all occurrences if the event is not published or no start and
@@ -357,7 +449,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         self.occurrences = []
 
         # do not create occurrences unless the event is published
-        if not self.state == 'published':
+        if self.state != 'published':
             return
 
         # do not create occurrences unless start and end is set
@@ -368,13 +460,16 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         for start in self.occurrence_dates():
             self.occurrences.append(self.spawn_occurrence(start))
 
-    def submit(self):
+        for occ in self.occurrences:
+            occ.filter_keywords = self.filter_keywords
+
+    def submit(self) -> None:
         """ Submit the event. """
 
         assert self.state == 'initiated'
         self.state = 'submitted'
 
-    def publish(self):
+    def publish(self) -> None:
         """ Publish the event.
 
         Publishing the event will generate the occurrences.
@@ -383,7 +478,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         assert self.state == 'submitted' or self.state == 'withdrawn'
         self.state = 'published'
 
-    def withdraw(self):
+    def withdraw(self) -> None:
         """ Withdraw the event.
 
         Withdraw the event will delete the occurrences."""
@@ -391,7 +486,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         assert self.state in ('submitted', 'published')
         self.state = 'withdrawn'
 
-    def get_ical_vevents(self, url=None):
+    def get_ical_vevents(self, url: str | None = None) -> Iterator[vEvent]:
         """ Returns the event and all its occurrences as icalendar objects.
 
         If the calendar has a bunch of RDATE's instead of a proper RRULE, we
@@ -400,8 +495,8 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
         """
 
-        modified = self.modified or self.created or datetime.utcnow()
-        rrule = ''
+        modified = self.modified or self.created or utcnow()
+        rrule = None
         if self.recurrence:
             rrule = vRecur.from_ical(self.recurrence.replace('RRULE:', ''))
 
@@ -423,13 +518,14 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             if url:
                 vevent.add('url', url)
             if self.coordinates:
+                assert isinstance(self.coordinates, Coordinates)
                 vevent.add('geo', (self.coordinates.lat, self.coordinates.lon))
             yield vevent
 
             if rrule:
                 break
 
-    def as_ical(self, url=None):
+    def as_ical(self, url: str | None = None) -> bytes:
         """ Returns the event and all its occurrences as iCalendar string.
 
         """

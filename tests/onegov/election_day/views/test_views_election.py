@@ -1,4 +1,4 @@
-import pytest
+from __future__ import annotations
 
 from freezegun import freeze_time
 from onegov.election_day.layouts import ElectionLayout
@@ -11,11 +11,16 @@ from webtest import TestApp as Client
 from webtest.forms import Upload
 
 
-def round_(n, z):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def round_(n: int, z: int) -> float:
     return round(100 * n / z, 2)
 
 
-def test_view_election_redirect(election_day_app_gr):
+def test_view_election_redirect(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -33,19 +38,31 @@ def test_view_election_redirect(election_day_app_gr):
     assert 'proporz-election/lists' in response.headers['Location']
 
 
-def test_view_election_candidates(election_day_app_gr):
+def test_view_election_candidates(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_majorz_election(client, status='final')
-    upload_proporz_election(client, status='final')
 
+    # Majorz election intermediate results
+    upload_majorz_election(client, status='interim')
+
+    # ... main
     candidates = client.get('/election/majorz-election/candidates')
     assert all((expected in candidates for expected in (
-        "Engler Stefan", "20", "Schmid Martin", "18"
+        "Engler Stefan", "20", "Pendent", "Schmid Martin", "18", "Pendent"
     )))
 
+    # Majorz election final results
+    upload_majorz_election(client, status='final')
+
+    # ... main
+    candidates = client.get('/election/majorz-election/candidates')
+    assert all((expected in candidates for expected in (
+        "Engler Stefan", "20", "Ja", "Schmid Martin", "18", "Ja"
+    )))
+
+    # ... bar chart data (with filters)
     for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
         candidates = client.get(
             f'/election/majorz-election/candidates-data{suffix}'
@@ -53,6 +70,7 @@ def test_view_election_candidates(election_day_app_gr):
         assert {r['text']: r['value'] for r in candidates.json['results']} == {
             'Engler Stefan': 20, 'Schmid Martin': 18
         }
+
     candidates = client.get(
         '/election/majorz-election/candidates-data?limit=1'
     )
@@ -60,25 +78,104 @@ def test_view_election_candidates(election_day_app_gr):
         'Engler Stefan': 20
     }
 
+    candidates = client.get(
+        '/election/majorz-election/candidates-data?entity=Vaz/Obervaz'
+    )
+    assert {r['text']: r['value'] for r in candidates.json['results']} == {
+        'Engler Stefan': 20, 'Schmid Martin': 18
+    }
+
+    # ... embedded chart (with filters)
     chart = client.get('/election/majorz-election/candidates-chart')
     assert '/election/majorz-election/candidates' in chart
 
+    chart = client.get(
+        '/election/majorz-election/candidates-chart?entity=Filisur'
+    )
+    assert 'entity=Filisur' in chart
+
+    # ... embedded table (with filters)
+    table = client.get('/election/majorz-election/candidates-table')
+    assert 'data-text="20"' in table
+
+    table = client.get(
+        '/election/majorz-election/candidates-table?entity=Vaz/Obervaz'
+    )
+    assert 'data-text="20"' in table
+
+    table = client.get(
+        '/election/majorz-election/candidates-table?entity=Filisur'
+    )
+    assert 'data-text=' not in table
+
+    # Proporz election intermediate results
+    upload_proporz_election(client, status='interim')
+
+    # ....main
     candidates = client.get('/election/proporz-election/candidates')
     assert all((expected in candidates for expected in (
-        "Caluori Corina", "1", "Casanova Angela", "0"
+        "Caluori Corina", "1", "Pendent", "Casanova Angela", "0", "Pendent"
     )))
 
-    for suffix in ('', '?limit=', '?limit=a', '?limit=0', '?limit=1'):
+    # Proporz election final results
+    upload_proporz_election(client, status='final')
+
+    # ....main
+    candidates = client.get('/election/proporz-election/candidates')
+    assert all((expected in candidates for expected in (
+        "Caluori Corina", "1", "Nein", "Casanova Angela", "0", "Nein"
+    )))
+
+    # ... bar chart data (with filters)
+    for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
         candidates = client.get(
             f'/election/proporz-election/candidates-data{suffix}'
         )
         assert candidates.json['results'] == []
 
+    candidates = client.get(
+        '/election/proporz-election/candidates-data?elected=False&limit=1'
+    )
+    assert {r['text']: r['value'] for r in candidates.json['results']} == {
+        'Caluori Corina': 2
+    }
+
+    candidates = client.get(
+        '/election/majorz-election/candidates-data?elected=False&'
+        'entity=Vaz/Obervaz'
+    )
+    assert {r['text']: r['value'] for r in candidates.json['results']} == {
+        'Engler Stefan': 20, 'Schmid Martin': 18
+    }
+
+    # ... embedded chart (with filters)
     chart = client.get('/election/proporz-election/candidates-chart')
     assert '/election/proporz-election/candidates' in chart
 
+    chart = client.get(
+        '/election/proporz-election/candidates-chart?entity=Filisur'
+    )
+    assert 'entity=Filisur' in chart
 
-def test_view_election_candidate_by_entity(election_day_app_gr):
+    # ... ebmedded table (with filters)
+    table = client.get('/election/proporz-election/candidates-table')
+    assert 'data-text="2"' in table
+
+    table = client.get(
+        '/election/proporz-election/candidates-table?entity=Vaz/Obervaz'
+    )
+    assert 'data-text="2"' in table
+
+    table = client.get(
+        '/election/proporz-election/candidates-table?entity=Filisur'
+    )
+    assert 'data-text=' not in table
+
+
+def test_view_election_candidate_by_entity(
+    election_day_app_gr: TestApp
+) -> None:
+
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -134,7 +231,10 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
     # test for incomplete proporz
 
 
-def test_view_election_candidate_by_district(election_day_app_gr):
+def test_view_election_candidate_by_district(
+    election_day_app_gr: TestApp
+) -> None:
+
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -181,7 +281,7 @@ def test_view_election_candidate_by_district(election_day_app_gr):
         assert data['Casanova']['Bernina']['percentage'] == 0.0
 
 
-def test_view_election_statistics(election_day_app_gr):
+def test_view_election_statistics(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -190,56 +290,92 @@ def test_view_election_statistics(election_day_app_gr):
     upload_proporz_election(client)
 
     statistics = client.get('/election/majorz-election/statistics')
-    assert all((expected in statistics for expected in (
+    assert all(expected in statistics for expected in (
         "1 von 101", "Grüsch", "56", "25", "21", "41", "Noch nicht ausgezählt"
-    )))
+    ))
 
     statistics = client.get('/election/proporz-election/statistics')
-    assert all((expected in statistics for expected in (
+    assert all(expected in statistics for expected in (
         "1 von 101", "Grüsch", "56", "32", "31", "153", "Noch nicht ausgezählt"
-    )))
+    ))
 
 
-def test_view_election_lists(election_day_app_gr):
+def test_view_election_lists(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
     login(client)
+
+    # Majorz election
     upload_majorz_election(client)
 
+    # ... main
     main = client.get('/election/majorz-election/lists')
     assert '<h3>Listen</h3>' not in main
 
-    lists = client.get('/election/majorz-election/lists-data')
-    assert lists.json['results'] == []
+    # ... bar chart data
+    data = client.get('/election/majorz-election/lists-data')
+    assert data.json['results'] == []
 
+    # ... embedded chart
     chart = client.get('/election/majorz-election/lists-chart')
     assert chart.status_code == 200
     assert '/election/majorz-election/lists' in chart
 
+    # .... embedded table
+    table = client.get('/election/majorz-election/lists-table')
+    assert 'data-text=' not in table
+
+    # Proporz election
     upload_proporz_election(client)
 
+    # ... main
     main = client.get('/election/proporz-election/lists')
     assert '<h3>Listen</h3>' in main
 
+    # ... bar chart data (with filters)
     for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
-        lists = client.get(f'/election/proporz-election/lists-data{suffix}')
-        assert {r['text']: r['value'] for r in lists.json['results']} == {
+        data = client.get(f'/election/proporz-election/lists-data{suffix}')
+        assert {r['text']: r['value'] for r in data.json['results']} == {
             'FDP': 8,
             'CVP': 6
         }
 
-    lists = client.get('/election/proporz-election/lists-data?limit=1')
-    assert {r['text']: r['value'] for r in lists.json['results']} == {
+    data = client.get('/election/proporz-election/lists-data?limit=1')
+    assert {r['text']: r['value'] for r in data.json['results']} == {
         'FDP': 8,
     }
 
+    data = client.get(
+        '/election/proporz-election/lists-data?entity=Vaz/Obervaz'
+    )
+    assert data.json['results']
+
+    data = client.get('/election/proporz-election/lists-data?entity=Filisur')
+    assert not data.json['results']
+
+    # ... embedded chart (with filters)
     chart = client.get('/election/proporz-election/lists-chart')
     assert chart.status_code == 200
     assert '/election/proporz-election/lists-data' in chart
 
+    chart = client.get('/election/proporz-election/lists-chart?entity=Filisur')
+    assert 'entity=Filisur' in chart
 
-def test_view_election_list_by_entity(election_day_app_gr):
+    # ... embedded table (with filters)
+    table = client.get('/election/proporz-election/lists-table')
+    assert 'data-text="8"' in table
+
+    table = client.get(
+        '/election/proporz-election/lists-table?entity=Vaz/Obervaz'
+    )
+    assert 'data-text="8"' in table
+
+    table = client.get('/election/proporz-election/lists-table?entity=Filisur')
+    assert 'data-text=' not in table
+
+
+def test_view_election_list_by_entity(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -269,7 +405,7 @@ def test_view_election_list_by_entity(election_day_app_gr):
         assert data['FDP']['3506']['percentage'] == round_(8, 14)
 
 
-def test_view_election_list_by_district(election_day_app_gr):
+def test_view_election_list_by_district(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -301,7 +437,7 @@ def test_view_election_list_by_district(election_day_app_gr):
         assert data['FDP']['Bernina']['percentage'] == 0.0
 
 
-def test_view_election_party_strengths(election_day_app_gr):
+def test_view_election_party_strengths(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
     login(client)
@@ -312,8 +448,8 @@ def test_view_election_party_strengths(election_day_app_gr):
     main = client.get('/election/majorz-election/party-strengths')
     assert '<h4>Parteistärken</h4>' not in main
 
-    parties = client.get('/election/majorz-election/party-strengths-data')
-    assert parties.json['results'] == []
+    parties = client.get('/election/majorz-election/party-strengths-data').json
+    assert parties['results'] == []
 
     chart = client.get('/election/majorz-election/party-strengths-chart')
     assert chart.status_code == 200
@@ -326,8 +462,8 @@ def test_view_election_party_strengths(election_day_app_gr):
     main = client.get('/election/proporz-election/party-strengths')
     assert '<h4>Parteistärken</h4>' in main
 
-    parties = client.get('/election/proporz-election/party-strengths-data')
-    parties = parties.json
+    parties = client.get(
+        '/election/proporz-election/party-strengths-data').json
     assert parties['groups'] == ['BDP', 'CVP', 'FDP']
     assert parties['labels'] == ['2022']
     assert parties['maximum']['back'] == 100
@@ -338,23 +474,39 @@ def test_view_election_party_strengths(election_day_app_gr):
     assert chart.status_code == 200
     assert '/election/proporz-election/party-strengths-data' in chart
 
+    assert 'panel_2022' in client.get(
+        '/election/proporz-election/party-strengths-table'
+    )
+    assert 'panel_2022' in client.get(
+        '/election/proporz-election/party-strengths-table?year=2022'
+    )
+    assert 'panel_2022' not in client.get(
+        '/election/proporz-election/party-strengths-table?year=2018'
+    )
+
     export = client.get('/election/proporz-election/data-parties-csv').text
     lines = [l for l in export.split('\r\n') if l]
     assert lines == [
-        'year,id,name,name_de_CH,name_fr_CH,name_it_CH,name_rm_CH,'
+        'domain,domain_segment,year,id,'
+        'name,name_de_CH,name_fr_CH,name_it_CH,name_rm_CH,'
         'total_votes,color,mandates,votes,'
         'voters_count,voters_count_percentage,panachage_votes_from_1,'
         'panachage_votes_from_2,panachage_votes_from_3,'
         'panachage_votes_from_999',
-        '2022,1,BDP,BDP,,,,11270,#efb52c,1,60387,603.01,41.73,,11,12,100',
-        '2022,2,CVP,CVP,,,,11270,#ff6300,1,49117,491.02,33.98,21,,22,200',
-        '2022,3,FDP,FDP,,,,11270,#0571b0,0,35134,351.04,24.29,31,32,,300',
+        'federation,,2022,1,BDP,BDP,,,,11270,#efb52c,'
+        '1,60387,603.01,41.73,,11,12,100',
+        'federation,,2022,2,CVP,CVP,,,,11270,#ff6300,'
+        '1,49117,491.02,33.98,21,,22,200',
+        'federation,,2022,3,FDP,FDP,,,,11270,,'
+        '0,35134,351.04,24.29,31,32,,300',
     ]
 
     export = client.get('/election/proporz-election/data-parties-json').json
     assert export == [
         {
             'color': '#efb52c',
+            'domain': 'federation',
+            'domain_segment': None,
             'id': '1',
             'mandates': 1,
             'name': 'BDP',
@@ -374,6 +526,8 @@ def test_view_election_party_strengths(election_day_app_gr):
         },
         {
             'color': '#ff6300',
+            'domain': 'federation',
+            'domain_segment': None,
             'id': '2',
             'mandates': 1,
             'name': 'CVP',
@@ -392,7 +546,9 @@ def test_view_election_party_strengths(election_day_app_gr):
             'year': 2022
         },
         {
-            'color': '#0571b0',
+            'color': None,
+            'domain': 'federation',
+            'domain_segment': None,
             'id': '3',
             'mandates': 0,
             'name': 'FDP',
@@ -414,13 +570,14 @@ def test_view_election_party_strengths(election_day_app_gr):
 
     # Historical data with translations
     csv_parties = (
-        'year,name,name_fr_ch,id,total_votes,color,mandates,votes\r\n'
-        '2022,BDP,,1,60000,#efb52c,1,10000\r\n'
-        '2022,Die Mitte,Le Centre,2,60000,#ff6300,1,30000\r\n'
-        '2022,FDP,,3,60000,#4068c8,0,20000\r\n'
-        '2011,BDP,,1,40000,#efb52c,1,1000\r\n'
-        '2011,CVP,PDC,2,40000,#ff6300,1,15000\r\n'
-        '2011,FDP,,3,40000,#4068c8,1,10000\r\n'
+        'year,name,name_fr_ch,id,total_votes,color,mandates,'
+        'votes,voters_count,voters_count_percentage\r\n'
+        '2022,BDP,,1,60000,#efb52c,1,10000,100,16.67\r\n'
+        '2022,Die Mitte,Le Centre,2,60000,#ff6300,1,30000,300,50\r\n'
+        '2022,FDP,,3,60000,#4068c8,0,20000,200,33.33\r\n'
+        '2018,BDP,,1,40000,#efb52c,1,1000,10,2.5\r\n'
+        '2018,CVP,PDC,2,40000,#ff6300,1,15000,150.7,37.67\r\n'
+        '2018,FDP,,3,40000,#4068c8,1,10000,100,25.0\r\n'
     ).encode('utf-8')
 
     upload = client.get('/election/proporz-election/upload-party-results')
@@ -428,10 +585,11 @@ def test_view_election_party_strengths(election_day_app_gr):
     upload = upload.form.submit()
     assert "erfolgreich hochgeladen" in upload
 
-    parties = client.get('/election/proporz-election/party-strengths-data')
-    parties = parties.json
+    parties = client.get(
+        '/election/proporz-election/party-strengths-data'
+    ).json
     assert parties['groups'] == ['BDP', 'Die Mitte', 'FDP']
-    assert parties['labels'] == ['2011', '2022']
+    assert parties['labels'] == ['2018', '2022']
     assert parties['maximum']['back'] == 100
     assert parties['maximum']['front'] == 5
     assert parties['results']
@@ -440,30 +598,30 @@ def test_view_election_party_strengths(election_day_app_gr):
         '{}-{}'.format(party['item'], party['group']): party
         for party in parties['results']
     }
-    assert parties['2011-BDP']['color'] == '#efb52c'
+    assert parties['2018-BDP']['color'] == '#efb52c'
     assert parties['2022-BDP']['color'] == '#efb52c'
-    assert parties['2011-Die Mitte']['color'] == '#ff6300'
+    assert parties['2018-Die Mitte']['color'] == '#ff6300'
     assert parties['2022-Die Mitte']['color'] == '#ff6300'
-    assert parties['2011-FDP']['color'] == '#4068c8'
+    assert parties['2018-FDP']['color'] == '#4068c8'
     assert parties['2022-FDP']['color'] == '#4068c8'
 
-    assert parties['2011-BDP']['active'] is False
-    assert parties['2011-Die Mitte']['active'] is False
-    assert parties['2011-FDP']['active'] is False
+    assert parties['2018-BDP']['active'] is False
+    assert parties['2018-Die Mitte']['active'] is False
+    assert parties['2018-FDP']['active'] is False
     assert parties['2022-BDP']['active'] is True
     assert parties['2022-Die Mitte']['active'] is True
     assert parties['2022-FDP']['active'] is True
 
-    assert parties['2011-BDP']['value']['front'] == 1
-    assert parties['2011-Die Mitte']['value']['front'] == 1
-    assert parties['2011-FDP']['value']['front'] == 1
+    assert parties['2018-BDP']['value']['front'] == 1
+    assert parties['2018-Die Mitte']['value']['front'] == 1
+    assert parties['2018-FDP']['value']['front'] == 1
     assert parties['2022-BDP']['value']['front'] == 1
     assert parties['2022-Die Mitte']['value']['front'] == 1
     assert parties['2022-FDP']['value']['front'] == 0
 
-    assert parties['2011-BDP']['value']['back'] == 2.5
-    assert parties['2011-Die Mitte']['value']['back'] == 37.5
-    assert parties['2011-FDP']['value']['back'] == 25
+    assert parties['2018-BDP']['value']['back'] == 2.5
+    assert parties['2018-Die Mitte']['value']['back'] == 37.5
+    assert parties['2018-FDP']['value']['back'] == 25
     assert parties['2022-BDP']['value']['back'] == 16.7
     assert parties['2022-Die Mitte']['value']['back'] == 50
     assert parties['2022-FDP']['value']['back'] == 33.3
@@ -481,10 +639,35 @@ def test_view_election_party_strengths(election_day_app_gr):
     assert '33.3%' in results
     assert '8.3%' in results
 
+    # with exact voters counts
+    edit = client.get('/election/proporz-election/edit')
+    edit.form['voters_counts'] = True
+    edit.form['exact_voters_counts'] = True
+    edit.form.submit()
+
+    assert '>10.00<' in client.get(
+        '/election/proporz-election/party-strengths'
+    )
+    data = client.get('/election/proporz-election/party-strengths-data').json
+    assert data['results'][0]['value']['back'] == 16.67
+    data = client.get('/election/proporz-election/json').json
+    assert data['parties']['2']['2018']['voters_count']['total'] == 150.7
+
+    # with rounded voters counts
+    edit = client.get('/election/proporz-election/edit')
+    edit.form['exact_voters_counts'] = False
+    edit.form.submit()
+
+    assert '>10<' in client.get('/election/proporz-election/party-strengths')
+    data = client.get('/election/proporz-election/party-strengths-data').json
+    assert data['results'][0]['value']['back'] == 16.67
+    data = client.get('/election/proporz-election/json').json
+    assert data['parties']['2']['2018']['voters_count']['total'] == 151
+
     # translations
     client.get('/locale/fr_CH')
-    parties = client.get('/election/proporz-election/party-strengths-data')
-    parties = parties.json
+    parties = client.get(
+        '/election/proporz-election/party-strengths-data').json
     assert parties['groups'] == ['BDP', 'Le Centre', 'FDP']
     results = client.get('/election/proporz-election/party-strengths').text
     assert 'Le Centre' in results
@@ -492,7 +675,7 @@ def test_view_election_party_strengths(election_day_app_gr):
     assert 'BDP' in results
 
 
-def test_view_election_connections(election_day_app_gr):
+def test_view_election_connections(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -507,8 +690,6 @@ def test_view_election_connections(election_day_app_gr):
     chart = client.get('/election/majorz-election/connections-chart')
     assert '/election/majorz-election/connections-data' in chart
 
-    # Fixme: Add an incomplete election and test
-    #  if connections_data is not there
     upload_proporz_election(client)
 
     main = client.get('/election/proporz-election/connections')
@@ -529,8 +710,22 @@ def test_view_election_connections(election_day_app_gr):
     chart = client.get('/election/proporz-election/connections-chart')
     assert '/election/proporz-election/connections-data' in chart
 
+    data = client.get('/election/proporz-election/data-list-connections').json
+    assert data == {
+        '1': {
+            'subconns': {
+                '1': {'lists': {'FDP': 8}, 'total_votes': 8},
+                '2': {'lists': {'CVP': 6}, 'total_votes': 6}
+            },
+            'total_votes': 14
+        }
+    }
 
-def test_view_election_lists_panachage_majorz(election_day_app_gr):
+
+def test_view_election_lists_panachage_majorz(
+    election_day_app_gr: TestApp
+) -> None:
+
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -549,7 +744,10 @@ def test_view_election_lists_panachage_majorz(election_day_app_gr):
     assert '/election/majorz-election/lists-panachage-data' in chart
 
 
-def test_view_election_lists_panachage_proporz(election_day_app_gr):
+def test_view_election_lists_panachage_proporz(
+    election_day_app_gr: TestApp
+) -> None:
+
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -576,7 +774,7 @@ def test_view_election_lists_panachage_proporz(election_day_app_gr):
     assert links == [(3, 1), (4, 2)]
 
 
-def test_view_election_parties_panachage(election_day_app_gr):
+def test_view_election_parties_panachage(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -614,13 +812,13 @@ def test_view_election_parties_panachage(election_day_app_gr):
 
     links = [link['value'] for link in data['links']]
     assert all((i in links for i in (
-        11, 12, 100, 60387 - 11 - 12 - 100,
-        21, 22, 200, 49117 - 21 - 22 - 200,
-        31, 32, 300, 35134 - 31 - 32 - 300
+        11, 12, 100,
+        21, 22, 200,
+        31, 32, 300,
     )))
 
 
-def test_view_election_json(election_day_app_gr):
+def test_view_election_json(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -633,8 +831,6 @@ def test_view_election_json(election_day_app_gr):
     assert all((expected in str(response.json) for expected in (
         "Engler", "Stefan", "20", "Schmid", "Martin", "18"
     )))
-    for tab in ElectionLayout.tabs_with_embedded_tables:
-        assert f'{tab}-table' in str(response.json['embed'])
 
     response = client.get('/election/proporz-election/json')
     assert response.headers['Access-Control-Allow-Origin'] == '*'
@@ -643,7 +839,7 @@ def test_view_election_json(election_day_app_gr):
     )))
 
 
-def test_view_election_summary(election_day_app_gr):
+def test_view_election_summary(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -684,7 +880,7 @@ def test_view_election_summary(election_day_app_gr):
         }
 
 
-def test_view_election_data(election_day_app_gr):
+def test_view_election_data(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -692,30 +888,50 @@ def test_view_election_data(election_day_app_gr):
     upload_majorz_election(client)
     upload_proporz_election(client)
 
-    export = client.get('/election/majorz-election/data-json')
-    assert all((expected in export for expected in ("3506", "Engler", "20")))
+    main = client.get('/election/majorz-election/data')
+    assert '/election/majorz-election/data-json' in main
+    assert '/election/majorz-election/data-csv' in main
 
-    export = client.get('/election/majorz-election/data-csv')
-    assert all((expected in export for expected in ("3506", "Engler", "20")))
+    data = client.get('/election/majorz-election/data-json')
+    assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
+    assert data.headers['Content-Disposition'] == (
+        'inline; filename=majorz-election.json')
+    assert all((expected in data for expected in ("3506", "Engler", "20")))
 
-    export = client.get('/election/proporz-election/data-json')
-    assert all((expected in export for expected in ("FDP", "Caluori", "56")))
+    data = client.get('/election/majorz-election/data-csv')
+    assert data.headers['Content-Type'] == 'text/csv; charset=UTF-8'
+    assert data.headers['Content-Disposition'] == (
+        'inline; filename=majorz-election.csv')
+    assert all((expected in data for expected in ("3506", "Engler", "20")))
 
-    export = client.get('/election/proporz-election/data-csv')
-    assert all((expected in export for expected in ("FDP", "Caluori", "56")))
+    main = client.get('/election/proporz-election/data')
+    assert '/election/proporz-election/data-json' in main
+    assert '/election/proporz-election/data-csv' in main
+
+    data = client.get('/election/proporz-election/data-json')
+    assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
+    assert data.headers['Content-Disposition'] == (
+        'inline; filename=proporz-election.json')
+    assert all((expected in data for expected in ("FDP", "Caluori", "56")))
+
+    data = client.get('/election/proporz-election/data-csv')
+    assert data.headers['Content-Type'] == 'text/csv; charset=UTF-8'
+    assert data.headers['Content-Disposition'] == (
+        'inline; filename=proporz-election.csv')
+    assert all((expected in data for expected in ("FDP", "Caluori", "56")))
 
 
-def test_view_election_tacit(election_day_app_gr):
+def test_view_election_tacit(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Tacit Election'
+    new.form['title_de'] = 'Tacit Election'
     new.form['date'] = '2022-01-01'
     new.form['mandates'] = 2
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form['tacit'] = True
     new.form.submit()
@@ -725,11 +941,11 @@ def test_view_election_tacit(election_day_app_gr):
         "final,,3506,True,56,0,0,0,0,0,1,True,Engler,Stefan,0,\n"
         "final,,3506,True,56,0,0,0,0,0,2,True,Schmid,Martin,0,\n"
     )
-    csv = csv.encode('utf-8')
 
     upload = client.get('/election/tacit-election/upload').follow()
     upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['results'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain')
     upload = upload.form.submit()
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
@@ -739,28 +955,28 @@ def test_view_election_tacit(election_day_app_gr):
     assert "Wahlbeteiligung" not in candidates
 
 
-def test_view_election_relations(election_day_app_gr):
+def test_view_election_relations(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_majorz_election
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'First Election'
+    new.form['title_de'] = 'First Election'
     new.form['date'] = '2022-01-01'
     new.form['mandates'] = 2
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Second Election'
+    new.form['title_de'] = 'Second Election'
     new.form['date'] = '2022-01-02'
     new.form['mandates'] = 2
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
-    new.form['related_elections'] = ['first-election']
+    new.form['related_elections_historical'] = ['first-election']
+    new.form['related_elections_other'] = ['first-election']
     new.form.submit()
 
     csv = MAJORZ_HEADER
@@ -768,12 +984,12 @@ def test_view_election_relations(election_day_app_gr):
         "final,,3506,True,56,0,0,0,0,0,1,True,Engler,Stefan,0,\n"
         "final,,3506,True,56,0,0,0,0,0,2,True,Schmid,Martin,0,\n"
     )
-    csv = csv.encode('utf-8')
 
     for count in ('first', 'second'):
         upload = client.get(f'/election/{count}-election/upload').follow()
         upload.form['file_format'] = 'internal'
-        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        upload.form['results'] = Upload(
+            'data.csv', csv.encode('utf-8'), 'text/plain')
         upload = upload.form.submit()
         assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
@@ -789,10 +1005,11 @@ def test_view_election_relations(election_day_app_gr):
         assert 'First Election' in result
 
 
-@pytest.mark.parametrize('tab_name', ElectionLayout.tabs_with_embedded_tables)
-def test_views_election_embedded_widgets(election_day_app_gr, tab_name):
+def test_views_election_embedded_widgets(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
+
     login(client)
     upload_majorz_election(client)
-    client.get(f'/election/majorz-election/{tab_name}-table')
+    for tab_name in ElectionLayout.tabs_with_embedded_tables:
+        client.get(f'/election/majorz-election/{tab_name}-table')

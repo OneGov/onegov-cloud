@@ -4,6 +4,7 @@
 
 .newslist,
 .directories-list {
+
     i {
         margin-right: $icon-margin-right;
     }
@@ -16,6 +17,23 @@
             margin-left: .5rem;
         }
     }
+
+    .news-lead {
+        color: $body-font-color;
+        display: block;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
+
+    .news-text {
+        color: $body-font-color;
+    }
+
+    hr {
+        border: solid $primary-color 1px;
+        margin: 1rem 0;
+    }
+
 }
 
 .news-list-item {
@@ -26,8 +44,8 @@
         justify-content: space-between;
     }
 
-    .subheader small {
-        color: $dark-gray;
+    .subheader {
+        margin-top: 0;
     }
 
     .heading {
@@ -44,8 +62,19 @@
     }
 
     p.news-lead {
+        color: $body-font-color;
         line-height: 1.5;
     }
+}
+
+.card.news-card {
+    height: calc(100% - 2rem);
+    margin-bottom: 2rem;
+}
+
+.news-card .card-section a:first-child {
+    display: block;
+    height: 100%;
 }
 
 .news-years {
@@ -62,17 +91,13 @@
     }
 }
 
-.news-more-link {
-
-    &::after {
-        @include icon-bold($more-link-icon);
-        float: right;
-        padding-right: .5rem;
-        transition: all 200ms linear;
+body:not(.homepage-layout) {
+    .newslist {
+        justify-content: left;
     }
 
-    &:hover::after {
-        padding-right: 0;
+    .news-all-entries {
+        display: none;
     }
 }
 

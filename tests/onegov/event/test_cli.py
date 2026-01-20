@@ -1,13 +1,16 @@
+from __future__ import annotations
+
+import pytest
+
 from click.testing import CliRunner
 from onegov.core.utils import module_path
 from onegov.event.cli import cli
 from os import path
-from pytest import mark
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 
-def test_import_ical(cfg_path, temporary_directory):
+def test_import_ical(cfg_path: str, temporary_directory: str) -> None:
     runner = CliRunner()
 
     text = '\n'.join([
@@ -87,13 +90,60 @@ def test_import_ical(cfg_path, temporary_directory):
     assert "Events successfully imported" in result.output
     assert "0 added, 1 updated, 0 deleted" in result.output
 
+    # Clear
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'clear'
+    ], 'y')
+    assert result.exit_code == 0
 
-@mark.parametrize("xml", [
+    # import with filter keywords
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'import-ical', ical, '-f', 'kalender', 'Sport Veranstaltungskalender',
+    ])
+    assert result.exit_code == 0
+    assert "Events successfully imported" in result.output
+    assert "1 added, 0 updated, 0 deleted" in result.output
+
+    # Reimport with filter keywords
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'import-ical', ical, '-f', 'animals',
+        # FIXME: I'm not sure what this is testing, but that's not the
+        #        correct way to build this command and if we correct it
+        #        then the follow-up fails since there's no update necessary
+        ['mamals', 'birds', 'fish', 'reptiles', 'insects'],  # type: ignore[list-item]
+    ])
+    assert result.exit_code == 0
+    assert "Events successfully imported" in result.output
+    assert "0 added, 1 updated, 0 deleted" in result.output
+
+    # Reimport again with filter keywords
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'import-ical', ical, '-f', 'animals',
+        'mamals,birds,fish,reptiles,insects',
+    ])
+    assert result.exit_code == 0
+    assert "Events successfully imported" in result.output
+    assert "0 added, 1 updated, 0 deleted" in result.output
+
+
+@pytest.mark.parametrize("xml", [
     module_path('tests.onegov.event', 'fixtures/guidle.xml'),
 ])
-def test_import_guidle(cfg_path, temporary_directory, xml):
-    runner = CliRunner()
+def test_import_guidle(
+    cfg_path: str,
+    temporary_directory: str,
+    xml: str
+) -> None:
 
+    runner = CliRunner()
     with open(xml) as f:
         text = f.read()
     response = MagicMock(text=text)
@@ -157,3 +207,28 @@ def test_import_guidle(cfg_path, temporary_directory, xml):
     assert "Events successfully imported" in result.output
     assert "Tags not in tagmap: \"Kulinarik\"!"
     assert "4 added, 0 updated, 0 deleted" in result.output
+
+
+@pytest.mark.parametrize("xml", [
+    module_path('tests.onegov.event',
+                'fixtures/guidle_no_end_date.xml'),
+])
+def test_import_guidle_no_end_date(cfg_path: str, xml: str) -> None:
+    runner = CliRunner()
+
+    with open(xml) as f:
+        text = f.read()
+    response = MagicMock(text=text)
+
+    # First import
+    with patch('onegov.event.cli.get', return_value=response):
+        result = runner.invoke(cli, [
+            '--config', cfg_path,
+            '--select', '/foo/bar',
+            'import-guidle', "'https://example.org/abcd'",
+        ])
+
+    # Fails on reoccurring event with no end date specified
+    assert result.exit_code == 1
+    assert ("Error importing events: End date is required if recurrence is "
+            "set") in result.output

@@ -1,20 +1,34 @@
+from __future__ import annotations
+
 import morepath
 
 from collections import defaultdict
 
 
-def keywords_encode(keywords):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+    from typing import Protocol
+
+    class HasKeywords(Protocol):
+        @property
+        def keywords(self) -> Mapping[str, Sequence[str]]: ...
+
+
+def keywords_encode(
+    keywords: HasKeywords | Mapping[str, Sequence[str]]
+) -> str:
     """ Takes a dictionary of keywords and encodes them into a somewhat
     readable url query format.
 
-    For example:
+    For example::
 
         {
             'color': ['blue', 'red'],
             'weight': ['normal']
         }
 
-    Results in
+    Results in::
 
         '+color:blue+color:red+weight:normal'
 
@@ -31,7 +45,7 @@ def keywords_encode(keywords):
     if hasattr(keywords, 'keywords'):
         keywords = keywords.keywords
 
-    def escape(s):
+    def escape(s: str) -> str:
         return s.replace('+', '++')
 
     return '+'.join(
@@ -40,7 +54,7 @@ def keywords_encode(keywords):
     )
 
 
-def keywords_decode(text):
+def keywords_decode(text: str) -> dict[str, list[str]] | None:
     """ Decodes keywords creaged by :func:`keywords_encode`. """
 
     if not text:
@@ -56,5 +70,6 @@ def keywords_decode(text):
 
 
 keywords_converter = morepath.Converter(
-    decode=keywords_decode, encode=keywords_encode
+    decode=keywords_decode,
+    encode=keywords_encode  # type:ignore[arg-type]
 )

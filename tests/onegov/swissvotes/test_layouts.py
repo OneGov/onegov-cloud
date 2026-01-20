@@ -1,8 +1,12 @@
+from __future__ import annotations
+
+import pytest
+
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from onegov.core.crypto import random_token
-from onegov.core.utils import Bunch
+from onegov.core.utils import append_query_param
 from onegov.file.utils import as_fileintent
 from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
@@ -29,11 +33,21 @@ from onegov.swissvotes.layouts import VoteCampaignMaterialLayout
 from onegov.swissvotes.layouts import VoteLayout
 from onegov.swissvotes.layouts import VotesLayout
 from onegov.swissvotes.layouts import VoteStrengthsLayout
+from onegov.swissvotes.layouts.page import Slide
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
-from pytest import mark
+from tests.shared.utils import use_locale
 from unittest.mock import patch
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+    from onegov.core.elements import Link, LinkGroup
+    from onegov.swissvotes.models import SwissVoteFile
+    from sqlalchemy.orm import Session
+    from .conftest import TestApp
 
 
 class DummyPrincipal:
@@ -42,49 +56,66 @@ class DummyPrincipal:
 
 class DummyApp:
     principal = DummyPrincipal()
-    theme_options = {}
+    theme_options: dict[str, Any] = {}
     static_content_pages = {'home'}
+    version = '1.0'
+    sentry_dsn = None
 
 
 class DummyRequest:
-    app = DummyApp()
+    app: Any = DummyApp()
     is_logged_in = False
     locale = 'de_CH'
-    roles = []
-    includes = []
-    session = None
+    roles: list[str] = []
+    includes: list[Any] = []
+    session: Any = None
     url = ''
+    csrf_token = 'x'
 
-    def has_role(self, *roles):
-        return any((role in self.roles for role in roles))
+    def has_role(self, *roles: str) -> bool:
+        return any(role in self.roles for role in roles)
 
-    def translate(self, text):
+    def translate(self, text: str) -> str:
         return str(text)
 
-    def include(self, *args, **kwargs):
+    def include(self, *args: Any, **kwargs: Any) -> None:
         self.includes.extend(args)
 
-    def link(self, model, name=''):
-        if isinstance(model, str):
-            return f'{model}/{name}'
-        if hasattr(model, 'bfs_number'):
-            return f'{model.__class__.__name__}/{model.bfs_number}/{name}'
-        if hasattr(model, 'id'):
-            return f'{model.__class__.__name__}/{model.id}/{name}'
-        return f'{model.__class__.__name__}/{name}'
+    def link(self, obj: object, name: str = '') -> str:
+        if isinstance(obj, str):
+            return f'{obj}/{name}'
+        if hasattr(obj, 'bfs_number'):
+            return f'{obj.__class__.__name__}/{obj.bfs_number}/{name}'
+        if hasattr(obj, 'id'):
+            return f'{obj.__class__.__name__}/{obj.id}/{name}'
+        return f'{obj.__class__.__name__}/{name}'
 
-    def exclude_invisible(self, objects):
+    def class_link(
+        self,
+        model: type[object],
+        variables: dict[str, Any] | None = None,
+        name: str = ''
+    ) -> str:
+        return f'{model.__name__}{variables or ""}/{name}'
+
+    def exclude_invisible(self, objects: Any) -> Any:
         return objects
 
-    def new_csrf_token(self):
-        return 'x'
+    def new_csrf_token(self) -> str:
+        return self.csrf_token
+
+    def csrf_protected_url(self, url: str) -> str:
+        return append_query_param(url, 'csrf-token', self.csrf_token)
+
+    def return_to(self, url: str, redirect: str) -> str:
+        return f'{url}{redirect}'
 
 
-def path(links):
-    return '/'.join([link.attrs['href'].strip('/') for link in links])
+def path(links: Iterable[Link]) -> str:
+    return '/'.join(link.attrs['href'].strip('/') for link in links)
 
 
-def hrefs(items):
+def hrefs(items: Iterable[Link | LinkGroup]) -> Iterator[str | None]:
     for item in items:
         if hasattr(item, 'links'):
             for ln in item.links:
@@ -95,16 +126,16 @@ def hrefs(items):
                 )
         else:
             yield (
-                item.attrs.get('href')
-                or item.attrs.get('ic-delete-from')
-                or item.attrs.get('ic-post-to')
+                item.attrs.get('href')  # type: ignore[union-attr]
+                or item.attrs.get('ic-delete-from')  # type: ignore[union-attr]
+                or item.attrs.get('ic-post-to')  # type: ignore[union-attr]
             )
 
 
-def test_layout_default(swissvotes_app):
+def test_layout_default(swissvotes_app: TestApp) -> None:
     session = swissvotes_app.session()
 
-    request = DummyRequest()
+    request: Any = DummyRequest()
     request.app = swissvotes_app
     request.session = session
     model = None
@@ -119,23 +150,27 @@ def test_layout_default(swissvotes_app):
         ('fr_CH', 'fr', 'Français', 'SiteLocale/'),
         ('en_US', 'en', 'English', 'SiteLocale/')
     ]
-    assert layout.request.includes == ['frameworks', 'chosen', 'common']
+    assert request.includes == ['frameworks', 'chosen', 'common']
     assert list(hrefs(layout.top_navigation)) == ['SwissVoteCollection/']
     assert layout.homepage_url == 'Principal/'
     assert layout.votes_url == 'SwissVoteCollection/'
     assert layout.login_url == 'Auth/login'
     assert layout.logout_url is None
     assert layout.move_page_url_template == (
-        'TranslatablePageMove/?csrf-token=x'
+        'TranslatablePageMove{'
+        "'subject_id': '{subject_id}', "
+        "'target_id': '{target_id}', "
+        "'direction': '{direction}'"
+        '}/?csrf-token=x'
     )
     assert path([layout.disclaimer_link]) == 'TranslatablePage/disclaimer'
-    layout.disclaimer_link.text == 'disclaimer'
+    assert layout.disclaimer_link.text == 'disclaimer'
     assert path([layout.imprint_link]) == 'TranslatablePage/imprint'
-    layout.imprint_link.text == 'imprint'
+    assert layout.imprint_link.text == 'imprint'
     assert path([layout.data_protection_link]) == (
         'TranslatablePage/data-protection'
     )
-    layout.data_protection_link.text == 'data-protection'
+    assert layout.data_protection_link.text == 'data-protection'
 
     # Login
     request.is_logged_in = True
@@ -297,8 +332,8 @@ def test_layout_default(swissvotes_app):
     assert layout.format_bfs_number(Decimal('100.12')) == '100.1'
 
 
-def test_layout_format_policy_areas():
-    layout = DefaultLayout(None, DummyRequest())
+def test_layout_format_policy_areas() -> None:
+    layout = DefaultLayout(None, DummyRequest())  # type: ignore[arg-type]
 
     assert layout.format_policy_areas(SwissVote()) == ''
 
@@ -343,16 +378,16 @@ def test_layout_format_policy_areas():
     )
 
 
-def test_layout_mail():
-    request = DummyRequest()
+def test_layout_mail() -> None:
+    request: Any = DummyRequest()
     model = None
 
     layout = MailLayout(model, request)
     assert layout.primary_color == '#fff'
 
 
-def test_layout_page(session):
-    request = DummyRequest()
+def test_layout_page(session: Session) -> None:
+    request: Any = DummyRequest()
     model = TranslatablePage(
         id='page',
         title_translations={'en_US': "Page", 'de_CH': "Seite"},
@@ -399,7 +434,11 @@ def test_layout_page(session):
     ]
 
 
-def test_layout_page_slides(swissvotes_app, slider_images):
+def test_layout_page_slides(
+    swissvotes_app: TestApp,
+    slider_images: dict[str, TranslatablePageFile]
+) -> None:
+
     session = swissvotes_app.session()
     votes = {
         bfs_number: SwissVote(
@@ -416,7 +455,7 @@ def test_layout_page_slides(swissvotes_app, slider_images):
         session.add(vote)
     session.flush()
 
-    request = DummyRequest()
+    request: Any = DummyRequest()
     request.app = swissvotes_app
     model = TranslatablePage(
         id='page',
@@ -432,32 +471,32 @@ def test_layout_page_slides(swissvotes_app, slider_images):
 
     layout = PageLayout(model, request)
     assert layout.slides == [
-        Bunch(
+        Slide(
             image='TranslatablePageFile/{}/'.format(slider_images['1-1'].id),
             url='SwissVote/{}/'.format(votes['1'].bfs_number),
             label=votes['1'].title,
         ),
-        Bunch(
+        Slide(
             image='TranslatablePageFile/{}/'.format(slider_images['1'].id),
             url='SwissVote/{}/'.format(votes['1'].bfs_number),
             label=votes['1'].title,
         ),
-        Bunch(
+        Slide(
             image='TranslatablePageFile/{}/'.format(slider_images['2.1-x'].id),
             url='SwissVote/{}/'.format(votes['2.1'].bfs_number),
             label=votes['2.1'].title,
         ),
-        Bunch(
+        Slide(
             image='TranslatablePageFile/{}/'.format(slider_images['2.2-x'].id),
             url='SwissVote/{}/'.format(votes['2.2'].bfs_number),
             label=votes['2.2'].title,
         ),
-        Bunch(
+        Slide(
             image='TranslatablePageFile/{}/'.format(slider_images['2.3-x'].id),
             url='',
             label='2.3-x.png',
         ),
-        Bunch(
+        Slide(
             image='TranslatablePageFile/{}/'.format(slider_images['n'].id),
             url='',
             label='n.png',
@@ -465,8 +504,8 @@ def test_layout_page_slides(swissvotes_app, slider_images):
     ]
 
 
-def test_layout_add_page(session):
-    request = DummyRequest()
+def test_layout_add_page(session: Session) -> None:
+    request: Any = DummyRequest()
     model = TranslatablePageCollection(session)
 
     layout = AddPageLayout(model, request)
@@ -485,8 +524,8 @@ def test_layout_add_page(session):
     assert layout.editbar_links == []
 
 
-def test_layout_edit_page(session):
-    request = DummyRequest()
+def test_layout_edit_page(session: Session) -> None:
+    request: Any = DummyRequest()
     model = TranslatablePage(
         id='page',
         title_translations={'en_US': "Page", 'de_CH': "Seite"},
@@ -511,8 +550,8 @@ def test_layout_edit_page(session):
     assert layout.editbar_links == []
 
 
-def test_layout_delete_page(session):
-    request = DummyRequest()
+def test_layout_delete_page(session: Session) -> None:
+    request: Any = DummyRequest()
     model = TranslatablePage(
         id='page',
         title_translations={'en_US': "Page", 'de_CH': "Seite"},
@@ -537,8 +576,8 @@ def test_layout_delete_page(session):
     assert layout.editbar_links == []
 
 
-def test_layout_manage_page_attachments(session):
-    request = DummyRequest()
+def test_layout_manage_page_attachments(session: Session) -> None:
+    request: Any = DummyRequest()
     model = TranslatablePage(
         id='page',
         title_translations={'en_US': "Page", 'de_CH': "Seite"},
@@ -554,17 +593,17 @@ def test_layout_manage_page_attachments(session):
 
     # Log in as editor
     request.roles = ['editor']
-    layout = EditPageLayout(model, request)
-    assert layout.editbar_links == []
+    layout2 = EditPageLayout(model, request)
+    assert layout2.editbar_links == []
 
     # Log in as admin
     request.roles = ['admin']
-    layout = EditPageLayout(model, request)
-    assert layout.editbar_links == []
+    layout2 = EditPageLayout(model, request)
+    assert layout2.editbar_links == []
 
 
-def test_layout_mange_page_slides(session):
-    request = DummyRequest()
+def test_layout_mange_page_slides(session: Session) -> None:
+    request: Any = DummyRequest()
     model = TranslatablePage(
         id='page',
         title_translations={'en_US': "Page", 'de_CH': "Seite"},
@@ -580,17 +619,17 @@ def test_layout_mange_page_slides(session):
 
     # Log in as editor
     request.roles = ['editor']
-    layout = EditPageLayout(model, request)
-    assert layout.editbar_links == []
+    layout2 = EditPageLayout(model, request)
+    assert layout2.editbar_links == []
 
     # Log in as admin
     request.roles = ['admin']
-    layout = EditPageLayout(model, request)
-    assert layout.editbar_links == []
+    layout2 = EditPageLayout(model, request)
+    assert layout2.editbar_links == []
 
 
-def test_layout_delete_page_attachment(swissvotes_app):
-    request = DummyRequest()
+def test_layout_delete_page_attachment(swissvotes_app: TestApp) -> None:
+    request: Any = DummyRequest()
 
     model = TranslatablePageFile(id=random_token())
     model.name = 'attachment-name'
@@ -622,9 +661,9 @@ def test_layout_delete_page_attachment(swissvotes_app):
     assert layout.editbar_links == []
 
 
-def test_layout_vote(swissvotes_app):
+def test_layout_vote(swissvotes_app: TestApp) -> None:
     session = swissvotes_app.session()
-    request = DummyRequest()
+    request: Any = DummyRequest()
     request.app = swissvotes_app
     session.add(SwissVote(
         title_de="Vote DE",
@@ -643,15 +682,15 @@ def test_layout_vote(swissvotes_app):
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
 
-    swissvotes_app.session_manager.current_locale = 'fr_CH'
-    model = swissvotes_app.session().query(SwissVote).one()
-    layout = VoteLayout(model, request)
-    assert layout.title == "Vote F"
+    with use_locale(swissvotes_app, 'fr_CH'):
+        model = swissvotes_app.session().query(SwissVote).one()
+        layout = VoteLayout(model, request)
+        assert layout.title == "Vote F"
 
-    swissvotes_app.session_manager.current_locale = 'en_US'
-    model = swissvotes_app.session().query(SwissVote).one()
-    layout = VoteLayout(model, request)
-    assert layout.title == "Vote D"
+    with use_locale(swissvotes_app, 'en_US'):
+        model = swissvotes_app.session().query(SwissVote).one()
+        layout = VoteLayout(model, request)
+        assert layout.title == "Vote D"
 
     # Log in as editor
     request.roles = ['editor']
@@ -676,11 +715,16 @@ def test_layout_vote(swissvotes_app):
     ]
 
 
-@mark.parametrize('locale', ('de_CH', 'fr_CH', 'en_US'))
-def test_layout_vote_file_urls(swissvotes_app, attachments, attachment_urls,
-                               locale):
+@pytest.mark.parametrize('locale', ('de_CH', 'fr_CH', 'en_US'))
+def test_layout_vote_file_urls(
+    swissvotes_app: TestApp,
+    attachments: dict[str, SwissVoteFile],
+    attachment_urls: dict[str, dict[str, str]],
+    locale: str
+) -> None:
+
     session = swissvotes_app.session()
-    request = DummyRequest()
+    request: Any = DummyRequest()
     request.app = swissvotes_app
     request.locale = locale
     model = SwissVote(
@@ -692,23 +736,30 @@ def test_layout_vote_file_urls(swissvotes_app, attachments, attachment_urls,
         date=date(1990, 6, 2),
         _legal_form=1
     )
-    model.session_manager.current_locale = locale
-    for name, attachment in attachments.items():
-        setattr(model, name, attachment)
-    session.add(model)
-    session.flush()
+    with use_locale(model, locale):
+        for name, attachment in attachments.items():
+            setattr(model, name, attachment)
+        session.add(model)
+        session.flush()
 
-    layout = VoteLayout(model, request)
-    for attachment in attachments:
-        filename = (
-            attachment_urls.get(locale, {}).get(attachment)
-            or attachment_urls['de_CH'][attachment]  # fallback
-        )
-        assert layout.attachments[attachment] == f'SwissVote/100/{filename}'
+        layout = VoteLayout(model, request)
+        for name in attachments:
+            filename = (
+                attachment_urls.get(locale, {}).get(name)
+                or attachment_urls['de_CH'][name]  # fallback
+            )
+            assert layout.attachments[name] == {
+                'locale': locale,
+                'url': f'SwissVote/100/{filename}'
+            }
 
 
-def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
-                                        attachment_urls):
+def test_layout_vote_file_urls_fallback(
+    swissvotes_app: TestApp,
+    attachments: dict[str, SwissVoteFile],
+    attachment_urls: dict[str, dict[str, str]]
+) -> None:
+
     model = SwissVote(
         title_de="Vote DE",
         title_fr="Vote FR",
@@ -718,25 +769,29 @@ def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
         date=date(1990, 6, 2),
         _legal_form=1
     )
-    model.session_manager.current_locale = 'de_CH'
-    setattr(model, 'post_vote_poll', attachments['post_vote_poll'])
+    model.post_vote_poll = attachments['post_vote_poll']
 
     session = swissvotes_app.session()
     session.add(model)
     session.flush()
 
-    request = DummyRequest()
+    request: Any = DummyRequest()
     request.app = swissvotes_app
     request.locale = 'fr_CH'
 
     layout = VoteLayout(model, request)
-    assert layout.attachments['post_vote_poll'] == (
-        'SwissVote/100/nachbefragung-de.pdf'
-    )
+    assert layout.attachments['post_vote_poll'] == {
+        'locale': 'de_CH',
+        'url': 'SwissVote/100/nachbefragung-de.pdf'
+    }
 
 
-def test_layout_vote_search_results(swissvotes_app, attachments,
-                                    campaign_material):
+def test_layout_vote_search_results(
+    swissvotes_app: TestApp,
+    attachments: dict[str, SwissVoteFile],
+    campaign_material: dict[str, SwissVoteFile]
+) -> None:
+
     model = SwissVote(
         title_de="Vote DE",
         title_fr="Vote FR",
@@ -762,8 +817,8 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
         ('post_vote_poll', 'de_CH'),
         ('brief_description', 'fr_CH')
     ):
-        model.session_manager.current_locale = locale
-        setattr(model, name, attachments[name])
+        with use_locale(model, locale):
+            setattr(model, name, attachments[name])
 
     for name in (
         'campaign_material_other-article.pdf',
@@ -777,7 +832,7 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
     session.add(model)
     session.flush()
 
-    request = DummyRequest()
+    request: Any = DummyRequest()
     request.app = swissvotes_app
     request.locale = 'de_CH'
 
@@ -786,7 +841,8 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
         results = [r[:4] for r in layout.search_results]
         assert results == [
             (0, 'Brief description Swissvotes', 'French', False),
-            (0, 'Full analysis of post-vote poll results', 'German', False),
+            (0, 'Full analysis of VOX post-vote poll results', 'German',
+             False),
             (1, 'campaign_material_other-leaflet.pdf', '', True),
             (1, 'Perché è una pessima idea.', 'Italian, Rhaeto-Romanic',
              False),
@@ -795,8 +851,8 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
         ]
 
 
-def test_layout_vote_details(swissvotes_app):
-    request = DummyRequest()
+def test_layout_vote_details(swissvotes_app: TestApp) -> None:
+    request: Any = DummyRequest()
     request.app = swissvotes_app
     model = SwissVote(
         title_de="Vote",
@@ -805,6 +861,8 @@ def test_layout_vote_details(swissvotes_app):
         short_title_fr="Vote",
         bfs_number=Decimal('100')
     )
+
+    layout: DefaultLayout
 
     # VoteStrengthsLayout
     layout = VoteStrengthsLayout(model, request)
@@ -907,8 +965,8 @@ def test_layout_vote_details(swissvotes_app):
     assert layout.editbar_links == []
 
 
-def test_layout_vote_campaign_material(swissvotes_app):
-    request = DummyRequest()
+def test_layout_vote_campaign_material(swissvotes_app: TestApp) -> None:
+    request: Any = DummyRequest()
     request.app = swissvotes_app
     model = SwissVote(
         title_de="Vote",
@@ -936,13 +994,15 @@ def test_layout_vote_campaign_material(swissvotes_app):
             'legal': 'Legal text',
             'lecture': 'Text of a presentation',
             'statistics': 'Statistical data',
-            'other': 'Other'
+            'other': 'Other',
+            'website': 'Website'
         },
         'language': {
             'de': 'German',
             'fr': 'French',
             'it': 'Italian',
             'rm': 'Rhaeto-Romanic',
+            'en': 'English',
             'mixed': 'Mixed',
             'other': 'Other'
         },
@@ -953,13 +1013,13 @@ def test_layout_vote_campaign_material(swissvotes_app):
             'mixed': 'Mixed'
         }
     }
-    assert layout.format_code(None, None) == ''
-    assert layout.format_code({}, None) == ''
+    assert layout.format_code(None, None) == ''  # type: ignore[arg-type]
+    assert layout.format_code({}, None) == ''  # type: ignore[arg-type]
     assert layout.format_code({}, 'language') == ''
     assert layout.format_code({'language': 'de'}, 'language') == 'German'
     assert layout.format_code({'language': 'zu'}, 'language') == ''
     assert layout.format_code({'language': ['de', 'en']}, 'language') == (
-        'German'
+        'German, English'
     )
     assert layout.format_code({'language': ['de', 'fr']}, 'language') == (
         'German, French'
@@ -1049,8 +1109,8 @@ def test_layout_vote_campaign_material(swissvotes_app):
     }
 
 
-def test_layout_votes(swissvotes_app):
-    request = DummyRequest()
+def test_layout_votes(swissvotes_app: TestApp) -> None:
+    request: Any = DummyRequest()
     request.app = swissvotes_app
     model = SwissVoteCollection(swissvotes_app)
 
@@ -1083,12 +1143,13 @@ def test_layout_votes(swissvotes_app):
     ]
 
 
-def test_layout_votes_details(swissvotes_app):
+def test_layout_votes_details(swissvotes_app: TestApp) -> None:
     # UpdateVotesLayout
-    request = DummyRequest()
+    request: Any = DummyRequest()
     request.app = swissvotes_app
     model = SwissVoteCollection(swissvotes_app)
 
+    layout: DefaultLayout
     layout = UpdateVotesLayout(model, request)
     assert layout.title == _("Update dataset on the votes")
     assert layout.editbar_links == []
@@ -1153,8 +1214,12 @@ def test_layout_votes_details(swissvotes_app):
     assert layout.editbar_links == []
 
 
-def test_layout_delete_vote_attachment(swissvotes_app, attachments):
-    request = DummyRequest()
+def test_layout_delete_vote_attachment(
+    swissvotes_app: TestApp,
+    attachments: dict[str, SwissVoteFile]
+) -> None:
+
+    request: Any = DummyRequest()
     request.app = swissvotes_app
     vote = SwissVote(
         title_de="Vote",
@@ -1163,8 +1228,7 @@ def test_layout_delete_vote_attachment(swissvotes_app, attachments):
         short_title_fr="Vote",
         bfs_number=Decimal('100')
     )
-    vote.ad_analysis = attachments['ad_analysis']
-    model = vote.ad_analysis
+    model = vote.ad_analysis = attachments['ad_analysis']
 
     layout = DeleteVoteAttachmentLayout(model, request)
     assert layout.title == _("Delete attachment")

@@ -1,9 +1,24 @@
+from __future__ import annotations
+
 from morepath import App
+
+
+from typing import TYPE_CHECKING, Any
+if TYPE_CHECKING:
+    from onegov.core import cache
 
 
 class ApiApp(App):
 
-    def configure_api(self, **cfg):
+    if TYPE_CHECKING:
+        # forward declare Framework.get_cache
+        def get_cache(
+            self,
+            name: str,
+            expiration_time: float
+        ) -> cache.RedisCacheRegion: ...
+
+    def configure_api(self, **cfg: Any) -> None:
         """ Configures the API.
 
         The following configuration options are accepted:
@@ -22,13 +37,13 @@ class ApiApp(App):
         )
 
     @property
-    def rate_limit_cache(self):
+    def rate_limit_cache(self) -> cache.RedisCacheRegion:
         """ A cache for rate limits. """
 
-        limit, expiration = self.rate_limit
+        _limit, expiration = self.rate_limit
         return self.get_cache('rate_limits', expiration)
 
 
 @ApiApp.setting(section='api', name='endpoints')
-def get_api_endpoints():
+def get_api_endpoints() -> list[str]:
     return []

@@ -1,5 +1,9 @@
+from __future__ import annotations
+
 import base64
 import bleach
+from urlextract import URLExtract, CacheFileError
+from bleach.linkifier import TLDS
 import errno
 import fcntl
 import gzip
@@ -19,23 +23,44 @@ import urllib.request
 from collections.abc import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
-from datetime import datetime
-from functools import reduce
+from functools import lru_cache, reduce, cache
 from importlib import import_module
 from io import BytesIO, StringIO
-from itertools import groupby, islice, tee, zip_longest
+from itertools import groupby, islice
+from markupsafe import escape
+from markupsafe import Markup
 from onegov.core import log
-from onegov.core.cache import lru_cache
 from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
+from phonenumbers import (PhoneNumberFormat, format_number,
+                          NumberParseException, parse)
 from purl import URL
 from threading import Thread
+from time import perf_counter
 from unidecode import unidecode
 from uuid import UUID, uuid4
 from webob import static
-from yubico_client import Yubico
-from yubico_client.yubico_exceptions import SignatureVerificationError
-from yubico_client.yubico_exceptions import StatusCodeError
+from yubico_client import Yubico  # type:ignore[import-untyped]
+from yubico_client.yubico_exceptions import (  # type:ignore[import-untyped]
+    SignatureVerificationError, StatusCodeError)
+
+
+from typing import overload, Any, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import SupportsRichComparison
+    from collections.abc import Callable, Collection, Iterator, Mapping
+    from fs.base import FS, SubFS
+    from re import Match
+    from sqlalchemy import Column
+    from sqlalchemy.orm import Session
+    from types import ModuleType
+    from webob import Response
+    from .request import CoreRequest
+    from .types import FileDict, LaxFileDict
+
+
+_T = TypeVar('_T')
+_KT = TypeVar('_KT')
 
 
 # http://stackoverflow.com/a/13500078
@@ -43,15 +68,16 @@ _unwanted_url_chars = re.compile(r'[\.\(\)\\/\s<>\[\]{},:;?!@&=+$#@%|\*"\'`]+')
 _double_dash = re.compile(r'[-]+')
 _number_suffix = re.compile(r'-([0-9]+)$')
 _repeated_spaces = re.compile(r'\s\s+')
+_repeated_dots = re.compile(r'\.\.+')
 _uuid = re.compile(
     r'^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$')
 
 # only temporary until bleach has a release > 1.4.1 -
-_email_regex = re.compile((
+_email_regex = re.compile(
     r"([a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`"
     r"{|}~-]+)*(@|\sat\s)(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(\.|"
     r"\sdot\s))+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)"
-))
+)
 
 # detects multiple successive newlines
 _multiple_newlines = re.compile(r'\n{2,}', re.MULTILINE)
@@ -59,11 +85,8 @@ _multiple_newlines = re.compile(r'\n{2,}', re.MULTILINE)
 # detect starting strings of phone inside a link
 _phone_inside_a_tags = r'(\">|href=\"tel:)?'
 
-# matches duplicate whitespace
-_duplicate_whitespace = re.compile(r'\s{2,}')
-
 # regex pattern for swiss phone numbers
-_phone_ch_country_code = r"(\+41|0041|0[0-9]{2})"
+_phone_ch_country_code = r'(\+41|0041|0[0-9]{2})'
 _phone_ch = re.compile(_phone_ch_country_code + r'([ \r\f\t\d]+)')
 
 # Adds a regex group to capture if a leading a tag is present or if the
@@ -77,7 +100,7 @@ ALPHABET_RE = re.compile(r'^[cbdefghijklnrtuv]{12,44}$')
 
 
 @contextmanager
-def local_lock(namespace, key):
+def local_lock(namespace: str, key: str) -> Iterator[None]:
     """ Locks the given namespace/key combination on the current system,
     automatically freeing it after the with statement has been completed or
     once the process is killed.
@@ -90,16 +113,21 @@ def local_lock(namespace, key):
     """
     name = f'{namespace}-{key}'.replace('/', '-')
 
-    with open(f'/tmp/{name}', 'w+') as f:
+    # NOTE: hardcoding /tmp is a bit piggy, but on the other hand we
+    #       don't want different processes to miss each others locks
+    #       just because one of them has a different TMPDIR, can we
+    #       come up with a more robust way of doing this, e.g. with
+    #       named semaphores?
+    with open(f'/tmp/{name}', 'w+') as f:  # nosec:B108
         try:
             fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
             yield
             fcntl.flock(f, fcntl.LOCK_UN)
-        except BlockingIOError:
-            raise AlreadyLockedError
+        except BlockingIOError as exception:
+            raise AlreadyLockedError from exception
 
 
-def normalize_for_url(text):
+def normalize_for_url(text: str) -> str:
     """ Takes the given text and makes it fit to be used for an url.
 
     That means replacing spaces and other unwanted characters with '-',
@@ -112,9 +140,9 @@ def normalize_for_url(text):
 
     # German is our main language, so we are extra considerate about it
     # (unidecode turns ü into u)
-    text = text.replace("ü", "ue")
-    text = text.replace("ä", "ae")
-    text = text.replace("ö", "oe")
+    text = text.replace('ü', 'ue')
+    text = text.replace('ä', 'ae')
+    text = text.replace('ö', 'oe')
     clean = _unwanted_url_chars.sub('-', unidecode(text).strip(' ').lower())
     clean = _double_dash.sub('-', clean)
     clean = clean.strip('-')
@@ -122,7 +150,37 @@ def normalize_for_url(text):
     return clean
 
 
-def increment_name(name):
+def normalize_for_path(
+    text: str,
+    default: str = '_default_path_'
+) -> str:
+    """
+    Takes the given text and makes it fit to be used for a path. It replaces
+    invalid characters (for windows and linux systems) with underscores.
+    """
+    sanitized = re.sub(r'[<>:"/\\|?*]', '_', text).strip()
+    return sanitized or default
+
+
+def normalize_for_filename(
+    text: str,
+    default: str = '_default_filename_'
+) -> str:
+    """
+    Takes the given text and makes it fit to be used as a filename for windows
+    and linux systems. Replaces invalid characters with underscores.
+    """
+    sanitized = re.sub(r'[<>:"/\\|?*\x00-\x1F]', '_', text)
+    sanitized = sanitized.strip().strip('.')
+    sanitized = sanitized or default
+
+    max_length = 255
+    if len(sanitized) > max_length:
+        sanitized = sanitized[:max_length]
+    return sanitized
+
+
+def increment_name(name: str) -> str:
     """ Takes the given name and adds a numbered suffix beginning at 1.
 
     For example::
@@ -133,40 +191,28 @@ def increment_name(name):
     """
 
     match = _number_suffix.search(name)
-    number = (match and int(match.group(1)) or 0) + 1
-
     if match:
-        return _number_suffix.sub('-{}'.format(number), name)
+        number_str = match.group(1)
+        next_number = int(number_str) + 1
+        return f'{name[:-len(number_str)]}{next_number}'
     else:
-        return name + '-{}'.format(number)
+        return f'{name}-1'
 
 
-def lchop(text, beginning):
-    """ Removes the beginning from the text if the text starts with it. """
-
-    if text.startswith(beginning):
-        return text[len(beginning):]
-
-    return text
-
-
-def rchop(text, end):
-    """ Removes the end from the text if the text ends with it. """
-
-    if text.endswith(end):
-        return text[:-len(end)]
-
-    return text
-
-
-def remove_repeated_spaces(text):
+def remove_repeated_spaces(text: str) -> str:
     """ Removes repeated spaces in the text ('a  b' -> 'a b'). """
 
     return _repeated_spaces.sub(' ', text)
 
 
+def remove_repeated_dots(text: str) -> str:
+    """ Removes repeated dots in the text ('a..b' -> 'a.b'). """
+
+    return _repeated_dots.sub('.', text)
+
+
 @contextmanager
-def profile(filename):
+def profile(filename: str) -> Iterator[None]:
     """ Profiles the wrapped code and stores the result in the profiles folder
     with the given filename.
 
@@ -182,27 +228,25 @@ def profile(filename):
 
 
 @contextmanager
-def timing(name=None):
+def timing(name: str | None = None) -> Iterator[None]:
     """ Runs the wrapped code and prints the time in ms it took to run it.
     The name is printed in front of the time, if given.
 
     """
-
-    start = datetime.utcnow()
+    start = perf_counter()
 
     yield
 
-    duration = datetime.utcnow() - start
-    duration = int(round(duration.total_seconds() * 1000, 0))
+    duration_ms = 1000.0 * (perf_counter() - start)
 
     if name:
-        print('{}: {} ms'.format(name, duration))
+        print(f'{name}: {duration_ms:.0f} ms')  # noqa: T201
     else:
-        print('{} ms'.format(duration))
+        print(f'{duration_ms:.0f} ms')  # noqa: T201
 
 
 @lru_cache(maxsize=32)
-def module_path_root(module):
+def module_path_root(module: ModuleType | str) -> str:
     if isinstance(module, str):
         module = importlib.import_module(module)
 
@@ -211,7 +255,7 @@ def module_path_root(module):
     return os.path.dirname(inspect.getfile(module))
 
 
-def module_path(module, subpath):
+def module_path(module: ModuleType | str, subpath: str) -> str:
     """ Returns a subdirectory in the given python module.
 
     :mod:
@@ -230,7 +274,7 @@ def module_path(module, subpath):
     return path
 
 
-def touch(file_path):
+def touch(file_path: str) -> None:
     """ Touches the file on the given path. """
     try:
         os.utime(file_path, None)
@@ -259,41 +303,51 @@ class Bunch:
         assert request.app.settings.org.my_setting is True
 
     """
-    def __init__(self, **kwargs):
-        self.__dict__.update({
-            key: value for key, value in kwargs.items()
+    def __init__(self, **kwargs: Any):
+        self.__dict__.update(
+            (key, value)
+            for key, value in kwargs.items()
             if '.' not in key
-        })
+        )
         for key, value in kwargs.items():
             if '.' in key:
-                name = key.split('.')[0]
-                key = '.'.join(key.split('.')[1:])
+                name, _, key = key.partition('.')
                 setattr(self, name, Bunch(**{key: value}))
 
-    def __eq__(self, other):
+    if TYPE_CHECKING:
+        # let mypy know that any attribute access could be valid
+        def __getattr__(self, name: str) -> Any: ...
+        def __setattr__(self, name: str, value: Any) -> None: ...
+        def __delattr__(self, name: str) -> None: ...
+
+    def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
             return self.__dict__ == other.__dict__
         return False
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
 
-def render_file(file_path, request):
+def render_file(file_path: str, request: CoreRequest) -> Response:
     """ Takes the given file_path (content) and renders it to the browser.
     The file must exist on the local system and be readable by the current
     process.
 
     """
 
-    def hash_path(path):
-        return hashlib.sha1(path.encode('utf-8')).hexdigest()
+    def hash_path(path: str) -> str:
+        return hashlib.new(  # nosec:B324
+            'sha1',
+            path.encode('utf-8'),
+            usedforsecurity=False
+        ).hexdigest()
 
     # this is a very cachable result - though it's possible that a file
     # changes it's content type, it should usually not, especially since
     # we emphasize the use of random filenames
     @request.app.cache.cache_on_arguments(to_str=hash_path)
-    def get_content_type(file_path):
+    def get_content_type(file_path: str) -> str:
         content_type = mimetypes.guess_type(file_path)[0]
 
         if not content_type:
@@ -305,7 +359,7 @@ def render_file(file_path, request):
         static.FileApp(file_path, content_type=get_content_type(file_path)))
 
 
-def hash_dictionary(dictionary):
+def hash_dictionary(dictionary: dict[str, Any]) -> str:
     """ Computes a sha256 hash for the given dictionary. The dictionary
     is expected to only contain values that can be serialized by json.
 
@@ -315,19 +369,47 @@ def hash_dictionary(dictionary):
     not include data in this dictionary that is secret!
 
     """
-    dict_as_string = json.dumps(dictionary, sort_keys=True).encode('utf-8')
-    return hashlib.sha1(dict_as_string).hexdigest()
+    # NOTE: For backwards compatibility we use the old json encoder
+    #       otherwise our hashes change depending on whether or not
+    #       the dictionary contained non-ASCII characters
+    dict_as_string = json.dumps(
+        dictionary,
+        sort_keys=True,
+        ensure_ascii=True
+    ).encode('ascii')
+    return hashlib.new(  # nosec:B324
+        'sha1',
+        dict_as_string,
+        usedforsecurity=False
+    ).hexdigest()
 
 
-def groupbylist(*args, **kwargs):
+@overload
+def groupbylist(
+    iterable: Iterable[_T],
+    key: None = ...
+) -> list[tuple[_T, list[_T]]]: ...
+
+
+@overload
+def groupbylist(
+    iterable: Iterable[_T],
+    key: Callable[[_T], _KT]
+) -> list[tuple[_KT, list[_T]]]: ...
+
+
+def groupbylist(
+    iterable: Iterable[_T],
+    key: Callable[[_T], Any] | None = None
+) -> list[tuple[Any, list[_T]]]:
     """ Works just like Python's ``itertools.groupby`` function, but instead
     of returning generators, it returns lists.
 
     """
-    return [(k, list(g)) for k, g in groupby(*args, **kwargs)]
+    return [(k, list(g)) for k, g in groupby(iterable, key=key)]
 
 
-def linkify_phone(text):
+def linkify_phone(text: str) -> Markup:
     """ Takes a string and replaces valid phone numbers with html links. If a
     phone number is matched, it will be replaced by the result of a callback
     function, that does further checks on the regex match. If these checks do
@@ -335,10 +417,10 @@ def linkify_phone(text):
 
     """
 
-    def strip_whitespace(number):
+    def strip_whitespace(number: str) -> str:
         return re.sub(r'\s', '', number)
 
-    def is_valid_length(number):
+    def is_valid_length(number: str) -> bool:
         if number.startswith('+00'):
             return False
         if number.startswith('00'):
@@ -349,22 +431,36 @@ def linkify_phone(text):
             return len(number) == 12
         return False
 
-    def handle_match(match):
+    def handle_match(match: Match[str]) -> str:
         inside_html = match.group(1)
         number = f'{match.group(2)}{match.group(3)}'
         assert not number.endswith('\n')
         if inside_html:
             return match.group(0)
         if is_valid_length(strip_whitespace(number)):
-            number = remove_duplicate_whitespace(number).strip()
-            return f'<a href="tel:{number}">{number}</a> '
+            number = remove_repeated_spaces(number).strip()
+            return Markup(
+                '<a href="tel:{number}">{number}</a> '
+            ).format(number=number)
 
         return match.group(0)
 
-    return _phone_ch_html_safe.sub(handle_match, text)
+    # NOTE: re.sub isn't Markup aware, so we need to re-wrap
+    return Markup(  # nosec: B704
+        _phone_ch_html_safe.sub(handle_match, escape(text)))
 
 
-def linkify(text, escape=True):
+@cache
+def top_level_domains() -> set[str]:
+    try:
+        return URLExtract()._load_cached_tlds()
+    except CacheFileError:
+        pass
+    # fallback
+    return {'agency', 'ngo', 'swiss', 'gle'}
+
+
+def linkify(text: str | None) -> Markup:
     """ Takes plain text and injects html links for urls and email addresses.
 
     By default the text is html escaped before it is linkified. This accounts
@@ -380,32 +476,52 @@ def linkify(text, escape=True):
     """
 
     if not text:
-        return text
+        return Markup('')
 
-    linkified = linkify_phone(bleach.linkify(text, parse_email=True))
+    def remove_dots(tlds: set[str]) -> list[str]:
+        return [domain[1:] for domain in tlds]
 
-    if not escape:
+    # bleach.linkify supports only a fairly limited amount of tlds
+    additional_tlds = top_level_domains()
+    if any(domain in text for domain in additional_tlds):
+
+        all_tlds = list(set(TLDS + remove_dots(additional_tlds)))
+
+        # Longest first, to prevent eager matching, if for example
+        # .co is matched before .com
+        all_tlds.sort(key=len, reverse=True)
+
+        bleach_linker = bleach.Linker(
+            url_re=bleach.linkifier.build_url_re(tlds=all_tlds),
+            email_re=bleach.linkifier.build_email_re(tlds=all_tlds),
+            parse_email=True if '@' in text else False
+        )
+        # NOTE: bleach's linkify always returns a plain string
+        #       so we need to re-wrap
+        linkified = linkify_phone(Markup(  # nosec: B704
+            bleach_linker.linkify(escape(text)))
+        )
+
+    else:
+        # NOTE: bleach's linkify always returns a plain string
+        #       so we need to re-wrap
+        linkified = linkify_phone(Markup(  # nosec: B704
+            bleach.linkify(escape(text), parse_email=True))
+        )
+
+    # NOTE: this is already vetted markup, don't clean it
+    if isinstance(text, Markup):
         return linkified
 
-    return bleach.clean(
+    return Markup(bleach.clean(  # nosec: B704
         linkified,
         tags=['a'],
         attributes={'a': ['href', 'rel']},
         protocols=['http', 'https', 'mailto', 'tel']
-    )
+    ))
 
 
-def remove_duplicate_whitespace(text):
-    """ Removes whitespace that is duplicated.
-
-    For example: 'foo  bar' becomes 'foo bar'.
-
-    """
-
-    return _duplicate_whitespace.sub(' ', text)
-
-
-def paragraphify(text):
+def paragraphify(text: str) -> Markup:
     """ Takes a text with newlines groups them into paragraphs according to the
     following rules:
 
@@ -419,62 +535,100 @@ def paragraphify(text):
     text = text and text.replace('\r', '').strip('\n')
 
     if not text:
-        return ''
+        return Markup('')
 
-    return ''.join(f'<p>{p}</p>' for p in (
-        p.replace('\n', '<br>') for p in _multiple_newlines.split(text)
-    ))
+    was_markup = isinstance(text, Markup)
+
+    return Markup('').join(
+        Markup('<p>{}</p>').format(
+            (
+                # NOTE: re.split returns a plain str, so we need to restore
+                #       markup based on whether it was markup before
+                Markup(p) if was_markup  # nosec: B704
+                else escape(p)
+            ).replace('\n', Markup('<br>'))
+        )
+        for p in _multiple_newlines.split(text)
+    )
 
 
-def to_html_ul(value, convert_dashes=True):
-    """ Linkify and convert to text to one or multiple ul's.
+def to_html_ul(
+    value: str | None,
+    convert_dashes: bool = True,
+    with_title: bool = False
+) -> Markup:
+    """ Linkify and convert to text to one or multiple ul's or paragraphs.
     """
     if not value:
-        return ''
+        return Markup('')
 
     value = value.replace('\r', '').strip('\n')
+    value = value.replace('\n\n', '\n \n')
 
     if not convert_dashes:
-        return '<ul><li>{}</li></ul>'.format(
-            '</li><li>'.join(linkify(value).splitlines())
+        return Markup('<p>{}</p>').format(
+            Markup('<br>').join(linkify(value).splitlines())
         )
 
     elements = []
-    temp_li = []
+    temp: list[Markup] = []
 
-    def ul(inner, bulleted=False):
-        return f'<ul class="bulleted">{inner}</ul>' if bulleted \
-            else f'<ul>{inner}</ul>'
+    def ul(inner: str) -> Markup:
+        return Markup('<ul class="bulleted">{}</ul>').format(inner)
 
-    def li(inner):
-        return f'<li>{inner}</li>'
+    def li(inner: str) -> Markup:
+        return Markup('<li>{}</li>').format(inner)
 
-    was_bulleted = False
-    for line in value.splitlines():
+    def p(inner: str) -> Markup:
+        return Markup('<p>{}</p>').format(inner)
+
+    was_list = False
+
+    for i, line in enumerate(value.splitlines()):
         if not line:
             continue
+
         line = linkify(line)
-        now_bullet = line.startswith('-')
+        is_list = line.startswith('-')
+        new_p_or_ul = True if line == ' ' else False
+
         line = line.lstrip('-').strip()
-        if now_bullet and was_bulleted:
-            temp_li.append(li(line))
-        elif now_bullet != was_bulleted:
-            if temp_li:
-                elements.append(ul(''.join(temp_li), bulleted=was_bulleted))
-                temp_li = []
-            temp_li.append(li(line))
+
+        if with_title:
+            elements.append(p(
+                Markup('<span class="title">{}</span>').format(line)))
+            with_title = False
         else:
-            temp_li.append(li(line))
+            if new_p_or_ul or (was_list != is_list and i > 0):
+                elements.append(
+                    ul(Markup('').join(temp)) if was_list
+                    else p(Markup('<br>').join(temp))
+                )
+                temp = []
+                was_list = False
 
-        was_bulleted = now_bullet
+            if not new_p_or_ul:
+                temp.append(li(line) if is_list else line)
 
-    if temp_li:
-        elements.append(ul(''.join(temp_li), bulleted=was_bulleted))
+        new_p_or_ul = False
+        was_list = is_list
 
-    return ''.join(elements)
+    if temp:
+        elements.append(
+            ul(Markup('').join(temp)) if was_list
+            else p(Markup('<br>').join(temp))
+        )
+
+    return Markup('').join(elements)
 
 
-def ensure_scheme(url, default='http'):
+@overload
+def ensure_scheme(url: str, default: str = 'http') -> str: ...
+@overload
+def ensure_scheme(url: None, default: str = 'http') -> None: ...
+
+
+def ensure_scheme(url: str | None, default: str = 'http') -> str | None:
     """ Makes sure that the given url has a scheme in front, if none
     was provided.
 
@@ -497,7 +651,7 @@ def ensure_scheme(url, default='http'):
     return _url.scheme(default).as_string()
 
 
-def is_uuid(value):
+def is_uuid(value: object) -> bool:
     """ Returns true if the given value is a uuid. The value may be a string
     or of type UUID. If it's a string, the uuid is checked with a regex.
     """
@@ -507,37 +661,12 @@ def is_uuid(value):
     return isinstance(value, UUID)
 
 
-def is_non_string_iterable(obj):
+def is_non_string_iterable(obj: object) -> bool:
     """ Returns true if the given obj is an iterable, but not a string. """
-    return not (isinstance(obj, str) or isinstance(obj, bytes))\
-        and isinstance(obj, Iterable)
+    return not isinstance(obj, (str, bytes)) and isinstance(obj, Iterable)
 
 
-def pairwise(iterable):
-    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
-
-
-def chunks(iterable, n, fillvalue=None):
-    """ Iterates through an iterable, returning chunks with the given size.
-
-    For example::
-
-        chunks('ABCDEFG', 3, 'x') --> [
-            ('A', 'B', 'C'),
-            ('D', 'E', 'F'),
-            ('G', 'x', 'x')
-        ]
-
-    """
-
-    args = [iter(iterable)] * n
-    return zip_longest(fillvalue=fillvalue, *args)
-
-
-def relative_url(absolute_url):
+def relative_url(absolute_url: str | None) -> str:
     """ Removes everything in front of the path, including scheme, host,
     username, password and port.
 
@@ -554,7 +683,7 @@ def relative_url(absolute_url):
     return url.as_string()
 
 
-def is_subpath(directory, path):
+def is_subpath(directory: str, path: str) -> bool:
     """ Returns true if the given path is inside the given directory. """
     directory = os.path.join(os.path.realpath(directory), '')
     path = os.path.realpath(path)
@@ -564,19 +693,46 @@ def is_subpath(directory, path):
     return os.path.commonprefix([path, directory]) == directory
 
 
-def is_sorted(iterable, key=lambda i: i, reverse=False):
+@overload
+def is_sorted(
+    iterable: Iterable[SupportsRichComparison],
+    key: Callable[[SupportsRichComparison], SupportsRichComparison] = ...,
+    reverse: bool = ...
+) -> bool: ...
+
+
+@overload
+def is_sorted(
+    iterable: Iterable[_T],
+    key: Callable[[_T], SupportsRichComparison],
+    reverse: bool = ...
+) -> bool: ...
+
+
+# FIXME: Do we really want to allow any Iterable? This seems like a bad
+#        idea to me... Iterators will be consumed and the Iterable might
+#        be infinite. This seems like it should be a Container instead,
+#        then we also don't need to use tee or list to make a copy
+def is_sorted(
+    iterable: Iterable[Any],
+    key: Callable[[Any], SupportsRichComparison] = lambda i: i,
+    reverse: bool = False
+) -> bool:
     """ Returns True if the iterable is sorted. """
 
-    i1, i2 = tee(iterable)
+    # NOTE: we previously used `tee` here, but since `sorted` consumes
+    #       the entire iterator, this is the exact case where tee is
+    #       slower than just pulling the entire sequence into a list
+    seq = list(iterable)
 
-    for a, b in zip(i1, sorted(i2, key=key, reverse=reverse)):
+    for a, b in zip(seq, sorted(seq, key=key, reverse=reverse)):
         if a is not b:
             return False
 
     return True
 
 
-def morepath_modules(cls):
+def morepath_modules(cls: type[morepath.App]) -> Iterator[str]:
     """ Returns all morepath modules which should be scanned for the given
     morepath application class.
 
@@ -600,8 +756,8 @@ def morepath_modules(cls):
         yield module
 
 
-def scan_morepath_modules(cls):
-    """ Tries to scann all the morepath modules required for the given
+def scan_morepath_modules(cls: type[morepath.App]) -> None:
+    """ Tries to scan all the morepath modules required for the given
     application class. This is not guaranteed to stay reliable as there is
     no sure way to discover all modules required by the application class.
 
@@ -610,13 +766,17 @@ def scan_morepath_modules(cls):
         morepath.scan(import_module(module))
 
 
-def get_unique_hstore_keys(session, column):
+def get_unique_hstore_keys(
+    session: Session,
+    column: Column[dict[str, Any]] | Column[dict[str, Any] | None] |
+            Column[Mapping[str, Any]] | Column[Mapping[str, Any] | None]
+) -> set[str]:
     """ Returns a set of keys found in an hstore column over all records
     of its table.
 
     """
 
-    base = session.query(column.keys()).with_entities(
+    base = session.query(column.keys()).with_entities(  # type:ignore
         sqlalchemy.func.skeys(column).label('keys'))
 
     query = sqlalchemy.select(
@@ -628,7 +788,7 @@ def get_unique_hstore_keys(session, column):
     return set(keys) if keys else set()
 
 
-def makeopendir(fs, directory):
+def makeopendir(fs: FS, directory: str) -> SubFS[FS]:
     """ Creates and opens the given directory in the given PyFilesystem. """
 
     if not fs.isdir(directory):
@@ -637,14 +797,14 @@ def makeopendir(fs, directory):
     return fs.opendir(directory)
 
 
-def append_query_param(url, key, value):
+def append_query_param(url: str, key: str, value: str) -> str:
     """ Appends a single query parameter to an url. This is faster than
     using Purl, if and only if we only add one query param.
 
     Also this function assumes that the value is already url encoded.
 
     """
-    template = '?' in url and '{}&{}={}' or '{}?{}={}'
+    template = '{}&{}={}' if '?' in url else '{}?{}={}'
     return template.format(url, key, value)
 
 
@@ -670,19 +830,32 @@ class PostThread(Thread):
 
     """
 
-    def __init__(self, url, data, headers, timeout=30):
+    def __init__(
+        self,
+        url: str,
+        data: bytes,
+        headers: Collection[tuple[str, str]],
+        timeout: float = 30
+    ):
         Thread.__init__(self)
         self.url = url
         self.data = data
         self.headers = headers
         self.timeout = timeout
 
-    def run(self):
+    def run(self) -> None:
         try:
+            # Validate URL protocol before opening it, since it's possible to
+            # open ftp:// and file:// as well.
+            if not self.url.lower().startswith('http'):
+                raise ValueError from None
+
             request = urllib.request.Request(self.url)
             for header in self.headers:
                 request.add_header(header[0], header[1])
-            urllib.request.urlopen(request, self.data, self.timeout)
+            urllib.request.urlopen(  # nosec B310
+                request, self.data, self.timeout
+            )
         except Exception as e:
             log.error(
                 'Error while sending a POST request to {}: {}'.format(
@@ -691,8 +864,8 @@ class PostThread(Thread):
             )
 
 
-def toggle(collection, item):
-    """ Toggles an item in a set. """
+def toggle(collection: set[_T], item: _T | None) -> set[_T]:
+    """ Returns a new set where the item has been toggled. """
 
     if item is None:
         return collection
@@ -703,7 +876,10 @@ def toggle(collection, item):
         return collection | {item}
 
 
-def binary_to_dictionary(binary, filename=None):
+def binary_to_dictionary(
+    binary: bytes,
+    filename: str | None = None
+) -> FileDict:
     """ Takes raw binary filedata and stores it in a dictionary together
     with metadata information.
 
@@ -733,7 +909,7 @@ def binary_to_dictionary(binary, filename=None):
     }
 
 
-def dictionary_to_binary(dictionary):
+def dictionary_to_binary(dictionary: LaxFileDict) -> bytes:
     """ Takes a dictionary created by :func:`binary_to_dictionary` and returns
     the original binary data.
 
@@ -744,8 +920,33 @@ def dictionary_to_binary(dictionary):
         return f.read()
 
 
-def safe_format(format, dictionary, types={int, str, float}, adapt=None,
-                raise_on_missing=False):
+@overload
+def safe_format(
+    format: str,
+    dictionary: dict[str, str | int | float],
+    types: None = ...,
+    adapt: Callable[[str], str] | None = ...,
+    raise_on_missing: bool = ...
+) -> str: ...
+
+
+@overload
+def safe_format(
+    format: str,
+    dictionary: dict[str, _T],
+    types: set[type[_T]] = ...,
+    adapt: Callable[[str], str] | None = ...,
+    raise_on_missing: bool = ...
+) -> str: ...
+
+
+def safe_format(
+    format: str,
+    dictionary: dict[str, Any],
+    types: set[type[Any]] | None = None,
+    adapt: Callable[[str], str] | None = None,
+    raise_on_missing: bool = False
+) -> str:
     """ Takes a user-supplied string with format blocks and returns a string
     where those blocks are replaced by values in a dictionary.
 
@@ -784,11 +985,12 @@ def safe_format(format, dictionary, types={int, str, float}, adapt=None,
 
     """
 
+    types = types or {int, str, float}
     output = StringIO()
     buffer = StringIO()
     opened = 0
 
-    for ix, char in enumerate(format):
+    for char in format:
         if char == '[':
             opened += 1
 
@@ -801,7 +1003,7 @@ def safe_format(format, dictionary, types={int, str, float}, adapt=None,
 
         if opened == 2 or opened == -2:
             if buffer.tell():
-                raise RuntimeError("Unexpected bracket inside bracket found")
+                raise RuntimeError('Unexpected bracket inside bracket found')
 
             print(char, file=output, end='')
             opened = 0
@@ -831,12 +1033,15 @@ def safe_format(format, dictionary, types={int, str, float}, adapt=None,
     return output.getvalue()
 
 
-def safe_format_keys(format, adapt=None):
+def safe_format_keys(
+    format: str,
+    adapt: Callable[[str], str] | None = None
+) -> list[str]:
     """ Takes a :func:`safe_format` string and returns the found keys. """
 
     keys = []
 
-    def adapt_and_record(key):
+    def adapt_and_record(key: str) -> str:
         key = adapt(key) if adapt else key
         keys.append(key)
 
@@ -847,7 +1052,12 @@ def safe_format_keys(format, adapt=None):
     return keys
 
 
-def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
+def is_valid_yubikey(
+    client_id: str,
+    secret_key: str,
+    expected_yubikey_id: str,
+    yubikey: str
+) -> bool:
     """ Asks the yubico validation servers if the given yubikey OTP is valid.
 
     :client_id:
@@ -871,23 +1081,18 @@ def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
     assert client_id and secret_key and expected_yubikey_id and yubikey
     assert len(expected_yubikey_id) == 12
 
-    # if the yubikey doesn't start with the expected yubikey id we do not
-    # need to make a roundtrip to the validation server
-    if not yubikey.startswith(expected_yubikey_id):
-        return False
-
     try:
         return Yubico(client_id, secret_key).verify(yubikey)
     except StatusCodeError as e:
         if e.status_code != 'REPLAYED_OTP':
-            raise e
+            raise
 
         return False
     except SignatureVerificationError:
         return False
 
 
-def is_valid_yubikey_format(otp):
+def is_valid_yubikey_format(otp: str) -> bool:
     """ Returns True if the given OTP has the correct format. Does not actually
     contact Yubico, so this function may return true, for some invalid keys.
 
@@ -896,18 +1101,18 @@ def is_valid_yubikey_format(otp):
     return ALPHABET_RE.match(otp) and True or False
 
 
-def yubikey_otp_to_serial(otp):
+def yubikey_otp_to_serial(otp: str) -> int | None:
     """ Takes a Yubikey OTP and calculates the serial number of the key.
 
     The serial key is printed on the yubikey, in decimal and as a QR code.
 
-    Example:
+    Example::
 
         >>> yubikey_otp_to_serial(
             'ccccccdefghdefghdefghdefghdefghdefghdefghklv')
         2311522
 
-    Adapted from Java:
+    Adapted from Java::
 
         https://github.com/Yubico/yubikey-salesforce-client/blob/
         e38e46ee90296a852374a8b744555e99d16b6ca7/src/classes/Modhex.cls
@@ -943,21 +1148,23 @@ def yubikey_otp_to_serial(otp):
     # https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.19
     mask_value = 0x1f
 
-    for i in range(0, 8):
+    for i in range(8):
         shift = (4 - 1 - i) * 8
         value += (bytesarray[i] & 255) << (shift & mask_value)
 
     return value
 
 
-def yubikey_public_id(otp):
+def yubikey_public_id(otp: str) -> str:
     """ Returns the yubikey identity given a token. """
 
     return otp[:12]
 
 
-def dict_path(dictionary, path):
-    """ Gets the value of the given dictionary at the given path. For example:
+def dict_path(dictionary: dict[str, _T], path: str) -> _T:
+    """ Gets the value of the given dictionary at the given path.
+
+    For example::
 
         >>> data = {'foo': {'bar': True}}
         >>> dict_path(data, 'foo.bar')
@@ -968,11 +1175,15 @@ def dict_path(dictionary, path):
     if not dictionary:
         raise KeyError()
 
-    return reduce(operator.getitem, path.split('.'), dictionary)
+    return reduce(operator.getitem, path.split('.'), dictionary)  # type:ignore
 
 
-def safe_move(src, dst):
+def safe_move(src: str, dst: str, tmp_dst: str | None = None) -> None:
     """ Rename a file from ``src`` to ``dst``.
+
+    Optionally provide a ``tmp_dst`` where the file will be copied to
+    before being renamed. This needs to be on the same filesystem as
+    ``tmp``, otherwise this will fail.
 
     * Moves must be atomic.  ``shutil.move()`` is not atomic.
 
@@ -997,29 +1208,95 @@ def safe_move(src, dst):
             # atomic.  We intersperse a random UUID so if different processes
             # are copying into `<dst>`, they don't overlap in their tmp copies.
             copy_id = uuid4()
-            tmp_dst = "%s.%s.tmp" % (dst, copy_id)
+            tmp_dst = f'{tmp_dst or dst}.{copy_id}.tmp'
             shutil.copyfile(src, tmp_dst)
 
             # Then do an atomic rename onto the new name, and clean up the
-            # source image.
+            # source file.
             os.rename(tmp_dst, dst)
             os.unlink(src)
         else:
             raise
 
 
-def batched(iterable, batch_size, container_factory=tuple):
-    """ Splits an iterable into container batches of batch_size.
+@overload
+def batched(
+    iterable: Iterable[_T],
+    batch_size: int,
+    container_factory: type[tuple] = ...  # type:ignore[type-arg]
+) -> Iterator[tuple[_T, ...]]: ...
+
+
+@overload
+def batched(
+    iterable: Iterable[_T],
+    batch_size: int,
+    container_factory: type[list]  # type:ignore[type-arg]
+) -> Iterator[list[_T]]: ...
+
+
+# NOTE: If there were higher order TypeVars, we could properly infer
+#       the type of the Container, for now we just add overloads for
+#       two of the most common container_factories
+@overload
+def batched(
+    iterable: Iterable[_T],
+    batch_size: int,
+    container_factory: Callable[[Iterator[_T]], Collection[_T]]
+) -> Iterator[Collection[_T]]: ...
+
+
+def batched(
+    iterable: Iterable[_T],
+    batch_size: int,
+    container_factory: Callable[[Iterator[_T]], Collection[_T]] = tuple
+) -> Iterator[Collection[_T]]:
+    """ Splits an iterable into batches of batch_size and puts them
+    inside a given collection (tuple by default).
 
     The container_factory is necessary in order to consume the iterator
     returned by islice. Otherwise this function would never return.
 
     """
 
-    iterable = iter(iterable)
+    iterator = iter(iterable)
     while True:
-        batch = container_factory(islice(iterable, batch_size))
-        if not batch:
+        batch = container_factory(islice(iterator, batch_size))
+        if len(batch) == 0:
             return
 
         yield batch
+
+
+def generate_fts_phonenumbers(numbers: Iterable[str | None]) -> list[str]:
+    """
+    Generates a list of phonenumbers in various formats for full text search.
+    The international, the national and the local format as well as the
+    extension.
+
+    """
+    result = []
+
+    for number in numbers:
+        if not number:
+            continue
+
+        try:
+            parsed = parse(number, 'CH')
+        except NumberParseException:
+            # allow invalid phone number
+            result.append(number.replace(' ', ''))
+            continue
+
+        result.append(format_number(
+            parsed, PhoneNumberFormat.E164))
+
+        national = format_number(
+            parsed, PhoneNumberFormat.NATIONAL)
+        groups = national.split()
+        for idx in range(len(groups)):
+            partial = ''.join(groups[idx:])
+            if len(partial) > 3:
+                result.append(partial)
+
+    return result

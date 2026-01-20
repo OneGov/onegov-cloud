@@ -1,29 +1,47 @@
-from cached_property import cached_property
+from __future__ import annotations
+
+from functools import cached_property
 from onegov.core.elements import Link
+from onegov.core.elements import LinkGroup
 from onegov.swissvotes import _
 from onegov.swissvotes.layouts.default import DefaultLayout
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.swissvotes.collections import SwissVoteCollection
+    from onegov.swissvotes.request import SwissvotesRequest
+
+
 class VotesLayout(DefaultLayout):
 
-    @cached_property
-    def title(self):
-        return _("Votes")
+    if TYPE_CHECKING:
+        model: SwissVoteCollection
+
+        def __init__(
+            self,
+            model: SwissVoteCollection,
+            request: SwissvotesRequest
+        ) -> None: ...
 
     @cached_property
-    def editbar_links(self):
-        result = []
+    def title(self) -> str:
+        return _('Votes')
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        result: list[Link | LinkGroup] = []
         if self.request.has_role('admin', 'editor'):
             result.append(
                 Link(
-                    text=_("Update dataset on the votes"),
+                    text=_('Update dataset on the votes'),
                     url=self.request.link(self.model.default(), name='update'),
                     attrs={'class': 'upload-icon'}
                 )
             )
             result.append(
                 Link(
-                    text=_("Update metadata on the campaign material"),
+                    text=_('Update metadata on the campaign material'),
                     url=self.request.link(
                         self.model.default(), name='update-metadata'
                     ),
@@ -32,7 +50,7 @@ class VotesLayout(DefaultLayout):
             )
             result.append(
                 Link(
-                    text=_("Update external sources for images"),
+                    text=_('Update external sources for images'),
                     url=self.request.link(
                         self.model.default(),
                         name='update-external-resources'
@@ -42,14 +60,14 @@ class VotesLayout(DefaultLayout):
             )
             result.append(
                 Link(
-                    text=_("Download dataset (CSV)"),
+                    text=_('Download dataset (CSV)'),
                     url=self.request.link(self.model.default(), name='csv'),
                     attrs={'class': 'export-icon'}
                 )
             )
             result.append(
                 Link(
-                    text=_("Download dataset (XLSX)"),
+                    text=_('Download dataset (XLSX)'),
                     url=self.request.link(self.model.default(), name='xlsx'),
                     attrs={'class': 'export-icon'}
                 )
@@ -57,7 +75,7 @@ class VotesLayout(DefaultLayout):
         if self.request.has_role('admin'):
             result.append(
                 Link(
-                    text=_("Delete all votes"),
+                    text=_('Delete all votes'),
                     url=self.request.link(self.model.default(), name='delete'),
                     attrs={'class': 'delete-icon'}
                 )
@@ -65,9 +83,9 @@ class VotesLayout(DefaultLayout):
         return result
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, self.votes_url),
         ]
 
@@ -75,14 +93,14 @@ class VotesLayout(DefaultLayout):
 class VotesActionLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         raise NotImplementedError()
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Votes"), self.votes_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Votes'), self.votes_url),
             Link(self.title, '#'),
         ]
 
@@ -90,26 +108,26 @@ class VotesActionLayout(DefaultLayout):
 class UpdateVotesLayout(VotesActionLayout):
 
     @cached_property
-    def title(self):
-        return _("Update dataset on the votes")
+    def title(self) -> str:
+        return _('Update dataset on the votes')
 
 
 class UpdateMetadataLayout(VotesActionLayout):
 
     @cached_property
-    def title(self):
-        return _("Update metadata on the campaign material")
+    def title(self) -> str:
+        return _('Update metadata on the campaign material')
 
 
 class UpdateExternalResourcesLayout(VotesActionLayout):
 
     @cached_property
-    def title(self):
-        return _("Update external sources for images")
+    def title(self) -> str:
+        return _('Update external sources for images')
 
 
 class DeleteVotesLayout(VotesActionLayout):
 
     @cached_property
-    def title(self):
-        return _("Delete all votes")
+    def title(self) -> str:
+        return _('Delete all votes')

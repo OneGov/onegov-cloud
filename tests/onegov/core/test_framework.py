@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 import morepath
 import os
 import transaction
 import pytest
 
 from base64 import b64encode
-from cached_property import cached_property
+from cryptography.fernet import InvalidToken
 from datetime import datetime, timedelta
 from freezegun import freeze_time
+from functools import cached_property
 from gettext import NullTranslations
 from itsdangerous import BadSignature, Signer
 from onegov.core.custom import json
@@ -26,7 +29,16 @@ from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 
-def test_set_application_id():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from gettext import GNUTranslations
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import MessageType
+    from pathlib import Path
+    from sqlalchemy.orm import Session
+
+
+def test_set_application_id() -> None:
     app = Framework()
     app.namespace = 'namespace'
     app.configure_application()
@@ -35,27 +47,28 @@ def test_set_application_id():
     assert app.schema == 'namespace-id'
 
 
-def test_configure():
+def test_configure() -> None:
     class App(Framework):
         configured = []
 
-        def configure_a(self, **cfg):
+        def configure_a(self, **cfg: object) -> None:
             self.configured.append('a')
 
-        def configure_b(self, **cfg):
+        def configure_b(self, **cfg: object) -> None:
             self.configured.append('b')
 
         @property
-        def configure_c(self, **cfg):
+        def configure_c(self, **cfg: object) -> None:
             self.configured.append('c')
 
     app = App()
+    app.namespace = 'foo'
     app.configure_application()
 
     assert app.configured == ['a', 'b']
 
 
-def test_virtual_host_request(redis_url):
+def test_virtual_host_request(redis_url: str) -> None:
 
     class App(Framework):
         pass
@@ -69,11 +82,11 @@ def test_virtual_host_request(redis_url):
         pass
 
     @App.view(model=Root)
-    def view_root(self, request):
+    def view_root(self: Root, request: CoreRequest) -> str:
         return request.link(self) + ' - root'
 
     @App.view(model=Blog)
-    def view_blog(self, request):
+    def view_blog(self: Blog, request: CoreRequest) -> str:
         return request.link(self) + ' - blog'
 
     app = App()
@@ -122,18 +135,18 @@ def test_virtual_host_request(redis_url):
     assert response.body == b'https://blog.example.org/ - blog'
 
 
-def test_registered_upgrade_tasks(postgres_dsn):
+def test_registered_upgrade_tasks(postgres_dsn: str) -> None:
 
     app = Framework()
 
-    app.configure_application(dsn=postgres_dsn)
     app.namespace = 'foo'
+    app.configure_application(dsn=postgres_dsn)
     app.set_application_id('foo/bar')
 
     assert app.session().query(UpgradeState).count() > 0
 
 
-def test_browser_session_request(redis_url):
+def test_browser_session_request(redis_url: str) -> None:
 
     class App(Framework):
         pass
@@ -143,54 +156,55 @@ def test_browser_session_request(redis_url):
         pass
 
     @App.view(model=Root)
-    def view_root(self, request):
+    def view_root(self: Root, request: CoreRequest) -> str:
         # the session id is only available if there's a change in the
         # browser session
         request.browser_session['foo'] = 'bar'
         return request.cookies['session_id']
 
     @App.view(model=Root, name='login')
-    def view_login(self, request):
+    def view_login(self: Root, request: CoreRequest) -> str:
         request.browser_session.logged_in = True
         return 'logged in'
 
     @App.view(model=Root, name='status')
-    def view_status(self, request):
+    def view_status(self: Root, request: CoreRequest) -> str:
         if request.browser_session.has('logged_in'):
             return 'logged in'
         else:
             return 'logged out'
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/foo')
 
-    app.cache_backend = 'dogpile.cache.memory'
-    app.cache_backend_arguments = {}
+    app.cache_backend = 'dogpile.cache.memory'  # type: ignore[attr-defined]
+    app.cache_backend_arguments = {}  # type: ignore[attr-defined]
 
     c1 = Client(app)
     c2 = Client(app)
 
-    c1.get('/').text == c1.get('/').text
-    c1.get('/').text != c2.get('/').text
-    c2.get('/').text == c2.get('/').text
+    assert c1.get('/').text == c1.get('/').text
+    assert c1.get('/').text != c2.get('/').text
+    assert c2.get('/').text == c2.get('/').text
 
-    c1.get('/status').text == 'logged out'
-    c2.get('/status').text == 'logged out'
+    assert c1.get('/status').text == 'logged out'
+    assert c2.get('/status').text == 'logged out'
 
     c1.get('/login')
 
-    c1.get('/status').text == 'logged in'
-    c2.get('/status').text == 'logged out'
+    assert c1.get('/status').text == 'logged in'
+    assert c2.get('/status').text == 'logged out'
 
-    app.application_id = 'tset'
-    c1.get('/status').text == 'logged out'
+    app.set_application_id('test/bar')
+    assert c1.get('/status').text == 'logged out'
 
-    app.application_id = 'test'
-    c1.get('/status').text == 'logged in'
+    app.set_application_id('test/foo')
+    assert c1.get('/status').text == 'logged in'
 
 
-def test_browser_session_dirty(redis_url):
+def test_browser_session_dirty(redis_url: str) -> None:
 
     class App(Framework):
         pass
@@ -200,21 +214,22 @@ def test_browser_session_dirty(redis_url):
         pass
 
     @App.view(model=Root, name='undirty')
-    def view_undirty(self, request):
+    def view_undirty(self: Root, request: CoreRequest) -> str:
         request.browser_session.get('foo')
         return ''
 
     @App.view(model=Root, name='dirty')
-    def view_dirty(self, request):
+    def view_dirty(self: Root, request: CoreRequest) -> str:
         request.browser_session['foo'] = 'bar'
         return ''
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/foo')
 
-    app.cache_backend = 'dogpile.cache.memory'
-    app.cache_backend_arguments = {}
+    app.cache_backend = 'dogpile.cache.memory'  # type: ignore[attr-defined]
+    app.cache_backend_arguments = {}  # type: ignore[attr-defined]
 
     client = Client(app)
 
@@ -233,7 +248,80 @@ def test_browser_session_dirty(redis_url):
     assert client.cookies['session_id'] == old_session_id
 
 
-def test_request_messages(redis_url):
+def test_session_nonce_request(redis_url: str) -> None:
+
+    class App(Framework):
+        pass
+
+    @App.path(path='/')
+    class Root:
+        pass
+
+    @App.view(model=Root, request_method='POST')
+    def view_root(self: Root, request: CoreRequest) -> str:
+        # the session id is only available if there's a change in the
+        # browser session
+        request.browser_session['foo'] = 'bar'
+        return request.cookies['session_id']
+
+    @App.view(model=Root, name='session_nonce')
+    def view_session_nonce(self: Root, request: CoreRequest) -> str:
+        return request.get_session_nonce()
+
+    @App.view(model=Root, name='login')
+    def view_login(self: Root, request: CoreRequest) -> str:
+        request.browser_session.logged_in = True
+        return 'logged in'
+
+    @App.view(model=Root, name='status')
+    def view_status(self: Root, request: CoreRequest) -> str:
+        if request.browser_session.has('logged_in'):
+            return 'logged in'
+        else:
+            return 'logged out'
+
+    app = App()
+    app.namespace = 'test'
+    app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/foo')
+
+    app.cache_backend = 'dogpile.cache.memory'  # type: ignore[attr-defined]
+    app.cache_backend_arguments = {}  # type: ignore[attr-defined]
+
+    c1 = Client(app)
+    c2 = Client(app)
+
+    session_id1 = c1.post('/').text
+    assert c1.post('/').text == session_id1
+    assert c1.post('/').text != c2.post('/').text
+    assert c2.post('/').text == c2.post('/').text
+
+    assert c1.get('/status').text == 'logged out'
+    assert c2.get('/status').text == 'logged out'
+
+    c1.get('/login')
+
+    assert c1.get('/status').text == 'logged in'
+    assert c2.get('/status').text == 'logged out'
+
+    nonce = c1.get('/session_nonce').text
+    assert c1.get('/session_nonce').text != nonce
+
+    # session cookie gets lost
+    c1.cookiejar.clear()
+    assert c1.post('/').text != session_id1
+
+    # but the session_nonce restores it (as long as there is none)
+    c1.cookiejar.clear()
+    assert c1.post('/', {'session_nonce': nonce}).text == session_id1
+    assert c1.post('/').text == session_id1
+
+    # and it can't be reused
+    c2.cookiejar.clear()
+    assert c2.post('/', {'session_nonce': nonce}).text != session_id1
+
+
+def test_request_messages(redis_url: str) -> None:
 
     class App(Framework):
         pass
@@ -243,28 +331,29 @@ def test_request_messages(redis_url):
         pass
 
     class Message:
-        def __init__(self, text, type):
+        def __init__(self, text: str, type: MessageType) -> None:
             self.text = text
             self.type = type
 
     @App.path(model=Message, path='/messages')
-    def get_message(text, type):
+    def get_message(text: str, type: MessageType) -> Message:
         return Message(text, type)
 
     @App.view(model=Message, name='add')
-    def view_add_message(self, request):
+    def view_add_message(self: Message, request: CoreRequest) -> None:
         request.message(self.text, self.type)
 
     @App.view(model=Root)
-    def view_root(self, request):
+    def view_root(self: Root, request: CoreRequest) -> str:
         return json.dumps(list(request.consume_messages()))
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/foo')
 
-    app.cache_backend = 'dogpile.cache.memory'
-    app.cache_backend_arguments = {}
+    app.cache_backend = 'dogpile.cache.memory'  # type: ignore[attr-defined]
+    app.cache_backend_arguments = {}  # type: ignore[attr-defined]
 
     c1 = Client(app)
     c2 = Client(app)
@@ -292,7 +381,7 @@ def test_request_messages(redis_url):
     assert len(messages) == 0
 
 
-def test_fix_webassets_url(redis_url):
+def test_fix_webassets_url(redis_url: str) -> None:
 
     import onegov.core
     import more.transaction
@@ -309,12 +398,12 @@ def test_fix_webassets_url(redis_url):
         pass
 
     @App.html(model=Root)
-    def view_root(self, request):
+    def view_root(self: Root, request: CoreRequest) -> str:
         return '/' + request.app.config.webasset_registry.url + '/jquery.js'
 
     class TestServer(Server):
 
-        def configure_morepath(self, *args, **kwargs):
+        def configure_morepath(self, *args: object, **kwargs: object) -> None:
             pass
 
     server = TestServer(Config({
@@ -345,7 +434,7 @@ def test_fix_webassets_url(redis_url):
                              b'7da9c72a3b5f9e060b898ef7cd714b8a/jquery.js')
 
 
-def test_sign_unsign():
+def test_sign_unsign() -> None:
     framework = Framework()
     framework.unsafe_identity_secret = 'test'
     framework.application_id = 'one'
@@ -364,10 +453,10 @@ def test_sign_unsign():
     assert framework.unsign(signed) is None
 
     signed = framework.sign('foo')
-    framework.unsign('bar' + signed) is None
+    assert framework.unsign('bar' + signed) is None
 
 
-def test_custom_signer():
+def test_custom_signer() -> None:
     framework = Framework()
     framework.unsafe_identity_secret = 'test'
     framework.application_id = 'one'
@@ -384,8 +473,34 @@ def test_custom_signer():
         Signer(framework.identity_secret).unsign(signed)
 
 
-def test_csrf_secret_key():
+def test_encrypt_decrypt() -> None:
+    framework = Framework()
+    framework.unsafe_identity_secret = 'test'
+    framework.application_id = 'one'
+
+    encrypted_by_one = framework.encrypt('foo')
+    assert framework.decrypt(encrypted_by_one) == 'foo'
+
+    framework.application_id = 'two'
+    with pytest.raises(InvalidToken):
+        framework.decrypt(encrypted_by_one)
+
+    framework.application_id = 'one'
+    assert framework.decrypt(encrypted_by_one) == 'foo'
+
+    encrypted = framework.encrypt('foo')
+    framework.unsafe_identity_secret = 'asdf'
+    with pytest.raises(InvalidToken):
+        assert framework.decrypt(encrypted)
+
+    encrypted = framework.encrypt('foo')
+    with pytest.raises(InvalidToken):
+        assert framework.decrypt(b'bar' + encrypted) is None
+
+
+def test_csrf_secret_key() -> None:
     app = Framework()
+    app.namespace = 'test'
 
     with pytest.raises(AssertionError):
         app.configure_application(identity_secret='test', csrf_secret='test')
@@ -399,7 +514,7 @@ def test_csrf_secret_key():
     app.configure_application(identity_secret='x', csrf_secret='y')
 
 
-def test_csrf(redis_url):
+def test_csrf(redis_url: str) -> None:
 
     class MyForm(Form):
         name = StringField('Name')
@@ -412,24 +527,25 @@ def test_csrf(redis_url):
         pass
 
     @App.view(model=Root, request_method='GET')
-    def view_get_root(self, request):
+    def view_get_root(self: Root, request: CoreRequest) -> str:
         form = request.get_form(MyForm, i18n_support=False)
-        return form.csrf_token._value()
+        return form['csrf_token']._value()  # type: ignore[attr-defined]
 
     @App.view(model=Root, request_method='POST')
-    def view_post_root(self, request):
+    def view_post_root(self: Root, request: CoreRequest) -> str:
         if request.get_form(MyForm, i18n_support=False).validate():
             return 'success'
         else:
             return 'fail'
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(
         identity_secure=False,
         csrf_time_limit=60,
         redis_url=redis_url
     )
+    app.set_application_id('test/foo')
 
     client = Client(app)
     csrf_token = client.get('/').text
@@ -441,13 +557,13 @@ def test_csrf(redis_url):
         assert client.post('/', {'csrf_token': csrf_token}).text == 'fail'
 
 
-def test_get_form(redis_url):
+def test_get_form(redis_url: str) -> None:
 
     class PlainForm(Form):
         called = False
 
     class OnRequestForm(Form):
-        def on_request(self):
+        def on_request(self) -> None:
             self.called = True
 
     class App(Framework):
@@ -458,61 +574,77 @@ def test_get_form(redis_url):
         pass
 
     @App.form(model=Root, form=PlainForm, name='plain')
-    def view_get_plain(self, request, form):
+    def view_get_plain(
+        self: Root,
+        request: CoreRequest,
+        form: PlainForm
+    ) -> str:
+
+        assert form.model is self  # type: ignore[attr-defined]
+        assert form.request is request  # type: ignore[attr-defined]
         return form.called and 'called' or 'not-called'
-        assert form.model is self
-        assert form.request is request
 
     @App.form(model=Root, form=OnRequestForm, name='on-request')
-    def view_get_on_request(self, request, form):
+    def view_get_on_request(
+        self: Root,
+        request: CoreRequest,
+        form: OnRequestForm
+    ) -> str:
+
+        assert form.model is self  # type: ignore[attr-defined]
+        assert form.request is request  # type: ignore[attr-defined]
         return form.called and 'called' or 'not-called'
-        assert form.model is self
-        assert form.request is request
 
     App.commit()
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(
         identity_secure=False,
         csrf_time_limit=60,
         redis_url=redis_url,
     )
+    app.set_application_id('test/foo')
 
     client = Client(app)
     assert client.get('/plain').text == 'not-called'
     assert client.get('/on-request').text == 'called'
 
 
-def test_get_localized_form(redis_url):
+def test_get_localized_form(redis_url: str) -> None:
 
     class LocalizedForm(Form):
         name = StringField('Name', validators=[InputRequired()])
 
     class App(Framework):
-        locales = {}
-        default_locale = None
+        locales = set()
+        default_locale: str | None = None
 
     @App.path(path='/')
     class Root:
         pass
 
     @App.form(model=Root, form=LocalizedForm, name='form')
-    def view_get_form(self, request, form):
-        assert form.model is self
-        assert form.request is request
+    def view_get_form(
+        self: Root,
+        request: CoreRequest,
+        form: LocalizedForm
+    ) -> str:
+        assert form.model is self  # type: ignore[attr-defined]
+        assert form.request is request  # type: ignore[attr-defined]
         assert form.validate() == False
-        return form.errors['name'][0]
+        return form.errors['name'][0]  # type: ignore[index, return-value]
 
     App.commit()
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(
         identity_secure=False,
         csrf_time_limit=60,
         redis_url=redis_url
     )
+    app.set_application_id('test/foo')
 
     client = Client(app)
     assert client.get('/form').text == 'This field is required.'
@@ -524,9 +656,9 @@ def test_get_localized_form(redis_url):
     assert client.get('/form').text == 'Dieses Feld wird benötigt.'
 
 
-def test_fixed_translation_chain_length(redis_url):
+def test_fixed_translation_chain_length(redis_url: str) -> None:
 
-    def translation_chain_length(form):
+    def translation_chain_length(form: Form) -> int:
         return sum(1 for t in translation_chain(form.meta._translations))
 
     class LocalizedForm(Form):
@@ -535,30 +667,37 @@ def test_fixed_translation_chain_length(redis_url):
     class App(Framework):
         locales = {'de'}
         default_locale = 'de'
-        translation_chain_length = None
+        translation_chain_length: int | None = None
 
         @cached_property
-        def translations(self):
-            return {'de': NullTranslations()}
+        def translations(self) -> dict[str, GNUTranslations]:
+            return {'de': NullTranslations()}  # type: ignore[dict-item]
 
     @App.path(path='/')
     class Root:
         pass
 
     @App.form(model=Root, form=LocalizedForm, name='form')
-    def view_get_form(self, request, form):
+    def view_get_form(
+        self: Root,
+        request: CoreRequest,
+        form: LocalizedForm
+    ) -> None:
+
         form.validate()
+        assert isinstance(request.app, App)
         request.app.translation_chain_length = translation_chain_length(form)
 
     App.commit()
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(
         identity_secure=False,
         csrf_time_limit=60,
         redis_url=redis_url
     )
+    app.set_application_id('test/foo')
 
     client = Client(app)
 
@@ -569,9 +708,9 @@ def test_fixed_translation_chain_length(redis_url):
     assert app.translation_chain_length == initial_length
 
 
-def test_send_email(tmpdir):
-
-    maildir = tmpdir.mkdir('mail')
+def test_send_email(tmp_path: Path) -> None:
+    maildir = tmp_path / 'mail'
+    maildir.mkdir()
     app = Framework()
 
     app.mail = {
@@ -592,7 +731,7 @@ def test_send_email(tmpdir):
 
     transaction.commit()
 
-    files = maildir.listdir()
+    files = list(maildir.iterdir())
     assert len(files) == 1
     messages = json.loads(files[0].read_text('utf-8'))
     assert len(messages) == 1
@@ -606,9 +745,9 @@ def test_send_email(tmpdir):
     assert headers['List-Unsubscribe'] == '<mailto:unsubscribe@example.org>'
 
 
-def test_send_email_with_name(tmpdir):
-
-    maildir = tmpdir.mkdir('mail')
+def test_send_email_with_name(tmp_path: Path) -> None:
+    maildir = tmp_path / 'mail'
+    maildir.mkdir()
     app = Framework()
     app.mail = {
         'transactional': {
@@ -627,7 +766,7 @@ def test_send_email_with_name(tmpdir):
 
     transaction.commit()
 
-    files = maildir.listdir()
+    files = list(maildir.iterdir())
     assert len(files) == 1
     messages = json.loads(files[0].read_text('utf-8'))
     assert len(messages) == 1
@@ -638,9 +777,9 @@ def test_send_email_with_name(tmpdir):
     assert message['Subject'] == 'Test E-Mail'
 
 
-def test_email_attachments(tmpdir):
-
-    maildir = tmpdir.mkdir('mail')
+def test_email_attachments(tmp_path: Path) -> None:
+    maildir = tmp_path / 'mail'
+    maildir.mkdir()
     app = Framework()
     app.mail = {
         'transactional': {
@@ -652,23 +791,23 @@ def test_email_attachments(tmpdir):
     tempfile = NamedTemporaryFile(suffix='.txt', mode='w', delete=False)
     tempfile.write('First')
     tempfile.close()
-    attachments = [tempfile.name]
+    attachments_in: list[str | Attachment] = [tempfile.name]
 
     attachment = Attachment(
         'at.txt', content='Second', content_type='text/custom'
     )
-    attachments.append(attachment)
+    attachments_in.append(attachment)
 
     app.send_email(
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
         content="This e-mail is just a test",
-        attachments=attachments,
+        attachments=attachments_in,
         category='transactional'
     )
     transaction.commit()
-    files = maildir.listdir()
+    files = list(maildir.iterdir())
     messages = json.loads(files[0].read_text('utf-8'))
     assert len(messages) == 1
     message = messages[0]
@@ -687,7 +826,7 @@ def test_email_attachments(tmpdir):
     assert attachments[1]['ContentType'] == 'text/custom'
 
 
-def test_html_to_text():
+def test_html_to_text() -> None:
     html = (
         "<h1>Date</h1><p>6. April 1984</p>\n"
         "<h1>Path</h1><p>/foo-bar</p>\n"
@@ -697,7 +836,7 @@ def test_html_to_text():
     assert plaintext == "# Date\n\n6. April 1984\n\n# Path\n\n/foo-bar"
 
 
-def test_object_by_path():
+def test_object_by_path() -> None:
 
     class App(Framework):
         pass
@@ -708,7 +847,7 @@ def test_object_by_path():
 
     @App.path(path='/pages', absorb=True)
     class Page:
-        def __init__(self, absorb):
+        def __init__(self, absorb: str) -> None:
             self.absorb = absorb
 
     App.commit()
@@ -718,18 +857,20 @@ def test_object_by_path():
     assert isinstance(app.object_by_path('https://www.example.org/'), Root)
 
     page = app.object_by_path('/pages/foo/bar')
+    assert isinstance(page, Page)
     assert page.absorb == 'foo/bar'
     assert isinstance(page, Page)
 
-    assert app.object_by_path('/pages').absorb == ''
+    page = app.object_by_path('/pages')
+    assert isinstance(page, Page)
+    assert page.absorb == ''
 
     # works, because 'foobar' is a view of the root
     assert isinstance(app.object_by_path('/foobar'), Root)
     assert app.object_by_path('/asdf/asdf') is None
 
 
-def test_send_email_transaction(tmpdir, redis_url):
-
+def test_send_email_transaction(tmp_path: Path, redis_url: str) -> None:
     import more.transaction
     import more.webassets
     import onegov.core
@@ -746,7 +887,7 @@ def test_send_email_transaction(tmpdir, redis_url):
         pass
 
     @App.view(model=Root, name='send-fail')
-    def fail_send(self, request):
+    def fail_send(self: Root, request: CoreRequest) -> None:
         app.send_email(
             reply_to='Gövikon <info@example.org>',
             receivers=['recipient@example.org'],
@@ -754,10 +895,10 @@ def test_send_email_transaction(tmpdir, redis_url):
             content="This e-mäil is just a test",
             category='transactional'
         )
-        assert False
+        raise AssertionError()
 
     @App.view(model=Root, name='send-ok')
-    def success_send(self, request):
+    def success_send(self: Root, request: CoreRequest) -> None:
         app.send_email(
             reply_to='Gövikon <info@example.org>',
             receivers=['recipient@example.org'],
@@ -766,10 +907,12 @@ def test_send_email_transaction(tmpdir, redis_url):
             category='transactional'
         )
 
-    maildir = tmpdir.mkdir('mail')
+    maildir = tmp_path / 'mail'
+    maildir.mkdir()
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/foo')
     app.mail = {
         'transactional': {
             'directory': str(maildir),
@@ -777,23 +920,23 @@ def test_send_email_transaction(tmpdir, redis_url):
         }
     }
 
-    app.cache_backend = 'dogpile.cache.memory'
-    app.cache_backend_arguments = {}
+    app.cache_backend = 'dogpile.cache.memory'  # type: ignore[attr-defined]
+    app.cache_backend_arguments = {}  # type: ignore[attr-defined]
 
     client = Client(app)
 
     with pytest.raises(AssertionError):
         client.get('/send-fail')
 
-    assert len(maildir.listdir()) == 0
+    assert len(list(maildir.iterdir())) == 0
 
     client.get('/send-ok')
-    assert len(maildir.listdir()) == 1
+    assert len(list(maildir.iterdir())) == 1
 
 
-def test_send_email_plaintext_alternative(tmpdir):
-
-    maildir = tmpdir.mkdir('mail')
+def test_send_email_plaintext_alternative(tmp_path: Path) -> None:
+    maildir = tmp_path / 'mail'
+    maildir.mkdir()
     app = Framework()
     app.mail = {
         'transactional': {
@@ -812,7 +955,7 @@ def test_send_email_plaintext_alternative(tmpdir):
 
     transaction.commit()
 
-    files = maildir.listdir()
+    files = list(maildir.iterdir())
     assert len(files) == 1
     messages = json.loads(files[0].read_text('utf-8'))
     assert len(messages) == 1
@@ -829,9 +972,9 @@ def test_send_email_plaintext_alternative(tmpdir):
     )
 
 
-def test_send_transactional_email_batch(tmpdir):
-
-    maildir = tmpdir.mkdir('mail')
+def test_send_transactional_email_batch(tmp_path: Path) -> None:
+    maildir = tmp_path / 'mail'
+    maildir.mkdir()
     app = Framework()
 
     app.mail = {
@@ -855,7 +998,7 @@ def test_send_transactional_email_batch(tmpdir):
 
     transaction.commit()
 
-    files = sorted(maildir.listdir())
+    files = sorted(maildir.iterdir())
     assert len(files) == 3
     messages = json.loads(files[0].read_text('utf-8'))
     assert len(messages) == 500
@@ -888,9 +1031,9 @@ def test_send_transactional_email_batch(tmpdir):
     assert message['MessageStream'] == 'outbound'
 
 
-def test_send_marketing_email_batch(tmpdir):
-
-    maildir = tmpdir.mkdir('mail')
+def test_send_marketing_email_batch(tmp_path: Path) -> None:
+    maildir = tmp_path / 'mail'
+    maildir.mkdir()
     app = Framework()
 
     app.mail = {
@@ -916,7 +1059,7 @@ def test_send_marketing_email_batch(tmpdir):
 
     transaction.commit()
 
-    files = sorted(maildir.listdir())
+    files = sorted(maildir.iterdir())
     assert len(files) == 3
     messages = json.loads(files[0].read_text('utf-8'))
     assert len(messages) == 500
@@ -946,9 +1089,9 @@ def test_send_marketing_email_batch(tmpdir):
     assert message['MessageStream'] == 'marketing'
 
 
-def test_send_marketing_email_batch_size_limit(tmpdir):
-
-    maildir = tmpdir.mkdir('mail')
+def test_send_marketing_email_batch_size_limit(tmp_path: Path) -> None:
+    maildir = tmp_path / 'mail'
+    maildir.mkdir()
     app = Framework()
 
     app.mail = {
@@ -975,9 +1118,9 @@ def test_send_marketing_email_batch_size_limit(tmpdir):
 
     transaction.commit()
 
-    files = sorted(maildir.listdir())
+    files = sorted(maildir.iterdir())
     assert len(files) == 2
-    payload = files[0].read_binary()
+    payload = files[0].read_bytes()
     assert len(payload) < 50_000_000
     messages = json.loads(payload.decode('utf-8'))
     assert len(messages) == 49
@@ -988,7 +1131,7 @@ def test_send_marketing_email_batch_size_limit(tmpdir):
     assert message['Subject'] == 'Subject 1'
     assert message['MessageStream'] == 'marketing'
 
-    payload = files[1].read_binary()
+    payload = files[1].read_bytes()
     assert len(payload) < 50_000_000
     messages = json.loads(payload.decode('utf-8'))
     assert len(messages) == 25
@@ -1000,9 +1143,12 @@ def test_send_marketing_email_batch_size_limit(tmpdir):
     assert message['MessageStream'] == 'marketing'
 
 
-def test_send_marketing_email_batch_missing_unsubscribe(tmpdir):
+def test_send_marketing_email_batch_missing_unsubscribe(
+    tmp_path: Path
+) -> None:
 
-    maildir = tmpdir.mkdir('mail')
+    maildir = tmp_path / 'mail'
+    maildir.mkdir()
     app = Framework()
 
     app.mail = {
@@ -1029,9 +1175,9 @@ def test_send_marketing_email_batch_missing_unsubscribe(tmpdir):
         app.send_marketing_email_batch(mails)
 
 
-def test_send_marketing_email_batch_illegal_category(tmpdir):
-
-    maildir = tmpdir.mkdir('mail')
+def test_send_marketing_email_batch_illegal_category(tmp_path: Path) -> None:
+    maildir = tmp_path / 'mail'
+    maildir.mkdir()
     app = Framework()
 
     app.mail = {
@@ -1059,9 +1205,67 @@ def test_send_marketing_email_batch_illegal_category(tmpdir):
         app.send_marketing_email_batch(mails)
 
 
-def test_send_zulip(session):
+def test_send_sms(tmp_path: Path) -> None:
+    smsdir = tmp_path / 'sms'
+    smsdir.mkdir()
+    app = Framework()
+    app.sms_directory = smsdir
+    app.schema = 'test'
+
+    app.send_sms('+41791112233', 'text')
+    transaction.commit()
+
+    path = os.path.join(smsdir, 'test')
+    sms = os.listdir(path)
+    assert len(sms) == 1
+    assert sms[0].startswith('0.1.')
+
+    with open(os.path.join(path, sms[0])) as file:
+        data = json.loads(file.read())
+        assert data['receivers'] == ['+41791112233']
+        assert data['content'] == 'text'
+
+
+def test_send_sms_batch(tmp_path: Path) -> None:
+    smsdir = tmp_path / 'sms'
+    smsdir.mkdir()
+    app = Framework()
+    app.sms_directory = smsdir
+    app.schema = 'test'
+
+    app.send_sms(
+        [f'+4179111{digits}' for digits in range(1000, 3700)],
+        'text'
+    )
+    transaction.commit()
+
+    path = os.path.join(smsdir, 'test')
+    sms = sorted(os.listdir(path))
+    assert len(sms) == 3
+    assert sms[0].startswith('0.1000.')
+    assert sms[1].startswith('1.1000.')
+    assert sms[2].startswith('2.700.')
+
+    with open(os.path.join(path, sms[0])) as file:
+        data = json.loads(file.read())
+        assert len(data['receivers']) == 1000
+        assert data['content'] == 'text'
+
+    with open(os.path.join(path, sms[1])) as file:
+        data = json.loads(file.read())
+        assert len(data['receivers']) == 1000
+        assert data['content'] == 'text'
+
+    with open(os.path.join(path, sms[2])) as file:
+        data = json.loads(file.read())
+        assert len(data['receivers']) == 700
+        assert data['content'] == 'text'
+
+
+def test_send_zulip(session: Session) -> None:
     with patch('urllib.request.urlopen') as urlopen:
         app = Framework()
+        app.namespace = 'test'
         app.configure_application()
 
         thread = app.send_zulip('Zulip integration', 'It works!')
@@ -1091,12 +1295,12 @@ def test_send_zulip(session):
         assert headers == {
             'Authorization':
             'Basic dGVzdC1ib3RAc2VhbnRpcy56dWxpcGNoYXQuY29tOmFhYmJjYw==',
-            'Content-length': 68,
+            'Content-length': '68',
             'Content-type': 'application/x-www-form-urlencoded'
         }
 
 
-def test_generic_redirect(redis_url):
+def test_generic_redirect(redis_url: str) -> None:
 
     import more.transaction
     import more.webassets
@@ -1126,10 +1330,10 @@ def test_generic_redirect(redis_url):
 
     client = Client(app)
 
-    assert client.get('/foo', status=302).location.endswith('/bar')
+    assert client.get('/foo', status=302).location.endswith('/bar')  # type: ignore[union-attr]
     assert client.get('/fooo', status=404)
     assert client.get('/foo/bar', status=404)
 
-    assert client.get('/bar', status=302).location.endswith('/foo')
+    assert client.get('/bar', status=302).location.endswith('/foo')  # type: ignore[union-attr]
     assert client.get('/barr', status=404)
-    assert client.get('/bar/foo', status=302).location.endswith('/foo/foo')
+    assert client.get('/bar/foo', status=302).location.endswith('/foo/foo')  # type: ignore[union-attr]

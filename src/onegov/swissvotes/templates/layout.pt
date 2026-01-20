@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html class="no-js" lang="${request.html_lang}"
+<html
+    class="no-js"
+    lang="${request.html_lang}"
+    tal:attributes="layout.custom_html_attributes|{}"
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     xmlns:metal="http://xml.zope.org/namespaces/metal"
@@ -29,31 +32,10 @@
     <link rel="apple-touch-icon" sizes="57x57" href="${layout.static_path}/images/apple-icon-57x57.png">
     <link rel="icon" type="image/png" sizes="16x16" href="${layout.static_path}/images/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="${layout.static_path}/images/favicon-32x32.png">
-
-    <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/5.6.2/bundle.min.js" crossorigin="anonymous"></script>
-    <script tal:condition="layout.app.sentry_dsn">
-        Sentry.init({
-            dsn: '${layout.app.sentry_dsn}',
-            release: '${layout.app.sentry_version}',
-            environment: '${layout.app.sentry_environment}',
-        });
-    </script>
-
-    <script type="text/javascript" tal:condition="'swissvotes.ch' in request.url">
-      var _paq = window._paq || [];
-      _paq.push(['disableCookies']);
-      _paq.push(['trackPageView']);
-      _paq.push(['enableLinkTracking']);
-      (function() {
-        var u="https://stats.seantis.ch/";
-        _paq.push(['setTrackerUrl', u+'matomo.php']);
-        _paq.push(['setSiteId', '22']);
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-      })();
-    </script>
+    <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/7.54.0/bundle.min.js" integrity="sha384-EmlJLN9Q0yu0/2UUCIYnEM88jpQ7xUhtNI2ZeXb/ci3cwoAoIQl350N4PQPlMbP5" crossorigin="anonymous"></script>
+    <script tal:condition="layout.app.sentry_dsn" src="${layout.sentry_init_path}"></script>
 </head>
-<body>
+<body tal:attributes="layout.custom_body_attributes|{}">
     <header>
         <div class="languages">
             <div class="row">
@@ -100,10 +82,10 @@
             <div class="row">
                 <div class="small-12 columns" id="alert-boxes">
                     <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
-                        <tal:block tal:content="structure message.text" />
+                        <tal:block tal:content="message.text" />
                         <a href="#" class="close">&times;</a>
                     </div>
-                    <div i18n:translate tal:condition="request.agent['user_agent']['family'] == 'IE'" data-alert class="alert-box warning">
+                    <div i18n:translate tal:condition="request.agent.user_agent.family == 'IE'" data-alert class="alert-box warning">
                         This webpage is best viewed with a modern Browser. Consider to use Chrome, Firefox or Edge.
                         <a href="#" class="close">&times;</a>
                     </div>
@@ -124,13 +106,13 @@
                 <div class="links">
                      <div class="row">
                         <div class="small-12 medium-4 columns small-only-text-center">
-                            <tal:block replace="structure layout.disclaimer_link(layout)" />
+                            <tal:block replace="layout.disclaimer_link(layout)" />
                         </div>
                         <div class="small-12 medium-4 columns text-center">
-                            <tal:block replace="structure layout.imprint_link(layout)" />
+                            <tal:block replace="layout.imprint_link(layout)" />
                         </div>
                         <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
-                            <tal:block replace="structure layout.data_protection_link(layout)" />
+                            <tal:block replace="layout.data_protection_link(layout)" />
                         </div>
                     </div>
                      <div class="row">

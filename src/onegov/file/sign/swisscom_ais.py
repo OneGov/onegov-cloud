@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import io
 import os
 
@@ -6,10 +8,21 @@ from contextlib import suppress
 from onegov.file.sign.generic import SigningService
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import SupportsRead, SupportsWrite
+
+
 class SwisscomAIS(SigningService, service_name='swisscom_ais'):
     """ Sign PDFs using Swisscom's All-In Signing Service. """
 
-    def __init__(self, customer, key_static, cert_file, cert_key):
+    def __init__(
+        self,
+        customer: str,
+        key_static: str,
+        cert_file: str,
+        cert_key: str
+    ):
         if not os.path.exists(cert_file):
             raise FileNotFoundError(cert_file)
 
@@ -22,9 +35,15 @@ class SwisscomAIS(SigningService, service_name='swisscom_ais'):
         self.customer = customer
         self.client = AIS(customer, key_static, cert_file, cert_key)
 
-    def sign(self, infile, outfile):
-        with suppress(io.UnsupportedOperation):
-            infile.seek(0)
+    def sign(
+        self,
+        infile: SupportsRead[bytes],
+        outfile: SupportsWrite[bytes]
+    ) -> str:
+
+        if hasattr(infile, 'seek'):
+            with suppress(io.UnsupportedOperation):
+                infile.seek(0)
 
         # NOTE: We gain nothing from a chunked read, since we need to
         #       keep the entire file in memory anyways.

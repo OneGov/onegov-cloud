@@ -1,23 +1,25 @@
+from __future__ import annotations
+
 import os
 
 from subprocess import run, PIPE, DEVNULL, TimeoutExpired
-from testing.common.database import get_path_of
-from testing.postgresql import Postgresql as Base, SEARCH_PATHS
+from testing.common.database import get_path_of  # type: ignore[import-untyped]
+from testing.postgresql import Postgresql as Base, SEARCH_PATHS  # type: ignore[import-untyped]
 
 
 class Snapshot:
-    def __init__(self, url):
+    def __init__(self, url: str) -> None:
         self.url = url
         self.dump = self.create_dump()
 
-    def create_dump(self):
+    def create_dump(self) -> bytes:
         return run(
             ('pg_dump', '-Fc', self.url),
             stdout=PIPE,
             check=True
         ).stdout
 
-    def restore(self):
+    def restore(self) -> None:
         try:
             run(
                 ('pg_restore', '--clean', '-d', self.url),
@@ -26,26 +28,27 @@ class Snapshot:
                 check=True,
                 timeout=10
             )
-        except TimeoutExpired:
+        except TimeoutExpired as exception:
             raise RuntimeError("""
                 pg_restore has stalled, probably due to an idle transaction
 
                 be sure to close all connections through either
                 transaction.abort() or transaction.commit()
-            """)
+            """) from exception
 
 
-class Postgresql(Base):
+class Postgresql(Base):  # type: ignore[misc]
     """ Adds snapshot support to the testing postgresql. """
 
+    snapshots: list[Snapshot]
     DEFAULT_KILL_TIMEOUT = 30.0
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         self.preferred_versions = kwargs.pop('preferred_versions', [])
         super().__init__(*args, **kwargs)
         self.snapshots = []
 
-    def initialize(self):
+    def initialize(self) -> None:
         self.initdb = self.settings.pop('initdb')
         if self.initdb is None:
             self.initdb = self.find_program('initdb', ['bin'])
@@ -54,7 +57,7 @@ class Postgresql(Base):
         if self.postgres is None:
             self.postgres = self.find_program('postgres', ['bin'])
 
-    def find_program(self, name, subdirs):
+    def find_program(self, name: str, subdirs: list[str]) -> str:
         paths = []
         for base_dir in SEARCH_PATHS:
             for subdir in subdirs:
@@ -76,15 +79,15 @@ class Postgresql(Base):
 
         raise RuntimeError("command not found: %s" % name)
 
-    def save(self):
+    def save(self) -> Snapshot:
         self.snapshots.append(Snapshot(self.url()))
         return self.snapshots[-1]
 
-    def undo(self, pop=True):
+    def undo(self, pop: bool = True) -> None:
         if pop:
             self.snapshots.pop().restore()
         else:
             self.snapshots[-1].restore()
 
-    def reset_snapshots(self):
+    def reset_snapshots(self) -> None:
         self.snapshots = []

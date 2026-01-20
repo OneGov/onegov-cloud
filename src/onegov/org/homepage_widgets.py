@@ -1,26 +1,41 @@
-from collections import namedtuple
+from __future__ import annotations
+
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
-from onegov.newsletter import NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link, LinkGroup
-from onegov.org.layout import EventBaseLayout
-from onegov.org.models import ImageSet, ImageFile, News
+from onegov.org.models import ImageSet, ImageFile, News, NewsCollection
 from onegov.file.models.fileset import file_to_set_associations
+from operator import attrgetter
 from sqlalchemy import func
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 
-def get_lead(text, max_chars=180, consider_sentences=True):
+from typing import NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Sequence
+    from onegov.core.types import RenderData
+    from onegov.org.layout import DefaultLayout
+    from onegov.org.models import ExtendedDirectory
+
+
+def get_lead(
+    text: str,
+    max_chars: int = 180,
+    consider_sentences: bool = True
+) -> str:
+
     if len(text) > max_chars:
         first_point_ix = text.find('.')
-        if not first_point_ix or not consider_sentences:
+        if first_point_ix < 1 or not consider_sentences:
             return text[0:max_chars] + '...'
         elif first_point_ix >= max_chars:
-            return text
+            # still return the entire first sentence, but nothing more
+            return text[0:first_point_ix + 1]
         else:
-            end = text[0:max_chars].rindex('.') + 1
+            # return up to the n'th sentence that is still below the limit
+            end = text.rindex('.', 0, max_chars) + 1
             return text[0:end]
 
     return text
@@ -122,9 +137,10 @@ class DirectoriesWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
+        directories: DirectoryCollection[ExtendedDirectory]
         directories = DirectoryCollection(
-            layout.app.session(), type="extended")
+            layout.app.session(), type='extended')
 
         links = [
             Link(
@@ -133,17 +149,13 @@ class DirectoriesWidget:
                     ExtendedDirectoryEntryCollection,
                     {'directory_name': d.name}
                 ),
-                subtitle=(
-                    d.count == 1
-                    and _("1 entry")
-                    or _("${count} entries", mapping={'count': d.count})
-                )
+                subtitle=d.lead
             ) for d in layout.request.exclude_invisible(directories.query())
         ]
 
         links.append(
             Link(
-                text=_("All directories"),
+                text=_('All directories'),
                 url=layout.request.class_link(DirectoryCollection),
                 classes=('more-link', )
             )
@@ -151,7 +163,7 @@ class DirectoriesWidget:
 
         return {
             'directory_panel': LinkGroup(
-                title=_("Directories"),
+                title=_('Directories'),
                 links=links,
             )
         }
@@ -169,43 +181,46 @@ class NewsWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
 
-        if not layout.root_pages:
+        root_pages = layout.root_pages
+        if not root_pages:
             return {'news': ()}
 
-        news_index = False
-        for index, page in enumerate(layout.root_pages):
-            if isinstance(page, News):
-                news_index = index
+        news_index: int | None = None
+        for index, page in enumerate(root_pages):
+            if page.type == 'news':
+                if page.children:
+                    # only bother doing the query if there are children
+                    news_index = index
                 break
 
-        if not news_index:
+        if news_index is None:
             return {'news': ()}
 
+        # FIXME: We probably don't need full fat News objects for this
+        #        and could instead just use children on the root news page
+        #        if we need additional attributes, we can just add them
+        #        to PageMeta, although we would still need to sort the news
+        #        which can get costly if there's a lot of them. So fetching
+        #        a small number fresh migh actually be faster, unless we
+        #        separately cache the ones we need to display.
+        collection = NewsCollection(layout.request)
+        news = collection.sticky().all()
         # request more than the required amount of news to account for hidden
         # items which might be in front of the queue
-        news_limit = layout.org.news_limit_homepage
-        query_params = dict(
-            limit=news_limit + 2,
-            published_only=not layout.request.is_manager
+        news.extend(
+            collection.subset()
+            .filter(~News.id.in_([n.id for n in news]))
+            .limit(layout.org.news_limit_homepage)
         )
-        news = layout.request.exclude_invisible(
-            layout.root_pages[news_index].news_query(**query_params).all())
-
-        # limits the news, but doesn't count sticky news towards that limit
-        def limited(news, limit):
-            count = 0
-
-            for item in news:
-                if count < limit or item.is_visible_on_homepage:
-                    yield item
-
-                if not item.is_visible_on_homepage:
-                    count += 1
+        # the ones that shouldn't be visible should already be excluded
+        # but we do this again anyways just to be safe
+        news = layout.request.exclude_invisible(news)
+        news.sort(key=attrgetter('published_or_created'), reverse=True)
 
         return {
-            'news': limited(news, limit=news_limit),
+            'news': news,
             'get_lead': get_lead
         }
 
@@ -231,30 +246,29 @@ class EventsWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         occurrences = OccurrenceCollection(layout.app.session()).query()
         occurrences = occurrences.limit(layout.org.event_limit_homepage)
 
-        event_layout = EventBaseLayout(layout.model, layout.request)
         event_links = [
             Link(
                 text=o.title,
                 url=layout.request.link(o),
-                subtitle=event_layout.format_date(o.localized_start, 'event')
+                subtitle=layout.format_date(o.localized_start, 'event')
                 .title()
             ) for o in occurrences
         ]
 
         event_links.append(
             Link(
-                text=_("All events"),
-                url=event_layout.events_url,
+                text=_('All events'),
+                url=layout.events_url,
                 classes=('more-link', )
             )
         )
 
         latest_events = LinkGroup(
-            title=_("Events"),
+            title=_('Events'),
             links=event_links,
         )
 
@@ -280,58 +294,42 @@ class TilesWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         return {'tiles': tuple(self.get_tiles(layout))}
 
-    def get_tiles(self, layout):
-        Tile = namedtuple('Tile', ['page', 'links', 'number'])
+    class Tile(NamedTuple):
+        page: Link
+        links: Sequence[Link]
+        number: int
 
-        homepage_pages = layout.request.app.homepage_pages
+    def get_tiles(self, layout: DefaultLayout) -> Iterator[Tile]:
+
         request = layout.request
-        link = request.link
-        session = layout.app.session()
+        homepage_pages = request.homepage_pages
         classes = ('tile-sub-link', )
 
         for ix, page in enumerate(layout.root_pages):
             if page.type == 'topic':
 
-                children = []
-                for child in page.children:
-                    if child.id in map(
-                        lambda n: n.id, homepage_pages[page.id]
-                    ):
-                        children.append(child)
-
-                if not request.is_manager:
-                    children = (
-                        c for c in children if c.access == 'public'
-                    )
-
-                yield Tile(
-                    page=Link(page.title, link(page)),
+                yield self.Tile(
+                    page=Link(page.title, page.link(request)),
                     number=ix + 1,
                     links=tuple(
-                        Link(c.title, link(c), classes=classes, model=c)
-                        for c in children
+                        Link(
+                            child.title,
+                            child.link(request),
+                            classes=classes,
+                            # this only accesses the `access` attribute
+                            # which we have, so this is safe, even though
+                            # it's not the actual page model
+                            model=child,
+                        )
+                        for child in homepage_pages.get(page.id, ())
                     )
                 )
 
             elif page.type == 'news':
-                links = [
-                    Link(str(year), link(page.for_year(year)), classes=classes)
-                    for year in page.all_years
-                ]
-                if layout.org.show_newsletter:
-                    links.append(Link(
-                        _("Newsletter"), link(NewsletterCollection(session)),
-                        classes=classes
-                    ))
-
-                yield Tile(
-                    page=Link(page.title, link(page)),
-                    number=ix + 1,
-                    links=links
-                )
+                pass
             else:
                 raise NotImplementedError
 
@@ -349,19 +347,25 @@ class HrWidget:
 class SliderWidget:
     template = """
         <xsl:template match="slider">
-            <div metal:use-macro="layout.macros.slider" />
+            <div metal:use-macro="layout.macros['slider']"
+            tal:define="height_m '{@height-m}';
+            height_d '{@height-d}'"
+            />
         </xsl:template>
     """
 
-    def get_images_from_sets(self, layout):
+    def get_images_from_sets(
+        self,
+        layout: DefaultLayout
+    ) -> Iterator[RenderData]:
+
         session = layout.app.session()
 
-        sets = session.query(ImageSet)
-        sets = sets.with_entities(ImageSet.id, ImageSet.meta)
         sets = tuple(
-            s.id for s in sets
-            if s.meta.get('show_images_on_homepage')
-            and s.meta.get('access', 'public') == 'public'
+            set_id for set_id, meta in session.query(ImageSet)
+            .with_entities(ImageSet.id, ImageSet.meta)
+            if meta.get('show_images_on_homepage')
+            and meta.get('access', 'public') == 'public'
         )
 
         if not sets:
@@ -384,11 +388,11 @@ class SliderWidget:
                 'src': layout.request.link(image)
             }
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         # if we don't have an album used for images, we use the images
         # shown on the homepage anyway to avoid having to show nothing
         images = tuple(self.get_images_from_sets(layout))
 
         return {
-            'images': images
+            'images': images,
         }

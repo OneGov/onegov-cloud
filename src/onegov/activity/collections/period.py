@@ -1,17 +1,34 @@
-from onegov.activity.models import Period
+from __future__ import annotations
+
+from onegov.activity.models import BookingPeriod
 from onegov.core.collection import GenericCollection
 
 
-class PeriodCollection(GenericCollection):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import date
+
+
+class BookingPeriodCollection(GenericCollection[BookingPeriod]):
 
     @property
-    def model_class(self):
-        return Period
+    def model_class(self) -> type[BookingPeriod]:
+        return BookingPeriod
 
-    def add(self, title, prebooking, booking, execution, active=False,
-            minutes_between=0, deadline_days=None,
-            cancellation_date=None, cancellation_days=None, finalizable=True,
-            confirmable=True):
+    def add(  # type:ignore[override]
+        self,
+        title: str,
+        prebooking: tuple[date | None, date | None],
+        booking: tuple[date, date],
+        execution: tuple[date, date],
+        active: bool = False,
+        minutes_between: int | None = 0,
+        deadline_days: int | None = None,
+        cancellation_date: date | None = None,
+        cancellation_days: int | None = None,
+        finalizable: bool = True,
+        confirmable: bool = True
+    ) -> BookingPeriod:
 
         if not confirmable:
             prebooking = (booking[0], booking[0])
@@ -38,5 +55,5 @@ class PeriodCollection(GenericCollection):
 
         return period
 
-    def active(self):
-        return self.query().filter(Period.active == True).first()
+    def active(self) -> BookingPeriod | None:
+        return self.query().filter(BookingPeriod.active == True).first()

@@ -1,38 +1,57 @@
+from __future__ import annotations
+
 import hashlib
 import magic
 import os
 
 from contextlib import contextmanager, suppress
 from depot.io.utils import FileIntent
+from functools import lru_cache
 from mimetypes import guess_extension
 from io import IOBase, BytesIO, UnsupportedOperation
 from lxml import etree
 from PIL import Image
 
 
-def content_type_from_fileobj(fileobj):
+from typing import IO, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import SupportsRead, StrOrBytesPath
+    from collections.abc import Iterator
+
+
+def content_type_from_fileobj(fileobj: SupportsRead[bytes]) -> str:
     """ Gets the content type from a file obj. Depot has this as well, but it
     doesn't use python-magic. We use python-magic to be slower, but more
     accurate.
 
     """
 
-    with suppress(UnsupportedOperation):
-        fileobj.seek(0)
+    if hasattr(fileobj, 'seek'):
+        with suppress(UnsupportedOperation):
+            fileobj.seek(0)
 
     return magic.from_buffer(fileobj.read(4096), mime=True)
 
 
-def as_fileintent(content, filename):
-    assert isinstance(content, bytes) or isinstance(content, IOBase), """
-        Content must be either a bytes string or a file-like object.
-    """
+def as_fileintent(
+    content: bytes | IO[bytes],
+    filename: str | None
+) -> FileIntent:
+
+    # this is far stricter than filedepot is, but our custom UploadedFile
+    # requires more than just a read() to be implemented, this check won't
+    # make mypy happy, since IOBase does not inherit from typing.IO
+    # the minimum we could get away with right now is SupportsReadCloseSeek
+    # which is not that far off what IO provides, so for simplicity let's
+    # just use that
+    msg = 'Content must be either a bytes string or a file-like object.'
+    assert isinstance(content, (bytes, IOBase)), msg
 
     if isinstance(content, bytes):
         return FileIntent(BytesIO(content), filename, 'text/plain')
     else:
-        if hasattr(content, 'mode'):
-            assert 'b' in content.mode, "Open file in binary mode."
+        if hasattr(content, 'mode'):  # type: ignore[unreachable]
+            assert 'b' in content.mode, 'Open file in binary mode.'
 
         if hasattr(content, 'seek'):
             content.seek(0)
@@ -41,7 +60,8 @@ def as_fileintent(content, filename):
             content, filename, content_type_from_fileobj(content))
 
 
-def get_supported_image_mime_types():
+@lru_cache(maxsize=1)
+def get_supported_image_mime_types() -> set[str]:
     """ Queries PIL for *all* locally supported mime types.
 
     Adapted from:
@@ -74,7 +94,8 @@ def get_supported_image_mime_types():
     return supported_types
 
 
-def get_svg_size(svg):
+# TODO: technically SupportsReadClose is enough
+def get_svg_size(svg: IO[bytes]) -> tuple[str | None, str | None]:
     # note, the svg size may not be in pixel, it can include the same units
     # the browser uses for styling, so we need to pass this information down
     # to the browser, instead of using it internally
@@ -82,7 +103,10 @@ def get_svg_size(svg):
     return root.get('width'), root.get('height')
 
 
-def extension_for_content_type(content_type, filename=None):
+def extension_for_content_type(
+    content_type: str,
+    filename: str | None = None
+) -> str:
     """ Gets the extension for the given content type. Note that this is
     *meant for display only*. A file claiming to be a PDF might not be one,
     but this function would not let you know that.
@@ -90,20 +114,32 @@ def extension_for_content_type(content_type, filename=None):
     """
 
     if filename is not None:
-        ext = filename.split('.')[-1][:4].lower()
+        # previously we checked if the extension was at most 3 characters
+        # while I understand the motivation behind this, I don't think it
+        # is a good idea to make long file extensions not work, just to
+        # support files without an extension that have a `.` in the name
+        _, sep, ext = filename.rpartition('.')
+        ext = ext.lower() if sep else ''
     else:
-        ext = (guess_extension(content_type, strict=False) or '')
+        ext = guess_extension(content_type, strict=False) or ''
 
     return ext.strip('. ')
 
 
-def get_image_size(image):
-    return tuple('{}px'.format(d) for d in image.size)
+def get_image_size(image: Image.Image) -> tuple[str, str]:
+    w, h = image.size
+    return f'{w}px', f'{h}px'
 
 
-def digest(fileobj, type='sha256', chunksize=4096):
-    with suppress(UnsupportedOperation):
-        fileobj.seek(0)
+def digest(
+    fileobj: SupportsRead[bytes],
+    type: str = 'sha256',
+    chunksize: int = 4096
+) -> str:
+
+    if hasattr(fileobj, 'seek'):
+        with suppress(UnsupportedOperation):
+            fileobj.seek(0)
 
     digest = getattr(hashlib, type)()
 
@@ -113,7 +149,7 @@ def digest(fileobj, type='sha256', chunksize=4096):
     return digest.hexdigest()
 
 
-def word_count(text):
+def word_count(text: str) -> int:
     """ The word-count of the given text. Goes through the string exactly
     once and has constant memory usage. Not super sophisticated though.
 
@@ -134,15 +170,18 @@ def word_count(text):
     return count
 
 
-def name_without_extension(name):
-    if '.' in name.rstrip()[-5:]:
-        return name.rsplit('.', 1)[0]
-
-    return name
+def name_without_extension(name: str) -> str:
+    # previously we checked if the extension was at most 3 characters
+    # while I understand the motivation behind this, I don't think it
+    # is a good idea to make long file extensions not work, just to
+    # support files without an extension that have a `.` in the name
+    name, sep, ext = name.rpartition('.')
+    # if there is no sep, then the original string will be in ext
+    return name if sep else ext
 
 
 @contextmanager
-def current_dir(dir):
+def current_dir(dir: StrOrBytesPath) -> Iterator[None]:
     previous = os.getcwd()
     os.chdir(dir)
     yield

@@ -1,0 +1,44 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+            ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <h2 i18n:translate="">Sent Notifications</h2>
+                <div class="notifications">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th i18n:translate="">News</th>
+                            <th>Topic</th>
+                            <th i18n:translate="">Sent At</th>
+                            <th i18n:translate="">Response Data</th>
+                        </tr>
+                        </thead>
+                        <tbody tal:switch="bool(notifications)">
+                        <tal:b case="False">
+                            <tr>
+                                <td colspan="6" i18n:translate>No notifications</td>
+                                </tr>
+                            </tal:b>
+                            <tal:b case="True">
+                            <tr tal:repeat="notification notifications"
+                                     tal:attributes="class python: is_sent(notification) and 'sent-notification' or ''">
+                                <td>${notification.news.title}</td>
+                                <td>${notification.topic_id}</td>
+                                <td>${layout.format_date(notification.sent_at, 'datetime')}</td>
+                                <td>
+                                    <pre tal:condition="notification.response_data">${formatted_responses.get(notification.id, '')}</pre>
+                                    <span tal:condition="not:notification.response_data">No response data</span>
+                                </td>
+                            </tr>
+                        </tal:b>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

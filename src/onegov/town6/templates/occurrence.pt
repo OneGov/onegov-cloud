@@ -3,22 +3,39 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="grid-x grid-padding-x">
-            <div class="large-8 medium-8 cell">
+        <div class="grid-x grid-padding-x wrapper">
+            <div class="medium-7 cell content">
                 <div class="page-lead h5 limit-line-width">
-                    <div>
+                    <div tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end); suffix time_suffix|nothing">
                         ${layout.format_date(occurrence.localized_start, 'event')},
-                        ${layout.format_time_range(occurrence.localized_start, occurrence.localized_end)}
+                        <span tal:condition="python: '00:00' not in time">${time}${' ' + suffix if suffix else ''}</span>
+                        <span tal:condition="python: '00:00' in time">${time}</span>
                     </div>
                     <div tal:condition="occurrence.event.location">${occurrence.event.location}</div>
                 </div>
 
-                <div class="occurrence-tags">
+                <div class="occurrence-tags" tal:condition="occurrence.tags and show_tags">
                     <span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate="">${tag}</span>
                 </div>
 
+                <div class="occurrence-filters" tal:condition="occurrence.filter_keywords and show_filters">
+                    <div tal:repeat="filter occurrence.filter_keywords_ordered().items()">
+                        <span tal:condition="filter[1]" class="blank-label-description">${filter[0].title()}:</span>
+                        <span tal:repeat="tag filter[1]" tal:condition="isinstance(filter[1], list)" class="blank-label">${tag}</span>
+                        <span tal:condition="not isinstance(filter[1], list) and filter[1]" class="blank-label">${filter[1]}</span>
+                    </div>
+                </div>
+
+                <div class="occurence-link" tal:define="event_link occurrence.event.content.get('external_event_url')">
+                    <a tal:condition="event_link and event_link != 'https://' and 'keine' not in event_link.lower()" class="button" href="${event_link}" i18n:translate="">Link to organizers page</a>
+                </div>
+
+                <div class="occurence-link" tal:define="registration_link occurrence.event.content.get('event_registration_url')">
+                    <a tal:condition="registration_link and registration_link != 'https://' and 'keine' not in registration_link.lower()" class="button" href="${registration_link}" i18n:translate="">Link to registration</a>
+                </div>
+
                 <div class="occurrence-description">
-                    <p tal:content="structure description"></p>
+                    <p tal:content="description"></p>
                 </div>
 
                 <div class="occurrence-image" tal:condition="occurrence.event.image">
@@ -35,7 +52,9 @@
                 <div class="occurrence-price" tal:condition="occurrence.event.price">
                     <dl>
                         <dt i18n:translate>Price</dt>
-                        <dd>${occurrence.event.price}</dd>
+                        <tal:dd tal:repeat="line occurrence.event.price.split('\n')">
+                        ${line}<br tal:condition="not:repeat.line.end" />
+                        </tal:dd>
                     </dl>
                 </div>
 
@@ -46,67 +65,70 @@
                             <dd>${organizer}</dd>
                         </div>
                         <div tal:condition="organizer_email">
-                            <dt i18n:translate>E-Mail</dt>
+                            <dt i18n:translate>Organizer E-Mail address</dt>
                             <dd><a href="mailto:${organizer_email}" tal:content="organizer_email" /></dd>
+                        </div>
+                        <div tal:condition="organizer_phone">
+                            <dt i18n:translate>Organizer phone number</dt>
+                            <dd><a href="tel:${layout.format_phone_number(organizer_phone)}" tal:content="layout.format_phone_number(organizer_phone)" /></dd>
                         </div>
                     </dl>
                 </div>
-
-                <div class="occurrence-email" tal:condition="organizer_email">
-                    <p>
-
-                    </p>
-                </div>
             </div>
 
-            <div class="large-4 medium-4 cell">
-                <div class="occurrence-map" tal:define="coordinates occurrence.event.coordinates" tal:condition="coordinates">
-                    <h3 i18n:translate>Map</h3>
-                    <div class="marker-map" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
-                </div>
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="occurrence-map side-panel" tal:define="coordinates occurrence.event.coordinates" tal:condition="coordinates">
+                        <h3 i18n:translate>Map</h3>
+                        <div class="marker-map" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
+                    </div>
 
-                <tal:b metal:use-macro="layout.macros['ticket_callout']"
-                    tal:condition="request.is_manager and ticket"
-                />
+                    <div tal:condition="request.is_manager and ticket" class="side-panel">
+                        <tal:b metal:use-macro="layout.macros['ticket_callout']"
+                        />
+                    </div>
 
-                <div>
-                    <h3 i18n:translate="">Exports</h3>
-                    <div class="side-panel-with-bg">
-                        <ul class="calendar-export-list">
+                    <div class="side-panel">
+                        <h3 i18n:translate="">Exports</h3>
+                        <ul class="more-list">
                             <li>
-                                <a href="${request.link(occurrence, name='ical')}" i18n:translate>Export this event</a>
+                                <a  class="list-link no-chevron" href="${request.link(occurrence, name='ical')}">
+                                    <i class="far fa-calendar"></i> <span class="list-title" i18n:translate>Export this event</span>
+                                </a>
                             </li>
                             <li tal:condition="len(occurrences) > 1">
-                                <a href="${request.link(occurrence.event, name='ical')}" i18n:translate>Export all occurrences of this event</a>
+                                <a class="list-link no-chevron" href="${request.link(occurrence.event, name='ical')}">
+                                    <i class="far fa-calendar-alt"></i> <span class="list-title" i18n:translate>Export all occurrences of this event</span>
+                                </a>
                             </li>
                         </ul>
-                    </div>    
-                </div>
+                    </div>
 
-                <div class="borderless-side-panel occurrence-dates">
-                    <h3 i18n:translate="">All occurrences of this event</h3>
-                    <div class="monthly-view" data-dates="${';'.join(layout.format_date(o, 'isodate') for o in occurrences)}"></div>
-                </div>
+                    <div class="side-panel occurrence-dates">
+                        <h3 i18n:translate="">All occurrences of this event</h3>
+                        <div class="monthly-view" data-dates="${';'.join(layout.format_date(o, 'isodate') for o in occurrences)}"></div>
+                    </div>
 
-                <div class="borderless-side-panel imported-event-panel" tal:condition="occurrence.event.source and request.is_manager|nothing">
-                    <h2 i18n:translate="">Origin</h2>
-                    <p tal:define="source_url occurrence.event.source_url(layout.request)">
-                        <tal:b i18n:translate>This is an imported event</tal:b>:
+                    <div class="side-panel imported-event-panel" tal:condition="occurrence.event.source and request.is_manager|nothing">
+                        <h2 i18n:translate="">Origin</h2>
+                        <p tal:define="source_url occurrence.event.source_url(layout.request)">
+                            <tal:b i18n:translate>This is an imported event</tal:b>:
 
-                        <tal:b condition="source_url">
-                            <a href="${source_url}" class="imported-event">
-                                <i class="fa fa-fw fa-link" aria-hidden="true"></i>
-                                ${occurrence.event.source}
-                            </a>
-                        </tal:b>
+                            <tal:b condition="source_url">
+                                <a href="${source_url}" class="imported-event">
+                                    <i class="fa fa-fw fa-link" aria-hidden="true"></i>
+                                    ${occurrence.event.source}
+                                </a>
+                            </tal:b>
 
-                        <tal:b condition="not:source_url">
-                            <span class="imported-event">
-                                <i class="fa fa-fw fa-key" aria-hidden="true"></i>
-                                ${occurrence.event.source}
-                            </span>
-                        </tal:b>
-                    </p>
+                            <tal:b condition="not:source_url">
+                                <span class="imported-event">
+                                    <i class="fa fa-fw fa-key" aria-hidden="true"></i>
+                                    ${occurrence.event.source}
+                                </span>
+                            </tal:b>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

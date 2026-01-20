@@ -1,58 +1,78 @@
 """
-    htmldiff
-    ~~~~~~~~
+htmldiff
+========
 
-    Diffs HTML fragments.  Nice to show what changed between two revisions
-    of a document for an arbitrary user.  Examples:
+Diffs HTML fragments.  Nice to show what changed between two revisions
+of a document for an arbitrary user.
+
+Examples:
+.. code-block:: pycon
 
     >>> from htmldiff import render_html_diff
 
     >>> render_html_diff('Foo <b>bar</b> baz', 'Foo <i>bar</i> baz')
-    u'<div class="diff">Foo <i class="tagdiff_replaced">bar</i> baz</div>'
+    '<div class="diff">Foo <i class="tagdiff_replaced">bar</i> baz</div>'
 
     >>> render_html_diff('Foo bar baz', 'Foo baz')
-    u'<div class="diff">Foo <del>bar</del> baz</div>'
+    '<div class="diff">Foo <del>bar</del> baz</div>'
 
     >>> render_html_diff('Foo baz', 'Foo blah baz')
-    u'<div class="diff">Foo <ins>blah</ins> baz</div>'
+    '<div class="diff">Foo <ins>blah</ins> baz</div>'
 
-    :copyright: (c) 2011 by Armin Ronacher, see AUTHORS for more details.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2011 by Armin Ronacher
+:license: BSD
 """
-
-from __future__ import with_statement
+from __future__ import annotations
 
 import re
-from difflib import SequenceMatcher
-from itertools import chain
 from contextlib import contextmanager
-
-from genshi.core import Stream, QName, Attrs, START, END, TEXT
-from genshi.input import ET
+from difflib import SequenceMatcher
+from itertools import chain, zip_longest
 
 import html5lib
+from genshi.core import Stream, QName, Attrs, START, END, TEXT  # type:ignore
+from genshi.input import ET  # type:ignore[import-untyped]
+from markupsafe import Markup
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from genshi.core import StreamEventKind
+    from typing import TypeAlias
+
+    Position: TypeAlias = tuple[str | None, int, int]
+    StreamEvent: TypeAlias = tuple[StreamEventKind, Any, Position]
 
 
 _leading_space_re = re.compile(r'^(\s+)')
 _diff_split_re = re.compile(r'(\s+)')
 
 
-def diff_genshi_stream(old_stream, new_stream):
+def diff_genshi_stream(old_stream: Stream, new_stream: Stream) -> Stream:
     """Renders a creole diff for two texts."""
     differ = StreamDiffer(old_stream, new_stream)
     return differ.get_diff_stream()
 
 
-def render_html_diff(old, new, wrapper_element='div',
-                     wrapper_class='diff'):
+def render_html_diff(
+    old: str,
+    new: str,
+    wrapper_element: str = 'div',
+    wrapper_class: str = 'diff'
+) -> Markup:
     """Renders the diff between two HTML fragments."""
     old_stream = parse_html(old, wrapper_element, wrapper_class)
     new_stream = parse_html(new, wrapper_element, wrapper_class)
     rv = diff_genshi_stream(old_stream, new_stream)
-    return rv.render('html', encoding=None)
+    return Markup(rv.render('html', encoding=None))  # nosec: B704
 
 
-def parse_html(html, wrapper_element='div', wrapper_class='diff'):
+def parse_html(
+    html: str,
+    wrapper_element: str = 'div',
+    wrapper_class: str = 'diff'
+) -> ET:
     """Parse an HTML fragment into a Genshi stream."""
     builder = html5lib.getTreeBuilder('etree')
     parser = html5lib.HTMLParser(tree=builder)
@@ -63,39 +83,31 @@ def parse_html(html, wrapper_element='div', wrapper_class='diff'):
     return ET(tree)
 
 
-def longzip(a, b):
-    """Like `izip` but yields `None` for missing items."""
-    aiter = iter(a)
-    biter = iter(b)
-    try:
-        for item1 in aiter:
-            yield item1, next(biter)
-    except StopIteration:
-        for item1 in aiter:
-            yield item1, None
-    else:
-        for item2 in biter:
-            yield None, item2
-
-
 class StreamDiffer:
     """A class that can diff a stream of Genshi events. It will inject
-``<ins>`` and ``<del>`` tags into the stream. It probably breaks
-in very ugly ways if you pass a random Genshi stream to it. I'm
-not exactly sure if it's correct what creoleparser is doing here,
-but it appears that it's not using a namespace. That's fine with me
-so the tags the `StreamDiffer` adds are also unnamespaced.
-"""
+    ``<ins>`` and ``<del>`` tags into the stream. It probably breaks
+    in very ugly ways if you pass a random Genshi stream to it. I'm
+    not exactly sure if it's correct what creoleparser is doing here,
+    but it appears that it's not using a namespace. That's fine with me
+    so the tags the `StreamDiffer` adds are also unnamespaced.
+    """
 
-    def __init__(self, old_stream, new_stream):
+    _old: list[StreamEvent]
+    _new: list[StreamEvent]
+    _result: list[StreamEvent]
+    _stack: list[str]
+    _context: str | None
+
+    def __init__(self, old_stream: ET, new_stream: ET):
         self._old = list(old_stream)
         self._new = list(new_stream)
-        self._result = None
+        # FIXME: We should probably switch to a hasattr check
+        self._result = None  # type:ignore[assignment]
         self._stack = []
         self._context = None
 
     @contextmanager
-    def context(self, kind):
+    def context(self, kind: str | None) -> Iterator[None]:
         old_context = self._context
         self._context = kind
         try:
@@ -103,25 +115,30 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
         finally:
             self._context = old_context
 
-    def inject_class(self, attrs, classname):
+    def inject_class(self, attrs: Attrs, classname: str) -> Attrs:
         cls = attrs.get('class')
         attrs |= [(QName('class'), cls and cls + ' ' + classname or classname)]
         return attrs
 
-    def append(self, type, data, pos):
+    def append(
+        self,
+        type: StreamEventKind,
+        data: Any,
+        pos: Position
+    ) -> None:
         self._result.append((type, data, pos))
 
-    def text_split(self, text):
-        worditer = chain([u''], _diff_split_re.split(text))
+    def text_split(self, text: str) -> list[str]:
+        worditer = chain([''], _diff_split_re.split(text))
         return [x + next(worditer) for x in worditer]
 
-    def cut_leading_space(self, s):
+    def cut_leading_space(self, s: str) -> tuple[str, str]:
         match = _leading_space_re.match(s)
         if match is None:
-            return u'', s
+            return '', s
         return match.group(), s[match.end():]
 
-    def mark_text(self, pos, text, tag):
+    def mark_text(self, pos: Position, text: str, tag: str) -> None:
         ws, text = self.cut_leading_space(text)
         tag = QName(tag)
         if ws:
@@ -130,13 +147,14 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
         self.append(TEXT, text, pos)
         self.append(END, tag, pos)
 
-    def diff_text(self, pos, old_text, new_text):
+    def diff_text(self, pos: Position, old_text: str, new_text: str) -> None:
         old = self.text_split(old_text)
         new = self.text_split(new_text)
         matcher = SequenceMatcher(None, old, new)
 
-        def wrap(tag, words):
-            return self.mark_text(pos, u''.join(words), tag)
+        # FIXME: This function is too simple to be worth it, get rid of it
+        def wrap(tag: str, words: list[str]) -> None:
+            self.mark_text(pos, ''.join(words), tag)
 
         for tag, i1, i2, j1, j2 in matcher.get_opcodes():
             if tag == 'replace':
@@ -147,13 +165,20 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
             elif tag == 'insert':
                 wrap('ins', new[j1:j2])
             else:
-                self.append(TEXT, u''.join(old[i1:i2]), pos)
+                self.append(TEXT, ''.join(old[i1:i2]), pos)
 
-    def replace(self, old_start, old_end, new_start, new_end):
+    def replace(
+        self,
+        old_start: int,
+        old_end: int,
+        new_start: int,
+        new_end: int
+    ) -> None:
+
         old = self._old[old_start:old_end]
         new = self._new[new_start:new_end]
 
-        for idx, (old_event, new_event) in enumerate(longzip(old, new)):
+        for idx, (old_event, new_event) in enumerate(zip_longest(old, new)):
             if old_event is None:
                 self.insert(new_start + idx, new_end + idx)
                 break
@@ -212,28 +237,33 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
             else:
                 pass
 
-    def delete(self, start, end):
+    def delete(self, start: int, end: int) -> None:
         with self.context('del'):
             self.block_process(self._old[start:end])
 
-    def insert(self, start, end):
+    def insert(self, start: int, end: int) -> None:
         with self.context('ins'):
             self.block_process(self._new[start:end])
 
-    def unchanged(self, start, end):
+    def unchanged(self, start: int, end: int) -> None:
         with self.context(None):
             self.block_process(self._old[start:end])
 
-    def enter(self, pos, tag, attrs):
+    def enter(self, pos: Any, tag: Any, attrs: dict[str, Any]) -> None:
         self._stack.append(tag)
         self.append(START, (tag, attrs), pos)
 
-    def enter_mark_replaced(self, pos, tag, attrs):
+    def enter_mark_replaced(
+        self,
+        pos: Position,
+        tag: str,
+        attrs: Attrs
+    ) -> None:
         attrs = self.inject_class(attrs, 'tagdiff_replaced')
         self._stack.append(tag)
         self.append(START, (tag, attrs), pos)
 
-    def leave(self, pos, tag):
+    def leave(self, pos: Position, tag: str) -> bool:
         if not self._stack:
             return False
         if tag == self._stack[-1]:
@@ -242,14 +272,14 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
             return True
         return False
 
-    def leave_all(self):
+    def leave_all(self) -> None:
         if self._stack:
             last_pos = (self._new or self._old)[-1][2]
             for tag in reversed(self._stack):
                 self.append(END, tag, last_pos)
         del self._stack[:]
 
-    def block_process(self, events):
+    def block_process(self, events: list[StreamEvent]) -> None:
         for event in events:
             type, data, pos = event
             if type == START:
@@ -267,7 +297,7 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
             else:
                 self.append(type, data, pos)
 
-    def process(self):
+    def process(self) -> None:
         self._result = []
         matcher = SequenceMatcher(None, self._old, self._new)
         for tag, i1, i2, j1, j2 in matcher.get_opcodes():
@@ -281,7 +311,8 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
                 self.unchanged(i1, i2)
         self.leave_all()
 
-    def get_diff_stream(self):
+    def get_diff_stream(self) -> Stream:
+        # FIXME: We should probably switch to a hasattr check
         if self._result is None:
-            self.process()
+            self.process()  # type:ignore[unreachable]
         return Stream(self._result)

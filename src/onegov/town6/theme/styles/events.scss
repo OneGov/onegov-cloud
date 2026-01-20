@@ -2,21 +2,13 @@
     Events
 */
 $events-icon-width: 3ex;
-$placeholder-icon-size: 6rem;
+$placeholder-icon-size: 5rem;
 $event-image-max-height: 150px;
 
 .events {
 
     .event-item > a {
         width: 100%;
-    }
-
-    .card {
-        border: 0;
-
-        &:hover img {
-            transform: scale(1.05);
-        }
     }
 
     .card img {
@@ -26,31 +18,45 @@ $event-image-max-height: 150px;
         width: auto;
     }
 
+    @media #{$small-only} {
+        .no-image,
+        .no-image.image-placeholder {
+            display: none;
+        }
+    }
+
     .contained {
         border-bottom: 1px solid $iron;
         border-top: 1px solid $iron;
     }
 
+    h5 {
+        padding-bottom: 0 !important;
+        margin-bottom: 1rem;
+    }
+
     .date-place {
-        color:  $primary-color;
-        flex: none;
-        font-size: 97%;
-        font-weight: bold;
-        padding: 1rem;
+        color:  $charcoal;
         i { width: $events-icon-width; }
+    }
+
+    hr {
+        border-bottom: 1px solid $gray;
+        margin: .5rem 0;
     }
 
     .image-placeholder {
         display: flex;
         justify-content: center;
         max-height: $event-image-max-height;
-        padding: 30px 15px;
+        position: absolute;
 
         .far {
             color: $iron;
             font-size: $placeholder-icon-size;
             height: $placeholder-icon-size;
             margin: auto;
+            padding: 1.5rem;
             width: $placeholder-icon-size;
         }
     }
@@ -87,18 +93,8 @@ $event-image-max-height: 150px;
     margin-top: .5rem;
 }
 
-.calendar-export-list {
-    a::before {
-        @include icon($calendar-icon);
-        color: $body-font-color;
-        margin-right: 1ex;
-    }
-}
-
 // raise importance a bit by double-selecting
 .occurrence.occurrence {
-    margin-bottom: 2.25rem;
-
     h3 {
         font-weight: bold;
     }
@@ -149,10 +145,28 @@ $event-image-max-height: 150px;
 }
 
 .occurrence-tags,
-.occurrence-description {
+.occurrence-filters {
     margin-bottom: 1.25em;
+    font-size: .8rem;
 }
 
 .occurrence-description {
+    margin-bottom: 1.25em;
     max-width: $max-line-width;
+}
+
+.event-more-link.button.hollow {
+    border: 1px solid $gray;
+}
+
+.card:hover .event-more-link.button.hollow {
+    border: 1px solid $primary-color;
+}
+
+.event-header {
+    margin-bottom: 2rem;
+}
+
+.event-footer {
+    margin-top: 2rem;
 }

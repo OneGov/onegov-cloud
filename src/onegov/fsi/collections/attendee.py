@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import or_
 
 from onegov.core.collection import Pagination, GenericCollection
@@ -5,16 +7,28 @@ from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.user import User
 
 
-class CourseAttendeeCollection(GenericCollection, Pagination):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Query, Session
+    from typing import Self
+    from uuid import UUID
 
-    def __init__(self, session,
-                 page=0,
-                 exclude_external=False,
-                 external_only=False,
-                 auth_attendee=None,
-                 editors_only=False,
-                 admins_only=False
-                 ):
+
+class CourseAttendeeCollection(
+    GenericCollection[CourseAttendee],
+    Pagination[CourseAttendee]
+):
+
+    def __init__(
+        self,
+        session: Session,
+        page: int = 0,
+        exclude_external: bool = False,
+        external_only: bool = False,
+        auth_attendee: CourseAttendee | None = None,
+        editors_only: bool = False,
+        admins_only: bool = False
+    ) -> None:
         super().__init__(session)
         self.page = page
         self.exclude_external = exclude_external
@@ -24,35 +38,37 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
         self.admins_only = admins_only
 
     @property
-    def unfiltered(self):
-        return all((
-            self.exclude_external is False,
-            self.external_only is False,
-            self.editors_only is False,
-            self.admins_only is False
-        ))
+    def unfiltered(self) -> bool:
+        return (
+            self.exclude_external is False
+            and self.external_only is False
+            and self.editors_only is False
+            and self.admins_only is False
+        )
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[CourseAttendee]:
         return CourseAttendee
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """ Returns True if the current and the other Pagination instance
         are equal. Used to find the current page in a list of pages.
 
         """
-        return all((
-            self.page == other.page,
-            self.exclude_external == other.exclude_external,
-            self.external_only == other.external_only))
+        return (
+            isinstance(other, self.__class__)
+            and self.page == other.page
+            and self.exclude_external == other.exclude_external
+            and self.external_only == other.external_only
+        )
 
     @property
-    def attendee_permissions(self):
+    def attendee_permissions(self) -> list[str]:
         if self.auth_attendee:
             return self.auth_attendee.permissions or []
         return []
 
-    def query(self):
+    def query(self) -> Query[CourseAttendee]:
 
         query = super().query()
         query = query.order_by(
@@ -79,14 +95,14 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
 
         return query
 
-    def subset(self):
+    def subset(self) -> Query[CourseAttendee]:
         return self.query()
 
     @property
-    def page_index(self):
+    def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index):
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session, index,
             exclude_external=self.exclude_external,
@@ -95,15 +111,19 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
             editors_only=self.editors_only
         )
 
-    def add_from_user(self, user):
+    def add_from_user(self, user: User) -> CourseAttendee:
         default = 'Default Value'
-        data = dict(
+        return self.add(
             user_id=user.id,
             first_name=default,
             last_name=default,
-            email=user.username,
+            email=user.username
         )
-        self.add(**data)
 
-    def by_id(self, id):
+    def by_id(
+        self,
+        id: UUID  # type:ignore[override]
+    ) -> CourseAttendee | None:
+        # FIXME: Is this super() call intentional? This means we don't actually
+        #        respect all of our filters for this method...
         return super().query().filter(self.primary_key == id).first()

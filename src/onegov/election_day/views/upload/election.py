@@ -1,27 +1,39 @@
 """ The upload view. """
+from __future__ import annotations
+
 import morepath
 import transaction
 
-from onegov.ballot import Election
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_election_internal_majorz
 from onegov.election_day.formats import import_election_internal_proporz
-from onegov.election_day.formats import import_election_wabsti_majorz
-from onegov.election_day.formats import import_election_wabsti_proporz
 from onegov.election_day.formats import import_election_wabstic_majorz
 from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.forms import UploadMajorzElectionForm
 from onegov.election_day.forms import UploadProporzElectionForm
 from onegov.election_day.layouts import ManageElectionsLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import ProporzElection
 from onegov.election_day.views.upload import unsupported_year_error
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.models import DataSourceItem
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
 
 
 @ElectionDayApp.manage_html(
     model=Election,
     name='upload'
 )
-def view_upload_election(self, request):
+def view_upload_election(
+    self: Election,
+    request: ElectionDayRequest
+) -> Response:
     """ Upload results of an election.
 
     Redirects to the majorz or proporz upload view.
@@ -39,8 +51,11 @@ def view_upload_election(self, request):
     template='upload_election.pt',
     form=UploadMajorzElectionForm,
 )
-def view_upload_majorz_election(self, request, form):
-
+def view_upload_majorz_election(
+    self: Election,
+    request: ElectionDayRequest,
+    form: UploadMajorzElectionForm
+) -> RenderData:
     """ Upload results of a majorz election. """
 
     assert self.type == 'majorz'
@@ -57,34 +72,29 @@ def view_upload_majorz_election(self, request, form):
             errors = [unsupported_year_error(self.date.year)]
         else:
             if form.file_format.data == 'internal':
+                assert form.results.data is not None
+                assert form.results.file is not None
                 errors = import_election_internal_majorz(
                     self,
                     principal,
                     form.results.file,
                     form.results.data['mimetype']
                 )
-            elif form.file_format.data == 'wabsti':
-                elected = len(form.elected.data)
-                errors = import_election_wabsti_majorz(
-                    self,
-                    principal,
-                    form.results.file,
-                    form.results.data['mimetype'],
-                    form.elected.file if elected else None,
-                    form.elected.data['mimetype'] if elected else None,
-                )
-                if form.majority.data:
-                    self.absolute_majority = form.majority.data
-                self.status = 'final' if form.complete.data else 'interim'
-            elif form.file_format.data == 'wabsti_m':
-                errors = import_election_wabsti_majorz(
-                    self,
-                    principal,
-                    form.results.file,
-                    form.results.data['mimetype'],
-                )
             elif form.file_format.data == 'wabsti_c':
+                source: DataSourceItem
                 for source in self.data_sources:
+                    assert source.district is not None
+                    assert source.number is not None
+                    assert form.wm_wahl.data is not None
+                    assert form.wm_wahl.file is not None
+                    assert form.wmstatic_gemeinden.data is not None
+                    assert form.wmstatic_gemeinden.file is not None
+                    assert form.wm_gemeinden.data is not None
+                    assert form.wm_gemeinden.file is not None
+                    assert form.wm_kandidaten.data is not None
+                    assert form.wm_kandidaten.file is not None
+                    assert form.wm_kandidatengde.data is not None
+                    assert form.wm_kandidatengde.file is not None
                     errors.extend(
                         import_election_wabstic_majorz(
                             self,
@@ -104,7 +114,7 @@ def view_upload_majorz_election(self, request, form):
                         )
                     )
             else:
-                raise NotImplementedError("Unsupported import format")
+                raise NotImplementedError('Unsupported import format')
 
             archive = ArchivedResultCollection(request.session)
             archive.update(self, request)
@@ -118,9 +128,8 @@ def view_upload_majorz_election(self, request, form):
                 request.app.pages_cache.flush()
                 request.app.send_zulip(
                     request.app.principal.name,
-                    'New results available: [{}]({})'.format(
-                        self.title, request.link(self)
-                    )
+                    'New results available: '
+                    f'[{self.title}]({request.link(self)})'
                 )
 
     layout = ManageElectionsLayout(self, request)
@@ -139,13 +148,16 @@ def view_upload_majorz_election(self, request, form):
 
 
 @ElectionDayApp.manage_form(
-    model=Election,
+    model=ProporzElection,
     name='upload-proporz',
     template='upload_election.pt',
     form=UploadProporzElectionForm
 )
-def view_upload_proporz_election(self, request, form):
-
+def view_upload_proporz_election(
+    self: ProporzElection,
+    request: ElectionDayRequest,
+    form: UploadProporzElectionForm
+) -> RenderData:
     """ Upload results of a proproz election. """
 
     assert self.type == 'proporz'
@@ -162,31 +174,34 @@ def view_upload_proporz_election(self, request, form):
             errors = [unsupported_year_error(self.date.year)]
         else:
             if form.file_format.data == 'internal':
+                assert form.results.data is not None
+                assert form.results.file is not None
                 errors = import_election_internal_proporz(
                     self,
                     principal,
                     form.results.file,
                     form.results.data['mimetype']
                 )
-            elif form.file_format.data == 'wabsti':
-                connections = len(form.connections.data)
-                stats = len(form.statistics.data)
-                elected = len(form.elected.data)
-                errors = import_election_wabsti_proporz(
-                    self,
-                    principal,
-                    form.results.file,
-                    form.results.data['mimetype'],
-                    form.connections.file if connections else None,
-                    form.connections.data['mimetype'] if connections else None,
-                    form.elected.file if elected else None,
-                    form.elected.data['mimetype'] if elected else None,
-                    form.statistics.file if stats else None,
-                    form.statistics.data['mimetype'] if stats else None
-                )
-                self.status = 'final' if form.complete.data else 'interim'
             elif form.file_format.data == 'wabsti_c':
+                source: DataSourceItem
                 for source in self.data_sources:
+                    assert source.number is not None
+                    assert form.wp_wahl.data is not None
+                    assert form.wp_wahl.file is not None
+                    assert form.wpstatic_gemeinden.data is not None
+                    assert form.wpstatic_gemeinden.file is not None
+                    assert form.wp_gemeinden.data is not None
+                    assert form.wp_gemeinden.file is not None
+                    assert form.wp_listen.data is not None
+                    assert form.wp_listen.file is not None
+                    assert form.wp_listengde.data is not None
+                    assert form.wp_listengde.file is not None
+                    assert form.wpstatic_kandidaten.data is not None
+                    assert form.wpstatic_kandidaten.file is not None
+                    assert form.wp_kandidaten.data is not None
+                    assert form.wp_kandidaten.file is not None
+                    assert form.wp_kandidatengde.data is not None
+                    assert form.wp_kandidatengde.file is not None
                     errors.extend(
                         import_election_wabstic_proporz(
                             self,
@@ -212,7 +227,7 @@ def view_upload_proporz_election(self, request, form):
                         )
                     )
             else:
-                raise NotImplementedError("Unsupported import format")
+                raise NotImplementedError('Unsupported import format')
 
             archive = ArchivedResultCollection(request.session)
             archive.update(self, request)
@@ -226,9 +241,8 @@ def view_upload_proporz_election(self, request, form):
                 request.app.pages_cache.flush()
                 request.app.send_zulip(
                     request.app.principal.name,
-                    'New results available: [{}]({})'.format(
-                        self.title, request.link(self)
-                    )
+                    'New results available: '
+                    f'[{self.title}]({request.link(self)})'
                 )
 
     layout = ManageElectionsLayout(self, request)

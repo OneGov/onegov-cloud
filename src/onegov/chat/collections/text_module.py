@@ -1,21 +1,34 @@
+from __future__ import annotations
+
 from onegov.chat.models import TextModule
 from onegov.core.collection import GenericCollection
 from sqlalchemy import or_
 
 
-class TextModuleCollection(GenericCollection):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Query, Session
 
-    def __init__(self, session, type='*', handler='ALL', owner='*'):
+
+class TextModuleCollection(GenericCollection[TextModule]):
+
+    def __init__(
+        self,
+        session: Session,
+        type: str = '*',
+        handler: str = 'ALL',
+        owner: str = '*'
+    ):
         super().__init__(session)
         self.type = type
         self.handler = handler
         self.owner = owner
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[TextModule]:
         return TextModule
 
-    def query(self):
+    def query(self) -> Query[TextModule]:
         query = super().query()
 
         if self.owner != '*':

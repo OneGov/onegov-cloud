@@ -1,0 +1,228 @@
+name: Tests
+
+on:
+  workflow_dispatch:  # allow to run manually
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+  pull_request:
+
+jobs:
+
+  lint:
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-24.04
+
+    # we always use the latest container from the master branch
+    # this is fine because we still run all our installs just in case
+    container:
+      image: ghcr.io/onegov/onegov-cloud:master
+      credentials:
+         username: ${{ github.actor }}
+         password: ${{ secrets.GITHUB_TOKEN }}
+
+    defaults:
+      run:
+        shell: bash
+
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    name: Lint
+
+    steps:
+    - name: Install packages
+      run: |
+        apt-get update
+        apt-get install -y \
+          wget \
+          apparmor \
+          curl \
+          git-core \
+          postgresql \
+          redis \
+          gcc \
+          libc-dev \
+          fonts-liberation \
+          libappindicator3-1 \
+          libasound2t64 \
+          libcairo2-dev \
+          libdrm2 \
+          libgbm1 \
+          libnspr4 \
+          libnss3 \
+          libu2f-udev \
+          libvulkan1 \
+          libx11-xcb1 \
+          libxcb-dri3-0 \
+          libxshmfence1 \
+          libxss1 \
+          libxt-dev \
+          xdg-utils
+
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        source /app/bin/activate
+        python -m pip install --upgrade uv
+        uv pip compile setup.cfg -U \
+        | uv pip install .[mypy,lint] -r /dev/stdin
+
+    - name: Linting
+      run: |
+        /app/bin/ruff check src/ tests/ stubs/ --output-format github
+        /app/bin/flake8 \
+        --format '::error file=%(path)s,line=%(row)s,col=%(col)s,title=Flake8 (%(code)s)::%(text)s' \
+        src/
+
+    - name: Check security issues
+      run: |
+        /app/bin/bandit \
+        --quiet \
+        --recursive \
+        --configfile pyproject.toml \
+        --format custom \
+        --msg-template '::error file={abspath},line={line},col={col},title=Bandit ({test_id})::{msg}' \
+        src/ 2> /dev/null
+
+    - name: Static type checking
+      run: |
+        source /app/bin/activate
+        bash mypy.sh
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [1, 2, 3, 4, 5, 6, 7, 8]
+
+    runs-on: ubuntu-24.04
+
+    # we always use the latest container from the master branch
+    # this is fine because we still run all our installs just in case
+    container:
+      image: ghcr.io/onegov/onegov-cloud:master
+      credentials:
+         username: ${{ github.actor }}
+         password: ${{ secrets.GITHUB_TOKEN }}
+
+    defaults:
+      run:
+        shell: bash
+
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    name: Test group ${{ matrix.group }}
+
+    steps:
+    - name: Install packages
+      run: |
+        apt-get update
+        apt-get install -y \
+          wget \
+          apparmor \
+          curl \
+          git-core \
+          postgresql \
+          redis \
+          gcc \
+          libc-dev \
+          fonts-liberation \
+          libappindicator3-1 \
+          libasound2t64 \
+          libcairo2-dev \
+          libdrm2 \
+          libgbm1 \
+          libnspr4 \
+          libnss3 \
+          libpq-dev \
+          libu2f-udev \
+          libvulkan1 \
+          libx11-xcb1 \
+          libxcb-dri3-0 \
+          libxshmfence1 \
+          libxss1 \
+          libxt-dev \
+          unzip \
+          xdg-utils
+
+    - name: Install Chrome
+      uses: browser-actions/setup-chrome@v1
+      with:
+        # FIXME: OGC-1857
+        chrome-version: 127
+        install-chromedriver: true
+
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Get branch name (merge)
+      if: github.event_name != 'pull_request'
+      run: |
+        echo "CODECOV_BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" \
+             >> $GITHUB_ENV
+
+    - name: Get branch name (pull request)
+      if: github.event_name == 'pull_request'
+      run: |
+        echo "CODECOV_BRANCH=$(echo ${GITHUB_HEAD_REF} | tr / -)" \
+             >> $GITHUB_ENV
+
+    - name: Install dependencies
+      run: |
+        source /app/bin/activate
+        python -m pip install --upgrade uv
+        uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
+        # TEMPORARY: editable build so we don't need a path-fix in codecov
+        uv pip compile setup.cfg -U \
+        | uv pip install -e .[test] -r /dev/stdin
+      env:
+        # NOTE: Suppress uv warning
+        UV_LINK_MODE: copy
+
+    - name: Prepare test environment
+      run: |
+        # reset the build asset permissions
+        # TEMPORARY: if we no longer do an editable install, then the base
+        #            path needs to change to /app/lib/
+        find . -type d -iname assets -print0 | xargs -0 chmod a+w -R
+        # add unprivileged test user
+        adduser --disabled-password --gecos "" test
+        redis-server --daemonize yes
+        PG_DATA_DIR="$(pg_config --sharedir)/tsearch_data"
+        cp "${PG_DATA_DIR}/unaccent.rules" "${PG_DATA_DIR}/german.rules"
+        sed -i 's/^\([ÄÖÜäöü]\t.*\)/\1e/' "${PG_DATA_DIR}/german.rules"
+
+    - name: Run tests
+      run: |
+        run-as "$(id -u test)":test /app/bin/pytest \
+          -n logical \
+          -o cache_dir=/tmp/pytest \
+          -r fER \
+          --dist loadgroup \
+          --splits "8" \
+          --group "${{matrix.group}}" \
+          --reruns 3 \
+          --reruns-delay 1 \
+          --only-rerun "AttributeError: 'SessionManager'" \
+          --only-rerun "AttributeError: 'DefaultLayout'" \
+          --only-rerun ".*ReferenceError: [$] is not defined" \
+          --only-rerun "FileNotFoundError:" \
+          --only-rerun "Bad response: 404 Not Found" \
+          --junit-xml=/tmp/junit.xml \
+          -o junit_family=legacy \
+          --cov \
+          --cov-config=pyproject.toml \
+          --codecov \
+          --codecov-branch="$CODECOV_BRANCH" \
+          --codecov-commit="$GITHUB_SHA" \
+          --codecov-slug=OneGov/onegov-cloud \
+          --codecov-token="${{ secrets.CODECOV_TOKEN }}" \
+          tests
+      env:
+        LC_ALL: C.UTF-8
+        LANG: C.UTF-8
+        SKIP_DRIVER_MANAGER: '1'

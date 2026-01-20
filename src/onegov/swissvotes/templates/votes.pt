@@ -54,7 +54,7 @@
                             <td class="left-aligned"><span title="${vote.title}">${vote.short_title}</span> <a href="${request.link(votes.by_order('title'))}" class="sort-title-fix sort-${votes.sort_order_by_key('title')}"></a></td>
                             <td class="left-aligned sort-${votes.sort_order_by_key('date')}">${layout.format_date(vote.date, 'date')}</td>
                             <td class="left-aligned sort-${votes.sort_order_by_key('legal_form')}">${vote.legal_form}</td>
-                            <td class="left-aligned" tal:content="structure layout.format_policy_areas(vote)"></td>
+                            <td class="left-aligned" tal:content="layout.format_policy_areas(vote)"></td>
                             <td class="left-aligned sort-${votes.sort_order_by_key('result')}">${vote.result}</td>
                             <td class="right-aligned sort-${votes.sort_order_by_key('result_people_yeas_p')}">${layout.format_number(vote.result_people_yeas_p)}%</td>
                             <td class="left-aligned sort-${votes.sort_order_by_key('result')}">${layout.format_number(vote.result_turnout)}%</td>
@@ -65,8 +65,6 @@
                         </tr>
                     </tbody>
                 </table>
-
-                <script metal:use-macro="layout.macros['tablesaw_translations']" />
 
                 <div class="pagination-centered">
                     <div metal:use-macro="layout.macros['pagination']" tal:define="collection votes; current_page votes;" />

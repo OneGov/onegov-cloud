@@ -1,4 +1,6 @@
-from cached_property import cached_property
+from __future__ import annotations
+
+from functools import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
 from onegov.fsi.collections.subscription import SubscriptionsCollection
@@ -6,30 +8,38 @@ from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.fsi.models import CourseEvent, CourseSubscription
+
+
 class SubscriptionCollectionLayout(DefaultLayout):
 
+    model: SubscriptionsCollection
+
     @property
-    def for_himself(self):
+    def for_himself(self) -> bool:
         return self.model.attendee_id == self.request.attendee_id
 
-    def link(self, subscription):
+    def link(self, subscription: CourseSubscription) -> str:
         if subscription.is_placeholder:
             return self.request.link(subscription, name='edit-placeholder')
         return self.request.link(subscription.attendee)
 
-    def confirmation_link(self, subscription):
+    def confirmation_link(self, subscription: CourseSubscription) -> str:
         return self.csrf_protected_url(
             self.request.link(subscription, name='toggle-confirm'))
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         if self.request.view_name == 'add':
             return _('Add Attendee')
         if self.request.view_name == 'add-placeholder':
             return _('Add Placeholder')
         if self.model.course_event_id:
+            assert self.course_event is not None
             return _('Attendees Event ${event} - ${date} - ${begin}',
-                     mapping={'event': self.model.course_event.name,
+                     mapping={'event': self.course_event.name,
                               'date': self.format_date(
                                   self.course_event.start, 'date'),
                               'begin': self.format_date(
@@ -43,12 +53,12 @@ class SubscriptionCollectionLayout(DefaultLayout):
         return _('All Event Subscriptions')
 
     @cached_property
-    def editbar_links(self):
-        links = []
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
         if not self.request.view_name:
             links.append(
                 Link(
-                    text=_("PDF"),
+                    text=_('PDF'),
                     url=self.request.link(self.model, name='pdf'),
                     attrs={
                         'class': 'print-icon',
@@ -95,25 +105,28 @@ class SubscriptionCollectionLayout(DefaultLayout):
         return links
 
     @cached_property
-    def course_event(self):
+    def course_event(self) -> CourseEvent | None:
         return self.model.course_event
 
     @cached_property
-    def preview_info_mail_url(self):
+    def preview_info_mail_url(self) -> str:
+        assert self.course_event is not None
         return self.request.link(
             self.course_event.info_template, name='send')
 
     @cached_property
-    def show_send_info_mail_button(self):
-        return self.course_event and not self.course_event.is_past
+    def show_send_info_mail_button(self) -> bool:
+        return self.course_event is not None and not self.course_event.is_past
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
+        assert isinstance(links, list)
         if self.model.course_event_id:
+            assert self.course_event is not None
             links.append(
                 Link(
-                    self.model.course_event.name,
+                    self.course_event.name,
                     self.request.link(self.model.course_event)
                 )
             )
@@ -123,6 +136,7 @@ class SubscriptionCollectionLayout(DefaultLayout):
         if self.request.view_name in ('add', 'add-placeholder'):
             links.append(Link(_('Add')))
         if self.model.course_event_id:
+            assert self.course_event is not None
             links.append(
                 Link(
                     self.format_date(self.course_event.start, 'date_long'),
@@ -130,21 +144,24 @@ class SubscriptionCollectionLayout(DefaultLayout):
             )
         return links
 
-    def intercooler_btn_for_item(self, subscription):
+    def intercooler_btn_for_item(
+        self,
+        subscription: CourseSubscription
+    ) -> Link:
 
         confirm = subscription.is_placeholder and Confirm(
-            _("Do you want to delete the placeholder ?"),
-            yes=_("Delete"),
-            no=_("Cancel")
+            _('Do you want to delete the placeholder ?'),
+            yes=_('Delete'),
+            no=_('Cancel')
         ) or Confirm(
-            _("Do you want to cancel the subscription ?"),
-            _("A confirmation email will be sent to the person."),
-            _("Cancel subscription for course event"),
-            _("Cancel")
+            _('Do you want to cancel the subscription ?'),
+            _('A confirmation email will be sent to the person.'),
+            _('Cancel subscription for course event'),
+            _('Cancel')
         )
 
         return Link(
-            text=_("Delete"),
+            text=_('Delete'),
             url=self.csrf_protected_url(
                 self.request.link(subscription)
             ),
@@ -162,8 +179,10 @@ class SubscriptionCollectionLayout(DefaultLayout):
 class SubscriptionLayout(DefaultLayout):
     """ Only used for editing since it does not contain fields """
 
+    model: CourseSubscription
+
     @cached_property
-    def collection(self):
+    def collection(self) -> SubscriptionsCollection:
         return SubscriptionsCollection(
             self.request.session,
             auth_attendee=self.request.attendee,
@@ -172,23 +191,23 @@ class SubscriptionLayout(DefaultLayout):
         )
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup]:
         if not self.request.is_admin:
             return []
         return [
             Link(
-                text=_("Delete"),
+                text=_('Delete'),
                 url=self.csrf_protected_url(
                     self.request.link(self.model)
                 ),
                 attrs={'class': 'button tiny alert'},
                 traits=(
                     Confirm(
-                        _("Do you want to cancel the subscription ?"),
+                        _('Do you want to cancel the subscription ?'),
                         _(
-                            "A confirmation email will be sent to you later."),
-                        _("Cancel subscription for course event"),
-                        _("Cancel")
+                            'A confirmation email will be sent to you later.'),
+                        _('Cancel subscription for course event'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='DELETE',
@@ -199,8 +218,9 @@ class SubscriptionLayout(DefaultLayout):
         ]
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
+        assert isinstance(links, list)
         links.append(
             Link(
                 self.model.course_event.name,

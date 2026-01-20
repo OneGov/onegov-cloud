@@ -1,20 +1,22 @@
+from __future__ import annotations
+
 import pytest
 import tempfile
-
 from io import BytesIO
 from onegov.core import utils
 from onegov.core.csv import (
     CSVFile,
     convert_excel_to_csv,
     convert_list_of_dicts_to_csv,
+    convert_list_of_list_of_dicts_to_xlsx,
     convert_list_of_dicts_to_xlsx,
     convert_xls_to_csv,
     convert_xlsx_to_csv,
     detect_encoding,
     match_headers,
-    merge_multiple_excel_files_into_one,
     normalize_header,
-    parse_header,
+    parse_header, normalize_sheet_titles, remove_first_word,
+    avoid_duplicate_name, list_duplicates_index,
 )
 from onegov.core.errors import (
     AmbiguousColumnsError,
@@ -23,10 +25,9 @@ from onegov.core.errors import (
     MissingColumnsError,
 )
 from openpyxl import load_workbook
-from pathlib import Path
 
 
-def test_parse_header():
+def test_parse_header() -> None:
     assert parse_header("   Firtst name;  LastNAME; Designation")\
            == ['firtst name', 'lastname', 'designation']
     assert parse_header("a") == ['a']
@@ -38,13 +39,13 @@ def test_parse_header():
     ) == ['a', 'b', 'c', 'c_1', 'c_2', 'c_3', 'c_4', 'b_1', 'b_2', 'a_1']
 
 
-def test_normalize_header():
+def test_normalize_header() -> None:
     assert normalize_header("") == ""
     assert normalize_header("Wääh") == "waah"
     assert normalize_header(" a   b\tc ") == "a b c"
 
 
-def test_detect_encoding():
+def test_detect_encoding() -> None:
     assert detect_encoding(BytesIO('jöö'.encode('ISO-8859-2'))) == 'cp1252'
     assert detect_encoding(BytesIO('jöö'.encode('utf-8'))) == 'utf-8'
 
@@ -53,7 +54,7 @@ def test_detect_encoding():
     ) == 'utf-8'
 
 
-def test_simple_csv_file():
+def test_simple_csv_file() -> None:
     data = (
         b'Datum, Reale Temperatur, Gef\xfchlte Temperatur\n'
         b'01.01.2015, 5, k\xfchl\n'
@@ -67,23 +68,23 @@ def test_simple_csv_file():
     assert list(csv.headers.keys()) == [
         'datum', 'reale_temperatur', 'gefuhlte_temperatur'
     ]
-    list(csv.lines) == [
+    assert list(csv.lines) == [
         csv.rowtype(
-            rownumber=1,
+            rownumber=2,
             datum='01.01.2015',
             reale_temperatur='5',
             gefuhlte_temperatur='kühl'
         ),
         csv.rowtype(
-            rownumber=2,
-            datum='01.01.2015',
-            reale_temperatur='5',
+            rownumber=3,
+            datum='02.01.2015',
+            reale_temperatur='0',
             gefuhlte_temperatur='kalt'
         ),
     ]
 
 
-def test_wacky_csv_file():
+def test_wacky_csv_file() -> None:
     data = (
         b'Datum,   Temperatur%, Datum\n'
         b'01.01.2015, 5, 01.01.2014\n'
@@ -100,7 +101,7 @@ def test_wacky_csv_file():
     assert list(csv.lines)[1].temperatur == '0'
 
 
-def test_convert_xlsx_to_csv_wrong_format():
+def test_convert_xlsx_to_csv_wrong_format() -> None:
     with pytest.raises(IOError):
         convert_xlsx_to_csv(BytesIO())
 
@@ -113,7 +114,7 @@ def test_convert_xlsx_to_csv_wrong_format():
             convert_xlsx_to_csv(file)
 
 
-def test_convert_xls_to_csv_wrong_format():
+def test_convert_xls_to_csv_wrong_format() -> None:
     with pytest.raises(IOError):
         convert_xls_to_csv(BytesIO())
 
@@ -130,7 +131,7 @@ def test_convert_xls_to_csv_wrong_format():
     utils.module_path('tests.onegov.core', 'fixtures/excel.xls'),
     utils.module_path('tests.onegov.core', 'fixtures/excel.xlsx'),
 ])
-def test_convert_to_csv(excel_file):
+def test_convert_to_csv(excel_file: str) -> None:
     with open(excel_file, 'rb') as f:
         headers = ['ID', 'Namä', 'Date', 'Bool', 'Leer', 'Formel']
         csv = CSVFile(convert_excel_to_csv(f), headers)
@@ -175,7 +176,7 @@ def test_convert_to_csv(excel_file):
         convert_excel_to_csv(f, '')
 
 
-def test_empty_line_csv_file():
+def test_empty_line_csv_file() -> None:
     data = (
         b'Datum, Reale Temperatur, Gef\xfchlte Temperatur\n'
         b'\n'
@@ -186,7 +187,9 @@ def test_empty_line_csv_file():
         BytesIO(data), ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
     )
 
-    csv.headers == ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
+    assert list(csv.headers) == [
+        'datum', 'reale_temperatur', 'gefuhlte_temperatur'
+    ]
     with pytest.raises(EmptyLineInFileError):
         list(csv.lines)
 
@@ -202,16 +205,18 @@ def test_empty_line_csv_file():
         BytesIO(data), ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
     )
 
-    csv.headers == ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
+    assert list(csv.headers) == [
+        'datum', 'reale_temperatur', 'gefuhlte_temperatur'
+    ]
     assert list(csv.lines)
 
 
-def test_match_headers_duplicate():
+def test_match_headers_duplicate() -> None:
     with pytest.raises(DuplicateColumnNamesError):
-        match_headers(['first_name', 'first_name'], expected=None)
+        match_headers(['first_name', 'first_name'], expected=[])
 
 
-def test_match_headers_order():
+def test_match_headers_order() -> None:
     matches = match_headers(
         headers=['firtst name', 'lastname'],
         expected=('first_name', 'last_name')
@@ -225,12 +230,12 @@ def test_match_headers_order():
     assert matches == ['first_name', 'last_name']
 
 
-def test_match_headers_case():
+def test_match_headers_case() -> None:
     assert match_headers(['a', 'b'], expected=('A', 'B')) == ['A', 'B']
     assert match_headers(['a', 'b'], expected=('b', 'a')) == ['a', 'b']
 
 
-def test_match_headers_missing():
+def test_match_headers_missing() -> None:
     with pytest.raises(MissingColumnsError) as e:
         match_headers(['a', 'b'], expected=('a', 'c'))
     assert e.value.columns == ['c']
@@ -252,7 +257,7 @@ def test_match_headers_missing():
            == ['a', 'b', 'c']
 
 
-def test_match_headers_ambiguous():
+def test_match_headers_ambiguous() -> None:
     with pytest.raises(AmbiguousColumnsError) as e:
         match_headers(['abcd', 'bcde'], expected=('bcd',))
 
@@ -260,7 +265,7 @@ def test_match_headers_ambiguous():
     assert set(e.value.columns['bcd']) == {'abcd', 'bcde'}
 
 
-def test_convert_list_of_dicts_to_csv():
+def test_convert_list_of_dicts_to_csv() -> None:
     data = [
         {
             'first_name': 'Dick',
@@ -316,7 +321,7 @@ def test_convert_list_of_dicts_to_csv():
     assert donald == 'Donald,Rumsfeld'
 
 
-def test_convert_list_of_dicts_to_csv_escaping():
+def test_convert_list_of_dicts_to_csv_escaping() -> None:
     data = [
         {
             'value': ',;"'
@@ -331,7 +336,7 @@ def test_convert_list_of_dicts_to_csv_escaping():
     assert row == '",;"""'
 
 
-def test_convert_list_of_dicts_to_xlsx():
+def test_convert_list_of_dicts_to_xlsx() -> None:
     data = [
         {
             'first_name': 'Dick',
@@ -348,7 +353,9 @@ def test_convert_list_of_dicts_to_xlsx():
     with tempfile.NamedTemporaryFile() as f:
         f.write(xlsx)
 
-        rows = tuple(load_workbook(f).active.rows)
+        workbook = load_workbook(f)
+        assert workbook.active is not None
+        rows = tuple(workbook.active.rows)
 
         assert rows[0][0].value == 'first_name'
         assert rows[0][1].value == 'last_name'
@@ -358,7 +365,7 @@ def test_convert_list_of_dicts_to_xlsx():
         assert rows[2][1].value == 'Rumsfeld'
 
 
-def test_convert_irregular_list_of_dicts_to_csv():
+def test_convert_irregular_list_of_dicts_to_csv() -> None:
     data = [
         {
             'name': 'Batman',
@@ -395,85 +402,132 @@ def test_convert_irregular_list_of_dicts_to_csv():
     assert joker == 'Joker,Supervillain,,Injustice League'
 
 
-def test_combine_xlsx_from_multiple_files():
+def test_convert_multiple_list_of_dicts_to_xlsx() -> None:
     data = [
         {
-            'first_name': 'Jean-Jacques',
-            'last_name': 'Rousseau'
+            'first_name': 'Dick',
+            'last_name': 'Cheney',
+            'plz': '3434',
         },
         {
-            'first_name': 'Edgar',
-            'last_name': 'Poe'
+            'first_name': 'Donald',
+            'last_name': 'Rumsfeld',
+            'plz': '3434',
         }
     ]
     data2 = [
         {
-            'first_name': 'Charles',
-            'last_name': 'Darwin'
+            'first_name': 'Dick',
+            'last_name': 'Cheney',
+            'plz': '3434',
         },
         {
-            'first_name': 'James',
-            'last_name': 'Maxwell'
+            'first_name': 'Donald',
+            'last_name': 'Rumsfeld',
+            'plz': '3434',
         }
     ]
+    xlsx = convert_list_of_list_of_dicts_to_xlsx([data, data2],
+                                                 titles_list=["first",
+                                                              "second",
+                                                              "third"])
 
-    xlsx1 = convert_list_of_dicts_to_xlsx(data, fields=('first_name',
-                                                        'last_name'))
-    xlsx2 = convert_list_of_dicts_to_xlsx(data2, fields=('first_name',
-                                                         'last_name'))
-
-    input_workbooks = [xlsx1, xlsx2]
-    titles = ["test1", "test2"]
-    merged_file = merge_multiple_excel_files_into_one(input_workbooks, titles)
-
-    wb = load_workbook(BytesIO(merged_file), data_only=True)
-    assert len(wb.worksheets) == 2
-    first_sheet = wb[wb.sheetnames[0]]
-    second_sheet = wb[wb.sheetnames[1]]
-
-    tab_1 = tuple(first_sheet.rows)
-
-    assert tab_1[0][0].value == 'first_name'
-    assert tab_1[0][1].value == 'last_name'
-    assert tab_1[1][0].value == 'Jean-Jacques'
-    assert tab_1[1][1].value == 'Rousseau'
-    assert tab_1[2][0].value == 'Edgar'
-    assert tab_1[2][1].value == 'Poe'
-
-    tab_2 = tuple(second_sheet.rows)
-    assert tab_2[0][0].value == 'first_name'
-    assert tab_2[0][1].value == 'last_name'
-    assert tab_2[1][0].value == 'Charles'
-    assert tab_2[1][1].value == 'Darwin'
-    assert tab_2[2][0].value == 'James'
-    assert tab_2[2][1].value == 'Maxwell'
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(xlsx)
+        for i in range(2):  # Loop over each tab
+            rows = tuple(load_workbook(f).worksheets[i].rows)
+            assert rows[0][0].value == 'first_name'
+            assert rows[0][1].value == 'last_name'
+            assert rows[0][2].value == 'plz'
+            assert rows[1][0].value == 'Dick'
+            assert rows[1][1].value == 'Cheney'
+            assert rows[1][2].value == '3434'
+            assert rows[2][0].value == 'Donald'
+            assert rows[2][1].value == 'Rumsfeld'
+            assert rows[2][2].value == '3434'
 
 
-@pytest.mark.filterwarnings('ignore::UserWarning')
-def test_merge_multiple_excel_files_into_one():
-    def xlxs_files_names():
-        path = utils.module_path('tests.onegov.core',
-                                 'fixtures/reservations/')
-        return [p for p in filter(Path.is_file, Path(path).iterdir())]
+def test_xlsx_title_validation() -> None:
+    # this is 36 chars, excel cannot load more than 31 chars
+    title1 = "Schulhaus Schönwetter Gruppenraum 01"
+    title2 = "Schulhaus Schönwetter Gruppenraum 02"
+    titles = [title1, title2]
+    norm = normalize_sheet_titles(titles)
 
-    input_workbooks = []
-    titles = ["data", "data2"]
+    assert norm == ["schoenwetter-gruppenraum-01",
+                    "schoenwetter-gruppenraum-02"]
 
-    for file in xlxs_files_names():
-        with open(file, mode="rb") as f:
-            input_workbooks.append(f.read())
+    # if there are duplicates in the titles
+    title1 = "Schulhaus Schönwetter Gruppenraum 01"
+    title2 = "Schulhaus Schönwetter Gruppenraum 02"
+    title3 = "Schulhaus Schönwetter Gruppenraum 02"
+    titles = [title1, title2, title3]
 
-    merged_file = merge_multiple_excel_files_into_one(input_workbooks, titles)
+    norm = normalize_sheet_titles(titles)
 
-    wb = load_workbook(filename=BytesIO(merged_file), data_only=True)
+    # duplicates should be handled appropriately
+    assert norm == ["schoenwetter-gruppenraum-01",
+                    "schoenwetter-gruppenraum-02",
+                    "schoenwetter-gruppenraum-02_1"]
 
-    sheetnames = wb.sheetnames
-    assert len(sheetnames) == 2
-    first_sheet = wb[sheetnames[0]]
-    second_sheet = wb[sheetnames[1]]
+    # even with very long names
+    title1 = "Schulhaus Schönwetter Gruppenraum 01"
+    title2 = "Schulhaus Schönwetter Gruppenraum 02"
+    title3 = "Schulhaus Schönwetter Gruppenraum 02"
+    titles = [title1, title2, title3]
 
-    assert tuple(first_sheet.rows)[0][1].value == 'Name'
-    assert tuple(second_sheet.rows)[0][1].value == 'Name'
 
-    assert tuple(first_sheet.rows)[0][3].value == 'Case Number'
-    assert tuple(second_sheet.rows)[0][3].value == 'Case Number'
+def test_remove_first_word() -> None:
+    titles = ["raum-zweiter-stock-mit-langem-namen-01",
+              "raum-zweiter-stock-mit-langem-namen-02"]
+
+    trimmed_titles = [remove_first_word(t) for t in titles]
+
+    assert trimmed_titles[0] == "zweiter-stock-mit-langem-namen-01"
+    assert trimmed_titles[1] == "zweiter-stock-mit-langem-namen-02"
+
+
+def test_check_duplicates() -> None:
+    titles = ["raum-zweiter-stock-mit-langem-namen-01",
+              "raum-zweiter-stock-mit-langem-namen-011",
+              "raum-zweiter-stock-mit-langem-namen-01",
+              "raum-zweiter-stock-mit-langem-namen-02",
+              "raum-zweiter-stock-mit-langem-namen-02"]
+
+    duplicate_index = list_duplicates_index(titles)
+    assert len(duplicate_index) == 2
+    assert duplicate_index == [2, 4]
+
+
+def test_avoid_duplicates() -> None:
+    titles = ["Schulhaus-Schönwetter-Gruppenraum",
+              "raum-zweiter-stock-mit-langem-namen-01",
+              "raum-zweiter-stock-mit-langem-namen-01"]
+
+    duplicate_index = list_duplicates_index(titles)
+
+    for index in duplicate_index:
+        item = titles[index]
+        titles[index] = avoid_duplicate_name(titles, item)
+
+    assert titles == ["Schulhaus-Schönwetter-Gruppenraum",
+                      "raum-zweiter-stock-mit-langem-namen-01",
+                      "raum-zweiter-stock-mit-langem-namen-01_1"]
+
+    titles = ["raum-zweiter-stock-mit-langem-namen-01",
+              "raum-zweiter-stock-mit-langem-namen-011",
+              "raum-zweiter-stock-mit-langem-namen-01",
+              "raum-zweiter-stock-mit-langem-namen-02",
+              "raum-zweiter-stock-mit-langem-namen-02"]
+
+    duplicate_index = list_duplicates_index(titles)  # [2, 4]
+
+    for index in duplicate_index:
+        item = titles[index]
+        titles[index] = avoid_duplicate_name(titles, item)
+
+    assert titles == ["raum-zweiter-stock-mit-langem-namen-01",
+                      "raum-zweiter-stock-mit-langem-namen-011",
+                      "raum-zweiter-stock-mit-langem-namen-01_2",
+                      "raum-zweiter-stock-mit-langem-namen-02",
+                      "raum-zweiter-stock-mit-langem-namen-02_1"]

@@ -1,28 +1,46 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
+from onegov.core.utils import Bunch
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
 from onegov.org.models import GeneralFileCollection
 from onegov.ticket import TicketCollection
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
+from onegov.translator_directory.collections.time_report import (
+    TimeReportCollection,
+)
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection)
 from onegov.translator_directory import _
 from onegov.translator_directory.layout import DefaultLayout
 from onegov.user import Auth
-from onegov.user import UserCollection
+from onegov.user import UserCollection, UserGroupCollection
 
 
-def get_global_tools(request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.types import RenderData
+    from onegov.translator_directory.request import TranslatorAppRequest
+    from onegov.town6.layout import NavigationEntry
+
+
+def get_global_tools(
+    request: TranslatorAppRequest
+) -> Iterator[Link | LinkGroup]:
 
     if request.is_logged_in:
+        assert request.current_username is not None
 
         # Logout
         yield LinkGroup(
-            request.current_username, classes=('user',),
+            request.current_username,
+            classes=('user',),
             links=(
                 Link(
-                    _("Logout"), request.link(
+                    _('Logout'), request.link(
                         Auth.from_request(
                             request, to=logout_path(request)), name='logout'
                     ),
@@ -34,33 +52,57 @@ def get_global_tools(request):
         # Management Dropdown
         if request.is_admin:
             yield LinkGroup(
-                _("Management"), classes=('management',),
+                _('Management'),
+                classes=('management',),
                 links=(
                     Link(
-                        _("Files"), request.class_link(GeneralFileCollection),
+                        _('Files'), request.class_link(GeneralFileCollection),
                         attrs={'class': 'files'}
                     ),
                     Link(
-                        _("Settings"), request.link(
+                        _('Settings'), request.link(
                             request.app.org, 'settings'
                         ),
                         attrs={'class': 'settings'}
                     ),
                     Link(
-                        _("Settings translator directory"), request.link(
+                        _('Settings translator directory'), request.link(
                             request.app.org, 'directory-settings'
                         ),
                         attrs={'class': 'settings'}
                     ),
                     Link(
-                        _("Users"), request.class_link(UserCollection),
+                        _('Users'), request.class_link(UserCollection),
                         attrs={'class': 'user'}
-                    )
-                )
+                    ),
+                    Link(
+                        _('User groups'),
+                        request.class_link(UserGroupCollection),
+                        attrs={'class': 'users'},
+                    ),
+                    Link(
+                        _('Time Reports'),
+                        request.class_link(TimeReportCollection),
+                        attrs={'class': 'time-reports'},
+                    ),
+                ),
+            )
+        elif request.is_accountant:
+            yield LinkGroup(
+                _('Management'),
+                classes=('management',),
+                links=(
+                    Link(
+                        _('Time Reports'),
+                        request.class_link(TimeReportCollection),
+                        attrs={'class': 'time-reports'},
+                    ),
+                ),
             )
 
         # Tickets
         if request.is_admin:
+            assert request.current_user is not None
             # Tickets
             ticket_count = request.app.ticket_count
             screen_count = ticket_count.open or ticket_count.pending
@@ -70,12 +112,12 @@ def get_global_tools(request):
                 css = 'no-tickets'
 
             yield LinkGroup(
-                screen_count == 1 and _("Ticket") or _("Tickets"),
+                screen_count == 1 and _('Ticket') or _('Tickets'),
                 classes=('with-count', css),
                 attributes={'data-count': str(screen_count)},
                 links=(
                     Link(
-                        _("My Tickets"),
+                        _('My Tickets'),
                         request.class_link(
                             TicketCollection, {
                                 'handler': 'ALL',
@@ -88,7 +130,7 @@ def get_global_tools(request):
                         }
                     ),
                     Link(
-                        _("Open Tickets"),
+                        _('Open Tickets'),
                         request.class_link(
                             TicketCollection,
                             {'handler': 'ALL', 'state': 'open'}
@@ -99,7 +141,7 @@ def get_global_tools(request):
                         }
                     ),
                     Link(
-                        _("Pending Tickets"),
+                        _('Pending Tickets'),
                         request.class_link(
                             TicketCollection,
                             {'handler': 'ALL', 'state': 'pending'}
@@ -110,7 +152,7 @@ def get_global_tools(request):
                         }
                     ),
                     Link(
-                        _("Closed Tickets"),
+                        _('Closed Tickets'),
                         url=request.class_link(
                             TicketCollection,
                             {'handler': 'ALL', 'state': 'closed'}
@@ -129,39 +171,55 @@ def get_global_tools(request):
     else:
         # Login
         yield Link(
-            _("Login"), request.link(
+            _('Login'), request.link(
                 Auth.from_request_path(request), name='login'
             ), attrs={'class': 'login'}
         )
 
 
-def get_top_navigation(request):
+def get_top_navigation(
+        request: TranslatorAppRequest) -> Iterator[NavigationEntry]:
 
     # inject an activites link in front of all top navigation links
     if request.is_manager or request.is_member:
-        yield Link(
-            text=_("Translators"),
-            url=request.class_link(TranslatorCollection)
+        yield (  # type:ignore[misc]
+            Bunch(id=-1, access='public', published=True),
+            Link(
+                text=_('Translators'),
+                url=request.class_link(TranslatorCollection)
+            ),
+            ()
         )
 
-    if request.is_translator and request.current_user.translator:
-        yield Link(
-            text=_("Personal Information"),
-            url=request.link(request.current_user.translator)
+    if (
+        request.is_translator
+        and (translator := request.current_user.translator)  # type:ignore
+    ):
+        yield (  # type:ignore[misc]
+            Bunch(id=-1, access='public', published=True),
+            Link(
+                text=_('Personal Information'),
+                url=request.link(translator)
+            ),
+            ()
         )
 
     if request.is_manager:
-        yield Link(
-            text=_('Languages'),
-            url=request.class_link(LanguageCollection)
+        yield (  # type:ignore[misc]
+            Bunch(id=-1, access='public', published=True),
+            Link(
+                text=_('Languages'),
+                url=request.class_link(LanguageCollection)
+            ),
+            ()
         )
 
     layout = DefaultLayout(request.app.org, request)
-    yield from layout.top_navigation
+    yield from layout.top_navigation or ()
 
 
 @TranslatorDirectoryApp.template_variables()
-def get_template_variables(request):
+def get_template_variables(request: TranslatorAppRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),

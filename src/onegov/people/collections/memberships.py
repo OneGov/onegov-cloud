@@ -1,9 +1,19 @@
+from __future__ import annotations
+
 from onegov.core.collection import GenericCollection
 from onegov.core.orm.abstract import MoveDirection
 from onegov.people.models import AgencyMembership
 
 
-class AgencyMembershipCollection(GenericCollection):
+from typing import Literal
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from sqlalchemy.orm import Query
+    from uuid import UUID
+
+
+class AgencyMembershipCollection(GenericCollection[AgencyMembership]):
     """ Manages a list of agency memberships.
 
     Use it like this::
@@ -14,21 +24,27 @@ class AgencyMembershipCollection(GenericCollection):
     """
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[AgencyMembership]:
         return AgencyMembership
 
-    def by_id(self, id):
-        return super(AgencyMembershipCollection, self).query().filter(
+    def by_id(self, id: UUID) -> AgencyMembership | None:  # type:ignore
+        return super().query().filter(
             self.primary_key == id).first()
 
-    def query(self, order_by=None):
-        query = super(AgencyMembershipCollection, self).query()
+    def query(self, order_by: str | None = None) -> Query[AgencyMembership]:
+        query = super().query()
         if not order_by:
             return query
         assert hasattr(self.model_class, order_by)
         return query.order_by(getattr(self.model_class, order_by))
 
-    def move(self, subject, target, direction, move_on_col):
+    def move(
+        self,
+        subject: AgencyMembership,
+        target: AgencyMembership,
+        direction: MoveDirection,
+        move_on_col: Literal['order_within_person', 'order_within_agency']
+    ) -> None:
         """ Takes the given subject and moves it somewhere in relation to the
         target.
 
@@ -59,7 +75,7 @@ class AgencyMembershipCollection(GenericCollection):
         else:
             siblings = target.siblings_by_agency.all()
 
-        def new_order():
+        def new_order() -> Iterator[AgencyMembership]:
             for sibling in siblings:
                 if sibling == subject:
                     continue

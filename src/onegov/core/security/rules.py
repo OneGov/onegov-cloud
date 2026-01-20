@@ -1,11 +1,23 @@
+from __future__ import annotations
+
 from onegov.core.cronjobs import Job
 from onegov.core.framework import Framework
 from onegov.core.security import Public
 from webob.exc import HTTPException
 
 
+from typing import Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import HasRole
+
+
 @Framework.permission_rule(model=object, permission=object, identity=None)
-def has_permission_not_logged_in(app, identity, model, permission):
+def has_permission_not_logged_in(
+    app: Framework,
+    identity: None,
+    model: object,
+    permission: object
+) -> bool:
     """ This catch-all rule returns the default permission rule. It says
     that the permission must be part of the anonymous rule.
 
@@ -27,7 +39,12 @@ def has_permission_not_logged_in(app, identity, model, permission):
 
 
 @Framework.permission_rule(model=object, permission=object)
-def has_permission_logged_in(app, identity, model, permission):
+def has_permission_logged_in(
+    app: Framework,
+    identity: HasRole,
+    model: object,
+    permission: object
+) -> bool:
     """ This permission rule matches all logged in identities. It requires
     the identity to have a 'role' attribute. Said role attribute is used
     to determine if the given permission is part of the given role.
@@ -49,8 +66,14 @@ def has_permission_logged_in(app, identity, model, permission):
 @Framework.permission_rule(
     model=HTTPException,
     permission=Public,
-    identity=None)
-def may_view_http_errors_not_logged_in(app, identity, model, permission):
+    identity=None
+)
+def may_view_http_errors_not_logged_in(
+    app: Framework,
+    identity: None,
+    model: HTTPException,
+    permission: type[Public]
+) -> Literal[True]:
     """ HTTP errors may be viewed by anyone, regardeless of settings.
 
     This is important, otherwise the HTTPForbidden/HTTPNotFound views
@@ -61,11 +84,13 @@ def may_view_http_errors_not_logged_in(app, identity, model, permission):
     return True
 
 
-@Framework.permission_rule(
-    model=Job,
-    permission=Public,
-    identity=None)
-def may_view_cronjobs_not_logged_in(app, identity, model, permission):
+@Framework.permission_rule(model=Job, permission=Public, identity=None)
+def may_view_cronjobs_not_logged_in(
+    app: Framework,
+    identity: None,
+    model: Job[Any],
+    permission: type[Public]
+) -> Literal[True]:
     """ Cronjobs are run anonymously from a thread and need to be excluded
     from the permission rules as a result.
 

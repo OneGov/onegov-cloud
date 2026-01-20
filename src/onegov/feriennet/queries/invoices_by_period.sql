@@ -10,7 +10,9 @@ details AS (
         invoice_items.invoice_id,
         users.username,
         "group",
+        attendee_id,
         "text",
+        "organizer",
         "family",
         paid as paid,
         unit * quantity as amount,
@@ -77,7 +79,9 @@ invoices AS (
         details.username,
         INITCAP(users.realname) as realname,
         details.group,
+        details.attendee_id,
         details.text,
+        details.organizer,
         details.family,
         details.paid,
         details.amount,
@@ -120,7 +124,9 @@ SELECT
     realname,            -- Text
     username,            -- Text
     "group",             -- Text
+    attendee_id,         -- UUID
     "text",              -- Text
+    "organizer",         -- Text
     "family",            -- Text
     paid,                -- Boolean
     has_online_payments, -- Boolean
@@ -128,7 +134,7 @@ SELECT
     source,              -- Text
     period_id,           -- UUID
     changes,             -- Text
-    invoice_id,          -- Text
+    invoice_id,          -- UUID
     invoice_paid,        -- Boolean
     invoice_amount,      -- Numeric
     invoice_outstanding, -- Numeric

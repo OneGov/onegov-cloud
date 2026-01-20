@@ -56,7 +56,10 @@
                     <thead>
                         <tr>
                             <th>${address_title}</th>
+                            <th tal:condition="request.app.principal.segmented_notifications" i18n:translate>Domain</th>
                             <th i18n:translate>Locale</th>
+                            <th i18n:translate>Subscribed</th>
+                            <th i18n:translate>Unsubscribed</th>
                             <th i18n:translate>Active</th>
                             <th i18n:translate class="row-actions right-aligned">Actions</th>
                         </tr>
@@ -64,7 +67,13 @@
                     <tbody>
                     <tr tal:repeat="subscriber subscribers">
                         <td>${subscriber.address}</td>
+                        <td tal:condition="request.app.principal.segmented_notifications">
+                            <tal:block tal:condition="subscriber.domain == 'canton'" i18n:translate>Cantonal</tal:block>
+                            <tal:block tal:condition="subscriber.domain_segment" i18n:translate>${subscriber.domain_segment}</tal:block>
+                        </td>
                         <td>${subscriber.locale}</td>
+                        <td>${layout.format_date(subscriber.active_since, 'datetime')}</td>
+                        <td>${layout.format_date(subscriber.inactive_since, 'datetime')}</td>
                         <td tal:condition="subscriber.active">✔︎</td>
                         <td tal:condition="not subscriber.active">✘︎</td>
                         <td class="right-aligned">

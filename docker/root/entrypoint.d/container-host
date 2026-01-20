@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Configures the container-host hostname in /etc/hosts.
+#
+# Containers wanting to connect to a service offered on a port on the host
+# should use this host.
+#
+# For example:
+#
+#     curl http://container-host:8080/foobar
+#
+
+# running in docker
+if grep docker /proc/1/cgroup -qa; then
+
+    # running in docker on mac
+    if getent hosts host.docker.internal > /dev/null; then
+        HOST_IP=$(getent hosts host.docker.internal | awk '{ print $1 }')
+
+    # running in docker on unix
+    else
+        HOST_IP=$(/sbin/ip route | awk '/default/ { print $3 }' | awk '!seen[$0]++')
+    fi
+
+# running in systemd (currently only localhost is supported)
+else
+    HOST_IP='127.0.0.1'
+fi
+
+# add the line to the end of the hosts file - in docker we can *only* append to
+# that file, so "sed -i" is not an option
+echo -e "$HOST_IP container-host" >> /etc/hosts

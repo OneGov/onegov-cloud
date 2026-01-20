@@ -9,31 +9,38 @@
     .date-range-selector-result,
     .edit-bar,
     footer,
-    .occurrence-exports,
+    .occurrence-actions,
     .occurrences-filter-tags,
     .page-links,
     .searchbox,
     .side-nav,
     div.push,
     .counts,
-    .top-bar {
+    .top-bar,
+    #nav-bar,
+    .dark-overlay,
+    .sidebar-toggler,
+    .item-arrows {
         display: none !important;
     }
 
-    .side-panel {
-        border: 1px solid $tuatara;
-        border-radius: 3px;
-        margin-bottom: .5rem;
+    .header-image .page-image {
+        height: 200px !important;
+        padding-bottom: 200px !important;
+    }
 
-        .field-display-block {
-            float: left;
-            margin-right: 1.5rem;
+    .page-content-sidebar {
+        border-left: 1px solid $gainsboro;
+        margin-left: 2rem !important;
+
+        .side-panel {
+            padding: 0;
         }
     }
 
     html,
     body {
-        height: 99%; // avoids blank pages at the end
+        height: 98%; // avoids blank pages at the end
     }
 
     body {
@@ -149,19 +156,6 @@
         font-size: 1rem;
     }
 
-    .header {
-        max-height: 50px;
-    }
-
-    .logo {
-        max-height: 40px;
-
-        img,
-        svg {
-            max-height: 45px;
-            width: auto;
-        }
-    }
 
     ul.breadcrumbs {
         padding: 0 0 .25rem 1rem;
@@ -206,4 +200,47 @@
         color: $body-font-color !important;
         padding-left: 0 !important;
     }
+
+    .person-card,
+    img {
+        break-inside: avoid;
+    }
+
+    .person-card-portrait {
+        max-width: 9rem;
+        max-height: 9rem;
+    }
+
+    .cover-image {
+        color-adjust: exact !important;        /* Firefox 48 – 96 */
+        print-color-adjust: exact !important;           /* Firefox 97+, Safari 15.4+ */
+        border: 1px solid blue;
+    }
+
+    a[href]::after {
+        content: none !important;
+    }
+
+    .votum {
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none;
+        margin: 0 !important;
+        margin-bottom: 1.5rem !important;
+        padding: 0 !important;
+
+        .person-card-title,
+        .person-card-function {
+            font-size: .8rem !important;
+        }
+
+        .person-card-function {
+            font-style: italic !important;
+        }
+
+        blockquote {
+            border: none !important;
+        }
+    }
+
 }

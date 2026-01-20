@@ -13,21 +13,29 @@ For wildcard paths (e.g. /old-pages/my-page to /new-pages/my-page)::
         to = '/new-pages
 
 """
+from __future__ import annotations
 
 from onegov.core import Framework
 from onegov.core.security import Public
 
 
-class Redirect:
-    to = None
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from webob import Response
 
-    def __init__(self, absorb=None):
-        assert self.to and not self.to.endswith('/')
+    from .request import CoreRequest
+
+
+class Redirect:
+    to: str
+
+    def __init__(self, absorb: str | None = None):
+        assert hasattr(self, 'to') and not self.to.endswith('/')
 
         if absorb:
             self.to = self.to + '/' + absorb
 
 
 @Framework.view(model=Redirect, permission=Public)
-def view_redirect(self, request):
+def view_redirect(self: Redirect, request: CoreRequest) -> Response:
     return request.redirect(self.to)

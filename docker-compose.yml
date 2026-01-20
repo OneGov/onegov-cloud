@@ -1,9 +1,25 @@
-version: '3'
 services:
+    # For trying the image locally.
+    # Either build locally with "docker compose build onegov-cloud", or use an
+    # image from the container registry.
+    # onegov-cloud:
+    #     build: .
+    #     # image: ghcr.io/onegov/onegov-cloud:ogc-1625-container-tests
+    #     command: /app/bin/onegov-server --mode production -c /app/onegov.yml
+    #     network_mode: "host"
+    #     working_dir: /app
+    #     volumes:
+    #         - ./onegov.yml:/app/onegov.yml
+    #         - /usr/local/var/onegov/mail/postmark:/usr/local/var/onegov/mail/postmark
+    #         - /usr/local/var/onegov/mail/smtp:/usr/local/var/onegov/mail/smtp
+    #         - /usr/local/var/onegov/files:/usr/local/var/onegov/files
+    #         - /usr/local/var/onegov/depot:/usr/local/var/onegov/depot
+    #         - /usr/local/var/onegov/sms:/usr/local/var/onegov/sms
+
     # For trying out different postgres versions.
     # Use postgresql://postgres:postgres@localhost:5444/onegov in onegov.yml
     # Note that this won't work with tests and "onegov-core transfer"!
-    # 
+    #
     # postgres:
     #     image: postgres:14
     #     environment:
@@ -13,31 +29,13 @@ services:
     #     ports:
     #         - "5444:5432"
 
-    elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1-amd64
-        container_name: elasticsearch
-        environment:
-            - node.name=es01
-            - cluster.name=es-docker-cluster
-            - bootstrap.memory_lock=true
-            - discovery.type=single-node
-        ulimits:
-            memlock:
-                soft: -1
-                hard: -1
-        ports:
-            - "9200:9200"
-            - "9300:9300"
-        volumes:
-            - data01:/usr/share/elasticsearch/data
-
     smtp4dev:
         image: rnwood/smtp4dev:latest
         restart: always
         ports:
-            - "8081:80"
-            - "1025:25"
-            - "143:143"
+            - "8081:80"  # Web UI
+            - "1025:25"  # forwarding to port 25; configure your smtp4dev to listen on port 25
+            - "143:143"  # IMAP
         volumes:
             - smtp4dev-data:/smtp4dev
 

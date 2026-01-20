@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from onegov.core.markdown import render_untrusted_markdown as render
-from mistletoe import HTMLRenderer
+from mistletoe import HtmlRenderer
 
 
-def test_render_untrusted_markdown():
+def test_render_untrusted_markdown() -> None:
 
     # no unsafe html
     assert render("<table></table>") == '&lt;table&gt;&lt;/table&gt;\n'
@@ -15,9 +17,9 @@ def test_render_untrusted_markdown():
     assert render('<a>foo</a>') == '<p>&lt;a&gt;foo&lt;/a&gt;</p>\n'
 
     # though we can enable it (it is still sanitized though)
-    assert render('<a onclick="alert">foo</a>', cls=HTMLRenderer)\
-        == '<p><a>foo</a></p>\n'
+    assert render('<a onclick="alert">foo</a>', cls=HtmlRenderer) == (
+        '<p><a>foo</a></p>\n')
 
 
-def test_markdown_line_endings():
+def test_markdown_line_endings() -> None:
     assert render('foo  \r\nbar') == render('foo  \nbar')

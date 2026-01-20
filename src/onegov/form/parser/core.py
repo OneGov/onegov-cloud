@@ -164,6 +164,17 @@ An url field consists of the http/https prefix::
 
 Whether or not you enter http or https has no bearing on the validation.
 
+Video Link
+~~~~~~~~~~
+
+An url field pointing to a video ``video-url``::
+
+    I' am a video link = video-url
+
+In case of vimeo or youtube videos the video will be embedded in the page,
+otherwise the link will be shown.
+
+
 Date
 ~~~~
 
@@ -173,14 +184,29 @@ A date (without time) is defined by this exact string: ``YYYY.MM.DD``::
 
 Note that this doesn't mean that the date format can be influenced.
 
+A date field optionally can be limited to a relative or absolute date range.
+Note that the edges of the interval are inclusive. The list of possible
+grains for relative dates are ``years``, ``months``, ``weeks`` and ``days``
+as well as the special value ``today``.
+
+    I'm a future date field = YYYY.MM.DD (+1 days..)
+    I'm on today or in the future = YYYY.MM.DD (today..)
+    At least two weeks ago = YYYY.MM.DD (..-2 weeks)
+    Between 2010 and 2020 = YYYY.MM.DD (2010.01.01..2020.12.31)
+
 Datetime
 ~~~~~~~~
 
 A date (with time) is defined by this exact string: ``YYYY.MM.DD HH:MM``::
 
     I'm a datetime field = YYYY.MM.DD HH:MM
+    I'm a futue datetime field = YYYY.MM.DD HH:MM (today..)
 
 Again, this doesn't mean that the datetime format can be influenced.
+
+The same range validation that can be applied to date fields can also be
+applied to datetime. Note however that the Validation will be applied to
+to the date portion. The time portion is ignored completely.
 
 Time
 ~~~~
@@ -201,6 +227,13 @@ There are two types of number fields. An integer and a float field::
 
     I'm a float field = 0.00..99.00
     I'm an float field of a different range = -100.00..100.00
+
+Integer fields optionally can have a price attached to them which will be
+multiplied by the supplied integer::
+
+    Number of stamps to include = 0..30 (1.00 CHF)
+
+This will result in a price of 1.00 CHF per stamp.
 
 Code
 ~~~~
@@ -228,6 +261,13 @@ do something like this::
 The files are checked against their file extension. Onegov.form also checks
 that uploaded files have the mimetype they claim to have and it won't accept
 obviously dangerous uploads like binaries (unless you really want to).
+
+These file inputs allow only for one file to be uploaded. If you want to
+allow multiple files to be uploaded, use the following syntax::
+
+    I'm a multiple file upload field = *.* (multiple)
+
+This will allow the user to upload multiple files at once.
 
 Standard Numbers
 ~~~~~~~~~~~~~~~~
@@ -331,23 +371,47 @@ form can be modeled::
         [x] Second IP Address (20 CHF)
         [x] Backup (20 CHF)
 
+    Delivery =
+        (x) Pickup (0 CHF)
+        ( ) Delivery (5 CHF!)
+
 The additional pricing metadata can be used to provide simple order forms.
 As in any other form, dependencies are taken into account.
 
+The optional `!` at the end of the price indicates that credit card payment
+will become mandatory if this option is selected. It is possible to achieve
+this without a price increase too: (0 CHF!)
+
+Discounts
+~~~~~~~~~
+
+Radio buttons and checkboxes may apply proportial discounts. How those
+discounts are applied will depend on the consumer. It will not be factored
+into the price of the form automatically, since there may be other costs
+associated with the submission, that aren't part of the form.
+
+Example discount::
+
+    Discount =
+        (x) No discount
+        ( ) Sports club (50%)
+        ( ) School (100%)
+
 """
+from __future__ import annotations
 
 import pyparsing as pp
 import re
 import yaml
 
-from cached_property import cached_property
+from functools import cached_property
 from dateutil import parser as dateutil_parser
 from decimal import Decimal
-from onegov.core.cache import lru_cache
+from functools import lru_cache
+
 from onegov.core.utils import Bunch
 from onegov.form import errors
-from onegov.form.errors import MixedTypeError
-from onegov.form.parser.grammar import checkbox, field_help_identifier
+from onegov.form.parser.grammar import checkbox, chip_nr, field_help_identifier
 from onegov.form.parser.grammar import code
 from onegov.form.parser.grammar import date
 from onegov.form.parser.grammar import datetime
@@ -364,11 +428,35 @@ from onegov.form.parser.grammar import textarea
 from onegov.form.parser.grammar import textfield
 from onegov.form.parser.grammar import time
 from onegov.form.parser.grammar import url
+from onegov.form.parser.grammar import video_url
 from onegov.form.utils import as_internal_id
 
 
+from typing import final, Any, ClassVar, Literal, Self, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from onegov.form.types import PricingRules
+    from onegov.form.utils import decimal_range
+    from pyparsing import ParseResults
+    from re import Pattern
+    from typing import TypeAlias
+    from yaml.nodes import ScalarNode
+
+    # tagged unions so we can type narrow by type field
+    BasicParsedField: TypeAlias = (
+        'PasswordField | EmailField | UrlField | VideoURLField | DateField | '
+        'DatetimeField | TimeField | StringField | TextAreaField | '
+        'CodeField | StdnumField | IntegerRangeField | '
+        'DecimalRangeField | RadioField | CheckboxField | ChipNrField'
+    )
+    FileParsedField: TypeAlias = 'FileinputField | MultipleFileinputField'
+    ParsedField: TypeAlias = BasicParsedField | FileParsedField
+
+_FieldT = TypeVar('_FieldT', bound='ParsedField')
+
+
 # cache the parser elements
-def create_parser_elements():
+def create_parser_elements() -> Bunch:
     elements = Bunch()
     elements.identifier = field_identifier()
     elements.help_identifier = field_help_identifier()
@@ -379,15 +467,18 @@ def create_parser_elements():
     elements.password = password()
     elements.email = email()
     elements.url = url()
+    elements.video_url = video_url()
     elements.stdnum = stdnum()
     elements.datetime = datetime()
     elements.date = date()
     elements.time = time()
     elements.fileinput = fileinput()
+    elements.multiplefileinput = fileinput()
     elements.radio = radio()
     elements.checkbox = checkbox()
     elements.integer_range = integer_range_field()
     elements.decimal_range = decimal_range_field()
+    elements.chip_nr = chip_nr()
     elements.boxes = elements.checkbox | elements.radio
     elements.single_line_fields = elements.identifier + pp.MatchFirst([
         elements.textfield,
@@ -396,6 +487,7 @@ def create_parser_elements():
         elements.password,
         elements.email,
         elements.url,
+        elements.video_url,
         elements.stdnum,
         elements.datetime,
         elements.date,
@@ -403,6 +495,7 @@ def create_parser_elements():
         elements.fileinput,
         elements.integer_range,
         elements.decimal_range,
+        elements.chip_nr,
     ])
 
     return elements
@@ -411,10 +504,10 @@ def create_parser_elements():
 # lazy loads the parser elements and stores them as attributes on itself
 class LazyElements:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.loaded = False
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> pp.ParserElement:
         if not self.loaded:
             for k, v in create_parser_elements().__dict__.items():
                 setattr(self, k, v)
@@ -424,7 +517,7 @@ class LazyElements:
         if name in self.__dict__:
             return self.__dict__[name]
 
-        return super().__getattr__(name)
+        raise AttributeError(name)
 
 
 ELEMENTS = LazyElements()
@@ -434,101 +527,176 @@ class CustomLoader(yaml.SafeLoader):
     """ Extends the default yaml loader with customized constructors. """
 
 
-class constructor:
+class constructor:  # noqa: N801
     """ Adds decorated functions to as constructors to the CustomLoader. """
 
-    def __init__(self, tag):
+    def __init__(self, tag: str):
         self.tag = tag
 
-    def __call__(self, fn):
+    def __call__(
+        self,
+        fn: Callable[[CustomLoader, ScalarNode], pp.ParseResults]
+    ) -> Callable[[CustomLoader, ScalarNode], pp.ParseResults]:
         CustomLoader.add_constructor(self.tag, fn)
         return fn
 
 
 @constructor('!text')
-def construct_textfield(loader, node):
-    return ELEMENTS.textfield.parseString(node.value)
+def construct_textfield(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.textfield.parse_string(node.value)
 
 
 @constructor('!textarea')
-def construct_textarea(loader, node):
-    return ELEMENTS.textarea.parseString(node.value)
+def construct_textarea(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.textarea.parse_string(node.value)
 
 
 @constructor('!code')
-def construct_syntax(loader, node):
-    return ELEMENTS.code.parseString(node.value)
+def construct_syntax(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.code.parse_string(node.value)
 
 
 @constructor('!email')
-def construct_email(loader, node):
-    return ELEMENTS.email.parseString(node.value)
+def construct_email(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.email.parse_string(node.value)
 
 
 @constructor('!url')
-def construct_url(loader, node):
-    return ELEMENTS.url.parseString(node.value)
+def construct_url(
+        loader: CustomLoader,
+        node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.url.parse_string(node.value)
+
+
+@constructor('!video_url')
+def construct_video_url(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.video_url.parse_string(node.value)
 
 
 @constructor('!stdnum')
-def construct_stdnum(loader, node):
-    return ELEMENTS.stdnum.parseString(node.value)
+def construct_stdnum(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.stdnum.parse_string(node.value)
+
+
+@constructor('!chip_nr')
+def construct_chip_nr(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.chip_nr.parse_string(node.value)
 
 
 @constructor('!date')
-def construct_date(loader, node):
-    return ELEMENTS.date.parseString(node.value)
+def construct_date(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.date.parse_string(node.value)
 
 
 @constructor('!datetime')
-def construct_datetime(loader, node):
-    return ELEMENTS.datetime.parseString(node.value)
+def construct_datetime(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.datetime.parse_string(node.value)
 
 
 @constructor('!time')
-def construct_time(loader, node):
-    return ELEMENTS.time.parseString(node.value)
+def construct_time(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.time.parse_string(node.value)
 
 
 @constructor('!radio')
-def construct_radio(loader, node):
-    return ELEMENTS.radio.parseString(node.value)
+def construct_radio(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.radio.parse_string(node.value)
 
 
 @constructor('!checkbox')
-def construct_checkbox(loader, node):
-    return ELEMENTS.checkbox.parseString(node.value)
+def construct_checkbox(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.checkbox.parse_string(node.value)
 
 
 @constructor('!fileinput')
-def construct_fileinput(loader, node):
-    return ELEMENTS.fileinput.parseString(node.value)
+def construct_fileinput(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.fileinput.parse_string(node.value)
+
+
+@constructor('!multiplefileinput')
+def construct_multiplefileinput(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.multiplefileinput.parse_string(node.value)
 
 
 @constructor('!password')
-def construct_password(loader, node):
-    return ELEMENTS.password.parseString(node.value)
+def construct_password(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.password.parse_string(node.value)
 
 
 @constructor('!decimal_range')
-def construct_decimal_range(loader, node):
-    return ELEMENTS.decimal_range.parseString(node.value)
+def construct_decimal_range(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.decimal_range.parse_string(node.value)
 
 
 @constructor('!integer_range')
-def construct_integer_range(loader, node):
-    return ELEMENTS.integer_range.parseString(node.value)
+def construct_integer_range(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.integer_range.parse_string(node.value)
 
 
-def flatten_fieldsets(fieldsets):
+def flatten_fieldsets(
+    fieldsets: Iterable[Fieldset]
+) -> Iterator[ParsedField]:
     for fieldset in fieldsets:
         yield from flatten_fields(fieldset.fields)
 
 
-def flatten_fields(fields):
-    fields = fields or []
+def flatten_fields(
+    fields: Sequence[ParsedField] | None
+) -> Iterator[ParsedField]:
 
-    for field in fields:
+    for field in fields or []:
         yield field
 
         if hasattr(field, 'fields'):
@@ -539,7 +707,11 @@ def flatten_fields(fields):
                 yield from flatten_fields(choice.fields)
 
 
-def find_field(fieldsets, id):
+def find_field(
+    fieldsets: Iterable[Fieldset],
+    id: str | None
+) -> Fieldset | ParsedField | None:
+
     id = as_internal_id(id or '')
 
     for fieldset in fieldsets:
@@ -550,25 +722,33 @@ def find_field(fieldsets, id):
             for field in flatten_fields(fieldset.fields):
                 if field.id == id:
                     return field
+    return None
 
 
 class Fieldset:
     """ Represents a parsed fieldset. """
 
-    def __init__(self, label, fields=None):
+    def __init__(
+        self,
+        label: str,
+        fields: Sequence[ParsedField] | None = None
+    ):
         self.label = label if label != '...' else None
         self.fields = fields or []
 
     @property
-    def id(self):
+    def id(self) -> str:
         return as_internal_id(self.human_id)
 
     @property
-    def human_id(self):
+    def human_id(self) -> str:
         return self.label or ''
 
-    def find_field(self, *args, **kwargs):
-        return find_field((self, ), *args, **kwargs)
+    def find_field(
+        self,
+        id: str | None = None
+    ) -> Fieldset | ParsedField | None:
+        return find_field((self,), id=id)
 
 
 class Choice:
@@ -578,7 +758,13 @@ class Choice:
     user if the given choice was selected.
 
     """
-    def __init__(self, key, label, selected=False, fields=None):
+    def __init__(
+        self,
+        key: str,
+        label: str,
+        selected: bool = False,
+        fields: Sequence[ParsedField] | None = None
+    ):
         self.key = key
         self.label = label
         self.selected = selected
@@ -588,43 +774,52 @@ class Choice:
 class Field:
     """ Represents a parsed field. """
 
-    def __init__(self, label, required, parent=None, fieldset=None,
-                 field_help=None, **kwargs):
+    def __init__(
+        self,
+        label: str,
+        required: bool,
+        parent: ParsedField | None = None,
+        fieldset: Fieldset | None = None,
+        field_help: str | None = None,
+        human_id: str | None = None,
+        **extra_attributes: Any
+    ):
 
         self.label = label
+        self._human_id = human_id or label
         self.required = required
         self.parent = parent
         self.fieldset = fieldset
         self.field_help = field_help
 
-        for key, value in kwargs.items():
+        for key, value in extra_attributes.items():
             setattr(self, key, value)
 
     @property
-    def id(self):
+    def id(self) -> str:
         return as_internal_id(self.human_id)
 
     @cached_property
-    def human_id(self):
+    def human_id(self) -> str:
         if self.parent:
-            return '/'.join((
-                self.parent.human_id,
-                self.label
-            ))
+            return f'{self.parent.human_id}/{self._human_id}'
 
-        if self.fieldset.human_id:
-            return '/'.join((
-                self.fieldset.human_id,
-                self.label
-            ))
+        if self.fieldset and self.fieldset.human_id:
+            return f'{self.fieldset.human_id}/{self._human_id}'
 
-        return self.label
+        return self._human_id
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None,
-               field_help=None):
+    def create(  # type:ignore[misc]
+        cls: type[_FieldT],
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        parent: ParsedField | None = None,
+        fieldset: Fieldset | None = None,
+        field_help: str | None = None
+    ) -> _FieldT:
 
-        return cls(
+        return cls(  # type:ignore[return-value]
             label=identifier.label,
             required=identifier.required,
             parent=parent,
@@ -632,53 +827,118 @@ class Field:
             field_help=field_help
         )
 
-    def parse(self, value):
+    # FIXME: This is used in onegov.directory.archive and is honestly
+    #        pretty piggy, for now we just let anything pass and
+    #        trust that we only emit ValueError, which get turned
+    #        into a None on the receiving end, but we should make
+    #        this a bit more robust...
+    def parse(self, value: Any) -> object:
         return value
 
 
+@final
 class PasswordField(Field):
-    type = 'password'
+    type: ClassVar[Literal['password']] = 'password'
 
 
+@final
 class EmailField(Field):
-    type = 'email'
+    type: ClassVar[Literal['email']] = 'email'
 
 
+@final
 class UrlField(Field):
-    type = 'url'
+    type: ClassVar[Literal['url']] = 'url'
 
 
+@final
+class VideoURLField(Field):
+    type: ClassVar[Literal['video_url']] = 'video_url'
+
+
+@final
 class DateField(Field):
-    type = 'date'
+    type: ClassVar[Literal['date']] = 'date'
+    valid_date_range: pp.ParseResults
 
-    def parse(self, value):
+    @classmethod
+    def create(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        parent: ParsedField | None = None,
+        fieldset: Fieldset | None = None,
+        field_help: str | None = None
+    ) -> DateField:
+
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
+            field_help=field_help,
+            valid_date_range=field.valid_date_range
+        )
+
+    def parse(self, value: Any) -> object:
         # the first int in an ambiguous date is assumed to be a day
         # (since our software runs in europe first and foremost)
         return dateutil_parser.parse(value, dayfirst=True).date()
 
 
+@final
 class DatetimeField(Field):
-    type = 'datetime'
+    type: ClassVar[Literal['datetime']] = 'datetime'
+    valid_date_range: pp.ParseResults
 
-    def parse(self, value):
+    @classmethod
+    def create(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        parent: ParsedField | None = None,
+        fieldset: Fieldset | None = None,
+        field_help: str | None = None
+    ) -> DatetimeField:
+
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
+            field_help=field_help,
+            valid_date_range=field.valid_date_range
+        )
+
+    def parse(self, value: Any) -> object:
         # the first int in an ambiguous date is assumed to be a day
         # (since our software runs in europe first and foremost)
         return dateutil_parser.parse(value, dayfirst=True)
 
 
+@final
 class TimeField(Field):
-    type = 'time'
+    type: ClassVar[Literal['time']] = 'time'
 
-    def parse(self, value):
+    def parse(self, value: Any) -> object:
         return time(*map(int, value.split(':')))
 
 
+@final
 class StringField(Field):
-    type = 'text'
+    type: ClassVar[Literal['text']] = 'text'
+    maxlength: int | None
+    regex: Pattern[str] | None
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None,
-               field_help=None):
+    def create(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        parent: ParsedField | None = None,
+        fieldset: Fieldset | None = None,
+        field_help: str | None = None
+    ) -> StringField:
         regex = field.regex and re.compile(field.regex) or None
 
         return cls(
@@ -692,12 +952,20 @@ class StringField(Field):
         )
 
 
+@final
 class TextAreaField(Field):
-    type = 'textarea'
+    type: ClassVar[Literal['textarea']] = 'textarea'
+    rows: int | None
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None,
-               field_help=None):
+    def create(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        parent: ParsedField | None = None,
+        fieldset: Fieldset | None = None,
+        field_help: str | None = None
+    ) -> TextAreaField:
         return cls(
             label=identifier.label,
             required=identifier.required,
@@ -708,12 +976,20 @@ class TextAreaField(Field):
         )
 
 
+@final
 class CodeField(Field):
-    type = 'code'
+    type: ClassVar[Literal['code']] = 'code'
+    syntax: str
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None,
-               field_help=None):
+    def create(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        parent: ParsedField | None = None,
+        fieldset: Fieldset | None = None,
+        field_help: str | None = None
+    ) -> CodeField:
         return cls(
             label=identifier.label,
             required=identifier.required,
@@ -724,12 +1000,20 @@ class CodeField(Field):
         )
 
 
+@final
 class StdnumField(Field):
-    type = 'stdnum'
+    type: ClassVar[Literal['stdnum']] = 'stdnum'
+    format: str
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None,
-               field_help=None):
+    def create(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        parent: ParsedField | None = None,
+        fieldset: Fieldset | None = None,
+        field_help: str | None = None
+    ) -> Self:
         return cls(
             label=identifier.label,
             required=identifier.required,
@@ -740,11 +1024,67 @@ class StdnumField(Field):
         )
 
 
-class RangeField:
+@final
+class ChipNrField(Field):
+    type: ClassVar[Literal['chip_nr']] = 'chip_nr'
+
+
+@final
+class IntegerRangeField(Field):
+    type: ClassVar[Literal['integer_range']] = 'integer_range'
+    pricing: PricingRules
+    range: range
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None,
-               field_help=None):
+    def create(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        parent: ParsedField | None = None,
+        fieldset: Fieldset | None = None,
+        field_help: str | None = None
+    ) -> IntegerRangeField:
+
+        if field.pricing:
+            label = identifier.label + format_pricing(field.pricing)
+            # map one price to the whole range, the price will be
+            # multiplied by the selected value from the range
+            pricing = {field[0]: field.pricing}
+        else:
+            label = identifier.label
+            pricing = None
+
+        return cls(
+            # only modify the label visually, we don't want to
+            # affect the field id
+            human_id=identifier.label,
+            label=label,
+            required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
+            range=field[0],
+            pricing=pricing,
+            field_help=field_help
+        )
+
+    def parse(self, value: Any) -> object:
+        return int(float(value))  # automatically truncates dots
+
+
+@final
+class DecimalRangeField(Field):
+    type: ClassVar[Literal['decimal_range']] = 'decimal_range'
+    range: decimal_range
+
+    @classmethod
+    def create(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        parent: ParsedField | None = None,
+        fieldset: Fieldset | None = None,
+        field_help: str | None = None
+    ) -> DecimalRangeField:
         return cls(
             label=identifier.label,
             required=identifier.required,
@@ -755,28 +1095,23 @@ class RangeField:
 
         )
 
-
-class IntegerRangeField(RangeField, Field):
-    type = 'integer_range'
-
-    def parse(self, value):
-        return int(float(value))  # automatically truncates dots
-
-
-class DecimalRangeField(RangeField, Field):
-    type = 'decimal_range'
-
-    def parse(self, value):
+    def parse(self, value: Any) -> object:
         return Decimal(value)
 
 
-class FileinputField(Field):
-    type = 'fileinput'
+class FileinputBase:
+    extensions: list[str]
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None,
-               field_help=None):
-        return cls(
+    def create(  # type:ignore[misc]
+        cls: type[_FieldT],
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        parent: ParsedField | None = None,
+        fieldset: Fieldset | None = None,
+        field_help: str | None = None
+    ) -> _FieldT:
+        return cls(  # type:ignore[return-value]
             label=identifier.label,
             required=identifier.required,
             parent=parent,
@@ -786,63 +1121,108 @@ class FileinputField(Field):
         )
 
 
+@final
+class FileinputField(FileinputBase, Field):
+    type: ClassVar[Literal['fileinput']] = 'fileinput'
+
+
+@final
+class MultipleFileinputField(FileinputBase, Field):
+    type: ClassVar[Literal['multiplefileinput']] = 'multiplefileinput'
+
+
 class OptionsField:
+    choices: list[Choice]
+    pricing: PricingRules
+    discount: dict[str, float]
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None,
-               field_help=None):
+    def create(  # type:ignore[misc]
+        cls: type[_FieldT],
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        parent: ParsedField | None = None,
+        fieldset: Fieldset | None = None,
+        field_help: str | None = None
+    ) -> _FieldT:
 
         choices = [
             Choice(
                 key=c.label,
-                label=c.label + format_pricing(c.pricing),
+                label=(
+                    c.label
+                    + format_pricing(c.pricing)
+                    + format_discount(c.discount)
+                ),
                 selected=c.checked
             )
             for c in field.choices
         ]
 
         pricing = {c.label: c.pricing for c in field.choices if c.pricing}
+        discount = {
+            c.label: c.discount.amount / Decimal('100')
+            for c in field.choices
+            if c.discount
+        }
 
-        return cls(
+        return cls(  # type:ignore[return-value]
             label=identifier.label,
             required=identifier.required,
             parent=parent,
             fieldset=fieldset,
             choices=choices,
             pricing=pricing or None,
+            discount=discount or None,
             field_help=field_help
         )
 
-    def parse(self, value):
+    def parse(self, value: Any) -> Any:
         if isinstance(value, str):
             return [v.strip() for v in value.split('\n')]
 
         return value
 
 
+@final
 class RadioField(OptionsField, Field):
-    type = 'radio'
+    type: ClassVar[Literal['radio']] = 'radio'
 
-    def parse(self, value):
+    def parse(self, value: Any) -> object:
         v = super().parse(value)
         return v and v[0] or None
 
 
+@final
 class CheckboxField(OptionsField, Field):
-    type = 'checkbox'
+    type: ClassVar[Literal['checkbox']] = 'checkbox'
 
 
 @lru_cache(maxsize=1)
-def parse_formcode(formcode):
+def parse_formcode(
+    formcode: str,
+    enable_edit_checks: bool = False
+) -> list[Fieldset]:
     """ Takes the given formcode and returns an intermediate representation
     that can be used to generate forms or do other things.
 
+    :param formcode: string representing formcode to be parsed
+    :param enable_edit_checks: bool to activate additional check after
+    editing the form. Should only be active originating from
+    forms.validators.py
     """
-    parsed = yaml.load('\n'.join(translate_to_yaml(formcode)), CustomLoader)
+    # CustomLoader is inherited from SafeLoader so no security issue here
+    parsed = yaml.load(  # nosec B506
+        '\n'.join(translate_to_yaml(formcode, enable_edit_checks)),
+        CustomLoader
+    )
 
     fieldsets = []
-    field_classes = {cls.type: cls for cls in Field.__subclasses__()}
-    used_ids = set()
+    field_classes: dict[str, type[ParsedField]] = {
+        cls.type: cls  # type:ignore
+        for cls in Field.__subclasses__()
+    }
+    used_ids: set[str] = set()
 
     for fieldset in parsed:
 
@@ -854,21 +1234,30 @@ def parse_formcode(formcode):
             parse_field_block(block, field_classes, used_ids, fs)
             for block in (fieldset[label] or ())
         ]
+        if enable_edit_checks and not fs.fields:
+            raise errors.EmptyFieldsetError(label)
 
         fieldsets.append(fs)
 
     return fieldsets
 
 
-def parse_field_block(field_block, field_classes,
-                      used_ids, fieldset, parent=None):
+def parse_field_block(
+    # FIXME: This is very loose, we could do better, but we want to
+    #        refactor form parsing anyways...
+    field_block: dict[str, Any],
+    field_classes: dict[str, type[ParsedField]],
+    used_ids: set[str],
+    fieldset: Fieldset,
+    parent: ParsedField | None = None
+) -> ParsedField:
     """ Takes the given parsed field block and yields the fields from it """
 
     key, field = next(i for i in field_block.items())
     field_help = field_block.get('field_help')
 
     identifier_src = key.rstrip('= ') + '='
-    identifier = ELEMENTS.identifier.parseString(identifier_src)
+    identifier = ELEMENTS.identifier.parse_string(identifier_src)
 
     # add the nested options/dependencies in case of radio/checkbox buttons
     if isinstance(field, list):
@@ -886,9 +1275,9 @@ def parse_field_block(field_block, field_classes,
         assert types <= {'radio', 'checkbox'}
 
         if not len(types) == 1:
-            raise MixedTypeError(key)
+            raise errors.MixedTypeError(key)
 
-    result = field_classes[field.type].create(
+    result: ParsedField = field_classes[field.type].create(
         field, identifier, parent, fieldset, field_help)
 
     if result.id in used_ids:
@@ -897,7 +1286,7 @@ def parse_field_block(field_block, field_classes,
     used_ids.add(result.id)
 
     # go through nested blocks and recursively add them
-    if field.type in {'radio', 'checkbox'}:
+    if result.type == 'radio' or result.type == 'checkbox':
         for ix, choice in enumerate(field.choices):
             if not choice.dependencies:
                 continue
@@ -916,48 +1305,53 @@ def parse_field_block(field_block, field_classes,
     return result
 
 
-def format_pricing(pricing):
+def format_pricing(pricing: ParseResults | None) -> str:
     if not pricing:
         return ''
 
-    return ' ({:.2f} {})'.format(pricing[0], pricing[1])
+    return ' ({:.2f} {})'.format(pricing.amount, pricing.currency)
 
 
-def match(expr, text):
+def format_discount(discount: ParseResults | None) -> str:
+    if not discount:
+        return ''
+
+    return ' ({:.2f}%)'.format(discount.amount)
+
+
+def match(expr: pp.ParserElement, text: str) -> bool:
     """ Returns true if the given parser expression matches the given text. """
     try:
-        expr.parseString(text)
-    except pp.ParseException:
+        expr.parse_string(text)
+    except pp.ParseBaseException:
         return False
     else:
         return True
 
 
-def try_parse(expr, text):
+def try_parse(expr: pp.ParserElement, text: str) -> pp.ParseResults | None:
     """ Returns the result of the given parser expression and text, or None.
 
     """
     try:
-        return expr.parseString(text)
-    except pp.ParseException:
+        return expr.parse_string(text)
+    except pp.ParseBaseException:
         return None
 
 
-def prepare(text):
+def prepare(text: str) -> Iterator[tuple[int, str]]:
     """ Takes the raw form source and prepares it for the translation into
     yaml.
 
     """
 
     lines = (l.rstrip() for l in text.split('\n'))
-    lines = ((ix, l) for ix, l in enumerate(lines) if l)
-    lines = ((ix, l) for ix, l in ensure_a_fieldset(lines))
-
-    for line in lines:
-        yield line
+    yield from ensure_a_fieldset((ix, l) for ix, l in enumerate(lines) if l)
 
 
-def ensure_a_fieldset(lines):
+def ensure_a_fieldset(
+    lines: Iterable[tuple[int, str]]
+) -> Iterator[tuple[int, str]]:
     """ Makes sure that the given lines all belong to a fieldset. That means
     adding an empty fieldset before all lines, if none is found first.
 
@@ -978,26 +1372,74 @@ def ensure_a_fieldset(lines):
             yield ix, line
 
 
-def translate_to_yaml(text):
+def validate_indent(indent: str) -> bool:
+    """
+    Returns `False` if indent is other than a multiple of 4, else True
+    """
+    if len(indent) % 4 != 0:
+        return False
+    return True
+
+
+def translate_to_yaml(
+    text: str,
+    enable_edit_checks: bool = False
+) -> Iterator[str]:
     """ Takes the given form text and constructs an easier to parse yaml
     string.
 
+    :param text: string to be parsed
+    :param enable_edit_checks: bool to activate additional checks after
+    editing a form. Should only be active originating from forms.validators.py
     """
 
     lines = ((ix, l) for ix, l in prepare(text))
     expect_nested = False
     actual_fields = 0
     ix = 0
+    identifier_indent_stack: list[int] = []
+    option_indent_stack: list[int] = []
+    expect_option = False
 
-    def escape_single(text):
+    def escape_single(text: str) -> str:
         return text.replace("'", "''")
 
-    def escape_double(text):
+    def escape_double(text: str) -> str:
         return text.replace('"', '\\"')
 
-    for ix, line in lines:
+    def handle_indent_stack(
+        stack: list[int],
+        ix: int,
+        current_indent: int,
+        enable_edit_checks: bool = False,
+    ) -> list[int]:
+        """ Handle indentation changes and return updated stack. """
+        if not enable_edit_checks:
+            return stack  # skip stack handling
 
-        indent = ' ' * (4 + (len(line) - len(line.lstrip())))
+        previous_indent = stack[-1] if stack else -1
+
+        if previous_indent < current_indent:
+            # add new level
+            stack.append(current_indent)
+            return stack
+
+        elif previous_indent > current_indent:
+            # pop back last level
+            if current_indent not in stack:
+                raise errors.InvalidIndentSyntax(line=ix + 1)
+            return stack[:stack.index(current_indent) + 1]
+
+        else:
+            # same level, nothing to do
+            return stack
+
+    for ix, line in lines:
+        len_indent = len(line) - len(line.lstrip())
+        indent = ' ' * (4 + len_indent)
+
+        if enable_edit_checks and not validate_indent(indent):
+            raise errors.InvalidIndentSyntax(line=ix + 1)
 
         # the top level are the fieldsets
         if match(ELEMENTS.fieldset_title, line):
@@ -1008,8 +1450,8 @@ def translate_to_yaml(text):
         # fields are nested lists of dictionaries
         try:
             parse_result = try_parse(ELEMENTS.single_line_fields, line)
-        except re.error:
-            raise errors.InvalidFormSyntax(line=ix + 1)
+        except re.error as exception:
+            raise errors.InvalidFormSyntax(line=ix + 1) from exception
 
         if parse_result is not None:
             yield '{indent}- "{identifier}": !{type} \'{definition}\''.format(
@@ -1020,15 +1462,33 @@ def translate_to_yaml(text):
             )
             expect_nested = len(indent) > 4
             actual_fields += 1
+
+            identifier_indent_stack = handle_indent_stack(
+                identifier_indent_stack, ix, len_indent, enable_edit_checks
+            )
             continue
 
         # help descriptions following a field
         parse_result = try_parse(ELEMENTS.help_identifier, line)
         if parse_result is not None:
+            if enable_edit_checks and not identifier_indent_stack:
+                raise errors.InvalidCommentLocationSyntax(line=ix + 1)
+
+            # check for a valid indentation level
+            if (enable_edit_checks and
+                    len_indent not in identifier_indent_stack):
+                raise errors.InvalidCommentIndentSyntax(line=ix + 1)
+
+            if enable_edit_checks and expect_option:
+                raise errors.InvalidCommentLocationSyntax(line=ix + 1)
+
             yield '{indent}"{identifier}": \'{message}\''.format(
                 indent=indent + 2 * ' ',
                 identifier='field_help',
                 message=parse_result.message
+            )
+            identifier_indent_stack = handle_indent_stack(
+                identifier_indent_stack, ix, len_indent, enable_edit_checks
             )
             continue
 
@@ -1039,11 +1499,20 @@ def translate_to_yaml(text):
             if not expect_nested:
                 raise errors.InvalidFormSyntax(line=ix + 1)
 
-            yield '{indent}- !{type} \'{definition}\':'.format(
+            yield "{indent}- !{type} '{definition}':".format(
                 indent=indent,
                 type=parse_result.type,
                 definition=escape_single(line.strip())
             )
+
+            # check for a valid indentation level
+            if enable_edit_checks and len_indent in identifier_indent_stack:
+                raise errors.InvalidIndentSyntax(line=ix + 1)
+
+            option_indent_stack = handle_indent_stack(
+                option_indent_stack, ix, len_indent, enable_edit_checks
+            )
+            expect_option = False
             continue
 
         # identifiers which are alone contain nested checkboxes/radios
@@ -1060,6 +1529,14 @@ def translate_to_yaml(text):
 
             expect_nested = True
             actual_fields += 1
+
+            if enable_edit_checks and len_indent in option_indent_stack:
+                raise errors.InvalidIndentSyntax(line=ix + 1)
+
+            identifier_indent_stack = handle_indent_stack(
+                identifier_indent_stack, ix, len_indent, enable_edit_checks
+            )
+            expect_option = True
             continue
 
         raise errors.InvalidFormSyntax(line=ix + 1)

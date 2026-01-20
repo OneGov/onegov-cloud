@@ -1,0 +1,12 @@
+name,id,color,year,domain,domain_segment,total_votes,votes,voters_count,voters_count,mandates,panachage_votes_from_1,panachage_votes_from_2,panachage_votes_from_3,panachage_votes_from_4,panachage_votes_from_5,panachage_votes_from_6,panachage_votes_from_7,panachage_votes_from_8,panachage_votes_from_9,panachage_votes_from_10,panachage_votes_from_11,panachage_votes_from_999
+AL,1,#a74c97,2017,,,700,10,10.01,1.68,1,,0,0,0,0,0,0,0,0,0,0,0
+BDP,2,#efb52c,2017,,,700,20,20.02,3.37,2,0,,0,0,0,0,0,0,0,0,0,0
+CVP,3,#ff6300,2017,,,700,30,30.03,5.05,3,0,0,,0,0,0,0,0,0,0,0,0
+EDU,4,#7f6b65,2017,,,700,40,40.04,6.73,4,0,0,0,,0,0,0,0,0,0,0,0
+EVP,5,#e3c700,2017,,,700,50,50.05,8.42,5,0,0,0,0,,0,0,0,0,0,0,0
+FDP,6,#4068c8,2017,,,700,60,60.06,10.1,6,0,0,0,0,0,,0,0,0,0,0,0
+GLP,7,#aeca00,2017,,,700,70,70.07,11.78,7,0,0,0,0,0,0,,0,0,0,0,0
+Grüne,8,#4abb3e,2017,,,700,80,80.08,13.47,8,0,0,0,0,0,0,0,,0,0,0,0
+Piraten,9,#333333,2017,,,700,90,90.09,15.15,9,0,0,0,0,0,0,0,0,,0,0,0
+SP,10,#db3c27,2017,,,700,100,100.1,16.84,10,0,0,0,0,0,0,0,0,0,,0,0
+SVP,11,#3f841a,2017,,,700,110,110.11,18.52,11,0,0,0,0,0,0,0,0,0,0,,0

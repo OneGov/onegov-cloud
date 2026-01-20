@@ -1,10 +1,16 @@
-from typing import Dict
+from __future__ import annotations
 
-import msal
+import msal  # type:ignore[import-untyped]
 from attr import attrs, attrib
-from cached_property import cached_property
+from functools import cached_property
 
 from onegov.user import log
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.user.auth.provider import HasApplicationIdAndNamespace
+    from typing import Self
 
 
 @attrs(auto_attribs=True)
@@ -32,7 +38,7 @@ class AzureADAttributes:
     preferred_username: str
 
     @classmethod
-    def from_cfg(cls, cfg):
+    def from_cfg(cls, cfg: dict[str, Any]) -> Self:
         return cls(
             source_id=cfg.get('source_id', 'sub'),
             username=cfg.get('username', 'email'),
@@ -44,7 +50,7 @@ class AzureADAttributes:
 
 
 @attrs()
-class MSALClient():
+class MSALClient:
 
     AUTHORITY_BASE = 'https://login.microsoftonline.com'
     SIGN_OUT_ENDPOINT = '/oauth2/v2.0/logout'
@@ -61,8 +67,10 @@ class MSALClient():
     # Needed attributes in id_token_claim
     attributes: AzureADAttributes = attrib()
 
+    primary: bool = attrib()
+
     @cached_property
-    def connection(self):
+    def connection(self) -> msal.ConfidentialClientApplication:
         """ Returns the msal instance. Upon initiation, the client tries to
         connect to the authority endpoint. msal always validate the the tenant
         with an tenant discovery, `validate_authority` will additionally check
@@ -76,35 +84,38 @@ class MSALClient():
                 token_cache=None,
                 validate_authority=self.validate_authority
             )
-        except Exception as e:
+        except Exception as exception:
             raise ValueError(
-                f'MSAL config error in tenant {self.tenant_id}: {str(e)}')
+                f'MSAL config error in tenant {self.tenant_id}: '
+                '{str(exception)}'
+            ) from exception
         return client
 
     @property
-    def authority(self):
+    def authority(self) -> str:
         return f'{self.AUTHORITY_BASE}/{self.tenant_id}'
 
-    def logout_url(self, logout_redirect):
+    def logout_url(self, logout_redirect: str) -> str:
         url_param = f'?post_logout_redirect_uri={logout_redirect}'
         return f'{self.authority}{self.SIGN_OUT_ENDPOINT}{url_param}'
 
 
 @attrs
-class MSALConnections():
+class MSALConnections:
 
     # instantiated connections for every tenant
-    connections: Dict[str, MSALClient] = attrib()
+    connections: dict[str, MSALClient] = attrib()
 
-    def client(self, app):
+    def client(self, app: HasApplicationIdAndNamespace) -> MSALClient | None:
         if app.application_id in self.connections:
             return self.connections[app.application_id]
 
         if app.namespace in self.connections:
             return self.connections[app.namespace]
+        return None
 
     @classmethod
-    def from_cfg(cls, config):
+    def from_cfg(cls, config: dict[str, Any]) -> Self:
         clients = {
             app_id: MSALClient(
                 client_id=cfg['client_id'],
@@ -113,7 +124,8 @@ class MSALConnections():
                 validate_authority=cfg.get('validate_authority', True),
                 attributes=AzureADAttributes.from_cfg(
                     cfg.get('attributes', {})
-                )
+                ),
+                primary=cfg.get('primary', False),
             ) for app_id, cfg in config.items()
         }
         for app_id, client in clients.items():

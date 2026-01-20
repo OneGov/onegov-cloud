@@ -1,35 +1,50 @@
+from __future__ import annotations
+
+from dicttoxml import dicttoxml  # type:ignore[import-untyped]
 from morepath.request import Response
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
+from onegov.form.filters import as_float
 from onegov.org import _
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
+from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
+from wtforms.validators import Optional
+from wtforms.validators import ValidationError
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from onegov.core.orm.abstract import AdjacencyList
+    from onegov.org.request import OrgRequest
 
 
 class DateRangeForm(Form):
     """ A form providing a start/end date range. """
 
     start = DateField(
-        label=_("Start"),
+        label=_('Start'),
         validators=[InputRequired()]
     )
 
     end = DateField(
-        label=_("End"),
+        label=_('End'),
         validators=[InputRequired()]
     )
 
-    def validate(self):
+    def validate(self) -> bool:  # type:ignore[override]
         result = super().validate()
 
         if self.start.data and self.end.data:
             if self.start.data > self.end.data:
-                message = _("The end date must be later than the start date")
+                message = _('The end date must be later than the start date')
+                assert isinstance(self.end.errors, list)
                 self.end.errors.append(message)
                 result = False
 
@@ -40,11 +55,12 @@ class ExportForm(Form):
     """ A form providing a choice of export formats. """
 
     file_format = RadioField(
-        label=_("Format"),
+        label=_('Format'),
         choices=[
-            ('csv', _("CSV File")),
-            ('xlsx', _("Excel File")),
-            ('json', _("JSON File"))
+            ('csv', _('CSV File')),
+            ('xlsx', _('Excel File')),
+            ('json', _('JSON File')),
+            ('xml', _('XML File')),
         ],
         default='csv',
         validators=[
@@ -53,20 +69,24 @@ class ExportForm(Form):
     )
 
     @property
-    def format(self):
+    def format(self) -> str:
         return self.file_format.data
 
-    def as_export_response(self, results, title='export', **kwargs):
+    def as_export_response(
+        self,
+        results: Sequence[dict[str, Any]],
+        title: str = 'export',
+        **kwargs: Any
+    ) -> Response:
         """ Turns the given results (list of dicts) into a webob response
         with the currently selected file format.
 
         The additional keyword arguments are directly passed into the
         convert_list_of_dicts_to_* functions.
 
-        For json, these additional arguments are ignored.
+        For json and xml, these additional arguments are ignored.
 
         """
-
         if self.format == 'json':
             return Response(
                 json_body=results,
@@ -91,31 +111,55 @@ class ExportForm(Form):
                 )
             )
 
+        if self.format == 'xml':
+            return Response(
+                dicttoxml(results),
+                content_type='text/xml',
+                content_disposition='inline; filename={}.xml'.format(
+                    normalize_for_url(title)
+                ),
+            )
+
         raise NotImplementedError()
 
 
-class PaymentMethodForm(Form):
+class PaymentForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
+
+    minimum_price_total = DecimalField(
+        label=_('Minimum price total'),
+        fieldset=_('Payments'),
+        filters=(as_float, ),
+        validators=[Optional()])
+
     payment_method = RadioField(
-        label=_("Payment Method"),
-        fieldset=_("Payments"),
+        label=_('Payment Method'),
+        fieldset=_('Payments'),
         default='manual',
         validators=[InputRequired()],
         choices=[
-            ('manual', _("No credit card payments")),
-            ('free', _("Credit card payments optional")),
-            ('cc', _("Credit card payments required"))
+            ('manual', _('No credit card payments')),
+            ('free', _('Credit card payments optional')),
+            ('cc', _('Credit card payments required'))
         ])
 
-    def ensure_valid_payment_method(self):
+    def validate_minimum_price_total(self, field: DecimalField) -> None:
+        if not float(self.minimum_price_total.data or 0) >= 0:
+            raise ValidationError(_(
+                'The price must be larger than zero'
+            ))
+
+    def validate_payment_method(self, field: RadioField) -> None:
         if self.payment_method.data == 'manual':
             return
 
         if not self.request.app.default_payment_provider:
-            self.payment_method.errors.append(_(
-                "You need to setup a default payment provider to enable "
-                "credit card payments"
+            raise ValidationError(_(
+                'You need to setup a default payment provider to enable '
+                'credit card payments'
             ))
-            return False
 
 
 class ChangeAdjacencyListUrlForm(Form):
@@ -129,48 +173,46 @@ class ChangeAdjacencyListUrlForm(Form):
         default=True
     )
 
-    def get_model(self):
+    def get_model(self) -> AdjacencyList:
         return self.model
 
-    def ensure_correct_name(self):
+    def validate_name(self, field: StringField) -> None:
         if not self.name.data:
             return
 
         model = self.get_model()
 
         if model.name == self.name.data:
-            self.name.errors.append(
+            raise ValidationError(
                 _('Please fill out a new name')
             )
-            return False
 
         normalized_name = normalize_for_url(self.name.data)
         if not self.name.data == normalized_name:
-            self.name.errors.append(
+            raise ValidationError(
                 _('Invalid name. A valid suggestion is: ${name}',
                   mapping={'name': normalized_name})
             )
-            return False
 
         if not model.parent_id:
             cls = model.__class__
-            query = self.request.session.query(cls)
-            query = query.filter(
+            session = self.request.session
+            query = session.query(cls).filter(
                 cls.parent_id.is_(None),
                 cls.name == normalized_name
             )
-            if query.first():
-                self.name.errors.append(
-                    _("An entry with the same name exists")
+            if session.query(query.exists()).scalar():
+                raise ValidationError(
+                    _('An entry with the same name exists')
                 )
-                return False
+
             return
 
+        assert model.parent is not None
         for child in model.parent.children:
             if child == self.model:
                 continue
             if child.name == self.name.data:
-                self.name.errors.append(
-                    _("An entry with the same name exists")
+                raise ValidationError(
+                    _('An entry with the same name exists')
                 )
-                return False

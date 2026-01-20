@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.collections import ArchivedResultCollection
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_election_compound
@@ -7,22 +9,29 @@ from webtest import TestApp as Client
 from webtest.forms import Upload
 
 
-def test_upload_election_compound_year_unavailable(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_upload_election_compound_year_unavailable(
+    election_day_app_zg: TestApp
+) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
+    new.form['title_de'] = 'Election'
     new.form['date'] = '1990-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'municipality'
     new.form.submit()
 
     new = client.get('/manage/election-compounds/new-election-compound')
-    new.form['election_de'] = "Elections"
+    new.form['title_de'] = "Elections"
     new.form['date'] = '1990-01-01'
     new.form['municipality_elections'] = ['election']
     new.form['domain'] = 'canton'
@@ -55,7 +64,9 @@ def test_upload_election_compound_year_unavailable(election_day_app_zg):
     assert "Das Jahr 1990 wird noch nicht unterstützt" in upload
 
 
-def test_upload_election_compound_invalidate_cache(election_day_app_gr):
+def test_upload_election_compound_invalidate_cache(
+    election_day_app_gr: TestApp
+) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -70,11 +81,12 @@ def test_upload_election_compound_invalidate_cache(election_day_app_gr):
     assert ">56<" in anonymous.get('/election/regional-election-b').follow()
 
     csv = anonymous.get('/elections/elections/data-csv').text
-    csv = csv.replace('56', '58').encode('utf-8')
+    csv = csv.replace('56', '58')
 
     upload = client.get('/elections/elections/upload')
     upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['results'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain')
     upload = upload.form.submit()
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
@@ -86,7 +98,9 @@ def test_upload_election_compound_invalidate_cache(election_day_app_gr):
     assert ">58<" in b
 
 
-def test_upload_election_compound_temporary_results(election_day_app_gr):
+def test_upload_election_compound_temporary_results(
+    election_day_app_gr: TestApp
+) -> None:
     archive = ArchivedResultCollection(election_day_app_gr.session())
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
@@ -94,16 +108,16 @@ def test_upload_election_compound_temporary_results(election_day_app_gr):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'election'
+    new.form['title_de'] = 'election'
     new.form['date'] = '2022-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'region'
     new.form['region'] = 'Ilanz'
     new.form.submit()
 
     new = client.get('/manage/election-compounds/new-election-compound')
-    new.form['election_de'] = "Elections"
+    new.form['title_de'] = "Elections"
     new.form['date'] = '2022-01-01'
     new.form['region_elections'] = ['election']
     new.form['domain'] = 'canton'
@@ -115,7 +129,7 @@ def test_upload_election_compound_temporary_results(election_day_app_gr):
         (0, 1)   # compound
     ]
 
-    # Onegov internal: misssing and number of municpalities
+    # Onegov internal: missing and number of municipalities
     csv = '\n'.join((
         (
             'election_status,'
@@ -175,7 +189,9 @@ def test_upload_election_compound_temporary_results(election_day_app_gr):
     ]
 
 
-def test_upload_election_compound_notify_zulip(election_day_app_zg):
+def test_upload_election_compound_notify_zulip(
+    election_day_app_zg: TestApp
+) -> None:
 
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
@@ -194,26 +210,27 @@ def test_upload_election_compound_notify_zulip(election_day_app_zg):
         election_day_app_zg.zulip_key = 'aabbcc'
         upload_election_compound(client, canton='zg')
         sleep(5)
+        urlopen = urlopen  # undo mypy narrowing
         assert urlopen.called
         assert 'zulipchat.com' in urlopen.call_args[0][0].get_full_url()
 
 
-def test_upload_election_compound_submit(election_day_app_zg):
+def test_upload_election_compound_submit(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
+    new.form['title_de'] = 'Election'
     new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'municipality'
     new.form.submit()
 
     new = client.get('/manage/election-compounds/new-election-compound')
-    new.form['election_de'] = "Elections"
+    new.form['title_de'] = "Elections"
     new.form['date'] = '2015-01-01'
     new.form['municipality_elections'] = ['election']
     new.form['domain'] = 'canton'

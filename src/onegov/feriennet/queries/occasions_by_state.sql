@@ -32,6 +32,7 @@ occasion_parameters AS (
     SELECT
         occasions.id AS occasion_id,
         activities.title,
+        activities.id as activity_id,
         first_date.start,
         first_date.end,
         occasions.cancelled,
@@ -63,7 +64,7 @@ occasion_states AS (
     CASE
         WHEN cancelled = TRUE
             THEN 'cancelled'
-        WHEN total_bookings > max_spots
+        WHEN total_bookings > max_spots AND accepted_bookings = max_spots
             THEN 'overfull'
         WHEN accepted_bookings = 0
             THEN 'empty'
@@ -82,8 +83,9 @@ occasion_states AS (
 -- the resulting query
 SELECT
     "state",           -- Text
-    occasion_id,       -- Integer
+    occasion_id,       -- UUID
     title,             -- Text
+    activity_id,       -- UUID
     "start",           -- DateTime
     "end",             -- DateTime
     min_spots,         -- Integer

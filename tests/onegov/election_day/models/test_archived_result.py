@@ -1,19 +1,28 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import datetime
 from datetime import timezone
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_archived_result(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_archived_result(session: Session) -> None:
     result = ArchivedResult()
     result.date = date(2007, 1, 1)
     result.last_modified = datetime(2007, 1, 2, 0, 0, tzinfo=timezone.utc)
     result.last_result_change = datetime(2007, 1, 1, 0, 0, tzinfo=timezone.utc)
     result.schema = 'schema'
+    result.external_id = 'id'
     result.url = 'url'
     result.title = 'title'
-    result.title_translations['en'] = 'title'
+    result.title_translations['en'] = 'title'  # type: ignore[index]
     result.domain = 'canton'
     result.type = 'vote'
     result.name = 'name'
@@ -40,6 +49,7 @@ def test_archived_result(session):
         2007, 1, 1, 0, 0, tzinfo=timezone.utc
     )
     assert result.schema == 'schema'
+    assert result.external_id == 'id'
     assert result.url == 'url'
     assert result.title == 'title'
     assert result.title_translations == {'en': 'title', 'de_CH': 'title'}
@@ -65,8 +75,10 @@ def test_archived_result(session):
         'completed': True,
         'elected_candidates': [('Joe', 'Quimby')],
         'elections': ['https://localhost/1', 'https://localhost/1'],
+        'id': 'id',
         'turnout': 50
     }
+    assert result.type_class == Vote
 
     # Test progress
     assert result.progress == (0, 0)
@@ -76,7 +88,7 @@ def test_archived_result(session):
     assert result.progress == (5, 10)
 
     # Test display functions
-    request = DummyRequest()
+    request: Any = DummyRequest()
     assert result.display_answer(request) == 'rejected'
     assert result.display_nays_percentage(request) == 20.5
     assert result.display_yeas_percentage(request) == 79.5
@@ -92,6 +104,13 @@ def test_archived_result(session):
     result.domain = 'municipality'
     assert result.title_prefix(request) == result.name
 
+    # Test fetched and adjusted URL
+    assert result.is_fetched(request) is True
+    assert result.adjusted_url(request) == 'url'
+    request.app.schema = 'schema'
+    assert result.is_fetched(request) is False
+    assert result.adjusted_url(request) == "Vote//{'id': 'id'}"
+
     # Test copy from
     copied = ArchivedResult()
     copied.copy_from(result)
@@ -104,6 +123,7 @@ def test_archived_result(session):
         2007, 1, 1, 0, 0, tzinfo=timezone.utc
     )
     assert copied.schema == 'schema'
+    assert copied.external_id == 'id'
     assert copied.url == 'url'
     assert copied.title == 'title'
     assert copied.title_translations == {'en': 'title', 'de_CH': 'title'}
@@ -129,12 +149,13 @@ def test_archived_result(session):
         'completed': True,
         'elected_candidates': [('Joe', 'Quimby')],
         'elections': ['https://localhost/1', 'https://localhost/1'],
+        'id': 'id',
         'turnout': 50
     }
     assert copied.shortcode == 'shortcode'
 
 
-def test_archived_result_local_results(session):
+def test_archived_result_local_results(session: Session) -> None:
     result = ArchivedResult()
 
     assert result.answer == ''
@@ -145,7 +166,7 @@ def test_archived_result_local_results(session):
     assert result.local_nays_percentage == 100.0
     assert result.local_yeas_percentage == 0.0
 
-    request = DummyRequest()
+    request: Any = DummyRequest()
     assert result.display_answer(request) == ''
     assert result.display_nays_percentage(request) == 100.0
     assert result.display_yeas_percentage(request) == 0.0

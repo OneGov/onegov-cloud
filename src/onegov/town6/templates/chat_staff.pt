@@ -1,0 +1,47 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+
+        <div class="grid-x chat ticket-chat">
+            <div class="medium-7 cell">
+                <p>
+                    <i class="fa fa-user icon-left-of-text"></i> <span>${chat.customer_name}</span><br/>
+                    <i class="fa fa-user-tie icon-left-of-text"></i> <span>${staff}</span><br/>
+                    <i class="fa fa-envelope icon-left-of-text"></i> <span>${chat.email}</span><br/>
+                    <i class="fa fa-tags icon-left-of-text"></i> <span>${chat.topic}</span><br/>
+                    <i class="fa fa-clock icon-left-of-text"></i> <span>${layout.format_date(chat.created, 'datetime')}</span><br/>
+                </p>
+                <div id="message-area">
+                    <div class="card chat-card" style="display: none;">
+                        <p class="info"></p>
+                        <div class="card-section">
+                            <p></p>
+                        </div>
+                        <p class="info"></p>
+                    </div>
+
+                    <tal:b tal:repeat="message chat.chat_history">
+                        <div class="card chat-card ${'right' if message.get('userId') != 'customer' else 'left'}">
+                            <p class="info">${message['user']}</p>
+                            <div class="card-section">
+                                <p>${message['text']}</p>
+                            </div>
+                            <p class="info">${message['time']}</p>
+                        </div>
+                    </tal:b>
+                </div>
+                <div id="chat-form" tal:condition="chat.active">
+                    <textarea id="chat" placeholder="Ihre Nachricht ..." rows="5"></textarea>
+                    <button id="send" class="button" i18n:translate="">Send</button>
+                </div>
+            </div>
+
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+                
+            </div>
+        </div>
+
+    </tal:b>
+</div>

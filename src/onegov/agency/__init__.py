@@ -1,12 +1,12 @@
-import logging
+from __future__ import annotations
 
+import logging
 log = logging.getLogger('onegov.agency')
 log.addHandler(logging.NullHandler())
 
-from translationstring import TranslationStringFactory  # noqa
-_ = TranslationStringFactory('onegov.agency')  # noqa
+from onegov.agency.i18n import _
 
-from onegov.agency.app import AgencyApp  # noqa
+from onegov.agency.app import AgencyApp
 
 __all__ = (
     '_',

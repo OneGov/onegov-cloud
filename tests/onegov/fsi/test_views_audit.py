@@ -1,11 +1,19 @@
+from __future__ import annotations
+
+import pytest
+
 from datetime import timedelta
 from sedate import utcnow
 from uuid import uuid4
-from pytest import mark
 
 
-@mark.flaky(reruns=3)
-def test_audit_for_course(client, scenario):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client, FsiScenario
+
+
+@pytest.mark.flaky(reruns=3, only_rerun=None)
+def test_audit_for_course(client: Client, scenario: FsiScenario) -> None:
     """
     Story:
     For a course with refresh interval,
@@ -63,8 +71,11 @@ def test_audit_for_course(client, scenario):
 
     scenario.commit()
     scenario.refresh()
-    editor = scenario.first_user('editor')
-    editor.permissions = ['UBV', 'ZHW']
+    # FIXME: This doesn't do anything, was the intention to check permissions
+    #        at some point? If so we need to create an attendee for the editor
+    #        set the permissions on the attendee and log in as the editor...
+    # editor = scenario.first_user('editor')
+    # editor.permissions = ['UBV', 'ZHW']  # type: ignore[attr-defined]
 
     scenario.commit()
     scenario.refresh()
@@ -82,15 +93,18 @@ def test_audit_for_course(client, scenario):
     assert 'class="next-subscription"' in page
 
     # Test pagination
-    assert page.pyquery('ul.pagination > li.current > a')[0].text == "1"
-    page = page.click('2', index=-1)
-    assert page.pyquery('ul.pagination > li.current > a')[0].text == "2"
+    assert page.pyquery('ul.pagination > li.current > a > span:nth-child(2)'
+                        )[0].text == "1"
+    page = page.click('2', index=-2)
+    assert page.pyquery('ul.pagination > li.current > a > span:nth-child(2)'
+                        )[0].text == "2"
     assert page.form['organisations'].value is None
 
     # Test reset of pagination upon choosing letter
     page = page.click('M', index=-1)
     # Test reset of page when filtering with last name
-    assert page.pyquery('ul.pagination > li.current > a')[0].text == "1"
+    assert page.pyquery('ul.pagination > li.current > a > span:nth-child(2)'
+                        )[0].text == "1"
 
     # Test pdf
     page.click('PDF')

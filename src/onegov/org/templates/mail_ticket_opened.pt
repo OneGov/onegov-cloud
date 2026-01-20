@@ -7,6 +7,8 @@
         <p><span i18n:translate>Your request has been registered with the following reference:</span></p>
 
         <p><span class="ticket-number">${model.reference(request)}</span></p>
+        <p tal:condition="resource|nothing"><b>${resource.title}</b></p>
+        <tal:b tal:condition="reservations|nothing" metal:use-macro="layout.macros['reservations']"></tal:b>
 
         <p i18n:translate>We will send another e-mail once your ticket has
         been completed. In the meantime you can check the status of your
@@ -14,9 +16,14 @@
 
         <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
 
-        <tal:b condition="show_submission|nothing">
+        <tal:b tal:condition="show_submission|nothing">
             <hr class="large">
             <metal:b use-macro="layout.macros['display_form']" />
+        </tal:b>
+
+        <tal:b tal:condition="ticket.handler.payment">
+            <hr class="large">
+            <metal:b tal:define="payment ticket.handler.payment; show_vat ticket.handler.show_vat" use-macro="layout.macros['payment']" />
         </tal:b>
 
     </tal:b>

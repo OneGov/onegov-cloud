@@ -3,6 +3,16 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
+        <tal:b condition="not:count">
+            <p i18n:translate="">No subscribers yet</p>
+        </tal:b>
+
+        <tal:b condition="count">
+            <p i18n:translate>There are currently <tal:b i18n:name="count">${count}</tal:b> recipients registered.</p>
+        </tal:b>
+
+        <!--! FIXME: Make this work without ic-on-success -->
+        <?python request.require_unsafe_eval() ?>
         <tal:b tal:repeat="letter by_letter">
             <h2>${letter}</h2>
 
@@ -10,6 +20,9 @@
                 <li tal:repeat="recipient by_letter[letter]" id="${recipient.id}">
                     <span>
                         ${recipient.address}
+                    </span>
+                    <span class="info">
+                        (<tal:b i18n:translate="">Subscribed on</tal:b> ${layout.format_date(recipient.created, 'date')})
                     </span>
                     -
                     <a class="confirm"
@@ -26,6 +39,9 @@
                        i18n:attributes="data-confirm-extra;data-confirm-yes;data-confirm-no">
                         unsubscribe
                     </a>
+                    <span tal:condition="recipient.is_inactive" class="small-text info-text" title="This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list." i18n:attributes="title">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </span>
                 </li>
             </ul>
         </tal:b>

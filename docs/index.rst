@@ -28,7 +28,7 @@ following consequences:
 
  * It only runs on POSIX platforms.
  * It uses PostgreSQL 10+ and won't support other databases.
- * It requires Python 3.6+.
+ * It requires Python 3.11+.
  * It aims to provide concurrency through multiple processes and is not
    necessarily thread-safe.
 
@@ -101,6 +101,23 @@ Describes our very own Formcode™ Syntax, a DSL to write forms with.
     :maxdepth: 2
 
     formcode
+
+
+Public API
+++++++++++
+
+Find out how to use the public API.
+
+.. toctree::
+    :maxdepth: 1
+
+    api/agency/README.md
+
+.. toctree::
+    :maxdepth: 1
+
+    api/election_day/README.md
+
 
 Source
 ^^^^^^

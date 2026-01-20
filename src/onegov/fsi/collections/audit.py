@@ -1,13 +1,62 @@
-from cached_property import cached_property
+from __future__ import annotations
+
+from functools import cached_property
 from sedate import utcnow
 from sqlalchemy import func, desc
 
 from onegov.core.collection import GenericCollection, Pagination
-from onegov.fsi.models import CourseAttendee, CourseSubscription, \
-    CourseEvent, Course
+from onegov.fsi.models import (
+    CourseAttendee, CourseSubscription, CourseEvent, Course)
 
 
-class AuditCollection(GenericCollection, Pagination):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import datetime
+    from onegov.fsi.request import FsiRequest
+    from sqlalchemy.orm import Query, Session
+    from typing import NamedTuple, TypeVar
+    from typing import Self
+    from uuid import UUID
+
+    T = TypeVar('T')
+
+    class RankedSubscriptionRow(NamedTuple):
+        attendee_id: UUID
+        event_completed: bool
+        name: str
+        refresh_interval: int | None
+        course_id: UUID
+        start: datetime
+        end: datetime
+        rownum: int
+
+    class LastSubscriptionRow(NamedTuple):
+        attendee_id: UUID
+        start: datetime
+        end: datetime
+        name: str
+        event_completed: bool
+        refresh_interval: int | None
+
+    class AuditRow(NamedTuple):
+        id: UUID
+        first_name: str | None
+        last_name: str | None
+        organisation: str | None
+        source_id: str | None
+        start: datetime | None
+        end: datetime | None
+        event_completed: bool | None
+        refresh_interval: int | None
+        name: str | None
+
+
+# FIXME: It's not quite kosher that we use a non-model row, so there
+#        may be some methods with incorrect types
+class AuditCollection(
+    GenericCollection['AuditRow'],  # type:ignore[type-var]
+    Pagination['AuditRow']  # type:ignore[type-var]
+):
     """
     Displays the list of attendees filtered by a course and organisation
     for evaluation if they subscribed and completed a course event.
@@ -18,14 +67,22 @@ class AuditCollection(GenericCollection, Pagination):
 
     batch_size = 20
 
-    def __init__(self, session, course_id, auth_attendee, organisations=None,
-                 letter=None, page=0, exclude_inactive=True):
+    def __init__(
+        self,
+        session: Session,
+        course_id: UUID | None,
+        auth_attendee: CourseAttendee,
+        organisations: list[str] | None = None,
+        letter: str | None = None,
+        page: int = 0,
+        exclude_inactive: bool = True
+    ) -> None:
         super().__init__(session)
         self.page = page
 
         # When using the class link, the option with a course is still
-        self.course_id = course_id if course_id \
-            else self.relevant_courses and self.relevant_courses[0].id
+        self.course_id = course_id if course_id else (
+            self.relevant_courses[0][0] if self.relevant_courses else None)
 
         self.auth_attendee = auth_attendee
 
@@ -34,14 +91,14 @@ class AuditCollection(GenericCollection, Pagination):
         self.letter = letter.upper() if letter else None
         self.exclude_inactive = exclude_inactive
 
-    def subset(self):
+    def subset(self) -> Query[AuditRow]:
         return self.query()
 
     @property
-    def page_index(self):
+    def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index):
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -52,7 +109,11 @@ class AuditCollection(GenericCollection, Pagination):
             exclude_inactive=self.exclude_inactive
         )
 
-    def by_letter_and_orgs(self, letter=None, orgs=None):
+    def by_letter_and_orgs(
+        self,
+        letter: str | None = None,
+        orgs: list[str] | None = None
+    ) -> Self:
         return self.__class__(
             self.session,
             page=0,
@@ -63,7 +124,7 @@ class AuditCollection(GenericCollection, Pagination):
             exclude_inactive=self.exclude_inactive
         )
 
-    def by_letter(self, letter):
+    def by_letter(self, letter: str | None) -> Self:
         return self.__class__(
             self.session,
             page=0,
@@ -74,17 +135,21 @@ class AuditCollection(GenericCollection, Pagination):
             letter=letter,
         )
 
-    def __eq__(self, other):
-        return all((
-            self.page == other.page,
-            self.course_id == other.course_id,
-            self.auth_attendee == other.auth_attendee,
-            self.organisations == other.organisations,
-            self.exclude_inactive == other.exclude_inactive,
-            self.letter == other.letter
-        ))
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, self.__class__)
+            and self.page == other.page
+            and self.course_id == other.course_id
+            and self.auth_attendee == other.auth_attendee
+            and self.organisations == other.organisations
+            and self.exclude_inactive == other.exclude_inactive
+            and self.letter == other.letter
+        )
 
-    def ranked_subscription_query(self, past_only=True):
+    def ranked_subscription_query(
+        self,
+        past_only: bool = True
+    ) -> Query[RankedSubscriptionRow]:
         """
         Ranks all subscriptions of all events of a course
         windowed over the attendee_id and ranked after completed, most recent
@@ -111,13 +176,13 @@ class AuditCollection(GenericCollection, Pagination):
             Course, Course.id == CourseEvent.course_id)
         ranked = ranked.filter(
             CourseEvent.course_id == self.course_id,
-            CourseSubscription.attendee_id != None
+            CourseSubscription.attendee_id.isnot(None)
         )
         if past_only:
             ranked = ranked.filter(CourseEvent.start < utcnow())
         return ranked
 
-    def last_subscriptions(self):
+    def last_subscriptions(self) -> Query[LastSubscriptionRow]:
         """Retrieve the last completed subscription by attemdee for
         a given the course_id.
         """
@@ -132,7 +197,7 @@ class AuditCollection(GenericCollection, Pagination):
         ).select_entity_from(ranked)
         return subquery.filter(ranked.c.rownum == 1)
 
-    def filter_attendees_by_role(self, query):
+    def filter_attendees_by_role(self, query: Query[T]) -> Query[T]:
         """Filter permissions of editor, exclude external, """
         if self.auth_attendee.role == 'admin':
             if not self.organisations:
@@ -149,7 +214,7 @@ class AuditCollection(GenericCollection, Pagination):
                 ) if self.organisations else editors_permissions)
             )
 
-    def query(self):
+    def query(self) -> Query[AuditRow]:
         last = self.last_subscriptions().subquery()
         query = self.session.query(
             CourseAttendee.id,
@@ -180,17 +245,37 @@ class AuditCollection(GenericCollection, Pagination):
         )
         return query
 
+    def next_subscriptions(
+        self,
+        request: FsiRequest
+    ) -> dict[UUID, tuple[str, datetime]]:
+        next_subscriptions: dict[UUID, tuple[str, datetime]] = {}
+        if self.course_id:
+            # FIXME: We can do this in a single query, this is N+1...
+            query = request.session.query(CourseEvent)
+            query = query.filter(CourseEvent.course_id == self.course_id)
+            query = query.filter(CourseEvent.start >= utcnow())
+            query = query.order_by(CourseEvent.start)
+            for event in query:
+                attendees = event.attendees.with_entities(CourseAttendee.id)
+                for attendee in attendees:
+                    next_subscriptions.setdefault(
+                        attendee[0],
+                        (request.link(event), event.start)
+                    )
+        return next_subscriptions
+
     @property
-    def model_class(self):
+    def model_class(self) -> type[CourseAttendee]:  # type:ignore[override]
         return CourseAttendee
 
     @cached_property
-    def course(self):
-        return self.course_id and self.session.query(Course).filter_by(
-            id=self.course_id).first() or None
+    def course(self) -> Course | None:
+        return self.session.query(Course).filter_by(
+            id=self.course_id).first() if self.course_id else None
 
     @cached_property
-    def used_letters(self):
+    def used_letters(self) -> list[str]:
         """ Returns a list of all the distinct first letters of the peoples
         last names.
 
@@ -202,7 +287,7 @@ class AuditCollection(GenericCollection, Pagination):
         return [r.letter for r in query if r.letter]
 
     @cached_property
-    def relevant_courses(self):
+    def relevant_courses(self) -> tuple[tuple[UUID, str], ...]:
         return tuple(self.session.query(Course.id, Course.name).filter(
             Course.hidden_from_public == False,
             Course.mandatory_refresh != None

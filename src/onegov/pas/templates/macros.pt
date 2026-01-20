@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    i18n:domain="onegov.pas"
+    >
+
+<body>
+    <metal:fields define-macro="fields">
+        <div class="grid-x">
+            <tal:b repeat="field fields">
+                <div tal:define="hidden form.is_hidden(field)|False" class="cell large-${field.render_kw['size']|12} large-offset-${field.render_kw['offset']|0} field-${field.id} field-type-${field.type.lower()} ${'field-hidden' if hidden else ''}">
+                    <tal:b define="input_type field.widget.input_type|None">
+                        <tal:b condition="input_type == 'hidden'">
+                            ${field()}
+                            <small class="error" tal:repeat="error field.errors">${error}</small>
+                        </tal:b>
+                        <tal:b condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField'); field_list field.type == 'UploadMultipleField'">
+                            <label tal:attributes="class field.errors and not field_list and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
+                                <metal:b use-macro="layout.macros['field']" />
+                            </label>
+                            <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
+                                <metal:b use-macro="layout.macros['field']" />
+                            </div>
+                            <small class="error" tal:condition="not field_list" tal:repeat="error field.errors">${error}</small>
+                        </tal:b>
+                    </tal:b>
+                </div>
+            </tal:b>
+        </div>
+    </metal:fields>
+
+    <metal:role_singular define-macro="role-singular" i18n:domain="onegov.pas">
+        <tal:b switch="role">
+            <tal:b case="'admin'" i18n:translate>Administrator</tal:b>
+            <tal:b case="'commission_president'" i18n:translate>Commission President</tal:b>
+            <tal:b case="'parliamentarian'" i18n:translate>Parliamentarian</tal:b>
+        </tal:b>
+    </metal:role_singular>
+
+    <metal:role_plural define-macro="role-plural" i18n:domain="onegov.pas">
+        <tal:b switch="role">
+            <tal:b case="'admin'" i18n:translate>Administrators</tal:b>
+            <tal:b case="'commission_president'" i18n:translate>Commission President</tal:b>
+            <tal:b case="'parliamentarian'" i18n:translate>Parliamentarians</tal:b>
+        </tal:b>
+    </metal:role_plural>
+
+    <metal:b define-macro="extra_usermanagement_fields">
+        <div tal:condition="user.parliamentarian">
+            <dt i18n:translate>Parliamentarian</dt>
+            <dd>
+                <a href="${request.link(user.parliamentarian)}">${user.parliamentarian.title}</a>
+            </dd>
+        </div>
+    </metal:b>
+
+</body>
+
+<html>

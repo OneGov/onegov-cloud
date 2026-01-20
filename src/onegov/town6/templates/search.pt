@@ -12,15 +12,16 @@
 
         <div class="grid-x" tal:condition="connection">
             <div class="cell small-12 medium-8">
-                <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
-                <label>${searchlabel}</label>
+                <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${request.link(model, name='suggest')}" data-typeahead-target="${request.link(model)}" data-typeahead-filter-params='["type"]'>
+                <div class="two-columns" tal:condition="form.type">${form.type()}</div>
+                <label for="search">${searchlabel}</label>
                 <div class="input-group">
-                    <input class="input-group-field" id="search" data-typeahead-subject type="search" name="q" value="${model.query}" autocomplete="off" autocorrect="off" required autofocus />
+                    ${form.q(class_='input-group-field')}
                     <div class="input-group-button">
                         <button type="submit" class="button" aria-label="Search" i18n:attributes="aria-label">
-                          <i class="fa fa-fw fa-search"></i>
+                            <i class="fa fa-fw fa-search"></i>
                         </button>
-                  </div>
+                    </div>
                 </div>
                 <div class="grid-x typeahead">
                     <div class="cell small-12" data-typeahead-container></div>
@@ -33,34 +34,11 @@
             <h2 i18n:translate>${resultslabel}</h2>
             <div class="grid-x">
                 <div class="cell medium-8 small-12">
-                    <p tal:condition="not: model.batch.hits.total" i18n:translate="">Your search returned no results.</p>
+                    <p tal:condition="not: model.batch" i18n:translate="">Your search returned no results.</p>
 
-                    <ul class="search-results">
-                        <tal:b repeat="result model.batch.load()">
-                            <li class="search-result-${result.es_type_name}" tal:condition="result">
-                                <tal:b
-                                    define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
-                                    metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
-                                />
+                    ${results_html}
 
-                                <tal:b condition="request.is_manager and result.explanation|nothing">
-                                    <ul class="result-explanation">
-                                        <li>Score: ${result.explanation['score']}</li>
-                                        <tal:b repeat="(title, key) [('TF', 'term-frequency'), ('IDF', 'inverse-document-frequency'), ('Field Norm', 'field-norm')]">
-                                            <li title="${result.explanation[key]['description']}" tal:condition="result.explanation[key]">
-                                                ${title}: ${result.explanation[key]['value']}
-                                            </li>
-                                        </tal:b>
-                                    </ul>
-                                </tal:b>
-                            </li>
-                        </tal:b>
-                    </ul>
-
-
-                        <div metal:use-macro="layout.macros['pagination']" tal:define="
-                        collection model; current_page model; pagination_centered True" />
-
+                    <div metal:use-macro="layout.macros['pagination']" tal:define="collection model; current_page model; pagination_centered True" />
                 </div>
             </div>
         </tal:b>

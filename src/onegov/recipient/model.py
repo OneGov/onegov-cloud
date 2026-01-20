@@ -1,10 +1,19 @@
-from onegov.core.orm import Base
+from __future__ import annotations
+
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column, Enum, Text
-from sqlalchemy_utils import observes
 from uuid import uuid4
+
+
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from typing import TypeAlias
+
+    Medium: TypeAlias = Literal['phone', 'email', 'http']
 
 
 class GenericRecipient(Base, ContentMixin, TimestampMixin):
@@ -13,16 +22,20 @@ class GenericRecipient(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'generic_recipients'
 
     #: the internal id of the recipient
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: Column[uuid.UUID] = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the recipient name
-    name = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
     #: the order of the records (set to the normalized name + medium)
-    order = Column(Text, nullable=False, index=True)
+    order: Column[str] = Column(Text, nullable=False, index=True)
 
     #: the medium over which notifications are sent
-    medium = Column(Enum(
+    medium: Column[Medium] = Column(Enum(  # type:ignore[arg-type]
         'phone',
         'email',
         'http',
@@ -30,13 +43,17 @@ class GenericRecipient(Base, ContentMixin, TimestampMixin):
     ), nullable=False)
 
     #: the phone number, e-mail, url, etc. of the recipient (matches medium)
-    address = Column(Text, nullable=False)
+    address: Column[str] = Column(Text, nullable=False)
 
     #: extra information associated with the address (say POST/GET for http)
-    extra = Column(Text, nullable=True)
+    extra: Column[str | None] = Column(Text, nullable=True)
 
     #: the polymorphic recipient type
-    type = Column(Text, nullable=False, default=lambda: 'generic')
+    type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': 'type',
@@ -44,5 +61,5 @@ class GenericRecipient(Base, ContentMixin, TimestampMixin):
     }
 
     @observes('name')
-    def name_observer(self, name):
+    def name_observer(self, name: str) -> None:
         self.order = normalize_for_url(name)

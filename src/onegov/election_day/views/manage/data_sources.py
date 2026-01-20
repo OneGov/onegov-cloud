@@ -1,4 +1,5 @@
 """ The manage subscription views. """
+from __future__ import annotations
 
 import morepath
 
@@ -16,17 +17,27 @@ from onegov.election_day.models.data_source import UPLOAD_TYPE_LABELS
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.forms import EmptyForm
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 @ElectionDayApp.manage_html(
     model=DataSourceCollection,
     template='manage/data_sources.pt'
 )
-def view_data_sources(self, request):
-
+def view_data_sources(
+    self: DataSourceCollection,
+    request: ElectionDayRequest
+) -> RenderData:
     """ View all data sources as a list. """
 
     return {
         'layout': ManageDataSourcesLayout(self, request),
-        'title': _("Wabsti data sources"),
+        'title': _('Wabsti data sources'),
         'data_sources': self.batch,
         'new_source': request.link(self, 'new-source'),
         'labels': dict(UPLOAD_TYPE_LABELS)
@@ -38,8 +49,11 @@ def view_data_sources(self, request):
     name='new-source',
     form=DataSourceForm
 )
-def create_data_source(self, request, form):
-
+def create_data_source(
+    self: DataSourceCollection,
+    request: ElectionDayRequest,
+    form: DataSourceForm
+) -> RenderData | Response:
     """ Create a new data source. """
 
     layout = ManageDataSourcesLayout(self, request)
@@ -48,14 +62,14 @@ def create_data_source(self, request, form):
         data_source = DataSource()
         form.update_model(data_source)
         self.add(data_source)
-        layout = ManageDataSourceItemsLayout(data_source, request)
-        request.message(_("Data source added."), 'success')
-        return morepath.redirect(layout.manage_model_link)
+        items_layout = ManageDataSourceItemsLayout(data_source, request)
+        request.message(_('Data source added.'), 'success')
+        return morepath.redirect(items_layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New data source"),
+        'title': _('New data source'),
         'cancel': layout.manage_model_link
     }
 
@@ -64,8 +78,10 @@ def create_data_source(self, request, form):
     model=DataSource,
     name='manage'
 )
-def manage_data_source(self, request):
-
+def manage_data_source(
+    self: DataSource,
+    request: ElectionDayRequest
+) -> Response:
     """ Manage the data source.
 
     Redirect to the list of data source items.
@@ -80,15 +96,18 @@ def manage_data_source(self, request):
     model=DataSource,
     name='generate-token'
 )
-def generate_data_source_token(self, request, form):
-
+def generate_data_source_token(
+    self: DataSource,
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Regenerate a new token for the data source. """
 
     layout = ManageDataSourcesLayout(self, request)
 
     if form.submitted(request):
         self.token = uuid4()
-        request.message(_("Token regenerated."), 'success')
+        request.message(_('Token regenerated.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -96,8 +115,8 @@ def generate_data_source_token(self, request, form):
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Regenerate token"),
-        'button_text': _("Regenerate token"),
+        'subtitle': _('Regenerate token'),
+        'button_text': _('Regenerate token'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -107,8 +126,11 @@ def generate_data_source_token(self, request, form):
     model=DataSource,
     name='delete'
 )
-def delete_data_source(self, request, form):
-
+def delete_data_source(
+    self: DataSource,
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Delete the data source item. """
 
     layout = ManageDataSourcesLayout(self, request)
@@ -116,7 +138,7 @@ def delete_data_source(self, request, form):
     if form.submitted(request):
         data_sources = DataSourceCollection(request.session)
         data_sources.delete(self)
-        request.message(_("Data source deleted."), 'success')
+        request.message(_('Data source deleted.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -129,8 +151,8 @@ def delete_data_source(self, request, form):
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Delete data source"),
-        'button_text': _("Delete data source"),
+        'subtitle': _('Delete data source'),
+        'button_text': _('Delete data source'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -140,13 +162,16 @@ def delete_data_source(self, request, form):
     model=DataSourceItemCollection,
     template='manage/data_source_items.pt'
 )
-def view_data_source_items(self, request):
-
+def view_data_source_items(
+    self: DataSourceItemCollection,
+    request: ElectionDayRequest
+) -> RenderData:
     """ View all data source items as a list. """
 
+    assert self.source is not None
     return {
         'layout': ManageDataSourceItemsLayout(self, request),
-        'title': _("Mappings"),
+        'title': _('Mappings'),
         'items': self.batch,
         'item_name': self.source.label,
         'source': self.source,
@@ -159,26 +184,30 @@ def view_data_source_items(self, request):
     name='new-item',
     form=DataSourceItemForm
 )
-def create_data_source_item(self, request, form):
-
+def create_data_source_item(
+    self: DataSourceItemCollection,
+    request: ElectionDayRequest,
+    form: DataSourceItemForm
+) -> RenderData | Response:
     """ Create a new data source item. """
 
     layout = ManageDataSourceItemsLayout(self, request)
 
+    assert self.source is not None
     form.populate(self.source)
 
     if form.submitted(request):
         data_source_item = DataSourceItem()
         form.update_model(data_source_item)
         self.add(data_source_item)
-        request.message(_("Mapping added."), 'success')
+        request.message(_('Mapping added.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
         'callout': form.callout,
-        'title': _("New mapping"),
+        'title': _('New mapping'),
         'cancel': layout.manage_model_link
     }
 
@@ -188,8 +217,11 @@ def create_data_source_item(self, request, form):
     name='edit',
     form=DataSourceItemForm
 )
-def edit_data_source_item(self, request, form):
-
+def edit_data_source_item(
+    self: DataSourceItem,
+    request: ElectionDayRequest,
+    form: DataSourceItemForm
+) -> RenderData | Response:
     """ Edit a data source item. """
 
     layout = ManageDataSourceItemsLayout(self.source, request)
@@ -198,7 +230,7 @@ def edit_data_source_item(self, request, form):
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Mapping modified."), 'success')
+        request.message(_('Mapping modified.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     if not form.errors:
@@ -208,7 +240,7 @@ def edit_data_source_item(self, request, form):
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Edit mapping"),
+        'subtitle': _('Edit mapping'),
         'cancel': layout.manage_model_link
     }
 
@@ -217,8 +249,11 @@ def edit_data_source_item(self, request, form):
     model=DataSourceItem,
     name='delete'
 )
-def delete_data_source_item(self, request, form):
-
+def delete_data_source_item(
+    self: DataSourceItem,
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Delete the data source item. """
 
     layout = ManageDataSourceItemsLayout(self.source, request)
@@ -226,7 +261,7 @@ def delete_data_source_item(self, request, form):
     if form.submitted(request):
         data_source_items = DataSourceItemCollection(request.session)
         data_source_items.delete(self)
-        request.message(_("Mapping deleted."), 'success')
+        request.message(_('Mapping deleted.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -239,8 +274,8 @@ def delete_data_source_item(self, request, form):
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Delete mapping"),
-        'button_text': _("Delete mapping"),
+        'subtitle': _('Delete mapping'),
+        'button_text': _('Delete mapping'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }

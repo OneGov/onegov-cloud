@@ -150,12 +150,13 @@ $label-radius: 1px;
 */
 $button-font-family: $header-font-family;
 
+
 /*
     Round corners
 */
-$global-radius: 1px;
+$global-radius: .7rem;
 
-$body-font-color: $black-dark;
+$body-font-color: $jet;
 $bottom-links-color: #777;
 $bottom-links-size: .8rem;
 $crumb-bg: #fff;
@@ -216,8 +217,7 @@ $chevron-right-icon: '\f054';
 /*
 Grid
 */
-
-//$grid-container: 1200px;
+$grid-container: 1200px;
 
 /*
 Off Canvas / SideBar

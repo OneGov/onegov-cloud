@@ -4,34 +4,35 @@
     </tal:b>
 
     <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="cell small-12 large-7">
 
-        <div class="panel callout" i18n:translate>
-            Clicking "Send" will send the e-mail below to all selected recipients. You will receive a copy of the e-mail if you are not already on the recipients list.
-        </div>
+                <div class="panel callout" i18n:translate>
+                    Clicking "Send" will send the e-mail below to all selected recipients. You will receive a copy of the e-mail if you are not already on the recipients list.
+                </div>
 
-        <h2 i18n:translate>Preview</h2>
-        <div class="notification-preview">
-            <!-- the preview subject doesn't use the "structure" keyword as it won't be rendered as html -->
-            <h3 tal:content="preview_subject" />
-            <div tal:content="structure preview_body" />
-            <a class="control" href="${edit_link}" i18n:translate>Edit</a>
-        </div>
-
-        <h2 i18n:translate>Period</h2>
-        <div class="row">
-            <div class="column medium-6 small-12">
-                <metal:b use-macro="layout.macros['periods']" tal:define="periods request.app.periods; view_name 'send'; hide_title True" />
+                <h2 i18n:translate>Preview</h2>
+                <div class="notification-preview">
+                    <h3 tal:content="preview_subject" />
+                    <div tal:content="preview_body" />
+                    <a class="control" href="${edit_link}" i18n:translate>Edit</a>
+                </div>
             </div>
-        </div>
-
-        <h2 i18n:translate>Target Group</h2>
-        <div class="row">
-            <div class="column medium-6 small-12">
-                <div tal:condition="form.has_choices" metal:use-macro="layout.macros['form']"></div>
+            <div class="cell small-12 large-4 large-offset-1 notifications-sidebar sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel">
+                        <h2 i18n:translate>Period</h2>
+                        <metal:b use-macro="layout.macros['periods']" tal:define="periods request.app.periods; view_name 'send'; hide_title True" />
+                    </div>
+                    <div class="side-panel">
+                        <h2 i18n:translate>Target Group</h2>
+                        <div tal:condition="form.has_choices" metal:use-macro="layout.macros['form']"></div>
+                        <div tal:condition="not:form.has_choices" i18n:translate>
+                            There are no available recipients for your user account.
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div tal:condition="not:form.has_choices" i18n:translate>
-            There are no available recipients for your user account.
         </div>
 
     </tal:b>

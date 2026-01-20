@@ -1,7 +1,11 @@
+from __future__ import annotations
+
 from onegov.election_day.layouts.default import DefaultLayout
 from onegov.election_day.layouts.election import ElectionLayout
-from onegov.election_day.layouts.election_compound import \
-    ElectionCompoundLayout
+from onegov.election_day.layouts.election_compound import (
+    ElectionCompoundLayout)
+from onegov.election_day.layouts.election_compound_part import (
+    ElectionCompoundPartLayout)
 from onegov.election_day.layouts.mail import MailLayout
 from onegov.election_day.layouts.manage import ManageDataSourceItemsLayout
 from onegov.election_day.layouts.manage import ManageDataSourcesLayout
@@ -15,7 +19,7 @@ from onegov.election_day.layouts.manage import ManageVotesLayout
 from onegov.election_day.layouts.vote import VoteLayout
 
 
-__all__ = [
+__all__ = (
     'DefaultLayout',
     'ElectionCompoundLayout',
     'ElectionLayout',
@@ -29,5 +33,6 @@ __all__ = [
     'ManageSubscribersLayout',
     'ManageUploadTokensLayout',
     'ManageVotesLayout',
+    'ElectionCompoundPartLayout',
     'VoteLayout',
-]
+)

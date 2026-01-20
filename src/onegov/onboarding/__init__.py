@@ -1,10 +1,11 @@
-import logging
-log = logging.getLogger('onegov.onboarding')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+from __future__ import annotations
 
-from translationstring import TranslationStringFactory
-_ = TranslationStringFactory('onegov.onboarding')  # noqa
+import logging
+log = logging.getLogger('onegov.onboarding')
+log.addHandler(logging.NullHandler())
+
+from onegov.onboarding.i18n import _
 
 from onegov.onboarding.app import OnboardingApp
 
-__all__ = ['_', 'log', 'OnboardingApp']
+__all__ = ('_', 'log', 'OnboardingApp')

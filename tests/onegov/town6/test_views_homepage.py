@@ -1,7 +1,16 @@
+from __future__ import annotations
+
 import transaction
 
+from freezegun import freeze_time
 
-def test_homepage(client):
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_homepage(client: Client) -> None:
     client.app.org.meta['homepage_cover'] = "<b>0xdeadbeef</b>"
     client.app.org.meta['homepage_structure'] = """
     <row-wide>
@@ -41,7 +50,7 @@ def test_homepage(client):
     </row-wide>
     <row>
         <column span="12">
-            <homepage-tiles show-title="True"/>
+            <homepage-tiles/>
         </column>
     </row>
     <row>
@@ -65,31 +74,87 @@ def test_homepage(client):
     homepage = client.get('/')
 
     assert '<b>0xdeadbeef</b>' not in homepage
-    assert 'Veranstaltungen' in homepage
-    assert 'Fokus' in homepage
-    assert 'Dienstleistungen' in homepage
+    assert 'Alle Veranstaltungen' in homepage
     assert 'admin.digital' in homepage
-    assert 'Aktuelles' in homepage
-    assert 'Alle Beiträge' in homepage
-    assert 'Ausgewählte Themen' in homepage
-    assert 'Partner' in homepage
+    assert 'Alle News' in homepage
 
-    # Test chatbot on homepage
-    assert not homepage.pyquery('.chatbot')
 
-    client.app.org.chat_customer_id = 'HEY'
-    client.app.org.chat_type = 'scoutss'
-    transaction.commit()
-    assert client.get('/').pyquery('.chat')
+def test_add_new_root_topic(client: Client) -> None:
+    # ensure a root page can be added once admin is logged-in
+    client.login_admin().follow()
 
-    editor = client.spawn()
-    editor.login_editor()
-    assert editor.get('/').pyquery('.chat')
+    page = client.get('/')
+    assert "Hinzufügen" in page
 
-    client.app.org.hide_chat_for_roles = ['admin', 'editor']
-    transaction.commit()
-    assert not editor.get('/').pyquery('.chat')
+    page = page.click('Hinzufügen')
+    page.form['title'] = 'Super Thema'
+    page = page.form.submit().follow()
+    assert page.status_code == 200
+    assert 'Das neue Thema wurde hinzugefügt' in page
+    assert page.pyquery('.callout')
+    assert page.pyquery('.success')
 
-    client.app.org.disable_chat = True
-    transaction.commit()
-    assert not client.get('/').pyquery('.chat')
+    page = client.get('/topics/super-thema')
+    assert page.status_code == 200
+    assert 'Super Thema' in page
+
+
+def test_chat_opening_hours(client: Client) -> None:
+    with freeze_time('2024-05-17 09:00'):
+        anon = client.spawn()
+        admin = client.spawn()
+        admin.login_admin().follow()
+
+        page = anon.get('/')
+        assert "Chat" not in page
+
+        settings = admin.get('/chat-settings')
+        settings.form['enable_chat'] = 'people_chat'
+        settings.form.submit()
+
+        page = anon.get('/')
+        assert "Chat" in page
+
+        # Set opening hours that include friday, 9:00
+        settings = admin.get('/chat-settings')
+        settings.form['enable_chat'] = 'people_chat'
+        settings.form['specific_opening_hours'] = True
+        settings.form['opening_hours_chat'] = '''
+            {"labels":
+                {"day": "Tag",
+                "start": "Start",
+                "end": "Ende",
+                "add": "Hinzufügen",
+                "remove": "Entfernen"},
+            "values": [
+                {"day": "4", "start": "8:00", "end": "15:00", "error": ""},
+                {"day": "6", "start": "12:00", "end": "13:00", "error": ""}
+            ]
+            }
+        '''
+        settings.form.submit()
+
+        page = anon.get('/')
+        assert "Chat" in page
+
+        # Set opening hours that exclude friday, 9:00
+        settings = admin.get('/chat-settings')
+        settings.form['enable_chat'] = 'people_chat'
+        settings.form['specific_opening_hours'] = True
+        settings.form['opening_hours_chat'] = '''
+            {"labels":
+                {"day": "Tag",
+                "start": "Start",
+                "end": "Ende",
+                "add": "Hinzufügen",
+                "remove": "Entfernen"},
+            "values": [
+                {"day": "4", "start": "13:00", "end": "15:00", "error": ""},
+                {"day": "1", "start": "08:00", "end": "10:00", "error": ""}
+            ]
+            }
+        '''
+        settings.form.submit()
+
+        page = anon.get('/')
+        assert "Chat" not in page

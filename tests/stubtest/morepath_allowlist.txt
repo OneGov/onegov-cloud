@@ -1,0 +1,34 @@
+# Error: variable differs from runtime
+# ======================
+# bound directives are very complex and can't be verified properly
+morepath\.(app\.)?App\.setting
+morepath\.(app\.)?App\.setting_section
+morepath\.(app\.)?App\.predicate_fallback
+morepath\.(app\.)?App\.predicate
+morepath\.(app\.)?App\.method
+morepath\.(app\.)?App\.converter
+morepath\.(app\.)?App\._path
+morepath\.(app\.)?App\.path
+morepath\.(app\.)?App\.permission_rule
+morepath\.(app\.)?App\.template_directory
+morepath\.(app\.)?App\.template_loader
+morepath\.(app\.)?App\.template_render
+morepath\.(app\.)?App\.view
+morepath\.(app\.)?App\.json
+morepath\.(app\.)?App\.html
+morepath\.(app\.)?App\.mount
+morepath\.(app\.)?App\.defer_links
+morepath\.(app\.)?App\.defer_class_links
+morepath\.(app\.)?App\.tween_factory
+morepath\.(app\.)?App\.identity_policy
+morepath\.(app\.)?App\.verify_identity
+morepath\.(app\.)?App\.dump_json
+morepath\.(app\.)?App\.link_prefix
+
+# Error: is not present at runtime
+# ======================
+# These __getattr__ need to be there so mypy is aware that these objects
+# can contain arbitary attributes
+morepath.settings.SettingRegistry.__getattr__
+morepath.settings.SettingSection.__getattr__
+morepath.settings.SettingSection.__setattr__

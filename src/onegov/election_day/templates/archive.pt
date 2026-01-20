@@ -3,7 +3,7 @@
      tal:define="communal_instance layout.principal.domain == 'municipality'">
     <tal:block metal:fill-slot="title">
         <tal:block condition="date">
-            <tal:block i18n:translate="">Archive</tal:block> ${date} - 
+            <tal:block i18n:translate="">Archive</tal:block> ${date} -
         </tal:block>
         ${request.app.principal.name}: <tal:block i18n:translate="">Elections &amp; Votes</tal:block>
     </tal:block>
@@ -13,7 +13,7 @@
             <tal:block i18n:translate="">Elections &amp; Votes</tal:block>
         </h1>
 
-        <hr />
+        <hr>
     </tal:block>
 
     <tal:block metal:fill-slot="content">
@@ -24,12 +24,10 @@
             </tal:block>
 
             <nav class="skip-links">
-                <ul>
-                    <a tal:repeat="date archive_items" class="show-only-on-tab" i18n:translate="" href="#date-${date}">
-                        Elections and votes on <tal:block tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
-                    </a>
-                    <a class="show-only-on-tab" href="#archive" i18n:translate="">Archive</a>
-                </ul>
+                <a tal:repeat="date archive_items" class="show-only-on-tab" i18n:translate="" href="#date-${date}">
+                    Elections and votes on <tal:block tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
+                </a>
+                <a class="show-only-on-tab" href="#archive" i18n:translate="">Archive</a>
             </nav>
 
             <div tal:repeat="date archive_items" class="date-${date}">
@@ -108,18 +106,18 @@
                             <tbody>
                                 <tr tal:repeat="election archive_items[date][domain][type]">
                                     <th tal:define="prefix election.title_prefix(request)" class="right-aligned-small">
-                                        <a href="${election.url}">
+                                        <a href="${election.adjusted_url(request)}">
                                             <span tal:condition="prefix">${prefix}: </span>
                                             <span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/>
                                         </a>
                                     </th>
-                                    <td class="right-aligned" tal:condition="election.progress[0] and not communal_instance">
+                                    <td class="right-aligned" tal:condition="election.has_results and not communal_instance">
                                         <div metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" />
                                     </td>
-                                    <td style="min-width: 25%;" i18n:translate="" colspan="2" class="right-aligned" tal:condition="not election.progress[0]">
+                                    <td style="min-width: 25%;" i18n:translate="" colspan="2" class="right-aligned" tal:condition="not election.has_results">
                                         No results yet
                                     </td>
-                                    <td class="right-aligned" tal:condition="election.progress[0]">
+                                    <td class="right-aligned" tal:condition="election.has_results">
                                         ${layout.format_date(election.last_result_change, 'datetime')}
                                     </td>
                                 </tr>
@@ -127,7 +125,7 @@
                         </table>
 
                         <table class="overview vote tablesaw" data-tablesaw-mode="stack"  tal:condition="type == 'vote'"
-                            tal:define="votes_started any(item.progress[0] for item in archive_items[date][domain][type])"
+                            tal:define="votes_started any(item.has_results for item in archive_items[date][domain][type])"
                         >
                             <thead>
                                 <tr>
@@ -145,17 +143,17 @@
                             <tbody>
                                 <tr tal:repeat="vote archive_items[date][domain][type]">
                                     <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small">
-                                        <a href="${vote.url}">
+                                        <a href="${vote.adjusted_url(request)}">
                                             <span tal:condition="prefix">${prefix}: </span>
                                             <span metal:use-macro="layout.macros['title-translation']" tal:define="item vote"/>
                                         </a>
                                     </th>
                                     <tal:block tal:switch="votes_started">
                                         <tal:block tal:case="True">
-                                            <td tal:condition="vote.progress[0]">
-                                                <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
+                                            <td tal:condition="vote.has_results">
+                                                <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request); direct vote.direct" />
                                             </td>
-                                            <td class="right-aligned" colspan="5" tal:condition="not vote.progress[0]" i18n:translate>
+                                            <td class="right-aligned" colspan="5" tal:condition="not vote.has_results" i18n:translate>
                                                 No results yet
                                             </td>
                                         </tal:block>
@@ -163,16 +161,16 @@
                                             No results yet
                                         </td>
                                     </tal:block>
-                                    <td class="right-aligned" tal:condition="vote.progress[0]">
+                                    <td class="right-aligned" tal:condition="vote.has_results">
                                             ${layout.format_number(vote.display_yeas_percentage(request))}
                                     </td>
-                                    <td class="right-aligned" tal:condition="vote.progress[0]">
+                                    <td class="right-aligned" tal:condition="vote.has_results">
                                             ${layout.format_number(vote.display_nays_percentage(request))}
                                     </td>
-                                    <td class="right-aligned" tal:condition="vote.progress[0] and not communal_instance" >
+                                    <td class="right-aligned" tal:condition="vote.has_results and not communal_instance" >
                                             <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
                                     </td>
-                                    <td class="right-aligned" tal:condition="vote.progress[0]">
+                                    <td class="right-aligned" tal:condition="vote.has_results">
                                         ${layout.format_date(vote.last_result_change, 'datetime')}
                                     </td>
                                 </tr>
@@ -194,7 +192,11 @@
                             <a tal:condition="python: str(year) != date" href="${request.link(layout.archive.for_date(year))}">${year}</a>
                         </li>
                     </ul><br>
-                    <p ><a i18n:translate href="${layout.archive_search_link}">Archive Search</a></p>
+                    <p><a i18n:translate href="${layout.archive_search_link}">Archive Search</a></p>
+                    <tal:block tal:condition="layout.last_archive_modification">
+                        <a i18n:translate href="${layout.archive_download}">
+                            Download the entire archive (Status: <tal:block tal:content="layout.format_date(layout.last_archive_modification, 'datetime')" i18n:name='date'/>)</a>
+                    </tal:block>
                 </div>
             </div>
         </div>

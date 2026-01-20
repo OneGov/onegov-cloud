@@ -1,14 +1,22 @@
+from __future__ import annotations
+
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.models import CourseSubscription, CourseAttendee, \
-    CourseEvent, Course
+from onegov.fsi.models import (
+    CourseSubscription, CourseAttendee, CourseEvent, Course)
 from onegov.user import User
 
 
-def test_locked_course_event_reservations(client_with_db):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_locked_course_event_reservations(client_with_db: Client) -> None:
     client = client_with_db
     client.login_admin()
     session = client.app.session()
     course = session.query(Course).first()
+    assert course is not None
 
     # Add a new course event
     page = client.get(f'/fsi/events/add?course_id={course.id}')
@@ -16,8 +24,8 @@ def test_locked_course_event_reservations(client_with_db):
     page.form['presenter_company'] = 'Presenter'
     page.form['presenter_email'] = 'presenter@example.org'
     page.form['locked_for_subscriptions'] = True
-    page.form['start'] = '2050-10-04 10:00'
-    page.form['end'] = '2050-10-04 12:00'
+    page.form['start'] = '2056-10-04 10:00'
+    page.form['end'] = '2056-10-04 12:00'
     page.form['location'] = 'location'
     page.form['max_attendees'] = 20
     # goes to the event created
@@ -28,16 +36,54 @@ def test_locked_course_event_reservations(client_with_db):
     # Hinzufügen - Teilnehmer als editor
     add_subscription = new.click('Teilnehmer', href='reservations', index=0)
     page = add_subscription.form.submit()
-    assert 'Diese Durchführung kann (nicht) mehr gebucht werden.' in page
+    assert 'Diese Durchführung kann nicht (mehr) gebucht werden.' in page
 
     client.login_admin()
     add_subscription = new.click('Teilnehmer', href='reservations', index=0)
     page = add_subscription.form.submit().follow()
     assert 'Neue Anmeldung wurde hinzugefügt' in page
-    assert 'Diese Durchführung kann (nicht) mehr gebucht werden.' not in page
+    assert 'Diese Durchführung kann nicht (mehr) gebucht werden.' not in page
 
 
-def test_reservation_collection_view(client_with_db):
+def test_subscription_to_a_course_event(client_with_db: Client) -> None:
+    client = client_with_db
+    client.login_admin()
+    session = client.app.session()
+    course = session.query(Course).first()
+    assert course is not None
+
+    attendee = session.query(CourseAttendee).first()
+    assert attendee is not None
+    assert attendee.user_id == session.query(User).filter_by(  # type: ignore[union-attr]
+        role='member').first().id
+    assert attendee.organisation == 'ORG'
+
+    # Add a new course event
+    page = client.get(f'/fsi/events/add?course_id={course.id}')
+    page.form['presenter_name'] = 'Presenter'
+    page.form['presenter_company'] = 'Presenter'
+    page.form['presenter_email'] = 'presenter@example.org'
+    page.form['locked_for_subscriptions'] = True
+    page.form['start'] = '2054-10-04 10:00'
+    page.form['end'] = '2054-10-04 12:00'
+    page.form['location'] = 'location'
+    page.form['max_attendees'] = 20
+    # goes to the event created
+    new = page.form.submit().follow()
+    assert 'Eine neue Durchführung wurde hinzugefügt' in new
+
+    coll = CourseEventCollection(session, upcoming_only=True)
+    events = coll.query().all()
+    assert len(events) == 3
+
+    form = client.get('/fsi/reservations/add')
+    form.form['attendee_id'] = str(attendee.id)
+    form.form['course_event_id'] = str(events[2].id)
+    page = form.form.submit().follow()
+    assert 'Neue Anmeldung wurde hinzugefügt' in page
+
+
+def test_reservation_collection_view(client_with_db: Client) -> None:
     view = '/fsi/reservations'
     client = client_with_db
     client.get(view, status=403)
@@ -51,25 +97,29 @@ def test_reservation_collection_view(client_with_db):
     assert '01.01.1950' in page
 
 
-def test_reservation_details(client_with_db):
+def test_reservation_details(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     attendee = session.query(CourseAttendee).first()
+    assert attendee is not None
     subscription = attendee.subscriptions.first()
+    assert subscription is not None
 
     view = f'/fsi/reservation/{subscription.id}'
     # This view has just the delete method
     client.get(view, status=405)
 
 
-def test_edit_reservation(client_with_db):
+def test_edit_reservation(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     subscription = session.query(CourseSubscription).filter(
         CourseSubscription.attendee_id != None).first()
+    assert subscription is not None
 
     placeholder = session.query(CourseSubscription).filter(
         CourseSubscription.attendee_id == None).first()
+    assert placeholder is not None
 
     events = session.query(CourseEvent).all()
     assert events[1].id != subscription.course_event_id
@@ -105,7 +155,7 @@ def test_edit_reservation(client_with_db):
     # Returns event.possible_subscribers, tested elsewhere
     # Planner (admin) and attendee have subscription, not editor_attendee (PE)
     # L, F is the normal attendee
-    assert options == ['L, F', 'PE, PE']
+    assert options == ['L, F, ORG', 'PE, PE']
 
     # course must be fixed
     options = [opt[2] for opt in edit.form['course_event_id'].options]
@@ -119,7 +169,7 @@ def test_edit_reservation(client_with_db):
     assert page.form['attendee_id'].value == new_id
 
 
-def test_own_reservations(client_with_db):
+def test_own_reservations(client_with_db: Client) -> None:
     client = client_with_db
     client.login_editor()
     page = client.get('/topics/informationen')
@@ -131,16 +181,18 @@ def test_own_reservations(client_with_db):
     assert 'Keine Einträge gefunden' not in page
 
 
-def test_create_delete_reservation(client_with_db):
+def test_create_delete_reservation(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
 
     attendee = session.query(CourseAttendee).first()
+    assert attendee is not None
     att_res = attendee.subscriptions.all()
     assert len(att_res) == 2
 
     # Lazy loading not possible
     member = session.query(User).filter_by(role='member').first()
+    assert member is not None
     coll = CourseEventCollection(session, upcoming_only=True)
     events = coll.query().all()
     # one of the three is past
@@ -168,7 +220,7 @@ def test_create_delete_reservation(client_with_db):
     new = client.get(view).click('Anmeldung')
 
     assert new.form['attendee_id'].options[0] == (
-        str(attendee.id), False, str(attendee))
+        str(attendee.id), False, f'{str(attendee)}, ORG')
 
     # the fixture also provides a past event which should not be an option
     options = [opt[2] for opt in new.form['course_event_id'].options]

@@ -1,26 +1,50 @@
+from __future__ import annotations
+
 import json
+import os
+from uuid import uuid4
+
+import re
 import tempfile
 import textwrap
-import transaction
 
-from datetime import datetime, date
-
-import os
 import pytest
-from pathlib import Path
-from openpyxl import load_workbook
+import transaction
+import warnings
+
+from base64 import b64decode
+from datetime import datetime, date, timedelta
+from decimal import Decimal
 from freezegun import freeze_time
+from io import BytesIO
 from libres.db.models import Reservation
-from libres.modules.errors import AffectedReservationError
+from urllib.parse import quote
 
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import module_path, normalize_for_url
+from onegov.file import FileCollection
 from onegov.form import FormSubmission
-from onegov.reservation import ResourceCollection
-from onegov.ticket import TicketCollection
 from onegov.org.models import ResourceRecipientCollection
+from onegov.pay import Payment, PaymentCollection, InvoiceCollection
+from onegov.pdf.utils import extract_pdf_info
+from onegov.reservation import Resource, ResourceCollection
+from onegov.ticket import TicketCollection, TicketInvoice
+from onegov.user import UserCollection, User
+from openpyxl import load_workbook
+from pathlib import Path
+from sqlalchemy import exc
+from sqlalchemy.orm.session import close_all_sessions
+from tests.shared.utils import add_reservation
+from unittest.mock import patch
+from webtest import Upload
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from unittest.mock import MagicMock
+    from .conftest import Client
 
 
-def test_resource_slots(client):
+def test_resource_slots(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.add("Foo", 'Europe/Zurich')
 
@@ -57,23 +81,23 @@ def test_resource_slots(client):
 
     assert result[0]['start'] == '2015-08-04T00:00:00+02:00'
     assert result[0]['end'] == '2015-08-05T00:00:00+02:00'
-    assert result[0]['className'] == 'event-in-past event-available'
+    assert result[0]['classNames'] == ['event-in-past', 'event-available']
     assert result[0]['title'] == "Ganztägig \nVerfügbar"
 
     assert result[1]['start'] == '2015-08-05T00:00:00+02:00'
     assert result[1]['end'] == '2015-08-06T00:00:00+02:00'
-    assert result[1]['className'] == 'event-in-past event-available'
+    assert result[1]['classNames'] == ['event-in-past', 'event-available']
     assert result[1]['title'] == "Ganztägig \nVerfügbar"
 
     url = '/resource/foo/slots?start=2015-08-06&end=2015-08-06'
     result = client.get(url).json
 
     assert len(result) == 1
-    assert result[0]['className'] == 'event-in-past event-unavailable'
+    assert result[0]['classNames'] == ['event-in-past', 'event-unavailable']
     assert result[0]['title'] == "12:00 - 16:00 \nBesetzt"
 
 
-def test_resources(client):
+def test_resources(client: Client) -> None:
     client.login_admin()
 
     resources = client.get('/resources')
@@ -84,37 +108,148 @@ def test_resources(client):
     assert 'Beamer' in resource
     edit = resource.click('Bearbeiten')
     edit.form['title'] = 'Beamers'
-    edit.form.submit().follow()
+    edit.form.submit()
 
     new = resources.click('Raum')
-    new.form['title'] = 'Meeting Room'
+    new.form['title'] = 'Meeting Room 1'
+    new.form['group'] = 'Office'
+    new.form['subgroup'] = 'Big Meeting Room'
     resource = new.form.submit().follow()
 
     assert 'calendar' in resource
-    assert 'Meeting Room' in resource
+    assert 'Meeting Room 1' in resource
 
     edit = resource.click('Bearbeiten')
-    edit.form['title'] = 'Besprechungsraum'
+    edit.form['title'] = 'Besprechungsraum 1'
     edit.form.submit()
 
+    new = resources.click('Raum')
+    new.form['title'] = 'Meeting Room 2'
+    new.form['group'] = 'Office'
+    new.form['subgroup'] = 'Big Meeting Room'
+    resource = new.form.submit()
+
+    new = resources.click('Raum')
+    new.form['title'] = 'Meeting Room 3'
+    new.form['group'] = 'Office'
+    new.form['subgroup'] = 'Big Meeting Room'
+    resource = new.form.submit()
+
+    # name collisions between titles and subgroups are fine
+    new = resources.click('Raum')
+    new.form['title'] = 'Big Meeting Room'
+    new.form['group'] = 'Office'
+    resource = new.form.submit()
+
+    new = resources.click('Raum')
+    new.form['title'] = 'Concert Hall'
+    resource = new.form.submit()
+
     resources = client.get('/resources')
-    assert 'Besprechungsraum' in resources
+    assert 'Besprechungsraum 1' in resources
+    assert 'Meeting Room 2' in resources
+    assert 'Meeting Room 3' in resources
+    assert 'Big Meeting Room' in resources
+    assert 'Office' in resources
+    assert 'Allgemein' in resources
     assert 'Beamers' in resources
 
     # Check warning duplicate
     duplicate = resources.click('Raum')
-    duplicate.form['title'] = 'Meeting Room'
+    duplicate.form['title'] = 'Meeting Room 1'
     page = new.form.submit()
     assert "Eine Resource mit diesem Namen existiert bereits" in page
 
-    resource = client.get('/resource/meeting-room')
+    resource = client.get('/resource/meeting-room-1')
     delete_link = resource.pyquery('a.delete-link').attr('ic-delete-from')
 
     assert client.delete(delete_link, status=200)
 
 
+def test_resources_person_link_extension(client: Client) -> None:
+    client.login_admin()
+
+    # add person
+    people_page = client.get('/people')
+    new_person_page = people_page.click('Person')
+    assert "Neue Person" in new_person_page
+
+    new_person_page.form['first_name'] = 'Franz'
+    new_person_page.form['last_name'] = 'Müller'
+    new_person_page.form['function'] = 'Gemeindeschreiber'
+
+    page = new_person_page.form.submit()
+    assert page.location is not None
+    person_uuid = page.location.split('/')[-1]
+    page = page.follow()
+    assert 'Müller Franz' in page
+
+    # add resource
+    resources = client.get('/resources')
+    new_item = resources.click('Gegenstand')
+    new_item.form['title'] = 'Dorf Bike'
+    new_item.form['western_name_order'] = False
+    new_item.form['people-0-person'] = person_uuid
+    resource = new_item.form.submit().follow()
+    assert 'Dorf Bike' in resource
+    assert 'Müller Franz' in resource
+
+    edit_resource = resource.click('Bearbeiten')
+    edit_resource.form['western_name_order'] = True
+    resource = edit_resource.form.submit().follow()
+    assert 'Franz Müller' in resource
+
+
+def test_resources_explicitly_link_referenced_files(client: Client) -> None:
+    admin = client.spawn()
+    admin.login_admin()
+
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    with open(path, 'rb') as f:
+        page = admin.get('/files')
+        page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
+        page.form.submit()
+
+    pdf_url = (
+        admin.get('/files')
+        .pyquery('[ic-trigger-from="#button-1"]')
+        .attr('ic-get-from')
+        .removesuffix('/details')
+    )
+    pdf_link = f'<a href="{pdf_url}">Sample.pdf</a>'
+
+    editor = client.spawn()
+    editor.login_editor()
+
+    # add resource
+    resources = editor.get('/resources')
+    new_item = resources.click('Gegenstand')
+    new_item.form['title'] = 'Dorf Bike'
+    new_item.form['text'] = pdf_link
+    resource_page = new_item.form.submit().follow()
+    assert 'Dorf Bike' in resource_page
+
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
+    resource = (
+        ResourceCollection(client.app.libres_context).query()
+        .filter(Resource.title == 'Dorf Bike').one()
+    )
+    assert resource.files == [pdf]
+    assert pdf.access == 'public'
+
+    resource.access = 'mtan'  # type: ignore[attr-defined]
+    session.flush()
+    assert pdf.access == 'mtan'
+
+    # link removed
+    resource.files = []
+    session.flush()
+    assert pdf.access == 'secret'
+
+
 @freeze_time("2020-01-01", tick=True)
-def test_find_your_spot(client):
+def test_find_your_spot(client: Client) -> None:
     client.login_admin()
 
     resources = client.get('/resources')
@@ -199,52 +334,161 @@ def test_find_your_spot(client):
     assert '05.01.2020' in result
     assert '06.01.2020' in result
 
+    # create a blocked and an unblocked allocation
+    transaction.begin()
 
-def add_reservation(
-    resource,
-    client,
-    start,
-    end,
-    email=None,
-    partly_available=True,
-    reserve=True,
-    approve=True,
-    add_ticket=True
-):
-    if not email:
-        email = f'{resource.name}@example.org'
+    scheduler_1 = (
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
+        .by_name('meeting-1')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler_1.allocate(
+        dates=(
+            (datetime(2020, 1, 1), datetime(2020, 1, 1)),
+            (datetime(2020, 1, 2), datetime(2020, 1, 2)),
+            (datetime(2020, 1, 3), datetime(2020, 1, 3)),
+            (datetime(2020, 1, 4), datetime(2020, 1, 4)),
+        ),
+        whole_day=True,
+        partly_available=True
+    )
 
-    allocation = resource.scheduler.allocate(
-        (start, end),
-        partly_available=partly_available,
-    )[0]
+    scheduler_2 = (
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
+        .by_name('meeting-2')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler_2.allocate(
+        dates=(
+            (datetime(2020, 1, 1), datetime(2020, 1, 1)),
+            (datetime(2020, 1, 2), datetime(2020, 1, 2)),
+            (datetime(2020, 1, 3), datetime(2020, 1, 3)),
+            (datetime(2020, 1, 5), datetime(2020, 1, 5)),
+        ),
+        whole_day=True,
+        partly_available=True
+    )
 
-    if reserve:
-        resource_token = resource.scheduler.reserve(
-            email,
-            (allocation.start, allocation.end),
-        )
+    transaction.commit()
 
-    if reserve and approve:
-        resource.scheduler.approve_reservations(resource_token)
-        if add_ticket:
-            with client.app.session().no_autoflush:
-                tickets = TicketCollection(client.app.session())
-                tickets.open_ticket(
-                    handler_code='RSV', handler_id=resource_token.hex
-                )
-    return resource
+    # force client to open a fresh session that includes our
+    # newly added allocations
+    close_all_sessions()
+
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_first_day'
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 1
+    reservation = result['reservations'][0]
+    assert reservation['resource'] == 'meeting-1'
+    assert reservation['date'].startswith('2020-01-01')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    # resubmitting doesn't add a reservation or change the existing one
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 1
+    reservation = result['reservations'][0]
+    assert reservation['resource'] == 'meeting-1'
+    assert reservation['date'].startswith('2020-01-01')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_every_day'
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 5
+    for idx, reservation in enumerate(result['reservations'][:-1]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+    # the final reservation only works for the other room
+    reservation = result['reservations'][-1]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-05')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    # resubmitting doesn't change anything
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 5
+    for idx, reservation in enumerate(result['reservations'][:-1]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+    # the final reservation only works for the other room
+    reservation = result['reservations'][-1]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-05')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_every_room'
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 8
+    for idx, reservation in enumerate(result['reservations'][::2]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+
+    for idx, reservation in enumerate(result['reservations'][1:-1:2]):
+        assert reservation['resource'] == 'meeting-2'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+    reservation = result['reservations'][-1]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-05')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    # resubmitting also doesn't change anything here
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 8
+    for idx, reservation in enumerate(result['reservations'][::2]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+
+    for idx, reservation in enumerate(result['reservations'][1:-1:2]):
+        assert reservation['resource'] == 'meeting-2'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+    reservation = result['reservations'][-1]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-05')
+    assert reservation['time'] == '07:00 - 08:00'
 
 
-def test_resource_room_deletion(client):
+def test_resource_room_deletion(client: Client) -> None:
     # TicketMessage.create(ticket, request, 'opened')
     resources = ResourceCollection(client.app.libres_context)
     foyer = resources.add('Foyer', 'Europe/Zurich', type='room')
 
     # Adds allocations and reservations in the past
     add_reservation(
-        foyer, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
-    assert foyer.deletable
+        foyer,
+        client.app.session(),
+        datetime(2017, 1, 6, 12),
+        datetime(2017, 1, 6, 16),
+    )
+    assert foyer.deletable  # type: ignore[attr-defined]
     transaction.commit()
 
     client.login_admin()
@@ -259,7 +503,152 @@ def test_resource_room_deletion(client):
     assert ticket.state == 'closed'
 
 
-def test_reserved_resources_fields(client):
+def test_resource_room_deletion_with_future_reservation_file_and_payment(
+    client: Client,
+) -> None:
+    session = client.app.session()
+    resources = ResourceCollection(client.app.libres_context)
+    tickets = TicketCollection(session)
+    users = UserCollection(session)
+    admin = users.query().filter(User.role == 'admin').first()
+    assert admin
+    files = FileCollection(session)
+
+    daypass = resources.add('Daypass', 'Europe/Zurich', type='daypass')
+    add_reservation(
+        daypass,
+        session,
+        datetime(2037, 11, 6, 12),
+        datetime(2037, 11, 6, 16),
+    )
+    readme_file = files.add('readme', b'content.', published=True)
+    daypass.files = [readme_file]
+
+    hall = resources.add('Town Hall', 'Europe/Zurich', type='room')
+    hall.pricing_method = 'per_item'
+    hall.price_per_hour = 999.00
+    hall.payment_method = 'manual'
+    add_reservation(
+        hall,
+        session,
+        datetime(2038, 11, 6, 12),
+        datetime(2038, 11, 6, 16),
+    )
+
+    lopper = resources.add('Lopper', 'Europe/Zurich', type='daily-item')
+    add_reservation(
+        lopper,
+        session,
+        datetime(2039, 11, 6, 12),
+        datetime(2039, 11, 6, 16),
+    )
+
+    transaction.commit()
+
+    assert resources.query().count() == 5  # as two are by default
+    resource_titles = [r.title for r in resources.query().all()]
+    assert 'Daypass' in resource_titles
+    assert 'Town Hall' in resource_titles
+    assert 'Lopper' in resource_titles
+    resource = resources.query().filter_by(title='Daypass').first()
+    assert resource and resource.files[0].name == 'readme'
+
+    for ticket in tickets.query().all():
+        assert ticket.state == 'open'
+        ticket.accept_ticket(admin)
+
+        if 'Town Hall' in ticket.group:
+            # ticket.payment = ManualPayment(
+            ticket.payment = Payment(
+                source='manual',
+                amount=Decimal(999),
+                currency='CHF',
+                state='paid'
+            )
+            invoice = TicketInvoice(id=uuid4())
+            session.add(invoice)
+            ticket.invoice = invoice
+            invoice_item = ticket.invoice.add(
+                text='Town Hall Cleaning',
+                group='manual',
+                kind='surcharge',
+                cost_object='Town Hall',
+                unit=Decimal(100)
+            )
+            invoice_item.payment_date = date.today()
+            invoice_item.payments.append(ticket.payment)
+            invoice_item.paid = ticket.payment.state == 'paid'
+
+        if 'Daypass' in ticket.group:
+            ticket.payment = Payment(
+                source='stripe_connect',
+                amount=Decimal(10),
+                currency='CHF',
+                state='open'
+            )
+            invoice = TicketInvoice(id=uuid4())
+            session.add(invoice)
+            ticket.invoice = invoice
+            invoice_item = ticket.invoice.add(
+                text='Daypass Discount',
+                group='manual',
+                kind='discount',
+                cost_object='Daypass',
+                unit=Decimal(1)
+            )
+            invoice_item.payment_date = date.today()
+            invoice_item.payments.append(ticket.payment)
+            invoice_item.paid = ticket.payment.state == 'paid'
+
+    transaction.commit()
+
+    assert PaymentCollection(session).query().count() == 2
+    assert InvoiceCollection(session).query().count() == 2
+    assert InvoiceCollection(session).query_items().count() == 2
+
+    tickets = TicketCollection(session)
+    for index, ticket in enumerate(tickets.query().all()):
+        assert ticket.state == 'pending'
+        assert not ticket.snapshot
+
+        if 'Daypass' in ticket.group:
+            assert ticket.payment and ticket.payment.paid is False
+        if 'Town Hall' in ticket.group:
+            assert ticket.payment and ticket.payment.paid is True
+        if 'Lopper' in ticket.group:
+            assert ticket.payment is None
+
+    # delete resource
+    client.login_admin()
+    for resource_title in ['Daypass', 'Town Hall', 'Lopper']:
+        page = client.get('/resources').click(resource_title)
+        delete_link = page.pyquery('a.delete-link').attr('ic-delete-from')
+        assert delete_link
+        assert client.delete(delete_link, status=200)
+        page = client.get('/resources')
+        assert resource_title not in page.pyquery('a.list-title').text()
+
+    assert resources.query().count() == 2  # as two are by default
+
+    # check if the tickets have been closed
+    tickets = TicketCollection(client.app.session())
+    for index, ticket in enumerate(tickets.query().all()):
+        assert ticket.state == 'closed'
+        assert ticket.snapshot is not None
+
+        if 'Daypass' in ticket.group:
+            assert ticket.payment is None
+        if 'Town Hall' in ticket.group:
+            assert ticket.payment is None
+        if 'Lopper' in ticket.group:
+            assert ticket.payment is None
+
+    assert PaymentCollection(session).query().count() == 0
+    assert InvoiceCollection(session).query().count() == 0
+    assert InvoiceCollection(session).query_items().count() == 0
+
+
+def test_reserved_resources_fields(client: Client) -> None:
     client.login_admin()
 
     room = client.get('/resources').click('Raum')
@@ -277,7 +666,7 @@ def test_reserved_resources_fields(client):
     assert "Meeting Room" in room
 
 
-def test_allocations(client):
+def test_allocations(client: Client) -> None:
     client.login_admin()
     items = client.get('/resources').click('Gegenstand')
     items.form['title'] = 'Beamer'
@@ -285,10 +674,11 @@ def test_allocations(client):
 
     # create new beamer allocation
     new = client.get((
-        '/resource/beamer/new-allocation'
-        '?start=2015-08-04&end=2015-08-05'
+        '/resource/beamer/new-rule'
     ))
-
+    new.form['title'] = 'Period 1'
+    new.form['start'] = '2015-08-04'
+    new.form['end'] = '2015-08-05'
     new.form['items'] = 1
     new.form['item_limit'] = 1
     new.form.submit()
@@ -317,10 +707,11 @@ def test_allocations(client):
 
     # create a new daypass allocation
     new = client.get((
-        '/resource/tageskarte/new-allocation'
-        '?start=2015-08-04&end=2015-08-05'
+        '/resource/tageskarte/new-rule'
     ))
-
+    new.form['title'] = 'Period 2'
+    new.form['start'] = '2015-08-04'
+    new.form['end'] = '2015-08-05'
     new.form['daypasses'] = 1
     new.form['daypasses_limit'] = 1
     new.form.submit()
@@ -346,18 +737,6 @@ def test_allocations(client):
 
     assert len(slots.json) == 1
     assert slots.json[0]['title'] == "Ganztägig \n2 Verfügbar"
-
-    # try to create a new allocation over an existing one
-    new = client.get((
-        '/resource/tageskarte/new-allocation'
-        '?start=2015-08-04&end=2015-08-04'
-    ))
-
-    new.form['daypasses'] = 1
-    new.form['daypasses_limit'] = 1
-    new = new.form.submit()
-
-    assert "Es besteht bereits eine Einteilung im gewünschten Zeitraum" in new
 
     # move the existing allocations
     slots = client.get((
@@ -404,7 +783,7 @@ def test_allocations(client):
     assert len(slots.json) == 0
 
 
-def test_allocation_times(client):
+def test_allocation_times(client: Client) -> None:
     client.login_admin()
 
     new = client.get('/resources').click('Raum')
@@ -412,12 +791,13 @@ def test_allocation_times(client):
     new.form.submit()
 
     # 12:00 - 00:00
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '12:00'
     new.form['end_time'] = '00:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get(
@@ -429,12 +809,13 @@ def test_allocation_times(client):
     assert slots.json[0]['end'] == '2015-08-21T00:00:00+02:00'
 
     # 00:00 - 02:00
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2015-08-22'
     new.form['end'] = '2015-08-22'
     new.form['start_time'] = '00:00'
     new.form['end_time'] = '02:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get(
@@ -446,12 +827,13 @@ def test_allocation_times(client):
     assert slots.json[0]['end'] == '2015-08-22T02:00:00+02:00'
 
     # 12:00 - 00:00 over two days
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 3'
     new.form['start'] = '2015-08-24'
     new.form['end'] = '2015-08-25'
     new.form['start_time'] = '12:00'
     new.form['end_time'] = '00:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get(
@@ -465,7 +847,7 @@ def test_allocation_times(client):
     assert slots.json[1]['end'] == '2015-08-26T00:00:00+02:00'
 
 
-def test_allocation_visibility(client):
+def test_allocation_visibility(client: Client) -> None:
     client.login_admin()
 
     new = client.get('/resources').click('Raum')
@@ -473,32 +855,35 @@ def test_allocation_visibility(client):
     new.form.submit()
 
     # 12:00 - 14:00 private
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '12:00'
     new.form['end_time'] = '14:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form['access'] = 'private'
     new.form.submit()
 
     # 14:00 - 16:00 member
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '14:00'
     new.form['end_time'] = '16:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form['access'] = 'member'
     new.form.submit()
 
     # 16:00 - 18:00 public
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 3'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '16:00'
     new.form['end_time'] = '18:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form['access'] = 'public'
     new.form.submit()
 
@@ -538,7 +923,7 @@ def test_allocation_visibility(client):
     assert slots.json[0]['end'] == '2015-08-20T18:00:00+02:00'
 
 
-def test_allocation_holidays(client):
+def test_allocation_holidays(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/holiday-settings')
@@ -550,13 +935,14 @@ def test_allocation_holidays(client):
     page.form['title'] = 'Foo'
     page.form.submit()
 
-    new = client.get('/resource/foo/new-allocation')
+    new = client.get('/resource/foo/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['on_holidays'] = 'yes'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
@@ -572,13 +958,14 @@ def test_allocation_holidays(client):
     page.form['title'] = 'Bar'
     page.form.submit()
 
-    new = client.get('/resource/bar/new-allocation')
+    new = client.get('/resource/bar/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['on_holidays'] = 'no'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
@@ -589,7 +976,7 @@ def test_allocation_holidays(client):
     assert slots.json[2]['start'].startswith('2019-08-02')
 
 
-def test_allocation_school_holidays(client):
+def test_allocation_school_holidays(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/holiday-settings')
@@ -601,13 +988,14 @@ def test_allocation_school_holidays(client):
     page.form['title'] = 'Foo'
     page.form.submit()
 
-    new = client.get('/resource/foo/new-allocation')
+    new = client.get('/resource/foo/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['during_school_holidays'] = 'yes'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
@@ -623,13 +1011,14 @@ def test_allocation_school_holidays(client):
     page.form['title'] = 'Bar'
     page.form.submit()
 
-    new = client.get('/resource/bar/new-allocation')
+    new = client.get('/resource/bar/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['during_school_holidays'] = 'no'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
@@ -640,10 +1029,11 @@ def test_allocation_school_holidays(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_auto_accept_reservations(client):
+def test_auto_accept_reservations(client: Client) -> None:
     # prepare the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.definition = 'Note = ___'
     resource.pick_up = 'You can pick it up at the counter'
     scheduler = resource.get_scheduler(client.app.libres_context)
@@ -679,8 +1069,16 @@ def test_auto_accept_reservations(client):
     assert 'Die Reservationen wurden angenommen' in page
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
-    assert 'Ihre Reservationen wurden angenommen' in message['Subject']
+    assert message is not None
+    assert 'Ihre Reservationen wurden bestätigt' in message['Subject']
     assert 'Foobar' in message['TextBody']
+    assert message['Attachments']
+    _, pdf_content = extract_pdf_info(BytesIO(
+        b64decode(message['Attachments'][0]['Content'])
+    ))
+    assert 'Tageskarte' in pdf_content
+    assert '28.08.2015' in pdf_content
+    assert 'Ganztägig' in pdf_content
 
     # close the ticket and check not email is sent
     tickets = client.get('/tickets/ALL/closed')
@@ -688,15 +1086,88 @@ def test_auto_accept_reservations(client):
 
     # Test display of status page of ticket
     # Generic message, shown when ticket is open or closed
-    assert 'Falls Sie Dokumente über den Postweg' not in page
+    assert 'Ihre Anfrage wurde erfolgreich abgeschlossen' not in page
     assert 'You can pick it up at the counter' in page
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_allocation(client):
+def test_blocker_views(client: Client) -> None:
+    # prepare the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.definition = 'Note = ___'
+    resource.pick_up = 'You can pick it up at the counter'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 29), datetime(2015, 8, 29)),
+        whole_day=True,
+        partly_available=True
+    )
+
+    add_blocker = client.bound_add_blocker(allocations[0])
+    transaction.commit()
+
+    client.login_admin()
+
+    # create a blocker
+    result = add_blocker(whole_day=True, reason='Cleaning')
+    assert result.json == {'success': True}
+
+    blocker = scheduler.managed_blockers().one()
+    assert blocker.reason == 'Cleaning'
+
+    # change the reason
+    client.post(
+        f'/reservation-blocker/{blocker.resource}/{blocker.id}/set-reason'
+        f'?blocker-id={blocker.id}&reason=No+reason'
+        f'&csrf-token={client.csrf_token}'
+    )
+
+    blocker = scheduler.managed_blockers().one()
+    assert blocker.reason == 'No reason'
+
+    # adjust the time
+    new_start = blocker.display_start() + timedelta(hours=1)
+    new_end = blocker.display_end() - timedelta(hours=1)
+    result = client.post(
+        f'/reservation-blocker/{blocker.resource}/{blocker.id}/adjust'
+        f'?blocker-id={blocker.id}&start={quote(new_start.isoformat())}'
+        f'&end={quote(new_end.isoformat())}&csrf-token={client.csrf_token}'
+    )
+    assert result.json == {'success': True}
+
+    blocker = scheduler.managed_blockers().one()
+    assert blocker.display_start() == new_start
+    assert blocker.display_end() == new_end
+
+    # delete the blocker
+    client.delete(
+        f'/reservation-blocker/{blocker.resource}/{blocker.id}'
+        f'?csrf-token={client.csrf_token}'
+    )
+    assert scheduler.managed_blockers().one_or_none() is None
+
+
+@pytest.mark.parametrize(
+    'reject_type', ['reject-all', 'reject-all-with-message']
+)
+@freeze_time("2015-08-28", tick=True)
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_reserve_allocation(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+    reject_type: str
+) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.definition = 'Note = ___'
     scheduler = resource.get_scheduler(client.app.libres_context)
 
@@ -749,10 +1220,18 @@ def test_reserve_allocation(client):
 
     assert len(slots.json) == 1
 
-    with pytest.raises(AffectedReservationError):
-        client.delete(client.extract_href(slots.json[0]['actions'][3]))
+    response = client.delete(client.extract_href(slots.json[0]['actions'][3]))
+    result = json.loads(response.headers['X-IC-Trigger-Data'])
+    assert result == {
+        'success': False,
+        'message': (
+            "Eine bestehende Reservation wäre von der gewünschten Änderung "
+            "betroffen."
+        )
+    }
 
     # open the created ticket
+    client.login_supporter()
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
     assert 'Foobar' in ticket
@@ -771,6 +1250,13 @@ def test_reserve_allocation(client):
     assert '28. August 2015' in message
     assert '4' in message
 
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
+
     # edit its details
     details = ticket.click('Details bearbeiten')
     details.form['note'] = '0xdeadbeef'
@@ -782,8 +1268,16 @@ def test_reserve_allocation(client):
     assert client.app.session().query(Reservation).count() == 1
     assert client.app.session().query(FormSubmission).count() == 1
 
-    link = ticket.pyquery('a.delete-link')[0].attrib['ic-get-from']
-    ticket = client.get(link).follow()
+    if reject_type == 'reject-all':
+        link = ticket.pyquery('a.delete-link')[0].attrib['ic-get-from']
+        ticket = client.get(link).follow()
+    elif reject_type == 'reject-all-with-message':
+        link = ticket.pyquery('a.delete-link')[1].attrib['href']
+        comment = client.get(link)
+        comment.form['text'] = 'Sorry!'
+        ticket = comment.form.submit().follow()
+    else:
+        raise AssertionError('Unknown reject type')
 
     assert client.app.session().query(Reservation).count() == 0
     assert client.app.session().query(FormSubmission).count() == 0
@@ -807,10 +1301,88 @@ def test_reserve_allocation(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_allocation_partially(client):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_reserve_with_tag(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.definition = 'Note = ___'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+        quota=4,
+        quota_limit=4
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    client.login_admin()
+
+    settings = client.get('/ticket-settings')
+    settings.form['ticket_tags'] = (
+        '- Test 1:\n'
+        '    Note: Default Note\n'
+        '    Foo: Bar\n'
+        '- Test 2:\n'
+        '    Foo: Baz\n'
+    )
+    settings.form.submit().follow()
+
+    # create a reservation
+    result = reserve(quota=4, whole_day=True)
+    assert result.json == {'success': True}
+    assert result.headers['X-IC-Trigger'] == 'rc-reservations-changed'
+
+    # and fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['ticket_tag'] = 'Test 1'
+    formular.form['email'] = 'info@example.org'
+    formular.form['note'] = 'Foobar'
+    formular.form.submit().follow().form.submit().follow()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert 'RSV-' in ticket.text
+    assert '<dt>Foo</dt><dd>Bar</dd>' in ticket.text
+    assert '<dt>Foo</dt><dd>Baz</dd>' not in ticket.text
+    assert 'Test 1' in ticket.text
+    assert 'Test 2' not in ticket.text
+    assert 'Foobar' in ticket.text
+    assert 'Default Note' not in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # make sure the resulting reservation has no session_id set
+    ids = [r.session_id for r in scheduler.managed_reservations()]
+    assert not any(ids)
+
+    # change the selected tag
+    change_tag = ticket.click(href='change-tag')
+    change_tag.form['tag'] = 'Test 2'
+    ticket = change_tag.form.submit().follow()
+    assert '<dt>Foo</dt><dd>Bar</dd>' not in ticket.text
+    assert '<dt>Foo</dt><dd>Baz</dd>' in ticket.text
+    assert 'Test 1' not in ticket.text
+    assert 'Test 2' in ticket.text
+    assert 'Foobar' in ticket.text
+    assert 'Default Note' not in ticket.text
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reserve_allocation_partially(client: Client) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -859,10 +1431,520 @@ def test_reserve_allocation_partially(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_no_definition_pick_up_hint(client):
+def test_reserve_allocation_change_email(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert ticket.pyquery('.ticket-submitter-email a').text() == (
+        'info@example.org')
+
+    # change the email
+    client.post(
+        ticket.pyquery('.ticket-submitter-email').attr('data-edit'),
+        {'email': 'new@example.org'}
+    )
+    ticket = client.get(ticket.request.url)
+    assert 'E-Mail Adresse des Antragstellers geändert' in ticket
+    assert ticket.pyquery('.ticket-submitter-email a').text() == (
+        'new@example.org')
+
+
+# NOTE: We're at UTC+2 in summertime in Europe/Zurich
+@freeze_time("2015-08-28 07:15:00", tick=True)
+def test_reserve_allocation_adjustment_pre_acceptance(client: Client) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 9), datetime(2015, 8, 28, 13)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert "info@example.org" in ticket
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "Anpassen" in ticket
+
+    # try an invalid adjustment
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['end_time'] = '13:05'
+    adjust = adjust.form.submit()
+    assert 'Zeitraum liegt ausserhalb' in adjust
+
+    # try another invalid adjustment
+    adjust.form['start_time'] = '09:00'
+    adjust.form['end_time'] = '12:00'
+    adjust = adjust.form.submit()
+    assert 'kann nicht in die Vergangenheit verschoben werden' in adjust
+
+    # adjust it (valid this time)
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '11:00'
+    ticket = adjust.form.submit().follow()
+    assert "10:00" in ticket
+    assert "11:00" in ticket
+
+    # accept it
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+
+    message = client.get_email(1)['TextBody']
+    assert "Tageskarte" in message
+    assert "28. August 2015" in message
+    assert "10:00" in message
+    assert "11:00" in message
+
+    # see if the slots are partitioned correctly
+    url = '/resource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
+    slots = client.get(url).json
+    assert slots[0]['partitions'] == [
+        [25.0, False], [25.0, True], [50.0, False]
+    ]
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reserve_allocation_adjustment_post_acceptance(client: Client) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert "info@example.org" in ticket
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "Anpassen" in ticket
+
+    # accept it
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+
+    # it can still be adjusted
+    assert 'Anpassen' in ticket
+    adjust = ticket.click('Anpassen', index=0)
+    # but there is a warning
+    assert 'Diese Reservation wurde bereits angenommen' in adjust
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '11:00'
+    ticket = adjust.form.submit().follow()
+    assert "10:00" in ticket
+    assert "11:00" in ticket
+
+    # see if the slots are partitioned correctly
+    url = '/resource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
+    slots = client.get(url).json
+    assert slots[0]['partitions'] == [[25.0, True], [75.0, False]]
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reserve_allocation_adjustment_invoice_change(client: Client) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.pricing_method = 'per_hour'
+    resource.price_per_hour = 10.00
+    resource.payment_method = 'manual'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert "info@example.org" in ticket
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "Anpassen" in ticket
+    assert "20.00" in ticket
+
+    # adjust it
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '11:00'
+    ticket = adjust.form.submit().follow()
+    assert "10:00" in ticket
+    assert "11:00" in ticket
+    assert "10.00" in ticket
+
+    # mark as paid
+    assert ticket.pyquery('.payment-state').text() == "Offen"
+    client.post(ticket.pyquery('.mark-as-paid').attr('ic-post-to'))
+    ticket = client.get(ticket.request.url)
+
+    # try to adjust it again (invalid since it changes the price)
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '12:00'
+    adjust = adjust.form.submit()
+    assert 'die Zahlung ist nicht mehr offen' in adjust
+
+    # try a valid adjustment that doesn't change the price
+    adjust.form['start_time'] = '11:00'
+    adjust.form['end_time'] = '12:00'
+    ticket = adjust.form.submit().follow()
+    assert "11:00" in ticket
+    assert "12:00" in ticket
+    assert "10.00" in ticket
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reserve_allocation_add_reservation_invoice_change(
+    client: Client
+) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('konferenzraum')
+    assert resource is not None
+    resource.pricing_method = 'per_hour'
+    resource.price_per_hour = 10.00
+    resource.payment_method = 'manual'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=[
+            (datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 12)),
+            (datetime(2015, 8, 28, 12), datetime(2015, 8, 28, 14)),
+            (datetime(2015, 8, 28, 14), datetime(2015, 8, 28, 16)),
+        ],
+        whole_day=False,
+        partly_available=False
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/konferenzraum/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert "info@example.org" in ticket
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "20.00" in ticket
+
+    # accept it
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+
+    # try to add a second reservation (invalid time range)
+    add = ticket.click('Reservation hinzufügen', index=0)
+    add.form['date'] = '2015-08-28'
+    add.form['whole_day'] = 'yes'
+    assert 'kann nicht teilweise reserviert werden' in add.form.submit()
+
+    # actually add a second reservation
+    add = ticket.click('Reservation hinzufügen', index=0)
+    add.form['date'] = '2015-08-28'
+    add.form['whole_day'] = 'no'
+    add.form['start_time'] = '12:00'
+    add.form['end_time'] = '14:00'
+    ticket = add.form.submit().follow()
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "14:00" in ticket
+    assert "40.00" in ticket
+    # the new reservation should already have been accepted
+    assert 'Alle Reservationen annehmen' not in ticket
+
+    # mark as paid
+    assert ticket.pyquery('.payment-state').text() == "Offen"
+    client.post(ticket.pyquery('.mark-as-paid').attr('ic-post-to'))
+    ticket = client.get(ticket.request.url)
+
+    # try to add a third reservation
+    add = ticket.click('Reservation hinzufügen', index=0)
+    add.form['date'] = '2015-08-28'
+    add.form['whole_day'] = 'no'
+    add.form['start_time'] = '14:00'
+    add.form['end_time'] = '16:00'
+    assert 'die Zahlung ist nicht mehr offen' in add.form.submit()
+
+
+@freeze_time("2015-08-28", tick=True)
+@patch('onegov.pay.models.payment.Payment.sync')
+def test_reject_reservation_price_change(
+    sync: MagicMock,
+    client: Client
+) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.pricing_method = 'per_item'
+    resource.price_per_item = 10.00
+    resource.payment_method = 'manual'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create three reservations
+    assert reserve('10:00', '10:30').json == {'success': True}
+    assert reserve('11:00', '11:30').json == {'success': True}
+    assert reserve('12:00', '12:30').json == {'success': True}
+
+    # and fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_supporter()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert '28. August 2015' in ticket
+    assert '10:00' in ticket
+    assert '10:30' in ticket
+    assert '11:00' in ticket
+    assert '11:30' in ticket
+    assert '12:00' in ticket
+    assert '12:30' in ticket
+    assert '30.00' in ticket
+
+    # reject the final reservation
+    assert client.app.session().query(Reservation).count() == 3
+    link = ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from']
+    ticket = client.get(link).follow()
+
+    assert client.app.session().query(Reservation).count() == 2
+    assert '10:00' in ticket
+    assert '10:30' in ticket
+    assert '11:00' in ticket
+    assert '11:30' in ticket
+    assert '20.00' in ticket
+
+    # mark as paid
+    assert ticket.pyquery('.payment-state').text() == "Offen"
+    client.post(ticket.pyquery('.mark-as-paid').attr('ic-post-to'))
+    ticket = client.get(ticket.request.url)
+
+    # try to delete again (payment needs to be open or refunded)
+    link = ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from']
+    ticket = client.get(link).follow()
+    assert 'Zahlung muss rückgängig gemacht werden' in ticket
+
+    # but if it changes the price even an open payment should
+    # result it in an error, if it's not a manual payment
+    payment = client.app.session().query(Payment).one()
+    # HACK: change type of payment to generic so it isn't treated
+    #       like a manual payment, even though it's also not an
+    #       online payment, we monkeypatch `Payment.sync` so it
+    #       doesn't raise. We would still need to monkeypatch
+    #       the `sync` of `StripePayment` & co. so this seems safer
+    payment.source = 'generic'
+    payment.state = 'open'
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            action='ignore',
+            message=r'Flushing object',
+            category=exc.SAWarning
+        )
+        transaction.commit()
+    close_all_sessions()
+    link = ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from']
+    ticket = client.get(link).follow()
+    assert 'die Zahlung ist nicht mehr offen' in ticket
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_send_reservation_summary(client: Client) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(
+            (datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+            (datetime(2015, 8, 29, 10), datetime(2015, 8, 29, 14)),
+        ),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve1 = client.bound_reserve(allocations[0])
+    reserve2 = client.bound_reserve(allocations[1])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve1('10:00', '12:00').json == {'success': True}
+    assert reserve2('10:30', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert "info@example.org" in ticket
+    assert "28. August 2015" in ticket
+    assert "29. August 2015" in ticket
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "Anpassen" in ticket
+
+    # adjust the first reservation
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '11:00'
+    ticket = adjust.form.submit().follow()
+    assert "10:00" in ticket
+    assert "11:00" in ticket
+
+    # then adjust it back to the original state
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '12:00'
+    ticket = adjust.form.submit().follow()
+
+    # reject the second reservation
+    ticket = ticket.click('Absagen', index=1).follow()
+    assert len(os.listdir(client.app.maildir)) == 2
+
+    # send a summary
+    ticket = client.get(
+        ticket.pyquery('a.envelope')[0].attrib['ic-get-from']
+    ).follow()
+    assert 'Erfolgreich 1 E-Mails gesendet' in ticket
+    assert len(os.listdir(client.app.maildir)) == 3
+
+    message = client.get_email(2)['TextBody']
+    assert "Tageskarte" in message
+    assert "10:00 - 12:00  | → |" not in message
+    assert "10:30 - 12:00  | → | Abgelehnt" in message
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reserve_no_definition_pick_up_hint(client: Client) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -890,10 +1972,11 @@ def test_reserve_no_definition_pick_up_hint(client):
 
 
 @freeze_time("2022-10-30", tick=True)
-def test_reserve_allocation_dst_to_st_transition(client):
+def test_reserve_allocation_dst_to_st_transition(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -920,10 +2003,11 @@ def test_reserve_allocation_dst_to_st_transition(client):
 
 
 @freeze_time("2022-03-27", tick=True)
-def test_reserve_allocation_st_to_dst_transition(client):
+def test_reserve_allocation_st_to_dst_transition(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -943,7 +2027,7 @@ def test_reserve_allocation_st_to_dst_transition(client):
     }
 
 
-def test_reserve_in_past(client):
+def test_reserve_in_past(client: Client) -> None:
     admin = client.spawn()
     admin.login_admin()
 
@@ -954,6 +2038,7 @@ def test_reserve_in_past(client):
 
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -980,9 +2065,10 @@ def test_reserve_in_past(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_confirmation_no_definition(client):
+def test_reserve_confirmation_no_definition(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1021,9 +2107,10 @@ def test_reserve_confirmation_no_definition(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_confirmation_with_definition(client):
+def test_reserve_confirmation_with_definition(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.definition = "Vorname *= ___\nNachname *= ___"
 
     scheduler = resource.get_scheduler(client.app.libres_context)
@@ -1064,10 +2151,11 @@ def test_reserve_confirmation_with_definition(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_session_bound(client):
+def test_reserve_session_bound(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1097,10 +2185,11 @@ def test_reserve_session_bound(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_delete_reservation_anonymous(client):
+def test_delete_reservation_anonymous(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1122,9 +2211,6 @@ def test_delete_reservation_anonymous(client):
     reservations = client.get(reservations_url).json['reservations']
     url = reservations[0]['delete']
 
-    # the url does not have csrf (anonymous does not)
-    assert url.endswith('?csrf-token=')
-
     # other clients still can't use the link
     assert client.spawn().delete(url, status=403)
     assert len(client.get(reservations_url).json['reservations']) == 1
@@ -1135,10 +2221,11 @@ def test_delete_reservation_anonymous(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_in_parallel(client):
+def test_reserve_in_parallel(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1167,15 +2254,16 @@ def test_reserve_in_parallel(client):
 
     # one will win, one will lose
     assert f1.form.submit().status_code == 302
-    assert "Der gewünschte Zeitraum ist nicht mehr verfügbar."\
-           in f2.form.submit().follow()
+    assert ("Der gewünschte Zeitraum ist nicht mehr verfügbar."
+        ) in f2.form.submit().follow()
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_occupancy_view(client):
+def test_occupancy_view(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1196,20 +2284,15 @@ def test_occupancy_view(client):
 
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
-    # at this point, the reservation will show up, but it should be
-    # marked pending
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
-    assert len(occupancy.pyquery('.occupancy-block')) == 1
-    assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 1
-
-    # ..until we accept it
-    ticket.click('Alle Reservationen annehmen')
-    occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
-    assert len(occupancy.pyquery('.occupancy-block')) == 1
-    assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 0
+    assert occupancy.status_code == 200
+    occupancy = client.get(
+        '/resource/tageskarte/occupancy-json?start=2015-08-28&end=2015-08-29'
+    )
+    assert occupancy.status_code == 200
 
 
-def test_occupancy_view_member_access(client):
+def test_occupancy_view_member_access(client: Client) -> None:
     # setup a resource that's visible to members
     client.login_admin()
 
@@ -1235,12 +2318,16 @@ def test_occupancy_view_member_access(client):
     occupancy = client.get('/resource/test/occupancy')
     assert occupancy.status_code == 200
 
+    occupancy = client.get('/resource/test/occupancy-json')
+    assert occupancy.status_code == 200
+
 
 @freeze_time("2015-08-28", tick=True)
-def test_reservation_export_view(client):
+def test_reservation_export_view(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.definition = "Vorname *= ___\nNachname *= ___"
 
     scheduler = resource.get_scheduler(client.app.libres_context)
@@ -1286,7 +2373,7 @@ def test_reservation_export_view(client):
 
 
 @freeze_time("2022-09-07", tick=True)
-def test_export_all_default_date_range(client):
+def test_export_all_default_date_range(client: Client) -> None:
     """ Date range in the export form is the current week. (from
     monday to friday)
     """
@@ -1304,7 +2391,9 @@ def test_export_all_default_date_range(client):
 
 
 @freeze_time("2022-09-05", tick=True)
-def test_export_all_default_date_range_from_start_of_week(client):
+def test_export_all_default_date_range_from_start_of_week(
+    client: Client
+) -> None:
     client.login_admin()
     export = client.get('/resources/export-all')
     start = export.form['start']
@@ -1317,7 +2406,9 @@ def test_export_all_default_date_range_from_start_of_week(client):
 
 
 @freeze_time("2022-09-09", tick=True)
-def test_export_all_default_date_range_from_end_of_week(client):
+def test_export_all_default_date_range_from_end_of_week(
+    client: Client
+) -> None:
     client.login_admin()
     export = client.get('/resources/export-all')
     start = export.form['start']
@@ -1330,15 +2421,15 @@ def test_export_all_default_date_range_from_end_of_week(client):
 
 
 @freeze_time("2023-08-28", tick=True)
-def test_reservation_export_all_view(client):
+def test_reservation_export_all_view(client: Client) -> None:
     """ Create reservations with two different resources.
         Then export everything to Excel.
         It should create one Worksheet per resource.
     """
     resources = ResourceCollection(client.app.libres_context)
     daypass_resource = resources.by_name('tageskarte')
+    assert daypass_resource is not None
     daypass_resource.definition = "Vorname *= ___\nNachname *= ___"
-    daypass_title = daypass_resource.title
 
     scheduler = daypass_resource.get_scheduler(client.app.libres_context)
     daypass_allocations = scheduler.allocate(
@@ -1356,8 +2447,8 @@ def test_reservation_export_all_view(client):
     )
 
     room_resource = resources.by_name('conference-room')
+    assert room_resource is not None
     room_resource.definition = "title *= ___"
-    room_resource_title = room_resource.title
 
     room_allocations = room_resource.scheduler.allocate(
         dates=(datetime(2023, 8, 28), datetime(2023, 8, 28)),
@@ -1399,9 +2490,6 @@ def test_reservation_export_all_view(client):
         wb = load_workbook(Path(tmp.name))
 
         daypass_sheet_name = wb.sheetnames[1]
-        # Tabs are named after the titles, without special characters.
-        assert daypass_sheet_name.lower() == normalize_for_url(
-            daypass_title.lower())
         daypass_sheet = wb[daypass_sheet_name]
 
         tab_2 = tuple(daypass_sheet.rows)
@@ -1422,8 +2510,6 @@ def test_reservation_export_all_view(client):
         assert tab_2[1][3].value == "info@example.org"
 
         room_sheet_name = wb.sheetnames[0]
-        assert room_sheet_name.lower() == normalize_for_url(
-            room_resource_title.lower())
         room_sheet = wb[room_sheet_name]
 
         tab_1 = tuple(room_sheet.rows)
@@ -1438,12 +2524,14 @@ def test_reservation_export_all_view(client):
         assert tab_1[1][0].value == "28.08.2023 00:00"
         assert tab_1[1][1].value == "29.08.2023 00:00"
         assert tab_1[1][2].value == int("1")
-        assert "RSV-" in tab_1[1][4].value
-        assert "Room" in tab_1[1][5].value
+        assert "RSV-" in tab_1[1][4].value  # type: ignore[operator]
+        assert "Room" in tab_1[1][5].value  # type: ignore[operator]
 
 
 @freeze_time("2023-08-28", tick=True)
-def test_reservation_export_all_view_normalizes_sheet_names(client):
+def test_reservation_export_all_view_normalizes_sheet_names(
+    client: Client
+) -> None:
     """ Names of Excel worksheets have to be valid.
         Limited to 31 characters, no special characters.
         Duplicate titles will be incremented numerically.
@@ -1454,6 +2542,7 @@ def test_reservation_export_all_view_normalizes_sheet_names(client):
 
     resources = ResourceCollection(client.app.libres_context)
     daypass_resource = resources.by_name('tageskarte')
+    assert daypass_resource is not None
     daypass_resource.definition = "Vorname *= ___\nNachname *= ___"
     daypass_resource.title = duplicate_title
 
@@ -1473,6 +2562,7 @@ def test_reservation_export_all_view_normalizes_sheet_names(client):
     )
 
     room_resource = resources.by_name('conference-room')
+    assert room_resource is not None
     room_resource.definition = "Name *= ___"
     room_resource.title = duplicate_title
 
@@ -1517,12 +2607,12 @@ def test_reservation_export_all_view_normalizes_sheet_names(client):
         wb = load_workbook(Path(tmp.name))
         actual_sheet_name_room = wb.sheetnames[0]
         actual_sheet_name_daypass = wb.sheetnames[1]
-        assert duplicate_title[:31] == actual_sheet_name_room.lower()
-        assert duplicate_title[:31] + "1" == actual_sheet_name_daypass.lower()
+        assert "sitzungszimmer-gross-2-og" == actual_sheet_name_room
+        assert "sitzungszimmer-gross-2-og_1" == actual_sheet_name_daypass
 
 
 @freeze_time("2022-09-07", tick=True)
-def test_reservation_export_all_with_no_resources(client):
+def test_reservation_export_all_with_no_resources(client: Client) -> None:
     client.login_admin()
 
     export = client.get('/resources/export-all')
@@ -1536,7 +2626,7 @@ def test_reservation_export_all_with_no_resources(client):
 
 
 @freeze_time("2016-04-28", tick=True)
-def test_reserve_session_separation(client):
+def test_reserve_session_separation(client: Client) -> None:
     c1 = client.spawn()
     c1.login_admin()
 
@@ -1552,6 +2642,7 @@ def test_reserve_session_separation(client):
         new.form.submit()
 
         resource = client.app.libres_resources.by_name(room)
+        assert resource is not None
         allocations = resource.scheduler.allocate(
             dates=(datetime(2016, 4, 28, 12, 0), datetime(2016, 4, 28, 13, 0)),
             whole_day=False
@@ -1578,19 +2669,19 @@ def test_reserve_session_separation(client):
     # check combined reservations for rooms without a group
     result = c1.get('/find-your-spot/reservations').json
     assert len(result['reservations']) == 2
-    assert result['reservations'][0]['resource'] == 'meeting-room'
-    assert result['reservations'][1]['resource'] == 'gym'
+    assert result['reservations'][0]['resource'] == 'gym'
+    assert result['reservations'][1]['resource'] == 'meeting-room'
 
     result = c2.get('/find-your-spot/reservations').json
     assert len(result['reservations']) == 2
-    assert result['reservations'][0]['resource'] == 'meeting-room'
-    assert result['reservations'][1]['resource'] == 'gym'
+    assert result['reservations'][0]['resource'] == 'gym'
+    assert result['reservations'][1]['resource'] == 'meeting-room'
 
     formular = c1.get('/resource/meeting-room/form')
     formular.form['email'] = 'info@example.org'
     formular.form.submit()
 
-    # we should get the same formular by following the group link
+    # we should get the same form by following the group link
     group_formular = c1.get('/find-your-spot/form').follow()
     assert 'meeting-room' in group_formular
 
@@ -1598,6 +2689,7 @@ def test_reserve_session_separation(client):
     next_form = formular.form.submit().follow().form.submit().follow()
 
     resource = client.app.libres_resources.by_name('meeting-room')
+    assert resource is not None
     assert resource.scheduler.managed_reserved_slots().count() == 1
 
     result = c1.get('/resource/meeting-room/reservations').json
@@ -1612,7 +2704,7 @@ def test_reserve_session_separation(client):
     result = c2.get('/resource/gym/reservations').json
     assert len(result['reservations']) == 1
 
-    # next_formul should now be gym, since we had another pending
+    # next_form should now be gym, since we had another pending
     # reservation in the same group (no group i.e. general)
     assert 'Bitte fahren Sie fort mit Ihrer Reservation für gym' in next_form
     # but e-mail shoud be pre-filled so we can just submit twice to reserve
@@ -1636,7 +2728,97 @@ def test_reserve_session_separation(client):
     assert 'gym' in tickets
 
 
-def test_reserve_reservation_prediction(client):
+@freeze_time("2016-04-28", tick=True)
+def test_reserve_related_tickets_email_threading(client: Client) -> None:
+    client.login_admin()
+
+    reserve = []
+
+    # check both for separation by resource and by client
+    for room in ('meeting-room', 'gym'):
+        new = client.get('/resources').click('Raum')
+        new.form['title'] = room
+        new.form.submit()
+
+        resource = client.app.libres_resources.by_name(room)
+        assert resource is not None
+        allocations = resource.scheduler.allocate(
+            dates=(datetime(2016, 4, 28, 12, 0), datetime(2016, 4, 28, 13, 0)),
+            whole_day=False
+        )
+
+        reserve.append(client.bound_reserve(allocations[0]))
+        transaction.commit()
+
+    reserve_room, reserve_gym = reserve
+
+    assert reserve_room().json == {'success': True}
+    assert reserve_gym().json == {'success': True}
+
+    formular = client.get('/resource/meeting-room/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form.submit()
+
+    # we should get the same form by following the group link
+    group_formular = client.get('/find-your-spot/form').follow()
+    assert 'meeting-room' in group_formular
+
+    # confirm the first reservation
+    next_form = formular.form.submit().follow().form.submit().follow()
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+    assert message is not None
+    assert 'Headers' in message
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert 'Message-ID' in headers
+    message_id1 = headers['Message-ID']
+
+    # confirm the second reservation
+    assert 'Bitte fahren Sie fort mit Ihrer Reservation für gym' in next_form
+    # but e-mail shoud be pre-filled so we can just submit twice to reserve
+    tickets = next_form.form.submit().follow().form.submit().follow()
+
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)
+    assert message is not None
+    assert 'Headers' in message
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert 'Message-ID' in headers
+    message_id2 = headers['Message-ID']
+    assert message_id2 > message_id1
+    assert headers['In-Reply-To'] == message_id1
+    assert headers['References'] == message_id1
+
+    # we should have a ticket for each room we reserved
+    assert 'Eingereichte Anfragen' in tickets
+    assert 'meeting-room' in tickets
+    assert 'gym' in tickets
+
+    # the two tickets should be linked
+    open_tickets = client.get('/tickets/ALL/open')
+    ticket = open_tickets.click('Annehmen', index=0).follow()
+    assert 'Verknüpfte Tickets' in ticket
+    # we can create a multi-ticket pdf
+    pdf = ticket.click('Mit verknüpften Tickets')
+    # we can mute all the related tickets
+    ticket = ticket.click(href='/mute-related').follow()
+    # and then unmute all the related tickets
+    ticket = ticket.click(href='/unmute-related').follow()
+
+    # trigger a third email in the thread
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+    assert len(os.listdir(client.app.maildir)) == 3
+    message = client.get_email(2)
+    assert 'Headers' in message
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert 'Message-ID' in headers
+    message_id3 = headers['Message-ID']
+    assert message_id3 > message_id2
+    assert headers['In-Reply-To'] == message_id2
+    assert headers['References'] == f'{message_id1} {message_id2}'
+
+
+def test_reserve_reservation_prediction(client: Client) -> None:
     client.login_admin()
 
     new = client.get('/resources').click('Raum')
@@ -1646,6 +2828,7 @@ def test_reserve_reservation_prediction(client):
     transaction.begin()
 
     resource = client.app.libres_resources.by_name('gym')
+    assert resource is not None
 
     a1 = resource.scheduler.allocate(
         dates=(datetime(2017, 1, 1, 12, 0), datetime(2017, 1, 1, 13, 0)),
@@ -1670,6 +2853,7 @@ def test_reserve_reservation_prediction(client):
     transaction.begin()
 
     resource = client.app.libres_resources.by_name('gym')
+    assert resource is not None
     a3 = resource.scheduler.allocate(
         dates=(datetime(2017, 1, 3, 12, 0), datetime(2017, 1, 3, 13, 0)),
         whole_day=False
@@ -1694,12 +2878,13 @@ def test_reserve_reservation_prediction(client):
     assert prediction['wholeDay'] is False
 
 
-def test_reserve_multiple_allocations(client):
+def test_reserve_multiple_allocations(client: Client) -> None:
     client.login_admin()
 
     transaction.begin()
 
     resource = client.app.libres_resources.by_name('tageskarte')
+    assert resource is not None
     thursday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
         whole_day=True
@@ -1745,6 +2930,7 @@ def test_reserve_multiple_allocations(client):
 
     # make sure the reservations are no longer pending
     resource = client.app.libres_resources.by_name('tageskarte')
+    assert resource is not None
 
     reservations = resource.scheduler.managed_reservations()
     assert reservations.filter(Reservation.status == 'approved').count() == 2
@@ -1766,12 +2952,13 @@ def test_reserve_multiple_allocations(client):
     assert resource.scheduler.managed_reserved_slots().count() == 0
 
 
-def test_reserve_and_deny_multiple_dates(client):
+def test_reserve_and_deny_multiple_dates(client: Client) -> None:
     client.login_admin()
 
     transaction.begin()
 
     resource = client.app.libres_resources.by_name('tageskarte')
+    assert resource is not None
     wednesday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 27), datetime(2016, 4, 27)),
         whole_day=True
@@ -1804,6 +2991,7 @@ def test_reserve_and_deny_multiple_dates(client):
 
     # the resource needs to be refetched after the commit
     resource = client.app.libres_resources.by_name('tageskarte')
+    assert resource is not None
     assert resource.scheduler.managed_reserved_slots().count() == 3
 
     # deny the last reservation
@@ -1819,7 +3007,7 @@ def test_reserve_and_deny_multiple_dates(client):
     assert resource.scheduler.managed_reserved_slots().count() == 2
 
     message = client.get_email(2)['TextBody']
-    assert "angenommen" in message
+    assert "bestätigt" in message
     assert "27. April 2016" in message
     assert "28. April 2016" in message
 
@@ -1848,7 +3036,7 @@ def test_reserve_and_deny_multiple_dates(client):
     assert "29. April 2016" not in message
 
 
-def test_reserve_failing_multiple(client):
+def test_reserve_failing_multiple(client: Client) -> None:
     c1 = client.spawn()
     c1.login_admin()
 
@@ -1858,6 +3046,7 @@ def test_reserve_failing_multiple(client):
     transaction.begin()
 
     resource = client.app.libres_resources.by_name('tageskarte')
+    assert resource is not None
     thursday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
         whole_day=True
@@ -1897,16 +3086,18 @@ def test_reserve_failing_multiple(client):
     assert 'class="reservation failed"' in confirmation
 
 
-def test_cleanup_allocations(client):
+def test_cleanup_allocations(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(
-            datetime(2015, 8, 28), datetime(2015, 8, 28),
-            datetime(2015, 8, 29), datetime(2015, 8, 29)
+            (datetime(2015, 8, 28), datetime(2015, 8, 28)),
+            (datetime(2015, 8, 29), datetime(2015, 8, 29)),
+            (datetime(2015, 8, 30), datetime(2015, 8, 30)),
         ),
         whole_day=True
     )
@@ -1927,18 +3118,29 @@ def test_cleanup_allocations(client):
 
     cleanup.form['start'] = date(2015, 8, 1)
     cleanup.form['end'] = date(2015, 8, 31)
-    resource = cleanup.form.submit().follow()
+    # only remove fridays and sundays, which excludes the middle allocation
+    cleanup.form['weekdays'] = [4, 6]
+    resource_page = cleanup.form.submit().follow()
 
-    assert "1 Einteilungen wurden erfolgreich entfernt" in resource
+    assert "1 Verfügbarkeiten wurden erfolgreich entfernt" in resource_page
+
+    allocations = scheduler.managed_allocations().order_by('id').all()
+    assert len(allocations) == 2
+    # not removed due to existing reservation
+    assert allocations[0].display_start().date() == date(2015, 8, 28)
+    # not removed due to not being on a friday or sunday
+    assert allocations[1].display_start().date() == date(2015, 8, 29)
 
 
 @freeze_time("2017-07-09", tick=True)
-def test_manual_reservation_payment_with_extra(client):
+def test_manual_reservation_payment_with_one_off_extra(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.pricing_method = 'per_item'
     resource.price_per_item = 15.00
+    resource.extras_pricing_method = 'one_off'
     resource.payment_method = 'manual'
     resource.definition = textwrap.dedent("""
         Donation =
@@ -1990,6 +3192,12 @@ def test_manual_reservation_payment_with_extra(client):
 
     assert page.pyquery('.payment-state').text() == "Offen"
 
+    invoice = page.click('Rechnung anzeigen')
+    assert '30.00' in invoice
+    assert '10.00' in invoice
+    assert '40.00' in invoice
+    assert invoice.pyquery('.payment-state').text() == "Offen"
+
     payments = client.get('/payments')
     assert "RSV-" in payments
     assert "Manuell" in payments
@@ -1997,12 +3205,275 @@ def test_manual_reservation_payment_with_extra(client):
     assert "40.00" in payments
     assert "Offen" in payments
 
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "40.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
+
+    # add a manual discount
+    item = invoice.click('Abzug / Zuschlag')
+    item.form['booking_text'] = 'Gratis'
+    item.form['discount'] = '40.00'
+    invoice = item.form.submit().follow()
+    assert '30.00' in invoice
+    assert '10.00' in invoice
+    assert '40.00' in invoice
+    assert '-40.00' in invoice
+    assert not invoice.pyquery('.payment-state').text()
+
+    # delete the manual discount
+    client.delete(
+        invoice.pyquery('.remove-invoice-item').attr('ic-delete-from')
+    )
+    invoice = client.get(invoice.request.url)
+    assert '30.00' in invoice
+    assert '10.00' in invoice
+    assert '40.00' in invoice
+    assert 'Zahlungsmethode' in invoice
+    assert invoice.pyquery('.payment-state').text() == "Offen"
+
+    # reject the final reservation (invoice should get deleted)
+    delete_url = page.pyquery('a.delete-link')[-1].attrib['ic-get-from']
+    page = client.get(delete_url).follow()
+    assert 'Rechnung anzeigen' not in page
+
 
 @freeze_time("2017-07-09", tick=True)
-def test_manual_reservation_payment_without_extra(client):
+def test_manual_reservation_payment_with_per_item_extra(
+    client: Client
+) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.pricing_method = 'per_item'
+    resource.price_per_item = 15.00
+    resource.extras_pricing_method = 'per_item'
+    resource.payment_method = 'manual'
+    resource.definition = textwrap.dedent("""
+        Donation =
+            (x) Yes (10 CHF)
+            ( ) No
+    """)
+
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9),
+            datetime(2017, 7, 9)
+        ),
+        whole_day=True,
+        quota=4
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    reserve(quota=2, whole_day=True)
+
+    page = client.get('/resource/tageskarte/form')
+    page.form['email'] = 'info@example.org'
+
+    page.form['donation'] = 'No'
+    assert '30.00' in page.form.submit().follow()
+
+    page.form['donation'] = 'Yes'
+    assert '50.00' in page.form.submit().follow()
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    client.login_editor()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    # change the submission (works until it is marked as paid)
+    edit_page = page.click('Details bearbeiten')
+    edit_page.form['donation'] = 'No'
+    page = edit_page.form.submit().follow()
+    assert '30.00' in page
+
+    # the invoice should change accordingly
+    invoice = page.click('Rechnung anzeigen')
+    assert '15.00' in invoice
+    assert '2.00' in invoice
+    assert '30.00' in invoice
+
+    # let's add a manual invoice item
+    item = invoice.click('Abzug / Zuschlag')
+    item.form['booking_text'] = 'Preisreduktion'
+    item.form['discount'] = '10.00'
+    invoice = item.form.submit().follow()
+    assert '15.00' in invoice
+    assert '2.00' in invoice
+    assert '-10.00' in invoice
+    assert '20.00' in invoice
+
+    # mark it as paid
+    client.post(invoice.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    # try to change it again (it should not work)
+    edit_page = page.click('Details bearbeiten')
+    edit_page.form['donation'] = 'Yes'
+    assert 'die Zahlung ist nicht mehr offen' in edit_page.form.submit()
+
+    # try to add a new reservation (it should not work)
+    add_page = page.click('Reservation hinzufügen')
+    add_page.form['date'] = '2017-07-09'
+    add_page.form['quota_other'] = '2'
+    assert 'die Zahlung ist nicht mehr offen' in add_page.form.submit()
+
+    # mark it as unpaid again
+    client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    # and change it back
+    edit_page = page.click('Details bearbeiten')
+    edit_page.form['donation'] = 'Yes'
+    page = edit_page.form.submit().follow()
+    assert '40.00' in page
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    # add a new reservation
+    add_page = page.click('Reservation hinzufügen')
+    add_page.form['date'] = '2017-07-09'
+    add_page.form['quota_other'] = '2'
+    page = add_page.form.submit().follow()
+    assert '90.00' in page
+
+    invoice = page.click('Rechnung anzeigen')
+    assert '15.00' in invoice
+    assert '10.00' in invoice
+    assert '-10.00' in invoice
+    assert '2.00' in invoice
+    assert '90.00' in invoice
+
+    # delete the manual invoice item
+    client.delete(
+        invoice.pyquery('.remove-invoice-item').attr('ic-delete-from')
+    )
+    invoice = client.get(invoice.request.url)
+    assert '15.00' in invoice
+    assert '10.00' in invoice
+    assert '2.00' in invoice
+    assert '100.00' in invoice
+
+    page = client.get(page.request.url)
+    assert '100.00' in page
+
+    payments = client.get('/payments')
+    assert "RSV-" in payments
+    assert "Manuell" in payments
+    assert "info@example.org" in payments
+    assert "100.00" in payments
+    assert "Offen" in payments
+
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "100.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
+
+    # adding another new reservation should fail
+    # since we used up all of the quota
+    add_page = page.click('Reservation hinzufügen')
+    add_page.form['date'] = '2017-07-09'
+    add_page.form['quota_other'] = '1'
+    assert ('Der gewünschte Zeitraum ist nicht mehr verfügbar'
+        ) in add_page.form.submit()
+
+
+@freeze_time("2017-07-09", tick=True)
+def test_manual_reservation_payment_with_per_hour_extra(
+    client: Client
+) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.pricing_method = 'per_item'
+    resource.price_per_item = 15.00
+    resource.extras_pricing_method = 'per_hour'
+    resource.payment_method = 'manual'
+    resource.definition = textwrap.dedent("""
+        Donation =
+            (x) Yes (1 CHF)
+            ( ) No
+    """)
+
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9),
+            datetime(2017, 7, 9)
+        ),
+        whole_day=True,
+        quota=4
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    reserve(quota=1, whole_day=True)
+
+    page = client.get('/resource/tageskarte/form')
+    page.form['email'] = 'info@example.org'
+
+    page.form['donation'] = 'No'
+    assert '15.00' in page.form.submit().follow()
+
+    page.form['donation'] = 'Yes'
+    assert '39.00' in page.form.submit().follow()
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    # mark it as paid
+    client.login_editor()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    payments = client.get('/payments')
+    assert "RSV-" in payments
+    assert "Manuell" in payments
+    assert "info@example.org" in payments
+    assert "39.00" in payments
+    assert "Offen" in payments
+
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "39.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
+
+
+@freeze_time("2017-07-09", tick=True)
+def test_manual_reservation_payment_without_extra(client: Client) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.pricing_method = 'per_hour'
     resource.price_per_hour = 10.00
     resource.payment_method = 'manual'
@@ -2051,26 +3522,409 @@ def test_manual_reservation_payment_without_extra(client):
     assert "20.00" in payments
     assert "Offen" in payments
 
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "20.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
 
-def test_allocation_rules_on_rooms(client):
+
+@freeze_time("2017-07-09", tick=True)
+def test_manual_reservation_payment_allocation_override(
+    client: Client
+) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.pricing_method = 'per_hour'
+    resource.price_per_hour = 10.00
+    resource.payment_method = 'manual'
+
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations_inherit = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 10),
+            datetime(2017, 7, 9, 12)
+        )
+    )
+    allocations_free = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 12),
+            datetime(2017, 7, 9, 14)
+        ),
+        data={'pricing_method': 'free'}
+    )
+    allocations_per_item = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 14),
+            datetime(2017, 7, 9, 16)
+        ),
+        data={
+            'pricing_method': 'per_item',
+            'price_per_item': 23.00,
+            'currency': 'CHF'
+        }
+    )
+    allocations_per_hour = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 16),
+            datetime(2017, 7, 9, 18)
+        ),
+        data={
+            'pricing_method': 'per_hour',
+            'price_per_hour': 12.00,
+            'currency': 'CHF'
+        }
+    )
+
+    reserve_inherit = client.bound_reserve(allocations_inherit[0])
+    reserve_free = client.bound_reserve(allocations_free[0])
+    reserve_per_item = client.bound_reserve(allocations_per_item[0])
+    reserve_per_hour = client.bound_reserve(allocations_per_hour[0])
+    transaction.commit()
+
+    # create a reservation of each type
+    reserve_inherit()
+    reserve_free()
+    reserve_per_item()
+    reserve_per_hour()
+
+    page = client.get('/resource/tageskarte/form')
+    page.form['email'] = 'info@example.org'
+    assert '20.00' in page.form.submit().follow()
+    assert '24.00' in page.form.submit().follow()
+    assert '23.00' in page.form.submit().follow()
+    assert '67.00' in page.form.submit().follow()
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    # mark it as paid
+    client.login_editor()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    payments = client.get('/payments')
+    assert "RSV-" in payments
+    assert "Manuell" in payments
+    assert "info@example.org" in payments
+    assert "67.00" in payments
+    assert "Offen" in payments
+
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "67.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
+
+
+@freeze_time("2017-07-09", tick=True)
+def test_manual_reservation_payment_with_resource_discount(
+    client: Client
+) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.pricing_method = 'per_item'
+    resource.price_per_item = 10.00
+    resource.payment_method = 'manual'
+    resource.extras_pricing_method = 'one_off'
+    resource.discount_method = 'resource'
+    resource.definition = textwrap.dedent("""
+        Shipping =
+            (x) Yes (6 CHF)
+            ( ) No (0 CHF)
+        Discount =
+            (x) Yes (50%)
+            ( ) No
+    """)
+
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9),
+            datetime(2017, 7, 9)
+        ),
+        whole_day=True,
+        quota=4
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    reserve(quota=2, whole_day=True)
+
+    page = client.get('/resource/tageskarte/form')
+    page.form['email'] = 'info@example.org'
+
+    page.form['shipping'] = 'Yes'
+    page.form['discount'] = 'No'
+    result = page.form.submit().follow()
+    assert '20.00' in result
+    assert '6.00' in result
+    assert '26.00' in result
+    assert '-10.00' not in result
+
+    page.form['shipping'] = 'Yes'
+    page.form['discount'] = 'Yes'
+    result = page.form.submit().follow()
+    assert '20.00' in result
+    assert '6.00' in result
+    assert '16.00' in result
+    assert '-10.00' in result
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    # mark it as paid
+    client.login_editor()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    payments = client.get('/payments')
+    assert "RSV-" in payments
+    assert "Manuell" in payments
+    assert "info@example.org" in payments
+    assert "16.00" in payments
+    assert "Offen" in payments
+
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "16.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
+
+
+@freeze_time("2017-07-09", tick=True)
+def test_manual_reservation_payment_with_extras_discount(
+    client: Client
+) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.pricing_method = 'per_item'
+    resource.price_per_item = 10.00
+    resource.payment_method = 'manual'
+    resource.extras_pricing_method = 'one_off'
+    resource.discount_method = 'extras'
+    resource.definition = textwrap.dedent("""
+        Shipping =
+            (x) Yes (6 CHF)
+            ( ) No (0 CHF)
+        Discount =
+            (x) Yes (50%)
+            ( ) No
+    """)
+
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9),
+            datetime(2017, 7, 9)
+        ),
+        whole_day=True,
+        quota=4
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    reserve(quota=2, whole_day=True)
+
+    page = client.get('/resource/tageskarte/form')
+    page.form['email'] = 'info@example.org'
+
+    page.form['shipping'] = 'Yes'
+    page.form['discount'] = 'No'
+    result = page.form.submit().follow()
+    assert '20.00' in result
+    assert '6.00' in result
+    assert '26.00' in result
+    assert '-3.00' not in result
+
+    page.form['shipping'] = 'Yes'
+    page.form['discount'] = 'Yes'
+    result = page.form.submit().follow()
+    assert '20.00' in result
+    assert '6.00' in result
+    assert '23.00' in result
+    assert '-3.00' in result
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    # mark it as paid
+    client.login_editor()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    payments = client.get('/payments')
+    assert "RSV-" in payments
+    assert "Manuell" in payments
+    assert "info@example.org" in payments
+    assert "23.00" in payments
+    assert "Offen" in payments
+
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "23.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
+
+
+@freeze_time("2017-07-09", tick=True)
+def test_manual_reservation_payment_with_everything_discount(
+    client: Client
+) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.pricing_method = 'per_item'
+    resource.price_per_item = 10.00
+    resource.payment_method = 'manual'
+    resource.extras_pricing_method = 'one_off'
+    resource.discount_method = 'everything'
+    resource.definition = textwrap.dedent("""
+        Shipping =
+            (x) Yes (6 CHF)
+            ( ) No (0 CHF)
+        Discount =
+            (x) Yes (50%)
+            ( ) No
+    """)
+
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9),
+            datetime(2017, 7, 9)
+        ),
+        whole_day=True,
+        quota=4
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    reserve(quota=2, whole_day=True)
+
+    page = client.get('/resource/tageskarte/form')
+    page.form['email'] = 'info@example.org'
+
+    page.form['shipping'] = 'Yes'
+    page.form['discount'] = 'No'
+    result = page.form.submit().follow()
+    assert '20.00' in result
+    assert '6.00' in result
+    assert '26.00' in result
+    assert '-13.00' not in result
+
+    page.form['shipping'] = 'Yes'
+    page.form['discount'] = 'Yes'
+    result = page.form.submit().follow()
+    assert '20.00' in result
+    assert '6.00' in result
+    assert '13.00' in result
+    assert '-13.00' in result
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    # mark it as paid
+    client.login_editor()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    payments = client.get('/payments')
+    assert "RSV-" in payments
+    assert "Manuell" in payments
+    assert "info@example.org" in payments
+    assert "13.00" in payments
+    assert "Offen" in payments
+
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "13.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
+
+
+def test_allocation_rules_on_rooms(client: Client) -> None:
     client.login_admin()
 
-    resources = client.get('/resources')
+    resources_page = client.get('/resources')
 
-    page = resources.click('Raum')
+    page = resources_page.click('Raum')
     page.form['title'] = 'Room'
     page.form.submit()
 
-    def count_allocations():
+    def count_allocations() -> int:
         s = '2000-01-01'
         e = '2050-01-31'
 
         return len(client.get(f'/resource/room/slots?start={s}&end={e}').json)
 
-    def run_cronjob():
+    def run_cronjob() -> None:
         client.get('/resource/room/process-rules')
 
-    page = client.get('/resource/room').click("Regeln").click("Regel")
+    page = client.get('/resource/room').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Täglich'
     page.form['extend'] = 'daily'
     page.form['start'] = '2019-01-01'
@@ -2082,7 +3936,7 @@ def test_allocation_rules_on_rooms(client):
 
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 2 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 2
 
     # running the cronjob once will add a new allocation
@@ -2128,6 +3982,7 @@ def test_allocation_rules_on_rooms(client):
     # deleting the rule will delete all associated slots (but not others)
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('room')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     scheduler.allocate(
@@ -2139,37 +3994,134 @@ def test_allocation_rules_on_rooms(client):
 
     assert count_allocations() == 7
 
-    page = client.get('/resource/room').click("Regeln")
-    page.click('Löschen')
 
-    assert count_allocations() == 1
-
-
-def test_allocation_rules_on_daypasses(client):
+def test_allocation_rules_edit(client: Client) -> None:
     client.login_admin()
 
-    resources = client.get('/resources')
+    resources_page = client.get('/resources')
 
-    page = resources.click('Tageskarte', index=0)
+    page = resources_page.click('Raum')
+    page.form['title'] = 'Room'
+    page.form.submit()
+
+    def count_allocations() -> int:
+        s = '2000-01-01'
+        e = '2050-01-31'
+
+        return len(client.get(f'/resource/room/slots?start={s}&end={e}').json)
+
+    def run_cronjob() -> None:
+        client.get('/resource/room/process-rules')
+
+    page = client.get('/resource/room').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
+    page.form['title'] = 'Täglich'
+    page.form['extend'] = 'daily'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-01-02'
+    page.form['as_whole_day'] = 'yes'
+
+    page.select_checkbox('except_for', "Sa")
+    page.select_checkbox('except_for', "So")
+
+    page = page.form.submit().follow()
+
+    assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
+    assert count_allocations() == 2
+
+    # Modifying the rule applies changes where possible, but
+    # existing reserved slots remain unaffected.
+    edit_page = client.get('/resource/room')
+    edit_page = edit_page.click('Verfügbarkeitszeiträume').click('Bearbeiten')
+    form = edit_page.form
+    form['title'] = 'Renamed room'
+
+    edit_page = form.submit().follow()
+
+    assert 'Renamed room' in edit_page
+
+
+def test_allocation_rules_copy_paste(client: Client) -> None:
+    client.login_admin()
+
+    resources_page = client.get('/resources')
+
+    page = resources_page.click('Raum')
+    page.form['title'] = 'Room 1'
+    page.form.submit()
+
+    page = resources_page.click('Raum')
+    page.form['title'] = 'Room 2'
+    page.form.submit()
+
+    def count_allocations(room: int) -> int:
+        return len(client.get(
+            f'/resource/room-{room}/slots?start=2000-01-01&end=2050-01-31'
+        ).json)
+
+    def run_cronjob() -> None:
+        client.get('/resource/room/process-rules')
+
+    page = client.get('/resource/room-1').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
+    page.form['title'] = 'Täglich'
+    page.form['extend'] = 'daily'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-01-02'
+    page.form['as_whole_day'] = 'yes'
+
+    page.select_checkbox('except_for', "Sa")
+    page.select_checkbox('except_for', "So")
+
+    page = page.form.submit().follow()
+
+    assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
+    assert count_allocations(1) == 2
+    assert count_allocations(2) == 0
+
+    # Copy the rule
+    edit_page = client.get('/resource/room-1').click('Verfügbarkeitszeiträume')
+    copy_links = edit_page.html.find_all('a', string='Kopieren')
+    client.post(copy_links[0].attrs['ic-post-to'])
+    edit_page = client.get(edit_page.request.path)
+    assert 'in die Zwischenablage kopiert' in edit_page
+
+    # Paste the rule in the other room
+    edit_page = client.get('/resource/room-2').click('Verfügbarkeitszeiträume')
+    paste_links = edit_page.html.find_all('a', string='Einfügen')
+    client.post(paste_links[0].attrs['ic-post-to'])
+    edit_page = client.get(edit_page.request.path)
+    assert 'wurde eingefügt' in edit_page
+    assert count_allocations(1) == 2
+    assert count_allocations(2) == 2
+
+
+def test_allocation_rules_on_daypasses(client: Client) -> None:
+    client.login_admin()
+
+    resources_page = client.get('/resources')
+
+    page = resources_page.click('Tageskarte', index=0)
     page.form['title'] = 'Daypass'
     page.form.submit()
 
-    page = resources.click('Tageskarte', index=0)
+    page = resources_page.click('Tageskarte', index=0)
     page.form['title'] = 'Daypass'
     page = page.form.submit()
     assert "Eine Resource mit diesem Namen existiert bereits" in page
 
-    def count_allocations():
+    def count_allocations() -> int:
         s = '2000-01-01'
         e = '2050-01-31'
 
         return len(client.get(
             f'/resource/daypass/slots?start={s}&end={e}').json)
 
-    def run_cronjob():
+    def run_cronjob() -> None:
         client.get('/resource/daypass/process-rules')
 
-    page = client.get('/resource/daypass').click("Regeln").click("Regel")
+    page = client.get('/resource/daypass').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Monatlich'
     page.form['extend'] = 'monthly'
     page.form['start'] = '2019-01-01'
@@ -2178,7 +4130,7 @@ def test_allocation_rules_on_daypasses(client):
     page.form['daypasses_limit'] = '1'
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 31 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 31 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 31
 
     # running the cronjob on an ordinary day will not change anything
@@ -2206,37 +4158,38 @@ def test_allocation_rules_on_daypasses(client):
     assert count_allocations() == 90
 
     # let's stop the rule, which should leave existing allocations
-    page = client.get('/resource/daypass').click("Regeln")
+    page = client.get('/resource/daypass').click("Verfügbarkeitszeiträume")
     page.click('Stop')
 
-    page = client.get('/resource/daypass').click("Regeln")
-    assert "Keine Regeln" in page
+    page = client.get('/resource/daypass').click("Verfügbarkeitszeiträume")
+    assert "Keine Verfügbarkeitszeiträume" in page
     assert count_allocations() == 90
 
 
-def test_allocation_rules_with_holidays(client):
+def test_allocation_rules_with_holidays(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/holiday-settings')
     page.select_checkbox('cantonal_holidays', "Zug")
     page.form.submit()
 
-    resources = client.get('/resources')
-    page = resources.click('Tageskarte', index=0)
+    resources_page = client.get('/resources')
+    page = resources_page.click('Tageskarte', index=0)
     page.form['title'] = 'Daypass'
     page.form.submit()
 
-    def count_allocations():
+    def count_allocations() -> int:
         s = '2000-01-01'
         e = '2050-01-31'
 
         return len(client.get(
             f'/resource/daypass/slots?start={s}&end={e}').json)
 
-    def run_cronjob():
+    def run_cronjob() -> None:
         client.get('/resource/daypass/process-rules')
 
-    page = client.get('/resource/daypass').click("Regeln").click("Regel")
+    page = client.get('/resource/daypass').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Jährlich'
     page.form['extend'] = 'yearly'
     page.form['start'] = '2019-01-01'
@@ -2246,7 +4199,7 @@ def test_allocation_rules_with_holidays(client):
     page.form['on_holidays'] = 'no'
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 352 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 352 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 352
 
     # running the cronjob on an ordinary day will not change anything
@@ -2262,7 +4215,7 @@ def test_allocation_rules_with_holidays(client):
     assert count_allocations() == 705
 
 
-def test_allocation_rules_with_school_holidays(client):
+def test_allocation_rules_with_school_holidays(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/holiday-settings')
@@ -2277,17 +4230,18 @@ def test_allocation_rules_with_school_holidays(client):
     page.form['title'] = 'Daypass'
     page.form.submit()
 
-    def count_allocations():
+    def count_allocations() -> int:
         s = '2000-01-01'
         e = '2050-01-31'
 
         return len(client.get(
             f'/resource/daypass/slots?start={s}&end={e}').json)
 
-    def run_cronjob():
+    def run_cronjob() -> None:
         client.get('/resource/daypass/process-rules')
 
-    page = client.get('/resource/daypass').click("Regeln").click("Regel")
+    page = client.get('/resource/daypass').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Jährlich'
     page.form['extend'] = 'yearly'
     page.form['start'] = '2019-01-01'
@@ -2297,7 +4251,7 @@ def test_allocation_rules_with_school_holidays(client):
     page.form['during_school_holidays'] = 'no'
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 350 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 350 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 350
 
     # running the cronjob on an ordinary day will not change anything
@@ -2314,7 +4268,7 @@ def test_allocation_rules_with_school_holidays(client):
 
 
 @freeze_time("2019-08-01", tick=True)
-def test_zipcode_block(client):
+def test_zipcode_block(client: Client) -> None:
     client.login_admin()
 
     # enable zip-code blocking
@@ -2324,6 +4278,8 @@ def test_zipcode_block(client):
     ))
     page.select_radio('payment_method', "Keine Kreditkarten-Zahlungen")
     page.select_radio('pricing_method', "Kostenlos")
+    page.select_radio('extras_pricing_method', "Pro Eintrag")
+    page.select_radio('discount_method', "Nur den Preis pro Eintrag/Stunde")
     page.form['zipcode_block_use'] = True
     page.form['zipcode_days'] = 1
     page.form['zipcode_field'] = 'PLZ'
@@ -2336,9 +4292,11 @@ def test_zipcode_block(client):
     # create a blocked and an unblocked allocation
     transaction.begin()
 
-    scheduler = ResourceCollection(client.app.libres_context)\
-        .by_name('tageskarte')\
+    scheduler = (
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
+        .by_name('tageskarte')
         .get_scheduler(client.app.libres_context)
+    )
 
     allocations = [
         *scheduler.allocate(
@@ -2398,7 +4356,7 @@ def test_zipcode_block(client):
     page.form.submit().follow()
 
 
-def test_find_your_spot_link(client):
+def test_find_your_spot_link(client: Client) -> None:
     client.login_admin()
 
     resources = client.get('/resources')
@@ -2438,11 +4396,11 @@ def test_find_your_spot_link(client):
     assert page.pyquery('#Something .find-your-spot-link')
 
 
-def test_resource_recipient_overview(client):
+def test_resource_recipient_overview(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)
     gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
     dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
-    resources.add('Meeting', 'Europe/Zurich', type='room')
+    meeting = resources.add('Meeting', 'Europe/Zurich', type='room')
 
     recipients = ResourceRecipientCollection(client.app.session())
     recipients.add(
@@ -2454,9 +4412,14 @@ def test_resource_recipient_overview(client):
         send_on=['FR', 'SU'],
         resources=[
             gymnasium.id.hex,
-            dailypass.id.hex
+            dailypass.id.hex,
+            meeting.id.hex
         ]
     )
+
+    # John will still have the meeting room id as his resource, but this should
+    # not make any problems
+    resources.delete(meeting)
 
     transaction.commit()
     client.login_admin()
@@ -2464,9 +4427,159 @@ def test_resource_recipient_overview(client):
     page = client.get('/resource-recipients')
     assert "John" in page
     assert "john@example.org" in page
-    assert "Erhält Benachtchtigungen für neue Reservationen." in page
+    assert "Erhält Benachrichtigungen für neue Reservationen." in page
     assert "für Reservationen des Tages an folgenden Tagen:" in page
     assert "Fr , So" in page
     assert "Gymnasium" in page
     assert "Dailypass" in page
     assert "Meeting" not in page
+
+
+@freeze_time("2024-04-08", tick=True)
+def test_reserve_fractions_of_hours_total_correct_in_price(
+    client: Client
+) -> None:
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource
+    resource.pricing_method = 'per_hour'
+    resource.price_per_hour = 10.00
+    resource.payment_method = 'manual'
+
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(2024, 4, 9, 10, 0),
+            datetime(2024, 4, 9, 14, 0)  # 4-hour slot
+        ),
+        partly_available=True,
+        whole_day=False
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # Reserve 1.5 hours (10:00 to 11:30)
+    result = reserve(start='10:00', end='11:30')
+    assert result.json == {'success': True}
+
+    # Check price on confirmation page
+    form_page = client.get('/resource/tageskarte/form')
+    form_page.form['email'] = 'tester@example.org'
+
+    confirmation_page = form_page.form.submit().follow()
+
+    # Expected price: 1.5 hours * 10.00 CHF/hour = 15.00 CHF
+    total_amount_dt = confirmation_page.pyquery('dt:contains("Totalbetrag")')
+    assert total_amount_dt, 'Total amount dt not found'
+    total_amount_dd = total_amount_dt.next('dd')
+    assert total_amount_dd, 'Total amount dd not found'
+    assert total_amount_dd.text().strip() == '15.00'
+    assert '10:00 - 11:30' in confirmation_page
+
+    # Check price in reservations JSON
+    reservations_url = '/resource/tageskarte/reservations'
+    reservations_data = client.get(reservations_url).json['reservations']
+    assert len(reservations_data) == 1
+    assert reservations_data[0]['price']['amount'] == 15.00
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_my_reservations_view(client: Client) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve().json == {'success': True}
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form.submit().follow().form.submit()
+
+    client2 = client.spawn()
+
+    # by default this view is disabled
+    client.get('/resources/my-reservations', status=404)
+    client.get('/resources/my-reservations-json', status=404)
+    client.get('/resources/my-reservations-pdf', status=404)
+    client.get('/resources/my-reservations-subscribe', status=404)
+    client.get('/resources/my-reservations-ical', status=403)
+
+    # let's enable it
+    admin = client.spawn()
+    admin.login_admin()
+    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings.form['citizen_login_enabled'].checked = True
+    settings.form.submit().follow()
+
+    # now we don't have access yet
+    client.get('/resources/my-reservations-json', status=403)
+    client.get('/resources/my-reservations-pdf', status=403)
+    login = client.get('/resources/my-reservations?date=20150828').follow()
+    login.form['email'] = 'info@example.org'
+    confirm = login.form.submit().follow()
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)['TextBody']
+    token = re.search(r'&token=([^)]+)', message).group(1)  # type: ignore[union-attr]
+    confirm.form['token'] = token
+    reservations = confirm.form.submit().follow()
+    assert reservations.request.path_qs == (
+        '/resources/my-reservations?date=20150828'
+    )
+    reservations = client.get(
+        '/resources/my-reservations-json?start=2015-08-28&end=2015-08-29'
+    )
+    assert reservations.status_code == 200
+
+    # accessing the PDF without a date filter is not allowed
+    client.get('/resources/my-reservations-pdf', status=400)
+    pdf = client.get(
+        '/resources/my-reservations-pdf?start=2015-08-28&end=2015-08-29'
+    )
+    _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
+    assert '28. August 2015 - 29. August 2015' in pdf_content
+    assert 'Ganztägig' in pdf_content
+    assert 'Noch nicht akzeptiert' in pdf_content
+
+    # if we only include accepted reservations the PDF is empty
+    pdf = client.get(
+        '/resources/my-reservations-pdf'
+        '?start=2015-08-28&end=2015-08-29&accepted=1'
+    )
+    _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
+    assert '28. August 2015 - 29. August 2015' in pdf_content
+    assert 'Keine Daten verfügbar' in pdf_content
+
+    # let's also check out the ticket specific pdf
+    tickets = client.get('/tickets/ALL/all/my-tickets')
+    pdf = tickets.click(href='reservations-pdf')
+    _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
+    assert 'Ganztägig' in pdf_content
+
+    subscribe = client.get('/resources/my-reservations-subscribe')
+    assert 'webcal://' in subscribe
+    ical_url = re.search(  # type: ignore[union-attr]
+        r'webcal://localhost(/[^"]+)', subscribe.text
+    ).group(1)
+
+    # accept the reservation so the ical file contains an event
+    ticket = admin.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket.click('Alle Reservationen annehmen')
+
+    assert client.get(ical_url).status_code == 200
+
+    # someone else can open the same ical link without authentication
+    assert client2.get(ical_url).status_code == 200
+    # but not the other views
+    client2.get('/resources/my-reservations-json', status=403)
+    client2.get('/resources/my-reservations-pdf', status=403)

@@ -1,0 +1,573 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: OneGov Cloud 1.0\n"
+"POT-Creation-Date: 2025-12-22 16:12+0100\n"
+"PO-Revision-Date: 2021-03-03 16:24+0100\n"
+"Language-Team: German\n"
+"Language: de_CH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Logout"
+msgstr "Abmelden"
+
+msgid "Management"
+msgstr "Verwaltung"
+
+msgid "Files"
+msgstr "Dateien"
+
+msgid "Images"
+msgstr "Bilder"
+
+msgid "Text modules"
+msgstr "Textbausteine"
+
+msgid "Users"
+msgstr "Benutzer"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "People"
+msgstr "Personen"
+
+msgid "Archive"
+msgstr "Archiv"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "General"
+msgstr "Allgemein"
+
+msgid "State"
+msgstr "Status"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "Irrelevant"
+msgstr "Unerheblich"
+
+msgid "Excerpt from the Memorial (PDF)"
+msgstr "Auszug aus dem Memorial (PDF)"
+
+msgid "Memorial"
+msgstr "Memorial"
+
+msgid "Alternatively: Page from the Memorial"
+msgstr "Alternativ: Seite aus dem Memorial"
+
+msgid "Additional documents"
+msgstr "Zusätzliche Dokumente"
+
+msgid "Documents"
+msgstr "Dokumente"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "Progress"
+msgstr "Ablauf"
+
+msgid "Automatically updated when agenda item changed to ongoing."
+msgstr ""
+"Automatisch aktualisiert, wenn das Traktandum auf 'laufend' gesetzt wird."
+
+msgid "Calculated video timestamp"
+msgstr "Berechneter Video-Zeitstempel"
+
+msgid "Manual video timestamp"
+msgstr "Manueller Video-Zeitstempel"
+
+msgid "Overrides the calculated video timestamp."
+msgstr "Übersteuert den berechneten Videozeitstempel."
+
+msgid "Text"
+msgstr "Text"
+
+msgid "Overview"
+msgstr "Übersicht"
+
+msgid "Content"
+msgstr "Inhalt"
+
+msgid "Resolution"
+msgstr "Beschluss"
+
+msgid "Tacitly accepted"
+msgstr "Stillschweigend angenommen"
+
+msgid "Tags"
+msgstr "Schlagworte"
+
+#, python-format
+msgid ""
+"Links to the whole memorial (if there is one linked to the "
+"${assembly_type}), but opens it on the chosen page number"
+msgstr ""
+"Verlinkt das gesamte Memorial (sofern eines auf der ${assembly_type} "
+"hochgeladen ist), öffnet es aber auf der angegebenen Seitennummer"
+
+#, python-format
+msgid ""
+"Calculated automatically based on the start time of the agenda item and the "
+"start time of of the livestream of the ${assembly_type}."
+msgstr ""
+"Automatisch berechnet anhand der Startzeit des Traktandums und der Startzeit "
+"des Livestreams der ${assembly_type}."
+
+msgid "Number already used."
+msgstr "Nummer wird bereits verwendet."
+
+msgid "Invalid timestamp."
+msgstr "Ungültiger Zeitstempel."
+
+msgid "Agenda Item ZIP"
+msgstr "Traktandum ZIP"
+
+msgid "Import"
+msgstr "Importieren"
+
+msgid "No file uploaded."
+msgstr "Keine Datei hochgeladen."
+
+msgid "No html directory found in the zip file."
+msgstr "Keine HTML-Dateien im ZIP-Archiv gefunden."
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Extraordinary"
+msgstr "Ausserordentlich"
+
+msgid ""
+"To embed a youtube video first click on the \"share\" button then on the "
+"\"embed\" button. Copy the URL of the src attribute."
+msgstr ""
+"Um ein YouTube-Video einzubetten, klicken Sie zuerst auf die Schaltfläche "
+"\"share\" und dann auf die Schaltfläche \"einbetten\". Kopieren Sie die URL "
+"des src-Attributs."
+
+msgid "Video"
+msgstr "Video"
+
+msgid "Video URL"
+msgstr "Video URL"
+
+msgid "Start time of the livestream"
+msgstr "Startzeit des Livestreams"
+
+msgid "Memorial part 1 (PDF)"
+msgstr "Memorial Teil 1 (PDF)"
+
+msgid "Downloads"
+msgstr "Downloads"
+
+msgid "Memorial part 2 (PDF)"
+msgstr "Memorial Teil 2 (PDF)"
+
+msgid "Supplement to the memorial (PDF)"
+msgstr "Nachtrag zum Memorial (PDF)"
+
+msgid "Protocol (PDF)"
+msgstr "Protokoll (PDF)"
+
+msgid "Audio (MP3)"
+msgstr "Audio (MP3)"
+
+msgid "Memorial as audio for the visually impaired and blind"
+msgstr "Memorial als Hörfassung für Sehbehinderte und Blinde"
+
+#, python-format
+msgid "The URL to the video of the ${assembly_type}."
+msgstr "Die URL zum Video der ${assembly_type}."
+
+msgid "Date already used."
+msgstr "Datum wird bereits verwendet."
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "The title of the assemblies."
+msgstr "Der Titel der Versammlungen."
+
+msgid "Assembly settings"
+msgstr "Einstellungen für Versammlungen"
+
+msgid "Assembly"
+msgstr "Landsgemeinde"
+
+msgid "General Assembly"
+msgstr "Versammlung"
+
+msgid "Town Hall Meeting"
+msgstr "Gemeindeversammlung"
+
+msgid "Person"
+msgstr "Person"
+
+msgid "Person from person directory"
+msgstr "Person aus Personenverzeichnis"
+
+msgid "Choosing a person will overwrite the fields below"
+msgstr ""
+"Die untenstehenden Felder werden mit der ausgewählten Person überschrieben"
+
+msgid "Function"
+msgstr "Funktion"
+
+msgid "Party or parliamentary group"
+msgstr "Partei oder Fraktion"
+
+msgid "Place"
+msgstr "Ort"
+
+msgid "Picture"
+msgstr "Bild"
+
+msgid "Automatically updated when votum changed to ongoing."
+msgstr ""
+"Automatisch aktualisiert, wenn die Wortmeldung auf 'laufend' gesetzt wird."
+
+msgid "Motion"
+msgstr "Antrag"
+
+msgid "Statement of reasons"
+msgstr "Begründung"
+
+#, python-format
+msgid ""
+"Calculated automatically based on the start time of the votum and the start "
+"time of of the livestream of the ${assembly_type}."
+msgstr ""
+"Automatisch berechnet anhand der Startzeit der Wortmeldung und der Startzeit "
+"des Livestreams der ${assembly_type}."
+
+#, python-format
+msgid "Agenda items of ${assembly_type} from ${date}"
+msgstr "Traktanden der ${assembly_type} vom ${date}"
+
+msgid "Homepage"
+msgstr "Startseite"
+
+msgid "Agenda items"
+msgstr "Traktanden"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Agenda item"
+msgstr "Traktandum"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Do you really want to delete this agenda item?"
+msgstr "Möchten Sie dieses Traktandum wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Delete agenda item"
+msgstr "Traktandum löschen"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Votum"
+msgstr "Wortmeldung"
+
+msgid "Do you really want to delete this votum?"
+msgstr "Möchten Sie diese Wortmeldung wirklich löschen?"
+
+msgid "Delete votum"
+msgstr "Wortmeldung löschen"
+
+msgid "States"
+msgstr "Status"
+
+msgid "Ticker"
+msgstr "Ticker"
+
+#, python-format
+msgid "Do you really want to delete this ${assembly_type}?"
+msgstr "Möchten Sie diese ${assembly_type} wirklich löschen?"
+
+#, python-format
+msgid "Delete ${assembly_type}"
+msgstr "${assembly_type} löschen"
+
+msgid "ZIP Upload"
+msgstr "ZIP-Upload"
+
+#, python-format
+msgid "Extraordinary ${assembly_type} from ${date}"
+msgstr "Ausserordentliche ${assembly_type} vom ${date}"
+
+#, python-format
+msgid "${assembly_type} from ${date}"
+msgstr "${assembly_type} vom ${date}"
+
+msgid "Irrelevant motion"
+msgstr "Unerheblicher Antrag"
+
+msgid "General Assemblies"
+msgstr "Versammlungen"
+
+msgid "Town Hall Meetings"
+msgstr "Gemeindeversammlungen"
+
+msgid "Assemblies"
+msgstr "Landsgemeinden"
+
+#, python-format
+msgid "Vota of agenda items ${number} of ${assembly_type} from ${date}"
+msgstr ""
+"Wortmeldungen des Traktandum ${number} der ${assembly_type} vom ${date}"
+
+msgid "Vota"
+msgstr "Wortmeldungen"
+
+msgid "draft"
+msgstr "Entwurf"
+
+msgid "scheduled"
+msgstr "geplant"
+
+msgid "ongoing"
+msgstr "laufend"
+
+msgid "completed"
+msgstr "abgeschlossen"
+
+msgid "Previous agenda item"
+msgstr "Vorheriges Traktandum"
+
+msgid "Next agenda item"
+msgstr "Nächstes Traktandum"
+
+msgid "Excerpt from the Memorial.pdf"
+msgstr "Auszug aus dem Memorial.pdf"
+
+msgid "Links"
+msgstr "Links"
+
+msgid "No ${assembly} defined yet."
+msgstr "Noch keine ${assembly} erfasst."
+
+msgid "Downloads, Audio & Assembly items"
+msgstr "Downloads, Audio & Traktanden"
+
+msgid "Memorial part 1"
+msgstr "Memorial Teil 1"
+
+msgid "Memorial part 2"
+msgstr "Memorial Teil 2"
+
+msgid "Supplement to the memorial"
+msgstr "Nachtrag zum Memorial"
+
+msgid "Protocol"
+msgstr "Protokoll"
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Download audio"
+msgstr "Audio herunterladen"
+
+msgid "Search term"
+msgstr "Suchbegriff"
+
+msgid "Skip navigation"
+msgstr "Navigation überspringen"
+
+msgid "Back to the homepage"
+msgstr "Zurück zur Startseite"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "To the liveticker"
+msgstr "Zum Liveticker"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
+"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "Copied to Clipboard!"
+msgstr "In die Zwischenablage kopiert!"
+
+msgid "Memorial (PDF)"
+msgstr "Memorial (PDF)"
+
+msgid "more"
+msgstr "mehr"
+
+msgid "Raw Data"
+msgstr "Rohdaten"
+
+msgid "Terms of use"
+msgstr "Nutzungsbedingungen"
+
+msgid "Open use. Must provide the source."
+msgstr "Freie Nutzung. Quellenangabe ist Pflicht."
+
+msgid "You may use this dataset for non-commercial purposes."
+msgstr "Sie dürfen diesen Datensatz für nicht kommerzielle Zwecke nutzen."
+
+msgid "You may use this dataset for commercial purposes."
+msgstr "Sie dürfen diesen Datensatz für kommerzielle Zwecke nutzen"
+
+msgid "You must provide the source (author, title and link to the dataset)."
+msgstr "Eine Quellenangabe ist Pflicht (Autor, Titel und Link zum Datensatz)."
+
+msgid ""
+"Shows the status of each element of an ${assembly}. The statuses of each "
+"element are automatically adjusted when editing an element, if possible."
+msgstr ""
+"Zeigt den Status jedes Elements einer ${assembly}. Die Stati aller Elemente "
+"einer ${assembly} werden beim Bearbeiten eines einzelnen Elementes "
+"automatisch angepasst (sofern möglich)."
+
+msgid "The ${assembly} has ended."
+msgstr "Die ${assembly} ist beendet."
+
+msgid "Added a new agenda item"
+msgstr "Neues Traktandum hinzugefügt"
+
+msgid "New"
+msgstr "Neu"
+
+msgid "New agenda item"
+msgstr "Neues Traktandum"
+
+msgid "Imported a new agenda item"
+msgstr "Neues Traktandum importiert"
+
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"
+
+#, python-format
+msgid "Added a new ${assembly}"
+msgstr "Neue ${assembly} hinzugefügt"
+
+#, python-format
+msgid "New ${assembly}"
+msgstr "Neue ${assembly}"
+
+msgid "Open Data"
+msgstr "Open Data"
+
+#, python-format
+msgid "Results from the ${title}, structured as json"
+msgstr "Resultate der ${title}, strukturiert als JSON"
+
+msgid "Location"
+msgstr "Ort"
+
+msgid "Added a new votum"
+msgstr "Neue Wortmeldung hinzugefügt"
+
+msgid "New votum"
+msgstr "Neue Wortmeldung"
+
+#~ msgid "The assembly has ended."
+#~ msgstr "Die Landsgemeinde ist beendet."
+
+#~ msgid ""
+#~ "Shows the status of each element of an ${layout.assembly_type}. The "
+#~ "statuses of each element are automatically adjusted when editing an "
+#~ "element, if possible."
+#~ msgstr ""
+#~ "Zeigt den Status jedes Elements einer ${layout.assembly_type}. Die Stati "
+#~ "aller Elemente einer ${layout.assembly_type} werden beim Bearbeiten eines "
+#~ "einzelnen Elementes automatisch angepasst (sofern möglich)."
+
+#~ msgid ""
+#~ "Shows the status of each element of an assembly. The statuses of each "
+#~ "element are automatically adjusted when editing an element, if possible."
+#~ msgstr ""
+#~ "Zeigt den Status jedes Elements einer Landsgemeinde. Die Stati aller "
+#~ "Elemente einer Landsgemeinde werden beim Bearbeiten eines einzelnen "
+#~ "Elementes automatisch angepasst (sofern möglich)."
+
+#, python-format
+#~ msgid "Vota of agenda items ${number} of assembly from ${date}"
+#~ msgstr ""
+#~ "Wortmeldungen des Traktandum ${number} der Landsgemeinde vom ${date}"
+
+#~ msgid "Do you really want to delete this assembly?"
+#~ msgstr "Möchten Sie diese Landsgemeinde wirklich löschen?"
+
+#~ msgid "Delete assembly"
+#~ msgstr "Landsgemeinde löschen"
+
+#, python-format
+#~ msgid "Agenda items of assembly from ${date}"
+#~ msgstr "Traktanden der Landsgemeinde vom ${date}"
+
+#~ msgid ""
+#~ "Calculated automatically based on the start time of the votum and the "
+#~ "start time of of the livestream of the assembly."
+#~ msgstr ""
+#~ "Automatisch berechnet anhand der Startzeit der Wortmeldung und der "
+#~ "Startzeit des Livestreams der Landsgemeinde."
+
+#~ msgid ""
+#~ "Calculated automatically based on the start time of the agenda item and "
+#~ "the start time of of the livestream of the assembly ."
+#~ msgstr ""
+#~ "Automatisch berechnet anhand der Startzeit des Traktandums und der "
+#~ "Startzeit des Livestreams der Landsgemeinde."
+
+#~ msgid "The URL to the video of the assembly."
+#~ msgstr "Die URL zum Video der Landsgemeinde."
+
+#~ msgid ""
+#~ "Links to the whole memorial (if there is one linked to the assembly), but "
+#~ "opens it on the chosen page number"
+#~ msgstr ""
+#~ "Verlinkt das gesamte Memorial (sofern eines auf der Landsgemeinde "
+#~ "hochgeladen ist), öffnet es aber auf der angegebenen Seitennummer"
+
+#, python-format
+#~ msgid "Extraodinary ${assembly_type} from ${date}"
+#~ msgstr "Ausserordentliche ${assembly_type} vom ${date}"
+
+#~ msgid "No assemblies defined yet."
+#~ msgstr "Noch keine Landsgemeinden erfasst."
+
+#, python-format
+#~ msgid "Extraodinary assembly from ${date}"
+#~ msgstr "Ausserordentliche Landsgemeinde vom ${date}"
+
+#, python-format
+#~ msgid "Assembly from ${date}"
+#~ msgstr "Landsgemeinde vom ${date}"
+
+#~ msgid "Assembly items & downloads"
+#~ msgstr "Traktanden & Downloads"
+
+#~ msgid "Audio (ZIP)"
+#~ msgstr "Audio (ZIP)"
+
+#~ msgid "Video timestamp"
+#~ msgstr "Video-Zeitstempel"
+
+#~ msgid "Close"
+#~ msgstr "Schliessen"

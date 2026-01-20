@@ -86,15 +86,6 @@
             <tal:b tal:condition="type == 'election-table' and scope == 'lists'">
                 <tal:b metal:use-macro="layout.macros['election-lists-table']"/>
             </tal:b>
-            <tal:b tal:condition="type == 'election-compound-table' and scope == 'seat-allocation'">
-                <tal:b metal:use-macro="layout.macros['election-compound-seat-allocation-table']"/>
-            </tal:b>
-            <tal:b tal:condition="type == 'election-compound-table' and scope == 'list-groups'">
-                <tal:b metal:use-macro="layout.macros['election-compound-list-groups-table']"/>
-            </tal:b>
-            <tal:b tal:condition="type == 'election-compound-table' and scope == 'statistics'">
-                <tal:b metal:use-macro="layout.macros['election-compound-statistics-table']"/>
-            </tal:b>
             <tal:b tal:condition="type == 'election-table' and scope == 'candidates'">
                 <tal:b metal:use-macro="layout.macros['election-candidates-table']"/>
             </tal:b>
@@ -104,6 +95,9 @@
             <tal:b tal:condition="type == 'election-table' and scope == 'connections'">
                 <tal:b metal:use-macro="layout.macros['election-connections-table']"/>
             </tal:b>
+            <tal:b tal:condition="type == 'election-table' and scope == 'party-strengths'">
+                <tal:b metal:use-macro="layout.macros['party-strengths-table']"/>
+            </tal:b>
             <tal:b tal:condition="type == 'election-compound-table' and scope == 'districts'">
                 <tal:b metal:use-macro="layout.macros['election-compound-districts-table']"/>
             </tal:b>
@@ -112,6 +106,21 @@
             </tal:b>
             <tal:b tal:condition="type == 'election-compound-table' and scope == 'candidates'">
                 <tal:b metal:use-macro="layout.macros['election-compound-candidates-table']"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'election-compound-table' and scope == 'seat-allocation'">
+                <tal:b metal:use-macro="layout.macros['election-compound-seat-allocation-table']"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'election-compound-table' and scope == 'list-groups'">
+                <tal:b metal:use-macro="layout.macros['election-compound-list-groups-table']"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'election-compound-table' and scope == 'statistics'">
+                <tal:b metal:use-macro="layout.macros['election-compound-statistics-table']"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'election-compound-table' and scope == 'party-strengths'">
+                <tal:b metal:use-macro="layout.macros['party-strengths-table']"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'election-compound-part-table' and scope == 'party-strengths'">
+                <tal:b metal:use-macro="layout.macros['party-strengths-table']"/>
             </tal:b>
             <tal:b tal:condition="type == 'vote-header' and scope == 'vote'">
                 <div class="before-content">

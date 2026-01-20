@@ -1,4 +1,12 @@
-from cached_property import cached_property
+from __future__ import annotations
+
+from functools import cached_property
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
+    from typing import Self
 
 
 class Clipboard:
@@ -11,38 +19,38 @@ class Clipboard:
 
     """
 
-    def __init__(self, request, token):
+    def __init__(self, request: OrgRequest, token: str) -> None:
         self.request = request
         self.token = token
 
     @cached_property
-    def url(self):
+    def url(self) -> str | None:
         data = self.request.load_url_safe_token(self.token, salt='clipboard')
         return data and data['url'] or None
 
-    def get_object(self):
+    def get_object(self) -> Any | None:
         if not self.url:
             return None
 
         return self.request.app.object_by_path(self.url)
 
-    def clear(self):
+    def clear(self) -> None:
         if self.request.browser_session.has('clipboard_url'):
             del self.request.browser_session['clipboard_url']
 
-    def store_in_session(self):
+    def store_in_session(self) -> None:
         if self.url:
             self.request.browser_session['clipboard_url'] = self.url
 
     @classmethod
-    def from_url(cls, request, url):
+    def from_url(cls, request: OrgRequest, url: str) -> Self:
         return cls(
             request,
             request.new_url_safe_token({'url': url}, salt='clipboard')
         )
 
     @classmethod
-    def from_session(cls, request):
+    def from_session(cls, request: OrgRequest) -> Self:
         return cls(
             request,
             request.new_url_safe_token(

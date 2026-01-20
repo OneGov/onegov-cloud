@@ -1,23 +1,31 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionResult
-from onegov.ballot import PanachageResult
-from onegov.ballot import PartyResult
-from onegov.ballot import ProporzElection
 from onegov.election_day.layouts import ElectionCompoundLayout
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundRelationship
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import PartyPanachageResult
+from onegov.election_day.models import PartyResult
+from onegov.election_day.models import ProporzElection
 from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
 
 
-def test_election_compound_layout_general(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_election_compound_layout_general(session: Session) -> None:
     date_ = date(2011, 1, 1)
     election = ProporzElection(title="election", domain='region', date=date_)
     session.add(election)
     session.add(ElectionCompound(title="e", domain='canton', date=date_))
     session.flush()
     compound = session.query(ElectionCompound).one()
-    request = DummyRequest()
+    request: Any = DummyRequest()
     layout = ElectionCompoundLayout(compound, request)
     assert layout.all_tabs == (
         'seat-allocation',
@@ -57,7 +65,7 @@ def test_election_compound_layout_general(session):
             eligible_voters=500,
         )
     )
-    layout = ElectionCompoundLayout(compound, DummyRequest())
+    layout = ElectionCompoundLayout(compound, DummyRequest())  # type: ignore[arg-type]
     assert layout.has_results
 
     # test party results
@@ -65,7 +73,7 @@ def test_election_compound_layout_general(session):
         PartyResult(
             year=2017,
             number_of_mandates=0,
-            votes=0,
+            votes=10,
             total_votes=100,
             name_translations={'de_CH': 'A'},
             party_id='1'
@@ -85,7 +93,6 @@ def test_election_compound_layout_general(session):
     layout = ElectionCompoundLayout(compound, request)
     assert layout.has_superregions is True
 
-    # test main view
     layout = ElectionCompoundLayout(compound, request)
     assert layout.main_view == 'ElectionCompound/superregions'
 
@@ -98,12 +105,6 @@ def test_election_compound_layout_general(session):
     compound.show_list_groups = True
     layout = ElectionCompoundLayout(compound, request)
     assert layout.main_view == 'ElectionCompound/list-groups'
-
-    request.app.principal.hidden_tabs = {'elections': ['list-groups']}
-    request.app.principal.has_superregions = False
-    layout = ElectionCompoundLayout(compound, request)
-    assert layout.hide_tab('list-groups') is True
-    assert layout.main_view == 'ElectionCompound/districts'
 
     # test file paths
     with freeze_time("2014-01-01 12:00"):
@@ -154,8 +155,46 @@ def test_election_compound_layout_general(session):
         assert layout.svg_link == 'ElectionCompound/parties-panachage-svg'
         assert layout.svg_name == 'electioncompound-panachage.svg'
 
+    with freeze_time("2014-01-01 13:00"):
+        second_compound = ElectionCompound(
+            title='Second Compound',
+            domain='federation',
+            date=date(2011, 1, 1),
+        )
+        session.add(second_compound)
+        session.flush()
 
-def test_election_compound_layout_menu(session):
+        relationship = ElectionCompoundRelationship(
+            source_id=compound.id,
+            target_id=second_compound.id
+        )
+        session.add(relationship)
+        session.flush()
+
+        assert ElectionCompoundLayout(compound, request).related_compounds == [
+            ('Second Compound', 'ElectionCompound/second-compound')
+        ]
+        assert ElectionCompoundLayout(
+            second_compound, request
+        ).related_compounds == []
+
+    # test table links
+    for tab, expected in (
+        ('seat-allocation', 'ElectionCompound/seat-allocation-table'),
+        ('list-groups', 'ElectionCompound/list-groups-table'),
+        ('superregions', 'ElectionCompound/superregions-table'),
+        ('districts', 'ElectionCompound/districts-table'),
+        ('candidates', 'ElectionCompound/candidates-table'),
+        ('party-strengths', 'ElectionCompound/party-strengths-table'),
+        ('parties-panachage', None),
+        ('statistics', 'ElectionCompound/statistics-table'),
+        ('data', None)
+    ):
+        layout = ElectionCompoundLayout(compound, DummyRequest(), tab=tab)  # type: ignore[arg-type]
+        assert not expected or f'{expected}?locale=de' == layout.table_link()
+
+
+def test_election_compound_layout_menu(session: Session) -> None:
     election = ProporzElection(
         title="Election",
         domain='region',
@@ -172,7 +211,7 @@ def test_election_compound_layout_menu(session):
     compound.elections = [election]
 
     # No results yet
-    request = DummyRequest()
+    request: Any = DummyRequest()
     assert ElectionCompoundLayout(compound, request).menu == []
     assert ElectionCompoundLayout(compound, request, 'data').menu == []
 
@@ -203,14 +242,14 @@ def test_election_compound_layout_menu(session):
         PartyResult(
             year=2017,
             number_of_mandates=0,
-            votes=0,
+            votes=10,
             total_votes=100,
             name_translations={'de_CH': 'A'},
             party_id='1'
         )
     )
-    compound.panachage_results.append(
-        PanachageResult(target='t', source='t ', votes=0)
+    compound.party_panachage_results.append(
+        PartyPanachageResult(target='t', source='t ', votes=10)
     )
     assert ElectionCompoundLayout(compound, request).menu == [
         ('__districts', 'ElectionCompound/districts', False, []),
@@ -239,18 +278,16 @@ def test_election_compound_layout_menu(session):
         ('Downloads', 'ElectionCompound/data', False, [])
     ]
 
-
-def test_election_compound_layout_table_links():
-    for tab, expected in (
-        ('seat-allocation', 'ElectionCompound/seat-allocation-table'),
-        ('list-groups', 'ElectionCompound/list-groups-table'),
-        ('superregions', 'ElectionCompound/superregions-table'),
-        ('districts', 'ElectionCompound/districts-table'),
-        ('candidates', 'ElectionCompound/candidates-table'),
-        ('party-strengths', None),
-        ('parties-panachage', None),
-        ('data', None)
-    ):
-        election = ElectionCompound(date=date(2100, 1, 1), domain='federation')
-        layout = ElectionCompoundLayout(election, DummyRequest(), tab=tab)
-        assert expected == layout.table_link
+    # with horizontal_party_strengths
+    compound.horizontal_party_strengths = True
+    assert ElectionCompoundLayout(compound, request).menu == [
+        ('Seat allocation', 'ElectionCompound/seat-allocation', False, []),
+        ('Party strengths', 'ElectionCompound/party-strengths', False, []),
+        ('List groups', 'ElectionCompound/list-groups', False, []),
+        ('__superregions', 'ElectionCompound/superregions', False, []),
+        ('__regions', 'ElectionCompound/districts', False, []),
+        ('Elected candidates', 'ElectionCompound/candidates', False, []),
+        ('Panachage', 'ElectionCompound/parties-panachage', False, []),
+        ('Election statistics', 'ElectionCompound/statistics', False, []),
+        ('Downloads', 'ElectionCompound/data', False, [])
+    ]

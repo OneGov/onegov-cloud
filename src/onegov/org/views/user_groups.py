@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.org import _
 from onegov.org import OrgApp
@@ -10,7 +12,18 @@ from onegov.user import UserGroup
 from onegov.user import UserGroupCollection
 
 
-def get_usergroup_form_class(model, request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.org.request import OrgRequest
+    from webob import Response
+
+
+def get_usergroup_form_class(
+    model: object,
+    request: OrgRequest
+) -> type[ManageUserGroupForm]:
+
     return getattr(
         request.app.settings.org, 'usergroup_form_class', ManageUserGroupForm
     )
@@ -21,7 +34,12 @@ def get_usergroup_form_class(model, request):
     template='user_groups.pt',
     permission=Secret
 )
-def view_user_groups(self, request, layout=None):
+def view_user_groups(
+    self: UserGroupCollection[UserGroup],
+    request: OrgRequest,
+    layout: UserGroupCollectionLayout | None = None
+) -> RenderData:
+
     layout = layout or UserGroupCollectionLayout(self, request)
 
     return {
@@ -38,7 +56,13 @@ def view_user_groups(self, request, layout=None):
     permission=Secret,
     form=get_usergroup_form_class
 )
-def add_user_group(self, request, form, layout=None):
+def add_user_group(
+    self: UserGroupCollection[UserGroup],
+    request: OrgRequest,
+    form: ManageUserGroupForm,
+    layout: UserGroupCollectionLayout | None = None
+) -> RenderData | Response:
+
     if form.submitted(request):
         user_group = self.add(name=form.name.data)
         form.update_model(user_group)
@@ -47,6 +71,7 @@ def add_user_group(self, request, form, layout=None):
 
     layout = layout or UserGroupCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New user group'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -60,12 +85,18 @@ def add_user_group(self, request, form, layout=None):
     template='user_group.pt',
     permission=Secret
 )
-def view_user_group(self, request, layout=None):
+def view_user_group(
+    self: UserGroup,
+    request: OrgRequest,
+    layout: UserGroupLayout | None = None
+) -> RenderData:
+
     layout = layout or UserGroupLayout(self, request)
 
     return {
         'layout': layout,
         'title': self.name,
+        'directories': self.meta.get('directories', ()),
     }
 
 
@@ -76,7 +107,13 @@ def view_user_group(self, request, layout=None):
     permission=Secret,
     form=get_usergroup_form_class
 )
-def edit_user_group(self, request, form, layout=None):
+def edit_user_group(
+    self: UserGroup,
+    request: OrgRequest,
+    form: ManageUserGroupForm,
+    layout: UserGroupLayout | None = None
+) -> RenderData | Response:
+
     if form.submitted(request):
         form.update_model(self)
         request.success(_('Your changes were saved'))
@@ -87,6 +124,7 @@ def edit_user_group(self, request, form, layout=None):
 
     layout = layout or UserGroupLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit user group'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -100,6 +138,6 @@ def edit_user_group(self, request, form, layout=None):
     request_method='DELETE',
     permission=Secret
 )
-def delete_user_group(self, request):
+def delete_user_group(self: UserGroup, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     UserGroupCollection(request.session).delete(self)

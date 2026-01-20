@@ -1,37 +1,43 @@
 """ Use Markov chains to generate random text that sounds Japanese.
-    This makes random pronounceable passwords that are both strong and easy
-    to memorize.
+This makes random pronounceable passwords that are both strong and easy
+to memorize.
 
-    Of course English or any other language could be used in the sample text.
+Of course English or any other language could be used in the sample text.
 
-    See more details at http://exyr.org/2011/random-pronounceable-passwords/
+See more details at http://exyr.org/2011/random-pronounceable-passwords/
 
-    Author: Simon Sapin
-    License: BSD
+Author: Simon Sapin
+License: BSD
 """
+from __future__ import annotations
 
 import string
-import itertools
-import random
+import secrets
 
 from collections import defaultdict
-from onegov.core.utils import pairwise
+from itertools import islice, pairwise
 
 
-def random_password(length=16):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+
+
+def random_password(length: int = 16) -> str:
     """ Returns a random password using the markov chain below. """
 
+    # FIXME: We only really need to initialize the markov chain once
     chain = MarkovChain(
         c for c in japanese.lower() if c in string.ascii_lowercase
     )
-    return ''.join(itertools.islice(chain, length))
+    return ''.join(islice(chain, length))
 
 
 # This is a romanization of the opening of "Genji Monogatari"
 # by Murasaki Shikibu.
 # Source: http://etext.lib.virginia.edu/japanese/genji/roman.html
 
-japanese = '''
+japanese = """
 Idure no ohom-toki ni ka, nyougo, kaui amata saburahi tamahi keru naka ni,
 ito yamgotonaki kiha ni ha ara nu ga, sugurete tokimeki tamahu ari keri.
 
@@ -90,10 +96,13 @@ mo ohokari. Koto ni hure te kazu sira zu kurusiki koto nomi masare ba, ito itau
 omohi wabi taru wo, itodo ahare to go-ran-zi te, Kourau-den ni motoyori
 saburahi tamahu Kaui no zausi wo hoka ni utusa se tamahi te, Uhe-tubone ni
 tamaha su. Sono urami masite yara m kata nasi.
-'''
+"""
 
 
 class MarkovChain:
+    counts: dict[str, dict[str, int]]
+    totals: dict[str, int]
+
     """
     If a system transits from a state to another and the next state depends
     only on the current state and not the past, it is said to be a Markov
@@ -107,36 +116,37 @@ class MarkovChain:
     The probabilities are built from the frequencies in the `sample` chain.
     Elements of the sample that are not a valid state are ignored.
     """
-    def __init__(self, sample):
-        self.counts = counts = defaultdict(lambda: defaultdict(int))
+    def __init__(self, sample: Iterable[str]):
+        counts = self.counts = defaultdict(lambda: defaultdict(int))
         for current, next in pairwise(sample):
             counts[current][next] += 1
 
-        self.totals = dict(
-            (current, sum(next_counts.values()))
+        self.totals = {
+            current: sum(next_counts.values())
             for current, next_counts in counts.items()
-        )
+        }
 
-    def next(self, state):
+    def next(self, state: str) -> str:
         """
         Choose at random and return a next state from a current state,
         according to the probabilities for this chain
         """
         nexts = self.counts[state].items()
         # Like random.choice() but with a different weight for each element
-        rand = random.randrange(0, self.totals[state])
+        rand = secrets.randbelow(self.totals[state])
         # Using bisection here could be faster, but simplicity prevailed.
-        # (Also it’s not that slow with 26 states or so.)
+        # (Also it's not that slow with 26 states or so.)
         for next_state, weight in nexts:
             if rand < weight:
                 return next_state
             rand -= weight
+        raise AssertionError('unreachable')
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         """
         Return an infinite iterator of states.
         """
-        state = random.choice(tuple(k for k in self.counts.keys()))
+        state = secrets.choice(tuple(k for k in self.counts.keys()))
         while True:
             state = self.next(state)
             yield state

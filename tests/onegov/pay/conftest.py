@@ -1,11 +1,18 @@
+from __future__ import annotations
+
 import pytest
 import transaction
 
 from onegov.pay.models import Payment
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+
 @pytest.fixture(scope='function', autouse=True)
-def reset_payment():
+def reset_payment() -> Iterator[None]:
     yield
 
     # during testing we need to reset the links created on the payment
@@ -16,12 +23,11 @@ def reset_payment():
     while classes:
         cls = classes.pop()
 
-        # todo: it seems that we have a problem that depending on the test/
-        # selection of tests and/or used fixtures different models/table
-        # are created
-        for key in getattr(Payment, 'registered_links', []) or []:
-            if key in cls.__mapper__._props:
-                del cls.__mapper__._props[key]
+        for key in (Payment.registered_links or ()):
+            try:
+                del cls.__mapper__._props[key]  # type: ignore[attr-defined]
+            except KeyError:
+                pass
 
         classes.extend(cls.__subclasses__())
 

@@ -1,15 +1,26 @@
-from onegov.ballot import Election
-from onegov.core.security import Public
+from __future__ import annotations
+
+from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.hidden_by_principal import \
-    hide_candidates_chart
+from onegov.election_day.hidden_by_principal import hide_candidates_chart
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils import get_entity_filter
 from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
 from sqlalchemy.orm import object_session
-from onegov.election_day import _
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
 
 election_incomplete_text = _(
     'The figure with elected candidates will be available '
@@ -20,10 +31,12 @@ election_incomplete_text = _(
 @ElectionDayApp.json(
     model=Election,
     name='candidates-data',
-    permission=Public
+    permission=MaybePublic
 )
-def view_election_candidates_data(self, request):
-
+def view_election_candidates_data(
+    self: Election,
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" View the candidates as JSON.
 
     Used to for the candidates bar chart.
@@ -33,11 +46,17 @@ def view_election_candidates_data(self, request):
     limit = get_parameter(request, 'limit', int, None)
     lists = get_parameter(request, 'lists', list, None)
     elected = get_parameter(request, 'elected', bool, None)
-    sort_by_lists = get_parameter(request, 'sort_by_lists', bool, None)
+    sort_by_lists = get_parameter(request, 'sort_by_lists', bool, False)
+    entity = request.params.get('entity', '')
+    assert isinstance(entity, str)
 
     return get_candidates_data(
-        self, limit=limit, lists=lists, elected=elected,
-        sort_by_lists=sort_by_lists
+        self,
+        limit=limit,
+        lists=lists,
+        elected=elected,
+        sort_by_lists=sort_by_lists,
+        entities=[entity] if entity else None
     )
 
 
@@ -45,15 +64,19 @@ def view_election_candidates_data(self, request):
     model=Election,
     name='candidates-chart',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
-def view_election_candidates_chart(self, request):
-
+def view_election_candidates_chart(
+    self: Election,
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the candidates as bar chart. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
+
+    entity = request.params.get('entity', '')
 
     return {
         'skip_rendering': hide_candidates_chart(self, request),
@@ -61,6 +84,7 @@ def view_election_candidates_chart(self, request):
         'model': self,
         'layout': ElectionLayout(self, request),
         'type': 'candidates-chart',
+        'entity': entity
     }
 
 
@@ -68,14 +92,23 @@ def view_election_candidates_chart(self, request):
     model=Election,
     name='candidates',
     template='election/candidates.pt',
-    permission=Public
+    permission=MaybePublic
 )
-def view_election_candidates(self, request):
-
+def view_election_candidates(
+    self: Election,
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
-    candidates = get_candidates_results(self, object_session(self)).all()
-    any_elected = any([candidate.elected for candidate in candidates])
+    entity = request.params.get('entity', '')
+    assert isinstance(entity, str)
+    entities = get_entity_filter(request, self, 'candidates', entity)
+    candidates = get_candidates_results(
+        self,
+        object_session(self),
+        entities=[entity] if entity else None
+    ).all()
+    any_elected = any(candidate.elected for candidate in candidates)
 
     return {
         'skip_rendering': hide_candidates_chart(self, request),
@@ -83,7 +116,9 @@ def view_election_candidates(self, request):
         'election': self,
         'layout': ElectionLayout(self, request, 'candidates'),
         'candidates': candidates,
-        'any_elected': any_elected
+        'any_elected': any_elected,
+        'entity': entity,
+        'redirect_filters': {request.app.principal.label('entity'): entities}
     }
 
 
@@ -91,28 +126,44 @@ def view_election_candidates(self, request):
     model=Election,
     name='candidates-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
-def view_election_lists_table(self, request):
-
+def view_election_lists_table(
+    self: Election,
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the lists as table. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
+
+    entity = request.params.get('entity', '')
+    assert isinstance(entity, str)
+    candidates = get_candidates_results(
+        self,
+        object_session(self),
+        entities=[entity] if entity else None
+    ).all()
 
     return {
         'election': self,
-        'candidates': get_candidates_results(self, object_session(self)).all(),
+        'candidates': candidates,
         'layout': ElectionLayout(self, request, 'candidates'),
         'type': 'election-table',
         'scope': 'candidates',
     }
 
 
-@ElectionDayApp.svg_file(model=Election, name='candidates-svg')
-def view_election_candidates_svg(self, request):
-
+@ElectionDayApp.svg_file(
+    model=Election,
+    name='candidates-svg',
+    permission=MaybePublic
+)
+def view_election_candidates_svg(
+    self: Election,
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the candidates as SVG. """
 
     layout = ElectionLayout(self, request, 'candidates')

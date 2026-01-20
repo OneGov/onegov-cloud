@@ -84,20 +84,41 @@ $publications-icon: '\f1ea';
 
 
 .side-panel {
-
     @include clean-ul;
     @include breakpoint(medium up) {
+        margin-bottom: 2.5rem;
+
+        &:last-child {
+            margin-bottom: 1rem;
+        }
+    }
+    padding-left: 1.5rem;
+
+    @media #{$small-only} {
         margin-bottom: 2rem;
+        padding-left: 0;
+
+        &:last-child {
+            margin-bottom: 1rem;
+        }
     }
 
-    ul.bulleted {
-        list-style-type: disc;
-        margin-left: 1.5rem;
-        margin-top: .25rem;
+    ul.more-list {
+        margin: 0 -.5rem;
     }
 
-    .contacts-albums-panel ul.panel-links.more-list {
-        padding: 0;
+    #search {
+        @include smooth-edges;
+
+        + .input-group-button .button {
+            margin-left: 1.5rem;
+            padding: .2rem .7rem !important;
+
+            &:hover {
+                margin-left: 1rem;
+                padding: .2rem 1.2rem !important;
+            }
+        }
     }
 
     .services-panel {
@@ -121,13 +142,8 @@ $publications-icon: '\f1ea';
             padding-right: $panel-icon-padding-right;
         }
 
-        .callout {
-            border: none;
-        }
-
-        @include more-link-after;
-
         a {
+            @include more-link-after;
             color: $primary-fg-color !important;
         }
 
@@ -183,11 +199,48 @@ $publications-icon: '\f1ea';
 $checklist-icon: "\f0ae";
 
 @mixin contact-content-base {
-    min-height: .5rem;
+    min-height: 1rem;
 
     + li {
         margin-top: .25rem;
     }
+}
+
+.contact-panel {
+    ul.bulleted {
+        list-style-type: disc;
+        margin-bottom: 1rem;
+        margin-left: 1rem;
+    }
+
+    ul li {
+        min-height: 1rem;
+    }
+
+    >ul li+li {
+        margin-top: 0 !important;
+    }
+
+    p:nth-child(2),
+    p:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.side-panel-with-bg {
+
+    .calendar-export-list {
+        list-style: none;
+        margin: 0;
+    }
+
+    &> *:last-child {
+        margin-bottom: 0 !important;
+    }
+}
+
+.marker-map {
+    @include smooth-edges;
 }
 
 .homepage .side-panel:first-child,
@@ -213,17 +266,6 @@ $checklist-icon: "\f0ae";
     }
 }
 
-.contact-panel-content > ul li {
-    @include contact-content-base;
-}
-
-.side-panel.highlighted,
-.contact-panel-content {
-    @include callout-style($gray-dark-medium);
-    padding: 1rem;
-    color: #444;
-}
-
 
 .panel {
     @include smooth-edges;
@@ -240,41 +282,27 @@ $checklist-icon: "\f0ae";
     }
 }
 
-/*
-    Custom record submission
-*/
-.submit-yours {
-    @include callout($gray-dark-medium);
-    @include smooth-edges;
-
-    padding: 1rem 1rem .5rem;
-
-    h2 {
-        color: $primary-color;
-        display: inline;
-        font-size: 1rem;
-        font-weight: bold;
-    }
-}
-
 .people-panel {
-    li div:first-of-type {
-        margin-top: .3rem;
-    }
-
-    ul div {
-        color: #444;
-        margin-top: -10px !important;
-    }
-
-    .person-link {
-        color: $anchor-color;
-        line-height: inherit;
-    }
+    margin-top: 2rem;
 }
 
 .page-content-sidebar {
     .newsletter-sidepanel {
         margin-top: 2rem;
+    }
+}
+
+.date-filters input {
+    margin-bottom: 0;
+}
+
+.occurrence-dates {
+    h3 {
+        hyphens: none;
+    }
+
+    .monthly-view {
+        border-top: 1px solid #e1e4e6;
+        padding-top: 1rem;
     }
 }

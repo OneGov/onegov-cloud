@@ -1,0 +1,23 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="org-settings">
+            <div class="grid-x grid-margin-x small-up-1 medium-up-2 large-up-4">
+                <div tal:repeat="shortcut shortcuts" class="${shortcut.name} cell">
+                    <a href="${shortcut.link}">
+                        <div class="card">
+                            <div class="card-section">
+                                <i class="fas ${shortcut.icon}" aria-hidden="true"></i>
+                                <span>
+                                    ${shortcut.title}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

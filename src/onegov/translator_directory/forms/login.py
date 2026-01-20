@@ -1,10 +1,17 @@
+from __future__ import annotations
+
 from onegov.user.forms import LoginForm as LoginFormBase
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.user.forms.login import LoginData
 
 
 class LoginForm(LoginFormBase):
 
     @property
-    def login_data(self):
+    def login_data(self) -> LoginData:
         """
         Skips auth providers for school users are just indexed by the LDAP but
         not can bot be logged in to. The are authenticated with the user and

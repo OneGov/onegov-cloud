@@ -1,16 +1,25 @@
+from __future__ import annotations
+
 from datetime import date
-from onegov.ballot import ComplexVote
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ProporzElection
-from onegov.ballot import Vote
 from onegov.election_day.forms import ScreenForm
+from onegov.election_day.models import ComplexVote
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
+from onegov.election_day.models import ProporzElection
 from onegov.election_day.models import Screen
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_screen_form_validate(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
+def test_screen_form_validate(election_day_app_zg: TestApp) -> None:
     session = election_day_app_zg.session()
 
     assert not ScreenForm().validate()
@@ -23,11 +32,11 @@ def test_screen_form_validate(election_day_app_zg):
             'description': 'My Screen',
             'type': 'majorz_election',
             'majorz_election': 'election',
-            'structure': '<title />',
+            'structure': '<model-title />',
             'css': ''
         })
     )
-    form.request = DummyRequest(app=election_day_app_zg, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)  # type: ignore[assignment]
     form.majorz_election.choices = [('election', 'Election')]
     assert form.validate()
 
@@ -39,11 +48,11 @@ def test_screen_form_validate(election_day_app_zg):
             'description': 'My Screen',
             'type': 'majorz_election',
             'majorz_election': 'election',
-            'structure': '<row<title /></row>',
+            'structure': '<grid-row<model-title /></grid-row>',
             'css': ''
         })
     )
-    form.request = DummyRequest(app=election_day_app_zg, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)  # type: ignore[assignment]
     form.majorz_election.choices = [('election', 'Election')]
     assert not form.validate()
     assert form.errors == {'structure': ['error parsing attribute name']}
@@ -60,13 +69,13 @@ def test_screen_form_validate(election_day_app_zg):
             'css': ''
         })
     )
-    form.request = DummyRequest(app=election_day_app_zg, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)  # type: ignore[assignment]
     form.majorz_election.choices = [('election', 'Election')]
     assert not form.validate()
     assert form.errors == {'structure': ["Invalid element '<fancy-stuff>'"]}
 
 
-def test_screen_form_update_apply(session):
+def test_screen_form_update_apply(session: Session) -> None:
     simple = Vote(
         title='Simple',
         domain='federation',
@@ -98,6 +107,7 @@ def test_screen_form_update_apply(session):
     session.add(proporz)
     session.add(compound)
     session.flush()
+    part = ElectionCompoundPart(compound, 'domain', 'segment')
 
     # Create model
     model = Screen(
@@ -126,6 +136,9 @@ def test_screen_form_update_apply(session):
     assert form.majorz_election.data == majorz.id
     assert form.proporz_election.data == ''
     assert form.election_compound.data == ''
+    assert form.election_compound_part.data is False
+    assert form.domain.data is None
+    assert form.domain_segment.data is None
     assert form.structure.data == '<title />'
     assert form.css.data == 'h1 { font-size: 20em; }'
 
@@ -140,9 +153,14 @@ def test_screen_form_update_apply(session):
     form.majorz_election.data = 'xxx'
     form.proporz_election.data = proporz.id
     form.election_compound.data = 'xxx'
+    form.election_compound_part.data = True
+    form.domain.data = 'domain'
+    form.domain_segment.data = 'segment'
     form.structure.data = '<h1><title /></h1>'
     form.css.data = ''
     form.update_model(model)
+    session.flush()
+    session.expire(model)
     assert model.number == 6
     assert model.group == 'A'
     assert model.duration == 10
@@ -151,6 +169,9 @@ def test_screen_form_update_apply(session):
     assert model.vote_id is None
     assert model.election_id == proporz.id
     assert model.election_compound_id is None
+    assert model.election_compound_part is None
+    assert model.domain is None
+    assert model.domain_segment is None
     assert model.structure == '<h1><title /></h1>'
     assert model.css == ''
     form = ScreenForm()
@@ -165,6 +186,9 @@ def test_screen_form_update_apply(session):
     assert form.majorz_election.data == ''
     assert form.proporz_election.data == proporz.id
     assert form.election_compound.data == ''
+    assert form.election_compound_part.data is False
+    assert form.domain.data is None
+    assert form.domain_segment.data is None
     assert form.structure.data == '<h1><title /></h1>'
     assert form.css.data == ''
 
@@ -176,10 +200,17 @@ def test_screen_form_update_apply(session):
     form.proporz_election.data = 'xxx'
     form.election_compound.data = compound.id
     form.update_model(model)
+    session.flush()
+    session.expire(model)
+    # undo mypy narrowing
+    model = model
     assert model.type == 'election_compound'
     assert model.vote_id is None
     assert model.election_id is None
     assert model.election_compound_id == compound.id
+    assert model.election_compound_part is None
+    assert model.domain is None
+    assert model.domain_segment is None
     form = ScreenForm()
     form.apply_model(model)
     assert form.type.data == 'election_compound'
@@ -188,6 +219,43 @@ def test_screen_form_update_apply(session):
     assert form.majorz_election.data == ''
     assert form.proporz_election.data == ''
     assert form.election_compound.data == compound.id
+    assert form.election_compound_part.data is False
+    assert form.domain.data is None
+    assert form.domain_segment.data is None
+
+    # Election compound part
+    form.type.data = 'election_compound'
+    form.simple_vote.data = 'xxx'
+    form.complex_vote.data = 'xxx'
+    form.majorz_election.data = 'xxx'
+    form.proporz_election.data = 'xxx'
+    form.election_compound.data = compound.id
+    form.election_compound_part.data = True
+    form.domain.data = 'domain'
+    form.domain_segment.data = 'segment'
+    form.update_model(model)
+    session.flush()
+    session.expire(model)
+    assert model.type == 'election_compound_part'
+    assert model.vote_id is None
+    assert model.election_id is None
+    assert model.election_compound_id == compound.id
+    assert model.election_compound_part == part
+    assert model.domain == 'domain'
+    assert model.domain_segment == 'segment'
+    form = ScreenForm()
+    form.apply_model(model)
+    # undo mypy narrowing
+    model = model
+    assert form.type.data == 'election_compound'
+    assert form.simple_vote.data == ''
+    assert form.complex_vote.data == ''
+    assert form.majorz_election.data == ''
+    assert form.proporz_election.data == ''
+    assert form.election_compound.data == compound.id
+    assert form.election_compound_part.data is True
+    assert form.domain.data == 'domain'
+    assert form.domain_segment.data == 'segment'
 
     # Simple vote
     form.type.data = 'simple_vote'
@@ -197,10 +265,17 @@ def test_screen_form_update_apply(session):
     form.proporz_election.data = 'xxx'
     form.election_compound.data = 'xxx'
     form.update_model(model)
+    session.flush()
+    session.expire(model)
+    # undo mypy narrowing
+    model = model
     assert model.type == 'simple_vote'
     assert model.vote_id == simple.id
     assert model.election_id is None
     assert model.election_compound_id is None
+    assert model.election_compound_part is None
+    assert model.domain is None
+    assert model.domain_segment is None
     form = ScreenForm()
     form.apply_model(model)
     assert form.type.data == 'simple_vote'
@@ -209,6 +284,9 @@ def test_screen_form_update_apply(session):
     assert form.majorz_election.data == ''
     assert form.proporz_election.data == ''
     assert form.election_compound.data == ''
+    assert form.election_compound_part.data is False
+    assert form.domain.data is None
+    assert form.domain_segment.data is None
 
     # Complex vote
     form.type.data = 'complex_vote'
@@ -218,10 +296,15 @@ def test_screen_form_update_apply(session):
     form.proporz_election.data = 'xxx'
     form.election_compound.data = 'xxx'
     form.update_model(model)
+    session.flush()
+    session.expire(model)
     assert model.type == 'complex_vote'
     assert model.vote_id == complex.id
     assert model.election_id is None
     assert model.election_compound_id is None
+    assert model.election_compound_part is None
+    assert model.domain is None
+    assert model.domain_segment is None
     form = ScreenForm()
     form.apply_model(model)
     assert form.type.data == 'complex_vote'
@@ -230,9 +313,12 @@ def test_screen_form_update_apply(session):
     assert form.majorz_election.data == ''
     assert form.proporz_election.data == ''
     assert form.election_compound.data == ''
+    assert form.election_compound_part.data is False
+    assert form.domain.data is None
+    assert form.domain_segment.data is None
 
 
-def test_screen_form_populate(election_day_app_zg):
+def test_screen_form_populate(election_day_app_zg: TestApp) -> None:
     session = election_day_app_zg.session()
     session.add(
         Vote(
@@ -299,7 +385,7 @@ def test_screen_form_populate(election_day_app_zg):
     session.flush()
 
     form = ScreenForm()
-    form.request = DummyRequest(app=election_day_app_zg, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)  # type: ignore[assignment]
     form.on_request()
     assert form.simple_vote.choices == [
         ('simple-2', 'Simple 2 [2001-01-01]'),
@@ -319,21 +405,23 @@ def test_screen_form_populate(election_day_app_zg):
         ('elections-1', 'Elections 1 [2001-01-01]'),
         ('elections-2', 'Elections 2 [2001-01-01]')
     ]
-
     assert form.tags_simple_vote.text == (
-        '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
+        '<grid-column span="" class=""></grid-column>\n'
+        '<grid-row class=""></grid-row>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
         '<hr class=""/>\n'
+        '<if-completed></if-completed>\n'
+        '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
-        '<logo class=""/>\n'
+        '<model-progress class=""/>\n'
+        '<model-title class=""/>\n'
         '<number-of-counted-entities class=""/>\n'
-        '<progress class=""/>\n'
-        '<row class=""></row>\n'
-        '<text class=""></text>\n'
-        '<title class=""/>\n'
+        '<p class=""></p>\n'
+        '<principal-logo class=""/>\n'
+        '<qr-code class="" url="https://"/>\n'
         '<total-entities class=""/>\n'
         '<vote-proposal-districts-map class=""/>\n'
         '<vote-proposal-entities-map class=""/>\n'
@@ -342,19 +430,22 @@ def test_screen_form_populate(election_day_app_zg):
         '<vote-proposal-turnout class=""/>'
     )
     assert form.tags_complex_vote.text == (
-        '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
+        '<grid-column span="" class=""></grid-column>\n'
+        '<grid-row class=""></grid-row>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
         '<hr class=""/>\n'
+        '<if-completed></if-completed>\n'
+        '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
-        '<logo class=""/>\n'
+        '<model-progress class=""/>\n'
+        '<model-title class=""/>\n'
         '<number-of-counted-entities class=""/>\n'
-        '<progress class=""/>\n'
-        '<row class=""></row>\n'
-        '<text class=""></text>\n'
-        '<title class=""/>\n'
+        '<p class=""></p>\n'
+        '<principal-logo class=""/>\n'
+        '<qr-code class="" url="https://"/>\n'
         '<total-entities class=""/>\n'
         '<vote-counter-proposal-districts-map class=""/>\n'
         '<vote-counter-proposal-entities-map class=""/>\n'
@@ -377,31 +468,35 @@ def test_screen_form_populate(election_day_app_zg):
     assert form.tags_majorz_election.text == (
         '<absolute-majority class=""/>\n'
         '<allocated-mandates class=""/>\n'
-        '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
         '<election-candidates-by-entity-table class=""/>\n'
         '<election-candidates-chart limit="" lists="," sort-by-lists=""'
         ' elected="" class=""/>\n'
         '<election-candidates-table class="" lists=","/>\n'
         '<election-turnout class=""/>\n'
+        '<grid-column span="" class=""></grid-column>\n'
+        '<grid-row class=""></grid-row>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
         '<hr class=""/>\n'
+        '<if-absolute-majority></if-absolute-majority>\n'
+        '<if-completed></if-completed>\n'
+        '<if-not-completed></if-not-completed>\n'
+        '<if-relative-majority></if-relative-majority>\n'
         '<last-result-change class=""/>\n'
-        '<logo class=""/>\n'
         '<mandates class=""/>\n'
+        '<model-progress class=""/>\n'
+        '<model-title class=""/>\n'
         '<number-of-counted-entities class=""/>\n'
         '<number-of-mandates class=""/>\n'
-        '<progress class=""/>\n'
-        '<row class=""></row>\n'
-        '<text class=""></text>\n'
-        '<title class=""/>\n'
+        '<p class=""></p>\n'
+        '<principal-logo class=""/>\n'
+        '<qr-code class="" url="https://"/>\n'
         '<total-entities class=""/>'
     )
     assert form.tags_proporz_election.text == (
         '<allocated-mandates class=""/>\n'
-        '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
         '<election-candidates-chart limit="" lists="," sort-by-lists=""'
         ' elected="" class=""/>\n'
@@ -409,41 +504,56 @@ def test_screen_form_populate(election_day_app_zg):
         '<election-lists-chart limit="" names="," sort-by-names=""'
         ' class=""/>\n'
         '<election-lists-table class="" names=","/>\n'
+        '<election-party-strengths-chart horizontal="false" class=""/>\n'
+        '<election-party-strengths-table year="" class=""/>\n'
         '<election-turnout class=""/>\n'
+        '<grid-column span="" class=""></grid-column>\n'
+        '<grid-row class=""></grid-row>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
         '<hr class=""/>\n'
+        '<if-completed></if-completed>\n'
+        '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
-        '<logo class=""/>\n'
         '<mandates class=""/>\n'
+        '<model-progress class=""/>\n'
+        '<model-title class=""/>\n'
         '<number-of-counted-entities class=""/>\n'
         '<number-of-mandates class=""/>\n'
-        '<progress class=""/>\n'
-        '<row class=""></row>\n'
-        '<text class=""></text>\n'
-        '<title class=""/>\n'
+        '<p class=""></p>\n'
+        '<principal-logo class=""/>\n'
+        '<qr-code class="" url="https://"/>\n'
         '<total-entities class=""/>'
     )
     assert form.tags_election_compound.text == (
-        '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
         '<election-compound-candidates-table class=""/>\n'
+        '<election-compound-districts-map class=""/>\n'
         '<election-compound-districts-table class=""/>\n'
         '<election-compound-list-groups-chart class=""/>\n'
         '<election-compound-list-groups-table class="" />\n'
+        '<election-compound-party-strengths-chart horizontal="false" '
+        'class=""/>\n'
+        '<election-compound-party-strengths-table year="" class=""/>\n'
         '<election-compound-seat-allocation-chart class=""/>\n'
         '<election-compound-seat-allocation-table class=""/>\n'
+        '<election-compound-superregions-map class=""/>\n'
+        '<election-compound-superregions-table class=""/>\n'
+        '<grid-column span="" class=""></grid-column>\n'
+        '<grid-row class=""></grid-row>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
         '<hr class=""/>\n'
+        '<if-completed></if-completed>\n'
+        '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
-        '<logo class=""/>\n'
+        '<model-progress class=""/>\n'
+        '<model-title class=""/>\n'
         '<number-of-counted-entities class=""/>\n'
-        '<progress class=""/>\n'
-        '<row class=""></row>\n'
-        '<text class=""></text>\n'
-        '<title class=""/>\n'
+        '<p class=""></p>\n'
+        '<principal-logo class=""/>\n'
+        '<qr-code class="" url="https://"/>\n'
         '<total-entities class=""/>'
     )

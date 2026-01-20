@@ -1,10 +1,19 @@
+from __future__ import annotations
+
+from onegov.api.models import ApiKey
 from onegov.org.theme.org_theme import HELVETICA
+from xml.etree.ElementTree import tostring
 
 
-def test_settings(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
 
-    assert client.get('/general-settings', expect_errors=True)\
-        .status_code == 403
+
+def test_settings(client: Client) -> None:
+    assert client.get(
+        '/general-settings', expect_errors=True
+    ).status_code == 403
 
     client.login_admin()
 
@@ -45,11 +54,11 @@ def test_settings(client):
 
     # analytics settings
     settings = client.get('/analytics-settings')
-    settings.form['analytics_code'] = '<script>alert("Hi!");</script>'
+    settings.form['analytics_provider_name'] = 'plausible'
     settings.form.submit()
 
     settings = client.get('/analytics-settings')
-    assert '<script>alert("Hi!");</script>' in settings.text
+    assert 'src="https://dummy-plausible.test/script.js"' in settings.text
 
     # header settings
     color = '#006fbb'
@@ -59,10 +68,10 @@ def test_settings(client):
 
     # test default not giving the color
     assert settings.form['left_header_color'].value == '#000000'
-    assert settings.form['left_header_announcement_bg_color'].value == (
+    assert settings.form['announcement_bg_color'].value == (
         '#FBBC05'
     )
-    assert settings.form['left_header_announcement_font_color'].value == (
+    assert settings.form['announcement_font_color'].value == (
         '#000000'
     )
 
@@ -70,22 +79,57 @@ def test_settings(client):
     settings.form['left_header_url'] = 'https://govikon.ch'
     settings.form['left_header_rem'] = 2.5
     settings.form['left_header_color'] = color
-    settings.form['left_header_announcement'] = text
-    settings.form['left_header_announcement_bg_color'] = bg_color
-    settings.form['left_header_announcement_font_color'] = color
+    settings.form['announcement'] = text
+    settings.form['announcement_url'] = 'https://other-town.ch'
+    settings.form['announcement_bg_color'] = bg_color
+    settings.form['announcement_font_color'] = color
     page = settings.form.submit().follow()
     assert (
         f'<a href="https://govikon.ch" '
         f'style="color:{color}; font-size: 2.5rem">'
     ) in page
     assert text in page
+    assert '' in page
     assert (
-        f'<div id="announcement" style="color: {color}; '
-        f'background-color: {bg_color};">'
+        f'<div id="header_announcement" '
+        f'style="background-color: {bg_color};">'
+    ) in page
+    assert (
+        f'<a style="color: {color}" href="https://other-town.ch"'
     ) in page
 
+    # module settings
+    settings = client.get('/event-settings')
+    assert client.app.org.event_filter_type == 'tags'
+    assert settings.form['event_filter_type'].value == 'tags'
 
-def test_switch_languages(client):
+
+def test_api_keys_create_and_delete(client: Client) -> None:
+
+    client.login_admin()
+
+    settings = client.get('/api-keys')
+    settings.form['name'] = "My API key"
+    page = settings.form.submit()
+    assert 'My API key' in page
+
+    key = client.app.session().query(ApiKey).first()
+    assert key is not None
+    assert key.name == "My API key"
+    assert key.read_only == True
+
+    # manually extract the link
+    delete_link = tostring(page.pyquery('a.confirm')[0]).decode('utf-8')
+    url = client.extract_href(delete_link)
+    remove_chars = len("http://localhost")
+    link = url[remove_chars:]
+
+    client.delete(link)
+    # should be gone
+    assert client.app.session().query(ApiKey).first() is None
+
+
+def test_switch_languages(client: Client) -> None:
 
     client.login_admin()
 

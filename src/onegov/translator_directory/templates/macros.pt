@@ -40,12 +40,28 @@
             <dd><a href="${request.link(translator)}">${translator.title}</a></dd>
 
             <dt tal:condition="message" i18n:translate>Message</dt>
-            <dd tal:condition="message" tal:content="structure message"></dd>
+            <dd tal:condition="message" tal:content="message"></dd>
 
             <dt tal:condition="changes" i18n:translate>Proposed changes</dt>
             <dd tal:condition="changes" tal:repeat="(name, change) changes.items()">
-                ${change[0]}: ${change[1]}
-                <div tal:condition="name == 'coordinates' and change[2]" class="marker-map" data-map-type="thumbnail" data-lat="${change[2].lat}" data-lon="${change[2].lon}" data-zoom="${change[2].zoom}" />
+                <div tal:condition="name == 'nationalities' and change[2]">
+                    ${change[0]}: ${translator.nationalities_as_text(request.locale, change[2])}
+                </div>
+                <div tal:condition="name != 'nationalities'">
+                    ${change[0]}: ${change[1]}
+                    <div tal:condition="name == 'coordinates' and change[2]" class="marker-map" data-map-type="thumbnail" data-lat="${change[2].lat}" data-lon="${change[2].lon}" data-zoom="${change[2].zoom}"></div>
+                </div>
+            </dd>
+
+            <dt tal:condition="uploaded_files" i18n:translate>Documents</dt>
+            <dd tal:condition="uploaded_files">
+                <ul>
+                    <li tal:repeat="file uploaded_files">
+                        <a href="${request.link(file)}" tal:condition="file">
+                            <i class="far fa-file-pdf"></i> ${file.name}
+                        </a>
+                    </li>
+                </ul>
             </dd>
         </dl>
     </metal:display_translator_mutation>
@@ -68,17 +84,17 @@
             <dd>${layout.format_date(translator.date_of_birth, 'date')}</dd>
 
             <dt i18n:translate>Hometown</dt>
-            <dd>${ticket_data.get('hometown')}</dd>
+            <dd>${translator.hometown}</dd>
 
-            <dt i18n:translate>Nationality</dt>
-            <dd>${translator.nationality}</dd>
+            <dt i18n:translate>Nationality(ies)</dt>
+            <dd>${translator.nationalities_as_text(request.locale)}</dd>
 
             <dt i18n:translate>Marital status</dt>
             <dd>${ticket_data.get('marital_status')}</dd>
 
             <dt i18n:translate>Coordinates</dt>
             <dd>${translator.coordinates.lat}, ${translator.coordinates.lon} </dd>
-            <div tal:condition="translator.coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${translator.coordinates.lat}" data-lon="${translator.coordinates.lon}" data-zoom="${translator.coordinates.zoom}" />
+            <div tal:condition="translator.coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${translator.coordinates.lat}" data-lon="${translator.coordinates.lon}" data-zoom="${translator.coordinates.zoom}"></div>
 
             <dt i18n:translate>Address</dt>
             <dd>${translator.address}</dd>
@@ -89,8 +105,8 @@
             <dt i18n:translate>City</dt>
             <dd>${translator.city}</dd>
 
-            <dt i18n:translate>Drive distance</dt>
-            <dd>${layout.format_drive_distance(translator.drive_distance)}</dd>
+            <dt class="drive-distance" i18n:translate>Drive distance</dt>
+            <dd class="drive-distance">${layout.format_drive_distance(translator.drive_distance)}</dd>
 
             <dt i18n:translate>Withholding tax</dt>
             <dd class="withholding-tax">${layout.format_boolean(translator.withholding_tax)}</dd>
@@ -120,16 +136,16 @@
         <h3 i18n:translate>Contact</h3>
         <dl class="accreditation">
             <dt i18n:translate>Email</dt>
-            <dd tal:content="structure layout.linkify(translator.email)"></dd>
+            <dd tal:content="layout.linkify(translator.email)"></dd>
 
             <dt i18n:translate>Private Phone Number</dt>
-            <dd tal:content="structure layout.linkify(translator.tel_private)"></dd>
+            <dd tal:content="layout.linkify(translator.tel_private)"></dd>
 
             <dt i18n:translate>Mobile Phone Number</dt>
-            <dd tal:content="structure layout.linkify(translator.tel_mobile)"></dd>
+            <dd tal:content="layout.linkify(translator.tel_mobile)"></dd>
 
             <dt i18n:translate>Office Phone Number</dt>
-            <dd tal:content="structure layout.linkify(translator.tel_office)"></dd>
+            <dd tal:content="layout.linkify(translator.tel_office)"></dd>
 
             <dt i18n:translate>Availability</dt>
             <dd>${translator.availability}</dd>
@@ -210,7 +226,7 @@
             <dt i18n:translate>Admission course of the high court of the Canton of Zurich available</dt>
             <dd class="admission-course-completed">${layout.format_boolean(ticket_data.get('admission_course_completed'))}</dd>
 
-            <dt i18n:translate>I agree to attend the admission course of the high court of the Canton of Zürich at my own expense CHF 1'100.00.</dt>
+            <dt>${agreement_text}</dt>
             <dd class="admission-course-agreement">${layout.format_boolean(ticket_data.get('admission_course_agreement'))}</dd>
         </dl>
 

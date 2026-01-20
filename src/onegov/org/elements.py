@@ -2,33 +2,39 @@
 macros.
 
 """
+from __future__ import annotations
+
 from random import choice
 
 from lxml.html import builder, tostring
+from markupsafe import Markup
 
-from onegov.core.elements import Element
+from onegov.core.elements import AccessMixin, LinkGroup
+from onegov.core.elements import Link as BaseLink
 from onegov.org import _
 from purl import URL
 
 
-class AccessMixin:
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection, Iterable
+    from onegov.core.elements import Trait
+    from onegov.core.elements import ChameleonLayout
+    from onegov.core.request import CoreRequest
 
-    @property
-    def access(self):
-        """ Wraps access to the model's access property, ensuring it always
-        works, even if the model does not use it.
-
-        """
-        if hasattr(self, 'model'):
-            return getattr(self.model, 'access', 'public')
-
-        return 'public'
+    # NOTE: We pretend to inherit from BaseLink at type checking time
+    #       so we're not stuck in dependency hell everywhere else
+    #       In reality we probably should actually inherit from this
+    #       class and clean up redundancies...
+    _Base = BaseLink
+else:
+    _Base = AccessMixin
 
 
-class Link(AccessMixin):
+class Link(_Base):
     """ Represents a link rendered in a template. """
 
-    __slots__ = [
+    __slots__ = (
         'active',
         'attributes',
         'classes',
@@ -37,13 +43,22 @@ class Link(AccessMixin):
         'subtitle',
         'text',
         'url',
-    ]
+    )
 
-    def __init__(self, text, url, classes=None, request_method='GET',
-                 attributes={}, active=False, model=None, subtitle=None):
+    def __init__(
+        self,
+        text: str,
+        url: str,
+        classes: Collection[str] | None = None,
+        request_method: str = 'GET',
+        attributes: dict[str, Any] | None = None,
+        active: bool = False,
+        model: Any | None = None,
+        subtitle: str | None = None
+    ) -> None:
 
         #: The text of the link
-        self.text = text
+        self.text: str = text
 
         #: The fully qualified url of the link
         self.url = url
@@ -57,7 +72,7 @@ class Link(AccessMixin):
 
         #: HTML attributes (may override other attributes set by this class).
         #: Attributes which are translatable, are transalted before rendering.
-        self.attributes = attributes
+        self.attributes = attributes or {}
 
         #: Indicate if this link is active or not (not used for rendering)
         self.active = active
@@ -68,13 +83,17 @@ class Link(AccessMixin):
         #: Shown as a subtitle below certain links (not automatically rendered)
         self.subtitle = subtitle
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         for attr in self.__slots__:
-            if getattr(self, attr) != getattr(other, attr):
+            if getattr(self, attr) != getattr(other, attr, None):
                 return False
         return True
 
-    def __call__(self, request, extra_classes=None):
+    def __call__(
+        self,
+        request: ChameleonLayout | CoreRequest,
+        extra_classes: Iterable[str] | None = None
+    ) -> Markup:
         """ Renders the element. """
 
         # compatibility shim for new elements
@@ -95,7 +114,7 @@ class Link(AccessMixin):
 
             a.attrib['ic-delete-from'] = url.as_string()
 
-        classes = []
+        classes: list[str] = []
         if self.classes:
             classes.extend(self.classes)
         if extra_classes:
@@ -108,7 +127,7 @@ class Link(AccessMixin):
             # This snippet is duplicated in the access-hint macro!
             hint = builder.I()
             hint.attrib['class'] = 'private-hint'
-            hint.attrib['title'] = request.translate(_("This site is private"))
+            hint.attrib['title'] = request.translate(_('This site is private'))
 
             a.append(builder.I(' '))
             a.append(hint)
@@ -118,7 +137,7 @@ class Link(AccessMixin):
             # This snippet is duplicated in the access-hint macro!
             hint = builder.I()
             hint.attrib['class'] = 'secret-hint'
-            hint.attrib['title'] = request.translate(_("This site is secret"))
+            hint.attrib['title'] = request.translate(_('This site is secret'))
 
             a.append(builder.I(' '))
             a.append(hint)
@@ -126,50 +145,72 @@ class Link(AccessMixin):
         for key, value in self.attributes.items():
             a.attrib[key] = request.translate(value)
 
-        return tostring(a)
+        return Markup(tostring(a, encoding=str))  # nosec: B704
+
+    def __repr__(self) -> str:
+        return f'<Link {self.text}>'
 
 
-class QrCodeLink(Element, AccessMixin):
-    """ Implements a the qr code link that shows a modal with the QrCode.
-        Thu url is sent to the qr endpoint url which generates the image
-        and sends it back.
+class QrCodeLink(BaseLink):
+    """ Implements a qr code link that shows a modal with the QrCode.
+    Thu url is sent to the qr endpoint url which generates the image
+    and sends it back.
     """
 
     id = 'qr_code_link'
 
-    __slots__ = [
+    __slots__ = (
         'active',
         'attributes',
         'classes',
         'text',
         'url',
         'title'
-    ]
+    )
 
-    def __init__(self, text, url, title=None, attrs=None, traits=(), **props):
+    def __init__(
+        self,
+        text: str,
+        url: str,
+        title: str | None = None,
+        attrs: dict[str, Any] | None = None,
+        traits: Iterable[Trait] | Trait = (),
+        **props: Any
+    ) -> None:
+
         attrs = attrs or {}
-        attrs['href'] = '#'
         attrs['data-payload'] = url
         attrs['data-reveal-id'] = ''.join(
-            choice('abcdefghi') for i in range(8))
+            choice('abcdefghi') for i in range(8)  # nosec B311
+        )
         # Foundation 6 Compatibility
         attrs['data-open'] = attrs['data-reveal-id']
         attrs['data-image-parent'] = f"qr-{attrs['data-reveal-id']}"
 
-        super().__init__(text, attrs, traits, **props)
+        super().__init__(text, '#', attrs, traits, **props)
         self.title = title
+
+    def __repr__(self) -> str:
+        return f'<QrCodeLink {self.text}>'
 
 
 class DeleteLink(Link):
 
-    def __init__(self, text, url, confirm,
-                 yes_button_text=None,
-                 no_button_text=None,
-                 extra_information=None,
-                 redirect_after=None,
-                 request_method='DELETE',
-                 classes=('confirm', 'delete-link'),
-                 target=None):
+    def __init__(
+        self,
+        text: str,
+        url: str,
+        confirm: str,
+        yes_button_text: str | None = None,
+        no_button_text: str | None = None,
+        extra_information: str | None = None,
+        redirect_after: str | None = None,
+        request_method: str = 'DELETE',
+        classes: Collection[str] = ('confirm', 'delete-link'),
+        target: str | None = None,
+        items: str | None = None,
+        scroll_hint: str | None = None,
+    ) -> None:
 
         attr = {
             'data-confirm': confirm
@@ -184,7 +225,7 @@ class DeleteLink(Link):
         if no_button_text:
             attr['data-confirm-no'] = no_button_text
         else:
-            attr['data-confirm-no'] = _("Cancel")
+            attr['data-confirm-no'] = _('Cancel')
 
         if redirect_after:
             attr['redirect-after'] = redirect_after
@@ -203,6 +244,10 @@ class DeleteLink(Link):
         else:
             raise NotImplementedError
 
+        if items:
+            attr['data-confirm-items'] = items
+            attr['data-scroll-hint'] = scroll_hint or ''
+
         super().__init__(
             text=text,
             url=url,
@@ -213,39 +258,79 @@ class DeleteLink(Link):
 
 
 class ConfirmLink(DeleteLink):
-    # XXX this is some wonky class hierarchy with tons of paramters.
+    # XXX this is some wonky class hierarchy with tons of parameters.
     # We can do better!
 
-    def __init__(self, text, url, confirm,
-                 yes_button_text=None,
-                 no_button_text=None,
-                 extra_information=None,
-                 redirect_after=None,
-                 request_method='POST',
-                 classes=('confirm', )):
+    def __init__(
+        self,
+        text: str,
+        url: str,
+        confirm: str,
+        yes_button_text: str | None = None,
+        no_button_text: str | None = None,
+        extra_information: str | None = None,
+        redirect_after: str | None = None,
+        request_method: str = 'POST',
+        classes: Collection[str] = ('confirm', )
+    ) -> None:
 
         super().__init__(
             text, url, confirm, yes_button_text, no_button_text,
             extra_information, redirect_after, request_method, classes)
 
 
-class LinkGroup(AccessMixin):
-    """ Represents a list of links. """
+__all__ = (
+    'AccessMixin',
+    'ConfirmLink',
+    'DeleteLink',
+    'Link',
+    'LinkGroup',
+    'QrCodeLink'
+)
 
-    __slots__ = [
-        'title',
-        'links',
-        'model',
-        'right_side',
+
+class IFrameLink(BaseLink):
+    """ Implements an iframe link that shows a modal with the iframe.
+    The url is sent to the iframe endpoint url which generates the iframe
+    and sends it back.
+    """
+
+    id = 'iframe_link'
+
+    __slots__ = (
+        'active',
+        'attributes',
         'classes',
-        'attributes'
-    ]
+        'text',
+        'url',
+        'title'
+    )
 
-    def __init__(self, title, links,
-                 model=None, right_side=True, classes=None, attributes=None):
+    def __init__(
+        self,
+        text: str,
+        url: str,
+        title: str | None = None,
+        attrs: dict[str, Any] | None = None,
+        traits: Iterable[Trait] | Trait = (),
+        **props: Any
+    ) -> None:
+
+        attrs = attrs or {}
+        attrs['new-iframe-link'] = (
+            '<iframe src="'
+            + url
+            + '" width="100%" height="800" frameborder="0"></iframe>'
+        )
+        attrs['data-reveal-id'] = ''.join(
+            choice('abcdefghi') for i in range(8)  # nosec B311
+        )
+        # Foundation 6 Compatibility
+        attrs['data-open'] = attrs['data-reveal-id']
+        attrs['data-image-parent'] = f"iframe-{attrs['data-reveal-id']}"
+
+        super().__init__(text, '#', attrs, traits, **props)
         self.title = title
-        self.links = links
-        self.model = model
-        self.right_side = right_side
-        self.classes = classes
-        self.attributes = attributes
+
+    def __repr__(self) -> str:
+        return f'<IFrameLink {self.text}>'

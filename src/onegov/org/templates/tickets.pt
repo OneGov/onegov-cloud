@@ -2,6 +2,9 @@
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
+    <tal:b metal:fill-slot="post-title">
+        <button class="tiny secondary radius button ticket-notifications" i18n:attributes="title" title="Enable notifications about new tickets. Only works when being logged in and having the browser with the site open."></button>
+    </tal:b>
     <tal:b metal:fill-slot="content">
         <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id 'archive-confirm-modal'">
             <tal:block metal:fill-slot="modal_content">
@@ -30,12 +33,26 @@
                                     <dt class="show-for-sr" i18n:translate>State:</dt>
                                     <tal:b repeat="link filters">
                                         <dd class="${link.active and 'active' or ''}">
-                                            <tal:b replace="structure link(layout)"></tal:b>
+                                            <tal:b replace="link(layout)"></tal:b>
                                         </dd>
                                     </tal:b>
                                 </dl>
                             </div>
                             <div class="columns small-12 medium-5">
+                                <span>
+                                    <button href="#" data-dropdown="submitters" aria-controls="submitters" aria-expanded="false" class="${has_submitter_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'} selected-submitter">
+                                        <span class="show-for-sr"><tal:b i18n:translate>Submitter</tal:b>:</span>
+                                        <span>${submitter}</span>
+                                    </button>
+                                    <ul id="submitters" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
+                                        <li tal:repeat="link submitters">
+                                            <a href="${link.attrs.href}" class="${not repeat.link.start and 'ticket-group-filter' or 'ALL-link'}">
+                                                ${link.text}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+
                                 <span>
                                     <button href="#" data-dropdown="owners" aria-controls="owners" aria-expanded="false" class="${has_owner_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'} selected-owner">
                                         <span i18n:translate class="show-for-sr">Owner:</span>
@@ -57,16 +74,16 @@
                                 <span>
                                     <button href="#" data-dropdown="handlers" aria-controls="handlers" aria-expanded="false" class="${has_handler_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'} selected-handler">
                                         <span i18n:translate class="show-for-sr">Kind:</span>
-                                        <span class="${' '.join(handler.attrs['class'])}">${handler.text}</span>
+                                        <span class="${handler_class}">${handler}</span>
                                     </button>
                                     <ul id="handlers" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
-                                        <li tal:repeat="link handlers"><tal:b replace="structure link(layout)"></tal:b></li>
+                                        <li tal:repeat="link handlers"><tal:b replace="link(layout)"></tal:b></li>
                                     </ul>
                                 </span>
                             </div>
                         </div>
                     </th>
-                    <th tal:condition="archive_tickets" >
+                    <th tal:condition="archive_tickets" class="archive-tickets">
                         <div id="action-box" title="Archive selected" i18n:attributes="title">
                             <a id="do-action" class="archive"></a>
                             <input id="select-all" type="checkbox">

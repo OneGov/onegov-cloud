@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import pytest
+
 from csv import DictReader
 from datetime import date
 from datetime import datetime
@@ -11,9 +15,17 @@ from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.models import SwissVote
 from openpyxl import load_workbook
 from pytz import utc
+from tests.shared.utils import use_locale
 
 
-def test_pages(session):
+from typing import Any, IO, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.swissvotes.models import SwissVoteFile
+    from sqlalchemy.orm import Session
+    from .conftest import TestApp
+
+
+def test_pages(session: Session) -> None:
     pages = TranslatablePageCollection(session)
 
     # setdefault
@@ -57,7 +69,7 @@ def test_pages(session):
     ]
 
 
-def test_votes(swissvotes_app):
+def test_votes(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
     assert votes.last_modified is None
 
@@ -70,6 +82,7 @@ def test_votes(swissvotes_app):
             title_fr="Vote FR",
             short_title_de="V D",
             short_title_fr="V F",
+            short_title_en="V E",
             _legal_form=1
         )
 
@@ -80,6 +93,7 @@ def test_votes(swissvotes_app):
     assert vote.title_fr == "Vote FR"
     assert vote.short_title_de == "V D"
     assert vote.short_title_fr == "V F"
+    assert vote.short_title_en == "V E"
     assert vote.legal_form == "Mandatory referendum"
 
     assert votes.last_modified == datetime(2019, 1, 1, 10, tzinfo=utc)
@@ -87,39 +101,39 @@ def test_votes(swissvotes_app):
     assert votes.by_bfs_number(Decimal('100.1')) == vote
 
 
-def test_votes_default(swissvotes_app):
+def test_votes_default(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(
         swissvotes_app,
         page=2,
-        from_date=3,
-        to_date=4,
-        legal_form=5,
-        result=6,
-        policy_area=7,
-        term=8,
-        full_text=9,
-        position_federal_council=10,
-        position_national_council=11,
-        position_council_of_states=12,
-        sort_by=13,
-        sort_order=14
+        from_date=3,  # type: ignore[arg-type]
+        to_date=4,  # type: ignore[arg-type]
+        legal_form=5,  # type: ignore[arg-type]
+        result=6,  # type: ignore[arg-type]
+        policy_area=7,  # type: ignore[arg-type]
+        term=8,  # type: ignore[arg-type]
+        full_text=9,  # type: ignore[arg-type]
+        position_federal_council=10,  # type: ignore[arg-type]
+        position_national_council=11,  # type: ignore[arg-type]
+        position_council_of_states=12,  # type: ignore[arg-type]
+        sort_by=13,  # type: ignore[arg-type]
+        sort_order=14  # type: ignore[arg-type]
     )
     assert votes.page == 2
     assert votes.from_date == 3
     assert votes.to_date == 4
-    assert votes.legal_form == 5
-    assert votes.result == 6
-    assert votes.policy_area == 7
-    assert votes.term == 8
+    assert votes.legal_form == 5  # type: ignore[comparison-overlap]
+    assert votes.result == 6  # type: ignore[comparison-overlap]
+    assert votes.policy_area == 7  # type: ignore[comparison-overlap]
+    assert votes.term == 8  # type: ignore[comparison-overlap]
     assert votes.full_text == 9
-    assert votes.position_federal_council == 10
-    assert votes.position_national_council == 11
-    assert votes.position_council_of_states == 12
-    assert votes.sort_by == 13
-    assert votes.sort_order == 14
+    assert votes.position_federal_council == 10  # type: ignore[comparison-overlap]
+    assert votes.position_national_council == 11  # type: ignore[comparison-overlap]
+    assert votes.position_council_of_states == 12  # type: ignore[comparison-overlap]
+    assert votes.sort_by == 13  # type: ignore[comparison-overlap]
+    assert votes.sort_order == 14  # type: ignore[comparison-overlap]
 
     votes = votes.default()
-    assert votes.page is None
+    assert votes.page == 0
     assert votes.from_date is None
     assert votes.to_date is None
     assert votes.legal_form is None
@@ -134,7 +148,7 @@ def test_votes_default(swissvotes_app):
     assert votes.sort_order is None
 
 
-def test_votes_pagination(swissvotes_app):
+def test_votes_pagination(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
 
     assert votes.pages_count == 0
@@ -154,6 +168,7 @@ def test_votes_pagination(swissvotes_app):
             title_fr="Vote",
             short_title_de="Vote",
             short_title_fr="Vote",
+            short_title_en="Vote",
             _legal_form=1
         )
 
@@ -173,13 +188,24 @@ def test_votes_pagination(swissvotes_app):
     assert votes.next.previous == votes
 
 
-def test_votes_term_filter(swissvotes_app):
+def test_votes_pagination_negative_page_index(swissvotes_app: TestApp) -> None:
+    swissvotes = SwissVoteCollection(swissvotes_app, page=-9)
+    assert swissvotes.page == 0
+    assert swissvotes.page_index == 0
+    assert swissvotes.page_by_index(-2).page == 0
+    assert swissvotes.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        SwissVoteCollection(swissvotes_app, page=None)  # type: ignore[arg-type]
+
+
+def test_votes_term_filter(swissvotes_app: TestApp) -> None:
     assert SwissVoteCollection(swissvotes_app).term_filter == []
     assert SwissVoteCollection(swissvotes_app, term='').term_filter == []
     assert SwissVoteCollection(swissvotes_app, term='', full_text=True)\
         .term_filter == []
 
-    def compiled(**kwargs):
+    def compiled(**kwargs: Any) -> list[str]:
         list_ = SwissVoteCollection(swissvotes_app, **kwargs).term_filter
         return [
             str(statement.compile(compile_kwargs={"literal_binds": True}))
@@ -190,8 +216,10 @@ def test_votes_term_filter(swissvotes_app):
     c_title_fr = "to_tsvector('french', swissvotes.title_fr)"
     c_short_title_de = "to_tsvector('german', swissvotes.short_title_de)"
     c_short_title_fr = "to_tsvector('french', swissvotes.short_title_fr)"
+    c_short_title_en = "to_tsvector('english', swissvotes.short_title_en)"
     c_keyword = "to_tsvector('german', swissvotes.keyword)"
-    c_initiator = "to_tsvector('german', swissvotes.initiator)"
+    c_initiator_de = "to_tsvector('german', swissvotes.initiator_de)"
+    c_initiator_fr = "to_tsvector('french', swissvotes.initiator_fr)"
     c_text_de = 'swissvotes."searchable_text_de_CH"'
     c_text_fr = 'swissvotes."searchable_text_fr_CH"'
     c_text_it = 'swissvotes."searchable_text_it_CH"'
@@ -204,6 +232,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', '987')",
         f"{c_short_title_de} @@ to_tsquery('german', '987')",
         f"{c_short_title_fr} @@ to_tsquery('french', '987')",
+        f"{c_short_title_en} @@ to_tsquery('english', '987')",
         f"{c_keyword} @@ to_tsquery('german', '987')",
     ]
 
@@ -214,6 +243,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', '17.060')",
         f"{c_short_title_de} @@ to_tsquery('german', '17.060')",
         f"{c_short_title_fr} @@ to_tsquery('french', '17.060')",
+        f"{c_short_title_en} @@ to_tsquery('english', '17.060')",
         f"{c_keyword} @@ to_tsquery('german', '17.060')",
     ]
 
@@ -222,6 +252,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', '17.12.2004')",
         f"{c_short_title_de} @@ to_tsquery('german', '17.12.2004')",
         f"{c_short_title_fr} @@ to_tsquery('french', '17.12.2004')",
+        f"{c_short_title_en} @@ to_tsquery('english', '17.12.2004')",
         f"{c_keyword} @@ to_tsquery('german', '17.12.2004')",
     ]
 
@@ -231,6 +262,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', '1893002')",
         f"{c_short_title_de} @@ to_tsquery('german', '1893002')",
         f"{c_short_title_fr} @@ to_tsquery('french', '1893002')",
+        f"{c_short_title_en} @@ to_tsquery('english', '1893002')",
         f"{c_keyword} @@ to_tsquery('german', '1893002')",
     ]
 
@@ -239,6 +271,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'abc')",
         f"{c_short_title_de} @@ to_tsquery('german', 'abc')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'abc')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'abc')",
         f"{c_keyword} @@ to_tsquery('german', 'abc')",
     ]
     assert compiled(term='abc', full_text=True) == [
@@ -246,8 +279,10 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'abc')",
         f"{c_short_title_de} @@ to_tsquery('german', 'abc')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'abc')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'abc')",
         f"{c_keyword} @@ to_tsquery('german', 'abc')",
-        f"{c_initiator} @@ to_tsquery('german', 'abc')",
+        f"{c_initiator_de} @@ to_tsquery('german', 'abc')",
+        f"{c_initiator_fr} @@ to_tsquery('french', 'abc')",
         f"{c_text_de} @@ to_tsquery('german', 'abc')",
         f"{c_text_fr} @@ to_tsquery('french', 'abc')",
         f"{c_text_it} @@ to_tsquery('italian', 'abc')",
@@ -259,6 +294,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'Müller')",
         f"{c_short_title_de} @@ to_tsquery('german', 'Müller')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'Müller')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'Müller')",
         f"{c_keyword} @@ to_tsquery('german', 'Müller')",
     ]
 
@@ -267,6 +303,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', '20,20')",
         f"{c_short_title_de} @@ to_tsquery('german', '20,20')",
         f"{c_short_title_fr} @@ to_tsquery('french', '20,20')",
+        f"{c_short_title_en} @@ to_tsquery('english', '20,20')",
         f"{c_keyword} @@ to_tsquery('german', '20,20')",
     ]
 
@@ -275,6 +312,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'Neu')",
         f"{c_short_title_de} @@ to_tsquery('german', 'Neu')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'Neu')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'Neu')",
         f"{c_keyword} @@ to_tsquery('german', 'Neu')",
     ]
 
@@ -283,6 +321,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'H <-> P <-> Müller')",
         f"{c_short_title_de} @@ to_tsquery('german', 'H <-> P <-> Müller')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'H <-> P <-> Müller')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'H <-> P <-> Müller')",
         f"{c_keyword} @@ to_tsquery('german', 'H <-> P <-> Müller')",
     ]
 
@@ -291,6 +330,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'x <-> AND <-> y')",
         f"{c_short_title_de} @@ to_tsquery('german', 'x <-> AND <-> y')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'x <-> AND <-> y')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'x <-> AND <-> y')",
         f"{c_keyword} @@ to_tsquery('german', 'x <-> AND <-> y')",
     ]
 
@@ -299,6 +339,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'x <-> y')",
         f"{c_short_title_de} @@ to_tsquery('german', 'x <-> y')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'x <-> y')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'x <-> y')",
         f"{c_keyword} @@ to_tsquery('german', 'x <-> y')",
     ]
 
@@ -307,11 +348,12 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'y <-> y')",
         f"{c_short_title_de} @@ to_tsquery('german', 'y <-> y')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'y <-> y')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'y <-> y')",
         f"{c_keyword} @@ to_tsquery('german', 'y <-> y')",
     ]
 
 
-def test_votes_query(swissvotes_app):
+def test_votes_query(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
     vote_1 = votes.add(
         id=1,
@@ -321,6 +363,7 @@ def test_votes_query(swissvotes_app):
         title_fr="Vote sur cette question",
         short_title_de="diese Sache",
         short_title_fr="cette question",
+        short_title_en="this thing",
         _legal_form=1,
         descriptor_1_level_1=Decimal('4'),
         descriptor_1_level_2=Decimal('4.2'),
@@ -344,8 +387,10 @@ def test_votes_query(swissvotes_app):
         title_fr="Nous voulons cette version de la chose",
         short_title_de="diese Version",
         short_title_fr="cette version",
+        short_title_en="that version",
         keyword="Variant A of X",
-        initiator="The group that wants something",
+        initiator_de="Urheber",
+        initiator_fr="Initiant",
         _legal_form=2,
         descriptor_1_level_1=Decimal('10'),
         descriptor_1_level_2=Decimal('10.3'),
@@ -366,6 +411,7 @@ def test_votes_query(swissvotes_app):
         title_fr="Nous voulons encore une autre version de la chose",
         short_title_de="Nochmals etwas anderes",
         short_title_fr="encore une autre version",
+        short_title_en="something else again",
         keyword="Variant B of X",
         _legal_form=2,
         descriptor_3_level_1=Decimal('8'),
@@ -376,7 +422,7 @@ def test_votes_query(swissvotes_app):
         _result=2
     )
 
-    def count(**kwargs):
+    def count(**kwargs: Any) -> int:
         return SwissVoteCollection(swissvotes_app, **kwargs).query().count()
 
     assert count() == 3
@@ -442,11 +488,13 @@ def test_votes_query(swissvotes_app):
     assert count(term='cette question') == 1
     assert count(term='version') == 2
     assert count(term='encore') == 1
+    assert count(term='thing') == 1
+    assert count(term='something') == 1
     assert count(term='riant') == 0
     assert count(term='A of X') == 1
-    assert count(term='group') == 0
-    assert count(term='group', full_text=True) == 1
-    assert count(term='The group that wants something', full_text=True) == 1
+    assert count(term='urheber') == 0
+    assert count(term='Urheber', full_text=True) == 1
+    assert count(term='Initiant', full_text=True) == 1
 
     # test tie-breaker
     vote_1._legal_form = 5
@@ -483,8 +531,12 @@ def test_votes_query(swissvotes_app):
     assert count(legal_form=[5], position_national_council=[9]) == 1
 
 
-def test_votes_query_attachments(swissvotes_app, attachments,
-                                 postgres_version, campaign_material):
+def test_votes_query_attachments(
+    swissvotes_app: TestApp,
+    postgres_version: str,
+    attachments: dict[str, SwissVoteFile],
+    campaign_material: dict[str, SwissVoteFile]
+) -> None:
     votes = SwissVoteCollection(swissvotes_app)
     votes.add(
         id=1,
@@ -494,6 +546,7 @@ def test_votes_query_attachments(swissvotes_app, attachments,
         title_fr="Vote on that one thing",
         short_title_de="Vote on that one thing",
         short_title_fr="Vote on that one thing",
+        short_title_en="Vote on that one thing",
         _legal_form=1,
     )
     votes.add(
@@ -504,6 +557,7 @@ def test_votes_query_attachments(swissvotes_app, attachments,
         title_fr="We want this version the thing",
         short_title_de="We want this version the thing",
         short_title_fr="We want this version the thing",
+        short_title_en="We want this version the thing",
         _legal_form=2,
     )
     vote = votes.add(
@@ -514,6 +568,7 @@ def test_votes_query_attachments(swissvotes_app, attachments,
         title_fr="We want that version of the thing",
         short_title_de="We want that version of the thing",
         short_title_fr="We want that version of the thing",
+        short_title_en="We want that version of the thing",
         _legal_form=2,
     )
     for name, attachment in attachments.items():
@@ -526,7 +581,7 @@ def test_votes_query_attachments(swissvotes_app, attachments,
     vote.files.append(campaign_material['campaign_material_other-leaflet.pdf'])
     votes.session.flush()
 
-    def count(**kwargs):
+    def count(**kwargs: Any) -> int:
         return SwissVoteCollection(swissvotes_app, **kwargs).query().count()
 
     assert count() == 3
@@ -544,7 +599,7 @@ def test_votes_query_attachments(swissvotes_app, attachments,
     assert count(term='Volantini', full_text=True) == 1
 
 
-def test_votes_order(swissvotes_app):
+def test_votes_order(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
 
     for index, title in enumerate(('Firsţ', 'Śecond', 'Thirḓ'), start=1):
@@ -556,7 +611,7 @@ def test_votes_order(swissvotes_app):
             title_fr=''.join(reversed(title)),
             short_title_de=title,
             short_title_fr=''.join(reversed(title)),
-
+            short_title_en=''.join(reversed(title)),
             _legal_form=index,
             _result=index,
             result_people_yeas_p=index / 10,
@@ -672,8 +727,8 @@ def test_votes_order(swissvotes_app):
     assert 'DESC' in str(votes.order_by)
     assert [vote.id for vote in votes.query()] == [3, 2, 1]
 
-    votes.app.session_manager.current_locale = 'fr_CH'
-    assert [vote.id for vote in votes.query()] == [1, 3, 2]
+    with use_locale(votes.app, 'fr_CH'):
+        assert [vote.id for vote in votes.query()] == [1, 3, 2]
 
     votes = votes.by_order(None)
     assert votes.current_sort_by == 'date'
@@ -688,7 +743,7 @@ def test_votes_order(swissvotes_app):
     assert votes.current_sort_order == 'descending'
 
 
-def test_votes_available_descriptors(swissvotes_app):
+def test_votes_available_descriptors(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
     assert votes.available_descriptors == [set(), set(), set()]
 
@@ -700,6 +755,7 @@ def test_votes_available_descriptors(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
+        short_title_en="Vote",
         _legal_form=1,
         descriptor_1_level_1=Decimal('4'),
         descriptor_1_level_2=Decimal('4.2'),
@@ -719,6 +775,7 @@ def test_votes_available_descriptors(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
+        short_title_en="Vote",
         _legal_form=1,
         descriptor_1_level_1=Decimal('10'),
         descriptor_1_level_2=Decimal('10.3'),
@@ -735,6 +792,7 @@ def test_votes_available_descriptors(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
+        short_title_en="Vote",
         _legal_form=1,
         descriptor_3_level_1=Decimal('8'),
         descriptor_3_level_2=Decimal('8.3'),
@@ -747,7 +805,7 @@ def test_votes_available_descriptors(swissvotes_app):
     ]
 
 
-def test_votes_update(swissvotes_app):
+def test_votes_update(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
 
     added, updated = votes.update([
@@ -758,6 +816,7 @@ def test_votes_update(swissvotes_app):
             title_fr="First",
             short_title_de="First",
             short_title_fr="First",
+            short_title_en="First",
             _legal_form=1,
         ),
         SwissVote(
@@ -767,6 +826,7 @@ def test_votes_update(swissvotes_app):
             title_fr="Second",
             short_title_de="Second",
             short_title_fr="Second",
+            short_title_en="Second",
             _legal_form=1,
         )
     ])
@@ -782,6 +842,7 @@ def test_votes_update(swissvotes_app):
             title_fr="First",
             short_title_de="First",
             short_title_fr="First",
+            short_title_en="First",
             _legal_form=1,
         )
     ])
@@ -796,15 +857,16 @@ def test_votes_update(swissvotes_app):
             title_fr="First vote",
             short_title_de="First vote",
             short_title_fr="First vote",
+            short_title_en="First vote",
             _legal_form=1,
         )
     ])
     assert added == 0
     assert updated == 1
-    assert votes.by_bfs_number(Decimal('1')).title == 'First vote'
+    assert votes.by_bfs_number(Decimal('1')).title == 'First vote'  # type: ignore[union-attr]
 
 
-def test_votes_update_metadata(swissvotes_app):
+def test_votes_update_metadata(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
     vote_1 = votes.add(
         bfs_number=Decimal('1'),
@@ -813,6 +875,7 @@ def test_votes_update_metadata(swissvotes_app):
         title_fr="First",
         short_title_de="First",
         short_title_fr="First",
+        short_title_en="First",
         _legal_form=1,
     )
     vote_2 = votes.add(
@@ -822,6 +885,7 @@ def test_votes_update_metadata(swissvotes_app):
         title_fr="Second",
         short_title_de="Second",
         short_title_fr="Second",
+        short_title_en="Second",
         _legal_form=1,
     )
 
@@ -862,7 +926,7 @@ def test_votes_update_metadata(swissvotes_app):
     }
 
 
-def test_votes_export(swissvotes_app):
+def test_votes_export(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
     vote = votes.add(
         bfs_number=Decimal('100.1'),
@@ -871,9 +935,12 @@ def test_votes_export(swissvotes_app):
         title_fr="Vote FR",
         short_title_de="V D",
         short_title_fr="V F",
+        short_title_en="V E",
         keyword="Keyword",
         _legal_form=1,
-        initiator="Initiator",
+        _parliamentary_initiated=1,
+        initiator_de="Initiator D",
+        initiator_fr="Initiator F",
         anneepolitique="anneepolitique",
         descriptor_1_level_1=Decimal('4'),
         descriptor_1_level_2=Decimal('4.2'),
@@ -980,11 +1047,16 @@ def test_votes_export(swissvotes_app):
         'vcs': 9999,
         'voev': 9999,
     }
-    vote.recommendations_other_yes = "Pro Velo"
-    vote.recommendations_other_no = "Biosuisse"
-    vote.recommendations_other_free = "Pro Natura, Greenpeace"
-    vote.recommendations_other_counter_proposal = "Pro Juventute"
-    vote.recommendations_other_popular_initiative = "Pro Senectute"
+    vote.recommendations_other_yes_de = "Pro Velo D"
+    vote.recommendations_other_yes_fr = "Pro Velo F"
+    vote.recommendations_other_no_de = "Biosuisse D"
+    vote.recommendations_other_no_fr = "Biosuisse F"
+    vote.recommendations_other_free_de = "Pro Natura D, Greenpeace D"
+    vote.recommendations_other_free_fr = "Pro Natura F, Greenpeace F"
+    vote.recommendations_other_counter_proposal_de = "Pro Juventute D"
+    vote.recommendations_other_counter_proposal_fr = "Pro Juventute F"
+    vote.recommendations_other_popular_initiative_de = "Pro Senectute D"
+    vote.recommendations_other_popular_initiative_fr = "Pro Senectute F"
     vote.recommendations_divergent = {
         'bdp_ag': 1,
         'bdp_ai': 1,
@@ -1460,8 +1532,14 @@ def test_votes_export(swissvotes_app):
     vote.national_council_share_unknown = Decimal('28.20')
     vote.bfs_map_de = 'map de'
     vote.bfs_map_fr = 'map fr'
+    vote.bfs_map_en = 'map en'
+    vote.bfs_dashboard_de = "https://dashboard.de"
+    vote.bfs_dashboard_fr = "https://dashboard.fr"
+    vote.bfs_dashboard_en = "https://dashboard.en"
     vote.link_curia_vista_de = 'https://curia.vista/de'
     vote.link_curia_vista_fr = 'https://curia.vista/fr'
+    vote.link_easyvote_de = 'https://easy.vote/de'
+    vote.link_easyvote_fr = 'https://easy.vote/fr'
     vote.link_bk_results_de = 'https://bk.results/de'
     vote.link_bk_results_fr = 'https://bk.results/fr'
     vote.link_bk_chrono_de = 'https://bk.chrono/de'
@@ -1475,6 +1553,18 @@ def test_votes_export(swissvotes_app):
     vote.link_federal_office_de = 'https://federal.office/de'
     vote.link_federal_office_fr = 'https://federal.office/fr'
     vote.link_federal_office_en = 'https://federal.office/en'
+    vote.link_campaign_yes_1_de = 'https://yes1.de'
+    vote.link_campaign_yes_2_de = 'https://yes2.de'
+    vote.link_campaign_yes_3_de = 'https://yes3.de'
+    vote.link_campaign_no_1_de = 'https://no1.de'
+    vote.link_campaign_no_2_de = 'https://no2.de'
+    vote.link_campaign_no_3_de = 'https://no3.de'
+    vote.link_campaign_yes_1_fr = 'https://yes1.fr'
+    vote.link_campaign_yes_2_fr = 'https://yes2.fr'
+    vote.link_campaign_yes_3_fr = 'https://yes3.fr'
+    vote.link_campaign_no_1_fr = 'https://no1.fr'
+    vote.link_campaign_no_2_fr = 'https://no2.fr'
+    vote.link_campaign_no_3_fr = 'https://no3.fr'
     vote.posters_mfg_yea = (
         'https://museum.ch/objects/1 '
         'https://museum.ch/objects/2'
@@ -1482,6 +1572,14 @@ def test_votes_export(swissvotes_app):
     vote.posters_mfg_nay = (
         'https://museum.ch/objects/3 '
         'https://museum.ch/objects/4'
+    )
+    vote.posters_bs_yea = (
+        'https://plakatsammlungbasel.ch/objects/1 '
+        'https://plakatsammlungbasel.ch/objects/2'
+    )
+    vote.posters_bs_nay = (
+        'https://plakatsammlungbasel.ch/objects/3 '
+        'https://plakatsammlungbasel.ch/objects/4'
     )
     vote.posters_sa_yea = (
         'https://sozialarchiv.ch/objects/1 '
@@ -1498,26 +1596,36 @@ def test_votes_export(swissvotes_app):
     vote.media_ads_yea_p = Decimal('10.06')
     vote.media_coverage_articles_total = 1007
     vote.media_coverage_tonality_total = Decimal('10.10')
+    vote.campaign_finances_yea_total = 10000
+    vote.campaign_finances_nay_total = 20000
+    vote.campaign_finances_yea_donors_de = 'Donor 1 D, Donor 2 D'
+    vote.campaign_finances_yea_donors_fr = 'Donor 1 F, Donor 2 F'
+    vote.campaign_finances_nay_donors_de = 'Donor D'
+    vote.campaign_finances_nay_donors_fr = 'Donor F'
+    vote.campaign_finances_link_de = 'https://finances.de'
+    vote.campaign_finances_link_fr = 'https://finances.fr'
 
     votes.session.flush()
     votes.session.expire_all()
 
-    file = StringIO()
+    file: IO[Any] = StringIO()
     votes.export_csv(file)
     file.seek(0)
     rows = list(DictReader(file))
     assert len(rows) == 1
     csv = dict(rows[0])
-    expected = {
+    expected: dict[str, Any] = {
         'anr': '100,1',
         'datum': '02.06.1990',
         'titel_off_d': 'Vote DE',
         'titel_off_f': 'Vote FR',
         'titel_kurz_d': 'V D',
         'titel_kurz_f': 'V F',
+        'titel_kurz_e': 'V E',
         'kurzbetitel': 'Kurzbeschreibung',
         'stichwort': 'Keyword',
         'rechtsform': '1',
+        'pa-iv': '1',
         'd1e1': '4',
         'd1e2': '4,2',
         'd1e3': '4,21',
@@ -1546,6 +1654,8 @@ def test_votes_export(swissvotes_app):
         'bs-annahme': '0',
         'curiavista-de': 'https://curia.vista/de',
         'curiavista-fr': 'https://curia.vista/fr',
+        'easyvideo_de': 'https://easy.vote/de',
+        'easyvideo_fr': 'https://easy.vote/fr',
         'info_br-de': 'https://federal.council/de',
         'info_br-fr': 'https://federal.council/fr',
         'info_br-en': 'https://federal.council/en',
@@ -1634,11 +1744,16 @@ def test_votes_export(swissvotes_app):
         'p-tcs': '9999',
         'p-vcs': '9999',
         'p-voev': '9999',
-        'p-others_yes': 'Pro Velo',
-        'p-others_no': 'Biosuisse',
-        'p-others_free': 'Pro Natura, Greenpeace',
-        'p-others_counterp': 'Pro Juventute',
-        'p-others_init': 'Pro Senectute',
+        'p-others_yes': 'Pro Velo D',
+        'p-others_yes-fr': 'Pro Velo F',
+        'p-others_no': 'Biosuisse D',
+        'p-others_no-fr': 'Biosuisse F',
+        'p-others_free': 'Pro Natura D, Greenpeace D',
+        'p-others_free-fr': 'Pro Natura F, Greenpeace F',
+        'p-others_counterp': 'Pro Juventute D',
+        'p-others_counterp-fr': 'Pro Juventute F',
+        'p-others_init': 'Pro Senectute D',
+        'p-others_init-fr': 'Pro Senectute F',
         'pdev-bdp_AG': '1',
         'pdev-bdp_AI': '1',
         'pdev-bdp_AR': '1',
@@ -2110,10 +2225,15 @@ def test_votes_export(swissvotes_app):
         'freigabe-summe': '27,2',
         'neutral-summe': '24,2',
         'unbekannt-summe': '28,2',
-        'urheber': 'Initiator',
+        'urheber': 'Initiator D',
+        'urheber-fr': 'Initiator F',
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
+        'bfsmap-en': 'map en',
+        'bfsdash-de': 'https://dashboard.de',
+        'bfsdash-fr': 'https://dashboard.fr',
+        'bfsdash-en': 'https://dashboard.en',
         'poster_ja_mfg': (
             'https://museum.ch/objects/1 '
             'https://museum.ch/objects/2'
@@ -2121,6 +2241,14 @@ def test_votes_export(swissvotes_app):
         'poster_nein_mfg': (
             'https://museum.ch/objects/3 '
             'https://museum.ch/objects/4'
+        ),
+        'poster_ja_bs': (
+            'https://plakatsammlungbasel.ch/objects/1 '
+            'https://plakatsammlungbasel.ch/objects/2'
+        ),
+        'poster_nein_bs': (
+            'https://plakatsammlungbasel.ch/objects/3 '
+            'https://plakatsammlungbasel.ch/objects/4'
         ),
         'poster_ja_sa': (
             'https://sozialarchiv.ch/objects/1 '
@@ -2137,6 +2265,26 @@ def test_votes_export(swissvotes_app):
         'inserate-jaanteil': '10,06',
         'mediares-tot': '1007',
         'mediaton-tot': '10,1',
+        'web-yes-1-de': 'https://yes1.de',
+        'web-yes-2-de': 'https://yes2.de',
+        'web-yes-3-de': 'https://yes3.de',
+        'web-no-1-de': 'https://no1.de',
+        'web-no-2-de': 'https://no2.de',
+        'web-no-3-de': 'https://no3.de',
+        'web-yes-1-fr': 'https://yes1.fr',
+        'web-yes-2-fr': 'https://yes2.fr',
+        'web-yes-3-fr': 'https://yes3.fr',
+        'web-no-1-fr': 'https://no1.fr',
+        'web-no-2-fr': 'https://no2.fr',
+        'web-no-3-fr': 'https://no3.fr',
+        'finanz-ja-tot': '10000',
+        'finanz-nein-tot': '20000',
+        'finanz-ja-gr-de': 'Donor 1 D, Donor 2 D',
+        'finanz-ja-gr-fr': 'Donor 1 F, Donor 2 F',
+        'finanz-nein-gr-de': 'Donor D',
+        'finanz-nein-gr-fr': 'Donor F',
+        'finanz-link-de': 'https://finances.de',
+        'finanz-link-fr': 'https://finances.fr',
     }
     assert csv == expected
 
@@ -2158,9 +2306,11 @@ def test_votes_export(swissvotes_app):
         'titel_off_f': 'Vote FR',
         'titel_kurz_d': 'V D',
         'titel_kurz_f': 'V F',
+        'titel_kurz_e': 'V E',
         'kurzbetitel': 'Kurzbeschreibung',
         'stichwort': 'Keyword',
         'rechtsform': 1.0,
+        'pa-iv': 1.0,
         'd1e1': 4.0,
         'd1e2': 4.2,
         'd1e3': 4.21,
@@ -2189,6 +2339,8 @@ def test_votes_export(swissvotes_app):
         'bs-annahme': 0.0,
         'curiavista-de': 'https://curia.vista/de',
         'curiavista-fr': 'https://curia.vista/fr',
+        'easyvideo_de': 'https://easy.vote/de',
+        'easyvideo_fr': 'https://easy.vote/fr',
         'info_br-de': 'https://federal.council/de',
         'info_br-fr': 'https://federal.council/fr',
         'info_br-en': 'https://federal.council/en',
@@ -2259,7 +2411,6 @@ def test_votes_export(swissvotes_app):
         'p-sgb': 3.0,
         'p-travs': 3.0,
         'p-vsa': 9999.0,
-        'p-vsa': 9999.0,
         'p-vpod': 9999.0,
         'p-ssv': 9999.0,
         'p-gem': 9999.0,
@@ -2278,11 +2429,16 @@ def test_votes_export(swissvotes_app):
         'p-tcs': 9999.0,
         'p-vcs': 9999.0,
         'p-voev': 9999.0,
-        'p-others_yes': 'Pro Velo',
-        'p-others_no': 'Biosuisse',
-        'p-others_free': 'Pro Natura, Greenpeace',
-        'p-others_counterp': 'Pro Juventute',
-        'p-others_init': 'Pro Senectute',
+        'p-others_yes': 'Pro Velo D',
+        'p-others_yes-fr': 'Pro Velo F',
+        'p-others_no': 'Biosuisse D',
+        'p-others_no-fr': 'Biosuisse F',
+        'p-others_free': 'Pro Natura D, Greenpeace D',
+        'p-others_free-fr': 'Pro Natura F, Greenpeace F',
+        'p-others_counterp': 'Pro Juventute D',
+        'p-others_counterp-fr': 'Pro Juventute F',
+        'p-others_init': 'Pro Senectute D',
+        'p-others_init-fr': 'Pro Senectute F',
         'pdev-bdp_AG': 1.0,
         'pdev-bdp_AI': 1.0,
         'pdev-bdp_AR': 1.0,
@@ -2754,10 +2910,15 @@ def test_votes_export(swissvotes_app):
         'freigabe-summe': 27.2,
         'neutral-summe': 24.2,
         'unbekannt-summe': 28.2,
-        'urheber': 'Initiator',
+        'urheber': 'Initiator D',
+        'urheber-fr': 'Initiator F',
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
+        'bfsmap-en': 'map en',
+        'bfsdash-de': 'https://dashboard.de',
+        'bfsdash-fr': 'https://dashboard.fr',
+        'bfsdash-en': 'https://dashboard.en',
         'poster_ja_mfg': (
             'https://museum.ch/objects/1 '
             'https://museum.ch/objects/2'
@@ -2765,6 +2926,14 @@ def test_votes_export(swissvotes_app):
         'poster_nein_mfg': (
             'https://museum.ch/objects/3 '
             'https://museum.ch/objects/4'
+        ),
+        'poster_ja_bs': (
+            'https://plakatsammlungbasel.ch/objects/1 '
+            'https://plakatsammlungbasel.ch/objects/2'
+        ),
+        'poster_nein_bs': (
+            'https://plakatsammlungbasel.ch/objects/3 '
+            'https://plakatsammlungbasel.ch/objects/4'
         ),
         'poster_ja_sa': (
             'https://sozialarchiv.ch/objects/1 '
@@ -2781,6 +2950,26 @@ def test_votes_export(swissvotes_app):
         'inserate-jaanteil': 10.06,
         'mediares-tot': 1007,
         'mediaton-tot': 10.10,
+        'web-yes-1-de': 'https://yes1.de',
+        'web-yes-2-de': 'https://yes2.de',
+        'web-yes-3-de': 'https://yes3.de',
+        'web-no-1-de': 'https://no1.de',
+        'web-no-2-de': 'https://no2.de',
+        'web-no-3-de': 'https://no3.de',
+        'web-yes-1-fr': 'https://yes1.fr',
+        'web-yes-2-fr': 'https://yes2.fr',
+        'web-yes-3-fr': 'https://yes3.fr',
+        'web-no-1-fr': 'https://no1.fr',
+        'web-no-2-fr': 'https://no2.fr',
+        'web-no-3-fr': 'https://no3.fr',
+        'finanz-ja-tot': 10000,
+        'finanz-nein-tot': 20000,
+        'finanz-ja-gr-de': 'Donor 1 D, Donor 2 D',
+        'finanz-ja-gr-fr': 'Donor 1 F, Donor 2 F',
+        'finanz-nein-gr-de': 'Donor D',
+        'finanz-nein-gr-fr': 'Donor F',
+        'finanz-link-de': 'https://finances.de',
+        'finanz-link-fr': 'https://finances.fr',
     }
     assert xlsx == expected
 

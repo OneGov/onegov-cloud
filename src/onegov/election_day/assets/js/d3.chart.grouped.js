@@ -258,12 +258,12 @@
                         bar.all.on('mouseover', function(d) {
                             bar.all.filter(function(s) { return !(s.group === d.group && s.item === d.item); })
                                 .transition()
-                                .duration(700)
+                                .duration(500)
                         		    .style('opacity', 0.1);
                         });
                         bar.all.on('mouseout', function(d) {
                             bar.all.transition()
-                                .duration(700)
+                                .duration(500)
                         		    .style('opacity', 1);
                         });
 
@@ -271,12 +271,12 @@
                         label.on('mouseover', function(d) {
                             bar.all.filter(function(s) { return s.group !== d; })
                                 .transition()
-                                .duration(700)
+                                .duration(500)
                         		    .style('opacity', 0.1);
                         });
                         label.on('mouseout', function(d) {
                             bar.all.transition()
-                                .duration(700)
+                                .duration(500)
                         		    .style('opacity', 1);
                         });
 
@@ -285,19 +285,19 @@
                             axis.front.on('mouseover', function(d) {
                                 bar.back
                                     .transition()
-                                    .duration(700)
+                                    .duration(500)
                             		    .style('opacity', 0.1);
                             });
                             axis.back.on('mouseover', function(d) {
                                 bar.front
                                 .transition()
-                                .duration(700)
+                                .duration(500)
                                 .style('opacity', 0.1);
                             });
                         }
                         axis.all.on('mouseout', function(d) {
                             bar.all.transition()
-                                .duration(700)
+                                .duration(500)
                         	      .style('opacity', 1);
                         });
                     }

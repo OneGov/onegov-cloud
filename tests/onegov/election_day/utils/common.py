@@ -1,35 +1,50 @@
+from __future__ import annotations
+
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Ballot
-from onegov.ballot import BallotResult
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot import ListResult
-from onegov.ballot import PanachageResult
-from onegov.ballot import PartyResult
-from onegov.ballot import ProporzElection
-from onegov.ballot import Vote
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ComplexVote
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ListPanachageResult
+from onegov.election_day.models import ListResult
+from onegov.election_day.models import PartyPanachageResult
+from onegov.election_day.models import PartyResult
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from reportlab.pdfgen.canvas import Canvas
 from uuid import uuid4
 
 
+from typing import overload, Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
 class PatchedD3Renderer(D3Renderer):
-    def get_chart(self, chart, fmt, data, width=1000, params=None):
-        chart = BytesIO()
-        canvas = Canvas(chart, pagesize=(140, 140))
+    def get_chart(  # type: ignore[override]
+        self,
+        chart: str,
+        fmt: object,
+        data: object,
+        width: int = 1000,
+        params: object = None
+    ) -> BytesIO:
+        output = BytesIO()
+        canvas = Canvas(output, pagesize=(140, 140))
         canvas.drawString(10, 70, "This is a diagram")
         canvas.save()
-        chart.seek(0)
-        return chart
+        output.seek(0)
+        return output
 
 
-def add_majorz_election(session):
+def add_majorz_election(session: Session) -> Election:
     election = Election(
         title='Majorz Election',
         domain='federation',
@@ -81,7 +96,11 @@ def add_majorz_election(session):
     return election
 
 
-def add_proporz_election(session, year=2015):
+def add_proporz_election(
+    session: Session,
+    year: int = 2015
+) -> ProporzElection:
+
     election = ProporzElection(
         title='Proporz Election',
         domain='federation',
@@ -113,6 +132,7 @@ def add_proporz_election(session, year=2015):
 
     election.party_results.append(
         PartyResult(
+            domain='federation',
             name_translations={'de_CH': 'Party 1'},
             party_id='0',
             number_of_mandates=1,
@@ -121,36 +141,61 @@ def add_proporz_election(session, year=2015):
     )
     election.party_results.append(
         PartyResult(
+            domain='federation',
             name_translations={'de_CH': 'Party 2'},
             party_id='1',
             number_of_mandates=1,
             votes=20
         )
     )
-    election.panachage_results.append(
-        PanachageResult(source='0', target='1', votes=12)
+    election.party_panachage_results.append(
+        PartyPanachageResult(source='0', target='1', votes=12)
     )
-    election.panachage_results.append(
-        PanachageResult(source='1', target='0', votes=21)
+    election.party_panachage_results.append(
+        PartyPanachageResult(source='1', target='0', votes=21)
     )
 
     list_1.panachage_results.append(
-        PanachageResult(target=str(list_1.id), source=2, votes=1)
+        ListPanachageResult(
+            target_id=list_1.id,
+            source_id=list_2.id,
+            votes=1
+        )
     )
     list_1.panachage_results.append(
-        PanachageResult(target=str(list_1.id), source=3, votes=1)
+        ListPanachageResult(
+            target_id=list_1.id,
+            source_id=list_3.id,
+            votes=1
+        )
     )
     list_2.panachage_results.append(
-        PanachageResult(target=str(list_2.id), source=1, votes=2)
+        ListPanachageResult(
+            target_id=list_2.id,
+            source_id=list_1.id,
+            votes=2
+        )
     )
     list_2.panachage_results.append(
-        PanachageResult(target=str(list_2.id), source=3, votes=2)
+        ListPanachageResult(
+            target_id=list_2.id,
+            source_id=list_3.id,
+            votes=2
+        )
     )
     list_3.panachage_results.append(
-        PanachageResult(target=str(list_3.id), source=1, votes=3)
+        ListPanachageResult(
+            target_id=list_3.id,
+            source_id=list_1.id,
+            votes=3
+        )
     )
     list_3.panachage_results.append(
-        PanachageResult(target=str(list_3.id), source=2, votes=3)
+        ListPanachageResult(
+            target_id=list_3.id,
+            source_id=list_2.id,
+            votes=3
+        )
     )
 
     candidate_1 = Candidate(
@@ -208,34 +253,40 @@ def add_proporz_election(session, year=2015):
     return election
 
 
-def add_vote(session, type_):
+@overload
+def add_vote(session: Session, type_: Literal['complex']) -> ComplexVote: ...
+@overload
+def add_vote(session: Session, type_: Literal['simple']) -> Vote: ...
+def add_vote(session: Session, type_: Literal['simple', 'complex']) -> Vote:
     vote = Vote.get_polymorphic_class(type_, Vote)(
         title='Vote', domain='federation', date=date(2015, 6, 18)
     )
-
-    vote.ballots.append(Ballot(type='proposal'))
-    if type_ == 'complex':
-        vote.ballots.append(Ballot(type='counter-proposal'))
-        vote.ballots.append(Ballot(type='tie-breaker'))
-    session.add(vote)
-    session.flush()
-
     vote.proposal.results.append(BallotResult(
         name='x', yeas=0, nays=100, counted=True, entity_id=1
     ))
+
     if type_ == 'complex':
+        assert isinstance(vote, ComplexVote)
         vote.counter_proposal.results.append(BallotResult(
             name='x', yeas=90, nays=10, counted=True, entity_id=1
         ))
         vote.tie_breaker.results.append(BallotResult(
             name='x', yeas=0, nays=0, counted=True, entity_id=1
         ))
+
+    session.add(vote)
     session.flush()
 
     return vote
 
 
-def add_election_compound(session, year=2015, elections=None, **kwargs):
+def add_election_compound(
+    session: Session,
+    year: int = 2015,
+    elections: list[Election] | None = None,
+    **kwargs: Any
+) -> ElectionCompound:
+
     compound = ElectionCompound(
         title='Election Compound',
         domain='canton',
@@ -248,6 +299,7 @@ def add_election_compound(session, year=2015, elections=None, **kwargs):
 
     compound.party_results.append(
         PartyResult(
+            domain='canton',
             name_translations={'de_CH': 'Party 1'},
             year=year,
             party_id='0',
@@ -257,6 +309,7 @@ def add_election_compound(session, year=2015, elections=None, **kwargs):
     )
     compound.party_results.append(
         PartyResult(
+            domain='canton',
             name_translations={'de_CH': 'Party 2'},
             year=year,
             party_id='1',
@@ -264,11 +317,11 @@ def add_election_compound(session, year=2015, elections=None, **kwargs):
             votes=20
         )
     )
-    compound.panachage_results.append(
-        PanachageResult(source='0', target='1', votes=12)
+    compound.party_panachage_results.append(
+        PartyPanachageResult(source='0', target='1', votes=12)
     )
-    compound.panachage_results.append(
-        PanachageResult(source='1', target='0', votes=21)
+    compound.party_panachage_results.append(
+        PartyPanachageResult(source='1', target='0', votes=21)
     )
 
     return compound

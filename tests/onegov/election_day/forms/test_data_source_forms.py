@@ -1,15 +1,22 @@
+from __future__ import annotations
+
 from datetime import date
-from onegov.ballot import Election
-from onegov.ballot import Vote
 from onegov.election_day.forms import DataSourceForm
 from onegov.election_day.forms import DataSourceItemForm
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
+from onegov.election_day.models import Election
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_data_source_form():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_data_source_form() -> None:
     # Validation
     assert not DataSourceForm().validate()
     assert DataSourceForm(
@@ -37,7 +44,7 @@ def test_data_source_form():
     assert model.name == 'ds_majorz'
 
 
-def test_data_source_item_form():
+def test_data_source_item_form() -> None:
     # Validation
     assert not DataSourceItemForm().validate()
     form = DataSourceItemForm(
@@ -80,9 +87,9 @@ def test_data_source_item_form():
     assert model.election_id == 'new-election-id'
 
 
-def test_data_source_item_form_populate(session):
+def test_data_source_item_form_populate(session: Session) -> None:
     form = DataSourceItemForm()
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
 
     session.add(DataSource(type='vote', name='dsv'))
     session.add(DataSource(type='majorz', name='dsm'))

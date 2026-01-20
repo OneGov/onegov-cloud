@@ -42,7 +42,7 @@
                 </div>
             </div>
                 <tal:block metal:use-macro="layout.macros['election-connections-table']"/>
-                <div metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link"/>
+                <div metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link()"/>
         </tal:block>
 
         <div metal:use-macro="layout.macros['related_link']" />

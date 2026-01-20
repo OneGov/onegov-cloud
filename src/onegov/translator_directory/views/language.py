@@ -1,12 +1,21 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Secret, Private
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.forms.language import LanguageForm
 from onegov.translator_directory import _
-from onegov.translator_directory.layout import LanguageCollectionLayout, \
-    AddLanguageLayout, EditLanguageLayout
+from onegov.translator_directory.layout import (
+    LanguageCollectionLayout, AddLanguageLayout, EditLanguageLayout)
 from onegov.translator_directory.models.language import Language
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.translator_directory.request import TranslatorAppRequest
+    from webob import Response
 
 
 @TranslatorDirectoryApp.form(
@@ -16,7 +25,11 @@ from onegov.translator_directory.models.language import Language
     form=LanguageForm,
     permission=Secret
 )
-def add_new_language(self, request, form):
+def add_new_language(
+    self: LanguageCollection,
+    request: TranslatorAppRequest,
+    form: LanguageForm
+) -> RenderData | Response:
 
     if form.submitted(request):
         lang = self.add(**form.get_useful_data())
@@ -25,8 +38,11 @@ def add_new_language(self, request, form):
         )
         return request.redirect(request.class_link(LanguageCollection))
 
+    layout = AddLanguageLayout(self, request)
+    layout.edit_mode = True
+
     return {
-        'layout': AddLanguageLayout(self, request),
+        'layout': layout,
         'model': self,
         'form': form,
         'title': _('Add new language')
@@ -38,7 +54,10 @@ def add_new_language(self, request, form):
     template='languages.pt',
     permission=Private,
 )
-def view_languages(self, request):
+def view_languages(
+    self: LanguageCollection,
+    request: TranslatorAppRequest
+) -> RenderData:
 
     letters = tuple(
         Link(
@@ -68,7 +87,11 @@ def view_languages(self, request):
     form=LanguageForm,
     template='form.pt'
 )
-def edit_language(self, request, form):
+def edit_language(
+    self: Language,
+    request: TranslatorAppRequest,
+    form: LanguageForm
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -82,8 +105,12 @@ def edit_language(self, request, form):
     if not form.errors:
         form.process(obj=self)
 
+    layout = EditLanguageLayout(self, request)
+    layout.edit_mode = True
+    layout.editmode_links.extend(layout.editbar_links)
+
     return {
-        'layout': EditLanguageLayout(self, request),
+        'layout': layout,
         'model': self,
         'form': form,
         'title': _('Edit language')
@@ -95,7 +122,7 @@ def edit_language(self, request, form):
     request_method='DELETE',
     permission=Secret
 )
-def delete_language(self, request):
+def delete_language(self: Language, request: TranslatorAppRequest) -> None:
     request.assert_valid_csrf_token()
     if not self.deletable:
         request.warning(_("This language is used and can't be deleted."))

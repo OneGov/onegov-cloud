@@ -13,8 +13,17 @@ templates directly is faster.
 This module should eventually replace the elements.py module.
 
 """
+from __future__ import annotations
 
 from onegov.core.templates import render_macro
+
+
+from typing import Any, ClassVar, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Collection, Iterable, Sequence
+    from markupsafe import Markup
+
+    from .layout import ChameleonLayout
 
 
 class Element:
@@ -44,11 +53,17 @@ class Element:
     """
 
     # The link refers to the id of the macro written in elements.pt
-    id = None
+    id: ClassVar[str | None] = None
 
     __slots__ = ('text', 'attrs', 'props')
 
-    def __init__(self, text=None, attrs=None, traits=(), **props):
+    def __init__(
+        self,
+        text: str | None = None,
+        attrs: dict[str, Any] | None = None,
+        traits: Iterable[Trait] | Trait = (),
+        **props: Any
+    ):
         self.text = text
         self.props = props
         self.attrs = self.normalize_attrs(attrs)
@@ -59,7 +74,7 @@ class Element:
         for trait in traits:
             self.attrs = trait(self.attrs, **props)
 
-    def normalize_attrs(self, attrs):
+    def normalize_attrs(self, attrs: dict[str, Any] | None) -> dict[str, Any]:
         """ Before we do anything with attributes we make sure we can easily
         add/remove classes from them, so we use a set.
 
@@ -75,18 +90,29 @@ class Element:
 
         return attrs
 
-    def __eq__(self, other):
-        return self.id == other.id\
-            and self.attrs == other.attrs\
-            and self.props == other.props
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, Element)
+            and self.id == other.id
+            and self.attrs == other.attrs
+            and self.props == other.props)
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
+        # Handle special attributes that deepcopy looks for
+        if name.startswith('__') and name.endswith('__'):
+            raise AttributeError(name)
         if name in self.props:
             return self.props[name]
-
         raise AttributeError(name)
 
-    def __call__(self, layout, extra_classes=None):
+    def __call__(
+        self,
+        layout: ChameleonLayout,
+        extra_classes: Iterable[str] | None = None
+    ) -> Markup:
+
+        assert self.id is not None
+
         if extra_classes:
             self.attrs['class'].update(extra_classes)
 
@@ -96,9 +122,11 @@ class Element:
         else:
             del self.attrs['class']
 
-        return render_macro(layout.elements[self.id], layout.request, {
-            'e': self, 'layout': layout,
-        })
+        return render_macro(
+            layout.elements[self.id],
+            layout.request,
+            {'e': self, 'layout': layout}
+        )
 
 
 class AccessMixin:
@@ -113,7 +141,7 @@ class AccessMixin:
     __slots__ = ()
 
     @property
-    def access(self):
+    def access(self) -> str:
         """ Wraps model.access, ensuring it is always available, even if the
         model does not use it.
 
@@ -131,7 +159,14 @@ class Link(Element, AccessMixin):
 
     __slots__ = ()
 
-    def __init__(self, text, url='#', attrs=None, traits=(), **props):
+    def __init__(
+        self,
+        text: str | None,
+        url: str = '#',
+        attrs: dict[str, Any] | None = None,
+        traits: Iterable[Trait] | Trait = (),
+        **props: Any
+    ):
         # this is the only exception we permit where we don't use a trait
         # to change the attributes - we do this because the url is essential
         # to a link, so it makes sense to have it as a proper argument
@@ -139,6 +174,38 @@ class Link(Element, AccessMixin):
         attrs['href'] = url
 
         super().__init__(text, attrs, traits, **props)
+
+    def __repr__(self) -> str:
+        return f'<Link {self.text}>'
+
+
+class Button(Link):
+    """ A generic button. """
+
+    id = 'button'
+
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        return f'<Button {self.text}>'
+
+
+class BackLink(Link):
+    """ A button that goes back in the history. """
+
+    id = 'back_link'
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        text: str = '',
+        **props: Any
+    ):
+        super().__init__(text, **props)
+
+    def __repr__(self) -> str:
+        return f'<BackButton {self.text}>'
 
 
 class LinkGroup(AccessMixin):
@@ -153,8 +220,15 @@ class LinkGroup(AccessMixin):
         'attributes'
     ]
 
-    def __init__(self, title, links,
-                 model=None, right_side=True, classes=None, attributes=None):
+    def __init__(
+        self,
+        title: str,
+        links: Sequence[Link],
+        model: Any | None = None,
+        right_side: bool = True,
+        classes: Collection[str] | None = None,
+        attributes: dict[str, Any] | None = None
+    ):
         self.title = title
         self.links = links
         self.model = model
@@ -168,7 +242,13 @@ class Trait:
 
     __slots__ = ('apply', )
 
-    def __call__(self, attrs, **ignored):
+    apply: Callable[[dict[str, Any]], dict[str, Any]]
+
+    def __call__(
+        self,
+        attrs: dict[str, Any],
+        **ignored: Any
+    ) -> dict[str, Any]:
         return self.apply(attrs)
 
 
@@ -188,14 +268,25 @@ class Confirm(Trait):
 
     __slots__ = ()
 
-    def __init__(self, confirm, extra=None, yes="Yes", no="Cancel",
-                 **ignored):
-        def apply(attrs):
+    def __init__(
+        self,
+        confirm: str,
+        extra: str | None = None,
+        yes: str | None = 'Yes',
+        no: str = 'Cancel',
+        items: Sequence[str] | None = None,
+        scroll_hint: str | None = None,
+        **ignored: Any
+    ):
+        def apply(attrs: dict[str, Any]) -> dict[str, Any]:
             attrs['class'].add('confirm')
             attrs['data-confirm'] = confirm
             attrs['data-confirm-extra'] = extra
             attrs['data-confirm-yes'] = yes
             attrs['data-confirm-no'] = no
+            if items:
+                attrs['data-confirm-items'] = items
+                attrs['data-scroll-hint'] = scroll_hint
             return attrs
 
         self.apply = apply
@@ -206,7 +297,13 @@ class Block(Confirm):
 
     __slots__ = ()
 
-    def __init__(self, message, extra=None, no="Cancel", **ignored):
+    def __init__(
+        self,
+        message: str,
+        extra: str | None = None,
+        no: str = 'Cancel',
+        **ignored: Any
+    ):
         super().__init__(message, extra, None, no)
 
 
@@ -219,9 +316,14 @@ class Intercooler(Trait):
 
     __slots__ = ()
 
-    def __init__(self, request_method, target=None, redirect_after=None,
-                 **ignored):
-        def apply(attrs):
+    def __init__(
+        self,
+        request_method: Literal['GET', 'POST', 'DELETE'],
+        target: str | None = None,
+        redirect_after: str | None = None,
+        **ignored: Any
+    ):
+        def apply(attrs: dict[str, Any]) -> dict[str, Any]:
             if request_method == 'GET':
                 attrs['ic-get-from'] = attrs['href']
             elif request_method == 'POST':

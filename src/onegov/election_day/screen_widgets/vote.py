@@ -1,12 +1,22 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget
+
+
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.layouts import DefaultLayout
+    from onegov.election_day.models import ComplexVote  # noqa: F401
+    from onegov.election_day.models import Vote  # noqa: F401
 
 
 @ElectionDayApp.screen_widget(
     tag='vote-counter-proposal-title',
     category='complex_vote'
 )
-class VoteCounterProposalTitleWidget(ModelBoundWidget):
+class VoteCounterProposalTitleWidget(ModelBoundWidget['Vote']):
     tag = 'vote-counter-proposal-title'
     template = """
         <xsl:template match="vote-counter-proposal-title">
@@ -23,7 +33,7 @@ class VoteCounterProposalTitleWidget(ModelBoundWidget):
     tag='vote-tie-breaker-title',
     category='complex_vote'
 )
-class VoteTieBreakerTitleWidget(ModelBoundWidget):
+class VoteTieBreakerTitleWidget(ModelBoundWidget['ComplexVote']):
     tag = 'vote-tie-breaker-title'
     template = """
         <xsl:template match="vote-tie-breaker-title">
@@ -40,7 +50,7 @@ class VoteTieBreakerTitleWidget(ModelBoundWidget):
     tag='vote-proposal-result-bar',
     category='vote'
 )
-class VoteProposalResultBarWidget(ModelBoundWidget):
+class VoteProposalResultBarWidget(ModelBoundWidget['Vote']):
     tag = 'vote-proposal-result-bar'
     template = """
         <xsl:template match="vote-proposal-result-bar">
@@ -54,7 +64,7 @@ class VoteProposalResultBarWidget(ModelBoundWidget):
     """
     usage = '<vote-proposal-result-bar class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'proposal': model.proposal,
@@ -65,7 +75,7 @@ class VoteProposalResultBarWidget(ModelBoundWidget):
     tag='vote-counter-proposal-result-bar',
     category='complex_vote'
 )
-class VoteCounterProposalResultBarWidget(ModelBoundWidget):
+class VoteCounterProposalResultBarWidget(ModelBoundWidget['ComplexVote']):
     tag = 'vote-counter-proposal-result-bar'
     template = """
         <xsl:template match="vote-counter-proposal-result-bar">
@@ -79,7 +89,7 @@ class VoteCounterProposalResultBarWidget(ModelBoundWidget):
     """
     usage = '<vote-counter-proposal-result-bar class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'counter_proposal': model.counter_proposal,
@@ -90,7 +100,7 @@ class VoteCounterProposalResultBarWidget(ModelBoundWidget):
     tag='vote-tie-breaker-result-bar',
     category='complex_vote'
 )
-class VoteTieBreakerResultBarWidget(ModelBoundWidget):
+class VoteTieBreakerResultBarWidget(ModelBoundWidget['ComplexVote']):
     tag = 'vote-tie-breaker-result-bar'
     template = """
         <xsl:template match="vote-tie-breaker-result-bar">
@@ -104,7 +114,7 @@ class VoteTieBreakerResultBarWidget(ModelBoundWidget):
     """
     usage = '<vote-tie-breaker-result-bar class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'tie_breaker': model.tie_breaker,
@@ -115,24 +125,28 @@ class VoteTieBreakerResultBarWidget(ModelBoundWidget):
     tag='vote-proposal-entities-table',
     category='vote'
 )
-class VoteProposalEntitiesTableWidget(ModelBoundWidget):
+class VoteProposalEntitiesTableWidget(ModelBoundWidget['Vote']):
     tag = 'vote-proposal-entities-table'
     template = """
         <xsl:template match="vote-proposal-entities-table">
             <div class="{@class}">
                 <tal:block
                     metal:use-macro="layout.macros['ballot-entities-table']"
-                    tal:define="ballot proposal"
+                    tal:define="ballot proposal;
+                                results proposal_results"
                     />
             </div>
         </xsl:template>
     """
     usage = '<vote-proposal-entities-table class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
+        ballot = model.proposal
+        results = sorted(ballot.results, key=lambda x: x.name)
         return {
-            'proposal': model.proposal,
+            'proposal': ballot,
+            'proposal_results': results
         }
 
 
@@ -140,24 +154,28 @@ class VoteProposalEntitiesTableWidget(ModelBoundWidget):
     tag='vote-counter-proposal-entities-table',
     category='complex_vote'
 )
-class VoteCounterProposalEntitiesTableWidget(ModelBoundWidget):
+class VoteCounterProposalEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
     tag = 'vote-counter-proposal-entities-table'
     template = """
         <xsl:template match="vote-counter-proposal-entities-table">
             <div class="{@class}">
                 <tal:block
                     metal:use-macro="layout.macros['ballot-entities-table']"
-                    tal:define="ballot counter_proposal"
+                    tal:define="ballot counter_proposal;
+                                results counter_proposal_results"
                     />
             </div>
         </xsl:template>
     """
     usage = '<vote-counter-proposal-entities-table class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
+        ballot = model.counter_proposal
+        results = sorted(ballot.results, key=lambda x: x.name)
         return {
-            'counter_proposal': model.counter_proposal,
+            'counter_proposal': ballot,
+            'counter_proposal_results': results,
         }
 
 
@@ -165,24 +183,28 @@ class VoteCounterProposalEntitiesTableWidget(ModelBoundWidget):
     tag='vote-tie-breaker-entities-table',
     category='complex_vote'
 )
-class VoteTieBreakerEntitiesTableWidget(ModelBoundWidget):
+class VoteTieBreakerEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
     tag = 'vote-tie-breaker-entities-table'
     template = """
         <xsl:template match="vote-tie-breaker-entities-table">
             <div class="{@class}">
                 <tal:block
                     metal:use-macro="layout.macros['ballot-entities-table']"
-                    tal:define="ballot tie_breaker"
+                    tal:define="ballot tie_breaker;
+                                results tie_breaker_results"
                     />
             </div>
         </xsl:template>
     """
     usage = '<vote-tie-breaker-entities-table class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
+        ballot = model.tie_breaker
+        results = sorted(ballot.results, key=lambda x: x.name)
         return {
-            'tie_breaker': model.tie_breaker,
+            'tie_breaker': ballot,
+            'tie_breaker_results': results,
         }
 
 
@@ -190,7 +212,7 @@ class VoteTieBreakerEntitiesTableWidget(ModelBoundWidget):
     tag='vote-proposal-entities-map',
     category='vote'
 )
-class VoteProposalEntitiesMap(ModelBoundWidget):
+class VoteProposalEntitiesMap(ModelBoundWidget['Vote']):
     tag = 'vote-proposal-entities-map'
     template = """
         <xsl:template match="vote-proposal-entities-map">
@@ -204,7 +226,7 @@ class VoteProposalEntitiesMap(ModelBoundWidget):
     """
     usage = '<vote-proposal-entities-map class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -216,7 +238,7 @@ class VoteProposalEntitiesMap(ModelBoundWidget):
     tag='vote-counter-proposal-entities-map',
     category='complex_vote'
 )
-class VoteCounterProposalEntitiesMap(ModelBoundWidget):
+class VoteCounterProposalEntitiesMap(ModelBoundWidget['ComplexVote']):
     tag = 'vote-counter-proposal-entities-map'
     template = """
         <xsl:template match="vote-counter-proposal-entities-map">
@@ -230,7 +252,7 @@ class VoteCounterProposalEntitiesMap(ModelBoundWidget):
     """
     usage = '<vote-counter-proposal-entities-map class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -242,7 +264,7 @@ class VoteCounterProposalEntitiesMap(ModelBoundWidget):
     tag='vote-tie-breaker-entities-map',
     category='complex_vote'
 )
-class VoteTieBreakerEntitiesMap(ModelBoundWidget):
+class VoteTieBreakerEntitiesMap(ModelBoundWidget['ComplexVote']):
     tag = 'vote-tie-breaker-entities-map'
     template = """
         <xsl:template match="vote-tie-breaker-entities-map">
@@ -256,7 +278,7 @@ class VoteTieBreakerEntitiesMap(ModelBoundWidget):
     """
     usage = '<vote-tie-breaker-entities-map class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -268,7 +290,7 @@ class VoteTieBreakerEntitiesMap(ModelBoundWidget):
     tag='vote-proposal-districts-map',
     category='vote'
 )
-class VoteProposalDistrictsMap(ModelBoundWidget):
+class VoteProposalDistrictsMap(ModelBoundWidget['Vote']):
     tag = 'vote-proposal-districts-map'
     template = """
         <xsl:template match="vote-proposal-districts-map">
@@ -282,7 +304,7 @@ class VoteProposalDistrictsMap(ModelBoundWidget):
     """
     usage = '<vote-proposal-districts-map class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -294,7 +316,7 @@ class VoteProposalDistrictsMap(ModelBoundWidget):
     tag='vote-counter-proposal-districts-map',
     category='complex_vote'
 )
-class VoteCounterProposalDistrictsMap(ModelBoundWidget):
+class VoteCounterProposalDistrictsMap(ModelBoundWidget['ComplexVote']):
     tag = 'vote-counter-proposal-districts-map'
     template = """
         <xsl:template match="vote-counter-proposal-districts-map">
@@ -308,7 +330,7 @@ class VoteCounterProposalDistrictsMap(ModelBoundWidget):
     """
     usage = '<vote-counter-proposal-districts-map class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -320,7 +342,7 @@ class VoteCounterProposalDistrictsMap(ModelBoundWidget):
     tag='vote-tie-breaker-districts-map',
     category='complex_vote'
 )
-class VoteTieBreakerDistrictsMap(ModelBoundWidget):
+class VoteTieBreakerDistrictsMap(ModelBoundWidget['ComplexVote']):
     tag = 'vote-tie-breaker-districts-map'
     template = """
         <xsl:template match="vote-tie-breaker-districts-map">
@@ -334,7 +356,7 @@ class VoteTieBreakerDistrictsMap(ModelBoundWidget):
     """
     usage = '<vote-tie-breaker-districts-map class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -346,7 +368,7 @@ class VoteTieBreakerDistrictsMap(ModelBoundWidget):
     tag='vote-proposal-turnout',
     category='vote'
 )
-class VoteProposalTurnoutWidget(ModelBoundWidget):
+class VoteProposalTurnoutWidget(ModelBoundWidget['Vote']):
     tag = 'vote-proposal-turnout'
     template = """
         <xsl:template match="vote-proposal-turnout">
@@ -357,7 +379,7 @@ class VoteProposalTurnoutWidget(ModelBoundWidget):
     """
     usage = '<vote-proposal-turnout class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -369,7 +391,7 @@ class VoteProposalTurnoutWidget(ModelBoundWidget):
     tag='vote-counter-proposal-turnout',
     category='complex_vote'
 )
-class VoteCounterProposalTurnoutWidget(ModelBoundWidget):
+class VoteCounterProposalTurnoutWidget(ModelBoundWidget['ComplexVote']):
     tag = 'vote-counter-proposal-turnout'
     template = """
         <xsl:template match="vote-counter-proposal-turnout">
@@ -380,7 +402,7 @@ class VoteCounterProposalTurnoutWidget(ModelBoundWidget):
     """
     usage = '<vote-counter-proposal-turnout class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -392,7 +414,7 @@ class VoteCounterProposalTurnoutWidget(ModelBoundWidget):
     tag='vote-tie-breaker-turnout',
     category='complex_vote'
 )
-class VoteTieBreakerTurnoutWidget(ModelBoundWidget):
+class VoteTieBreakerTurnoutWidget(ModelBoundWidget['ComplexVote']):
     tag = 'vote-tie-breaker-turnout'
     template = """
         <xsl:template match="vote-tie-breaker-turnout">
@@ -403,7 +425,7 @@ class VoteTieBreakerTurnoutWidget(ModelBoundWidget):
     """
     usage = '<vote-tie-breaker-turnout class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,

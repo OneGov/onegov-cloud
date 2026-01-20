@@ -1,19 +1,27 @@
+from __future__ import annotations
+
 import pytest
 import transaction
 
+from email_validator import EmailNotValidError
 from onegov.newsletter import Newsletter, Recipient, Subscription
 from onegov.newsletter.models import newsletter_recipients
 from sqlalchemy.exc import IntegrityError
 
 
-def test_recipients_unconfirmed(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_recipients_unconfirmed(session: Session) -> None:
     session.add(Recipient(address='info@example.org'))
     transaction.commit()
 
-    assert session.query(Recipient).first().confirmed is False
+    assert session.query(Recipient).one().confirmed is False
 
 
-def test_recipients_unique_per_group(session):
+def test_recipients_unique_per_group(session: Session) -> None:
 
     for group in (None, 'foo', 'bar'):
         session.add(Recipient(address='info@example.org', group=group))
@@ -26,7 +34,7 @@ def test_recipients_unique_per_group(session):
         transaction.abort()
 
 
-def test_valid_name():
+def test_valid_name() -> None:
     with pytest.raises(AssertionError):
         Newsletter(
             title="Normalization Works",
@@ -35,12 +43,12 @@ def test_valid_name():
         )
 
 
-def test_recipients_valid_email():
-    with pytest.raises(AssertionError):
+def test_recipients_valid_email() -> None:
+    with pytest.raises(EmailNotValidError):
         Recipient(address="no-email")
 
 
-def test_recipient_subscription(session):
+def test_recipient_subscription(session: Session) -> None:
     recipient = Recipient(address="info@example.org")
     session.add(recipient)
     session.flush()
@@ -56,17 +64,19 @@ def test_recipient_subscription(session):
     assert not recipient.confirmed
     assert session.query(Recipient).count() == 1
 
+    # undo mypy narrowing
+    recipient2 = recipient
     assert recipient.subscription.confirm()
-    assert recipient.confirmed
+    assert recipient2.confirmed
 
     assert not Subscription(recipient, 'asdf').unsubscribe()
-    assert recipient.confirmed
+    assert recipient2.confirmed
 
     assert recipient.subscription.unsubscribe()
     assert session.query(Recipient).count() == 0
 
 
-def test_newsletter_recipients_cascade(session):
+def test_newsletter_recipients_cascade(session: Session) -> None:
 
     # is the relationship reflected correctly?
     newsletter = Newsletter(
@@ -81,8 +91,8 @@ def test_newsletter_recipients_cascade(session):
     session.add(newsletter)
     transaction.commit()
 
-    newsletter = session.query(Newsletter).first()
-    recipient = session.query(Recipient).first()
+    newsletter = session.query(Newsletter).one()
+    recipient = session.query(Recipient).one()
 
     assert len(newsletter.recipients) == 1
     assert len(recipient.newsletters) == 1
@@ -92,7 +102,7 @@ def test_newsletter_recipients_cascade(session):
     session.delete(newsletter)
     transaction.commit()
 
-    recipient = session.query(Recipient).first()
+    recipient = session.query(Recipient).one()
     assert len(recipient.newsletters) == 0
     assert session.query(newsletter_recipients).count() == 0
 
@@ -104,10 +114,10 @@ def test_newsletter_recipients_cascade(session):
     ))
     transaction.commit()
 
-    newsletter = session.query(Newsletter).first()
+    newsletter = session.query(Newsletter).one()
     session.delete(newsletter.recipients[0])
     transaction.commit()
 
-    newsletter = session.query(Newsletter).first()
+    newsletter = session.query(Newsletter).one()
     assert len(newsletter.recipients) == 0
     assert session.query(newsletter_recipients).count() == 0

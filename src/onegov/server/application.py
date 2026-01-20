@@ -1,6 +1,15 @@
+from __future__ import annotations
+
 import re
 
 from onegov.server import errors
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed.wsgi import WSGIEnvironment, StartResponse
+    from collections.abc import Iterable
+    from re import Pattern
 
 
 class Application:
@@ -12,23 +21,27 @@ class Application:
     #: If the host passed by the request is not localhost, then it is
     #: checked against the allowed_hosts expression. If it doesn't match,
     #: the request is denied.
-    allowed_hosts_expression = None
+    allowed_hosts_expression: Pattern[str] | None = None
 
     #: Additional allowed hosts may be added to this set. Those are not
     #: expressions, but straight hostnames.
-    allowed_hosts = None
+    allowed_hosts: set[str]
 
     #: The namespace of the application, set before the application is
     #: configured in :meth:`configure_application`.
-    namespace = None
+    namespace: str
 
     #: Use :meth:`alias` instead of manipulating this dictionary.
-    _aliases = None
+    _aliases: dict[str, str]
 
-    def __call__(self, environ, start_respnose):
+    def __call__(
+        self,
+        environ: WSGIEnvironment,
+        start_respnose: StartResponse
+    ) -> Iterable[bytes]:
         raise NotImplementedError
 
-    def configure_application(self, **configuration):
+    def configure_application(self, **configuration: Any) -> None:
         """ Called *once* when the application is instantiated, with the
         configuration values defined for this application.
 
@@ -39,6 +52,9 @@ class Application:
         adds its own configuration here!
 
         """
+        assert hasattr(self, 'namespace'), (
+            'namespace must be set before calling configure_application')
+
         self.configuration = configuration
 
         if 'allowed_hosts_expression' in configuration:
@@ -50,7 +66,7 @@ class Application:
 
         self._aliases = {}
 
-    def set_application_id(self, application_id):
+    def set_application_id(self, application_id: str) -> None:
         """ Sets the application id before __call__ is called. That is, before
         each request.
 
@@ -84,7 +100,7 @@ class Application:
         assert application_id.startswith(self.namespace + '/')
         self.application_id = application_id
 
-    def set_application_base_path(self, base_path):
+    def set_application_base_path(self, base_path: str) -> None:
         """ Sets the base path of the application before __call__ is called.
         That is, before each request.
 
@@ -99,7 +115,7 @@ class Application:
         """
         self.application_base_path = base_path
 
-    def is_allowed_hostname(self, hostname):
+    def is_allowed_hostname(self, hostname: str) -> bool:
         """ Called at least once per request with the given hostname.
 
         If True is returned, the request with the given hostname is allowed.
@@ -119,7 +135,7 @@ class Application:
 
         return hostname in self.allowed_hosts
 
-    def is_allowed_application_id(self, application_id):
+    def is_allowed_application_id(self, application_id: str) -> bool:
         """ Called at least once per request with the given application id.
 
         If True is returned, the request with the given application_id is
@@ -131,7 +147,7 @@ class Application:
 
         return True
 
-    def alias(self, application_id, alias):
+    def alias(self, application_id: str, alias: str) -> None:
         """ Adds an alias under which this application is available on the
         server.
 
@@ -170,9 +186,14 @@ class Application:
 
         self._aliases[alias] = application_id
 
-    def handle_exception(self, exception, environ, start_response):
+    def handle_exception(
+        self,
+        exception: BaseException,
+        environ: WSGIEnvironment,
+        start_response: StartResponse
+    ) -> Iterable[bytes]:
         """ Default exception handling - this can be used to return a different
-        response when an unhandle exception occurs inside a request or before
+        response when an unhandled exception occurs inside a request or before
         a request is handled by the application (when any of the above methods
         are called).
 

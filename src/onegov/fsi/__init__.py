@@ -1,9 +1,10 @@
-import logging
-log = logging.getLogger('onegov.fsi')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+from __future__ import annotations
 
-from translationstring import TranslationStringFactory  # noqa
-_ = TranslationStringFactory('onegov.fsi')  # noqa
+import logging
+log = logging.getLogger('onegov.fsi')
+log.addHandler(logging.NullHandler())
+
+from onegov.fsi.i18n import _
 
 from onegov.fsi.app import FsiApp
 

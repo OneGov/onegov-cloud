@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-20 09:54+0100\n"
+"POT-Creation-Date: 2024-07-25 09:34+0200\n"
 "PO-Revision-Date: 2022-03-07 13:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -62,6 +62,35 @@ msgstr ""
 "Login fehlgeschlagen, da ihr Nutzer keine Gruppenzugehörigkeiten hat. "
 "Kontaktieren Sie ihren Azure AD System-Administrator"
 
+msgid "SAML2"
+msgstr "SAML2"
+
+msgid ""
+"Can't login because your user has no groups. Contact your SAML2 system "
+"administrator"
+msgstr ""
+"Login fehlgeschlagen, da ihr Nutzer keine Gruppenzugehörigkeiten hat. "
+"Kontaktieren Sie ihren SAML2 System-Administrator"
+
+msgid "OpenID Connect"
+msgstr "OpenID Connect"
+
+msgid ""
+"Can't login because your user has no group. Contact your OpenID system "
+"administrator"
+msgstr "Login fehlgeschlagen, da der Nutzer keine Gruppen hat"
+
+#, python-format
+msgid "${mtan} - mTAN for ${organisation}."
+msgstr "${mtan} - mTAN für ${organisation}."
+
+msgid ""
+"We sent an mTAN to the number linked with this account. Please enter it "
+"below."
+msgstr ""
+"Wir haben einen mTAN an die mit diesem Konto verknüpfte Nummer gesendet. "
+"Bitte geben Sie diesen unten ein."
+
 msgid "Name"
 msgstr "Name"
 
@@ -77,8 +106,14 @@ msgstr "YubiKey"
 msgid "Plug your YubiKey into a USB slot and press it."
 msgstr "YubiKey anschliessen und Knopf drücken."
 
-msgid "The password must be at least eight characters long"
-msgstr "Das Passwort muss mindestens acht Zeichen lang sein"
+msgid "mTAN"
+msgstr "mTAN"
+
+msgid "Phone number"
+msgstr "Telefonnummer"
+
+msgid "The password must be at least ten characters long"
+msgstr "Das Passwort muss mindestens zehn Zeichen lang sein"
 
 msgid "Password Confirmation"
 msgstr "Passwort Bestätigung"
@@ -122,7 +157,8 @@ msgstr "30 Tage"
 msgid "Number of Signups"
 msgstr "Anzahl Anmeldungen"
 
-#~ msgid ""
-#~ "Can't login because user has no groups. Contact your AzureAD system "
-#~ "administrator"
-#~ msgstr "Login fehlgeschlagen, da der Nutzer keine Gruppen hat"
+msgid "Code"
+msgstr "Code"
+
+msgid "Users"
+msgstr "Benutzer"

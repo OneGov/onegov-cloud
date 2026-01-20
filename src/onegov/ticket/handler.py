@@ -1,5 +1,25 @@
+from __future__ import annotations
+
+from decimal import Decimal
 from onegov.ticket.errors import DuplicateHandlerError
 from sqlalchemy.orm import object_session
+
+
+from typing import Any, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+    from markupsafe import Markup
+    from onegov.core.request import CoreRequest
+    from onegov.pay import InvoiceItemMeta, Payment
+    from onegov.ticket.models import Ticket
+    from sqlalchemy.orm import Query, Session
+    from typing import TypeAlias
+    from uuid import UUID
+
+    _LinkOrCallback: TypeAlias = tuple[str, str] | Callable[[CoreRequest], str]
+
+_H = TypeVar('_H', bound='Handler')
+_Q = TypeVar('_Q', bound='Query[Any]')
 
 
 class Handler:
@@ -24,16 +44,21 @@ class Handler:
 
     """
 
-    def __init__(self, ticket, handler_id, handler_data):
+    def __init__(
+        self,
+        ticket: Ticket,
+        handler_id: UUID | str,
+        handler_data: dict[str, Any]
+    ):
         self.ticket = ticket
         self.id = handler_id
         self.data = handler_data
 
     @property
-    def session(self):
+    def session(self) -> Session:
         return object_session(self.ticket)
 
-    def refresh(self):
+    def refresh(self) -> None:
         """ Updates the current ticket with the latest data from the handler.
         """
 
@@ -47,36 +72,107 @@ class Handler:
             self.ticket.subtitle = self.subtitle
 
         if self.ticket.group != self.group:
-            self.ticket.group = self.group
+            # FIXME: Deal with a group of None, since some handlers
+            #        appear to return None for group
+            self.ticket.group = self.group  # type: ignore[assignment]
 
-        if self.ticket.handler_id != self.id:
-            self.ticket.handler_id = self.id
+        if self.ticket.handler_id != str(self.id):
+            self.ticket.handler_id = str(self.id)
 
         if self.ticket.handler_data != self.data:
             self.ticket.handler_data = self.data
 
+        if self.ticket.ticket_email != self.email:
+            self.ticket.ticket_email = self.email
+
+        payment = self.payment
+        payment_id = payment.id if payment else None
+        if self.ticket.payment_id != payment_id:
+            self.ticket.payment_id = payment_id
+
+    def invoice_items(self, request: CoreRequest) -> list[InvoiceItemMeta]:
+        """ Returns the generated invoice items based on the current state
+        of the ticket.
+        """
+        raise NotImplementedError
+
+    def refresh_invoice_items(self, request: CoreRequest) -> None:
+        """ Updates the invoice items with the latest data from the handler.
+        """
+        raise NotImplementedError
+
+    def refreshing_invoice_is_safe(self, request: CoreRequest) -> bool:
+        """ Whether or not is safe to refresh the invoice.
+
+        Currently we disallow changing the total amount for a
+        non-manual non-open payment.
+        """
+        payment = self.payment
+        if payment is None:
+            return True
+
+        if payment.state == 'open' and payment.source == 'manual':
+            return True
+
+        invoice = self.ticket.invoice
+        if invoice is None:
+            expected = Decimal('0')
+        elif invoice.invoiced:
+            # If it has already been invoiced no changes should be made
+            return False
+        else:
+            expected = invoice.total_excluding_manual_entries
+
+        # if the total doesn't change, we're fine
+        # TODO: What if we have a manual discount that results in a negative
+        #       total and we end up with a new non-positive total? Either way
+        #       we don't get a change in payment, so it should be fine. But
+        #       it also seems a little bit fragile to allow this.
+        # FIXME: circular import
+        from onegov.pay import InvoiceItemMeta
+        return InvoiceItemMeta.total(self.invoice_items(request)) == expected
+
     @property
-    def email(self):
+    def email(self) -> str | None:
         """ Returns the email address behind the ticket request. """
         raise NotImplementedError
 
     @property
-    def submitter_name(self):
+    def email_changeable(self) -> bool:
+        """ Returns whether or not the email address behind the ticket request
+        may be changed.
+        """
+        return False
+
+    def change_email(self, email: str) -> None:
+        """ Handles the logic for changing the email.
+
+        Every handler is tied to a different set of objects, which may or
+        may not store the email redundantly. So they all need to be changed
+        in order for data to remain consistent.
+
+        This method is only expected to work for handlers that return ``True``
+        for `email_changeable`.
+        """
+        raise NotImplementedError
+
+    @property
+    def submitter_name(self) -> str | None:
         """ Returns the name of the submitter """
-        return
+        return None
 
     @property
-    def submitter_address(self):
+    def submitter_address(self) -> str | None:
         """ Returns the address of the submitter """
-        return
+        return None
 
     @property
-    def submitter_phone(self):
+    def submitter_phone(self) -> str | None:
         """ Returns the phone of the submitter """
-        return
+        return None
 
     @property
-    def title(self):
+    def title(self) -> str:
         """ Returns the title of the ticket. If this title may change over
         time, the handler must call :meth:`self.refresh` when there's a change.
 
@@ -84,7 +180,15 @@ class Handler:
         raise NotImplementedError
 
     @property
-    def group(self):
+    def subtitle(self) -> str | None:
+        """ Returns the subtitle of the ticket. If this title may change over
+        time, the handler must call :meth:`self.refresh` when there's a change.
+
+        """
+        raise NotImplementedError
+
+    @property
+    def group(self) -> str | None:
         """ Returns the group of the ticket. If this group may change over
         time, the handler must call :meth:`self.refresh` when there's a change.
 
@@ -92,7 +196,7 @@ class Handler:
         raise NotImplementedError
 
     @property
-    def deleted(self):
+    def deleted(self) -> bool:
         """ Returns true if the underlying model was deleted. It is best to
         never let that happen, as we want tickets to stay around forever.
 
@@ -105,22 +209,27 @@ class Handler:
         raise NotImplementedError
 
     @property
-    def extra_data(self):
+    def extra_data(self) -> Sequence[str]:
         """ An array of string values which are indexed in elasticsearch when
         the ticket is stored there.
 
         """
 
-        return tuple()
+        return ()
 
     @property
-    def payment(self):
+    def payment(self) -> Payment | None:
         """ An optional link to a onegov.pay payment record. """
 
         return None
 
     @property
-    def undecided(self):
+    def show_vat(self) -> bool:
+        """ Whether or not to show VAT for this ticket. """
+        return False
+
+    @property
+    def undecided(self) -> bool:
         """ Returns true if there has been no decision about the subject
         of this handler.
 
@@ -141,8 +250,26 @@ class Handler:
 
         return False
 
+    @property
+    def reply_to(self) -> str | None:
+        """ An optional email address which will be used as a Reply-To
+        in mails instead of any global setting.
+
+        For example for a certain subset of forms you may want replies
+        to end up with the department in charge of those specific forms
+        instead of a global bucket.
+
+        """
+
+        return None
+
     @classmethod
-    def handle_extra_parameters(self, session, query, extra_parameters):
+    def handle_extra_parameters(
+        cls,
+        session: Session,
+        query: _Q,
+        extra_parameters: dict[str, Any]
+    ) -> _Q:
         """ Takes a dictionary of extra parameters and uses it to optionally
         modifiy the query used for the collection.
 
@@ -158,12 +285,12 @@ class Handler:
         """
         return query
 
-    def get_summary(self, request):
+    def get_summary(self, request: CoreRequest) -> Markup:
         """ Returns the summary of the current ticket as a html string. """
 
         raise NotImplementedError
 
-    def get_links(self, request):
+    def get_links(self, request: CoreRequest) -> Sequence[_LinkOrCallback]:
         """ Returns the links associated with the current ticket in the
         following format::
 
@@ -178,22 +305,46 @@ class Handler:
 
         raise NotImplementedError
 
+    @property
+    def ticket_deletable(self) -> bool:
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+        if self.payment:
+            # For now we do not handle this case since payment might be
+            # needed for exports
+            return False
+        if self.undecided:
+            return False
+        return True
+
+    def prepare_delete_ticket(self) -> None:
+        """The handler knows best what to do when a ticket is called for
+        deletion. """
+        assert self.ticket_deletable
+
 
 class HandlerRegistry:
 
     _reserved_handler_codes = {'ALL'}
+    registry: dict[str, type[Handler]]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.registry = {}
 
-    def get(self, handler_code):
+    def get(self, handler_code: str) -> type[Handler]:
         """ Returns the handler registration for the given id. If the id
         does not exist, a KeyError is raised.
 
         """
         return self.registry[handler_code]
 
-    def register(self, handler_code, handler_class):
+    def register(
+        self,
+        handler_code: str,
+        handler_class: type[Handler]
+    ) -> None:
         """ Registers a handler.
 
         :handler_code:
@@ -221,15 +372,20 @@ class HandlerRegistry:
 
         self.registry[handler_code] = handler_class
 
-    def registered_handler(self, handler_code):
-        """ A decorator to register handles as follows::
+    def registered_handler(
+        self,
+        handler_code: str
+    ) -> Callable[[type[_H]], type[_H]]:
+        """ A decorator to register handles.
 
-        @handlers.registered_handler('FOO')
-        class FooHandler(Handler):
-            pass
+        Use as followed::
+
+            @handlers.registered_handler('FOO')
+            class FooHandler(Handler):
+                pass
 
         """
-        def wrapper(handler_class):
+        def wrapper(handler_class: type[_H]) -> type[_H]:
             self.register(handler_code, handler_class)
             return handler_class
         return wrapper

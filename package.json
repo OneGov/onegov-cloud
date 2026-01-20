@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "postcss": "^8.5.3",
+    "stylelint": "^16.19.1",
+    "stylelint-config-standard-scss": "^15.0.0"
+  }
+}

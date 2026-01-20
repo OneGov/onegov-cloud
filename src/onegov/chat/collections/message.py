@@ -1,12 +1,56 @@
+from __future__ import annotations
+
 from onegov.chat.models import Message
 from onegov.core.collection import GenericCollection
 from sqlalchemy import desc
 
 
-class MessageCollection(GenericCollection):
+from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import datetime
+    from onegov.chat.models import MessageFile
+    from sqlalchemy.orm import Query, Session
 
-    def __init__(self, session, type='*', channel_id='*', newer_than=None,
-                 older_than=None, limit=None, load='older-first'):
+
+_M = TypeVar('_M', bound=Message)
+
+
+class MessageCollection(GenericCollection[_M]):
+
+    @overload
+    def __init__(
+        self: MessageCollection[Message],
+        session: Session,
+        type: tuple[str, ...] | Literal['*'] | None = ...,
+        channel_id: str = '*',
+        newer_than: str | None = None,
+        older_than: str | None = None,
+        limit: int | None = None,
+        load: Literal['older-first', 'newer-first'] = 'older-first'
+    ): ...
+
+    @overload
+    def __init__(
+        self,
+        session: Session,
+        type: str,
+        channel_id: str = '*',
+        newer_than: str | None = None,
+        older_than: str | None = None,
+        limit: int | None = None,
+        load: Literal['older-first', 'newer-first'] = 'older-first'
+    ): ...
+
+    def __init__(
+        self,
+        session: Session,
+        type: str | tuple[str, ...] | None = '*',
+        channel_id: str = '*',
+        newer_than: str | None = None,
+        older_than: str | None = None,
+        limit: int | None = None,
+        load: Literal['older-first', 'newer-first'] = 'older-first'
+    ):
         super().__init__(session)
         self.type = type
         self.channel_id = channel_id
@@ -18,27 +62,57 @@ class MessageCollection(GenericCollection):
         assert self.load in ('older-first', 'newer-first')
 
     @property
-    def model_class(self):
-        return Message.get_polymorphic_class(self.type, Message)
+    def model_class(self) -> type[_M]:
+        if not isinstance(self.type, str):
+            return Message  # type:ignore[return-value]
+        return Message.get_polymorphic_class(self.type, Message)  # type:ignore
 
-    def add(self, **kwargs):
-        t = kwargs.pop('type', self.type)
+    @overload
+    def add(
+        self,
+        *,
+        channel_id: str,
+        owner: str | None = None,
+        type: str | None = None,
+        meta: dict[str, Any] = ...,
+        text: str | None = None,
+        created: datetime = ...,
+        updated: datetime | None = ...,
+        file: MessageFile | None = None,
+        **kwargs: Any
+    ) -> _M: ...
 
-        if not isinstance(t, str):
-            raise RuntimeError(f"Multiple types to add a message with: {t}")
+    @overload
+    def add(self, **kwargs: Any) -> _M: ...
 
-        if t == '*':
-            t = None
+    def add(
+        self,
+        *,
+        type: str | None = None,
+        **kwargs: Any
+    ) -> Message:
 
-        return super().add(type=t, **kwargs)
+        _type: str | tuple[str, ...] | None = type
+        if _type is None:
+            _type = self.type
 
-    def query(self):
+        if _type is not None and not isinstance(_type, str):
+            raise RuntimeError(
+                f'Multiple types to add a message with: {_type}'
+            )
+
+        if _type == '*':
+            _type = None
+
+        return super().add(type=_type, **kwargs)
+
+    def query(self) -> Query[_M]:
         """ Queries the messages with the given parameters. """
 
         q = self.session.query(self.model_class)
 
         if self.type != '*':
-            if isinstance(self.type, str):
+            if self.type is None or isinstance(self.type, str):
                 q = q.filter_by(type=self.type)
             else:
                 q = q.filter(self.model_class.type.in_(self.type))
@@ -62,12 +136,19 @@ class MessageCollection(GenericCollection):
 
         return q
 
-    def latest_message(self, offset=0):
-        """ Returns the latest messages in descending order (newest first). """
+    # FIXME: This is kind of a goofball method, since it ignores
+    #        almost all the parameters on the collection. It is used
+    #        to ensure that the feed by default contains the 25
+    #        latest messages with the oldest one first, but it will
+    #        be wrong with a channel or type filter, we should probably
+    #        at least apply the type and channel filters and potentially
+    #        the older_than and limit filters...
+    def latest_message(self, offset: int = 0) -> _M | None:
+        """ Returns the latest message in descending order (newest first)."""
         q = self.session.query(self.model_class)
         q = q.order_by(desc(self.model_class.id))
 
         if offset:
-            q = q.offset(min(offset, q.count()))
+            q = q.offset(offset)
 
         return q.first()

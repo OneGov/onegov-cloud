@@ -1,0 +1,61 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <dl class="field-display">
+            <div tal:condition="commission.start">
+                <dt i18n:translate>Start</dt>
+                <dd>${layout.format_date(commission.start, 'date')}</dd>
+            </div>
+            <div tal:condition="commission.end">
+                <dt i18n:translate>End</dt>
+                <dd>${layout.format_date(commission.end, 'date')}</dd>
+            </div>
+            <div tal:condition="commission.type">
+                <dt i18n:translate>Type</dt>
+                <dd>${commission.type_label}</dd>
+            </div>
+            <div tal:condition="commission.description">
+                <dt i18n:translate>Description</dt>
+                <dd><div tal:content="commission.description"></div></dd>
+            </div>
+            <div tal:condition="president">
+                <dt i18n:translate>President</dt>
+                <dd>
+                    <strong>
+                        <a href="${request.link(president.parliamentarian)}">${president.parliamentarian.title}</a>
+                    </strong>
+                    <span tal:condition="president.start">
+                        <br>${layout.format_date(president.start, 'date')}
+                    </span>
+                    <span tal:condition="president.end">
+                        -
+                        ${layout.format_date(president.end, 'date')}
+                    </span>
+                </dd>
+            </div>
+            <div tal:condition="other_members">
+                <dt i18n:translate>Members</dt>
+                <dd>
+                    <ul>
+                        <li tal:repeat="membership other_members">
+                            <span>
+                                <a href="${request.link(membership.parliamentarian)}">${membership.parliamentarian.title}</a>
+                                (<a href="${request.link(membership)}">${membership.role_label}</a>)
+                            <span>
+                            <span tal:condition="membership.start">
+                                <br>${layout.format_date(membership.start, 'date')}
+                            </span>
+                            <span tal:condition="membership.end">
+                                -
+                                ${layout.format_date(membership.end, 'date')}
+                            </span>
+                        </li>
+                    </ul>
+                </dd>
+            </div>
+        </dl>
+    </tal:b>
+</div>

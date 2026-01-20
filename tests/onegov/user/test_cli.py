@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 import yaml
 
@@ -9,7 +11,17 @@ from unittest.mock import patch
 from transaction import commit
 
 
-def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import SessionManager
+
+
+def test_cli(
+    postgres_dsn: str,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
 
     cfg = {
         'applications': [
@@ -26,19 +38,40 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     }
 
     session_manager.ensure_schema_exists('foo-bar')
+    # session_manager.ensure_schema_exists('foo-zar')
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
 
     with open(cfg_path, 'w') as f:
         f.write(yaml.dump(cfg))
 
-    def login(username):
+    def login(
+        username: str,
+        yubikey: str | None = None,
+        phone_number: str | None = None,
+        totp: str | None = None
+    ) -> None:
         with patch('onegov.user.models.user.remembered'):
             with patch('onegov.user.models.user.forget'):
                 session = session_manager.session()
                 user = session.query(User).filter_by(username=username).one()
+                if yubikey:
+                    assert user.second_factor is not None
+                    assert user.second_factor['type'] == 'yubikey'
+                    assert user.second_factor['data'] == yubikey
+                elif phone_number:
+                    assert user.second_factor is not None
+                    assert user.second_factor['type'] == 'mtan'
+                    assert user.second_factor['data'] == phone_number
+                elif totp:
+                    assert user.second_factor is not None
+                    assert user.second_factor['type'] == 'totp'
+                    assert user.second_factor['data'] == totp
+                else:
+                    assert not user.second_factor
+
                 number = len(user.sessions or {}) + 1
-                user.save_current_session(Bunch(
+                user.save_current_session(Bunch(  # type: ignore[arg-type]
                     browser_session=Bunch(_token=f'session-{number}'),
                     client_addr=f'127.0.0.{number}',
                     user_agent='CLI',
@@ -172,8 +205,130 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     assert result.exit_code == 0
     assert 'admin@example.org' not in result.output
 
-    # Change role
+    # Change yubikey
     login('admin@example.org')
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-yubikey', 'admin@example.org',
+        '--yubikey', 'cccccccdefgh'
+    ])
+    assert result.exit_code == 0
+    assert "admin@example.org's yubikey was changed" in result.output
+
+    # List all sessions, check if logged-out
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'list-sessions'
+    ])
+    assert result.exit_code == 0
+    assert 'admin@example.org' not in result.output
+
+    # Create new user
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'add', 'member', 'member@example.org',
+        '--password', 'hunter2',
+        '--no-prompt',
+    ])
+    assert result.exit_code == 0
+    assert 'Adding member@example.org to foo/bar' in result.output
+    assert 'member@example.org was added' in result.output
+
+    # Transfer yubikey
+    login('admin@example.org', yubikey='cccccccdefgh')
+    login('member@example.org')
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'transfer-yubikey', 'admin@example.org', 'member@example.org'
+    ])
+    assert result.exit_code == 0
+    assert (
+        "yubikey was transferred from admin@example.org to member@example.org"
+    ) in result.output
+
+    # List all sessions, check if logged-out
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'list-sessions'
+    ])
+    assert result.exit_code == 0
+    assert 'admin@example.org' not in result.output
+    assert 'member@example.org' not in result.output
+
+    # Check if changed
+    login('admin@example.org')
+    login('member@example.org', yubikey='cccccccdefgh')
+
+    # Try to set bogus number for mTAN login
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-mtan', 'admin@example.org',
+        '--phone-number', 'bogus'
+    ])
+    assert result.exit_code == 1
+    assert "Failed to parse bogus as a phone number" in result.output
+
+    # Try to set invalid number for mTAN login
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-mtan', 'admin@example.org',
+        '--phone-number', '+417811122333'
+    ])
+    assert result.exit_code == 1
+    assert "+417811122333 is not a valid phone number" in result.output
+
+    # Change number for mTAN login
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-mtan', 'admin@example.org',
+        '--phone-number', '+41781112233'
+    ])
+    assert result.exit_code == 0
+    assert "admin@example.org's phone number was changed" in result.output
+
+    # List all sessions, check if logged-out
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'list-sessions'
+    ])
+    assert result.exit_code == 0
+    assert 'admin@example.org' not in result.output
+
+    # Check if mtan login is set up
+    login('admin@example.org', phone_number='+41781112233')
+
+    # Change secret for TOTP login
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-totp', 'admin@example.org',
+        '--secret', 'very_secret'
+    ])
+    assert result.exit_code == 0
+    assert "admin@example.org's TOTP secret was changed" in result.output
+
+    # List all sessions, check if logged-out
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'list-sessions'
+    ])
+    assert result.exit_code == 0
+    assert 'admin@example.org' not in result.output
+
+    # Check if totp login is set up
+    login('admin@example.org', totp='very_secret')
+
+    # Change role
     result = runner.invoke(cli, [
         '--config', cfg_path,
         '--select', '/foo/bar',
@@ -203,7 +358,7 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     assert '[editor]' in result.output
 
     # Deactivate user
-    login('admin@example.org')
+    login('admin@example.org', totp='very_secret')
     result = runner.invoke(cli, [
         '--config', cfg_path,
         '--select', '/foo/bar',
@@ -275,3 +430,129 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     ])
     assert result.exit_code == 1
     assert 'admin@example.org does not exist' in result.output
+
+    # Try to change yubikey of deleted user
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-yubikey', 'admin@example.org',
+        '--yubikey', 'cccccccdefgh'
+    ])
+    assert result.exit_code == 1
+    assert 'admin@example.org does not exist' in result.output
+
+    # Try to transfer yubikey of deleted user
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'transfer-yubikey', 'admin@example.org', 'member@example.org'
+    ])
+    assert result.exit_code == 1
+    assert 'admin@example.org does not exist' in result.output
+
+    # Try to add realname and phone
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'add', 'admin', 'admin@example.org',
+        '--password', 'hunter2',
+        '--no-prompt',
+        '--realname', 'Jane Doe',
+        '--phone_number', '0411234567'
+    ])
+
+    assert result.exit_code == 0
+    assert 'admin@example.org was added' in result.output
+
+    with patch('onegov.user.models.user.forget'):
+        session = session_manager.session()
+        username = 'admin@example.org'
+        user = session.query(User).filter_by(username=username).one()
+        assert user.realname == 'Jane Doe'
+        assert user.phone_number == '0411234567'
+
+
+def test_cli_exists_recursive(
+    postgres_dsn: str,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
+
+    cfg = {
+        'applications': [
+            {
+                'path': '/foo/*',
+                'application': 'onegov.core.Framework',
+                'namespace': 'foo',
+                'configuration': {
+                    'dsn': postgres_dsn,
+                    'redis_url': redis_url
+                }
+            }
+        ]
+    }
+
+    session_manager.ensure_schema_exists('foo-bar')
+    session_manager.ensure_schema_exists('foo-zar')
+
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+
+    with open(cfg_path, 'w') as f:
+        f.write(yaml.dump(cfg))
+
+    # Add user to bar
+    runner = CliRunner()
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'add', 'admin', 'admin@bar.org',
+        '--password', 'hunterb',
+        '--no-prompt',
+    ])
+    assert result.exit_code == 0
+    assert 'Adding admin@bar.org to foo/bar' in result.output
+    assert 'admin@bar.org was added' in result.output
+
+    # add user to zar
+    runner = CliRunner()
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/zar',
+        'add', 'admin', 'admin@zar.org',
+        '--password', 'hunterz',
+        '--no-prompt',
+    ])
+    assert result.exit_code == 0
+    assert 'Adding admin@zar.org to foo/zar' in result.output
+    assert 'admin@zar.org was added' in result.output
+
+    # use exits to check if user exists in bar
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'exists', 'admin@bar.org'
+    ])
+    assert result.exit_code == 0
+    assert 'foo-bar admin@bar.org exists' in result.output
+    assert 'foo-zar admin@zar exists' not in result.output
+
+    # use exits to check if user exists in zar
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/zar',
+        'exists', 'admin@zar.org'
+    ])
+    assert result.exit_code == 0
+    assert 'foo-zar admin@zar.org exists' in result.output
+    assert 'foo-bar admin@bar exists' not in result.output
+
+    # use recursive exists
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/*',
+        'exists', 'admin@bar.org', '-r'
+    ])
+    assert result.exit_code == 0
+    assert 'foo-bar admin@bar.org exists' in result.output
+    assert 'foo-zar admin@bar.org does not exist' in result.output

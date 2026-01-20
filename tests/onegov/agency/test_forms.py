@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from cgi import FieldStorage
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
@@ -19,18 +21,39 @@ from tests.shared.utils import encode_map_value
 from unittest.mock import MagicMock
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency import AgencyApp
+    from onegov.agency.request import AgencyRequest as BaseRequest
+    from onegov.user import User
+    from sqlalchemy.orm import Session
+    from webob.multidict import MultiDict
+
+    BasePostData = MultiDict[str, Any]
+else:
+    BaseRequest = object
+    BasePostData = dict
+
+
 class DummyApp:
-    def __init__(self, session, principal):
+    def __init__(self, session: Session, principal: object) -> None:
         self._session = session
 
-    def session(self):
+    def session(self) -> Session:
         return self._session
 
 
-class DummyRequest:
-    def __init__(self, session, principal=None, private=False, secret=False,
-                 permissions=None, current_user=None):
-        self.app = DummyApp(session, principal)
+class DummyRequest(BaseRequest):
+    def __init__(
+        self,
+        session: Session,
+        principal: object = None,
+        private: bool = False,
+        secret: bool = False,
+        permissions: dict[str, list[str]] | None = None,
+        current_user: User | None = None
+    ) -> None:
+        self.app = DummyApp(session, principal)  # type: ignore[assignment]
         self.session = session
         self.private = private
         self.secret = secret
@@ -38,34 +61,34 @@ class DummyRequest:
         self.time_zone = 'Europe/Zurich'
         self.permissions = permissions or {}
         self.current_user = current_user
-        self.client_addr = '1.1.1.1'
+        self.client_addr = '1.1.1.1'  # type: ignore[misc]
 
-    def is_private(self, model):
+    def is_private(self, model: object) -> bool:
         return self.private
 
-    def is_secret(self, model):
+    def is_secret(self, model: object) -> bool:
         return self.secret
 
-    def include(self, resource):
+    def include(self, resource: object) -> None:
         pass
 
-    def translate(self, text):
+    def translate(self, text: str) -> str:  # type: ignore[override]
         return text.interpolate() if hasattr(text, 'interpolate') else text
 
-    def has_permission(self, model, permission):
+    def has_permission(self, model: object, permission: type[object]) -> bool:  # type: ignore[override]
         permissions = self.permissions.get(model.__class__.__name__, [])
         return permission.__name__ in permissions
 
 
-class DummyPostData(dict):
-    def getlist(self, key):
+class DummyPostData(BasePostData):
+    def getlist(self, key: str) -> list[Any]:
         v = self[key]
         if not isinstance(v, (list, tuple)):
             v = [v]
         return v
 
 
-def create_file(mimetype, filename, content):
+def create_file(mimetype: str, filename: str, content: bytes) -> FieldStorage:
     fs = FieldStorage()
     fs.file = TemporaryFile("wb+")
     fs.type = mimetype
@@ -75,33 +98,45 @@ def create_file(mimetype, filename, content):
     return fs
 
 
-def test_extended_agency_form(agency_app):
+def test_extended_agency_form(agency_app: AgencyApp) -> None:
     # get useful data
     form = ExtendedAgencyForm(DummyPostData({
         'title': 'Springfield Hospital',
         'portrait': 'Springfield Hospital is hospital.',
+        'location_address': 'Springfield Lane\n12345 Springfield',
+        'postal_address': 'Hospital Blvd\nPostbox',
+        'postal_code_city': '12345 Hospital City',
+        'phone': '+1 23456789',
+        'phone_direct': '+1 98765432',
+        'email': 'emc@springfieldhospital.com',
+        'website': 'springfieldhospital.com',
+        'opening_hours': 'Mo bis Mittwoch\n8.00 - 8.01',
         'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
-        'address': 'Springstreet 12',
-        'zip_code': '6078',
-        'city': 'Springfield',
         'export_fields': ['person.first_name', 'person.last_name'],
-        'organigram': create_file('image/png', 'org.png', b'PNG')
+        'organigram': create_file('image/png', 'org.png', b'PNG',),
     }))
     data = form.get_useful_data()
     assert list(data.keys()) == [
-        'title', 'portrait', 'coordinates', 'address', 'zip_code', 'city',
-        'export_fields', 'organigram_file'
+        'title', 'portrait', 'location_address', 'location_code_city',
+        'postal_address', 'postal_code_city', 'phone', 'phone_direct',
+        'email', 'website', 'opening_hours', 'coordinates', 'export_fields',
+        'organigram_file'
     ]
     assert data['organigram_file'].read() == b'PNG'
     assert data['title'] == 'Springfield Hospital'
     assert data['portrait'] == 'Springfield Hospital is hospital.'
+    assert data['location_address'] == 'Springfield Lane\n12345 Springfield'
+    assert data['postal_address'] == 'Hospital Blvd\nPostbox'
+    assert data['postal_code_city'] == '12345 Hospital City'
+    assert data['phone'] == '+1 23456789'
+    assert data['phone_direct'] == '+1 98765432'
+    assert data['email'] == 'emc@springfieldhospital.com'
+    assert data['website'] == 'http://springfieldhospital.com'
+    assert data['opening_hours'] == 'Mo bis Mittwoch\n8.00 - 8.01'
     coordinates = data['coordinates']
     assert coordinates.lat == 1
     assert coordinates.lon == 2
     assert coordinates.zoom == 12
-    assert data['address'] == 'Springstreet 12'
-    assert data['zip_code'] == '6078'
-    assert data['city'] == 'Springfield'
     assert data['export_fields'] == ['person.first_name', 'person.last_name']
 
     # update / apply / reorder
@@ -111,21 +146,21 @@ def test_extended_agency_form(agency_app):
     assert model.title == 'Springfield Hospital'
     assert model.portrait == 'Springfield Hospital is hospital.'
     assert model.export_fields == ['person.first_name', 'person.last_name']
-    assert model.organigram_file.read() == b'PNG'
+    assert model.organigram_file.read() == b'PNG'  # type: ignore[union-attr]
 
     form = ExtendedAgencyForm()
     form.apply_model(model)
     assert form.title.data == 'Springfield Hospital'
     assert form.portrait.data == 'Springfield Hospital is hospital.'
     assert form.export_fields.data == ['person.first_name', 'person.last_name']
-    assert form.export_fields.choices[:2] == [
+    assert form.export_fields.choices[:2] == [  # type: ignore[index]
         ('person.first_name', 'Person: First Name'),
         ('person.last_name', 'Person: Last Name')
     ]
-    assert form.organigram.data['size']
+    assert form.organigram.data['size']  # type: ignore[index]
 
 
-def test_extended_agency_form_choices():
+def test_extended_agency_form_choices() -> None:
     models = {
         'membership': ExtendedAgencyMembership(),
         'person': ExtendedPerson(first_name="f", last_name="l")
@@ -137,7 +172,7 @@ def test_extended_agency_form_choices():
         assert hasattr(models[model], attribute)
 
 
-def test_move_agency_form(session):
+def test_move_agency_form(session: Session) -> None:
     all_permissions = {
         'ExtendedAgency': ['Private'],
         'ExtendedAgencyCollection': ['Private']
@@ -237,7 +272,7 @@ def test_move_agency_form(session):
     session.flush()
 
 
-def test_membership_form(session):
+def test_membership_form(session: Session) -> None:
     people = ExtendedPersonCollection(session)
     request = DummyRequest(session)
 
@@ -266,13 +301,14 @@ def test_membership_form(session):
     }
 
 
-def test_membership_form_choices(session):
+def test_membership_form_choices(session: Session) -> None:
     people = ExtendedPersonCollection(session)
     people.add(first_name="Nick", last_name="Rivera")
     people.add(first_name="Nick", last_name="Rivera", phone="1234")
     people.add(first_name="Nick", last_name="Rivera", phone="5555", email="x")
     people.add(first_name="Nick", last_name="Rivera", phone_direct="4")
-    people.add(first_name="Nick", last_name="Rivera", address="Street")
+    people.add(first_name="Nick", last_name="Rivera", postal_address="Street",
+               postal_code_city="9876 Telltown")
     people.add(first_name="Nick", last_name="Rivera", email="n@h.com")
 
     agencies = ExtendedAgencyCollection(session)
@@ -296,23 +332,45 @@ def test_membership_form_choices(session):
     ]
 
 
-def test_agency_mutation_form():
+def test_agency_mutation_form() -> None:
     form = AgencyMutationForm(DummyPostData({
         'submitter_email': 'info@hospital-springfield.org',
         'submitter_message': 'There is a typo in the name!',
-        'title': 'Hospital Springfield'
+        'title': 'Hospital Springfield',
+        'location_address': '',
+        'location_code_city': '',
+        'postal_address': '',
+        'postal_code_city': '',
+        'phone': '',
+        'phone_direct': '',
+        'email': '',
+        'website': '',
+        'opening_hours': '',
     }))
-    form.model = ExtendedAgency(title='Hopital Springfield')
-    form.request = DummyRequest(None)
+    form.model = ExtendedAgency(title='Hopital Springfield',
+                                email='info@abc.com')
+    form.request = DummyRequest(None)  # type: ignore[arg-type]
     form.on_request()
 
-    assert set(form.proposal_fields.keys()) == {'title'}
+    assert set(form.proposal_fields.keys()) == {
+        'title', 'location_address', 'location_code_city', 'postal_address',
+        'postal_code_city', 'phone', 'phone_direct', 'email', 'website',
+        'opening_hours'}
     assert form.title.description == 'Hopital Springfield'
     assert form.proposed_changes == {'title': 'Hospital Springfield'}
     assert form.get_useful_data() == {
         'submitter_email': 'info@hospital-springfield.org',
         'submitter_message': 'There is a typo in the name!',
-        'title': 'Hospital Springfield'
+        'title': 'Hospital Springfield',
+        'location_address': '',
+        'location_code_city': '',
+        'postal_address': '',
+        'postal_code_city': '',
+        'phone': '',
+        'phone_direct': '',
+        'email': '',
+        'website': '',
+        'opening_hours': '',
     }
     assert form.validate()
 
@@ -328,27 +386,28 @@ def test_agency_mutation_form():
         'submitter_message': "Nick Rivera's retired.",
         'delay': '10'
     }))
-    form.request = DummyRequest(None)
+    form.request = DummyRequest(None)  # type: ignore[arg-type]
     assert not form.validate()
 
 
-def test_person_mutation_form():
+def test_person_mutation_form() -> None:
     form = PersonMutationForm(DummyPostData({
         'submitter_email': 'info@hospital-springfield.org',
         'submitter_message': 'There is a typo in the name!',
         'first_name': 'nick',
         'last_name': 'Rivera',
-        'academic_title': 'Dr.'
+        'academic_title': 'Dr.',
     }))
     form.model = ExtendedPerson(first_name="Nick", last_name="Riviera")
-    form.request = DummyRequest(None)
+    form.request = DummyRequest(None)  # type: ignore[arg-type]
     form.on_request()
 
     assert set(form.proposal_fields.keys()) == {
-        'function', 'website', 'political_party', 'salutation', 'email',
-        'notes', 'first_name', 'last_name', 'born', 'phone',
-        'parliamentary_group', 'address', 'profession', 'phone_direct',
-        'academic_title'
+        'function', 'website', 'website_2', 'political_party', 'salutation',
+        'email', 'notes', 'first_name', 'last_name', 'born', 'phone',
+        'parliamentary_group', 'location_address',
+        'location_code_city', 'postal_address', 'postal_code_city',
+        'profession', 'phone_direct', 'academic_title'
     }
     assert form.first_name.description == 'Nick'
     assert form.last_name.description == 'Riviera'
@@ -372,7 +431,11 @@ def test_person_mutation_form():
         'political_party': None,
         'parliamentary_group': None,
         'website': None,
-        'address': None,
+        'website_2': None,
+        'location_address': None,
+        'location_code_city': None,
+        'postal_address': None,
+        'postal_code_city': None,
         'notes': None
     }
     assert form.validate()
@@ -389,22 +452,22 @@ def test_person_mutation_form():
         'submitter_message': "Nick Rivera's retired.",
         'delay': '10'
     }))
-    form.request = DummyRequest(None)
+    form.request = DummyRequest(None)  # type: ignore[arg-type]
     assert not form.validate()
 
 
-def test_apply_muation_form():
+def test_apply_muation_form() -> None:
     form = ApplyMutationForm(DummyPostData({'changes': ['a', 'b']}))
-    form.request = DummyRequest(None)
+    form.request = DummyRequest(None)  # type: ignore[arg-type]
     form.model = Bunch(
         labels={'a': 'A', 'c': 'C'},
         changes={'a': 'X', 'b': 'Y', 'c': 'Z'},
         apply=MagicMock()
     )
     form.on_request()
-    assert form.changes.choices == (
+    assert form.changes.choices == [
         ('a', 'A: X'), ('b', 'b: Y'), ('c', 'C: Z')
-    )
+    ]
     assert form.changes.data == ['a', 'b']
 
     form.apply_model()
@@ -414,14 +477,14 @@ def test_apply_muation_form():
     assert form.model.apply.called
 
 
-def test_user_group_form(session):
+def test_user_group_form(session: Session) -> None:
     users = UserCollection(session)
     user_a = users.add(username='a@example.org', password='a', role='member')
     user_b = users.add(username='b@example.org', password='b', role='member')
     user_c = users.add(username='c@example.org', password='c', role='member')
-    user_a.logout_all_sessions = MagicMock()
-    user_b.logout_all_sessions = MagicMock()
-    user_c.logout_all_sessions = MagicMock()
+    user_a.logout_all_sessions = MagicMock()  # type: ignore[method-assign]
+    user_b.logout_all_sessions = MagicMock()  # type: ignore[method-assign]
+    user_c.logout_all_sessions = MagicMock()  # type: ignore[method-assign]
 
     agencies = ExtendedAgencyCollection(session)
     agency_a = agencies.add_root(title="a")
@@ -479,7 +542,7 @@ def test_user_group_form(session):
     form.update_model(group)
     assert group.users.one() == user_c
     assert group.role_mappings.one().content_id == str(agency_a_1.id)
+    assert group.meta['immediate_notification'] == 'no'
     assert user_a.logout_all_sessions.called is True
     assert user_b.logout_all_sessions.called is True
     assert user_c.logout_all_sessions.called is True
-    assert group.meta['immediate_notification'] == 'no'

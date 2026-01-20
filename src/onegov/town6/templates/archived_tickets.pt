@@ -9,12 +9,27 @@
                 <li><a  class="show-for-sr" href="#" i18n:translate>State:</a></li>
                 <tal:b repeat="link filters">
                     <li class="${link.active and 'active' or ''}">
-                        <tal:b replace="structure link(layout)"></tal:b>
+                        <tal:b replace="link(layout)"></tal:b>
                     </li>
                 </tal:b>
             </ul>
             <div>
                 <div class="right-side">
+                    <span>
+                        <button type="button" data-toggle="submitters" class="${has_submitter_filter and 'primary radius button small' or 'secondary radius button small'} selected-submitter">
+                            <span class="show-for-sr"><tal:b i18n:translate>Submitter</tal:b>:</span>
+                            <span>${submitter}</span>
+                        </button>
+                        <div id="submitters" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
+                            <ul class="f-dropdown disable-scroll">
+                                <li tal:repeat="link submitters">
+                                    <a href="${link.attrs.href}" class="${repeat.link.start and 'ALL-link' or 'ticket-group-filter'}">
+                                        ${link.text}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </span>
                     <span>
                         <button type="button" data-toggle="owners" class="${has_owner_filter and 'primary radius button small' or 'secondary radius button small'} selected-owner">
                             <span i18n:translate class="show-for-sr">Owner:</span>
@@ -37,14 +52,27 @@
                     <span>
                         <button type="button" data-toggle="handlers" class="${has_handler_filter and 'primary radius button small' or 'secondary radius button small'} selected-handler">
                             <span i18n:translate class="show-for-sr">Kind:</span>
-                            <span class="${' '.join(handler.attrs['class'])}">${handler.text}</span>
+                            <span class="${handler_class}">${handler}</span>
                         </button>
                         <div id="handlers" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
                             <ul class="f-dropdown disable-scroll">
-                                <li tal:repeat="link handlers"><tal:b replace="structure link(layout)"></tal:b></li>
+                                <li tal:repeat="link handlers"><tal:b replace="link(layout)"></tal:b></li>
                             </ul>
                         </div>
                     </span>
+                    <form class="ticket-filter-search" action="${request.path_url}" method="GET" tal:condition="layout.model.search_term_supported|nothing">
+                    <tal:b tal:condition="request.GET" tal:repeat="item request.GET.items()">
+                        <input type="hidden" name="${item[0]}" value="${item[1]}" tal:condition="item[0] not in ('page', 'q')" />
+                    </tal:b>
+                    <div class="input-group">
+                        <input class="input-group-field" id="search" data-typeahead-subject type="search" name="q" value="${layout.model.q}" autocomplete="off" autocorrect="off" autofocus />
+                        <div class="input-group-button">
+                            <button type="submit" class="button" aria-label="Search" i18n:attributes="aria-label">
+                                <i class="fa fa-fw fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -1,4 +1,8 @@
-from cached_property import cached_property
+from __future__ import annotations
+import json
+
+from functools import cached_property
+from itertools import islice
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
@@ -18,31 +22,43 @@ from onegov.org.layout import PersonCollectionLayout
 from onegov.org.layout import PersonLayout as OrgPersonLayout
 
 
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from collections.abc import Iterator
+    from collections.abc import Sequence
+    from onegov.agency.models import ExtendedAgency
+    from onegov.agency.request import AgencyRequest
+    from onegov.org.elements import Trait
+
+
 class PageLayout(OrgPageLayout):
 
     @cached_property
-    def sidebar_links(self):
+    def sidebar_links(self) -> None:  # type:ignore[override]
         return None
 
 
 class PersonLayout(OrgPersonLayout):
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):
+            traits: Sequence[Trait]
             if not self.model.deletable(self.request):
                 traits = (
                     Block(
                         _("People with memberships can't be deleted"),
-                        no=_("Cancel")
+                        no=_('Cancel')
                     ),
                 )
             else:
                 traits = (
                     Confirm(
-                        _("Do you really want to delete this person?"),
-                        _("This cannot be undone."),
-                        _("Delete person"),
-                        _("Cancel")
+                        _('Do you really want to delete this person?'),
+                        _('This cannot be undone.'),
+                        _('Delete person'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='DELETE',
@@ -51,17 +67,17 @@ class PersonLayout(OrgPersonLayout):
                 )
             return [
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
-                    text=_("Sort"),
+                    text=_('Sort'),
                     url=self.request.link(self.model, 'sort'),
                     attrs={'class': 'sort'}
                 ),
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -69,34 +85,55 @@ class PersonLayout(OrgPersonLayout):
                     traits=traits
                 )
             ]
+        return None
 
 
 class MoveAgencyMixin:
 
+    if TYPE_CHECKING:
+        request: AgencyRequest
+
+        def csrf_protected_url(self, url: str) -> str: ...
+
     @cached_property
-    def move_agency_url_template(self):
+    def move_agency_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(AgencyMove.for_url_template())
+            self.request.class_link(
+                AgencyMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
 
 class NavTreeMixin:
 
-    def nav_item_url(self, agency):
+    if TYPE_CHECKING:
+        model: Any
+        request: AgencyRequest
+
+    def nav_item_url(self, agency: ExtendedAgency) -> str:
         return self.request.link(agency.proxy(), 'as-nav-item')
 
     @cached_property
-    def browsed_agency(self):
-        if isinstance(self.model, ExtendedAgencyCollection):
-            return self.model.browse and self.model.by_id(self.model.browse)
+    def browsed_agency(self) -> ExtendedAgency | None:
+        if (
+            isinstance(self.model, ExtendedAgencyCollection)
+            and self.model.browse
+        ):
+            return self.model.by_id(self.model.browse)  # type:ignore[arg-type]
+        return None
 
     @cached_property
-    def browsed_agency_parents(self):
+    def browsed_agency_parents(self) -> list[int]:
         return self.browsed_agency and [
             agency.id for agency in self.browsed_agency.ancestors
         ] or []
 
-    def prerender_content(self, agency_id):
+    def prerender_content(self, agency_id: int | str) -> bool:
         if not self.browsed_agency:
             return False
         agency_id = int(agency_id)
@@ -106,34 +143,40 @@ class NavTreeMixin:
         ))
 
 
-class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin, NavTreeMixin):
+class AgencyCollectionLayout(
+    DefaultLayout,
+    MoveAgencyMixin,
+    NavTreeMixin
+):
+
+    request: AgencyRequest
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Agencies"), self.request.link(self.model))
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Agencies'), self.request.link(self.model))
         ]
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):
             return [
                 Link(
-                    text=_("Create PDF"),
+                    text=_('Create PDF'),
                     url=self.request.link(self.model, 'create-pdf'),
                     attrs={'class': 'create-pdf'}
                 ),
                 Link(
-                    text=_("Sort"),
+                    text=_('Sort'),
                     url=self.request.link(self.model, 'sort'),
                     attrs={'class': 'sort'}
                 ),
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Agency"),
+                            text=_('Agency'),
                             url=self.request.link(
                                 self.model,
                                 name='new'
@@ -143,35 +186,62 @@ class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin, NavTreeMixin):
                     ]
                 ),
             ]
+        return None
 
 
-class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
+class AgencyLayout(
+    AdjacencyListLayout,
+    MoveAgencyMixin
+):
 
-    def include_editor(self):
+    request: AgencyRequest
+
+    def include_editor(self) -> None:
         self.request.include('redactor')
         self.request.include('editor')
 
     @cached_property
-    def collection(self):
+    def collection(self) -> ExtendedAgencyCollection:
         return ExtendedAgencyCollection(self.request.session)
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Agencies"), self.request.link(self.collection)),
-        ] + list(self.get_breadcrumbs(self.model))[1:]
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Agencies'), self.request.link(self.collection)),
+            *islice(self.get_breadcrumbs(self.model), 1, None)
+        ]
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):
             if self.model.deletable(self.request):
-                delete_traits = (
+                def get_all_children_titles_json(
+                        agency: ExtendedAgency) -> list[dict[str, Any]]:
+                    return [
+                        {
+                            'title': child.title,
+                            'children': get_all_children_titles_json(child)
+                        }
+                        for child in agency.children
+                    ]
+
+                children = json.dumps(get_all_children_titles_json(self.model))
+                if children != '[]':
+                    confirm_text = _('This cannot be undone. Following '
+                        'agencies will be deleted as well:')
+                else:
+                    confirm_text = _('This cannot be undone.')
+
+                delete_traits: Sequence[Trait] = (
                     Confirm(
-                        _("Do you really want to delete this agency?"),
-                        _("This cannot be undone."),
-                        _("Delete agency"),
-                        _("Cancel")
+                        _('Do you really want to delete this agency?'),
+                        confirm_text,
+                        _('Delete agency'),
+                        _('Cancel'),
+                        children,
+                        _('Please scroll to the bottom to enable the confirm '
+                          'button.')
                     ),
                     Intercooler(
                         request_method='DELETE',
@@ -185,32 +255,32 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                             "Agency with memberships or suborganizations "
                             "can't be deleted"
                         ),
-                        no=_("Cancel")
+                        no=_('Cancel')
                     ),
                 )
             return [
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model.proxy(), 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
-                    text=_("Move"),
+                    text=_('Move'),
                     url=self.request.link(self.model.proxy(), 'move'),
                     attrs={'class': 'move'}
                 ),
                 Link(
-                    text=_("Sort"),
+                    text=_('Sort'),
                     url=self.request.link(self.model.proxy(), 'sort'),
                     attrs={'class': 'sort'}
                 ),
                 Link(
-                    text=_("Change URL"),
+                    text=_('Change URL'),
                     url=self.request.link(self.model.proxy(), 'change-url'),
                     attrs={'class': 'change-url'}
                 ),
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -218,15 +288,15 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                     traits=delete_traits
                 ),
                 Link(
-                    text=_("Create PDF"),
+                    text=_('Create PDF'),
                     url=self.request.link(self.model.proxy(), 'create-pdf'),
                     attrs={'class': 'create-pdf'}
                 ),
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Agency"),
+                            text=_('Agency'),
                             url=self.request.link(
                                 self.model.proxy(),
                                 name='new'
@@ -234,7 +304,7 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                             attrs={'class': 'new-agency'}
                         ),
                         Link(
-                            text=_("Membership"),
+                            text=_('Membership'),
                             url=self.request.link(
                                 self.model.proxy(),
                                 name='new-membership'
@@ -244,10 +314,10 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                     ]
                 ),
                 LinkGroup(
-                    title=_("Sort"),
+                    title=_('Sort'),
                     links=[
                         Link(
-                            text=_("Suborganizations"),
+                            text=_('Suborganizations'),
                             url=self.csrf_protected_url(
                                 self.request.link(
                                     self.model.proxy(), 'sort-children'
@@ -257,13 +327,13 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                             traits=(
                                 Confirm(
                                     _(
-                                        "Do you really want to sort the "
-                                        "suborganizations alphabetically by "
-                                        "title?"
+                                        'Do you really want to sort the '
+                                        'suborganizations alphabetically by '
+                                        'title?'
                                     ),
-                                    _("This cannot be undone."),
-                                    _("Sort suborganizations"),
-                                    _("Cancel")
+                                    _('This cannot be undone.'),
+                                    _('Sort suborganizations'),
+                                    _('Cancel')
                                 ),
                                 Intercooler(
                                     request_method='POST',
@@ -274,7 +344,7 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                             )
                         ),
                         Link(
-                            text=_("Relationships"),
+                            text=_('Relationships'),
                             url=self.csrf_protected_url(
                                 self.request.link(
                                     self.model.proxy(), 'sort-relationships'
@@ -284,13 +354,13 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                             traits=(
                                 Confirm(
                                     _(
-                                        "Do you really want to sort the "
-                                        "relationships alphabetically by "
-                                        "last name and first name?"
+                                        'Do you really want to sort the '
+                                        'relationships alphabetically by '
+                                        'last name and first name?'
                                     ),
-                                    _("This cannot be undone."),
-                                    _("Sort relationships"),
-                                    _("Cancel")
+                                    _('This cannot be undone.'),
+                                    _('Sort relationships'),
+                                    _('Cancel')
                                 ),
                                 Intercooler(
                                     request_method='POST',
@@ -303,69 +373,85 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                     ]
                 ),
             ]
+        return None
 
     @cached_property
-    def move_membership_within_agency_url_template(self):
+    def move_membership_within_agency_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(
-                AgencyMembershipMoveWithinAgency.for_url_template())
+            self.request.class_link(
+                AgencyMembershipMoveWithinAgency,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
 
 class AgencyPathMixin:
 
-    def get_ancestors(self, item, with_item=True, levels=None):
+    if TYPE_CHECKING:
+        request: AgencyRequest
+
+    def get_ancestors(
+        self,
+        item: ExtendedAgency,
+        with_item: bool = True,
+        levels: Collection[int] | None = None
+    ) -> Iterator[Link]:
 
         for ix, ancestor in enumerate(item.ancestors, 1):
-            if levels is None:
-                yield Link(ancestor.title, self.request.link(ancestor))
-            elif ix in levels:
+            if levels is None or ix in levels:
                 yield Link(ancestor.title, self.request.link(ancestor))
 
         if with_item:
             yield Link(item.title, self.request.link(item))
 
-    def parent_path(self, agency):
+    def parent_path(self, agency: ExtendedAgency) -> str:
         levels = self.request.app.org.agency_display_levels
-        return ' > '.join((
-            ln.text for ln in self.get_ancestors(agency, False, levels)
-        ))
+        return ' > '.join(
+            ln.text or ln.title
+            for ln in self.get_ancestors(agency, False, levels)
+        )
 
-    def agency_path(self, agency):
-        return ' > '.join((
-            ln.text for ln in self.get_ancestors(agency)
-        ))
+    def agency_path(self, agency: ExtendedAgency) -> str:
+        return ' > '.join(
+            ln.text or ln.title
+            for ln in self.get_ancestors(agency)
+        )
 
 
 class MembershipLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        return AgencyLayout(self.model.agency, self.request).breadcrumbs + [
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            *AgencyLayout(self.model.agency, self.request).breadcrumbs,
             Link(self.model.title, self.request.link(self.model))
         ]
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):
             return [
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to delete this membership?"),
-                            _("This cannot be undone."),
-                            _("Delete membership"),
-                            _("Cancel")
+                            _('Do you really want to delete this membership?'),
+                            _('This cannot be undone.'),
+                            _('Delete membership'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -374,25 +460,31 @@ class MembershipLayout(DefaultLayout):
                     )
                 )
             ]
+        return None
 
 
-class ExtendedPersonCollectionLayout(PersonCollectionLayout, AgencyPathMixin):
+class ExtendedPersonCollectionLayout(
+    PersonCollectionLayout,
+    AgencyPathMixin
+):
+
+    request: AgencyRequest
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
                 Link(
-                    text=_("Create Excel"),
+                    text=_('Create Excel'),
                     url=self.request.link(
                         self.model, name='create-people-xlsx'),
                     attrs={'class': 'create-excel'}
                 ),
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Person"),
+                            text=_('Person'),
                             url=self.request.link(
                                 self.model,
                                 name='new'
@@ -402,25 +494,34 @@ class ExtendedPersonCollectionLayout(PersonCollectionLayout, AgencyPathMixin):
                     ]
                 ),
             ]
+        return None
 
 
 class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):
 
+    request: AgencyRequest
+
     @cached_property
-    def collection(self):
+    def collection(self) -> ExtendedPersonCollection:  # type:ignore
         return ExtendedPersonCollection(self.request.session)
 
     @cached_property
-    def move_membership_within_person_url_template(self):
+    def move_membership_within_person_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(
-                AgencyMembershipMoveWithinPerson.for_url_template())
+            self.request.class_link(
+                AgencyMembershipMoveWithinPerson,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
     @property
-    def default_membership_title(self):
+    def default_membership_title(self) -> str:
         return self.request.translate(_('Member'))
 
 
 class AgencySearchLayout(DefaultLayout, AgencyPathMixin):
-    pass
+    request: AgencyRequest

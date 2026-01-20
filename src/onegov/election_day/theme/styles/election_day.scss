@@ -59,14 +59,23 @@ html {
     color: $aluminum;
     margin-bottom: 2em;
 
-    dl dt {
-        margin-bottom: 0;
+    ul {
+        margin: 0;
     }
 
-    dl dd {
-        font-size: 2.75rem;
+    .percentages li {
         font-weight: bold;
-        margin-bottom: -6px;
+        list-style: none;
+        padding-bottom: 1rem;
+
+        &:last-child {
+            text-align: right;
+        }
+    }
+
+    .accepted,
+    .rejected {
+        font-size: 2.75rem;
     }
 
     .percentage {
@@ -79,6 +88,7 @@ html {
         }
     }
 }
+
 
 /*
     Before Content
@@ -431,7 +441,8 @@ table {
     }
 
     th.right-aligned-small {
-        span, a {
+        span,
+        a {
             float: right;
             text-align: right;
         }
@@ -632,6 +643,33 @@ footer {
     p {
         font-size: inherit;
     }
+
+    ul {
+        font-size: .875rem;
+
+        &.horizontal {
+            display: inline-block;
+            list-style: none;
+            margin: 0;
+
+            li {
+                display: inline-block;
+
+                + li::before {
+                    content: '|';
+                }
+            }
+        }
+
+        &.locales {
+            margin: 0 0 1em;
+        }
+
+        &.additional-links {
+            list-style: none;
+            margin: 0 0 1em;
+        }
+    }
 }
 
 
@@ -660,7 +698,7 @@ footer {
         }
 
         .title-area .name span {
-            color: $aluminum;
+            color: #575757;
         }
 
         .left {
@@ -671,7 +709,7 @@ footer {
 
         .has-dropdown>a::after {
             border-color: transparent;
-            border-left-color: $aluminum;
+            border-left-color: #575757;
         }
     }
 }
@@ -689,13 +727,18 @@ footer {
             }
 
             .left {
-                border-bottom: 1px solid $aluminum;
+                border-bottom: 1px solid #575757;
                 width: 100%;
 
                 li {
                     border-bottom: 2px solid $white;
                     position: relative;
                     z-index: 10;
+
+                    a,
+                    a:hover {
+                        color: #575757;
+                    }
 
                     &.active {
                         border-bottom: 2px solid $primary-color;
@@ -708,7 +751,7 @@ footer {
 
             .has-dropdown>a::after {
                 border-color: transparent;
-                border-top-color: $aluminum;
+                border-top-color: #575757;
             }
 
             .top-bar-section .dropdown {
@@ -719,6 +762,7 @@ footer {
 
                     > a {
                         background-color: $white-smoke;
+                        color: #575757;
                     }
 
                     &:not(.has-form):not(.active)>a:not(.button) {
@@ -825,7 +869,8 @@ ul.actions {
 */
 
 form {
-    label ul {
+    label ul,
+    .group-label > ul {
         list-style: none;
 
         margin: 0;
@@ -840,6 +885,20 @@ form {
     p {
         font-size: inherit;
     }
+
+    .group-label {
+        color: $form-label-font-color;
+        font-size: $form-label-font-size;
+    }
+
+    .label-required {
+        color: $primary-color;
+    }
+
+    .label-text {
+        font-weight: bold;
+    }
+
 }
 
 .cancel-button {
@@ -854,6 +913,11 @@ form {
 .alert-box {
     font-size: 1rem;
 
+    &.alert {
+        background-color: #d72d0f;
+        border-color: #d72d0f;
+    }
+
     p {
         margin-bottom: 0;
     }
@@ -864,6 +928,19 @@ form {
     margin-right: auto;
     margin-top: 1%;
     width: 85%;
+}
+
+/*
+    Errors
+*/
+
+label.error {
+    color: #a2220b;
+}
+
+small.error,
+span.error {
+    background-color: #d72d0f;
 }
 
 /*
@@ -903,16 +980,21 @@ form {
 /*
     Pagination
 */
-ul.pagination li.first,
-ul.pagination li.last {
-    background-color: $smoke;
-    border-radius: 3px;
-}
+ul.pagination li {
+    a {
+        color: $steel;
+    }
 
-ul.pagination li.current a {
-    font-size: 1.2rem;
-}
+    &.first,
+    &.last {
+        background-color: $smoke;
+        border-radius: 3px;
+    }
 
+    &.current a {
+        font-size: 1.2rem;
+    }
+}
 
 /*
     Shortcode
@@ -925,25 +1007,6 @@ ul.pagination li.current a {
 
     &.large {
         font-size: 1.5em;
-    }
-}
-
-/*
-    Locales switcher
-*/
-
-.locales {
-    display: inline-block;
-    font-size: .875rem;
-    list-style: none;
-    margin: 0 0 1em;
-
-    li {
-        display: inline-block;
-
-        + li::before {
-            content: '|';
-        }
     }
 }
 
@@ -1111,6 +1174,7 @@ ul.pagination li.current a {
     .subscription-links,
     .onegov-link,
     .open-data-link,
+    .sitemap-link,
     .results-navigation a,
     .results-navigation h2::after,
 
@@ -1205,4 +1269,11 @@ a:focus {
     right: 0;
     text-align: center;
     width: 200px;
-    }
+}
+
+.page-refresh {
+    position: sticky;
+    text-align: center;
+    top: 0;
+    z-index: 999;
+}

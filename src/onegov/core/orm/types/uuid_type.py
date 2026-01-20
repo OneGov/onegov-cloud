@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy.dialects.postgresql import UUID as BaseUUID
 
 
@@ -15,5 +17,5 @@ class UUID(BaseUUID):
 
     """
 
-    def __init__(self, as_uuid=True):
+    def __init__(self, as_uuid: bool = True):
         super().__init__(as_uuid=as_uuid)

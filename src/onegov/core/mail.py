@@ -1,12 +1,22 @@
+from __future__ import annotations
+
 import os.path
 import magic
 import re
 
 from base64 import b64encode
-from email.headerregistry import Address
+from email.headerregistry import Address, SingleAddressHeader
 from email.policy import SMTP
 from onegov.core.html import html_to_text
 from string import ascii_letters, digits
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import StrPath, SupportsRead
+    from collections.abc import Iterable
+
+    from .types import AttachmentJsonDict, EmailJsonDict, SequenceOrScalar
 
 
 specials_regex = re.compile(r'[][\\()<>@,:;.]')
@@ -19,7 +29,7 @@ QP_MAX_WORD_LENGTH = 75
 QP_CONTENT_LENGTH = QP_MAX_WORD_LENGTH - QP_PREFIX_LENGTH - QP_SUFFIX_LENGTH
 
 
-def needs_qp_encode(display_name):
+def needs_qp_encode(display_name: str) -> bool:
     # NOTE: Backslash escaping is forbidden in Postmark API
     if '"' in display_name:
         return True
@@ -35,14 +45,14 @@ def needs_qp_encode(display_name):
     return False
 
 
-def qp_encode_display_name(display_name):
+def qp_encode_display_name(display_name: str) -> str:
     """
     Applies Quoted Printable encoding to the display name according
     to Postmark API's rules that can be parsed losslessly back into
     the original display_name with the EmailMessage API.
     """
-    words = []
-    current_word = []
+    words: list[str] = []
+    current_word: list[str] = []
 
     def finish_word() -> None:
         nonlocal current_word
@@ -78,7 +88,7 @@ def qp_encode_display_name(display_name):
     return f'"{" ".join(words)}"'
 
 
-def coerce_address(address):
+def coerce_address(address: Address | str) -> Address:
     """
     Coerces a string type into a email.headerregistry.Address object
     by parsing the string as a sender header.
@@ -94,13 +104,14 @@ def coerce_address(address):
     """
     if isinstance(address, str):
         header = SMTP.header_factory('sender', address)
+        assert isinstance(header, SingleAddressHeader)
         return header.address
 
     assert isinstance(address, Address)
     return address
 
 
-def format_single_address(address):
+def format_single_address(address: Address | str) -> str:
     """
     Formats a single Address according to Postmark API rules that is
     cross-compatible with email.message.EmailMessage for raw SMTP sends.
@@ -128,7 +139,7 @@ def format_single_address(address):
     return f'{name} <{address.addr_spec}>'
 
 
-def format_address(addresses):
+def format_address(addresses: SequenceOrScalar[Address | str]) -> str:
     """
     Convenience function that accepts both a single Address and a
     sequence of Address, otherwise identical to format_single_address
@@ -146,33 +157,50 @@ def format_address(addresses):
 
 class Attachment:
     """
-    Represents a mail attachment that can be passed to prepare_mail
+    Represents a mail attachment that can be passed to prepare_email
     """
 
+    __slots__ = ('filename', 'content', 'content_type')
+    filename: str
+    content: bytes
+    content_type: str
+
     # TODO: Add support for ContentID for embedded attachments.
-    def __init__(self, filename, content=None, content_type=None):
+    # TODO: We could be nice and allow StrOrBytesPath, but then
+    #       we need to make sure to coerce self.filename to str
+    def __init__(
+        self,
+        filename: StrPath,
+        content: SupportsRead[str | bytes] | str | bytes | None = None,
+        content_type: str | None = None
+    ):
+
         self.filename = os.path.basename(filename)
+
+        _content: str | bytes
         if content is None:
             with open(filename, 'rb') as fd:
-                content = fd.read()
+                _content = fd.read()
         elif hasattr(content, 'read'):
-            content = content.read()
+            _content = content.read()
+        else:
+            _content = content
 
-        if isinstance(content, str):
-            content = content.encode('utf-8')
+        if isinstance(_content, str):
+            _content = _content.encode('utf-8')
 
-        assert isinstance(content, bytes)
-        self.content = content
+        assert isinstance(_content, bytes)
+        self.content = _content
 
         if content_type is None:
             # shortcut for depot.io.interfaces.StoredFile
-            if hasattr(content, 'content_type'):
+            if content is not None and hasattr(content, 'content_type'):
                 content_type = content.content_type
             else:
                 content_type = magic.from_buffer(self.content, mime=True)
         self.content_type = content_type
 
-    def prepare(self):
+    def prepare(self) -> AttachmentJsonDict:
         """
         Prepares attachment so it can be sent to Postmark API.
         """
@@ -184,29 +212,43 @@ class Attachment:
         }
 
 
-def prepare_email(sender, reply_to=None, receivers=(), cc=(), bcc=(),
-                  subject=None, content=None, plaintext=None,
-                  attachments=(), headers=None, stream='marketing'):
+def prepare_email(
+    sender: Address | str,
+    reply_to: Address | str | None = None,
+    receivers: SequenceOrScalar[Address | str] = (),
+    cc: SequenceOrScalar[Address | str] = (),
+    bcc: SequenceOrScalar[Address | str] = (),
+    subject: str | None = None,
+    content: str | None = None,
+    plaintext: str | None = None,
+    attachments: Iterable[Attachment | StrPath] = (),
+    headers: dict[str, str] | None = None,
+    stream: str = 'marketing'
+) -> EmailJsonDict:
     """
     Creates a dictiornary that can be turned into JSON as is and sent
     to the Postmark API.
 
     :param content: HTML content.
-    :param attachments: Either a list of :class:`onegov.core.email.Attachment`
+    :param attachments: Either a list of :class:`onegov.core.mail.Attachment`
         or a list of filenames/os.PathLike to attach to the email.
     :param headers: Dictionary containing additional headers to be set
 
     """
 
-    if not plaintext:
+    if plaintext is None:
         # if no plaintext is given we require content
-        assert content
+        # FIXME: it would be nice to verify this statically, but the
+        #        order of arguments makes this a bit cumbersome, we
+        #        could remedy this by forcing them all to be keyword
+        #        arguments
+        assert content is not None
 
         # turn the html email into a plaintext representation
         # this leads to a lower spam rating
         plaintext = html_to_text(content)
 
-    message = {
+    message: EmailJsonDict = {
         'From': format_single_address(sender),
         'To': format_address(receivers),
         'TextBody': plaintext,
@@ -243,11 +285,11 @@ def prepare_email(sender, reply_to=None, receivers=(), cc=(), bcc=(),
         message['HtmlBody'] = content
 
     if attachments:
-        attachments = (
+        coerced_attachments = (
             a if isinstance(a, Attachment) else Attachment(a)
             for a in attachments
         )
-        message['Attachments'] = [a.prepare() for a in attachments]
+        message['Attachments'] = [a.prepare() for a in coerced_attachments]
 
     if headers:
         message['Headers'] = [

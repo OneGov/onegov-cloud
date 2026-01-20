@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from collections import OrderedDict
+
+from onegov.core.orm.mixins import content_property, ContentMixin
 from onegov.core.orm.types import UTCDateTime
 from sedate import to_timezone
 from sqlalchemy import Column
@@ -7,7 +12,14 @@ from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 
 
-class OccurrenceMixin:
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from datetime import datetime
+    from onegov.core.orm.mixins import dict_property
+
+
+class OccurrenceMixin(ContentMixin):
     """ Contains all attributes events and ocurrences share.
 
     The ``start`` and ``end`` date and times are stored in UTC - that is, they
@@ -18,44 +30,61 @@ class OccurrenceMixin:
     """
 
     #: Title of the event
-    title = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
 
     #: A nice id for the url, readable by humans
-    name = Column(Text)
+    name: Column[str | None] = Column(Text)
 
     #: Description of the location of the event
-    location = Column(Text, nullable=True)
+    location: Column[str | None] = Column(Text, nullable=True)
 
     #: Tags/Categories of the event
-    _tags = Column(MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
+    _tags: Column[dict[str, str] | None] = Column(  # type:ignore
+        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
+        nullable=True,
+        name='tags'
+    )
 
     @property
-    def tags(self):
+    def tags(self) -> list[str]:
         """ Tags/Categories of the event. """
 
         return list(self._tags.keys()) if self._tags else []
 
+    # FIXME: asymmetric properties are not supported, if we need to
+    #        be able to set this with arbitrary iterables we need
+    #        to define a custom descriptor
     @tags.setter
-    def tags(self, value):
-        self._tags = dict(((key.strip(), '') for key in value))
+    def tags(self, value: Iterable[str]) -> None:
+        self._tags = {key.strip(): '' for key in value}
+
+    #: Filter keywords if organisation settings enabled filters
+    filter_keywords: dict_property[dict[str, list[str] | str]]
+    filter_keywords = content_property(default=dict)
 
     #: Timezone of the event
-    timezone = Column(String, nullable=False)
+    timezone: Column[str] = Column(String, nullable=False)
 
     #: Start date and time of the event (of the first event if recurring)
-    start = Column(UTCDateTime, nullable=False)
+    start: Column[datetime] = Column(UTCDateTime, nullable=False)
 
     @property
-    def localized_start(self):
+    def localized_start(self) -> datetime:
         """ The localized version of the start date/time. """
 
         return to_timezone(self.start, self.timezone)
 
     #: End date and time of the event (of the first event if recurring)
-    end = Column(UTCDateTime, nullable=False)
+    end: Column[datetime] = Column(UTCDateTime, nullable=False)
 
     @property
-    def localized_end(self):
+    def localized_end(self) -> datetime:
         """ The localized version of the end date/time. """
 
         return to_timezone(self.end, self.timezone)
+
+    def filter_keywords_ordered(
+            self,
+    ) -> dict[str, list[str] | str | None]:
+        return OrderedDict((k, sorted(v) if isinstance(v, list) else v)
+                           for k, v in sorted(self.filter_keywords.items()))

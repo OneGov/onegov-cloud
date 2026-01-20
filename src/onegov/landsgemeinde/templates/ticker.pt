@@ -1,0 +1,93 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.landsgemeinde">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="post-title">
+        <div id="liveticker" class="${'inactive' if assembly.state != 'ongoing' else ''}"><span class="blob"></span> <span>Liveticker</span></div>
+    </tal:b>
+    <tal:b metal:fill-slot="before-content">
+        <div class="callout secondary assembly-completed" tal:condition="assembly.state == 'completed'">
+            <p i18n:translate="">The <tal:b i18n:name="assembly">${layout.assembly_type}</tal:b> has ended.</p>
+        </div>
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x wrapper">
+            <div class="medium-7 cell main-content content">
+
+                <div class="video" tal:condition="assembly.video_url">
+                    <h2 i18n:translate="" class="visually-hidden">Video</h2>
+                    <div class="videowrapper">
+                        <iframe allow="fullscreen" frameborder="0" src="${assembly.video_url}"></iframe>
+                    </div>
+                </div>
+
+
+                <tal:block tal:repeat="agenda_item agenda_items">
+                    <tal:block metal:use-macro="layout.macros['ticker-agenda-item']" />
+                </tal:block>
+
+                <div class="ticker-item ticker-item-assembly-overview">
+                    <h2 i18n:translate="">Overview</h2>
+                    <tal:block tal:content="(assembly.overview or '').replace('h2', 'h3')"></tal:block>
+                </div>
+            </div>
+
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel downloads" tal:condition="assembly.memorial_pdf or assembly.memorial_2_pdf or assembly.memorial_supplement_pdf or assembly.protocol_pdf or assembly.audio_mp3 or assembly.audio_zip">
+                        <h3 i18n:translate="">Downloads</h3>
+                        <p tal:condition="assembly.memorial_pdf">
+                            <a href="${request.link(assembly.memorial_pdf)}" class="memorial-link">
+                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <span tal:condition="not: assembly.memorial_2_pdf" i18n:translate="">Memorial (PDF)</span>
+                                <span tal:condition="assembly.memorial_2_pdf" i18n:translate="">Memorial part 1 (PDF)</span>
+                            </a>
+                        </p>
+                        <p tal:condition="assembly.memorial_2_pdf">
+                            <a href="${request.link(assembly.memorial_2_pdf)}" class="memorial-link">
+                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <span i18n:translate="">Memorial part 2 (PDF)</span>
+                            </a>
+                        </p>
+                        <p tal:condition="assembly.memorial_supplement_pdf">
+                            <a href="${request.link(assembly.memorial_supplement_pdf)}" class="memorial-supplement-link">
+                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <span i18n:translate="">Supplement to the memorial (PDF)</span>
+                            </a>
+                        </p>
+                        <p tal:condition="assembly.protocol_pdf">
+                            <a href="${request.link(assembly.protocol_pdf)}" class="protocol-link">
+                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <span i18n:translate="">Protocol (PDF)</span>
+                            </a>
+                        </p>
+                        <p tal:condition="assembly.audio_mp3">
+                            <a href="${request.link(assembly.audio_mp3)}" class="audio-mp3-link">
+                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <span i18n:translate="">Audio (MP3)</span>
+                            </a>
+                        </p>
+                        <p tal:condition="assembly.audio_zip">
+                            <a href="${request.link(assembly.audio_zip)}" class="audio-zip-link">
+                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <span i18n:translate="">Memorial as audio for the visually impaired and blind</span>
+                            </a>
+                        </p>
+                    </div>
+
+                    <div class="side-panel audio" tal:condition="assembly.audio_mp3">
+                        <h3 i18n:translate="">Audio</h3>
+                        <audio preload="none" controls="">
+                            <source type="audio/mpeg" src="${request.link(assembly.audio_mp3)}" />
+                            <p><a href="${request.link(assembly.audio_mp3)}" i18n:translate="">Download audio</a></p>
+                        </audio>
+                    </div>
+
+                    <tal:block metal:use-macro="layout.macros['ticker-agenda-item-list']" />
+                </div>
+
+            </div>
+        </div>
+
+    </tal:b>
+</div>

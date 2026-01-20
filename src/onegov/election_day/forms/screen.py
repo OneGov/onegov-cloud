@@ -1,16 +1,19 @@
+from __future__ import annotations
+
 from lxml.etree import XMLSyntaxError
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
 from onegov.core.widgets import transform_structure
 from onegov.election_day import _
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Screen
+from onegov.election_day.models import Vote
 from onegov.election_day.models.screen import ScreenType
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import CssField
 from onegov.form.fields import PanelField
 from onegov.form.validators import UniqueColumnValue
+from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
@@ -21,13 +24,18 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.directives import ScreenWidget
+
+
 class ScreenForm(Form):
 
     number = IntegerField(
         label=_('Number'),
         validators=[
             InputRequired(),
-            NumberRange(min=1),
+            NumberRange(min=1, max=2147483647),
             UniqueColumnValue(Screen)
         ]
     )
@@ -130,8 +138,31 @@ class ScreenForm(Form):
         depends_on=('type', 'election_compound'),
     )
 
+    election_compound_part = BooleanField(
+        _('Part of an Election Compound'),
+        default=False,
+        depends_on=('type', 'election_compound'),
+    )
+
+    domain = StringField(
+        label=_('Domain'),
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('election_compound_part', 'y'),
+    )
+
+    domain_segment = StringField(
+        label=_('Domain Segment'),
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('election_compound_part', 'y'),
+    )
+
     tags_simple_vote = PanelField(
         label=_('Available tags'),
+        hide_label=False,
         text='',
         kind='',
         depends_on=('type', 'simple_vote'),
@@ -139,6 +170,7 @@ class ScreenForm(Form):
 
     tags_complex_vote = PanelField(
         label=_('Available tags'),
+        hide_label=False,
         text='',
         kind='',
         depends_on=('type', 'complex_vote'),
@@ -146,6 +178,7 @@ class ScreenForm(Form):
 
     tags_majorz_election = PanelField(
         label=_('Available tags'),
+        hide_label=False,
         text='',
         kind='',
         depends_on=('type', 'majorz_election'),
@@ -153,6 +186,7 @@ class ScreenForm(Form):
 
     tags_proporz_election = PanelField(
         label=_('Available tags'),
+        hide_label=False,
         text='',
         kind='',
         depends_on=('type', 'proporz_election'),
@@ -160,6 +194,7 @@ class ScreenForm(Form):
 
     tags_election_compound = PanelField(
         label=_('Available tags'),
+        hide_label=False,
         text='',
         kind='',
         depends_on=('type', 'election_compound'),
@@ -178,20 +213,23 @@ class ScreenForm(Form):
         render_kw={'rows': 10},
     )
 
-    def get_widgets(self, type_):
+    def get_widgets(self, type_: str) -> dict[str, ScreenWidget]:
         registry = self.request.app.config.screen_widget_registry
         return registry.by_categories(ScreenType(type_).categories)
 
-    def validate_structure(self, field):
+    def validate_structure(self, field: TextAreaField) -> None:
         widgets = self.get_widgets(self.type.data)
 
         if field.data:
             try:
                 transform_structure(widgets.values(), field.data)
-            except XMLSyntaxError as e:
-                raise ValidationError(e.msg.split(', line')[0])
+            except XMLSyntaxError as exception:
+                raise ValidationError(
+                    exception.msg.split(', line')[0]
+                ) from exception
 
-    def update_model(self, model):
+    def update_model(self, model: Screen) -> None:
+        assert self.number.data is not None
         model.number = self.number.data
         model.group = self.group.data
         model.duration = self.duration.data
@@ -200,6 +238,8 @@ class ScreenForm(Form):
         model.vote_id = None
         model.election_id = None
         model.election_compound_id = None
+        model.domain = None
+        model.domain_segment = None
         if self.type.data == 'simple_vote':
             model.vote_id = self.simple_vote.data
         elif self.type.data == 'complex_vote':
@@ -210,15 +250,27 @@ class ScreenForm(Form):
             model.election_id = self.proporz_election.data
         elif self.type.data == 'election_compound':
             model.election_compound_id = self.election_compound.data
+            if self.election_compound_part.data:
+                model.type = 'election_compound_part'
+                model.domain = self.domain.data
+                model.domain_segment = self.domain_segment.data
+        assert self.structure.data is not None
         model.structure = self.structure.data
         model.css = self.css.data
 
-    def apply_model(self, model):
+    def apply_model(self, model: Screen) -> None:
         self.number.data = model.number
         self.group.data = model.group
         self.duration.data = model.duration
         self.description.data = model.description
         self.type.data = model.type
+        self.domain.data = None
+        self.domain_segment.data = None
+        if model.type == 'election_compound_part':
+            self.type.data = 'election_compound'
+            self.election_compound_part.data = True
+            self.domain.data = model.domain
+            self.domain_segment.data = model.domain_segment
         self.simple_vote.data = ''
         self.complex_vote.data = ''
         self.majorz_election.data = ''
@@ -237,33 +289,33 @@ class ScreenForm(Form):
         self.structure.data = model.structure
         self.css.data = model.css
 
-    def on_request(self):
+    def on_request(self) -> None:
         session = self.request.session
 
-        query = session.query(Vote).filter_by(type='simple')
+        vquery = session.query(Vote).filter_by(type='simple')
         self.simple_vote.choices = [
             (vote.id, f'{vote.title} [{vote.date}]')
-            for vote in query.order_by(Vote.date.desc(), Vote.shortcode)
+            for vote in vquery.order_by(Vote.date.desc(), Vote.shortcode)
         ]
 
-        query = session.query(Vote).filter_by(type='complex')
+        vquery = session.query(Vote).filter_by(type='complex')
         self.complex_vote.choices = [
             (vote.id, f'{vote.title} [{vote.date}]')
-            for vote in query.order_by(Vote.date.desc(), Vote.shortcode)
+            for vote in vquery.order_by(Vote.date.desc(), Vote.shortcode)
         ]
 
-        query = session.query(Election).filter_by(type='majorz')
+        equery = session.query(Election).filter_by(type='majorz')
         self.majorz_election.choices = [
             (election.id, f'{election.title} [{election.date}]')
-            for election in query.order_by(
+            for election in equery.order_by(
                 Election.date.desc(), Election.shortcode
             )
         ]
 
-        query = session.query(Election).filter_by(type='proporz')
+        equery = session.query(Election).filter_by(type='proporz')
         self.proporz_election.choices = [
             (election.id, f'{election.title} [{election.date}]')
-            for election in query.order_by(
+            for election in equery.order_by(
                 Election.date.desc(), Election.shortcode
             )
         ]

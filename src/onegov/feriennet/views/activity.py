@@ -1,4 +1,8 @@
+from __future__ import annotations
+
+import copy
 import sedate
+import random
 
 from datetime import date, timedelta
 from itertools import groupby
@@ -6,8 +10,9 @@ from onegov.activity import Activity
 from onegov.activity import Booking
 from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
-from onegov.activity import Period
+from onegov.activity import BookingPeriod
 from onegov.activity.models import ACTIVITY_STATES, DAYS
+
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.security import Personal
 from onegov.core.security import Private
@@ -25,6 +30,8 @@ from onegov.feriennet.models import ActivityMessage
 from onegov.feriennet.models import VacationActivity
 from onegov.feriennet.models import VolunteerCart
 from onegov.feriennet.models import VolunteerCartAction
+from onegov.feriennet.utils import (activity_ages, activity_min_cost,
+                                    activity_max_cost, activity_spots)
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
 from onegov.ticket import TicketCollection
@@ -38,33 +45,56 @@ from sqlalchemy.orm import undefer
 from webob import exc
 
 
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator, Sequence
+    from onegov.activity.models import OccasionDate
+    from onegov.activity.models.occasion_need import OccasionNeed
+    from onegov.core.types import JSON_ro, RenderData
+    from onegov.feriennet.request import FeriennetRequest
+    from onegov.ticket import Ticket
+    from sqlalchemy.orm import Session
+    from webob import Response
+
+
 ACTIVITY_STATE_TRANSLATIONS = {
-    'preview': _("Preview"),
-    'proposed': _("Proposed"),
-    'accepted': _("Published"),  # users like the term 'Published' better
-    'archived': _("Archived")
+    'preview': _('Preview'),
+    'proposed': _('Proposed'),
+    'accepted': _('Published'),  # users like the term 'Published' better
+    'archived': _('Archived')
 }
 
 
 WEEKDAYS = (
-    _("Mo"),
-    _("Tu"),
-    _("We"),
-    _("Th"),
-    _("Fr"),
-    _("Sa"),
-    _("Su")
+    _('Mo'),
+    _('Tu'),
+    _('We'),
+    _('Th'),
+    _('Fr'),
+    _('Sa'),
+    _('Su')
 )
 
 
-def get_activity_form_class(model, request):
+def get_activity_form_class(
+    model: VacationActivity | VacationActivityCollection,
+    request: FeriennetRequest
+) -> type[VacationActivityForm]:
+
     if isinstance(model, VacationActivityCollection):
         model = VacationActivity()
 
     return model.with_content_extensions(VacationActivityForm, request)
 
 
-def occasions_by_period(session, activity, show_inactive, show_archived):
+def occasions_by_period(
+    session: Session,
+    activity: Activity,
+    show_inactive: bool,
+    show_archived: bool,
+    show_only_inactive: bool = False
+) -> tuple[tuple[str, tuple[Occasion, ...]], ...]:
+
     query = OccasionCollection(session).query()
     query = query.filter(Occasion.activity_id == activity.id)
 
@@ -72,42 +102,55 @@ def occasions_by_period(session, activity, show_inactive, show_archived):
     query = query.options(contains_eager(Occasion.period))
 
     if not show_inactive:
-        query = query.filter(Period.active == True)
+        query = query.filter(BookingPeriod.active == True)
 
     if not show_archived:
-        query = query.filter(Period.archived == False)
+        query = query.filter(BookingPeriod.archived == False)
+
+    if show_only_inactive:
+        query = query.filter(BookingPeriod.active == False)
 
     query = query.order_by(
-        desc(Period.active),
-        Period.execution_start,
+        desc(BookingPeriod.active),
+        BookingPeriod.execution_start,
         Occasion.order)
 
     return tuple(
         (title, tuple(occasions)) for title, occasions in
-        groupby(query.all(), key=lambda o: o.period.title)
+        groupby(query, key=lambda o: o.period.title)
     )
 
 
-def filter_link(text, active, url, rounded=False):
-    return Link(text=text, active=active, url=url, rounded=rounded, attrs={
+def filter_link(
+    text: str,
+    active: bool,
+    url: str,
+    rounded: bool = False
+) -> Link:
+    return Link(text=text, active=active, url=url,
+                rounded=rounded, attrs={
         'ic-get-from': url
     })
 
 
-def filter_timelines(activity, request):
+def filter_timelines(
+    activity: VacationActivityCollection,
+    request: FeriennetRequest
+) -> list[Link]:
+
     links = [
         filter_link(
-            text=request.translate(_("Elapsed")),
+            text=request.translate(_('Elapsed')),
             active='past' in activity.filter.timelines,
             url=request.link(activity.for_filter(timeline='past'))
         ),
         filter_link(
-            text=request.translate(_("Now")),
+            text=request.translate(_('Now')),
             active='now' in activity.filter.timelines,
             url=request.link(activity.for_filter(timeline='now'))
         ),
         filter_link(
-            text=request.translate(_("Scheduled")),
+            text=request.translate(_('Scheduled')),
             active='future' in activity.filter.timelines,
             url=request.link(activity.for_filter(timeline='future'))
         ),
@@ -115,7 +158,7 @@ def filter_timelines(activity, request):
 
     if request.is_organiser:
         links.insert(0, filter_link(
-            text=request.translate(_("Without")),
+            text=request.translate(_('Without')),
             active='undated' in activity.filter.timelines,
             url=request.link(activity.for_filter(timeline='undated'))
         ))
@@ -123,7 +166,11 @@ def filter_timelines(activity, request):
     return links
 
 
-def filter_tags(activity, request):
+def filter_tags(
+    activity: VacationActivityCollection,
+    request: FeriennetRequest
+) -> list[Link]:
+
     links = [
         filter_link(
             text=request.translate(_(tag)),
@@ -131,37 +178,45 @@ def filter_tags(activity, request):
             url=request.link(activity.for_filter(tag=tag)),
         ) for tag in activity.used_tags
     ]
-    links.sort(key=lambda l: l.text)
+    links.sort(key=lambda l: l.text)  # type:ignore
 
     return links
 
 
-def filter_durations(activity, request):
+def filter_durations(
+    activity: VacationActivityCollection,
+    request: FeriennetRequest
+) -> tuple[Link, ...]:
+
     return tuple(
         filter_link(
             text=request.translate(text),
             active=duration in activity.filter.durations,
             url=request.link(activity.for_filter(duration=duration))
         ) for text, duration in (
-            (_("Half day"), DAYS.half),
-            (_("Full day"), DAYS.full),
-            (_("Multiple days"), DAYS.many),
+            (_('Half day'), DAYS.half),
+            (_('Full day'), DAYS.full),
+            (_('Multiple days'), DAYS.many),
         )
     )
 
 
-def filter_ages(activity, request):
+def filter_ages(
+    activity: VacationActivityCollection,
+    request: FeriennetRequest
+) -> tuple[Link, ...]:
+
     ages = activity.available_ages()
 
     if not ages:
-        return
+        return ()
 
-    def age_filters():
+    def age_filters() -> Iterator[tuple[str, tuple[int, int]]]:
         for age in range(*ages):
             if age < 16:
                 yield str(age), (age, age)
             else:
-                yield "16+", (16, 99)
+                yield '16+', (16, 99)
                 break
 
     return tuple(
@@ -173,23 +228,33 @@ def filter_ages(activity, request):
     )
 
 
-def filter_price_range(activity, request):
+def filter_price_range(
+    activity: VacationActivityCollection,
+    request: FeriennetRequest
+) -> tuple[Link, ...]:
+
     return tuple(
         filter_link(
             text=request.translate(text),
             active=activity.filter.contains_price_range(price_range),
             url=request.link(activity.for_filter(price_range=price_range))
         ) for text, price_range in (
-            (_("Free of Charge"), (0, 0)),
-            (_("Up to 25 CHF"), (1, 25)),
-            (_("Up to 50 CHF"), (26, 50)),
-            (_("Up to 100 CHF"), (51, 100)),
-            (_("More than 100 CHF"), (101, 100000)),
+            (_('Free of Charge'), (0, 0)),
+            (_('Up to 25 CHF'), (1, 25)),
+            (_('Up to 50 CHF'), (26, 50)),
+            (_('Up to 100 CHF'), (51, 100)),
+            (_('More than 100 CHF'), (101, 100000)),
         )
     )
 
 
-def filter_weeks(activity, request):
+def filter_weeks(
+    activity: VacationActivityCollection,
+    request: FeriennetRequest
+) -> tuple[Link, ...]:
+
+    # FIXME: format_date should be available on the request, so we don't
+    #        need to create dummy layouts in order to use it.
     layout = VacationActivityCollectionLayout(activity, request)
 
     return tuple(
@@ -207,31 +272,49 @@ def filter_weeks(activity, request):
     )
 
 
-def filter_weekdays(activity, request):
+def filter_weekdays(
+    activity: VacationActivityCollection,
+    request: FeriennetRequest
+) -> tuple[Link, ...]:
+
     return tuple(
         filter_link(
             text=WEEKDAYS[weekday],
             active=weekday in activity.filter.weekdays,
             url=request.link(activity.for_filter(weekday=weekday))
-        ) for weekday in range(0, 7)
+        ) for weekday in range(7)
     )
 
 
-def filter_available(activity, request):
+def filter_available(
+    activity: VacationActivityCollection,
+    request: FeriennetRequest
+) -> tuple[Link, ...]:
+
+    # NOTE: We're helping out mypy's inference here, since it won't
+    #       infer the second tuple element as a literal
+    availabilities: tuple[
+        tuple[str, Literal['none', 'few', 'many']],
+        ...
+    ] = (
+        (_('None'), 'none'),
+        (_('Few'), 'few'),
+        (_('Many'), 'many'),
+    )
     return tuple(
         filter_link(
             text=request.translate(text),
             active=available in activity.filter.available,
             url=request.link(activity.for_filter(available=available))
-        ) for text, available in (
-            (_("None"), 'none'),
-            (_("Few"), 'few'),
-            (_("Many"), 'many'),
-        )
+        ) for text, available in availabilities
     )
 
 
-def filter_municipalities(activity, request):
+def filter_municipalities(
+    activity: VacationActivityCollection,
+    request: FeriennetRequest
+) -> list[Link]:
+
     links = [
         filter_link(
             text=municipality,
@@ -240,12 +323,16 @@ def filter_municipalities(activity, request):
         ) for municipality in activity.used_municipalities
     ]
 
-    links.sort(key=lambda l: normalize_for_url(l.text))
+    links.sort(key=lambda l: normalize_for_url(l.text))  # type:ignore
 
     return links
 
 
-def filter_periods(activity, request):
+def filter_periods(
+    activity: VacationActivityCollection,
+    request: FeriennetRequest
+) -> list[Link]:
+
     links = [
         filter_link(
             text=period.title,
@@ -253,24 +340,32 @@ def filter_periods(activity, request):
             url=request.link(activity.for_filter(period_id=period.id))
         ) for period in request.app.periods if period
     ]
-    links.sort(key=lambda l: l.text)
+    links.sort(key=lambda l: l.text)  # type:ignore
 
     return links
 
 
-def filter_own(activity, request):
+def filter_own(
+    activity: VacationActivityCollection,
+    request: FeriennetRequest
+) -> tuple[Link, ...]:
+
+    assert request.current_username is not None
     return (
         filter_link(
-            text=request.translate(_("Own")),
+            text=request.translate(_('Own')),
             active=request.current_username in activity.filter.owners,
             url=request.link(
-                activity.for_filter(owner=request.current_username)
-            )
+                activity.for_filter(owner=request.current_username))
         ),
     )
 
 
-def filter_states(activity, request):
+def filter_states(
+    activity: VacationActivityCollection,
+    request: FeriennetRequest
+) -> tuple[Link, ...]:
+
     return tuple(
         filter_link(
             text=ACTIVITY_STATE_TRANSLATIONS[state],
@@ -280,147 +375,194 @@ def filter_states(activity, request):
     )
 
 
-def period_bound_occasions(activity, request):
-    active_period = request.app.active_period
-
-    if not active_period:
-        return []
-
-    return [o for o in activity.occasions if o.period_id == active_period.id]
-
-
-def activity_ages(activity, request):
-    return tuple(o.age for o in period_bound_occasions(activity, request))
-
-
-def activity_spots(activity, request):
-    if not request.app.active_period:
-        return 0
-
-    if not request.app.active_period.confirmed:
-        return sum(o.max_spots for o in period_bound_occasions(
-            activity, request))
-
-    return sum(o.available_spots for o in period_bound_occasions(
-        activity, request))
-
-
-def activity_min_cost(activity, request):
-    occasions = period_bound_occasions(activity, request)
-
-    if not occasions:
-        return None
-
-    return min(o.total_cost for o in occasions)
-
-
-def activity_max_cost(activity, request):
-    occasions = period_bound_occasions(activity, request)
-
-    if not occasions:
-        return None
-
-    return max(o.total_cost for o in occasions)
-
-
-def is_filtered(filters):
+def is_filtered(filters: dict[str, tuple[str, Sequence[Link]]]) -> bool:
     for links in filters.values():
-        for link in links:
+        for link in links[1]:
             if link.active:
                 return True
 
     return False
 
 
-def adjust_filter_path(filters, suffix):
+def count_active(filter: tuple[str, Sequence[Link]]) -> int:
+    return sum(1 for link in filter[1] if link.active)
+
+
+def adjust_filter_path(
+    filters: dict[str, tuple[str, Sequence[Link]]],
+    suffix: str
+) -> None:
 
     for links in filters.values():
-        for link in links:
-            link.attrs['href'] = link.attrs['ic-get-from'] = \
-                URL(link.attrs['href']).add_path_segment(suffix).as_string()
+        for link in links[1]:
+            link.attrs['href'] = link.attrs['ic-get-from'] = URL(
+                link.attrs['href']).add_path_segment(suffix).as_string()
 
 
-def exclude_filtered_dates(activities, dates):
-    result = []
+def exclude_filtered_dates(
+    activities: VacationActivityCollection,
+    dates: Iterable[OccasionDate]
+) -> list[OccasionDate]:
+
     today = date.today()
-    for dt in dates:
-        if dt.start.date() > today:
-            result.append(dt)
+    return [
+        dt
+        for dt in dates
 
-    dates = result
-    result = []
+        # only include future date ranges
+        if dt.start.date() > today
 
-    if not activities.filter.dateranges:
-        result = dates
-    else:
-        for dt in dates:
-            for s, e in activities.filter.dateranges:
-                if overlaps(dt.start.date(), dt.end.date(), s, e):
-                    result.append(dt)
-                    break
+        # .. that overlap with the selected date ranges
+        #    unless we didn't select any date ranges
+        if not activities.filter.dateranges or any(
+            overlaps(dt.start.date(), dt.end.date(), s, e)
+            for s, e in activities.filter.dateranges
+        )
 
-    dates = result
-    result = []
-
-    if not activities.filter.weekdays:
-        result = dates
-    else:
-        for dt in dates:
-            for day in dtrange(dt.start, dt.end):
-                if day.weekday() not in activities.filter.weekdays:
-                    break
-            else:
-                result.append(dt)
-
-    return result
+        # .. and don't contain a weekday that wasn't selected
+        #    unless we didn't select any weekdays
+        if not activities.filter.weekdays or all(
+            day.weekday() in activities.filter.weekdays
+            # NOTE: This is technically quite inefficient for date ranges
+            #       that are longer than a week, but realistically most
+            #       activities will be much shorter than that.
+            for day in dtrange(dt.start, dt.end)
+        )
+    ]
 
 
 @FeriennetApp.html(
     model=VacationActivityCollection,
     template='activities.pt',
     permission=Public)
-def view_activities(self, request):
+def view_activities(
+    self: VacationActivityCollection,
+    request: FeriennetRequest
+) -> RenderData:
+
     active_period = request.app.active_period
     show_activities = bool(active_period or request.is_organiser)
     layout = VacationActivityCollectionLayout(self, request)
 
-    filters = {}
+    filters: dict[str, tuple[str, Sequence[Link]]] = {}
 
     if show_activities:
-        filters['timelines'] = filter_timelines(self, request)
-        filters['tags'] = filter_tags(self, request)
-        filters['durations'] = filter_durations(self, request)
-        filters['ages'] = filter_ages(self, request)
-        filters['price_range'] = filter_price_range(self, request)
+        filters['timelines'] = (_('Occasion'), filter_timelines(self, request))
+        filters['tags'] = (_('Tags'), filter_tags(self, request))
+        filters['durations'] = (_('Duration'), filter_durations(self, request))
+        filters['ages'] = (_('Age'), filter_ages(self, request))
+        filters['price_range'] = (_('Price'),
+                                  filter_price_range(self, request))
 
         if active_period:
-            filters['weeks'] = filter_weeks(self, request)
+            filters['weeks'] = (_('Weeks'), filter_weeks(self, request))
 
-        filters['weekdays'] = filter_weekdays(self, request)
-        filters['available'] = filter_available(self, request)
-        filters['municipalities'] = filter_municipalities(self, request)
+        filters['weekdays'] = (_('Weekdays'), filter_weekdays(self, request))
+        filters['available'] = (_('Free Spots'),
+                                filter_available(self, request))
+        filters['municipalities'] = (_('Municipalities'),
+                                     filter_municipalities(self, request))
 
         if request.is_organiser:
             if request.app.periods:
-                filters['periods'] = filter_periods(self, request)
+                filters['periods'] = (_('Periods'),
+                                      filter_periods(self, request))
 
-            filters['own'] = filter_own(self, request)
-            filters['states'] = filter_states(self, request)
+            filters['own'] = (_('Advanced'), filter_own(self, request))
+            filters['states'] = (_('State'), filter_states(self, request))
 
     filters = {k: v for k, v in filters.items() if v}
+    mobile_filters = {k: v for k, v in copy.deepcopy(filters).items() if v}
+
+    all_sponsors = layout.app.banners(request)
+    main_sponsor = all_sponsors[0]
+    sponsors = all_sponsors[1:len(all_sponsors)]
+
+    activities = list(self.batch) if show_activities else []
+    active_filter = request.params.get('active-filter', None)
+    adjust_filter_path(filters, suffix='filters')
+    adjust_filter_path(mobile_filters, suffix='filters')
 
     return {
-        'activities': self.batch if show_activities else None,
+        'activities': activities,
+        'main_sponsor': main_sponsor,
+        'sponsors': sponsors,
+        'random': random,
         'layout': layout,
-        'title': _("Activities"),
+        'title': _('Activities'),
+        'count_active': count_active,
         'filters': filters,
+        'mobile_filters': mobile_filters,
+        'active_filter': active_filter,
         'filtered': is_filtered(filters),
         'period': active_period,
+        'current_location': request.link(
+            self.by_page_range((0, self.pages[-1]))),
         'activity_ages': activity_ages,
         'activity_min_cost': activity_min_cost,
-        'activity_spots': activity_spots,
-        'current_location': request.link(
-            self.by_page_range((0, self.pages[-1])))
+        'activity_spots': activity_spots
+}
+
+
+@FeriennetApp.html(
+    model=VacationActivityCollection,
+    template='activity-filters.pt',
+    permission=Public,
+    name='filters')
+def view_activity_filters(
+    self: VacationActivityCollection,
+    request: FeriennetRequest
+) -> RenderData | Response:
+
+    if not request.is_xhr:
+        return request.redirect(request.class_link(VacationActivityCollection))
+
+    active_period = request.app.active_period
+    show_activities = bool(active_period or request.is_organiser)
+    layout = VacationActivityCollectionLayout(self, request)
+
+    filters: dict[str, tuple[str, Sequence[Link]]] = {}
+
+    if show_activities:
+        filters['timelines'] = (_('Occasion'), filter_timelines(self,
+                                                                request))
+        filters['tags'] = (_('Tags'), filter_tags(self, request))
+        filters['durations'] = (_('Duration'), filter_durations(self,
+                                                                request))
+        filters['ages'] = (_('Age'), filter_ages(self, request))
+        filters['price_range'] = (_('Price'), filter_price_range(self,
+                                                                 request))
+
+        if active_period:
+            filters['weeks'] = (_('Weeks'), filter_weeks(self, request))
+
+        filters['weekdays'] = (_('Weekdays'), filter_weekdays(self, request))
+        filters['available'] = (_('Free Spots'),
+                                filter_available(self, request))
+        filters['municipalities'] = (_('Municipalities'),
+                                     filter_municipalities(self, request))
+
+        if request.is_organiser:
+            if request.app.periods:
+                filters['periods'] = (_('Periods'),
+                                      filter_periods(self, request))
+
+            filters['own'] = (_('Advanced'), filter_own(self, request))
+            filters['states'] = (_('State'), filter_states(self, request))
+
+    filters = {k: v for k, v in filters.items() if v}
+    mobile_filters = {k: v for k, v in copy.deepcopy(filters).items() if v}
+
+    active_filter = request.params.get('active-filter', None)
+
+    return {
+        'layout': layout,
+        'count_active': count_active,
+        'filters': filters,
+        'mobile_filters': mobile_filters,
+        'active_filter': active_filter,
+        'filtered': is_filtered(filters),
+        'period': active_period,
     }
 
 
@@ -429,26 +571,29 @@ def view_activities(self, request):
     name='json',
     permission=Public
 )
-def view_activities_as_json(self, request):
+def view_activities_as_json(
+    self: VacationActivityCollection,
+    request: FeriennetRequest
+) -> JSON_ro:
 
     self.filter.states = {'accepted'}
 
     active_period = request.app.active_period
 
-    def image(activity):
+    def image(activity: VacationActivity) -> JSON_ro:
         url = (activity.meta or {}).get('thumbnail')
         return {
             'thumbnail': url,
             'full': url.replace('/thumbnail', '') if url else None
         }
 
-    def age(activity):
+    def age(activity: VacationActivity) -> JSON_ro:
         ages = activity_ages(activity, request)
         min_age = min(age.lower for age in ages) if ages else None
         max_age = max(age.upper - 1 for age in ages) if ages else None
         return {'min': min_age, 'max': max_age}
 
-    def cost(activity):
+    def cost(activity: VacationActivity) -> JSON_ro:
         min_cost = activity_min_cost(activity, request)
         max_cost = activity_max_cost(activity, request)
         return {
@@ -456,7 +601,7 @@ def view_activities_as_json(self, request):
             'max': float(max_cost) if max_cost is not None else 0.0
         }
 
-    def dates(activity):
+    def dates(activity: VacationActivity) -> JSON_ro:
         occasion_dates = []
         for occasion in activity.occasions:
             for occasion_date in occasion.dates:
@@ -470,17 +615,23 @@ def view_activities_as_json(self, request):
                 })
         return occasion_dates
 
-    def zip_code(activity):
+    def zip_code(activity: VacationActivity) -> int | None:
         match = search(r'(\d){4}', activity.location or '')
         return int(match.group()) if match else None
 
-    def coordinates(activity):
+    def coordinates(activity: VacationActivity) -> JSON_ro:
         lat = activity.coordinates.lat if activity.coordinates else None
         lon = activity.coordinates.lon if activity.coordinates else None
         return {'lat': lat, 'lon': lon}
 
-    def tags(activity):
-        durations = sum({o.duration for o in activity.occasions})
+    def tags(activity: VacationActivity) -> JSON_ro:
+        period = request.app.active_period
+        period_id = period.id if period else None
+        durations = sum({
+            o.duration
+            for o in activity.occasions
+            if o.period_id == period_id and o.duration is not None
+        })
         return activity.ordered_tags(request, durations)
 
     provider = request.app.org.title
@@ -528,7 +679,11 @@ def view_activities_as_json(self, request):
     template='activities-for-volunteers.pt',
     permission=Public,
     name='volunteer')
-def view_activities_for_volunteers(self, request):
+def view_activities_for_volunteers(
+    self: VacationActivityCollection,
+    request: FeriennetRequest
+) -> RenderData:
+
     if not request.app.show_volunteers(request):
         raise exc.HTTPForbidden()
 
@@ -536,7 +691,8 @@ def view_activities_for_volunteers(self, request):
     show_activities = bool(active_period or request.is_organiser)
 
     layout = VacationActivityCollectionLayout(self, request)
-    layout.breadcrumbs[-1].text = _("Join as a Volunteer")
+    layout.breadcrumbs[-1].text = _('Join as a Volunteer')
+    layout.editbar_links = []
 
     # always limit to activities seeking volunteers
     self.filter.volunteers = {True}
@@ -544,34 +700,66 @@ def view_activities_for_volunteers(self, request):
     # include javascript part
     request.include('volunteer-cart')
 
-    filters = {}
+    filters: dict[str, tuple[str, Sequence[Link]]] = {}
 
     if show_activities:
 
-        filters['tags'] = filter_tags(self, request)
-        filters['durations'] = filter_durations(self, request)
+        filters['tags'] = (_('Tags'), filter_tags(self, request))
+        filters['durations'] = (_('Duration'),
+                                filter_durations(self, request))
 
         if active_period:
-            filters['weeks'] = filter_weeks(self, request)
-            self.filter.period_ids = (active_period.id,)
+            filters['weeks'] = (_('Weeks'), filter_weeks(self, request))
+            self.filter.period_ids = {active_period.id}
 
-        filters['weekdays'] = filter_weekdays(self, request)
-        filters['municipalities'] = filter_municipalities(self, request)
+        filters['weekdays'] = (_('Weekday'), filter_weekdays(self, request))
+        filters['municipalities'] = (_('Municipalities'),
+                                     filter_municipalities(self, request))
 
     filters = {k: v for k, v in filters.items() if v}
+    mobile_filters = {k: v for k, v in copy.deepcopy(filters).items() if v}
+    active_filter = request.params.get('active-filter', None)
     adjust_filter_path(filters, suffix='volunteer')
+    adjust_filter_path(mobile_filters, suffix='volunteer')
+
+    def occasions_for_volunteer(
+        activity: Activity,
+    ) -> list[Occasion]:
+
+        query = OccasionCollection(request.session).query()
+        query = query.filter(Occasion.activity_id == activity.id)
+
+        query = query.join(Occasion.period)
+        query = query.options(contains_eager(Occasion.period))
+
+        query = query.filter(BookingPeriod.active == True)
+        query = query.filter(BookingPeriod.archived == False)
+
+        query = query.order_by(
+            desc(BookingPeriod.active),
+            BookingPeriod.execution_start,
+            Occasion.order)
+
+        return query.all()
+
+    def wants_more_volunteers(need: OccasionNeed) -> bool:
+        needed = need.number.upper - 1
+        current = sum(v.state == 'confirmed' for v in need.volunteers)
+        return current < needed
 
     return {
         'activities': self.batch if show_activities else None,
         'layout': layout,
-        'title': _("Join as a Volunteer"),
+        'title': _('Join as a Volunteer'),
         'filters': filters,
+        'mobile_filters': mobile_filters,
+        'active_filter': active_filter,
+        'count_active': count_active,
         'filtered': is_filtered(filters),
         'period': active_period,
-        'activity_ages': activity_ages,
-        'activity_min_cost': activity_min_cost,
-        'activity_spots': activity_spots,
         'exclude_filtered_dates': exclude_filtered_dates,
+        'occasions_for_volunteer': occasions_for_volunteer,
+        'wants_more_volunteers': wants_more_volunteers,
         'cart_url': request.class_link(VolunteerCart),
         'cart_submit_url': request.class_link(VolunteerCart, name='submit'),
         'cart_action_url': request.class_link(VolunteerCartAction, {
@@ -579,7 +767,10 @@ def view_activities_for_volunteers(self, request):
             'target': 'target',
         }),
         'current_location': request.link(
-            self.by_page_range((0, self.pages[-1])), name='volunteer')
+            self.by_page_range((0, self.pages[-1])), name='volunteer'),
+        'activity_ages': activity_ages,
+        'activity_min_cost': activity_min_cost,
+        'activity_spots': activity_spots
     }
 
 
@@ -587,7 +778,10 @@ def view_activities_for_volunteers(self, request):
     model=VacationActivity,
     template='activity.pt',
     permission=Public)
-def view_activity(self, request):
+def view_activity(
+    self: VacationActivity,
+    request: FeriennetRequest
+) -> RenderData:
 
     session = request.session
     layout = VacationActivityLayout(self, request)
@@ -599,12 +793,12 @@ def view_activity(self, request):
         .filter(Booking.occasion_id.in_(occasion_ids))
     } or set()
 
-    def occasion_links(o):
+    def occasion_links(o: Occasion) -> Iterator[Link]:
 
         if not o.period.archived and (o.period.active or request.is_admin):
-            yield Link(text=_("Edit"), url=request.link(o, name='edit'))
+            yield Link(text=_('Edit'), url=request.link(o, name='edit'))
 
-        yield Link(text=_("Clone"), url=request.link(o, name='clone'))
+        yield Link(text=_('Clone'), url=request.link(o, name='clone'))
 
         title = layout.format_datetime_range(
             o.dates[0].localized_start,
@@ -616,7 +810,7 @@ def view_activity(self, request):
 
         if o.cancelled and not o.period.finalized:
             yield Link(
-                text=_("Reinstate"),
+                text=_('Reinstate'),
                 url=layout.csrf_protected_url(
                     request.link(o, name='reinstate')
                 ),
@@ -626,19 +820,19 @@ def view_activity(self, request):
                             'Do you really want to reinstate "${title}"?',
                             mapping={'title': title}
                         ),
-                        _("Previous attendees need to re-apply"),
-                        _("Reinstate Occasion"),
-                        _("Cancel")
+                        _('Previous attendees need to re-apply'),
+                        _('Reinstate Occasion'),
+                        _('Cancel')
                     ),
                     Intercooler(
-                        request_method="POST",
+                        request_method='POST',
                         redirect_after=request.link(self)
                     )
                 )
             )
         elif o.id in occasion_ids_with_bookings and can_cancel:
             yield Link(
-                text=_("Rescind"),
+                text=_('Rescind'),
                 url=layout.csrf_protected_url(request.link(o, name='cancel')),
                 traits=(
                     Confirm(
@@ -647,47 +841,47 @@ def view_activity(self, request):
                             mapping={'title': title}
                         ),
                         _(
-                            "${count} already accepted bookings will "
-                            "be cancelled", mapping={'count': o.attendee_count}
+                            '${count} already accepted bookings will '
+                            'be cancelled', mapping={'count': o.attendee_count}
                         ),
                         _(
-                            "Rescind Occasion"
+                            'Rescind Occasion'
                         ),
                         _(
-                            "Cancel"
+                            'Cancel'
                         )
                     ),
                     Intercooler(
-                        request_method="POST",
+                        request_method='POST',
                         redirect_after=request.link(self)
                     )
                 )
             )
         elif o.id not in occasion_ids_with_bookings:
             yield Link(
-                text=_("Delete"),
+                text=_('Delete'),
                 url=layout.csrf_protected_url(request.link(o)),
                 traits=(
                     Confirm(
                         _('Do you really want to delete "${title}"?', mapping={
                             'title': title
                         }),
-                        _((
-                            "There are no accepted bookings associated with "
-                            "this occasion, though there might be "
-                            "cancelled/blocked bookings which will be deleted."
-                        )),
-                        _("Delete Occasion"),
-                        _("Cancel")
+                        _(
+                            'There are no accepted bookings associated with '
+                            'this occasion, though there might be '
+                            'cancelled/blocked bookings which will be deleted.'
+                        ),
+                        _('Delete Occasion'),
+                        _('Cancel')
                     ),
                     Intercooler(
-                        request_method="DELETE",
+                        request_method='DELETE',
                         redirect_after=request.link(self)
                     )
                 )
             )
 
-    def show_enroll(occasion):
+    def show_enroll(occasion: Occasion) -> bool:
         if self.state != 'accepted':
             return False
 
@@ -707,6 +901,7 @@ def view_activity(self, request):
         if occasion.period.finalized and not occasion.period.book_finalized:
             return False
 
+        acceptable_phases: tuple[str, ...]
         if occasion.period.finalized and occasion.period.book_finalized:
             acceptable_phases = ('wishlist', 'booking', 'execution', 'payment')
         else:
@@ -718,11 +913,37 @@ def view_activity(self, request):
         if occasion.is_past_deadline(sedate.utcnow()):
             return False
 
-        if occasion.period.wishlist_phase and \
-                occasion.period.is_prebooking_in_past:
+        if (
+            occasion.period.wishlist_phase
+            and occasion.period.is_prebooking_in_past
+        ):
             return False
 
         return True
+
+    phases = []
+    active_period = request.app.active_period
+    text_until = request.translate(_('Until'))
+    text_from = request.translate(_('Starts at'))
+
+    # Booking date
+    if active_period and not active_period.book_finalized:
+        text = text_until
+        date = active_period.booking_end
+        if active_period.is_booking_in_future:
+            text = text_from
+            date = active_period.booking_start
+        phases.append(
+            f'{text} {layout.format_date(date, "date_long")}')
+    # Pre booking date
+    if active_period and not active_period.is_prebooking_in_past:
+        text = text_until
+        date = active_period.prebooking_end
+        if active_period.is_prebooking_in_future:
+            text = text_from
+            date = active_period.prebooking_start
+        phases.append(
+            f'{text} {layout.format_date(date, "date_long")}')
 
     return {
         'layout': layout,
@@ -730,6 +951,15 @@ def view_activity(self, request):
         'activity': self,
         'show_enroll': show_enroll,
         'occasion_links': occasion_links,
+        'occasions_current_period': occasions_by_period(
+            session=session,
+            activity=self,
+            show_inactive=False,
+            show_archived=request.is_admin or (
+                request.is_organiser
+                and self.username == request.current_username
+            )
+        ),
         'occasions_by_period': occasions_by_period(
             session=session,
             activity=self,
@@ -737,8 +967,10 @@ def view_activity(self, request):
             show_archived=request.is_admin or (
                 request.is_organiser
                 and self.username == request.current_username
-            )
+            ),
+            show_only_inactive=True
         ),
+        'phases_date': phases
     }
 
 
@@ -748,9 +980,15 @@ def view_activity(self, request):
     form=get_activity_form_class,
     permission=Private,
     name='new')
-def new_activity(self, request, form):
+def new_activity(
+    self: VacationActivityCollection,
+    request: FeriennetRequest,
+    form: VacationActivityForm
+) -> RenderData | Response:
 
     if form.submitted(request):
+        assert form.title.data is not None
+        assert request.current_username is not None
         activity = self.add(
             title=form.title.data,
             username=request.current_username)
@@ -759,9 +997,12 @@ def new_activity(self, request, form):
 
         return request.redirect(request.link(activity))
 
+    layout = VacationActivityFormLayout(self, request, _('New Activity'))
+    layout.edit_mode = True
+
     return {
-        'layout': VacationActivityFormLayout(self, request, _("New Activity")),
-        'title': _("New Activity"),
+        'layout': layout,
+        'title': _('New Activity'),
         'form': form
     }
 
@@ -772,7 +1013,11 @@ def new_activity(self, request, form):
     form=get_activity_form_class,
     permission=Private,
     name='edit')
-def edit_activity(self, request, form):
+def edit_activity(
+    self: VacationActivity,
+    request: FeriennetRequest,
+    form: VacationActivityForm
+) -> RenderData | Response:
 
     if form.submitted(request):
         old_username = self.username
@@ -787,20 +1032,24 @@ def edit_activity(self, request, form):
             if ticket:
 
                 # ..note the change
-                ActivityMessage.create(ticket, request, 'reassign', {
-                    'old_username': old_username,
-                    'new_username': new_username,
-                })
+                ActivityMessage.create(
+                    ticket, request, 'reassign',
+                    old_username=old_username,
+                    new_username=new_username
+                )
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return request.redirect(request.link(self))
 
     elif not request.POST:
         form.process(obj=self)
 
+    layout = VacationActivityFormLayout(self, request, _('Edit Activity'))
+    layout.edit_mode = True
+
     return {
-        'layout': VacationActivityFormLayout(self, request, self.title),
+        'layout': layout,
         'title': self.title,
         'form': form
     }
@@ -810,7 +1059,10 @@ def edit_activity(self, request, form):
     model=VacationActivity,
     permission=Private,
     request_method='DELETE')
-def discard_activity(self, request):
+def discard_activity(
+    self: VacationActivity,
+    request: FeriennetRequest
+) -> None:
 
     request.assert_valid_csrf_token()
 
@@ -822,11 +1074,11 @@ def discard_activity(self, request):
 
     activities = VacationActivityCollection(
         request.session,
-        request.identity
+        identity=request.identity
     )
     activities.delete(self)
 
-    request.success(_("The activity was discarded"))
+    request.success(_('The activity was discarded'))
 
 
 @FeriennetApp.view(
@@ -834,8 +1086,12 @@ def discard_activity(self, request):
     permission=Private,
     name='propose',
     request_method='POST')
-def propose_activity(self, request):
-    assert request.app.active_period, "An active period is required"
+def propose_activity(
+    self: VacationActivity,
+    request: FeriennetRequest
+) -> None:
+
+    assert request.app.active_period, 'An active period is required'
 
     # if the latest request has been done in the last minute, this is a
     # duplicate and should be ignored
@@ -850,17 +1106,18 @@ def propose_activity(self, request):
         self.propose()
 
         publication_request = self.create_publication_request(
-            request.app.active_period)
+            request.app.active_period.materialize(request.session))
 
         ticket = TicketCollection(session).open_ticket(
-            handler_code='FER', handler_id=publication_request.id.hex
+            handler_code='FER',
+            handler_id=publication_request.id.hex
         )
-        TicketMessage.create(ticket, request, 'opened')
+        TicketMessage.create(ticket, request, 'opened', 'external')
 
     send_ticket_mail(
         request=request,
         template='mail_ticket_opened.pt',
-        subject=_("Your ticket has been opened"),
+        subject=_('Your ticket has been opened'),
         receivers=(self.username, ),
         ticket=ticket,
         force=(
@@ -872,7 +1129,7 @@ def propose_activity(self, request):
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened_info.pt',
-            subject=_("New ticket"),
+            subject=_('New ticket'),
             ticket=ticket,
             receivers=(request.email_for_new_tickets, ),
             content={
@@ -880,10 +1137,20 @@ def propose_activity(self, request):
             }
         )
 
-    request.success(_("Thank you for your proposal!"))
+    request.app.send_websocket(
+        channel=request.app.websockets_private_channel,
+        message={
+            'event': 'browser-notification',
+            'title': request.translate(_('New ticket')),
+            'created': ticket.created.isoformat()
+        },
+        groupids=request.app.groupids_for_ticket(ticket),
+    )
+
+    request.success(_('Thank you for your proposal!'))
 
     @request.after
-    def redirect_intercooler(response):
+    def redirect_intercooler(response: Response) -> None:
         response.headers.add('X-IC-Redirect', request.link(ticket, 'status'))
 
     # do not redirect here, intercooler doesn't deal well with that...
@@ -895,14 +1162,17 @@ def propose_activity(self, request):
     permission=Secret,
     name='accept',
     request_method='POST')
-def accept_activity(self, request):
+def accept_activity(
+    self: VacationActivity,
+    request: FeriennetRequest
+) -> None:
 
     return administer_activity(
         model=self,
         request=request,
         action='accept',
         template='mail_activity_accepted.pt',
-        subject=_("Your activity has been published")
+        subject=_('Your activity has been published')
     )
 
 
@@ -911,14 +1181,17 @@ def accept_activity(self, request):
     permission=Secret,
     name='archive',
     request_method='POST')
-def archive_activity(self, request):
+def archive_activity(
+    self: VacationActivity,
+    request: FeriennetRequest
+) -> None:
 
     return administer_activity(
         model=self,
         request=request,
         action='archive',
         template='mail_activity_archived.pt',
-        subject=_("Your activity has been archived")
+        subject=_('Your activity has been archived')
     )
 
 
@@ -927,31 +1200,46 @@ def archive_activity(self, request):
     permission=Personal,
     name='offer-again',
     request_method='POST')
-def offer_activity_again(self, request):
+def offer_activity_again(
+    self: VacationActivity,
+    request: FeriennetRequest
+) -> None:
+
     assert self.state in ('archived', 'preview')
 
     if self.state == 'archived':
         self.state = 'preview'
 
     @request.after
-    def redirect_intercooler(response):
+    def redirect_intercooler(response: Response) -> None:
         response.headers.add('X-IC-Redirect', request.link(self, 'edit'))
 
 
-def relevant_ticket(activity, request):
-    pr = activity.request_by_period(request.app.active_period) \
-        or activity.latest_request
+def relevant_ticket(
+    activity: VacationActivity,
+    request: FeriennetRequest
+) -> Ticket | None:
+
+    pr = (activity.request_by_period(request.app.active_period)
+          or activity.latest_request)
 
     if pr:
         return TicketCollection(request.session).by_handler_id(pr.id.hex)
+    return None
 
 
-def administer_activity(model, request, action, template, subject):
+def administer_activity(
+    model: VacationActivity,
+    request: FeriennetRequest,
+    action: str,
+    template: str,
+    subject: str
+) -> None:
+
     ticket = relevant_ticket(model, request)
-
     if not ticket:
         raise RuntimeError(
-            f"No ticket found for {model.name}, when performing {action}")
+            f'No ticket found for {model.name}, when performing {action}')
 
     # execute state change
     getattr(model, action)()
@@ -971,7 +1259,7 @@ def administer_activity(model, request, action, template, subject):
     ActivityMessage.create(ticket, request, action)
 
     @request.after
-    def redirect_intercooler(response):
+    def redirect_intercooler(response: Response) -> None:
         response.headers.add('X-IC-Redirect', request.link(ticket))
 
     # do not redirect here, intercooler doesn't deal well with that...

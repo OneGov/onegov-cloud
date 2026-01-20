@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import errno
 import logging
 import os
@@ -70,13 +72,15 @@ MAX_SEND_TIME = 60 * 60 * 3
 
 class MailQueueProcessor:
 
-    def __init__(self, *paths, limit=None):
+    def __init__(self, *paths: str, limit: int | None = None):
         self.paths = paths
         self.limit = limit
 
-    def split(self, filename):
+    def split(self, filename: str) -> tuple[str, str, str]:
         """ Returns the path, the name and the suffix of the given path. """
 
+        # FIXME: rpartition seems better here, also we should probably
+        #        use `os.path.sep` instead of hardcoding `/`
         if '/' in filename:
             path, name = filename.rsplit('/', 1)
         else:
@@ -90,7 +94,7 @@ class MailQueueProcessor:
 
         return path, name, suffix
 
-    def message_files(self):
+    def message_files(self) -> tuple[str, ...]:
         """ Returns a tuple of full paths that need processing.
 
         The file names in the directory usually look like this:
@@ -110,11 +114,15 @@ class MailQueueProcessor:
         for path in self.paths:
             for f in os.scandir(path):
 
-                if not f.is_file:
+                if not f.is_file():
                     continue
 
                 # ignore .sending- .rejected-  files
                 if f.name.startswith('.'):
+                    continue
+
+                # ignore .tmp files created by safe_move
+                if f.name.endswith('.tmp'):
                     continue
 
                 files.append(os.path.join(path, f))
@@ -123,20 +131,20 @@ class MailQueueProcessor:
 
         return tuple(files)
 
-    def send(self, filename, payload):
+    def send(self, filename: str, payload: str) -> bool:
         """ Sends the mail and returns success as bool """
         raise NotImplementedError()
 
-    def parse(self, filename):
+    def parse(self, filename: str) -> str:
         # NOTE: For now we don't perform any validation, since it would
         #       be pretty expensive for large batches, Postmark will
         #       complain if we send them garbage
         #       But if we ever decide we want to perform some offline
         #       validation anyways, we can do it in here.
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             return f.read()
 
-    def send_messages(self):
+    def send_messages(self) -> None:
         sent = 0
         for filename in self.message_files():
             if self.send_message(filename):
@@ -150,7 +158,7 @@ class MailQueueProcessor:
             if self.limit and sent >= self.limit:
                 break
 
-    def send_message(self, filename):
+    def send_message(self, filename: str) -> bool:
         head, tail = os.path.split(filename)
         tmp_filename = os.path.join(head, f'.sending-{tail}')
         rejected_filename = os.path.join(head, f'.rejected-{tail}')
@@ -240,14 +248,14 @@ class MailQueueProcessor:
             # and maybe will try again.
             status = self.send(filename, payload)
             if status is True:
-                log.info(f"Mail batch {filename} sent.")
+                log.info(f'Mail batch {filename} sent.')
             elif status is False:
                 os.link(filename, failed_filename)
         else:
             # this should cause stderr output, which
             # will write the cronjob output to chat
             log.error(
-                f"Discarding mail batch {filename} due to invalid payload"
+                f'Discarding mail batch {filename} due to invalid payload'
             )
             os.link(filename, rejected_filename)
 

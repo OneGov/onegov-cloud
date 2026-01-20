@@ -1,7 +1,15 @@
+from __future__ import annotations
+
 import os
 
 from onegov.foundation import BaseTheme
 from onegov.core.utils import module_path
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
 
 HELVETICA = '"Helvetica Neue", Helvetica, Roboto, Arial, sans-serif !default;'
 ARIAL = 'Arial, sans-serif !default;'
@@ -28,11 +36,11 @@ class OrgTheme(BaseTheme):
     _force_compile = False
 
     @property
-    def default_options(self):
+    def default_options(self) -> dict[str, Any]:
         return user_options
 
     @property
-    def foundation_components(self):
+    def foundation_components(self) -> Sequence[str]:
         return (
             'grid',
             'accordion',
@@ -60,47 +68,46 @@ class OrgTheme(BaseTheme):
             'tooltips',
             'top-bar',
             'type',
-            'visibility',
+            'visibility'
         )
 
     @property
-    def pre_imports(self):
-        imports = [
+    def pre_imports(self) -> list[str]:
+        return [
             'foundation-mods',
+            *self.additional_font_families
         ]
-        for font_family in self.additional_font_families:
-            imports.append(font_family)
-        return imports
 
     @property
-    def post_imports(self):
+    def post_imports(self) -> list[str]:
         return [
             'org',
-            'chosen'
+            'chosen',
+            'bar-graph'
         ]
 
     @property
-    def extra_search_paths(self):
+    def extra_search_paths(self) -> list[str]:
         return [
             module_path('onegov.org.theme', 'styles'),
             self.font_search_path
         ]
 
     @property
-    def font_search_path(self):
+    def font_search_path(self) -> str:
         """ Load fonts of the current theme folder and ignore fonts from
         parent applications if OrgTheme is inherited. """
         module = self.name.replace('foundation', 'theme')
         return module_path(module, 'fonts')
 
     @property
-    def font_families(self):
+    def font_families(self) -> dict[str, str]:
         families = default_font_families.copy()
         families.update(self.additional_font_families)
         return families
 
     @property
-    def additional_font_families(self):
+    def additional_font_families(self) -> dict[str, str]:
         """ Returns the filenames as they are to use as label in the settings
         as well as to construct the font-family string.
         Only sans-serif fonts are supported by now.
@@ -108,7 +115,7 @@ class OrgTheme(BaseTheme):
         if not os.path.exists(self.font_search_path):
             return {}
 
-        def fn(n):
+        def fn(n: str) -> list[str]:
             return n.split('.')
 
         return {

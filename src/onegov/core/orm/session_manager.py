@@ -1,16 +1,47 @@
+from __future__ import annotations
+
 import threading
 import re
 import weakref
 import zope.sqlalchemy
 
 from blinker import Signal
-from onegov.core.cache import lru_cache
+from contextlib import contextmanager
+from functools import lru_cache
 from onegov.core.custom import json
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm.query import Query
 from sqlalchemy_utils.aggregates import manager as aggregates_manager
+
+
+from typing import Any, Self, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from sqlalchemy.engine import Connection, Engine
+    from sqlalchemy.orm.session import Session, SessionTransaction
+
+    _T = TypeVar('_T')
+    _S = TypeVar('_S', bound=Session)
+
+    # FIXME: we can lift this out of type checking context in SQLAlchemy 2.0
+    class ForceFetchQueryClass(Query[_T]):
+        def delete(self, synchronize_session: Any = None) -> int:
+            ...
+
+else:
+
+    class ForceFetchQueryClass(Query):
+        """ Alters the builtin query class, ensuring that the delete query
+        always fetches the data first, which is important for the bulk delete
+        events to get the actual objects affected by the change.
+
+        """
+
+        # FIXME: Make this work again
+        def delete(self, synchronize_session: Any = None) -> int:
+            return super().delete('fetch')
 
 
 # Limits the lifteime of sessions for n seconds. Postgres will automatically
@@ -24,19 +55,10 @@ from sqlalchemy_utils.aggregates import manager as aggregates_manager
 CONNECTION_LIFETIME = 60 * 60
 
 
-class ForceFetchQueryClass(Query):
-    """ Alters the buitlin query class, ensuring that the delete query always
-    fetches the data first, which is important for the bulk delete events
-    to get the actual objects affected by the change.
-
-    """
-
-    # todo: this doesn't work anymore, can we remove this?
-    def delete(self, synchronize_session=None):
-        return super().delete('fetch')
-
-
-def query_schemas(connection, namespace=None):
+def query_schemas(
+    connection: Connection | Engine,
+    namespace: str | None = None
+) -> Iterator[str]:
     """ Yields all schemas or the ones with the given namespace. """
 
     query = text("""
@@ -78,8 +100,14 @@ class SessionManager:
     # holds thread local data
     _thread_bound = threading.local()
 
-    def __init__(self, dsn, base,
-                 engine_config=None, session_config=None, pool_config=None):
+    def __init__(
+        self,
+        dsn: str,
+        base: type[Any],  # FIXME: use DeclarativeBase in SQLAlchemy 2.0
+        engine_config: dict[str, Any] | None = None,  # TODO: TypedDict?
+        session_config: dict[str, Any] | None = None,  # TODO: TypedDict?
+        pool_config: dict[str, Any] | None = None  # TODO: TypedDict?
+    ):
         """ Configures the data source name/dsn/database url and sets up the
         connection to the database.
 
@@ -137,6 +165,20 @@ class SessionManager:
 
         The session manager supports the following signals:
 
+        ``self.on_schema_init``
+
+        Called with the schema and connection when a schema gets first
+        initialized. This allows things like custom search configurations
+        to be created once per schema on startup, since those are not
+        part of the SQLAlchemy metadata.
+
+        ``self.on_transaction_join``
+
+        Called with the schema and session each time a new transaction
+        could be joined on the given session. This helps with creating
+        a `transaction.interfaces.IDataManager` that tracks SQLAlchemy
+        activity per transaction.
+
         ``self.on_insert``
 
         Called with the schema and each object when an insert happens.
@@ -147,9 +189,12 @@ class SessionManager:
 
         ``self.on_delete``
 
-        Called with the scheam and each object when a change happens. Note that
-        because those objects basically do not exist anymore, only the
-        primary keys of those objects contain actual values!
+        Called with the schema, the session and each object when a delete
+        happens. Note that because those objects basically do not exist
+        anymore, only the primary keys of those objects contain actual
+        values! You also can't use `object_session` on these objects.
+        That's why this signal also sends the session the delete happened
+        in for additional context.
 
         Signals abstracts SQLAlchemy ORM events. Since those handle events
         of the Session, only things happening on sessions provided by this
@@ -187,11 +232,11 @@ class SessionManager:
             # handler is strongly referenced and may be used in a closure
             from blinker import ANY
             @mgr.on_delete.connect_via(ANY, weak=False)
-            def on_delete(schema, obj):
+            def on_delete(schema, session, obj):
                 print("Deleted {} @ {}".format(obj, schema))
 
         """
-        assert 'postgres' in dsn, "Onegov only supports Postgres!"
+        assert 'postgres' in dsn, 'Onegov only supports Postgres!'
 
         self.activate()
 
@@ -201,9 +246,13 @@ class SessionManager:
 
         self.dsn = dsn
         self.bases = [base]
-        self.created_schemas = set()
-        self.current_schema = None
+        self.created_schemas: set[str] = set()
+        self.current_schema: str | None = None
 
+        self._ignore_bulk_updates = False
+
+        self.on_schema_init = Signal()
+        self.on_transaction_join = Signal()
         self.on_insert = Signal()
         self.on_update = Signal()
         self.on_delete = Signal()
@@ -213,7 +262,7 @@ class SessionManager:
         # the setuptools entry_points -> modules could advertise what they need
         # and the core would install the extensions the modules require
         self.required_extensions = {'btree_gist', 'hstore', 'unaccent'}
-        self.created_extensions = set()
+        self.created_extensions: set[str] = set()
 
         # override the isolation level in any case, we cannot allow another
         engine_config['isolation_level'] = 'SERIALIZABLE'
@@ -255,7 +304,24 @@ class SessionManager:
         )
         self.register_session(self.session_factory)
 
-    def register_engine(self, engine):
+    @contextmanager
+    def ignore_bulk_updates(self) -> Iterator[Self]:
+        """ Ensures bulk updates don't get blocked when we can't emit
+        update events for each changed object.
+
+        In some cases we know that a bulk update is fine, even if it
+        doesn't fully propagate through our event hooks. This function
+        should only be rarely used however, where the speed increase
+        outweighs the potential synchrocity issues.
+        """
+        previous_state = self._ignore_bulk_updates
+        self._ignore_bulk_updates = True
+        try:
+            yield self
+        finally:
+            self._ignore_bulk_updates = previous_state
+
+    def register_engine(self, engine: Engine) -> None:
         """ Takes the given engine and registers it with the schema
         switching mechanism. Maybe used to register external engines with
         the session manager.
@@ -265,16 +331,21 @@ class SessionManager:
 
         """
 
-        @event.listens_for(engine, "before_cursor_execute")
-        def activate_schema(connection, cursor, *args, **kwargs):
+        @event.listens_for(engine, 'before_cursor_execute')  # type:ignore[untyped-decorator]
+        def activate_schema(
+            connection: Connection,
+            cursor: Any,
+            *args: Any,
+            **kwargs: Any
+        ) -> None:
             """ Share the 'info' dictionary of Session with Connection
             objects.
 
             """
 
             # execution options have priority!
-            if 'schema' in connection._execution_options:
-                schema = connection._execution_options['schema']
+            if 'schema' in connection._execution_options:  # type:ignore
+                schema = connection._execution_options['schema']  # type:ignore
             else:
                 if 'session' in connection.info:
                     schema = connection.info['session'].info['schema']
@@ -282,28 +353,27 @@ class SessionManager:
                     schema = None
 
             if schema is not None:
-                cursor.execute("SET search_path TO %s, extensions", (schema, ))
+                cursor.execute('SET search_path TO %s, extensions', (schema, ))
 
-        @event.listens_for(engine, "before_cursor_execute")
-        def limit_session_lifetime(connection, cursor, *args, **kwargs):
+        @event.listens_for(engine, 'before_cursor_execute')  # type:ignore[untyped-decorator]
+        def limit_session_lifetime(
+            connection: Connection,
+            cursor: Any,
+            *args: Any,
+            **kwargs: Any
+        ) -> None:
             """ Kills idle sessions after a while, freeing up memory. """
 
             cursor.execute(
-                "SET SESSION idle_in_transaction_session_timeout = %s",
+                'SET SESSION idle_in_transaction_session_timeout = %s',
                 (f'{CONNECTION_LIFETIME}s', )
             )
 
-    def register_session(self, session):
+    def register_session(self, session: Session) -> None:
         """ Takes the given session and registers it with zope.sqlalchemy and
         various orm events.
 
         """
-
-        signals = (
-            (self.on_insert, lambda session: session.new),
-            (self.on_update, lambda session: session.dirty),
-            (self.on_delete, lambda session: session.deleted)
-        )
 
         # SQLAlchemy-Utils' aggregates decorator doesn't work correctly
         # with our sessions - we need to setup the appropriate event handler
@@ -321,7 +391,9 @@ class SessionManager:
         cache_size = min(len(aggregates_manager.generator_registry), 32)
 
         @lru_cache(cache_size)
-        def prevent_bulk_changes_on_aggregate_modules(module_class):
+        def prevent_bulk_changes_on_aggregate_modules(
+            module_class: type[Any]
+        ) -> None:
             for registered in aggregates_manager.generator_registry:
                 assert not issubclass(module_class, registered), """
                     Bulk queries run on models that use sqlalchemy-utils
@@ -329,15 +401,27 @@ class SessionManager:
                     to have both aggregates and bulk updates/deletes.
                 """
 
-        @event.listens_for(session, 'after_flush')
-        def on_after_flush(session, flush_context):
-            for signal, get_objects in signals:
-                if signal.receivers:
-                    for obj in get_objects(session):
-                        signal.send(self.current_schema, obj=obj)
+        @event.listens_for(session, 'after_flush')  # type:ignore[untyped-decorator]
+        def on_after_flush(
+            session: Session,
+            flush_context: Any
+        ) -> None:
+            if self.on_insert.receivers:
+                for obj in session.new:
+                    self.on_insert.send(self.current_schema, obj=obj)
+            if self.on_update.receivers:
+                for obj in session.dirty:
+                    self.on_update.send(self.current_schema, obj=obj)
+            if self.on_delete.receivers:
+                for obj in session.deleted:
+                    self.on_delete.send(
+                        self.current_schema, session=session, obj=obj)
 
-        @event.listens_for(session, 'after_bulk_update')
-        def on_after_bulk_update(update_context):
+        @event.listens_for(session, 'after_bulk_update')  # type:ignore[untyped-decorator]
+        def on_after_bulk_update(update_context: Any) -> None:
+            if self._ignore_bulk_updates:
+                return
+
             prevent_bulk_changes_on_aggregate_modules(
                 update_context.mapper.class_)
 
@@ -354,22 +438,49 @@ class SessionManager:
                 for obj in update_context.query:
                     self.on_update.send(self.current_schema, obj=obj)
 
-        @event.listens_for(session, 'after_bulk_delete')
-        def on_after_bulk_delete(delete_context):
+        @event.listens_for(session, 'after_bulk_delete')  # type:ignore[untyped-decorator]
+        def on_after_bulk_delete(delete_context: Any) -> None:
             prevent_bulk_changes_on_aggregate_modules(
                 delete_context.mapper.class_)
 
-            assert not self.on_delete.receivers, """
-                Bulk delete does not return the affected rows anymore.
+            if self.on_delete.receivers:
+                # FIXME: Make this work again (we could modify the
+                #        DELETE to contain a RETURNING primary_key
+                #        and then emit a simpler bulk delete specific
+                #        event that only contains the keys and model
+                #        since we don't need the state of the model
+                #        before it was deleted, we just need to know
+                #        that it was deleted.
+                for row in delete_context.matched_rows:
+                    obj = delete_context.mapper.class_(**{
+                        c.name: v for c, v
+                        in zip(delete_context.mapper.primary_key, row)
+                    })
+                    self.on_delete.send(
+                        self.current_schema,
+                        session=delete_context.session,
+                        obj=obj
+                    )
 
-                It's not possible to use bulk delete such as
-                session.query(Model).delete() together with applications that
-                use ORM signals.
-            """
+        @event.listens_for(session, 'after_begin')  # type: ignore[untyped-decorator]
+        def on_after_begin(
+            session: Session,
+            transaction: SessionTransaction,
+            connection: Connection
+        ) -> None:
+            if self.on_transaction_join.receivers:
+                self.on_transaction_join.send(
+                    self.current_schema, session=session)
+
+        @event.listens_for(session, 'after_attach')  # type: ignore[untyped-decorator]
+        def on_after_attach(session: Session, instance: object) -> None:
+            if self.on_transaction_join.receivers:
+                self.on_transaction_join.send(
+                    self.current_schema, session=session)
 
         zope.sqlalchemy.register(session)
 
-    def activate(self):
+    def activate(self) -> None:
         """ Sets the currently active session_manager - this is basically a
         global variable we require because we hook into the orm/query events
         where we don't know yet which session is going to be used and therefore
@@ -399,7 +510,7 @@ class SessionManager:
 
         self.__class__.set_active(self)
 
-    def deactivate(self):
+    def deactivate(self) -> None:
         """ Sets the currently active session manager to None, if it is equal
         to self.
 
@@ -409,24 +520,28 @@ class SessionManager:
         if active is None:
             return
 
-        if active.__repr__.__self__ is self:
+        if active.__repr__.__self__ is self:  # type:ignore[attr-defined]
             self.set_active(None)
 
     @classmethod
-    def set_active(cls, session_manager):
+    def set_active(cls, session_manager: SessionManager | None) -> None:
         if session_manager:
             cls._thread_bound._active = weakref.proxy(session_manager)
         else:
             cls._thread_bound._active = None
 
     @classmethod
-    def get_active(cls):
+    def get_active(cls) -> SessionManager | None:
         try:
             return cls._thread_bound._active
         except (AttributeError, ReferenceError):
             return None
 
-    def set_locale(self, default_locale, current_locale):
+    def set_locale(
+        self,
+        default_locale: str | None,
+        current_locale: str | None
+    ) -> None:
         """ Sets the default locale and the current locale so it may be
         shared with the translated ORM columns.
 
@@ -438,7 +553,7 @@ class SessionManager:
         self.default_locale = default_locale
         self.current_locale = current_locale
 
-    def _scopefunc(self):
+    def _scopefunc(self) -> tuple[threading.Thread, str | None]:
         """ Returns the scope of the scoped_session used to create new
         sessions. Relies on self.current_schema being set before the
         session is created.
@@ -450,7 +565,7 @@ class SessionManager:
         """
         return (threading.current_thread(), self.current_schema)
 
-    def dispose(self):
+    def dispose(self) -> None:
         """ Closes the connection to the server and cleans up. This only needed
         for testing.
 
@@ -459,7 +574,7 @@ class SessionManager:
         self.engine.dispose()
         self.deactivate()
 
-    def is_valid_schema(self, schema):
+    def is_valid_schema(self, schema: str | None) -> bool:
         """ Returns True if the given schema looks valid enough to be created
         on the database with no danger of SQL injection or other unwanted
         sideeffects.
@@ -480,7 +595,7 @@ class SessionManager:
 
         return self._valid_schema_name.match(schema) and True or False
 
-    def set_current_schema(self, schema):
+    def set_current_schema(self, schema: str) -> None:
         """ Sets the current schema in use. The current schema is then used
         to bind the session to a schema. Note that this can't be done
         in a functional way. We need the current schema to generate a new
@@ -510,7 +625,7 @@ class SessionManager:
 
         self.activate()
 
-    def create_schema(self, schema, validate=True):
+    def create_schema(self, schema: str, validate: bool = True) -> None:
         """ Creates the given schema. If said schema exists, expect this
         method to throw an error. If you use :meth:`set_current_schema`,
         this is invoked automatically if needed. So you usually shouldn't
@@ -532,19 +647,23 @@ class SessionManager:
         conn.execute('CREATE SCHEMA "{}"'.format(schema))
         conn.execute('COMMIT')
 
-    def create_schema_if_not_exists(self, schema, validate=True):
+    def create_schema_if_not_exists(
+        self,
+        schema: str,
+        validate: bool = True
+    ) -> None:
         """ Creates the given schema if it doesn't exist yet. """
         if not self.is_schema_found_on_database(schema):
             self.create_schema(schema, validate)
 
-    def bind_session(self, session):
+    def bind_session(self, session: _S) -> _S:
         """ Bind the session to the current schema. """
         session.info['schema'] = self.current_schema
         session.connection().info['session'] = weakref.proxy(session)
 
         return session
 
-    def session(self):
+    def session(self) -> Session:
         """ Returns a new session or an existing session. Sessions with
         different schemas are kept independent, though they might reuse
         each others connections.
@@ -564,25 +683,25 @@ class SessionManager:
 
         return self.bind_session(self.session_factory())
 
-    def list_schemas(self, namespace=None):
+    def list_schemas(self, namespace: str | None = None) -> list[str]:
         """ Returns a tuple containing *all* schemas defined in the current
         database.
 
         """
         return list(query_schemas(self.engine, namespace))
 
-    def is_schema_found_on_database(self, schema):
+    def is_schema_found_on_database(self, schema: str) -> bool:
         """ Returns True if the given schema exists on the database. """
 
         conn = self.engine.execution_options(schema=None)
         result = conn.execute(text(
-            "SELECT EXISTS(SELECT 1 FROM information_schema.schemata "
-            "WHERE schema_name = :schema)"
+            'SELECT EXISTS(SELECT 1 FROM information_schema.schemata '
+            'WHERE schema_name = :schema)'
         ), schema=schema)
 
         return result.first()[0]
 
-    def create_required_extensions(self):
+    def create_required_extensions(self) -> None:
         """ Creates the required extensions once per lifetime of the manager.
 
         """
@@ -600,7 +719,7 @@ class SessionManager:
                 conn.execute('COMMIT')
                 self.created_extensions.add(ext)
 
-    def ensure_schema_exists(self, schema):
+    def ensure_schema_exists(self, schema: str) -> None:
         """ Makes sure the schema exists on the database. If it doesn't, it
         is created.
 
@@ -631,6 +750,9 @@ class SessionManager:
                     declared_classes.update(
                         base.registry._class_registry.values()
                     )
+
+                if self.on_schema_init.receivers:
+                    self.on_schema_init.send(schema, connection=conn)
 
                 conn.execute('COMMIT')
             finally:

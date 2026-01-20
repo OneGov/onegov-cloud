@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from passlib.hash import bcrypt_sha256
 
 
-def hash_password(password):
+def hash_password(password: str) -> str:
     """ The default password hashing algorithm used by onegov.
 
     Over time the underlying algorithm may change, at which point
@@ -19,13 +21,13 @@ def hash_password(password):
 
     # be sure not to have this issue (some crypt bindings will):
     # blog.ircmaxell.com/2015/03/security-issue-combining-bcrypt-with.html
-    assert "\0" not in password
+    assert '\0' not in password
 
     # like bcrypt, but with the ability to support any password length
     return bcrypt_sha256.hash(password)
 
 
-def verify_password(password, hash):
+def verify_password(password: str, hash: str) -> bool:
     """ Compares a password to a hash and returns true if they match according
     to the hashing algorithm used.
 
@@ -33,6 +35,6 @@ def verify_password(password, hash):
 
     # be sure not to have this issue (some crypt bindings will):
     # blog.ircmaxell.com/2015/03/security-issue-combining-bcrypt-with.html
-    assert "\0" not in password
+    assert '\0' not in password
 
     return bcrypt_sha256.verify(password, hash)

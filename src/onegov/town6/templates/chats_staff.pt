@@ -1,0 +1,85 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+
+        <div class="grid-x chat wrapper">
+            <div class="medium-7 cell content">
+                <p i18n:translate="" id="no-chat-open">Currently no chats open.</p>
+                <div id="message-area" style="display:none;" data-staff-name="${user.username}" data-staff-id="${user.id.hex}">
+                    <p class="notification" id="accepted" style="display: none;"><i class="fas fa-info-circle"></i> <span i18n:translate="">You accepted the chat request.</span></p>
+                    <p class="notification" id="loading" style="display: none;"><i class="fas fa-circle-notch fa-spin"></i> <span i18n:translate="">Chat is loading ...</span></p>
+                    <div class="card chat-card" style="display: none;">
+                        <p class="info"></p>
+                        <div class="card-section">
+                            <p></p>
+                        </div>
+                        <p class="info"></p>
+                    </div>
+                </div>
+                <div id="chat-form" style="display:none;">
+                    <textarea id="chat" placeholder="Ihre Nachricht ..." rows="5"></textarea>
+                    <button id="send" class="button">Senden</button>
+                </div>
+                <form id="chat-actions" style="display:none;" method="POST">
+                    <tal:b repeat="fieldset form.fieldsets">
+                        <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
+                            <legend>${fieldset.label}</legend>
+                            <div class="formfields" tal:define="form_two_columns form_two_columns|False">
+                                <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
+                            </div>
+                        </fieldset>
+                        <tal:b condition="not:fieldset.is_visible">
+                            <div class="formfields" tal:define="form_two_columns form_two_columns|False">
+                                <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
+                            </div>
+                        </tal:b>
+                    </tal:b>
+                    <button name="chat-action" value="end-chat" type="submit" id="end-chat" class="button hollow" i18n:translate="">End and archive chat</button>
+                    <button name="chat-action" value="create-ticket" type="submit" id="create-ticket" class="button hollow" i18n:translate="">Create ticket</button>
+                </form>
+            </div>
+
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel">
+                        <h3 i18n:translate="">Chat requests</h3>
+                        <p id="no-request" style="display: ${'none' if open_requests else 'block'}" i18n:translate="">Currently no new chat requests.</p>
+                        <ul class="more-list" id="request-list">
+                            <li style="display: none;" id="new-request" class="open-request">
+                                <a class="list-link" href="#"><span class="blob"></span><span class="list-title"></span></a>
+                                <p class="list-lead preview"></p>
+                            </li>
+                            <tal:b tal:repeat="request open_requests">
+                                <li class="open-request" data-request-id="${request.id.hex}" data-user="${request.customer_name}" id="request-${request.id.hex}">
+                                    <a class="list-link" href="#"><span class="blob"></span><span class="list-title">${request.customer_name}</span></a>
+                                    <p class="list-lead preview">${request.topic}</p>
+                                </li>
+                            </tal:b>
+                        </ul>
+                    </div>
+                    <div class="side-panel">
+                        <h3 i18n:translate="">Active Chats</h3>
+                        <p style="display: ${'none' if active_chats else ''}" id="no-active-chats" i18n:translate="">No active chats.</p>
+                        <ul class="more-list" id="active-chat-list">
+                            <li class="active-chat" id="new-active-chat" style="display:none;">
+                                <a class="list-link" href="#">
+                                    <span class="blob"></span><span class="list-title"></span>
+                                </a>
+                            </li>
+                            <tal:b tal:repeat="chat active_chats">
+                                <li class="active-chat" data-chat-id="${chat.id.hex}" id="active-chat-${chat.id.hex}" tal:define="last_message chat.chat_history[-1]">
+                                    <a class="list-link" href="#">
+                                        <span style="display: ${'' if last_message['userId'] == 'customer' else 'none'}" class="blob"></span><span class="list-title">${chat.customer_name}</span>
+                                    </a>
+                                </li>
+                            </tal:b>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </tal:b>
+</div>

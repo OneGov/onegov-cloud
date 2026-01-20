@@ -1,10 +1,17 @@
+from __future__ import annotations
+
 from onegov.core.orm.types import UTCDateTime
 from sedate import utcnow
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import func
-from sqlalchemy.orm import deferred
 from sqlalchemy.schema import Column
 from sqlalchemy.ext.hybrid import hybrid_property
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import datetime
+    from sqlalchemy.sql.elements import ClauseElement
 
 
 class TimestampMixin:
@@ -16,26 +23,39 @@ class TimestampMixin:
     """
 
     @staticmethod
-    def timestamp():
+    def timestamp() -> datetime:
         return utcnow()
 
-    def force_update(self):
+    def force_update(self) -> None:
         """ Forces the model to update by changing the modified parameter. """
         self.modified = self.timestamp()
 
-    @declared_attr
-    def created(cls):
-        return deferred(Column(UTCDateTime, default=cls.timestamp))
+    if TYPE_CHECKING:
+        # FIXME: With SQLAlchemy 2.0 there is probably better support
+        #        for type checking hybrid_properties/declared_attr, until
+        #        then we have to pretend they are Columns in order for
+        #        type checking to do the right thing, we still want
+        #        to type check the implementation though, hence the
+        #        `type:ignore[no-redef]` below, rather than putting
+        #        the definitions inside the else block
+        created: Column[datetime]
+        modified: Column[datetime | None]
+        last_change: Column[datetime]
 
-    @declared_attr
-    def modified(cls):
-        return deferred(Column(UTCDateTime, onupdate=cls.timestamp))
+    @declared_attr  # type:ignore[no-redef]
+    def created(cls) -> Column[datetime]:
+        # FIXME: This probably should have been nullable=False
+        return Column(UTCDateTime, default=cls.timestamp)
 
-    @hybrid_property
-    def last_change(self):
+    @declared_attr  # type:ignore[no-redef]
+    def modified(cls) -> Column[datetime | None]:
+        return Column(UTCDateTime, onupdate=cls.timestamp)
+
+    @hybrid_property  # type:ignore[no-redef]
+    def last_change(self) -> datetime:
         """ Returns the self.modified if not NULL, else self.created. """
         return self.modified or self.created
 
-    @last_change.expression
-    def last_change(cls):
+    @last_change.expression  # type:ignore[no-redef]
+    def last_change(cls) -> ClauseElement:
         return func.coalesce(cls.modified, cls.created)

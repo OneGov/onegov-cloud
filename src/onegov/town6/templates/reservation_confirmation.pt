@@ -31,7 +31,7 @@
                     tal:define="payment_method layout.model.payment_method; show_privacy_settings form is not None">
 
                     <tal:b metal:fill-slot="after-submit">
-                        <a href="${edit_link}" class="button secondary" i18n:translate>Edit</a>
+                        <a href="${edit_link}" class="button-clear" i18n:translate="">Edit</a>
                     </tal:b>
                 </tal:b>
             </div>

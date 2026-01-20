@@ -1,0 +1,9 @@
+.ticker-item {
+    &.scheduled {
+        display: none;
+    }
+
+    &.draft {
+        display: none;
+    }
+}

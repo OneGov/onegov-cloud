@@ -1,41 +1,50 @@
-from onegov.core.orm.abstract import MoveDirection
-from onegov.core.utils import Bunch
-from onegov.page import PageCollection
+from __future__ import annotations
+
+from onegov.page import Page, PageCollection
 
 
-class AdjacencyListMove:
+from typing import Generic, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm.abstract import (
+        AdjacencyList, AdjacencyListCollection, MoveDirection)
+    from sqlalchemy.orm import Session
+
+
+_L = TypeVar('_L', bound='AdjacencyList')
+
+
+class AdjacencyListMove(Generic[_L]):
     """ Represents a single move of an adjacency list item. """
 
-    def __init__(self, session, subject, target, direction):
+    __collection__: type[AdjacencyListCollection[_L]]
+
+    def __init__(
+        self,
+        session: Session,
+        subject: _L,
+        target: _L,
+        direction: MoveDirection
+    ) -> None:
         self.session = session
         self.subject = subject
         self.target = target
         self.direction = direction
 
-    @classmethod
-    def for_url_template(cls):
-        return cls(
-            session=None,
-            subject=Bunch(id='{subject_id}'),
-            target=Bunch(id='{target_id}'),
-            direction='{direction}'
-        )
-
     @property
-    def subject_id(self):
+    def subject_id(self) -> int:
         return self.subject.id
 
     @property
-    def target_id(self):
+    def target_id(self) -> int:
         return self.target.id
 
-    def execute(self):
+    def execute(self) -> None:
         self.__collection__(self.session).move(
             subject=self.subject,
             target=self.target,
-            direction=getattr(MoveDirection, self.direction)
+            direction=self.direction
         )
 
 
-class PageMove(AdjacencyListMove):
+class PageMove(AdjacencyListMove[Page]):
     __collection__ = PageCollection

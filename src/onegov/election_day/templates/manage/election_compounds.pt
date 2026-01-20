@@ -18,7 +18,7 @@
                     </div>
                 </div>
 
-                <div metal:use-macro="layout.macros['years-dropdown']" />
+                <div metal:use-macro="layout.macros['redirect-filters']"/>
 
                 <p tal:condition="not:groups" i18n:translate>
                     No compounds yet.
@@ -38,7 +38,7 @@
                             <tal:block tal:repeat="compound group[1]">
                                 <tr tal:attributes="class python: 'divider' if repeat.compound.end else ''">
                                     <td>${compound.title}</td>
-                                    <td><span class="shortcode" tal:condition="compound.shortcode">${compound.shortcode}</span></td>
+                                    <td>${compound.shortcode}</td>
                                     <td>${layout.format_date(compound.date, 'date')}</td>
                                     <td class="right-aligned"><div metal:use-macro="layout.macros['election-compound-actions']" /></td>
                                 </tr>

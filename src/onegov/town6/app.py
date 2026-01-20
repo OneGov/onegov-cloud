@@ -1,81 +1,133 @@
+from __future__ import annotations
+
+from datetime import datetime
+
+import pytz
+from sedate import replace_timezone
+
+from onegov.api import ApiApp
 from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
+from onegov.core.templates import render_template
 from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
+from onegov.org.app import OrgApp
+from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.models.directory import ExtendedDirectory
+from onegov.town6.api import (
+    EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint,
+    DirectoryEntryApiEndpoint)
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs, \
-    OrgApp, org_content_security_policy
 from onegov.town6.theme import TownTheme
+from webob import Response
 
 
-class TownApp(OrgApp, FoundationApp):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator, Sequence
+    from onegov.api import ApiEndpoint
+    from onegov.core.types import RenderData
+    from onegov.org.exceptions import MTANAccessLimitExceeded
+    from onegov.org.models import Organisation
+    from onegov.town6.request import TownRequest
 
-    def configure_organisation(self, **cfg):
-        cfg.setdefault('enable_user_registration', False)
-        cfg.setdefault('enable_yubikey', True)
-        super().configure_organisation(**cfg)
+
+class TownApp(OrgApp, FoundationApp, ApiApp):
+
+    def configure_organisation(
+        self,
+        *,
+        enable_user_registration: bool = False,
+        enable_yubikey: bool = True,
+        disable_password_reset: bool = False,
+        **cfg: Any
+    ) -> None:
+        super().configure_organisation(
+            enable_user_registration=enable_user_registration,
+            enable_yubikey=enable_yubikey,
+            disable_password_reset=disable_password_reset,
+            **cfg
+        )
 
     @property
-    def font_family(self):
+    def font_family(self) -> str | None:
         return self.theme_options.get('body-font-family-ui')
 
-
-@TownApp.setting(section='content_security_policy', name='default')
-def town_content_security_policy():
-    policy = org_content_security_policy()
-    policy.child_src.add('https://dialog.scoutsss.com/')
-    policy.child_src.add('https://business.scoutsss.com/')
-    policy.img_src.add('https://business.scoutsss.com/')
-    return policy
+    def chat_open(self, request: TownRequest) -> bool:
+        if not request.app.org.specific_opening_hours:
+            return True
+        opening_hours = request.app.org.opening_hours_chat
+        tz = pytz.timezone('Europe/Zurich')
+        now = datetime.now(tz=tz)
+        if opening_hours:
+            for day, start, end in opening_hours:
+                if str(now.weekday()) == day:
+                    open = replace_timezone(
+                        datetime(now.year, now.month, now.day,
+                                 int(start.split(':')[0]),
+                                 int(start.split(':')[1])), tz)
+                    close = replace_timezone(
+                        datetime(now.year, now.month, now.day,
+                                 int(end.split(':')[0]),
+                                 int(end.split(':')[1])), tz)
+                    if now > open and now < close:
+                        return True
+        return False
 
 
 @TownApp.webasset_path()
-def get_shared_assets_path():
+def get_shared_assets_path() -> str:
     return utils.module_path('onegov.shared', 'assets/js')
 
 
 @TownApp.static_directory()
-def get_static_directory():
+def get_static_directory() -> str:
     return 'static'
 
 
 @TownApp.template_directory()
-def get_template_directory():
+def get_template_directory() -> str:
     return 'templates'
 
 
 @TownApp.template_variables()
-def get_template_variables(request):
+def get_template_variables(request: TownRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request))
     }
 
 
 @TownApp.setting(section='core', name='theme')
-def get_theme():
+def get_theme() -> TownTheme:
     return TownTheme()
 
 
 @TownApp.setting(section='i18n', name='locales')
-def get_i18n_used_locales():
+def get_i18n_used_locales() -> set[str]:
     return {'de_CH', 'fr_CH'}
 
 
 @TownApp.setting(section='i18n', name='localedirs')
-def get_i18n_localedirs():
-    return [module_path('onegov.town6', 'locale')] \
-        + get_org_i18n_localedirs()
+def get_i18n_localedirs() -> list[str]:
+    return [
+        module_path('onegov.town6', 'locale'),
+        *get_org_i18n_localedirs()
+    ]
 
 
 @TownApp.setting(section='i18n', name='default_locale')
-def get_i18n_default_locale():
+def get_i18n_default_locale() -> str:
     return 'de_CH'
 
 
 @TownApp.setting(section='i18n', name='locale_negotiator')
-def get_locale_negotiator():
-    def locale_negotiator(locales, request):
+def get_locale_negotiator(
+) -> Callable[[Sequence[str], TownRequest], str | None]:
+    def locale_negotiator(
+        locales: Sequence[str],
+        request: TownRequest
+    ) -> str | None:
         if request.app.org:
             locales = request.app.org.locales or get_i18n_default_locale()
 
@@ -89,40 +141,47 @@ def get_locale_negotiator():
 
 
 @TownApp.setting(section='org', name='create_new_organisation')
-def get_create_new_organisation_factory():
+def get_create_new_organisation_factory(
+) -> Callable[[TownApp, str], Organisation]:
     return create_new_organisation
 
 
 @TownApp.setting(section='org', name='status_mail_roles')
-def get_status_mail_roles():
+def get_status_mail_roles() -> tuple[str, ...]:
     return ('admin', 'editor')
 
 
 @TownApp.setting(section='org', name='ticket_manager_roles')
-def get_ticket_manager_roles():
-    return ('admin', 'editor')
+def get_ticket_manager_roles() -> tuple[str, ...]:
+    return ('admin', 'editor', 'supporter')
 
 
 @TownApp.setting(section='org', name='require_complete_userprofile')
-def get_require_complete_userprofile():
+def get_require_complete_userprofile() -> bool:
     return False
 
 
 @TownApp.setting(section='org', name='is_complete_userprofile')
-def get_is_complete_userprofile_handler():
-    def is_complete_userprofile(request, username):
+def get_is_complete_userprofile_handler(
+) -> Callable[[TownRequest, str], bool]:
+    def is_complete_userprofile(request: TownRequest, username: str) -> bool:
         return True
 
     return is_complete_userprofile
 
 
 @TownApp.setting(section='org', name='default_directory_search_widget')
-def get_default_directory_search_widget():
+def get_default_directory_search_widget() -> None:
+    return None
+
+
+@TownApp.setting(section='org', name='default_event_search_widget')
+def get_default_event_search_widget() -> None:
     return None
 
 
 @TownApp.setting(section='org', name='public_ticket_messages')
-def get_public_ticket_messages():
+def get_public_ticket_messages() -> tuple[str, ...]:
     """ Returns a list of message types which are availble on the ticket
     status page, visible to anyone that knows the unguessable url.
 
@@ -140,23 +199,73 @@ def get_public_ticket_messages():
     )
 
 
+@TownApp.setting(section='org', name='disabled_extensions')
+def get_disabled_extensions() -> tuple[str, ...]:
+    return ()
+
+
+@TownApp.setting(section='org', name='render_mtan_access_limit_exceeded')
+def get_render_mtan_access_limit_exceeded(
+) -> Callable[[MTANAccessLimitExceeded, TownRequest], Response]:
+
+    # circular import
+    from onegov.town6.layout import DefaultLayout
+
+    def render_mtan_access_limit_exceeded(
+        self: MTANAccessLimitExceeded,
+        request: TownRequest
+    ) -> Response:
+        return Response(
+            render_template('mtan_access_limit_exceeded.pt', request, {
+                'layout': DefaultLayout(self, request),
+                'title': self.title,
+            }),
+            status=423
+        )
+    return render_mtan_access_limit_exceeded
+
+
+@TownApp.setting(section='api', name='endpoints')
+def get_api_endpoints_handler(
+) -> Callable[[TownRequest], Iterator[ApiEndpoint[Any]]]:
+
+    def get_api_endpoints(
+            request: TownRequest,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
+    ) -> Iterator[ApiEndpoint[Any]]:
+        yield EventApiEndpoint(request, extra_parameters, page)
+        yield NewsApiEndpoint(request, extra_parameters, page)
+        yield TopicApiEndpoint(request, extra_parameters, page)
+        directories = request.exclude_invisible(
+            request.session.query(ExtendedDirectory).all())
+        for directory in directories:
+            yield DirectoryEntryApiEndpoint(
+                request=request,
+                page=page,
+                name=directory.name,
+                extra_parameters=extra_parameters)
+
+    return get_api_endpoints
+
+
 @TownApp.webasset_path()
-def get_js_path():
+def get_js_path() -> str:
     return 'assets/js'
 
 
 @TownApp.webasset_path()
-def get_css_path():
+def get_css_path() -> str:
     return 'assets/css'
 
 
 @TownApp.webasset_output()
-def get_webasset_output():
+def get_webasset_output() -> str:
     return 'assets/bundles'
 
 
 @TownApp.webasset('common')
-def get_common_asset():
+def get_common_asset() -> Iterator[str]:
     yield 'global.js'
     yield 'polyfills.js'
     yield 'jquery.datetimepicker.css'
@@ -180,12 +289,15 @@ def get_common_asset():
     yield 'jquery.load.js'
     yield 'videoframe.js'
     yield 'datetimepicker.js'
+    yield 'many.jsx'
     yield 'url.js'
     yield 'date-range-selector.js'
     yield 'lazyalttext.js'
     yield 'lazysizes.js'
+    yield 'button-toggler.js'
     yield 'common.js'
     yield '_blank.js'
+    yield 'homepage_video_or_slider.js'
     yield 'animate.js'
     yield 'forms.js'
     yield 'internal_link_check.js'
@@ -194,10 +306,19 @@ def get_common_asset():
     yield 'aos.js'
     yield 'aos-init.js'
     yield 'aos.css'
+    yield 'notifications.js'
+    yield 'sidebar_mobile.js'
+    yield 'sidebar_fixed.js'
+    yield 'ResizeSensor.js'
+    yield 'theia-sticky-sidebar.js'
+    yield 'apply-filters.js'
+    yield 'foundation-intercooler.js'
+    yield 'chosen_select_hierarchy.js'
+    yield 'iframe_request_parameters.js'
 
 
 @TownApp.webasset('editor')
-def get_editor_asset():
+def get_editor_asset() -> Iterator[str]:
     yield 'bufferbuttons.js'
     yield 'definedlinks.js'
     yield 'filemanager.js'
@@ -210,16 +331,28 @@ def get_editor_asset():
     yield 'editor.js'
 
 
-@TownApp.webasset('scoutss-chatbot')
-def get_scoutss_chatbot_assets():
-    yield 'jqueryui.min.js'
-    yield 'scoutss-dialog.js'
-
-
 @TownApp.webasset('fullcalendar')
-def get_fullcalendar_asset():
-    yield 'fullcalendar.css'
+def get_fullcalendar_asset() -> Iterator[str]:
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
+    yield 'fullcalendar.fr.js'
     yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
+
+
+@TownApp.webasset('occupancycalendar')
+def get_occupancycalendar_asset() -> Iterator[str]:
+    yield 'occupancycalendar.jsx'
+    yield 'occupancycalendar_custom.js'
+
+
+@TownApp.webasset('staff-chat')
+def get_staff_chat_asset() -> Iterator[str]:
+    yield 'chat-shared.js'
+    yield 'chat-staff.js'
+
+
+@TownApp.webasset('client-chat')
+def get_staff_client_asset() -> Iterator[str]:
+    yield 'chat-shared.js'
+    yield 'chat-client.js'

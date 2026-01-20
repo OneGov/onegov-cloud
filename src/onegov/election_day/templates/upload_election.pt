@@ -16,7 +16,7 @@
                 Your results were uploaded successfully.
             </div>
 
-            <div tal:condition="layout.principal.notifications and show_trigger|True" class="panel callout">
+            <div tal:condition="show_trigger|True" class="panel callout">
                 <p>
                     <strong><a href="${request.link(election, 'trigger')}" i18n:translate="">Click here to trigger the notifications.</a></strong>
                 </p>

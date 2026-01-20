@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from morepath import redirect
-from onegov.ballot import Election
-from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_summary
@@ -15,24 +17,39 @@ from onegov.election_day.utils.parties import get_party_results
 from sqlalchemy.orm import object_session
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
+    from onegov.core.types import JSONObject
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 @ElectionDayApp.view(
     model=Election,
     request_method='HEAD',
-    permission=Public
+    permission=MaybePublic
 )
-def view_election_head(self, request):
+def view_election_head(
+    self: Election,
+    request: ElectionDayRequest
+) -> None:
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
 
 @ElectionDayApp.html(
     model=Election,
-    permission=Public
+    permission=MaybePublic
 )
-def view_election(self, request):
+def view_election(
+    self: Election,
+    request: ElectionDayRequest
+) -> Response:
 
     """" The main view. """
 
@@ -42,20 +59,25 @@ def view_election(self, request):
 @ElectionDayApp.json(
     model=Election,
     name='json',
-    permission=Public
+    permission=MaybePublic
 )
-def view_election_json(self, request):
+def view_election_json(
+    self: Election,
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" The main view as JSON. """
 
     last_modified = self.last_modified
+    assert last_modified is not None
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
     embed = defaultdict(list)
-    media = {'charts': {}}
+    charts: JSONObject = {}
+    media: JSONObject = {'charts': charts}
     layout = ElectionLayout(self, request)
     layout.last_modified = last_modified
     if layout.pdf_path:
@@ -77,14 +99,16 @@ def view_election_json(self, request):
         if layout.visible:
             embed[tab].append(request.link(self, f'{tab}-chart'))
         if layout.svg_path:
-            media['charts'][tab] = request.link(self, f'{tab}-svg')
+            charts[tab] = request.link(self, f'{tab}-svg')
 
     for tab in ElectionLayout.tabs_with_embedded_tables:
-        embed[tab].append(request.link(self, f'{tab}-table'))
+        layout = ElectionLayout(self, request, tab=tab)
+        if layout.visible and (table_link := layout.table_link()):
+            embed[tab].append(table_link)
 
-    years, parties = get_party_results(self, json_serializable=True)
+    _years, parties = get_party_results(self, json_serializable=True)
 
-    data = {
+    data: JSONObject = {
         'completed': self.completed,
         'date': self.date.isoformat(),
         'domain': self.domain,
@@ -98,7 +122,8 @@ def view_election_json(self, request):
             'total': self.progress[1] or 0
         },
         'related_link': self.related_link,
-        'title': self.title_translations,
+        'title': self.title_translations,  # type:ignore[dict-item]
+        'short_title': self.short_title_translations,  # type:ignore[dict-item]
         'type': 'election',
         'statistics': {
             'total': {
@@ -110,7 +135,7 @@ def view_election_json(self, request):
                 'accounted_votes': self.accounted_votes,
                 'turnout': self.turnout,
             },
-            'entitites': [
+            'entities': [
                 {
                     'eligible_voters': entity.eligible_voters,
                     'received_ballots': entity.received_ballots,
@@ -127,7 +152,7 @@ def view_election_json(self, request):
         },
         'election_type': self.type,
         'url': request.link(self),
-        'embed': embed,
+        'embed': embed,  # type:ignore[dict-item]
         'media': media,
         'data': {
             'json': request.link(self, 'data-json'),
@@ -206,27 +231,35 @@ def view_election_json(self, request):
 @ElectionDayApp.json(
     model=Election,
     name='summary',
-    permission=Public
+    permission=MaybePublic
 )
-def view_election_summary(self, request):
-
+def view_election_summary(
+    self: Election,
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ View the summary of the election as JSON. """
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     return get_election_summary(self, request)
 
 
-@ElectionDayApp.pdf_file(model=Election, name='pdf')
-def view_election_pdf(self, request):
-
+@ElectionDayApp.pdf_file(
+    model=Election,
+    name='pdf',
+    permission=MaybePublic
+)
+def view_election_pdf(
+    self: Election,
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the generated PDF. """
 
     layout = ElectionLayout(self, request)
     return {
         'path': layout.pdf_path,
-        'name': normalize_for_url(self.title)
+        'name': normalize_for_url(self.title or '')
     }

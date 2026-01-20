@@ -3,80 +3,109 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <dl class="field-display">
-            <div>
-                <dt i18n:translate>E-Mail</dt>
-                <dd>
-                    <a href="mailto:${layout.model.username}">${layout.model.username}</a>
-                </dd>
-            </div>
-
-            <div>
-                <dt i18n:translate>State</dt>
-                <dd>
-                    <tal:b condition="layout.model.active">
-                        ✔︎ <span i18n:translate>Active</span>
-                    </tal:b>
-                    <tal:b condition="not: layout.model.active">
-                        ✘︎ <span i18n:translate>Inactive</span>
-                    </tal:b>
-                </dd>
-            </div>
-
-            <div>
-                <dt i18n:translate>Role</dt>
-                <dd>
-                    <metal:b use-macro="layout.macros['role_singular']" tal:define="role layout.model.role" />
-                </dd>
-            </div>
-
-            <div>
-                <dt i18n:translate>Source</dt>
-                <dd tal:condition="layout.model.source">
-                    <metal:b use-macro="layout.macros['user_source']" tal:define="source layout.model.source" /> (${layout.model.source_id})
-                </dd>
-                <dd tal:condition="not: layout.model.source" i18n:translate>
-                    local
-                </dd>
-            </div>
-
-            <div>
-                <dt i18n:translate>User group</dt>
-                <dd>
-                    <tal:block tal:condition="layout.model.group">
-                        ✔︎ <span>${layout.model.group.name}</span>
-                    </tal:block>
-                    <tal:block tal:condition="not layout.model.group">
-                        ✘︎ <span i18n:translate>None</span>
-                    </tal:block>
-                </dd>
-            </div>
-
-            <metal:b use-macro="layout.macros['extra_usermanagement_fields']" tal:define="user layout.model" />
-
-            <hr tal:condition="linkgroups">
-
-            <div class="linkgroup" tal:repeat="group linkgroups">
-                <dt>${group.title}</dt>
-                <dd>
-                    <div tal:condition="not:group.links" i18n:translate>
-                        No links found.
+        <div class="row main-content content">
+            <div class="medium-6 columns">
+                <dl class="field-display">
+                    <div>
+                        <dt i18n:translate>E-Mail</dt>
+                        <dd>
+                            <a href="mailto:${layout.model.username}">${layout.model.username}</a>
+                        </dd>
                     </div>
-                    <tal:b condition="len(group.links) > 25">
-                        <select onchange="location = this.value;" tal:condition="group.links">
-                            <option value="" selected disabled i18n:translate>Select an item to view it</option>
-                            <option tal:repeat="link group.links" value="${link.attrs.href}">${link.text}</option>
-                        </select>
-                    </tal:b>
-                    <tal:b condition="len(group.links) <= 25">
-                        <ul>
-                            <li tal:repeat="link group.links">
-                                <tal:b replace="structure link(layout)" />
-                            </li>
-                        </ul>
-                    </tal:b>
-                </dd>
+
+                    <div>
+                        <dt i18n:translate>State</dt>
+                        <dd>
+                            <tal:b condition="layout.model.active">
+                                ✔︎ <span i18n:translate>Active</span>
+                            </tal:b>
+                            <tal:b condition="not: layout.model.active">
+                                ✘︎ <span i18n:translate>Inactive</span>
+                            </tal:b>
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt i18n:translate>Role</dt>
+                        <dd>
+                            <metal:b use-macro="layout.macros['role_singular']" tal:define="role layout.model.role" />
+                        </dd>
+                    </div>
+                </dl>
             </div>
-        </dl>
+            <div class="medium-6 columns">
+                <dl class="field-display">
+                    <div>
+                        <dt i18n:translate>Source</dt>
+                        <dd tal:condition="layout.model.source">
+                            <metal:b use-macro="layout.macros['user_source']" tal:define="source layout.model.source" /> (${layout.model.source_id})
+                        </dd>
+                        <dd tal:condition="not: layout.model.source" i18n:translate>
+                            local
+                        </dd>
+                        <dt i18n:translate>Created</dt>
+                        <dd>${layout.format_date(layout.model.created, 'datetime_long')}</dd>
+                        <dt i18n:translate>Last login</dt>
+                        <dd tal:condition="layout.model.last_login">${layout.format_date(layout.model.last_login, 'datetime_long')}</dd>
+                        <dd tal:condition="not layout.model.last_login" i18n:translate>Never</dd>
+                        <tal:b define="sessions layout.model.data.get('sessions', '')">
+                            <dt tal:condition="sessions" i18n:translate>Session information</dt>
+                            <dd tal:condition="sessions">
+                                <div class="reveal-modal" id="sessionInformation" data-reveal aria-hidden="true">
+                                    <h1>Session Information</h1>
+                                    <p tal:repeat="session sessions">
+                                        <b>${session}</b><br/>
+                                        <code>${sessions[session]}</code>
+                                    </p>
+                                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                                </div>
+                                <a href="#" data-reveal-id="sessionInformation" i18n:translate="">Display information</a>
+
+                            </dd>
+                        </tal:b>
+                    </div>
+
+                    <div>
+                        <dt i18n:translate>User group</dt>
+                        <dd>
+                            <tal:block tal:condition="layout.model.groups">
+                                ✔︎ <span>${', '.join(group.name for group in layout.model.groups)}</span>
+                            </tal:block>
+                            <tal:block tal:condition="not layout.model.groups">
+                                ✘︎ <span i18n:translate>None</span>
+                            </tal:block>
+                        </dd>
+                    </div>
+
+                    <metal:b use-macro="layout.macros['extra_usermanagement_fields']" tal:define="user layout.model" />
+                </dl>
+            </div>
+            <div class="small-12 columns">
+                <hr tal:condition="linkgroups">
+                <dl class="field-display">
+                    <div class="linkgroup" tal:repeat="group linkgroups">
+                        <dt>${group.title}</dt>
+                        <dd>
+                            <div tal:condition="not:group.links" i18n:translate>
+                                No links found.
+                            </div>
+                            <tal:b condition="len(group.links) > 25">
+                                <select data-auto-redirect tal:condition="group.links">
+                                    <option value="" selected disabled i18n:translate>Select an item to view it</option>
+                                    <option tal:repeat="link group.links" value="${link.attrs.href}">${link.text}</option>
+                                </select>
+                            </tal:b>
+                            <tal:b condition="len(group.links) <= 25">
+                                <ul>
+                                    <li tal:repeat="link group.links">
+                                        <tal:b replace="link(layout)" />
+                                    </li>
+                                </ul>
+                            </tal:b>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
     </tal:b>
 </div>

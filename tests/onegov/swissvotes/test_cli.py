@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import os
+import pytest
 import yaml
 
 from click.testing import CliRunner
@@ -6,16 +9,32 @@ from datetime import date
 from decimal import Decimal
 from onegov.pdf import Pdf
 from onegov.swissvotes.cli import cli
-from onegov.swissvotes.external_resources.posters import MfgPosters
+from onegov.swissvotes.external_resources.posters import MfgPosters, BsPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import SwissVote
 from pathlib import Path
+from tests.shared.utils import use_locale
 from transaction import commit
 from unittest.mock import patch
 
 
-def write_config(path, postgres_dsn, temporary_directory, redis_url,
-                 mfg_api_token=None):
+from typing import Any, IO, TYPE_CHECKING
+if TYPE_CHECKING:
+    from click.testing import Result
+    from onegov.core.orm import SessionManager
+    from onegov.swissvotes.models import SwissVoteFile
+    from unittest.mock import MagicMock
+
+
+def write_config(
+    path: Path | str,
+    postgres_dsn: str,
+    temporary_directory: str,
+    redis_url: str,
+    mfg_api_token: str | None = None,
+    bs_api_token: str | None = None
+) -> None:
+
     cfg = {
         'applications': [
             {
@@ -36,6 +55,7 @@ def write_config(path, postgres_dsn, temporary_directory, redis_url,
                         'create': 'true'
                     },
                     'mfg_api_token': mfg_api_token,
+                    'bs_api_token': bs_api_token,
                 },
             }
         ]
@@ -44,19 +64,25 @@ def write_config(path, postgres_dsn, temporary_directory, redis_url,
         f.write(yaml.dump(cfg))
 
 
-def run_command(cfg_path, principal, commands, input=None):
+def run_command(
+    cfg_path: str,
+    principal: str,
+    commands: list[str],
+    input: IO[Any] | str | bytes | None = None
+) -> Result:
     runner = CliRunner()
     return runner.invoke(
         cli,
         [
             '--config', cfg_path,
-            '--select', '/onegov_swissvotes/{}'.format(principal),
-        ] + commands,
+            '--select', f'/onegov_swissvotes/{principal}',
+            *commands
+        ],
         input
     )
 
 
-def create_file(path, content='content'):
+def create_file(path: Path, content: str = 'content') -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, 'wb') as file:
         pdf = Pdf(file)
@@ -65,7 +91,13 @@ def create_file(path, content='content'):
         pdf.generate()
 
 
-def test_cli_add_instance(postgres_dsn, temporary_directory, redis_url):
+# FIXME: Improve test isolation, so they can run in parallel
+@pytest.mark.xdist_group(name="swissvotes-cli")
+def test_cli_add_instance(
+    postgres_dsn: str,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
@@ -79,8 +111,12 @@ def test_cli_add_instance(postgres_dsn, temporary_directory, redis_url):
     assert "This selector may not reference an existing path" in result.output
 
 
-def test_cli_import_attachments(session_manager, temporary_directory,
-                                redis_url):
+@pytest.mark.xdist_group(name="swissvotes-cli")
+def test_cli_import_attachments(
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, session_manager.dsn, temporary_directory, redis_url)
@@ -98,6 +134,7 @@ def test_cli_import_attachments(session_manager, temporary_directory,
     create_file(folder / 'voting_text' / 'de_CH' / '01.1.pdf')
     create_file(folder / 'voting_text' / 'de_CH' / '01.10.pdf')
     create_file(folder / 'voting_text' / 'de_CH' / '001.100.pdf')
+    create_file(folder / 'voting_text' / 'de_CH' / '10-12.pdf')
 
     create_file(folder / 'voting_text' / 'de_CH' / 'a.pdf')
     create_file(folder / 'voting_text' / 'de_CH' / '100.pdx')
@@ -119,6 +156,9 @@ def test_cli_import_attachments(session_manager, temporary_directory,
     assert "1.1 for voting_text/de_CH/01.1.pdf" in result.output
     assert "1.10 for voting_text/de_CH/01.10.pdf" in result.output
     assert "1.100 for voting_text/de_CH/001.100.pdf" in result.output
+    assert "10 for voting_text/de_CH/10-12.pdf" in result.output
+    assert "11 for voting_text/de_CH/10-12.pdf" in result.output
+    assert "12 for voting_text/de_CH/10-12.pdf" in result.output
 
     assert "Invalid name voting_text/de_CH/a.pdf" in result.output
     assert "Ignoring voting_text/de_CH/100.pdx" in result.output
@@ -194,20 +234,25 @@ def test_cli_import_attachments(session_manager, temporary_directory,
     for number in (1, 2):
         vote = session.query(SwissVote).filter_by(id=number).one()
         for lang in ('de', 'fr'):
-            vote.session_manager.current_locale = f'{lang}_CH'
-            for name in (
-                'federal_council_message',
-                'parliamentary_debate',
-                'realization',
-                'resolution',
-                'voting_booklet',
-                'voting_text',
-            ):
-                assert f'{number}{name}{lang}' in getattr(vote, name).extract
+            with use_locale(vote, f'{lang}_CH'):
+                for name in (
+                    'federal_council_message',
+                    'parliamentary_debate',
+                    'realization',
+                    'resolution',
+                    'voting_booklet',
+                    'voting_text',
+                ):
+                    extract = getattr(vote, name).extract
+                    assert f'{number}{name}{lang}' in extract
 
 
-def test_cli_import_campaign_material(session_manager, temporary_directory,
-                                      redis_url):
+@pytest.mark.xdist_group(name="swissvotes-cli")
+def test_cli_import_campaign_material(
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
 
     # Create instance
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
@@ -254,8 +299,8 @@ def test_cli_import_campaign_material(session_manager, temporary_directory,
     assert 'Added 232-2' in result.output
     assert 'No matching vote for 236' in result.output
 
-    for number in (0, 1, 2):
-        vote = session.query(SwissVote).filter_by(id=number).one()
+    for idx in range(3):
+        vote = session.query(SwissVote).filter_by(id=idx).one()
         assert len(vote.campaign_material_other) == 1
         assert vote.campaign_material_other[0].extract
 
@@ -273,8 +318,14 @@ def test_cli_import_campaign_material(session_manager, temporary_directory,
     assert 'No matching vote for 236_Mix_PB_Presseartikel.pdf' in result.output
 
 
-def test_cli_reindex(session_manager, temporary_directory, redis_url,
-                     attachments, campaign_material):
+@pytest.mark.xdist_group(name="swissvotes-cli")
+def test_cli_reindex(
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str,
+    attachments: dict[str, SwissVoteFile],
+    campaign_material: dict[str, SwissVoteFile]
+) -> None:
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, session_manager.dsn, temporary_directory, redis_url)
@@ -322,12 +373,13 @@ def test_cli_reindex(session_manager, temporary_directory, redis_url,
     vote = session.query(SwissVote).one()
     assert "abstimmungstext" in vote.searchable_text_de_CH
     assert "abhandl" in vote.searchable_text_de_CH
+    assert vote.voting_text is not None
 
     # Change file contents
     for content, path in (
-        ("Realisation", vote.voting_text.reference.file._file_path),
+        ("Realisation", vote.voting_text.reference.file._file_path),  # type: ignore[attr-defined]
         ("Kampagnenmaterial",
-         vote.campaign_material_other[0].reference.file._file_path),
+         vote.campaign_material_other[0].reference.file._file_path),  # type: ignore[attr-defined]
     ):
         with open(path, 'wb') as file:
             pdf = Pdf(file)
@@ -349,11 +401,20 @@ def test_cli_reindex(session_manager, temporary_directory, redis_url,
     assert "kampagnenmaterial" in vote.searchable_text_de_CH
 
 
-@patch.object(MfgPosters, 'fetch', return_value=(1, 2, 3, set((4, 5))))
-@patch.object(SaPosters, 'fetch', return_value=(6, 7, 8, set((9, ))))
+@patch.object(MfgPosters, 'fetch', return_value=(1, 2, 3, {4, 5}))
+@patch.object(BsPosters, 'fetch', return_value=(2, 3, 4, {5, 6}))
+@patch.object(SaPosters, 'fetch', return_value=(6, 7, 8, {9}))
+@pytest.mark.xdist_group(name="swissvotes-cli")
 def test_cli_update_resources(
-    mfg, sa, session_manager, temporary_directory, redis_url, sample_vote
-):
+    mfg: MagicMock,
+    sa: MagicMock,
+    bs: MagicMock,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str,
+    sample_vote: SwissVote
+) -> None:
+
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, session_manager.dsn, temporary_directory, redis_url)
 
@@ -384,17 +445,20 @@ def test_cli_update_resources(
 
     # All fine
     write_config(
-        cfg_path, session_manager.dsn, temporary_directory, redis_url, 'x'
+        cfg_path, session_manager.dsn, temporary_directory, redis_url, 'x', 'y'
     )
     result = run_command(
         cfg_path,
         'govikon',
-        ['update-resources', '--mfg', '--sa', '--details']
+        ['update-resources', '--mfg', '--sa', '--bs', '--details']
     )
     assert result.exit_code == 0
     assert 'Updating MfG posters' in result.output
+    assert 'Updating BS posters' in result.output
     assert 'Updating SA posters' in result.output
     assert '1 added, 2 updated, 3 removed, 2 failed' in result.output
     assert 'Failed: 4, 5\n' in result.output
+    assert '2 added, 3 updated, 4 removed, 2 failed' in result.output
+    assert 'Failed: 5, 6\n' in result.output
     assert '6 added, 7 updated, 8 removed, 1 failed' in result.output
     assert 'Failed: 9\n' in result.output

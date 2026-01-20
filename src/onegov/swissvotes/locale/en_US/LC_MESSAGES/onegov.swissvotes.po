@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-01-13 07:05+0100\n"
+"POT-Creation-Date: 2024-10-08 08:58+0200\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -55,7 +55,7 @@ msgid "Preliminary examination"
 msgstr "Preliminary examination"
 
 msgid "Submission"
-msgstr "Submission"
+msgstr "Collection of signatures"
 
 msgid "Realization"
 msgstr "Success"
@@ -66,23 +66,38 @@ msgstr "Federal Council dispatch"
 msgid "Pre-parliamentary phase"
 msgstr "Pre-parliamentary phase"
 
-msgid "Parliamentary debate"
-msgstr "Parliamentary debate"
+msgid "Parliamentary initiative"
+msgstr "Parliamentary initiative"
 
 msgid "Parliamentary phase"
 msgstr "Parliamentary phase"
 
+msgid "Report of the parliamentary committee (only for Pa.Iv.)"
+msgstr "Report of the parliamentary committee (only for Pa.Iv.)"
+
+msgid "Opinion of the Federal Council (only for Pa.Iv.)"
+msgstr "Opinion of the Federal Council (only for Pa.Iv.)"
+
+msgid "Parliamentary debate"
+msgstr "Parliamentary debate"
+
 msgid "Voting booklet"
-msgstr "Explanatory brochure"
+msgstr "Official explanatory brochure"
 
 msgid "Voting campaign"
 msgstr "Public campaign"
+
+msgid "Explanatory brochure by easyvote"
+msgstr "Explanatory brochure by easyvote"
 
 msgid "Advertisment analysis"
 msgstr "Analysis of advertisement campaign"
 
 msgid "Fög Analysis"
 msgstr "Fög Analysis"
+
+msgid "Campaign finances"
+msgstr "Campaign finances"
 
 msgid "Resolution"
 msgstr "Decree on voting result"
@@ -93,23 +108,23 @@ msgstr "Vote"
 msgid "Result by canton, district and municipality"
 msgstr "Result by canton, district and municipality"
 
-msgid "Full analysis of post-vote poll results"
-msgstr "Full analysis of post-vote poll results"
+msgid "Full analysis of VOX post-vote poll results"
+msgstr "Full analysis of VOX post-vote poll results"
 
-msgid "Post-vote poll"
-msgstr "Post-vote poll"
+msgid "Post-vote polls"
+msgstr "Post-vote polls"
 
-msgid "Questionnaire of the poll"
-msgstr "Questionnaire of the poll"
+msgid "Questionnaire of the VOX poll"
+msgstr "Questionnaire of the VOX poll"
 
-msgid "Dataset of the post-vote poll (CSV)"
-msgstr "Dataset of the post-vote poll (CSV)"
+msgid "Dataset of the VOX poll (CSV)"
+msgstr "Dataset of the VOX poll (CSV)"
 
-msgid "Dataset of the post-vote poll (SAV)"
-msgstr "Dataset of the post-vote poll (SAV)"
+msgid "Dataset of the VOX poll (SAV)"
+msgstr "Dataset of the VOX poll (SAV)"
 
-msgid "Dataset of the post-vote poll (DTA)"
-msgstr "Dataset of the post-vote poll (DTA)"
+msgid "Dataset of the VOX poll (DTA)"
+msgstr "Dataset of the VOX poll (DTA)"
 
 msgid "Codebook for the post-vote poll (PDF)"
 msgstr "Codebook for the post-vote poll (PDF)"
@@ -117,8 +132,11 @@ msgstr "Codebook for the post-vote poll (PDF)"
 msgid "Codebook for the post-vote poll (XLSX)"
 msgstr "Codebook for the post-vote poll (XLSX)"
 
-msgid "Technical report of the post-vote poll"
-msgstr "Technical report of the post-vote poll"
+msgid "Technical report on the VOX poll"
+msgstr "Technical report on the VOX poll"
+
+msgid "Results of the LeeWas post-vote poll"
+msgstr "Results of the LeeWas post-vote poll"
 
 msgid "Updating the external resources may take some time."
 msgstr "Updating the external resources may take some time."
@@ -132,11 +150,17 @@ msgstr "eMuseum.ch"
 msgid "Social Archives"
 msgstr "Social Archives"
 
+msgid "Basel Poster Collection"
+msgstr "Basel Poster Collection"
+
 msgid "No eMuseum API key available."
 msgstr "No eMuseum API key available."
 
 msgid "Title"
 msgstr "Title"
+
+msgid "Show Mastodon timeline"
+msgstr "Show Mastodon timeline"
 
 msgid "Content"
 msgstr "Content"
@@ -530,247 +554,295 @@ msgid "actor-vsa-abbreviation"
 msgstr "VSA"
 
 msgid "actor-acs-label"
-msgstr "Automobil Club der Schweiz"
+msgstr "Automobile Club of Switzerland (Automobil Club der Schweiz)"
 
 msgid "actor-auns-label"
-msgstr "Aktion für eine unabhängige und neutrale Schweiz"
+msgstr ""
+"Action for an independent and neutral Switzerland (Aktion für eine "
+"unabhängige und neutrale Schweiz)"
 
 msgid "actor-bdp-label"
-msgstr "Bürgerlich-Demokratische Partei"
+msgstr "Conservative Democratic Party (Bürgerlich-Demokratische Partei)"
 
 msgid "actor-bpuk-label"
-msgstr "Schweiz. Bau-, Planungs- und Umweltschutzdirektorenkonferenz"
+msgstr ""
+"Swiss Conference of Cantonal Ministers of Public Works, Land Use and "
+"Environment (Schweiz. Bau-, Planungs- und Umweltschutzdirektorenkonferenz)"
 
 msgid "actor-csp-label"
-msgstr "Christlichsoziale Partei"
+msgstr "Christian Social Party (Christlichsoziale Partei)"
 
 msgid "actor-cvp-fr-label"
-msgstr "CVP Frauen"
+msgstr ""
+"Women's section of the Christian Democratic People's Party (CVP Frauen)"
 
 msgid "actor-cvp-label"
-msgstr "Christlichdemokratische Volkspartei der Schweiz"
+msgstr ""
+"Christian Democratic People's Party of Switzerland (Christlichdemokratische "
+"Volkspartei der Schweiz)"
 
 msgid "actor-dem-label"
-msgstr "Demokratische Partei"
+msgstr "Democratic Party (Demokratische Partei)"
 
 msgid "actor-dsp-label"
-msgstr "Demokratisch-Soziale Partei Basel-Stadt"
+msgstr ""
+"Democratic Social Party of Basel-Stadt (Demokratisch-Soziale Partei Basel-"
+"Stadt)"
 
 msgid "actor-eco-label"
-msgstr "economiesuisse"
+msgstr "economiesuisse (corporate union)"
 
 msgid "actor-edk-label"
-msgstr "Erziehungsdirektorenkonferenz"
+msgstr ""
+"Conference of Cantonal Ministers of Education (Erziehungsdirektorenkonferenz)"
 
 msgid "actor-edu-label"
-msgstr "Eidgenössisch-Demokratische Union"
+msgstr ""
+"Federal Democratic Union of Switzerland (Eidgenössisch-Demokratische Union)"
 
 msgid "actor-endk-label"
-msgstr "Energiedirektorenkonferenz"
+msgstr "Conference of Cantonal Energy Ministers (Energiedirektorenkonferenz)"
 
 msgid "actor-evp-label"
-msgstr "Evangelische Volkspartei der Schweiz"
+msgstr ""
+"Evangelical People's Party of Switzerland (Evangelische Volkspartei der "
+"Schweiz)"
 
 msgid "actor-fdk-label"
-msgstr "Finanzdirektorenkonferenz"
+msgstr ""
+"Conference of Cantonal Ministers of Finance (Finanzdirektorenkonferenz)"
 
 msgid "actor-fdp-fr-label"
-msgstr "FDP.Die Liberalen Frauen"
+msgstr "Women's section of FDP.The Liberals (FDP.Die Liberalen Frauen)"
 
 msgid "actor-fdp-label"
-msgstr "Freisinnig-demokratische Partei der Schweiz"
+msgstr ""
+"Free Democratic Party of Switzerland (Freisinnig-demokratische Partei der "
+"Schweiz)"
 
 msgid "actor-fmh-label"
-msgstr "Verbindung Schweizer Ärztinnen und Ärzte"
+msgstr "Swiss Doctors' Association (Verbindung Schweizer Ärztinnen und Ärzte)"
 
 msgid "actor-fps-label"
-msgstr "Autopartei"
+msgstr "Automobile Party (Autopartei)"
 
 msgid "actor-frap-label"
-msgstr "Frauen macht Politik!"
+msgstr "Women make politics! (Frauen macht Politik!)"
 
 msgid "actor-ga-label"
-msgstr "Grüne Alternative"
+msgstr "Green Alternative (Grüne Alternative)"
 
 msgid "actor-gdk-label"
-msgstr "Gesundheitsdirektorenkonferenz"
+msgstr ""
+"Conference of the Cantonal Ministers of Public Health "
+"(Gesundheitsdirektorenkonferenz)"
 
 msgid "actor-gem-label"
-msgstr "Schweiz. Gemeindeverband SGV"
+msgstr "Association of Swiss Communes (Schweizerischer Gemeindeverband SGV)"
 
 msgid "actor-glp-label"
-msgstr "Grünliberale Partei"
+msgstr "Green Liberal Party (Grünliberale Partei)"
 
 msgid "actor-gps-label"
-msgstr "Grüne Partei der Schweiz"
+msgstr "Green Party of Switzerland (Grüne Partei der Schweiz)"
 
 msgid "actor-gsoa-label"
-msgstr "Gruppe für eine Schweiz ohne Armee"
+msgstr ""
+"Group for a Switzerland without an Army (Gruppe für eine Schweiz ohne Armee)"
 
 msgid "actor-hev-label"
-msgstr "Hauseigentümerverband"
+msgstr "Swiss Association of Property Owners (Hauseigentümerverband)"
 
 msgid "actor-jbdp-label"
-msgstr "Junge BDP"
+msgstr "Young Conservative Democratic Party of Switzerland (Junge BDP)"
 
 msgid "actor-jcvp-label"
-msgstr "Junge CVP"
+msgstr "Young Christian Democratic Party of Switzerland (Junge CVP)"
 
 msgid "actor-jevp-label"
-msgstr "Junge EVP"
+msgstr ""
+"Young Evangelical Party of Switzerland (Junge Evangelische Volkspartei der "
+"Schweiz)"
 
 msgid "actor-jfdp-label"
-msgstr "Jungfreisinnige"
+msgstr "FDP. The Liberals Youth (Jungfreisinnige)"
 
 msgid "actor-jgps-label"
-msgstr "Junge Grüne"
+msgstr "Young Green Party (Junge Grüne)"
 
 msgid "actor-jldu-label"
-msgstr "Junger LdU"
+msgstr "Young Alliance of Independents (Junger LdU)"
 
 msgid "actor-jlps-label"
-msgstr "Junge LPS"
+msgstr "Young Liberals Switzerland (Junge LPS)"
 
 msgid "actor-jmitte-label"
-msgstr "Die Junge Mitte"
+msgstr "Young Center Party (Die Junge Mitte)"
 
 msgid "actor-jna-label"
-msgstr "Junge NA"
+msgstr "Young National Action (Junge Nationale Aktion)"
 
 msgid "actor-jpda-label"
-msgstr "Junge Partei der Arbeit"
+msgstr "Young Party of Labour (Junge Partei der Arbeit)"
 
 msgid "actor-jsd-label"
-msgstr "Junge Schweizer Demokraten"
+msgstr "Young Swiss Democrats (Junge Schweizer Demokraten)"
 
 msgid "actor-jsvp-label"
-msgstr "Junge SVP"
+msgstr "Young Swiss People's Party (Junge SVP)"
 
 msgid "actor-juso-label"
-msgstr "JungsozialistInnen Schweiz"
+msgstr "Young Socialists Switzerland (JungsozialistInnen Schweiz)"
 
 msgid "actor-kdk-label"
-msgstr "Konferenz der Kantonsregierungen"
+msgstr "Conference of Cantonal Governments (Konferenz der Kantonsregierungen)"
 
 msgid "actor-kkjpd-label"
-msgstr "Konferenz der kant. Justiz- und Polizeidirektoren"
+msgstr ""
+"Conference of Cantonal Justice and Police Ministers (Konferenz der "
+"kantonalen Justiz- und Polizeidirektoren)"
 
 msgid "actor-kvp-label"
-msgstr "Katholische Volkspartei"
+msgstr "Catholic People's Party of Switzerland (Katholische Volkspartei)"
 
 msgid "actor-ldk-label"
-msgstr "Landwirtschaftsdirektorenkonferenz"
+msgstr ""
+"Conference of Cantonal Ministers of Agriculture "
+"(Landwirtschaftsdirektorenkonferenz)"
 
 msgid "actor-ldu-label"
-msgstr "Landesring der Unabhängigen"
+msgstr "Alliance of Independents (Landesring der Unabhängigen)"
 
 msgid "actor-lega-label"
-msgstr "Lega dei Ticinesi"
+msgstr "Ticino League (Lega dei Ticinesi)"
 
 msgid "actor-lps-label"
-msgstr "Liberale Partei der Schweiz"
+msgstr "Liberal Party of Switzerland (Liberale Partei der Schweiz)"
 
 msgid "actor-mcg-label"
-msgstr "Mouvement citoyens genevois"
+msgstr "Geneva Citizens' Movement (Mouvement citoyens genevois)"
 
 msgid "actor-mitte-label"
-msgstr "Die Mitte"
+msgstr "The Center (Die Mitte)"
 
 msgid "actor-mitte-fr-label"
-msgstr "Die Mitte Frauen"
+msgstr "Women's section of The Center (Die Mitte Frauen)"
 
 msgid "actor-pda-label"
-msgstr "Partei der Arbeit"
+msgstr "Swiss Party of Labour (Partei der Arbeit)"
 
 msgid "actor-poch-label"
-msgstr "Progressive Organisationen der Schweiz"
+msgstr ""
+"Progressive Organisations of Switzerland (Progressive Organisationen der "
+"Schweiz)"
 
 msgid "actor-pps-label"
-msgstr "Piratenpartei"
+msgstr "Pirate Party (Piratenpartei)"
 
 msgid "actor-psa-label"
-msgstr "Autonome Sozialistische Partei"
+msgstr "Autonomous Socialist Party (Autonome Sozialistische Partei)"
 
 msgid "actor-rep-label"
-msgstr "Schweizerische Republikanische Bewegung"
+msgstr "Swiss Republican Movement (Schweizerische Republikanische Bewegung)"
 
 msgid "actor-sab-label"
-msgstr "Schweizerische Arbeitsgemeinschaft für die Berggebiete"
+msgstr ""
+"Swiss Group for the Mountain Regions (Schweizerische Arbeitsgemeinschaft für "
+"die Berggebiete)"
 
 msgid "actor-sante-label"
-msgstr "santésuisse Verband Schweizer Krankenversicherer"
+msgstr ""
+"Association of Swiss Health Insurers (santésuisse Verband Schweizer "
+"Krankenversicherer)"
 
 msgid "actor-sav-label"
-msgstr "Schweizerischer Arbeitgeberverband"
+msgstr "Swiss Employers' Confederation (Schweizerischer Arbeitgeberverband)"
 
 msgid "actor-sbk-label"
-msgstr "Schweizer Bischofskonferenz"
+msgstr "Swiss Bishops' Conference (Schweizer Bischofskonferenz)"
 
 msgid "actor-sblv-label"
-msgstr "Schweizerischer Bäuerinnen- und Landfrauenverband"
+msgstr ""
+"Swiss Association of Women Farmers and Rural Women (Schweizerischer "
+"Bäuerinnen- und Landfrauenverband)"
 
 msgid "actor-sbv-asb-label"
-msgstr "Schweizerische Bankiervereinigung"
+msgstr "Swiss Bankers Association (Schweizerische Bankiervereinigung)"
 
 msgid "actor-sbv-usp-label"
-msgstr "Schweizerischer Bauernverband"
+msgstr "Swiss Farmers' Union (Schweizerischer Bauernverband)"
 
 msgid "actor-sd-label"
-msgstr "Schweizer Demokraten"
+msgstr "Swiss Democrats (Schweizer Demokraten)"
 
 msgid "actor-seks-label"
-msgstr "Schweizerischer Evangelischer Kirchenbund"
+msgstr ""
+"Federation of Swiss Protestant Churches (Schweizerischer Evangelischer "
+"Kirchenbund) "
 
 msgid "actor-sgb-label"
-msgstr "Schweizerischer Gewerkschaftsbund"
+msgstr "Swiss Trade Union Federation (Schweizerischer Gewerkschaftsbund)"
 
 msgid "actor-sgv-label"
-msgstr "Schweizerischer Gewerbeverband"
+msgstr "Swiss Trade Association (Schweizerischer Gewerbeverband)"
 
 msgid "actor-skos-label"
-msgstr "Schweizerische Konferenz für Sozialhilfe"
+msgstr ""
+"Swiss Conference for Social Welfare (Schweizerische Konferenz für "
+"Sozialhilfe)"
 
 msgid "actor-sks-label"
-msgstr "Stiftung für Konsumentenschutz"
+msgstr "Swiss Consumer Protection Foundation (Stiftung für Konsumentenschutz)"
 
 msgid "actor-smv-label"
-msgstr "Schweizerischer Mieterinnen- und Mieterverband"
+msgstr ""
+"Swiss Association of Tenants (Schweizerischer Mieterinnen- und Mieterverband)"
 
 msgid "actor-sodk-label"
-msgstr "Sozialdirektorenkonferenz"
+msgstr ""
+"Conference of Cantonal Ministers of Social Security "
+"(Sozialdirektorenkonferenz)"
 
 msgid "actor-sol-label"
-msgstr "solidaritéS"
+msgstr "Solidarity Party (solidaritéS)"
 
 msgid "actor-sps-label"
-msgstr "Sozialdemokratische Partei der Schweiz"
+msgstr ""
+"Social Democratic Party of Switzerland (Sozialdemokratische Partei der "
+"Schweiz)"
 
 msgid "actor-ssv-label"
-msgstr "Schweiz. Städteverband"
+msgstr "Swiss Association of Cities (Schweizerischer Städteverband)"
 
 msgid "actor-svp-label"
-msgstr "Schweizerische Volkspartei"
+msgstr "Swiss People's Party (Schweizerische Volkspartei)"
 
 msgid "actor-tcs-label"
-msgstr "Touring Club Schweiz"
+msgstr "Touring Club Switzerland (Touring Club Schweiz)"
 
 msgid "actor-travs-label"
-msgstr "Travail.Suisse"
+msgstr "Work.Switzerland (Travail.Suisse)"
 
 msgid "actor-vcs-label"
-msgstr "Verkehrs-Club der Schweiz"
+msgstr "Swiss Transport Association (Verkehrs-Club der Schweiz)"
 
 msgid "actor-vdk-label"
-msgstr "Volkswirtschaftsdirektorenkonferenz"
+msgstr ""
+"Conference of Cantonal Ministers of Economy "
+"(Volkswirtschaftsdirektorenkonferenz)"
 
 msgid "actor-voev-label"
-msgstr "Verband öffentlicher Verkehr"
+msgstr "Swiss Association of Public Transport (Verband öffentlicher Verkehr)"
 
 msgid "actor-vpod-label"
-msgstr "Verband des Personals öffentlicher Dienste"
+msgstr ""
+"Swiss Union of Public Service Personnel (Verband des Personals öffentlicher "
+"Dienste)"
 
 msgid "actor-vsa-label"
-msgstr "Vereinigung schweizerischer Angestelltenverbände"
+msgstr ""
+"Confederation of Swiss Employees' Associations (Vereinigung schweizerischer "
+"Angestelltenverbände)"
 
 msgid "d-1-1"
 msgstr "State organisation"
@@ -1172,7 +1244,7 @@ msgid "d-3-938"
 msgstr "Animal protection"
 
 msgid "d-1-10"
-msgstr "Social policy"
+msgstr "Social and societal policy"
 
 msgid "d-2-101"
 msgstr "Health"
@@ -1222,31 +1294,31 @@ msgid "d-3-1028"
 msgstr "Welfare"
 
 msgid "d-2-103"
-msgstr "Social groups"
+msgstr "Societal issues"
 
 msgid "d-3-1031"
-msgstr "Immigration policy"
+msgstr "Migration and integration policy"
 
 msgid "d-3-1032"
-msgstr "Refugees"
+msgstr "Asylum policy"
 
 msgid "d-3-1033"
-msgstr "Status of women"
+msgstr "Women and gender equality policy"
 
 msgid "d-3-1034"
 msgstr "Family policy"
 
 msgid "d-3-1035"
-msgstr "Children and young people"
+msgstr "Children and youth policy"
 
 msgid "d-3-1036"
-msgstr "Senior citizens"
+msgstr "Age policy"
 
 msgid "d-3-1037"
-msgstr "Persons with disabilities"
+msgstr "People with disabilities"
 
 msgid "d-3-1038"
-msgstr "Homosexuals"
+msgstr "LGBTQIA+"
 
 msgid "d-1-11"
 msgstr "Education and research"
@@ -1503,14 +1575,32 @@ msgstr "Text of a presentation"
 msgid "Statistical data"
 msgstr "Statistical data"
 
+msgid "Website"
+msgstr "Website"
+
+msgid "Campaign for a Yes"
+msgstr "Campaign for a Yes"
+
+msgid "Campaign for a No"
+msgstr "Campaign for a No"
+
 msgid "Link eMuseum.ch"
 msgstr "Link eMuseum.ch"
 
 msgid "Link Social Archives"
 msgstr "Link Social Archives"
 
+msgid "Link Basel Poster Collection"
+msgstr "Link Basel Poster Collection"
+
 msgid "Swissvotes database"
 msgstr "Swissvotes database"
+
+msgid "Report of the parliamentary committee"
+msgstr "Report of the parliamentary committee"
+
+msgid "Opinion of the Federal Council"
+msgstr "Opinion of the Federal Council"
 
 msgid "Analysis of the advertising campaign by Année Politique"
 msgstr "Analysis of the advertising campaign by Année Politique"
@@ -1518,11 +1608,11 @@ msgstr "Analysis of the advertising campaign by Année Politique"
 msgid "Media coverage: fög analysis"
 msgstr "Media coverage: fög analysis"
 
-msgid "Dataset of the post-vote poll"
-msgstr "Dataset of the post-vote poll"
+msgid "Dataset of the VOX poll"
+msgstr "Dataset of the VOX poll"
 
-msgid "Codebook for the post-vote poll"
-msgstr "Codebook for the post-vote poll"
+msgid "Codebook for the VOX poll"
+msgstr "Codebook for the VOX poll"
 
 msgid "Attachment"
 msgstr "Attachment"
@@ -1611,17 +1701,11 @@ msgstr "Search"
 msgid "Reset"
 msgstr "Reset"
 
-msgid "Stack"
-msgstr "Stack"
-
-msgid "Toggle"
-msgstr "Toggle"
-
-msgid "Columns"
-msgstr "Columns"
-
 msgid "Show all"
 msgstr "Show all"
+
+msgid "(in German)"
+msgstr "(in German)"
 
 msgid "Dear Sir or Madam,"
 msgstr "Dear Sir or Madam,"
@@ -1634,6 +1718,9 @@ msgstr "If you don't want to change your password, you can ignore this email."
 
 msgid "Files"
 msgstr "Files"
+
+msgid "Swissvotes on Mastodon"
+msgstr "Swissvotes on Mastodon"
 
 msgid "Patrons"
 msgstr "Sponsors"
@@ -1673,6 +1760,12 @@ msgstr "Keyword"
 
 msgid "Vote date"
 msgstr "Voting day"
+
+msgid "and ${number} out of ${total} votes of the Cantons"
+msgstr "and ${number} out of ${total} votes of the Cantons"
+
+msgid "% Yes votes"
+msgstr "% Yes votes"
 
 msgid "Vote number"
 msgstr "Vote Nº"
@@ -1731,14 +1824,23 @@ msgid "for the counter-proposal"
 msgstr "for the counter-proposal"
 
 msgid ""
-"Number of days between the Parliament’s final vote and the decree to declare "
-"the success of the referendum"
+"Number of days from the start of the collection period (publication of the "
+"parliamentary decision) until the submission of signatures."
 msgstr ""
-"Number of days between the Parliament’s final vote and the decree to declare "
-"the success of the referendum"
+"Number of days from the start of the collection period (publication of the "
+"parliamentary decision) until the submission of signatures."
 
 msgid "Online information by the federal authorities"
 msgstr "Online information by the federal authorities"
+
+msgid ""
+"For future votes, links to the current versions of the websites are provided "
+"here. For past votes, the links lead to the archived versions of the "
+"websites so as to show the status prior to the respective vote."
+msgstr ""
+"For future votes, links to the current versions of the websites are provided "
+"here. For past votes, the links lead to the archived versions of the "
+"websites so as to show the status prior to the respective vote."
 
 msgid "Link Federal Council"
 msgstr "Link Federal Council"
@@ -1748,6 +1850,19 @@ msgstr "Link department"
 
 msgid "Link federal office"
 msgstr "Link federal office"
+
+msgid "Explainer video by easyvote"
+msgstr "Explainer video by easyvote"
+
+msgid "Campaign websites"
+msgstr "Campaign websites"
+
+msgid ""
+"The links lead to the archived versions of the websites so as to show the "
+"status prior to the respective vote."
+msgstr ""
+"The links lead to the archived versions of the websites so as to show the "
+"status prior to the respective vote."
 
 msgid "Recommendations of the Parties"
 msgstr "Recommendations by parties"
@@ -1843,14 +1958,33 @@ msgstr "(predominantly positive)"
 msgid "(predominantly negative)"
 msgstr "(predominantly negative)"
 
+msgid ""
+"This information has been taken from the website of the Swiss Federal Audit "
+"Office, which for its part points out that the data is published in the form "
+"in which it was reported to the SFAO by the actors subject to disclosure "
+"requirements.<br><br>Total receipts and largest donors are shown according "
+"to the final statement, which is published 75 days after the vote"
+msgstr ""
+"This information has been taken from the website of the Swiss Federal Audit "
+"Office, which for its part points out that the data is published in the form "
+"in which it was reported to the SFAO by the actors subject to disclosure "
+"requirements.<br><br>Total receipts and largest donors are shown according "
+"to the final statement, which is published 75 days after the vote."
+
+msgid "Total receipts of ‘yes’ campaign:"
+msgstr "Total receipts of ‘yes’ campaign:"
+
+msgid "largest donors:"
+msgstr "largest donors:"
+
+msgid "Total receipts of ‘no’ campaign:"
+msgstr "Total receipts of ‘no’ campaign:"
+
 msgid "Display the list of documents"
 msgstr "Display the list of documents"
 
 msgid "People"
 msgstr "People"
-
-msgid "Yeas"
-msgstr "Yes"
 
 msgid "Cantons"
 msgstr "Cantons"
@@ -1861,17 +1995,29 @@ msgstr "Turnout"
 msgid "Overview of voting result by the Federal Chancellery"
 msgstr "Overview of voting result by the Federal Chancellery"
 
+msgid "Popular votes dashboard by the Swiss Federal Statistical Office"
+msgstr "Popular votes dashboard by the Swiss Federal Statistical Office"
+
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Interactive map by the Swiss Federal Statistical Office"
 
 msgid "Display the map"
 msgstr "Display the map"
 
-msgid "Technical report"
-msgstr "Technical report"
+msgid "Full analysis of VOTO post-vote poll results"
+msgstr "Full analysis of VOTO post-vote poll results"
 
-msgid "Cockpit with selected results"
-msgstr "Cockpit with selected results"
+msgid "Cockpit with selected VOX results"
+msgstr "Cockpit with selected VOX results"
+
+msgid "Cockpit with selected VOTO results"
+msgstr "Cockpit with selected VOTO results"
+
+msgid "Questionnaire of the VOTO poll"
+msgstr "Questionnaire of the VOTO poll"
+
+msgid "Dataset of the VOTO poll"
+msgstr "Dataset of the VOTO poll"
 
 msgid ""
 "Due to data protection requirements, Swissvotes publishes a slightly reduced "
@@ -1879,6 +2025,13 @@ msgid ""
 "research purposes; see the Swissvotes codebook for more details on this "
 "(https://swissvotes.ch/page/dataset/codebook-en.pdf)."
 msgstr ""
+"Due to data protection requirements, Swissvotes publishes a slightly reduced "
+"version of this dataset. Access to the full version might be possible for "
+"research purposes; see the Swissvotes codebook for more details on this "
+"(https://swissvotes.ch/page/dataset/codebook-en.pdf)."
+
+msgid "Codebook for the VOTO poll"
+msgstr "Codebook for the VOTO poll"
 
 msgid "Full-text search in all documents on this vote"
 msgstr "Full-text search in all documents on this vote"
@@ -1903,14 +2056,14 @@ msgstr "Date"
 
 #. Default: Voting result
 msgid "voting_result_hyphenated"
-msgstr ""
+msgstr "Voting result"
 
 msgid "Yeas Percentage People"
 msgstr "Yes share"
 
 #. Default: Turnout
 msgid "turnout_hyphenated"
-msgstr ""
+msgstr "Turnout"
 
 msgid "Search results in the documents on this vote"
 msgstr "Search results in the documents on this vote"
@@ -1940,6 +2093,18 @@ msgstr "Password changed."
 
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Wrong username or password reset link has expired."
+
+msgid "Failed to continue login, please ensure cookies are allowed."
+msgstr "Failed to continue login, please ensure cookies are allowed."
+
+msgid "Invalid or expired TOTP provided."
+msgstr "Invalid or expired TOTP provided."
+
+msgid "Please enter the six digit code from your authenticator app"
+msgstr "Please enter the six digit code from your authenticator app"
+
+msgid "Enter TOTP"
+msgstr "Enter TOTP"
 
 msgid "Access Denied"
 msgstr "Access denied"
@@ -2087,3 +2252,6 @@ msgstr "All votes have been deleted"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Do you really want to delete all votes?!"
+
+#~ msgid "Technical report"
+#~ msgstr "Technical report"

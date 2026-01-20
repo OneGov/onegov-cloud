@@ -1,0 +1,134 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.translator_directory">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="cell small-12">
+                <div tal:condition="not: layout.has_confirmed_reports"
+                     class="callout warning"
+                     style="margin-bottom: 1rem;">
+                    <p i18n:translate="">
+                        No confirmed time reports available for export.
+                        Time reports must be confirmed before they can be exported.
+                    </p>
+                </div>
+                <div tal:condition="layout.has_confirmed_reports"
+                     style="margin-bottom: 1rem;">
+                    <div class="grid-x grid-padding-x">
+                        <div class="cell small-12">
+                            <form method="get" id="time-reports-filter">
+                                <div class="grid-x grid-padding-x">
+                                    <div class="cell small-12 medium-4">
+                                        <label>
+                                            <span i18n:translate="">
+                                                Month
+                                            </span>
+                                            <select name="month">
+                                                <option
+                                                    tal:repeat="month_item months"
+                                                    value="${month_item[0]}"
+                                                    selected="${month_item[0] == (selected_month or default_month) or None}">
+                                                    ${month_item[1]}
+                                                </option>
+                                            </select>
+                                        </label>
+                                    </div>
+                                    <div class="cell small-12 medium-4">
+                                        <label>
+                                            <span i18n:translate="">
+                                                Year
+                                            </span>
+                                            <select name="year">
+                                                <option
+                                                    tal:repeat="year_item years"
+                                                    value="${year_item}"
+                                                    selected="${year_item == (selected_year or default_year) or None}">
+                                                    ${year_item}
+                                                </option>
+                                            </select>
+                                        </label>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="cell small-12">
+                            <form action="${export_url}"
+                                  method="POST"
+                                  class="grid-x grid-padding-x">
+                                <input type="hidden"
+                                       name="month"
+                                       value="${selected_month or default_month}" />
+                                <input type="hidden"
+                                       name="year"
+                                       value="${selected_year or default_year}" />
+                                <button type="submit"
+                                        class="button primary">
+                                    <span i18n:translate="">
+                                        Export für Buchhaltung
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="time-reports-list">
+                    <p tal:condition="not: reports" i18n:translate="">
+                        No time reports found
+                    </p>
+                    <table class="fullwidth" tal:condition="reports">
+                        <thead>
+                            <th i18n:translate="">Translator</th>
+                            <th i18n:translate="">Created</th>
+                            <th i18n:translate="">Assignment Date</th>
+                            <th i18n:translate="">Type</th>
+                            <th i18n:translate="">Duration</th>
+                            <th i18n:translate="">Total</th>
+                            <th i18n:translate="">Status</th>
+                            <th i18n:translate="">Ticket</th>
+                        </thead>
+                        <tbody>
+                            <tr tal:repeat="report reports">
+                                <td>
+                                    <a href="${request.link(report.translator)}"
+                                       tal:condition="report.translator">
+                                        ${report.translator.title}
+                                    </a>
+                                </td>
+                                <td>
+                                    ${layout.format_date(report.created, 'datetime')}
+                                </td>
+                                <td>
+                                    ${layout.format_date(
+                                        report.assignment_date, 'date')}
+                                </td>
+                                <td>${layout.format_interpreting_type(
+                                    report.assignment_type) if report.assignment_type else '-'}</td>
+                                <td>${report.duration} min</td>
+                                <td>${layout.format_currency(
+                                    report.total_compensation)}</td>
+                                <td>
+                                    <span tal:condition="report.status == 'pending'"
+                                          i18n:translate="">Pending</span>
+                                    <span tal:condition="report.status == 'confirmed'"
+                                          i18n:translate="">Confirmed</span>
+                                </td>
+                                <td tal:define="ticket report_tickets.get(
+                                    str(report.id))">
+                                    <a href="${request.link(ticket)}"
+                                       tal:condition="ticket"
+                                       i18n:translate="">View Ticket</a>
+                                    <span tal:condition="not: ticket">-</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pagination-centered">
+                        <div metal:use-macro="layout.macros['pagination']"
+                             tal:define="collection model; current_page model;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

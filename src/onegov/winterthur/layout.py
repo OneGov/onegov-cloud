@@ -1,4 +1,6 @@
-from cached_property import cached_property
+from __future__ import annotations
+
+from functools import cached_property
 from onegov.org.layout import DefaultLayout
 from onegov.core.elements import Link, LinkGroup, Intercooler, Confirm, Block
 from onegov.winterthur import _
@@ -11,23 +13,36 @@ from onegov.winterthur.models import MissionReportVehicle
 from onegov.winterthur.roadwork import RoadworkCollection
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.winterthur.request import WinterthurRequest
+    from typing import TypeAlias
+
+    MissionReportContext: TypeAlias = (
+        MissionReport | MissionReportVehicle
+        | MissionReportCollection | MissionReportVehicleCollection
+        | MissionReportFileCollection
+    )
+
+
 class AddressLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Addresses"), '#'),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Addresses'), '#'),
         ]
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if not self.request.is_manager:
-            return
+            return None
 
         return [
             Link(
-                text=_("Update"),
+                text=_('Update'),
                 url=self.csrf_protected_url(
                     self.request.link(self.model, '+update')
                 ),
@@ -43,10 +58,10 @@ class AddressLayout(DefaultLayout):
 class AddressSubsetLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Addresses"), self.request.class_link(AddressCollection)),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Addresses'), self.request.class_link(AddressCollection)),
             Link(_(self.model.street), '#')
         ]
 
@@ -54,20 +69,20 @@ class AddressSubsetLayout(DefaultLayout):
 class RoadworkCollectionLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Roadworks"), '#'),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Roadworks'), '#'),
         ]
 
 
 class RoadworkLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Roadworks"), self.request.class_link(RoadworkCollection)),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Roadworks'), self.request.class_link(RoadworkCollection)),
             Link(self.model.title, self.request.link(self.model))
         ]
 
@@ -75,40 +90,47 @@ class RoadworkLayout(DefaultLayout):
 class DaycareSubsidyCalculatorLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        return (
-            Link(_("Homepage"), self.homepage_url),
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Daycare Subsidy Calculator"),
+                _('Daycare Subsidy Calculator'),
                 self.request.link(self.model)
             )
-        )
+        ]
 
 
 class MissionReportLayout(DefaultLayout):
 
-    def __init__(self, model, request, *suffixes):
+    model: MissionReportContext
+
+    def __init__(
+        self,
+        model: MissionReportContext,
+        request: WinterthurRequest,
+        *suffixes: Link
+    ) -> None:
         self.suffixes = suffixes
         super().__init__(model, request)
         request.include('iframe-enhancements')
 
-    def breadcrumbs_iter(self):
+    def breadcrumbs_iter(self) -> Iterator[Link]:
         yield Link(
-            _("Homepage"),
+            _('Homepage'),
             self.homepage_url)
 
         yield Link(
-            _("Mission Reports"),
+            _('Mission Reports'),
             self.request.class_link(MissionReportCollection))
 
         yield from self.suffixes
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return list(self.breadcrumbs_iter())
 
     @cached_property
-    def image_upload_url(self):
+    def image_upload_url(self) -> str:
 
         if not hasattr(self.model, 'report'):
             return super().image_upload_url
@@ -120,7 +142,7 @@ class MissionReportLayout(DefaultLayout):
         return self.csrf_protected_url(url)
 
     @cached_property
-    def image_upload_json_url(self):
+    def image_upload_json_url(self) -> str:
 
         if not hasattr(self.model, 'report'):
             return super().image_upload_json_url
@@ -132,28 +154,28 @@ class MissionReportLayout(DefaultLayout):
         return self.csrf_protected_url(url)
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
 
-        # this is a bit different then usual, trying out some things as part
+        # this is a bit different than usual, trying out some things as part
         # of this project - probably not a good idea to copy this elsewhere
         if not self.request.is_manager:
-            return
+            return None
 
         if self.suffixes and not getattr(self.suffixes[-1], 'editbar', True):
-            return
+            return None
 
         if isinstance(self.model, MissionReportCollection):
             return [
                 Link(
-                    _("Vehicles"), self.request.class_link(
+                    _('Vehicles'), self.request.class_link(
                         MissionReportVehicleCollection
                     ), attrs={'class': 'vehicles'}
                 ),
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Mission Report"),
+                            text=_('Mission Report'),
                             url=self.request.link(
                                 self.model,
                                 name='+new'
@@ -167,10 +189,10 @@ class MissionReportLayout(DefaultLayout):
         if isinstance(self.model, MissionReportVehicleCollection):
             return [
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Vehicle"),
+                            text=_('Vehicle'),
                             url=self.request.link(
                                 self.model,
                                 name='+new'
@@ -184,17 +206,17 @@ class MissionReportLayout(DefaultLayout):
         if isinstance(self.model, MissionReport):
             return [
                 Link(
-                    _("Images"),
+                    _('Images'),
                     self.request.link(self.model, name='images'),
                     attrs={'class': 'upload-images'}
                 ),
                 Link(
-                    _("Edit"),
+                    _('Edit'),
                     self.request.link(self.model, name='edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
-                    _("Delete"),
+                    _('Delete'),
                     self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -202,12 +224,12 @@ class MissionReportLayout(DefaultLayout):
                     traits=(
                         Confirm(
                             _(
-                                "Do you really want to delete "
-                                "this mission report?"
+                                'Do you really want to delete '
+                                'this mission report?'
                             ),
-                            _("This cannot be undone."),
-                            _("Delete mission report"),
-                            _("Cancel")
+                            _('This cannot be undone.'),
+                            _('Delete mission report'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -223,17 +245,17 @@ class MissionReportLayout(DefaultLayout):
             if self.model.uses:
                 return [
                     Link(
-                        _("Delete"),
+                        _('Delete'),
                         '#',
                         attrs={'class': 'delete-link'},
                         traits=(
                             Block(
                                 _("This vehicle can't be deleted."),
                                 _(
-                                    "There are mission reports associated "
-                                    "with this vehicle."
+                                    'There are mission reports associated '
+                                    'with this vehicle.'
                                 ),
-                                _("Cancel")
+                                _('Cancel')
                             ),
                         )
                     )
@@ -241,7 +263,7 @@ class MissionReportLayout(DefaultLayout):
             else:
                 return [
                     Link(
-                        _("Delete"),
+                        _('Delete'),
                         self.csrf_protected_url(
                             self.request.link(self.model)
                         ),
@@ -249,12 +271,12 @@ class MissionReportLayout(DefaultLayout):
                         traits=(
                             Confirm(
                                 _(
-                                    "Do you really want to delete "
-                                    "this vehicle?"
+                                    'Do you really want to delete '
+                                    'this vehicle?'
                                 ),
-                                _("This cannot be undone."),
-                                _("Delete vehicle"),
-                                _("Cancel")
+                                _('This cannot be undone.'),
+                                _('Delete vehicle'),
+                                _('Cancel')
                             ),
                             Intercooler(
                                 request_method='DELETE',
@@ -265,3 +287,4 @@ class MissionReportLayout(DefaultLayout):
                         )
                     )
                 ]
+        return None

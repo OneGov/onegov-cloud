@@ -1,16 +1,22 @@
+from __future__ import annotations
 
 import os
 
-from onegov.core.utils import module_path, rchop
+from onegov.core.utils import module_path
 from onegov.event import EventCollection, OccurrenceCollection
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
 from onegov.page import PageCollection
 
 
-def test_initial_content(org_app):
-    pages = PageCollection(org_app.session()).query().all()
-    pages = {p.name: p.title for p in pages}
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import TestOrgApp
+
+
+def test_initial_content(org_app: TestOrgApp) -> None:
+    pages_query = PageCollection(org_app.session()).query()
+    pages = {p.name: p.title for p in pages_query}
 
     assert pages == {
         'organisation': 'Organisation',
@@ -20,20 +26,20 @@ def test_initial_content(org_app):
         'wir-haben-eine-neue-webseite': 'Wir haben eine neue Webseite!'
     }
 
-    forms = FormCollection(org_app.session()).definitions.query().all()
-    forms = set(form.name for form in forms)
+    forms_query = FormCollection(org_app.session()).definitions.query()
+    forms = {form.name for form in forms_query}
 
     builtin_forms_path = module_path('onegov.org', 'forms/builtin/de')
 
     paths = (p for p in os.listdir(builtin_forms_path))
     paths = (p for p in paths if p.endswith('.form'))
     paths = (os.path.basename(p) for p in paths)
-    builtin_forms = set(rchop(p, '.form') for p in paths)
+    builtin_forms = {p.removesuffix('.form') for p in paths}
 
     assert builtin_forms == forms
 
-    resources = ResourceCollection(org_app.libres_context).query().all()
-    resources = {r.name: r.type for r in resources}
+    resources_query = ResourceCollection(org_app.libres_context).query()
+    resources = {r.name: r.type for r in resources_query}
 
     assert resources == {
         'konferenzraum': 'room',

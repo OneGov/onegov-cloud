@@ -1,4 +1,6 @@
-import kerberos
+from __future__ import annotations
+
+import kerberos  # type: ignore[import-not-found]
 import morepath
 import pytest
 
@@ -13,47 +15,73 @@ from unittest.mock import patch, DEFAULT
 from webtest import TestApp as Client
 
 
-@pytest.fixture(scope='function')
-def app(request, postgres_dsn, temporary_path, redis_url, keytab):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.request import CoreRequest
+    from pathlib import Path
+    from webob import Response
+    from webtest import TestResponse
 
-    class App(Framework, UserApp):
+
+class App(Framework, UserApp):
+    pass
+
+
+@pytest.fixture(scope='function')
+def app(
+    request: pytest.FixtureRequest,
+    postgres_dsn: str,
+    temporary_path: Path,
+    redis_url: str,
+    keytab: str
+) -> App:
+
+    class _App(App):
         pass
 
-    @App.path(model=KerberosClient, path='/kerberos-client')
-    def get_kerberos_client(request):
+    @_App.path(model=KerberosClient, path='/kerberos-client')
+    def get_kerberos_client(request: CoreRequest) -> KerberosClient:
         return KerberosClient(
             keytab=keytab,
             hostname='ogc.example.org',
             service='HTTP'
         )
 
-    @App.view(model=KerberosClient, permission=Public)
-    def view_kerberos_client(self, request):
+    @_App.view(model=KerberosClient, permission=Public)
+    def view_kerberos_client(
+        self: KerberosClient,
+        request: CoreRequest
+    ) -> Response | str | None:
         return self.authenticated_username(request)
 
-    scan_morepath_modules(App)
-    morepath.commit(App)
+    scan_morepath_modules(_App)
+    morepath.commit(_App)
 
-    app = App()
+    app = _App()
+    app.namespace = 'apps'
     app.configure_application(
         dsn=postgres_dsn,
         redis_url=redis_url,
     )
 
-    app.namespace = 'apps'
     app.set_application_id('apps/my-app')
 
     return app
 
 
 @pytest.fixture(scope='function')
-def client(app):
+def client(app: App) -> Iterator[Client]:
     yield Client(app)
 
 
-def test_kerberos_client(client, app, keytab):
+def test_kerberos_client(
+    client: Client,
+    app: App,
+    keytab: str
+) -> None:
 
-    def auth(headers=None):
+    def auth(headers: dict[str, str] | None = None) -> TestResponse:
         return client.get(
             url='/kerberos-client',
             expect_errors=True,
@@ -102,7 +130,7 @@ def test_kerberos_client(client, app, keytab):
         assert r.text == 'foo@EXAMPLE.ORG'
 
 
-def test_ldap_client(glauth_binary):
+def test_ldap_client(glauth_binary: str) -> None:
     config = f"""
         debug = true
 

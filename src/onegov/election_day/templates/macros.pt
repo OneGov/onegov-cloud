@@ -13,27 +13,53 @@
     </tal:b>
 </metal:gender-singular>
 
+<metal:notification-type-translation define-macro="notification-type-translation" i18n:domain="onegov.election_day">
+    <tal:block tal:switch="notification_type">
+        <tal:block tal:case="'email'" i18n:translate="">email</tal:block>
+        <tal:block tal:case="'sms'" i18n:translate="">SMS</tal:block>
+        <tal:block tal:case="default">${notification_type}</tal:block>
+    </tal:block>
+</metal:notification-type-translation>
+
 <metal:title-translation define-macro="title-translation" i18n:domain="onegov.election_day">
-    <tal:b switch="item.title == item.title_translations.get(request.locale)">
+    <tal:b switch="item.title == item.title_translations.get(request.locale)|True">
         <tal:b case="True">${item.title}</tal:b>
         <tal:b case="False"><span lang="${request.default_locale.replace('_', '-')}">${item.title}</span></tal:b>
     </tal:b>
 </metal:title-translation>
 
-<metal:years-dropdown define-macro="years-dropdown" i18n:domain="onegov.election_day">
+<metal:short-title-translation define-macro="short-title-translation" i18n:domain="onegov.election_day">
+    <tal:block tal:condition="item.short_title">
+        <tal:b switch="item.short_title == item.short_title_translations.get(request.locale)|True">
+            <tal:b case="True">${item.short_title}</tal:b>
+            <tal:b case="False"><span lang="${request.default_locale.replace('_', '-')}">${item.short_title}</span></tal:b>
+        </tal:b>
+    </tal:block>
+    <tal:block tal:condition="not item.short_title" metal:use-macro="layout.macros['title-translation']" />
+</metal:short-title-translation>
+
+<metal:redirect-filters define-macro="redirect-filters" i18n:domain="onegov.election_day">
+    <tal:block tal:repeat="(name, options) redirect_filters.items()">
+        <div metal:use-macro="layout.macros['redirect-dropdown']"/>
+    </tal:block>
+</metal:redirect-filters>
+
+
+<metal:redirect-dropdown define-macro="redirect-dropdown" i18n:domain="onegov.election_day">
     <div class="row">
         <div class="small-12 columns">
-            <form>
-                <select onchange="this.options[this.selectedIndex].onclick()">
-                    <tal:block tal:repeat="(name, active, link) years">
+            <form tal:define="id name.lower()">
+                <label for="filter-${id}">${name}</label>
+                <select id="filter-${id}" name="filter-${id}" class="redirect-dropdown">
+                    <tal:block tal:repeat="(name, active, link) options">
                         <option tal:condition="active" selected>${name}</option>
-                        <option tal:condition="not active" onclick="location.href='${link}'">${name}</option>
+                        <option tal:condition="not active" data-redirect="${link}">${name}</option>
                     </tal:block>
                 </select>
             </form>
         </div>
     </div>
-</metal:years-dropdown>
+</metal:redirect-dropdown>
 
 <metal:election-actions define-macro="election-actions" i18n:domain="onegov.election_day">
     <div tal:condition="request.is_logged_in" class="clearfix">
@@ -46,12 +72,9 @@
                     <a i18n:translate="" class="action-edit" href="${request.link(election, 'edit')}">Edit</a>
                 </li>
                 <li>
-                    <a i18n:translate="" class="action-change-id" href="${request.link(election, 'change-id')}">Change ID</a>
-                </li>
-                <li>
                     <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload')}">Upload results</a>
                 </li>
-                <li tal:condition="election.type == 'proporz' and election.completed">
+                <li tal:condition="election.type == 'proporz' and election.has_results">
                     <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload-party-results')}">Upload party results</a>
                 </li>
                 <li>
@@ -60,7 +83,7 @@
                 <li>
                     <a i18n:translate="" class="action-clear" href="${request.link(election, 'clear-media')}">Clear media</a>
                 </li>
-                <li tal:condition="layout.principal.notifications">
+                <li>
                     <a i18n:translate="" class="action-trigger" href="${request.link(election, 'trigger')}">Trigger notifications</a>
                 </li>
                 <li>
@@ -82,9 +105,6 @@
                     <a i18n:translate="" class="action-edit" href="${request.link(compound, 'edit')}">Edit</a>
                 </li>
                 <li>
-                    <a i18n:translate="" class="action-change-id" href="${request.link(compound, 'change-id')}">Change ID</a>
-                </li>
-                <li>
                     <a i18n:translate="" class="action-upload" href="${request.link(compound, 'upload')}">Upload results</a>
                 </li>
                 <li>
@@ -96,7 +116,7 @@
                 <li>
                     <a i18n:translate="" class="action-clear" href="${request.link(compound, 'clear-media')}">Clear media</a>
                 </li>
-                <li tal:condition="layout.principal.notifications">
+                <li>
                     <a i18n:translate="" class="action-trigger" href="${request.link(compound, 'trigger')}">Trigger notifications</a>
                 </li>
                 <li>
@@ -118,9 +138,6 @@
                     <a i18n:translate="" class="action-edit" href="${request.link(vote, 'edit')}">Edit</a>
                 </li>
                 <li>
-                    <a i18n:translate="" class="action-change-id" href="${request.link(vote, 'change-id')}">Change ID</a>
-                </li>
-                <li>
                     <a i18n:translate="" class="action-upload" href="${request.link(vote, 'upload')}">Upload results</a>
                 </li>
                 <li>
@@ -129,7 +146,7 @@
                 <li>
                     <a i18n:translate="" class="action-clear" href="${request.link(vote, 'clear-media')}">Clear media</a>
                 </li>
-                <li tal:condition="layout.principal.notifications">
+                <li>
                     <a i18n:translate="" class="action-trigger" href="${request.link(vote, 'trigger')}">Trigger notifications</a>
                 </li>
                 <li>
@@ -159,14 +176,14 @@
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-entity left-aligned">${layout.principal.label('entity')}</th>
                 <th data-tablesaw-priority="3" i18n:translate="" class="column-district left-aligned" tal:condition="layout.has_districts">${layout.principal.label('district')}</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="column-result left-aligned">Result</th>
-                <th data-tablesaw-priority="5" i18n:translate="" class="column-yeas right-aligned">Yeas</th>
-                <th data-tablesaw-priority="5" i18n:translate="" class="column-nays right-aligned">Nays</th>
-                <th data-tablesaw-priority="2" i18n:translate="" class="column-yeas-percentage right-aligned">Yes %</th>
-                <th data-tablesaw-priority="2" i18n:translate="" class="column-nays-percentage right-aligned">No %</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="column-yeas right-aligned">${layout.label('Yeas')}</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="column-nays right-aligned">${layout.label('Nays')}</th>
+                <th data-tablesaw-priority="2" i18n:translate="" class="column-yeas-percentage right-aligned">${layout.label('Yes %')}</th>
+                <th data-tablesaw-priority="2" i18n:translate="" class="column-nays-percentage right-aligned">${layout.label('No %')}</th>
             </tr>
         </thead>
         <tbody>
-            <tr tal:repeat="result ballot.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
+            <tr tal:repeat="result results|ballot.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:b condition="not: result.counted">
                     <th class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
@@ -175,8 +192,8 @@
                 <tal:b condition="result.counted">
                     <th class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
-                    <td class="column-result answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
-                    <td class="column-result answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
+                    <td tal:condition="result.accepted" class="column-result answer accepted" i18n:translate="">${layout.label('Accepted')}</td>
+                    <td tal:condition="not result.accepted" class="column-result answer rejected" i18n:translate="">${layout.label('Rejected')}</td>
                     <td class="column-yeas right-aligned" data-text="${result.yeas}">${layout.format_number(result.yeas)}</td>
                     <td class="column-nays right-aligned" data-text="${result.nays}">${layout.format_number(result.nays)}</td>
                     <td class="column-yeas-percentage right-aligned">${layout.format_number(result.yeas_percentage)}</td>
@@ -184,13 +201,13 @@
                 </tal:b>
             </tr>
         </tbody>
-        <tfoot tal:condition="ballot.results.count() != 1">
+        <tfoot tal:condition="len(ballot.results) != 1">
             <tr class="total">
                 <td class="column-entity" i18n:translate="">Total</td>
                 <td class="column-district" tal:condition="layout.has_districts"></td>
-                <td class="column-result answer" tal:condition="not:ballot.vote.completed" i18n:translate="">Not yet counted</td>
-                <td class="column-result answer accepted" tal:condition="ballot.vote.completed and ballot.accepted" i18n:translate="">Accepted</td>
-                <td class="column-result answer rejected" tal:condition="ballot.vote.completed and not ballot.accepted" i18n:translate="">Rejected</td>
+                <td tal:condition="not ballot.vote.completed" class="column-result answer" i18n:translate="">Not yet counted</td>
+                <td tal:condition="ballot.vote.completed and ballot.accepted" class="column-result answer accepted" i18n:translate="">${layout.label('Accepted')}</td>
+                <td tal:condition="ballot.vote.completed and not ballot.accepted" class="column-result answer rejected" i18n:translate="">${layout.label('Rejected')}</td>
                 <td class="column-yeas right-aligned">${layout.format_number(ballot.yeas)}</td>
                 <td class="column-nays right-aligned">${layout.format_number(ballot.nays)}</td>
                 <td class="column-yeas-percentage right-aligned">${layout.format_number(ballot.yeas_percentage)}</td>
@@ -210,10 +227,10 @@
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('district')}</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="left-aligned">Result</th>
-                <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Yeas</th>
-                <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Nays</th>
-                <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">Yes %</th>
-                <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">No %</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="column-yeas right-aligned">${layout.label('Yeas')}</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="column-nays right-aligned">${layout.label('Nays')}</th>
+                <th data-tablesaw-priority="2" i18n:translate="" class="column-yeas-percentage right-aligned">${layout.label('Yes %')}</th>
+                <th data-tablesaw-priority="2" i18n:translate="" class="column-nays-percentage right-aligned">${layout.label('No %')}</th>
             </tr>
         </thead>
         <tbody>
@@ -224,8 +241,8 @@
                 </tal:b>
                 <tal:b condition="result.counted">
                     <th>${layout.format_name(result)}</th>
-                    <td class="answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
-                    <td class="answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
+                    <td tal:condition="result.accepted" class="answer accepted" i18n:translate="">${layout.label('Accepted')}</td>
+                    <td tal:condition="not result.accepted" class="answer rejected" i18n:translate="">${layout.label('Rejected')}</td>
                     <td class="right-aligned">${layout.format_number(result.yeas)}</td>
                     <td class="right-aligned">${layout.format_number(result.nays)}</td>
                     <td class="right-aligned">${layout.format_number(result.yeas_percentage)} %</td>
@@ -233,12 +250,12 @@
                 </tal:b>
             </tr>
         </tbody>
-        <tfoot tal:condition="ballot.results.count() != 1">
+        <tfoot tal:condition="len(ballot.results) != 1">
             <tr class="total">
                 <td i18n:translate="">Total</td>
-                <td class="answer" tal:condition="not:ballot.vote.completed" i18n:translate="">Not yet counted</td>
-                <td class="answer accepted" tal:condition="ballot.vote.completed and ballot.accepted" i18n:translate="">Accepted</td>
-                <td class="answer rejected" tal:condition="ballot.vote.completed and not ballot.accepted" i18n:translate="">Rejected</td>
+                <td tal:condition="not ballot.vote.completed" class="answer" i18n:translate="">Not yet counted</td>
+                <td tal:condition="ballot.vote.completed and ballot.accepted" class="answer accepted" i18n:translate="">${layout.label('Accepted')}</td>
+                <td tal:condition="ballot.vote.completed and not ballot.accepted" class="answer rejected" i18n:translate="">${layout.label('Rejected')}</td>
                 <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>
                 <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
                 <td class="right-aligned">${layout.format_number(ballot.yeas_percentage)} %</td>
@@ -277,16 +294,16 @@
                 <tal:b condition="result.counted">
                     <th class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
-                    <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.eligible_voters)}</td>
-                    <td class="column-empty right-aligned" data-text="${result.empty}" tal:condition="expats">${layout.format_number(result.expats)}</td>
-                    <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.cast_ballots)}</td>
+                    <td class="column-empty right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
+                    <td class="column-empty right-aligned" data-text="${result.expats}" tal:condition="expats">${layout.format_number(result.expats or 0)}</td>
+                    <td class="column-empty right-aligned" data-text="${result.cast_ballots}">${layout.format_number(result.cast_ballots)}</td>
                     <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.empty)}</td>
                     <td class="column-invalid right-aligned" data-text="${result.invalid}">${layout.format_number(result.invalid)}</td>
                     <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f} %'.format(result.turnout)}</td>
                 </tal:b>
             </tr>
         </tbody>
-        <tfoot tal:condition="ballot.results.count() != 1">
+        <tfoot tal:condition="len(ballot.results) != 1">
             <tr class="total">
                 <td class="column-entity" i18n:translate="">Total</td>
                 <td class="column-district" tal:condition="layout.has_districts"></td>
@@ -311,10 +328,10 @@
             data-embed-source="${layout.map_link}"
             data-thumbs="true"
             data-color-scale="rb"
-            data-label-left-hand="Nay"
-            data-label-right-hand="Yay"
+            data-label-left-hand="${layout.label('Nay')}"
+            data-label-right-hand="${layout.label('Yay')}"
             data-label-expats="Expats"
-            i18n:attributes="data-embed-link; data-label-left-hand; data-label-right-hand; data-label-expats"
+            i18n:attributes="data-embed-link; data-label-expats"
             >
         </div>
     </tal:block>
@@ -325,10 +342,10 @@
             data-dataurl="${request.link(ballot, name='by-entity')}"
             data-thumbs="true"
             data-color-scale="rb"
-            data-label-left-hand="Nay"
-            data-label-right-hand="Yay"
+            data-label-left-hand="${layout.label('Nay')}"
+            data-label-right-hand="${layout.label('Yay')}"
             data-label-expats="Expats"
-            i18n:attributes="data-label-left-hand; data-label-right-hand; data-label-expats"
+            i18n:attributes="data-label-expats"
             >
         </div>
     </tal:block>
@@ -344,10 +361,10 @@
             data-embed-source="${layout.map_link}"
             data-thumbs="true"
             data-color-scale="rb"
-            data-label-left-hand="Nay"
-            data-label-right-hand="Yay"
+            data-label-left-hand="${layout.label('Nay')}"
+            data-label-right-hand="${layout.label('Yay')}"
             data-label-expats="Expats"
-            i18n:attributes="data-embed-link; data-label-left-hand; data-label-right-hand; data-label-expats"
+            i18n:attributes="data-embed-link; data-label-expats"
             >
         </div>
     </tal:block>
@@ -358,10 +375,10 @@
             data-dataurl="${request.link(ballot, name='by-district')}"
             data-thumbs="true"
             data-color-scale="rb"
-            data-label-left-hand="Nay"
-            data-label-right-hand="Yay"
+            data-label-left-hand="${layout.label('Nay')}"
+            data-label-right-hand="${layout.label('Yay')}"
             data-label-expats="Expats"
-            i18n:attributes="data-label-left-hand; data-label-right-hand; data-label-expats"
+            i18n:attributes="data-label-expats"
             >
         </div>
     </tal:block>
@@ -416,17 +433,20 @@
         data-tablesaw-mode="columntoggle"
         data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
         data-tablesaw-minimap=""
+        tal:condition="party_years"
         >
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
-                <th tal:repeat="year years" data-tablesaw-priority="1" class="right-aligned">${year}</th>
+                <th tal:repeat="year party_years" data-tablesaw-priority="1" class="right-aligned">${year}</th>
             </tr>
         </thead>
-        <tbody tal:condition="years">
-            <tr tal:repeat="party parties" tal:define="current_year python: years[-1]">
-                <th>${parties[party][current_year]['name']}</th>
-                <td tal:repeat="year years" class="right-aligned">${parties[party][year]['mandates']}</td>
+        <tbody>
+            <tr tal:repeat="line seat_allocations">
+                <tal:block tal:repeat="cell line">
+                    <td tal:condition="repeat.cell.start">${cell}</td>
+                    <td tal:condition="not: repeat.cell.start" class="right-aligned">${cell}</td>
+                </tal:block>
             </tr>
         </tbody>
     </table>
@@ -461,6 +481,46 @@
 </metal:election-compound-districts-table>
 
 
+<metal:election-compound-districts-map define-macro="election-compound-districts-map" i18n:domain="onegov.election_day">
+    <tal:block tal:define="map_type 'entities' if election_compound.domain_elections == 'municipality' else 'districts'">
+        <tal:block tal:condition="embed">
+            <div class="${map_type}-map"
+                data-canton="${layout.principal.id}"
+                data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
+                data-dataurl="${request.link(election_compound, name='by-district')}"
+                data-embed-link="Embed map"
+                data-embed-source="${request.link(election_compound, name='districts-map', query_params={'locale': request.locale})}"
+                data-thumbs="false"
+                data-color-scale="b"
+                data-label-left-hand=""
+                data-label-right-hand=""
+                data-label-expats="Expats"
+                data-hide-percentages="true"
+                data-hide-legend="true"
+                i18n:attributes="data-embed-link; data-label-expats"
+                >
+            </div>
+        </tal:block>
+        <tal:block tal:condition="not: embed">
+            <div class="${map_type}-map"
+                data-canton="${layout.principal.id}"
+                data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
+                data-dataurl="${request.link(election_compound, name='by-district')}"
+                data-thumbs="false"
+                data-color-scale="b"
+                data-label-left-hand=""
+                data-label-right-hand=""
+                data-label-expats="Expats"
+                data-hide-percentages="true"
+                data-hide-legend="true"
+                i18n:attributes="data-label-expats"
+                >
+            </div>
+        </tal:block>
+    </tal:block>
+</metal:election-compound-districts-map>
+
+
 <metal:election-compound-superregions-table define-macro="election-compound-superregions-table" i18n:domain="onegov.election_day">
     <table
         class="election-compound-superregions-table results tablesaw sortable"
@@ -477,13 +537,52 @@
         </thead>
         <tbody>
             <tr tal:repeat="superregion superregions">
-                <th class="column-superregion left-aligned" tal:condition="layout.has_superregions">${superregion}</th>
+                <th class="column-superregion left-aligned" tal:condition="layout.has_superregions"><a href="${request.link(superregions[superregion]['superregion'])}">${superregion}</a></th>
                 <td class="column-mandates right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (superregions[superregion]['mandates']['allocated'], superregions[superregion]['mandates']['total'])" /></td>
                 <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (superregions[superregion]['progress']['counted'], superregions[superregion]['progress']['total'])" /></td>
             </tr>
         </tbody>
     </table>
 </metal:election-compound-superregions-table>
+
+
+<metal:election-compound-superregions-map define-macro="election-compound-superregions-map" i18n:domain="onegov.election_day">
+    <tal:block tal:condition="embed">
+        <div class="districts-map"
+            data-canton="${layout.principal.id}"
+            data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
+            data-dataurl="${request.link(election_compound, name='by-superregion')}"
+            data-embed-link="Embed map"
+            data-embed-source="${request.link(election_compound, name='superregions-map', query_params={'locale': request.locale})}"
+            data-thumbs="false"
+            data-color-scale="b"
+            data-label-left-hand=""
+            data-label-right-hand=""
+            data-label-expats="Expats"
+            data-hide-percentages="true"
+            data-hide-legend="true"
+            i18n:attributes="data-embed-link; data-label-expats"
+            >
+        </div>
+    </tal:block>
+    <tal:block tal:condition="not: embed">
+        <div class="districts-map"
+            data-canton="${layout.principal.id}"
+            data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
+            data-dataurl="${request.link(election_compound, name='by-superregion')}"
+            data-thumbs="false"
+            data-color-scale="b"
+            data-label-left-hand=""
+            data-label-right-hand=""
+            data-label-expats="Expats"
+            data-hide-percentages="true"
+            data-hide-legend="true"
+            i18n:attributes="data-label-expats"
+            >
+        </div>
+    </tal:block>
+</metal:election-compound-superregions-map>
+
 
 <metal:election-statistics-table define-macro="election-statistics-table" i18n:domain="onegov.election_day">
     <table
@@ -580,7 +679,7 @@
                     <th class="column-district left-aligned">${result.domain_segment}</th>
                     <td class="column-superregion left-aligned" tal:condition="layout.has_superregions">${result.domain_supersegment}</td>
                     <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
-                    <td class="right-aligned" data-text="${result.eligible_voters}" tal:condition="expats">${layout.format_number(result.expats)}</td>
+                    <td class="right-aligned" data-text="${result.expats}" tal:condition="expats">${layout.format_number(result.expats)}</td>
                     <td class="right-aligned" data-text="${result.received_ballots}">${layout.format_number(result.received_ballots)}</td>
                     <td class="right-aligned" data-text="${result.accounted_ballots}">${layout.format_number(result.accounted_ballots)}</td>
                     <td class="right-aligned" data-text="${result.blank_ballots}">${layout.format_number(result.blank_ballots)}</td>
@@ -590,6 +689,20 @@
                 </tal:block>
             </tr>
         </tbody>
+        <tfoot>
+            <tr class="total">
+                <td i18n:translate="">Total</td>
+                <td class="column-superregion left-aligned" tal:condition="layout.has_superregions"></td>
+                <td class="right-aligned" data-text="${layout.totals.eligible_voters}">${layout.format_number(layout.totals.eligible_voters)}</td>
+                <td class="right-aligned" data-text="${layout.totals.expats}" tal:condition="expats">${layout.format_number(layout.totals.expats)}</td>
+                <td class="right-aligned" data-text="${layout.totals.received_ballots}">${layout.format_number(layout.totals.received_ballots)}</td>
+                <td class="right-aligned" data-text="${layout.totals.accounted_ballots}">${layout.format_number(layout.totals.accounted_ballots)}</td>
+                <td class="right-aligned" data-text="${layout.totals.blank_ballots}">${layout.format_number(layout.totals.blank_ballots)}</td>
+                <td class="right-aligned" data-text="${layout.totals.invalid_ballots}">${layout.format_number(layout.totals.invalid_ballots)}</td>
+                <td class="right-aligned" data-text="${layout.totals.accounted_votes}">${layout.format_number(layout.totals.accounted_votes)}</td>
+                <td class="right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(layout.totals.turnout)} %</td>
+            </tr>
+        </tfoot>
     </table>
 </metal:election-compound-statistics-table>
 
@@ -642,20 +755,21 @@
                 <th data-tablesaw-priority="2" tal:condition="not:layout.tacit" i18n:translate="single_votes" class="column-votes right-aligned">Votes</th>
                 <th data-tablesaw-priority="3" tal:condition="layout.majorz" i18n:translate="" class="column-party right-aligned">Party</th>
                 <th data-tablesaw-priority="3" tal:condition="layout.proporz" i18n:translate="" class="column-list right-aligned">List</th>
-                <th data-tablesaw-priority="3" tal:condition="layout.majorz and show_percentage" i18n:translate="single_votes" class="column-party right-aligned">Votes</th>
+                <th data-tablesaw-priority="3" tal:condition="layout.majorz and show_percentage" i18n:translate="single_votes" class="column-votes-percentage right-aligned">Votes</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="column-elected right-aligned">Elected</th>
             </tr>
         </thead>
         <tbody>
             <tal:block tal:repeat="candidate candidates">
-                <tr tal:condition="not lists or candidate.party in lists or candidate.list_name in lists" tal:attributes="class 'sticky-row' if not election.completed or candidate.elected > 0 else ''">
+                <tr tal:condition="not lists or candidate.party in lists or candidate.list_name in lists" tal:attributes="class 'sticky-row' if not layout.completed or candidate.elected > 0 else ''">
                     <th class="column-candidate">${candidate.family_name} ${candidate.first_name}</th>
                     <td tal:condition="not:layout.tacit" class="column-votes right-aligned" data-text="${candidate.votes}">${layout.format_number(candidate.votes)}</td>
                     <td tal:condition="layout.majorz" class="column-party right-aligned">${candidate.party}</td>
                     <td tal:condition="layout.proporz" class="column-list right-aligned">${candidate.list_name}</td>
-                    <td tal:condition="layout.majorz and show_percentage" class="column-party right-aligned">${layout.format_number(candidate.percentage, 1)}%</td>
-                    <td class="column-elected answer accepted right-aligned" tal:condition="candidate.elected is True" i18n:translate="">Yes</td>
-                    <td class="column-elected answer rejected right-aligned" tal:condition="candidate.elected is False" i18n:translate="">No</td>
+                    <td tal:condition="layout.majorz and show_percentage" class="column-votes-percentage right-aligned">${layout.format_number(candidate.percentage, 1)}%</td>
+                    <td class="column-elected answer accepted right-aligned" tal:condition="election.completed and candidate.elected is True" i18n:translate="">Yes</td>
+                    <td class="column-elected answer rejected right-aligned" tal:condition="election.completed and candidate.elected is False" i18n:translate="">No</td>
+                    <td class="column-elected answer right-aligned" tal:condition="not election.completed" i18n:translate="">Pending</td>
                     <td class="column-elected answer right-aligned" tal:condition="candidate.elected is None" i18n:translate=""></td>
                 </tr>
             </tal:block>
@@ -759,20 +873,16 @@
 
 <metal:ballot-result-bar define-macro="ballot-result-bar">
     <div class="ballot-result-bar" tal:condition="layout.has_results and ballot">
-        <div class="percentages flex-container justify-between align-center">
-            <div class="">
-                <dl>
-                    <dt i18n:translate="">Yeas</dt>
-                    <dd class="accepted" >${'{0:.2f}'.format(ballot.yeas_percentage)}%</dd>
-                </dl>
-            </div>
-            <div class="">
-                <dl style="text-align: right;">
-                    <dt i18n:translate="">Nays</dt>
-                    <dd class="rejected" >${'{0:.2f}'.format(ballot.nays_percentage)}%</dd>
-                </dl>
-            </div>
-        </div>
+        <ul class="percentages flex-container justify-between align-center">
+            <li>
+                <span i18n:translate="">${layout.label('Yeas')}</span><br/>
+                <span class="accepted" >${'{0:.2f}'.format(ballot.yeas_percentage)}%</span>
+            </li>
+            <li>
+                <span i18n:translate="">${layout.label('Nays')}</span><br/>
+                <span class="rejected" >${'{0:.2f}'.format(ballot.nays_percentage)}%</span>
+            </li>
+        </ul>
         <div class="percentage">
             <div class="yeas"></div>
             <div class="nays right" style="width:${'{0:.2f}'.format(ballot.nays_percentage)}%"></div>
@@ -781,36 +891,36 @@
 </metal:ballot-result-bar>
 
 <metal:candidates-chart define-macro="candidates-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:define="limit limit|''; lists lists|''; elected elected|''; sort_by_lists sort_by_lists|''">
+    <tal:block tal:define="limit limit|''; lists lists|''; elected elected|''; sort_by_lists sort_by_lists|''; entity entity|''">
         <tal:block tal:condition="embed">
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
-                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists})}"
+                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists, 'entity': entity})}"
                 data-embed-link="Embed diagram"
-                data-embed-source="${request.link(model, name='candidates-chart')}">
+                data-embed-source="${request.link(model, name='candidates-chart', query_params={'entity': entity, 'locale': request.locale})}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
             <div class="bar-chart"
-                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists})}">
+                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists, 'entity': entity})}">
             </div>
         </tal:block>
     </tal:block>
 </metal:candidates-chart i18n:domain="onegov.election_day">
 
 <metal:lists-chart define-macro="lists-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:define="limit limit|''; names names|''; sort_by_names sort_by_names|''">
+    <tal:block tal:define="limit limit|''; names names|''; sort_by_names sort_by_names|''; entity entity|''">
         <tal:block tal:condition="embed">
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
-                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names, 'sort_by_names': sort_by_names})}"
+                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names, 'sort_by_names': sort_by_names, 'entity': entity})}"
                 data-embed-link="Embed diagram"
-                data-embed-source="${request.link(model, name='lists-chart')}">
+                data-embed-source="${request.link(model, name='lists-chart', query_params={'entity': entity, 'locale': request.locale})}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
             <div class="bar-chart"
-                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names, 'sort_by_names': sort_by_names})}">
+                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names, 'sort_by_names': sort_by_names, 'entity': entity})}">
             </div>
         </tal:block>
     </tal:block>
@@ -822,7 +932,7 @@
             i18n:attributes="data-embed-link"
             data-dataurl="${request.link(model, name='list-groups-data')}"
             data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='list-groups-chart')}">
+            data-embed-source="${request.link(model, name='list-groups-chart', query_params={'locale': request.locale})}">
         </div>
     </tal:block>
     <tal:block tal:condition="not: embed">
@@ -839,7 +949,7 @@
             data-dataurl="${request.link(model, name='seat-allocation-data')}"
             data-show-back="false"
             data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='seat-allocation-chart')}">
+            data-embed-source="${request.link(model, name='seat-allocation-chart', query_params={'locale': request.locale})}">
         </div>
     </tal:block>
     <tal:block tal:condition="not: embed">
@@ -851,20 +961,37 @@
 </metal:seat-allocation-chart i18n:domain="onegov.election_day">
 
 <metal:party-strengths-chart define-macro="party-strengths-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:condition="embed">
-        <div class="grouped-bar-chart"
-            i18n:attributes="data-embed-link"
-            data-dataurl="${request.link(model, name='party-strengths-data')}"
-            data-show-back="true"
-            data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='party-strengths-chart')}">
-        </div>
+    <tal:block tal:condition="not horizontal">
+        <tal:block tal:condition="embed">
+            <div class="grouped-bar-chart"
+                i18n:attributes="data-embed-link"
+                data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}"
+                data-show-back="true"
+                data-embed-link="Embed diagram"
+                data-embed-source="${request.link(model, name='party-strengths-chart', query_params={'locale': request.locale})}">
+            </div>
+        </tal:block>
+        <tal:block tal:condition="not: embed">
+            <div class="grouped-bar-chart"
+                data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}"
+                data-show-back="true">
+            </div>
+        </tal:block>
     </tal:block>
-    <tal:block tal:condition="not: embed">
-        <div class="grouped-bar-chart"
-            data-dataurl="${request.link(model, name='party-strengths-data')}"
-            data-show-back="true">
-        </div>
+    <tal:block tal:condition="horizontal">
+        <tal:block tal:condition="embed">
+            <div class="bar-chart"
+                i18n:attributes="data-embed-link"
+                data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}"
+                data-embed-link="Embed diagram"
+                data-embed-source="${request.link(model, name='party-strengths-chart', query_params={'locale': request.locale})}">
+            </div>
+        </tal:block>
+        <tal:block tal:condition="not: embed">
+            <div class="bar-chart"
+                data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}">
+            </div>
+        </tal:block>
     </tal:block>
 </metal:party-strengths-chart i18n:domain="onegov.election_day">
 
@@ -875,7 +1002,7 @@
             data-dataurl="${request.link(model, name='connections-data')}"
             data-inverse="true"
             data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='connections-chart')}">
+            data-embed-source="${request.link(model, name='connections-chart', query_params={'locale': request.locale})}">
         </div>
     </tal:block>
     <tal:block tal:condition="not: embed">
@@ -894,7 +1021,7 @@
             data-dataurl="${request.link(model, name='lists-panachage-data')}"
             data-inverse="false"
             data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='lists-panachage-chart')}">
+            data-embed-source="${request.link(model, name='lists-panachage-chart', query_params={'locale': request.locale})}">
         </div>
     </tal:block>
     <tal:block tal:condition="not: embed">
@@ -912,7 +1039,7 @@
             data-dataurl="${request.link(model, name='parties-panachage-data')}"
             data-inverse="false"
             data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='parties-panachage-chart')}">
+            data-embed-source="${request.link(model, name='parties-panachage-chart', query_params={'locale': request.locale})}">
         </div>
     </tal:block>
     <tal:block tal:condition="not: embed">
@@ -942,9 +1069,14 @@
     <span tal:condition="answer == 'proposal'" class="answer accepted" i18n:translate="">
         Proposal
     </span>
-    <span tal:condition="answer == 'counter-proposal'" class="answer rejected" i18n:translate="">
-        Counter Proposal
-    </span>
+    <tal:block tal:condition="answer == 'counter-proposal'">
+        <span tal:condition="direct" class="answer rejected" i18n:translate="">
+            Direct Counter Proposal
+        </span>
+        <span tal:condition="not direct" class="answer rejected" i18n:translate="">
+            Indirect Counter Proposal
+        </span>
+    </tal:block>
 </metal:answer>
 
 <metal:progress define-macro="progress" i18n:domain="onegov.election_day">
@@ -993,38 +1125,18 @@
                         ${field()}
                         <p><small class="error" tal:repeat="error field.errors">${error}</small></p>
                     </tal:block>
-                    <tal:block condition="input_type != 'hidden'">
-                        <label tal:attributes="class field.errors and 'error' or None">
-                            <tal:block condition="field.type == 'BooleanField'">
-                                ${field(placeholder=request.translate(field.description))}
-                                <span class="label-text">${field.label.text}</span>
-                                <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
-                                <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                            </tal:block>
-                            <tal:block condition="field.type != 'BooleanField'">
 
-                                <!--!
-                                    Note how the field is rendered *first* in the 'define' step,
-                                    before the label is accessed. This is due to the field call
-                                    setting up translatable labels as a side-effect.
-
-                                    See onegov.core.i18n.get_translation_bound_meta.render_field
-                                -->
-                                <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '')">
-                                    <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
-                                    <tal:b tal:condition="long_description">
-                                        <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
-                                        <p class="visually-hidden">${field.description}</p>
-                                    </tal:b>
-                                    <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-
-                                    <!--! The field is placed here -->
-                                    <tal:b replace="structure content" />
-                                </tal:b>
-
-                            </tal:block>
+                    <tal:block condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField')">
+                        <p class="visually-hidden" tal:condition="field.type == 'LazyWolvesField'" i18n:translate>The next field is a spam protection, please do not fill it out.</p>
+                        <label tal:attributes="class field.errors and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
+                            <metal:b use-macro="layout.macros['field']" />
                         </label>
-                        <p><small id="${field.name}-error" class="error" tal:repeat="error field.errors">${error}</small></p>
+
+                        <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
+                            <metal:b use-macro="layout.macros['field']" />
+                        </div>
+
+                        <p tal:condition="field.errors"><small id="${field.name}-error" class="error" tal:repeat="error field.errors">${error}</small></p>
                     </tal:block>
                </tal:block>
             </div>
@@ -1032,6 +1144,36 @@
         </tal:block>
   </div>
 </metal:fields>
+
+<metal:field define-macro="field" i18n:domain="onegov.election_day">
+    <tal:block condition="field.type == 'BooleanField'">
+        ${field(placeholder=request.translate(field.description))}
+        <span class="label-text">${field.label.text}</span>
+        <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}">?</span>
+        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+    </tal:block>
+    <tal:block condition="field.type != 'BooleanField'">
+
+        <!--!
+            Note how the field is rendered *first* in the 'define' step,
+            before the label is accessed. This is due to the field call
+            setting up translatable labels as a side-effect.
+
+            See onegov.core.i18n.get_translation_bound_meta.render_field
+        -->
+        <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '')">
+            <span class="label-text" tal:condition="(not field.hide_label)|(not field.render_kw['hide_label'])|True">${field.label.text}</span>
+            <tal:b tal:condition="long_description">
+                <span data-tooltip aria-haspopup="true" class="has-tip" title="${long_description}">?</span>
+            </tal:b>
+            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+
+            <!--! The field is placed here -->
+            <tal:b replace="content" />
+        </tal:b>
+
+    </tal:block>
+</metal:field>
 
 <metal:related_link define-macro="related_link" i18n:domain="onegov.election_day">
     <tal:block tal:define="explanations_pdf layout.explanations_pdf;
@@ -1053,10 +1195,10 @@
 </metal:related_link>
 
 <metal:related_elections define-macro="related_elections" i18n:domain="onegov.election_day">
-    <div class="row related" tal:condition="layout.related_elections">
+    <div class="row related" tal:define="related_elections layout.related_elections|layout.related_compounds|None" tal:condition="related_elections">
         <div class="columns small-12">
             <h2 i18n:translate="">Related elections</h2>
-            <p tal:repeat="(title, link) layout.related_elections">
+            <p tal:repeat="(title, link) related_elections">
                 <a href="${link}" class="related-link">${title}</a>
             </p>
         </div>
@@ -1074,18 +1216,18 @@
                 is_visible (abs(current_page.page-page.page) < 4) or repeat.page.start or repeat.page.end;
             ">
                 <tal:block condition="repeat.page.start and previous">
-                    <li class="arrow">
-                        <a href="${request.link(previous)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
+                    <li role="none" class="arrow">
+                        <a role="menuitem" href="${request.link(previous)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
                     </li>
                 </tal:block>
 
-                <li tal:condition="is_visible" class="${'current' if is_current else ''} ${repeat.page.start and 'first' or ''} ${repeat.page.end and 'last' or ''}">
-                    <a href="${request.link(page)}">${page.page + 1}<span tal:condition="is_current" i18n:translate="" class="visually-hidden"> (active)</span></a>
+                <li tal:condition="is_visible" role="none" class="${'current' if is_current else ''} ${repeat.page.start and 'first' or ''} ${repeat.page.end and 'last' or ''}">
+                    <a role="menuitem" href="${request.link(page)}">${page.page + 1}<span tal:condition="is_current" i18n:translate="" class="visually-hidden"> (active)</span></a>
                 </li>
 
                 <tal:block condition="repeat.page.end and next">
-                    <li class="arrow">
-                        <a href="${request.link(next)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
+                    <li role="none" class="arrow">
+                        <a role="menuitem" href="${request.link(next)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
                     </li>
                 </tal:block>
             </tal:block>
@@ -1105,12 +1247,12 @@
 
 <metal:tab_menu define-macro="tab_menu" i18n:domain="onegov.election_day">
     <div class="tab-navigation clearfix" tal:condition="layout.menu">
-        <nav class="top-bar clearfix" data-topbar data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
+        <nav class="top-bar clearfix" data-topbar="" data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
             <ul class="title-area">
                 <li class="name menu-icon"><span>${layout.title()}</span></li>
                 <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
             </ul>
-            <section class="top-bar-section">
+            <div class="top-bar-section">
                 <ul class="left">
                     <tal:block repeat="(title, link, active, submenu) layout.menu">
                         <li tal:condition="not submenu" tal:attributes="class 'active' if active else '';aria-current 'true' if active else 'false'">
@@ -1128,7 +1270,7 @@
                         </li>
                     </tal:block>
                 </ul>
-            </section>
+            </div>
         </nav>
     </div>
 </metal:tab_menu>
@@ -1175,12 +1317,12 @@
 
 <metal:election_day_link define-macro="election_day_link" i18n:domain="onegov.election_day">
     <nav role="navigation" aria-label="Breadcrumb Navigation">
-        <ul class="breadcrumbs back-links">
+        <ul class="breadcrumbs back-links" tal:define="compound item.election_compound|None">
             <li><a href="${layout.homepage_link}" i18n:translate="homepage">Start</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date.year))}">${item.date.year}</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date))}">${layout.format_date(item.date, 'day_long')}</a></li>
-            <li tal:condition="item.compound|None"><a href="${request.link(item.compound)}"><span metal:use-macro="layout.macros['title-translation']" tal:define="item item.compound"/></a></li>
-            <li><a href="${request.link(item)}" aria-current="You are here" i18n:attributes="aria-current"><span metal:use-macro="layout.macros['title-translation']" tal:define="item item"/></a></li>
+            <li tal:condition="compound"><a href="${request.link(compound)}"><span metal:use-macro="layout.macros['short-title-translation']" tal:define="item compound"/></a></li>
+            <li><a href="${request.link(item)}" aria-current="page"><span metal:use-macro="layout.macros['short-title-translation']" tal:define="item item"/></a></li>
         </ul>
     </nav>
 </metal:election_day_link>
@@ -1188,44 +1330,61 @@
 <metal:election_header define-macro="election_header" i18n:domain="onegov.election_day">
     <div metal:use-macro="layout.macros['election_day_link']" tal:define="item election"/>
     <h1><span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/></h1>
-    <hr />
+    <hr>
 </metal:election_header>
 
 <metal:vote_header define-macro="vote_header" i18n:domain="onegov.election_day">
     <h1>
         <span metal:use-macro="layout.macros['title-translation']" tal:define="item vote"/>
-        <div tal:condition="layout.answer">
-            <div tal:condition="layout.type == 'simple'" metal:use-macro="layout.macros['answer']" tal:define="answer layout.answer"/>
-            <div tal:condition="layout.type == 'complex'">
+        <tal:b tal:condition="layout.answer">
+            <br>
+            <tal:b tal:condition="layout.type == 'simple'" metal:use-macro="layout.macros['answer']" tal:define="answer layout.answer; direct layout.direct"/>
+            <tal:b tal:condition="layout.type == 'complex'">
                 <tal:block tal:define="proposal vote.proposal.accepted;
                                        counter_proposal vote.counter_proposal.accepted;
-                                       tie_breaker vote.tie_breaker.accepted">
-                    <span tal:condition="python: not proposal and not counter_proposal" class="answer rejected" i18n:translate="">
-                        Proposal and counter proposal rejected
-                    </span>
+                                       tie_breaker vote.tie_breaker.accepted;
+                                       direct vote.direct">
+                    <tal:block tal:condition="python: not proposal and not counter_proposal">
+                        <span tal:condition="direct" class="answer rejected" i18n:translate="">
+                            Proposal and direct counter proposal rejected
+                        </span>
+                        <span tal:condition="not direct" class="answer rejected" i18n:translate="">
+                            Proposal and indirect counter proposal rejected
+                        </span>
+                    </tal:block>
                     <span tal:condition="python: proposal and not counter_proposal" class="answer accepted" i18n:translate="">
                         Proposal accepted
                     </span>
-                    <span tal:condition="python: not proposal and counter_proposal" class="answer accepted" i18n:translate="">
-                        Counter proposal accepted
-                    </span>
+                    <tal:block tal:condition="python: not proposal and counter_proposal">
+                        <span tal:condition="direct" class="answer accepted" i18n:translate="">
+                            Direct counter proposal accepted
+                        </span>
+                        <span tal:condition="not direct" class="answer accepted" i18n:translate="">
+                            Indirect counter proposal accepted
+                        </span>
+                    </tal:block>
                     <tal:block tal:condition="python: proposal and counter_proposal">
                         <span tal:condition="tie_breaker" class="answer accepted" i18n:translate="">
                             Tie breaker in favor of the proposal
                         </span>
-                        <span tal:condition="not: tie_breaker" class="answer rejected" i18n:translate="">
-                            Tie breaker in favor of the counter proposal
-                        </span>
+                        <tal:block tal:condition="not: tie_breaker">
+                            <span tal:condition="direct" class="answer rejected" i18n:translate="">
+                                Tie breaker in favor of the direct counter proposal
+                            </span>
+                            <span tal:condition="not direct" class="answer rejected" i18n:translate="">
+                                Tie breaker in favor of the indirect counter proposal
+                            </span>
+                        </tal:block>
                     </tal:block>
                 </tal:block>
-            </div>
-        </div>
+            </tal:b>
+        </tal:b>
     </h1>
 
     <div class="clearfix"></div>
     <metal metal:use-macro="layout.macros['ballot-result-bar']" />
     <tal:block tal:condition="not: layout.has_results and ballot">
-        <hr />
+        <hr>
     </tal:block>
 </metal:vote_header>
 
@@ -1362,19 +1521,6 @@
     </ul>
 </metal:file_import_errors>
 
-<metal:tablesaw_translations define-macro="tablesaw_translations" i18n:domain="onegov.election_day">
-    <script>
-        TablesawConfig = {
-            i18n: {
-                modeStack: '<tal:block i18n:translate>Stack</tal:block>',
-                modeToggle: '<tal:block i18n:translate>Toggle</tal:block>',
-                modeSwitchColumns: '<tal:block i18n:translate>Columns</tal:block>',
-                modeSwitchColumnsAbbreviated: '<tal:block i18n:translate>Columns</tal:block>',
-            }
-        };
-    </script>
-</metal:tablesaw_translations>
-
 <metal:seat_allocation_figure define-macro="seat_allocation_figure" i18n:domain="onegov.election_day">
     <figure>
         <tal:block metal:use-macro="layout.macros['seat-allocation-chart']" tal:define="embed True"/>
@@ -1387,11 +1533,11 @@
 
 <metal:party_strengths_figure define-macro="party_strengths_figure" i18n:domain="onegov.election_day">
     <figure>
-        <tal:block metal:use-macro="layout.macros['party-strengths-chart']" tal:define="embed True"/>
+        <tal:block metal:use-macro="layout.macros['party-strengths-chart']" tal:define="embed True; horizontal model.horizontal_party_strengths|False"/>
         <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
             <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
         </a>
-        <figcaption i18n:translate="figcaption_party_strengths">
+            <figcaption i18n:translate="figcaption_party_strengths" tal:condition="not: model.horizontal_party_strengths|False">
             The diagram shows the votes and mandates of the parties. The rimmed bars
             (left scale) correspond to the number of mandates, the colored bars (right scale)
             to the voices (percentages).
@@ -1399,62 +1545,63 @@
     </figure>
 </metal:party_strengths_figure>
 
-<metal:party_strengths define-macro="party_strengths" i18n:domain="onegov.election_day">
-    <div class="tab-navigation clearfix">
-        <nav class="top-bar" data-topbar role="navigation">
-            <ul class="title-area">
-                <li class="name menu-icon"><span i18n:translate="">Year</span></li>
-                <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
-            </ul>
-            <section class="top-bar-section">
-                <ul class="left tabs" data-tab>
-                    <tal:block tal:repeat="year sorted(years, reverse=True)">
-                        <li tal:attributes="class 'active' if repeat.year.start else ''"><a href="#panel_${year}">${year}</a></li>
-                    </tal:block>
+<metal:party-strengths-table define-macro="party-strengths-table" i18n:domain="onegov.election_day">
+    <tal:block tal:define="voters_counts layout.model.voters_counts|False; year year|None">
+        <div class="tab-navigation clearfix" tal:condition="party_years and not year">
+            <nav class="top-bar" data-topbar="" role="navigation">
+                <ul class="title-area">
+                    <li class="name menu-icon"><span i18n:translate="">Year</span></li>
+                    <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
                 </ul>
-            </section>
-        </nav>
-    </div>
-    <div class="tabs-content">
-        <tal:block tal:repeat="year sorted(years, reverse=True)">
-            <div tal:attributes="class 'content active' if repeat.year.start else 'content'" id="panel_${year}">
-                <table
-                    class="results tablesaw sortable"
-                    data-tablesaw-mode="columntoggle"
-                    data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
-                    data-tablesaw-minimap=""
-                    >
-                    <thead>
-                        <tr>
-                            <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
-                            <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">${layout.label('mandates')}</th>
-                            <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
-                            <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
-                            <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
-                            <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
-                            <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="deltas">Difference</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr tal:repeat="line results[year]">
-                            <tal:block tal:repeat="cell line">
-                                <td tal:condition="repeat.cell.start">${cell}</td>
-                                <td tal:condition="not: repeat.cell.start" class="right-aligned">${cell}</td>
-                            </tal:block>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </tal:block>
-    </div>
-</metal:party_strengths>
+                <div class="top-bar-section">
+                    <ul class="left tabs" data-tab="">
+                        <tal:block tal:repeat="year sorted(party_years, reverse=True)">
+                            <li tal:attributes="class 'active' if repeat.year.start else ''"><a href="#panel_${year}">${year}</a></li>
+                        </tal:block>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <div class="tabs-content" tal:condition="party_years">
+            <tal:block tal:repeat="current_year sorted(party_years, reverse=True)">
+                <div tal:attributes="class 'content active' if repeat.current_year.start or year == current_year else 'content'" id="panel_${current_year}" tal:condition="not year or year == current_year">
+                    <table
+                        class="results tablesaw sortable"
+                        data-tablesaw-mode="columntoggle"
+                        data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+                        data-tablesaw-minimap=""
+                        >
+                        <thead>
+                            <tr>
+                                <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
+                                <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">${layout.label('mandates')}</th>
+                                <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
+                                <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
+                                <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
+                                <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
+                                <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="party_deltas">Difference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr tal:repeat="line party_results[current_year]">
+                                <tal:block tal:repeat="cell line">
+                                    <td tal:condition="repeat.cell.start">${cell}</td>
+                                    <td tal:condition="not: repeat.cell.start" class="right-aligned">${cell}</td>
+                                </tal:block>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </tal:block>
+        </div>
+    </tal:block>
+</metal:party-strengths-table>
 
 <metal:figcaption_panachage define-macro="figcaption_panachage" i18n:domain="onegov.election_day">
     <figcaption i18n:translate="figcaption_panachage">
-        The diagram shows the origin of the votes. The bars on the left correspond
-        to the unchanged votes (including the blank list), the bars on the right
-        side to the final results. The width of the bars and connections is
-        proportional to the votes.
+        The diagram shows the origin of votes won and lost by panache.
+        On the left side are the lost votes, on the right side the won votes.
+        The width of the bars and the connections is proportional to the number of votes.
     </figcaption>
 </metal:figcaption_panachage>
 
@@ -1616,7 +1763,7 @@
     </tal:block>
     <tal:block tal:condition="vote.has_results and vote.completed and vote.type == 'simple'">
         <!--! Final results, simple vote -->
-        <h2><tal:block metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer"/></h2>
+        <h2><tal:block metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer; direct vote.direct"/></h2>
         <dl>
             <dt i18n:translate>Yeas</dt>
             <dd>${'{0:.2f}'.format(vote.proposal.yeas_percentage)}%</dd>
@@ -1628,12 +1775,15 @@
     </tal:block>
     <tal:block tal:condition="vote.has_results and vote.completed and vote.type == 'complex'">
         <!--! Final results, complex vote -->
-        <h2 tal:define="proposal vote.proposal.accepted; counter_proposal vote.counter_proposal.accepted; tie_breaker vote.tie_breaker.accepted">
-            <tal:block tal:condition="python: not proposal and not counter_proposal" i18n:translate>Proposal and counter proposal rejected</tal:block>
+        <h2 tal:define="proposal vote.proposal.accepted; counter_proposal vote.counter_proposal.accepted; tie_breaker vote.tie_breaker.accepted; direct vote.direct">
+            <tal:block tal:condition="python: not proposal and not counter_proposal and direct" i18n:translate>Proposal and direct counter proposal rejected</tal:block>
+            <tal:block tal:condition="python: not proposal and not counter_proposal and not direct" i18n:translate>Proposal and indirect counter proposal rejected</tal:block>
             <tal:block tal:condition="python: proposal and not counter_proposal" i18n:translate>Proposal accepted</tal:block>
-            <tal:block tal:condition="python: not proposal and counter_proposal" i18n:translate>Counter proposal accepted</tal:block>
+            <tal:block tal:condition="python: not proposal and counter_proposal and direct" i18n:translate>Direct counter proposal accepted</tal:block>
+            <tal:block tal:condition="python: not proposal and counter_proposal and not direct" i18n:translate>Indirect counter proposal accepted</tal:block>
             <tal:block tal:condition="python: proposal and counter_proposal and tie_breaker" i18n:translate>Tie breaker in favor of the proposal</tal:block>
-            <tal:block tal:condition="python: proposal and counter_proposal and not tie_breaker" i18n:translate>Tie breaker in favor of the counter proposal</tal:block>
+            <tal:block tal:condition="python: proposal and counter_proposal and not tie_breaker and direct" i18n:translate>Tie breaker in favor of the direct counter proposal</tal:block>
+            <tal:block tal:condition="python: proposal and counter_proposal and not tie_breaker and not direct" i18n:translate>Tie breaker in favor of the indirect counter proposal</tal:block>
         </h2>
         <dl>
             <dt i18n:translate>Proposal</dt>

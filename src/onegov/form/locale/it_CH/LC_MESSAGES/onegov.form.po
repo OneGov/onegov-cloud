@@ -1,11 +1,10 @@
-#
 # Italian translations for PACKAGE package
 # Traduzioni italiane per il pacchetto PACKAGE.
 # This file is distributed under the same license as the PACKAGE package.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-20 09:55+0100\n"
+"POT-Creation-Date: 2026-01-07 17:12+0100\n"
 "PO-Revision-Date: 2022-03-07 13:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -16,6 +15,18 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 3.0.1\n"
+
+msgid "Invalid number of hours"
+msgstr "Numero di ore non valido"
+
+msgid "Invalid number of minutes"
+msgstr "Numero di minuti non valido"
+
+msgid "Not a valid email"
+msgstr "Non è un'email valida"
+
+msgid "Not a valid color."
+msgstr "Non è un colore valido."
 
 msgid "Required"
 msgstr "Richiesto"
@@ -36,17 +47,29 @@ msgstr "Generale"
 msgid "Title"
 msgstr "Titolo"
 
-msgid "Text"
-msgstr "Testo"
-
-msgid "Multiline"
-msgstr "Multilinea"
-
 msgid "E-Mail"
 msgstr "E-Mail"
 
 msgid "Website"
 msgstr "Sito web"
+
+msgid "Video Link"
+msgstr "Link video"
+
+msgid "Text fields"
+msgstr "Campi di testo"
+
+msgid "Text"
+msgstr "Testo"
+
+msgid "Limited text"
+msgstr "Testo limitato"
+
+msgid "Multiline with optional number of rows"
+msgstr "Multilinea con numero di righe opzionale"
+
+msgid "Numbers-only textfield (regex)"
+msgstr "Campo di testo solo numeri (regex)"
 
 msgid "Comment"
 msgstr "Commento"
@@ -72,6 +95,9 @@ msgstr "Scelta"
 msgid "Multiple Choice"
 msgstr "Scelta multipla"
 
+msgid "Subfields depending on choice"
+msgstr "Sottocampi a seconda della scelta"
+
 msgid "Files"
 msgstr "File"
 
@@ -81,6 +107,9 @@ msgstr "Immagine"
 msgid "Document"
 msgstr "Documento"
 
+msgid "Documents (Multiple upload)"
+msgstr "Documenti (Caricamento multiplo)"
+
 msgid "Numbers"
 msgstr "Numeri"
 
@@ -89,6 +118,9 @@ msgstr "Età"
 
 msgid "Percentage"
 msgstr "Percentuale"
+
+msgid "Amount with Price"
+msgstr "Importo con prezzo"
 
 msgid "Extended"
 msgstr "Esteso"
@@ -105,6 +137,12 @@ msgstr "Identificatore aziendale svizzero"
 msgid "Swiss vat number"
 msgstr "Partita iva svizzera"
 
+msgid "Animal identification number (Microchip-Nr.)"
+msgstr "Numero di identificazione dell'animale (Microchip-Nr.)"
+
+msgid "Password"
+msgstr "Password"
+
 msgid "Markdown"
 msgstr "Markdown"
 
@@ -115,6 +153,14 @@ msgstr ""
 
 msgid "Files of this type are not supported."
 msgstr "I file di questo tipo non sono supportati."
+
+msgid ""
+"The password you wanted to use was found on list of commonly used passwords, "
+"please use a more secure password."
+msgstr ""
+"La password che desideravi utilizzare è stata trovata nell'elenco delle "
+"password comunemente utilizzate. Ti preghiamo di utilizzare una password più "
+"sicura."
 
 msgid "The form could not be parsed."
 msgstr "Il modulo non può essere analizzato."
@@ -127,6 +173,30 @@ msgid "The syntax on line {line} is not valid."
 msgstr "La sintassi sulla linea {line} non è valida."
 
 #, python-format
+msgid ""
+"The indentation on line {line} is not valid. Please use a multiple of 4 "
+"spaces"
+msgstr ""
+"L'indentazione della riga {linea} non è valida. Si prega di utilizzare un "
+"multiplo di 4 spazi"
+
+#, python-format
+msgid ""
+"The indentation on line {line} is not valid. Comments must be indented to "
+"the same level as the field definition (`=`) they belong to."
+msgstr ""
+"L'indentazione della riga {linea} non è valida. I commenti devono essere "
+"rientrati allo stesso livello della definizione del campo (`=`) a cui "
+"appartengono."
+
+#, python-format
+msgid ""
+"Incorrect placement of the field description on line {line}. The field "
+"description must be placed below the field definition (`=`) and with the "
+"same indentation."
+msgstr ""
+
+#, python-format
 msgid "The field '{label}' exists more than once."
 msgstr "Il campo '{label}' esiste più di una volta."
 
@@ -137,6 +207,44 @@ msgstr "'{label}' è un nome riservato. Per favore usa un nome diverso."
 msgid "Define at least one required field"
 msgstr "Definire almeno un campo obbligatorio"
 
+#, python-format
+msgid ""
+"The field '{label}' contains a price that requires a credit card payment. "
+"This is only allowed if credit card payments are optional."
+msgstr ""
+"Il campo '{label}' contiene un prezzo che richiede un pagamento con carta di "
+"credito. Ciò è consentito solo se i pagamenti con carta di credito sono "
+"facoltativi."
+
+msgid ""
+"A minimum price total can only be set if at least one priced field is "
+"defined."
+msgstr ""
+"È possibile impostare un prezzo minimo totale solo se è definito almeno un "
+"campo prezzo."
+
+#, python-format
+msgid ""
+"The '{label}' group is empty and will not be visible. Either remove the "
+"empty group or add fields to it."
+msgstr ""
+"Il gruppo '{label}' è vuoto e non sarà visibile. Rimuovere il gruppo vuoto o "
+"aggiungere campi."
+
+#, python-format
+msgid ""
+"Invalid field type for field '{label}'. For filters only 'select' or "
+"'multiple select' fields are allowed."
+msgstr ""
+"Tipo di campo non valido per il campo '{label}'. Per i filtri solo i campi "
+"'selezionare' o 'selezionare più volte' sono consentiti."
+
+#, python-format
+msgid ""
+"Invalid field type for field '${label}'. Please use the plus-icon to add "
+"allowed field types."
+msgstr ""
+
 msgid "Not a valid phone number."
 msgstr "Non è un numero di telefono valido."
 
@@ -145,6 +253,21 @@ msgstr "Non è un numero di sicurezza sociale svizzero valido."
 
 msgid "This value already exists."
 msgstr "Questo valore esiste già."
+
+#, python-format
+msgid "Needs to be between {min_date} and {max_date}."
+msgstr "Deve essere compreso tra {min_date} e {max_date}."
+
+#, python-format
+msgid "Needs to be on or after {date}."
+msgstr "Deve essere durante o dopo il {date}."
+
+#, python-format
+msgid "Needs to be on or before {date}."
+msgstr "Deve essere durante o prima del {date}."
+
+msgid "Not a valid domain."
+msgstr "Dominio non valido."
 
 msgid "Uploaded file"
 msgstr "File caricato"
@@ -158,6 +281,12 @@ msgstr "Cancellare il file"
 msgid "Replace file"
 msgstr "Sostituire il file"
 
+msgid "Upload additional files"
+msgstr "Caricare file aggiuntivi"
+
+msgid "Text modules"
+msgstr "Moduli di testo"
+
 msgid "Select an Option"
 msgstr "Selezionare un'opzione"
 
@@ -166,3 +295,12 @@ msgstr "Nessun risultato corrisponde"
 
 msgid "Select Some Options"
 msgstr "Seleziona alcune opzioni"
+
+msgid "hours"
+msgstr "ore"
+
+msgid "minutes"
+msgstr "minuti"
+
+#~ msgid "Multiline"
+#~ msgstr "Multilinea"

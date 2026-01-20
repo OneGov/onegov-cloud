@@ -1,0 +1,106 @@
+name: Measure and store test durations for pytest-split
+
+on:
+  workflow_dispatch:  # allow to run manually
+  schedule:
+    - cron: '0 4 * * 1'  # run once a week on monday morning
+
+jobs:
+  build:
+
+    runs-on: ubuntu-24.04
+
+    # we always use the latest container from the master branch
+    # this is fine because we still run all our installs just in case
+    container:
+      image: ghcr.io/onegov/onegov-cloud:master
+      credentials:
+         username: ${{ github.actor }}
+         password: ${{ secrets.GITHUB_TOKEN }}
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Install packages
+      run: |
+        apt-get update
+        apt-get install -y \
+          wget \
+          apparmor \
+          curl \
+          git-core \
+          postgresql \
+          redis \
+          gcc \
+          libc-dev \
+          fonts-liberation \
+          libappindicator3-1 \
+          libasound2t64 \
+          libcairo2-dev \
+          libdrm2 \
+          libgbm1 \
+          libnspr4 \
+          libnss3 \
+          libu2f-udev \
+          libvulkan1 \
+          libx11-xcb1 \
+          libxcb-dri3-0 \
+          libxshmfence1 \
+          libxss1 \
+          libxt-dev \
+          unzip \
+          xdg-utils
+
+    - name: Install Chrome
+      uses: browser-actions/setup-chrome@v1
+      with:
+        # FIXME: OGC-1857
+        chrome-version: 127
+        install-chromedriver: true
+
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        source /app/bin/activate
+        python -m pip install --upgrade uv
+        uv pip install pytest-split pytest-xdist
+        # TEMPORARY: editable build so we don't need a path-fix in codecov
+        uv pip install -e .[test]
+      env:
+        # NOTE: Suppress uv warning
+        UV_LINK_MODE: copy
+
+    - name: Prepare test environment
+      run: |
+        # reset the build asset permissions
+        # TEMPORARY: if we no longer do an editable install, then the base
+        #            path needs to change to /app/lib/
+        find . -type d -iname assets -print0 | xargs -0 chmod a+w -R
+        # add unprivileged test user
+        adduser --disabled-password --gecos "" test
+        redis-server --daemonize yes
+        # NOTE: Allow the test user to write to this file
+        chown test .test_durations
+        # NOTE: Avoid dubious ownership error when commiting
+        git config --global --add safe.directory $PWD
+
+    - name: Measure test durations
+      run: |
+        run-as "$(id -u test)":test /app/bin/pytest \
+          -o cache_dir=/tmp/pytest \
+          --store-durations \
+          tests
+      env:
+        LC_ALL: C.UTF-8
+        LANG: C.UTF-8
+        SKIP_DRIVER_MANAGER: '1'
+
+    - uses: EndBug/add-and-commit@v9
+      with:
+        add: .test_durations
+        default_author: github_actions
+        message: Updates test durations [skip-ci]

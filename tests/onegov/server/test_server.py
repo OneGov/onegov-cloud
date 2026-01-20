@@ -1,15 +1,29 @@
+from __future__ import annotations
+
 from onegov.server.application import Application
 from onegov.server.core import Server
 from onegov.server.config import Config
-from webob import BaseRequest, Response
+from webob import Response
+from webob.request import BaseRequest
 from webtest import TestApp as Client
 
 
-def test_application_mapping():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed.wsgi import WSGIEnvironment, StartResponse
+    from collections.abc import Iterable
+
+
+def test_application_mapping() -> None:
 
     class EchoApplication(Application):
 
-        def __call__(self, environ, start_response):
+        def __call__(
+            self,
+            environ: WSGIEnvironment,
+            start_response: StartResponse
+        ) -> Iterable[bytes]:
+
             response = Response()
             response.text = ', '.join(
                 (self.application_base_path, self.application_id))
@@ -32,17 +46,17 @@ def test_application_mapping():
     }))
 
     c = Client(server)
-    c.get('/static').body == b'/static, stag/static'
-    c.get('/static/').body == b'/static, stag/static'
-    c.get('/static/site').body == b'/static, stag/static'
-    c.get('/static/site/').body == b'/static, stag/static'
-    c.get('/wildcard/blog').body == b'/wildcard/blog, wild/blog'
-    c.get('/wildcard/blog/').body == b'/wildcard/blog, wild/blog'
-    c.get('/wildcard/blog/login').body == b'/wildcard/blog, wild/blog'
-    c.get('/wildcard/blog/login/').body == b'/wildcard/blog, wild/blog'
-    c.get('/wildcard/monitor/refresh').body\
+    assert c.get('/static').body == b'/static, stag/static'
+    assert c.get('/static/').body == b'/static, stag/static'
+    assert c.get('/static/site').body == b'/static, stag/static'
+    assert c.get('/static/site/').body == b'/static, stag/static'
+    assert c.get('/wildcard/blog').body == b'/wildcard/blog, wild/blog'
+    assert c.get('/wildcard/blog/').body == b'/wildcard/blog, wild/blog'
+    assert c.get('/wildcard/blog/login').body == b'/wildcard/blog, wild/blog'
+    assert c.get('/wildcard/blog/login/').body == b'/wildcard/blog, wild/blog'
+    assert c.get('/wildcard/monitor/refresh').body\
         == b'/wildcard/monitor, wild/monitor'
-    c.get('/wildcard/monitor/refresh/').body\
+    assert c.get('/wildcard/monitor/refresh/').body\
         == b'/wildcard/monitor, wild/monitor'
 
     c.get('/', status=404)
@@ -51,11 +65,16 @@ def test_application_mapping():
     c.get('/not-there', status=404)
 
 
-def test_path_prefix():
+def test_path_prefix() -> None:
 
     class EchoApplication(Application):
 
-        def __call__(self, environ, start_response):
+        def __call__(
+            self,
+            environ: WSGIEnvironment,
+            start_response: StartResponse
+        ) -> Iterable[bytes]:
+
             request = BaseRequest(environ)
 
             response = Response()
@@ -80,19 +99,24 @@ def test_path_prefix():
     }))
 
     c = Client(server)
-    c.get('/static').body == b'/static, '
-    c.get('/static/info').body == b'/static, /info'
-    c.get('/static/info/test').body == b'/static, /info/test'
-    c.get('/wildcard/info').body == b'/wildcard/info, '
-    c.get('/wildcard/info/test').body == b'/wildcard/info, /test'
-    c.get('/wildcard/x/y/z').body == b'/wildcard/x, /y/z'
+    assert c.get('/static').body == b'/static, '
+    assert c.get('/static/info').body == b'/static, /info'
+    assert c.get('/static/info/test').body == b'/static, /info/test'
+    assert c.get('/wildcard/info').body == b'/wildcard/info, '
+    assert c.get('/wildcard/info/test').body == b'/wildcard/info, /test'
+    assert c.get('/wildcard/x/y/z').body == b'/wildcard/x, /y/z'
 
 
-def test_environ_changes():
+def test_environ_changes() -> None:
 
     class EchoApplication(Application):
 
-        def __call__(self, environ, start_response):
+        def __call__(
+            self,
+            environ: WSGIEnvironment,
+            start_response: StartResponse
+        ) -> Iterable[bytes]:
+
             response = Response()
             response.text = ', '.join((
                 environ['SCRIPT_NAME'],
@@ -125,11 +149,17 @@ def test_environ_changes():
         == b'/wildcard/wildcard, /wildcard'
 
 
-def test_invalid_host_request():
+def test_invalid_host_request() -> None:
 
     class HelloApplication(Application):
 
-        def __call__(self, environ, start_response):
+
+        def __call__(
+            self,
+            environ: WSGIEnvironment,
+            start_response: StartResponse
+        ) -> Iterable[bytes]:
+
             response = Response()
             response.text = 'hello'
 
@@ -158,7 +188,9 @@ def test_invalid_host_request():
         '/static', headers={'HOST': 'example.org:8080'}, status=403)
     assert response.status_code == 403
 
-    server.applications.get('/static').allowed_hosts.add('example.org')
+    app = server.applications.get('/static')
+    assert app is not None
+    app.allowed_hosts.add('example.org')
 
     response = c.get('/static', headers={'X_VHM_HOST': 'https://example.org'})
     assert response.body == b'hello'
@@ -167,14 +199,19 @@ def test_invalid_host_request():
     assert response.body == b'hello'
 
 
-def test_not_allowed_application_id():
+def test_not_allowed_application_id() -> None:
 
     class HelloApplication(Application):
 
-        def is_allowed_application_id(self, application_id):
+        def is_allowed_application_id(self, application_id: str) -> bool:
             return application_id == 'foobar'
 
-        def __call__(self, environ, start_response):
+        def __call__(
+            self,
+            environ: WSGIEnvironment,
+            start_response: StartResponse
+        ) -> Iterable[bytes]:
+
             response = Response()
             response.text = 'hello'
 
@@ -196,11 +233,16 @@ def test_not_allowed_application_id():
     assert c.get('/sites/foobar', expect_errors=False).status_code == 200
 
 
-def test_aliases():
+def test_aliases() -> None:
 
     class EchoApplication(Application):
 
-        def __call__(self, environ, start_response):
+        def __call__(
+            self,
+            environ: WSGIEnvironment,
+            start_response: StartResponse
+        ) -> Iterable[bytes]:
+
             response = Response()
             response.text = ''.join((self.application_id))
 
@@ -217,6 +259,7 @@ def test_aliases():
     }))
 
     application = server.applications.get('/sites')
+    assert application is not None
 
     c = Client(server)
 
@@ -232,11 +275,16 @@ def test_aliases():
     assert response.body == b'aliases/main'
 
 
-def test_application_id_dashes():
+def test_application_id_dashes() -> None:
 
     class HelloApplication(Application):
 
-        def __call__(self, environ, start_response):
+        def __call__(
+            self,
+            environ: WSGIEnvironment,
+            start_response: StartResponse
+        ) -> Iterable[bytes]:
+
             response = Response()
             response.text = self.application_id
 
@@ -256,14 +304,25 @@ def test_application_id_dashes():
     assert c.get('/foo-bar/bar-foo').text == 'foo_bar/bar_foo'
 
 
-def test_exception_handler():
+def test_exception_handler() -> None:
 
     class ErrorApplication(Application):
 
-        def __call__(self, environ, start_response):
+        def __call__(
+            self,
+            environ: WSGIEnvironment,
+            start_response: StartResponse
+        ) -> Iterable[bytes]:
+
             raise RuntimeError()
 
-        def handle_exception(self, exception, environ, start_response):
+        def handle_exception(
+            self,
+            exception: BaseException,
+            environ: WSGIEnvironment,
+            start_response: StartResponse
+        ) -> Iterable[bytes]:
+
             response = Response()
             response.text = exception.__class__.__name__
 

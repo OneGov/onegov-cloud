@@ -11,7 +11,7 @@
                 <a href="mailto:${message.owner}" i18n:name="author">${message.owner}</a> wrote
             </span>
 
-            <tal:b content="structure message.formatted_text(layout)" />
+            <tal:b content="message.formatted_text(layout)" />
         </td></tr></table>
 
         <p><b>${resource.title}</b></p>

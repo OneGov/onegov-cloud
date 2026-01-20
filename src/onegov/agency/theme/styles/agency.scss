@@ -5,6 +5,13 @@ $building-icon: '\f0f7';
 $person-icon: '\f2bd';
 $arrow-right: '\f061';
 
+/*
+    hide certain settings
+*/
+.vat-settings {
+    display: none;
+}
+
 .agencies {
     list-style: none;
     margin-left: 0;
@@ -19,10 +26,8 @@ $arrow-right: '\f061';
         margin-top: 1em;
     }
 
-    dt,
-    dd {
-        display: inline;
-        font-weight: normal;
+    dt {
+        margin-bottom: 0;
     }
 
     .children,
@@ -190,4 +195,19 @@ ul.agency-nav {
 .breadcrumbs {
     text-overflow: clip;
     white-space: normal;
+}
+
+
+/*
+    Agency Form
+*/
+
+// hide the organisation field
+.row.field-organisation {
+    display: none;
+}
+
+// hide the sub organisation field
+.row.field-sub_organisation {
+    display: none;
 }

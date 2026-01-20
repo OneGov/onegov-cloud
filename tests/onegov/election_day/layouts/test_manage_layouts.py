@@ -1,17 +1,16 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import Election
-from onegov.ballot import ElectionCollection
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundCollection
-from onegov.ballot import Vote
-from onegov.ballot import VoteCollection
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
+from onegov.election_day.collections import ElectionCollection
+from onegov.election_day.collections import ElectionCompoundCollection
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import ScreenCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
+from onegov.election_day.collections import VoteCollection
 from onegov.election_day.layouts import ManageDataSourceItemsLayout
 from onegov.election_day.layouts import ManageDataSourcesLayout
 from onegov.election_day.layouts import ManageElectionCompoundsLayout
@@ -20,14 +19,26 @@ from onegov.election_day.layouts import ManageScreensLayout
 from onegov.election_day.layouts import ManageSubscribersLayout
 from onegov.election_day.layouts import ManageUploadTokensLayout
 from onegov.election_day.layouts import ManageVotesLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_manage_layouts(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.layouts import DefaultLayout
+    from onegov.election_day.types import DomainOfInfluence
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
+def test_manage_layouts(session: Session) -> None:
+    layout: DefaultLayout
     # Votes
     layout = ManageVotesLayout(
         VoteCollection(session),
-        DummyRequest()
+        DummyRequest()  # type: ignore[arg-type]
     )
     assert layout.manage_model_link == 'VoteCollection/archive'
     assert layout.menu == [
@@ -44,6 +55,14 @@ def test_manage_layouts(session):
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ]),
         ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
@@ -54,7 +73,7 @@ def test_manage_layouts(session):
     # ... with full menu
     layout = ManageVotesLayout(
         VoteCollection(session),
-        DummyRequest()
+        DummyRequest()  # type: ignore[arg-type]
     )
     layout.principal.sms_notification = 'http://example.com'
     layout.principal.email_notification = True
@@ -74,7 +93,7 @@ def test_manage_layouts(session):
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
             ('Wabsti data sources', 'DataSourceCollection/archive', False, []),
         ]),
-        ('Subscribers', '', False, [
+        ('Notifications', '', False, [
             ('SMS subscribers', 'SmsSubscriberCollection/archive', False, []),
             (
                 'Email subscribers',
@@ -99,7 +118,7 @@ def test_manage_layouts(session):
     # Elections
     layout = ManageElectionsLayout(
         ElectionCollection(session),
-        DummyRequest()
+        DummyRequest()  # type: ignore[arg-type]
     )
     assert layout.manage_model_link == 'ElectionCollection/archive'
     assert layout.menu == [
@@ -116,6 +135,14 @@ def test_manage_layouts(session):
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ]),
         ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
@@ -126,7 +153,7 @@ def test_manage_layouts(session):
     # Election compounds
     layout = ManageElectionCompoundsLayout(
         ElectionCompoundCollection(session),
-        DummyRequest()
+        DummyRequest()  # type: ignore[arg-type]
     )
     assert layout.manage_model_link == 'ElectionCompoundCollection/archive'
     assert layout.menu == [
@@ -143,6 +170,14 @@ def test_manage_layouts(session):
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ]),
         ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
@@ -153,7 +188,7 @@ def test_manage_layouts(session):
     # Upload tokens
     layout = ManageUploadTokensLayout(
         UploadTokenCollection(session),
-        DummyRequest()
+        DummyRequest()  # type: ignore[arg-type]
     )
     assert layout.manage_model_link == 'UploadTokenCollection/archive'
     assert layout.menu == [
@@ -170,6 +205,14 @@ def test_manage_layouts(session):
         ('Import configuration', '', True, [
             ('Upload tokens', 'UploadTokenCollection/archive', True, []),
         ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ]),
         ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
@@ -180,7 +223,7 @@ def test_manage_layouts(session):
     # Wabsti data sources
     layout = ManageDataSourcesLayout(
         DataSourceCollection(session),
-        DummyRequest()
+        DummyRequest()  # type: ignore[arg-type]
     )
     layout.principal.wabsti_import = True
     assert layout.manage_model_link == 'DataSourceCollection/archive'
@@ -199,6 +242,14 @@ def test_manage_layouts(session):
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
             ('Wabsti data sources', 'DataSourceCollection/archive', True, []),
         ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ]),
         ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
@@ -208,8 +259,8 @@ def test_manage_layouts(session):
 
     # Data source items
     layout = ManageDataSourceItemsLayout(
-        DataSourceItemCollection(session, 'source'),
-        DummyRequest()
+        DataSourceItemCollection(session, 'source'),  # type: ignore[arg-type]
+        DummyRequest()  # type: ignore[arg-type]
     )
     layout.principal.wabsti_import = True
     assert layout.manage_model_link == 'DataSourceItemCollection/source'
@@ -228,6 +279,14 @@ def test_manage_layouts(session):
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
             ('Wabsti data sources', 'DataSourceCollection/archive', True, []),
         ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ]),
         ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
@@ -239,7 +298,7 @@ def test_manage_layouts(session):
     # Email subscribers
     layout = ManageSubscribersLayout(
         EmailSubscriberCollection(session),
-        DummyRequest()
+        DummyRequest()  # type: ignore[arg-type]
     )
     layout.principal.email_notification = True
     assert layout.manage_model_link == 'EmailSubscriberCollection/archive'
@@ -257,7 +316,7 @@ def test_manage_layouts(session):
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
-        ('Subscribers', '', True, [
+        ('Notifications', '', True, [
             (
                 'Email subscribers',
                 'EmailSubscriberCollection/archive',
@@ -281,7 +340,7 @@ def test_manage_layouts(session):
     # SMS subscribers
     layout = ManageSubscribersLayout(
         SmsSubscriberCollection(session),
-        DummyRequest()
+        DummyRequest()  # type: ignore[arg-type]
     )
     layout.principal.sms_notification = 'http://example.com'
     assert layout.manage_model_link == 'SmsSubscriberCollection/archive'
@@ -299,7 +358,7 @@ def test_manage_layouts(session):
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
-        ('Subscribers', '', True, [
+        ('Notifications', '', True, [
             ('SMS subscribers', 'SmsSubscriberCollection/archive', True, []),
             (
                 'Trigger notifications',
@@ -318,7 +377,7 @@ def test_manage_layouts(session):
     # Screens
     layout = ManageScreensLayout(
         ScreenCollection(session),
-        DummyRequest()
+        DummyRequest()  # type: ignore[arg-type]
     )
     assert layout.manage_model_link == 'ScreenCollection/archive'
     assert layout.menu == [
@@ -335,6 +394,14 @@ def test_manage_layouts(session):
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ]),
         ('Screens', 'ScreenCollection/archive', True, [])
     ]
     assert layout.breadcrumbs == [
@@ -343,7 +410,7 @@ def test_manage_layouts(session):
     ]
 
     # Admin
-    layout = ManageScreensLayout(None, DummyRequest(is_secret=True))
+    layout = ManageScreensLayout(None, DummyRequest(is_secret=True))  # type: ignore[arg-type]
     assert layout.menu[-1] == (
         'Administration',
         '',
@@ -365,16 +432,17 @@ def test_manage_layouts(session):
     )
 
 
-def test_manage_layouts_clear_media(election_day_app_zg):
+def test_manage_layouts_clear_media(election_day_app_zg: TestApp) -> None:
     session = election_day_app_zg.session()
-    request = DummyRequest(app=election_day_app_zg, session=session)
+    request: Any = DummyRequest(app=election_day_app_zg, session=session)
     filestorage = election_day_app_zg.filestorage
+    assert filestorage is not None
     filestorage.makedir('svg')
     filestorage.makedir('pdf')
 
     with freeze_time('2016-08-31'):
         date_ = date(2010, 1, 1)
-        domain = 'canton'
+        domain: DomainOfInfluence = 'canton'
         session.add(Election(title='item', domain=domain, date=date_))
         session.add(ElectionCompound(title='item', domain=domain, date=date_))
         session.add(Vote(title='item', domain=domain, date=date_))
@@ -386,14 +454,16 @@ def test_manage_layouts_clear_media(election_day_app_zg):
         f'pdf/election-{hash}.{timestamp}.de_CH.pdf',
         f'svg/election-{hash}.{timestamp}.lists.de_CH.svg',
         f'svg/election-{hash}.{timestamp}.parties-panachage.de_CH.svg',
-        f'svg/election-{hash}.{timestamp-5}.parties-panachage.de_CH.svg',
+        f'svg/election-{hash}.{timestamp - 5}.parties-panachage.de_CH.svg',
         f'pdf/elections-{hash}.{timestamp}.de_CH.pdf',
         f'pdf/vote-{hash}.{timestamp}.rm_CH.pdf',
         f'svg/vote-{hash}.{timestamp}.proposal-entities.de_CH.svg',
-        f'svg/vote-{hash}.{timestamp-5}.proposal-entities.de_CH.svg',
+        f'svg/vote-{hash}.{timestamp - 5}.proposal-entities.de_CH.svg',
     ):
         filestorage.touch(path)
 
+    model: Election | ElectionCompound | Vote
+    layout: DefaultLayout
     model = session.query(Election).one()
     layout = ManageElectionsLayout(model, request)
     assert layout.clear_media() == 3

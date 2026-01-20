@@ -1,12 +1,16 @@
+from __future__ import annotations
+
+import pytest
+
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from onegov.core.utils import module_path
+from onegov.swissvotes.external_resources import BsPosters
 from onegov.swissvotes.external_resources.posters import MfgPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import SwissVote
-from pytest import mark
 from tests.shared import Client
 from transaction import commit
 from unittest.mock import patch
@@ -14,7 +18,13 @@ from webtest.forms import Upload
 from xlsxwriter.workbook import Workbook
 
 
-def test_view_votes_pagination(swissvotes_app):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from unittest.mock import MagicMock
+    from .conftest import TestApp
+
+
+def test_view_votes_pagination(swissvotes_app: TestApp) -> None:
     for day, number in ((1, '100'), (2, '101.1'), (2, '101.2'), (3, '102')):
         swissvotes_app.session().add(
             SwissVote(
@@ -26,7 +36,7 @@ def test_view_votes_pagination(swissvotes_app):
                 short_title_fr="V F",
                 keyword="Keyword",
                 _legal_form=3,
-                initiator="Initiator",
+                initiator_de="Initiator",
             )
         )
     commit()
@@ -72,10 +82,10 @@ def test_view_votes_pagination(swissvotes_app):
     assert "<td>102</td>" in page
 
 
-@mark.parametrize('file', [
+@pytest.mark.parametrize('file', [
     module_path('tests.onegov.swissvotes', 'fixtures/dataset.xlsx'),
 ])
-def test_view_update_votes(swissvotes_app, file):
+def test_view_update_votes(swissvotes_app: TestApp, file: str) -> None:
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
@@ -97,7 +107,7 @@ def test_view_update_votes(swissvotes_app, file):
     )
     manage = manage.form.submit().follow()
 
-    assert "Datensatz aktualisiert (673 hinzugefügt, 0 geändert)" in manage
+    assert "Datensatz aktualisiert (689 hinzugefügt, 0 geändert)" in manage
 
     session = swissvotes_app.session()
     vote = session.query(SwissVote).filter_by(bfs_number=82.2).one()
@@ -154,7 +164,10 @@ def test_view_update_votes(swissvotes_app, file):
     assert swissvotes_app.session().query(SwissVote).count() == 0
 
 
-def test_view_update_votes_unknown_descriptors(swissvotes_app):
+def test_view_update_votes_unknown_descriptors(
+    swissvotes_app: TestApp
+) -> None:
+
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
@@ -173,6 +186,7 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
         '1.2.2008',  # datum
         'kurztitel de',  # titel_kurz_d
         'kurztitel fr',  # titel_kurz_f
+        'kurztitel en',  # titel_kurz_e
         'titel de',  # titel_off_d
         'titel fr',  # titel_off_f
         'stichwort',  # stichwort
@@ -206,10 +220,15 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
     assert "unbekannte Deskriptoren: 12.55, 12.6, 13" in manage
 
 
-@mark.parametrize('file', [
+@pytest.mark.parametrize('file', [
     module_path('tests.onegov.swissvotes', 'fixtures/metadata.xlsx'),
 ])
-def test_view_update_metdata(swissvotes_app, file, sample_vote):
+def test_view_update_metadata(
+    swissvotes_app: TestApp,
+    sample_vote: SwissVote,
+    file: str
+) -> None:
+
     session = swissvotes_app.session()
     sample_vote.bfs_number = Decimal('236')
     session.add(sample_vote)
@@ -254,10 +273,21 @@ def test_view_update_metdata(swissvotes_app, file, sample_vote):
     assert "Metadaten aktualisiert (0 hinzugefügt, 0 geändert)" in manage
 
 
-@patch.object(MfgPosters, 'fetch', return_value=(1, 2, 3, {Decimal('4')}))
-@patch.object(SaPosters, 'fetch', return_value=(5, 6, 7, {Decimal('8')}))
-def test_view_update_external_resources(mfg, sa, swissvotes_app):
+@patch.object(MfgPosters, 'fetch',
+              return_value=(1, 2, 3, {(Decimal('4'), 'id-4')}))
+@patch.object(SaPosters, 'fetch',
+              return_value=(5, 6, 7, {(Decimal('8'), 'id-8')}))
+@patch.object(BsPosters, 'fetch',
+              return_value=(9, 9, 9, {(Decimal('9'), 'id-9')}))
+def test_view_update_external_resources(
+    mfg: MagicMock,
+    sa: MagicMock,
+    bs: MagicMock,
+    swissvotes_app: TestApp
+) -> None:
+
     swissvotes_app.mfg_api_token = 'xxx'
+    swissvotes_app.bs_api_token = 'yyy'
 
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
@@ -269,8 +299,8 @@ def test_view_update_external_resources(mfg, sa, swissvotes_app):
 
     manage = client.get('/').maybe_follow().click('Abstimmungen')
     manage = manage.click('Bildquellen aktualisieren')
-    manage.form['resources'] = ['mfg', 'sa']
+    manage.form['resources'] = ['mfg', 'sa', 'bs']
     manage = manage.form.submit().follow()
 
-    assert '6 hinzugefügt, 8 geändert, 10 gelöscht' in manage
-    assert 'Quellen konnten nicht aktualisiert werden: 4, 8' in manage
+    assert '15 hinzugefügt, 17 geändert, 19 gelöscht' in manage
+    assert 'Quellen konnten nicht aktualisiert werden: 4, 8, 9' in manage

@@ -66,9 +66,7 @@ p a {
 
 
 /*
-
 All places where we change to the sans serif font
-
 */
 
 a,
@@ -129,5 +127,17 @@ a {
     &.h5,
     &.h6 {
         color: $anchor-color;
+    }
+}
+
+p.edit-note,
+.redactor-dropdown .redactor-formatting-p-edit-note {
+    color: $aluminum;
+    font-size: .875rem;
+    font-style: italic;
+
+    &::before {
+        @include icon('\f249');
+        margin-right: .25rem;
     }
 }

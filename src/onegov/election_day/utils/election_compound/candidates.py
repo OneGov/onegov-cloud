@@ -1,12 +1,44 @@
-from onegov.ballot import Candidate
-from onegov.ballot import Election
-from onegov.ballot import List
+from __future__ import annotations
+
 from onegov.core.utils import groupbylist
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import Election
+from onegov.election_day.models import List
+from operator import itemgetter
 from sqlalchemy.orm import object_session
 from statistics import mean
 
 
-def get_elected_candidates(election_compound, session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import ElectionCompoundPart
+    from onegov.election_day.types import Gender
+    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Session
+    from typing import NamedTuple
+    from typing import TypedDict
+
+    class ElectedCandidateRow(NamedTuple):
+        family_name: str
+        first_name: str
+        party: str | None
+        gender: Gender | None
+        year_of_birth: int | None
+        list: str | None
+        list_id: str | None
+        election_id: str | None
+
+    class CandidateStatistics(TypedDict):
+        count: int
+        age: int | None
+
+
+def get_elected_candidates(
+    election_compound: ElectionCompound | ElectionCompoundPart,
+    session: Session
+) -> Query[ElectedCandidateRow]:
     """ Returns the elected candidates of an election compound. """
 
     election_ids = [election.id for election in election_compound.elections]
@@ -35,7 +67,10 @@ def get_elected_candidates(election_compound, session):
     return elected
 
 
-def get_candidate_statistics(election_compound, elected_candidates=None):
+def get_candidate_statistics(
+    election_compound: ElectionCompound | ElectionCompoundPart,
+    elected_candidates: Iterable[ElectedCandidateRow] | None = None
+) -> dict[str, CandidateStatistics]:
 
     if elected_candidates is None:
         session = object_session(election_compound)
@@ -43,23 +78,34 @@ def get_candidate_statistics(election_compound, elected_candidates=None):
 
     year = election_compound.date.year
 
-    def statistics(values):
-        age = [value[1] for value in values]
-        age = None if not age or None in age else mean([year - v for v in age])
+    def statistics(
+        values: list[tuple[Gender, int | None]]
+    ) -> CandidateStatistics:
+
+        birth_years = [
+            birth_year
+            for _, birth_year in values
+            if birth_year is not None
+        ]
+        age = mean(year - y for y in birth_years) if birth_years else None
         return {
             'count': len(values),
             'age': round(age) if age is not None else age
         }
 
-    values = [
-        (candidate.gender or 'undetermined', candidate.year_of_birth)
-        for candidate in elected_candidates
-    ]
+    all_values = sorted(
+        (
+            (candidate.gender or 'undetermined', candidate.year_of_birth)
+            for candidate in elected_candidates
+        ),
+        key=itemgetter(0)
+    )
 
-    result = {'total': statistics(values)}
-    values = sorted(values, key=lambda x: x[0])
-    values = dict(groupbylist(values, key=lambda x: x[0]))
-    result.update({gender: statistics(values[gender]) for gender in values})
+    result = {
+        gender: statistics(values)
+        for gender, values in groupbylist(all_values, key=itemgetter(0))
+    }
+    result['total'] = statistics(all_values)
 
     if set(result) - {'total', 'undetermined'}:
         return result

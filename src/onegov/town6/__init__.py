@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import logging
-log = logging.getLogger('onegov.town')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.town')
+log.addHandler(logging.NullHandler())
 
-from translationstring import TranslationStringFactory  # noqa
-_ = TranslationStringFactory('onegov.town')  # noqa
+from onegov.town6.i18n import _
 
-from onegov.town6.app import TownApp  # noqa
+from onegov.town6.app import TownApp
 
 __all__ = ['_', 'log', 'TownApp']

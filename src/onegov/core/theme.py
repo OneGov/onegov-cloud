@@ -40,12 +40,18 @@ template::
 Note that for the theme to work you need to define a filestorage. See
 :meth:`onegov.core.framework.Framework.configure_application`.
 """
+from __future__ import annotations
 
 from onegov.core import __version__
 from onegov.core.framework import Framework
 from onegov.core import log
 from onegov.core import utils
 from onegov.core.filestorage import FilestorageFile
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from fs.base import FS, SubFS
 
 
 class Theme:
@@ -69,27 +75,28 @@ class Theme:
     version = __version__
 
     @property
-    def name(self):
+    def name(self) -> str:
         """ The name of the theme, must be unique. """
         raise NotImplementedError
 
     @property
-    def default_options(self):
+    def default_options(self) -> dict[str, Any]:
         """ The default options of the theme, will be overwritten by options
         passed to :meth:`compile`.
 
         """
+        raise NotImplementedError
 
-    def compile(self, options={}):
+    def compile(self, options: dict[str, Any] | None = None) -> str:
         """ Returns a single css that represents the theme. """
         raise NotImplementedError
 
 
-def get_filename(theme, options={}):
+def get_filename(theme: Theme, options: dict[str, Any] | None = None) -> str:
     """ Returns a unique filename for the given theme and options. """
 
     _options = theme.default_options.copy()
-    _options.update(options)
+    _options.update(options or {})
 
     return '-'.join((
         theme.name,
@@ -98,7 +105,12 @@ def get_filename(theme, options={}):
     )) + '.css'  # needed to get the correct content_type
 
 
-def compile(storage, theme, options={}, force=False):
+def compile(
+    storage: FS | SubFS[FS],
+    theme: Theme,
+    options: dict[str, Any] | None = None,
+    force: bool = False
+) -> str:
     """ Generates a theme and stores it in the filestorage, returning the
     path to the theme.
 
@@ -124,14 +136,14 @@ def compile(storage, theme, options={}, force=False):
     if not force and storage.exists(filename):
         return filename
 
-    log.info(f"Compiling theme {theme.name}, {theme.version}")
+    log.info(f'Compiling theme {theme.name}, {theme.version}')
     storage.writebytes(filename, theme.compile(options).encode('utf-8'))
 
     return filename
 
 
 @Framework.setting(section='core', name='theme')
-def get_theme():
+def get_theme() -> Theme | None:
     """ Defines the default theme, which is no theme. """
     return None
 
@@ -141,7 +153,11 @@ class ThemeFile(FilestorageFile):
 
 
 @Framework.path(model=ThemeFile, path='/theme', absorb=True)
-def get_themestorage_file(app, absorb):
+def get_themestorage_file(app: Framework, absorb: str) -> ThemeFile | None:
     """ Serves the theme files. """
+    if app.themestorage is None:
+        return None
+
     if app.themestorage.isfile(absorb):
         return ThemeFile(absorb)
+    return None

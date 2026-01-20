@@ -21,6 +21,13 @@ var ManyFields = React.createClass({
                             onChange={this.props.onChange}
                         />
                 }
+                {
+                    this.props.type === "links" &&
+                        <ManyLinks
+                            data={this.props.data}
+                            onChange={this.props.onChange}
+                        />
+                }
             </div>
         );
     }
@@ -288,53 +295,247 @@ var DateTimePickerField = React.createClass({
     }
 });
 
+var ManyLinks = React.createClass({
+    getInitialState: function() {
+        var state = {
+            values: _.clone(this.props.data.values)
+        };
+
+        if (state.values.length === 0) {
+            state.values = [
+                {'text': '', 'link': ''}
+            ];
+        }
+
+        return state;
+    },
+    handleAdd: function(index, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+        state.values.splice(index + 1, 0, {
+            text: '',
+            link: ''
+        });
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    handleRemove: function(index, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+        state.values.splice(index, 1);
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    handleInputChange: function(index, name, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+
+        state.values[index][name] = e.target.value;
+
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    componentWillUpdate: function(props, state) {
+        props.onChange(state);
+    },
+    render: function() {
+        var data = this.props.data;
+        var values = this.state.values;
+        var self = this;
+        return (
+            <div> {
+                _.map(values, function(value, index) {
+                    var onTextChange = self.handleInputChange.bind(self, index, 'text');
+                    var onLinkChange = self.handleInputChange.bind(self, index, 'link');
+                    var onRemove = self.handleRemove.bind(self, index);
+                    var onAdd = self.handleAdd.bind(self, index);
+
+                    return (
+                        <div key={index}>
+                            <div className={"row " + (value.error && 'error' || '')}>
+                                <div className="small-6 columns">
+                                    <StringField
+                                        type="text"
+                                        label={data.labels.text}
+                                        defaultValue={value.text}
+                                        onChange={onTextChange}
+                                        extra={data.extra}
+                                        size="small"
+                                        placeholder="Linktext"
+                                    />
+                                </div>
+                                <div className="small-6 columns">
+                                    <StringField required
+                                        type="text"
+                                        label={data.labels.link}
+                                        defaultValue={value.link}
+                                        onChange={onLinkChange}
+                                        extra={data.extra}
+                                        size="small"
+                                        placeholder="https://www.example.ch"
+                                    />
+                                </div>
+                                <div className="small-12 columns">
+                                    {
+                                        index === (values.length - 1) &&
+                                            <a href="#" className="button round field-button" onClick={onAdd}>
+                                                <i className="fa fa-plus" aria-hidden="true" />
+                                                <span className="show-for-sr">{data.labels.add}</span>
+                                            </a>
+                                    }
+                                    {
+                                        index > 0 && index === (values.length - 1) &&
+                                            <a href="#" className="button round secondary field-button" onClick={onRemove}>
+                                                <i className="fa fa-minus" aria-hidden="true" />
+                                                <span className="show-for-sr">{data.labels.remove}</span>
+                                            </a>
+                                    }
+                                </div>
+                            </div>
+                            {
+                                value.error &&
+                                    <div className="row link-error">
+                                        <div className="small-12 columns end">
+                                            <small className="error">{value.error}</small>
+                                        </div>
+                                    </div>
+                            }
+                        </div>
+                    );
+                })
+            } </div>
+        );
+    }
+});
+
+var StringField = React.createClass({
+    componentWillMount: function() {
+        this.id = _.uniqueId(this.props.type + '-');
+    },
+    componentDidMount: function() {
+        this.renderStringInput();
+    },
+    componentDidUpdate: function() {
+        this.renderStringInput();
+    },
+    renderStringInput: function() {
+        var onChange = this.props.onChange;
+
+    },
+    render: function() {
+        return (
+            <label>
+                <span className="label-text">{this.props.label}</span>
+
+                {
+                    this.props.required &&
+                        <span className="label-required">*</span>
+                }
+
+                <input
+                    id={this.id}
+                    type={this.props.type}
+                    className={this.props.size}
+                    defaultValue={this.props.defaultValue}
+                    onChange={this.props.onChange}
+                    placeholder={this.props.placeholder}
+                />
+            </label>
+        );
+    }
+});
+
 function extractType(target) {
-    return _.first(_.filter(
-        target.attr('class').split(' '),
-        function(c) { return c.startsWith('many-'); }
-    )).replace('many-', '');
+    // More robust type extraction
+    var classes = target.attr('class').split(' ');
+    var manyClass = classes.find(function(c) {
+        return c.startsWith('many-');
+    });
+    return manyClass ? manyClass.replace('many-', '') : 'links'; // Default to links if no type found
 }
 
 jQuery.fn.many = function() {
-    return this.each(function() {
 
+    return this.each(function(index) {
         var target = $(this);
+
+        // Get type before any DOM modifications
         var type = extractType(target);
-        var data = JSON.parse(target.val());
+
+        // Safely parse data with fallback
+        var rawValue = target.val();
+
+        var data;
+        try {
+            data = rawValue ? JSON.parse(rawValue) : null;
+        } catch (e) {
+            console.warn('Failed to parse JSON for many-' + type, e);
+            data = null;
+        }
+
+        // Provide default data structure if needed
+        if (!data) {
+            data = {
+                labels: {
+                    text: type === 'contactlinks' ? 'Contact Text' : 'Text',
+                    link: type === 'contactlinks' ? 'Contact URL' : 'URL',
+                    add: 'Add',
+                    remove: 'Remove'
+                },
+                values: []
+            };
+        }
+
         var label = target.closest('label');
-        var errors = label.siblings('.error');
+
+        // Create a unique wrapper for this instance
+        var wrapperId = 'many-wrapper-' + Math.random().toString(36).substr(2, 9);
+        var el = $('<div class="many-wrapper" id="' + wrapperId + '" />');
 
         // straight-up hiding the element prevents it from getting update
         // with the target.val call below
         label.attr('aria-hidden', true);
         label.css({
-            'position': 'absolute'
+            'position': 'absolute',
+            'visibility': 'hidden'
         });
-        label.hide();
-        errors.hide();
 
-        var el = $('<div class="many-wrapper" />');
         el.appendTo(label.parent());
 
-        // transfer javascript dependencies to the wrapper
+        // Handle dependencies
         var dependency = target.attr('data-depends-on');
-        if (!_.isUndefined(dependency)) {
+        if (dependency) {
             target.removeAttr('data-depends-on');
             el.attr('data-depends-on', dependency);
         }
 
+        // Create scoped onChange handler
         var onChange = function(newValues) {
             data.values = newValues.values;
             var json = JSON.stringify(data);
-            label.show();
             target.val(json);
-            label.hide();
         };
 
-        ReactDOM.render(
-            <ManyFields type={type} data={data} onChange={onChange} />,
-            el.get(0)
-        );
+        // Render with error handling
+        try {
+            ReactDOM.render(
+                React.createElement(ManyFields, {
+                    type: type,
+                    data: data,
+                    onChange: onChange
+                }),
+                document.getElementById(wrapperId)
+            );
+        } catch (e) {
+            console.error('Failed to render ManyFields for ' + type, e);
+            // Restore original input if render fails
+            el.remove();
+            label.css({
+                'position': 'static',
+                'visibility': 'visible'
+            });
+        }
+
     });
 };
 

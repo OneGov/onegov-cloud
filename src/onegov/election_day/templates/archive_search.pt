@@ -10,7 +10,7 @@
             <tal:b i18n:translate="">Elections &amp; Votes</tal:b>
         </h1>
 
-        <hr />
+        <hr>
     </tal:b>
 
     <tal:b metal:fill-slot="content">
@@ -21,7 +21,7 @@
                     <div class="columns small-12 small-centered">
                         <div class="tab-navigation clearfix" tal:condition="layout.menu">
                             <nav class="top-bar clearfix" data-topbar data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
-                                <section class="top-bar-section">
+                                <div class="top-bar-section">
                                     <ul class="left">
 
                                         <tal:b repeat="(title, link, active) layout.menu">
@@ -31,7 +31,7 @@
                                         </tal:b>
 
                                     </ul>
-                                </section>
+                                </div>
                             </nav>
                         </div>
                     </div>
@@ -60,13 +60,13 @@
                                 <tal:b tal:repeat="vote results">
                                     <tr tal:attributes="class python: 'divider' if repeat.vote.end else ''">
                                         <th class="top-aligned" tal:define="prefix vote.title_prefix(request)">
-                                            <a href="${vote.url}">
+                                            <a href="${vote.adjusted_url(request)}">
                                                 <span tal:condition="prefix">${prefix}: </span>
                                                 <span metal:use-macro="layout.macros['title-translation']" tal:define="item vote"/>
                                             </a>
                                         </th>
                                         <td class="top-aligned">
-                                            <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
+                                            <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request); direct vote.direct" />
                                         </td>
                                         <td class="top-aligned" >${layout.format_date(vote.date, 'date')}</td>
                                         <td class="top-aligned" tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
@@ -76,7 +76,7 @@
                                         <td class="top-aligned" tal:condition="vote.domain == 'municipality'" i18n:translate>Communal</td>
                                         <td class="top-aligned" tal:condition="vote.domain == 'none'" i18n:translate>Regional</td>
                                         <td class="right-aligned top-aligned" tal:condition="not: communal_instance">
-                                            <tal:b tal:condition="vote.progress[0]">
+                                            <tal:b tal:condition="vote.has_results">
                                                 <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
                                             </tal:b>
                                         </td>
@@ -106,7 +106,7 @@
                             <tbody>
                                 <tr tal:repeat="election results">
                                     <th class="top-aligned" tal:define="prefix election.title_prefix(request)">
-                                        <a href="${election.url}">
+                                        <a href="${election.adjusted_url(request)}">
                                             <span tal:condition="prefix">${prefix}: </span>
                                             <span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/>
                                         </a>
@@ -133,6 +133,6 @@
                     </tal:b>
                 </div>
             </div>
-
+        </div>
     </tal:b>
 </div>

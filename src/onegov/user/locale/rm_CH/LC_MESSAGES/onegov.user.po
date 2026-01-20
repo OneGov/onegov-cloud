@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-20 09:54+0100\n"
+"POT-Creation-Date: 2024-07-25 09:34+0200\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <info@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -17,10 +17,10 @@ msgstr ""
 "X-Generator: Poedit 2.0.2\n"
 
 msgid "LDAP"
-msgstr ""
+msgstr "LDAP"
 
 msgid "LDAP Kerberos"
-msgstr ""
+msgstr "LDAP Kerberos"
 
 msgid "Login with operating system"
 msgstr ""
@@ -41,7 +41,7 @@ msgid "Successfully logged in as «${user}»"
 msgstr ""
 
 msgid "AzureAD"
-msgstr ""
+msgstr "AzureAD"
 
 msgid "Login with Microsoft"
 msgstr ""
@@ -55,6 +55,31 @@ msgstr ""
 msgid ""
 "Can't login because your user has no groups. Contact your AzureAD system "
 "administrator"
+msgstr ""
+
+msgid "SAML2"
+msgstr "SAML2"
+
+msgid ""
+"Can't login because your user has no groups. Contact your SAML2 system "
+"administrator"
+msgstr ""
+
+msgid "OpenID Connect"
+msgstr ""
+
+msgid ""
+"Can't login because your user has no group. Contact your OpenID system "
+"administrator"
+msgstr ""
+
+#, python-format
+msgid "${mtan} - mTAN for ${organisation}."
+msgstr ""
+
+msgid ""
+"We sent an mTAN to the number linked with this account. Please enter it "
+"below."
 msgstr ""
 
 msgid "Name"
@@ -72,8 +97,14 @@ msgstr "YubiKey"
 msgid "Plug your YubiKey into a USB slot and press it."
 msgstr "Endatar la YubiKey e smatgar il buttun."
 
-msgid "The password must be at least eight characters long"
-msgstr "Il pled-clav sto avair almain 8 segns"
+msgid "mTAN"
+msgstr "mTAN"
+
+msgid "Phone number"
+msgstr ""
+
+msgid "The password must be at least ten characters long"
+msgstr "Il pled-clav sto avair almain 10 segns"
 
 msgid "Password Confirmation"
 msgstr "Confermar il pled-clav"
@@ -115,4 +146,10 @@ msgid "30 days"
 msgstr ""
 
 msgid "Number of Signups"
+msgstr ""
+
+msgid "Code"
+msgstr ""
+
+msgid "Users"
 msgstr ""

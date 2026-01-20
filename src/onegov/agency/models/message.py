@@ -1,5 +1,14 @@
+from __future__ import annotations
+
 from onegov.chat import Message
 from onegov.org.models.message import TicketMessageMixin
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency.request import AgencyRequest
+    from onegov.ticket import Ticket
+    from typing import Self
 
 
 class AgencyMutationMessage(Message, TicketMessageMixin):
@@ -9,7 +18,12 @@ class AgencyMutationMessage(Message, TicketMessageMixin):
     }
 
     @classmethod
-    def create(cls, ticket, request, change):
+    def create(  # type:ignore[override]
+        cls,
+        ticket: Ticket,
+        request: AgencyRequest,
+        change: str
+    ) -> Self:
         return super().create(ticket, request, change=change)
 
 
@@ -20,5 +34,10 @@ class PersonMutationMessage(Message, TicketMessageMixin):
     }
 
     @classmethod
-    def create(cls, ticket, request, change):
+    def create(  # type:ignore[override]
+        cls,
+        ticket: Ticket,
+        request: AgencyRequest,
+        change: str
+    ) -> Self:
         return super().create(ticket, request, change=change)

@@ -1,0 +1,124 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+            ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <dl class="field-display">
+            <div>
+                <dt i18n:translate="">Start</dt>
+                <dd>${layout.format_date(settlement_run.start, 'date')}</dd>
+            </div>
+            <div>
+                <dt i18n:translate="">End</dt>
+                <dd>${layout.format_date(settlement_run.end, 'date')}</dd>
+            </div>
+            <div>
+                <dt i18n:translate="">Active</dt>
+                <dd tal:condition="settlement_run.active" i18n:translate="">Yes</dd>
+                <dd tal:condition="not settlement_run.active" i18n:translate="">No</dd>
+            </div>
+        </dl>
+
+        <!-- Tabs Start -->
+        <ul class="tabs" data-tabs id="settlement-run-export-tabs" role="tablist">
+            <!-- Commission Closure Status Tab -->
+            <li class="tabs-title" role="presentation">
+                <a href="#panel-closure-status"
+                   aria-controls="panel-closure-status"
+                   aria-selected="false"
+                   role="tab"
+                   i18n:translate="">Commission Closure Status</a>
+            </li>
+            <tal:block tal:repeat="tab_item export_tabs_data.values()">
+                <li tal:attributes="class python:'tabs-title' + (' is-active' if repeat.tab_item.start else '')" role="presentation">
+                    <a tal:attributes="href '#' + tab_item.panel_id;
+                                       aria-controls tab_item.panel_id;
+                                       aria-selected python:'true' if repeat.tab_item.start else 'false'"
+                       role="tab">${tab_item.tab_title}</a>
+                </li>
+            </tal:block>
+        </ul>
+
+        <div class="tabs-content" data-tabs-content="settlement-run-export-tabs">
+            <!-- Commission Closure Status Tab Content -->
+            <div class="tabs-panel" id="panel-closure-status" role="tabpanel">
+                <div tal:condition="commission_closure_status" class="closure-status-section">
+                    <div class="explanatory-text">
+                        <p i18n:translate="">
+                            This table shows the attendance closure status for each commission.
+                            It displays how many commission members have marked their attendance as "closed" (abschluss)
+                            for this settlement run. Members who have not yet closed their attendance are listed below each commission.
+                        </p>
+                    </div>
+
+                    <div tal:repeat="commission commission_closure_status" class="commission-closure-item">
+                        <div class="commission-header"
+                             tal:attributes="class python:'commission-header ' + ('complete' if commission['is_complete'] else 'incomplete')">
+                            <h4>
+                                ${commission['commission_name']}
+                                <span class="completion-ratio">(${commission['completion_ratio']})</span>
+                                <span tal:condition="commission['is_complete']" class="status-indicator complete">✓ Complete</span>
+                                <span tal:condition="not commission['is_complete']" class="status-indicator incomplete" i18n:translate="">⚠ Incomplete</span>
+                            </h4>
+                        </div>
+
+                        <div class="member-lists">
+                            <div tal:condition="commission['complete_members']" class="complete-members">
+                                <h5 i18n:translate="">Members who have closed their attendance:</h5>
+                                <ul>
+                                    <li tal:repeat="member commission['complete_members']"
+                                        class="completed">
+                                        ${member['name']}
+                                        <span class="attendance-status completed" i18n:translate="">✓ (closed)</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div tal:condition="commission['incomplete_members']" class="incomplete-members">
+                                <h5 i18n:translate="">Members who have not closed their attendance:</h5>
+                                <ul>
+                                    <li tal:repeat="member commission['incomplete_members']"
+                                        tal:attributes="class python:'has-attendance' if member['has_attendance'] else 'no-attendance'">
+                                        ${member['name']}
+                                        <span tal:condition="member['has_attendance']" class="attendance-status" i18n:translate="">(has attendance)</span>
+                                        <span tal:condition="not member['has_attendance']" class="attendance-status" i18n:translate="">(no attendance)</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div tal:condition="not commission_closure_status" class="no-commissions">
+                    <p i18n:translate="">No commissions with active memberships found for this settlement period.</p>
+                </div>
+            </div>
+
+            <!-- Export Tabs -->
+            <tal:block tal:repeat="tab_item export_tabs_data.values()">
+                <div tal:attributes="class python:'tabs-panel' + (' is-active' if repeat.tab_item.start else '');
+                                    id tab_item.panel_id"
+                     role="tabpanel">
+                    <div tal:repeat="category_key tab_item.categories.keys()" class="export-category">
+                        <tal:block tal:define="category tab_item.categories[category_key]">
+                            <div class="category-container">
+                                <hr class="short-hr">
+                                <h3 class="export-category-title">${category.title}</h3>
+                                <hr class="long-hr">
+                            </div>
+                            <div class="link-container">
+                                <tal:b repeat="link category.links">
+                                    <span class="link-item" tal:content="link(layout)"></span>
+                                </tal:b>
+                            </div>
+                        </tal:block>
+                    </div>
+                </div>
+            </tal:block>
+        </div>
+        <!-- Tabs End -->
+
+    </tal:b>
+
+</div>

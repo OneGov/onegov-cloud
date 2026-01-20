@@ -1,108 +1,122 @@
+from __future__ import annotations
+
 from datetime import date
 from decimal import Decimal
 from freezegun import freeze_time
 from lxml import etree
-from onegov.ballot import ElectionCompound
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import ElectionCompoundLayout
+from onegov.election_day.models import ElectionCompound
 from onegov.election_day.screen_widgets import (
-    ColumnWidget,
     CountedEntitiesWidget,
     ElectionCompoundCandidatesTableWidget,
+    ElectionCompoundDistrictsMapWidget,
     ElectionCompoundDistrictsTableWidget,
     ElectionCompoundListGroupsChartWidget,
     ElectionCompoundListGroupsTableWidget,
+    ElectionCompoundPartyStrengthsChartWidget,
+    ElectionCompoundPartyStrengthsTableWidget,
     ElectionCompoundSeatAllocationChartWidget,
     ElectionCompoundSeatAllocationTableWidget,
+    ElectionCompoundSuperregionsMapWidget,
+    ElectionCompoundSuperregionsTableWidget,
+    IfCompletedWidget,
+    IfNotCompletedWidget,
     LastResultChangeWidget,
+    ModelProgressWidget,
+    ModelTitleWidget,
     NumberOfCountedEntitiesWidget,
-    ProgressWidget,
-    RowWidget,
-    TitleWidget,
     TotalEntitiesWidget,
 )
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
-    structure = """
-        <row>
-            <column span="1">
-                <title class="class-for-title"/>
-            </column>
-            <column span="1">
-                <progress class="class-for-progress"/>
-            </column>
-            <column span="1">
-                <counted-entities class="class-for-counted-entities"/>
-            </column>
-            <column span="1">
-                <election-compound-candidates-table
-                 class="class-for-candidates-table"/>
-            </column>
-            <column span="1">
-                <election-compound-districts-table
-                 class="class-for-districts-table"/>
-            </column>
-            <column span="1">
-                <election-compound-list-groups-table
-                 class="class-for-list-groups-table"/>
-            </column>
-            <column span="1">
-                <election-compound-list-groups-chart
-                 class="class-for-list-groups-chart"/>
-            </column>
-            <column span="1">
-                <number-of-counted-entities
-                 class="class-for-number-of-counted-entities"/>
-            </column>
-            <column span="1">
-                <total-entities class="class-for-total-entities"/>
-            </column>
-            <column span="1">
-                <last-result-change class="class-for-last-result-change"/>
-            </column>
-            <column span="1">
-                <election-compound-seat-allocation-table
-                 class="class-for-seat-allocation-table"/>
-            </column>
-            <column span="1">
-                <election-compound-seat-allocation-chart
-                 class="class-for-seat-allocation-chart"/>
-            </column>
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.widgets import Widget
+    from ..conftest import ImportTestDatasets, TestApp
 
-        </row>
+
+def test_election_compound_widgets(
+    election_day_app_sg: TestApp,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+
+    structure = """
+        <model-title class="class-for-title"/>
+        <model-progress class="class-for-progress"/>
+        <counted-entities class="class-for-counted-entities"/>
+        <election-compound-candidates-table
+            class="class-for-candidates-table"/>
+        <election-compound-districts-table
+            class="class-for-districts-table"/>
+        <election-compound-districts-map
+            class="class-for-districts-map"/>
+        <election-compound-list-groups-table
+            class="class-for-list-groups-table"/>
+        <election-compound-list-groups-chart
+            class="class-for-list-groups-chart"/>
+        <number-of-counted-entities
+            class="class-for-number-of-counted-entities"/>
+        <total-entities class="class-for-total-entities"/>
+        <last-result-change class="class-for-last-result-change"/>
+        <election-compound-seat-allocation-table
+            class="class-for-seat-allocation-table"/>
+        <election-compound-seat-allocation-chart
+            class="class-for-seat-allocation-chart"/>
+        <election-compound-superregions-table
+            class="class-for-superregions-table"/>
+        <election-compound-superregions-map
+            class="class-for-superregions-map"/>
+        <if-completed>is-completed</if-completed>
+        <if-not-completed>is-not-completed</if-not-completed>
+        <election-compound-party-strengths-chart
+            class="class-for-party-strengths-chart-1"
+            horizontal="true"/>
+        <election-compound-party-strengths-chart
+            class="class-for-party-strengths-chart-2"
+            horizontal="false"/>
+        <election-compound-party-strengths-table
+            class="class-for-party-strengths-table-1"/>
+        <election-compound-party-strengths-table
+            class="class-for-party-strengths-table-2"
+            year="2019"/>
     """
-    widgets = [
-        RowWidget(),
-        ColumnWidget(),
+    widgets: list[Widget] = [
         CountedEntitiesWidget(),
-        LastResultChangeWidget(),
-        NumberOfCountedEntitiesWidget(),
-        ProgressWidget(),
-        TitleWidget(),
-        TotalEntitiesWidget(),
         ElectionCompoundCandidatesTableWidget(),
+        ElectionCompoundDistrictsMapWidget(),
         ElectionCompoundDistrictsTableWidget(),
         ElectionCompoundListGroupsChartWidget(),
         ElectionCompoundListGroupsTableWidget(),
+        ElectionCompoundPartyStrengthsChartWidget(),
+        ElectionCompoundPartyStrengthsTableWidget(),
         ElectionCompoundSeatAllocationChartWidget(),
         ElectionCompoundSeatAllocationTableWidget(),
+        ElectionCompoundSuperregionsMapWidget(),
+        ElectionCompoundSuperregionsTableWidget(),
+        IfCompletedWidget(),
+        IfNotCompletedWidget(),
+        LastResultChangeWidget(),
+        ModelProgressWidget(),
+        ModelTitleWidget(),
+        NumberOfCountedEntitiesWidget(),
+        TotalEntitiesWidget(),
     ]
 
     # Empty
     session = election_day_app_sg.session()
     session.add(
-        ElectionCompound(
+        ElectionCompound(  # type: ignore[misc]
             title='Compound', domain='canton', date=date(2020, 3, 8),
             pukelsheim=True, completes_manually=True, voters_counts=True,
             exact_voters_counts=True
         )
     )
     model = session.query(ElectionCompound).one()
-    request = DummyRequest(app=election_day_app_sg, session=session)
+    request: Any = DummyRequest(app=election_day_app_sg, session=session)
     layout = ElectionCompoundLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
@@ -117,9 +131,12 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'groups': [],
         'layout': layout,
         'model': model,
-        'parties': {},
         'request': request,
-        'years': []
+        'seat_allocations': [],
+        'superregions': {},
+        'party_years': [],
+        'party_deltas': False,
+        'party_results': {}
     }
 
     result = transform_structure(widgets, structure)
@@ -127,11 +144,16 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     etree.fromstring(result.encode('utf-8'))
 
     assert '>Compound</span>' in result
+    assert 'ElectionCompound/by-district' in result
+    assert 'ElectionCompound/by-superregion' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert 'class-for-title' in result
     assert 'class-for-progress' in result
     assert 'class-for-counted-entities' in result
     assert 'class-for-candidates-table' in result
     assert 'class-for-districts-table' in result
+    assert 'class-for-districts-map' in result
     assert 'class-for-list-groups-table' in result
     assert 'class-for-list-groups-chart' in result
     assert 'class-for-number-of-counted-entities' in result
@@ -139,10 +161,16 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'class-for-last-result-change' in result
     assert 'class-for-seat-allocation-table' in result
     assert 'class-for-seat-allocation-chart' in result
+    assert 'class-for-superregions-table' in result
+    assert 'class-for-superregions-map' in result
+    assert 'class-for-party-strengths-chart-1' in result
+    assert 'class-for-party-strengths-chart-2' in result
+    assert 'class-for-party-strengths-table-1' in result
+    assert 'class-for-party-strengths-table-2' in result
 
     # Add intermediate results
     with freeze_time('2022-01-01 12:00'):
-        election_1, errors = import_test_datasets(
+        results = import_test_datasets(
             'internal',
             'election',
             'sg',
@@ -156,8 +184,10 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             ),
             app_session=session
         )
+        assert len(results) == 1
+        election_1, errors = next(iter(results.values()))
         assert not errors
-        election_2, errors = import_test_datasets(
+        results = import_test_datasets(
             'internal',
             'election',
             'sg',
@@ -169,6 +199,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             dataset_name='kantonsratswahl-2020-wahlkreis-rorschach',
             app_session=session
         )
+        assert len(results) == 1
+        election_2, errors = next(iter(results.values()))
         assert not errors
         session.add(election_1)
         session.add(election_2)
@@ -183,8 +215,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     e_2 = election_2.title
     assert data == {
         'districts': {
-            e_1: ('Rheintal', f'ProporzElection/{e_1}'),
-            e_2: ('Rorschach', f'ProporzElection/{e_2}')
+            e_1: ('Rheintal', f'ProporzElection/{e_1}', ''),
+            e_2: ('Rorschach', f'ProporzElection/{e_2}', '')
         },
         'elected_candidates': [
             ('Bruss-Schmidheiny', 'Carmen', '', None, None, 'SVP', '01', e_1),
@@ -222,9 +254,12 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'groups': [],
         'layout': layout,
         'model': model,
-        'parties': {},
         'request': request,
-        'years': []
+        'seat_allocations': [],
+        'superregions': {},
+        'party_years': [],
+        'party_deltas': False,
+        'party_results': {}
     }
 
     result = transform_structure(widgets, structure)
@@ -244,11 +279,25 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '0' in result
     assert '2' in result
     assert '01.01.2022' in result
+    assert 'election-compound-superregions-table' in result
+    assert 'ElectionCompound/by-district' in result
+    assert 'ElectionCompound/by-superregion' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
+    assert (
+        'data-dataurl="ElectionCompound/party-strengths-data?horizontal=True"'
+    ) in result
+    assert (
+        'data-dataurl="ElectionCompound/party-strengths-data?horizontal=False"'
+    ) in result
+    assert 'tab-navigation' not in result
+    assert 'tabs-content' not in result
     assert 'class-for-title' in result
     assert 'class-for-progress' in result
     assert 'class-for-counted-entities' in result
     assert 'class-for-candidates-table' in result
     assert 'class-for-districts-table' in result
+    assert 'class-for-districts-map' in result
     assert 'class-for-list-groups-table' in result
     assert 'class-for-list-groups-chart' in result
     assert 'class-for-number-of-counted-entities' in result
@@ -256,10 +305,16 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'class-for-last-result-change' in result
     assert 'class-for-seat-allocation-table' in result
     assert 'class-for-seat-allocation-chart' in result
+    assert 'class-for-superregions-table' in result
+    assert 'class-for-superregions-map' in result
+    assert 'class-for-party-strengths-chart-1' in result
+    assert 'class-for-party-strengths-chart-2' in result
+    assert 'class-for-party-strengths-table-1' in result
+    assert 'class-for-party-strengths-table-2' in result
 
     # Add final results
     with freeze_time('2022-01-02 12:00'):
-        election_1, errors = import_test_datasets(
+        results = import_test_datasets(
             'internal',
             'election',
             'sg',
@@ -271,17 +326,20 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             dataset_name='kantonsratswahl-2020-wahlkreis-rheintal',
             app_session=session
         )
+        assert len(results) == 1
+        election_1, errors = next(iter(results.values()))
         assert not errors
-        errors = import_test_datasets(
+        results_ = import_test_datasets(
             'internal',
             'parties',
             'sg',
             'district',
-            'proporz',
             election=model,
             dataset_name='kantonsratswahl-2020-parteien',
         )
-        assert not errors
+        assert len(results) == 1
+        errors_ = next(iter(results_.values()))
+        assert not errors_
         session.add(election_1)
         model.elections = [election_1, election_2]
         model.manually_completed = True
@@ -301,8 +359,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     ]
     assert data == {
         'districts': {
-            e_1: ('Rheintal', f'ProporzElection/{e_1}'),
-            e_2: ('Rorschach', f'ProporzElection/{e_2}')
+            e_1: ('Rheintal', f'ProporzElection/{e_1}', ''),
+            e_2: ('Rorschach', f'ProporzElection/{e_2}', '')
         },
         'elected_candidates': [
             ('Bruss-Schmidheiny', 'Carmen', '', None, None, 'SVP', '01', e_1),
@@ -348,94 +406,30 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         ],
         'layout': layout,
         'model': model,
-        'parties': {
-            '0': {
-                '2020': {
-                    'color': '#0571b0',
-                    'mandates': 27,
-                    'name': 'CVP',
-                    'voters_count': {
-                        'permille': Decimal('218.60'),
-                        'total': Decimal('3487.00')
-                    },
-                    'votes': {'permille': 219, 'total': 373080}
-                }
-            },
-            '1': {
-                '2020': {
-                    'color': '#0571b0',
-                    'mandates': 2,
-                    'name': 'EVP',
-                    'voters_count': {
-                        'permille': Decimal('23.10'),
-                        'total': Decimal('369.00')
-                    },
-                    'votes': {'permille': 23, 'total': 39526}
-                }
-            },
-            '2': {
-                '2020': {
-                    'color': '#0571b0',
-                    'mandates': 22,
-                    'name': 'FDP',
-                    'voters_count': {
-                        'permille': Decimal('181.50'),
-                        'total': Decimal('2894.00')
-                    },
-                    'votes': {'permille': 181, 'total': 309635}
-                }
-            },
-            '3': {
-                '2020': {
-                    'color': '#0571b0',
-                    'mandates': 6,
-                    'name': 'GLP',
-                    'voters_count': {
-                        'permille': Decimal('73.00'),
-                        'total': Decimal('1165.00')
-                    },
-                    'votes': {'permille': 73, 'total': 124660}
-                }
-            },
-            '4': {
-                '2020': {
-                    'color': '#0571b0',
-                    'mandates': 9,
-                    'name': 'GRÜ',
-                    'voters_count': {
-                        'permille': Decimal('89.30'),
-                        'total': Decimal('1424.00')
-                    },
-                    'votes': {'permille': 89, 'total': 152405}
-                }
-            },
-            '5': {
-                '2020': {
-                    'color': '#0571b0',
-                    'mandates': 6,
-                    'name': 'SP',
-                    'voters_count': {
-                        'permille': Decimal('155.60'),
-                        'total': Decimal('2481.00')
-                    },
-                    'votes': {'permille': 156, 'total': 265457}
-                }
-            },
-            '6': {
-                '2020': {
-                    'color': '#0571b0',
-                    'mandates': 35,
-                    'name': 'SVP',
-                    'voters_count': {
-                        'permille': Decimal('258.80'),
-                        'total': Decimal('4128.00')
-                    },
-                    'votes': {'permille': 259, 'total': 441744}
-                }
-            }
-        },
         'request': request,
-        'years': ['2020']
+        'seat_allocations': [
+            ['CVP', 27],
+            ['EVP', 2],
+            ['FDP', 22],
+            ['GLP', 6],
+            ['GRÜ', 9],
+            ['SP', 6],
+            ['SVP', 35]
+        ],
+        'superregions': {},
+        'party_years': ['2020'],
+        'party_deltas': False,
+        'party_results': {
+            '2020': [
+                ['CVP', 27, Decimal('3487.00'), '21.86%'],
+                ['EVP', 2, Decimal('369.00'), '2.31%'],
+                ['FDP', 22, Decimal('2894.00'), '18.15%'],
+                ['GLP', 6, Decimal('1165.00'), '7.30%'],
+                ['GRÜ', 9, Decimal('1424.00'), '8.93%'],
+                ['SP', 6, Decimal('2481.00'), '15.56%'],
+                ['SVP', 35, Decimal('4128.00'), '25.88%']
+            ]
+        },
     }
 
     assert '>Compound</span>' in result
@@ -453,11 +447,25 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '2' in result
     assert '2' in result
     assert '02.01.2022' in result
+    assert 'election-compound-superregions-table' in result
+    assert 'ElectionCompound/by-district' in result
+    assert 'ElectionCompound/by-superregion' in result
+    assert 'is-completed' in result
+    assert 'is-not-completed' not in result
+    assert (
+        'data-dataurl="ElectionCompound/party-strengths-data?horizontal=True"'
+    ) in result
+    assert (
+        'data-dataurl="ElectionCompound/party-strengths-data?horizontal=False"'
+    ) in result
+    assert "panel_2020" in result
+    assert ">2.31%<" in result
     assert 'class-for-title' in result
     assert 'class-for-progress' in result
     assert 'class-for-counted-entities' in result
     assert 'class-for-candidates-table' in result
     assert 'class-for-districts-table' in result
+    assert 'class-for-districts-map' in result
     assert 'class-for-list-groups-table' in result
     assert 'class-for-list-groups-chart' in result
     assert 'class-for-number-of-counted-entities' in result
@@ -465,3 +473,9 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'class-for-last-result-change' in result
     assert 'class-for-seat-allocation-table' in result
     assert 'class-for-seat-allocation-chart' in result
+    assert 'class-for-superregions-table' in result
+    assert 'class-for-superregions-map' in result
+    assert 'class-for-party-strengths-chart-1' in result
+    assert 'class-for-party-strengths-chart-2' in result
+    assert 'class-for-party-strengths-table-1' in result
+    assert 'class-for-party-strengths-table-2' in result

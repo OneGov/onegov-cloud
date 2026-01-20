@@ -1,4 +1,7 @@
-from cached_property import cached_property
+from __future__ import annotations
+
+from functools import cached_property
+from markupsafe import Markup
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.layout import AgencyLayout
@@ -10,106 +13,126 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import linkify
 from onegov.org import _
 from onegov.org.models.ticket import OrgTicketMixin
-from onegov.org.models.ticket import TicketDeletionMixin
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
 
 
-class AgencyMutationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'AGN'}
-    es_type_name = 'agency_tickets'
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency.request import AgencyRequest
+    from onegov.agency.models import ExtendedAgency
+    from onegov.agency.models import ExtendedPerson
+    from onegov.org.request import OrgRequest
 
-    def reference_group(self, request):
+
+class AgencyMutationTicket(OrgTicketMixin, Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'AGN'}  # type:ignore
+
+    if TYPE_CHECKING:
+        @property
+        def handler(self) -> AgencyMutationHandler: ...
+
+    def reference_group(self, request: OrgRequest) -> str:
         return self.title
 
 
 class PersonMutationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'PER'}
-    es_type_name = 'person_tickets'
+    __mapper_args__ = {'polymorphic_identity': 'PER'}  # type:ignore
 
-    def reference_group(self, request):
+    if TYPE_CHECKING:
+        @property
+        def handler(self) -> PersonMutationHandler: ...
+
+    def reference_group(self, request: OrgRequest) -> str:
         return self.title
 
 
 @handlers.registered_handler('AGN')
-class AgencyMutationHandler(Handler, TicketDeletionMixin):
+class AgencyMutationHandler(Handler):
 
-    handler_title = _("Agency")
-    code_title = _("Agencies")
+    handler_title = _('Agency')
+    code_title = _('Agencies')
 
     @cached_property
-    def collection(self):
+    def collection(self) -> ExtendedAgencyCollection:
         return ExtendedAgencyCollection(self.session)
 
     @cached_property
-    def agency(self):
+    def agency(self) -> ExtendedAgency | None:
         return self.collection.by_id(self.data['handler_data']['id'])
 
     @cached_property
-    def mutation(self):
+    def mutation(self) -> AgencyMutation | None:
         if self.agency:
-            return AgencyMutation(None, self.agency.id, self.ticket.id)
+            return AgencyMutation(self.session, self.agency.id, self.ticket.id)
+        return None
 
     @property
-    def deleted(self):
+    def deleted(self) -> bool:
         return self.agency is None
 
     @cached_property
-    def email(self):
+    def email(self) -> str:
         return (
             self.data['handler_data'].get('submitter_email', '')
             or self.data['handler_data'].get('email', '')
         )
 
     @cached_property
-    def message(self):
+    def message(self) -> str:
         return (
             self.data['handler_data'].get('submitter_message', '')
             or self.data['handler_data'].get('message', '')
         )
 
     @cached_property
-    def proposed_changes(self):
+    def proposed_changes(self) -> dict[str, Any]:
         return self.data['handler_data'].get('proposed_changes', {})
 
     @cached_property
-    def state(self):
+    def state(self) -> str | None:
         return self.data.get('state')
 
     @property
-    def title(self):
-        return self.agency.title
+    def title(self) -> str:
+        return self.agency.title if self.agency else '<deleted>'
 
     @property
-    def subtitle(self):
-        return _("Mutation")
+    def subtitle(self) -> str:
+        return _('Mutation')
 
     @cached_property
-    def group(self):
-        return _("Agency")
+    def group(self) -> str:
+        return _('Agency')
 
-    def get_summary(self, request):
+    def get_summary(
+        self,
+        request: AgencyRequest  # type:ignore[override]
+    ) -> Markup:
+
         layout = AgencyLayout(self.agency, request)
         return render_macro(
             layout.macros['display_agency_mutation'],
             request,
             {
                 'agency': self.agency,
-                'message': linkify(self.message).replace('\n', '<br>'),
+                'message': linkify(self.message).replace('\n', Markup('<br>')),
                 'proposed_changes': self.proposed_changes,
-                'labels': self.mutation.labels,
+                'labels': self.mutation.labels if self.mutation else {},
                 'layout': layout
             }
         )
 
-    def get_links(self, request):
+    def get_links(self, request: AgencyRequest) -> list[Link]:  # type:ignore
         if self.deleted:
             return []
 
+        assert self.agency is not None
         links = [
             Link(
-                text=_("Edit agency"),
+                text=_('Edit agency'),
                 url=request.return_here(
                     request.link(self.agency.proxy(), 'edit')
                 ),
@@ -118,9 +141,10 @@ class AgencyMutationHandler(Handler, TicketDeletionMixin):
         ]
 
         if self.proposed_changes and self.state is None:
+            assert self.mutation is not None
             links.append(
                 Link(
-                    text=_("Apply proposed changes"),
+                    text=_('Apply proposed changes'),
                     url=request.return_here(
                         request.link(self.mutation, 'apply')
                     ),
@@ -132,83 +156,89 @@ class AgencyMutationHandler(Handler, TicketDeletionMixin):
 
 
 @handlers.registered_handler('PER')
-class PersonMutationHandler(Handler, TicketDeletionMixin):
+class PersonMutationHandler(Handler):
 
-    handler_title = _("Person")
-    code_title = _("People")
+    handler_title = _('Person')
+    code_title = _('People')
 
     @cached_property
-    def collection(self):
+    def collection(self) -> ExtendedPersonCollection:
         return ExtendedPersonCollection(self.session)
 
     @cached_property
-    def person(self):
+    def person(self) -> ExtendedPerson | None:
         return self.collection.by_id(self.data['handler_data']['id'])
 
     @cached_property
-    def mutation(self):
+    def mutation(self) -> PersonMutation | None:
         if self.person:
-            return PersonMutation(None, self.person.id, self.ticket.id)
+            return PersonMutation(self.session, self.person.id, self.ticket.id)
+        return None
 
     @property
-    def deleted(self):
+    def deleted(self) -> bool:
         return self.person is None
 
     @cached_property
-    def email(self):
+    def email(self) -> str:
         return (
             self.data['handler_data'].get('submitter_email', '')
             or self.data['handler_data'].get('email', '')
         )
 
     @cached_property
-    def message(self):
+    def message(self) -> str:
         return (
             self.data['handler_data'].get('submitter_message', '')
             or self.data['handler_data'].get('message', '')
         )
 
     @cached_property
-    def proposed_changes(self):
+    def proposed_changes(self) -> dict[str, Any]:
         return self.data['handler_data'].get('proposed_changes', {})
 
     @cached_property
-    def state(self):
+    def state(self) -> str | None:
         return self.data.get('state')
 
     @property
-    def title(self):
-        return self.person.title
+    def title(self) -> str:
+        return self.person.title if self.person else '<deleted>'
 
     @property
-    def subtitle(self):
-        return _("Mutation")
+    def subtitle(self) -> str:
+        return _('Mutation')
 
     @cached_property
-    def group(self):
-        return _("Person")
+    def group(self) -> str:
+        return _('Person')
 
-    def get_summary(self, request):
+    def get_summary(
+        self,
+        request: AgencyRequest  # type:ignore[override]
+    ) -> Markup:
+
         layout = ExtendedPersonLayout(self.person, request)
         return render_macro(
             layout.macros['display_person_mutation'],
             request,
             {
                 'person': self.person,
-                'message': linkify(self.message).replace('\n', '<br>'),
+                'message': linkify(self.message).replace('\n', Markup('<br>')),
                 'proposed_changes': self.proposed_changes,
-                'labels': self.mutation.labels,
+                'labels': self.mutation.labels if self.mutation else {},
                 'layout': layout
             }
         )
 
-    def get_links(self, request):
+    def get_links(self, request: AgencyRequest) -> list[Link]:  # type:ignore
         if self.deleted:
             return []
 
+        assert self.person is not None
         links = [
             Link(
-                text=_("Edit person"),
+                text=_('Edit person'),
                 url=request.return_here(
                     request.link(self.person, 'edit')
                 ),
@@ -217,9 +247,10 @@ class PersonMutationHandler(Handler, TicketDeletionMixin):
         ]
 
         if self.proposed_changes and self.state is None:
+            assert self.mutation is not None
             links.append(
                 Link(
-                    text=_("Apply proposed changes"),
+                    text=_('Apply proposed changes'),
                     url=request.return_here(
                         request.link(self.mutation, 'apply')
                     ),

@@ -14,8 +14,8 @@ $('.collapsible .more, .collapsible .less').click(function() {
 // sort tables wishing to be sorted
 $('table.sortable').tablesorter({widgets: ['staticRow']});
 
-// Add backend dropdown actions
-$('ul.actions').each(function(index, element) {
+// add backend dropdown actions
+$('ul.actions').each(function(_index, element) {
     $(element).before(
         $('<a></a>')
             .attr('href', '#')
@@ -24,6 +24,14 @@ $('ul.actions').each(function(index, element) {
             .html($(this).data('title') + ' <span></span>')
     ).hide();
     $(element).parent('td').addClass('row-actions');
+});
+
+// redirect dropdowns
+$('select.redirect-dropdown option[data-redirect]').on("click", function() {
+    location.href = this.dataset.redirect;
+});
+$('select.redirect-dropdown').on("change", function() {
+    this.options[this.selectedIndex].click();
 });
 
 // force all dropdowns to be rendered in the direction specified in the

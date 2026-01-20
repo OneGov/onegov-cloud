@@ -1,0 +1,23 @@
+# Error: is not present in stub
+# ================================
+# Internal zope.interface attributes we don't care about
+transaction\.[.\w]+\.__implemented__
+transaction\.[.\w]+\.__provides__
+transaction\.[.\w]+\.__providedBy__
+
+# Error: is not a type
+# ================================
+# Interfaces are not a subclass of type
+transaction.interfaces.IDataManager
+transaction.interfaces.IDataManagerSavepoint
+transaction.interfaces.IRetryDataManager
+transaction.interfaces.ISavepoint
+transaction.interfaces.ISavepointDataManager
+transaction.interfaces.ISynchronizer
+transaction.interfaces.ITransaction
+transaction.interfaces.ITransactionManager
+
+# Error: failed to find stubs
+# ================================
+# Tests should not be part of the stubs
+transaction.tests.*

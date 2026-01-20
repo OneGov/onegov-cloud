@@ -1,0 +1,3 @@
+from sqlalchemy import Unicode
+
+class CaseInsensitiveComparator(Unicode.Comparator): ...

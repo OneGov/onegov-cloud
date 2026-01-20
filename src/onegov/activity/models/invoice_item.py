@@ -1,73 +1,40 @@
-from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin
+from __future__ import annotations
+
 from onegov.core.orm.types import UUID
-from onegov.pay import PayableManyTimes
-from sqlalchemy import Boolean
+from onegov.pay import InvoiceItem
 from sqlalchemy import Column
-from sqlalchemy import Date
 from sqlalchemy import ForeignKey
-from sqlalchemy import Numeric
 from sqlalchemy import Text
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import validates
-from uuid import uuid4
 
 
-# total digits
-PRECISION = 8
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from onegov.activity.models import BookingPeriodInvoice
+    from sqlalchemy.orm import relationship
 
-# digits after the point
-SCALE = 2
 
+class ActivityInvoiceItem(InvoiceItem):
+    """
+    An invoice item related to an activity.
 
-class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
-    """ An item in an invoice. """
+    Could also just be a donation or manual invoice item unrelated
+    to a specific activity.
+    """
 
-    __tablename__ = 'invoice_items'
+    __mapper_args__ = {
+        'polymorphic_identity': 'activity'
+    }
 
-    #: the public id of the invoice item
-    id = Column(UUID, primary_key=True, default=uuid4)
+    #: the attendee, if the item is connected to an attendee
+    attendee_id: Column[uuid.UUID | None] = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('attendees.id'),
+        nullable=True
+    )
 
-    #: the invoice this item belongs to
-    invoice_id = Column(UUID, ForeignKey('invoices.id'))
+    #: organizer (if the item is an activity)
+    organizer: Column[str | None] = Column(Text, nullable=True)
 
-    #: the item group (all items with the same text are visually grouped)
-    group = Column(Text, nullable=False)
-
-    #: a secondary group who is not necessarily grouped visually
-    family = Column(Text, nullable=True)
-
-    #: the item text
-    text = Column(Text, nullable=False)
-
-    #: true if paid
-    paid = Column(Boolean, nullable=False, default=False)
-
-    #: the payment date
-    payment_date = Column(Date, nullable=True)
-
-    #: the transaction id if paid through a bank or online transaction
-    tid = Column(Text, nullable=True)
-
-    #: the source of the transaction id, e.g. stripe, xml
-    source = Column(Text, nullable=True)
-
-    #: the unit to pay..
-    unit = Column(Numeric(precision=PRECISION, scale=SCALE), nullable=True)
-
-    #: ..multiplied by the quantity..
-    quantity = Column(Numeric(precision=PRECISION, scale=SCALE), nullable=True)
-
-    #: ..together form the amount
-    @hybrid_property
-    def amount(self):
-        return round(self.unit, SCALE) * round(self.quantity, SCALE)
-
-    @amount.expression
-    def amount(cls):
-        return cls.unit * cls.quantity
-
-    @validates('source')
-    def validate_source(self, key, value):
-        assert value in (None, 'xml', 'stripe_connect')
-        return value
+    if TYPE_CHECKING:
+        invoice: relationship[BookingPeriodInvoice]

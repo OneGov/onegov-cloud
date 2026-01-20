@@ -1,18 +1,43 @@
+from __future__ import annotations
+
+import operator
 from email.headerregistry import Address
+from markupsafe import Markup
+from sqlalchemy import func
+
 from onegov.core.mail import coerce_address
 from onegov.people.models import Agency, Person
 
 
-def handle_empty_p_tags(html):
-    return html if not html == '<p></p>' else ''
+from typing import Literal
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from collections.abc import Iterator
+    from datetime import datetime
+    from onegov.agency.request import AgencyRequest
+    from onegov.core.orm.mixins import TimestampMixin
+    from onegov.user import UserGroup
+    from sqlalchemy.orm import Query
+    from typing import TypeVar
+
+    _T = TypeVar('_T')
 
 
-def emails_for_new_ticket(model, request):
+def handle_empty_p_tags(html: Markup) -> Markup:
+    return html if html != Markup('<p></p>') else Markup('')
+
+
+def emails_for_new_ticket(
+    model: Agency | Person,
+    request: AgencyRequest
+) -> Iterator[Address]:
     """
     Returns an iterator with all the unique email addresses
     that need to be notified for a new ticket of this type
     """
 
+    agencies: Iterable[Agency]
     if isinstance(model, Agency):
         agencies = (model, )
         handler_code = 'AGN'
@@ -20,7 +45,7 @@ def emails_for_new_ticket(model, request):
         agencies = (membership.agency for membership in model.memberships)
         handler_code = 'PER'
     else:
-        assert False, 'Invalid model'
+        raise NotImplementedError()
 
     seen = set()
     if request.email_for_new_tickets:
@@ -36,32 +61,29 @@ def emails_for_new_ticket(model, request):
     # to filter the groups at all.
     permissions = request.app.ticket_permissions.get(handler_code, {})
     if hasattr(model, 'group') and model.group in permissions:
-        groupids = permissions[model.group]
+        groupids: list[str] | None = permissions[model.group]
     else:
         groupids = permissions.get(None)
 
     # we try to minimize the amount of e-mail address parsing we
     # perform by de-duplicating the raw usernames as we get them
+    agency: Agency | None
     for agency in agencies:
-        for role_mapping in agency.role_mappings:
-            if role_mapping.role != 'editor':
-                continue
+        # if there are no user groups which can handle our ticket
+        # then look if there are groups in one of the parent agencies
+        while not (
+            agency is None
+            or (groups := ticket_groups(agency, groupids))
+        ):
+            agency = agency.parent
 
-            # we only care about group role mappings
-            group = role_mapping.group
-            if group is None:
-                continue
+        if agency is None or not groups:
+            continue
 
-            # if the group does not have permission to manage this
-            # type of ticket then we need to skip it
-            if groupids is not None and group.id.hex not in groupids:
-                continue
-
+        for group in groups:
             # if the group does not have immediate notification
             # turned on, then skip it
-            if not group.meta:
-                continue
-            if group.meta.get('immediate_notification') != 'yes':
+            if (group.meta or {}).get('immediate_notification') != 'yes':
                 continue
 
             for user in group.users:
@@ -78,3 +100,49 @@ def emails_for_new_ticket(model, request):
                 except ValueError:
                     # if it's not a valid address then skip it
                     pass
+
+
+def ticket_groups(
+    agency: Agency,
+    groupids: list[str] | None
+) -> list[UserGroup]:
+    return [
+        group
+        for role_mapping in getattr(agency, 'role_mappings', ())
+        if role_mapping.role == 'editor'
+        if (group := role_mapping.group)
+        if groupids is None or group.id.hex in groupids
+    ]
+
+
+def get_html_paragraph_with_line_breaks(text: object) -> Markup:
+    if not text:
+        return Markup('')
+    return Markup('<p>{}</p>').format(
+        Markup('<br>').join(line for line in str(text).splitlines())
+    )
+
+
+def filter_modified_or_created(
+    query: Query[_T],
+    relate: Literal['>', '<', '>=', '<=', '=='],
+    # FIXME: This is a bit lax about types, SQLAlchemy is doing the heavy
+    #        lifting here, auto casting ISO formatted date strings
+    comparison_property: datetime | str,
+    collection_class: type[TimestampMixin]
+) -> Query[_T]:
+
+    ops = {
+        '>': operator.gt,
+        '<': operator.lt,
+        '>=': operator.ge,
+        '<=': operator.le,
+        '==': operator.eq,
+    }
+
+    return query.filter(
+        ops[relate](
+            func.date_trunc('minute', collection_class.last_change),
+            comparison_property
+        )
+    )

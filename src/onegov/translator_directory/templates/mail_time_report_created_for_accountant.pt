@@ -1,0 +1,55 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.translator_directory">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p>
+            <span i18n:translate>
+                A new time report has been submitted for review.
+            </span>
+        </p>
+
+        <p><span class="ticket-number">${ticket.reference(request)}</span></p>
+
+        <p tal:condition="translator|nothing">
+            <strong i18n:translate>Translator:</strong> ${translator.title}
+        </p>
+
+        <p tal:condition="time_report|nothing">
+            <strong i18n:translate>Assignment Date:</strong>
+            ${time_report.assignment_date.strftime('%d.%m.%Y')}
+        </p>
+
+        <p tal:condition="time_report and time_report.start and time_report.end"
+           tal:define="start_date python:time_report.start.date();
+                       end_date python:time_report.end.date();
+                       same_day python:start_date == end_date">
+            <strong i18n:translate>Time:</strong>
+            <span tal:condition="same_day">
+                ${time_report.start.strftime('%d.%m.%Y %H:%M')} Uhr - ${time_report.end.strftime('%H:%M')} Uhr
+            </span>
+            <span tal:condition="not same_day">
+                ${time_report.start.strftime('%d.%m.%Y %H:%M')} Uhr - ${time_report.end.strftime('%d.%m.%Y %H:%M')} Uhr
+            </span>
+        </p>
+
+        <p tal:condition="time_report|nothing">
+            <strong i18n:translate>Total Compensation:</strong>
+            CHF ${'{:.2f}'.format(time_report.total_compensation)}
+        </p>
+
+        <p>
+            <span i18n:translate>
+                Please review the details and process accordingly.
+            </span>
+        </p>
+
+        <p>
+            <a href="${request.link(ticket)}" i18n:translate>
+                View the time report
+            </a>
+        </p>
+
+    </tal:b>
+</div>

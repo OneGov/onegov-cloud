@@ -1,0 +1,34 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <dl class="field-display">
+            <div>
+                <dt i18n:translate>Commission</dt>
+                <dd>
+                    <a href="${request.link(commission_membership.commission)}">${commission_membership.commission.title}</a>
+                </dd>
+            </div>
+            <div>
+                <dt i18n:translate>Parliamentarian</dt>
+                <dd>
+                    <a href="${request.link(commission_membership.parliamentarian)}">${commission_membership.parliamentarian.title}</a>
+                </dd>
+            </div>
+            <div>
+                <dt i18n:translate>Function</dt>
+                <dd>${commission_membership.role_label}</dd>
+            </div>
+            <div tal:condition="commission_membership.start">
+                <dt i18n:translate>Start</dt>
+                <dd>${layout.format_date(commission_membership.start, 'date')}</dd>
+            </div>
+            <div tal:condition="commission_membership.end">
+                <dt i18n:translate>End</dt>
+                <dd>${layout.format_date(commission_membership.end, 'date')}</dd>
+            </div>
+        </dl>
+    </tal:b>
+</div>

@@ -4,17 +4,30 @@
 .dropzone {
     @include prefix(transition, border 100ms ease-out);
 
+    align-items: center;
     border: 1px dashed $gainsboro;
     display: flex;
-    flex-direction: column;
     font-family: $header-font-family;
     height: 10rem;
-    justify-content: center;
     margin-bottom: 1.5rem;
+    padding: 2rem;
     text-align: center;
 
     &.drag-over {
         border-color: $anchor-font-color;
+    }
+
+    .button {
+        height: fit-content;
+    }
+
+    label {
+        min-width: 0;
+    }
+
+    p {
+        margin-bottom: 0;
+        padding: 2rem;
     }
 }
 
@@ -34,7 +47,6 @@
             font-size: .875rem;
             left: 1rem;
             overflow: hidden;
-            position: absolute;
             text-align: left;
             text-overflow: ellipsis;
             white-space: nowrap;

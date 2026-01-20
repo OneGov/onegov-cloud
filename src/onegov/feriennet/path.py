@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from onegov.activity import ActivityFilter
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection
-from onegov.activity import InvoiceCollection, InvoiceItem
+from onegov.activity import ActivityInvoiceItem, BookingPeriodInvoiceCollection
 from onegov.activity import Occasion, OccasionCollection, OccasionNeed
-from onegov.activity import Period, PeriodCollection
+from onegov.activity import BookingPeriod, BookingPeriodCollection
 from onegov.activity import Volunteer, VolunteerCollection
 from onegov.activity.utils import is_valid_group_code
 from onegov.feriennet import FeriennetApp
@@ -12,6 +14,7 @@ from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
+from onegov.feriennet.collections.match import OccasionState
 from onegov.feriennet.models import Calendar
 from onegov.feriennet.models import GroupInvite
 from onegov.feriennet.models import InvoiceAction, VacationActivity
@@ -19,8 +22,14 @@ from onegov.feriennet.models import NotificationTemplate
 from onegov.feriennet.models import VolunteerCart
 from onegov.feriennet.models import VolunteerCartAction
 from onegov.org.converters import keywords_converter
-from onegov.core.converters import integer_range_converter
+from onegov.core.converters import integer_range_converter, LiteralConverter
 from uuid import UUID
+
+
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.activity.models import BookingPeriodMeta
+    from onegov.feriennet.request import FeriennetRequest
 
 
 @FeriennetApp.path(
@@ -30,17 +39,24 @@ from uuid import UUID
         'filter': keywords_converter,
         'pages': integer_range_converter
     })
-def get_vacation_activities(request, app, pages=None, filter=None):
-    filter = filter and ActivityFilter(**filter) or ActivityFilter()
+def get_vacation_activities(
+    request: FeriennetRequest,
+    app: FeriennetApp,
+    pages: tuple[int, int] | None = None,
+    filter: dict[str, list[str]] | None = None
+) -> VacationActivityCollection:
+
+    filter_obj = ActivityFilter(**filter) if filter else ActivityFilter()
 
     if not request.is_organiser:
-        filter.period_ids = app.active_period and [app.active_period.id]
+        filter_obj.period_ids = (
+            {app.active_period.id} if app.active_period else set())
 
     collection = VacationActivityCollection(
         session=app.session(),
         pages=pages,
         identity=request.identity,
-        filter=filter
+        filter=filter_obj
     )
 
     # prevent large lookups
@@ -52,39 +68,48 @@ def get_vacation_activities(request, app, pages=None, filter=None):
 @FeriennetApp.path(
     model=VacationActivity,
     path='/activity/{name}')
-def get_vacation_activity(request, app, name):
+def get_vacation_activity(
+    request: FeriennetRequest,
+    name: str
+) -> VacationActivity | None:
     return VacationActivityCollection(
-        app.session(), identity=request.identity).by_name(name)
+        request.session, identity=request.identity).by_name(name)
 
 
 @FeriennetApp.path(
     model=Occasion,
     path='/occasions/{id}',
-    converters=dict(id=UUID))
-def get_occasion(request, app, id):
-    return OccasionCollection(app.session()).by_id(id)
+    converters={'id': UUID})
+def get_occasion(request: FeriennetRequest, id: UUID) -> Occasion | None:
+    return OccasionCollection(request.session).by_id(id)
 
 
 @FeriennetApp.path(
-    model=PeriodCollection,
+    model=BookingPeriodCollection,
     path='/periods')
-def get_periods(request, app):
-    return PeriodCollection(app.session())
+def get_periods(request: FeriennetRequest) -> BookingPeriodCollection:
+    return BookingPeriodCollection(request.session)
 
 
 @FeriennetApp.path(
-    model=Period,
+    model=BookingPeriod,
     path='/period/{id}',
-    converters=dict(id=UUID))
-def get_period(request, app, id):
-    return PeriodCollection(app.session()).by_id(id)
+    converters={'id': UUID})
+def get_period(request: FeriennetRequest, id: UUID) -> BookingPeriod | None:
+    return BookingPeriodCollection(request.session).by_id(id)
 
 
 @FeriennetApp.path(
     model=BookingCollection,
     path='/my-bookings',
-    converters=dict(period_id=UUID))
-def get_my_bookings(request, app, period_id=None, username=None):
+    converters={'period_id': UUID})
+def get_my_bookings(
+    request: FeriennetRequest,
+    app: FeriennetApp,
+    period_id: UUID | None = None,
+    username: str | None = None
+) -> BookingCollection:
+
     # only admins can actually specify the username
     if not request.is_admin:
         username = request.current_username
@@ -106,29 +131,39 @@ def get_my_bookings(request, app, period_id=None, username=None):
 @FeriennetApp.path(
     model=Booking,
     path='/booking/{id}',
-    converters=dict(id=UUID))
-def get_booking(request, app, id):
-    return BookingCollection(app.session()).by_id(id)
+    converters={'id': UUID})
+def get_booking(request: FeriennetRequest, id: UUID) -> Booking | None:
+    return BookingCollection(request.session).by_id(id)
 
 
 @FeriennetApp.path(
     model=Attendee,
     path='/attendee/{id}',
-    converters=dict(id=UUID))
-def get_attendee(request, app, id):
-    return AttendeeCollection(app.session()).by_id(id)
+    converters={'id': UUID})
+def get_attendee(request: FeriennetRequest, id: UUID) -> Attendee | None:
+    return AttendeeCollection(request.session).by_id(id)
 
 
 @FeriennetApp.path(
     model=MatchCollection,
     path='/matching',
-    converters=dict(period_id=UUID, states=[str]))
-def get_matches(request, app, period_id, states=None):
+    converters={
+        'period_id': UUID,
+        'states': [LiteralConverter(OccasionState)]
+    })
+def get_matches(
+    request: FeriennetRequest,
+    app: FeriennetApp,
+    period_id: UUID | None,
+    states: list[OccasionState] | None = None
+) -> MatchCollection | None:
+
     # the default period is the active period or the first we can find
+    period: BookingPeriod | BookingPeriodMeta | None
     if not period_id:
         period = app.default_period
     else:
-        period = PeriodCollection(app.session()).by_id(period_id)
+        period = BookingPeriodCollection(app.session()).by_id(period_id)
 
     if not period:
         return None
@@ -139,14 +174,27 @@ def get_matches(request, app, period_id, states=None):
 @FeriennetApp.path(
     model=BillingCollection,
     path='/billing',
-    converters=dict(period_id=UUID))
-def get_billing(request, app, period_id,
-                username=None, expand=False, state='unpaid'):
+    converters={
+        'period_id': UUID,
+        'expand': bool,
+        'payment_state': LiteralConverter('paid', 'unpaid')
+    }
+)
+def get_billing(
+    request: FeriennetRequest,
+    app: FeriennetApp,
+    period_id: UUID,
+    username: str | None = None,
+    expand: bool = False,
+    state: Literal['paid', 'unpaid'] = 'unpaid'
+) -> BillingCollection | None:
+
     # the default period is the active period or the first we can find
+    period: BookingPeriod | BookingPeriodMeta | None
     if not period_id:
         period = app.default_period
     else:
-        period = PeriodCollection(app.session()).by_id(period_id)
+        period = BookingPeriodCollection(app.session()).by_id(period_id)
 
     if not period:
         return None
@@ -157,22 +205,43 @@ def get_billing(request, app, period_id,
 @FeriennetApp.path(
     model=InvoiceAction,
     path='/invoice-action/{id}/{action}',
-    converters=dict(id=UUID))
-def get_invoice_action(request, app, id, action, extend_to=None):
-    action = InvoiceAction(
+    converters={
+        'id': UUID,
+        'action': LiteralConverter(
+            'mark-paid',
+            'mark-unpaid',
+            'remove-manual'
+        ),
+        'extend_to': LiteralConverter('invoice', 'family')
+    })
+def get_invoice_action(
+    request: InvoiceAction,
+    app: FeriennetApp,
+    id: UUID,
+    action: Literal['mark-paid', 'mark-unpaid', 'remove-manual'],
+    extend_to: Literal['invoice', 'family'] | None = None
+) -> InvoiceAction | None:
+
+    action_obj = InvoiceAction(
         session=app.session(),
         id=id,
         action=action,
         extend_to=extend_to
     )
-    return action.valid and action or None
+    return action_obj if action_obj.valid else None
 
 
 @FeriennetApp.path(
-    model=InvoiceCollection,
+    model=BookingPeriodInvoiceCollection,
     path='/my-bills',
-    converters=dict(invoice=UUID))
-def get_my_invoices(request, app, username=None, invoice=None):
+    converters={'invoice': UUID})
+def get_my_invoices(
+    request: FeriennetRequest,
+    app: FeriennetApp,
+    username: str | None = None,
+    invoice: UUID | None = None
+) -> BookingPeriodInvoiceCollection | None:
+
     # only admins can actually specify the username/invoice
     if not request.is_admin:
         username, invoice = None, None
@@ -182,14 +251,13 @@ def get_my_invoices(request, app, username=None, invoice=None):
         username = request.current_username
 
     # the default period is the active period
-    if not invoice:
-        invoice = request.app.default_period and request.app.default_period.id
+    if not invoice and request.app.default_period:
+        invoice = request.app.default_period.id
 
-    # at this point the username has to exist...
     user_id = request.app.user_ids_by_name.get(username)
 
-    # ...as well as the invoice
-    if not user_id or not invoice:
+    # the invoice has to exist
+    if not invoice:
         return None
 
     # XXX username should be user_id, invoice should be period_id
@@ -199,30 +267,39 @@ def get_my_invoices(request, app, username=None, invoice=None):
 
 
 @FeriennetApp.path(
-    model=InvoiceItem,
-    path='/invoice-item/{id}')
-def get_my_invoice_item(request, app, id):
-    return request.session.query(InvoiceItem).filter_by(id=id).first()
+    model=ActivityInvoiceItem,
+    path='/invoice-item/{id}',
+    converters={'id': UUID})
+def get_my_invoice_item(
+    request: FeriennetRequest,
+    id: UUID
+) -> ActivityInvoiceItem | None:
+    return request.session.query(ActivityInvoiceItem).filter_by(id=id).first()
 
 
 @FeriennetApp.path(
     model=OccasionAttendeeCollection,
     path='/attendees/{activity_name}',
-    converters=dict(period_id=UUID))
-def get_occasion_attendee_collection(request, app, activity_name,
-                                     period_id=None):
+    converters={'period_id': UUID})
+def get_occasion_attendee_collection(
+    request: FeriennetRequest,
+    app: FeriennetApp,
+    activity_name: str,
+    period_id: UUID | None = None
+) -> OccasionAttendeeCollection | None:
 
     # load the activity
-    activity = get_vacation_activity(request, app, activity_name)
+    activity = get_vacation_activity(request, activity_name)
 
     if not activity:
         return None
 
     # the default period is the active period or the first we can find
+    period: BookingPeriod | BookingPeriodMeta | None
     if not period_id:
         period = app.default_period
     else:
-        period = PeriodCollection(app.session()).by_id(period_id)
+        period = BookingPeriodCollection(app.session()).by_id(period_id)
 
     if not period:
         return None
@@ -240,22 +317,32 @@ def get_occasion_attendee_collection(request, app, activity_name,
 @FeriennetApp.path(
     model=NotificationTemplateCollection,
     path='/notifications')
-def get_notification_template_collection(request, app):
+def get_notification_template_collection(
+    app: FeriennetApp
+) -> NotificationTemplateCollection:
     return NotificationTemplateCollection(app.session())
 
 
 @FeriennetApp.path(
     model=NotificationTemplate,
     path='/notification/{id}',
-    converters=dict(id=UUID, period_id=UUID))
-def get_notification_template(request, app, id, period_id):
+    converters={'id': UUID, 'period_id': UUID})
+def get_notification_template(
+    app: FeriennetApp,
+    id: UUID,
+    period_id: UUID | None
+) -> NotificationTemplate | None:
+
     template = NotificationTemplateCollection(app.session()).by_id(id)
 
     if not period_id and not app.active_period:
         return None
 
     if template:
-        template.period_id = period_id or app.active_period.id
+        if not period_id:
+            assert app.active_period is not None
+            period_id = app.active_period.id
+        template.period_id = period_id
 
     return template
 
@@ -263,14 +350,23 @@ def get_notification_template(request, app, id, period_id):
 @FeriennetApp.path(
     model=Calendar,
     path='/calendar/{name}/{token}')
-def get_calendar(request, name, token):
+def get_calendar(
+    request: FeriennetRequest,
+    name: str,
+    token: str
+) -> Calendar | None:
     return Calendar.from_name_and_token(request.session, name, token)
 
 
 @FeriennetApp.path(
     model=GroupInvite,
     path='/join/{group_code}')
-def get_group_invite(app, request, group_code, username=None):
+def get_group_invite(
+    request: FeriennetRequest,
+    group_code: str,
+    username: str | None = None
+) -> GroupInvite | None:
+
     group_code = group_code.upper()
 
     if not is_valid_group_code(group_code):
@@ -286,31 +382,45 @@ def get_group_invite(app, request, group_code, username=None):
 @FeriennetApp.path(
     model=OccasionNeed,
     path='/occasion-need/{id}',
-    converters=dict(id=UUID))
-def get_occasion_need(request, id):
+    converters={'id': UUID})
+def get_occasion_need(
+    request: FeriennetRequest,
+    id: UUID
+) -> OccasionNeed | None:
     return request.session.query(OccasionNeed).filter_by(id=id).first()
 
 
 @FeriennetApp.path(
     model=VolunteerCart,
     path='/volunteer-cart')
-def get_volunteer_cart(request):
+def get_volunteer_cart(request: FeriennetRequest) -> VolunteerCart:
     return VolunteerCart.from_request(request)
 
 
 @FeriennetApp.path(
     model=VolunteerCartAction,
     path='/volunteer-cart-action/{action}/{target}',
-    converters=dict(target=UUID))
-def get_volunteer_cart_action(request, action, target):
+    converters={'action': LiteralConverter('add', 'remove'), 'target': UUID})
+def get_volunteer_cart_action(
+    request: FeriennetRequest,
+    action: Literal['add', 'remove'],
+    target: UUID
+) -> VolunteerCartAction:
     return VolunteerCartAction(action, target)
 
 
 @FeriennetApp.path(
     model=VolunteerCollection,
     path='/volunteers/{period_id}',
-    converters=dict(period_id=UUID))
-def get_volunteers(request, period_id):
+    converters={'period_id': UUID})
+def get_volunteers(
+    request: FeriennetRequest,
+    period_id: UUID
+) -> VolunteerCollection | None:
+
+    if not period_id:
+        return None
+
     if not request.app.show_volunteers(request):
         return None
 
@@ -325,6 +435,6 @@ def get_volunteers(request, period_id):
 @FeriennetApp.path(
     model=Volunteer,
     path='/volunteer/{id}',
-    converters=dict(id=UUID))
-def get_volunteer(request, id):
+    converters={'id': UUID})
+def get_volunteer(request: FeriennetRequest, id: UUID) -> Volunteer | None:
     return VolunteerCollection(request.session, None).by_id(id)

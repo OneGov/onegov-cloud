@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import yaml
 
@@ -7,12 +9,23 @@ from onegov.chat import MessageCollection
 from onegov.core.cli.commands import cli as core_cli
 from onegov.event import Event, EventCollection
 from onegov.org.cli import cli
+from onegov.org.models.ticket import EventSubmissionTicket
 from onegov.ticket import TicketCollection
 from onegov.user import User
 from transaction import commit
 
 
-def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import SessionManager
+    from sqlalchemy.orm import Query, Session
+
+
+def test_manage_orgs(
+    postgres_dsn: str,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
 
     cfg = {
         'applications': [
@@ -23,7 +36,19 @@ def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
                 'configuration': {
                     'dsn': postgres_dsn,
                     'depot_backend': 'depot.io.memory.MemoryFileStorage',
+                    'filestorage': 'fs.osfs.OSFS',
+                    'filestorage_options': {
+                        'root_path': '{}/file-storage'.format(
+                            temporary_directory
+                        ),
+                        'create': 'true'
+                    },
                     'redis_url': redis_url,
+                    'websockets': {
+                        'client_url': 'ws://localhost:8766',
+                        'manage_url': 'ws://localhost:8766',
+                        'manage_token': 'super-super-secret-token'
+                    }
                 }
             }
         ]
@@ -38,7 +63,7 @@ def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
     result = runner.invoke(cli, [
         '--config', cfg_path, '--select', '/onegov_org/newyork',
         'add', 'New York'
-    ])
+    ], catch_exceptions=False)
 
     assert result.exit_code == 0
     assert "New York was created successfully" in result.output
@@ -60,17 +85,21 @@ def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
 
 
 def test_fetch_with_state_and_tickets(
-        cfg_path, session_manager, test_password):
+    cfg_path: str,
+    session_manager: SessionManager,
+    test_password: str
+) -> None:
+
     runner = CliRunner()
     local = 'baz'
     remote = 'bar'
     session_manager.ensure_schema_exists('foo-baz')
     session_manager.ensure_schema_exists('foo-bar')
 
-    def events(entity=local):
+    def events(entity: str = local) -> Query[Event]:
         return get_session(entity).query(Event)
 
-    def get_session(entity):
+    def get_session(entity: str) -> Session:
         session_manager.set_current_schema(f'foo-{entity}')
         return session_manager.session()
 
@@ -86,7 +115,8 @@ def test_fetch_with_state_and_tickets(
             tags=tags,
             location=location,
             source=source,
-            organizer_email='triceracops@newyork.com'
+            organizer_email='triceracops@newyork.com',
+            organizer_phone='079 123 45 67',
         )
     commit()
 
@@ -120,13 +150,16 @@ def test_fetch_with_state_and_tickets(
     assert result.exit_code == 0
     assert "2 added, 0 updated, 0 deleted" in result.output
     local_event = events().filter_by(title='1').first()
+    assert local_event is not None
     assert local_event.state == 'submitted'
     assert local_event.organizer_email == 'triceracops@newyork.com'
+    assert local_event.organizer_phone == '079 123 45 67'
     assert TicketCollection(get_session(local)).query().count() == 2
     assert MessageCollection(get_session(local)).query().count() == 2
-    assert TicketCollection(get_session(local)).query().first().muted is True
+    assert TicketCollection(get_session(local)).query().first().muted is True  # type: ignore[union-attr]
     collection = TicketCollection(get_session(local))
     ticket = collection.by_handler_id(local_event.id.hex)
+    assert isinstance(ticket, EventSubmissionTicket)
     assert ticket.title == local_event.title
     assert ticket.handler.event == local_event
     assert ticket.handler.source == 'fetch-bar-1'
@@ -135,6 +168,7 @@ def test_fetch_with_state_and_tickets(
 
     # Chance the state of one ticket
     remote_event = events(remote).filter_by(title='1').first()
+    assert remote_event is not None
     remote_event.submit()
     remote_event.publish()
     commit()
@@ -153,6 +187,7 @@ def test_fetch_with_state_and_tickets(
 
     # Withdraw event when ticket is still open and state is initiated
     remote_event = events(remote).filter_by(title='1').first()
+    assert remote_event is not None
     remote_event.withdraw()
     commit()
     assert remote_event.state == 'withdrawn'
@@ -169,15 +204,18 @@ def test_fetch_with_state_and_tickets(
     assert result.exit_code == 0
     assert "0 added, 1 updated, 0 deleted" in result.output
     local_event = events(local).filter_by(title='1').first()
+    assert local_event is not None
     assert local_event.state == 'withdrawn'
     collection = TicketCollection(get_session(local))
     ticket = collection.by_handler_id(local_event.id.hex)
+    assert ticket is not None
     # do not touch tickets when updating state
     assert ticket.state == 'open'
 
     # Change state of remaining to published
     # Change the state of one ticket
     remote_event = events(remote).filter_by(title='2').first()
+    assert remote_event is not None
     remote_event.submit()
     remote_event.publish()
     commit()
@@ -194,6 +232,7 @@ def test_fetch_with_state_and_tickets(
     assert result.exit_code == 0
     assert "0 added, 1 updated, 0 deleted" in result.output
     event = events(local).filter_by(title='2').first()
+    assert event is not None
     assert event.state == 'published'
 
     # Delete the original event
@@ -234,13 +273,18 @@ def test_fetch_with_state_and_tickets(
     assert all(m.owner == 'admin@example.org' for m in messages)
 
 
-def test_fetch(cfg_path, session_manager, test_password):
+def test_fetch(
+    cfg_path: str,
+    session_manager: SessionManager,
+    test_password: str
+) -> None:
+
     runner = CliRunner()
 
     session_manager.ensure_schema_exists('foo-baz')
     session_manager.ensure_schema_exists('foo-qux')
 
-    def get_session(entity):
+    def get_session(entity: str) -> Session:
         session_manager.set_current_schema(f'foo-{entity}')
         return session_manager.session()
 
@@ -277,7 +321,7 @@ def test_fetch(cfg_path, session_manager, test_password):
     assert get_session('bar').query(Event).count() == 7
     assert get_session('baz').query(Event).count() == 3
     assert get_session('qux').query(Event).count() == 0
-    assert get_session('bar').query(Event).first().state == 'initiated'
+    assert get_session('bar').query(Event).first().state == 'initiated'  # type: ignore[union-attr]
 
     # No sources provided
     result = runner.invoke(cli, [
@@ -297,7 +341,7 @@ def test_fetch(cfg_path, session_manager, test_password):
     ])
     assert result.exit_code == 0
     assert "5 added, 0 updated, 0 deleted" in result.output
-    assert get_session('qux').query(Event).first().state == 'published'
+    assert get_session('qux').query(Event).first().state == 'published'  # type: ignore[union-attr]
 
     # Bar[B, C] -> Qux
     result = runner.invoke(cli, [

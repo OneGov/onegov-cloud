@@ -1,8 +1,17 @@
+from __future__ import annotations
+
+import pytest
+
 from onegov.election_day.collections import ScreenCollection
 from onegov.election_day.models import Screen
 
 
-def test_screen_collection(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_screen_collection(session: Session) -> None:
     collection = ScreenCollection(session)
     collection.add(
         Screen(
@@ -62,13 +71,14 @@ def test_screen_collection(session):
     ]
 
     screen = collection.by_number(10)
+    assert screen is not None
     assert screen == collection.by_id(screen.id)
     collection.delete(screen)
 
     assert [screen.number for screen in collection.query()] == [8, 12]
 
 
-def test_screen_collection_pagination(session):
+def test_screen_collection_pagination(session: Session) -> None:
     collection = ScreenCollection(session)
 
     for number in range(100):
@@ -87,3 +97,14 @@ def test_screen_collection_pagination(session):
     assert ScreenCollection(session, page=9).batch[9].number == 99
 
     assert len(ScreenCollection(session, page=10).batch) == 0
+
+
+def test_screen_pagination_negative_page_index(session: Session) -> None:
+    collection = ScreenCollection(session, page=-3)
+    assert collection.page == 0
+    assert collection.page_index == 0
+    assert collection.page_by_index(-2).page == 0
+    assert collection.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        ScreenCollection(session, page=None)  # type: ignore[arg-type]

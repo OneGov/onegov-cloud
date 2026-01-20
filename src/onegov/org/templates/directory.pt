@@ -16,14 +16,39 @@
             </div>
         </div>
 
-        <p tal:condition="directory.lead" tal:content="structure layout.linkify(directory.lead)" />
+        <p tal:condition="directory.lead" tal:content="layout.linkify(directory.lead)" />
 
         <div class="row reverse-on-mobile">
             <div class="columns medium-8">
-                <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
+                <tal:b tal:condition="not:entries" tal:switch="not:directory.configuration.empty_notice">
+                    <p tal:case="True" i18n:translate="">No entries found.</p>
+                    <p tal:case="False">${directory.configuration.empty_notice}</p>
+                </tal:b>
 
-                <ul class="with-lead ${show_thumbnails and 'with-thumbnails' or ''}" tal:condition="entries">
-                    <li tal:repeat="entry entries">
+                <!--? display in accordion mode -->
+                <ul tal:condition="directory.layout == 'accordion'" class="accordion" data-accordion>
+                    <li tal:repeat="entry entries" class="accordion-navigation small-12-cell" style="">
+                        <a tal:attributes="href python:'#panel'+str(repeat['entry'].index)">
+                            <span class="h5">${entry.title}</span>
+                        </a>
+                        <div tal:attributes="id python:'panel'+str(repeat['entry'].index)" class="content">
+                            <ul tal:repeat="field directory.fields" style="list-style: none; margin-left: 0">
+                                <li tal:condition="field.type == 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: <br>{}').format(key, value)" style="white-space: pre-wrap;"></li>
+                                <li tal:condition="field.type != 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                            </ul>
+                            <ul style="list-style: none; margin-left: 0">
+                                <li>
+                                    <a tal:condition="request.is_manager" class="edit-link" tal:attributes="href request.link(entry, 'edit')">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="directory-list with-lead ${show_thumbnails and 'with-thumbnails' or ''}  ${'row' if overview_two_columns else ''}" tal:condition="entries and directory.layout == 'default'">
+                    <li tal:repeat="entry entries" class="small-12 ${'medium-6' if overview_two_columns else ''} columns">
                         <div class="thumbnail" tal:condition="show_thumbnails">
                             <tal:b define="thumbnail thumbnail_link(entry)" condition="thumbnail">
                                 <img data-src="${thumbnail}" class="lazyload" data-no-alt align="top" alt="" />
@@ -31,30 +56,32 @@
                         </div>
 
                         <div>
-                            <a class="list-title" tal:attributes="href request.link(entry)">${entry.title}</a><metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
+                            <a class="list-title" tal:attributes="href request.link(entry)">
+                                <span tal:condition="entry.number" class="entry-number">${entry.number}. </span>${entry.title}
+                            </a><metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
 
-                            <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
+                            <tal:b define="custom_lead search_widget.lead(layout, entry)|nothing">
                                 <div class="list-lead">
-                                    <tal:b condition="custom_lead" replace="structure custom_lead" />
-                                    <tal:b condition="not:custom_lead" replace="entry.lead" />
+                                    <tal:b condition="custom_lead" replace="custom_lead" />
+                                    <tal:b condition="not:custom_lead" replace="escape(entry.lead).replace('\\n', Markup('<br>'))" />
                                 </div>
                             </tal:b>
                         </div>
                     </li>
                 </ul>
 
-                <tal:b define="text directory.content.get('text')" condition="text">
+                <tal:b define="text directory.text|nothing" condition="text">
                     <h2 i18n:translate>Further Information</h2>
-                    <tal:b content="structure text" />
+                    <tal:b content="text" />
                 </tal:b>
 
             </div>
 
             <div class="columns medium-4">
 
-                <div class="row" tal:condition="searchwidget">
+                <div class="row" tal:condition="search_widget">
                     <div class="columns medium-12">
-                        <tal:b replace="structure searchwidget.html(layout)" />
+                        <tal:b replace="search_widget.html(layout)" />
                     </div>
                 </div>
 
@@ -65,7 +92,7 @@
                     </div>
                 </div>
 
-                <div class="submit-yours" tal:condition="directory.enable_submissions or request.is_manager">
+                <div class="submit-yours" tal:condition="directory.enable_submissions">
                     <dl>
                         <dt>
                             <a href="${submit}">
@@ -79,9 +106,30 @@
                 <div class="publication-nav" tal:condition="layout.publication_filters">
                     <button href="#" data-dropdown="pubnav" aria-controls="pubnav" aria-expanded="false" class="button small secondary dropdown" i18n:translate>${layout.publication_filter_title}</button><br>
                     <ul id="pubnav" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                        <li tal:repeat="link layout.publication_links" tal:content="structure link(layout)"></li>
+                        <li tal:repeat="link layout.publication_links" tal:content="link(layout)"></li>
                     </ul>
                 </div>
+
+                <div class="side-panel files-panel" tal:condition="files and directory.show_file_links_in_sidebar|True">
+                    <h2 i18n:translate>Documents</h2>
+                    <ul class="panel-links">
+                        <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
+                            <a title="${file.name}" href="${request.link(file)}">${file.name}</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="side-panel" tal:condition="directory.enable_update_notifications|False">
+                    <h2 i18n:translate>Actions</h2>
+                    <ul class="panel-links">
+                        <li >
+                            <a class="list-link" href="${new_recipient_link}">
+                                <i class="fa fa-bell"></i> <span class="list-title" i18n:translate>Get notifications on new entries</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
 
         </div>

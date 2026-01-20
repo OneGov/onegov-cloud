@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-09-05 10:29+0200\n"
+"POT-Creation-Date: 2025-12-10 15:02+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -28,83 +28,86 @@ msgstr "Periodo di prenotazione: ${dates}"
 msgid "Execution: ${dates}"
 msgstr "Evento: ${dates}"
 
-#, python-format
-msgid "${count} Activities"
-msgstr "${count} Attività"
+msgid "Activities"
+msgstr "Attività"
 
-#, python-format
-msgid "${count} Occasions"
-msgstr "${count} eventi"
+msgid "Occasions"
+msgstr "Eventi"
 
-#, python-format
-msgid "${count} Wishes"
-msgstr "${count} Desideri"
+msgid "overfull"
+msgstr "con troppi partecipanti"
 
-#, python-format
-msgid "${count} Bookings"
-msgstr "${count} prenotazioni"
+msgid "full"
+msgstr "completo"
 
-#, python-format
-msgid "${count} Wishes per Attendee"
-msgstr "${count} desideri per partecipante"
+msgid "operable"
+msgstr "con abbastanza partecipanti"
 
-#, python-format
-msgid "${count} accepted"
-msgstr "${count} accettato"
+msgid "unoperable"
+msgstr "con non abbastanza partecipanti"
 
-#, python-format
-msgid "${count} cancelled"
-msgstr "${count} annullato"
+msgid "empty"
+msgstr "con nessun partecipante"
 
-#, python-format
-msgid "${count} denied"
-msgstr "${count} rifiutato"
+msgid "cancelled"
+msgstr "annullato"
 
-#, python-format
-msgid "${count} blocked"
-msgstr "${count} bloccato"
+msgid "Wishes"
+msgstr "Desideri"
 
-#, python-format
-msgid "${count} Bookings per Attendee"
-msgstr "${count} prenotazioni per partecipante"
+msgid "Bookings"
+msgstr "Prenotazioni"
 
-#, python-format
-msgid "${count} Attendees"
-msgstr "${count} partecipante"
+msgid "Wishes per Attendee"
+msgstr "desideri per partecipante"
 
-#, python-format
-msgid "${count} Girls"
-msgstr "${count} femmina"
+msgid "accepted"
+msgstr "accettato"
 
-#, python-format
-msgid "${count} Boys"
-msgstr "${count} maschio"
+msgid "not carried out or cancelled"
+msgstr "annullati o cancellati"
 
-#, python-format
-msgid "${amount}% Happiness"
-msgstr "${amount}% soddisfazione"
+msgid "denied"
+msgstr "rifiutato"
 
-#, python-format
-msgid "${count} Attendees Without Occasion"
-msgstr "${count} Partecipante senza eventi"
+msgid "blocked"
+msgstr "bloccato"
 
-#, python-format
-msgid "${amount} CHF outstanding"
-msgstr "${amount} CHF scoperti"
+msgid "Bookings per Attendee"
+msgstr "prenotazioni per partecipante"
 
-#, python-format
-msgid "${amount} CHF total"
-msgstr "${amount} CHF totale"
+msgid "Attendees"
+msgstr "Partecipante"
 
-#, python-format
-msgid "${amount} CHF paid"
-msgstr "${amount} CHF pagato"
+msgid "Girls"
+msgstr "femmina"
+
+msgid "Boys"
+msgstr "maschio"
+
+msgid "of which without accepted bookings"
+msgstr "dei quali senza prenotazioni accettate"
+
+msgid "Happiness"
+msgstr "Soddisfazione"
+
+msgid "Attendees Without Occasion"
+msgstr "Partecipante senza eventi"
+
+msgid "CHF outstanding"
+msgstr "CHF scoperti"
+
+msgid "CHF total"
+msgstr "CHF totale"
+
+msgid "CHF paid"
+msgstr "CHF pagato"
 
 msgid "Help us"
 msgstr "Aiutare"
 
-msgid "Dashboard"
-msgstr "Dashboard"
+msgid "Overview"
+msgstr "Panoramica"
 
 msgid "Periods"
 msgstr "Periodi"
@@ -129,12 +132,6 @@ msgstr "Fatture"
 
 msgid "Wishlist"
 msgstr "Lista dei desideri"
-
-msgid "Bookings"
-msgstr "Prenotazioni"
-
-msgid "Activities"
-msgstr "Attività"
 
 msgid "Activity Title"
 msgstr "Titolo dell'attività"
@@ -183,6 +180,9 @@ msgstr "Sesso  partecipante"
 
 msgid "Attendee Notes"
 msgstr "Commenti partecipante"
+
+msgid "Attendee SwissPass ID"
+msgstr "ID SwissPass partecipante"
 
 msgid "Attendee Booking-Limit"
 msgstr "Limiti di prenotazione partecipante"
@@ -289,6 +289,9 @@ msgstr "status e-mail utente"
 msgid "User TOS Accepted"
 msgstr "accettazione condizioni generali da parte dell'utente"
 
+msgid "User Allow contact for carpooling"
+msgstr "utente autorizza contatto per covoituraggio"
+
 msgid "Invoice Item Group"
 msgstr "Voce di fattura gruppo"
 
@@ -298,7 +301,7 @@ msgstr "Voce di fattura testo"
 msgid "Invoice Item Paid"
 msgstr "Voce di fattura pagata"
 
-msgid "Invoice Item Payment Date"
+msgid "Invoice Item Payment date"
 msgstr "Data di pagamento"
 
 msgid "Invoice Item Transaction ID"
@@ -318,6 +321,18 @@ msgstr "Voce di fattura importo"
 
 msgid "Invoice Item References"
 msgstr "Voce di fattura riferimenti"
+
+msgid "Attendee Address"
+msgstr "Indirizzo del partecipante"
+
+msgid "Attendee Zipcode"
+msgstr "CAP del partecipante"
+
+msgid "Attendee Place"
+msgstr "Posto del partecipante"
+
+msgid "Attendee Political Municipality"
+msgstr "Partecipante Comune politico"
 
 msgid "Organiser Last Name"
 msgstr "Cognome organizzatore"
@@ -357,6 +372,36 @@ msgstr "Conto bancario organizzatore"
 
 msgid "Organiser Beneficiary"
 msgstr "Beneficiario organizzazione"
+
+msgid "Confirmed Volunteers"
+msgstr "Aiutanti confermati"
+
+msgid "Volunteer State"
+msgstr "Stato dell'aiutante"
+
+msgid "First Name"
+msgstr "Nome"
+
+msgid "Last Name"
+msgstr "Cognome"
+
+msgid "Birth Date"
+msgstr "Data di nascita"
+
+msgid "Organisation"
+msgstr "Organizzazione"
+
+msgid "Place"
+msgstr "Località utente"
+
+msgid "E-Mail"
+msgstr "E-mail"
+
+msgid "Phone"
+msgstr "Telefono"
+
+msgid "Address"
+msgstr "Indirizzo"
 
 msgid "Wishlist / Bookings"
 msgstr "Lista desideri / Prenotazioni"
@@ -428,14 +473,17 @@ msgstr "Organizzatore"
 msgid "Member"
 msgstr "Membro"
 
+msgid "Contacted"
+msgstr "Contatto"
+
+msgid "Confirmed"
+msgstr "Confermato"
+
 msgid "Invoice Items"
 msgstr "Voci fattura"
 
 msgid "Exports invoice items in the given period."
 msgstr "Esportare gli elementi della fattura nel periodo selezionato."
-
-msgid "Occasions"
-msgstr "Eventi"
 
 msgid "Exports activities with an occasion in the given period."
 msgstr "Esportare le attività con esecuzioni nel periodo selezionato."
@@ -457,6 +505,9 @@ msgstr "Utente"
 
 msgid "Exports user accounts."
 msgstr "Esportare gli account utente."
+
+msgid "Exports volunteers in the given period."
+msgstr "Esportazioni volontarie nel periodo indicato."
 
 msgid "Accessible"
 msgstr "Adatta a persone con disabilità"
@@ -560,6 +611,12 @@ msgstr "Formazione continua"
 msgid "Healthy Snacks"
 msgstr "Merende equilibrate"
 
+msgid "Just for Boys"
+msgstr "Solo ragazzi"
+
+msgid "Just for Girls"
+msgstr "Solo ragazze"
+
 msgid "Title"
 msgstr "Titolo"
 
@@ -593,23 +650,38 @@ msgstr "Mappa"
 msgid "You already entered a child with this name"
 msgstr "Ha già inserito un bambino con questo nome"
 
-msgid "First Name"
-msgstr "Nome"
-
-msgid "Last Name"
-msgstr "Cognome"
-
 msgid "Birthdate"
 msgstr "Data di nascita"
 
 msgid "Gender"
 msgstr "Genere"
 
-msgid "Health Information"
-msgstr "Informazioni salute"
+msgid "Is there anything the course instructor should know?"
+msgstr "C'è qualcosa che l'istruttore dovrebbe sapere?"
 
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergie, disabilità, caratteristiche speciali"
+
+msgid "Swisspass ID"
+msgstr "ID Swisspass"
+
+msgid "The address of the attendee differs from the users address"
+msgstr "L'indirizzo del partecipante differisce dall'indirizzo dell'utente"
+
+msgid "Check this box if the attendee doesn't live with you"
+msgstr "Spuntare questa casella se il partecipante non vive con voi"
+
+msgid "Zip Code"
+msgstr "CAP"
+
+msgid "Political municipality"
+msgstr "Comune politico"
+
+msgid "The Swisspass ID must be 13 characters long (including dashes)."
+msgstr "L'ID Swisspass deve essere lungo 13 caratteri (inclusi i trattini)."
+
+msgid "The Swisspass ID must only contain digits and dashes."
+msgstr "L'ID Swisspass deve contenere solo cifre e trattini."
 
 msgid "Attendee"
 msgstr "Partecipante"
@@ -617,14 +689,17 @@ msgstr "Partecipante"
 msgid "Note"
 msgstr "Commento"
 
+msgid "Political Municipality"
+msgstr "Comune politico"
+
 msgid "Ignore Age Restriction"
 msgstr "Ignorare restrizioni di età"
 
 msgid "Accept TOS"
 msgstr "Accettare CG"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "CG"
 
@@ -747,6 +822,18 @@ msgstr "Per un utente specifico"
 
 msgid "For users with tags"
 msgstr "Per gli utenti di una categoria specifica"
+
+msgid "Payment date"
+msgstr "Data di pagamento"
+
+msgid "Whole invoice"
+msgstr "Fattura intera"
+
+msgid "Only for specific items"
+msgstr "Solo per articoli specifici"
+
+msgid "Items"
+msgstr "Voci della fattura"
 
 msgid "My donation"
 msgstr "La mia donazionoe"
@@ -1019,8 +1106,26 @@ msgstr "Inizio della fase prenotazione"
 msgid "Booking End"
 msgstr "Fine della fase prenotazione"
 
+msgid "Stop accepting bookings"
+msgstr "Smettere di accettare prenotazioni"
+
+msgid "Deadline"
+msgstr "Termine di registrazione"
+
+msgid "At the end of the booking phase"
+msgstr "Alla fine della fase di prenotazione"
+
+msgid "X days before each occasion"
+msgstr "X giorni prima di ogni evento"
+
+msgid "X Days Before"
+msgstr "X giorni prima"
+
 msgid "Execution Start"
 msgstr "Inizio evento"
+
+msgid "Execution phase"
+msgstr "Fase degli eventi"
 
 msgid "Execution End"
 msgstr "Fine evento"
@@ -1088,21 +1193,6 @@ msgstr "Sì"
 msgid "No"
 msgstr "No"
 
-msgid "Stop accepting bookings"
-msgstr "Smettere di accettare prenotazioni"
-
-msgid "Deadline"
-msgstr "Termine di registrazione"
-
-msgid "At the end of the booking phase"
-msgstr "Alla fine della fase di prenotazione"
-
-msgid "X days before each occasion"
-msgstr "X giorni prima di ogni evento"
-
-msgid "X Days Before"
-msgstr "X giorni prima"
-
 msgid "Allow bookings after the bills have been created."
 msgstr "Permettere le prenotazioni post-fatturazione."
 
@@ -1145,18 +1235,17 @@ msgid "Age check"
 msgstr "Verifica dell'età"
 
 msgid ""
-"<b>Exact</b> - the attendees need to be of the expected age at the beginning "
-"of the occasion"
+"Exact - the attendees need to be of the expected age at the beginning of the "
+"occasion"
 msgstr ""
-"<b>Precisa</b> - I partecipanti devono avere l'età prevista all'inizio "
-"dell'evento"
+"Precisa - I partecipanti devono avere l'età prevista all'inizio dell'evento"
 
 msgid ""
-"<b>Age group</b> - The attendees need to be of the expected age sometime "
-"during the year of the occasion"
+"Age group - The attendees need to be of the expected age sometime during the "
+"year of the occasion"
 msgstr ""
-"<b>Anno di nascita</b> - I partecipanti devono avere l'età prevista durante "
-"l'anno dell'evento"
+"Anno di nascita - I partecipanti devono avere l'età prevista durante l'anno "
+"dell'evento"
 
 msgid "The execution phase conflicts with existing occasions"
 msgstr "Conflitto con gli eventi esistenti"
@@ -1217,29 +1306,11 @@ msgstr "Appellativo"
 msgid "Personal"
 msgstr "Personale"
 
-msgid "Organisation"
-msgstr "Organizzazione"
-
-msgid "Address"
-msgstr "Indirizzo"
-
-msgid "Zip Code"
-msgstr "CAP"
-
-msgid "Place"
-msgstr "Località utente"
-
-msgid "Political Municipality"
-msgstr "Comune politico"
-
 msgid "Public E-Mail Address"
 msgstr "Indirizzo e-mail"
 
 msgid "If different than username"
 msgstr "Se diverso dal nome utente"
-
-msgid "Phone"
-msgstr "Telefono"
 
 msgid "Emergency Contact"
 msgstr "Contatto in caso di emergenza"
@@ -1258,6 +1329,12 @@ msgstr "Conto bancario (IBAN)"
 
 msgid "Beneficiary"
 msgstr "Beneficiario"
+
+msgid "Allow contact for carpooling"
+msgstr "Permettere il contatto per condividere il viaggio"
+
+msgid "Privacy"
+msgstr "Privacy"
 
 msgid "Please enter both a phone number and a name"
 msgstr "Inserisci un numero di telefono e un nome"
@@ -1356,9 +1433,6 @@ msgstr ""
 "Attualmente non ci sono periodi di tempo. Deve esistere almeno un periodo "
 "prima che gli eventi possano essere registrati."
 
-msgid "Attendees"
-msgstr "Partecipante"
-
 msgid "Show Ticket"
 msgstr "Ticket"
 
@@ -1413,6 +1487,9 @@ msgstr ""
 "Le prenotazioni manuali possono essere create solo dopo la conferma della "
 "fatturazione."
 
+msgid "Payment with date"
+msgstr "Pagamento con data"
+
 msgid "Donation"
 msgstr "Donazione"
 
@@ -1429,7 +1506,16 @@ msgid "Register as Volunteer"
 msgstr "Registrazione come aiutante"
 
 msgid "Sort"
-msgstr ""
+msgstr "Tipo"
+
+msgid "Delete"
+msgstr "Cancellare"
+
+msgid "Do you really want to delete this user?"
+msgstr "Vuole davvero cancellare questo utente?"
+
+msgid "Delete user"
+msgstr "Cancellare utente"
 
 msgid "Half day"
 msgstr "Mezza giornata"
@@ -1458,8 +1544,8 @@ msgstr "Archiviare"
 msgid "Do you really want to archive this activity?"
 msgstr "Vuole davvero archiviare questa attività?"
 
-msgid "This cannot be undone. The activity will be made private as a result."
-msgstr "Questo non può essere revocato. L'attività è nascosta al pubblico."
+msgid "The activity will be made private as a result."
+msgstr "L'attività è nascosta al pubblico."
 
 msgid "Archive Activity"
 msgstr "Archiviare attività"
@@ -1506,12 +1592,6 @@ msgstr ""
 "Vi preghiamo di notare che non possiamo garantire che possiate partecipare "
 "alla stessa attività."
 
-msgid "No activities found."
-msgstr "Nessuna attività trovata."
-
-msgid "Reset filter."
-msgstr "Azzerare il filtro."
-
 msgid "To my list"
 msgstr "La mia lista"
 
@@ -1521,47 +1601,11 @@ msgstr "Mostra di più"
 msgid "Navigate up"
 msgstr "Verso l'alto"
 
-msgid "My list"
-msgstr "La mia lista"
+msgid "No activities found."
+msgstr "Nessuna attività trovata."
 
-msgid "Weeks"
-msgstr "Settimane"
-
-msgid "Weekdays"
-msgstr "Giorni della settimana"
-
-msgid "Duration"
-msgstr "Durata"
-
-msgid "Municipalities"
-msgstr "Comuni"
-
-msgid "Age"
-msgstr "Età"
-
-msgid "${min_age} - ${max_age} years"
-msgstr "${min_age} - ${max_age} anni"
-
-msgid "starting at ${price} CHF"
-msgstr "da ${price} CHF"
-
-msgid "Free Spots"
-msgstr "Posti liberi"
-
-msgid "No free spots"
-msgstr "Nessun posto libero"
-
-msgid "1 free spot"
-msgstr "1 posto libero"
-
-msgid "${count} free spots"
-msgstr "${count} posti liberi"
-
-msgid "States"
-msgstr "Stato"
-
-msgid "Price"
-msgstr "Prezzo"
+msgid "Reset filter."
+msgstr "Azzerare il filtro."
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
@@ -1580,7 +1624,7 @@ msgstr ""
 "selezionate  \"Richiesta pubblicazione\" nella barra del menu. Lei o un "
 "altro amministratore controllerà e pubblicherà l'attività."
 
-msgid "This activity is currently being reviewd by an administrator."
+msgid "This activity is currently being reviewed by an administrator."
 msgstr "Questa attività è attualmente in fase di controllo."
 
 msgid "This activity has been archived."
@@ -1588,6 +1632,15 @@ msgstr "Questa attività è stata archiviata."
 
 msgid "There are currently no occasions planned."
 msgstr "Attualmente non ci sono eventi pianificati."
+
+msgid "Prebooking"
+msgstr "Fase dei desideri"
+
+msgid "Booking"
+msgstr "Fase di prenotazione"
+
+msgid "Other Occasions"
+msgstr "Altri eventi"
 
 msgid "The total amount is ${amount} CHF."
 msgstr "L'importo totale è di ${amount} CHF."
@@ -1619,11 +1672,20 @@ msgstr "Azioni"
 msgid "Discounts / Surcharges"
 msgstr "Deduzioni / Supplementi"
 
+msgid "Organizer:"
+msgstr "Organizzatore:"
+
 msgid "Unpaid"
 msgstr "Non pagato"
 
 msgid "Total"
 msgstr "Totale"
+
+msgid "amount unpaid"
+msgstr "non pagato"
+
+msgid "paid"
+msgstr "pagato"
 
 msgid "Reset Billing"
 msgstr "Azzerare la fatturazione"
@@ -1847,14 +1909,14 @@ msgstr "Questo è un gruppo di un periodo inattivo."
 msgid "Own Children"
 msgstr "Figli propri"
 
+msgid "None of own children in group."
+msgstr "Nessun figlio proprio nel gruppo."
+
 msgid "Add own child"
 msgstr "Aggiungere il proprio bambino"
 
 msgid "Add new own child"
 msgstr "Registrare un nuovo figlio proprio"
-
-msgid "None of own children in group."
-msgstr "Nessun figlio proprio nel gruppo."
 
 msgid "Other Children"
 msgstr "Altri bambini"
@@ -1895,17 +1957,41 @@ msgstr "Bonifico bancario"
 msgid "Purpose of Payment"
 msgstr "Scopo del pagamento"
 
-msgid "Pro Juventute Feriennet"
-msgstr "Pro Juventute Feriennet"
+msgid "Search term"
+msgstr "Termine di ricerca"
+
+msgid "Skip navigation"
+msgstr "Migrazione dei link"
+
+msgid "Back to the homepage"
+msgstr "Torna alla pagina principale"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr "Il modulo contiene degli errori. Verifica i campi segnalati in rosso."
+
+msgid "Copied to Clipboard!"
+msgstr "Copiato negli appunti!"
 
 msgid "Pro Juventute Logo"
 msgstr "Logo Pro Juventute"
+
+msgid "Pro Juventute Feriennet"
+msgstr "Pro Juventute Feriennet"
+
+msgid "Implementation"
+msgstr "Realizzazione"
 
 msgid "Feriennet Partner"
 msgstr "Partner Feriennet"
 
 msgid "Privacy Protection"
 msgstr "Tutela della privacy"
+
+msgid "Login"
+msgstr "Accedi"
 
 msgid "Best of Swiss Web Award 2019"
 msgstr "Premio Best of Swiss Web 2019"
@@ -1940,17 +2026,32 @@ msgstr ""
 msgid "Ticket State"
 msgstr "Stato del biglietto"
 
-msgid "Fully booked"
-msgstr "Al completo"
+msgid "Age"
+msgstr "Età"
 
-msgid "Rescinded"
-msgstr "Annullato"
+msgid "${min_age} - ${max_age} years"
+msgstr "${min_age} - ${max_age} anni"
 
-msgid "${count} spots available"
-msgstr "Ancora ${count} posti disponibili"
+msgid "starting at ${price} CHF"
+msgstr "da ${price} CHF"
 
-msgid "${count} attendees"
-msgstr "${count} Partecipante"
+msgid "Free Spots"
+msgstr "Posti liberi"
+
+msgid "No free spots"
+msgstr "Nessun posto libero"
+
+msgid "1 free spot"
+msgstr "1 posto libero"
+
+msgid "${count} free spots"
+msgstr "${count} posti liberi"
+
+msgid "Independent of other occasions"
+msgstr "Indipendente da altri eventi"
+
+msgid "Please bring ${cost} CHF in cash."
+msgstr "Si prega di pagare CHF ${cost} all'organizzatore sul posto."
 
 msgid "${min_spots} - ${max_spots} participants"
 msgstr "${min_spots} - ${max_spots} Partecipanti"
@@ -1960,12 +2061,6 @@ msgstr "fino a ${max_spots} partecipanti"
 
 msgid "${cost} CHF"
 msgstr "${cost} CHF"
-
-msgid "Independent of other occasions"
-msgstr "Indipendente da altri eventi"
-
-msgid "Please bring ${cost} CHF in cash."
-msgstr "Si prega di pagare CHF ${cost} all'organizzatore sul posto."
 
 msgid "Enter a need"
 msgstr "Inserire una richiesta"
@@ -1982,14 +2077,20 @@ msgstr "Vuole davvero cancellare questa richiesta?"
 msgid "Delete need"
 msgstr "Cancellare richiesta"
 
-msgid "Delete"
-msgstr "Cancellare"
-
-msgid "Enroll your child now."
-msgstr "Iscriva ora suo figlio/a."
-
 msgid "Enroll"
 msgstr "Iscrizione"
+
+msgid "Fully booked"
+msgstr "Al completo"
+
+msgid "Rescinded"
+msgstr "Annullato"
+
+msgid "${count} spots available"
+msgstr "Ancora ${count} posti disponibili"
+
+msgid "${count} attendees"
+msgstr "${count} Partecipante"
 
 msgid "Mark activity as favorite"
 msgstr "Segnare l'attività come preferita"
@@ -2002,24 +2103,6 @@ msgstr "Aumentare la priorità della prenotazione"
 
 msgid "Decrease the bookings priority"
 msgstr "Abbassare la priorità della prenotazione"
-
-msgid "Prebooking begins on ${date}."
-msgstr "La fase dei desideri inizia il ${date}."
-
-msgid "Prebooking is now active until ${date}."
-msgstr "La fase dei desideri è ora attiva fino a ${date}."
-
-msgid "Prebooking has ended."
-msgstr "La fase dei desideri è finita."
-
-msgid "Booking begins on ${date}."
-msgstr "La fase di prenotazione inizia il ${date}."
-
-msgid "Booking is now active until ${date}."
-msgstr "La fase di prenotazione è ora attiva fino a ${date}."
-
-msgid "Booking has ended."
-msgstr "La fase di prenotazione è finita."
 
 msgid "There cannot be any more bookings."
 msgstr "Non si possono fare altre prenotazioni."
@@ -2070,6 +2153,24 @@ msgid ""
 "other booking is permitted."
 msgstr "Tempo di trasferta richiesto tra due eventi: ${minutes} minuti."
 
+msgid "Prebooking begins on ${date}."
+msgstr "La fase dei desideri inizia il ${date}."
+
+msgid "Prebooking is now active until ${date}."
+msgstr "La fase dei desideri è ora attiva fino a ${date}."
+
+msgid "Prebooking has ended."
+msgstr "La fase dei desideri è finita."
+
+msgid "Booking begins on ${date}."
+msgstr "La fase di prenotazione inizia il ${date}."
+
+msgid "Booking is now active until ${date}."
+msgstr "La fase di prenotazione è ora attiva fino a ${date}."
+
+msgid "Booking has ended."
+msgstr "La fase di prenotazione è finita."
+
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time. All information on this page has "
@@ -2086,8 +2187,11 @@ msgstr "La sua richiesta è stata completata con successo."
 msgid "I have read the ${tos} and accept them."
 msgstr "Ho letto e sono d'accordo con i ${tos}."
 
-msgid "E-Mail"
-msgstr "E-mail"
+msgid "Apply filters"
+msgstr "Applicare i filtri"
+
+msgid "Filters"
+msgstr "Filtri"
 
 msgid "Manage user"
 msgstr "Gestione utente"
@@ -2097,6 +2201,12 @@ msgstr "Nessuna offerta nella sua lista."
 
 msgid "Register as volunteer"
 msgstr "Restistrazione come aiutante"
+
+msgid "My List"
+msgstr "La mia lista"
+
+msgid "All activities"
+msgstr "Tutte le attività"
 
 msgid "Hello!"
 msgstr "Buongiorno"
@@ -2109,6 +2219,24 @@ msgstr "Mostra lo stato del biglietto"
 
 msgid "Your activity has been archived:"
 msgstr "La sua attività è stata archiviata:"
+
+msgid "Thanks a lot!"
+msgstr "Grazie mille!"
+
+msgid "We received your booking for ${name}."
+msgstr "Abbiamo ricevuto la sua prenotazione per ${name}."
+
+msgid "You can find an overview of all bookings here:"
+msgstr "Potete trovare una panoramica di tutte le prenotazioni qui:"
+
+msgid "Best regards"
+msgstr "Cordiali saluti"
+
+msgid "Cancellation conditions:"
+msgstr "Condizioni di cancellazione:"
+
+msgid "We have received your deregistration for ${name}."
+msgstr "Abbiamo ricevuto la sua cancellazione per ${name}."
 
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Pro Juventute FERIENNET è sostenuta da:"
@@ -2164,6 +2292,9 @@ msgstr "Attività archiviata."
 
 msgid "Activity reassigned from ${old_username} to ${new_username}."
 msgstr "Assegnazione dell'attività a ${new_username} (da ${old_username})."
+
+msgid "Activity reassigned."
+msgstr "Assegnazione dell'attività."
 
 msgid "Period activated."
 msgstr "Periodo attivato."
@@ -2270,12 +2401,6 @@ msgstr "Costi amministrativi"
 msgid "Status"
 msgstr "Stato"
 
-msgid "Prebooking"
-msgstr "Fase dei desideri"
-
-msgid "Booking"
-msgstr "Fase di prenotazione"
-
 msgid "${cost} for ${count} bookings"
 msgstr "${cost} per ${count} prenotazioni"
 
@@ -2298,9 +2423,6 @@ msgstr ""
 "Grazie mille per averci offerto il vostro aiuto! Esamineremo la sua "
 "richiesta e le faremo sapere."
 
-msgid "Back to the homepage"
-msgstr "Torna alla homepage"
-
 msgid "No activities needing volunteers found."
 msgstr "Nessuna attività trovata che abbia bisogno di aiutanti."
 
@@ -2312,12 +2434,6 @@ msgstr "Nome"
 
 msgid "Last name"
 msgstr "Cognome"
-
-msgid "Contacted"
-msgstr "Contatto"
-
-msgid "Confirmed"
-msgstr "Confermato"
 
 msgid "Contact by e-mail"
 msgstr "Contattare per e-mail"
@@ -2421,6 +2537,24 @@ msgstr "Molti"
 msgid "Own"
 msgstr "Propri"
 
+msgid "Duration"
+msgstr "Durata"
+
+msgid "Price"
+msgstr "Prezzo"
+
+msgid "Weeks"
+msgstr "Settimane"
+
+msgid "Weekdays"
+msgstr "Giorni della settimana"
+
+msgid "Municipalities"
+msgstr "Comuni"
+
+msgid "Weekday"
+msgstr "Giorno della settimana"
+
 msgid "Clone"
 msgstr "Duplicare"
 
@@ -2465,11 +2599,20 @@ msgstr ""
 msgid "Delete Occasion"
 msgstr "Cancellare l'evento"
 
+msgid "Until"
+msgstr "Fino a"
+
+msgid "Starts at"
+msgstr "Inizio il"
+
 msgid "New Activity"
 msgstr "Nuova attività"
 
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
+
+msgid "Edit Activity"
+msgstr "Modifica attività"
 
 msgid "The activity was discarded"
 msgstr "L'attività è stata rifiutata"
@@ -2478,7 +2621,7 @@ msgid "Your ticket has been opened"
 msgstr "Il biglietto è stato aperto"
 
 msgid "New ticket"
-msgstr ""
+msgstr "Nuovo biglietto"
 
 msgid "Thank you for your proposal!"
 msgstr "Grazie per la vostra applicazione!"
@@ -2496,6 +2639,17 @@ msgstr "Modificare partecipante"
 msgid "Booking Limit of ${name}"
 msgstr "Limite di prenotazione di ${name}"
 
+#, python-format
+msgid "${name} and associated bookings were deleted."
+msgstr "${name} e le prenotazioni associate sono state cancellate."
+
+msgid ""
+"The attendee cannot be deleted because there are existing bookings in the "
+"current period."
+msgstr ""
+"L'attendente non può essere cancellato perché ci sono prenotazioni esistenti "
+"nel periodo attuale."
+
 msgid "The user account must be opened by a parent or guardian of full age."
 msgstr ""
 "L'account utente deve essere aperto da una persona maggiorenne con autorità "
@@ -2503,6 +2657,9 @@ msgstr ""
 
 msgid "Add manual booking"
 msgstr "Aggiungere prenotazione manuale"
+
+msgid "Mark paid with specific date"
+msgstr "Contrassegnare il pagamento con una data specifica"
 
 msgid "Show invoice"
 msgstr "Mostra fattura"
@@ -2611,6 +2768,16 @@ msgstr "Non sono state create prenotazioni manualmente."
 msgid "Created ${count} manual bookings"
 msgstr "${count} sono state create prenotazioni manualmente"
 
+msgid "Invoice marked as paid"
+msgstr "Fattura contrassegnata come pagata"
+
+msgid "Invoice item(s) marked as paid"
+msgstr "Articolo(i) della fattura contrassegnato come pagato"
+
+#, python-format
+msgid "Mark paid for ${user}"
+msgstr "Mark ha pagato per ${user}"
+
 msgid "Invite a companion"
 msgstr "Invitare gli amici"
 
@@ -2638,6 +2805,17 @@ msgstr "Cancellare la prenotazione"
 msgid "Do you really want to cancel \"${title}\"?"
 msgstr "Vuole davvero cancellare \"${title}\"?"
 
+msgid "Delete attendee"
+msgstr "Cancellare partecipante"
+
+#, python-format
+msgid "Do you really want to delete \"${name}\" and all associated bookings?"
+msgstr ""
+"Vuole davvero cancellare \"${name}\" e tutte le prenotazioni associate?"
+
+msgid "The invoices will not be deleted."
+msgstr "Le fatture non saranno cancellate."
+
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
 msgstr ""
 "Solo le prenotazioni aperte, cancellate, rifiutate e bloccate possono essere "
@@ -2651,14 +2829,21 @@ msgstr ""
 msgid "The booking was cancelled successfully"
 msgstr "La prenotazione è stata cancellata con successo"
 
+#, python-format
+msgid "Degregistration of ${attendee} for \"${title}\""
+msgstr "Cancellazione di ${attendee} per \"${title}\""
+
 msgid "Cannot select more than three favorites per child"
 msgstr "Si possono scegliere un massimo di tre preferenze per bambino"
 
 msgid "The period is not in the wishlist-phase"
 msgstr "Il periodo non è nella fase desiderata"
 
-msgid "Leave Group"
-msgstr "Lasciare il gruppo"
+msgid "add to group"
+msgstr "aggiungere al gruppo"
+
+msgid "remove from group"
+msgstr "rimuovere dal gruppo"
 
 #, python-format
 msgid ""
@@ -2683,10 +2868,6 @@ msgstr ""
 "partecipare insieme:\n"
 "\n"
 "${link}"
-
-#, python-format
-msgid "Group for \"${title}\""
-msgstr "Gruppo per \"${title}\""
 
 msgid "The booking does not exist"
 msgstr "Questa prenotazione non esiste"
@@ -2738,20 +2919,6 @@ msgstr "La sua donazione è stata rimossa"
 msgid "This donation has already been paid"
 msgstr "La donazione è già stata pagata"
 
-msgid "Can not do matchings for an inactive period"
-msgstr "Le assegnazioni possono essere fatte solo in un periodo attivo"
-
-msgid "Can not do matchings for an confirmed period"
-msgstr ""
-"Le assegnazioni possono essere fatte solo in un periodo che non è stato "
-"confermato"
-
-msgid "The matching was confirmed successfully"
-msgstr "L'assegnazione è stata completata con successo"
-
-msgid "The matching run executed successfully"
-msgstr "La fase delle assegnazioni è stata completata con successo"
-
 msgid "Too many attendees"
 msgstr "Troppi partecipanti"
 
@@ -2766,6 +2933,20 @@ msgstr "Troppo pochi partecipanti"
 
 msgid "No attendees"
 msgstr "Nessun partecipante"
+
+msgid "Can not do matchings for an inactive period"
+msgstr "Le assegnazioni possono essere fatte solo in un periodo attivo"
+
+msgid "Can not do matchings for an confirmed period"
+msgstr ""
+"Le assegnazioni possono essere fatte solo in un periodo che non è stato "
+"confermato"
+
+msgid "The matching was confirmed successfully"
+msgstr "L'assegnazione è stata completata con successo"
+
+msgid "The matching run executed successfully"
+msgstr "La fase delle assegnazioni è stata completata con successo"
 
 #, python-format
 msgid "Matches for ${title}"
@@ -2803,11 +2984,11 @@ msgstr "Vuole davvero cancellare la prenotazione di ${attendee}?"
 msgid "The matching was successfully reset"
 msgstr "L'assegnazione è stata resettata con successo"
 
-msgid "Mailing"
-msgstr "Spedizione"
-
 msgid "Delete Notification Template"
 msgstr "Cancellare l'esempio di messaggio"
+
+msgid "Use Template"
+msgstr "Usare il modello"
 
 msgid "Successfully added a new notification template"
 msgstr "Il modello di messaggio è stato aggiunto con successo"
@@ -2819,6 +3000,9 @@ msgstr ""
 #, python-format
 msgid "Successfully sent the e-mail to ${count} recipients"
 msgstr "L'email è stata inviata con successo a ${count} destinatario"
+
+msgid "Mailing"
+msgstr "Spedizione"
 
 msgid "Send E-Mail Now"
 msgstr "Inviare e-mail ora"
@@ -2839,6 +3023,10 @@ msgstr "Modificare evento"
 #, python-format
 msgid "The booking for ${name} was succesfull"
 msgstr "La prenotazione per ${name} ha funzionato correttamente"
+
+#, python-format
+msgid "Booking of ${attendee} for \"${title}\""
+msgstr "Prenotazione di ${attendee} per \"${title}\""
 
 #, python-format
 msgid "The occasion was added to ${name}'s wishlist"
@@ -2914,6 +3102,9 @@ msgstr ""
 "Un periodo può essere archiviato solo quando l'assegnazione è stata fatta e "
 "le fatture sono state emesse."
 
+msgid "The period can not be deleted as it is already in use"
+msgstr "Il periodo non può essere cancellato perché è già in uso"
+
 msgid "Delete Period"
 msgstr "Cancellare il periodo"
 
@@ -2971,16 +3162,26 @@ msgstr "Età completa richiesta per la registrazione"
 msgid "Userprofile"
 msgstr "Profilo utente"
 
-msgid "Require the political municipality in the userprofile"
-msgstr "Richiedere il comune  nel profilo dell'utente"
+msgid "Require the political municipality on registration"
+msgstr "Richiedere al comune politico la registrazione"
 
-msgid "Parents can see the contacts of other parents in the same activity"
+msgid "Require a SwissPass ID of attendees"
+msgstr "Richiedere un ID SwissPass per i partecipanti"
+
+msgid "SwissPass ID"
+msgstr "ID SwissPass"
+
+msgid "Cancellation condition text"
+msgstr "Condizioni di cancellazione"
+
+msgid "Cancellation conditions"
+msgstr "Condizioni di cancellazione"
+
+msgid ""
+"The text will be shown below the confirmation text for an activity in the "
+"mail"
 msgstr ""
-"I genitori possono vedere i dettagli di contatto di altri genitori della "
-"stessa offerta"
-
-msgid "Privacy"
-msgstr "Privacy"
+"Il testo sarà mostrato sotto il testo di conferma dell'attività nell'email"
 
 msgid "Public organiser data"
 msgstr "Dati pubblici dell'organizzatore"
@@ -3058,3 +3259,63 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+msgid ""
+"The user cannot be deleted because they are organizers of existing "
+"activities."
+msgstr ""
+"The user cannot be deleted because they are organizers of existing "
+"activities."
+
+msgid ""
+"The account cannot be deleted because there are attendees with existing "
+"bookings in the current period. Wait for the period to end or delete the "
+"bookings first."
+msgstr ""
+"L'account non può essere cancellato perché ci sono partecipanti con "
+"prenotazioni esistenti nel periodo corrente. Attendere la fine del periodo "
+"o cancellare prima le prenotazioni."
+
+msgid ""
+"The account cannot be deleted because there are unpaid invoices associated "
+"with them. Mark all invoices as paid before deleting the user."
+msgstr ""
+"L'account non può essere cancellato perché ci sono fatture non pagate "
+"associate. Contrassegna tutte le fatture come pagate prima di cancellare "
+"l'utente."
+
+#, python-format
+msgid "${name} has been deleted, including all associated data."
+msgstr "${name} è stato cancellato, inclusi tutti i dati associati."
+
+msgid "Could not delete account; try again or contact an administrator."
+msgstr ""
+"Impossibile cancellare l'account; riprovi o contatti un amministratore."
+
+#~ msgid "Parents can see the contacts of other parents in the same activity"
+#~ msgstr ""
+#~ "I genitori possono vedere i dettagli di contatto di altri genitori della "
+#~ "stessa offerta"
+
+#~ msgid "Dashboard"
+#~ msgstr "Dashboard"
+
+#~ msgid "The Swisspass ID must be 13 characters long."
+#~ msgstr "L'ID Swisspass deve essere lungo 13 caratteri."
+
+#~ msgid ""
+#~ "This cannot be undone. The activity will be made private as a result."
+#~ msgstr "Questo non può essere revocato. L'attività è nascosta al pubblico."
+
+#~ msgid "Health Information"
+#~ msgstr "Informazioni salute"
+
+#~ msgid "Invoice items marked as paid"
+#~ msgstr "Voci di fattura contrassegnate come pagate"
+
+#~ msgid "Move"
+#~ msgstr "Spostare"
+
+#, python-format
+#~ msgid "${count} registered Attendees"
+#~ msgstr "${count} partecipanti registrati"

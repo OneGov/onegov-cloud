@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 
 from contextlib import contextmanager, suppress
@@ -5,26 +7,38 @@ from tempfile import mkstemp
 from io import UnsupportedOperation
 
 
+from typing import Any, ClassVar, Protocol, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import SupportsRead, SupportsWrite
+    from collections.abc import Iterator
+    from onegov.file.types import SigningServiceConfig
+
+    class SupportsReadAndHasName(SupportsRead[bytes], Protocol):
+        @property
+        def name(self) -> str: ...
+
+
 class SigningService:
     """ A generic interface for various file signing services. """
 
-    registry = {}
+    registry: ClassVar[dict[str, type[SigningService]]] = {}
+    service_name: ClassVar[str]
 
-    def __init_subclass__(cls, service_name, **kwargs):
+    def __init_subclass__(cls, service_name: str, **kwargs: Any):
         SigningService.registry[service_name] = cls
         cls.service_name = service_name
 
         super().__init_subclass__(**kwargs)
 
     @staticmethod
-    def for_config(config):
+    def for_config(config: SigningServiceConfig) -> SigningService:
         """ Spawns a service instance using the given config. """
 
         return SigningService.registry[config['name']](
             **config.get('parameters', {})
         )
 
-    def __init__(self, **parameters):
+    def __init__(self, **parameters: Any):
         """ Signing services are initialised with parameters of their chosing.
 
         Typically those parameters are read from a yaml file::
@@ -49,7 +63,11 @@ class SigningService:
 
         self.parameters = parameters
 
-    def sign(self, infile, outfile):
+    def sign(
+        self,
+        infile: SupportsRead[bytes],
+        outfile: SupportsWrite[bytes]
+    ) -> str:
         """ Signs the input file and writes it to the given output file.
 
         Arguments
@@ -87,22 +105,25 @@ class SigningService:
         raise NotImplementedError
 
     @contextmanager
-    def materialise(self, file):
+    def materialise(
+        self,
+        file: SupportsRead[bytes]
+    ) -> Iterator[SupportsReadAndHasName]:
         """ Takes the given file-like object and ensures that it exists
         somewhere on the disk during the lifetime of the context.
 
         """
-        with suppress(UnsupportedOperation):
-            file.seek(0)
+        if hasattr(file, 'seek'):
+            with suppress(UnsupportedOperation):
+                file.seek(0)
 
-        if os.path.exists(file.name):
-            yield file
+        if hasattr(file, 'name') and os.path.exists(file.name):
+            yield file  # type:ignore[misc]
         else:
-            fd, path = mkstemp()
+            _fd, path = mkstemp()
 
             with open(path, 'rb+') as output:
-                for chunk in iter(lambda: file.read(4096), b''):
-                    output.write(chunk)
+                output.writelines(iter(lambda: file.read(4096), b''))
 
                 output.seek(0)
 

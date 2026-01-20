@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.framework import Framework
 from webtest import TestApp as Client
 
 
-def test_metadata(redis_url):
+def test_metadata(redis_url: str) -> None:
 
     class App(Framework):
         pass
@@ -12,8 +14,8 @@ def test_metadata(redis_url):
     morepath.commit(App)
 
     app = App()
-    app.configure_application(redis_url=redis_url)
     app.namespace = 'tests'
+    app.configure_application(redis_url=redis_url)
     app.set_application_id('tests/foo')
 
     client = Client(app)

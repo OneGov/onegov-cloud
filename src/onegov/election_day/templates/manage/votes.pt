@@ -19,7 +19,7 @@
                     </div>
                 </div>
 
-                <div metal:use-macro="layout.macros['years-dropdown']" />
+                <div metal:use-macro="layout.macros['redirect-filters']"/>
 
                 <p tal:condition="not:groups" i18n:translate>
                     No votes yet.
@@ -29,7 +29,6 @@
                     <thead>
                         <tr>
                             <th i18n:translate>Title</th>
-                            <th i18n:translate>Identifier</th>
                             <th i18n:translate>Shortcode</th>
                             <th i18n:translate>Date</th>
                             <th i18n:translate>Domain</th>
@@ -41,8 +40,7 @@
                             <tal:block tal:repeat="vote group[1]">
                                 <tr tal:attributes="class python: 'divider' if repeat.vote.end else ''">
                                     <td>${vote.title}</td>
-                                    <td>${vote.id}</td>
-                                    <td><span class="shortcode" tal:condition="vote.shortcode">${vote.shortcode}</span></td>
+                                    <td>${vote.shortcode}</td>
                                     <td>${layout.format_date(vote.date, 'date')}</td>
                                     <td tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
                                     <td tal:condition="vote.domain == 'region'" i18n:translate>Regional</td>

@@ -1,22 +1,29 @@
-from cached_property import cached_property
+from __future__ import annotations
 
-from onegov.core.elements import Link, Confirm, Intercooler
+from functools import cached_property
+
+from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.fsi.models import CourseAttendee
+
+
 class CourseAttendeeCollectionLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         if self.request.view_name == 'add-external':
             return _('Add External Attendee')
         return _('Manage Course Attendees')
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup]:
         if not self.request.is_manager:
             return []
         return [
@@ -24,13 +31,14 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
                 _('Add External Attendee'),
                 url=self.request.class_link(
                     CourseAttendeeCollection, name='add-external'),
-                attrs={'class': 'users'}
+                attrs={'class': 'add-external'}
             ),
         ]
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
+        assert isinstance(links, list)
         links.append(
             Link(_('Manage Course Attendees'), self.request.link(self.model))
         )
@@ -39,34 +47,34 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
         return links
 
     @cached_property
-    def collection(self):
+    def collection(self) -> CourseAttendeeCollection:
         return CourseAttendeeCollection(
             self.request.session, auth_attendee=self.request.attendee
         )
 
     @cached_property
-    def collection_externals(self):
+    def collection_externals(self) -> CourseAttendeeCollection:
         return CourseAttendeeCollection(
             self.request.session, auth_attendee=self.request.attendee,
             external_only=True
         )
 
     @cached_property
-    def collection_editors(self):
+    def collection_editors(self) -> CourseAttendeeCollection:
         return CourseAttendeeCollection(
             self.request.session, auth_attendee=self.request.attendee,
             editors_only=True
         )
 
     @cached_property
-    def collection_admins(self):
+    def collection_admins(self) -> CourseAttendeeCollection:
         return CourseAttendeeCollection(
             self.request.session, auth_attendee=self.request.attendee,
             admins_only=True
         )
 
     @cached_property
-    def menu(self):
+    def menu(self) -> list[tuple[str, str, bool]]:
         if not self.request.is_admin:
             # Hide menu for editor since filtered by permissions
             return []
@@ -84,20 +92,23 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
 
 class CourseAttendeeLayout(DefaultLayout):
 
+    model: CourseAttendee
+
     @cached_property
-    def title(self):
+    def title(self) -> str:
         if self.request.view_name == 'edit':
             return _('Edit Profile')
         return _('Profile Details')
 
     @cached_property
-    def collection(self):
+    def collection(self) -> CourseAttendeeCollection:
         return CourseAttendeeCollection(
             self.request.session, auth_attendee=self.request.attendee)
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
+        assert isinstance(links, list)
         if self.request.is_manager:
             links.append(
                 Link(
@@ -114,8 +125,8 @@ class CourseAttendeeLayout(DefaultLayout):
         return links
 
     @cached_property
-    def editbar_links(self):
-        links = []
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
         if self.request.is_manager:
             links = [
                 Link(
@@ -152,11 +163,11 @@ class CourseAttendeeLayout(DefaultLayout):
                         attrs={'class': 'delete-link'},
                         traits=(
                             Confirm(
-                                _("Do you really want to delete "
-                                  "this external attendee ?"),
-                                _("This cannot be undone."),
-                                _("Delete external attendee"),
-                                _("Cancel")
+                                _('Do you really want to delete '
+                                  'this external attendee ?'),
+                                _('This cannot be undone.'),
+                                _('Delete external attendee'),
+                                _('Cancel')
                             ),
                             Intercooler(
                                 request_method='DELETE',
@@ -170,5 +181,7 @@ class CourseAttendeeLayout(DefaultLayout):
         return links
 
     @property
-    def for_himself(self):
+    def for_himself(self) -> bool:
+        if self.request.attendee is None:
+            return False
         return self.model.id == self.request.attendee.id

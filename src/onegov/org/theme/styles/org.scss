@@ -2,9 +2,9 @@
     useful mixins
 */
 
-// sass-lint:disable-all
+// stylelint-disable declaration-block-no-duplicate-properties
 @mixin grayscale {
-    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
+            filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
             filter: grayscale(100%);
        -moz-filter: grayscale(100%);
         -ms-filter: grayscale(100%);
@@ -20,7 +20,7 @@
             filter: none;
     -webkit-filter: none;
 }
-// sass-lint:enable-all
+// stylelint-enable declaration-block-no-duplicate-properties
 
 @mixin hairline {
     border: 0;
@@ -127,7 +127,7 @@ a[href^="mailto:"] {
     @include prefix(word-break, break-all);
 
     // Non standard for WebKit
-    word-break: break-word;
+    word-break: break-word; /* stylelint-disable-line declaration-property-value-keyword-no-deprecated */
 }
 
 /*
@@ -328,6 +328,7 @@ $globals-height: 2.5rem;
         text-align: center;
     }
 
+    .dashboard::before { @include icon('\f0e4'); }
     .login::before { @include icon('\f090'); }
     .logout::before { @include icon('\f08b'); }
     .register::before { @include icon('\f234'); }
@@ -345,6 +346,11 @@ $globals-height: 2.5rem;
     .no-tickets::before { @include icon('\f145'); }
     .link-check::before { @include icon('\f0fa'); }
     .ticket-archive::before { @include icon('\f1c6'); }
+    .forms::before { @include icon('\f15c'); }
+    .surveys::before { @include icon('\f080'); }
+    .citizen-login::before { @include icon('\f090'); }
+    .citizen-tickets::before { @include icon('\f145'); }
+    .citizen-reservations::before { @include icon('\f133'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -414,9 +420,13 @@ $globals-height: 2.5rem;
     }
 }
 
-#announcement {
+#header_announcement {
     padding: 1rem;
     text-align: center;
+
+    p {
+        margin-bottom: 0;
+    }
 }
 
 #redactor-modal-box footer {
@@ -440,8 +450,21 @@ del {
     Login page
 */
 #page-auth-login #content {
+
+    $first-color: #ffc56c;
+    $first-hover: darken($first-color, 10%);
+
     .alternatives {
         margin-top: 1.5rem;
+
+        input[type="submit"].button {
+            background: $first-color;
+            color: $body-font-color;
+
+            &:hover {
+                background: $first-hover;
+            }
+        }
     }
 
     h2 {
@@ -463,9 +486,6 @@ del {
     }
 
     .provider-login {
-        $first-color: #ffc56c;
-        $first-hover: darken($first-color, 10%);
-
         @for $i from 1 through 4 {
             a:nth-child(#{$i}) {
                 background: lighten($first-color, ($i - 1) * 5%);
@@ -496,6 +516,14 @@ del {
     a {
         color: inherit;
     }
+}
+
+/*
+    Description for a blank (uncolored) label
+*/
+.blank-label-description {
+    font-size: 1.0rem;
+    display: block;
 }
 
 /*
@@ -594,6 +622,11 @@ $footer-border-width: 0;
     line-height: 1.5rem;
     list-style-type: none;
     margin: 0 0 1rem;
+}
+
+.tiktok {
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 /*
@@ -777,6 +810,18 @@ form {
         }
     }
 
+    .duration-widget label {
+        display: inline-block;
+        white-space: nowrap;
+        margin-right: .5rem;
+
+        input {
+            display: inline-block;
+            width: auto;
+            margin-right: .25rem;
+        }
+    }
+
     .group-label > ul li {
         align-content: flex-start;
         align-items: flex-start;
@@ -830,6 +875,44 @@ form {
             display: inline-block;
             margin-left: 0;
             vertical-align: text-top;
+        }
+
+        &:checked + label .with-count::before {
+            background-color: $primary-color;
+            color: $white;
+        }
+
+        + label .with-count::before {
+            background-color: $secondary-color;
+            color: $body-font-color;
+            border: 0px solid #000;
+            border-radius: 1000px;
+            box-sizing: content-box;
+            content: attr(data-count);
+            display: inline-block;
+            font-size: .75rem;
+            line-height: 22px;
+            min-width: 4ex;
+            padding: 0 .5rem;
+            text-align: right;
+            margin-right: 1ex;
+        }
+    }
+
+    .two-columns ul {
+        -moz-column-count: 2;
+        -moz-column-gap: 2em;
+        -webkit-column-count: 2;
+        -webkit-column-gap: 2em;
+        column-count: 2;
+        column-gap: 2em;
+        max-width: calc(100% - 2em);
+        margin-left: 0;
+        list-style: none;
+
+        li {
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
     }
 
@@ -1034,6 +1117,60 @@ form {
     .ace-syntax-error {
         background: $yellow-light;
         position: absolute;
+    }
+
+    .file-preview-wrapper {
+        &:not(:empty) {
+            border: 1px solid $input-border-color;
+            padding: .5rem;
+            margin-bottom: 1rem;
+        }
+
+        .row {
+            /* FIXME:
+                temporary to ensure a somewhat reasonable display
+                within the form. Once this widget is more responsive
+                we may be able to get away with displaying this
+            */
+            .columns:first-child {
+                display: none;
+            }
+
+            .file-status {
+                margin-left: 0;
+                width: 66%;
+            }
+
+            .file-actions {
+                width: 33%;
+            }
+        }
+
+        .file-actions .button {
+            padding: 0.85em .15em !important;
+            margin-bottom: .5rem !important;
+
+            &.delete {
+                /* FIXME:
+                    the delete button does not work well, since we
+                    would need to remove the input after deletion
+                    in order to not cause any issues.
+
+                    All the actions assume a tabular layout, so
+                    we either need to change the widget to adhere
+                    to that layout or make the delete action more
+                    flexible, so we can specify which elements
+                    should be removed.
+
+                    The rename button also has a small issue, in
+                    that the name displayed above the file-preview-wrapper
+                    will not be updated currently, so that should
+                    be fixed as well, but it's not large enough of
+                    an issue to hide that button as well...
+                */
+                display: none;
+            }
+        }
     }
     /*
     <--
@@ -1351,7 +1488,7 @@ ul.panel-links {
 
 .side-panel {
     border: 1px solid $gray;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 
     h2,
     h3 {
@@ -1361,10 +1498,6 @@ ul.panel-links {
         margin-top: 0;
         padding: .75rem 1rem;
         text-transform: uppercase;
-
-        + .marker-map {
-            margin: 1rem 1rem 0;
-        }
 
         + .location {
             margin-top: 1rem;
@@ -1430,9 +1563,7 @@ ul.panel-links {
     }
 
     .marker-map {
-        border-bottom: 1rem solid $white;
         box-sizing: content-box;
-        margin: -1rem 1rem 1rem;
 
         a {
             font-size: 10px;
@@ -1475,10 +1606,6 @@ ul.panel-links {
     background-color: $topbar-bg-color;
     border: 0;
 
-    .marker-map {
-        border-bottom: 1rem solid $topbar-bg-color;
-    }
-
     h2 {
         @include primary-color-background;
         border-bottom: 0;
@@ -1487,10 +1614,10 @@ ul.panel-links {
     }
 
     &.without-title {
-        > ul:first-of-type {
+        > ul:first-of-type:not(.bulleted) {
             li:first-child {
                 @include primary-color-background;
-                margin-bottom: 1rem;
+                margin: -.5rem -1rem 1rem;
                 padding: .75rem 1rem;
                 text-transform: uppercase;
 
@@ -1505,7 +1632,6 @@ ul.panel-links {
 
             li {
                 min-height: .5rem;
-                padding: 0 1rem;
 
                 + li {
                     margin-top: .25rem;
@@ -1515,6 +1641,10 @@ ul.panel-links {
 
         > ul:last-of-type {
             padding: 0 0 1rem;
+        }
+
+        p {
+            font-size: .875rem;
         }
     }
 }
@@ -1528,15 +1658,19 @@ $copy-link-icon: '\f0c5';
 $delete-link-icon: '\f014';
 $disabled-icon: '\f05e';
 $edit-link-icon: '\f040';
+$save-link-icon: '\f0c7';
+$cancel-link-icon: '\f00d';
 $export-link-icon: '\f019';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
 $import-link-icon: '\f093';
+$filters-link-icon: '\f02c';
 $internal-link-icon: '\f0c1';
 $manage-recipients: '\f003';
 $manage-subscribers: '\f0c0';
 $mark-as-paid: '\f058';
 $mark-as-unpaid: '\f057';
+$move-link-icon: '\f047';
 $new-daypass-icon: '\f145';
 $new-daily-item-icon: '\f02d';
 $new-resource-link-icon: '\f0c1';
@@ -1544,7 +1678,9 @@ $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f114';
 $new-recipient: '\f1fa';
 $new-form-icon: '\f044';
+$new-document-form-icon: '\f15b';
 $new-link-icon: '\f0c1';
+$new-iframe-icon: '\f2d0';
 $new-news-icon: '\f1ea';
 $new-newsletter-icon: '\f003';
 $new-note-icon: '\f24a';
@@ -1555,7 +1691,9 @@ $new-photo-album: '\f03e';
 $new-registration-window: '\f067';
 $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
+$new-datatrans-icon: '\f09d';
 $new-stripe-connect-icon: '\f1f5';
+$new-worldline-saferpay-icon: '\f09d';
 $new-user-icon: '\f234';
 $new-text-module-icon: '\f24a';
 $paste-link-icon: '\f0ea';
@@ -1563,6 +1701,7 @@ $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
 $payment-provider-icon: '\f283';
 $payments-icon: '\f09d';
+$invoice-icon: '\f1ea';
 $rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
@@ -1574,7 +1713,11 @@ $occupancy-link-icon: '\f022';
 $upload-icon: '\f0ee';
 $view-link: '\f06e';
 $pdf-icon: '\f1c1';
+$ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
+$envelope-icon: '\f0e0';
+$results-icon: '\f080';
+$settings-icon: '\f1de';
 $editbar-bg-color: $topbar-link-bg-hover;
 
 .edit-bar {
@@ -1648,7 +1791,8 @@ $editbar-bg-color: $topbar-link-bg-hover;
         font-size: .8rem;
     }
 
-    a::before {
+    a::before,
+    button::before {
         display: inline-block;
         margin-right: .8ex;
         text-align: center;
@@ -1660,18 +1804,23 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .copy-link::before { @include icon($copy-link-icon); }
     .delete-link::before { @include icon($delete-link-icon); }
     .edit-link::before { @include icon($edit-link-icon); }
+    .save-link::before { @include icon($save-link-icon); }
+    .cancel-link::before { @include icon($cancel-link-icon); }
     .export-link::before { @include icon($export-link-icon); }
+    .envelope::before { @include icon($envelope-icon); }
+    .move-link::before { @include icon($move-link-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon($import-link-icon); }
-    .internal-url::before { @include icon($internal-link-icon); }
-    .manage-recipients::before { @include icon($manage-recipients); }
+    .filters-link::before { @include icon($filters-link-icon); }
     .manage-subscribers::before { @include icon($manage-subscribers); }
     .new-daypass::before { @include icon($new-daypass-icon); }
     .new-directory::before { @include icon($new-directory-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
+    .new-document-form::before { @include icon($new-document-form-icon); }
     .new-link::before { @include icon($new-link-icon); }
+    .new-iframe::before { @include icon($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }
     .new-newsletter::before { @include icon($new-newsletter-icon); }
     .new-note::before { @include icon($new-note-icon); }
@@ -1683,13 +1832,16 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-registration-window::before { @include icon($new-registration-window); }
     .new-reservation::before { @include icon($new-reservation-icon); }
     .new-room::before { @include icon($new-room-icon); }
+    .new-datatrans::before { @include icon($new-datatrans-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
+    .new-worldline-saferpay::before { @include icon($new-worldline-saferpay-icon); }
     .new-user::before { @include icon($new-user-icon); }
     .new-text-module::before { @include icon($new-text-module-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
     .paste-link::before { @include icon($paste-link-icon); }
     .payment-provider::before { @include icon($payment-provider-icon); }
     .payments::before { @include icon($payments-icon); }
+    .invoice::before { @include icon($invoice-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
     .sort-link::before { @include icon($sort-link-icon); }
@@ -1699,14 +1851,18 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .sync::before { @include icon($sync-icon); }
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
-    .ticket-pdf::before { @include icon($pdf-icon); }
+    .ticket-files::before { @include icon($ticket-files-icon); }
     .new-daily-item::before { @include icon($new-daily-item-icon); }
     .new-resource-link::before { @include icon($new-resource-link-icon); }
     .qr-code-link::before { @include icon($qr-code-icon); }
     .cancel::before { @include icon($disabled-icon); }
+    .envelope::before { @include icon($envelope-icon); }
+    .internal-link::before { @include icon($internal-link-icon); }
+    .results-link::before { @include icon($results-icon); }
+    .settings-link::before { @include icon($settings-icon); }
 }
 
-
+.ticket-pdf::before { @include icon($pdf-icon); }
 .mark-as-paid::before { @include icon($mark-as-paid); }
 .mark-as-unpaid::before { @include icon($mark-as-unpaid); }
 .payment-capture::before { @include icon($payment-capture-icon); }
@@ -1764,6 +1920,10 @@ $editbar-bg-color: $topbar-link-bg-hover;
         label:last-child {
             margin-right: 0;
         }
+    }
+
+    .checkbox {
+        margin-top: .75rem;
     }
 
     .split > div {
@@ -1923,6 +2083,12 @@ div#redactor-droparea {
 .main-title {
     margin-bottom: 1rem;
     margin-top: -.5rem;
+
+    .small {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: normal;
+    }
 }
 
 /*
@@ -2222,6 +2388,15 @@ div#redactor-droparea {
     margin: 0 0 1rem;
 }
 
+.danger-zone {
+    margin: 0 1em 1em;
+    padding: 8px;
+}
+
+.chat-settings {
+    display: none;
+}
+
 /*
     news list
 */
@@ -2360,6 +2535,10 @@ $person-email-icon: '\f003';
         margin-bottom: 1em;
     }
 
+    :nth-last-child(1 of .person-card-organisation) {
+        margin-bottom: 1em;
+    }
+
     .person-card-personal {
         margin-bottom: 1em;
 
@@ -2423,6 +2602,8 @@ $person-email-icon: '\f003';
 
     .person-card-portrait {
         height: 5rem;
+        margin-right: 1.2rem;
+        position: relative;
         text-align: center;
         width: 5rem;
 
@@ -2438,9 +2619,6 @@ $person-email-icon: '\f003';
     ul {
         > li {
             font-size: .875rem;
-            max-width: calc(100vw - 7.5rem);
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
     }
 
@@ -2453,7 +2631,6 @@ $person-email-icon: '\f003';
         margin-bottom: 0;
     }
 }
-
 
 /*
     Ticket
@@ -2550,7 +2727,24 @@ $closed-ticket-icon: '\f05d';
 $all-ticket-icon: '\f055';
 $ticket-archive-icon: '\f1c6';
 $ticket-filter-icon-mr: .5em;
+$ticket-notification-enabled-icon: '\f0f3';
+$ticket-notification-disabled-icon: '\f1f6';
+$delete-ticket-icon: '\f1f8';
 $archive-ticket-icon: '\f1c6';
+
+.ticket-notifications {
+    float: right;
+
+    &::before {
+        @include icon($ticket-notification-disabled-icon);
+    }
+
+    &.granted {
+        &::before {
+            @include icon($ticket-notification-enabled-icon);
+        }
+    }
+}
 
 .my-tickets::before {
     @include icon($my-ticket-icon);
@@ -2700,6 +2894,20 @@ $archive-ticket-icon: '\f1c6';
     margin-right: 1ex;
 }
 
+.FRM-option label::before { @include icon($frm-handler-icon); }
+.RSV-option label::before { @include icon($rsv-handler-icon); }
+.EVN-option label::before { @include icon($evn-handler-icon); }
+.DIR-option label::before { @include icon($dir-handler-icon); }
+
+.ALL-option label::before,
+.FRM-option label::before,
+.RSV-option label::before,
+.EVN-option label::before,
+.DIR-option label::before {
+    display: inline-block;
+    margin-right: 1ex;
+}
+
 .ticket-handler-FRM td:first-child::before {
     @include icon($frm-handler-icon);
 }
@@ -2760,6 +2968,16 @@ tr.ticket:hover {
     }
 }
 
+.ticket-delete {
+    float: right;
+
+    &::before {
+        @include icon($delete-ticket-icon);
+        margin-right: 1ex;
+    }
+
+}
+
 .ticket-reopen {
     float: right;
 
@@ -2783,6 +3001,13 @@ tr.ticket:hover {
 
     &:hover::before {
         content: $assign-ticket-icon-hover;
+    }
+}
+
+.ticket-change-tag {
+    &::before {
+        @include icon($edit-link-icon);
+        margin-right: 1ex;
     }
 }
 
@@ -2862,7 +3087,7 @@ button {
     }
 }
 
-.selected-owner {
+.selected-owner, .selected-submitter {
     margin-left: 1rem !important;
 
     &.secondary {
@@ -2920,7 +3145,99 @@ button {
     to {box-shadow: none;}
 }
 
-.calendar {
+.occupancy-calendar {
+    .fc-view:not(.fc-list) .fc-event,
+    .fc-view:not(.fc-list) + .fc-popover .fc-event,
+    .fc-view-harness:has(.fc-view:not(.fc-list)) ~ .fc-event-dragging {
+        &.event-accepted,
+        &.event-accepted .fc-bg,
+        &.event-accepted .fc-content {
+            border-width: 0;
+            background-color: $blue-dark;
+        }
+
+        &.event-pending,
+        &.event-pending .fc-bg,
+        &.event-pending .fc-content {
+            border-width: 0;
+            background-color: lighten(desaturate($blue-dark, 50%), 10%);
+        }
+
+        &.event-blocker, &.fc-event-mirror:not(.event-accepted,.event-pending) {
+            border-width: 0;
+            background-color: $red;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0, 0, 0, 0.1) 10px,
+                rgba(0, 0, 0, 0.1) 20px
+            );
+
+            & .fc-event-main {
+                position: relative;
+                padding: 2px 4px !important;
+                padding-right: 20px !important;
+                font-weight: bold;
+                font-size: .875rem;
+            }
+
+            & .delete-blocker {
+                display: inline-block;
+                position: absolute;
+                padding: 2px 6px;
+                top: 0;
+                right: 0;
+                font-size: .75rem;
+
+                &:hover {
+                    opacity: .75;
+                }
+            }
+        }
+    }
+
+    .fc-event, .fc-event-main {
+        padding: 0 !important;
+    }
+
+    .fc-event .fc-content {
+        position: relative;
+        z-index: 2;
+        padding: 2px 4px;
+        border-top-right-radius: 1.2rem;
+        white-space: nowrap;
+
+        &::first-line {
+            font-weight: bold;
+        }
+    }
+
+    .fc-event.fc-timegrid-event-short .fc-title {
+        font-weight: bold;
+    }
+
+    .fc-list-item-title::first-line {
+        font-weight: bold;
+    }
+
+    &[data-editable="true"] .fc-list-item {
+        cursor: pointer;
+    }
+
+    .fc-event .fc-bg {
+        opacity: 1 !important;
+        border-top-right-radius: 1.5rem;
+    }
+
+    .fc-bg-event {
+        background-color: $green;
+        opacity: .15;
+        cursor: default !important;
+    }
+}
+
+.calendar, .occupancy-calendar {
 
     margin-bottom: 1.5rem;
 
@@ -2936,14 +3253,12 @@ button {
         outline: none;
     }
 
-    .fc-content {
-        // pass through pointer events to the background, where we have the
-        // hover and javascript handling
-        pointer-events: none;
-    }
-
     .fc-toolbar {
-        margin-bottom: 0;
+        align-items: end;
+
+        &.fc-header-toolbar {
+            margin-bottom: 2rem;
+        }
 
         h2 {
             clear: both;
@@ -2951,15 +3266,18 @@ button {
             float: none;
             margin-bottom: 1rem;
             text-align: left;
+
+            &:hover .fa {
+                color: $primary-color;
+            }
         }
 
-        .fc-left {
-            float: none;
+        h2 + button {
+            margin-left: 0 !important;
+        }
 
-            button {
-                margin-bottom: 15px;
-                margin-left: 0;
-            }
+        select {
+            margin: 0;
         }
     }
 
@@ -2991,10 +3309,23 @@ button {
         background-color: $primary-color !important;
     }
 
-    .fc-month-view {
-        .fc-day-number {
+    .fc-dayGridMonth-view, .fc-multimonth {
+        .fc-daygrid-day-number {
             font-size: .875rem;
             padding: .25rem .5rem;
+        }
+    }
+
+    .fc-view.fc-multimonth {
+        max-height: 850px;
+
+        .fc-event .fc-content {
+            max-height: 2.5rem;
+            overflow-y: hidden;
+
+            .fc-title {
+                font-size: .675rem;
+            }
         }
     }
 
@@ -3020,16 +3351,17 @@ button {
             }
         }
 
-        .event-in-past {
+        .event-in-past, .event-outside-booking-window {
             filter: grayscale(1);
         }
 
-        .fc-day-header,
-        .fc-day-number {
+        .fc-daygrid-day-header,
+        .fc-daygrid-day-number {
             font-size: .9em;
         }
 
         .fc-event {
+            overflow: hidden;
             border: 0;
             border-radius: 2px;
             margin: 0 0 2px;
@@ -3037,7 +3369,13 @@ button {
         }
 
         .fc-bg {
-            background: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            opacity: .25;
         }
 
         .event-unavailable {
@@ -3059,8 +3397,8 @@ button {
     }
 
     .fc-event {
-        div.fc-time,
-        span.fc-time {
+        div.fc-event-time,
+        span.fc-event-time {
             display: none;
         }
 
@@ -3069,7 +3407,7 @@ button {
             padding: 0;
         }
 
-        &.fc-short .fc-title {
+        &.fc-timegrid-event-short .fc-title {
             display: inline-block;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -3089,25 +3427,53 @@ button {
         }
     }
 
-    .fc button,
-    .fc-button {
+    .fc-more-link {
+        font-size: .8rem;
+    }
+
+    &.fc button,
+    &.fc .fc-button {
         @include button(
             $padding: $button-tny,
             $bg: $smoke
         );
+        margin-bottom: 0;
+        border-radius: 4px;
         background-image: none;
-        box-shadow: none;
+        box-shadow: none !important;
         font-size: .9rem;
         height: 2.25rem;
         text-shadow: none;
 
-        &.fc-state-active,
-        &.fc-state-disabled {
-            background: $charcoal;
-            color: $white;
+        .fc-icon {
+            margin-top: -4px;
+        }
+
+        &.fc-button-active,
+        &:disabled {
+            background: $charcoal !important;
+            color: $white !important;
             opacity: 1;
         }
+
+        &:hover,
+        &:focus,
+        &:active {
+          color: #333;
+          background-color: #bebebe;
+        }
     }
+
+    &.fc .fc-button-primary {
+        background-color: #f5f5f5;
+        color: #333;
+    }
+}
+
+.calendar .fc-event-main {
+    // pass through pointer events to the background, where we have the
+    // hover and javascript handling
+    pointer-events: none;
 }
 
 .calendar-footer {
@@ -3126,28 +3492,27 @@ button {
     Fullcalendar responsive design
 */
 @media #{$small-up} {
-    .fc .fc-toolbar {
+    .calendar .fc-toolbar {
         width: 100%;
     }
 }
 
 @media #{$large-up} {
-    .fc .fc-toolbar {
+    .calendar .fc-toolbar {
         width: 80%;
     }
 }
 
 @media (max-width: 850px) {
-    .fc-center {
-        display: block;
-        width: 100%;
-    }
-}
+    .calendar {
+        .fc-toolbar {
+            flex-direction: column;
+            align-items: start;
+        }
 
-@media (min-width: 850px) {
-    .fc-center {
-        display: inline-block;
-        width: 40%;
+        .fc-toolbar-chunk {
+            margin-bottom: .5rem;
+        }
     }
 }
 
@@ -3160,6 +3525,17 @@ button {
 @media #{$medium-only} {
     .calendar-footer {
         width: 75%;
+    }
+
+    .occupancy-calendar {
+        .fc-toolbar {
+            flex-direction: column;
+            align-items: start;
+        }
+
+        .fc-toolbar-chunk {
+            margin-bottom: .5rem;
+        }
     }
 }
 
@@ -3366,13 +3742,50 @@ button {
     margin-bottom: .5em;
 }
 
-.occurrence-tags,
 .occurrence-description {
     margin-bottom: 1.25em;
+    margin-top: 1.25em;
+    max-width: $max-line-width;
 }
 
-.occurrence-description {
-    max-width: $max-line-width;
+.filter-panel .accordion {
+    margin-left: 0;
+
+    .accordion-navigation {
+        &> a {
+            background: transparent;
+            border: 1px solid #cbcccc;
+            color: $aluminum;
+            display: inline-block;
+            font-size: .8rem;
+            padding: .3rem .5rem;
+
+            &:hover {
+                color: $primary-color;
+            }
+        }
+
+        &> .content.active {
+            background: transparent;
+            padding: 0;
+        }
+
+        & .more-items {
+
+            i {
+                border: 1px solid;
+                border-radius: 100px;
+                font-size: .5rem;
+                padding: .2rem;
+                margin-left: .2rem;
+            }
+        }
+
+        &.active > .more-items {
+            display: none;
+        }
+    }
+
 }
 
 /*
@@ -3569,6 +3982,13 @@ button {
     Search results
 */
 ul.search-results {
+    em {
+        color: $red !important;
+        font-style: initial;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+
     a {
         display: block;
         font-weight: bold;
@@ -3678,23 +4098,6 @@ ul.search-results {
             font-weight: normal;
         }
     }
-}
-
-/*
-    The list of people on the form view can swell to a large number. For now
-    we limit the size of this list. In the future we might replace it with
-    a better way of doing this.
-*/
-#fieldset-people > div {
-    border: 1px solid $iron;
-    border-color: $iron;
-    border-style: solid;
-    border-width: 1px;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
-    max-height: 500px;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    padding: 1em;
 }
 
 /*
@@ -3872,7 +4275,11 @@ ul.search-results {
     .button {
         border-radius: 3px;
         display: block;
-        margin: 0;
+        margin-left: 0;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
     }
 
     .failed {
@@ -3921,6 +4328,7 @@ ul.search-results {
     }
 
     a,
+    .reservation-resource,
     .reservation-time,
     .reservation-price {
         display: block;
@@ -3943,6 +4351,7 @@ ul.search-results {
             width: 24px;
         }
 
+        .reservation-resource,
         .reservation-time,
         .reservation-price {
             margin-left: 2.3rem;
@@ -4002,7 +4411,8 @@ ul.search-results {
         width: 20%;
     }
 
-    .fc-view-container, .reservation-list {
+    .calendar .fc-view,
+    .reservation-list {
         display: inline-block;
         float: left;
         width: 80%;
@@ -4018,7 +4428,8 @@ ul.search-results {
         }
     }
 
-    .fc-view-container, .reservation-list {
+    .calendar .fc-view,
+    .reservation-list {
         width: 75%;
     }
 }
@@ -4030,7 +4441,8 @@ ul.search-results {
         width: 100%;
     }
 
-    .fc-view-container, .reservation-list {
+    .calendar .fc-view,
+    .reservation-list {
         display: block;
         width: 100%;
     }
@@ -4040,12 +4452,6 @@ ul.search-results {
         .fc-button-group {
             display: inline-block;
             font-size: .7rem;
-        }
-
-        .fc-right {
-            left: -7px;
-            margin-bottom: 1rem;
-            position: relative;
         }
     }
 
@@ -4094,6 +4500,26 @@ ul.search-results {
 
         li {
             margin-bottom: .5rem;
+        }
+
+        .reservation {
+            background: $white-smoke;
+            border-radius: 2px;
+            margin-bottom: 1rem;
+            margin-left: -0.5rem;
+            position: relative;
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem 8rem .5rem .5rem;
+        }
+
+        .reservation-actions {
+            font-size: .8rem;
+            position: absolute;
+            right: .5rem;
+            top: .275rem;
         }
     }
 
@@ -4348,11 +4774,21 @@ ul.recipients {
         font-size: 1rem;
         font-weight: bold;
         margin: 0 0 .5rem;
+    }
 
-        &::before {
-            @include icon('\f1f5');
-            margin-right: 1.5ex;
-        }
+    .payment-provider-stripe-connect h2::before {
+        @include icon('\f1f5');
+        margin-right: 1.5ex;
+    }
+
+    .payment-provider-datatrans h2::before {
+        @include icon('\f09d');
+        margin-right: 1.5ex;
+    }
+
+    .payment-provider-worldline-saferpay h2::before {
+        @include icon('\f09d');
+        margin-right: 1.5ex;
     }
 }
 
@@ -4363,6 +4799,7 @@ ul.recipients {
     background-color: $white;
     display: inline-block;
     padding: 2px 8px;
+    white-space:nowrap;
 
     &.payment-state-open {
         border: 1px solid $info-color;
@@ -4403,6 +4840,16 @@ ul.recipients {
             margin-right: .75ex;
         }
     }
+
+    &.payment-state-invoiced {
+        border: 1px solid get-color(info);
+
+        &::before {
+            @include icon('\f1ea');
+            color: get-color(info);
+            margin-right: .75ex;
+        }
+    }
 }
 
 .tickets-table .payment-state {
@@ -4430,6 +4877,163 @@ ul.recipients {
     td {
         padding-right: 5px;
         vertical-align: top;
+    }
+}
+
+/*
+    Invoices table
+*/
+#ticket_group_chosen .chosen-results {
+
+    .ticket-group-filter {
+        font-weight: normal;
+        margin-left: 1.4rem;
+    }
+}
+
+.invoices-table {
+    width: 100%;
+
+    tr.paid {
+        &.uninvoiced .invoiced-state {
+            color: get-color(warning);
+            filter: grayscale(1);
+        }
+        &.invoiced .invoiced-state, .paid-state {
+            color: get-color(success);
+        }
+    }
+
+    tr.unpaid.invoiced {
+        .invoiced-state {
+            color: get-color(success);
+        }
+        .paid-state {
+            color: get-color(warning);
+        }
+    }
+
+    tr.unpaid.uninvoiced {
+        .invoiced-state {
+            color: get-color(alert);
+        }
+        .paid-state {
+            color: get-color(warning);
+            filter: grayscale(1);
+        }
+    }
+
+    .invoiced-state, .paid-state {
+        font-size: 1.25rem;
+        text-align: center;
+        white-space: nowrap;
+        width: 1%;
+    }
+
+    td {
+        padding-right: 5px;
+        vertical-align: top;
+    }
+}
+
+/*
+    Invoice
+*/
+.invoice-items {
+    position: relative;
+    width: 100%;
+
+    thead th.centered {
+        text-align: center !important;
+    }
+
+    tbody tr {
+        background-color: transparent;
+
+        &.paid:hover {
+            background-color: $green-pastel !important;
+        }
+
+        &.unpaid:hover {
+            background-color: $red-pastel !important;
+        }
+    }
+
+    td {
+        border: 0;
+        padding-bottom: .35rem;
+        padding-top: .35rem;
+
+        &:not(:first-child) {
+            white-space: nowrap;
+        }
+    }
+
+    .group th {
+        padding-bottom: .75rem;
+        padding-top: .75rem;
+    }
+
+    .amount, .unit, .quantity, .vat, .vat-rate {
+        font-family: $font-family-monospace;
+        text-align: right;
+        width: 1%;
+    }
+
+    .actions {
+        width: 1%;
+    }
+
+    .total .amount,
+    .total .vat {
+        padding-top: .75rem;
+    }
+
+    .total td {
+        padding-bottom: .5rem;
+        padding-top: .5rem;
+    }
+
+    .total td:last-child {
+        padding-right: .75rem;
+    }
+
+    .total td:first-child,
+    .group th:first-child {
+        font-weight: bold;
+        text-decoration: underline;
+        text-decoration-color: $body-font-color;
+    }
+
+    tbody tr:last-child td {
+        // make sure the backgrounds of all item lines cover the same
+        // height, here we mask the extended height of the row with
+        // a white box-shadow
+        box-shadow: 0 -.75rem $white inset;
+        padding-bottom: 1rem;
+    }
+
+    .unpaid .amount {
+        color: $red-dark;
+    }
+
+    .paid .amount {
+        color: $green-dark;
+    }
+
+    a.remove-invoice-item {
+        color: $red-dark;
+
+        &:link,
+        &:visited {
+            color: $red-dark;
+        }
+
+        &:hover,
+        &:active,
+        &:focus {
+            color: rgba($red-dark, .9);
+        }
     }
 }
 
@@ -4638,6 +5242,29 @@ h2 + div.timeline {
     .file {
         margin-left: 4rem;
     }
+
+    .reservation-adjustment {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 0;
+
+        .fa {
+            font-size: 1.5rem;
+            color: rgba(0, 0, 0, .5);
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem;
+            background: rgba(255, 255, 255, .7);
+            border-radius: 2px;
+            box-shadow: 3px 3px 3px rgba(220, 220, 220, .2);
+            flex: 0 0 32.66%;
+            margin: .5rem 0;
+        }
+
+    }
 }
 
 /*
@@ -4649,6 +5276,10 @@ h2 + div.timeline {
 .message-directory,
 .message-submission {
     background: lighten($green-pastel, 2.5%);
+}
+
+.message-reservation_adjusted {
+    background: lighten($yellow-pastel, 2.5%);
 }
 
 .message-ticket_note {
@@ -4698,6 +5329,10 @@ h2 + div.timeline {
 .directories-map {
     height: $full-width-banner-height;
     margin-bottom: 1.4rem;
+}
+
+.directory-list.row {
+    list-style-type: none;
 }
 
 /*
@@ -5055,7 +5690,7 @@ h2 + div.timeline {
     @include panel;
     @include smooth-edges;
 
-    padding: 1rem 1rem .5rem;
+    padding: 1rem;
 
     i.unpublished-hint::before {
         width: 2ex;
@@ -5655,7 +6290,6 @@ h2 + div.timeline {
 
 .field-button {
     height: 27px;
-    margin-top: 27px;
     padding: 5px;
     text-align: center;
     width: 27px;
@@ -5887,6 +6521,68 @@ h2 + div.timeline {
         margin-top: -1px;
     }
 
+    a.mute {
+        color: #333;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: none;
+        }
+        .fa-microphone {
+            display: inline;
+        }
+
+        &:hover {
+            color: $red;
+
+            .fa-microphone-slash {
+                display: inline;
+            }
+            .fa-microphone {
+                display: none;
+            }
+        }
+    }
+
+    a.unmute {
+        color: $red;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: inline;
+        }
+        .fa-microphone {
+            display: none;
+        }
+
+        &:hover {
+            color: #333;
+
+            .fa-microphone-slash {
+                display: none;
+            }
+            .fa-microphone {
+                display: inline;
+            }
+
+            &.disabled {
+                color: $red;
+                cursor: disabled;
+
+                .fa-microphone-slash {
+                    display: inline;
+                }
+                .fa-microphone {
+                    display: none;
+                }
+            }
+        }
+    }
+
     .button {
         display: block;
         font-size: .875rem;
@@ -5921,6 +6617,11 @@ h2 + div.timeline {
     .ticket-submitter-notification-status > span {
         display: inline-block;
         margin-bottom: .5rem;
+    }
+
+    .ticket-submitter-notification-status .prevent-text-overflow {
+        white-space: normal;
+        display: inline;
     }
 }
 
@@ -6099,12 +6800,24 @@ h2 + div.timeline {
         @include icon('\f0c0');
         color: $blue-dark;
     }
+
+    input[value="mtan"] + label::before {
+        @include icon('\f10b');
+        color: $blue-dark;
+    }
+
+    input[value="secret_mtan"] + label::before {
+        @include icon('\f10b');
+        color: $yellow-dark;
+    }
 }
 
 
 .secret-hint::before,
 .private-hint::before,
 .member-hint::before,
+.mtan-hint::before,
+.secret-mtan-hint::before,
 .unpublished-hint::before {
     font-style: normal;
 }
@@ -6124,6 +6837,16 @@ h2 + div.timeline {
     color: $blue-dark;
 }
 
+.mtan-hint::before {
+    @include icon('\f10b');
+    color: $blue-dark;
+}
+
+.secret-mtan-hint::before {
+    @include icon('\f10b');
+    color: $yellow-dark;
+}
+
 .unpublished-hint::before {
     @include icon('\f070');
     color: $orange-dark;
@@ -6132,18 +6855,12 @@ h2 + div.timeline {
 /*
     Dashboard
 */
-.boardlet-group {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-}
 
 .boardlet {
     background: $gray-pastel;
     border-top: 10px solid $green-light;
     margin-bottom: 1.5rem;
     padding: .5rem 1rem 1rem;
-    width: calc((100% / 3) - 1rem);
 
     h2 {
         font-size: 1.3rem;
@@ -6152,8 +6869,36 @@ h2 + div.timeline {
         word-wrap: break-word;
     }
 
-    li {
+    table {
+        margin-bottom: 0;
+    }
+
+    tr {
         font-size: .9rem;
+
+        &.zero {
+            color: $base;
+        }
+
+        .facts {
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        .fact-number,
+        .fact-icon {
+            padding: 0.5rem;
+            text-align: right;
+        }
+
+        .fact-icon {
+            text-align: center;
+        }
+
+        .fact-text {
+            margin-left: .5rem;
+            width: 100%;
+        }
     }
 
     &.boardlet-warning {
@@ -6377,31 +7122,34 @@ a#results {
 
 .reservation-list {
 
-    position: relative;
-    margin-bottom: 1.5rem;
-    overflow-x: auto;
     /* HACK: Overflow clipping is broken in Chromium when scrolling
              for all the not-selected events due to the use of opacity
              and/or filter. So we use a filter on the container element
              to fix this. This is dumb, but this bug has been around for
              almost a decade and still hasn't been fixed... */
     filter: blur(0);
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    position: relative;
+    /* NOTE: Since we allow shift as a modifier key, text-selection would
+             become annoying, rather than helpful. */
+    user-select: none;
 
     table {
         margin-bottom: 0;
 
         tr {
+            scroll-margin-top: 7rem;  // sass-lint:disable-line no-misspelled-properties
             scroll-snap-margin-top: 7rem;
-            scroll-margin-top: 7rem;
         }
 
         th:first-child {
             background-color: #fff;
-            position: sticky;
             left: 0;
-            width: 0;
-            white-space: nowrap;
+            position: sticky;
             text-align: center;
+            white-space: nowrap;
+            width: 0;
             z-index: 1;
         }
 
@@ -6414,9 +7162,9 @@ a#results {
         }
 
         .event {
-            color: #fff;
             border: 0;
             border-radius: 2px;
+            color: #fff;
             margin-bottom: 2px;
             padding: 2px 4px;
             white-space: nowrap;
@@ -6426,7 +7174,6 @@ a#results {
             }
 
             &.selected {
-                cursor: default;
                 background-image: repeating-linear-gradient(
                     45deg,
                     rgba($steel, .25),
@@ -6434,27 +7181,39 @@ a#results {
                     rgba($iron, .25) 10px,
                     rgba($iron, .25) 20px
                 );
+                cursor: default;
+
+                &.event-available.event-adjustable {
+                    cursor: pointer;
+                }
             }
 
             &.not-selected:not(:hover) {
-                opacity: .75;
                 filter: grayscale(.75);
+                opacity: .75;
             }
         }
 
         .event-unavailable {
-            cursor: not-allowed;
             background-color: $red;
+            cursor: not-allowed;
         }
 
         .event-partly-available {
-            cursor: pointer;
             background-color: $orange;
+            cursor: pointer;
         }
 
         .event-available {
-            cursor: pointer;
             background-color: $green;
+            cursor: pointer;
+        }
+
+        .event-adjustable::before {
+            float: right;
+            color: white;
+            font-size: 1.5rem;
+            @include icon($edit-link-icon);
         }
     }
 }
@@ -6466,4 +7225,174 @@ a#results {
     i.fa-calendar {
         font-size: 1.8rem;
     }
+}
+
+#fieldset-header_links {
+    .field-button {
+        margin-top: 0 !important;
+    }
+
+    small.error {
+        display: block !important;
+        margin-top: .5rem;
+    }
+}
+
+#fieldset-header-fixation {
+    display: none;
+}
+
+#header_links {
+    .toggle-topbar {
+        left: 0;
+        right: 0;
+
+        span {
+            color: #666 !important;
+        }
+    }
+
+    .title-bar,
+    button {
+        color: $editbar-bg-color;
+    }
+
+    #quicklinks-submenu {
+        li {
+            border-left: 1px solid $editbar-bg-color;
+
+            a {
+                color: #666;
+                padding: .5rem;
+                text-transform: none;
+            }
+        }
+    }
+
+    & * {
+        background: transparent;
+    }
+    @media #{$small-only} {
+        ul.menu {
+            display: block;
+        }
+
+        #quicklinks-submenu li {
+            border-left: 0;
+            border-top: 1px dashed $editbar-bg-color;
+        }
+    }
+}
+
+.page-image {
+    padding-bottom: 1rem;
+}
+
+/* Hide page-image form field on topic-forms */
+[id^="page-editor-edit-page"] .field-page_image,
+[id^="page-editor-edit-link"] .field-page_image {
+    display: none;
+}
+
+.videowrapper {
+    position: relative;
+    height: 0;
+    padding-bottom: 45%;
+}
+
+.videowrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.iframe-panel {
+    border: 1px solid $gray;
+    padding: 1rem;
+}
+
+.survey-definition {
+    #formcode-snippet-date-and-time,
+    #formcode-snippet-date,
+    #formcode-snippet-time,
+    #formcode-snippet-files,
+    #formcode-snippet-image,
+    #formcode-snippet-document,
+    #formcode-snippet-extended,
+    #formcode-snippet-iban,
+    #formcode-snippet-swiss-social-security-number,
+    #formcode-snippet-swiss-business-identifier,
+    #formcode-snippet-swiss-vat-number,
+    #formcode-snippet-markdown {
+        display: none;
+    }
+}
+
+.no-list-div {
+    ul li {
+        list-style: none;
+    }
+}
+
+
+/*
+    Code Block, Code Inline, Code
+
+    <pre><code>...</code></pre>
+*/
+
+$code-background: #f5f5f5;
+$code-border-radius: 4px;
+$code-padding-block: 0.5rem;
+$code-padding-inline: 0.125rem;
+$code-block-margin-bottom: 0.8rem;
+
+pre code,
+.code-block,
+.code-inline,
+code {
+    background: $code-background;
+    border-radius: $code-border-radius;
+}
+
+pre code,
+.code-block {
+    padding: $code-padding-block;
+    margin-bottom: $code-block-margin-bottom;
+    display: block;
+}
+
+.code-inline,
+code {
+    padding: $code-padding-inline;
+    display: inline;
+}
+
+// confirm scrollable list
+.confirm-list {
+    margin-bottom: 1rem;
+    max-height: 40vh;
+    overflow: auto;
+    padding: 10px;
+
+    ul {
+        margin-bottom: 0;
+    }
+}
+
+.button.alert.yes.disabled {
+    cursor: not-allowed !important;
+    opacity: .6;
+}
+
+.scroll-hint {
+    color: #8e1c26;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+p.full-text-width {
+    max-width: 100% !important;
 }

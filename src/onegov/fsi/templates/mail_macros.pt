@@ -8,21 +8,30 @@
 <body>
 
 <metal:email_header define-macro="email_header">
-    <p tal:condition="attendee|nothing" i18n:translate>Dear <span tal:replace="attendee.first_name" i18n:name="first_name" /> <span tal:replace="attendee.last_name" i18n:name="last_name" />, </p>
-    <p tal:condition="not: attendee|False" i18n:translate="">Dear [first_name] [last_name], </p>
+    <p tal:condition="attendee|nothing" i18n:translate>Dear <span tal:replace="attendee.first_name" i18n:name="first_name" /> <span tal:replace="attendee.last_name" i18n:name="last_name" /> </p>
+    <p tal:condition="not: attendee|False" i18n:translate="">Dear [first_name] [last_name] </p>
     <br>
+</metal:email_header>
+
+<metal:email_footer define-macro="email_footer">
     <tal:b tal:switch="layout.notification_type|nothing">
         <tal:b tal:case="'info'">
             <p i18n:translate="">Please take notice about the information below.</p>
+            <h3 i18n:translate="">Event Details</h3>
+            <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
         </tal:b>
+
         <tal:b tal:case="'reservation'">
             <p i18n:translate="">You have successfully subscribed to the following course event:</p>
             <h3>${layout.model.course_event.name}</h3>
             <metal:b use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
             <br>
             <p i18n:translate="">Thank you for your course subscription. Please add the course event to your outlook calender.</p>
+            <p i18n:translate="">To integrate the appointment into your own Outlook calendar, you will find instructions here: </p>
+            <a href="https://zug.service-now.com/sp?id=kb_article_view&sysparm_article=KB0010850">https://zug.service-now.com/sp?id=kb_article_view&sysparm_article=KB0010850</a>
             <p i18n:translate="">You will receive a reminder email 2 weeks prior to the start.</p>
         </tal:b>
+
         <tal:b tal:case="'reminder'">
             <p i18n:translate="">You have successfully subscribed to the following course event:</p>
             <h3>${layout.model.course_event.name}</h3>
@@ -31,6 +40,7 @@
                 Please take note of the course description at</span> <a href="${layout.course_url}" i18n:translate="">iZug/Fachstelle Sicherheit</a>.
             </p>
         </tal:b>
+
         <tal:b tal:case="'cancellation'">
             <p i18n:translate="">We unsubscribed you from the following course event which, will not take place:</p>
             <h3>${layout.model.course_event.name}</h3>
@@ -42,6 +52,7 @@
             </p>
             <p i18n:translate="">We kindly ask for understanding and acknowledgement.</p>
         </tal:b>
+
         <tal:b tal:case="'invitation'">
             <p i18n:translate="">We would like to invite you to subscribe for one of the events for the course <span tal:replace="layout.model.name" i18n:name="course_name" />.</p>
             <p>
@@ -49,20 +60,11 @@
                 <a href="${layout.open_events_url}" i18n:translate="">iZug/Fachstelle Sicherheit</a>.
             </p>
             <br>
-
         </tal:b>
+
         <tal:b tal:case="'unsubscribe'">
             <p i18n:translate="">Your subscription for the following event has been deleted:</p>
             <metal:b use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
-        </tal:b>
-    </tal:b>
-</metal:email_header>
-
-<metal:email_footer define-macro="email_footer">
-    <tal:b tal:switch="layout.notification_type|nothing">
-        <tal:b tal:case="'info'">
-            <h3 i18n:translate="">Event Details</h3>
-            <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
         </tal:b>
     </tal:b>
     <br>

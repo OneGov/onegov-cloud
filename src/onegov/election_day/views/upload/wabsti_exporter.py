@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import transaction
 
 from base64 import b64decode
@@ -12,24 +14,36 @@ from onegov.election_day.forms import UploadWabstiMajorzElectionForm
 from onegov.election_day.forms import UploadWabstiProporzElectionForm
 from onegov.election_day.forms import UploadWabstiVoteForm
 from onegov.election_day.models import DataSource
+from onegov.election_day.models import Election
 from onegov.election_day.models import Principal
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
 from onegov.election_day.views.upload import set_locale
 from onegov.election_day.views.upload import translate_errors
 from onegov.election_day.views.upload import unsupported_year_error
 from webob.exc import HTTPForbidden
 
 
-def authenticated_source(request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.formats.imports.common import FileImportError
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+    from onegov.election_day.request import ElectionDayRequest
+
+
+def authenticated_source(request: ElectionDayRequest) -> DataSource:
     try:
         token = b64decode(
-            request.authorization[1]
+            request.authorization[1]  # type:ignore
         ).decode('utf-8').split(':')[1]
 
         query = request.session.query(DataSource)
         query = query.filter(DataSource.token == token)
         return query.one()
-    except Exception:
-        raise HTTPForbidden()
+    except Exception as exception:
+        raise HTTPForbidden() from exception
 
 
 @ElectionDayApp.json(
@@ -38,7 +52,10 @@ def authenticated_source(request):
     request_method='POST',
     permission=Public
 )
-def view_upload_wabsti_vote(self, request):
+def view_upload_wabsti_vote(
+    self: Canton | Municipality,
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Upload vote results using the WabstiCExportert 2.2+.
 
@@ -56,7 +73,7 @@ def view_upload_wabsti_vote(self, request):
     data_source = authenticated_source(request)
     if (
         data_source.type != 'vote'
-        or not all((item.vote for item in data_source.items))
+        or not all(item.vote for item in data_source.items)
     ):
         return {
             'status': 'error',
@@ -78,12 +95,17 @@ def view_upload_wabsti_vote(self, request):
             'errors': form.errors
         }
 
-    errors = {}
+    assert form.sg_geschaefte.data is not None
+    assert form.sg_geschaefte.file is not None
+    assert form.sg_gemeinden.data is not None
+    assert form.sg_gemeinden.file is not None
+
+    errors: dict[str, list[FileImportError]] = {}
     session = request.session
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
         vote = item.item
-        if not vote:
+        if not isinstance(vote, Vote):
             continue
 
         errors[vote.id] = []
@@ -91,8 +113,14 @@ def view_upload_wabsti_vote(self, request):
             errors[vote.id].append(unsupported_year_error(vote.date.year))
             continue
 
+        assert item.number is not None
+        assert item.district is not None
+
         errors[vote.id] = import_vote_wabstic(
-            vote, self, item.number, item.district,
+            vote,
+            self,
+            item.number,
+            item.district,
             form.sg_geschaefte.file,
             form.sg_geschaefte.data['mimetype'],
             form.sg_gemeinden.file,
@@ -123,7 +151,10 @@ def view_upload_wabsti_vote(self, request):
     request_method='POST',
     permission=Public
 )
-def view_upload_wabsti_majorz(self, request):
+def view_upload_wabsti_majorz(
+    self: Canton | Municipality,
+    request: ElectionDayRequest
+) -> RenderData:
     """ Upload election results using the WabstiCExportert 2.2+.
 
     Example usage:
@@ -142,7 +173,7 @@ def view_upload_wabsti_majorz(self, request):
     data_source = authenticated_source(request)
     if (
         data_source.type != 'majorz'
-        or not all((item.election for item in data_source.items))
+        or not all(item.election for item in data_source.items)
     ):
         return {
             'status': 'error',
@@ -165,12 +196,23 @@ def view_upload_wabsti_majorz(self, request):
             'errors': form.errors
         }
 
-    errors = {}
+    assert form.wm_wahl.data is not None
+    assert form.wm_wahl.file is not None
+    assert form.wmstatic_gemeinden.data is not None
+    assert form.wmstatic_gemeinden.file is not None
+    assert form.wm_gemeinden.data is not None
+    assert form.wm_gemeinden.file is not None
+    assert form.wm_kandidaten.data is not None
+    assert form.wm_kandidaten.file is not None
+    assert form.wm_kandidatengde.data is not None
+    assert form.wm_kandidatengde.file is not None
+
+    errors: dict[str, list[FileImportError]] = {}
     session = request.session
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
         election = item.item
-        if not election:
+        if not isinstance(election, Election):
             continue
 
         errors[election.id] = []
@@ -180,8 +222,14 @@ def view_upload_wabsti_majorz(self, request):
             )
             continue
 
+        assert item.number is not None
+        assert item.district is not None
+
         errors[election.id] = import_election_wabstic_majorz(
-            election, self, item.number, item.district,
+            election,
+            self,
+            item.number,
+            item.district,
             form.wm_wahl.file,
             form.wm_wahl.data['mimetype'],
             form.wmstatic_gemeinden.file,
@@ -218,7 +266,10 @@ def view_upload_wabsti_majorz(self, request):
     request_method='POST',
     permission=Public
 )
-def view_upload_wabsti_proporz(self, request):
+def view_upload_wabsti_proporz(
+    self: Canton | Municipality,
+    request: ElectionDayRequest
+) -> RenderData:
     """ Upload election results using the WabstiCExportert 2.2+.
 
     Example usage:
@@ -240,7 +291,7 @@ def view_upload_wabsti_proporz(self, request):
     data_source = authenticated_source(request)
     if (
         data_source.type != 'proporz'
-        or not all((item.election for item in data_source.items))
+        or not all(item.election for item in data_source.items)
     ):
         return {
             'status': 'error',
@@ -262,12 +313,29 @@ def view_upload_wabsti_proporz(self, request):
             'errors': form.errors
         }
 
-    errors = {}
+    assert form.wp_wahl.data is not None
+    assert form.wp_wahl.file is not None
+    assert form.wpstatic_gemeinden.data is not None
+    assert form.wpstatic_gemeinden.file is not None
+    assert form.wp_gemeinden.data is not None
+    assert form.wp_gemeinden.file is not None
+    assert form.wp_listen.data is not None
+    assert form.wp_listen.file is not None
+    assert form.wp_listengde.data is not None
+    assert form.wp_listengde.file is not None
+    assert form.wpstatic_kandidaten.data is not None
+    assert form.wpstatic_kandidaten.file is not None
+    assert form.wp_kandidaten.data is not None
+    assert form.wp_kandidaten.file is not None
+    assert form.wp_kandidatengde.data is not None
+    assert form.wp_kandidatengde.file is not None
+
+    errors: dict[str, list[FileImportError]] = {}
     session = request.session
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
         election = item.item
-        if not election:
+        if not isinstance(election, ProporzElection):
             continue
 
         errors[election.id] = []
@@ -277,8 +345,13 @@ def view_upload_wabsti_proporz(self, request):
             )
             continue
 
+        assert item.number is not None
+
         errors[election.id] = import_election_wabstic_proporz(
-            election, self, item.number, item.district,
+            election,
+            self,
+            item.number,
+            item.district,
             form.wp_wahl.file,
             form.wp_wahl.data['mimetype'],
             form.wpstatic_gemeinden.file,

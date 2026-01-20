@@ -1,4 +1,5 @@
 """ The onegov organisation homepage. """
+from __future__ import annotations
 
 from morepath import redirect
 from onegov.core.security import Public, Private
@@ -14,7 +15,19 @@ from onegov.org.models import PublicationCollection
 from onegov.reservation import ResourceCollection
 
 
-def redirect_to(request, target, path):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.org.layout import Layout
+    from onegov.org.request import OrgRequest
+    from webob import Response
+
+
+def redirect_to(
+    request: OrgRequest,
+    target: str | None,
+    path: str | None
+) -> Response | None:
     if target == 'directories':
         return redirect(request.class_link(DirectoryCollection))
 
@@ -33,9 +46,15 @@ def redirect_to(request, target, path):
     if target == 'path' and path:
         return redirect(request.class_link(Organisation) + path.lstrip('/'))
 
+    return None
+
 
 @OrgApp.html(model=Organisation, template='homepage.pt', permission=Public)
-def view_org(self, request, layout=None):
+def view_org(
+    self: Organisation,
+    request: OrgRequest,
+    layout: Layout | None = None
+) -> RenderData | Response:
     """ Renders the org's homepage. """
 
     # the homepage can optionally be used as a jump-pad to redirect to
@@ -67,11 +86,16 @@ def view_org(self, request, layout=None):
     name='sort',
     permission=Private
 )
-def view_pages_sort(self, request, layout=None):
+def view_pages_sort(
+    self: Organisation,
+    request: OrgRequest,
+    layout: HomepageLayout | None = None
+) -> RenderData:
+
     layout = layout or HomepageLayout(self, request)
 
     return {
-        'title': _("Sort"),
+        'title': _('Sort'),
         'layout': layout,
         'page': self,
         'pages': layout.root_pages

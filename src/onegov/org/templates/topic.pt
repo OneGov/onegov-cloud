@@ -11,13 +11,13 @@
         <tal:b condition="page.trait == 'page'">
 
             <tal:b metal:use-macro="layout.macros.page_content"
-             tal:define="lead layout.linkify(page.content.get('lead'));text page.content.get('text'); people page.people; contact page.contact_html; coordinates page.coordinates">
+             tal:define="lead layout.linkify(page.content.get('lead'));text page.text|None; people page.people; contact page.contact_html; coordinates page.coordinates; files page.files; sidepanel_links page.sidepanel_links;">
                 <tal:b metal:fill-slot="after-text">
                      <div class="row" tal:condition="children">
                         <div class="small-12 columns">
                             <ul class="inline-list page-links">
-                                <li tal:repeat="(lead, title, link, url, edit_link) children">
-                                    <tal:b replace="structure link(layout)" />
+                                <li tal:repeat="(lead, title, link, url, edit_link, page_image, show_preview_image) children">
+                                    <tal:b replace="link(layout)" />
                                 </li>
                             </ul>
                         </div>
@@ -40,6 +40,15 @@
                             You are not automatically redirected so you have a chance
                             to edit or delete this link.
                         </p>
+                    </div>
+                </div>
+            </div>
+        </tal:b>
+        <tal:b condition="page.trait == 'iframe'">
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="${'iframe-panel' if page.as_card else ''}">
+                        <iframe src="${page.content.url}" width="100%" height="${page.height if page.height else '800'}" frameborder="0"></iframe>
                     </div>
                 </div>
             </div>

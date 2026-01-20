@@ -1,13 +1,21 @@
 """ The upload view. """
+from __future__ import annotations
+
 import transaction
 
-from onegov.ballot import ElectionCompound
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.forms import UploadElectionCompoundForm
-from onegov.election_day.layouts import ManageElectionsLayout
+from onegov.election_day.layouts import ManageElectionCompoundsLayout
+from onegov.election_day.models import ElectionCompound
 from onegov.election_day.views.upload import unsupported_year_error
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
 
 
 @ElectionDayApp.manage_form(
@@ -16,8 +24,11 @@ from onegov.election_day.views.upload import unsupported_year_error
     template='upload_election.pt',
     form=UploadElectionCompoundForm
 )
-def view_upload_election_compound(self, request, form):
-
+def view_upload_election_compound(
+    self: ElectionCompound,
+    request: ElectionDayRequest,
+    form: UploadElectionCompoundForm
+) -> RenderData:
     """ Upload results of a election compound. """
 
     errors = []
@@ -30,6 +41,8 @@ def view_upload_election_compound(self, request, form):
             errors = [unsupported_year_error(self.date.year)]
         else:
             if form.file_format.data == 'internal':
+                assert form.results.data is not None
+                assert form.results.file is not None
                 errors = import_election_compound_internal(
                     self,
                     principal,
@@ -37,7 +50,7 @@ def view_upload_election_compound(self, request, form):
                     form.results.data['mimetype']
                 )
             else:
-                raise NotImplementedError("Unsupported import format")
+                raise NotImplementedError('Unsupported import format')
 
             archive = ArchivedResultCollection(request.session)
             archive.update(self, request)
@@ -58,7 +71,7 @@ def view_upload_election_compound(self, request, form):
                     )
                 )
 
-    layout = ManageElectionsLayout(self, request)
+    layout = ManageElectionCompoundsLayout(self, request)
 
     return {
         'layout': layout,

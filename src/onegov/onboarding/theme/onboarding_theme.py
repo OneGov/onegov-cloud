@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from onegov.foundation import BaseTheme
 from onegov.core.utils import module_path
@@ -7,13 +9,13 @@ class OnboardingTheme(BaseTheme):
     name = 'onegov.onboarding.foundation'
 
     @property
-    def post_imports(self):
+    def post_imports(self) -> list[str]:
         return [
             'onboarding'
         ]
 
     @property
-    def default_options(self):
+    def default_options(self) -> dict[str, str]:
         return OrderedDict((
             ('primary-color-ui', '#005BA1'),
 
@@ -48,5 +50,5 @@ class OnboardingTheme(BaseTheme):
         ))
 
     @property
-    def extra_search_paths(self):
+    def extra_search_paths(self) -> list[str]:
         return [module_path('onegov.onboarding.theme', 'styles')]

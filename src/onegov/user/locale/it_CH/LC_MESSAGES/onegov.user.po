@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-20 09:54+0100\n"
+"POT-Creation-Date: 2024-07-25 09:34+0200\n"
 "PO-Revision-Date: 2022-03-07 13:38+0100\n"
 "Last-Translator: Marc Sommerhalder <info@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -60,11 +60,40 @@ msgstr ""
 "Non è possibile effettuare il login perché l'utente non ha gruppi. Contatta "
 "il tuo amministratore di sistema AzureAD."
 
+msgid "SAML2"
+msgstr "SAML2"
+
+msgid ""
+"Can't login because your user has no groups. Contact your SAML2 system "
+"administrator"
+msgstr ""
+"Non è possibile effettuare il login perché l'utente non ha gruppi. Contatta "
+"il tuo amministratore di sistema SAML2."
+
+msgid "OpenID Connect"
+msgstr ""
+
+msgid ""
+"Can't login because your user has no group. Contact your OpenID system "
+"administrator"
+msgstr ""
+
+#, python-format
+msgid "${mtan} - mTAN for ${organisation}."
+msgstr "${mtan} - mTAN per ${organisation}."
+
+msgid ""
+"We sent an mTAN to the number linked with this account. Please enter it "
+"below."
+msgstr ""
+"Abbiamo inviato un mTAN al numero collegato a questo conto. La preghiamo di "
+"inserirlo qui sotto."
+
 msgid "Name"
 msgstr "Nome"
 
 msgid "E-Mail Address"
-msgstr "Indirizzo email"
+msgstr "Indirizzo e-mail"
 
 msgid "Password"
 msgstr "Password"
@@ -73,10 +102,16 @@ msgid "YubiKey"
 msgstr "YubiKey"
 
 msgid "Plug your YubiKey into a USB slot and press it."
-msgstr "Collegare il dispositivo YubiKey a una porta USB e premerlo."
+msgstr "Collega il dispositivo YubiKey a una porta USB e premi."
 
-msgid "The password must be at least eight characters long"
-msgstr "La password deve contenere almeno 8 caratteri"
+msgid "mTAN"
+msgstr "mTAN"
+
+msgid "Phone number"
+msgstr "Numero di telefono"
+
+msgid "The password must be at least ten characters long"
+msgstr "La password deve contenere almeno 10 caratteri"
 
 msgid "Password Confirmation"
 msgstr "Conferma Password"
@@ -97,7 +132,7 @@ msgid "Role"
 msgstr "Ruolo"
 
 msgid "Editor"
-msgstr "Editor"
+msgstr "Redattore"
 
 msgid "Admin"
 msgstr "Amministratore"
@@ -119,3 +154,9 @@ msgstr "30 giorni"
 
 msgid "Number of Signups"
 msgstr "Numero di iscrizioni"
+
+msgid "Code"
+msgstr "Code"
+
+msgid "Users"
+msgstr "Utenti"

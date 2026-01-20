@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from decimal import Decimal
 from onegov.election_day.utils.common import LastUpdatedOrderedDict
@@ -11,11 +13,21 @@ from onegov.election_day.utils.parties import get_parties_panachage_data
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_data
 from onegov.election_day.utils.parties import get_party_results_deltas
-from tests.onegov.election_day.common import print_errors
+from onegov.election_day.utils.parties import get_party_results_seat_allocation
 
 
-def test_election_utils_majorz(import_test_datasets, session):
-    election, errors = import_test_datasets(
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from ..conftest import ImportTestDatasets
+
+
+def test_election_utils_majorz(
+    import_test_datasets: ImportTestDatasets,
+    session: Session
+) -> None:
+
+    results = import_test_datasets(
         'internal',
         'election',
         'zg',
@@ -26,9 +38,11 @@ def test_election_utils_majorz(import_test_datasets, session):
         dataset_name='staenderatswahl-2015-parties',
         has_expats=False
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
 
-    election.absolute_majoriy = 18191
+    election.absolute_majority = 18191
     election.majority_type = 'absolute'
     election.colors = {
         'ALG': '#a74c97',
@@ -39,15 +53,33 @@ def test_election_utils_majorz(import_test_datasets, session):
     }
 
     # get_candidates_results
-    assert tuple(get_candidates_results(election, session)) == (
-        ('Hegglin', 'Peter', True, 'CVP', 24132, Decimal('62.3'), None, None),
-        ('Eder', 'Joachim', True, 'FDP', 23620, Decimal('61.0'), None, None),
-        ('Brandenberg', 'Manuel', False, 'SVP', 10997, Decimal('28.4'), None,
+    assert tuple(get_candidates_results(election, session)) == (  # type: ignore[comparison-overlap]
+        (24132, 'Hegglin', 'Peter', True, 'CVP', Decimal('62.3'), None, None),
+        (23620, 'Eder', 'Joachim', True, 'FDP', Decimal('61.0'), None, None),
+        (10997, 'Brandenberg', 'Manuel', False, 'SVP', Decimal('28.4'), None,
          None),
-        ('Gysel', 'Barbara', False, 'SP', 6612, Decimal('17.1'), None, None),
-        ('Lustenberger', 'Andreas', False, 'ALG', 5691, Decimal('14.7'), None,
+        (6612, 'Gysel', 'Barbara', False, 'SP', Decimal('17.1'), None, None),
+        (5691, 'Lustenberger', 'Andreas', False, 'ALG', Decimal('14.7'), None,
          None),
-        ('Thöni', 'Stefan', False, 'Piraten', 1709, Decimal('4.4'), None, None)
+        (1709, 'Thöni', 'Stefan', False, 'Piraten', Decimal('4.4'), None, None)
+    )
+
+    entities = ['Baar', 'Cham']
+    assert tuple(  # type: ignore[comparison-overlap]
+        get_candidates_results(election, session, entities=entities)
+    ) == (
+        (2905 + 4207, 'Hegglin', 'Peter', True, 'CVP', Decimal('60.2'),
+         None, None),
+        (2726 + 4237, 'Eder', 'Joachim', True, 'FDP', Decimal('58.9'),
+         None, None),
+        (1404 + 2100, 'Brandenberg', 'Manuel', False, 'SVP', Decimal('29.6'),
+         None, None),
+        (1264 + 888, 'Gysel', 'Barbara', False, 'SP', Decimal('18.2'),
+         None, None),
+        (1269 + 685, 'Lustenberger', 'Andreas', False, 'ALG', Decimal('16.5'),
+         None, None),
+        (232 + 320, 'Thöni', 'Stefan', False, 'Piraten', Decimal('4.7'),
+         None, None)
     )
 
     # get_candidates_data
@@ -84,7 +116,7 @@ def test_election_utils_majorz(import_test_datasets, session):
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'Thöni Stefan',
             'value': 1709
         }
@@ -102,8 +134,14 @@ def test_election_utils_majorz(import_test_datasets, session):
             'title': 'majorz_internal_staenderatswahl-2015-parties',
             'results': expected,
         }
-    for lists in ([], None):
+    for lists in ([], None):  # type: ignore[var-annotated]
         assert get_candidates_data(election, lists=lists) == {
+            'majority': 18191,
+            'title': 'majorz_internal_staenderatswahl-2015-parties',
+            'results': expected,
+        }
+    for entities in ([], None):  # type: ignore[assignment]
+        assert get_candidates_data(election, entities=entities) == {
             'majority': 18191,
             'title': 'majorz_internal_staenderatswahl-2015-parties',
             'results': expected,
@@ -143,6 +181,25 @@ def test_election_utils_majorz(import_test_datasets, session):
         'title': 'majorz_internal_staenderatswahl-2015-parties',
         'results': expected[3:4],
     }
+    assert get_candidates_data(election, lists=['ALG', 'SP'],
+                               entities=['Baar', 'Cham'],
+                               sort_by_lists=True) == {
+        'majority': 0,
+        'title': 'majorz_internal_staenderatswahl-2015-parties',
+        'results': [
+            {
+                'class': 'inactive',
+                'color': '#a74c97',
+                'text': 'Lustenberger Andreas',
+                'value': 1269 + 685},
+            {
+                'class': 'inactive',
+                'color': '#db3c27',
+                'text': 'Gysel Barbara',
+                'value': 1264 + 888
+            }
+        ]
+    }
 
     # get_list_results
     assert tuple(get_list_results(election)) == tuple()
@@ -172,9 +229,8 @@ def test_election_utils_majorz(import_test_datasets, session):
     }
 
     # get_candidates_results_by_entity
-    candidates, entities = get_candidates_results_by_entity(election)
-    candidates = [candidate[1:] for candidate in candidates]
-    assert candidates == [
+    candidates, candidate_entities = get_candidates_results_by_entity(election)
+    assert [candidate[1:] for candidate in candidates] == [
         ('Brandenberg', 'Manuel', 10997),
         ('Eder', 'Joachim', 23620),
         ('Gysel', 'Barbara', 6612),
@@ -182,7 +238,7 @@ def test_election_utils_majorz(import_test_datasets, session):
         ('Lustenberger', 'Andreas', 5691),
         ('Thöni', 'Stefan', 1709)
     ]
-    assert entities == [
+    assert candidate_entities == [
         ('Baar', [
             ('Baar', 'Brandenberg', 'Manuel', 2100),
             ('Baar', 'Eder', 'Joachim', 4237),
@@ -273,11 +329,10 @@ def test_election_utils_majorz(import_test_datasets, session):
         ])
     ]
 
-    candidates, entities = get_candidates_results_by_entity(
+    candidates, candidate_entities = get_candidates_results_by_entity(
         election, sort_by_votes=True
     )
-    candidates = [candidate[1:] for candidate in candidates]
-    assert candidates == [
+    assert [candidate[1:] for candidate in candidates] == [
         ('Hegglin', 'Peter', 24132),
         ('Eder', 'Joachim', 23620),
         ('Brandenberg', 'Manuel', 10997),
@@ -285,7 +340,7 @@ def test_election_utils_majorz(import_test_datasets, session):
         ('Lustenberger', 'Andreas', 5691),
         ('Thöni', 'Stefan', 1709)
     ]
-    assert entities[0][1] == [
+    assert candidate_entities[0][1] == [
         ('Baar', 'Hegglin', 'Peter', 4207),
         ('Baar', 'Eder', 'Joachim', 4237),
         ('Baar', 'Brandenberg', 'Manuel', 2100),
@@ -295,8 +350,12 @@ def test_election_utils_majorz(import_test_datasets, session):
     ]
 
 
-def test_election_utils_proporz(import_test_datasets, session):
-    election, errors = import_test_datasets(
+def test_election_utils_proporz(
+    import_test_datasets: ImportTestDatasets,
+    session: Session
+) -> None:
+
+    results = import_test_datasets(
         'internal',
         'election',
         'zg',
@@ -307,6 +366,8 @@ def test_election_utils_proporz(import_test_datasets, session):
         dataset_name='nationalratswahlen-2015',
         has_expats=False
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
 
     election.colors = {
@@ -316,56 +377,63 @@ def test_election_utils_proporz(import_test_datasets, session):
 
     # get_candidates_results
     assert tuple(get_candidates_results(election, session)) == (
-        ('Lustenberger', 'Andreas', False, '', 3240, 0, 'ALG', '1'),
-        ('Estermann', 'Astrid', False, '', 1327, 0, 'ALG', '1'),
-        ('Schriber-Neiger', 'Hanni', False, '', 1206, 0, 'ALG', '1'),
-        ('Schuler', 'Hubert', False, '', 3859, 0, 'SP', '10'),
-        ('Bürgi Dellsperger', 'Christina', False, '', 2987, 0, 'SP', '10'),
-        ('Sivaganesan', 'Rupan', False, '', 1874, 0, 'SP', '10'),
-        ('Hutter Elsener', 'Simone', False, '', 929, 0, 'SP Frauen', '11'),
-        ('Hug', 'Malaika', False, '', 684, 0, 'SP Frauen', '11'),
-        ('Mäder Beglinger', 'Anne', False, '', 561, 0, 'SP Frauen', '11'),
-        ('Spescha', 'Anna', False, '', 555, 0, 'SP Juso', '12'),
-        ('Krasnici', 'Denis', False, '', 550, 0, 'SP Juso', '12'),
-        ('Koepfli', 'Virginia', False, '', 218, 0, 'SP Juso', '12'),
-        ('Dzaferi', 'Zari', False, '', 2303, 0, 'SP Männer', '13'),
-        ('Suter', 'Guido', False, '', 545, 0, 'SP Männer', '13'),
-        ('Freimann', 'Fabian', False, '', 394, 0, 'SP Männer', '13'),
-        ('Coralic', 'Fadila', False, '', 144, 0, 'SP Migrant.', '14'),
-        ('Sönmez', 'Sehriban', False, '', 117, 0, 'SP Migrant.', '14'),
-        ('Simsek', 'Deniz', False, '', 82, 0, 'SP Migrant.', '14'),
-        ('Aeschi', 'Thomas', True, '', 17034, 0, 'SVP', '15'),
-        ('Werner', 'Thomas', False, '', 7206, 0, 'SVP', '15'),
-        ('Villiger', 'Thomas', False, '', 5629, 0, 'SVP', '15'),
-        ('Pfisterer', 'Luc', False, '', 269, 0, 'SVP Int.', '16'),
-        ('Bucher', 'Rinaldo', False, '', 168, 0, 'SVP Int.', '16'),
-        ('Hornickel', 'Alexander', False, '', 132, 0, 'SVP Int.', '16'),
-        ('Risi', 'Adrian', False, '', 2607, 0, 'SVP WuG', '17'),
-        ('Brunner', 'Philip C.', False, '', 1159, 0, 'SVP WuG', '17'),
-        ('Gertsch', 'Beat', False, '', 607, 0, 'SVP WuG', '17'),
-        ('Widmer', 'Fabienne', False, '', 345, 0, 'ALG Junge', '2'),
-        ('Gut', 'Christina', False, '', 235, 0, 'ALG Junge', '2'),
-        ('Perucchi', 'Alessandro', False, '', 222, 0, 'ALG Junge', '2'),
-        ('Odermatt', 'Anastas', False, '', 637, 0, 'ALG Bildung', '3'),
-        ('Haas', 'Esther', False, '', 559, 0, 'ALG Bildung', '3'),
-        ('Zimmermann Gibson', 'Tabea', False, '', 490, 0, 'ALG Bildung', '3'),
-        ('Pfister', 'Gerhard', True, '', 16134, 0, 'CVP', '4'),
-        ('Barmet-Schelbert', 'Monika', False, '', 4093, 0, 'CVP', '4'),
-        ('Hausheer', 'Andreas', False, '', 3606, 0, 'CVP', '4'),
-        ('Bieri', 'Anna', False, '', 3908, 0, 'CVP Junge', '5'),
-        ('Iten', 'Christoph', False, '', 1394, 0, 'CVP Junge', '5'),
-        ('Kremmel', 'Corina', False, '', 1163, 0, 'CVP Junge', '5'),
-        ('Pezzatti', 'Bruno', True, '', 10174, 0, 'FDP Ost', '6'),
-        ('Ingold', 'Gabriela', False, '', 3637, 0, 'FDP Ost', '6'),
-        ('Mollet', 'Patrick', False, '', 2190, 0, 'FDP Ost', '6'),
-        ('Grüter', 'Arno', False, '', 1706, 0, 'FDP West', '7'),
-        ('Gygli', 'Daniel', False, '', 1378, 0, 'FDP West', '7'),
-        ('Siegrist', 'Birgitt', False, '', 1142, 0, 'FDP West', '7'),
-        ('Stadlin', 'Daniel', False, '', 1823, 0, 'glp', '8'),
-        ('Kottelat Schloesing', 'Michèle', False, '', 1256, 0, 'glp', '8'),
-        ('Soltermann', 'Claus', False, '', 1043, 0, 'glp', '8'),
-        ('Mauchle', 'Florian', False, '', 629, 0, 'Piraten', '9'),
-        ('Thöni', 'Stefan', False, '', 488, 0, 'Piraten', '9')
+        (3240, 'Lustenberger', 'Andreas', False, '', 0, 'ALG', '1'),
+        (1327, 'Estermann', 'Astrid', False, '', 0, 'ALG', '1'),
+        (1206, 'Schriber-Neiger', 'Hanni', False, '', 0, 'ALG', '1'),
+        (3859, 'Schuler', 'Hubert', False, '', 0, 'SP', '10'),
+        (2987, 'Bürgi Dellsperger', 'Christina', False, '', 0, 'SP', '10'),
+        (1874, 'Sivaganesan', 'Rupan', False, '', 0, 'SP', '10'),
+        (929, 'Hutter Elsener', 'Simone', False, '', 0, 'SP Frauen', '11'),
+        (684, 'Hug', 'Malaika', False, '', 0, 'SP Frauen', '11'),
+        (561, 'Mäder Beglinger', 'Anne', False, '', 0, 'SP Frauen', '11'),
+        (555, 'Spescha', 'Anna', False, '', 0, 'SP Juso', '12'),
+        (550, 'Krasnici', 'Denis', False, '', 0, 'SP Juso', '12'),
+        (218, 'Koepfli', 'Virginia', False, '', 0, 'SP Juso', '12'),
+        (2303, 'Dzaferi', 'Zari', False, '', 0, 'SP Männer', '13'),
+        (545, 'Suter', 'Guido', False, '', 0, 'SP Männer', '13'),
+        (394, 'Freimann', 'Fabian', False, '', 0, 'SP Männer', '13'),
+        (144, 'Coralic', 'Fadila', False, '', 0, 'SP Migrant.', '14'),
+        (117, 'Sönmez', 'Sehriban', False, '', 0, 'SP Migrant.', '14'),
+        (82, 'Simsek', 'Deniz', False, '', 0, 'SP Migrant.', '14'),
+        (17034, 'Aeschi', 'Thomas', True, '', 0, 'SVP', '15'),
+        (7206, 'Werner', 'Thomas', False, '', 0, 'SVP', '15'),
+        (5629, 'Villiger', 'Thomas', False, '', 0, 'SVP', '15'),
+        (269, 'Pfisterer', 'Luc', False, '', 0, 'SVP Int.', '16'),
+        (168, 'Bucher', 'Rinaldo', False, '', 0, 'SVP Int.', '16'),
+        (132, 'Hornickel', 'Alexander', False, '', 0, 'SVP Int.', '16'),
+        (2607, 'Risi', 'Adrian', False, '', 0, 'SVP WuG', '17'),
+        (1159, 'Brunner', 'Philip C.', False, '', 0, 'SVP WuG', '17'),
+        (607, 'Gertsch', 'Beat', False, '', 0, 'SVP WuG', '17'),
+        (345, 'Widmer', 'Fabienne', False, '', 0, 'ALG Junge', '2'),
+        (235, 'Gut', 'Christina', False, '', 0, 'ALG Junge', '2'),
+        (222, 'Perucchi', 'Alessandro', False, '', 0, 'ALG Junge', '2'),
+        (637, 'Odermatt', 'Anastas', False, '', 0, 'ALG Bildung', '3'),
+        (559, 'Haas', 'Esther', False, '', 0, 'ALG Bildung', '3'),
+        (490, 'Zimmermann Gibson', 'Tabea', False, '', 0, 'ALG Bildung', '3'),
+        (16134, 'Pfister', 'Gerhard', True, '', 0, 'CVP', '4'),
+        (4093, 'Barmet-Schelbert', 'Monika', False, '', 0, 'CVP', '4'),
+        (3606, 'Hausheer', 'Andreas', False, '', 0, 'CVP', '4'),
+        (3908, 'Bieri', 'Anna', False, '', 0, 'CVP Junge', '5'),
+        (1394, 'Iten', 'Christoph', False, '', 0, 'CVP Junge', '5'),
+        (1163, 'Kremmel', 'Corina', False, '', 0, 'CVP Junge', '5'),
+        (10174, 'Pezzatti', 'Bruno', True, '', 0, 'FDP Ost', '6'),
+        (3637, 'Ingold', 'Gabriela', False, '', 0, 'FDP Ost', '6'),
+        (2190, 'Mollet', 'Patrick', False, '', 0, 'FDP Ost', '6'),
+        (1706, 'Grüter', 'Arno', False, '', 0, 'FDP West', '7'),
+        (1378, 'Gygli', 'Daniel', False, '', 0, 'FDP West', '7'),
+        (1142, 'Siegrist', 'Birgitt', False, '', 0, 'FDP West', '7'),
+        (1823, 'Stadlin', 'Daniel', False, '', 0, 'glp', '8'),
+        (1256, 'Kottelat Schloesing', 'Michèle', False, '', 0, 'glp', '8'),
+        (1043, 'Soltermann', 'Claus', False, '', 0, 'glp', '8'),
+        (629, 'Mauchle', 'Florian', False, '', 0, 'Piraten', '9'),
+        (488, 'Thöni', 'Stefan', False, '', 0, 'Piraten', '9')
+    )
+
+    assert tuple(
+        get_candidates_results(election, session, entities=['Baar', 'Cham'])
+    )[:2] == (
+        (290 + 948, 'Lustenberger', 'Andreas', False, '', 0, 'ALG', '1'),
+        (135 + 255, 'Estermann', 'Astrid', False, '', 0, 'ALG', '1'),
     )
 
     # get_candidates_data
@@ -384,7 +452,7 @@ def test_election_utils_proporz(import_test_datasets, session):
         },
         {
             'class': 'active',
-            'color': '#999',
+            'color': None,
             'text': 'Pezzatti Bruno',
             'value': 10174
         }
@@ -402,8 +470,14 @@ def test_election_utils_proporz(import_test_datasets, session):
             'title': 'proporz_internal_nationalratswahlen-2015',
             'results': expected,
         }
-    for lists in ([], None):
+    for lists in ([], None):  # type: ignore[var-annotated]
         assert get_candidates_data(election, lists=lists) == {
+            'majority': 0,
+            'title': 'proporz_internal_nationalratswahlen-2015',
+            'results': expected,
+        }
+    for entities in ([], None):  # type: ignore[var-annotated]
+        assert get_candidates_data(election, entities=entities) == {
             'majority': 0,
             'title': 'proporz_internal_nationalratswahlen-2015',
             'results': expected,
@@ -426,7 +500,7 @@ def test_election_utils_proporz(import_test_datasets, session):
         'title': 'proporz_internal_nationalratswahlen-2015',
         'results': list(reversed(expected[1:])),
     }
-    assert len(get_candidates_data(election, elected=False)['results']) == 50
+    assert len(get_candidates_data(election, elected=False)['results']) == 50  # type: ignore[arg-type]
     assert get_candidates_data(election, limit=1,
                                lists=['FDP Ost', 'CVP', 'GLP']) == {
         'majority': 0,
@@ -459,19 +533,19 @@ def test_election_utils_proporz(import_test_datasets, session):
         'results': [
             {
                 'class': 'active',
-                'color': '#999',
+                'color': None,
                 'text': 'Pezzatti Bruno',
                 'value': 10174
             },
             {
                 'class': 'inactive',
-                'color': '#999',
+                'color': None,
                 'text': 'Ingold Gabriela',
                 'value': 3637
             },
             {
                 'class': 'inactive',
-                'color': '#999',
+                'color': None,
                 'text': 'Mollet Patrick',
                 'value': 2190
             },
@@ -483,44 +557,70 @@ def test_election_utils_proporz(import_test_datasets, session):
             }
         ],
     }
+    assert get_candidates_data(election, lists=['ALG'], limit=2,
+                               entities=['Baar', 'Cham'], elected=False) == {
+        'majority': 0,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': [
+            {
+                'class': 'inactive',
+                'color': None,
+                'text': 'Lustenberger Andreas',
+                'value': 290 + 948
+            },
+            {
+                'class': 'inactive',
+                'color': None,
+                'text': 'Estermann Astrid',
+                'value': 135 + 255
+            }
+        ],
+    }
 
     # get_list_results
-    expected = (
-        ('SVP', 30532, '15', 1),
-        ('CVP', 24335, '4', 1),
-        ('FDP Ost', 16285, '6', 1),
-        ('SP', 8868, '10', 0),
-        ('CVP Junge', 6521, '5', 0),
-        ('ALG', 5844, '1', 0),
-        ('SVP WuG', 4436, '17', 0),
-        ('FDP West', 4299, '7', 0),
-        ('glp', 4178, '8', 0),
-        ('SP Männer', 3314, '13', 0),
-        ('SP Frauen', 2186, '11', 0),
-        ('ALG Bildung', 1701, '3', 0),
-        ('SP Juso', 1333, '12', 0),
-        ('Piraten', 1128, '9', 0),
-        ('ALG Junge', 807, '2', 0),
-        ('SVP Int.', 575, '16', 0),
-        ('SP Migrant.', 347, '14', 0)
+    expected_list: tuple[tuple[int, str, int], ...] = (
+        (30532, 'SVP', 1),
+        (24335, 'CVP', 1),
+        (16285, 'FDP Ost', 1),
+        (8868, 'SP', 0),
+        (6521, 'CVP Junge', 0),
+        (5844, 'ALG', 0),
+        (4436, 'SVP WuG', 0),
+        (4299, 'FDP West', 0),
+        (4178, 'glp', 0),
+        (3314, 'SP Männer', 0),
+        (2186, 'SP Frauen', 0),
+        (1701, 'ALG Bildung', 0),
+        (1333, 'SP Juso', 0),
+        (1128, 'Piraten', 0),
+        (807, 'ALG Junge', 0),
+        (575, 'SVP Int.', 0),
+        (347, 'SP Migrant.', 0)
     )
-    assert tuple(get_list_results(election)) == expected
+    assert tuple(get_list_results(election)) == expected_list
 
     # ... invalid filters
     for limit in (0, None, -3):
-        assert tuple(get_list_results(election, limit=limit)) == expected
-    for names in ([], None):
-        assert tuple(get_list_results(election, names=names)) == expected
+        assert tuple(get_list_results(election, limit=limit)) == expected_list
+    for names in ([], None):  # type: ignore[var-annotated]
+        assert tuple(get_list_results(election, names=names)) == expected_list
+    for entities in ([], None):
+        assert tuple(
+            get_list_results(election, entities=entities)) == expected_list
 
     # ... valid filters
-    assert tuple(get_list_results(election, limit=3)) == expected[:3]
+    assert tuple(get_list_results(election, limit=3)) == expected_list[:3]
     names = ['SP Juso', 'SP Alle', 'SP Männer', 'SP Frauen']
     assert tuple(get_list_results(election, names=names)) == tuple(
-        (e for e in expected if e[0] in names)
+        (e for e in expected_list if e[1] in names)
     )
     assert tuple(get_list_results(election, limit=2, names=names)) == tuple(
-        (e for e in expected if e[0] in names)
+        (e for e in expected_list if e[1] in names)
     )[:2]
+    entities = ['Baar', 'Zug']
+    assert tuple(
+        get_list_results(election, limit=2, names=names, entities=entities)
+    ) == ((1133 + 724, 'SP Männer', 0), (579 + 570, 'SP Frauen', 0))
 
     # get_lists_data
     expected = [
@@ -539,105 +639,105 @@ def test_election_utils_proporz(import_test_datasets, session):
         },
         {
             'class': 'active',
-            'color': '#999',
+            'color': None,
             'text': 'FDP Ost',
             'value': 16285,
             'value2': 1
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SP',
             'value': 8868,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'CVP Junge',
             'value': 6521,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'ALG',
             'value': 5844,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SVP WuG',
             'value': 4436,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'FDP West',
             'value': 4299,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'glp',
             'value': 4178,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SP Männer',
             'value': 3314,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SP Frauen',
             'value': 2186,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'ALG Bildung',
             'value': 1701,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SP Juso',
             'value': 1333,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'Piraten',
             'value': 1128,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'ALG Junge',
             'value': 807,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SVP Int.',
             'value': 575,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SP Migrant.',
             'value': 347,
             'value2': 0
@@ -662,6 +762,12 @@ def test_election_utils_proporz(import_test_datasets, session):
             'title': 'proporz_internal_nationalratswahlen-2015',
             'results': expected,
         }
+    for entities in ([], None):
+        assert get_lists_data(election, entities=entities) == {
+            'majority': None,
+            'title': 'proporz_internal_nationalratswahlen-2015',
+            'results': expected,
+        }
 
     # ... valid filters
     assert get_lists_data(election, limit=3) == {
@@ -673,23 +779,50 @@ def test_election_utils_proporz(import_test_datasets, session):
     assert get_lists_data(election, names=names) == {
         'majority': None,
         'title': 'proporz_internal_nationalratswahlen-2015',
-        'results': [e for e in expected if e['text'] in names],
+        'results': [e for e in expected if e['text'] in names],  # type: ignore[index]
     }
     assert get_lists_data(election, limit=2, names=names) == {
         'majority': None,
         'title': 'proporz_internal_nationalratswahlen-2015',
-        'results': [e for e in expected if e['text'] in names][:2],
+        'results': [e for e in expected if e['text'] in names][:2],  # type: ignore[index]
     }
     names = ['SP Juso', 'SP Frauen', 'SP Männer']
     assert get_lists_data(election, names=names, sort_by_names=True) == {
         'majority': None,
         'title': 'proporz_internal_nationalratswahlen-2015',
-        'results': list(reversed([e for e in expected if e['text'] in names])),
+        'results': list(reversed([e for e in expected if e['text'] in names])),  # type: ignore[index]
+    }
+    entities = ['Baar', 'Zug']
+    assert get_lists_data(
+        election, limit=2, names=names, entities=entities
+    ) == {
+        'majority': None,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': [
+            {
+                'class': 'inactive',
+                'color': None,
+                'text': 'SP Männer',
+                'value': 1133 + 724,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': None,
+                'text': 'SP Frauen',
+                'value': 579 + 570,
+                'value2': 0
+            }
+        ],
     }
 
 
-def test_election_utils_parties(import_test_datasets, session):
-    election, errors = import_test_datasets(
+def test_election_utils_parties(
+    import_test_datasets: ImportTestDatasets,
+    session: Session
+) -> None:
+
+    results = import_test_datasets(
         'internal',
         'election',
         'zg',
@@ -700,17 +833,20 @@ def test_election_utils_parties(import_test_datasets, session):
         dataset_name='nationalratswahlen-2015',
         has_expats=False
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
-    errors = import_test_datasets(
+    results_ = import_test_datasets(
         'internal',
         'parties',
         'zg',
         'canton',
-        'proporz',
         election=election,
         dataset_name='nationalratswahlen-2015-parteien',
     )
-    assert not errors
+    assert len(results_) == 1
+    errors_ = next(iter(results_.values()))
+    assert not errors_
 
     years, parties = get_party_results(election)
     assert years == ['2011', '2015']
@@ -813,9 +949,9 @@ def test_election_utils_parties(import_test_datasets, session):
         }
     }
 
-    deltas, results = get_party_results_deltas(election, years, parties)
+    deltas, party_results = get_party_results_deltas(election, years, parties)
     assert deltas
-    assert results == {
+    assert party_results == {
         '2011': [
             ['AL', 0, 17972, '15.4%', ''],
             ['CVP', 1, 28413, '24.3%', ''],
@@ -834,7 +970,16 @@ def test_election_utils_parties(import_test_datasets, session):
         ]
     }
 
-    assert get_party_results_data(election) == {
+    assert get_party_results_seat_allocation(years, parties) == [
+        ['AL', 0, 0],
+        ['CVP', 1, 1],
+        ['FDP', 1, 1],
+        ['GLP', 0, 0],
+        ['SP', 0, 0],
+        ['SVP', 1, 1]
+    ]
+
+    assert get_party_results_data(election, False) == {
         'axis_units': {'back': '%', 'front': ''},
         'groups': ['AL', 'CVP', 'FDP', 'GLP', 'SP', 'SVP'],
         'labels': ['2011', '2015'],
@@ -927,72 +1072,212 @@ def test_election_utils_parties(import_test_datasets, session):
         ],
         'title': 'proporz_internal_nationalratswahlen-2015'
     }
+    assert get_party_results_data(election, True) == {
+        'results': [
+            {
+                'class': 'active',
+                'color': '#3f841a',
+                'percentage': True,
+                'text': 'SVP 2015',
+                'value': 30.5,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#3f841a',
+                'percentage': True,
+                'text': '2011',
+                'value': 28.3,
+                'value2': 1
+            },
+            {
+                'class': 'active',
+                'color': '#ff6300',
+                'percentage': True,
+                'text': 'CVP 2015',
+                'value': 26.4,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#ff6300',
+                'percentage': True,
+                'text': '2011',
+                'value': 24.3,
+                'value2': 1
+            },
+            {
+                'class': 'active',
+                'color': '#4068c8',
+                'percentage': True,
+                'text': 'FDP 2015',
+                'value': 17.6,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#4068c8',
+                'percentage': True,
+                'text': '2011',
+                'value': 19.2,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#db3c27',
+                'percentage': True,
+                'text': 'SP 2015',
+                'value': 13.8,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#db3c27',
+                'percentage': True,
+                'text': '2011',
+                'value': 5.3,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#a74c97',
+                'percentage': True,
+                'text': 'AL 2015',
+                'value': 7.2,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#a74c97',
+                'percentage': True,
+                'text': '2011',
+                'value': 15.4,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#aeca00',
+                'percentage': True,
+                'text': 'GLP 2015',
+                'value': 3.6,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#aeca00',
+                'percentage': True,
+                'text': '2011',
+                'value': 6.8,
+                'value2': 0
+            }
+        ]
+    }
 
     data = get_parties_panachage_data(election)
     assert data['title'] == 'proporz_internal_nationalratswahlen-2015'
-    l = data['links']
-    assert {'color': '#ff6300', 'source': 2, 'target': 8, 'value': 20} in l
-    assert {'color': '#4068c8', 'source': 3, 'target': 8, 'value': 30} in l
-    assert {'color': '#aeca00', 'source': 4, 'target': 8, 'value': 40} in l
-    assert {'color': '#db3c27', 'source': 5, 'target': 8, 'value': 50} in l
-    assert {'color': '#3f841a', 'source': 6, 'target': 8, 'value': 60} in l
-    assert {'color': '#999', 'source': 0, 'target': 8, 'value': 70} in l
-    assert {'color': '#a74c97', 'source': 1, 'target': 9, 'value': 10} in l
-    assert {'color': '#4068c8', 'source': 3, 'target': 9, 'value': 31} in l
-    assert {'color': '#aeca00', 'source': 4, 'target': 9, 'value': 41} in l
-    assert {'color': '#db3c27', 'source': 5, 'target': 9, 'value': 51} in l
-    assert {'color': '#3f841a', 'source': 6, 'target': 9, 'value': 61} in l
-    assert {'color': '#999', 'source': 0, 'target': 9, 'value': 71} in l
-    assert {'color': '#a74c97', 'source': 1, 'target': 10, 'value': 11} in l
-    assert {'color': '#ff6300', 'source': 2, 'target': 10, 'value': 21} in l
-    assert {'color': '#aeca00', 'source': 4, 'target': 10, 'value': 42} in l
-    assert {'color': '#db3c27', 'source': 5, 'target': 10, 'value': 52} in l
-    assert {'color': '#3f841a', 'source': 6, 'target': 10, 'value': 62} in l
-    assert {'color': '#999', 'source': 0, 'target': 10, 'value': 72} in l
-    assert {'color': '#a74c97', 'source': 1, 'target': 11, 'value': 12} in l
-    assert {'color': '#ff6300', 'source': 2, 'target': 11, 'value': 22} in l
-    assert {'color': '#4068c8', 'source': 3, 'target': 11, 'value': 32} in l
-    assert {'color': '#db3c27', 'source': 5, 'target': 11, 'value': 53} in l
-    assert {'color': '#3f841a', 'source': 6, 'target': 11, 'value': 63} in l
-    assert {'color': '#999', 'source': 0, 'target': 11, 'value': 73} in l
-    assert {'color': '#a74c97', 'source': 1, 'target': 12, 'value': 13} in l
-    assert {'color': '#ff6300', 'source': 2, 'target': 12, 'value': 23} in l
-    assert {'color': '#4068c8', 'source': 3, 'target': 12, 'value': 33} in l
-    assert {'color': '#aeca00', 'source': 4, 'target': 12, 'value': 43} in l
-    assert {'color': '#3f841a', 'source': 6, 'target': 12, 'value': 64} in l
-    assert {'color': '#999', 'source': 0, 'target': 12, 'value': 74} in l
-    assert {'color': '#a74c97', 'source': 1, 'target': 13, 'value': 14} in l
-    assert {'color': '#ff6300', 'source': 2, 'target': 13, 'value': 24} in l
-    assert {'color': '#4068c8', 'source': 3, 'target': 13, 'value': 34} in l
-    assert {'color': '#aeca00', 'source': 4, 'target': 13, 'value': 44} in l
-    assert {'color': '#db3c27', 'source': 5, 'target': 13, 'value': 54} in l
-    assert {'color': '#999', 'source': 0, 'target': 13, 'value': 75} in l
-    assert {'color': '#3f841a', 'source': 6, 'target': 13, 'value': 35298} in l
-    assert {'color': '#ff6300', 'source': 2, 'target': 9, 'value': 30591} in l
-    assert {'color': '#a74c97', 'source': 1, 'target': 8, 'value': 8082} in l
-    assert {'color': '#aeca00', 'source': 4, 'target': 11, 'value': 3923} in l
-    assert {'color': '#db3c27', 'source': 5, 'target': 12, 'value': 15798} in l
-    assert {'color': '#4068c8', 'source': 3, 'target': 10, 'value': 20324} in l
 
-    n = data['nodes']
-    assert {'color': '#999', 'id': 1, 'name': '-'} in n
-    assert {'color': '#a74c97', 'id': 2, 'name': 'AL'} in n
-    assert {'color': '#ff6300', 'id': 3, 'name': 'CVP'} in n
-    assert {'color': '#4068c8', 'id': 4, 'name': 'FDP'} in n
-    assert {'color': '#aeca00', 'id': 5, 'name': 'GLP'} in n
-    assert {'color': '#db3c27', 'id': 6, 'name': 'SP'} in n
-    assert {'color': '#3f841a', 'id': 7, 'name': 'SVP'} in n
-    assert {'color': '#999', 'id': 8, 'name': '-'} in n
-    assert {'color': '#a74c97', 'id': 9, 'name': 'AL'} in n
-    assert {'color': '#ff6300', 'id': 10, 'name': 'CVP'} in n
-    assert {'color': '#4068c8', 'id': 11, 'name': 'FDP'} in n
-    assert {'color': '#aeca00', 'id': 12, 'name': 'GLP'} in n
-    assert {'color': '#db3c27', 'id': 13, 'name': 'SP'} in n
-    assert {'color': '#3f841a', 'id': 14, 'name': 'SVP'} in n
+    def assert_link(
+        active: bool,
+        color: str | None,
+        source: int,
+        target: int,
+        value: int
+    ) -> None:
+        assert {  # type: ignore[operator]
+            'active': active, 'color': color,
+            'source': source, 'target': target, 'value': value
+        } in data['links']
+
+    assert_link(True, '#ff6300', 2, 8, 20)
+    assert_link(True, '#4068c8', 3, 8, 30)
+    assert_link(False, '#aeca00', 4, 8, 40)
+    assert_link(False, '#db3c27', 5, 8, 50)
+    assert_link(True, '#3f841a', 6, 8, 60)
+    assert_link(False, None, 0, 8, 70)
+    assert_link(False, '#a74c97', 1, 9, 10)
+    assert_link(True, '#4068c8', 3, 9, 31)
+    assert_link(False, '#aeca00', 4, 9, 41)
+    assert_link(False, '#db3c27', 5, 9, 51)
+    assert_link(True, '#3f841a', 6, 9, 61)
+    assert_link(False, None, 0, 9, 71)
+    assert_link(False, '#a74c97', 1, 10, 11)
+    assert_link(True, '#ff6300', 2, 10, 21)
+    assert_link(False, '#aeca00', 4, 10, 42)
+    assert_link(False, '#db3c27', 5, 10, 52)
+    assert_link(True, '#3f841a', 6, 10, 62)
+    assert_link(False, None, 0, 10, 72)
+    assert_link(False, '#a74c97', 1, 11, 12)
+    assert_link(True, '#ff6300', 2, 11, 22)
+    assert_link(True, '#4068c8', 3, 11, 32)
+    assert_link(False, '#db3c27', 5, 11, 53)
+    assert_link(True, '#3f841a', 6, 11, 63)
+    assert_link(False, None, 0, 11, 73)
+    assert_link(False, '#a74c97', 1, 12, 13)
+    assert_link(True, '#ff6300', 2, 12, 23)
+    assert_link(True, '#4068c8', 3, 12, 33)
+    assert_link(False, '#aeca00', 4, 12, 43)
+    assert_link(True, '#3f841a', 6, 12, 64)
+    assert_link(False, None, 0, 12, 74)
+    assert_link(False, '#a74c97', 1, 13, 14)
+    assert_link(True, '#ff6300', 2, 13, 24)
+    assert_link(True, '#4068c8', 3, 13, 34)
+    assert_link(False, '#aeca00', 4, 13, 44)
+    assert_link(False, '#db3c27', 5, 13, 54)
+    assert_link(False, None, 0, 13, 75)
+
+    def assert_node(
+        active: bool,
+        color: str | None,
+        id_: int,
+        name: str
+    ) -> None:
+        assert {  # type: ignore[operator]
+            'active': active, 'color': color, 'id': id_, 'name': name
+        } in data['nodes']
+
+    assert_node(False, None, 1, '-')
+    assert_node(False, '#a74c97', 2, 'AL')
+    assert_node(True, '#ff6300', 3, 'CVP')
+    assert_node(True, '#4068c8', 4, 'FDP')
+    assert_node(False, '#aeca00', 5, 'GLP')
+    assert_node(False, '#db3c27', 6, 'SP')
+    assert_node(True, '#3f841a', 7, 'SVP')
+    assert_node(False, None, 8, '-')
+    assert_node(False, '#a74c97', 9, 'AL')
+    assert_node(True, '#ff6300', 10, 'CVP')
+    assert_node(True, '#4068c8', 11, 'FDP')
+    assert_node(False, '#aeca00', 12, 'GLP')
+    assert_node(False, '#db3c27', 13, 'SP')
+    assert_node(True, '#3f841a', 14, 'SVP')
+
+    # incomplete data (only check for exceptions)
+    party_result = next((
+        r for r in election.party_results if r.year == 2011 and r.name == 'AL'
+    ))
+    party_result.party_id = 'AL11'
+    party_result.party_id = '6'
+    election.party_results = [
+        result for result in election.party_results
+        if not (
+            (result.year == 2011 and result.name == 'FDP')
+            or (result.year == 2015 and result.name == 'CVP')
+        )
+    ]
+
+    years, parties = get_party_results(election)
+    get_party_results_deltas(election, years, parties)
+    get_party_results_seat_allocation(years, parties)
+    get_parties_panachage_data(election)
+    get_party_results_data(election, True)
+    get_party_results_data(election, False)
 
 
-def test_get_connection_results_internal(import_test_datasets, session):
-    election, errors = import_test_datasets(
+def test_get_connection_results_internal(
+    import_test_datasets: ImportTestDatasets,
+    session: Session
+) -> None:
+
+    import_results = import_test_datasets(
         'internal',
         'election',
         'gr',
@@ -1003,10 +1288,13 @@ def test_get_connection_results_internal(import_test_datasets, session):
         dataset_name='nationalratswahlen-2019-final',
         app_session=session
     )
+    assert len(import_results) == 1
+    election, errors = next(iter(import_results.values()))
     assert not errors
     # These results have been verified by T. Hardegger
     results = get_connection_results_api(election, session)
 
+    assert isinstance(results, dict)
     assert results['1']['total_votes'] == 23141
     assert results['1']['subconns']['1'] == LastUpdatedOrderedDict({
         'total_votes': 7520,
@@ -1046,8 +1334,12 @@ def test_get_connection_results_internal(import_test_datasets, session):
     })
 
 
-def test_get_connection_results_subconn_ids(import_test_datasets, session):
-    election, errors = import_test_datasets(
+def test_get_connection_results_subconn_ids(
+    import_test_datasets: ImportTestDatasets,
+    session: Session
+) -> None:
+
+    import_results = import_test_datasets(
         'internal',
         'election',
         'sg',
@@ -1058,13 +1350,15 @@ def test_get_connection_results_subconn_ids(import_test_datasets, session):
         dataset_name='test_nonunique_subconn_ids',
         app_session=session
     )
-    print_errors(errors)
+    assert len(import_results) == 1
+    election, errors = next(iter(import_results.values()))
     assert not errors
     results = get_connection_results_api(election, session)
+    assert isinstance(results, dict)
     assert results['1']['total_votes'] == 3
     assert results['2']['total_votes'] == 2
     assert results['1']['subconns']['1']['total_votes'] == 2
     assert results['2']['subconns']['1']['total_votes'] == 2
 
 
-# todo: test on incompleted election
+# TODO: test on uncompleted election

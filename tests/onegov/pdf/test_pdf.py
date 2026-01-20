@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from copy import deepcopy
 from datetime import date
 from io import BytesIO
@@ -10,7 +12,7 @@ from onegov.pdf import page_fn_header_logo_and_footer
 from onegov.pdf import Pdf
 from onegov.pdf.utils import extract_pdf_info
 from pdfdocument.document import MarkupParagraph
-from pdfrw import PdfReader
+from pdfrw import PdfReader  # type: ignore[import-untyped]
 from pytest import mark
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.enums import TA_LEFT
@@ -18,6 +20,7 @@ from reportlab.lib.enums import TA_RIGHT
 from reportlab.lib.units import cm
 from reportlab.platypus import ListFlowable
 from reportlab.platypus import Paragraph
+from tempfile import NamedTemporaryFile
 
 
 LONGEST_TABLE_CELL_TEXT = """
@@ -57,9 +60,9 @@ place between the identity provider and the OpenID acceptor
 """
 
 
-def test_pdf_fit_size():
+def test_pdf_fit_size() -> None:
 
-    def floor(*args):
+    def floor(*args: float) -> tuple[int, ...]:
         return tuple(int(arg) for arg in args)
 
     pdf = Pdf(BytesIO())
@@ -88,7 +91,7 @@ def test_pdf_fit_size():
     assert floor(*pdf.fit_size(100 * cm, 200 * cm, 0.9)) == floor(m_h / 2, m_h)
 
 
-def test_pdf_table():
+def test_pdf_table() -> None:
     """Tables fails if one paragraph is larger then a whole site.
     The limit is roughly TABLE_CELL_CHAR_LIMIT.
     """
@@ -101,7 +104,7 @@ def test_pdf_table():
     assert len(PdfReader(f, decompress=False).pages) == 1
 
 
-def test_pdf():
+def test_pdf() -> None:
 
     f = BytesIO()
     pdf = Pdf(f)
@@ -120,25 +123,25 @@ def test_pdf():
     pdf.figcaption('a figure')
     pdf.pagebreak()
 
-    pdf.table([[1, 2, 3]], 'even')
-    assert len(set(pdf.story[-1]._colWidths)) == 1
-    assert int(sum(pdf.story[-1]._colWidths)) == int(pdf.doc.width)
+    pdf.table([['1', '2', '3']], 'even')
+    assert len(set(pdf.story[-1]._colWidths)) == 1  # type: ignore[attr-defined]
+    assert int(sum(pdf.story[-1]._colWidths)) == int(pdf.doc.width)  # type: ignore[attr-defined]
     pdf.pagebreak()
 
-    pdf.table([[1, 2, 3, 4, 5]], [2, 1, 1, 1, 2], ratios=True)
-    assert len(set(pdf.story[-1]._colWidths)) == 2
-    assert int(sum(pdf.story[-1]._colWidths)) == int(pdf.doc.width)
+    pdf.table([['1', '2', '3', '4', '5']], [2, 1, 1, 1, 2], ratios=True)
+    assert len(set(pdf.story[-1]._colWidths)) == 2  # type: ignore[attr-defined]
+    assert int(sum(pdf.story[-1]._colWidths)) == int(pdf.doc.width)  # type: ignore[attr-defined]
     pdf.pagebreak()
 
-    pdf.table([[1, 2, 3]], [1 * cm, 1 * cm, 1 * cm])
-    assert len(set(pdf.story[-1]._colWidths)) == 1
+    pdf.table([['1', '2', '3']], [1 * cm, 1 * cm, 1 * cm])
+    assert len(set(pdf.story[-1]._colWidths)) == 1  # type: ignore[attr-defined]
     pdf.pagebreak()
 
     style = deepcopy(pdf.style.normal)
     style.fontSize = 20
     pdf.table([['1', '2', MarkupParagraph('3', style)]], None)
-    row = pdf.story[-1]._cellvalues[0]
-    assert all([isinstance(cell, Paragraph) for cell in row])
+    row = pdf.story[-1]._cellvalues[0]  # type: ignore[attr-defined]
+    assert all(isinstance(cell, Paragraph) for cell in row)
     assert [p.style.fontSize for p in row] == [10, 10, 20]
     pdf.pagebreak()
 
@@ -148,7 +151,7 @@ def test_pdf():
         ('ALIGN', (2, 0), (-1, -1), 'CENTER'),
     )
     pdf.table([['right', 'left', 'center']], None, style=style)
-    row = pdf.story[-1]._cellvalues[0]
+    row = pdf.story[-1]._cellvalues[0]  # type: ignore[attr-defined]
     assert [p.style.alignment for p in row] == [TA_RIGHT, TA_LEFT, TA_CENTER]
 
     pdf.generate()
@@ -156,7 +159,25 @@ def test_pdf():
     assert len(PdfReader(f, decompress=False).pages) == 7
 
 
-def test_pdf_headers():
+def test_pdf_characters() -> None:
+    with NamedTemporaryFile() as file:
+        pdf = Pdf(file)
+        pdf.init_a4_portrait()
+        pdf.style.heading1.fontName = f'{pdf.style.fontName}-Bold'
+        pdf.style.heading2.fontName = f'{pdf.style.fontName}-Italic'
+        pdf.h1('Lorem ipsum Č ✓')
+        pdf.h2('Lorem ipsum Č ✓')
+        pdf.h3('Lorem ipsum Č ✓')
+        pdf.p('Lorem ipsum Č ✓')
+        pdf.generate()
+        # you might want to set a breakpoint here and manually open file.name
+        # to check if all characters are rendered correctly
+        assert extract_pdf_info(file)[1] == (
+            'Lorem ipsum Č ✓ Lorem ipsum Č ✓ Lorem ipsum Č ✓ Lorem ipsum Č ✓'
+        )
+
+
+def test_pdf_headers() -> None:
 
     file = BytesIO()
     pdf = Pdf(file)
@@ -164,30 +185,30 @@ def test_pdf_headers():
 
     pdf.h1('h1')
     pdf.h('h1', 1)
-    assert pdf.story[-1].style == pdf.story[-2].style
+    assert pdf.story[-1].style == pdf.story[-2].style  # type: ignore[attr-defined]
 
     pdf.h2('h2')
     pdf.h('h2', 2)
-    assert pdf.story[-1].style == pdf.story[-2].style
+    assert pdf.story[-1].style == pdf.story[-2].style  # type: ignore[attr-defined]
 
     pdf.h3('h3')
     pdf.h('h3', 3)
-    assert pdf.story[-1].style == pdf.story[-2].style
+    assert pdf.story[-1].style == pdf.story[-2].style  # type: ignore[attr-defined]
 
     pdf.h4('h4')
     pdf.h('h4', 4)
-    assert pdf.story[-1].style == pdf.story[-2].style
+    assert pdf.story[-1].style == pdf.story[-2].style  # type: ignore[attr-defined]
 
     pdf.h5('h5')
     pdf.h('h5', 5)
-    assert pdf.story[-1].style == pdf.story[-2].style
+    assert pdf.story[-1].style == pdf.story[-2].style  # type: ignore[attr-defined]
 
     pdf.h6('h6')
     pdf.h('h6', 6)
-    assert pdf.story[-1].style == pdf.story[-2].style
+    assert pdf.story[-1].style == pdf.story[-2].style  # type: ignore[attr-defined]
 
     pdf.h('h7', 7)
-    assert pdf.story[-1].style == pdf.story[-2].style
+    assert pdf.story[-1].style == pdf.story[-2].style  # type: ignore[attr-defined]
 
     pdf.generate()
     assert extract_pdf_info(file) == (
@@ -196,7 +217,7 @@ def test_pdf_headers():
     )
 
 
-def test_pdf_toc():
+def test_pdf_toc() -> None:
 
     file = BytesIO()
     pdf = Pdf(file, toc_levels=6)
@@ -226,6 +247,7 @@ def test_pdf_toc():
 
     assert extract_pdf_info(file) == (
         4,
+        # table of contents
         '1a 2 '
         '1.1 a.a 2 '
         '1.2 a.b 3 '
@@ -242,6 +264,7 @@ def test_pdf_toc():
         '1.3.1.1.2 a.c.a.a.b 4 '
         '1.3.1.1.2.1 a.c.a.a.b.a 4 '
         '1.3.1.1.2.2 a.c.a.a.b.b 4 '
+        # content
         '1a '
         '1.1 a.a '
         '1.2 a.b '
@@ -260,8 +283,40 @@ def test_pdf_toc():
         '1.3.1.1.2.2 a.c.a.a.b.b'
     )
 
+    # no hierarchical numbering
+    file = BytesIO()
+    pdf = Pdf(file, toc_levels=6, skip_numbering=True)
+    pdf.init_a4_portrait()
+    pdf.table_of_contents()
+    pdf.h1('Argon')
+    pdf.h2('Boron')
+    pdf.h3('Carbon')
+    pdf.h4('Dubnium')
+    pdf.h5('Europium')
+    pdf.h6('Francium')
+    pdf.pagebreak()
 
-def test_pdf_toc_levels():
+    pdf.generate()
+    assert extract_pdf_info(file) == (
+        1,
+        # table of contents
+        'Argon 1 '
+        'Boron 1 '
+        'Carbon 1 '
+        'Dubnium 1 '
+        'Europium 1 '
+        'Francium 1 '
+        # content
+        'Argon '
+        'Boron '
+        'Carbon '
+        'Dubnium '
+        'Europium '
+        'Francium'
+    )
+
+
+def test_pdf_toc_levels() -> None:
 
     file = BytesIO()
     pdf = Pdf(file, toc_levels=2)
@@ -277,8 +332,10 @@ def test_pdf_toc_levels():
     pdf.generate()
     assert extract_pdf_info(file) == (
         1,
+        # table of contents
         '1a 1 '
         '1.1 a.a 1 '
+        # content
         '1a '
         '1.1 a.a '
         '1.1.1 a.a.a '
@@ -287,12 +344,39 @@ def test_pdf_toc_levels():
         '1.1.1.1.1.1 a.a.a.a.a.a'
     )
 
+    # no hierarchical numbering
+    file = BytesIO()
+    pdf = Pdf(file, toc_levels=2, skip_numbering=True)
+    pdf.init_a4_portrait()
+    pdf.table_of_contents()
+    pdf.h1('Argon')
+    pdf.h2('Boron')
+    pdf.h3('Carbon')
+    pdf.h4('Dubnium')
+    pdf.h5('Europium')
+    pdf.h6('Francium')
+
+    pdf.generate()
+    assert extract_pdf_info(file) == (
+        1,
+        # table of contents
+        'Argon 1 '
+        'Boron 1 '
+        # content
+        'Argon '
+        'Boron '
+        'Carbon '
+        'Dubnium '
+        'Europium '
+        'Francium'
+    )
+
 
 @mark.parametrize("path", [
     module_path('tests.onegov.pdf', 'fixtures/onegov.jpg'),
     module_path('tests.onegov.pdf', 'fixtures/onegov.png'),
 ])
-def test_pdf_image(path):
+def test_pdf_image(path: str) -> None:
     file = BytesIO()
     pdf = Pdf(file)
     pdf.init_a4_portrait()
@@ -313,7 +397,7 @@ def test_pdf_image(path):
     assert len(PdfReader(file, decompress=False).pages) == 1
 
 
-def test_pdf_mini_html():
+def test_pdf_mini_html() -> None:
     file = BytesIO()
     pdf = Pdf(file)
     pdf.init_a4_portrait()
@@ -366,7 +450,7 @@ def test_pdf_mini_html():
     )
 
     lists = [
-        [li.text for li in l._flowables]
+        [li.text for li in l._flowables]  # type: ignore[attr-defined]
         for l in pdf.story if isinstance(l, ListFlowable)
     ]
     assert lists == [
@@ -398,7 +482,7 @@ def test_pdf_mini_html():
     )
 
 
-def test_pdf_mini_html_strip():
+def test_pdf_mini_html_strip() -> None:
     file = BytesIO()
     pdf = Pdf(file)
     pdf.init_a4_portrait()
@@ -493,7 +577,7 @@ def test_pdf_mini_html_strip():
     assert set(paras) == {'Eins zwei drei vier .'}
 
 
-def test_pdf_mini_html_linkify():
+def test_pdf_mini_html_linkify() -> None:
     file = BytesIO()
     pdf = Pdf(file)
     pdf.init_a4_portrait()
@@ -516,7 +600,7 @@ def test_pdf_mini_html_linkify():
     ]
 
 
-def test_page_fn_header():
+def test_page_fn_header() -> None:
     # no title
     file = BytesIO()
     pdf = Pdf(file)
@@ -566,7 +650,7 @@ def test_page_fn_header():
     assert extract_pdf_info(file) == (1, 'created')
 
 
-def test_page_fn_footer():
+def test_page_fn_footer() -> None:
     year = date.today().year
 
     # no author
@@ -596,7 +680,7 @@ def test_page_fn_footer():
     assert extract_pdf_info(file) == (1, f'© {year} author 1')
 
 
-def test_page_fn_header_and_footer():
+def test_page_fn_header_and_footer() -> None:
     year = date.today().year
 
     file = BytesIO()
@@ -616,9 +700,9 @@ def test_page_fn_header_and_footer():
 @mark.parametrize("path", [
     module_path('tests.onegov.pdf', 'fixtures/onegov.svg'),
 ])
-def test_page_fn_header_logo(path):
-    with open(path) as file:
-        logo = file.read()
+def test_page_fn_header_logo(path: str) -> None:
+    with open(path) as fp:
+        logo = fp.read()
 
     # no logo
     file = BytesIO()
@@ -640,11 +724,11 @@ def test_page_fn_header_logo(path):
 @mark.parametrize("path", [
     module_path('tests.onegov.pdf', 'fixtures/onegov.svg'),
 ])
-def test_page_fn_header_logo_and_footer(path):
+def test_page_fn_header_logo_and_footer(path: str) -> None:
     year = date.today().year
 
-    with open(path) as file:
-        logo = file.read()
+    with open(path) as fp:
+        logo = fp.read()
 
     file = BytesIO()
     pdf = Pdf(file, author='author', logo=logo)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from onegov.core.security import Public
 from onegov.file import File
@@ -10,31 +12,55 @@ from onegov.core.elements import Link
 from sqlalchemy import desc, literal
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from datetime import datetime
+    from onegov.core.types import RenderData
+    from onegov.file.types import FileStats
+    from onegov.org.request import OrgRequest
+    from typing import NamedTuple
+
+    class FileRow(NamedTuple):
+        id: str
+        name: str
+        stats: FileStats | None
+        created: datetime
+
+
 MONTHS = (
-    _("January"),
-    _("Feburary"),
-    _("March"),
-    _("April"),
-    _("May"),
-    _("June"),
-    _("July"),
-    _("August"),
-    _("September"),
-    _("October"),
-    _("November"),
-    _("December"),
+    _('January'),
+    _('Feburary'),
+    _('March'),
+    _('April'),
+    _('May'),
+    _('June'),
+    _('July'),
+    _('August'),
+    _('September'),
+    _('October'),
+    _('November'),
+    _('December'),
 )
 
 
-@OrgApp.html(model=PublicationCollection, permission=Public,
-             template='publications.pt')
-def view_publications(self, request, layout=None):
+@OrgApp.html(
+    model=PublicationCollection,
+    permission=Public,
+    template='publications.pt'
+)
+def view_publications(
+    self: PublicationCollection,
+    request: OrgRequest,
+    layout: PublicationLayout | None = None
+) -> RenderData:
+
     layout = layout or PublicationLayout(self, request)
 
     # filter by year, from latest to first year
     s = self.first_year(layout.timezone) or self.year
     e = layout.today().year
-    years = range(e, s - 1, -1)
+    years = range(e, s - 1, -1) if s is not None else ()
 
     filters = {
         'years': tuple(
@@ -48,7 +74,7 @@ def view_publications(self, request, layout=None):
     }
 
     # load the publications and bucket them into months
-    publications = tuple([] for i in range(12))
+    publications: Sequence[list[FileRow]] = tuple([] for i in range(12))
 
     query = self.query().with_entities(
         File.id,
@@ -64,42 +90,42 @@ def view_publications(self, request, layout=None):
 
     # group the publications by months, while merging empty months
     today = layout.today()
-    grouped = OrderedDict()
-    spool = tuple()
+    grouped: dict[str, list[FileRow] | None] = OrderedDict()
+    spool: Sequence[str] = ()
 
-    def apply_spool(spool):
+    def apply_spool(spool: Sequence[str]) -> Sequence[str]:
         if spool:
             if len(spool) == 1:
                 label = spool[0]
             else:
-                label = f"{spool[0]} - {spool[-1]}"
+                label = f'{spool[0]} - {spool[-1]}'
 
             grouped[label] = None
 
-        return tuple()
+        return ()
 
-    for ix, publications in enumerate(reversed(publications)):
+    for ix, publications_ in enumerate(reversed(publications)):
         month = 12 - ix
 
         # exclude current year's months if they are in the future
         if self.year == today.year and month > today.month:
             continue
 
-        if not publications:
+        if not publications_:
             spool = (*spool, request.translate(MONTHS[month - 1]))
             continue
 
         spool = apply_spool(spool)
-        grouped[request.translate(MONTHS[month - 1])] = publications
+        grouped[request.translate(MONTHS[month - 1])] = publications_
 
     apply_spool(spool)
 
     # link to file and thumbnail by id
-    def link(f, name=None):
+    def link(f: FileRow, name: str = '') -> str:
         return request.class_link(File, {'id': f.id}, name=name)
 
     return {
-        'title': _("Publications"),
+        'title': _('Publications'),
         'layout': layout,
         'model': self,
         'filters': filters,

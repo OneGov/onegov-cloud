@@ -1,38 +1,54 @@
-from onegov.core.html import html_to_text
+from __future__ import annotations
+
 from onegov.core.security import Private, Secret, Personal
 from onegov.core.templates import render_template
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.course import CourseCollection
-from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.forms.course import CourseForm, InviteCourseForm
 from onegov.fsi import _
-from onegov.fsi.layouts.course import CourseCollectionLayout, CourseLayout, \
-    AddCourseLayout, EditCourseLayout, InviteCourseLayout, \
-    CourseInviteMailLayout
+from onegov.fsi.layouts.course import (
+    CourseCollectionLayout, CourseLayout, AddCourseLayout, EditCourseLayout,
+    InviteCourseLayout, CourseInviteMailLayout)
 from onegov.fsi.models import CourseAttendee
 
 from onegov.fsi.models.course import Course
-from onegov.fsi.models.course_notification_template import \
-    CourseInvitationTemplate, CourseNotificationTemplate
+from onegov.fsi.models.course_notification_template import (
+    CourseInvitationTemplate, CourseNotificationTemplate)
 from onegov.user import User
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection, Iterator
+    from onegov.core.types import EmailJsonDict, RenderData
+    from onegov.fsi.request import FsiRequest
+    from webob import Response
+
+
 def handle_send_invitation_email(
-        self, course, request, recipients, cc_to_sender=True):
+    self: CourseInvitationTemplate,
+    course: Course,
+    request: FsiRequest,
+    recipients: Collection[str],
+    cc_to_sender: bool = True
+) -> FsiRequest:
     """Recipients must be a list of emails"""
 
     if not recipients:
-        request.alert(_("There are no recipients matching the selection"))
-    else:
-        att = request.attendee
-        if cc_to_sender and att.id not in recipients:
-            recipients = list(recipients)
-            recipients.append(att.id)
+        request.alert(_('There are no recipients matching the selection'))
+        return request
 
-        mail_layout = CourseInviteMailLayout(course, request)
+    att = request.attendee
+    assert att is not None
+    if cc_to_sender and att.email not in recipients:
+        recipients = list(recipients)
+        recipients.append(att.email)
 
-        errors = []
+    mail_layout = CourseInviteMailLayout(course, request)
 
+    errors = []
+
+    def email_iter() -> Iterator[EmailJsonDict]:
         for email in recipients:
 
             attendee = request.session.query(
@@ -43,7 +59,7 @@ def handle_send_invitation_email(
                 if not user:
                     errors.append(email)
                     continue
-                attendee = user.attendee
+                attendee = user.attendee  # type:ignore[attr-defined]
                 if not attendee:
                     # This is a case that should not happen except in testing
                     errors.append(email)
@@ -55,27 +71,28 @@ def handle_send_invitation_email(
                 'notification': self.text_html,
                 'attendee': attendee,
             })
-            plaintext = html_to_text(content)
 
-            request.app.send_transactional_email(
+            yield request.app.prepare_email(
+                category='transactional',
                 receivers=(attendee.email,),
                 subject=self.subject,
                 content=content,
-                plaintext=plaintext,
             )
 
-        request.success(_(
-            "Successfully sent the e-mail to ${count} recipients",
-            mapping={
-                'count': len(recipients) - len(errors)
-            }
-        ))
+    request.app.send_transactional_email_batch(email_iter())
 
-        if errors:
-            request.warning(
-                _('Following emails were unknown: ${mail_list}',
-                  mapping={'mail_list': ', '.join(errors)})
-            )
+    request.success(_(
+        'Successfully sent the e-mail to ${count} recipients',
+        mapping={
+            'count': len(recipients) - len(errors)
+        }
+    ))
+
+    if errors:
+        request.warning(
+            _('Following emails were unknown: ${mail_list}',
+              mapping={'mail_list': ', '.join(errors)})
+        )
     return request
 
 
@@ -83,8 +100,12 @@ def handle_send_invitation_email(
     model=Course,
     template='mail_notification.pt',
     permission=Private,
-    name='embed')
-def view_email_preview_for_course(self, request):
+    name='embed'
+)
+def view_email_preview_for_course(
+    self: Course,
+    request: FsiRequest
+) -> RenderData:
 
     mail_layout = CourseInviteMailLayout(self, request)
 
@@ -103,9 +124,11 @@ def view_email_preview_for_course(self, request):
     template='courses.pt',
     permission=Personal
 )
-def view_course_collection(self, request):
+def view_course_collection(
+    self: CourseCollection,
+    request: FsiRequest
+) -> RenderData:
     layout = CourseCollectionLayout(self, request)
-    layout.include_accordion()
     return {
         'layout': layout,
         'model': self,
@@ -119,15 +142,20 @@ def view_course_collection(self, request):
     form=CourseForm,
     permission=Secret
 )
-def view_add_course_event(self, request, form):
-    layout = AddCourseLayout(self, request)
-    layout.include_editor()
+def view_add_course_event(
+    self: CourseCollection,
+    request: FsiRequest,
+    form: CourseForm
+) -> RenderData | Response:
 
     if form.submitted(request):
         course = self.add(**form.get_useful_data())
-        request.success(_("Added a new course"))
+        request.success(_('Added a new course'))
         return request.redirect(request.link(course))
 
+    layout = AddCourseLayout(self, request)
+    layout.include_editor()
+    layout.edit_mode = True
     return {
         'layout': layout,
         'model': self,
@@ -140,7 +168,7 @@ def view_add_course_event(self, request, form):
     template='course.pt',
     permission=Personal
 )
-def view_course_event(self, request):
+def view_course_event(self: Course, request: FsiRequest) -> RenderData:
     layout = CourseLayout(self, request)
     return {
         'layout': layout,
@@ -154,7 +182,7 @@ def view_course_event(self, request):
     permission=Personal,
     name='content-json'
 )
-def get_course_event_content(self, request):
+def get_course_event_content(self: Course, request: FsiRequest) -> str:
     return self.description_html
 
 
@@ -165,18 +193,23 @@ def get_course_event_content(self, request):
     form=CourseForm,
     permission=Secret
 )
-def view_edit_course_event(self, request, form):
-    layout = EditCourseLayout(self, request)
-    layout.include_editor()
+def view_edit_course_event(
+    self: Course,
+    request: FsiRequest,
+    form: CourseForm
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.update_model(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     if not form.errors:
         form.apply_model(self)
+
+    layout = EditCourseLayout(self, request)
+    layout.include_editor()
 
     return {
         'layout': layout,
@@ -193,8 +226,11 @@ def view_edit_course_event(self, request, form):
     name='invite',
     permission=Private
 )
-def invite_attendees_for_event(self, request, form):
-    layout = InviteCourseLayout(self, request)
+def invite_attendees_for_event(
+    self: Course,
+    request: FsiRequest,
+    form: InviteCourseForm
+) -> RenderData | Response:
 
     if form.submitted(request):
         recipients = form.get_useful_data()
@@ -207,6 +243,7 @@ def invite_attendees_for_event(self, request, form):
         )
         return request.redirect(request.link(self))
 
+    layout = InviteCourseLayout(self, request)
     return {
         'layout': layout,
         'model': self,
@@ -223,10 +260,10 @@ def invite_attendees_for_event(self, request, form):
     request_method='DELETE',
     permission=Secret
 )
-def delete_course(self, request):
+def delete_course(self: Course, request: FsiRequest) -> None:
     request.assert_valid_csrf_token()
-    if not self.events.first():
-        CourseEventCollection(request.session).delete(self)
+    if not request.session.query(self.events.exists()).scalar():
+        CourseCollection(request.session).delete(self)
         request.success(_('Course successfully deleted'))
     else:
         request.warning(_('This course has events and can not be deleted'))

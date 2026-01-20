@@ -7,7 +7,7 @@
             <div>
                 <dt i18n:translate>Text</dt>
                 <dd>
-                    ${structure:layout.model.formatted_text}
+                    ${layout.model.formatted_text}
                 </dd>
             </div>
         </dl>

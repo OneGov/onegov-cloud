@@ -11,28 +11,67 @@ var setupRedirectAfter = function(elements) {
     });
 };
 
+// qr code modals
+var addModalImage = function(parent, rawData, fmt) {
+    var src = 'data:image/' + fmt + ';base64,' + rawData;
+    parent.append($(`<img class="qr" src="${src}">`));
+};
+
+var addModalDownload = function(parent, rawData, fmt) {
+    var src = 'data:image/' + fmt + ';base64,' + rawData;
+    var title = window.document.title;
+    parent.append($(`<a class="button qr" download="qrcode_${title}.${fmt}" href="${src}">Download</a>`));
+};
 
 // sets up the given nodes with the functionality provided by common.js
 // this is done at document.ready and can be repeated for out of band content
 var processCommonNodes = function(elements, out_of_band) {
     var targets = $(elements);
 
-    // intercooler integration (only done for dynamic content, and if
-    // the nodes weren't already processed by intercooler)
-    if (out_of_band !== false) {
-        if (_.isUndefined(elements.data('ic-event-id'))) {
-            Intercooler.processNodes(targets);
-        }
-    }
-
     // intercooler redirects
     setupRedirectAfter(targets.find('a'));
+
+    // auto resize some iframes
+    targets.find('iframe.resizeable').on('load', function() {
+        this.height = this.contentWindow.document.body.scrollHeight + 'px';
+        this.width = this.contentWindow.document.body.scrollWidth + 'px';
+    });
+
+    // back links
+    targets.find('a[data-back-link], .button[data-back-link]').on('click', function() {
+        if (document.referrer) {
+            window.open(document.referrer, '_self');
+        } else {
+            history.go(-1);
+        }
+        return false;
+    });
+
+    // auto-submitting select dropdowns
+    targets.find('select[data-auto-submit]').on('change', function() {
+        this.form.submit();
+    });
+
+    // auto-redirecting select dropdowns
+    targets.find('select[data-auto-redirect]').on('change', function() {
+        window.location = this.value;
+    });
+
+    // submitting a targetted form based on the specified selector
+    targets.find('.button[data-submits-form]').on('click', function() {
+        $($(this).data('submits-form')).submit();
+    });
+
+    // open the browser's printing dialogue
+    targets.find('[data-print-current-page]').on('click', function() {
+        window.print();
+    });
 
     // Make sure files open in another window
     targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
 
     // generic toggle button
-    // targets.find('[data-toggle]').not('header *').toggleButton();
+    targets.find('[data-ogc-toggle]').toggleButton();
 
     // send an event to allow optional scripts to hook themselves up
     // (we only do out of band updates since it's not guaranteed that these
@@ -55,6 +94,61 @@ var processCommonNodes = function(elements, out_of_band) {
         }
 
         return false;
+    });
+
+    // QR-Code modal links
+    targets.find('.qr-code-link').each(function() {
+        var el = $(this);
+        var imageParentID = el.data('image-parent');
+        var imageParent = $(`#${imageParentID}`);
+        var payload = el.data('payload') || window.location.href;
+        var endpoint = el.data('endpoint');
+        var fmt = 'png';
+
+        el.on('click', function() {
+            if (imageParent.find('img.qr').length) {
+                return;
+            }
+            $.ajax({
+                type: "GET",
+                contentType: "image/" + fmt,
+                url: `${endpoint}?encoding=base64&image_fmt=${fmt}&border=2&box_size=8&payload=${payload}`,
+                statusCode: {
+                    // eslint-disable-next-line quote-props
+                    200: function(resp) {
+                        addModalImage(imageParent, resp, fmt);
+                        addModalDownload(imageParent, resp, fmt);
+                    }
+                }
+            }).fail(function(jqXHR) {
+                // eslint-disable-next-line no-console
+                console.error(jqXHR.statusMessage);
+            });
+        });
+    });
+
+    // Disable scroll on elements which wish it disabled
+    targets.find('.disable-scroll').on('mouseover', function() {
+        var el = $(this);
+        var height = el.height();
+        var scrollHeight = el.get(0).scrollHeight;
+
+        $(this).on('mousewheel', function(event) {
+            var block = this.scrollTop === scrollHeight - height && event.deltaY < 0 || this.scrollTop === 0 && event.deltaY > 0;
+            return !block;
+        });
+    });
+
+    targets.find('.disable-scroll').on('mouseout', function() {
+        $(this).off('mousewheel');
+    });
+
+    // Toggle the selected state in image selection views when clicking the checkbox
+    targets.find('.image-select input[type="checkbox"]').on('click', function(e) {
+        var target = $(e.target);
+        var checked = target.is(':checked');
+
+        target.closest('.image-container').toggleClass('selected', checked);
     });
 };
 
@@ -94,14 +188,20 @@ var tagselectors = [
     '.directory-fields .field-display dd',
     '.message .text'
 ];
-var tagexpr = new RegExp('(#[0-9a-zA-Zöäüéèà]{3,})', 'gi');
+
+// To avoid matching URLs, we need to make sure that the hashtag is not
+// preceded by a letter, number or /. This is done by including the character
+// before the hashtag. The character is then added back in the replacement.
+var tagexpr = new RegExp('(^|[^a-zA-Z0-9/])(#[0-9a-zA-Zöäüéèà]{3,})', 'gi');
 
 var highlightTags = function(target) {
     $(target).find(tagselectors.join(',')).each(function() {
-        this.innerHTML = this.innerHTML.replace(
-            tagexpr, function(match) {
-                return '<a class="hashtag" href="/search?q=' + encodeURIComponent(match) + '">' + match + '</a>';
-            });
+        this.innerHTML = this.innerHTML.replace(tagexpr, function(_fullMatch, beforeChar, hashtag) {
+            // `beforeChar` captures the character before the hashtag
+            // `hashtag` captures the hashtag itself
+
+            return beforeChar + '<a class="hashtag" href="/search?q=' + encodeURIComponent(hashtag) + '">' + hashtag + '</a>';
+        });
     });
 };
 
@@ -109,30 +209,6 @@ highlightTags('#content');
 
 $(document).on('process-common-nodes', function(_e, elements) {
     highlightTags(elements);
-});
-
-// Disable scroll on elements which wish it disabled
-$('.disable-scroll').on('mouseover', function() {
-    var el = $(this);
-    var height = el.height();
-    var scrollHeight = el.get(0).scrollHeight;
-
-    $(this).on('mousewheel', function(event) {
-        var block = this.scrollTop === scrollHeight - height && event.deltaY < 0 || this.scrollTop === 0 && event.deltaY > 0;
-        return !block;
-    });
-});
-
-$('.disable-scroll').on('mouseout', function() {
-    $(this).off('mousewheel');
-});
-
-// Toggle the selected state in image selection views when clicking the checkbox
-$('.image-select input[type="checkbox"]').on('click', function(e) {
-    var target = $(e.target);
-    var checked = target.is(':checked');
-
-    target.closest('.image-container').toggleClass('selected', checked);
 });
 
 // A generic error messages handler
@@ -143,7 +219,7 @@ function showAlertMessage(message, type, target) {
     var alert = $('<div />')
         .attr('data-closable', '')
         .attr('class', 'alert-box callout ' + (type || 'alert'))
-        .text(message)
+        .text(message);
     $(target || '#alert-boxes').append(alert);
 }
 
@@ -176,7 +252,6 @@ $(document).ajaxError(function(_e, xhr, _settings, error) {
         showAlertMessage(error || xhr.statusText);
     }
 });
-
 
 // support some extraordinary styling
 $(document).ready(function() {
@@ -219,79 +294,169 @@ $(document).ready(function() {
     });
 });
 
-
-function autoResize() {
-    var newheight;
-    var newwidth;
-    var frame;
-
-    for (frame of document.getElementsByClassName('resizeable')) {
-        newheight = frame.contentWindow.document.body.scrollHeight;
-        newwidth = frame.contentWindow.document.body.scrollWidth;
-        frame.height = (newheight) + "px";
-        frame.width = (newwidth) + "px";
-    }
-
-}
-
 // Customize the sidebar. We need click events to browse to links with children
 $(document).ready(function() {
     $('[data-click-target]').each(function() {
         var el = $(this);
-        el.on('click', function () {
-            var parent = el.parent()
-            parent.off('click')
-            window.location = el.data('click-target')
-        })
+        el.on('click', function() {
+            var parent = el.parent();
+            parent.off('click');
+            window.location = el.data('click-target');
+        });
     });
 });
-
-// qr code modals
-function addModalImage(parent, rawData, fmt) {
-    var src = 'data:image/' + fmt +';base64,' + rawData;
-    parent.append($(`<img class="qr" src="${src}">`));
-}
-
-function addModalDownload(parent, rawData, fmt) {
-    var src = 'data:image/' + fmt +';base64,' + rawData;
-    var title = window.document.title;
-    parent.append($(`<a class="button qr" download="qrcode_${title}.${fmt}" href="${src}">Download</a>`));
-}
-
-$('.qr-code-link').each(function () {
-    var el = $(this);
-    var imageParentID = el.data('image-parent');
-    var imageParent = $(`#${imageParentID}`);
-    var payload = el.data('payload') || window.location.href;
-    var endpoint = el.data('endpoint');
-    var fmt = 'png';
-
-    el.on('click', function () {
-        if (imageParent.find('img.qr').length) return
-        $.ajax({
-            type: "GET",
-            contentType: "image/" + fmt,
-            url: `${endpoint}?encoding=base64&image_fmt=${fmt}&border=2&box_size=8&payload=${payload}`,
-            statusCode : {
-                200: function (resp) {
-                    addModalImage(imageParent, resp, fmt);
-                    addModalDownload(imageParent, resp, fmt);
-                }
-            }
-        }).fail(function(jqXHR) {
-            console.log(jqXHR.statusMessage);
-        })
-    })
-})
 
 var page_refs = new ClipboardJS('.pageref');
 page_refs.on('success', function(e) {
     // var success_msg = e.trigger.getAttribute('data-on-success');
-    var msgContainer = $('#clipboard-copy')
+    var msgContainer = $('#clipboard-copy');
     msgContainer.toggleClass('hidden');
     setTimeout(
-        function () { msgContainer.toggleClass('hidden'); },
+        function() { msgContainer.toggleClass('hidden'); },
         1500
-    )
+    );
     e.clearSelection();
+});
+
+// Allow custom reveal widths
+$('.reveal[data-reveal-width]').on('open.zf.reveal', function() {
+    this.style.width = this.dataset.revealWidth;
+});
+
+// Page edit form style adjustments
+[...document.getElementsByClassName('indent-form-field')].forEach((formField) => {
+    if (formField instanceof HTMLInputElement && formField.type === 'text') {
+        formField.style.width = '90%';
+    }
+    var divWrapper = formField.parentElement.parentElement;
+    divWrapper.style.marginLeft = '1.55rem';
+});
+
+// Height of header images
+var w = window.matchMedia("(max-width: 700px)");
+var header_height = $('#header').height();
+
+if ($('.header-image .page-image').length) {
+    var page_image = $('.header-image .page-image');
+    var new_height;
+    if (w.matches) {
+        new_height = '60vw';
+    } else {
+        new_height = 'calc(80vh - ' + header_height + 'px)';
+    }
+    page_image.css('padding-bottom', new_height);
+}
+
+// if there are headings in the content and if there is a .sidebar-wrapper, add a div with the class "side-panel" to the sidebar and add the headings to it
+var level = $('.side-panel.content-panel').data('toc-level');
+
+if (level !== 'none' && $('.sidebar-wrapper').length) {
+    // Create heading selector based on level
+    var headingSelector;
+    switch (level) {
+        case 'h5':
+            headingSelector = 'h1, h2, h3, h4, h5';
+            break;
+        case 'h4':
+            headingSelector = 'h1, h2, h3, h4';
+            break;
+        case 'h3':
+            headingSelector = 'h1, h2, h3';
+            break;
+        case 'h2':
+            headingSelector = 'h1, h2';
+            break;
+        default:
+            headingSelector = 'h1, h2, h3, h4, h5'; // fallback
+    }
+
+    var mainContent = $('.main-content').length ? $('.main-content') : $('.page-content-main');
+    var headings = mainContent.find(headingSelector);
+
+    if (headings.length > 2) {
+        var sidePanel = $('.side-panel.content-panel');
+        var list = $('<ul class="more-list"></ul>');
+
+        headings.each(function() {
+            if (this.textContent === '') {
+                return; // skip empty headings
+            }
+            var id = this.textContent;
+            id = id.trim().toLowerCase();
+            // replace ä, ö, ü with ae, oe, ue
+            id = id.replace(/ä/g, 'ae');
+            id = id.replace(/ö/g, 'oe');
+            id = id.replace(/ü/g, 'ue');
+            id = id.replace(/[^a-z0-9]+/g, '-');
+
+            if (id) {
+                var link = $('<a class="anchor-link" href="#' + id + '"><i class="fa fa-link"></i></a>');
+                $(this).append(link);
+                var anchor = $('<a class="category-anchor"></a>');
+                anchor.attr('id', id);
+                $(this).prepend(anchor);
+                $(this).addClass('anchor-link-heading');
+                var headingLevel = parseInt(this.tagName.charAt(1), 10);
+                var listItem = $('<li><a class="list-link level-' + headingLevel + '" href="#' + id + '">' + this.textContent + '</a></li>');
+                list.append(listItem);
+            }
+        });
+        sidePanel.append(list);
+        sidePanel.show();
+    }
+}
+
+$('.is-accordion-submenu-parent a span').on('click', function(e) {
+    e.stopPropagation();
+});
+
+$('.main-content table, .page-content-main table').each(function() {
+    if ($(this).width() > $('.main-content').width() || $(this).width() > $('.page-content-main').width()) {
+        const $table = $(this);
+        const $container = $('<div class="table-container"></div>');
+        const $gradient = $('<div class="scroll-gradient"></div>');
+
+        $table.wrap($container);
+        $table.addClass('scroll');
+        $table.parent().append($gradient);
+    }
+});
+
+function setupScrollGradient() {
+    $('.scroll').each(function() {
+        const $table = $(this);
+        const $gradient = $table.siblings('.scroll-gradient');
+
+        if ($gradient.length === 0) {
+            return;
+        }
+
+        function updateGradient() {
+            const scrollWidth = $table[0].scrollWidth;
+            const clientWidth = $table[0].clientWidth;
+            const scrollLeft = $table[0].scrollLeft;
+
+            const hasMoreContent = scrollLeft + clientWidth < scrollWidth - 5; // 5px tolerance
+
+            if (hasMoreContent) {
+                $gradient.addClass('show');
+            } else {
+                $gradient.removeClass('show');
+            }
+        }
+
+        updateGradient();
+        $table.on('scroll', updateGradient);
+        $(window).on('resize', updateGradient);
+    });
+}
+
+setupScrollGradient();
+
+// Add a 'framed' class to the body if a document is shown inside an iframe
+$('body').each(function() {
+    var params = new URLSearchParams(window.location.search);
+    if (window !== window.parent || params.get('framed') === 'true') {
+        this.className += " framed";
+    }
 });

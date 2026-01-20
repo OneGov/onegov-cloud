@@ -3,23 +3,22 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-    <div class="row">
-        <div class="columns small-12 medium-8">
+    <div class="grid-x grid-padding-x">
+        <div class="cell small-12 medium-8">
             <tal:b condition="not: invoices">
                 <p i18n:translate>
                 No bills created yet.
                 </p>
             </tal:b>
+            <div class="show-for-small-only">
+                <tal:b define="banner layout.app.banners(request)[0]" condition="banner">
+                    <tal:b metal:use-macro="layout.macros['banner']" define="position 'rechnungen'"/>
+                </tal:b>
+            </div>
 
-            <tal:b
-                    define="banner layout.app.banner(request, 'invoices')"
-                    condition="banner"
-                    replace="structure banner"
-                />
-
-            <div class="bills" tal:condition="invoices">
-                <div class="bill ${invoice.paid and 'paid' or 'unpaid'}" id="${invoice.id}" tal:repeat="invoice invoices">
-                    <div class="bills-header show-for-print">
+            <div class="bills limit-line-width" tal:condition="invoices">
+                <div class="bill item-wrapper ${invoice.paid and 'item-green' or 'item-red'}" id="${invoice.id}" tal:repeat="invoice invoices">
+                    <div class="bill-header show-for-print">
                         <div class="bill-creditor"
                              tal:define="contact layout.org.meta.contact_html|nothing; contact_url None"
                              condition="contact">
@@ -45,99 +44,115 @@
                             <br tal:condition="user.data.get('zip_code') or user.data.get('place')">
                         </div>
                     </div>
+                    <div class="item-header">
+                        <div class="item-header-bar">
+                            <h3>${invoice.period.title}</h3>
 
-                    <h3>${invoice.period.title}</h3>
-
-                    <strong class="outstanding">
-                        <tal:b condition="invoice.paid" i18n:translate>Paid</tal:b>
-                        <tal:b condition="not: invoice.paid" i18n:translate>
-                            <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(invoice.outstanding_amount)" /> unpaid
-                        </tal:b>
-                    </strong>
-
-                    <button id="button-${invoice.id}" data-toggle="#details-${invoice.id}" class="${invoice.paid and 'untoggled' or 'toggled'} hide-for-print">
-                        <span i18n:translate class="show-for-sr">Show Details</span>
-                        <i class="fa fa-angle-double-down" aria-hidden="true"></i>
-                    </button>
-
-                    <div id="details-${invoice.id}" class="invoice-items-list" style="${invoice.paid and 'display: none;' or ''}">
-                        <ul>
-                            <tal:b repeat="item invoice.items">
-                                <li class="item-group" tal:condition="repeat.item.index == 0 or invoice.items[repeat.item.index - 1].group != item.group">
-                                    <tal:b switch="item.group">
-                                        <strong tal:case="'donation'">
-                                            <tal:b i18n:translate>Donation</tal:b>
-                                            <span class="svg-icon svg-icon-small">
-                                                <metal:b use-macro="layout.svg['heart']" />
-                                            </span>
-                                        </strong>
-                                        <strong tal:case="'manual'" i18n:translate>Discounts / Surcharges</strong>
-                                        <strong tal:case="default">${item.group}</strong>
-                                    </tal:b>
-                                </li>
-                                <li class="${(invoice.paid or item.paid) and 'paid' or 'unpaid'} ${item.source and item.source or ''}">
-                                    <span class="item-text">
-                                        <tal:b switch="item.group">
-                                            <tal:b case="'donation'">
-                                                <tal:b i18n:translate>
-                                                    Your donation
-                                                </tal:b>
-                                            </tal:b>
-                                            <tal:b case='default'>
-                                                ${item.text}
-                                            </tal:b>
-                                        </tal:b>
-                                    </span>
-                                    <span class="item-amount" tal:content="'{:.2f}'.format(item.amount)"></span>
-                                    <div class="text-links" style="font-size: .875rem" tal:condition="not item.paid and item.group=='donation'">
-                                        <a href="${request.link(layout.model.for_period_id(invoice.period_id), name='donation')}" i18n:translate>
-                                            Adjust
-                                        </a>
-                                        <a class="confirm"
-                                            data-confirm="Do you really want to remove your donation?"
-                                            data-confirm-extra=""
-                                            data-confirm-yes="Remove donation"
-                                            data-confirm-no="Cancel"
-                                            ic-delete-from="${layout.csrf_protected_url(request.link(layout.model.for_period_id(invoice.period_id), name='donation'))}"
-                                            redirect-after="${request.url}"
-                                            i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
-                                            i18n:translate>
-                                            Remove
-                                        </a>
-                                    </div>
-                                </li>
-                            </tal:b>
-                            <tal:b condition="layout.org.meta.get('donation', True) and invoice.period.active and invoice.period.confirmed and not invoice.period.archived and not invoice.has_donation">
-                                <li class="item-group hide-for-print">
-                                    <strong i18n:translate>Donation</strong>
-                                </li>
-                                <li class="row hide-for-print">
-                                    <div class="small-8 columns">
-                                        <span class="item-text" i18n:translate>I would like to make a donation to support children and teenagers.</span>
-                                    </div>
-                                    <div class="small-4 columns">
-                                        <a class="donation-button" href="${request.link(layout.model.for_period_id(invoice.period_id), name='donation')}">
-                                            <span i18n:translate>Donate now</span>
-                                        </a>
-                                    </div>
-                                </li>
-                            </tal:b>
-                            <li class="item-total ${invoice.paid and 'paid' or 'unpaid'}">
-                                <span class="item-text"><strong i18n:translate="">Total</strong><span>
-                                <strong class="item-amount" tal:content="'{:.2f}'.format(invoice.total_amount)"></strong>
-                            </li>
-                        </ul>
-                        <div class="print-area">
-                            <a class="print button secondary small round" href="#" data-print-selector="#${invoice.id}">
-                                <i class="fa fa-print" aria-hidden="true"></i>
-                                <tal:b i18n:translate>Print</tal:b>
-                            </a>
+                            <span class="outstanding">
+                                <tal:b condition="invoice.paid" i18n:translate>Paid</tal:b>
+                                <tal:b condition="not: invoice.paid" i18n:translate>
+                                    <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(invoice.outstanding_amount)" /> unpaid
+                                </tal:b>
+                            </span>
                         </div>
-                    </div>
 
-                    <div class="invoice-items-payment hide-for-print" tal:condition="payment_provider and not invoice.paid">
-                        <div class="row">
-                            <div class="columns small-12">
+                        <a id="button-${invoice.id}" data-ogc-toggle="#details-${invoice.id}" class="hide-for-print details-button">
+                            <span i18n:translate class="show-for-sr">Show Details</span>
+                            <i class="fa fa-chevron-down rotate ${'' if invoice.paid else 'down'}" aria-hidden="true"></i>
+                        </a>
+
+                    </div>
+                    <div id="details-${invoice.id}" class="${'hidden' if invoice.paid else ''}">
+                        <div class="invoice-items-list">
+                            <ul>
+                                <tal:b repeat="item invoice.items">
+                                    <li class="item-group" tal:condition="repeat.item.index == 0 or invoice.items[repeat.item.index - 1].group != item.group">
+                                        <tal:b switch="item.group">
+                                            <strong tal:case="'donation'">
+                                                <tal:b i18n:translate>Donation</tal:b>
+                                                <span class="svg-icon svg-icon-small">
+                                                    <metal:b use-macro="layout.svg['heart']" />
+                                                </span>
+                                            </strong>
+                                            <strong tal:case="'manual'" i18n:translate>Discounts / Surcharges</strong>
+                                            <strong tal:case="default">${item.group}</strong>
+                                        </tal:b>
+                                    </li>
+                                    <li class="${(invoice.paid or item.paid) and 'item-green' or 'item-red'} ${item.source and item.source or ''}">
+                                        <div class="text-amount">
+                                            <span class="item-text">
+                                                <tal:b switch="item.group">
+                                                    <tal:b case="'donation'">
+                                                        <tal:b i18n:translate>
+                                                            Your donation
+                                                        </tal:b>
+                                                    </tal:b>
+                                                    <tal:b case='default'>
+                                                        ${item.text}<br>
+                                                    </tal:b>
+                                                </tal:b>
+                                            </span>
+                                            <span tal:condition="invoice.paid or item.paid" class="item-payment-status" i18n:translate>paid</span>
+                                            <span tal:condition="not invoice.paid and not item.paid" class="item-payment-status" i18n:translate>amount unpaid</span>
+                                            <span class="item-amount" tal:content="'{:.2f}'.format(item.amount)"></span>
+                                        </div>
+                                            <span class="item-organizer" tal:condition="item.organizer">
+                                                <tal:b i18n:translate>Organizer:</tal:b> ${item.organizer}
+                                            </span>
+                                            <div class="text-links" style="font-size: .875rem" tal:condition="not item.paid and item.group=='donation'">
+                                                <a href="${request.link(layout.model.for_period_id(invoice.period_id), name='donation')}" i18n:translate>
+                                                    Adjust
+                                                </a>
+                                                <a class="confirm"
+                                                    data-confirm="Do you really want to remove your donation?"
+                                                    data-confirm-extra=""
+                                                    data-confirm-yes="Remove donation"
+                                                    data-confirm-no="Cancel"
+                                                    ic-delete-from="${layout.csrf_protected_url(request.link(layout.model.for_period_id(invoice.period_id), name='donation'))}"
+                                                    redirect-after="${request.url}"
+                                                    i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
+                                                    i18n:translate>
+                                                    Remove
+                                                </a>
+                                            </div>
+                                    </li>
+                                </tal:b>
+                                <tal:b condition="layout.org.meta.get('donation', True) and invoice.period.active and invoice.period.confirmed and not invoice.period.archived and not invoice.has_donation">
+                                    <li class="item-group hide-for-print">
+                                        <strong i18n:translate>Donation</strong>
+                                    </li>
+                                    <li class="grid-x hide-for-print">
+                                        <div class="small-8 cell">
+                                            <span class="item-text" i18n:translate>I would like to make a donation to support children and teenagers.</span>
+                                        </div>
+                                        <div class="small-4 cell donate">
+                                            <a class="donation-button button hollow narrow" href="${request.link(layout.model.for_period_id(invoice.period_id), name='donation')}">
+                                                <span i18n:translate>Donate now</span>
+                                            </a>
+                                        </div>
+                                    </li>
+                                </tal:b>
+                                <li class="invoice-total">
+                                <strong>
+                                    <span class="item-text" i18n:translate="">Total</span>
+                                    <span class="item-amount" tal:content="'{:.2f}'.format(invoice.total_amount)"></span>
+                                </strong>
+                                </li>
+                                <li class="amount-total ${invoice.paid and 'item-green' or 'item-red'}" tal:condition="not invoice.paid">
+                                    <span class="item-payment-status item-amount">${'{:.2f}'.format(invoice.outstanding_amount)}</span>
+                                    <span class="item-payment-status item-amount" i18n:translate>amount unpaid</span>
+                                </li>
+                            </ul>
+                            <div class="print-area">
+                                <a class="print button secondary small round" href="#" data-print-selector="#${invoice.id}">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                    <tal:b i18n:translate>Print</tal:b>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="invoice-items-payment">
+                            <div class="hide-for-print" tal:condition="payment_provider and not invoice.paid">
                                 <h4 i18n:translate>Online Payment</h4>
 
                                 <div class="payment-button">
@@ -154,56 +169,67 @@
                                     </tal:b>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="invoice-items-payment" tal:condition="account and not invoice.paid">
-                        <div class="row">
-                            <div class="columns small-12">
+                            <div tal:condition="account and not invoice.paid">
+
                                 <h4 i18n:translate>Bank Transfer</h4>
-                                <ul>
-                                    <li>
-                                        <span i18n:translate>Account</span>
-                                        <span>${account}</span>
-                                    </li>
-                                    <li>
-                                        <span i18n:translate>Beneficiary</span>
-                                        <span>${beneficiary}</span>
-                                    </li>
-                                    <li>
-                                        <span i18n:translate>Amount</span>
-                                        <span>${'{:.2f}'.format(invoice.outstanding_amount)} CHF</span>
-                                    </li>
+                                <div class="grid-x bank-transfer">
+                                    <div class="cell small-12 medium-4" i18n:translate>
+                                        Account
+                                    </div>
+                                    <div class="cell small-12 medium-8" i18n:translate>
+                                        ${account}
+                                    </div>
+                                    <div class="cell small-12 medium-4" i18n:translate>
+                                        Beneficiary
+                                    </div>
+                                    <div class="cell small-12 medium-8" i18n:translate>
+                                        ${beneficiary}
+                                    </div>
+                                    <div class="cell small-12 medium-4" i18n:translate>
+                                        Amount
+                                    </div>
+                                    <div class="cell small-12 medium-8">
+                                        ${'{:.2f}'.format(invoice.outstanding_amount)} CHF
+                                    </div>
                                     <tal:b switch="layout.org.meta.get('bank_reference_schema')">
-                                        <li tal:case="string:esr-v1">
-                                            <span i18n:translate>Reference Number</span>
-                                            <span class="reference-number">${invoice.readable_by_bucket(invoice_bucket)}</span>
-                                        </li>
-                                        <li tal:case="string:raiffeisen-v1">
-                                            <span i18n:translate>Reference Number</span>
-                                            <span class="reference-number">${invoice.readable_by_bucket(invoice_bucket)}</span>
-                                        </li>
-                                        <li tal:case="default">
-                                            <span i18n:translate>Purpose of Payment</span>
-                                            <span class="reference-number">${invoice.readable_by_bucket(invoice_bucket)}</span>
-                                        </li>
+                                        <tal:b tal:case="string:esr-v1">
+                                            <div class="cell small-12 medium-4" i18n:translate>Reference Number</div>
+                                            <div class="reference-number cell small-12 medium-8">${invoice.readable_by_bucket(invoice_bucket)}</div>
+                                        </tal:b>
+                                        <tal:b tal:case="string:raiffeisen-v1">
+                                            <div class="cell small-12 medium-4" i18n:translate>Reference Number</div>
+                                            <div class="reference-number cell small-12 medium-8">${invoice.readable_by_bucket(invoice_bucket)}</div>
+                                        </tal:b>
+                                        <tal:b tal:case="default">
+                                            <div class="cell small-12 medium-4" i18n:translate>Purpose of Payment</div>
+                                            <div class="reference-number cell small-12 medium-8">${invoice.readable_by_bucket(invoice_bucket)}</div>
+                                        </tal:b>
                                     </tal:b>
-                                </ul>
+                                </div>
                                 <tal:b tal:condition="qr_bill">
                                     <tal:b tal:define="bill qr_bill(invoice)">
                                         <img class="qr-bill" tal:condition="bill" src="data:image/svg+xml;base64,${bill}">
                                     </tal:b>
                                 </tal:b>
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="columns small-12 medium-4 hide-for-print">
-            <tal:b metal:use-macro="layout.macros.users" define="model model.for_period_id(period_id=None)"/>
-            <tal:b metal:use-macro="layout.macros.user_panel" />
+        <div class="cell small-12 medium-4 hide-for-print sidebar">
+            <div class="sidebar-wrapper">
+                <div class="side-panel show-for-medium">
+                    <tal:b define="banner layout.app.banners(request)[0]" condition="banner">
+                        <tal:b metal:use-macro="layout.macros['banner']" define="position 'rechnungen'"/>
+                    </tal:b>
+                </div>
+                <tal:b metal:use-macro="layout.macros.users" define="model model.for_period_id(period_id=None)"/>
+                <tal:b metal:use-macro="layout.macros.user_panel" />
+            </div>
         </div>
 
     </div>

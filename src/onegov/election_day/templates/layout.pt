@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html class="no-js" lang="${request.html_lang}"
-xmlns="http://www.w3.org/1999/xhtml"
-xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-xmlns:metal="http://xml.zope.org/namespaces/metal"
-xmlns:tal="http://xml.zope.org/namespaces/tal"
-i18n:domain="onegov.election_day"
-metal:define-macro="layout">
+<html
+    class="no-js"
+    lang="${request.html_lang}"
+    tal:attributes="layout.custom_html_attributes|{}"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    i18n:domain="onegov.election_day"
+    metal:define-macro="layout">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         <tal:block metal:define-slot="title">
             <tal:block content="layout.principal.name" />:
@@ -27,17 +30,10 @@ metal:define-macro="layout">
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
     <style tal:condition="request.app.principal.custom_css">${request.app.principal.custom_css}</style>
-    <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/5.6.2/bundle.min.js" crossorigin="anonymous"></script>
-    <script tal:condition="layout.app.sentry_dsn">
-        Sentry.init({
-            dsn: '${layout.app.sentry_dsn}',
-            release: '${layout.app.sentry_version}',
-            environment: '${layout.app.sentry_environment}',
-        });
-    </script>
-    <script metal:use-macro="layout.macros['tablesaw_translations']" />
+    <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/7.54.0/bundle.min.js" integrity="sha384-EmlJLN9Q0yu0/2UUCIYnEM88jpQ7xUhtNI2ZeXb/ci3cwoAoIQl350N4PQPlMbP5" crossorigin="anonymous"></script>
+    <script tal:condition="layout.app.sentry_dsn" src="${layout.sentry_init_path}"></script>
 </head>
-<body>
+<body tal:attributes="layout.custom_body_attributes|{}">
     <div class="row accessibility-links">
         <a accesskey="0" class="show-only-on-tab" href="${layout.homepage_link}" i18n:translate="">Homepage</a>
         <a accesskey="1" class="show-only-on-tab" href="#content" i18n:translate="">Content</a>
@@ -50,7 +46,7 @@ metal:define-macro="layout">
             </div>
             <div class="small-12 medium-8 medium-pull-4 small-only-text-center columns">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
-                    <img aria-hidden="true" alt="${layout.logo_alt_text}" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                    <img aria-hidden="true" alt="${layout.logo_alt_text}" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" >
                 </a>
             </div>
         </tal:block>
@@ -60,7 +56,7 @@ metal:define-macro="layout">
             </div>
             <div class="small-12 columns text-right">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
-                    <img aria-hidden="true" alt="${layout.logo_alt_text}" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                    <img aria-hidden="true" alt="${layout.logo_alt_text}" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing">
                 </a>
             </div>
         </tal:block>
@@ -78,7 +74,7 @@ metal:define-macro="layout">
         <div class="row">
           <div class="small-12 columns" id="alert-boxes">
             <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
-              <tal:block tal:content="structure message.text" />
+              <tal:block tal:content="message.text" />
               <a href="#" class="close">&times;</a>
             </div>
           </div>
@@ -100,7 +96,7 @@ metal:define-macro="layout">
                 <h3 class="visually-hidden" i18n:translate>
                     Language
                 </h3>
-                <ul class="locales">
+                <ul class="locales horizontal">
                     <li tal:repeat="(name, url) layout.locales">
                         <a tal:condition="request.locale not in url" href="${url}">${name}</a>
                         <strong tal:condition="request.locale in url">${name}</strong>
@@ -108,12 +104,29 @@ metal:define-macro="layout">
                 </ul>
             </div>
             <div class="small-12 medium-4 medium-pull-4 columns small-only-text-center">
-            <p>
-                <span >&copy; ${layout.copyright_year} ${layout.principal.name}</span><br>
-                <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a><br>
-                <a class="open-data-link" href="${layout.opendata_link}" i18n:translate>Open Data</a> |
-                <a class="sitemap-link" href="${request.link(layout.principal, 'sitemap')}" i18n:translate>Sitemap</a>
-            </p>
+                <ul class="additional-links">
+                    <li>&copy; ${layout.copyright_year} ${layout.principal.name}</li>
+                    <li>
+                        <ul class="horizontal">
+                            <li>
+                                <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <ul class="horizontal">
+                            <li>
+                                <a class="open-data-link" href="${layout.opendata_link}" i18n:translate>Open Data</a>
+                            </li>
+                            <li>
+                                <a class="sitemap-link" href="${request.link(layout.principal, 'sitemap')}" i18n:translate>Sitemap</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
             <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
                 <p tal:condition="layout.login_link"><a href="${layout.login_link}" i18n:translate>Login</a></p>
@@ -132,6 +145,6 @@ metal:define-macro="layout">
             <div class="small-12 columns">&copy; ${layout.copyright_year} ${layout.principal.name}</div>
         </div>
     </footer>
-    <tal:block tal:content="structure layout.principal.analytics|nothing" />
+    <tal:block tal:content="layout.principal.analytics|nothing" />
 </body>
 </html>

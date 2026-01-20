@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
@@ -9,16 +11,28 @@ from onegov.org.layout import TextModuleLayout
 from onegov.org.layout import TextModulesLayout
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.org.request import OrgRequest
+    from webob import Response
+
+
 @OrgApp.html(
     model=TextModuleCollection,
     template='text_modules.pt',
     permission=Private
 )
-def view_text_modules(self, request, layout=None):
+def view_text_modules(
+    self: TextModuleCollection,
+    request: OrgRequest,
+    layout: TextModulesLayout | None = None
+) -> RenderData:
+
     layout = layout or TextModulesLayout(self, request)
 
     return {
-        'title': _("Text modules"),
+        'title': _('Text modules'),
         'layout': layout,
         'text_modules': self.query().all(),
     }
@@ -31,7 +45,13 @@ def view_text_modules(self, request, layout=None):
     template='form.pt',
     form=TextModuleForm
 )
-def add_text_module(self, request, form, layout=None):
+def add_text_module(
+    self: TextModuleCollection,
+    request: OrgRequest,
+    form: TextModuleForm,
+    layout: TextModulesLayout | None = None
+) -> RenderData | Response:
+
     if form.submitted(request):
         text_module = self.add(
             name=form.name.data,
@@ -43,6 +63,7 @@ def add_text_module(self, request, form, layout=None):
 
     layout = layout or TextModulesLayout(self, request)
     layout.breadcrumbs.append(Link(_('New text module'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -56,7 +77,12 @@ def add_text_module(self, request, form, layout=None):
     template='text_module.pt',
     permission=Private
 )
-def view_text_module(self, request, layout=None):
+def view_text_module(
+    self: TextModule,
+    request: OrgRequest,
+    layout: TextModuleLayout | None = None
+) -> RenderData:
+
     layout = layout or TextModuleLayout(self, request)
 
     return {
@@ -72,7 +98,13 @@ def view_text_module(self, request, layout=None):
     template='form.pt',
     form=TextModuleForm
 )
-def edit_text_module(self, request, form, layout=None):
+def edit_text_module(
+    self: TextModule,
+    request: OrgRequest,
+    form: TextModuleForm,
+    layout: TextModuleLayout | None = None
+) -> RenderData | Response:
+
     if form.submitted(request):
         form.populate_obj(self)
         request.success(_('Your changes were saved'))
@@ -83,6 +115,7 @@ def edit_text_module(self, request, form, layout=None):
 
     layout = layout or TextModuleLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit text module'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -96,8 +129,8 @@ def edit_text_module(self, request, form, layout=None):
     permission=Private,
     request_method='DELETE'
 )
-def delete_text_module(self, request):
+def delete_text_module(self: TextModule, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
 
     request.session.delete(self)
-    request.success(_("The text module was deleted"))
+    request.success(_('The text module was deleted'))

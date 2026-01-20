@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 from onegov.election_day.models import Subscriber
@@ -7,7 +9,12 @@ from tests.shared import Client
 from webtest.forms import Upload
 
 
-def test_view_email_subscription(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_view_email_subscription(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -59,15 +66,15 @@ def test_view_email_subscription(election_day_app_zg):
     # Check in backend
     manage = Client(election_day_app_zg)
     login(manage)
-    manage = manage.get('/manage/subscribers/email')
-    assert 'howard@example.com' in manage
-    assert 'fr_CH' in manage
-    assert '✔︎' in manage
+    subscribers = manage.get('/manage/subscribers/email')
+    assert 'howard@example.com' in subscribers
+    assert 'fr_CH' in subscribers
+    assert '✔︎' in subscribers
 
     # Unsubscribe using the list-unsubscribe
     Client(election_day_app_zg).post(optout)
-    assert election_day_app_zg.session().query(Subscriber).one().active \
-        is False
+    assert election_day_app_zg.session().query(
+        Subscriber).one().active is False
 
     # Opt-in again
     client.get('/locale/de_CH').follow()
@@ -107,8 +114,39 @@ def test_view_email_subscription(election_day_app_zg):
     unsubscribe = client.get(optout)
     assert "Die E-Mail-Benachrichtigung wurde beendet." in unsubscribe
 
+    # Subscribe and un-subscribe with specific domain
+    principal = election_day_app_zg.principal
+    principal.segmented_notifications = True
+    election_day_app_zg.cache.set('principal', principal)
 
-def test_view_manage_email_subscription(election_day_app_zg):
+    # NOTE: this section may depend on static data for principle.entities.
+    # See src/onegov/election_day/static/municipalities/<year>/*.json
+    subscribe = client.get('/subscribe-email')
+    subscribe.form['email'] = 'howard@example.com'
+    subscribe.form['domain'].select('municipality')
+    subscribe.form['domain_segment'].select('Zug')
+    subscribe = subscribe.form.submit()
+    assert "Sie erhalten in Kürze eine E-Mail" in subscribe
+
+    message = client.get_email(0, flush_queue=True)
+    optin = get_email_link(message, 'optin')
+    subscribe = client.get(optin)
+    assert "E-Mail-Benachrichtigung wurde abonniert" in subscribe
+
+    unsubscribe = client.get('/unsubscribe-email')
+    unsubscribe.form['email'] = 'howard@example.com'
+    unsubscribe.form['domain'].select('municipality')
+    unsubscribe.form['domain_segment'].select('Zug')
+    unsubscribe = unsubscribe.form.submit()
+    assert "Sie erhalten in Kürze eine E-Mail" in unsubscribe
+
+    message = client.get_email(0, flush_queue=True)
+    optout = get_email_link(message, 'optout')
+    unsubscribe = client.get(optout)
+    assert "Die E-Mail-Benachrichtigung wurde beendet." in unsubscribe
+
+
+def test_view_manage_email_subscription(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -119,8 +157,8 @@ def test_view_manage_email_subscription(election_day_app_zg):
     message = client.get_email(0, flush_queue=True)
     subscribe = client.get(get_email_link(message, 'optin'))
     assert "E-Mail-Benachrichtigung wurde abonniert" in subscribe
-    assert election_day_app_zg.session().query(Subscriber).one().locale == \
-        'de_CH'
+    assert election_day_app_zg.session().query(
+        Subscriber).one().locale == 'de_CH'
 
     subscribe = client.get('/subscribe-email')
     subscribe.form['email'] = '456@example.org'
@@ -148,8 +186,8 @@ def test_view_manage_email_subscription(election_day_app_zg):
     # Export
     response = client.get('/manage/subscribers/email/export')
     assert response.headers['Content-Type'] == 'text/csv; charset=UTF-8'
-    assert response.headers['Content-Disposition'] == \
-        'inline; filename=email-subscribers.csv'
+    assert response.headers['Content-Disposition'] == (
+        'inline; filename=email-subscribers.csv')
     export = response.text
     assert '123@example.org' in export
     assert '456@example.org' in export
@@ -193,9 +231,9 @@ def test_view_manage_email_subscription(election_day_app_zg):
     assert '456@example.org' not in manage
 
 
-def test_view_sms_subscription(election_day_app_zg):
+def test_view_sms_subscription(election_day_app_zg: TestApp) -> None:
     sms_path = os.path.join(
-        election_day_app_zg.configuration['sms_directory'],
+        election_day_app_zg.sms_directory,
         election_day_app_zg.schema
     )
 
@@ -234,8 +272,8 @@ def test_view_sms_subscription(election_day_app_zg):
     subscribe = client.get('/subscribe-sms')
     subscribe.form['phone_number'] = '0791112233'
     subscribe = subscribe.form.submit()
-    assert election_day_app_zg.session().query(Subscriber).one().locale == \
-        'fr_CH'
+    assert election_day_app_zg.session().query(
+        Subscriber).one().locale == 'fr_CH'
     assert len(os.listdir(sms_path)) == 2
 
     client.get('/locale/de_CH').follow()
@@ -266,8 +304,29 @@ def test_view_sms_subscription(election_day_app_zg):
     assert "SMS-Benachrichtigung wurde beendet." in unsubscribe
     assert len(os.listdir(sms_path)) == 2
 
+    # Subscribe and un-subscribe with specific domain
+    principal = election_day_app_zg.principal
+    principal.segmented_notifications = True
+    election_day_app_zg.cache.set('principal', principal)
 
-def test_view_manage_sms_subscription(election_day_app_zg):
+    subscribe = client.get('/subscribe-sms')
+    subscribe.form['phone_number'] = '0791112233'
+    subscribe.form['domain'].select('municipality')
+    subscribe.form['domain_segment'].select('Zug')
+    subscribe = subscribe.form.submit()
+    assert "SMS-Benachrichtigung wurde abonniert" in subscribe
+    assert len(os.listdir(sms_path)) == 3
+
+    unsubscribe = client.get('/unsubscribe-sms')
+    unsubscribe.form['phone_number'] = '0791112233'
+    unsubscribe.form['domain'].select('municipality')
+    unsubscribe.form['domain_segment'].select('Zug')
+    unsubscribe = unsubscribe.form.submit()
+    assert "SMS-Benachrichtigung wurde beendet" in unsubscribe
+    assert len(os.listdir(sms_path)) == 3
+
+
+def test_view_manage_sms_subscription(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -276,8 +335,8 @@ def test_view_manage_sms_subscription(election_day_app_zg):
     subscribe.form['phone_number'] = '0791112233'
     subscribe = subscribe.form.submit()
     assert "SMS-Benachrichtigung wurde abonniert" in subscribe
-    assert election_day_app_zg.session().query(Subscriber).one().locale == \
-        'de_CH'
+    assert election_day_app_zg.session().query(
+        Subscriber).one().locale == 'de_CH'
 
     subscribe = client.get('/subscribe-sms')
     subscribe.form['phone_number'] = '0791112244'
@@ -303,8 +362,8 @@ def test_view_manage_sms_subscription(election_day_app_zg):
     # Export
     response = client.get('/manage/subscribers/sms/export')
     assert response.headers['Content-Type'] == 'text/csv; charset=UTF-8'
-    assert response.headers['Content-Disposition'] == \
-        'inline; filename=sms-subscribers.csv'
+    assert response.headers['Content-Disposition'] == (
+        'inline; filename=sms-subscribers.csv')
     export = response.text
     assert '+41791112233' in export
     assert '+41791112244' in export

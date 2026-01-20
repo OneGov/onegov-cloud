@@ -15,6 +15,22 @@
     <img tal:attributes="e.attrs" />
 </metal:b>
 
+<!--! A generic button element -->
+<metal:b define-macro="button">
+    <button tal:attributes="e.attrs">${e.text or ''}<tal:b condition="e.access != 'public'"></tal:b></button>
+</metal:b>
+
+<metal:b define-macro="back_link">
+    <a class="cancel-link" tal:attributes="e.attrs" href="#" data-back-link>
+        <tal:b condition="e.text">
+            ${e.text}
+        </tal:b>
+        <tal:b condition="not:e.text" i18n:translate="">
+            Cancel
+        </tal:b>
+    </a>
+</metal:b>
+
 <metal:b define-macro="qr_code_link">
     <a tal:attributes="e.attrs" data-endpoint="${layout.qr_endpoint}">
         ${e.text or ''}
@@ -24,6 +40,24 @@
             <div id="${e.attrs['data-image-parent']}" class="qr-image">
                 <h1 tal:condition="e.title|nothing">${e.title}</h1>
             </div>
+        </tal:block>
+    </tal:block>
+</metal:b>
+
+<metal:b define-macro="iframe_link">
+    <a tal:attributes="e.attrs" data-endpoint="${layout.qr_endpoint}">
+        ${e.text or ''}
+    </a>
+    <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id e.attrs['data-open']">
+        <tal:block metal:fill-slot="modal_content">
+            <h3 i18n:translate>Embed iFrame</h3>
+            <p i18n:translate>You can copy the following code to embed this page as an iFrame:</p>
+            <div class="panel">
+                <p>${e.attrs['new-iframe-link']}</p>
+            </div>
+            <p i18n:translate>
+                To display the breadcrumbs you can add <code i18n:name="bc_level">?bc-level=1</code> as a parameter to the URL. The number defines where the breadcrumbs start. 1 in this case means that the first level is hidden. You can use any number as long as it is less than the number of levels in the breadcrumbs.
+            </p>
         </tal:block>
     </tal:block>
 </metal:b>

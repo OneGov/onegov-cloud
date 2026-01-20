@@ -11,19 +11,35 @@
                 <a href="mailto:${message.owner}" i18n:name="author">${message.owner}</a> wrote
             </span>
 
-            <tal:b content="structure message.formatted_text(layout)" />
+            <tal:b content="message.formatted_text(layout)" />
         </td></tr></table>
 
         <p><b>${resource.title}</b></p>
         <tal:b metal:use-macro="layout.macros['reservations']"></tal:b>
 
-        <tal:b condition="show_submission|nothing">
+        <tal:b tal:condition="show_submission|nothing">
             <hr class="large">
+            <table class="field-display">
+                <tr><td><b i18n:translate>E-Mail</b></td></tr>
+                <tr><td>${model.email}</td></tr>
+                <tr tal:condition="ticket.tag"><td height="5"></td></tr>
+                <tr tal:condition="ticket.tag"><td><b i18n:translate>Tag</b></td></tr>
+                <tr tal:condition="ticket.tag"><td>${ticket.tag}</td></tr>
+            </table>
             <metal:b use-macro="layout.macros['display_form']"/>
+        </tal:b>
+        <tal:b tal:condition="ticket.handler.payment">
+            <hr class="large">
+            <metal:b tal:define="payment ticket.handler.payment; show_vat ticket.handler.show_vat" use-macro="layout.macros['payment']" />
+        </tal:b>
+        <tal:b tal:define="show_submission show_submission|False" tal:condition="show_submission or ticket.handler.payment">
             <hr class="large">
         </tal:b>
+
+        <p i18n:translate>
+            See Ticket <a href="${request.link(ticket, 'status')}" i18n:name="link">${ticket_reference}</a> for additional information.
+        </p>
         <p i18n:translate>Have a great day!</p>
-        <tal:b metal:use-macro="layout.macros['sender']" />
     </tal:b>
     <tal:b metal:fill-slot="above-footer">
         <p>

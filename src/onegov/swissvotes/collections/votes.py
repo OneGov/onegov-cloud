@@ -1,8 +1,10 @@
-from cached_property import cached_property
+from __future__ import annotations
+
 from csv import writer
 from datetime import date
 from decimal import Decimal
 from decimal import InvalidOperation
+from functools import cached_property
 from onegov.core.collection import Pagination
 from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import PolicyArea
@@ -12,7 +14,22 @@ from sqlalchemy import or_
 from xlsxwriter.workbook import Workbook
 
 
-class SwissVoteCollection(Pagination):
+from typing import Any
+from typing import IO
+from typing import TypeVar
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from datetime import datetime
+    from onegov.swissvotes.app import SwissvotesApp
+    from sqlalchemy.orm import Query
+    from sqlalchemy.sql import ColumnElement
+    from typing import Self
+
+T = TypeVar('T')
+
+
+class SwissVoteCollection(Pagination[SwissVote]):
 
     """ A collection of votes.
 
@@ -21,6 +38,7 @@ class SwissVoteCollection(Pagination):
 
     """
 
+    page: int | None  # type:ignore[assignment]
     batch_size = 20
     initial_sort_by = 'date'
     initial_sort_order = 'descending'
@@ -38,24 +56,24 @@ class SwissVoteCollection(Pagination):
 
     def __init__(
         self,
-        app,
-        page=None,
-        from_date=None,
-        to_date=None,
-        legal_form=None,
-        result=None,
-        policy_area=None,
-        term=None,
-        full_text=None,
-        position_federal_council=None,
-        position_national_council=None,
-        position_council_of_states=None,
-        sort_by=None,
-        sort_order=None
-    ):
+        app: SwissvotesApp,
+        page: int = 0,
+        from_date: date | None = None,
+        to_date: date | None = None,
+        legal_form: list[int] | None = None,
+        result: list[int] | None = None,
+        policy_area: list[str] | None = None,
+        term: str | None = None,
+        full_text: bool | None = None,
+        position_federal_council: list[int] | None = None,
+        position_national_council: list[int] | None = None,
+        position_council_of_states: list[int] | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None
+    ) -> None:
+        super().__init__(page)
         self.app = app
         self.session = app.session()
-        self.page = page
         self.from_date = from_date
         self.to_date = to_date
         self.legal_form = legal_form
@@ -69,18 +87,19 @@ class SwissVoteCollection(Pagination):
         self.sort_by = sort_by
         self.sort_order = sort_order
 
-    def add(self, **kwargs):
+    def add(self, **kwargs: Any) -> SwissVote:
         vote = SwissVote(**kwargs)
         self.session.add(vote)
         self.session.flush()
         return vote
 
-    def subset(self):
+    def subset(self) -> Query[SwissVote]:
         return self.query()
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return (
-            (self.page or 0) == (other.page or 0)
+            isinstance(other, self.__class__)
+            and (self.page or 0) == (other.page or 0)
             and (self.from_date or None) == (other.from_date or None)
             and (self.to_date or None) == (other.to_date or None)
             and set(self.legal_form or []) == set(other.legal_form or [])
@@ -104,18 +123,18 @@ class SwissVoteCollection(Pagination):
             and (self.sort_order or None) == (other.sort_order or None)
         )
 
-    def default(self):
+    def default(self) -> Self:
         """ Returns the votes unfiltered and ordered by default. """
 
         return self.__class__(self.app)
 
     @property
-    def page_index(self):
+    def page_index(self) -> int:
         """ The current page. """
 
         return self.page or 0
 
-    def page_by_index(self, page):
+    def page_by_index(self, page: int) -> Self:
         """ Returns the requested page. """
 
         return self.__class__(
@@ -136,7 +155,7 @@ class SwissVoteCollection(Pagination):
         )
 
     @property
-    def current_sort_by(self):
+    def current_sort_by(self) -> str:
         """ Returns the currently used sorting key.
 
         Defaults to a reasonable value.
@@ -148,7 +167,7 @@ class SwissVoteCollection(Pagination):
         return self.initial_sort_by
 
     @property
-    def current_sort_order(self):
+    def current_sort_order(self) -> str:
         """ Returns the currently used sorting order.
 
         Defaults to a reasonable value.
@@ -165,7 +184,7 @@ class SwissVoteCollection(Pagination):
 
         return self.initial_sort_order
 
-    def sort_order_by_key(self, sort_by):
+    def sort_order_by_key(self, sort_by: str | None) -> str:
         """ Returns the sort order by key.
 
         Defaults to 'unsorted'.
@@ -176,7 +195,7 @@ class SwissVoteCollection(Pagination):
             return self.current_sort_order
         return 'unsorted'
 
-    def by_order(self, sort_by):
+    def by_order(self, sort_by: str | None) -> Self:
         """ Returns the votes ordered by the given key. """
 
         sort_order = self.default_sort_order
@@ -188,7 +207,7 @@ class SwissVoteCollection(Pagination):
 
         return self.__class__(
             self.app,
-            page=None,
+            page=0,
             from_date=self.from_date,
             to_date=self.to_date,
             legal_form=self.legal_form,
@@ -204,16 +223,19 @@ class SwissVoteCollection(Pagination):
         )
 
     @property
-    def order_by(self):
+    def order_by(self) -> ColumnElement[Any]:
         """ Returns an SqlAlchemy expression for ordering queries based
         on the current sorting key and ordering.
 
         """
 
+        result: ColumnElement[Any] | None
         if self.current_sort_by == 'title':
             from onegov.core.orm.func import unaccent
             if self.app.session_manager.current_locale == 'fr_CH':
                 result = unaccent(SwissVote.short_title_fr)
+            elif self.app.session_manager.current_locale == 'en_US':
+                result = unaccent(SwissVote.short_title_en)
             else:
                 result = unaccent(SwissVote.short_title_de)
         else:
@@ -230,27 +252,29 @@ class SwissVoteCollection(Pagination):
         return result
 
     @property
-    def offset(self):
+    def offset(self) -> int:
         """ The current position in the batch. """
 
-        return (self.page or 0) * self.batch_size
+        return self.page_index * self.batch_size
 
     @property
-    def previous(self):
+    def previous(self) -> Self | None:
         """ The previous page. """
 
-        if (self.page or 0) - 1 >= 0:
-            return self.page_by_index((self.page or 0) - 1)
+        if self.page_index - 1 >= 0:
+            return self.page_by_index(self.page_index - 1)
+        return None
 
     @property
-    def next(self):
+    def next(self) -> Self | None:
         """ The next page. """
 
-        if (self.page or 0) + 1 < self.pages_count:
-            return self.page_by_index((self.page or 0) + 1)
+        if self.page_index + 1 < self.pages_count:
+            return self.page_by_index(self.page_index + 1)
+        return None
 
     @property
-    def term_filter_numeric(self):
+    def term_filter_numeric(self) -> list[ColumnElement[bool]]:
         """ Returns a list of SqlAlchemy filter statements matching possible
         numeric attributes based on the term.
 
@@ -268,7 +292,7 @@ class SwissVoteCollection(Pagination):
         return result
 
     @property
-    def term_filter_text(self):
+    def term_filter_text(self) -> list[ColumnElement[bool]]:
         """ Returns a list of SqlAlchemy filter statements matching possible
         fulltext attributes based on the term.
 
@@ -278,10 +302,16 @@ class SwissVoteCollection(Pagination):
         if not term:
             return []
 
-        def match(column, language):
+        def match(
+            column: ColumnElement[str] | ColumnElement[str | None],
+            language: str
+        ) -> ColumnElement[bool]:
             return column.op('@@')(func.to_tsquery(language, term))
 
-        def match_convert(column, language):
+        def match_convert(
+            column: ColumnElement[str] | ColumnElement[str | None],
+            language: str
+        ) -> ColumnElement[bool]:
             return match(func.to_tsvector(language, column), language)
 
         if not self.full_text:
@@ -290,6 +320,7 @@ class SwissVoteCollection(Pagination):
                 match_convert(SwissVote.title_fr, 'french'),
                 match_convert(SwissVote.short_title_de, 'german'),
                 match_convert(SwissVote.short_title_fr, 'french'),
+                match_convert(SwissVote.short_title_en, 'english'),
                 match_convert(SwissVote.keyword, 'german'),
             ]
         return [
@@ -297,8 +328,10 @@ class SwissVoteCollection(Pagination):
             match_convert(SwissVote.title_fr, 'french'),
             match_convert(SwissVote.short_title_de, 'german'),
             match_convert(SwissVote.short_title_fr, 'french'),
+            match_convert(SwissVote.short_title_en, 'english'),
             match_convert(SwissVote.keyword, 'german'),
-            match_convert(SwissVote.initiator, 'german'),
+            match_convert(SwissVote.initiator_de, 'german'),
+            match_convert(SwissVote.initiator_fr, 'french'),
             match(SwissVote.searchable_text_de_CH, 'german'),
             match(SwissVote.searchable_text_fr_CH, 'french'),
             match(SwissVote.searchable_text_it_CH, 'italian'),
@@ -306,7 +339,7 @@ class SwissVoteCollection(Pagination):
         ]
 
     @property
-    def term_filter(self):
+    def term_filter(self) -> list[ColumnElement[bool]]:
         """ Returns a list of SqlAlchemy filter statements based on the search
         term.
 
@@ -314,16 +347,22 @@ class SwissVoteCollection(Pagination):
 
         return self.term_filter_numeric + self.term_filter_text
 
-    def query(self):
+    def query(self) -> Query[SwissVote]:
         """ Returns the votes matching to the current filters and order. """
 
         query = self.session.query(SwissVote)
 
-        def in_or_none(column, values, extra={}):
+        def in_or_none(
+            column: ColumnElement[T] | ColumnElement[T | None],
+            values: list[T],
+            extra: dict[T, T] | None = None
+        ) -> ColumnElement[bool]:
+
+            extra = extra or {}
             values = values + [x for y, x in extra.items() if y in values]
             statement = column.in_(values)
             if -1 in values:
-                statement = or_(statement, column.is_(None))
+                statement = or_(statement, column.is_(None))  # type:ignore[no-untyped-call]
             return statement
 
         if self.from_date:
@@ -338,9 +377,9 @@ class SwissVoteCollection(Pagination):
                 SwissVote._result == None,
             ))
         if self.policy_area:
-            levels = [[], [], []]
-            for area in self.policy_area:
-                area = PolicyArea(area)
+            levels: list[list[Decimal]] = [[], [], []]
+            for area_code in self.policy_area:
+                area = PolicyArea(area_code)
                 if area.level == 1:
                     levels[0].append(area.descriptor_decimal)
                 if area.level == 2:
@@ -405,7 +444,7 @@ class SwissVoteCollection(Pagination):
 
         return query
 
-    def by_bfs_number(self, bfs_number):
+    def by_bfs_number(self, bfs_number: Decimal | str) -> SwissVote | None:
         """ Returns the vote with the given BFS number. """
         try:
             bfs_number = Decimal(bfs_number)
@@ -415,33 +454,62 @@ class SwissVoteCollection(Pagination):
         query = self.query().filter(SwissVote.bfs_number == bfs_number)
         return query.first()
 
+    def by_bfs_numbers(
+        self,
+        bfs_numbers: Iterable[Decimal | str]
+    ) -> dict[Decimal | str, SwissVote]:
+        """ Returns the votes with the given BFS numbers. """
+        real_bfs_numbers = {}
+        for bfs_number in bfs_numbers:
+            try:
+                real_bfs_numbers[Decimal(bfs_number)] = bfs_number
+            except InvalidOperation:
+                pass
+
+        if not real_bfs_numbers:
+            return {}
+
+        query = self.query().filter(
+            SwissVote.bfs_number.in_(real_bfs_numbers.keys())
+        )
+        return {
+            real_bfs_numbers[vote.bfs_number]: vote
+            for vote in query
+        }
+
     @cached_property
-    def available_descriptors(self):
+    def available_descriptors(self) -> list[set[Decimal]]:
         """ Returns a list of the used descriptor values (level 1-3). """
 
         query = self.session.query
         return [
-            set([
-                x[0] for x in query(SwissVote.descriptor_1_level_1).union(
+            {
+                x
+                for x, in query(SwissVote.descriptor_1_level_1).union(
                     query(SwissVote.descriptor_2_level_1),
                     query(SwissVote.descriptor_3_level_1)
-                ).all() if x[0]
-            ]),
-            set([
-                x[0] for x in query(SwissVote.descriptor_1_level_2).union(
+                ).distinct()
+                if x
+            },
+            {
+                x
+                for x, in query(SwissVote.descriptor_1_level_2).union(
                     query(SwissVote.descriptor_2_level_2),
                     query(SwissVote.descriptor_3_level_2)
-                ).all() if x[0]
-            ]),
-            set([
-                x[0] for x in query(SwissVote.descriptor_1_level_3).union(
+                ).distinct()
+                if x
+            },
+            {
+                x
+                for x, in query(SwissVote.descriptor_1_level_3).union(
                     query(SwissVote.descriptor_2_level_3),
                     query(SwissVote.descriptor_3_level_3)
-                ).all() if x[0]
-            ]),
+                ).distinct()
+                if x
+            },
         ]
 
-    def update(self, votes):
+    def update(self, votes: Iterable[SwissVote]) -> tuple[int, int]:
         """ Adds or updates the given votes. """
 
         added = 0
@@ -466,13 +534,19 @@ class SwissVoteCollection(Pagination):
 
         return added, updated
 
-    def update_metadata(self, metadata):
+    def update_metadata(
+        self,
+        metadata: dict[Decimal, dict[str, dict[str, Any]]]
+    ) -> tuple[int, int]:
+
         added = 0
         updated = 0
         for bfs_number, files in metadata.items():
-            vote = self.session.query(SwissVote)
-            vote = vote.filter_by(bfs_number=bfs_number).first()
-            if vote:
+            vote = (
+                self.session.query(SwissVote)
+                .filter_by(bfs_number=bfs_number).first()
+            )
+            if vote is not None:
                 for filename, data in files.items():
                     old = vote.campaign_material_metadata.get(filename)
                     if not old:
@@ -485,11 +559,11 @@ class SwissVoteCollection(Pagination):
         return added, updated
 
     @property
-    def last_modified(self):
+    def last_modified(self) -> datetime | None:
         """ Returns the last change of any votes. """
         return self.session.query(func.max(SwissVote.last_change)).scalar()
 
-    def export_csv(self, file):
+    def export_csv(self, file: IO[str]) -> None:
         """ Exports all votes according to the code book. """
         mapper = ColumnMapperDataset()
 
@@ -516,7 +590,7 @@ class SwissVoteCollection(Pagination):
                     )
             csv.writerow(row)
 
-    def export_xlsx(self, file):
+    def export_xlsx(self, file: IO[Any]) -> None:
         """ Exports all votes according to the code book. """
         mapper = ColumnMapperDataset()
 
@@ -528,17 +602,15 @@ class SwissVoteCollection(Pagination):
         query = self.query()
         query = query.order_by(None).order_by(SwissVote.bfs_number)
 
-        row = 0
-        for vote in query:
-            row += 1
-            for column_, value in enumerate(mapper.get_values(vote)):
+        for row, vote in enumerate(query, start=1):
+            for column, value in enumerate(mapper.get_values(vote)):
                 if value is None:
                     pass
                 elif isinstance(value, str):
-                    worksheet.write_string(row, column_, value)
+                    worksheet.write_string(row, column, value)
                 elif isinstance(value, date):
-                    worksheet.write_datetime(row, column_, value)
-                elif isinstance(value, int) or isinstance(value, Decimal):
-                    worksheet.write_number(row, column_, value)
+                    worksheet.write_datetime(row, column, value)
+                elif isinstance(value, (int, Decimal)):
+                    worksheet.write_number(row, column, value)
 
         workbook.close()

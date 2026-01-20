@@ -1,18 +1,23 @@
 """ The upload view. """
+from __future__ import annotations
+
 import transaction
 
-from onegov.ballot import Vote
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.formats import import_vote_default
 from onegov.election_day.formats import import_vote_internal
-from onegov.election_day.formats import import_vote_wabsti
 from onegov.election_day.formats import import_vote_wabstic
-from onegov.election_day.formats import import_vote_wabstim
-from onegov.election_day.formats.common import BALLOT_TYPES
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.layouts import ManageVotesLayout
+from onegov.election_day.models import Vote
 from onegov.election_day.views.upload import unsupported_year_error
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.models import DataSourceItem
+    from onegov.election_day.request import ElectionDayRequest
 
 
 @ElectionDayApp.manage_form(
@@ -21,8 +26,11 @@ from onegov.election_day.views.upload import unsupported_year_error
     template='upload_vote.pt',
     form=UploadVoteForm
 )
-def view_upload(self, request, form):
-
+def view_upload(
+    self: Vote,
+    request: ElectionDayRequest,
+    form: UploadVoteForm
+) -> RenderData:
     """ Uploads votes results. """
 
     errors = []
@@ -42,22 +50,23 @@ def view_upload(self, request, form):
                 self.date.year, principal.use_maps
             )
             if form.file_format.data == 'internal':
+                assert form.proposal.data is not None
+                assert form.proposal.file is not None
                 errors = import_vote_internal(
                     self,
                     principal,
                     form.proposal.file,
                     form.proposal.data['mimetype']
                 )
-            elif form.file_format.data == 'wabsti':
-                errors = import_vote_wabsti(
-                    self,
-                    principal,
-                    form.vote_number.data,
-                    form.proposal.file,
-                    form.proposal.data['mimetype']
-                )
             elif form.file_format.data == 'wabsti_c':
+                assert form.sg_geschaefte.data is not None
+                assert form.sg_geschaefte.file is not None
+                assert form.sg_gemeinden.data is not None
+                assert form.sg_gemeinden.file is not None
+                source: DataSourceItem
                 for source in self.data_sources:
+                    assert source.number is not None
+                    assert source.district is not None
                     errors.extend(
                         import_vote_wabstic(
                             self,
@@ -70,31 +79,8 @@ def view_upload(self, request, form):
                             form.sg_gemeinden.data['mimetype']
                         )
                     )
-            elif form.file_format.data == 'wabsti_m':
-                errors = import_vote_wabstim(
-                    self,
-                    principal,
-                    form.proposal.file,
-                    form.proposal.data['mimetype']
-                )
-            elif form.file_format.data == 'default':
-                ballot_types = ('proposal', )
-                if self.type == 'complex':
-                    ballot_types = BALLOT_TYPES
-
-                for ballot_type in ballot_types:
-                    field = getattr(form, ballot_type.replace('-', '_'))
-                    errors.extend(
-                        import_vote_default(
-                            self,
-                            principal,
-                            ballot_type,
-                            field.file,
-                            field.data['mimetype']
-                        )
-                    )
             else:
-                raise NotImplementedError("Unsupported import format")
+                raise NotImplementedError('Unsupported import format')
             archive = ArchivedResultCollection(session)
             archive.update(self, request)
 

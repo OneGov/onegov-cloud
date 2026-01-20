@@ -1,12 +1,12 @@
+from __future__ import annotations
+
 import logging
+log = logging.getLogger('onegov.translator_directory')
+log.addHandler(logging.NullHandler())
+
+from onegov.translator_directory.i18n import _
 
 from onegov.translator_directory.app import TranslatorDirectoryApp
-
-log = logging.getLogger('onegov.translator_directory')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
-
-from translationstring import TranslationStringFactory  # noqa
-_ = TranslationStringFactory('onegov.translator_directory')  # noqa
 
 
 __all__ = ('TranslatorDirectoryApp', 'log', '_')

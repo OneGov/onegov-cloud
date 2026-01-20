@@ -1,0 +1,28 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.landsgemeinde">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x wrapper">
+            <div class="medium-12 cell main-content content">
+                <h2 i18n:translate="">Raw Data</h2>
+                <p>${layout.title}</p>
+                <a href="${request.link(assembly, 'json')}"><i class="fa fa-link" aria-hidden="true"></i> JSON</a>
+                <h2 i18n:translate="">Terms of use</h2>
+                <p i18n:translate="">Open use. Must provide the source.</p>
+                <ul>
+                    <li i18n:translate="">You may use this dataset for non-commercial purposes.</li>
+                    <li i18n:translate="">You may use this dataset for commercial purposes.</li>
+                    <li>
+                        <tal:block i18n:translate="">You must provide the source (author, title and link to the dataset).</tal:block>
+                        <cite>
+                            ${layout.org.title} (${layout.format_date(assembly.last_change, 'datetime_long')}). ${layout.title} (JSON). ${request.link(assembly, 'json')}.
+                        </cite>
+                    </li>
+                </ul>
+                <p><a href="https://opendata.swiss/de/terms-of-use"><img width="100" height="80" src="${layout.terms_icon}" i18n:attributes="alt" alt="Terms of use"></a></p>
+            </div>
+        </div>
+    </tal:b>
+</div>

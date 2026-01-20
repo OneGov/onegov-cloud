@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import ExtendedPerson
@@ -9,7 +11,15 @@ from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 
 
-def duplicates(iterable):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from typing import TypeVar
+
+    _T = TypeVar('_T')
+
+
+def duplicates(iterable: Iterable[_T]) -> set[_T]:
     items = set()
     duplicates = set()
     for item in iterable:
@@ -23,14 +33,14 @@ class MembershipForm(Form):
     """ Form to edit memberships of an organization. """
 
     title = StringField(
-        label=_("Title"),
+        label=_('Title'),
         validators=[
             InputRequired()
         ],
     )
 
     person_id = ChosenSelectField(
-        label=_("Person"),
+        label=_('Person'),
         choices=[],
         validators=[
             InputRequired()
@@ -38,50 +48,50 @@ class MembershipForm(Form):
     )
 
     since = StringField(
-        label=_("Since"),
+        label=_('Since'),
     )
 
     note = StringField(
-        label=_("Note"),
+        label=_('Note'),
     )
 
     addition = StringField(
-        label=_("Addition"),
+        label=_('Addition'),
     )
 
     prefix = StringField(
-        label=_("Prefix"),
+        label=_('Prefix'),
     )
 
-    def validate_title(self, field):
+    def validate_title(self, field: StringField) -> None:
         if field.data and not field.data.strip():
-            raise ValidationError(_("This field is required."))
+            raise ValidationError(_('This field is required.'))
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.request.include('common')
         self.request.include('chosen')
 
-        ambiguous = duplicates([
-            r[0] for r in self.request.session.query(
+        ambiguous = duplicates(
+            name for name, in self.request.session.query(
                 func.concat(
                     ExtendedPerson.last_name, ' ', ExtendedPerson.first_name
                 )
             )
-        ])
+        )
 
-        def title(person):
+        def title(person: ExtendedPerson) -> str:
             if person.title in ambiguous:
                 info = (
                     person.phone_direct
                     or person.phone
                     or person.email
-                    or person.address
+                    or person.postal_address
                 )
                 if info:
-                    return f"{person.title} ({info})"
+                    return f'{person.title} ({info})'
                 memberships = person.memberships_by_agency
                 if memberships:
-                    return f"{person.title} ({memberships[0].agency.title})"
+                    return f'{person.title} ({memberships[0].agency.title})'
 
             return person.title
 

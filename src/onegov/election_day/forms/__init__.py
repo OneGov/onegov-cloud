@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from onegov.election_day.forms.archive import ArchiveSearchFormElection
 from onegov.election_day.forms.archive import ArchiveSearchFormVote
-from onegov.election_day.forms.common import ChangeIdForm
+from onegov.election_day.forms.common import ClearResultsForm
 from onegov.election_day.forms.common import EmptyForm
 from onegov.election_day.forms.data_source import DataSourceForm
 from onegov.election_day.forms.data_source import DataSourceItemForm
@@ -24,10 +26,10 @@ from onegov.election_day.forms.upload import UploadWabstiVoteForm
 from onegov.election_day.forms.vote import VoteForm
 
 
-__all__ = [
+__all__ = (
     'ArchiveSearchFormElection',
     'ArchiveSearchFormVote',
-    'ChangeIdForm',
+    'ClearResultsForm',
     'DataSourceForm',
     'DataSourceItemForm',
     'ElectionCompoundForm',
@@ -50,4 +52,4 @@ __all__ = [
     'UploadWabstiProporzElectionForm',
     'UploadWabstiVoteForm',
     'VoteForm',
-]
+)

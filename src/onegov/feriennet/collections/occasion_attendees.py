@@ -1,33 +1,56 @@
-from collections import namedtuple, OrderedDict, Counter
+from __future__ import annotations
+
+from collections import OrderedDict, Counter
 from onegov.activity import Activity, Attendee, Occasion, OccasionCollection
 from onegov.user import User
 
 
-OccasionAttendee = namedtuple(
-    'OccasionAttendee', ('attendee', 'info', 'group_code'))
+from typing import NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.activity.models import BookingPeriod, BookingPeriodMeta
+    from sqlalchemy.orm import Query, Session
+    from typing import TypedDict, Self
+    from uuid import UUID
+
+    class ContactInfo(TypedDict):
+        emergency: str | None
+        email: str
+        place: str | None
+
+
+class OccasionAttendee(NamedTuple):
+    attendee: Attendee
+    info: ContactInfo
+    group_code: str | None
 
 
 class OccasionAttendeeCollection(OccasionCollection):
 
-    def __init__(self, session, period, activity, username=None):
+    def __init__(
+        self,
+        session: Session,
+        period: BookingPeriod | BookingPeriodMeta,
+        activity: Activity,
+        username: str | None = None
+    ) -> None:
         super().__init__(session)
         self.period = period
         self.username = username
         self.activity = activity
 
     @property
-    def period_id(self):
+    def period_id(self) -> UUID:
         return self.period.id
 
     @property
-    def activity_name(self):
+    def activity_name(self) -> str:
         return self.activity.name
 
-    def for_period(self, period):
+    def for_period(self, period: BookingPeriod | BookingPeriodMeta) -> Self:
         return self.__class__(
             self.session, period, self.activity, self.username)
 
-    def query(self):
+    def query(self) -> Query[Occasion]:
         q = super().query()
         q = q.join(Occasion.activity)
 
@@ -42,14 +65,14 @@ class OccasionAttendeeCollection(OccasionCollection):
 
         return q.order_by(Activity.title, Occasion.order, Occasion.id)
 
-    def occasions(self):
+    def occasions(self) -> dict[Occasion, list[OccasionAttendee]]:
         occasions = OrderedDict()
 
         attendees = {
             attendee.id: attendee for attendee in self.session.query(Attendee)
         }
 
-        contacts = {
+        contacts: dict[str, ContactInfo] = {
             u.username: {
                 'emergency': u.data and u.data.get('emergency'),
                 'email': u.data and u.data.get('email') or u.username,

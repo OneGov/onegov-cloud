@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-19 06:59+0200\n"
+"POT-Creation-Date: 2024-11-28 10:06+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -31,6 +31,9 @@ msgstr "Teilnehmer"
 
 msgid "Event Subscriptions"
 msgstr "Kursanmeldungen"
+
+msgid "Surveys"
+msgstr "Umfragen"
 
 msgid "Files"
 msgstr "Dateien"
@@ -97,6 +100,12 @@ msgstr "Anzahl Jahre"
 msgid "Hidden"
 msgstr "Versteckt"
 
+msgid "Evaluation URL"
+msgstr "Link zur Umfrage"
+
+msgid "URL to the evaluation form"
+msgstr "URL zur Kursumfrage"
+
 msgid "Not a valid integer value"
 msgstr "Keine gültige Ganzzahl"
 
@@ -158,7 +167,7 @@ msgid "Status"
 msgstr "Status"
 
 msgid "Please use a start prior to the end"
-msgstr "Bitte benutzen Sie eine Anfangszeit vor der Startzeit"
+msgstr "Bitte setzen Sie eine Startzeit vor der Endzeit"
 
 msgid "A duplicate event already exists"
 msgstr "Ein Duplikat dieser Durchführung existiert bereits"
@@ -185,8 +194,18 @@ msgstr ""
 msgid "There are other subscriptions for the same course in this year"
 msgstr "Für dieses Jahr gibt es bereits andere Anmeldungen für diesen Kurs"
 
+#, python-format
+msgid ""
+"The selected course must take place at least 6 years after the last course "
+"for which the attendee was registered. The last course for this attendee was "
+"on ${date}."
+msgstr ""
+"Die gewählte Kursdurchführung muss mindestens 6 Jahre nach der letzten "
+"Kursdurchführung, zu welcher der Teilnehmer angemeldet wurde, stattfinden. "
+"Die letzte Kursdurchführung für diesen Teilnehmer war am ${date}."
+
 msgid "This course event can't be booked (anymore)."
-msgstr "Diese Durchführung kann (nicht) mehr gebucht werden."
+msgstr "Diese Durchführung kann nicht (mehr) gebucht werden."
 
 msgid "Placeholder Description (optional)"
 msgstr "Platzhalter-Beschreibung (optional)"
@@ -212,8 +231,8 @@ msgstr "Kürzel"
 msgid "Last Event"
 msgstr "Letzte Teilnahme"
 
-msgid "Attended"
-msgstr "Besucht"
+msgid "Registered"
+msgstr "Angemeldet"
 
 #, python-format
 msgid "Due by (every ${refresh_interval})"
@@ -365,6 +384,9 @@ msgstr "Email-Templates verwalten"
 msgid "Notification Template ${type}"
 msgstr "Email-Vorlage ${type}"
 
+msgid "Add or edit additional Information"
+msgstr "Zusatzinformationen hinzufügen oder bearbeiten"
+
 msgid "Send"
 msgstr "Senden"
 
@@ -455,6 +477,31 @@ msgstr "Buchstabe"
 msgid "By last name"
 msgstr "Nach Nachname"
 
+msgid "Reminder mails"
+msgstr "Erinnerungsmails"
+
+msgid ""
+"Opens an empty message in your mail program with the course participants "
+"filtered visibly here, who have neither attended the course due nor are "
+"registered (next attendance)."
+msgstr ""
+"Öffnet eine Leere Nachricht in ihrem Mailprogramm mit den hier sichtbar "
+"gefilterten Kursteilnehmern, welche den fälligen Kurs weder besucht haben, "
+"noch angemeldet sind (nächste Teilnahme)."
+
+msgid ""
+"Select one or more organizations. If people in the filtered view have "
+"neither attended the due course nor are registered (next attendance), the "
+"button can be used to send a reminder email to them."
+msgstr ""
+"Wählen Sie eine oder mehrere Organisationen aus. Wenn Personen in der "
+"gefilterten Ansicht den fälligen Kurs weder besucht haben, noch angemeldet "
+"sind (nächste Teilnahme), kann mit dem Button an diese eine Erinnerungsmail "
+"gesendet werden."
+
+msgid "Attended"
+msgstr "Besucht"
+
 msgid "Next Subscription"
 msgstr "Nächste Teilnahme"
 
@@ -500,9 +547,6 @@ msgstr "Nein"
 msgid "Details"
 msgstr "Details"
 
-msgid "Registered"
-msgstr "Angemeldet"
-
 msgid "No entries found."
 msgstr "Keine Einträge gefunden."
 
@@ -532,6 +576,9 @@ msgstr "Datum"
 
 msgid "Remaining seats"
 msgstr "Verbleibende Plätze"
+
+msgid "Course Evaluation"
+msgstr "Kursevaluation"
 
 msgid "Description:"
 msgstr "Beschreibung:"
@@ -581,14 +628,20 @@ msgstr "Rot"
 msgid "Attendee should have attended the course already, but didn't."
 msgstr "Der nächste Kursbesuch ist ausstehend."
 
-msgid "Dear ${first_name} ${last_name},"
-msgstr "Sehr geehrte(r) ${first_name} ${last_name},"
+msgid "Logo"
+msgstr "Logo"
 
-msgid "Dear [first_name] [last_name],"
-msgstr "Sehr geehrte(r) [first_name] [last_name],"
+msgid "Dear ${first_name} ${last_name}"
+msgstr "Sehr geehrte(r) ${first_name} ${last_name}"
+
+msgid "Dear [first_name] [last_name]"
+msgstr "Sehr geehrte(r) [first_name] [last_name]"
 
 msgid "Please take notice about the information below."
 msgstr "Bitte beachten sie die untenstehenden Informationen."
+
+msgid "Event Details"
+msgstr "Details Durchführung"
 
 msgid "You have successfully subscribed to the following course event:"
 msgstr "Sie haben sich erfolgreich für folgenden Kurs angemeldet:"
@@ -599,6 +652,13 @@ msgid ""
 msgstr ""
 "Besten Dank für Ihre Kursanmeldung. Bitte tragen Sie sich den Kurstermin in "
 "den Outlook-Kalender ein."
+
+msgid ""
+"To integrate the appointment into your own Outlook calendar, you will find "
+"instructions here:"
+msgstr ""
+"Um den Termin im eigenen Outlookkalender zu integrieren finden Sie hier eine "
+"Anleitung:"
 
 msgid "You will receive a reminder email 2 weeks prior to the start."
 msgstr "Sie erhalten 2 Wochen vor Kursbeginn eine Erinnerungsmail."
@@ -633,9 +693,6 @@ msgstr ""
 
 msgid "Your subscription for the following event has been deleted:"
 msgstr "Ihre Anmeldung für den folgenden Kurs wurde gelöscht:"
-
-msgid "Event Details"
-msgstr "Details Durchführung"
 
 msgid "Your's sincerily"
 msgstr "Freundliche Grüsse"
@@ -696,6 +753,9 @@ msgstr "Externer Teilnehmer erfolgreich gelöscht"
 
 msgid "Can only delete external attendees"
 msgstr "Es können nur externe Teilnehmer gelöscht werden"
+
+msgid "Reminder due course registration"
+msgstr "Erinnerung fällige Kursanmeldung"
 
 msgid "Update"
 msgstr "Aktualisieren"
@@ -776,3 +836,7 @@ msgstr "Anmeldung erfolgreich gelöscht"
 
 msgid "Placeholder successfully deleted"
 msgstr "Platzhalter erfolgreich gelöscht"
+
+#~ msgid "The form contains errors. Please check the fields marked in red."
+#~ msgstr ""
+#~ "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."

@@ -2,13 +2,56 @@
     .card-section {
         padding-bottom: .5rem;
         padding-top: .5rem;
+
+        ul.more-list {
+            margin: 0 -.5rem;
+        }
     }
 
-    .card-divider a {
-        color: $body-font-color;
+    .card-divider {
+        padding: 1rem 1.5rem;
     }
 
     .card-divider h5 {
+        color: $jet;
         margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    li {
+        border-top: 1px solid #f5f5f5;
+
+        &:first-child {
+            border-top: 0;
+
+            a.tile-sub-link {
+                border-top: 1px solid transparent !important;
+                padding-top: 0;
+            }
+        }
+
+        &:last-child {
+            padding-bottom: 0;
+        }
+
+        .tile-sub-link {
+            @include more-link-after;
+        }
+
+        a {
+            display: block;
+            font-size: 1.1875rem;
+            font-weight: bold;
+            padding-top: .5rem;
+            width: 100%;
+
+            &::after {
+                opacity: 0;
+            }
+        }
+
+        &:hover a::after {
+            opacity: 1;
+        }
     }
 }

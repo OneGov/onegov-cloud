@@ -4,9 +4,9 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
-            <div class="cell small-12 medium-9 small-order-2 medium-order-1 large-order-1">
-                <table class="usermanagement stack" tal:define="enable_yubikey request.app.enable_yubikey">
-                    <tal:b repeat="role ('admin', 'editor', 'member')">
+            <div class="medium-7 cell main-content small-order-2 medium-order-1 large-order-1">
+                <table class="usermanagement stack hover table" tal:define="enable_yubikey request.app.enable_yubikey; enable_mtan request.app.mtan_second_factor_enabled">
+                    <tal:b repeat="role roles">
                         <thead>
                             <tr>
                                 <td>
@@ -16,6 +16,9 @@
                                 <td></td>
                                 <td tal:condition="enable_yubikey" i18n:translate>
                                     Yubikey
+                                </td>
+                                <td tal:condition="enable_mtan" i18n:translate>
+                                    mTAN
                                 </td>
                                 <td></td>
                             </tr>
@@ -45,6 +48,16 @@
                                     <td tal:condition="not:serial" i18n:translate></td>
                                 </tal:b>
 
+                                <tal:b define="phone_number user.mtan_phone_number" condition="enable_mtan">
+                                    <td tal:condition="phone_number">
+                                        <span class="yubikey">
+                                            <i class="fa fa-mobile" aria-hidden="true"></i>
+                                            ${phone_number}
+                                        </span>
+                                    </td>
+                                    <td tal:condition="not:phone_number" i18n:translate></td>
+                                </tal:b>
+
                                 <td class="text-links">
                                     <a href="${request.link(user)}" i18n:translate>View</a>
                                 </td>
@@ -53,22 +66,24 @@
                     </tal:b>
                 </table>
             </div>
-            <div class="cell small-12 medium-3 filter-panel small-order-1 medium-order-2 large-order-2">
-                <div tal:condition="filters['active']|nothing" class="filter-active">
-                    <h3 class="filter-title" i18n:translate>State</h3>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['active']" />
-                </div>
-                <div tal:condition="filters['role']|nothing" class="filter-role">
-                    <h3 class="filter-title" i18n:translate>Role</h3>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['role']" />
-                </div>
-                <div tal:condition="filters['tag']|nothing" class="filter-tags">
-                    <h3 class="filter-title" i18n:translate>Tags</h3>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['tag']" />
-                </div>
-                <div tal:condition="filters['source']|nothing" class="filter-source">
-                    <h2 class="filter-title" i18n:translate>Source</h2>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['source']" />
+            <div class="medium-4 cell medium-offset-1 sidebar filter-panel small-order-1 medium-order-2 large-order-2" id="right-sidebar">
+                <div class="sidebar-wrapper">
+                    <div tal:condition="filters['active']|nothing" class="side-panel filter-active">
+                        <h2 class="filter-title h3" i18n:translate>State</h2>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['active']" />
+                    </div>
+                    <div tal:condition="filters['role']|nothing" class="side-panel filter-role">
+                        <h2 class="filter-title h3" i18n:translate>Role</h2>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['role']" />
+                    </div>
+                    <div tal:condition="filters['tag']|nothing" class="side-panel filter-tags">
+                        <h2 class="filter-title h3" i18n:translate>Tags</h2>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['tag']" />
+                    </div>
+                    <div tal:condition="filters['source']|nothing" class="side-panel filter-source">
+                        <h2 class="filter-title h3" i18n:translate>Source</h2>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['source']" />
+                    </div>
                 </div>
             </div>
         </div>

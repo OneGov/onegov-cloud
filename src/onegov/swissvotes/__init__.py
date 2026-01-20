@@ -1,12 +1,12 @@
+from __future__ import annotations
+
 import logging
-
-from translationstring import TranslationStringFactory
-
 log = logging.getLogger('onegov.swissvotes')
 log.addHandler(logging.NullHandler())
-_ = TranslationStringFactory('onegov.swissvotes')
 
-from onegov.swissvotes.app import SwissvotesApp  # noqa
+from onegov.swissvotes.i18n import _
+
+from onegov.swissvotes.app import SwissvotesApp
 
 __all__ = (
     '_',

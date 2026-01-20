@@ -41,7 +41,7 @@ var VolunteerCart = React.createClass({
             };
         };
 
-        return (
+        var volunteerCartList = (
             <div className="volunteer-cart">
                 <div>{
                     self.state.items && self.state.items.map(function(item) {
@@ -79,20 +79,39 @@ var VolunteerCart = React.createClass({
                 }</div>
             </div>
         );
+
+        if (self.props.isDropdown === 'False') {
+            return volunteerCartList;
+        } else {
+            return (
+                <div className="volunteer-cart-container">
+                    <div className="volunteer-cart">
+                        <button className={`button ${self.state.items.length === 0 ? 'hollow' : ''}`} type="button" data-toggle="my-list">
+                            <i className="fa fa-chevron-down"/>{self.props.listLabel} ({self.state.items.length})
+                        </button>
+                        <div className="dropdown-pane" id="my-list" data-dropdown data-auto-focus="true">
+                            {volunteerCartList}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
     }
 });
 
 jQuery.fn.volunteerCart = function() {
 
     var container = $(this);
-    if (!container.get(0)) return
-    var el = container.get(0).appendChild(document.createElement('div'));
+    if (!container.get(0)) { return; }
+    var el = container.get(0);
 
     var cart = ReactDOM.render(
         <VolunteerCart
             emptyLabel={container.attr('data-empty-label')}
             buttonLabel={container.attr('data-button-label')}
             removeLabel={container.attr('data-remove-label')}
+            listLabel={container.attr('data-list-label')}
+            isDropdown={container.attr('data-is-dropdown')}
             cartURL={container.attr('data-cart-url')}
             cartSubmitURL={container.attr('data-cart-submit-url')}
             cartActionURL={container.attr('data-cart-action-url')}
@@ -100,11 +119,22 @@ jQuery.fn.volunteerCart = function() {
     );
 
     cart.refresh();
+    $(this).foundation();
 
     // only one cart is currently supported
     window.volunteerCart = cart;
 };
 
-$(document).ready(function() {
-    $('.volunteer-cart-widget').volunteerCart();
+Intercooler.ready((elt) => {
+    $(elt).find('.volunteer-cart-widget').volunteerCart();
+    $(elt).find('#activities .needs a').click(function() {
+        var btn = $(this);
+        var need = btn.data('need');
+        var error_container = btn.data('error-container');
+        if (need && error_container) {
+            window.volunteerCart.append(need, error_container);
+        }
+        return false;
+    });
 });
+

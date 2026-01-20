@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import transaction
 
@@ -14,11 +16,24 @@ from pytest import mark
 from sedate import replace_timezone
 
 
-def tzdatetime(year, month, day, hour, minute, timezone):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from .conftest import TestApp
+
+
+def tzdatetime(
+    year: int,
+    month: int,
+    day: int,
+    hour: int,
+    minute: int,
+    timezone: str
+) -> datetime:
     return replace_timezone(datetime(year, month, day, hour, minute), timezone)
 
 
-def test_transitions():
+def test_transitions() -> None:
 
     event = Event(state='initiated')
     assert event.state == 'initiated'
@@ -28,31 +43,39 @@ def test_transitions():
     with pytest.raises(AssertionError):
         event.withdraw()
     event.submit()
-    assert event.state == 'submitted'
+    # NOTE: undo the narrowing mypy did
+    event2 = event
+    assert event2.state == 'submitted'
 
     with pytest.raises(AssertionError):
         event.submit()
     # imported events that are submitted should not be deleted but withdrawn
     event.withdraw()
     event.publish()
-    assert event.state == 'published'
+    # NOTE: undo the narrowing mypy did
+    event2 = event
+    assert event2.state == 'published'
 
     with pytest.raises(AssertionError):
         event.submit()
     with pytest.raises(AssertionError):
         event.publish()
     event.withdraw()
-    assert event.state == 'withdrawn'
+    # NOTE: undo the narrowing mypy did
+    event2 = event
+    assert event2.state == 'withdrawn'
 
     with pytest.raises(AssertionError):
         event.submit()
     with pytest.raises(AssertionError):
         event.withdraw()
     event.publish()
-    assert event.state == 'published'
+    # NOTE: undo the narrowing mypy did
+    event2 = event
+    assert event2.state == 'published'
 
 
-def test_create_event(session):
+def test_create_event(session: Session) -> None:
     start = tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich')
     end = tzdatetime(2008, 2, 7, 16, 00, 'Europe/Zurich')
 
@@ -123,7 +146,7 @@ def test_create_event(session):
 
 
 @mark.parametrize("path", [module_path('tests.onegov.event', 'fixtures')])
-def test_event_image(test_app, path):
+def test_event_image(test_app: TestApp, path: str) -> None:
     session = test_app.session()
 
     event = Event(state='initiated')
@@ -142,6 +165,7 @@ def test_event_image(test_app, path):
 
     event.set_image(BytesIO(content), 'file.png')
     session.flush()
+    assert event.image is not None
     assert event.image.reference.file.read() == content
 
     with open(f'{path}/event.jpg', 'rb') as file:
@@ -153,10 +177,10 @@ def test_event_image(test_app, path):
 
     event.set_image(None, None)
     session.flush()
-    assert event.image == None
+    assert event.image is None
 
 
-def test_occurrence_dates(session):
+def test_occurrence_dates(session: Session) -> None:
     with freeze_time('2020-07-07'):
         assert Event.occurrence_dates_year_limit == 2
 
@@ -209,10 +233,9 @@ def test_occurrence_dates(session):
         assert str(dates[-1].tzinfo) == 'Europe/Zurich'
 
 
-def test_latest_occurrence(session):
-    # Fixme: Depending on the time, this test fails
-
-    def create_event(delta):
+@pytest.mark.skip_night_hours
+def test_latest_occurrence(session: Session) -> None:
+    def create_event(delta: timedelta) -> Event:
         start = datetime.now() + delta
         end = start + timedelta(hours=6)
         session.query(Occurrence).delete()
@@ -236,21 +259,24 @@ def test_latest_occurrence(session):
 
     # current
     event = create_event(timedelta(hours=-3))
+    assert event.latest_occurrence is not None
     assert event.latest_occurrence.start == event.occurrence_dates()[0]
 
     event = create_event(timedelta(days=-1, hours=-3))
+    assert event.latest_occurrence is not None
     assert event.latest_occurrence.start == event.occurrence_dates()[1]
 
     # past
     event = create_event(timedelta(days=-40))
+    assert event.latest_occurrence is not None
     assert event.latest_occurrence.start == event.occurrence_dates()[-1]
 
     # future
     event = create_event(timedelta(days=40))
+    assert event.latest_occurrence is not None
     assert event.latest_occurrence.start == event.occurrence_dates()[0]
 
-
-def test_occurrence_dates_dst(session):
+def test_occurrence_dates_dst(session: Session) -> None:
     year = datetime.today().year
 
     event = Event(state='initiated')
@@ -273,10 +299,10 @@ def test_occurrence_dates_dst(session):
         f'BYDAY=MO,TU,WE,TH,FR,SA,SU'
     )
     occurrences = event.occurrence_dates(localize=True)
-    assert all((o.hour == 10 for o in occurrences))
+    assert all(o.hour == 10 for o in occurrences)
 
 
-def test_create_event_recurring(session):
+def test_create_event_recurring(session: Session) -> None:
     timezone = 'Europe/Zurich'
     start = tzdatetime(2008, 2, 7, 10, 15, timezone)
     end = tzdatetime(2008, 2, 7, 16, 00, timezone)
@@ -390,7 +416,62 @@ def test_create_event_recurring(session):
     assert occurrences[4].event.id == event.id
 
 
-def test_update_event(session):
+def test_occurrence_filter_keywords(session: Session) -> None:
+    timezone = 'Europe/Zurich'
+    start = tzdatetime(2008, 2, 7, 10, 15, timezone)
+    end = tzdatetime(2008, 2, 7, 16, 00, timezone)
+    title = 'Squirrel Park Visit'
+    description = '<em>Furry</em> things will happen!'
+    location = 'Squirrel Park'
+    tags = ['fun', 'animals', 'furry']
+
+    event = Event(state='initiated')
+    event.timezone = timezone
+    event.start = start
+    event.end = end
+    event.recurrence = (
+        'RRULE:FREQ=WEEKLY;'
+        'UNTIL=200802111500Z;'
+        'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+    )
+    event.title = title
+    event.content = {'description': description}
+    event.location = location
+    event.tags = tags
+    event.meta = {'submitter': 'fat.pauly@squirrelpark.org'}
+    event.name = 'event'
+    event.filter_keywords = {'Filter': ['Hochpassfilter', 'Tiefpassfilter',
+                                        'Bandpassfilter', 'Bandstoppfilter'],
+                             'Another': ['Brother', 'Butter', 'Another'],
+                             }
+    session.add(event)
+
+    event.submit()
+    event.publish()
+    transaction.commit()
+
+    event = session.query(Event).one()
+
+    assert event.filter_keywords_ordered() == {
+        'Another': [
+            'Another',
+            'Brother',
+            'Butter'
+        ],
+        'Filter': [
+            'Bandpassfilter',
+            'Bandstoppfilter',
+            'Hochpassfilter',
+            'Tiefpassfilter',
+        ]
+    }
+
+    # adjust filter (value as string instead of list)
+    event.filter_keywords = {'Filter': 'TheOnlyFilter'}
+    assert event.filter_keywords_ordered() == {'Filter': 'TheOnlyFilter'}
+
+
+def test_update_event(session: Session) -> None:
     timezone = 'Europe/Zurich'
 
     event = Event(state='initiated')
@@ -479,7 +560,7 @@ def test_update_event(session):
     assert len(session.query(Event).one().occurrences) == 1
 
 
-def test_delete_event(session):
+def test_delete_event(session: Session) -> None:
     timezone = 'Europe/Zurich'
     event = Event(
         state='initiated',
@@ -544,9 +625,9 @@ def test_delete_event(session):
     assert session.query(Occurrence).count() == 0
 
 
-def test_as_ical():
+def test_as_ical() -> None:
     url = 'https://example.org/my-event'
-    event = Event(
+    event = Event(  # type: ignore[misc]
         state='initiated',
         timezone='Europe/Zurich',
         start=tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich'),
@@ -573,12 +654,12 @@ def test_as_ical():
         'BEGIN:VEVENT',
         'UID:event-2008-02-07@onegov.event',
         'SUMMARY:Squirrel Park Visit',
-        'DTSTART;VALUE=DATE-TIME:20080207T091500Z',
-        'DTEND;VALUE=DATE-TIME:20080207T150000Z',
-        'DTSTAMP;VALUE=DATE-TIME:20080207T091500Z',
+        'DTSTART:20080207T091500Z',
+        'DTEND:20080207T150000Z',
+        'DTSTAMP:20080207T091500Z',
         'DESCRIPTION:<em>Furry</em> things will happen!',
         'CATEGORIES:fun,animals,furry',
-        'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z',
+        'LAST-MODIFIED:20080207T091500Z',
         'LOCATION:Squirrel Park',
         'GEO:47.051752750515746;8.305739625357093',
         (
@@ -604,12 +685,12 @@ def test_as_ical():
         'BEGIN:VEVENT',
         'UID:event-2008-02-07@onegov.event',
         'SUMMARY:Squirrel Park Visit',
-        'DTSTART;VALUE=DATE-TIME:20080207T091500Z',
-        'DTEND;VALUE=DATE-TIME:20080207T150000Z',
-        'DTSTAMP;VALUE=DATE-TIME:20080207T091500Z',
+        'DTSTART:20080207T091500Z',
+        'DTEND:20080207T150000Z',
+        'DTSTAMP:20080207T091500Z',
         'DESCRIPTION:<em>Furry</em> things will happen!',
         'CATEGORIES:fun,animals,furry',
-        'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z',
+        'LAST-MODIFIED:20080207T091500Z',
         'LOCATION:Squirrel Park',
         'GEO:47.051752750515746;8.305739625357093',
         'URL:https://example.org/my-event',
@@ -626,12 +707,12 @@ def test_as_ical():
         'BEGIN:VEVENT',
         'UID:event-2008-02-07@onegov.event',
         'SUMMARY:Squirrel Park Visit',
-        'DTSTART;VALUE=DATE-TIME:20080207T091500Z',
-        'DTEND;VALUE=DATE-TIME:20080207T150000Z',
-        'DTSTAMP;VALUE=DATE-TIME:20080207T091500Z',
+        'DTSTART:20080207T091500Z',
+        'DTEND:20080207T150000Z',
+        'DTSTAMP:20080207T091500Z',
         'DESCRIPTION:<em>Furry</em> things will happen!',
         'CATEGORIES:fun,animals,furry',
-        'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z',
+        'LAST-MODIFIED:20080207T091500Z',
         'LOCATION:Squirrel Park',
         'GEO:47.051752750515746;8.305739625357093',
         'URL:https://example.org/my-event',
@@ -639,12 +720,12 @@ def test_as_ical():
         'BEGIN:VEVENT',
         'UID:event-2008-02-14@onegov.event',
         'SUMMARY:Squirrel Park Visit',
-        'DTSTART;VALUE=DATE-TIME:20080214T091500Z',
-        'DTEND;VALUE=DATE-TIME:20080214T150000Z',
-        'DTSTAMP;VALUE=DATE-TIME:20080207T091500Z',
+        'DTSTART:20080214T091500Z',
+        'DTEND:20080214T150000Z',
+        'DTSTAMP:20080207T091500Z',
         'DESCRIPTION:<em>Furry</em> things will happen!',
         'CATEGORIES:fun,animals,furry',
-        'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z',
+        'LAST-MODIFIED:20080207T091500Z',
         'LOCATION:Squirrel Park',
         'GEO:47.051752750515746;8.305739625357093',
         'URL:https://example.org/my-event',

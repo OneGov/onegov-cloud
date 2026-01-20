@@ -1,9 +1,14 @@
+from __future__ import annotations
+
+import click
 import gc
 import os
 import tracemalloc
+from collections import deque
+from operator import itemgetter
 
 
-def current_memory_usage():
+def current_memory_usage() -> int:
     import psutil  # only installed in development
     return psutil.Process(os.getpid()).memory_info().rss
 
@@ -18,9 +23,12 @@ class ResourceTracker:
         'server/tracker.py'
     )
 
-    def __init__(self, enable_tracemalloc):
-        self.memory_snapshots = []
-        self.memory_snapshots_count = 10
+    memory_snapshots: deque[int]
+    non_monotonic: set[str]
+    tracebacks: dict[str, tuple[int, int]]
+
+    def __init__(self, enable_tracemalloc: bool):
+        self.memory_snapshots = deque(maxlen=10)
 
         self.non_monotonic = set()
         self.tracebacks = {}
@@ -31,24 +39,33 @@ class ResourceTracker:
         # get a baseline for memory, but not for the other things
         self.track_memory()
 
-    def start(self):
+    def start(self) -> None:
         self.started = True
 
         if self.enable_tracemalloc:
             tracemalloc.start()
 
     @property
-    def memory_usage(self):
+    def memory_snapshots_count(self) -> int:
+        return self.memory_snapshots.maxlen  # type:ignore[return-value]
+
+    @memory_snapshots_count.setter
+    def memory_snapshots_count(self, value: int) -> None:
+        # NOTE: We need to create a new deque to modify its size
+        self.memory_snapshots = deque(self.memory_snapshots, maxlen=value)
+
+    @property
+    def memory_usage(self) -> int:
         return self.memory_snapshots[-1]
 
     @property
-    def memory_usage_delta(self):
+    def memory_usage_delta(self) -> int:
         if len(self.memory_snapshots) > 1:
             return self.memory_snapshots[-1] - self.memory_snapshots[-2]
         else:
             return self.memory_snapshots[-1]
 
-    def track(self):
+    def track(self) -> None:
         if not self.started:
             self.start()
 
@@ -57,13 +74,10 @@ class ResourceTracker:
         if tracemalloc.is_tracing():
             self.track_tracemalloc()
 
-    def track_memory(self):
+    def track_memory(self) -> None:
         self.memory_snapshots.append(current_memory_usage())
-        self.memory_snapshots = self.memory_snapshots[
-            -self.memory_snapshots_count:
-        ]
 
-    def condense_name(self, name):
+    def condense_name(self, name: str) -> str:
         if 'site-packages/' in name:
             return name.split('site-packages/', 1)[1]
         if 'src/' in name:
@@ -71,7 +85,7 @@ class ResourceTracker:
 
         return name
 
-    def track_tracemalloc(self):
+    def track_tracemalloc(self) -> None:
         # exclude debugging tools
         filters = tuple(
             tracemalloc.Filter(
@@ -126,30 +140,30 @@ class ResourceTracker:
                 size, stable_for = self.tracebacks[name]
                 self.tracebacks[name] = size, stable_for + 1
 
-    def show_memory_usage(self):
+    def show_memory_usage(self) -> None:
         total = self.memory_usage / 1024 / 1024
         delta = self.memory_usage_delta / 1024 / 1024
-        print(f"Total memory used: {total:.3f}MiB ({delta:+.3f})")
-        print()
+        click.echo(f'Total memory used: {total:.3f}MiB ({delta:+.3f})')
+        click.echo()
 
-    def show_monotonically_increasing_traces(self):
+    def show_monotonically_increasing_traces(self) -> None:
         traces = [
             (n, info[0], info[1]) for n, info in self.tracebacks.items()
             if info[1] < 3  # unstable values only
         ]
-        traces.sort(key=lambda item: item[1], reverse=True)
+        traces.sort(key=itemgetter(1), reverse=True)
 
         if not traces:
-            print("No montonically increasing traces")
+            click.echo('No montonically increasing traces')
             return
 
-        print(f"Monotonically increasing traces ({len(traces)}):")
+        click.echo(f'Monotonically increasing traces ({len(traces)}):')
         for name, size, stable_for in traces:
             if stable_for >= 3:
                 continue
 
             name = self.condense_name(name)
-            size = size / 1024
+            kib_size = size / 1024
 
-            print(f"{size: >8.3f} KiB | {stable_for} | {name}")
-        print()
+            click.echo(f'{kib_size: >8.3f} KiB | {stable_for} | {name}')
+        click.echo()

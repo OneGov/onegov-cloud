@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.reservation.collection import ResourceCollection
 from onegov.reservation.core import LibresIntegration
 from onegov.reservation.models import CustomAllocation as Allocation

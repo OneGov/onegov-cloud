@@ -1,13 +1,15 @@
 """
-    Send E-Mail through SMTP
+Send E-Mail through SMTP
 
-    Adapted from repoze.sendmail: https://github.com/repoze/repoze.sendmail
+Adapted from `repoze.sendmail<https://github.com/repoze/repoze.sendmail>`_.
 
-    Usage:
-        mailer = smptlib.SMTP(host, port)
-        qp = SMTPEmailQueueProcessor(mailer, maildir1, maildir2, ..., limit=x)
-        qp.send_messages()
+Usage::
+
+    mailer = smptlib.SMTP(host, port)
+    qp = SMTPEmailQueueProcessor(mailer, maildir1, maildir2, ..., limit=x)
+    qp.send_messages()
 """
+from __future__ import annotations
 
 import json
 import smtplib
@@ -22,23 +24,39 @@ from .core import log, MailQueueProcessor
 
 class SMTPMailQueueProcessor(MailQueueProcessor):
 
-    def __init__(self, mailer, *paths, limit=None):
+    def __init__(
+        self,
+        mailer: smtplib.SMTP,
+        *paths: str,
+        limit: int | None = None
+    ):
         super().__init__(*paths, limit=limit)
         self.mailer = mailer
 
-    def parse_payload(self, filename, payload):
+    def parse_payload(
+        self,
+        filename: str,
+        payload: str
+    ) -> list[EmailMessage]:
         try:
             items = json.loads(payload)
             if not isinstance(items, list):
-                raise ValueError('Invalid JSON payload')
+                raise ValueError('Invalid JSON payload')  # noqa: TRY004
 
-            messages = []
+            messages: list[EmailMessage] = []
             for item in items:
                 message = EmailMessage(policy=SMTP)
                 message['from'] = item['From']
                 message['to'] = item['To']
                 message['date'] = formatdate()
-                message['message-id'] = make_msgid()
+
+                has_message_id = any(
+                    h['Name'].lower() == 'message-id'
+                    for h in item.get('Headers', [])
+                )
+                if not has_message_id:
+                    message['message-id'] = make_msgid()
+
                 if 'ReplyTo' in item:
                     message['reply-to'] = item['ReplyTo']
                 if 'Cc' in item:
@@ -63,12 +81,13 @@ class SMTPMailQueueProcessor(MailQueueProcessor):
                     # TODO: use add_related for attachment on html part if we
                     #       ever start supporting CID in onegov.core.mail
                     maintype, subtype = attachment['ContentType'].split('/', 1)
+                    content: str = attachment['Content']
                     message.add_attachment(
                         # FIXME: This can be optimized with a custom content
                         #        manager that folds the already base64 encoded
                         #        attachment content instead of having to do
                         #        this expensive decode/encode step here.
-                        b64decode(attachment['Content'].decode('ascii')),
+                        b64decode(content.encode('ascii')),
                         maintype=maintype,
                         subtype=subtype,
                         filename=attachment['Name']
@@ -80,7 +99,7 @@ class SMTPMailQueueProcessor(MailQueueProcessor):
             log.error(f'Discarding batch {filename} with invalid JSON payload')
             return []
 
-    def send(self, filename, payload):
+    def send(self, filename: str, payload: str) -> bool:
         """ Sends the mail and returns success as bool """
         messages = self.parse_payload(filename, payload)
         success = len(messages) > 0

@@ -4,12 +4,27 @@
 # to read each others json.
 #
 # Therefore we use a common denominator kind of json encoder/decoder.
+from __future__ import annotations
+
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.types import TypeDecorator
 from sqlalchemy.dialects.postgresql import JSONB
 
 
-class JSON(TypeDecorator):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.engine.interfaces import Dialect
+    # TODO: using an actual recursive JSON serializable dict type
+    #       would be more type safe, but it might be very annoying
+    #       to use, so for now we're completely unsafe. If mypy
+    #       ever implements AnyOf, we could be slightly more safe
+    #       without making it annoying to use.
+    _Base = TypeDecorator[dict[str, Any]]
+else:
+    _Base = TypeDecorator
+
+
+class JSON(_Base):
     """ A JSONB based type that coerces None's to empty dictionaries.
 
     That is, this JSONB column does not have NULL values, it only has
@@ -20,17 +35,21 @@ class JSON(TypeDecorator):
     impl = JSONB
     cache_ok = True
 
-    def process_bind_param(self, value, dialect):
-        if value is None:
-            return {}
+    def process_bind_param(  # type:ignore[override]
+        self,
+        value: dict[str, Any] | None,
+        dialect: Dialect
+    ) -> dict[str, Any]:
 
-        return value
+        return {} if value is None else value
 
-    def process_result_value(self, value, dialect):
-        if value is None:
-            return {}
+    def process_result_value(
+        self,
+        value: dict[str, Any] | None,
+        dialect: Dialect
+    ) -> dict[str, Any]:
 
-        return value
+        return {} if value is None else value
 
 
-MutableDict.associate_with(JSON)
+MutableDict.associate_with(JSON)  # type:ignore[no-untyped-call]

@@ -1,9 +1,10 @@
-import logging
-log = logging.getLogger('onegov.user')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+from __future__ import annotations
 
-from translationstring import TranslationStringFactory
-_ = TranslationStringFactory('onegov.user')  # noqa
+import logging
+log = logging.getLogger('onegov.user')
+log.addHandler(logging.NullHandler())
+
+from onegov.user.i18n import _
 
 from onegov.user.auth import Auth
 from onegov.user.collections import UserCollection
@@ -13,7 +14,9 @@ from onegov.user.models import User
 from onegov.user.models import UserGroup
 from onegov.user.models import RoleMapping
 
-__all__ = [
+__all__ = (
+    '_',
+    'log',
     'Auth',
     'RoleMapping',
     'User',
@@ -21,4 +24,4 @@ __all__ = [
     'UserCollection',
     'UserGroup',
     'UserGroupCollection',
-]
+)

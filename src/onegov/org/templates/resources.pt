@@ -8,7 +8,7 @@
         <div class="row" tal:condition="resources">
 
             <div class="columns small-12 medium-8">
-                <metal:b use-macro="layout.macros['group_by_column']" tal:define="grouped resources; add_pagerefs request.is_logged_in" />
+                <metal:b use-macro="layout.macros['resource_groups']" tal:define="add_pagerefs request.is_logged_in" />
             </div>
 
             <div class="large-4 medium-4 columns">
@@ -16,7 +16,7 @@
                     <h2 i18n:translate="">Categories</h2>
                     <ul>
                         <li tal:repeat="resource resources">
-                            <a href="#${resource}">${resource}</a>
+                            <a href="#${resource.title}">${resource.title}</a>
                         </li>
                     </ul>
                 </div>

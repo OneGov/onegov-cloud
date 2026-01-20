@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 import re
 
@@ -7,7 +9,7 @@ from datetime import date
 AGE_RANGE_RE = re.compile(r'[0-9]+-[0-9]+')
 
 
-def age_range_decode(s):
+def age_range_decode(s: str | None) -> tuple[int, int] | None:
     if not isinstance(s, str):
         return None
 
@@ -15,6 +17,7 @@ def age_range_decode(s):
         return None
 
     age_range = tuple(int(a) for a in s.split('-'))
+    assert len(age_range) == 2
 
     if age_range[0] < age_range[1]:
         return age_range
@@ -22,7 +25,9 @@ def age_range_decode(s):
         return None
 
 
-def age_range_encode(a):
+def age_range_encode(a: tuple[int, int] | None) -> str:
+    if not a:
+        return ''
     return '-'.join(str(n) for n in a)
 
 
@@ -36,7 +41,7 @@ DATE_RANGE_RE = re.compile(
 )
 
 
-def date_range_decode(s):
+def date_range_decode(s: str | None) -> tuple[date, date] | None:
     if not isinstance(s, str):
         return None
 
@@ -51,7 +56,9 @@ def date_range_decode(s):
     )
 
 
-def date_range_encode(d):
+def date_range_encode(d: tuple[date, date] | None) -> str:
+    if not d:
+        return ''
     return ':'.join((d[0].strftime('%Y-%m-%d'), d[1].strftime('%Y-%m-%d')))
 
 

@@ -1,25 +1,40 @@
+from __future__ import annotations
+
 from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from onegov.core.collection import GenericCollection
 from onegov.core.csv import CSVFile
 from onegov.core.orm import as_selectable
 from onegov.winterthur.models import WinterthurAddress
-from pycurl import Curl
+from pycurl import Curl, URL, WRITEDATA
 from sedate import utcnow
 from sqlalchemy import select, func
+
+
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import datetime
+    from onegov.core.csv import DefaultRow
+    from sqlalchemy.orm import Query, Session
+    from typing import NamedTuple
+
+    class StreetRow(NamedTuple):
+        letter: str
+        street: str
+
 
 HOST = 'https://stadt.winterthur.ch'
 STREETS = f'{HOST}/_static/strassenverzeichnis/gswpl_strver_str.csv'
 ADDRESSES = f'{HOST}/_static/strassenverzeichnis/gswpl_strver_adr.csv'
 
 
-class AddressCollection(GenericCollection):
+class AddressCollection(GenericCollection[WinterthurAddress]):
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[WinterthurAddress]:
         return WinterthurAddress
 
-    def streets(self):
+    def streets(self) -> Query[StreetRow]:
         query = as_selectable("""
             SELECT
                 UPPER(UNACCENT(LEFT(street, 1))) AS letter, -- Text
@@ -34,34 +49,43 @@ class AddressCollection(GenericCollection):
 
         return self.session.execute(select(query.c))
 
-    def last_updated(self):
+    def last_updated(self) -> datetime | None:
         result = self.query().first()
         return result.modified if result else None
 
-    def update_state(self):
+    def update_state(self) -> Literal['failed', 'ok']:
         last_updated = self.last_updated()
         if not last_updated:
             return 'failed'
 
         diff = utcnow() - last_updated
-        diff = (diff.days * 24) + (diff.seconds / 3600)
-        if diff > 24:
+        diff_hours = (diff.days * 24) + (diff.seconds / 3600)
+        if diff_hours > 24:
             return 'failed'
 
         return 'ok'
 
-    def update(self, streets=STREETS, addresses=ADDRESSES):
+    def update(
+        self,
+        streets: str = STREETS,
+        addresses: str = ADDRESSES
+    ) -> None:
         self.delete_existing()
         self.import_from_csv(*self.load_urls(streets, addresses))
 
-    def delete_existing(self):
+    def delete_existing(self) -> None:
         for address in self.query():
             self.session.delete(address)
 
-    def import_from_csv(self, streets, addresses):
-        streets = {s.strc: s.bez for s in streets.lines}
+    def import_from_csv(
+        self,
+        streets: CSVFile[DefaultRow],
+        addresses: CSVFile[DefaultRow]
+    ) -> None:
 
-        addressless = set(streets.keys())
+        streets_d = {s.strc: s.bez for s in streets.lines}
+
+        addressless = set(streets_d.keys())
         max_id = 0
 
         for r in addresses.lines:
@@ -70,11 +94,11 @@ class AddressCollection(GenericCollection):
             address = WinterthurAddress()
             address.id = int(r.einid)
             address.street_id = int(r.strc)
-            address.street = streets[r.strc]
+            address.street = streets_d[r.strc]
             address.house_number = int(r.hnr)
             address.house_extra = r.hnrzu
             address.zipcode = int(r.plz)
-            address.zipcode_extra = r.plzzu
+            address.zipcode_extra = None if r.plzzu is None else int(r.plzzu)
             address.place = r.ort
             address.district = r.kreisname
             address.neighbourhood = r.quartiername
@@ -89,41 +113,41 @@ class AddressCollection(GenericCollection):
         # not the most elegant solution, but better than introducing a separate
         # table at least for now
         for id, key in enumerate(addressless, start=max_id + 1):
-            address = self.model_class.as_addressless(int(key), streets[key])
+            address = self.model_class.as_addressless(int(key), streets_d[key])
             address.id = id
 
             self.session.add(address)
 
         self.session.flush()
 
-    def load_urls(self, *urls):
+    def load_urls(self, *urls: str) -> tuple[CSVFile[DefaultRow], ...]:
         with ThreadPoolExecutor(max_workers=2) as executor:
             futures = (executor.submit(self.load_url, url) for url in urls)
             return tuple(f.result() for f in futures)
 
-    def load_url(self, url):
+    def load_url(self, url: str) -> CSVFile[DefaultRow]:
         buffer = BytesIO()
 
         c = Curl()
-        c.setopt(c.URL, url)
-        c.setopt(c.WRITEDATA, buffer)
+        c.setopt(URL, url)
+        c.setopt(WRITEDATA, buffer)
         c.perform()
         c.close()
 
         return CSVFile(buffer)
 
 
-class AddressSubsetCollection(GenericCollection):
+class AddressSubsetCollection(GenericCollection[WinterthurAddress]):
 
-    def __init__(self, session, street):
+    def __init__(self, session: Session, street: str) -> None:
         super().__init__(session)
         self.street = street
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[WinterthurAddress]:
         return WinterthurAddress
 
-    def subset(self):
+    def subset(self) -> Query[WinterthurAddress]:
         subset = self.query().filter_by(street=self.street)
 
         return subset.order_by(
@@ -132,5 +156,5 @@ class AddressSubsetCollection(GenericCollection):
             WinterthurAddress.house_extra
         )
 
-    def exists(self):
+    def exists(self) -> bool:
         return self.session.query(self.subset().exists()).scalar()

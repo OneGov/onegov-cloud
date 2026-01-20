@@ -1,10 +1,11 @@
-import logging
-log = logging.getLogger('onegov.org')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+from __future__ import annotations
 
-from translationstring import TranslationStringFactory  # noqa
-_ = TranslationStringFactory('onegov.org')  # noqa
+import logging
+log = logging.getLogger('onegov.org')
+log.addHandler(logging.NullHandler())
+
+from onegov.org.i18n import _
 
 from onegov.org.app import OrgApp
 
-__all__ = ['OrgApp']
+__all__ = ('_', 'log', 'OrgApp')

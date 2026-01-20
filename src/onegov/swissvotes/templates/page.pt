@@ -10,7 +10,7 @@
             </div>
             <div class="row">
                 <div class="columns large-7 small-12" id="page-text">
-                    <tal:block tal:content="structure: layout.model.content"></tal:block>
+                    <tal:block tal:content="layout.model.html_content"></tal:block>
                 </div>
                 <div class="columns large-4 large-offset-1 small-12">
 
@@ -27,6 +27,18 @@
                                 </li>
                             </ul>
                         </div>
+
+                        <div tal:condition="layout.model.show_timeline" class="timeline">
+                            <h5 i18n:translate>Swissvotes on Mastodon</h5>
+                            <div class="mt-container">
+                                <div class="mt-timeline">
+                                    <div id="mt-body" class="mt-body" role="feed">
+                                        <div class="loading-spinner"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div id="patrons" tal:condition="layout.model.id == 'disclaimer'">

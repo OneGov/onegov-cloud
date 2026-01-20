@@ -12,39 +12,58 @@
         </tal:b>
 
         <div class="grid-x grid-padding-x" tal:condition="not: page.parent">
-            <div class="small-12 medium-8 cell">
+            <div class="small-12 medium-7 cell">
                 <div metal:use-macro="layout.macros.newslist" tal:define="news children; hide_title True; lg_span 6; " />
                 <div tal:condition="not: children" i18n:translate>Your search returned no results.</div>
             </div>
             <tal:b metal:use-macro="layout.macros.page_content_sidebar"
-                     tal:define="lead None; text None; people page.people; contact layout.contact_html; coordinates None; location False; filter_panel True;">
+                    tal:define="lead None; text None; people page.people; files page.files; contact layout.contact_html; coordinates None; location False; filter_panel True;">
                 <tal:b metal:fill-slot="before-panels">
-                    <div class="filter-tags">
+                    <!--! Show hashtags if there are any -->
+                    <div tal:condition="len(tag_links) > 0" class="filter-tags side-panel">
                         <h3 class="filter-title" i18n:translate>Hashtags</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags tag_links" />
                     </div>
-                    <div class="filter-years">
+                    <div class="side-panel subscribe-panel">
+                        <h3 i18n:translate="">Subscribe</h3>
+                        <ul class="more-list">
+                            <li tal:condition="rss_link">
+                                <a class="list-link" href="${rss_link}">
+                                    <i class="fas fa-rss"></i> <span class="list-title" i18n:translate>Subscribe to RSS feed</span>
+                                </a>
+                                <a href="${rss_link}">
+                                    <p class="list-lead preview" i18n:translate>RSS feed with your current selection of tags</p>
+                                </a>
+                            </li>
+                            <li tal:condition="layout.org.show_newsletter">
+                                <a class="list-link" href="${layout.newsletter_url}">
+                                    <i class="fa fa-envelope"></i> <span class="list-title" i18n:translate>Subscribe to newsletter</span>
+                                </a>
+                                <a href="${layout.newsletter_url}">
+                                    <p class="list-lead preview" i18n:translate>Receive the newsletter by email</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--! Show years only if there is more than one year -->
+                    <div tal:condition="len(year_links) > 1" class="filter-years side-panel">
                         <h3 class="filter-title" i18n:translate>Years</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags year_links" />
                     </div>
-                </tal:b>
-                <tal:b metal:fill-slot="after-panels">
-                    <div tal:condition="layout.org.show_newsletter" class="newsletter-sidepanel">
-                        <a class="button expanded" href="${layout.newsletter_url}">
-                            <span class="h5" i18n:translate="">Newsletter Subscription</span>
-                        </a>
-                    </div>
-
                 </tal:b>
             </tal:b>
         </div>
 
         <tal:b metal:use-macro="layout.macros.page_content" tal:condition="page.parent"
-         tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact None if children else layout.contact_html; coordinates page.coordinates" />
+            tal:define="lead page.content.get('lead');text page.text|None; people page.people; contact None if children else layout.contact_html; coordinates page.coordinates; files page.files; sidepanel_links page.sidepanel_links|False; imageset page.photo_album|False; sidepanel_contact page.sidepanel_contact|None; " />
+
+
+        <div metal:use-macro="layout.macros['pagination']" tal:condition="pagination" tal:define="
+            collection pagination; current_page pagination; pagination_centered True" />
 
     </tal:b>
 
     <tal:b metal:fill-slot="after-lead">
-          <p class="subheader">${layout.format_date(layout.model.published_or_created, 'date_long')}</p>
+        <p class="subheader">${layout.format_date(layout.model.published_or_created, 'date_long')}</p>
     </tal:b>
 </div>

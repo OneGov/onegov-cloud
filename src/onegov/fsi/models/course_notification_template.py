@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from uuid import uuid4
 
+from markupsafe import Markup
 from sqlalchemy import Column, Text, ForeignKey, Enum, UniqueConstraint
 from sqlalchemy.orm import relationship
 
@@ -8,7 +11,23 @@ from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi import _
 
-NOTIFICATION_TYPES = ('info', 'reservation', 'reminder', 'cancellation')
+
+from typing import Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from collections.abc import Iterable
+    from datetime import datetime
+    from onegov.fsi.request import FsiRequest
+    from typing import Self, TypeAlias
+    from .course_event import CourseEvent
+
+    NotificationType: TypeAlias = Literal[
+        'info', 'reservation', 'reminder', 'cancellation',
+    ]
+
+
+NOTIFICATION_TYPES: tuple[NotificationType, ...] = (
+    'info', 'reservation', 'reminder', 'cancellation')
 NOTIFICATION_TYPE_TRANSLATIONS = (
     _('Info Mail'), _('Subscription Confirmation'),
     _('Event Reminder'), _('Cancellation Confirmation')
@@ -24,9 +43,12 @@ GERMAN_TYPE_TRANSLATIONS = {
 
 
 # for forms...
-def template_type_choices(request=None):
+def template_type_choices(
+    request: FsiRequest | None = None
+) -> tuple[tuple[str, str], ...]:
+
     if request:
-        translations = (
+        translations: Iterable[str] = (
             request.translate(t) for t in NOTIFICATION_TYPE_TRANSLATIONS)
     else:
         translations = NOTIFICATION_TYPE_TRANSLATIONS
@@ -35,33 +57,45 @@ def template_type_choices(request=None):
                                        translations))
 
 
-def get_template_default(context, type=None):
+def get_template_default(
+    # FIXME: We can improve the type of context in SQLAlchemy 2.0
+    context: Any,
+    type: str | None = None
+) -> str:
     t = type or context.current_parameters.get('type')
     return GERMAN_TYPE_TRANSLATIONS[t]
 
 
-def template_name(type, request=None):
+def template_name(
+    type: NotificationType | Literal['invitation'],
+    request: FsiRequest | None = None
+) -> str:
     try:
-        text = NOTIFICATION_TYPE_TRANSLATIONS[NOTIFICATION_TYPES.index(type)]
-    except ValueError:
         if type == 'invitation':
             text = _('Course Subscription Invitation')
         else:
-            raise AssertionError('There are 5 notifications types allowed')
+            # FIXME: Why not just collapse these into a dictionary?
+            text = NOTIFICATION_TYPE_TRANSLATIONS[
+                NOTIFICATION_TYPES.index(type)
+            ]
+    except ValueError as exception:
+        raise AssertionError(
+            'There are 5 notifications types allowed'
+        ) from exception
     return request.translate(text) if request else text
 
 
 class CourseInvitationTemplate:
 
     """
-    This is cind of a dummy db model for using as the template for
+    This is kind of a dummy db model for using as the template for
     CourseInviteMailLayout. If needed, this can be replaced with
     a real model without changing too much code.
     """
 
     text = None
     text_html = None
-    type = 'invitation'
+    type: Literal['invitation'] = 'invitation'
     subject = get_template_default(None, type)
 
 
@@ -74,8 +108,8 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
                       )
 
     # the notification type used to choose the correct chameleon template
-    type = Column(
-        Enum(*NOTIFICATION_TYPES, name='notification_types'),
+    type: Column[NotificationType] = Column(
+        Enum(*NOTIFICATION_TYPES, name='notification_types'),  # type:ignore
         nullable=False,
     )
 
@@ -85,25 +119,34 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
     }
 
     # One-To-Many relationship with course
-    course_event_id = Column(
-        UUID, ForeignKey('fsi_course_events.id'), nullable=False)
+    course_event_id: Column[uuid.UUID] = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('fsi_course_events.id'),
+        nullable=False
+    )
 
-    course_event = relationship('CourseEvent',
-                                back_populates='notification_templates')
+    course_event: relationship[CourseEvent] = relationship(
+        'CourseEvent',
+        back_populates='notification_templates'
+    )
 
     #: The public id of the notification template
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: Column[uuid.UUID] = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: The subject of the notification would be according to template type
-    subject = Column(Text, default=get_template_default)
+    subject: Column[str | None] = Column(Text, default=get_template_default)
 
     #: The body text injected in plaintext (not html)
-    text = Column(Text)
+    text: Column[str | None] = Column(Text)
 
     # when email based on template was sent last time
-    last_sent = Column(UTCDateTime)
+    last_sent: Column[datetime | None] = Column(UTCDateTime)
 
-    def duplicate(self):
+    def duplicate(self) -> Self:
         return self.__class__(
             type=self.type,
             id=uuid4(),
@@ -112,12 +155,14 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
         )
 
     @property
-    def text_html(self):
+    def text_html(self) -> Markup | None:
         if not self.text:
             return None
-        parts = self.text.replace('\n\n', '\n').split('\n')
-        rendered = " ".join((f'<p>{el}</p>' for el in parts if el))
-        return rendered
+
+        return Markup(' ').join(
+            Markup('<p>{}</p>').format(part)
+            for part in self.text.split('\n') if part
+        )
 
 
 class InfoTemplate(CourseNotificationTemplate):

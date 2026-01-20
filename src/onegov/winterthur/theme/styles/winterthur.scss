@@ -54,6 +54,26 @@ input[data-street-search]::placeholder {
 /*
     Sidepanel
 */
+
+.homepage .side-panel:first-child,
+.side-panel.highlighted {
+    background-color: $topbar-bg-color;
+    border: 0;
+    padding: .5rem 1rem 1rem;
+
+
+    .title,
+    h2 {
+        background: $primary-color;
+        color: $white;
+        display: block;
+        margin: -.5rem -1rem 1rem;
+        padding: .75rem 1rem;
+        text-transform: uppercase;
+}
+}
+
+
 .side-panel.highlighted {
     &.without-title {
         > ul li:first-child {
@@ -128,15 +148,24 @@ input[data-street-search]::placeholder {
         li:hover span,
         span:hover,
         span:hover a {
-            background-color: $gray-ultra-light !important;
-            border-color: $gray !important;
-            color: $primary-color !important;
+            background-color: $primary-color !important;
+            border-color: $primary-color !important;
+            color: $gray-ultra-light !important;
         }
     }
 
     .filter-periods + .filter-periods {
         margin-top: 1rem;
     }
+}
+
+/*
+    Description for a blank (uncolored) label
+*/
+.blank-label-description {
+    display: initial;
+    font-weight: bold;
+    font-size: 0.875rem;
 }
 
 .publication-nav {
@@ -293,6 +322,7 @@ input[data-street-search]::placeholder {
         display: none;
     }
 
+    &.roadwork-layout .main-title,
     &.directory-entry-layout .main-title {
         display: block;
         font-size: $h2-font-size;
@@ -515,9 +545,10 @@ table.responsive {
 /*
     Mission reports legend
 */
-.mission-report-legend {
+.mission-report-legend, .mission-report-open-data {
     background: $gray-pastel;
     padding: 1rem 1rem .5rem;
+    margin-bottom: .5rem;
 
     * {
         font-size: .8rem;
@@ -958,4 +989,20 @@ table.responsive {
 */
 .visually-hidden {
     @include element-invisible;
+}
+
+/*
+    Events
+*/
+
+.button.back-button {
+    display: inline-block;
+    background: transparent;
+    border: 1px solid $primary-color;
+    color: $primary-color;
+    padding: .5rem;
+    &:hover {
+        color: $black;
+        border: 1px solid $black;
+    }
 }

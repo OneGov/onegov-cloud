@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import codecs
 import os
 import yaml
 
 from datetime import datetime, timedelta
-from onegov.core.cache import lru_cache
+from functools import lru_cache
 from onegov.core.utils import module_path
 from onegov.event import EventCollection
 from onegov.file import FileSetCollection, FileCollection
@@ -16,13 +18,23 @@ from pathlib import Path
 from sedate import as_datetime
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import StrPath
+    from collections.abc import Callable, Iterable, Iterator
+    from libres.context.core import Context as LibresContext
+    from onegov.org.app import OrgApp
+    from sqlalchemy.orm import Session
+    from translationstring import TranslationString
+
+
 @lru_cache(maxsize=1)
-def load_content(path):
-    with open(path, 'r', encoding='utf-8') as f:
+def load_content(path: str) -> dict[str, Any]:
+    with open(path, encoding='utf-8') as f:
         return yaml.safe_load(f)
 
 
-def absolute_path(path, base):
+def absolute_path(path: str, base: StrPath) -> str:
     if path.startswith('/'):
         return path
     if path.startswith('~'):
@@ -31,8 +43,14 @@ def absolute_path(path, base):
     return os.path.join(base, path)
 
 
-def create_new_organisation(app, name, create_files=True, path=None,
-                            locale='de_CH'):
+def create_new_organisation(
+    app: OrgApp,
+    name: str,
+    create_files: bool = True,
+    path: str | None = None,
+    locale: str = 'de_CH'
+) -> Organisation:
+
     locales = {
         'de_CH': 'content/de.yaml',
         'fr_CH': 'content/fr.yaml',
@@ -49,8 +67,9 @@ def create_new_organisation(app, name, create_files=True, path=None,
     session.add(org)
 
     translator = app.translations.get(locale)
+    assert translator is not None
 
-    def translate(text):
+    def translate(text: TranslationString) -> str:
         return text.interpolate(translator.gettext(text))
 
     add_pages(session, path)
@@ -64,10 +83,10 @@ def create_new_organisation(app, name, create_files=True, path=None,
     return org
 
 
-def add_pages(session, path):
+def add_pages(session: Session, path: str) -> None:
     pages = PageCollection(session)
 
-    for ix, page in enumerate(load_content(path).get('pages')):
+    for ix, page in enumerate(load_content(path).get('pages', ())):
         if 'parent' in page:
             parent = pages.by_path(page['parent'])
         else:
@@ -84,7 +103,12 @@ def add_pages(session, path):
         )
 
 
-def add_builtin_forms(session, definitions=None, locale='de_CH'):
+def add_builtin_forms(
+    session: Session,
+    definitions: Iterable[tuple[str, str, str]] | None = None,
+    locale: str = 'de_CH'
+) -> None:
+
     forms = FormCollection(session).definitions
     definitions = definitions or builtin_form_definitions(locale=locale)
 
@@ -98,11 +122,14 @@ def add_builtin_forms(session, definitions=None, locale='de_CH'):
             )
 
         assert form.form_class().has_required_email_field, (
-            "Each form must have at least one required email field"
+            'Each form must have at least one required email field'
         )
 
 
-def builtin_form_definitions(path=None, locale='de_CH'):
+def builtin_form_definitions(
+    path: StrPath | None = None,
+    locale: str = 'de_CH'
+) -> Iterator[tuple[str, str, str]]:
     """ Yields the name, title and the form definition of all form definitions
     in the given or the default path.
 
@@ -122,7 +149,7 @@ def builtin_form_definitions(path=None, locale='de_CH'):
             yield name, title, definition
 
 
-def load_definition(path):
+def load_definition(path: str) -> tuple[str, str]:
     """ Loads the title and the form definition from the given file. """
 
     with codecs.open(path, 'r', encoding='utf-8') as formfile:
@@ -134,26 +161,35 @@ def load_definition(path):
         return title, definition
 
 
-def add_resources(libres_context, translate):
+def add_resources(
+    libres_context: LibresContext,
+    translate: Callable[[TranslationString], str]
+) -> None:
+
     resource = ResourceCollection(libres_context)
     resource.add(
-        translate(_("Daypass")),
+        translate(_('Daypass')),
         'Europe/Zurich',
         type='daypass',
         name='tageskarte'
     )
     resource.add(
-        translate(_("Conference room")),
+        translate(_('Conference room')),
         'Europe/Zurich',
         type='room',
         name='konferenzraum'
     )
 
 
-def add_filesets(session, organisation_name, path):
+def add_filesets(
+    session: Session,
+    organisation_name: str,
+    path: str
+) -> None:
+
     base = os.path.dirname(path)
 
-    for fileset in load_content(path).get('filesets', tuple()):
+    for fileset in load_content(path).get('filesets', ()):
 
         fs = FileSetCollection(session, fileset['type']).add(
             title=fileset['title'],
@@ -179,7 +215,13 @@ def add_filesets(session, organisation_name, path):
                 )
 
 
-def add_events(session, name, translate, create_files):
+def add_events(
+    session: Session,
+    name: str,
+    translate: Callable[[TranslationString], str],
+    create_files: bool
+) -> None:
+
     start = as_datetime(datetime.today().date())
 
     while start.weekday() != 6:
@@ -189,19 +231,19 @@ def add_events(session, name, translate, create_files):
 
     events = EventCollection(session)
     event = events.add(
-        title=translate(_("150 years {organisation}")).format(
+        title=translate(_('150 years {organisation}')).format(
             organisation=name
         ),
         start=start + timedelta(hours=11, minutes=0),
         end=start + timedelta(hours=22, minutes=0),
-        timezone="Europe/Zurich",
-        tags=["Party"],
-        location=translate(_("Sports facility")),
+        timezone='Europe/Zurich',
+        tags=['Party'],
+        location=translate(_('Sports facility')),
         content={
-            "description": translate(_("We celebrate our 150th anniversary.")),
-            "organizer": name
+            'description': translate(_('We celebrate our 150th anniversary.')),
+            'organizer': name
         },
-        meta={"submitter_email": "info@example.org"}
+        meta={'submitter_email': 'info@example.org'}
     )
 
     if create_files:
@@ -211,17 +253,17 @@ def add_events(session, name, translate, create_files):
     event.submit()
     event.publish()
     event = events.add(
-        title=translate(_("General Assembly")),
+        title=translate(_('General Assembly')),
         start=start + timedelta(days=2, hours=20, minutes=0),
         end=start + timedelta(days=2, hours=22, minutes=30),
-        timezone="Europe/Zurich",
-        tags=["Politics"],
-        location=translate(_("Communal hall")),
+        timezone='Europe/Zurich',
+        tags=['Politics'],
+        location=translate(_('Communal hall')),
         content={
-            "description": translate(_("As every year.")),
-            "organizer": name
+            'description': translate(_('As every year.')),
+            'organizer': name
         },
-        meta={"submitter_email": "info@example.org"},
+        meta={'submitter_email': 'info@example.org'},
     )
 
     if create_files:
@@ -231,22 +273,22 @@ def add_events(session, name, translate, create_files):
     event.submit()
     event.publish()
     event = events.add(
-        title=translate(_("Community Gymnastics")),
+        title=translate(_('Community Gymnastics')),
         start=start + timedelta(days=2, hours=10, minutes=0),
         end=start + timedelta(days=2, hours=11, minutes=0),
         recurrence=(
-            "RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=TU,TH;UNTIL={0}".format(
+            'RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=TU,TH;UNTIL={}'.format(
                 (start + timedelta(days=31)).strftime('%Y%m%dT%H%M%SZ')
             )
         ),
-        timezone="Europe/Zurich",
-        tags=["Sports"],
-        location=translate(_("Gymnasium")),
+        timezone='Europe/Zurich',
+        tags=['Sports'],
+        location=translate(_('Gymnasium')),
         content={
-            "description": translate(_("Get fit together.")),
-            "organizer": translate(_("Women's Club"))
+            'description': translate(_('Get fit together.')),
+            'organizer': translate(_("Women's Club"))
         },
-        meta={"submitter_email": "info@example.org"},
+        meta={'submitter_email': 'info@example.org'},
     )
 
     if create_files:
@@ -256,17 +298,17 @@ def add_events(session, name, translate, create_files):
     event.submit()
     event.publish()
     event = events.add(
-        title=translate(_("Football Tournament")),
+        title=translate(_('Football Tournament')),
         start=start + timedelta(days=7, hours=10, minutes=0),
         end=start + timedelta(days=7, hours=18, minutes=0),
-        timezone="Europe/Zurich",
-        tags=["Sports"],
-        location=translate(_("Sports facility")),
+        timezone='Europe/Zurich',
+        tags=['Sports'],
+        location=translate(_('Sports facility')),
         content={
-            "description": translate(_("Amateurs welcome!")),
-            "organizer": translate(_("Sports Association"))
+            'description': translate(_('Amateurs welcome!')),
+            'organizer': translate(_('Sports Association'))
         },
-        meta={"submitter_email": "info@example.org"},
+        meta={'submitter_email': 'info@example.org'},
     )
 
     if create_files:

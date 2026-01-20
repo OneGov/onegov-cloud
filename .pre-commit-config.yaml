@@ -1,0 +1,75 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+      - id: check-merge-conflict
+      - id: check-ast
+      - id: debug-statements
+        exclude: '^src/onegov/server/core.py$'
+  - repo: https://github.com/seantis/pre-commit-hooks
+    rev: v1.1.0
+    hooks:
+      - id: nocheckin
+        exclude: .pre-commit-config.yaml
+      - id: pt_structure
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.11
+    hooks:
+      - id: ruff
+        args: [ "--fix" ]
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.3.0
+    hooks:
+      - id: flake8
+        files: '^src.*\.py'
+        additional_dependencies:
+        - flake8-type-checking>=3.0.0
+  - repo: https://github.com/thibaudcolas/pre-commit-stylelint
+    rev: v16.26.1
+    hooks:
+    - id: stylelint
+      files: '^src/.*\.scss'
+      additional_dependencies:
+        - stylelint@16.19.1
+        - stylelint-config-standard-scss@15.0.0
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v10.0.0-rc.0
+    hooks:
+    - id: eslint
+      files: '^src/.*\.jsx?$'
+      additional_dependencies:
+      - eslint-react
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.9.2
+    hooks:
+      - id: bandit
+        args: ["-c", "pyproject.toml", "--quiet"]
+        additional_dependencies: [ "bandit[toml]" ]
+  - repo: https://github.com/mondeja/pre-commit-po-hooks
+    rev: 'v1.7.3'
+    hooks:
+      - id: untranslated-messages
+        files: '\.po$'
+  - repo: local
+    hooks:
+      - id: system
+        name: mypy
+        entry: ./mypy.sh
+        language: system
+        # NOTE: We want this hook to always run, but exactly once
+        #       instead of for every file. So we exclude all files
+        exclude: '.*'
+        always_run: true
+        pass_filenames: false
+      - id: system
+        name: stubtest
+        entry: ./stubtest.sh
+        language: system
+        files:  '^stubs/.*\.pyi$'
+        pass_filenames: false
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.0
+    hooks:
+      - id: gitleaks

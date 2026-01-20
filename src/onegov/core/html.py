@@ -1,7 +1,19 @@
+from __future__ import annotations
+
 import re
 
 from bleach.sanitizer import Cleaner
 from html2text import HTML2Text
+from markupsafe import Markup
+
+
+from typing import Any, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+
+_StrT = TypeVar('_StrT', bound=str)
+
 
 # html tags allowed by bleach
 SANE_HTML_TAGS = [
@@ -44,7 +56,8 @@ SANE_HTML_ATTRS = {
     'a': ['href', 'title'],
     'abbr': ['title', ],
     'acronym': ['title', ],
-    'img': ['src', 'alt', 'title']
+    'img': ['src', 'alt', 'title'],
+    'p': ['class']
 }
 
 # lines without these plaintext characters are excluded in html_to_text
@@ -62,7 +75,7 @@ VALID_PLAINTEXT_CHARACTERS = re.compile(r"""
 """, re.VERBOSE)
 
 # match empty link expressions
-EMPTY_LINK = re.compile(r"\[\]\([^)]+\)")
+EMPTY_LINK = re.compile(r'\[\]\([^)]+\)')
 
 
 cleaner = Cleaner(
@@ -71,16 +84,16 @@ cleaner = Cleaner(
 )
 
 
-def sanitize_html(html):
+def sanitize_html(html: str | None) -> Markup:
     """ Takes the given html and strips all but a whitelisted number of tags
     from it.
 
     """
 
-    return cleaner.clean(html or '')
+    return Markup(cleaner.clean(html or ''))  # nosec: B704
 
 
-def sanitize_svg(svg):
+def sanitize_svg(svg: _StrT) -> _StrT:
     """ I couldn't find a good svg sanitiser function yet, so for now
     this function will be a no-op, though it will try to detect
     svg files which are harmful.
@@ -94,13 +107,22 @@ def sanitize_svg(svg):
 
     assert 'javascript:' not in svg
     assert 'CDATA' not in svg
-    assert '<script>' not in svg
+    assert Markup('<script>') not in svg
     assert 'Set-Cookie' not in svg
 
     return svg
 
 
-def html_to_text(html, **config):
+def html_to_text(
+    html: str,
+    *,
+    unicode_snob: bool = True,
+    body_width: int = 0,
+    ignore_images: bool = True,
+    single_line_break: bool = True,
+    # FIXME: We may want to specify the other valid options
+    **config: Any
+) -> str:
     """ Takes the given HTML text and extracts the text from it.
 
     The result is markdown. The driver behind it is html2text. Have a look
@@ -113,24 +135,24 @@ def html_to_text(html, **config):
     html2text = HTML2Text()
 
     # output unicode directly, instead of approximating it to ASCII
-    config.setdefault('unicode_snob', True)
+    html2text.unicode_snob = unicode_snob
 
     # do not wrap lines after a certain length
-    config.setdefault('body_width', 0)
+    html2text.body_width = body_width
 
     # images are just converted into somewhat useless links, so disable
-    config.setdefault('ignore_images', True)
+    html2text.ignore_images = ignore_images
 
     # we do our own paragraph handling
-    config.setdefault('single_line_break', True)
+    html2text.single_line_break = single_line_break
 
     for key, value in config.items():
         setattr(html2text, key, value)
 
-    lines = html2text.handle(html).splitlines()
+    lines: Iterable[str] = html2text.handle(html).splitlines()
 
     # ignore images doesn't catch all images:
-    if config['ignore_images']:
+    if ignore_images:
         lines = (EMPTY_LINK.sub('', line) for line in lines)
 
     lines = (l.strip() for l in lines)

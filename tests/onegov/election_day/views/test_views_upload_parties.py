@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from tests.onegov.election_day.common import create_election_compound
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_election_compound
@@ -8,7 +10,12 @@ from webtest import TestApp as Client
 from webtest.forms import Upload
 
 
-def test_upload_parties_invalidate_cache(election_day_app_gr):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_upload_parties_invalidate_cache(election_day_app_gr: TestApp) -> None:
     anonymous = Client(election_day_app_gr)
     anonymous.get('/locale/de_CH').follow()
 
@@ -35,16 +42,16 @@ def test_upload_parties_invalidate_cache(election_day_app_gr):
         assert '49117' in anonymous.get(url)
 
 
-def test_upload_parties_submit(election_day_app_zg):
+def test_upload_parties_submit(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'election'
+    new.form['title_de'] = 'election'
     new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -52,7 +59,8 @@ def test_upload_parties_submit(election_day_app_zg):
 
     for slug in ('election/election', 'elections/elections'):
         with patch(
-            'onegov.election_day.views.upload.parties.import_party_results'
+            'onegov.election_day.views.upload.parties.'
+            'import_party_results_internal'
         ) as import_:
             import_.return_value = []
 

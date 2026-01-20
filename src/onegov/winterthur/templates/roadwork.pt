@@ -12,7 +12,7 @@
                 </dd>
             </tal:b>
 
-            <tal:b condition='model["DauerVon"]|nothing'>
+            <tal:b condition='model["DauerBis"]|nothing'>
                 <dt i18n:translate>End</dt>
                 <dd>
                     ${layout.format_date(model["DauerBis"], 'weekday_long')},

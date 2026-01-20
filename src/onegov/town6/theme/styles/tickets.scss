@@ -6,6 +6,8 @@ $pending-ticket-bg: $blue-light;
 $closed-ticket-bg: $green-light;
 $archived-ticket-bg: $brown-light;
 $ticket-number-bg: $yellow-light;
+$ticket-notification-enabled-icon: '\f0f3';
+$ticket-notification-disabled-icon: '\f1f6';
 
 @mixin status-batch($bg) {
     background: $bg;
@@ -89,6 +91,8 @@ $ticket-number-bg: $yellow-light;
     margin-top: 1.25rem;
 }
 
+.ticket-pdf::before { @include icon($pdf-icon); }
+
 /*
     Tickets list
 */
@@ -108,6 +112,7 @@ $frm-handler-icon: '\f044';
 $rsv-handler-icon: '\f073';
 $evn-handler-icon: '\f133';
 $dir-handler-icon: '\f07b';
+$cht-handler-icon: '\f086';
 $pending-ticket-icon: $accept-ticket-icon-hover;
 $my-ticket-icon: '\f2bd';
 $ticket-archive-icon: '\f1c6';
@@ -196,12 +201,30 @@ $all-ticket-icon: '\f055';
 .RSV-link::before { @include icon-bold($rsv-handler-icon); }
 .EVN-link::before { @include icon-bold($evn-handler-icon); }
 .DIR-link::before { @include icon-bold($dir-handler-icon); }
+.CHT-link::before { @include icon-bold($cht-handler-icon); }
 
 .ALL-link::before,
 .FRM-link::before,
 .RSV-link::before,
 .EVN-link::before,
-.DIR-link::before {
+.DIR-link::before,
+.CHT-link::before {
+    display: inline-block;
+    margin-right: 1ex;
+}
+
+.FRM-option label::before { @include icon-bold($frm-handler-icon); }
+.RSV-option label::before { @include icon-bold($rsv-handler-icon); }
+.EVN-option label::before { @include icon-bold($evn-handler-icon); }
+.DIR-option label::before { @include icon-bold($dir-handler-icon); }
+.CHT-option label::before { @include icon-bold($cht-handler-icon); }
+
+.ALL-option label::before,
+.FRM-option label::before,
+.RSV-option label::before,
+.EVN-option label::before,
+.DIR-option label::before,
+.CHT-option label::before {
     display: inline-block;
     margin-right: 1ex;
 }
@@ -223,13 +246,21 @@ $all-ticket-icon: '\f055';
     @include icon($dir-handler-icon);
 }
 
+.ticket-handler-CHT td:first-child::before {
+    @include icon($cht-handler-icon);
+}
+
 tr.ticket:hover {
     background-color: $yellow-pastel;
 }
 
-.ticket-button {
+.button.ticket-button {
     font-size: 1em;
     margin: 0;
+
+    :hover {
+        margin: 0;
+    }
 }
 
 .new-note {
@@ -247,6 +278,46 @@ tr.ticket:hover {
     &:hover::before {
         content: $accept-ticket-icon-hover;
     }
+}
+
+@keyframes wobble-horizontal {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    15% {
+        transform: translateX(-2px) rotate(-3deg);
+    }
+    30% {
+        transform: translateX(2px) rotate(3deg);
+    }
+    45% {
+        transform: translateX(-2px) rotate(-3deg);
+    }
+    60% {
+        transform: translateX(2px) rotate(3deg);
+    }
+    75% {
+        transform: translateX(-2px) rotate(-3deg);
+    }
+    90% {
+        transform: translateX(2px) rotate(3deg);
+    }
+}
+
+.ticket-delete {
+
+    float: right;
+    transition: transform 0.3s ease-in-out;
+
+    &::before {
+        @include icon-bold($delete-ticket-icon);
+        margin-right: 1ex;
+    }
+
+    &:hover::before {
+        animation: wobble-horizontal 1s ease-in-out;
+    }
+
 }
 
 .ticket-close {
@@ -288,6 +359,13 @@ tr.ticket:hover {
     }
 }
 
+.ticket-change-tag {
+    &::before {
+        @include icon($edit-link-icon);
+        margin-right: 1ex;
+    }
+}
+
 .ticket-archive {
     &::before {
         @include icon($ticket-archive-icon);
@@ -305,12 +383,29 @@ tr.ticket:hover {
 $ticket-filters-padding: .5rem;
 
 .ticket-filters {
+    @include smooth-edges;
     align-items: center;
     background-color: $table-striped-background;
     display: flex;
     justify-content: space-between;
-    padding: rem-calc(12 12 12 0);
+    padding: rem-calc(12);
 
+    li a {
+        @include smooth-edges;
+        white-space: nowrap;
+    }
+
+    .menu {
+        flex-wrap: nowrap;
+
+        @include breakpoint(medium down) {
+            flex-wrap: wrap;
+        }
+
+        @include breakpoint(small only) {
+            flex-direction: column;
+        }
+    }
 
     .dropdown-pane {
         max-width: 275px;
@@ -324,10 +419,14 @@ $ticket-filters-padding: .5rem;
         overflow-y: auto;
         padding: 0;
 
-        li:hover {
-            @include primary-color-background;
-            a { color: $white; }
+        li {
+
+            &:hover {
+                @include primary-color-background;
+                a { color: $white; }
+            }
         }
+
 
         li:first-of-type {
             padding-bottom: .25rem;
@@ -387,6 +486,7 @@ $ticket-filters-padding: .5rem;
     .right-side {
         align-items: center;
         display: flex;
+        flex-wrap: wrap;
         justify-content: flex-end;
 
         input[type="checkbox"] {
@@ -396,6 +496,46 @@ $ticket-filters-padding: .5rem;
         @include breakpoint(small only) {
             align-items: flex-end;
             flex-direction: column;
+        }
+
+        .ticket-filter-search {
+            margin-bottom: 0;
+
+            &.small {
+                margin-top: 0.5rem;
+            }
+
+            .input-group {
+                margin-bottom: 0;
+
+                input {
+                    &.small {
+                        font-size: .875rem;
+
+                        @include breakpoint(medium up) {
+                            @include smooth-edges;
+                        }
+
+                        @include breakpoint(small only) {
+                            width: 8rem;
+                        }
+                    }
+
+                    &:not(.small) {
+                        margin: 0 1rem;
+                        height: 3.05rem;
+                        @include smooth-edges;
+                    }
+                }
+
+                .button.small {
+                    @include breakpoint(small only) {
+                        margin-left: 0;
+                        padding: .5rem 0 !important;
+                        border-radius: 0 .7rem .7rem 0 !important;
+                    }
+                }
+            }
         }
     }
 
@@ -443,7 +583,7 @@ button {
     }
 }
 
-.selected-owner {
+.selected-owner, .selected-submitter {
 
     &.secondary {
         ::before {
@@ -503,6 +643,26 @@ button {
         li {
             margin-bottom: .5rem;
         }
+
+        .reservation {
+            background: $white-smoke;
+            border-radius: 2px;
+            margin-bottom: 1rem;
+            margin-left: -0.5rem;
+            position: relative;
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem 8rem .5rem .5rem;
+        }
+
+        .reservation-actions {
+            font-size: .8rem;
+            position: absolute;
+            right: .5rem;
+            top: .275rem;
+        }
     }
 
     .occurrence.occurrence {
@@ -527,6 +687,68 @@ button {
         font-size: 1rem;
         font-weight: bold;
         margin-top: -1px;
+    }
+
+    a.mute {
+        color: #333;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: none;
+        }
+        .fa-microphone {
+            display: inline;
+        }
+
+        &:hover {
+            color: $red;
+
+            .fa-microphone-slash {
+                display: inline;
+            }
+            .fa-microphone {
+                display: none;
+            }
+        }
+    }
+
+    a.unmute {
+        color: $red;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: inline;
+        }
+        .fa-microphone {
+            display: none;
+        }
+
+        &:hover {
+            color: #333;
+
+            .fa-microphone-slash {
+                display: none;
+            }
+            .fa-microphone {
+                display: inline;
+            }
+
+            &.disabled {
+                color: $red;
+                cursor: disabled;
+
+                .fa-microphone-slash {
+                    display: inline;
+                }
+                .fa-microphone {
+                    display: none;
+                }
+            }
+        }
     }
 
     .button {
@@ -563,6 +785,11 @@ button {
     .ticket-submitter-notification-status > span {
         display: inline-block;
         margin-bottom: .5rem;
+    }
+
+    .ticket-submitter-notification-status .prevent-text-overflow {
+        white-space: normal;
+        display: inline;
     }
 }
 
@@ -688,5 +915,28 @@ button {
     input {
         display: inline-block;
         width: 50%;
+    }
+}
+
+.tickets-layout {
+    .button,
+    .button:hover {
+        margin-right: 0;
+        padding: .5rem !important;
+    }
+
+    .main-title {
+        max-width: none;
+    }
+
+}
+
+.ticket-notifications {
+    float: right;
+
+    &::before { @include icon-bold($ticket-notification-disabled-icon); }
+
+    &.granted {
+        &::before { @include icon-bold($ticket-notification-enabled-icon); }
     }
 }

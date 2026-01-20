@@ -5,10 +5,24 @@ $new-language-icon: '\f1ab';
 $orange-color: #eda815;
 $dark-orange:  #be860e;
 
+.grid-container {
+    // bump default width globally
+    max-width: 1400px !important;
+}
+
+.grid-container.fluid {
+    max-width: 100% !important;
+}
+
+.time-reports::before { @include icon-bold('\f017'); }
+
 .edit-bar {
     .create-excel::before { @include icon('\f1c3'); }
-    .documents::before { @include icon('\f016')}
-    .report-change::before { @include icon('\f2bc')}
+    .documents::before { @include icon-bold('\f15b')}
+    .report-change::before { @include icon-bold('\f044')}
+    .plus::before { @include icon-bold('\f017')}
+    .time::before { @include icon-bold('\f017')}
+    .translator::before { @include icon('\f27a')}
 }
 
 .location-settings {
@@ -16,24 +30,28 @@ $dark-orange:  #be860e;
 }
 
 .mobile-phone {
-    &::before { @include icon($mobile-phone-icon); }
+    &::before { @include icon-bold($mobile-phone-icon); }
 }
 
 .private-phone {
-    &::before { @include icon($phone-icon); }
+    &::before { @include icon-bold($phone-icon); }
 }
 
 .office-phone {
-    &::before { @include icon($office-icon); }
+    &::before { @include icon-bold($office-icon); }
 }
 
 .new-language {
-    &::before { @include icon($new-language-icon); }
+    &::before { @include icon-bold($new-language-icon); }
 }
 
 #search-results-table {
     td > span {
         display: block;
+    }
+
+    span::before {
+        margin-right: .3rem;
     }
 }
 
@@ -56,7 +74,7 @@ $dark-orange:  #be860e;
 
 ul.tags {
     list-style: none;
-    margin: 0 0 .75rem;
+    margin: 0 0 2rem;
     padding: 0;
 
     li {
@@ -83,7 +101,7 @@ ul.tags {
 }
 
 // Icons
-.check-icon::before { @include icon('\f00c'); }
+.check-icon::before { @include icon-bold('\f00c'); }
 
 
 // Form adjustments
@@ -93,6 +111,10 @@ span.label-text {
 
 form fieldset legend {
     font-size: 1rem;
+}
+
+form {
+    margin-bottom: 4rem !important;
 }
 
 /*
@@ -114,7 +136,7 @@ table.translator-documents {
 }
 
 .field-type-coordinatesfield .long-field-help {
-    @include panel($callout-panel-bg);
+    // @include panel($callout-panel-bg);
 }
 
 .hints .hint {
@@ -129,6 +151,29 @@ table.translator-documents {
         margin-bottom: .375em;
 
         &::before { content: "-"; }
+    }
+
+}
+
+.translator-directory {
+    columns: 2;
+
+    @media #{$large-up} {
+        columns: 3;
+    }
+
+    dl {
+        break-inside: avoid;
+        line-height: 1.3;
+    }
+
+    dd {
+        margin-bottom: 1rem;
+    }
+
+    dt {
+        border-top: 2px solid $white-smoke;
+        padding-top: .5rem;
     }
 
 }

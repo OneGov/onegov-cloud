@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import textwrap
 import transaction
@@ -6,16 +8,24 @@ from decimal import Decimal
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.org.models import Organisation
-from onegov.winterthur.daycare import DaycareSubsidyCalculator, Services
+from onegov.winterthur.daycare import (
+    DaycareSubsidyCalculator, Services, SERVICE_DAYS)
 from sqlalchemy.orm.session import close_all_sessions
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.models import ExtendedDirectory
+    from .conftest import TestApp
+
+
 @pytest.fixture(scope='function')
-def app(winterthur_app):
+def app(winterthur_app: TestApp) -> TestApp:
     app = winterthur_app
 
     session = app.session()
 
+    dirs: DirectoryCollection[ExtendedDirectory]
     dirs = DirectoryCollection(session, type='extended')
     directory = dirs.add(
         title="Daycare Centers",
@@ -27,7 +37,7 @@ def app(winterthur_app):
         """),
         configuration=DirectoryConfiguration(
             title="[Name]",
-            order=('Name', ),
+            order=['Name'],
         ))
 
     # Some actual daycare centers in Winterthur
@@ -84,7 +94,7 @@ def app(winterthur_app):
     org.meta['daycare_settings'] = {
         'rebate': Decimal('5.00'),
         'max_rate': Decimal('107'),
-        'min_rate': Decimal('15'),
+        'min_rate': Decimal('15.85'),
         'max_income': Decimal('75000'),
         'max_wealth': Decimal('154000'),
         'min_income': Decimal('20000'),
@@ -92,15 +102,15 @@ def app(winterthur_app):
         'wealth_premium': Decimal('10.00'),
         'directory': directory.id.hex,
         'services': textwrap.dedent("""
-            - titel: "Ganzer Tag inkl. Mitagessen"
+            - titel: "Ganzer Tag inkl. Mittagessen"
               tage: "Montag, Dienstag, Mittwoch, Donnerstag, Freitag"
               prozent: 100.00
 
-            - titel: "Vor- oder Nachmittag inkl. Mitagessen"
+            - titel: "Vor- oder Nachmittag inkl. Mittagessen"
               tage: "Montag, Dienstag, Mittwoch, Donnerstag, Freitag"
               prozent: 75.00
 
-            - titel: "Vor- oder Nachmittag ohne Mitagessen"
+            - titel: "Vor- oder Nachmittag ohne Mittagessen"
               tage: "Montag, Dienstag, Mittwoch, Donnerstag, Freitag"
               prozent: 50.00
         """)
@@ -112,15 +122,15 @@ def app(winterthur_app):
     return app
 
 
-def test_calculate_example_1(app):
+def test_calculate_example_1(app: TestApp) -> None:
     calculator = DaycareSubsidyCalculator(app.session())
 
     services = Services.from_org(app.org)
-    services.select('ganzer-tag-inkl-mitagessen', 'mo')
-    services.select('ganzer-tag-inkl-mitagessen', 'di')
-    services.select('ganzer-tag-inkl-mitagessen', 'mi')
-    services.select('ganzer-tag-inkl-mitagessen', 'do')
-    services.select('ganzer-tag-inkl-mitagessen', 'fr')
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mo'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['di'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mi'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['do'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['fr'])
 
     calculation = calculator.calculate(
         daycare=calculator.daycare_by_title("Fantasia"),
@@ -148,37 +158,37 @@ def test_calculate_example_1(app):
         ("Übertrag", None, Decimal('55000')),
         ("Faktor", "×", Decimal("0.001672727")),
         ("Einkommensabhängiger Elternbeitragsbestandteil", "=", Decimal("92")),
-        ("Mindestbeitrag Eltern", "+", Decimal("15")),
-        ("Elternbeitrag brutto", "=", Decimal("107")),
+        ("Mindestbeitrag Eltern", "+", Decimal("15.85")),
+        ("Elternbeitrag brutto", "=", Decimal("107.85")),
     ]
 
     results = [(r.title, r.operation, r.amount) for r in actual.results]
     assert results == [
-        ("Übertrag", None, Decimal('107')),
-        ("Zusatzbeitrag Eltern", "+", Decimal('1')),
-        ("Rabatt", "-", Decimal('5.35')),
-        ("Elternbeitrag pro Tag", "=", Decimal('102.65')),
-        ("Städtischer Beitrag pro Tag", None, Decimal('5.35'))
+        ("Übertrag", None, Decimal('107.85')),
+        ("Zusatzbeitrag Eltern", "+", Decimal('0.15')),
+        ("Rabatt", "-", Decimal('5.39')),
+        ("Elternbeitrag pro Tag", "=", Decimal('102.61')),
+        ("Städtischer Beitrag pro Tag", None, Decimal('5.39'))
     ]
 
     results = [(r.title, r.operation, r.amount) for r in monthly.results]
     assert results == [
-        ("Wochentarif", None, Decimal('513.25')),
+        ("Wochentarif", None, Decimal('513.05')),
         ("Faktor", "×", Decimal('4.25')),
-        ("Elternbeitrag pro Monat", "=", Decimal('2181.31')),
-        ("Städtischer Beitrag pro Monat", None, Decimal('113.69')),
+        ("Elternbeitrag pro Monat", "=", Decimal('2180.46')),
+        ("Städtischer Beitrag pro Monat", None, Decimal('114.54')),
     ]
 
 
-def test_calculate_example_2(app):
+def test_calculate_example_2(app: TestApp) -> None:
     calculator = DaycareSubsidyCalculator(app.session())
 
     services = Services.from_org(app.org)
-    services.select('ganzer-tag-inkl-mitagessen', 'mo')
-    services.select('ganzer-tag-inkl-mitagessen', 'di')
-    services.select('ganzer-tag-inkl-mitagessen', 'mi')
-    services.select('ganzer-tag-inkl-mitagessen', 'do')
-    services.select('ganzer-tag-inkl-mitagessen', 'fr')
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mo'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['di'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mi'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['do'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['fr'])
 
     calculation = calculator.calculate(
         daycare=calculator.daycare_by_title("Apfelblüte"),
@@ -203,35 +213,35 @@ def test_calculate_example_2(app):
 
     results = [(r.title, r.amount) for r in gross.results]
     assert results == [
-        ("Übertrag", Decimal('5000')),
-        ("Faktor", Decimal("0.001672727")),
-        ("Einkommensabhängiger Elternbeitragsbestandteil", Decimal("8.36")),
-        ("Mindestbeitrag Eltern", Decimal("15")),
-        ("Elternbeitrag brutto", Decimal("23.36")),
+        ("Übertrag", Decimal('5000.00')),
+        ("Faktor", Decimal("0.0016572730")),
+        ("Einkommensabhängiger Elternbeitragsbestandteil", Decimal("8.29")),
+        ("Mindestbeitrag Eltern", Decimal("15.85")),
+        ("Elternbeitrag brutto", Decimal("24.14")),
     ]
 
     results = [(r.title, r.amount) for r in actual.results]
     assert results == [
-        ("Übertrag", Decimal('23.36')),
-        ("Zusatzbeitrag Eltern", Decimal('0')),
-        ("Elternbeitrag pro Tag", Decimal('23.36')),
-        ("Städtischer Beitrag pro Tag", Decimal('83.64'))
+        ("Übertrag", Decimal('24.14')),
+        ("Zusatzbeitrag Eltern", Decimal('0.00')),
+        ("Elternbeitrag pro Tag", Decimal('24.14')),
+        ("Städtischer Beitrag pro Tag", Decimal('82.86'))
     ]
 
     results = [(r.title, r.amount) for r in monthly.results]
     assert results == [
-        ("Wochentarif", Decimal('116.80')),
+        ("Wochentarif", Decimal('120.70')),
         ("Faktor", Decimal('4.2500')),
-        ("Elternbeitrag pro Monat", Decimal('496.40')),
-        ("Städtischer Beitrag pro Monat", Decimal('1777.35')),
+        ("Elternbeitrag pro Monat", Decimal('512.98')),
+        ("Städtischer Beitrag pro Monat", Decimal('1760.78')),
     ]
 
 
-def test_calculate_example_3(app):
+def test_calculate_example_3(app: TestApp) -> None:
     calculator = DaycareSubsidyCalculator(app.session())
 
     services = Services.from_org(app.org)
-    services.select('ganzer-tag-inkl-mitagessen', 'mo')
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mo'])
 
     calculation = calculator.calculate(
         daycare=calculator.daycare_by_title("Pinochio"),
@@ -256,36 +266,36 @@ def test_calculate_example_3(app):
 
     results = [(r.title, r.amount) for r in gross.results]
     assert results == [
-        ("Übertrag", Decimal('52000')),
-        ("Faktor", Decimal("0.001509091")),
-        ("Einkommensabhängiger Elternbeitragsbestandteil", Decimal("78.47")),
-        ("Mindestbeitrag Eltern", Decimal("15")),
-        ("Elternbeitrag brutto", Decimal("93.47")),
+        ("Übertrag", Decimal('52000.00')),
+        ("Faktor", Decimal("0.0014936360")),
+        ("Einkommensabhängiger Elternbeitragsbestandteil", Decimal("77.67")),
+        ("Mindestbeitrag Eltern", Decimal("15.85")),
+        ("Elternbeitrag brutto", Decimal("93.52")),
     ]
 
     results = [(r.title, r.amount) for r in actual.results]
     assert results == [
-        ("Übertrag", Decimal('93.47')),
-        ("Zusatzbeitrag Eltern", Decimal('0')),
-        ("Rabatt", Decimal('4.67')),
-        ("Elternbeitrag pro Tag", Decimal('88.80')),
-        ("Städtischer Beitrag pro Tag", Decimal('9.20'))
+        ("Übertrag", Decimal('93.52')),
+        ("Zusatzbeitrag Eltern", Decimal('0.00')),
+        ("Rabatt", Decimal('4.68')),
+        ("Elternbeitrag pro Tag", Decimal('88.84')),
+        ("Städtischer Beitrag pro Tag", Decimal('9.16'))
     ]
 
     results = [(r.title, r.amount) for r in monthly.results]
     assert results == [
-        ("Wochentarif", Decimal('88.80')),
+        ("Wochentarif", Decimal('88.84')),
         ("Faktor", Decimal('4.0833')),
-        ("Elternbeitrag pro Monat", Decimal('362.60')),
-        ("Städtischer Beitrag pro Monat", Decimal('37.57')),
+        ("Elternbeitrag pro Monat", Decimal('362.76')),
+        ("Städtischer Beitrag pro Monat", Decimal('37.40')),
     ]
 
 
-def test_caclulate_example_4(app):
+def test_caclulate_example_4(app: TestApp) -> None:
     calculator = DaycareSubsidyCalculator(app.session())
 
     services = Services.from_org(app.org)
-    services.select('ganzer-tag-inkl-mitagessen', 'mo')
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mo'])
 
     calculation = calculator.calculate(
         daycare=calculator.daycare_by_title("Luftibus"),
@@ -310,38 +320,38 @@ def test_caclulate_example_4(app):
 
     results = [(r.title, r.amount) for r in gross.results]
     assert results == [
-        ("Übertrag", Decimal('0')),
-        ("Faktor", Decimal("0.001672727")),
-        ("Einkommensabhängiger Elternbeitragsbestandteil", Decimal("0")),
-        ("Mindestbeitrag Eltern", Decimal("15")),
-        ("Elternbeitrag brutto", Decimal("15")),
+        ("Übertrag", Decimal('0.00')),
+        ("Faktor", Decimal("0.0016727270")),
+        ("Einkommensabhängiger Elternbeitragsbestandteil", Decimal("0.00")),
+        ("Mindestbeitrag Eltern", Decimal("15.85")),
+        ("Elternbeitrag brutto", Decimal("15.85")),
     ]
 
     results = [(r.title, r.amount) for r in actual.results]
     assert results == [
-        ("Übertrag", Decimal('15')),
-        ("Zusatzbeitrag Eltern", Decimal('3')),
-        ("Rabatt", Decimal('0.75')),
-        ("Elternbeitrag pro Tag", Decimal('17.25')),
-        ("Städtischer Beitrag pro Tag", Decimal('92.75'))
+        ("Übertrag", Decimal('15.85')),
+        ("Zusatzbeitrag Eltern", Decimal('2.15')),
+        ("Rabatt", Decimal('0.79')),
+        ("Elternbeitrag pro Tag", Decimal('17.21')),
+        ("Städtischer Beitrag pro Tag", Decimal('92.79'))
     ]
 
     results = [(r.title, r.amount) for r in monthly.results]
     assert results == [
-        ("Wochentarif", Decimal('17.25')),
+        ("Wochentarif", Decimal('17.21')),
         ("Faktor", Decimal('4.25')),
-        ("Elternbeitrag pro Monat", Decimal('73.31')),
-        ("Städtischer Beitrag pro Monat", Decimal('394.19')),
+        ("Elternbeitrag pro Monat", Decimal('73.14')),
+        ("Städtischer Beitrag pro Monat", Decimal('394.36')),
     ]
 
 
-def test_calculate_example_5(app):
+def test_calculate_example_5(app: TestApp) -> None:
     calculator = DaycareSubsidyCalculator(app.session())
 
     services = Services.from_org(app.org)
-    services.select('ganzer-tag-inkl-mitagessen', 'mo')
-    services.select('vor-oder-nachmittag-inkl-mitagessen', 'di')
-    services.select('vor-oder-nachmittag-inkl-mitagessen', 'mi')
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mo'])
+    services.select('vor-oder-nachmittag-inkl-mittagessen', SERVICE_DAYS['di'])
+    services.select('vor-oder-nachmittag-inkl-mittagessen', SERVICE_DAYS['mi'])
 
     calculation = calculator.calculate(
         daycare=calculator.daycare_by_title("Am Park"),
@@ -366,17 +376,17 @@ def test_calculate_example_5(app):
 
     results = [(r.title, r.amount) for r in gross.results]
     assert results == [
-        ("Übertrag", Decimal('22000')),
-        ("Faktor", Decimal("0.001672727")),
+        ("Übertrag", Decimal('22000.00')),
+        ("Faktor", Decimal("0.0016727270")),
         ("Einkommensabhängiger Elternbeitragsbestandteil", Decimal("36.80")),
-        ("Mindestbeitrag Eltern", Decimal("15")),
-        ("Elternbeitrag brutto", Decimal("51.80")),
+        ("Mindestbeitrag Eltern", Decimal("15.85")),
+        ("Elternbeitrag brutto", Decimal("52.65")),
     ]
 
     results = [(r.title, r.amount) for r in actual.results]
     assert results == [
-        ("Übertrag", Decimal('51.80')),
-        ("Zusatzbeitrag Eltern", Decimal('13')),
+        ("Übertrag", Decimal('52.65')),
+        ("Zusatzbeitrag Eltern", Decimal('12.15')),
         ("Elternbeitrag pro Tag", Decimal('64.80')),
         ("Städtischer Beitrag pro Tag", Decimal('55.20'))
     ]

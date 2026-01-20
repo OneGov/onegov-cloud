@@ -35,10 +35,6 @@
             if ('options' in params) options = params.options;
         }
 
-        var isUndefined = function(obj) {
-            return obj === void 0;
-        };
-
         // We need some more margins to display the (vertically centered)
         // node names
         margin.top += 0.5 * parseInt(options.fontSize);
@@ -141,12 +137,13 @@
                 var bar = node.append('rect')
                     .attr('height', function(d) { return d.dy; })
                     .attr('width', options.nodeWidth)
-                    .style('fill', function(d) { return isUndefined(d.color) ? options.colorInactive : d.color; })
+                    .style('fill', function(d) {
+                        if (d.color) return d.color;
+                        return d.active ? options.colorActive : options.colorInactive;
+                    })
                     .style('shape-rendering', 'crispEdges');
                 bar.append('title')
                     .text(function(d) { return d.name ? d.name + '\n' + d.value : d.value; });
-                bar.filter(function(d) { return d.active; })
-                    .style('fill', options.colorActive);
 
                 // ... the inner value of the bar
                 node.filter(function(d) { return d.display_value; })
@@ -211,7 +208,12 @@
                     .attr('class', 'link')
                     .attr('d', path)
                     .attr('style', function(d) {
-                        var color = isUndefined(d.color) ? options.colorInactive : d.color;
+                        var color = options.colorInactive;
+                        if (d.color) {
+                            color = d.color;
+                        } else if (d.active) {
+                            color = options.colorActive;
+                        }
                         var width = Math.round(Math.max(1, d.dy));
                         return 'stroke: ' + color + '; stroke-opacity: 0.5; fill: none; stroke-width: ' + width + 'px';
                     })
@@ -229,31 +231,31 @@
                 if (interactive) {
                     node.on('mouseover', function(d) {
                     	link.transition()
-                            .duration(700)
+                            .duration(500)
                     		.style('opacity', 0.1);
                     	link.filter(function(s) { return d.id == s.source.id; })
                             .transition()
-                            .duration(700)
+                            .duration(500)
                     		.style('opacity', 1);
                     	link.filter(function(t) { return d.id == t.target.id; })
                             .transition()
-                            .duration(700)
+                            .duration(500)
                     		.style('opacity', 1);
                     });
                     node.on('mouseout', function(d) {
                         link.transition()
-                            .duration(700)
+                            .duration(500)
                     		.style('opacity', 1);
                     });
                     link.on('mouseover', function(d) {
                     	link.filter(function(s) { return s != d; })
                             .transition()
-                            .duration(700)
+                            .duration(500)
                     		.style('opacity', 0.1);
                     });
                     link.on('mouseout', function(d) {
                         link.transition()
-                            .duration(700)
+                            .duration(500)
                     		.style('opacity', 1);
                     });
                 }
