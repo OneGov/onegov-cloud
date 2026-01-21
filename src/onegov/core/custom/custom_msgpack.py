@@ -6,8 +6,8 @@ import ormsgpack
 
 from decimal import Decimal
 from markupsafe import Markup
-from sqlalchemy.util import lightweight_named_tuple
-from sqlalchemy.util._collections import AbstractKeyedTuple
+from sqlalchemy.engine.result import result_tuple  # type: ignore[attr-defined]
+from sqlalchemy.engine.row import Row  # type: ignore[import-untyped]
 from types import GeneratorType
 from uuid import UUID
 
@@ -163,8 +163,8 @@ class Serializers:
         if tag_and_serializer is None:
             if isinstance(value, dict):
                 return dict(value)
-            elif isinstance(value, AbstractKeyedTuple):
-                tag_and_serializer = self.by_type[AbstractKeyedTuple]
+            elif isinstance(value, Row):
+                tag_and_serializer = self.by_type[Row]
             elif isinstance(value, GeneratorType):
                 tag_and_serializer = self.by_type[tuple]
             else:
@@ -243,20 +243,23 @@ default_serializers.register(BytesSerializer(
 
 
 # NOTE: SQLAlchemy result support
-def load_keyed_tuple(b: bytes) -> AbstractKeyedTuple[Any]:
-    name, items = unpackb(b)
-    cls = lightweight_named_tuple(name, items.keys())
-    return cls(**items)
+def store_sqlalchemy_row(r: Row[Any]) -> bytes:
+    fields = list(r._fields)
+    data = [getattr(r, name) for name in fields]
+    return packb([fields, data])
+
+
+def load_sqlalchemy_row(b: bytes) -> Row[Any]:
+    fields, data = unpackb(b)
+    cls = result_tuple(fields)
+    return cls(data=data)
 
 
 default_serializers.register(BytesSerializer(
     tag=7,
-    target=AbstractKeyedTuple,
-    encode=lambda t: packb([
-        t.__class__.__name__,
-        {key: getattr(t, key) for key in t.keys()},
-    ]),
-    decode=load_keyed_tuple
+    target=Row,
+    encode=store_sqlalchemy_row,
+    decode=load_sqlalchemy_row
 ))
 
 default_serializers.register(StringSerializer(

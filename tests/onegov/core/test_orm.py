@@ -32,7 +32,8 @@ from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
 from sedate import utcnow
-from sqlalchemy import Column, Integer, Text, ForeignKey, func, select, and_
+from sqlalchemy import and_, func, inspect, select
+from sqlalchemy import Column, ForeignKey, Integer, Text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import MutableDict
@@ -1284,9 +1285,13 @@ def test_orm_signals(postgres_dsn: str) -> None:
     assert deleted[1][0].document_id == 2  # type: ignore[union-attr]
     assert deleted[1][1] == 'foo'
 
-    # .. since those objects are never loaded, the body is not present
-    assert not deleted[0][0].body
-    assert not deleted[1][0].body
+    # ensure these objects are detached
+    assert inspect(deleted[0][0]).detached
+    assert inspect(deleted[1][0]).detached
+
+    # and stay deleted
+    transaction.commit()
+    assert session.query(Comment).filter(Comment.document_id == 2).all() == []
 
 
 def test_get_polymorphic_class() -> None:
