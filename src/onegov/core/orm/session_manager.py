@@ -1,17 +1,21 @@
 from __future__ import annotations
 
-import threading
 import re
+import threading
+import transaction
+import warnings
 import weakref
 import zope.sqlalchemy
 
 from blinker import Signal
 from contextlib import contextmanager
 from functools import lru_cache
+from onegov.core import log
 from onegov.core.custom import json
 from sqlalchemy import create_engine, event, select, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
+from sqlalchemy.orm.query import Query
 from sqlalchemy.sql import Delete, Update
 from sqlalchemy_utils.aggregates import manager as aggregates_manager
 
@@ -23,7 +27,26 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import ORMExecuteState  # type: ignore[attr-defined]
     from sqlalchemy.orm.session import Session, SessionTransaction
 
+    _T = TypeVar('_T')
     _S = TypeVar('_S', bound=Session)
+
+    # FIXME: we can lift this out of type checking context in SQLAlchemy 2.0
+    class ForceFetchQueryClass(Query[_T]):
+        def delete(self, synchronize_session: Any = None) -> int:
+            ...
+
+else:
+
+    class ForceFetchQueryClass(Query):
+        """ Alters the builtin query class, ensuring that the delete query
+        always fetches the data first, which is important for the bulk delete
+        events to get the actual objects affected by the change.
+
+        """
+
+        # FIXME: Make this work again
+        def delete(self, synchronize_session: Any = None) -> int:
+            return super().delete('fetch')
 
 
 # Limits the lifteime of sessions for n seconds. Postgres will automatically
@@ -232,6 +255,7 @@ class SessionManager:
         self.current_schema: str | None = None
 
         self._ignore_bulk_updates = False
+        self._ignore_bulk_deletes = False
 
         self.on_schema_init = Signal()
         self.on_transaction_join = Signal()
@@ -279,6 +303,12 @@ class SessionManager:
         self.session_factory = scoped_session(
             sessionmaker(
                 bind=self.engine,
+                # NOTE: We should consider getting rid of this, now
+                #       that we're no longer forced to 'fetch' in order
+                #       to get ORM updates. However some queries will not
+                #       work with the default strategy, so we would need
+                #       to manually change the strategy for them.
+                query_cls=ForceFetchQueryClass,
                 **session_config
             ),
             scopefunc=self._scopefunc,
@@ -301,6 +331,23 @@ class SessionManager:
             yield self
         finally:
             self._ignore_bulk_updates = previous_state
+
+    @contextmanager
+    def ignore_bulk_deletes(self) -> Iterator[Self]:
+        """ Ensures bulk delete don't get blocked when we can't emit
+        delete events for each changed object.
+
+        In some cases we know that a bulk delete is fine, even if it
+        doesn't fully propagate through our event hooks. This function
+        should only be rarely used however, where the speed increase
+        outweighs the potential synchrocity issues.
+        """
+        previous_state = self._ignore_bulk_deletes
+        self._ignore_bulk_deletes = True
+        try:
+            yield self
+        finally:
+            self._ignore_bulk_deletes = previous_state
 
     def register_engine(self, engine: Engine) -> None:
         """ Takes the given engine and registers it with the schema
@@ -391,24 +438,32 @@ class SessionManager:
 
             stmt = orm_execution_state.statement
             if isinstance(stmt, Update):
-                if self._ignore_bulk_updates or not self.on_update.receivers:
+                if self._ignore_bulk_updates:
+                    return
+
+                model = orm_execution_state.bind_mapper.class_
+                prevent_bulk_changes_on_aggregate_modules(model)
+                if not self.on_update.receivers:
                     return
                 is_update = True
             elif isinstance(stmt, Delete):
+                if self._ignore_bulk_deletes:
+                    return
+
+                model = orm_execution_state.bind_mapper.class_
+                prevent_bulk_changes_on_aggregate_modules(model)
                 if not self.on_delete.receivers:
                     return
                 is_update = False
             else:
                 return
 
-            # we only augment updates if there isn't already a RETURNING
+            # if there is already a RETURNING we're in trouble
             assert not stmt.returning_column_descriptions, """
                 Bulk queries with a custom RETURNING cannot currently be
                 supported because it is unclear what rows were affected.
                 By default you should be getting model instances back.
             """
-
-            model = orm_execution_state.bind_mapper.class_
 
             # add a RETURNING to the statement
             stmt = stmt.returning(model)
@@ -418,15 +473,35 @@ class SessionManager:
             orm_stmt = select(model).from_statement(  # type: ignore[attr-defined]
                 stmt).execution_options(populate_existing=True)
 
-            result = orm_execution_state.invoke_statement(orm_stmt)
+            savepoint = transaction.savepoint()
+            try:
+                result = orm_execution_state.invoke_statement(orm_stmt)
+            # NOTE: We want to avoid hard failures here, but we still want to
+            #       fail in tests, so we emit a warning
+            except NotImplementedError:
+                savepoint.rollback()
+                log.warning(
+                    'Results from a bulk query could not be retrieved for '
+                    'further processing by on_update/on_delete handlers, '
+                    'so some caches or search indexes may be temporarly '
+                    'invalid.'
+                )
+                warnings.warn(
+                    f'Failed to retrieve results from bulk query:\n'
+                    f'{stmt.compile()}',
+                    UserWarning,
+                    stacklevel=0
+                )
+                return
+
             rowcount = 0
             if is_update:
-                for obj in result.scalars():
+                for obj in result.scalars().unique():
                     self.on_update.send(self.current_schema, obj=obj)
                     rowcount += 1
             else:
                 session = orm_execution_state.session
-                for obj in result.scalars():
+                for obj in result.scalars().unique():
                     # NOTE: Ensure this is not treated as a persisted instance
                     session.expunge(obj)
                     self.on_delete.send(

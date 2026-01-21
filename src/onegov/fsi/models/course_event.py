@@ -446,9 +446,9 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         a subscription for the parent course in the same year are excluded."""
         session = object_session(self)
 
-        excl = (
+        excluded = (
             self.excluded_subscribers(year, exclude_inactive)
-            .subquery('excl')
+            .scalar_subquery()  # type: ignore[union-attr]
         )
 
         # Use this because its less costly
@@ -466,7 +466,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
                 )
             )
 
-        query = query.filter(CourseAttendee.id.notin_(excl))
+        query = query.filter(CourseAttendee.id.notin_(excluded))
 
         if not as_uids:
             query = query.order_by(

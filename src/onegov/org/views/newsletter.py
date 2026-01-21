@@ -32,18 +32,17 @@ from onegov.org.layout import NewsletterLayout
 from onegov.org.layout import RecipientLayout
 from onegov.org.models import News
 from onegov.org.models import PublicationCollection
-from onegov.org.utils import ORDERED_ACCESS, \
-    extract_categories_and_subcategories
+from onegov.org.utils import extract_categories_and_subcategories
+from onegov.org.utils import ORDERED_ACCESS
+from onegov.org.views.utils import show_tags, show_filters
 from sedate import utcnow
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer
 from string import Template
 from webob.exc import HTTPNotFound
 
-from onegov.org.views.utils import show_tags, show_filters
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.types import EmailJsonDict, RenderData
@@ -69,10 +68,19 @@ def get_newsletter_form(
     form = form.with_publications(request, publications)
 
     occurrences = OccurrenceCollection(request.session).query()
-    occurrences = occurrences.order_by(
-        Occurrence.start, Occurrence.title
+    occurrences = occurrences.order_by(None).order_by(
+        Occurrence.start, Occurrence.title, Occurrence.event_id
     )
-    occurrences = occurrences.distinct(Occurrence.event_id)
+    # FIXME: Upgrading to SQLALchemy 1.4 revealed a bug here, it used to just
+    #        be distinct on `Occurrence.event_id`, but DISTINCT ON can't start
+    #        with different columns than ORDER BY, so previously SQLAlchemy
+    #        probably automatically corrected the DISTINCT ON, so it would work
+    #        it seems that there are tests that rely on every occurrence being
+    #        present, not just the next one, so it's unclear what this DISTINCT
+    #        ON accomplishes. It's possible we can get rid of it altogether.
+    occurrences = occurrences.distinct(
+        Occurrence.start, Occurrence.title, Occurrence.event_id
+    )
     form = form.with_occurrences(request, occurrences)
 
     move_fields(

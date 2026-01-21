@@ -155,13 +155,13 @@ class ProporzElection(
         else:
             e_ids = session.query(ElectionResult.id).filter(
                 ElectionResult.election_id == self.id
-            ).all()
+            ).scalar_subquery()
             session.query(CandidatePanachageResult).filter(
                 CandidatePanachageResult.election_result_id.in_(e_ids)
             ).delete()
             l_ids = session.query(List.id).filter(
                 List.election_id == self.id
-            ).all()
+            ).scalar_subquery()
             session.query(ListPanachageResult).filter(
                 ListPanachageResult.target_id.in_(l_ids)
             ).delete()

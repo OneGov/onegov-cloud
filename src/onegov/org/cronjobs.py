@@ -266,7 +266,8 @@ def delete_old_tans(request: OrgRequest) -> None:
     query = request.session.query(TAN).filter(TAN.created < cutoff)
     # cronjobs happen outside a regular request, so we don't need
     # to synchronize with the session
-    query.delete(synchronize_session=False)
+    with request.app.session_manager.ignore_bulk_deletes():
+        query.delete(synchronize_session=False)
 
 
 def delete_old_tan_accesses(request: OrgRequest) -> None:
@@ -282,7 +283,8 @@ def delete_old_tan_accesses(request: OrgRequest) -> None:
     query = request.session.query(TANAccess).filter(TANAccess.created < cutoff)
     # cronjobs happen outside a regular request, so we don't need
     # to synchronize with the session
-    query.delete(synchronize_session=False)
+    with request.app.session_manager.ignore_bulk_deletes():
+        query.delete(synchronize_session=False)
 
 
 @OrgApp.cronjob(hour='*', minute='*/15', timezone='UTC')

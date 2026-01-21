@@ -212,13 +212,7 @@ class FormDefinitionCollection:
                 definition.files = []
                 self.session.flush()
 
-        # this will fail if there are any submissions left
-        # todo: this was a bulk delete but this is not possible anymore with
-        # the search integration / ORM signals. Deleting these items one by
-        # one does not raise an IntegrityError anymore!
-        # self.query().filter(FormDefinition.name == name).delete('fetch')
-        for definition in self.query().filter(FormDefinition.name == name):
-            self.session.delete(definition)
+        self.query().filter(FormDefinition.name == name).delete('fetch')
 
         self.session.flush()
 

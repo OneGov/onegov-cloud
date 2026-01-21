@@ -732,9 +732,15 @@ class Form(BaseForm):
         include = include or set(self._fields.keys())
         exclude = exclude or set()
 
-        for name, field in self._fields.items():
-            if name in include and name not in exclude:
-                field.populate_obj(obj, name)
+        # NOTE: We've observed some issues starting with SQLAlchemy 1.4 where
+        #       a flush could occur mid-object-population, this is not only
+        #       inefficient, but also error-prone for fields that rely on
+        #       the original object state being correct (observers and other
+        #       subscribers could mutate that state during the flush).
+        with self.request.session.no_autoflush:
+            for name, field in self._fields.items():
+                if name in include and name not in exclude:
+                    field.populate_obj(obj, name)
 
     def process(
         self,

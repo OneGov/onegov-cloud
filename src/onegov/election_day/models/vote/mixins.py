@@ -56,8 +56,9 @@ class DerivedAttributesMixin:
     @accepted.expression  # type:ignore[no-redef]
     def accepted(cls) -> ColumnElement[bool | None]:
         return case(
+            (cls.counted.is_(False), None),
             (cls.yeas > cls.nays, True),
-            else_=cls.counted
+            else_=False
         )
 
 

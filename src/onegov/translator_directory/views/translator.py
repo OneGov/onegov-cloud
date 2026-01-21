@@ -772,7 +772,7 @@ def view_mail_templates(
             ),
         }
 
-        docx_template_id = (
+        docx_template_id, = (
             GeneralFileCollection(request.session)
             .query()
             .filter(File.name == template_name)

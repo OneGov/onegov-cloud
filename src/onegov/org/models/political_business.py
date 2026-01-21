@@ -459,5 +459,4 @@ class PoliticalBusinessParticipationCollection(
         self,
         parliamentarian_id: uuid.UUID
     ) -> Query[PoliticalBusinessParticipation]:
-        query = super().query()
-        return query.filter_by(parliamentarian_id=parliamentarian_id)
+        return self.query().filter_by(parliamentarian_id=parliamentarian_id)

@@ -11,7 +11,7 @@ from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
 from onegov.user.i18n import _
-from onegov.user.models.group import UserGroup, group_association_table
+from onegov.user.models.group import UserGroup
 from sedate import utcnow
 from sqlalchemy import Boolean, Column, Index, Text, func
 from sqlalchemy import UniqueConstraint
@@ -28,12 +28,22 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.core.types import AppenderQuery
     from onegov.user import RoleMapping
+    from sqlalchemy import Table
     from typing_extensions import TypedDict
 
     class SessionDict(TypedDict):
         address: str | None
         timestamp: str
         agent: str | None
+
+    # HACK: We experienced flaky behavior with mypy when importing this
+    #       symbol normally, so for now we'll just declare what this
+    #       symbol is, so it doesn't have to retrieved from the other module
+    #       eventually we can hopefully get rid of this again and just
+    #       import normally.
+    group_association_table: Table
+else:
+    from onegov.user.models.group import group_association_table
 
 
 class User(Base, TimestampMixin, ORMSearchable):
