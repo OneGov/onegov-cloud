@@ -85,7 +85,9 @@ class GroupInvite:
         """
 
         return self.session.query(Occasion).filter(Occasion.id.in_(
-            self.bookings().with_entities(Booking.occasion_id).subquery()
+            self.bookings()
+            .with_entities(Booking.occasion_id)
+            .scalar_subquery()
         )).one()
 
     @cached_property
@@ -128,7 +130,7 @@ class GroupInvite:
             self.session.query(Booking)
             .filter(Booking.occasion_id == self.occasion.id)
             .filter(Booking.attendee_id.in_(
-                attendees.with_entities(Attendee.id).subquery()))
+                attendees.with_entities(Attendee.id).scalar_subquery()))
         )
 
         bookings = {b.attendee_id: b for b in bookings_query}

@@ -841,7 +841,7 @@ def _files_observer(
 
     # remove ourselves if the link has been deleted
     state = inspect(self)
-    for file in state.attrs.files.history.deleted:
+    for file in state.attrs.files.history.deleted or ():
         if key in file.meta.get('linked_accesses', ()):
             del file.meta['linked_accesses'][key]
             flag_modified(file, 'meta')

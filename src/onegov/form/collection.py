@@ -116,7 +116,7 @@ class FormCollection:
         )
         definitions = definitions.order_by(FormDefinition.name)
 
-        for form, submissions_count in definitions.all():
+        for form, submissions_count in definitions:
             form.submissions_count = submissions_count or 0
             yield form
 
@@ -922,6 +922,6 @@ class SurveyCollection:
         )
         definitions = definitions.order_by(FormDefinition.name)
 
-        for survey, submissions_count in definitions.all():
+        for survey, submissions_count in definitions:
             survey.submissions_count = submissions_count or 0
             yield survey

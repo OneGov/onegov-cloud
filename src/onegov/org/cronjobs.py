@@ -1013,7 +1013,7 @@ def get_news_for_push_notification(session: Session) -> Query[News]:
 
     news_with_sent_notifications = session.query(
         PushNotification.news_id
-    ).subquery()
+    ).scalar_subquery()  # type: ignore[attr-defined]
     query = query.filter(~News.id.in_(news_with_sent_notifications))
     only_public_news = query.filter(
         or_(
