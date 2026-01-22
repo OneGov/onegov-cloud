@@ -3597,20 +3597,7 @@ def test_manual_reservation_payment_allocation_override(
     assert '23.00' in confirmation_page
     assert '67.00' in confirmation_page
 
-    # FIXME: I'm not sure why SQLAlchemy started emitting this warning
-    #        it happens as soon as the payment is linked to the reservations
-    #        and only started happening after random unrelated changes.
-    #        Maybe this is a weird race condition in SQLAlchemy that only
-    #        rarely triggers. It doesn't happen in other tests that make
-    #        paid reservations... Strangely enough pytest.mark.filterwarnings
-    #        also doesn't work here. So we need to manually adjust the
-    #        filters instead.
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            'ignore',
-            'Identity map already had an identity'
-        )
-        ticket = confirmation_page.form.submit().follow()
+    ticket = confirmation_page.form.submit().follow()
     assert 'RSV-' in ticket.text
 
     # mark it as paid

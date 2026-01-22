@@ -695,12 +695,22 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
 
         payment = self.process_payment(price, provider, payment_token)
 
-        # FIXME: Payment errors should have their own error message
+        # FIXME: Payment errors should probably have their own error message
         if not payment or isinstance(payment, PaymentError):
             request.alert(_('Your payment could not be processed'))
             return morepath.redirect(request.link(self))
 
         elif payment is not True:
+            # NOTE: When linking with multiple reservations we need to make
+            #       sure the payment already exists, otherwise SQLAlchemy
+            #       starting with v1.4 creates multiple conflicting versions
+            #       with different primary keys, so only some of the
+            #       reservations end up being linked to the real payment.
+            #       We could potentially achieve the same result by
+            #       generating the payment id more eagerly.
+            request.session.add(payment)
+            request.session.flush()
+            request.session.refresh(payment)
             for reservation in reservations:
                 reservation.payment = payment
 
@@ -745,9 +755,6 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
                 # set associated key code
                 ticket.handler_data['key_code'] = key_code
             ticket.tag_meta = tag_meta
-
-        if payment is not True:
-            ticket.payment = payment
 
         if invoice_items:
             invoice = TicketInvoice(
