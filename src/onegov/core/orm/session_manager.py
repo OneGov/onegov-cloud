@@ -81,7 +81,9 @@ def query_schemas(
             yield schema
 
 
-def get_warning_stacklevel() -> int:
+# NOTE: Currently this is only used in a safety escape hatch
+#       so we don't care if it's not covered by tests for now
+def get_warning_stacklevel() -> int:  # pragma: no cover
     # NOTE: When we emit a warning for an ORM event, we want to see
     #       where it was triggered from, so we have enough context
     #       in order to potentially fix the cause of the warning.
@@ -519,8 +521,9 @@ class SessionManager:
             try:
                 result = orm_execution_state.invoke_statement(orm_stmt)
             # NOTE: We want to avoid hard failures here, but we still want to
-            #       fail in tests, so we emit a warning
-            except NotImplementedError:
+            #       fail in tests, so we emit a warning, since we don't want
+            #       this to ever trigger ideally, we don't expect coverage
+            except NotImplementedError:  # pragma: no cover
                 savepoint.rollback()
                 log.warning(
                     'Results from a bulk query could not be retrieved for '

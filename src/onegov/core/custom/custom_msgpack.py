@@ -252,7 +252,7 @@ def store_sqlalchemy_row(r: Row[Any]) -> bytes:
 def load_sqlalchemy_row(b: bytes) -> Row[Any]:
     fields, data = unpackb(b)
     cls = result_tuple(fields)
-    return cls(data=data)
+    return cls(data)
 
 
 default_serializers.register(BytesSerializer(
