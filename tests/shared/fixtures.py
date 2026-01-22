@@ -410,7 +410,7 @@ def glauth_binary() -> str:
     if not os.path.exists(path):
         http = urllib3.PoolManager()
 
-        with http.request('GET', url, preload_content=False) as r:  # type: ignore[no-untyped-call]
+        with http.request('GET', url, preload_content=False) as r:
             assert r.status == 200, "Can't get glauth binary"
             with open(path, 'wb') as f:
                 shutil.copyfileobj(r, f)
