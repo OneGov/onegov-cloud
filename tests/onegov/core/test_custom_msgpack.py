@@ -99,7 +99,9 @@ def test_sqlalchemy_row_roundtrip(postgres_dsn: str) -> None:
     session.flush()
 
     result = session.query(Document.id, Document.body).one()
-    assert msgpack.unpackb(msgpack.packb(result)) == result
+    roundtripped = msgpack.unpackb(msgpack.packb(result))
+    assert result == roundtripped
+    assert result._asdict() == roundtripped._asdict()
 
 
 def test_not_serializable() -> None:
