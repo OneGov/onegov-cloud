@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import sys
 import threading
 import transaction
 import warnings
@@ -26,6 +27,7 @@ if TYPE_CHECKING:
     from sqlalchemy.engine import Connection, Engine
     from sqlalchemy.orm import ORMExecuteState  # type: ignore[attr-defined]
     from sqlalchemy.orm.session import Session, SessionTransaction
+    from types import FrameType
 
     _T = TypeVar('_T')
     _S = TypeVar('_S', bound=Session)
@@ -77,6 +79,46 @@ def query_schemas(
     for (schema, ) in connection.execute(query):
         if not prefix or schema.startswith(prefix):
             yield schema
+
+
+def get_warning_stacklevel() -> int:
+    # NOTE: When we emit a warning for an ORM event, we want to see
+    #       where it was triggered from, so we have enough context
+    #       in order to potentially fix the cause of the warning.
+    #       We use this function to walk the stack until we're back
+    #       in our own code. (One stack level up should be third
+    #       party code) This code is adapted from SQLAlchemy's warning
+    #       emitting code.
+    stacklevel = 1
+    frame: FrameType | None
+    try:
+        # NOTE: The stacklevel we retrieve here needs to be higher by 1
+        #       since calling this function inserts an addtional frame
+        #       onto the stack, which will no longer exist, when we emit
+        #       the actual warning.
+        frame = sys._getframe(stacklevel + 1)
+    except ValueError:
+        # NOTE: This shouldn't really happen, 1 stacklevel is whoever
+        #       calls this function, which is the SessionManager and
+        #       2 stacklevels should be whoever is calling the event
+        #       handler in the SessionManager, which is SQLAlchemy.
+        #       So there should be way more than 2 parent frames.
+        return 0
+    except BaseException:
+        # NOTE: This shouldn't really happen but if _getframe() doesn't
+        #       work, we don't want to crash.
+        return 0
+    else:
+        # using __name__ here requires that we have __name__ in the
+        # __globals__ of the decorated string functions we make also.
+        # we generate this using {"__name__": fn.__module__}
+        while (
+            frame is not None
+            and not frame.f_globals.get('__name__', '').startswith('onegov.')
+        ):
+            frame = frame.f_back
+            stacklevel += 1
+    return stacklevel
 
 
 class SessionManager:
@@ -490,7 +532,7 @@ class SessionManager:
                     f'Failed to retrieve results from bulk query:\n'
                     f'{stmt.compile()}',
                     UserWarning,
-                    stacklevel=0
+                    stacklevel=get_warning_stacklevel()
                 )
                 return
 

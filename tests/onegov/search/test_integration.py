@@ -415,8 +415,7 @@ def test_orm_integration(
         session = request.session
         query = session.query(Document)
         query = query.filter(Document.id == request.params.get('id'))
-        for document in query:
-            session.delete(document)
+        query.delete('fetch')
 
     scan_morepath_modules(App)
     morepath.commit(App)

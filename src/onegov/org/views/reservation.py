@@ -695,7 +695,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
 
         payment = self.process_payment(price, provider, payment_token)
 
-        # FIXME: Payment errors should probably have their own error message
+        # FIXME: Payment errors should have their own error message
         if not payment or isinstance(payment, PaymentError):
             request.alert(_('Your payment could not be processed'))
             return morepath.redirect(request.link(self))
@@ -745,6 +745,9 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
                 # set associated key code
                 ticket.handler_data['key_code'] = key_code
             ticket.tag_meta = tag_meta
+
+        if payment is not True:
+            ticket.payment = payment
 
         if invoice_items:
             invoice = TicketInvoice(

@@ -192,7 +192,7 @@ class FormDefinitionCollection:
         for submission in submissions:
             for file in submission.files:
                 self.session.delete(file)
-            self.session.delete(submission)
+        submissions.delete()
 
         if with_registration_windows:
             registration_windows = self.session.query(FormRegistrationWindow)
@@ -201,8 +201,7 @@ class FormDefinitionCollection:
             if handle_registration_windows:
                 handle_registration_windows(registration_windows)
 
-            for registration_window in registration_windows:
-                self.session.delete(registration_window)
+            registration_windows.delete()
             self.session.flush()
 
         definition = self.by_name(name)
@@ -213,7 +212,6 @@ class FormDefinitionCollection:
                 self.session.flush()
 
         self.query().filter(FormDefinition.name == name).delete('fetch')
-
         self.session.flush()
 
     def by_name(self, name: str) -> FormDefinition | None:

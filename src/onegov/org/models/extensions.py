@@ -978,7 +978,7 @@ class GeneralFileLinkExtension(ContentExtension):
                 #       operations, since the subscribers could add files
                 #       that aren't part of the form, so they subsequently
                 #       would get cleared again.
-                with self.request.session.no_autoflush:
+                with self.no_autoflush:
                     super().populate_obj(obj, *args, **kwargs)
 
                     for field_name in (

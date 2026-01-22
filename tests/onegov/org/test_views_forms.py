@@ -1141,8 +1141,7 @@ def test_registration_ticket_workflow(client: Client) -> None:
     # we have the case since the ticket deletion mixin that there might be
     # a submission without the ticket
     session = client.app.session()
-    for ticket_obj in session.query(Ticket):
-        session.delete(ticket_obj)
+    session.query(Ticket).delete('fetch')
     transaction.commit()
 
     # the window is no longer accesible through the ticket
