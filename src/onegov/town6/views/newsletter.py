@@ -6,11 +6,20 @@ from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import RecipientCollection
 from onegov.org.forms.newsletter import NewsletterSubscriberImportExportForm
 from onegov.org.views.newsletter import (
-    handle_newsletters, view_newsletter, view_subscribers,
-    handle_new_newsletter, get_newsletter_form, edit_newsletter,
-    handle_send_newsletter, handle_test_newsletter, handle_preview_newsletter,
-    export_newsletter_recipients, import_newsletter_recipients,
-    handle_update_newsletters_subscription)
+    handle_newsletters,
+    view_newsletter,
+    view_subscribers,
+    handle_new_newsletter,
+    handle_paste_newsletter,
+    get_newsletter_form,
+    edit_newsletter,
+    handle_send_newsletter,
+    handle_test_newsletter,
+    handle_preview_newsletter,
+    export_newsletter_recipients,
+    import_newsletter_recipients,
+    handle_update_newsletters_subscription,
+)
 from onegov.town6 import TownApp
 from onegov.org.forms import NewsletterSendForm, ExportForm
 from onegov.org.forms import NewsletterTestForm
@@ -96,6 +105,21 @@ def town_handle_new_newsletter(
     form: NewsletterForm
 ) -> RenderData | Response:
     return handle_new_newsletter(
+        self, request, form, NewsletterLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=NewsletterCollection,
+    name='new-paste',
+    template='form.pt',
+    permission=Private,
+    form=get_newsletter_form,
+)
+def town_handle_paste_newsletter(
+    self: NewsletterCollection, request: TownRequest, form: NewsletterForm
+) -> RenderData | Response:
+    return handle_paste_newsletter(
         self, request, form, NewsletterLayout(self, request))
 
 

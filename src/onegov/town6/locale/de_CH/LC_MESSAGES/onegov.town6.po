@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-12-19 12:13+0100\n"
+"POT-Creation-Date: 2026-01-20 16:18+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1454,8 +1454,8 @@ msgstr "Neue Kunden Nachricht in Ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 

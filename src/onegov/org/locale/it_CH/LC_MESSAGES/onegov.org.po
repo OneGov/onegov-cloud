@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-12-29 09:08+0100\n"
+"POT-Creation-Date: 2026-01-20 16:18+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -591,8 +591,11 @@ msgstr "Nascondi queste etichette nella vista principale"
 msgid "Contact Information Sidebar"
 msgstr "Barra laterale delle informazioni di contatto"
 
-msgid "The contact information is displayed in the sidebar without field names."
-msgstr "Le informazioni di contatto sono visualizzate nella barra laterale senza nomi di campo."
+msgid ""
+"The contact information is displayed in the sidebar without field names."
+msgstr ""
+"Le informazioni di contatto sono visualizzate nella barra laterale senza "
+"nomi di campo."
 
 msgid "Filters"
 msgstr "Filtri"
@@ -3474,6 +3477,9 @@ msgstr "Iscritti"
 msgid "Test"
 msgstr "Test"
 
+msgid "Copy"
+msgstr "Copia"
+
 msgid "Delete newsletter"
 msgstr "Elimina newsletter"
 
@@ -4144,9 +4150,6 @@ msgstr "Eliminare iFrame"
 #, python-format
 msgid "Do you really want to delete the iFrame \"${title}\"?"
 msgstr "Si vuole davvero eliminare l'iFrame \"${title}\"?"
-
-msgid "Copy"
-msgstr "Copia"
 
 msgid "A News cannot be pasted as Topic"
 msgstr "Una notizia non può essere incollata come argomento"
@@ -4987,8 +4990,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -6855,6 +6858,15 @@ msgstr "Aggiunta una nuova newsletter"
 
 msgid "New Newsletter"
 msgstr "Nuova newsletter"
+
+msgid "Invalid clipboard content"
+msgstr "Contenuto degli appunti non valido"
+
+msgid "Newsletter pasted successfully"
+msgstr "Newsletter incollata con successo"
+
+msgid "Paste Newsletter"
+msgstr "Incolla newsletter"
 
 msgid "Edit Newsletter"
 msgstr "Modifica la newsletter"

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-29 09:08+0100\n"
+"POT-Creation-Date: 2026-01-20 16:18+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -587,8 +587,11 @@ msgstr "Cacher ces noms de champs dans la vue principale"
 msgid "Contact Information Sidebar"
 msgstr "Barre latérale des informations de contact"
 
-msgid "The contact information is displayed in the sidebar without field names."
-msgstr "Les informations de contact sont affichées dans la barre latérale sans noms de champs."
+msgid ""
+"The contact information is displayed in the sidebar without field names."
+msgstr ""
+"Les informations de contact sont affichées dans la barre latérale sans noms "
+"de champs."
 
 msgid "Filters"
 msgstr "Filtres"
@@ -3473,6 +3476,9 @@ msgstr "Abonnés"
 msgid "Test"
 msgstr "Test"
 
+msgid "Copy"
+msgstr "Copie"
+
 msgid "Delete newsletter"
 msgstr "Supprimer la newsletter"
 
@@ -4144,9 +4150,6 @@ msgstr "Supprimer l'iFrame"
 #, python-format
 msgid "Do you really want to delete the iFrame \"${title}\"?"
 msgstr "Voulez-vous vraiment supprimer l'iFrame « ${title} » ?"
-
-msgid "Copy"
-msgstr "Copie"
 
 msgid "A News cannot be pasted as Topic"
 msgstr "Une nouvelle ne peut pas être collée comme un sujet"
@@ -5000,8 +5003,8 @@ msgstr "Nouveau message du client dans le ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -6878,6 +6881,15 @@ msgstr "Nouvelle lettre d'information ajoutée"
 
 msgid "New Newsletter"
 msgstr "Nouvelle lettre d'information"
+
+msgid "Invalid clipboard content"
+msgstr "Contenu du presse-papiers invalide"
+
+msgid "Newsletter pasted successfully"
+msgstr "Lettre d'information collée avec succès"
+
+msgid "Paste Newsletter"
+msgstr "Coller la lettre d'information"
 
 msgid "Edit Newsletter"
 msgstr "Éditer la lettre d'information"

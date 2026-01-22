@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-29 09:08+0100\n"
+"POT-Creation-Date: 2026-01-20 16:18+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -589,8 +589,10 @@ msgstr "Diese Feldnamen auf der Hauptansicht verstecken"
 msgid "Contact Information Sidebar"
 msgstr "Kontaktinformation Seitenleiste"
 
-msgid "The contact information is displayed in the sidebar without field names."
-msgstr "Die Kontaktinformation wird in der Seitenleiste ohne Feldnamen angezeigt."
+msgid ""
+"The contact information is displayed in the sidebar without field names."
+msgstr ""
+"Die Kontaktinformation wird in der Seitenleiste ohne Feldnamen angezeigt."
 
 msgid "Filters"
 msgstr "Filter"
@@ -3468,6 +3470,9 @@ msgstr "Abonnenten"
 msgid "Test"
 msgstr "Test"
 
+msgid "Copy"
+msgstr "Kopieren"
+
 msgid "Delete newsletter"
 msgstr "Newsletter löschen"
 
@@ -3651,7 +3656,9 @@ msgid "Hide contact info in sidebar"
 msgstr "Kontaktinformationen in der Seitenleiste ausblenden"
 
 msgid "Show people on bottom of main page (instead of sidebar)"
-msgstr "Personen am unteren Rand der Hauptseite anzeigen (statt in in der Seitenleiste)"
+msgstr ""
+"Personen am unteren Rand der Hauptseite anzeigen (statt in in der "
+"Seitenleiste)"
 
 msgid "Select additional person"
 msgstr "Zusätzliche Person auswählen"
@@ -4138,9 +4145,6 @@ msgstr "iFrame löschen"
 #, python-format
 msgid "Do you really want to delete the iFrame \"${title}\"?"
 msgstr "Möchten Sie wirklich das iFrame \"${title}\" löschen?"
-
-msgid "Copy"
-msgstr "Kopieren"
 
 msgid "A News cannot be pasted as Topic"
 msgstr "Eine Nachricht kann nicht als Thema eingefügt werden"
@@ -4994,8 +4998,8 @@ msgstr "Neue Kunden Nachricht in Ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -6864,6 +6868,15 @@ msgstr "Ein neuer Newsletter wurde hinzugefügt"
 
 msgid "New Newsletter"
 msgstr "Neuer Newsletter"
+
+msgid "Invalid clipboard content"
+msgstr "Ungültiger Inhalt in der Zwischenablage"
+
+msgid "Newsletter pasted successfully"
+msgstr "Newsletter erfolgreich eingefügt"
+
+msgid "Paste Newsletter"
+msgstr "Newsletter einfügen"
 
 msgid "Edit Newsletter"
 msgstr "Newsletter Bearbeiten"
