@@ -46,7 +46,6 @@ else:
 
         """
 
-        # FIXME: Make this work again
         def delete(self, synchronize_session: Any = None) -> int:
             return super().delete('fetch')
 
@@ -87,18 +86,14 @@ def get_warning_stacklevel() -> int:  # pragma: no cover
     # NOTE: When we emit a warning for an ORM event, we want to see
     #       where it was triggered from, so we have enough context
     #       in order to potentially fix the cause of the warning.
-    #       We use this function to walk the stack until we're back
-    #       in our own code. (One stack level up should be third
-    #       party code) This code is adapted from SQLAlchemy's warning
+    #       We use this function to walk the stack until we're outside
+    #       of SQLAlchemy's code. (Two stack levels up should be SQLAlchemy
+    #       code) This code is adapted from SQLAlchemy's warning
     #       emitting code.
-    stacklevel = 1
+    stacklevel = 2
     frame: FrameType | None
     try:
-        # NOTE: The stacklevel we retrieve here needs to be higher by 1
-        #       since calling this function inserts an addtional frame
-        #       onto the stack, which will no longer exist, when we emit
-        #       the actual warning.
-        frame = sys._getframe(stacklevel + 1)
+        frame = sys._getframe(stacklevel)
     except ValueError:
         # NOTE: This shouldn't really happen, 1 stacklevel is whoever
         #       calls this function, which is the SessionManager and
@@ -111,12 +106,11 @@ def get_warning_stacklevel() -> int:  # pragma: no cover
         #       work, we don't want to crash.
         return 0
     else:
-        # using __name__ here requires that we have __name__ in the
-        # __globals__ of the decorated string functions we make also.
-        # we generate this using {"__name__": fn.__module__}
-        while (
-            frame is not None
-            and not frame.f_globals.get('__name__', '').startswith('onegov.')
+        # NOTE: This relies on SQLAlchemy having set things up to be this
+        #       way in their modules.
+        while frame is not None and re.match(
+            r'^(?:sqlalchemy\.|alembic\.)',
+            frame.f_globals.get('__name__', '')
         ):
             frame = frame.f_back
             stacklevel += 1
