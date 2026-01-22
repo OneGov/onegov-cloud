@@ -2,13 +2,10 @@ from __future__ import annotations
 
 import json
 import os
-from uuid import uuid4
-
+import pytest
 import re
 import tempfile
 import textwrap
-
-import pytest
 import transaction
 import warnings
 
@@ -18,8 +15,6 @@ from decimal import Decimal
 from freezegun import freeze_time
 from io import BytesIO
 from libres.db.models import Reservation
-from urllib.parse import quote
-
 from onegov.core.utils import module_path, normalize_for_url
 from onegov.file import FileCollection
 from onegov.form import FormSubmission
@@ -35,10 +30,12 @@ from sqlalchemy import exc
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared.utils import add_reservation
 from unittest.mock import patch
+from urllib.parse import quote
+from uuid import uuid4
 from webtest import Upload
 
-from typing import TYPE_CHECKING
 
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from unittest.mock import MagicMock
     from .conftest import Client
@@ -3584,6 +3581,7 @@ def test_manual_reservation_payment_allocation_override(
     reserve_per_item = client.bound_reserve(allocations_per_item[0])
     reserve_per_hour = client.bound_reserve(allocations_per_hour[0])
     transaction.commit()
+    close_all_sessions()
 
     # create a reservation of each type
     reserve_inherit()
@@ -3593,12 +3591,13 @@ def test_manual_reservation_payment_allocation_override(
 
     page = client.get('/resource/tageskarte/form')
     page.form['email'] = 'info@example.org'
-    assert '20.00' in page.form.submit().follow()
-    assert '24.00' in page.form.submit().follow()
-    assert '23.00' in page.form.submit().follow()
-    assert '67.00' in page.form.submit().follow()
+    confirmation_page = page.form.submit().follow()
+    assert '20.00' in confirmation_page
+    assert '24.00' in confirmation_page
+    assert '23.00' in confirmation_page
+    assert '67.00' in confirmation_page
 
-    ticket = page.form.submit().follow().form.submit().follow()
+    ticket = confirmation_page.form.submit().follow()
     assert 'RSV-' in ticket.text
 
     # mark it as paid

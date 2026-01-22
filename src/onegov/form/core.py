@@ -3,6 +3,7 @@ from __future__ import annotations
 import weakref
 
 from collections import OrderedDict
+from contextlib import nullcontext
 from decimal import Decimal
 from itertools import chain, groupby
 from markupsafe import Markup
@@ -26,6 +27,7 @@ from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
+    from contextlib import AbstractContextManager as ContextManager
     from onegov.core.request import CoreRequest
     from onegov.form.types import PricingRules
     from typing import TypedDict, Self
@@ -714,6 +716,16 @@ class Form(BaseForm):
 
         return {k: v for k, v in self.data.items() if k not in exclude}
 
+    @property
+    def no_autoflush(self) -> ContextManager[None]:
+        """ A convenience attribute for handling a no_autoflush when there
+        may not yet be a request bound to the form.
+
+        """
+        if hasattr(self, 'request'):
+            return self.request.session.no_autoflush
+        return nullcontext(None)
+
     def populate_obj(
         self,
         obj: object,
@@ -732,9 +744,15 @@ class Form(BaseForm):
         include = include or set(self._fields.keys())
         exclude = exclude or set()
 
-        for name, field in self._fields.items():
-            if name in include and name not in exclude:
-                field.populate_obj(obj, name)
+        # NOTE: We've observed some issues starting with SQLAlchemy 1.4 where
+        #       a flush could occur mid-object-population, this is not only
+        #       inefficient, but also error-prone for fields that rely on
+        #       the original object state being correct (observers and other
+        #       subscribers could mutate that state during the flush).
+        with self.no_autoflush:
+            for name, field in self._fields.items():
+                if name in include and name not in exclude:
+                    field.populate_obj(obj, name)
 
     def process(
         self,

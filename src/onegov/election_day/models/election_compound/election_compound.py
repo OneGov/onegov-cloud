@@ -122,7 +122,8 @@ class ElectionCompound(
     party_results: relationship[list[PartyResult]] = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
-        back_populates='election_compound'
+        back_populates='election_compound',
+        overlaps='party_results'  # type: ignore[call-arg]
     )
 
     #: An election compound may contains n party panachage results
@@ -130,7 +131,8 @@ class ElectionCompound(
     party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
-        back_populates='election_compound'
+        back_populates='election_compound',
+        overlaps='panachage_results'  # type: ignore[call-arg]
     )
 
     #: An election compound may have related election compounds

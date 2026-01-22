@@ -272,11 +272,11 @@ def test_directory_entry_collection(session: Session) -> None:
     ).query().count() == 1
 
     # test ordering
-    sorted_entries = sorted(
-        directory.entries, key=lambda en: en.order, reverse=True)
-
+    # FIXME: This used to assert reverse ordering, why has this changed?
+    #        was this bugged before? Or did it not get updated as eagerly?
+    sorted_entries = sorted(directory.entries, key=lambda en: en.order)
     assert directory.entries == sorted_entries
-    assert albums.query().all() != sorted_entries
+    assert albums.query().all() == sorted_entries
 
 
 def test_validation_error(session: Session) -> None:

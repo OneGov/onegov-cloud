@@ -52,10 +52,10 @@ class DerivedAttributesMixin:
     def turnout(cls) -> float:
         """ The turnout of the election. """
         return case(
-            [(
+            (
                 cls.eligible_voters > 0,
                 cast(cls.received_ballots, Float)
                 / cast(cls.eligible_voters, Float) * 100
-            )],
+            ),
             else_=0
         )

@@ -37,12 +37,10 @@ class UTCPublicationMixin:
 
     @publication_started.expression  # type:ignore[no-redef]
     def publication_started(cls) -> ClauseElement:
-        return case((
-            (
-                cls.publication_start == None,
-                True
-            ),
-        ), else_=cls.publication_start <= func.now())
+        return case(
+            (cls.publication_start == None, True),
+            else_=cls.publication_start <= func.now()
+        )
 
     @hybrid_property  # type:ignore[no-redef]
     def publication_ended(self) -> bool:
@@ -52,12 +50,10 @@ class UTCPublicationMixin:
 
     @publication_ended.expression  # type:ignore[no-redef]
     def publication_ended(cls) -> ClauseElement:
-        return case((
-            (
-                cls.publication_end == None,
-                False
-            ),
-        ), else_=cls.publication_end < func.now())
+        return case(
+            (cls.publication_end == None, False),
+            else_=cls.publication_end < func.now()
+        )
 
     @hybrid_property  # type:ignore[no-redef]
     def published(self) -> bool:

@@ -5,6 +5,11 @@ install: ensure_uv
 	# install source in editable mode
 	uv pip install -e . --config-settings editable_mode=compat
 
+	# TEMPORARY: Uninstall types-urllib3. Some dependency seems to currently
+	#            want to install this even though we depend on v2, which does
+	#            not need type hints, so the stubs mess things up
+	uv pip uninstall types-urllib3
+
 	# enable pre-commit
 	pre-commit install
 

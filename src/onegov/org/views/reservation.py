@@ -701,6 +701,16 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             return morepath.redirect(request.link(self))
 
         elif payment is not True:
+            # NOTE: When linking with multiple reservations we need to make
+            #       sure the payment already exists, otherwise SQLAlchemy
+            #       starting with v1.4 creates multiple conflicting versions
+            #       with different primary keys, so only some of the
+            #       reservations end up being linked to the real payment.
+            #       We could potentially achieve the same result by
+            #       generating the payment id more eagerly.
+            request.session.add(payment)
+            request.session.flush()
+            request.session.refresh(payment)
             for reservation in reservations:
                 reservation.payment = payment
 
