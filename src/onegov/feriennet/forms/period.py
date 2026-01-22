@@ -489,10 +489,10 @@ class PeriodForm(Form):
         q = session.query(OccasionDate).join(Occasion)
         q = q.with_entities(distinct(Occasion.activity_id))
         q = q.filter(Occasion.period == self.model)
-        q = q.filter(Occasion.id.in_(qd.subquery()))
+        q = q.filter(Occasion.id.in_(qd.scalar_subquery()))
 
         return tuple(
-            session.query(Activity).filter(Activity.id.in_(q.subquery()))
+            session.query(Activity).filter(Activity.id.in_(q.scalar_subquery()))
             .order_by(Activity.order)
         )
 

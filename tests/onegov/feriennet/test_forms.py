@@ -55,7 +55,11 @@ def create_form(
         ('execution_start', iter_start()),
         ('execution_end', iter_start())
     ]))
-    form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)  # type: ignore[assignment]
+    form.request = Bunch(
+        translate=lambda txt: txt,
+        include=lambda src: None,
+        session=session,
+    )  # type: ignore[assignment]
     form.model = BookingPeriodCollection(session)
     return form
 

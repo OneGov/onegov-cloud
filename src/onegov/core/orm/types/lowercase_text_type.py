@@ -19,6 +19,7 @@ class LowercaseText(_Base):
     # FIXME: This was spelled incorrectly, but fixing the spelling
     #        causes some issues with custom join conditions
     omparator_factory = CaseInsensitiveComparator
+    cache_ok = True
 
     def process_bind_param(
         self,

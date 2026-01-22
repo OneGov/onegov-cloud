@@ -202,11 +202,11 @@ def get_candidates_data(
     if election.completed:
         order.insert(0, desc(Candidate.elected))
     if lists and sort_by_lists:
-        order.insert(0, case(
-            [
+        order.insert(0, case(  # type: ignore[call-overload]
+            *(
                 (column == name, index)
                 for index, name in enumerate(lists, 1)
-            ],
+            ),
             else_=0
         ))
     candidates = candidates.order_by(*order)

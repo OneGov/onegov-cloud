@@ -230,6 +230,9 @@ def handle_payment(
     elif payment is None or isinstance(payment, PaymentError):
         request.alert(_('Your payment could not be processed'))
     else:
+        request.session.add(payment)
+        request.session.flush()
+        request.session.refresh(payment)
         for item in invoice.items:
 
             if item.paid:

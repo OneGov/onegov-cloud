@@ -491,7 +491,7 @@ def test_find_your_spot_form_multiple_rooms() -> None:
     assert form.auto_reserve_available_slots.data == 'for_every_room'
 
 
-def test_event_form_update_apply() -> None:
+def test_event_form_update_apply(session: Session) -> None:
     form = EventForm(MultiDict([
         ('description', 'Rendez-vous automnal des médecines.'),
         ('email', 'info@example.org'),
@@ -507,6 +507,7 @@ def test_event_form_update_apply() -> None:
         ('repeat', 'without')
     ]))
     form.request = Bunch(  # type: ignore[assignment]
+        session=session,
         app=Bunch(
             org=Bunch(event_filter_type='tags')
         )
@@ -538,7 +539,7 @@ def test_event_form_update_apply() -> None:
     assert form.data['weekly'] == None
 
 
-def test_event_form_update_after_midnight() -> None:
+def test_event_form_update_after_midnight(session: Session) -> None:
     form = EventForm(MultiDict([
         ('email', 'info@example.org'),
         ('end_time', '8:00'),
@@ -550,6 +551,7 @@ def test_event_form_update_after_midnight() -> None:
         ('repeat', 'without')
     ]))
     form.request = Bunch(  # type: ignore[assignment]
+        session=session,
         app=Bunch(
             org=Bunch(event_filter_type='tags')
         )
@@ -619,7 +621,7 @@ def test_event_form_validate_weekly() -> None:
     }
 
 
-def test_event_form_create_rrule() -> None:
+def test_event_form_create_rrule(session: Session) -> None:
 
     def occurrences(form: EventForm) -> list[date]:
         event = Event()
@@ -636,6 +638,7 @@ def test_event_form_create_rrule() -> None:
         'repeat': 'weekly'
     })
     form.request = Bunch(  # type: ignore[assignment]
+        session=session,
         app=Bunch(
             org=Bunch(event_filter_type='tags')
         )

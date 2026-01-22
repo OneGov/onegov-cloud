@@ -290,6 +290,36 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         return null;
     };
 
+    fcOptions.eventsSet = function(events) {
+        // expand visible range if necessary
+        var minTime = ocOptions.minTime;
+        var maxTime = ocOptions.maxTime;
+        var changed = false;
+        for (var i = 0; i < events.length; i++) {
+            var event = events[i];
+            // snap to the start of the hour
+            var start = moment(event.start).startOf('hour').format('HH:mm');
+            if (start < minTime) {
+                minTime = start;
+                changed = true;
+            }
+            // snap to the start of the next hour
+            // unless the event ends on the hour
+            var end = moment(event.end);
+            end = end.minutes() === 0 ? end.format('HH:mm') : end.startOf('hour').add(1, 'hour').format('HH:mm');
+            end = end == '00:00' ? '24:00' : end;
+            if (end > maxTime) {
+                maxTime = end;
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            this.setOption('slotMinTime', minTime);
+            this.setOption('slotMaxTime', maxTime);
+        }
+    }
+
     // history handling
     oc.setupHistory(options);
 
@@ -663,6 +693,7 @@ oc.showPopup = function(calendar, element, content, position, extraClasses) {
         },
         onclose: function() {
             $(element).closest('.fc-event').removeClass('has-popup');
+            calendar.unselect();
         },
         closebutton: true,
         closebuttonmarkup: '<a href="#" class="close">×</a>'
