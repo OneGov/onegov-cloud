@@ -8,6 +8,7 @@ from onegov.form import parse_formcode
 from onegov.form.parser.core import OptionsField
 from sqlalchemy.orm import object_session, joinedload, undefer
 from sqlalchemy.orm.attributes import get_history
+from wtforms import ValidationError
 
 from typing import Any, TYPE_CHECKING
 
@@ -112,6 +113,15 @@ class DirectoryMigration:
         should only be used if you know what you are doing.
 
         """
+        if self.added_required_fields():
+            from onegov.org import _
+            raise ValidationError(
+                _('${fields}: New fields cannot be required initially. '
+                  'Require them in a separate migration step.', mapping={
+                    'fields': ', '.join(f'"{f}"' for f in self.get_added_required_field_ids())
+                })
+            )
+
         assert self.possible
 
         self.migrate_directory()
@@ -229,6 +239,13 @@ class DirectoryMigration:
             )
 
         return False
+
+    def get_added_required_field_ids(self) -> list[str]:
+        return [
+            f.human_id for f in self.changes.new.values()
+            if f.required and f.human_id in self.changes.added_fields
+        ]
+
 
 class FieldTypeMigrations:
     """ Contains methods to migrate fields from one type to another. """
