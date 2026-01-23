@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-01-23 11:00+0100\n"
+"POT-Creation-Date: 2026-01-23 14:45+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4391,6 +4391,13 @@ msgstr "Rinominato:"
 msgid "Changed:"
 msgstr "Modificato:"
 
+msgid ""
+"Please note, that data for existing entries that use the removed option will "
+"be lost."
+msgstr ""
+"Si prega di notare che i dati per gli elementi esistenti che utilizzano "
+"l'opzione rimossa andranno persi."
+
 msgid "Confirm"
 msgstr "Conferma"
 
@@ -6087,6 +6094,9 @@ msgstr ""
 "Per eliminare questa allocazione, è necessario prima annullare tutte le "
 "prenotazioni esistenti."
 
+msgid "Blocker"
+msgstr "Bloccante"
+
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Esiste un'allocazione in conflitto per il periodo di tempo richiesto."
 
@@ -6368,29 +6378,6 @@ msgstr "Aggiunta una nuova cartella"
 msgid "New Directory"
 msgstr "Nuova cartella"
 
-#, python-format
-msgid ""
-"Cannot convert field \"${field}\" from type \"${old_type}\" to "
-"\"${new_type}\"."
-msgstr ""
-"Impossibile convertire il campo \"${field}\" dal tipo \"${old_type}\" a "
-"\"${new_type}\"."
-
-#, python-format
-msgid ""
-"${fields}: New fields cannot be required initially. Require them in a "
-"separate migration step."
-msgstr ""
-"${fields}: I nuovi campi non possono essere inizialmente obbligatori. "
-"Rendili obbligatori in un passaggio di migrazione separato."
-
-msgid ""
-"Please note, that data for existing entries that use the removed option will "
-"be lost."
-msgstr ""
-"Si prega di notare che i dati per gli elementi esistenti che utilizzano "
-"l'opzione rimossa andranno persi."
-
 msgid ""
 "The requested change cannot be performed, as it is incompatible with "
 "existing entries"
@@ -6420,12 +6407,28 @@ msgstr ""
 "Non mescolare l'aggiunta, la rimozione e la ridenominazione delle opzioni "
 "nella stessa migrazione. Utilizzare migrazioni separate per ogni opzione."
 
+#, python-format
+msgid ""
+"${fields}: New fields cannot be required initially. Require them in a "
+"separate migration step."
+msgstr ""
+"${fields}: I nuovi campi non possono essere inizialmente obbligatori. "
+"Rendili obbligatori in un passaggio di migrazione separato."
+
 msgid ""
 "Renaming multiple options in the same migration is not supported. Please use "
 "separate migrations for each option."
 msgstr ""
 "Rinominare più opzioni nella stessa migrazione non è supportato. Utilizzare "
 "migrazioni separate per ogni opzione."
+
+#, python-format
+msgid ""
+"Cannot convert field \"${field}\" from type \"${old_type}\" to "
+"\"${new_type}\"."
+msgstr ""
+"Impossibile convertire il campo \"${field}\" dal tipo \"${old_type}\" a "
+"\"${new_type}\"."
 
 msgid "The directory was deleted"
 msgstr "La cartella è stata cancellata"
@@ -7314,8 +7317,20 @@ msgstr "Aggiunta una nuova prenotazione"
 msgid "Reservation not adjustable"
 msgstr "Prenotazione non regolabile"
 
+msgid ""
+"This reservation has already been accepted, but changes will not lead to a "
+"new confirmation e-mail so please make sure you inform the customer of the "
+"performed changes, so they have a record of it."
+msgstr ""
+"Questa prenotazione è già stata accettata, ma le modifiche non comporteranno "
+"l'invio di una nuova e-mail di conferma, quindi assicurati di informare il "
+"cliente delle modifiche apportate, in modo che ne abbia traccia."
+
 msgid "Adjust reservation"
 msgstr "Regolare la prenotazione"
+
+msgid "Cannot move reservation into the past"
+msgstr "Impossibile spostare la prenotazione nel passato"
 
 msgid "The reservation was adjusted"
 msgstr "La prenotazione è stata regolata"
@@ -7325,6 +7340,15 @@ msgstr "La prenotazione è rimasta invariata"
 
 msgid "There are no future reservations"
 msgstr "Non ci sono prenotazioni future"
+
+msgid "Blocker not adjustable"
+msgstr "Bloccante non regolabile"
+
+msgid "Cannot move blocker into the past"
+msgstr "Impossibile spostare il bloccante nel passato"
+
+msgid "Blocker no longer exists"
+msgstr "Il bloccante non esiste più"
 
 msgid "Added a new daypass"
 msgstr "Aggiunto un nuovo biglietto giornaliero"

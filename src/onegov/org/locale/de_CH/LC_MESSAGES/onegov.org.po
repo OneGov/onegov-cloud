@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-23 11:00+0100\n"
+"POT-Creation-Date: 2026-01-23 14:45+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -4389,6 +4389,13 @@ msgstr "Umbenannt:"
 msgid "Changed:"
 msgstr "Verändert:"
 
+msgid ""
+"Please note, that data for existing entries that use the removed option will "
+"be lost."
+msgstr ""
+"Bitte beachten Sie, dass Daten für bestehende Einträge, die die entfernte "
+"Option verwenden, verloren gehen."
+
 msgid "Confirm"
 msgstr "Bestätigen"
 
@@ -6093,6 +6100,9 @@ msgstr ""
 "Um die Verfügbarkeit zu löschen, müssen zuerst alle bestehenden "
 "Reservationen abgesagt werden."
 
+msgid "Blocker"
+msgstr "Sperrzeit"
+
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Es besteht bereits eine Verfügbarkeit im gewünschten Zeitraum."
 
@@ -6380,30 +6390,6 @@ msgstr "Ein neues Verzeichnis wurde hinzugefügt"
 msgid "New Directory"
 msgstr "Neues Verzeichnis"
 
-#, python-format
-msgid ""
-"Cannot convert field \"${field}\" from type \"${old_type}\" to "
-"\"${new_type}\"."
-msgstr ""
-"Feld \"${field}\" kann nicht von Typ \"${old_type}\" zu \"${new_type}\" "
-"konvertiert werden."
-
-#, python-format
-msgid ""
-"${fields}: New fields cannot be required initially. Require them in a "
-"separate migration step."
-msgstr ""
-"${fields}: Neue Felder können zunächst nicht als erforderlich markiert "
-"werden. Markieren Sie diese in einem separaten Migrationsschritt als "
-"erforderlich."
-
-msgid ""
-"Please note, that data for existing entries that use the removed option will "
-"be lost."
-msgstr ""
-"Bitte beachten Sie, dass Daten für bestehende Einträge, die die entfernte "
-"Option verwenden, verloren gehen."
-
 msgid ""
 "The requested change cannot be performed, as it is incompatible with "
 "existing entries"
@@ -6434,12 +6420,29 @@ msgstr ""
 "derselben Migration. Bitte verwenden Sie für jede Option separate "
 "Migrationen."
 
+#, python-format
+msgid ""
+"${fields}: New fields cannot be required initially. Require them in a "
+"separate migration step."
+msgstr ""
+"${fields}: Neue Felder können zunächst nicht als erforderlich markiert "
+"werden. Markieren Sie diese in einem separaten Migrationsschritt als "
+"erforderlich."
+
 msgid ""
 "Renaming multiple options in the same migration is not supported. Please use "
 "separate migrations for each option."
 msgstr ""
 "Das Umbenennen mehrerer Optionen in derselben Migration wird nicht "
 "unterstützt. Bitte verwenden Sie für jede Option separate Migrationen."
+
+#, python-format
+msgid ""
+"Cannot convert field \"${field}\" from type \"${old_type}\" to "
+"\"${new_type}\"."
+msgstr ""
+"Feld \"${field}\" kann nicht von Typ \"${old_type}\" zu \"${new_type}\" "
+"konvertiert werden."
 
 msgid "The directory was deleted"
 msgstr "Das Verzeichnis wurde gelöscht"
@@ -7328,8 +7331,21 @@ msgstr "Eine neue Reservation wurde hinzugefügt"
 msgid "Reservation not adjustable"
 msgstr "Diese Reservation ist nicht anpassbar"
 
+msgid ""
+"This reservation has already been accepted, but changes will not lead to a "
+"new confirmation e-mail so please make sure you inform the customer of the "
+"performed changes, so they have a record of it."
+msgstr ""
+"Diese Reservation wurde bereits angenommen und Änderungen führen nicht zu "
+"einem neuen Bestätigungs-Mail. Bitte stellen Sie sicher, dass der Kunde über "
+"diese Änderung informiert wird, z.B. via send der Terminübersicht oder "
+"einer Nachricht."
+
 msgid "Adjust reservation"
 msgstr "Reservation Anpassen"
+
+msgid "Cannot move reservation into the past"
+msgstr "Eine Reservation kann nicht in die Vergangenheit verschoben werden"
 
 msgid "The reservation was adjusted"
 msgstr "Die Reservation wurde angepasst"
@@ -7339,6 +7355,15 @@ msgstr "Die Reservation ist unverändert geblieben"
 
 msgid "There are no future reservations"
 msgstr "Es gibt keine zukünftige Reservationen"
+
+msgid "Blocker not adjustable"
+msgstr "Diese Sperrzeit kann nicht mehr angepasst werden"
+
+msgid "Cannot move blocker into the past"
+msgstr "Eine Sperrzeit kann nicht in die Vergangenheit verschoben werden"
+
+msgid "Blocker no longer exists"
+msgstr "Diese Sperrzeit existiert nicht mehr"
 
 msgid "Added a new daypass"
 msgstr "Eine neue Tageskarte wurde hinzugefügt"
