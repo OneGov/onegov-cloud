@@ -114,12 +114,11 @@ class DirectoryMigration:
 
         """
         if self.added_required_fields():
-            from onegov.org import _
             raise ValidationError(
-                _('${fields}: New fields cannot be required initially. '
-                  'Require them in a separate migration step.', mapping={
-                    'fields': ', '.join(f'"{f}"' for f in self.get_added_required_field_ids())
-                })
+                '${fields}: New fields cannot be required initially. '
+                  'Require them in a separate migration step.'.format(
+                    fields=', '.join(f'"{f}"' for f in self.get_added_required_field_ids())
+                )
             )
 
         assert self.possible
