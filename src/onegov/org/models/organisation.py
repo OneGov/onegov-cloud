@@ -100,11 +100,11 @@ class Organisation(Base, TimestampMixin):
     opening_hours_url: dict_property[str | None] = meta_property()
     about_url: dict_property[str | None] = meta_property()
     reply_to: dict_property[str | None] = meta_property()
-    # FIXME: This is inherently unsafe, we should consider hard-coding
-    #        support for the few providers we need instead and only
-    #        allow users to select a provider and set the token(s)
-    #        and other configuration options available to that provider
-    analytics_code = dict_markup_property('meta')
+    analytics_provider_name: dict_property[str | None] = meta_property()
+    plausible_domain: dict_property[str | None] = meta_property()
+    matomo_site_id: dict_property[int | None] = meta_property()
+    siteimprove_site_id: dict_property[int | None] = meta_property()
+    google_tag_id: dict_property[str | None] = meta_property()
     online_counter_label: dict_property[str | None] = meta_property()
     hide_online_counter: dict_property[bool | None] = meta_property()
     reservations_label: dict_property[str | None] = meta_property()

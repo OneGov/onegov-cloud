@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-25 08:49+0100\n"
+"POT-Creation-Date: 2026-01-07 17:12+0100\n"
 "PO-Revision-Date: 2022-03-07 13:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -267,6 +267,9 @@ msgstr "Muss am oder nach dem {date} sein."
 #, python-format
 msgid "Needs to be on or before {date}."
 msgstr "Muss am oder vor dem {date} sein."
+
+msgid "Not a valid domain."
+msgstr "Ungültige Domain."
 
 msgid "Uploaded file"
 msgstr "Hochgeladene Datei"

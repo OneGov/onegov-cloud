@@ -126,7 +126,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
                         ), Date
                     ).op('<->')(FormRegistrationWindow.end)
                 )
-            ).limit(1)
+            ).limit(1).scalar_subquery()
         )"""
     )
 
@@ -299,7 +299,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
                         ), Date
                     ).op('<->')(SurveySubmissionWindow.end)
                 )
-            ).limit(1)
+            ).limit(1).scalar_subquery()
         )"""
     )
 

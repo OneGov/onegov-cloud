@@ -127,7 +127,9 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
 
     course_event: relationship[CourseEvent] = relationship(
         'CourseEvent',
-        back_populates='notification_templates'
+        back_populates='notification_templates',
+        overlaps='info_template,reservation_template,'
+                 'cancellation_template,reminder_template'  # type: ignore[call-arg]
     )
 
     #: The public id of the notification template

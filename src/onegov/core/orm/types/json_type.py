@@ -33,6 +33,7 @@ class JSON(_Base):
     """
 
     impl = JSONB
+    cache_ok = True
 
     def process_bind_param(  # type:ignore[override]
         self,

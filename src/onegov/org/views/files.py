@@ -152,6 +152,8 @@ def view_get_file_collection(
         for group, files in groupby(files, key=self.group)
     )
 
+    # FIXME: Make file-details work without ic-on-success
+    request.require_unsafe_eval()
     return {
         'layout': layout,
         'title': _('Files'),

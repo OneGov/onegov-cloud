@@ -54,11 +54,11 @@ def test_settings(client: Client) -> None:
 
     # analytics settings
     settings = client.get('/analytics-settings')
-    settings.form['analytics_code'] = '<script>alert("Hi!");</script>'
+    settings.form['analytics_provider_name'] = 'plausible'
     settings.form.submit()
 
     settings = client.get('/analytics-settings')
-    assert '<script>alert("Hi!");</script>' in settings.text
+    assert 'src="https://dummy-plausible.test/script.js"' in settings.text
 
     # header settings
     color = '#006fbb'

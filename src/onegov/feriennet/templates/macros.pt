@@ -13,7 +13,7 @@
     <link tal:condition="layout.favicon_pinned_tab_safari_url|nothing" rel="mask-icon" href="${layout.favicon_pinned_tab_safari_url}" color="${layout.primary_color}">
     <meta name="theme-color" content="${layout.primary_color}">
     <!-- Google Tag Manager -->
-    <script>
+    <script nonce="${request.content_security_policy_nonce('script')}">
         /* eslint-disable */
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src= 'https://beobachten.projuventute.ch/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f); })(window,document,'script','dataLayer','GTM-WTBG4FX');
          /* eslint-enable */
@@ -904,7 +904,7 @@
 <metal:periods define-macro="periods" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
     <div class="filter-panel side-panel" tal:condition="len(periods) > 1">
         <h3 class="filter-title" i18n:translate tal:condition="not hide_title|True">Period</h3>
-        <select onchange="location = this.value;" tal:define="view_name view_name|None">
+        <select data-auto-redirect tal:define="view_name view_name|None">
             <option tal:repeat="p periods" value="${request.link(model.for_period(p), name=view_name)}" tal:attributes="selected p.id == period.id">
                 ${p.title}
             </option>
@@ -915,7 +915,7 @@
 <metal:users define-macro="users" i18n:domain="onegov.feriennet">
     <div class="filter-panel side-panel" tal:condition="request.is_admin and users">
         <h3 class="filter-title" i18n:translate>User</h3>
-        <select onchange="location = this.value;">
+        <select data-auto-redirect>
             <tal:b repeat="u users">
                 <option tal:condition="u.username == request.current_username or u.realname"
                         tal:attributes="selected u.id == user.id"
@@ -1034,7 +1034,7 @@
         </div>
 
         <div class="grid-x align-center">
-            <button ic-select-from-response="#activities" ic-target="#activities" ic-get-from="${request.url.replace('/filters','',1)}" class="button apply-filters" type="button" i18n:translate data-close>Apply filters</button>
+            <button ic-select-from-response="#content" ic-target="#content" ic-get-from="${request.url.replace('/filters','',1)}" class="button apply-filters" type="button" i18n:translate data-close>Apply filters</button>
         </div>
     </div>
 

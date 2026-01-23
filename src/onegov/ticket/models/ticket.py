@@ -9,11 +9,11 @@ from onegov.ticket import handlers
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
 from sedate import utcnow
-from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text
-from sqlalchemy import Index
-from sqlalchemy.dialects.postgresql import HSTORE
+from sqlalchemy import Boolean, Column, Enum, Integer, String, Text
+from sqlalchemy import ForeignKey, Index
+from sqlalchemy.dialects.postgresql import ARRAY, HSTORE
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.ext.mutable import MutableDict, MutableList
 from sqlalchemy.orm import deferred, relationship
 from translationstring import TranslationString
 from uuid import uuid4
@@ -79,6 +79,12 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         nullable=True,
         name='tags'
     )
+
+    #: Message-IDs of sent customer e-mails (for mail client threading)
+    customer_message_ids: Column[list[str] | None] = deferred(Column(
+        MutableList.as_mutable(ARRAY(String)),  # type: ignore[no-untyped-call]
+        nullable=True
+    ))
 
     #: the data associated with the selected tags at the time they were
     #: selected

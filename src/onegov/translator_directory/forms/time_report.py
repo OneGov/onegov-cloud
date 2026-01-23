@@ -49,7 +49,7 @@ class TranslatorTimeReportForm(Form):
     assignment_location = ChosenSelectField(
         label=_('Assignment Location'),
         choices=[],  # will be set in on_request
-        validators=[Optional()],
+        validators=[],
         depends_on=('assignment_type', 'on-site'),
     )
 
@@ -128,9 +128,8 @@ class TranslatorTimeReportForm(Form):
     def validate_assignment_location(self, field: ChosenSelectField) -> None:
         if self.assignment_type.data != 'on-site':
             return
-        else:
-            if not field.data:
-                raise ValidationError(_('Please select a location'))
+        if not field.data:
+            raise ValidationError(_('Please select a location'))
 
     def validate_end_time(self, field: TimeField) -> None:
         if not all(
@@ -160,9 +159,10 @@ class TranslatorTimeReportForm(Form):
             (key, self.request.translate(value))
             for key, value in TIME_REPORT_INTERPRETING_TYPES.items()
         ]
-        self.assignment_location.choices = [
-            (key, name) for key, (name, _) in ASSIGNMENT_LOCATIONS.items()
+        choices = self.assignment_location.choices = [(key, name)
+            for key, (name, _) in ASSIGNMENT_LOCATIONS.items()
         ]
+        choices.insert(0, ('', ''))
         self.finanzstelle.choices = [
             (key, fs.name) for key, fs in FINANZSTELLE.items()
         ]
@@ -519,14 +519,20 @@ class TranslatorTimeReportForm(Form):
 
         assert self.assignment_type.data is not None
         model.assignment_type = self.assignment_type.data
-        model.assignment_location = self.assignment_location.data or None
         model.finanzstelle = self.finanzstelle.data
 
-        # Handle location override (only in edit mode)
-        if self.assignment_location_override.data:
-            model.assignment_location = self.assignment_location_override.data
+        # Only on-site has a location
+        if self.assignment_type.data == 'on-site':
+            if self.assignment_location_override.data:
+                model.assignment_location = (
+                    self.assignment_location_override.data
+                )
+            else:
+                model.assignment_location = (
+                    self.assignment_location.data or None
+                )
         else:
-            model.assignment_location = self.assignment_location.data or None
+            model.assignment_location = None
 
         duration_hours = self.get_duration_hours()
         model.duration = int(float(duration_hours) * 60)

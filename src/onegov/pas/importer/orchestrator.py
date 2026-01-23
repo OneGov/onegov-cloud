@@ -65,7 +65,7 @@ def _fetch_custom_data_worker(
             person_id = parliamentarian.external_kub_id
             url = f'{base_url}/people/{person_id}'
 
-            response = session.get(url, timeout=30)
+            response = session.get(url, timeout=60)
             response.raise_for_status()
 
             person_data = response.json()
@@ -175,7 +175,7 @@ class KubImporter:
 
         test_url = f'{self.base_url}/people'
         try:
-            response = self.session.get(test_url, timeout=10)
+            response = self.session.get(test_url, timeout=60)
             if response.status_code != 200:
                 raise APIAccessibilityError(
                     f'API check failed: {response.status_code} - '
@@ -303,7 +303,7 @@ class KubImporter:
 
         while url:
             try:
-                response = self.session.get(url, timeout=30)
+                response = self.session.get(url, timeout=60)
                 response.raise_for_status()
 
                 data = response.json()

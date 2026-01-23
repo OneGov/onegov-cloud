@@ -223,9 +223,10 @@ class PoliticalBusiness(
     def display_name(cls) -> ColumnElement[str]:
         return func.concat(
             func.coalesce(cls.number, ''),
-            case([
-                (and_(cls.number.isnot(None), cls.number != ''), ' ')
-            ], else_=''),
+            case(
+                (and_(cls.number.isnot(None), cls.number != ''), ' '),
+                else_=''
+            ),
             cls.title
         )
 
@@ -458,5 +459,4 @@ class PoliticalBusinessParticipationCollection(
         self,
         parliamentarian_id: uuid.UUID
     ) -> Query[PoliticalBusinessParticipation]:
-        query = super().query()
-        return query.filter_by(parliamentarian_id=parliamentarian_id)
+        return self.query().filter_by(parliamentarian_id=parliamentarian_id)

@@ -11,6 +11,7 @@ from onegov.chat import MessageCollection
 from onegov.core.elements import Element
 from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.core.utils import Bunch, module_path
+from onegov.core.security import Public
 from onegov.form import (
     Form,
     FormDefinitionCollection,
@@ -20,7 +21,7 @@ from onegov.form import (
 from onegov.org import OrgApp
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.layout import DefaultLayout
-from onegov.org.models import TicketMessage
+from onegov.org.models import Organisation, TicketMessage
 from onegov.org.views.ticket import delete_ticket
 from onegov.ticket import TicketCollection, Handler
 from onegov.user import User
@@ -67,6 +68,15 @@ if TYPE_CHECKING:
             whole_day: bool = ...,
         ) -> ExtendedResponse: ...
 
+    class _AddBlockerFunc(Protocol):
+        def __call__(
+            self,
+            start: str = ...,
+            end: str = ...,
+            whole_day: bool = ...,
+            reason: str | None = ...,
+        ) -> ExtendedResponse: ...
+
     class _RenderFunc(Protocol):
         def __call__(self, element: Element) -> ExtendedResponse: ...
 else:
@@ -76,6 +86,19 @@ else:
 class TestOrgApp(OrgApp):
     __test__ = False
     maildir: str
+
+class CSRF:
+    pass
+
+@TestOrgApp.path(model=CSRF, path='csrf-token')
+def get_csrf_dummy(app: TestOrgApp) -> CSRF:
+    return CSRF()
+
+
+# NOTE: We add a testing view to retrieve a csrf token for the current session
+@TestOrgApp.view(CSRF, permission=Public)
+def get_csrf_token(self: Organisation, request: OrgRequest) -> str:
+    return request.csrf_token
 
 
 @pytest.fixture(scope='function')
@@ -116,6 +139,10 @@ class Client(BaseClient[_OrgAppT]):
     skip_n_forms = 1
     use_intercooler = True
 
+    @property
+    def csrf_token(self) -> str:
+        return self.get('/csrf-token').text
+
     def bound_reserve(self, allocation: Allocation) -> _ReserveFunc:
 
         default_start = f'{allocation.start:%H:%M}'
@@ -137,6 +164,29 @@ class Client(BaseClient[_OrgAppT]):
             )
 
         return reserve
+
+    def bound_add_blocker(self, allocation: Allocation) -> _AddBlockerFunc:
+
+        default_start = f'{allocation.start:%H:%M}'
+        default_end = f'{allocation.end:%H:%M}'
+        default_whole_day = allocation.whole_day
+        resource = allocation.resource
+        allocation_id = allocation.id
+
+        def add_blocker(
+            start: str = default_start,
+            end: str = default_end,
+            whole_day: bool = default_whole_day,
+            reason: str | None = None,
+        ) -> ExtendedResponse:
+            return self.post(
+                f'/allocation/{resource}/{allocation_id}/add-blocker'
+                f'?start={start}&end={end}&reason={reason or ""}'
+                f'&whole_day={whole_day and "1" or "0"}'
+                f'&csrf-token={self.csrf_token}'
+            )
+
+        return add_blocker
 
 
 @pytest.fixture(scope='function')
@@ -208,6 +258,21 @@ def create_org_app(
             'client_url': 'ws://localhost:8766',
             'manage_url': 'ws://localhost:8766',
             'manage_token': 'super-super-secret-token'
+        }
+    )
+    app.configure_analytics_providers(
+        analytics_providers={
+            'plausible': {
+                'provider': 'plausible',
+                'title': 'Dummy',
+                'script_src': 'https://dummy-plausible.test/script.js',
+            },
+            'matomo': {
+                'provider': 'matomo',
+                'title': 'Matomo',
+                'matomo_url': 'https://dummy-matomo.test/',
+            },
+            'siteimprove': None,
         }
     )
     app.configure_payment_providers(

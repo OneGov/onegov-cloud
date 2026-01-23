@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     class ResultsByDistrictRow(NamedTuple):
         name: str
         counted: bool
-        accepted: bool
+        accepted: bool | None
         yeas: int
         nays: int
         yeas_percentage: float
@@ -133,7 +133,11 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
             cast(func.coalesce(func.nullif(yeas + nays, 0), 1), Float)
         )
         nays_percentage = 100 - yeas_percentage
-        accepted = case({True: yeas > nays}, counted)
+        accepted = case(  # type: ignore[call-overload]
+            (counted.is_(False), None),
+            (yeas > nays, True),
+            else_=False
+        )
         results = session.query(BallotResult).filter(
             BallotResult.ballot_id == self.id
         ).with_entities(

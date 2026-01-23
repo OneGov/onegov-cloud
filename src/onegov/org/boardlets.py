@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from datetime import timedelta
 from functools import cached_property
 from sedate import utcnow
@@ -8,6 +7,7 @@ from sqlalchemy import func
 
 from onegov.org import _
 from onegov.org import OrgApp
+from onegov.org.analytics import Plausible
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import Boardlet, BoardletFact, News, Topic
 from onegov.plausible.plausible_api import PlausibleAPI
@@ -36,15 +36,17 @@ class OrgBoardlet(Boardlet):
 
     @cached_property
     def plausible_api(self) -> PlausibleAPI | None:
-        analytics_code = self.request.app.org.analytics_code
+        provider = self.request.analytics_provider
 
-        if analytics_code:
-            if 'analytics.seantis.ch' in analytics_code:
-                match = re.search(r'data-domain="(.+?)"', analytics_code)
-                if match:
-                    site_id = match.group(1)
-                    return PlausibleAPI(site_id,
-                                        self.request.app.plausible_api_token)
+        if isinstance(provider, Plausible):
+            # NOTE: In the future we may want to support arbitrary Plausible
+            #       instances, in which case the api token configuration would
+            #       probably move to the analytics provider.
+            if 'analytics.seantis.ch' in provider.configuration['script_src']:
+                return PlausibleAPI(
+                    provider.domain(self.request),
+                    self.request.app.plausible_api_token
+                )
 
         return None
 
@@ -128,7 +130,7 @@ class TicketBoardlet(OrgBoardlet):
 def get_icon_for_access_level(access: str) -> str:
     access_icons = {
         'public': 'fas fa-eye',
-        'secret': 'fas fa-user-secret',
+        'secret': 'fas fa-user-secret',  # nosec: B105
         'private': 'fas fa-lock',
         'member': 'fas fa-users'
     }
@@ -142,7 +144,7 @@ def get_icon_for_access_level(access: str) -> str:
 def get_icon_title(request: OrgRequest, access: str) -> str:
     access_texts = {
         'public': 'Public',
-        'secret': 'Through URL only (not listed)',
+        'secret': 'Through URL only (not listed)',  # nosec: B105
         'private': 'Only by privileged users',
         'member': 'Only by privileged users and members'
     }

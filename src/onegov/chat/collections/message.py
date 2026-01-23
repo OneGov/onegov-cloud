@@ -94,15 +94,14 @@ class MessageCollection(GenericCollection[_M]):
 
         _type: str | tuple[str, ...] | None = type
         if _type is None:
-            _type = self.type
-
+            _type = self.type or 'generic'
         if _type is not None and not isinstance(_type, str):
             raise RuntimeError(
                 f'Multiple types to add a message with: {_type}'
             )
 
-        if _type == '*':
-            _type = None
+        if _type is None or _type == '*':
+            _type = 'generic'
 
         return super().add(type=_type, **kwargs)
 

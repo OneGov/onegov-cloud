@@ -1257,7 +1257,7 @@ def parse_field_block(
     field_help = field_block.get('field_help')
 
     identifier_src = key.rstrip('= ') + '='
-    identifier = ELEMENTS.identifier.parseString(identifier_src)
+    identifier = ELEMENTS.identifier.parse_string(identifier_src)
 
     # add the nested options/dependencies in case of radio/checkbox buttons
     if isinstance(field, list):
@@ -1322,7 +1322,7 @@ def format_discount(discount: ParseResults | None) -> str:
 def match(expr: pp.ParserElement, text: str) -> bool:
     """ Returns true if the given parser expression matches the given text. """
     try:
-        expr.parseString(text)
+        expr.parse_string(text)
     except pp.ParseBaseException:
         return False
     else:
@@ -1334,7 +1334,7 @@ def try_parse(expr: pp.ParserElement, text: str) -> pp.ParseResults | None:
 
     """
     try:
-        return expr.parseString(text)
+        return expr.parse_string(text)
     except pp.ParseBaseException:
         return None
 
