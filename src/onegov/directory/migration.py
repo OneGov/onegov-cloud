@@ -117,7 +117,8 @@ class DirectoryMigration:
             raise ValidationError(
                 '${fields}: New fields cannot be required initially. '
                   'Require them in a separate migration step.'.format(
-                    fields=', '.join(f'"{f}"' for f in self.get_added_required_field_ids())
+                    fields=', '.join(
+                        f'"{f}"' for f in self.get_added_required_field_ids())
                 )
             )
 
