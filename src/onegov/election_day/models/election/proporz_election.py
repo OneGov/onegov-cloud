@@ -63,7 +63,8 @@ class ProporzElection(
     party_results: relationship[list[PartyResult]] = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
-        back_populates='election'
+        back_populates='election',
+        overlaps='party_results'  # type: ignore[call-arg]
     )
 
     #: An election may contains n party panachage results
@@ -71,7 +72,8 @@ class ProporzElection(
     party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
-        back_populates='election'
+        back_populates='election',
+        overlaps='panachage_results'  # type: ignore[call-arg]
     )
 
     @property
@@ -153,13 +155,13 @@ class ProporzElection(
         else:
             e_ids = session.query(ElectionResult.id).filter(
                 ElectionResult.election_id == self.id
-            ).all()
+            ).scalar_subquery()
             session.query(CandidatePanachageResult).filter(
                 CandidatePanachageResult.election_result_id.in_(e_ids)
             ).delete()
             l_ids = session.query(List.id).filter(
                 List.election_id == self.id
-            ).all()
+            ).scalar_subquery()
             session.query(ListPanachageResult).filter(
                 ListPanachageResult.target_id.in_(l_ids)
             ).delete()

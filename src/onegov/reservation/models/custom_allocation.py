@@ -7,7 +7,7 @@ from sqlalchemy.orm import object_session
 
 
 class CustomAllocation(Allocation, ModelBase):
-    __mapper_args__ = {'polymorphic_identity': 'custom'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'custom'}
 
     @property
     def resource_obj(self) -> Resource:

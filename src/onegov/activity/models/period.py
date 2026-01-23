@@ -553,7 +553,7 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
         # no occasion in any future period
         o = session.query(Occasion)
         o = o.filter(Occasion.period_id == self.id)
-        o = o.filter(not_(Occasion.activity_id.in_(f.subquery())))
+        o = o.filter(not_(Occasion.activity_id.in_(f.scalar_subquery())))
         o = o.options(joinedload(Occasion.activity))
 
         # archive those
@@ -569,7 +569,7 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
         from onegov.activity.models.activity import Activity
 
         a = session.query(Activity)
-        a = a.filter(not_(Activity.id.in_(w.subquery())))
+        a = a.filter(not_(Activity.id.in_(w.scalar_subquery())))
         a = a.filter(Activity.state == 'accepted')
 
         for activity in a:

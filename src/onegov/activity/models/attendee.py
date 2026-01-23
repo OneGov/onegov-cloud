@@ -221,9 +221,10 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
             # force the result to be a float instead of a decimal
             type_coerce(
                 func.sum(
-                    case([
+                    case(
                         (Booking.state == 'accepted', Booking.priority + 1),
-                    ], else_=0)
+                        else_=0
+                    )
                 ) / cast(
                     # force the division to produce a float instead of an int
                     func.sum(Booking.priority) + func.count(Booking.id), Float

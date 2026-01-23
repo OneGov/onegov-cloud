@@ -253,12 +253,12 @@ class Occasion(Base, TimestampMixin):
     def total_cost(cls) -> ColumnElement[Decimal]:
         from onegov.activity.models.period import BookingPeriod
 
-        return coalesce(Occasion.cost, 0) + case([
+        return coalesce(Occasion.cost, 0) + case(
             (BookingPeriod.all_inclusive == True, 0),
             (BookingPeriod.all_inclusive == False, func.coalesce(
                 Occasion.booking_cost, BookingPeriod.booking_cost, 0
             )),
-        ])
+        )
 
     def compute_duration(
         self,
@@ -344,12 +344,13 @@ class Occasion(Base, TimestampMixin):
 
     @available_spots.expression  # type:ignore[no-redef]
     def available_spots(cls) -> ColumnElement[int]:
-        return case((
+        return case(
             (
                 cls.cancelled == False,
                 func.upper(cls.spots) - 1 - cls.attendee_count
             ),
-        ), else_=0)
+            else_=0
+        )
 
     @property
     def max_spots(self) -> int:

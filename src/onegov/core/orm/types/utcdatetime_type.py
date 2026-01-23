@@ -23,6 +23,7 @@ class UTCDateTime(_Base):
     """
 
     impl = DateTime
+    cache_ok = True
 
     def __init__(self) -> None:
         super().__init__(timezone=False)

@@ -168,7 +168,12 @@ def delete_parliamentarian(
     request.assert_valid_csrf_token()
 
     businesses = PoliticalBusinessParticipationCollection(request.session)
-    businesses.by_parliamentarian_id(self.id).delete()
+    # NOTE: I'm not really sure why this is necessary for this specific
+    #       query. Similar bulk deletes work just fine, but since we don't
+    #       put participations themselves into the search index, we can
+    #       do this bulk delete more efficiently this way anyways.
+    with request.app.session_manager.ignore_bulk_deletes():
+        businesses.by_parliamentarian_id(self.id).delete()
 
     parliamentarians = ParliamentarianCollection(request.session)
     parliamentarians.delete(self)

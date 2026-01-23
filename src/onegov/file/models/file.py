@@ -279,7 +279,7 @@ class File(Base, Associable, TimestampMixin):
     @signature_timestamp.expression  # type:ignore[no-redef]
     def signature_timestamp(cls):
         return type_coerce(case(
-            [(
+            (
                 File.signed == True,
                 text("""
                     (
@@ -289,7 +289,7 @@ class File(Base, Associable, TimestampMixin):
                         )::timestamp without time zone
                     )
                 """)
-            )],
+            ),
             else_=text('NULL')
         ), UTCDateTime)
 

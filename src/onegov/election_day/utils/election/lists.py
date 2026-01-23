@@ -66,11 +66,11 @@ def get_list_results(
     )
     order: list[ColumnElement[Any]] = [desc('votes')]
     if names and sort_by_names:
-        order.insert(0, case(
-            [
+        order.insert(0, case(  # type: ignore[call-overload]
+            *(
                 (List.name == name, index)
                 for index, name in enumerate(names, 1)
-            ],
+            ),
             else_=0
         ))
     result = result.order_by(*order)

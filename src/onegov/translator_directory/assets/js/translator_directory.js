@@ -26,4 +26,16 @@ document.addEventListener("DOMContentLoaded", function() {
     $('#time-reports-filter select[name="month"], #time-reports-filter select[name="year"]').on('change', function() {
         $(this).closest('form').submit();
     });
+
+    // Auto-set end date to match start date in time report form for convenience while typing
+    const startDateField = document.querySelector(
+        'input[name="start_date"]'
+    );
+    const endDateField = document.querySelector('input[name="end_date"]');
+
+    if (startDateField && endDateField) {
+        startDateField.addEventListener('change', function() {
+            endDateField.value = startDateField.value;
+        });
+    }
 });

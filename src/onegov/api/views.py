@@ -61,6 +61,8 @@ def view_api_endpoints(
                 {
                     'href': request.link(endpoint),
                     'rel': endpoint.endpoint,
+                    'title': endpoint.title,
+                    'description': endpoint.description,
                     'data': [
                         {'name': name}
                         for name in getattr(endpoint, 'filters', [])
@@ -91,6 +93,8 @@ def view_api_endpoint(
             'collection': {
                 'version': '1.0',
                 'href': request.link(self.for_filter()),
+                'title': self.title,
+                'description': self.description,
                 'links': [
                     {
                         'rel': rel,

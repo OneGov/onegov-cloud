@@ -11,7 +11,7 @@ from collections import OrderedDict
 from datetime import date as date_t, datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import islice
-
+from libres.db.models import ReservationBlocker
 from libres.modules.errors import LibresError
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
@@ -43,7 +43,6 @@ from purl import URL
 from sedate import utcnow, standardize_date
 from sqlalchemy import and_, func, select, cast as sa_cast, Boolean
 from sqlalchemy.orm import undefer, joinedload, Session
-
 from webob import exc
 
 
@@ -1200,12 +1199,24 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
             for field in self.occupancy_fields
         ))
 
+    # get all blockers
+    blockers = self.scheduler.managed_blockers()
+    blockers = blockers.filter(start <= ReservationBlocker.start)
+    blockers = blockers.filter(ReservationBlocker.end <= end)
+
     return *(
         res.as_dict()
         for res in utils.ReservationEventInfo.from_reservations(
             request,
             self,
             query
+        )
+    ), *(
+        blk.as_dict()
+        for blk in utils.BlockerEventInfo.from_blockers(
+            request,
+            self,
+            blockers
         )
     ), *(
         av.as_dict()

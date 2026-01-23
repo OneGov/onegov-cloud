@@ -58,6 +58,8 @@ class UploadOrLinkExistingFileWidget(UploadWidget):
             # interactive preview widget
             request = field.meta.request
             request.include('prompt')
+            # FIXME: Make file-details work without ic-on-success
+            request.require_unsafe_eval()
             data['preview'] = self.file_details_template.format(
                 file_id=file.id,
                 details_url=request.link(file, 'details')

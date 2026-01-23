@@ -137,7 +137,7 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
         number_of_mandates = select(
             [Election.number_of_mandates],
             whereclause=text('elections.id = election_results.election_id')
-        )
+        ).scalar_subquery()
         return (
             number_of_mandates * (
                 cls.received_ballots - cls.blank_ballots - cls.invalid_ballots

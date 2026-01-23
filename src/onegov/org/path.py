@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import sedate
 from datetime import date, datetime
+from libres.db.models import ReservationBlocker
 from onegov.api.models import ApiKey
 from onegov.chat import MessageCollection
 from onegov.chat import TextModule
@@ -595,6 +596,27 @@ def get_reservation(
         query = query.filter(Reservation.id == id)
 
         return query.first()  # type:ignore[return-value]
+    return None
+
+
+@OrgApp.path(
+    model=ReservationBlocker,
+    path='/reservation-blocker/{resource}/{id}',
+    converters={'resource': UUID, 'id': int}
+)
+def get_reservation_blocker(
+    app: OrgApp,
+    resource: UUID,
+    id: int
+) -> ReservationBlocker | None:
+
+    res = app.libres_resources.by_id(resource)
+
+    if res is not None:
+        query = res.scheduler.managed_blockers()
+        query = query.filter(ReservationBlocker.id == id)
+
+        return query.first()
     return None
 
 

@@ -31,7 +31,7 @@ class Message(Base):
 
     __mapper_args__ = {
         'polymorphic_on': 'type',
-        'polymorphic_identity': None
+        'polymorphic_identity': 'generic'
     }
 
     __tablename__ = 'messages'
@@ -53,7 +53,7 @@ class Message(Base):
     owner: Column[str | None] = Column(Text, nullable=True)
 
     #: the polymorphic type of the message
-    type: Column[str | None] = Column(Text, nullable=True)
+    type: Column[str] = Column(Text, nullable=False, default='generic')
 
     #: meta information specific to this message and maybe its type -> we
     #: don't use the meta/content mixin yet as we might not need the content
