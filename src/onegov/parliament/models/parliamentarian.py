@@ -327,7 +327,10 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     #: A parliamentarian's interest ties
     interests: dict_property[dict[str, Any]] = content_property(default=dict)
 
-    @hybrid_property
+    if TYPE_CHECKING:
+        active: Column[bool]
+
+    @hybrid_property  # type: ignore[no-redef]
     def active(self) -> bool:
         if not self.roles and not self.commission_memberships:
             return True

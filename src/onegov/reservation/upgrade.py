@@ -189,3 +189,29 @@ def add_source_type_column_to_reserved_slots(context: UpgradeContext) -> None:
           'source_type',
           server_default=None
         )
+
+
+@upgrade_task('Make Reservation/Allocation.type not nullable')
+def make_allocation_and_reservation_type_not_nullable(
+    context: UpgradeContext
+) -> None:
+    if (
+        context.has_table('allocations')
+        and context.has_column('allocations', 'type')
+    ):
+        context.operations.execute("""
+            UPDATE allocations
+               SET type = 'generic'
+             WHERE type IS NULL;
+        """)
+        context.operations.alter_column('allocations', 'type', nullable=False)
+    if (
+        context.has_table('reservations')
+        and context.has_column('reservations', 'type')
+    ):
+        context.operations.execute("""
+            UPDATE reservations
+               SET type = 'generic'
+             WHERE type IS NULL;
+        """)
+        context.operations.alter_column('reservations', 'type', nullable=False)

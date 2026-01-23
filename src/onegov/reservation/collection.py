@@ -141,16 +141,19 @@ class ResourceCollection:
 
         scheduler = resource.get_scheduler(self.libres_context)
 
+        session_manager = self.libres_context.get_service('session_provider')
         if not including_reservations:
             assert not scheduler.managed_reserved_slots().first()
             assert not scheduler.managed_reservations().first()
 
-            scheduler.managed_allocations().delete('fetch')
+            with session_manager.ignore_bulk_deletes():
+                scheduler.managed_allocations().delete('fetch')
         else:
             if callable(handle_linked_objects):
                 handle_linked_objects(scheduler, self.session)
 
-            scheduler.extinguish_managed_records()
+            with session_manager.ignore_bulk_deletes():
+                scheduler.extinguish_managed_records()
 
         if resource.files:
             # unlink any linked files

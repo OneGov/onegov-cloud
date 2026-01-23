@@ -241,13 +241,14 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
 
         @registration_state.expression  # type:ignore[no-redef]
         def registration_state(cls):
-            return case((
+            return case(
                 (cls.spots == 0, None),
                 (cls.claimed == None, 'open'),
                 (cls.claimed == 0, 'cancelled'),
                 (cls.claimed == cls.spots, 'confirmed'),
-                (cls.claimed < cls.spots, 'partial')
-            ), else_=None)
+                (cls.claimed < cls.spots, 'partial'),
+                else_=None
+            )
 
     @property
     def payable_reference(self) -> str:

@@ -130,7 +130,7 @@ class TicketBoardlet(OrgBoardlet):
 def get_icon_for_access_level(access: str) -> str:
     access_icons = {
         'public': 'fas fa-eye',
-        'secret': 'fas fa-user-secret',
+        'secret': 'fas fa-user-secret',  # nosec: B105
         'private': 'fas fa-lock',
         'member': 'fas fa-users'
     }
@@ -144,7 +144,7 @@ def get_icon_for_access_level(access: str) -> str:
 def get_icon_title(request: OrgRequest, access: str) -> str:
     access_texts = {
         'public': 'Public',
-        'secret': 'Through URL only (not listed)',
+        'secret': 'Through URL only (not listed)',  # nosec: B105
         'private': 'Only by privileged users',
         'member': 'Only by privileged users and members'
     }

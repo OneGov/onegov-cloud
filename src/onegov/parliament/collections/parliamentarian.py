@@ -42,7 +42,7 @@ class ParliamentarianCollection(GenericCollection[ParliamentarianT]):
         Parliamentarian = self.model_class  # noqa: N806
         if self.active:
             query = query.filter(
-                Parliamentarian.active.expression.in_(self.active))  # type: ignore[attr-defined]
+                Parliamentarian.active.in_(self.active))
 
         if self.party:
             query = query.filter(

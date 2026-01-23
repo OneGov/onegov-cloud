@@ -179,7 +179,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
     @property
     def entry_cls(self) -> _type[DirectoryEntry]:
-        return self.__class__._decl_class_registry[  # type:ignore
+        return self.__class__.registry._class_registry[  # type:ignore
             self.entry_cls_name
         ]
 

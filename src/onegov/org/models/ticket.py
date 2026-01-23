@@ -870,7 +870,7 @@ class ReservationHandler(Handler):
 
             tokens = session.query(Reservation.token)
             tokens = tokens.filter(
-                Reservation.target.in_(allocations.subquery()))
+                Reservation.target.in_(allocations.scalar_subquery()))  # type: ignore[attr-defined]
 
             handler_ids = tuple(t[0].hex for t in tokens)
 

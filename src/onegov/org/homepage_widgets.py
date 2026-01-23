@@ -378,7 +378,7 @@ class SliderWidget:
         ))
 
         images = session.query(ImageFile)
-        images = images.filter(ImageFile.id.in_(files.subquery()))
+        images = images.filter(ImageFile.id.in_(files.scalar_subquery()))
         images = images.order_by(func.random())
         images = images.limit(6)
 

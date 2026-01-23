@@ -13,7 +13,6 @@ from onegov.form.errors import UnableToComplete
 from onegov.form.utils import hash_definition
 from sedate import utcnow
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import FlushError
 from textwrap import dedent
 from webob.multidict import MultiDict
 from werkzeug.datastructures import FileMultiDict
@@ -29,6 +28,7 @@ def test_form_checksum() -> None:
     assert hash_definition('abc') == '900150983cd24fb0d6963f7d28e17f72'
 
 
+@pytest.mark.filterwarnings('ignore:.*conflicts with persistent instance.*')
 def test_add_form(session: Session) -> None:
     collection = FormCollection(session)
 
@@ -47,7 +47,7 @@ def test_add_form(session: Session) -> None:
     assert hasattr(form.form_class, '_source')
     assert form.form_class._source == form.definition
 
-    with pytest.raises(FlushError):
+    with pytest.raises(IntegrityError):
         form = collection.definitions.add('Tax Form', definition=dedent("""
             First Name * = ___
             Last Name * = ___

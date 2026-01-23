@@ -188,7 +188,7 @@ class PreferOrganiserChildren:
                     .filter(Activity.id.in_(
                         session.query(Occasion.activity_id)
                         .filter(Occasion.period_id == booking.period_id)
-                        .subquery()
+                        .scalar_subquery()  # type: ignore[attr-defined]
                     ))
                 }
 

@@ -1,8 +1,28 @@
 # Changes
 
+## 2026.2
+
+`2026-01-23` | [7fe7cf163c...023c5e9877](https://github.com/OneGov/onegov-cloud/compare/7fe7cf163c^...023c5e9877)
+
+### Core
+
+##### Upgrades SQLAlchemy to version 1.4
+
+`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [7fe7cf163c](https://github.com/onegov/onegov-cloud/commit/7fe7cf163c340b75a7d5d99b18a07cd6ecd74dd1)
+
+### Town6
+
+##### Change background-size from cover to contain for image display.
+
+`Bugfix` | [OGC-2867](https://linear.app/onegovcloud/issue/OGC-2867) | [8687186243](https://github.com/onegov/onegov-cloud/commit/86871862437fff784be55c4d0b4e607d45f8ff3a)
+
+##### Increases robustness if underlying pdf of form doesn't exist.
+
+`Bugfix` | [OGC-2922](https://linear.app/onegovcloud/issue/OGC-2922) | [1314f1bdf8](https://github.com/onegov/onegov-cloud/commit/1314f1bdf83b0fa65528bc9a2b5ed1e8436047e0)
+
 ## 2026.1
 
-`2026-01-16` | [93d40ac5bd...fbf6bf5cda](https://github.com/OneGov/onegov-cloud/compare/93d40ac5bd^...fbf6bf5cda)
+`2026-01-16` | [93d40ac5bd...b829bbf934](https://github.com/OneGov/onegov-cloud/compare/93d40ac5bd^...b829bbf934)
 
 ### Api
 
@@ -2593,39 +2613,4 @@ will still use the old default of "one-off".
 ##### Adds daily cron job to import events from saiten
 
 `Feature` | [OGC-2184](https://linear.app/onegovcloud/issue/OGC-2184) | [2a00905128](https://github.com/onegov/onegov-cloud/commit/2a00905128f4d06b99d8a53dd7343d7355459571)
-
-## 2025.23
-
-`2025-05-19` | [cf50671551...039bb2563f](https://github.com/OneGov/onegov-cloud/compare/cf50671551^...039bb2563f)
-
-### Org
-
-##### Allows adjusting individual reservations within a ticket
-
-For now these adjustments are limited to the same allocation on the same
-day. Eventually we may allow moving reservations to arbitrary free
-allocations as long as the settings on the target allocation allow it.
-
-`Feature` | [OGC-2155](https://linear.app/onegovcloud/issue/OGC-2155) | [1d2870de8c](https://github.com/onegov/onegov-cloud/commit/1d2870de8cc67972c4f29ede5f236a9c2b8f62e2)
-
-### Server
-
-##### Avoids caching partially configured application instances
-
-Since `CachedApplication` was setting `self.instance` before the
-application was configured and the server will continue serving
-subsequent requests after a failed one, it was possible for a
-partially initialized application to end up in the cache, which
-leads to cryptic error messages.
-
-It's better if we fail the same way on every request, so we don't
-get distracted by red herrings.
-
-`Bugfix` | [6ae340b3d9](https://github.com/onegov/onegov-cloud/commit/6ae340b3d94c4b33c18b45dd7f41019db9b2958e)
-
-### Town6
-
-##### Reactivate recipient in cron job if no longer on postmark suppression list
-
-`Feature` | [OGC-2212](https://linear.app/onegovcloud/issue/OGC-2212) | [4688da1d6f](https://github.com/onegov/onegov-cloud/commit/4688da1d6f6924b24f622055f9c072ba7a88a2a9)
 
