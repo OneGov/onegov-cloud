@@ -203,12 +203,6 @@ def handle_new_directory(
     }
 
 
-# no op call to make translators aware of this string used in migration.reason
-_('Cannot convert field "${field}" from type "${old_type}" to "${new_type}".')
-_('${fields}: New fields cannot be required initially. Require them in a separate migration step.')
-_('Please note, that data for existing entries that use the removed option will be lost.')
-
-
 @OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
              template='directory_form.pt', permission=Secret,
              form=get_directory_form_class)
@@ -319,10 +313,11 @@ def alert_migration_errors(
         )
 
     if migration.added_required_fields():
+        field_names = migration.get_added_required_field_ids()
         request.alert(_(
             '${fields}: New fields cannot be required initially. '
             'Require them in a separate migration step.', mapping={
-                'fields': ', '.join(f'"{f}"' for f in migration.get_added_required_field_ids())
+                'fields': ', '.join(f'"{f}"' for f in field_names)
             }
         ))
 

@@ -580,8 +580,10 @@ def test_introduce_required_field_fail(session: Session) -> None:
         Seats *= 0..99
     """
 
-    with pytest.raises((ValidationError, WtfValidationError)):
+    with pytest.raises((ValidationError, WtfValidationError)) as error:
         session.flush()
+        assert ('"Seats": New fields cannot be required initially.'
+                in str(error))
 
 
 def test_introduce_required_field(session: Session) -> None:
