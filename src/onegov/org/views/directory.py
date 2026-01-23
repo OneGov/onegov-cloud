@@ -206,6 +206,7 @@ def handle_new_directory(
 # no op call to make translators aware of this string used in migration.reason
 _('Cannot convert field "${field}" from type "${old_type}" to "${new_type}".')
 _('${fields}: New fields cannot be required initially. Require them in a separate migration step.')
+_('Please note, that data for existing entries that use the removed option will be lost.')
 
 
 @OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
