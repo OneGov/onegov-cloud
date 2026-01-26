@@ -96,3 +96,20 @@ def split_title_and_data_tsvector_columns(context: UpgradeContext) -> None:
             columns=['data_vector'],
             postgresql_using='gin'
         )
+
+
+@upgrade_task('Create it_ch text search config')
+def create_it_ch_text_search_config(context: UpgradeContext) -> None:
+    context.operations.execute("""
+        DO $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM pg_ts_config
+            WHERE cfgname = 'it_ch'
+            AND cfgnamespace = CURRENT_SCHEMA()::regnamespace
+          ) THEN
+            CREATE TEXT SEARCH CONFIGURATION it_ch ( COPY = italian );
+          END IF;
+        END
+        $$;
+    """)
