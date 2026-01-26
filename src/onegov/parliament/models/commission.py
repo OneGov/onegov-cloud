@@ -109,11 +109,12 @@ class Commission(Base, ContentMixin, TimestampMixin):
     description = dict_markup_property('content')
 
     #: A commission may have n parliamentarians
-    memberships: relationship[list[CommissionMembership]]
-    memberships = relationship(
-        'CommissionMembership',
-        cascade='all, delete-orphan',
-        back_populates='commission'
+    memberships: relationship[list[CommissionMembership]] = (
+        relationship(
+            'CommissionMembership',
+            cascade='all, delete-orphan',
+            back_populates='commission'
+        )
     )
 
     @observes('end')

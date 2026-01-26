@@ -192,19 +192,21 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         overlaps='course_event,attendee,subscriptions'  # type: ignore[call-arg]
     )
 
-    subscriptions: relationship[AppenderQuery[CourseSubscription]]
-    subscriptions = relationship(
-        'CourseSubscription',
-        back_populates='course_event',
-        lazy='dynamic',
-        cascade='all, delete-orphan',
+    subscriptions: relationship[AppenderQuery[CourseSubscription]] = (
+        relationship(
+            'CourseSubscription',
+            back_populates='course_event',
+            lazy='dynamic',
+            cascade='all, delete-orphan',
+        )
     )
 
-    notification_templates: relationship[list[CourseNotificationTemplate]]
-    notification_templates = relationship(
-        'CourseNotificationTemplate',
-        back_populates='course_event',
-        cascade='all, delete-orphan',
+    notification_templates: relationship[list[CourseNotificationTemplate]] = (
+        relationship(
+            'CourseNotificationTemplate',
+            back_populates='course_event',
+            cascade='all, delete-orphan',
+        )
     )
 
     # The associated notification templates

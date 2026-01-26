@@ -20,8 +20,8 @@ from sqlalchemy import func
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.core.types import AppenderQuery
     from onegov.election_day.models import ElectionRelationship
@@ -68,12 +68,13 @@ class ProporzElection(
     )
 
     #: An election may contains n party panachage results
-    party_panachage_results: relationship[list[PartyPanachageResult]]
-    party_panachage_results = relationship(
-        'PartyPanachageResult',
-        cascade='all, delete-orphan',
-        back_populates='election',
-        overlaps='panachage_results'  # type: ignore[call-arg]
+    party_panachage_results: relationship[list[PartyPanachageResult]] = (
+        relationship(
+            'PartyPanachageResult',
+            cascade='all, delete-orphan',
+            back_populates='election',
+            overlaps='panachage_results'  # type: ignore[call-arg]
+        )
     )
 
     @property
@@ -137,7 +138,7 @@ class ProporzElection(
 
     @property
     def relationships_for_historical_party_results(
-        self
+            self
     ) -> AppenderQuery[ElectionRelationship]:
         return self.related_elections
 

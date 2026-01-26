@@ -15,8 +15,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     import uuid
     from onegov.election_day.models import CandidatePanachageResult
@@ -123,9 +123,9 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
         """ The number of accounted votes. """
 
         return (
-            self.election.number_of_mandates * self.accounted_ballots
-            - self.blank_votes
-            - self.invalid_votes
+                self.election.number_of_mandates * self.accounted_ballots
+                - self.blank_votes
+                - self.invalid_votes
         )
 
     @accounted_votes.expression  # type:ignore[no-redef]
@@ -139,9 +139,9 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
             whereclause=text('elections.id = election_results.election_id')
         ).scalar_subquery()
         return (
-            number_of_mandates * (
+                number_of_mandates * (
                 cls.received_ballots - cls.blank_ballots - cls.invalid_ballots
-            ) - cls.blank_votes - cls.invalid_votes
+        ) - cls.blank_votes - cls.invalid_votes
         )
 
     #: an election result may contain n list results
@@ -159,9 +159,11 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     )
 
     #: an election result contains n candidate panachage results
-    candidate_panachage_results: relationship[list[CandidatePanachageResult]]
-    candidate_panachage_results = relationship(
-        'CandidatePanachageResult',
-        cascade='all, delete-orphan',
-        back_populates='election_result'
+    candidate_panachage_results: (
+        relationship[list[CandidatePanachageResult]]) = (
+        relationship(
+            'CandidatePanachageResult',
+            cascade='all, delete-orphan',
+            back_populates='election_result'
+        )
     )

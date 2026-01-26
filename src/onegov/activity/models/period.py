@@ -441,10 +441,11 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
         back_populates='period'
     )
 
-    publication_requests: relationship[list[PublicationRequest]]
-    publication_requests = relationship(
-        'PublicationRequest',
-        back_populates='period'
+    publication_requests: relationship[list[PublicationRequest]] = (
+        relationship(
+            'PublicationRequest',
+            back_populates='period'
+        )
     )
 
     @validates('age_barrier_type')

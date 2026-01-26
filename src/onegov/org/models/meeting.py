@@ -88,12 +88,14 @@ class Meeting(
     title: Column[str] = Column(Text, nullable=False)
 
     #: date and time of the meeting start
-    start_datetime: Column[datetime | None]
-    start_datetime = Column(UTCDateTime, nullable=True)
+    start_datetime: Column[datetime | None] = (
+        Column(UTCDateTime, nullable=True)
+    )
 
     #: date and time of the meeting end
-    end_datetime: Column[datetime | None]
-    end_datetime = Column(UTCDateTime, nullable=True)
+    end_datetime: Column[datetime | None] = (
+        Column(UTCDateTime, nullable=True)
+    )
 
     #: location address of meeting
     address: Column[Markup] = Column(MarkupText, nullable=False)
@@ -101,12 +103,13 @@ class Meeting(
     description: Column[Markup | None] = Column(MarkupText, nullable=True)
 
     #: The meeting items
-    meeting_items: relationship[list[MeetingItem]]
-    meeting_items = relationship(
-        'MeetingItem',
-        cascade='all, delete-orphan',
-        back_populates='meeting',
-        order_by='desc(MeetingItem.number)'
+    meeting_items: relationship[list[MeetingItem]] = (
+        relationship(
+            'MeetingItem',
+            cascade='all, delete-orphan',
+            back_populates='meeting',
+            order_by='desc(MeetingItem.number)'
+        )
     )
 
     #: link to audio url

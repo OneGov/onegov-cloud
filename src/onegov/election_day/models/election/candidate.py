@@ -110,11 +110,12 @@ class Candidate(Base, TimestampMixin):
     )
 
     #: a (proporz) candidate contains votes from other other lists
-    panachage_results: relationship[list_t[CandidatePanachageResult]]
-    panachage_results = relationship(
-        'CandidatePanachageResult',
-        cascade='all, delete-orphan',
-        back_populates='candidate'
+    panachage_results: relationship[list_t[CandidatePanachageResult]] = (
+        relationship(
+            'CandidatePanachageResult',
+            cascade='all, delete-orphan',
+            back_populates='candidate'
+        )
     )
 
     #: the total votes
