@@ -142,17 +142,22 @@ class Organisation(Base, TimestampMixin):
     delete_past_events: dict_property[bool] = meta_property(default=False)
     event_filter_type: dict_property[str] = meta_property(default='tags')
     event_filter_definition: dict_property[str | None] = meta_property()
-    event_filter_configuration: dict_property[dict[str, Any]]
-    event_filter_configuration = meta_property(default=dict)
-    event_header_html: dict_markup_property[Markup | None]
-    event_header_html = dict_markup_property('meta')
-    event_footer_html: dict_markup_property[Markup | None]
-    event_footer_html = dict_markup_property('meta')
+    event_filter_configuration: dict_property[dict[str, Any]] = (
+        meta_property(default=dict)
+    )
+    event_header_html: dict_markup_property[Markup | None] = (
+        dict_markup_property('meta')
+    )
+    event_footer_html: dict_markup_property[Markup | None] = (
+        dict_markup_property('meta')
+    )
     event_files = associated(File, 'event_files', 'many-to-many')
-    resource_header_html: dict_markup_property[Markup | None]
-    resource_header_html = dict_markup_property('meta')
-    resource_footer_html: dict_markup_property[Markup | None]
-    resource_footer_html = dict_markup_property('meta')
+    resource_header_html: dict_markup_property[Markup | None] = (
+        dict_markup_property('meta')
+    )
+    resource_footer_html: dict_markup_property[Markup | None] = (
+        dict_markup_property('meta')
+    )
 
     # social media
     facebook_url: dict_property[str | None] = meta_property()
@@ -191,8 +196,9 @@ class Organisation(Base, TimestampMixin):
     always_show_partners: dict_property[bool] = meta_property(default=False)
 
     # Ticket options
-    ticket_tags: dict_property[list[str | dict[str, dict[str, Any]]]]
-    ticket_tags = meta_property(default=list)
+    ticket_tags: dict_property[list[str | dict[str, dict[str, Any]]]] = (
+        meta_property(default=list)
+    )
     hide_personal_email: dict_property[bool] = meta_property(default=False)
     general_email: dict_property[str | None] = meta_property()
     hide_submitter_email: dict_property[bool] = meta_property(default=True)
@@ -200,10 +206,12 @@ class Organisation(Base, TimestampMixin):
     ticket_auto_accept_style: dict_property[str | None] = meta_property()
     ticket_auto_accepts: dict_property[list[str] | None] = meta_property()
     ticket_auto_accept_roles: dict_property[list[str] | None] = meta_property()
-    tickets_skip_opening_email: dict_property[list[str] | None]
-    tickets_skip_opening_email = meta_property()
-    tickets_skip_closing_email: dict_property[list[str] | None]
-    tickets_skip_closing_email = meta_property()
+    tickets_skip_opening_email: dict_property[list[str] | None] = (
+        meta_property()
+    )
+    tickets_skip_closing_email: dict_property[list[str] | None] = (
+        meta_property()
+    )
     mute_all_tickets: dict_property[bool | None] = meta_property()
     ticket_always_notify: dict_property[bool] = meta_property(default=True)
     # username for the user supposed to automatically handle tickets
@@ -229,13 +237,15 @@ class Organisation(Base, TimestampMixin):
     header_options: dict_property[dict[str, Any]] = meta_property(default=dict)
 
     # Setting if show full agency path on people detail view
-    agency_path_display_on_people: dict_property[bool]
-    agency_path_display_on_people = meta_property(default=False)
+    agency_path_display_on_people: dict_property[bool] = (
+        meta_property(default=False)
+    )
 
     # Setting to index the last digits of the phone number as ES suggestion
     agency_phone_internal_digits: dict_property[int | None] = meta_property()
-    agency_phone_internal_field: dict_property[str]
-    agency_phone_internal_field = meta_property(default='phone_direct')
+    agency_phone_internal_field: dict_property[str] = (
+        meta_property(default='phone_direct')
+    )
 
     # Favicon urls for favicon macro
     favicon_win_url: dict_property[str | None] = meta_property()

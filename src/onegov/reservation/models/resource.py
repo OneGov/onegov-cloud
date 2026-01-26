@@ -132,8 +132,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     price_per_hour: dict_property[float | None] = content_property()
 
     #: the reservations cost a given amount per unit (allocations * quota)
-    price_per_item: dict_property[float | None]
-    price_per_item = content_property('price_per_reservation')
+    price_per_item: dict_property[float | None] = (
+        content_property('price_per_reservation')
+    )
 
     #: the invoicing party for this resource
     invoicing_party: dict_property[str | None] = content_property()
@@ -148,15 +149,17 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     ical_fields: dict_property[list[str]] = content_property(default=list)
 
     #: reservation deadline (e.g. None, (5, 'd'), (24, 'h'))
-    deadline: dict_property[tuple[int, DeadlineUnit] | None]
-    deadline = content_property()
+    deadline: dict_property[tuple[int, DeadlineUnit] | None] = (
+        content_property()
+    )
 
     #: reservation lead time (in days)
     lead_time: dict_property[int | None] = content_property()
 
     #: the pricing method to use for extras defined in formcode
-    extras_pricing_method: dict_property[str]
-    extras_pricing_method = content_property(default='per_item')
+    extras_pricing_method: dict_property[str] = (
+        content_property(default='per_item')
+    )
 
     #: the discount method to use
     discount_method: dict_property[str] = content_property(default='resource')
