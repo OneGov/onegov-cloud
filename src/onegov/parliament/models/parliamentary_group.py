@@ -76,11 +76,12 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin):
     description = dict_markup_property('content')
 
     #: A parliamentary group may have n role
-    roles: relationship[list[ParliamentarianRole]]
-    roles = relationship(
-        'ParliamentarianRole',
-        cascade='all, delete-orphan',
-        back_populates='parliamentary_group'
+    roles: relationship[list[ParliamentarianRole]] = (
+        relationship(
+            'ParliamentarianRole',
+            cascade='all, delete-orphan',
+            back_populates='parliamentary_group'
+        )
     )
 
     def __repr__(self) -> str:
