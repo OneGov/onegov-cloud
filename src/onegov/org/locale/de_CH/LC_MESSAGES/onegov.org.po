@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-07 17:25+0100\n"
+"POT-Creation-Date: 2026-01-15 17:20+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -6093,6 +6093,9 @@ msgstr ""
 "Um die Verfügbarkeit zu löschen, müssen zuerst alle bestehenden "
 "Reservationen abgesagt werden."
 
+msgid "Blocker"
+msgstr "Sperrzeit"
+
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Es besteht bereits eine Verfügbarkeit im gewünschten Zeitraum."
 
@@ -7289,8 +7292,21 @@ msgstr "Eine neue Reservation wurde hinzugefügt"
 msgid "Reservation not adjustable"
 msgstr "Diese Reservation ist nicht anpassbar"
 
+msgid ""
+"This reservation has already been accepted, but changes will not lead to a "
+"new confirmation e-mail so please make sure you inform the customer of the "
+"performed changes, so they have a record of it."
+msgstr ""
+"Diese Reservation wurde bereits angenommen und Änderungen führen nicht zu "
+"einem neuen Bestätigungs-Mail. Bitte stellen Sie sicher, dass der Kunde über "
+"diese Änderung informiert wird, z.B. via senden der Terminübersicht oder "
+"einer Nachricht."
+
 msgid "Adjust reservation"
 msgstr "Reservation Anpassen"
+
+msgid "Cannot move reservation into the past"
+msgstr "Eine Reservation kann nicht in die Vergangenheit verschoben werden"
 
 msgid "The reservation was adjusted"
 msgstr "Die Reservation wurde angepasst"
@@ -7300,6 +7316,15 @@ msgstr "Die Reservation ist unverändert geblieben"
 
 msgid "There are no future reservations"
 msgstr "Es gibt keine zukünftige Reservationen"
+
+msgid "Blocker not adjustable"
+msgstr "Dieser Sperrzeit kann nicht mehr angepasst werden"
+
+msgid "Cannot move blocker into the past"
+msgstr "Eine Sperrzeit kann nicht in die Vergangenheit verschoben werden"
+
+msgid "Blocker no longer exists"
+msgstr "Diese Sperrzeit existiert nicht mehr"
 
 msgid "Added a new daypass"
 msgstr "Eine neue Tageskarte wurde hinzugefügt"

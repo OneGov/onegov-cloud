@@ -20,8 +20,8 @@ from sqlalchemy import func
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.core.types import AppenderQuery
     from onegov.election_day.models import ElectionRelationship
@@ -63,15 +63,18 @@ class ProporzElection(
     party_results: relationship[list[PartyResult]] = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
-        back_populates='election'
+        back_populates='election',
+        overlaps='party_results'  # type: ignore[call-arg]
     )
 
     #: An election may contains n party panachage results
-    party_panachage_results: relationship[list[PartyPanachageResult]]
-    party_panachage_results = relationship(
-        'PartyPanachageResult',
-        cascade='all, delete-orphan',
-        back_populates='election'
+    party_panachage_results: relationship[list[PartyPanachageResult]] = (
+        relationship(
+            'PartyPanachageResult',
+            cascade='all, delete-orphan',
+            back_populates='election',
+            overlaps='panachage_results'  # type: ignore[call-arg]
+        )
     )
 
     @property
@@ -135,7 +138,7 @@ class ProporzElection(
 
     @property
     def relationships_for_historical_party_results(
-        self
+            self
     ) -> AppenderQuery[ElectionRelationship]:
         return self.related_elections
 
@@ -153,13 +156,13 @@ class ProporzElection(
         else:
             e_ids = session.query(ElectionResult.id).filter(
                 ElectionResult.election_id == self.id
-            ).all()
+            ).scalar_subquery()
             session.query(CandidatePanachageResult).filter(
                 CandidatePanachageResult.election_result_id.in_(e_ids)
             ).delete()
             l_ids = session.query(List.id).filter(
                 List.election_id == self.id
-            ).all()
+            ).scalar_subquery()
             session.query(ListPanachageResult).filter(
                 ListPanachageResult.target_id.in_(l_ids)
             ).delete()

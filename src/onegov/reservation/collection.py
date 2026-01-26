@@ -6,12 +6,12 @@ from onegov.core.utils import normalize_for_url
 from onegov.reservation.models import Resource
 from uuid import uuid4, UUID
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
 
+from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from libres.context.core import Context
-    from libres.db.models import Allocation, Reservation
+    from libres.db.models import Allocation, Reservation, ReservationBlocker
     from libres.db.scheduler import Scheduler
 
     from sqlalchemy.orm import Query, Session
@@ -124,6 +124,9 @@ class ResourceCollection:
     def by_reservation(self, reservation: Reservation) -> Resource | None:
         return self.by_id(reservation.resource)
 
+    def by_blocker(self, blocker: ReservationBlocker) -> Resource | None:
+        return self.by_id(blocker.resource)
+
     def ordered_by_type(self) -> Query[Resource]:
         return self.query().order_by(Resource.type, Resource.title)
 
@@ -138,16 +141,19 @@ class ResourceCollection:
 
         scheduler = resource.get_scheduler(self.libres_context)
 
+        session_manager = self.libres_context.get_service('session_provider')
         if not including_reservations:
             assert not scheduler.managed_reserved_slots().first()
             assert not scheduler.managed_reservations().first()
 
-            scheduler.managed_allocations().delete('fetch')
+            with session_manager.ignore_bulk_deletes():
+                scheduler.managed_allocations().delete('fetch')
         else:
             if callable(handle_linked_objects):
                 handle_linked_objects(scheduler, self.session)
 
-            scheduler.extinguish_managed_records()
+            with session_manager.ignore_bulk_deletes():
+                scheduler.extinguish_managed_records()
 
         if resource.files:
             # unlink any linked files

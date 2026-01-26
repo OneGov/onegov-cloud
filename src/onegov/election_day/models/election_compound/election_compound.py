@@ -122,35 +122,40 @@ class ElectionCompound(
     party_results: relationship[list[PartyResult]] = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
-        back_populates='election_compound'
+        back_populates='election_compound',
+        overlaps='party_results'  # type: ignore[call-arg]
     )
 
     #: An election compound may contains n party panachage results
-    party_panachage_results: rel[list[PartyPanachageResult]]
-    party_panachage_results = relationship(
-        'PartyPanachageResult',
-        cascade='all, delete-orphan',
-        back_populates='election_compound'
+    party_panachage_results: rel[list[PartyPanachageResult]] = (
+        relationship(
+            'PartyPanachageResult',
+            cascade='all, delete-orphan',
+            back_populates='election_compound',
+            overlaps='panachage_results'  # type: ignore[call-arg]
+        )
     )
 
     #: An election compound may have related election compounds
-    related_compounds: rel[AppenderQuery[ElectionCompoundRelationship]]
-    related_compounds = relationship(
-        'ElectionCompoundRelationship',
-        foreign_keys='ElectionCompoundRelationship.source_id',
-        cascade='all, delete-orphan',
-        back_populates='source',
-        lazy='dynamic'
+    related_compounds: rel[AppenderQuery[ElectionCompoundRelationship]] = (
+        relationship(
+            'ElectionCompoundRelationship',
+            foreign_keys='ElectionCompoundRelationship.source_id',
+            cascade='all, delete-orphan',
+            back_populates='source',
+            lazy='dynamic'
+        )
     )
 
     #: An election compound may be related by other election compounds
-    referencing_compounds: rel[AppenderQuery[ElectionCompoundRelationship]]
-    referencing_compounds = relationship(
-        'ElectionCompoundRelationship',
-        foreign_keys='ElectionCompoundRelationship.target_id',
-        cascade='all, delete-orphan',
-        back_populates='target',
-        lazy='dynamic'
+    referencing_compounds: rel[AppenderQuery[ElectionCompoundRelationship]] = (
+        relationship(
+            'ElectionCompoundRelationship',
+            foreign_keys='ElectionCompoundRelationship.target_id',
+            cascade='all, delete-orphan',
+            back_populates='target',
+            lazy='dynamic'
+        )
     )
 
     #: Defines optional colors for parties
@@ -236,11 +241,12 @@ class ElectionCompound(
         return result
 
     #: notifcations linked to this election compound
-    notifications: relationship[AppenderQuery[Notification]]
-    notifications = relationship(  # type:ignore[misc]
-        'onegov.election_day.models.notification.Notification',
-        back_populates='election_compound',
-        lazy='dynamic'
+    notifications: relationship[AppenderQuery[Notification]] = (
+        relationship(  # type:ignore[misc]
+            'onegov.election_day.models.notification.Notification',
+            back_populates='election_compound',
+            lazy='dynamic'
+        )
     )
 
     #: screens linked to this election compound

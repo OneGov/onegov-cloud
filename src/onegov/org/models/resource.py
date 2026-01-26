@@ -74,8 +74,9 @@ class SharedMethods:
     lead: dict_property[str | None] = meta_property()
     text = dict_markup_property('content')
     confirmation_text = dict_markup_property('content')
-    occupancy_is_visible_to_members: dict_property[bool | None]
-    occupancy_is_visible_to_members = meta_property()
+    occupancy_is_visible_to_members: dict_property[bool | None] = (
+        meta_property()
+    )
 
     @property
     def deletable(self) -> bool:
@@ -271,8 +272,9 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
     # used to render the reservation title
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M}'
 
-    kaba_components: dict_property[list[tuple[str, str]]]
-    kaba_components = meta_property(default=list)
+    kaba_components: dict_property[list[tuple[str, str]]] = (
+        meta_property(default=list)
+    )
 
     @property
     def deletable(self) -> bool:
@@ -301,5 +303,6 @@ class ItemResource(Resource, AccessExtension, SearchableContent,
 
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M} ({quota})'
 
-    kaba_components: dict_property[list[tuple[str, str]]]
-    kaba_components = meta_property(default=list)
+    kaba_components: dict_property[list[tuple[str, str]]] = (
+        meta_property(default=list)
+    )

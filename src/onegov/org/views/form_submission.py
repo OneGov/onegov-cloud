@@ -340,6 +340,9 @@ def handle_complete_submission(
                 return morepath.redirect(request.link(self))
 
             if payment is not True:
+                request.session.add(payment)
+                request.session.flush()
+                request.session.refresh(payment)
                 self.payment = payment
 
             window = self.registration_window

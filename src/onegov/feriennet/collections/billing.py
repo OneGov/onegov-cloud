@@ -286,7 +286,7 @@ class BillingCollection:
 
         # delete all existing invoices
         invoice_ids = invoices.query().with_entities(
-            BookingPeriodInvoice.id).subquery()
+            BookingPeriodInvoice.id).scalar_subquery()
 
         def delete_queries() -> Iterator[Query[Any]]:
             yield session.query(InvoiceReference).filter(

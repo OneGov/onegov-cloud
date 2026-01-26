@@ -38,6 +38,7 @@ from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Sequence
+    from libres.db.models import ReservationBlocker
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
     from onegov.form import Form, FormSubmission
@@ -710,13 +711,110 @@ class AvailabilityEventInfo:
     def event_end(self) -> str:
         return self.allocation.display_end().isoformat()
 
+    @property
+    def blockable(self) -> bool:
+        if not self.request.is_manager:
+            return False
+        if self.allocation.quota == 1:
+            if self.allocation.partly_available:
+                return self.allocation.availability > 0.0
+            return not self.allocation.reserved_slots
+        return self.allocation.quota_left == self.allocation.quota
+
     def as_dict(self) -> dict[str, Any]:
+        blockable = self.blockable
         return {
             'id': self.allocation.id,
             'start': self.event_start,
             'end': self.event_end,
             'editable': False,
             'display': 'background',
+            # extended properties
+            'blockable': blockable,
+            'blockurl': self.request.csrf_protected_url(
+                self.request.link(self.allocation, name='add-blocker')
+            ) if blockable else None,
+            'partlyAvailable': self.allocation.partly_available,
+            'fullyAvailable': self.allocation.availability == 100.0,
+            'kind': 'allocation',
+        }
+
+
+class BlockerEventInfo:
+
+    __slots__ = ('resource', 'blocker', 'request', 'translate')
+
+    def __init__(
+        self,
+        resource: Resource,
+        blocker: ReservationBlocker,
+        request: OrgRequest
+    ) -> None:
+
+        self.resource = resource
+        self.blocker = blocker
+        self.request = request
+        self.translate = request.translate
+
+    @classmethod
+    def from_blockers(
+        cls,
+        request: OrgRequest,
+        resource: Resource,
+        blockers: Iterable[ReservationBlocker]
+    ) -> list[Self]:
+
+        return [
+            cls(resource, blocker, request)
+            for blocker in blockers
+        ]
+
+    @property
+    def title(self) -> str:
+        if self.blocker.reason is None:
+            return self.request.translate(_('Blocker'))
+        return self.blocker.reason
+
+    @property
+    def event_start(self) -> str:
+        return self.blocker.display_start().isoformat()
+
+    @property
+    def event_end(self) -> str:
+        return self.blocker.display_end().isoformat()
+
+    @property
+    def editable(self) -> bool:
+        if not self.request.is_manager:
+            return False
+        return self.blocker.display_start() >= sedate.utcnow()
+
+    def as_dict(self) -> dict[str, Any]:
+        is_manager = self.request.is_manager
+        editable = self.editable
+        return {
+            'id': f'blocker-{self.blocker.id}',
+            'start': self.event_start,
+            'end': self.event_end,
+            'title': self.title,
+            'editable': editable,
+            'classNames': 'event-blocker',
+            'display': 'block',
+            # extended properties
+            'editurl': self.request.csrf_protected_url(self.request.link(
+                self.blocker,
+                name='adjust',
+                query_params={'blocker-id': str(self.blocker.id)}
+            )) if is_manager else None,
+            'deleteurl': self.request.csrf_protected_url(self.request.link(
+                self.blocker
+            )) if editable and is_manager else None,
+            'seturl': self.request.csrf_protected_url(self.request.link(
+                self.blocker,
+                name='set-reason',
+                query_params={'blocker-id': str(self.blocker.id)}
+            )) if is_manager else None,
+            'kind': 'blocker',
         }
 
 
@@ -836,11 +934,6 @@ class ReservationEventInfo:
         else:
             yield 'event-pending'
 
-        # HACK: Find event element by id, it would be better if fullcalendar
-        #       generated an element id we could use, but we'll work with
-        #       what we have.
-        yield f'event-{self.reservation.id}'
-
     @property
     def color(self) -> str | None:
         tag = self.ticket.tag
@@ -865,6 +958,8 @@ class ReservationEventInfo:
     def editable(self) -> bool:
         if self.reservation.display_start() < sedate.utcnow():
             return False
+        # NOTE: We don't allow adjusting already accepted reservations
+        #       in this view, since it's easier to happen by accident.
         return not self.accepted
 
     def as_dict(self) -> dict[str, Any]:
@@ -886,6 +981,7 @@ class ReservationEventInfo:
                 name='adjust-reservation',
                 query_params={'reservation-id': str(self.reservation.id)}
             )) if is_manager else None,
+            'kind': 'reservation',
         }
 
 
@@ -1007,6 +1103,7 @@ class MyReservationEventInfo:
             'wholeDay': self.whole_day,
             'editable': False,
             'editurl': None,
+            'kind': 'reservation',
         }
 
 

@@ -74,7 +74,7 @@ class InvoiceCollection(GenericCollection[InvoiceT], Generic[InvoiceT, ItemT]):
 
         query = self.session.query(self.item_model_class).filter(
             InvoiceItem.invoice_id.in_(
-                self.query().with_entities(Invoice.id).subquery()
+                self.query().with_entities(Invoice.id).scalar_subquery()
             )
         )
 
@@ -85,7 +85,7 @@ class InvoiceCollection(GenericCollection[InvoiceT], Generic[InvoiceT, ItemT]):
 
     def _invoice_ids(self) -> Query[tuple[UUID]]:
         Invoice = self.model_class  # noqa: N806
-        return self.query().with_entities(Invoice.id).subquery()
+        return self.query().with_entities(Invoice.id).scalar_subquery()
 
     def _sum(self, condition: ColumnElement[bool]) -> Decimal:
         InvoiceItem = self.item_model_class  # noqa: N806

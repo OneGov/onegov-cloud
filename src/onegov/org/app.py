@@ -576,8 +576,6 @@ def org_content_security_policy() -> ContentSecurityPolicy:
     # FIXME: which one do we need this for?
     policy.connect_src.add('https://cdn.jsdelivr.net')
 
-    policy.script_src.add('https:')
-
     return policy
 
 

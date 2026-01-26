@@ -602,10 +602,10 @@ class SearchableArchivedResultCollection(
             )
         query = query.order_by(
             ArchivedResult.date.desc(),
-            case(
-                tuple(
-                    (ArchivedResult.domain == domain, index) for
-                    index, domain in enumerate(order, 1)
+            case(  # type: ignore[call-overload]
+                *(
+                    (ArchivedResult.domain == domain, index)
+                    for index, domain in enumerate(order, 1)
                 )
             )
         )

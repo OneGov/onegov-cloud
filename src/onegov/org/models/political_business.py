@@ -194,20 +194,22 @@ class PoliticalBusiness(
     entry_date: Column[date | None] = Column(Date, nullable=True)
 
     #: may have participants (Verfasser/Beteiligte) depending on the type
-    participants: relationship[list[PoliticalBusinessParticipation]]
-    participants = relationship(
-        'PoliticalBusinessParticipation',
-        back_populates='political_business',
-        order_by='desc(PoliticalBusinessParticipation.participant_type)',
+    participants: relationship[list[PoliticalBusinessParticipation]] = (
+        relationship(
+            'PoliticalBusinessParticipation',
+            back_populates='political_business',
+            order_by='desc(PoliticalBusinessParticipation.participant_type)',
+        )
     )
 
     #: parliamentary groups (Fraktionen)
-    parliamentary_groups: relationship[list[RISParliamentaryGroup]]
-    parliamentary_groups = relationship(
-        'RISParliamentaryGroup',
-        secondary=par_political_business_parliamentary_groups,
-        back_populates='political_businesses',
-        passive_deletes=True
+    parliamentary_groups: relationship[list[RISParliamentaryGroup]] = (
+        relationship(
+            'RISParliamentaryGroup',
+            secondary=par_political_business_parliamentary_groups,
+            back_populates='political_businesses',
+            passive_deletes=True
+        )
     )
 
     meeting_items: relationship[list[MeetingItem]] = relationship(
@@ -223,9 +225,10 @@ class PoliticalBusiness(
     def display_name(cls) -> ColumnElement[str]:
         return func.concat(
             func.coalesce(cls.number, ''),
-            case([
-                (and_(cls.number.isnot(None), cls.number != ''), ' ')
-            ], else_=''),
+            case(
+                (and_(cls.number.isnot(None), cls.number != ''), ' '),
+                else_=''
+            ),
             cls.title
         )
 
@@ -268,10 +271,11 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     )
 
     #: the related political business
-    political_business: relationship[PoliticalBusiness]
-    political_business = relationship(
-        'PoliticalBusiness',
-        back_populates='participants',
+    political_business: relationship[PoliticalBusiness] = (
+        relationship(
+            'PoliticalBusiness',
+            back_populates='participants',
+        )
     )
 
     #: the related parliamentarian
@@ -458,5 +462,4 @@ class PoliticalBusinessParticipationCollection(
         self,
         parliamentarian_id: uuid.UUID
     ) -> Query[PoliticalBusinessParticipation]:
-        query = super().query()
-        return query.filter_by(parliamentarian_id=parliamentarian_id)
+        return self.query().filter_by(parliamentarian_id=parliamentarian_id)

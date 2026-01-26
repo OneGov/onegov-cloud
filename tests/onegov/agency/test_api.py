@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import json
 from base64 import b64encode
-from unittest.mock import patch
-
 from collection_json import Collection, Template  # type: ignore[import-untyped]
 from freezegun import freeze_time
+from tests.onegov.api.test_views import patch_collection_json  # noqa: F401
+from unittest.mock import patch
 
 
 from typing import Any, TYPE_CHECKING

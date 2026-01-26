@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-07 17:25+0100\n"
+"POT-Creation-Date: 2026-01-15 17:20+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -6107,6 +6107,9 @@ msgstr ""
 "Pour supprimer cette allocation, toutes les réservations existantes doivent "
 "être annulées en premier."
 
+msgid "Blocker"
+msgstr "Bloqueur"
+
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Une allocation contradictoire existe pour la période demandée."
 
@@ -7301,8 +7304,20 @@ msgstr "Ajout d'une nouvelle réservation"
 msgid "Reservation not adjustable"
 msgstr "Réservation non ajustable"
 
+msgid ""
+"This reservation has already been accepted, but changes will not lead to a "
+"new confirmation e-mail so please make sure you inform the customer of the "
+"performed changes, so they have a record of it."
+msgstr ""
+"Cette réservation a déjà été acceptée, mais les modifications n'entraîneront "
+"pas l'envoi d'un nouvel e-mail de confirmation. Veuillez donc informer le "
+"client des modifications effectuées afin qu'il en conserve une trace."
+
 msgid "Adjust reservation"
 msgstr "Ajuster la réservation"
+
+msgid "Cannot move reservation into the past"
+msgstr "Impossible de déplacer la réservation dans le passé"
 
 msgid "The reservation was adjusted"
 msgstr "La réservation a été ajustée"
@@ -7312,6 +7327,15 @@ msgstr "La réservation est restée inchangée"
 
 msgid "There are no future reservations"
 msgstr "Il n'y a pas de réservations futures"
+
+msgid "Blocker not adjustable"
+msgstr "Le bloqueur n'est pas réglable"
+
+msgid "Cannot move blocker into the past"
+msgstr "Impossible de déplacer le bloqueur dans le passé"
+
+msgid "Blocker no longer exists"
+msgstr "Le bloqueur n'existe plus"
 
 msgid "Added a new daypass"
 msgstr "Nouvel abonnement à la journée ajouté"

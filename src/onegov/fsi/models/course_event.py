@@ -188,34 +188,49 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         secondary=subscription_table,
         primaryjoin=id == subscription_table.c.course_event_id,
         secondaryjoin=subscription_table.c.attendee_id == CourseAttendee.id,
-        lazy='dynamic'
-    )
-
-    subscriptions: relationship[AppenderQuery[CourseSubscription]]
-    subscriptions = relationship(
-        'CourseSubscription',
-        back_populates='course_event',
         lazy='dynamic',
-        cascade='all, delete-orphan',
+        overlaps='course_event,attendee,subscriptions'  # type: ignore[call-arg]
     )
 
-    notification_templates: relationship[list[CourseNotificationTemplate]]
-    notification_templates = relationship(
-        'CourseNotificationTemplate',
-        back_populates='course_event',
-        cascade='all, delete-orphan',
+    subscriptions: relationship[AppenderQuery[CourseSubscription]] = (
+        relationship(
+            'CourseSubscription',
+            back_populates='course_event',
+            lazy='dynamic',
+            cascade='all, delete-orphan',
+        )
+    )
+
+    notification_templates: relationship[list[CourseNotificationTemplate]] = (
+        relationship(
+            'CourseNotificationTemplate',
+            back_populates='course_event',
+            cascade='all, delete-orphan',
+        )
     )
 
     # The associated notification templates
     # FIXME: Are some of these optional?
     info_template: relationship[InfoTemplate] = relationship(
-        'InfoTemplate', uselist=False)
+        'InfoTemplate',
+        uselist=False,
+        overlaps='notification_templates'  # type: ignore[call-arg]
+    )
     reservation_template: relationship[SubscriptionTemplate] = relationship(
-        'SubscriptionTemplate', uselist=False)
+        'SubscriptionTemplate',
+        uselist=False,
+        overlaps='notification_templates'  # type: ignore[call-arg]
+    )
     cancellation_template: relationship[CancellationTemplate] = relationship(
-        'CancellationTemplate', uselist=False)
+        'CancellationTemplate',
+        uselist=False,
+        overlaps='notification_templates'  # type: ignore[call-arg]
+    )
     reminder_template: relationship[ReminderTemplate] = relationship(
-        'ReminderTemplate', uselist=False)
+        'ReminderTemplate',
+        uselist=False,
+        overlaps='notification_templates'  # type: ignore[call-arg]
+    )
 
     # hides for members/editors
     hidden_from_public: Column[bool] = Column(
@@ -433,9 +448,9 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         a subscription for the parent course in the same year are excluded."""
         session = object_session(self)
 
-        excl = (
+        excluded = (
             self.excluded_subscribers(year, exclude_inactive)
-            .subquery('excl')
+            .scalar_subquery()  # type: ignore[union-attr]
         )
 
         # Use this because its less costly
@@ -453,7 +468,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
                 )
             )
 
-        query = query.filter(CourseAttendee.id.notin_(excl))
+        query = query.filter(CourseAttendee.id.notin_(excluded))
 
         if not as_uids:
             query = query.order_by(

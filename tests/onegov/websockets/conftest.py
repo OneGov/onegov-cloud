@@ -35,7 +35,10 @@ class WebsocketsRoot:
 @WebsocketsApp.html(model=WebsocketsRoot)
 def view_root(self: WebsocketsRoot, request: CoreRequest) -> str:
     request.include('websockets')
-    return self.html
+    return self.html.replace(
+        '${nonce}',
+        request.content_security_policy_nonce('script')
+    )
 
 
 @pytest.fixture(scope='function')

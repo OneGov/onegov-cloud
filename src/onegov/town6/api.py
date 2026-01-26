@@ -1,20 +1,18 @@
 from __future__ import annotations
-from functools import cached_property
 
+from functools import cached_property
 from onegov.api.models import ApiEndpoint, ApiEndpointItem
 from onegov.event.collections import OccurrenceCollection
 from onegov.gis import Coordinates
+from onegov.org.models.directory import (
+    ExtendedDirectory, ExtendedDirectoryEntry,
+    ExtendedDirectoryEntryCollection)
+from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
+from onegov.town6 import _
 from sqlalchemy.exc import SQLAlchemyError
-
 
 from typing import Any, Self
 from typing import TYPE_CHECKING
-
-from onegov.org.models.directory import (ExtendedDirectory,
-                                        ExtendedDirectoryEntry,
-                                        ExtendedDirectoryEntryCollection)
-from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
-
 if TYPE_CHECKING:
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
@@ -45,6 +43,14 @@ def get_modified_iso_format(item: TimestampMixin) -> str:
 class EventApiEndpoint(ApiEndpoint['Occurrence']):
     app: TownApp
     endpoint = 'events'
+
+    @property
+    def title(self) -> str:
+        return self.request.translate(_('Events'))
+
+    @property
+    def description(self) -> str | None:
+        return self.app.org.event_header_html or self.app.org.event_footer_html
 
     @property
     def collection(self) -> Any:
@@ -90,6 +96,10 @@ class NewsApiEndpoint(ApiEndpoint[News]):
     filters = set()
 
     @property
+    def title(self) -> str:
+        return self.request.translate(_('Latest news'))
+
+    @property
     def collection(self) -> Any:
         result = NewsCollection(
             self.request,
@@ -132,6 +142,10 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
     app: TownApp
     endpoint = 'topics'
     filters = set()
+
+    @property
+    def title(self) -> str:
+        return self.request.translate(_('Topics'))
 
     @property
     def collection(self) -> Any:
@@ -189,6 +203,14 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
     ):
         super().__init__(request, extra_parameters, page)
         self.endpoint = name
+
+    @property
+    def title(self) -> str:
+        return self.directory.title
+
+    @property
+    def description(self) -> str | None:
+        return self.directory.lead
 
     @cached_property
     def directory(self) -> ExtendedDirectory:
