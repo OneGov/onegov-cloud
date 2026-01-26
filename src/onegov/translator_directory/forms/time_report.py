@@ -446,7 +446,6 @@ class TranslatorTimeReportForm(Form):
 
         For on-site assignments with a selected location, calculates distance
         from translator's address to the assignment location.
-        The distance is multiplied by 2 to account for round trip.
         """
         if (
             self.skip_travel_calculation.data
@@ -457,7 +456,6 @@ class TranslatorTimeReportForm(Form):
         if self.assignment_type.data in ('telephonic', 'schriftlich'):
             return Decimal('0'), None
 
-        distance = None
         one_way_km = None
 
         # Try to calculate distance (handles both dropdown and override)
@@ -467,32 +465,27 @@ class TranslatorTimeReportForm(Form):
             and translator.coordinates
         ):
             location_key = self.assignment_location.data or ''
-            custom_address = None
             custom_address = self.assignment_location_override.data or None
 
-            one_way_distance = calculate_distance_to_location(
+            one_way_km = calculate_distance_to_location(
                 request, translator.coordinates, location_key, custom_address
             )
-            if one_way_distance is not None:
-                one_way_km = one_way_distance
-                distance = one_way_distance * 2
 
         # Fall back to translator's pre-calculated drive_distance
-        if distance is None and translator.drive_distance:
+        if one_way_km is None and translator.drive_distance:
             one_way_km = float(translator.drive_distance)
-            distance = float(translator.drive_distance) * 2
 
         # No distance available
-        if distance is None:
+        if one_way_km is None:
             return Decimal('0'), None
 
         # Apply compensation tiers
         compensation = Decimal('0')
-        if distance <= 25:
+        if one_way_km <= 25:
             compensation = Decimal('20')
-        elif distance <= 50:
+        elif one_way_km <= 50:
             compensation = Decimal('50')
-        elif distance <= 100:
+        elif one_way_km <= 100:
             compensation = Decimal('100')
         else:
             compensation = Decimal('150')

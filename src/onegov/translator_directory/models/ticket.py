@@ -484,7 +484,7 @@ class TimeReportHandler(Handler):
                     f"({request.translate(_('from'))} "
                     f"{escape(translator_address)} "
                     f"{request.translate(_('to'))} {escape(location_name)}, "
-                    f"{report.travel_distance} km \u00d7 2)"
+                    f"{report.travel_distance} km)"
                 )
             else:
                 travel_label = (
@@ -502,7 +502,7 @@ class TimeReportHandler(Handler):
                 f"{request.translate(_('Travel'))} "
                 f"({request.translate(_('from'))} "
                 f"{escape(translator_address)}, "
-                f"{report.translator.drive_distance} km \u00d7 2)"
+                f"{report.translator.drive_distance} km)"
             )
 
         summary_parts.extend(

@@ -285,7 +285,7 @@ def accept_time_report(
             travel_info = {
                 'from_address': translator_address,
                 'to_location': location_name,
-                'distance': time_report.travel_distance
+                'one_way_travel_distance': time_report.travel_distance,
             }
 
         send_ticket_mail(
@@ -903,7 +903,7 @@ def generate_time_report_pdf_bytes(
                 f"{request.translate(_('Travel'))} "
                 f"({request.translate(_('from'))} {translator_address} "
                 f"{request.translate(_('to'))} {location_name}, "
-                f"{time_report.travel_distance} km \u00d7 2)"
+                f"{time_report.travel_distance} km)"
             )
         else:
             travel_label = (
@@ -919,7 +919,7 @@ def generate_time_report_pdf_bytes(
         travel_label = (
             f"{request.translate(_('Travel'))} "
             f"({request.translate(_('from'))} {translator_address}, "
-            f"{translator.drive_distance} km \u00d7 2)"
+            f"{translator.drive_distance} km)"
         )
 
     html_content += f"""
