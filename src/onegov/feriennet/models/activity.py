@@ -32,8 +32,8 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         'lead': {'type': 'localized', 'weight': 'B'},
         'text': {'type': 'localized', 'weight': 'C'},
         'organizer_name': {'type': 'text', 'weight': 'B'},
-        'organisation_text': {'type': 'text', 'weight': 'B'},
-        'organiser_details': {'type': 'text', 'weight': 'D'}
+        'organization_text': {'type': 'text', 'weight': 'B'},
+        'organizer_details_text': {'type': 'text', 'weight': 'D'}
     }
 
     @property
@@ -52,10 +52,10 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         return self.user.username
 
     @property
-    def organisation_text(self) -> list[str]:
-        organisation: list[str] = []
+    def organization_text(self) -> str:
+        organization: list[str] = []
 
-        organisation_keys = (
+        organization_keys = (
             'organisation',
             'address',
             'zip_code',
@@ -65,16 +65,16 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
             'website',
         )
 
-        for key in organisation_keys:
+        for key in organization_keys:
             if not self.user.data:
                 continue
             if value := self.user.data.get(key):
-                organisation.append(value)
+                organization.append(value)
 
-        return organisation
+        return ' '.join(organization)
 
     @property
-    def organiser_details(self) -> list[str]:
+    def organizer_details_text(self) -> str:
         details: list[str] = []
 
         details_keys = (
@@ -89,7 +89,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
             if value := self.user.data.get(key):
                 details.append(value)
 
-        return details
+        return ' '.join(details)
 
     def ordered_tags(
         self,
