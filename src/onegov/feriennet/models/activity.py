@@ -64,6 +64,9 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
             'website',
         )
 
+        if not self.user.data:
+            return ''
+
         return ' '.join(
             value
             for key in organization_keys
