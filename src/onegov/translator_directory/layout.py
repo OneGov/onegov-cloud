@@ -25,6 +25,9 @@ from onegov.translator_directory.constants import (
     member_can_see, editor_can_see, translator_can_see,
     GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS,
     INTERPRETING_TYPES, TIME_REPORT_INTERPRETING_TYPES)
+from onegov.translator_directory.utils import (
+    get_accountant_emails_for_finanzstelle,
+)
 
 
 from typing import TYPE_CHECKING, Any
@@ -698,3 +701,47 @@ class TimeReportLayout(DefaultLayout):
         )
         links.append(Link(self.model.title))
         return links
+
+    def can_delete(self) -> bool:
+        if self.request.is_admin:
+            return True
+
+        if not self.request.current_user:
+            return False
+
+        try:
+            accountant_emails = get_accountant_emails_for_finanzstelle(
+                self.request, self.model.finanzstelle
+            )
+            return self.request.current_user.username in accountant_emails
+        except ValueError:
+            return False
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        if self.can_delete():
+            return [
+                Link(
+                    _('Delete'),
+                    self.csrf_protected_url(self.request.link(self.model)),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete '
+                                'this time report?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Delete time report'),
+                            _('Cancel'),
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                                TimeReportCollection
+                            ),
+                        ),
+                    ),
+                ),
+            ]
+        return []

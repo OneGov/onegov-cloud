@@ -3035,3 +3035,143 @@ def test_time_report_telephonic_no_location(client: Client) -> None:
     ticket_page = ticket_page.click('Ticket annehmen').follow()
     # Einsatzort should be hidden as there it has not been set
     assert 'Einsatzort' not in ticket_page
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_delete_time_report(
+    broadcast: 'MagicMock',
+    authenticate: 'MagicMock',
+    connect: 'MagicMock',
+    client: 'Client',
+) -> None:
+    """Test that admins and accountants can delete time reports."""
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    )
+    translator_id = translator.id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'telephonic'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '10:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '11:30'
+    page.form['case_number'] = 'DELETE-TEST'
+    page = page.form.submit().follow()
+
+    time_report = (
+        session.query(TranslatorTimeReport)
+        .filter_by(translator_id=translator_id)
+        .first()
+    )
+    assert time_report is not None
+    report_id = time_report.id
+
+    client.login_member()
+    page = client.get('/time-reports')
+    assert 'Delete</a>' not in str(page)
+
+    client.login_editor()
+    page = client.get('/time-reports')
+    csrf_token_match = re.search(
+        r'\?csrf-token=([a-zA-Z0-9\._\-]+)', str(page)
+    )
+    assert csrf_token_match is not None
+    csrf_token = csrf_token_match.group(1)
+
+    response = client.delete(
+        f'/time-report/{report_id}?csrf-token={csrf_token}',
+    )
+    assert response.status_code == 200
+
+    session.expire_all()
+    time_report = session.query(TranslatorTimeReport).get(report_id)
+    assert time_report is None
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_delete_time_report_admin(
+    broadcast: 'MagicMock',
+    authenticate: 'MagicMock',
+    connect: 'MagicMock',
+    client: 'Client',
+) -> None:
+    """Test that admin can delete time reports."""
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    )
+    translator_id = translator.id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='polizei')
+    user_group.meta = {
+        'finanzstelle': 'polizei',
+        'accountant_emails': ['other@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'telephonic'
+    page.form['finanzstelle'] = 'polizei'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '10:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '11:30'
+    page.form['case_number'] = 'ADMIN-DELETE'
+    page = page.form.submit().follow()
+
+    time_report = (
+        session.query(TranslatorTimeReport)
+        .filter_by(translator_id=translator_id)
+        .first()
+    )
+    assert time_report is not None
+    report_id = time_report.id
+
+    client.login_admin()
+    page = client.get('/time-reports')
+    csrf_token_match = re.search(
+        r'\?csrf-token=([a-zA-Z0-9\._\-]+)', str(page)
+    )
+    assert csrf_token_match is not None
+    csrf_token = csrf_token_match.group(1)
+
+    response = client.delete(
+        f'/time-report/{report_id}?csrf-token={csrf_token}',
+    )
+    assert response.status_code == 200
+
+    session.expire_all()
+    time_report = session.query(TranslatorTimeReport).get(report_id)
+    assert time_report is None
