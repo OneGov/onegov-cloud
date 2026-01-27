@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-10-13 11:02+0200\n"
+"POT-Creation-Date: 2026-01-27 16:19+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -88,8 +88,8 @@ msgstr "Ziel-Parlamentarier:in nicht gefunden."
 
 msgid "You can only edit your own or your commission members' attendance."
 msgstr ""
-"Sie können nur für sich selbst oder Ihre Kommissionsmitglieder "
-"Anwesenheiten bearbeiten."
+"Sie können nur für sich selbst oder Ihre Kommissionsmitglieder Anwesenheiten "
+"bearbeiten."
 
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
@@ -735,12 +735,6 @@ msgstr "✓ Abgeschlossen"
 msgid "⚠ Incomplete"
 msgstr "⚠ Unvollständig"
 
-msgid "Members who have closed their attendance:"
-msgstr "Mitglieder, die ihre Anwesenheit abgeschlossen haben:"
-
-msgid "✓ (closed)"
-msgstr "✓ (abgeschlossen)"
-
 msgid "Members who have not closed their attendance:"
 msgstr "Mitglieder, die ihre Anwesenheit nicht abgeschlossen haben:"
 
@@ -749,6 +743,12 @@ msgstr "(hat Anwesenheit)"
 
 msgid "(no attendance)"
 msgstr "(keine Anwesenheit)"
+
+msgid "Members who have closed their attendance:"
+msgstr "Mitglieder, die ihre Anwesenheit abgeschlossen haben:"
+
+msgid "✓ (closed)"
+msgstr "✓ (abgeschlossen)"
 
 msgid ""
 "No commissions with active memberships found for this settlement period."
@@ -782,6 +782,9 @@ msgstr "Keine Parlamentarier:innen ausgewählt"
 msgid "Added commission session"
 msgstr "Kommissionssitzung hinzugefügt"
 
+msgid "You do not have permission to edit plenary sessions."
+msgstr "Sie haben keine Berechtigung, Plenarsitzungen zu bearbeiten."
+
 msgid "Cannot edit attendance in closed settlement run."
 msgstr ""
 "Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
@@ -803,6 +806,9 @@ msgstr "Anwesenheiten löschen"
 
 msgid "Edit commission session"
 msgstr "Kommissionssitzung bearbeiten"
+
+msgid "You do not have permission to add plenary sessions."
+msgstr "Sie haben keine Berechtigung, Plenarsitzungen hinzuzufügen."
 
 msgid "New plenary session"
 msgstr "Neue Plenarsitzung"
@@ -837,8 +843,8 @@ msgstr "Kommissionsitzung hinzugefügt"
 msgid "Data Import (JSON)"
 msgstr "Import (JSON)"
 
-msgid "Dashboard"
-msgstr "Startseite"
+msgid "Overview"
+msgstr "Übersicht"
 
 msgid "Import completed successfully"
 msgstr "Import erfolgreich abgeschlossen"
@@ -956,3 +962,5 @@ msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
 
+#~ msgid "Dashboard"
+#~ msgstr "Startseite"

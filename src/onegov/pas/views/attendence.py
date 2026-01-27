@@ -208,6 +208,12 @@ def edit_plenary_bulk_attendence(
 ) -> RenderData | Response:
     request.include('custom')
 
+    if not request.is_admin:
+        request.alert(
+            _('You do not have permission to edit plenary sessions.')
+        )
+        return request.redirect(request.class_link(AttendenceCollection))
+
     all_parliamentarians = [
         str(parliamentarian.id)
         for parliamentarian
@@ -435,6 +441,10 @@ def add_plenary_attendence(self: AttendenceCollection,
     request: PasRequest,
     form: AttendenceAddPlenaryForm
 ) -> RenderData | Response:
+
+    if not request.is_admin:
+        request.alert(_('You do not have permission to add plenary sessions.'))
+        return request.redirect(request.link(self))
 
     if form.submitted(request):
         # Check if attendance date is in a closed settlement run
