@@ -86,9 +86,11 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         if not self.user.data:
             return ''
 
-        for key in details_keys:
-            if value := self.user.data.get(key):
-                details.append(value)
+        details = [
+            value
+            for key in details_keys
+            if (value := self.user.data.get(key))
+        ]
 
         return ' '.join(details)
 
