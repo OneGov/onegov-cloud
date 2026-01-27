@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-07 17:12+0100\n"
+"POT-Creation-Date: 2026-01-27 10:29+0100\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -211,6 +211,12 @@ msgstr ""
 msgid ""
 "The '{label}' group is empty and will not be visible. Either remove the "
 "empty group or add fields to it."
+msgstr ""
+
+#, python-format
+msgid ""
+"${fields}: New fields cannot be required initially. Require them in a "
+"separate migration step."
 msgstr ""
 
 #, python-format
