@@ -53,7 +53,6 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
     @property
     def organization_text(self) -> str:
-        organization: list[str] = []
 
         organization_keys = (
             'organisation',
@@ -65,17 +64,14 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
             'website',
         )
 
-        for key in organization_keys:
-            if not self.user.data:
-                continue
-            if value := self.user.data.get(key):
-                organization.append(value)
-
-        return ' '.join(organization)
+        return ' '.join(
+            value
+            for key in organization_keys
+            if (value := self.user.data.get(key))
+        )
 
     @property
     def organizer_details_text(self) -> str:
-        details: list[str] = []
 
         details_keys = (
             'emergency',
@@ -86,13 +82,11 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         if not self.user.data:
             return ''
 
-        details = [
+        return ' '.join(
             value
             for key in details_keys
             if (value := self.user.data.get(key))
-        ]
-
-        return ' '.join(details)
+        )
 
     def ordered_tags(
         self,
