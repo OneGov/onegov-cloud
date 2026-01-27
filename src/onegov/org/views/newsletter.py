@@ -30,6 +30,7 @@ from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.layout import NewsletterLayout
 from onegov.org.layout import RecipientLayout
+from onegov.org.models import Clipboard
 from onegov.org.models import News
 from onegov.org.models import PublicationCollection
 from onegov.org.utils import extract_categories_and_subcategories
@@ -455,6 +456,53 @@ def handle_new_newsletter(
         'layout': layout,
         'title': _('New Newsletter'),
         'size': 'large'
+    }
+
+
+@OrgApp.form(
+    model=NewsletterCollection,
+    name='new-paste',
+    template='form.pt',
+    permission=Private,
+    form=get_newsletter_form,
+)
+def handle_paste_newsletter(
+    self: NewsletterCollection,
+    request: OrgRequest,
+    form: NewsletterForm,
+    layout: NewsletterLayout | None = None,
+) -> RenderData | Response:
+    clipboard = Clipboard.from_session(request)
+    source = clipboard.get_object()
+
+    if not isinstance(source, Newsletter):
+        request.alert(_('Invalid clipboard content'))
+        return morepath.redirect(request.link(self))
+
+    if form.submitted(request):
+        assert form.title.data is not None
+        try:
+            newsletter = self.add(title=form.title.data, html=Markup(''))
+        except AlreadyExistsError:
+            request.alert(_('A newsletter with this name already exists'))
+        else:
+            form.update_model(newsletter, request)
+            clipboard.clear()
+
+            request.success(_('Newsletter pasted successfully'))
+            return morepath.redirect(request.link(newsletter))
+    elif request.method == 'GET':
+        form.apply_model(source)
+
+    layout = layout or NewsletterLayout(self, request)
+    layout.include_editor()
+    layout.edit_mode = True
+
+    return {
+        'form': form,
+        'layout': layout,
+        'title': _('Paste Newsletter'),
+        'size': 'large',
     }
 
 

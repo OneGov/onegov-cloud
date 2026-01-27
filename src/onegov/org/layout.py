@@ -32,11 +32,16 @@ from onegov.form import FormCollection, as_internal_id
 from onegov.org.models.document_form import (
     FormDocument,
     FormDocumentCollection)
-from onegov.newsletter import NewsletterCollection, RecipientCollection
+from onegov.newsletter import (
+    Newsletter,
+    NewsletterCollection,
+    RecipientCollection,
+)
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.exports.base import OrgExport
 from onegov.org.models import CitizenDashboard
+from onegov.org.models import Clipboard
 from onegov.org.models import ExportCollection, Editor
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
@@ -2867,6 +2872,12 @@ class NewsletterLayout(DefaultLayout):
                 Link(_('Newsletter'), self.request.link(self.collection)),
                 Link(_('New'), '#')
             ]
+        if self.is_collection and self.view_name == 'new-paste':
+            return [
+                Link(_('Homepage'), self.homepage_url),
+                Link(_('Newsletter'), self.request.link(self.collection)),
+                Link(_('Paste'), '#'),
+            ]
         if self.is_collection and self.view_name == 'update':
             return [
                 Link(_('Homepage'), self.homepage_url),
@@ -2891,7 +2902,7 @@ class NewsletterLayout(DefaultLayout):
             return None
 
         if self.is_collection:
-            return [
+            links: list[Link | LinkGroup] = [
                 Link(
                     text=_('Subscribers'),
                     url=self.request.link(self.recipients),
@@ -2903,6 +2914,23 @@ class NewsletterLayout(DefaultLayout):
                         self.request.app.org, 'newsletter-settings'),
                     attrs={'class': 'settings-link'}
                 ),
+            ]
+
+            if self.request.browser_session.has('clipboard_url'):
+                clipboard = Clipboard.from_session(self.request)
+                source = clipboard.get_object()
+                if source is None:
+                    clipboard.clear()
+                elif isinstance(source, Newsletter):
+                    links.append(
+                        Link(
+                            text=_('Paste'),
+                            url=self.request.link(self.model, 'new-paste'),
+                            attrs={'class': 'paste-link'},
+                        )
+                    )
+
+            links.append(
                 LinkGroup(
                     title=_('Add'),
                     links=[
@@ -2915,8 +2943,10 @@ class NewsletterLayout(DefaultLayout):
                             attrs={'class': 'new-newsletter'}
                         ),
                     ]
-                ),
-            ]
+                )
+            )
+
+            return links
         else:
             if self.view_name == 'send':
                 return []
@@ -2931,6 +2961,15 @@ class NewsletterLayout(DefaultLayout):
                     text=_('Test'),
                     url=self.request.link(self.model, 'test'),
                     attrs={'class': 'test-link'}
+                ),
+                Link(
+                    text=_('Copy'),
+                    url=self.request.link(
+                        Clipboard.from_url(
+                            self.request, self.request.path_info or ''
+                        )
+                    ),
+                    attrs={'class': 'copy-link'},
                 ),
                 Link(
                     text=_('Edit'),
