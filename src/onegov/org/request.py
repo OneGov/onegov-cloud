@@ -6,6 +6,7 @@ from onegov.core.orm import orm_cached
 from onegov.core.request import CoreRequest
 from onegov.core.security import Private
 from onegov.core.utils import normalize_for_url
+from onegov.org.layout import DefaultLayout, Layout
 from onegov.org.models import News, TANAccessCollection, Topic
 from onegov.page import Page, PageCollection
 from onegov.user import User
@@ -283,3 +284,21 @@ class OrgRequest(CoreRequest):
         if name := self.app.org.analytics_provider_name:
             return self.app.available_analytics_providers.get(name)
         return None
+
+    def get_layout(self, model: object) -> Layout | DefaultLayout:
+        """
+        Get the registered layout for a model instance.
+        """
+        layout_registry = self.app.config.layout_registry
+        model_type = model if isinstance(model, type) else type(model)
+
+        layout_class = None
+        for cls in model_type.mro():
+            layout_class = layout_registry.get(cls)
+            if layout_class:
+                break
+
+        if layout_class is None:
+            layout_class = DefaultLayout
+
+        return layout_class(model, self)

@@ -8,9 +8,9 @@ from onegov.core.static import StaticFile
 from onegov.core.utils import append_query_param, to_html_ul
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
-from onegov.directory import DirectoryCollection
-from onegov.event import OccurrenceCollection
-from onegov.form import FormCollection
+from onegov.directory import DirectoryCollection, DirectoryEntry, Directory
+from onegov.event import Event
+from onegov.event import OccurrenceCollection, Occurrence
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.org.layout import (
     Layout as OrgLayout,
@@ -22,6 +22,7 @@ from onegov.org.layout import (
     ArchivedTicketsLayout as OrgArchivedTicketsLayout,
     DashboardLayout as OrgDashboardLayout,
     DirectoryCollectionLayout as OrgDirectoryCollectionLayout,
+    DirectoryLayout as OrgDirectoryLayout,
     DirectoryEntryCollectionLayout as OrgDirectoryEntryCollectionLayout,
     DirectoryEntryLayout as OrgDirectoryEntryLayout,
     EditorLayout as OrgEditorLayout,
@@ -30,6 +31,7 @@ from onegov.org.layout import (
     ExternalLinkLayout as OrgExternalLinkLayout,
     FindYourSpotLayout as OrgFindYourSpotLayout,
     FormCollectionLayout as OrgFormCollectionLayout,
+    FormDefinitionLayout as OrgFormDefinitionLayout,
     SurveyCollectionLayout as OrgSurveyCollectionLayout,
     FormEditorLayout as OrgFormEditorLayout,
     FormSubmissionLayout as OrgFormSubmissionLayout,
@@ -42,7 +44,7 @@ from onegov.org.layout import (
     MessageCollectionLayout as OrgMessageCollectionLayout,
     NewsLayout as OrgNewsLayout,
     NewsletterLayout as OrgNewsletterLayout,
-    PageLayout as OrgPageLayout,
+    PageLayout as OrgTopicLayout,
     PaymentCollectionLayout as OrgPaymentCollectionLayout,
     PaymentProviderLayout as OrgPaymentProviderLayout,
     PersonCollectionLayout as OrgPersonCollectionLayout,
@@ -69,32 +71,46 @@ from onegov.org.layout import (
     UserGroupLayout as OrgUserGroupLayout,
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
+from onegov.form import FormDefinition
+from onegov.org.models import GeneralFile
+from onegov.org.models import ImageSet
+from onegov.org.models import Meeting
 from onegov.org.models import MeetingCollection
+from onegov.org.models import MeetingItem
+from onegov.org.models import News
 from onegov.org.models import PageMove
+from onegov.org.models import PoliticalBusiness
 from onegov.org.models import PoliticalBusinessCollection
+from onegov.org.models import RISCommission
 from onegov.org.models import RISCommissionCollection
+from onegov.org.models import RISParliamentarian
 from onegov.org.models import RISParliamentarianCollection
+from onegov.org.models import RISParliamentaryGroup
 from onegov.org.models import RISParliamentaryGroupCollection
+from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
+from onegov.people import Person
+from onegov.reservation import Resource
 from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
+from onegov.ticket import Ticket
+from onegov.user import User
 from onegov.town6 import _
 from onegov.town6.theme import user_options
+from onegov.town6 import TownApp
 
 
 from typing import Any, NamedTuple, TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from collections.abc import Iterator
-    from onegov.event import Event
-    from onegov.form import FormDefinition, FormSubmission
+    from collections.abc import Iterator, Sequence
+    from onegov.form import FormSubmission
     from onegov.form.models.definition import SurveyDefinition
     from onegov.form.models.submission import SurveySubmission
     from onegov.org.models import ExtendedDirectoryEntry
     from onegov.org.request import PageMeta
     from onegov.page import Page
-    from onegov.reservation import Resource
-    from onegov.ticket import Ticket
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
     from typing import TypeAlias
@@ -272,7 +288,8 @@ class SettingsLayout(OrgSettingsLayout, DefaultLayout):
     request: TownRequest
 
 
-class PageLayout(OrgPageLayout, AdjacencyListLayout):
+@TownApp.layout(model=Topic)
+class PageLayout(OrgTopicLayout, AdjacencyListLayout):
 
     app: TownApp
     request: TownRequest
@@ -284,6 +301,7 @@ class PageLayout(OrgPageLayout, AdjacencyListLayout):
         )
 
 
+@TownApp.layout(model=News)
 class NewsLayout(OrgNewsLayout, AdjacencyListLayout):
 
     app: TownApp
@@ -397,9 +415,12 @@ class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
     app: TownApp
     request: TownRequest
 
-    @property
-    def forms_url(self) -> str:
-        return self.request.class_link(FormCollection)
+
+@TownApp.layout(model=FormDefinition)
+class FormDefinitionLayout(OrgFormDefinitionLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
 
 
 class SurveySubmissionWindowLayout(OrgSurveySubmissionWindowLayout,
@@ -421,6 +442,7 @@ class PersonCollectionLayout(OrgPersonCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
+@TownApp.layout(model=Person)
 class PersonLayout(OrgPersonLayout, DefaultLayout):
 
     app: TownApp
@@ -439,6 +461,7 @@ class ArchivedTicketsLayout(OrgArchivedTicketsLayout, DefaultLayout):
     request: TownRequest
 
 
+@TownApp.layout(model=Ticket)
 class TicketLayout(OrgTicketLayout, DefaultLayout):
 
     app: TownApp
@@ -551,6 +574,7 @@ class ResourceRecipientsFormLayout(
     request: TownRequest
 
 
+@TownApp.layout(model=Resource)
 class ResourceLayout(OrgResourceLayout, DefaultLayout):
 
     app: TownApp
@@ -631,6 +655,7 @@ class OccurrencesLayout(OrgOccurrencesLayout, DefaultLayout):
         return links
 
 
+@TownApp.layout(model=Occurrence)
 class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
 
     app: TownApp
@@ -661,6 +686,7 @@ class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
     cls_before='EventLayout',
     cls_after='TicketChatMessageLayout'
 )
+@TownApp.layout(model=Event)
 class EventLayout(StepsLayoutExtension, OrgEventLayout, DefaultLayout):
 
     app: TownApp
@@ -701,6 +727,7 @@ class ImageSetCollectionLayout(OrgImageSetCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
+@TownApp.layout(model=ImageSet)
 class ImageSetLayout(OrgImageSetLayout, DefaultLayout):
 
     app: TownApp
@@ -713,6 +740,7 @@ class UserManagementLayout(OrgUserManagementLayout, DefaultLayout):
     request: TownRequest
 
 
+@TownApp.layout(model=User)
 class UserLayout(OrgUserLayout, DefaultLayout):
 
     app: TownApp
@@ -765,6 +793,13 @@ class MessageCollectionLayout(OrgMessageCollectionLayout, DefaultLayout):
 
 
 class DirectoryCollectionLayout(OrgDirectoryCollectionLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
+
+
+@TownApp.layout(model=Directory)
+class DirectoryLayout(OrgDirectoryLayout, DefaultLayout):
 
     app: TownApp
     request: TownRequest
@@ -897,6 +932,7 @@ class DirectoryEntryCollectionLayout(
 
 
 @step_sequences.registered_step(1, _('Form'), cls_after='FormSubmissionLayout')
+@TownApp.layout(model=DirectoryEntry)
 class DirectoryEntryLayout(
     StepsLayoutExtension,
     OrgDirectoryEntryLayout,
@@ -932,6 +968,7 @@ class DashboardLayout(OrgDashboardLayout, DefaultLayout):
     request: TownRequest
 
 
+@TownApp.layout(model=GeneralFile)
 class GeneralFileCollectionLayout(DefaultLayout):
 
     def __init__(self, model: Any, request: TownRequest) -> None:
@@ -943,6 +980,18 @@ class GeneralFileCollectionLayout(DefaultLayout):
         super().__init__(model, request)
         request.include('upload')
         request.include('prompt')
+
+    @cached_property
+    def breadcrumbs(self) -> Sequence[Link]:
+        name = self.model.name[:40]
+        if len(name) == 40:
+            name = name[:37] + '...'
+
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Files'), self.files_url),
+            Link(name, self.files_url_with_anchor(self.model)),
+        ]
 
 
 class ImageFileCollectionLayout(DefaultLayout):
@@ -1097,6 +1146,7 @@ class MeetingCollectionLayout(DefaultLayout):
         return None
 
 
+@TownApp.layout(model=Meeting)
 class MeetingLayout(DefaultLayout):
 
     @cached_property
@@ -1113,11 +1163,18 @@ class MeetingLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
+        title = (
+            self.title + ' - ' +
+            self.format_date(self.model.start_datetime, 'date')
+            if self.model.start_datetime
+            else self.title
+        )
+
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(_('RIS Settings'), self.ris_overview_url),
             Link(_('Meetings'), self.request.class_link(MeetingCollection)),
-            Link(self.title, self.request.link(self.model)),
+            Link(title, self.request.link(self.model)),
         ]
 
     @cached_property
@@ -1159,6 +1216,29 @@ class MeetingLayout(DefaultLayout):
         return None
 
 
+@TownApp.layout(model=MeetingItem)
+class MeetingItemLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        title = (
+            self.model.meeting.title + ' - ' +
+            self.format_date(self.model.meeting.start_datetime, 'date')
+            if self.model.meeting.start_datetime
+            else self.model.meeting.title
+        )
+
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(
+                _('Meetings'),
+                self.request.class_link(MeetingCollection)
+            ),
+            Link(title, self.request.link(self.model, fragment=self.model.title))
+        ]
+
+
 class RISParliamentarianCollectionLayout(DefaultLayout):
 
     @cached_property
@@ -1195,6 +1275,7 @@ class RISParliamentarianCollectionLayout(DefaultLayout):
         return None
 
 
+@TownApp.layout(model=RISParliamentarian)
 class RISParliamentarianLayout(DefaultLayout):
 
     @cached_property
@@ -1376,6 +1457,7 @@ class RISParliamentaryGroupCollectionLayout(DefaultLayout):
         return None
 
 
+@TownApp.layout(model=RISParliamentaryGroup)
 class RISParliamentaryGroupLayout(DefaultLayout):
 
     @cached_property
@@ -1511,6 +1593,7 @@ class RISCommissionCollectionLayout(DefaultLayout):
         return None
 
 
+@TownApp.layout(model=RISCommission)
 class RISCommissionLayout(DefaultLayout):
 
     @cached_property
@@ -1603,6 +1686,7 @@ class PoliticalBusinessCollectionLayout(DefaultLayout):
         return None
 
 
+@TownApp.layout(model=PoliticalBusiness)
 class PoliticalBusinessLayout(DefaultLayout):
 
     @cached_property

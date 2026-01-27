@@ -242,6 +242,15 @@ footer {
 }
 
 /*
+   Reset z-index for breadcrumbs links so earlier to prevent breadcrumbs
+    from overlapping search results
+*/
+.breadcrumbs a,
+.breadcrumbs .breadcrumb-item a {
+    z-index: 0;
+}
+
+/*
     page text
 */
 
@@ -847,6 +856,12 @@ $pageref-color-hover: $iron;
                     padding-right: 0;
                 }
             }
+        }
+
+        &:target,
+        &:has(:target) {
+            background-color: rgba($primary-color, 0.2);
+            transition: background-color 0.5s ease;
         }
 
         &.more-list-level-2 {

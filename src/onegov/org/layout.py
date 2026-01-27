@@ -36,7 +36,7 @@ from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.exports.base import OrgExport
-from onegov.org.models import CitizenDashboard
+from onegov.org.models import CitizenDashboard, GeneralFile
 from onegov.org.models import ExportCollection, Editor
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
@@ -288,6 +288,21 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             (get_name(locale), get_link(locale))
             for locale in sorted(self.app.locales)
         ]
+
+    @cached_property
+    def files_url(self) -> str:
+        """ Returns the url to the files view. """
+        url = self.request.link(
+            GeneralFileCollection(self.request.session)
+        )
+        return self.csrf_protected_url(url)
+
+    def files_url_with_anchor(self, file: GeneralFile | None) -> str:
+        """ Returns the url to the files view including anchor. """
+        if file is None:
+            return self.files_url
+
+        return f'{self.files_url}#{file.name}'
 
     @cached_property
     def file_upload_url(self) -> str:
@@ -1329,6 +1344,21 @@ class FormCollectionLayout(DefaultLayout):
         return None
 
 
+class FormDefinitionLayout(DefaultLayout):
+
+    @property
+    def forms_url(self) -> str:
+        return self.request.class_link(FormCollection)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Forms'), self.forms_url),
+            Link(self.model.title, self.request.link(self.model))
+        ]
+
+
 class SurveySubmissionWindowLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
@@ -1761,7 +1791,8 @@ class TicketLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(_('Tickets'), get_current_tickets_url(self.request)),
-            Link(self.model.number, '#')
+            Link(self.model.number, self.request.link(
+                TicketCollection(self.request.session).by_id(self.model.id)))
         ]
 
     @cached_property
@@ -3427,7 +3458,9 @@ class DirectoryCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Directories'), '#')
+            Link(_('Directories'), self.request.class_link(
+                DirectoryCollection
+            )),
         ]
 
     @cached_property
@@ -3449,6 +3482,19 @@ class DirectoryCollectionLayout(DefaultLayout):
                 ),
             ]
         return None
+
+
+class DirectoryLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Directories'), self.request.class_link(
+                DirectoryCollection
+            )),
+            Link(self.model.title, self.request.link(self.model))
+        ]
 
 
 class DirectoryEntryMixin:
