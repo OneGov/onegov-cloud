@@ -1438,6 +1438,7 @@ def view_my_reservations(
         'title': _('My Reservations'),
         'resource': Bunch(
             type='room',
+            name='',
             date=date,
             view=request.GET.get('view'),
             highlights_min=request.GET.get('highlights_min'),
