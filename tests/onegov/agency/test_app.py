@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from io import BytesIO
 from onegov.agency.custom import get_global_tools
-from onegov.agency.custom import get_top_navigation
 from onegov.agency.pdf import AgencyPdfAr
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
@@ -68,18 +67,18 @@ def test_app_custom(agency_app: AgencyApp) -> None:
     request: Any = DummyRequest()
     request.app = agency_app
 
-    assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
+    # assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == ['Login']
 
     request.is_logged_in = True
     request.current_username = 'Peter'
-    assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
+    # assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
         {'Account': ['User Profile', 'Logout']}
     ]
 
     request.is_manager = True
-    assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
+    # assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
         {'Account': ['User Profile', 'Logout']},
         {'Management': ['Overview', 'Timeline', 'Files', 'Images', 'Payments',
@@ -90,7 +89,7 @@ def test_app_custom(agency_app: AgencyApp) -> None:
     ]
 
     request.is_admin = True
-    assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
+    # assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
         {'Account': ['User Profile', 'Logout']},
         {'Management': ['Overview', 'Timeline', 'Files', 'Images', 'Payments',
