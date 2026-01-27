@@ -128,7 +128,11 @@ def test_return_to(redis_url: str) -> None:
     assert c.get('/do-something').location == 'http://localhost/default'
 
 
-def test_link_with_query_parameters_and_fragement(redis_url: str) -> None:
+@pytest.mark.parametrize('class_link', [False, True])
+def test_link_with_query_parameters_and_fragment(
+    redis_url: str,
+    class_link: bool
+) -> None:
 
     class App(Framework):
         pass
@@ -140,18 +144,25 @@ def test_link_with_query_parameters_and_fragement(redis_url: str) -> None:
 
     @App.view(model=Root)
     def homepage(self: Root, request: CoreRequest) -> str:
+        link: Any
+        if class_link:
+            def link(obj: Root, **kwargs: Any) -> str | None:
+                return request.class_link(Root, {'foo': obj.foo}, **kwargs)
+        else:
+            link = request.link
+
         foo = Root(foo='bar')
         return '\n'.join((
-            request.link(self),
-            request.link(self, query_params={'a': '1'}),
-            request.link(self, query_params={'a': '1', 'b': 2}),  # type: ignore[dict-item]
-            request.link(self, fragment='main'),
-            request.link(self, query_params={'a': '1'}, fragment='main'),
-            request.link(foo),
-            request.link(foo, query_params={'a': '1'}),
-            request.link(foo, query_params={'a': '1', 'b': 2}),  # type: ignore[dict-item]
-            request.link(foo, fragment='main'),
-            request.link(foo, query_params={'a': '1'}, fragment='main'),
+            link(self),
+            link(self, query_params={'a': '1'}),
+            link(self, query_params={'a': '1', 'b': 2}),
+            link(self, fragment='main'),
+            link(self, query_params={'a': '1'}, fragment='main'),
+            link(foo),
+            link(foo, query_params={'a': '1'}),
+            link(foo, query_params={'a': '1', 'b': 2}),
+            link(foo, fragment='main'),
+            link(foo, query_params={'a': '1'}, fragment='main'),
         ))
 
     @App.view(model=Root, name='foo')

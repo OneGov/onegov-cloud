@@ -17,7 +17,7 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.14
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: [ "--fix" ]
   - repo: https://github.com/PyCQA/flake8
     rev: 7.3.0
@@ -35,7 +35,7 @@ repos:
         - stylelint@16.19.1
         - stylelint-config-standard-scss@15.0.0
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.0.0-rc.0
+    rev: v10.0.0-rc.1
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
