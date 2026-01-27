@@ -22,7 +22,14 @@
                 <div class="sidebar-wrapper">
                     <div class="side-panel">
                         <h3 class="filter-title" i18n:translate>Letter</h3>
-                        <div metal:use-macro="layout.macros['tags']" tal:define="tags letters" />
+                        <div class="filter-panel">
+                            <ul class="tags">
+                                <li tal:repeat="letter letters">
+                                    <span class="blank-label click-through rounded ${letter.active and 'active' or ''}" tal:content="letter(layout)">
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
                     <div class="side-panel">

@@ -73,10 +73,10 @@
 
             <tal:block tal:condition="children">
                 <h3 i18n:translate>Suborganizations</h3>
-                <ul class="children">
+                <ul class="children more-list">
                     <tal:block tal:repeat="child children">
                         <li tal:condition="(child.access == 'public' and child.published) or request.is_logged_in">
-                            <a href="${request.link(child)}">${child.title}</a>
+                            <a class="list-link" href="${request.link(child)}">${child.title}</a>
                         </li>
                     </tal:block>
                 </ul>
@@ -84,7 +84,7 @@
 
             <tal:block tal:condition="memberships">
                 <h3 i18n:translate>People</h3>
-                <ul class="memberships">
+                <ul class="memberships list-lines">
                     <tal:block tal:repeat="membership memberships">
                         <li tal:condition="(membership.access == 'public' and membership.published and membership.person and membership.person.access == 'public' and membership.person.published) or request.is_logged_in">
                             <strong><a href="${request.link(membership.person)}">${membership.person.title}</a></strong>, <a href="${request.link(membership)}">${membership.title}</a>
@@ -231,7 +231,7 @@
                         </tal:block>
                         <dt tal:condition="memberships" i18n:translate>Memberships</dt>
                         <dd>
-                            <ul>
+                            <ul class="list-lines">
                                 <tal:block tal:repeat="membership memberships">
                                     <li tal:condition="(membership.access == 'public' and membership.published) or request.is_logged_in" tal:define="full_path request.app.org.agency_path_display_on_people" class="person-card-membership">
                                         <a tal:condition="not: full_path" href="${request.link(membership.agency)}" title="${layout.agency_path(membership.agency)}">${membership.agency.title}</a>

@@ -138,6 +138,10 @@ footer {
         font-weight: normal;
     }
 
+    small {
+        font-weight: normal;
+    }
+
 }
 
 /*
@@ -212,7 +216,8 @@ footer {
 .occasions,
 .agency-card,
 .membership-card,
-.person-single-item {
+.person-single-item,
+.person-list-card *:not(.person-card-details) {
     a:not(.button) {
         position: relative;
         transition: all 250ms;
@@ -762,6 +767,10 @@ $pageref-color-hover: $iron;
             transition: all 200ms linear;
         }
 
+        a::before {
+            display: none;
+        }
+
         .list-lead {
             -webkit-box-orient: vertical;
             display: -webkit-box;
@@ -806,7 +815,7 @@ $pageref-color-hover: $iron;
             .list-link {
                 @include more-link-after;
                 align-items: start;
-                border-top: 1px solid #f5f5f5;
+                border-top: 1px solid $smoke;
                 display: flex;
                 font-weight: bold;
                 justify-content: space-between;
@@ -872,6 +881,11 @@ $pageref-color-hover: $iron;
     > li:last-child {
         margin-bottom: 1rem;
     }
+}
+
+.list-lines li {
+    border-top: 1px solid $smoke;
+    padding: .5rem 0;
 }
 
 .side-panel {
@@ -1042,7 +1056,7 @@ a > i.fa-external-link-alt {
 .forms-list,
 .more-list {
     .edit-link .fa-edit {
-        color: #cacaca;
+        color: $medium-gray;
         display: block;
     }
 }
@@ -1523,6 +1537,7 @@ ul.recipients {
 .filter-panel .blank-label {
     border-radius: .7rem;
     background: $smoke;
+    transition: all linear 200ms;
     border: 1px solid $smoke;
 
     &.active {

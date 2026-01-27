@@ -139,11 +139,15 @@ ul.agency-nav {
         justify-content: flex-end;
 
         .button {
+            @media #{$large-up} {
+                margin-top: -2.15rem;
+                position: absolute;
+            }
+
             margin-bottom: 0;
-            position: absolute;
-            margin-top: -2.15rem;
-            padding-top: 0.4rem !important;
-            padding-bottom: 0.4rem !important;
+            margin-top: .5rem;
+            padding-bottom: .4rem !important;
+            padding-top: .4rem !important;
         }
     }
 
@@ -151,8 +155,8 @@ ul.agency-nav {
 
         @include hairline;
         cursor: pointer;
-        padding: .5rem;
         height: 2.5rem;
+        padding: .5rem;
         transition: background .3s;
 
         &::before {
