@@ -64,6 +64,8 @@ There are two different types of rows, `<row-wide> </row-wide>` and `<row> </row
 <slider
     height-m="30vw"
     height-d="55vh"
+    searchbox="true"
+    searchbox-position="top"
 ></slider>
 ```
 
@@ -71,6 +73,8 @@ There are two different types of rows, `<row-wide> </row-wide>` and `<row> </row
 | ------------- | ------------------------------------------ | ------------------- | ---------------------- |
 | `height-m`    | The height of the slider on mobile devices. Images will center themselves and cover the available space. | 40vw                | 30vw, 40vh, 100px, ... |
 | `height-d`    | The height of the slider on desktop devices. Images will center themselves and cover the available space.| 40vw                | 30vw, 40vh, 100px, ... |
+| `searchbox`    | If there should be a searchbox in the slider.| false                | true, false |
+| `searchbox-position`    | The position of the searchbox.| bottom                | top, bottom |
 
 #### Additional Info:
 The images for the slider are defined via photoalbums. You can find the "show on homepage"-Option in the settings of each album.
@@ -79,16 +83,18 @@ The images for the slider are defined via photoalbums. You can find the "show on
 ## Autoplay Video(s)
 [![Autoplay Video](docs/_static/homepage_widgets//autoplay_video.png?raw=true)]()
 ```
-    <autoplay_video
-        max-height="100vh"
-        text="Text on video"
-        button_url="https://..."
-        button_text="Button Text"
-        link_mp4="/storage/..."
-        link_mp4_low_res="/storage/..."
-        link_webm="/storage/..."
-        link_webm_low_res="/storage/..."
-    />
+<autoplay_video
+    max-height="100vh"
+    text="Text on video"
+    button_url="https://..."
+    button_text="Button Text"
+    link_mp4="/storage/..."
+    link_mp4_low_res="/storage/..."
+    link_webm="/storage/..."
+    link_webm_low_res="/storage/..."
+    searchbox="true"
+    searchbox-position="top"
+/>
 ```
 | Attribute Name | Description                                | Value if left empty | Possible Values        |
 | ------------- | ------------------------------------------ | ------------------- | ---------------------- |
@@ -100,6 +106,8 @@ The images for the slider are defined via photoalbums. You can find the "show on
 | `link_mp4`       | Link to the full sized video in the mp4 format uploaded in the files-section. Will be shown for desktop and mobile, if no smaller size is available. | -                   | /storage/...         |
 | `link_webm_low_res`  | Link to the video in the webm format with reduced size uploaded in the files-section. Will be shown for mobile devices instead of the full sized video. | -                   | /storage/...         |
 | `link_webm`       | Link to the full sized video in the webm format uploaded in the files-section. Will be shown for desktop and mobile, if no smaller size is available. | -                   | /storage/...         |
+| `searchbox`    | If there should be a searchbox in the video.| false                | true, false |
+| `searchbox-position`    | The position of the searchbox.| bottom                | top, bottom |
 
 #### Additional Info:
 You can add multiple videos and wrap them with `<random_videos> </random_videos>` to display one of the videos at random each time the page gets refreshed. Like this:
@@ -131,7 +139,7 @@ You can add multiple videos and wrap them with `<random_videos> </random_videos>
 | `title`       | Title of the icon link widget  | **Cannot** be left empty *     | Any text         |
 | `text`       | Text of the icon link widget               | -         | Any text         |
 | `text`       | Where the icon link widget is linked to     | -         | https://...         |
-| `text`       | Inverts the colors of the icon link widget (white turns to primary color and vice versa).                 | false         | true, false         |
+| `invert`       | Inverts the colors of the icon link widget (white turns to primary color and vice versa).                 | false         | true, false         |
 | `class`       | Custom classes                             | -                   | Any class name         |
 
 \* Icon link widget will not be displayed if this value is missing

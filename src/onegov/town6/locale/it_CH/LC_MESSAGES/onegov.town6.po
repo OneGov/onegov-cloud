@@ -1101,6 +1101,9 @@ msgstr "Ingrandisci/riduci"
 msgid "Show more"
 msgstr "Mostra di più"
 
+msgid "What are you searching for?"
+msgstr "Cosa stai cercando?"
+
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
 "photos to an album and mark it as available for the homepage."
