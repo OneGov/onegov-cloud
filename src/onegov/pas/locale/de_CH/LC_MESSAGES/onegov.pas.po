@@ -786,6 +786,10 @@ msgid "Added commission session"
 msgstr "Kommissionssitzung hinzugefügt"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> aa4f20fba (fix: Restrict bulk plenary booking to admins only)
 msgid "You do not have permission to edit plenary sessions."
 msgstr "Sie haben keine Berechtigung, Plenarsitzungen zu bearbeiten."
 
@@ -793,8 +797,12 @@ msgid "Cannot edit attendance in closed settlement run."
 msgstr ""
 "Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
 
+<<<<<<< HEAD
 =======
 >>>>>>> 976277348 (Pas: Validate attendance to be within a settlement run.)
+=======
+>>>>>>> 47d334944 (fix: Restrict bulk plenary booking to admins only)
+>>>>>>> aa4f20fba (fix: Restrict bulk plenary booking to admins only)
 msgid "Edit plenary session"
 msgstr "Plenarsitzung bearbeiten"
 
@@ -968,12 +976,3 @@ msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
 
-<<<<<<< HEAD
-=======
-#~ msgid "Cannot edit attendance in closed settlement run."
-#~ msgstr ""
-#~ "Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
-
->>>>>>> 976277348 (Pas: Validate attendance to be within a settlement run.)
-#~ msgid "Dashboard"
-#~ msgstr "Startseite"
