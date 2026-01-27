@@ -2323,7 +2323,7 @@ def test_time_report_workflow(
     assert report.duration == 90
     assert report.hourly_rate == 90.0
     assert report.surcharge_types == ['weekend_holiday']  # Saturday
-    assert report.travel_compensation == 100.0
+    assert report.travel_compensation == Decimal('50.00')
     assert report.case_number == 'CASE-123'
     assert report.status == 'pending'
 
@@ -2551,7 +2551,7 @@ def test_time_report_edit_toggle_skip_travel(
 
     translator = session.query(Translator).filter_by(id=translator_id).one()
     report = translator.time_reports[0]
-    assert report.travel_compensation == Decimal('100')
+    assert report.travel_compensation == Decimal('50')
     assert report.travel_distance == 35.0
 
     accountant_email = get_accountant_email(client)

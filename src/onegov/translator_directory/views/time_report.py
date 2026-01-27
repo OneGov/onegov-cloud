@@ -21,7 +21,6 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
 
-from markupsafe import Markup
 from onegov.core.elements import Confirm, Intercooler, Link
 from onegov.core.security import Private, Personal
 from onegov.translator_directory import TranslatorDirectoryApp
@@ -36,7 +35,6 @@ from onegov.translator_directory.forms.time_report import (
 from onegov.translator_directory.generate_docx import gendered_greeting
 from onegov.translator_directory.layout import (
     TimeReportCollectionLayout,
-    TimeReportLayout,
     TranslatorLayout,
 )
 from onegov.translator_directory.models.ticket import (
@@ -123,27 +121,28 @@ def view_time_reports(
         for ticket in tickets
     }
 
-    def get_delete_link(report: TranslatorTimeReport) -> Markup | None:
-        if not can_delete_time_report(request, report):
-            return None
-        link = Link(
-            text=_('Delete'),
-            url=layout.csrf_protected_url(request.link(report)),
-            attrs={'class': 'delete-link'},
-            traits=(
-                Confirm(
-                    _('Do you really want to delete this time report?'),
-                    _('This cannot be undone.'),
-                    _('Delete time report'),
-                    _('Cancel')
+    delete_links = {}
+    for report in self.batch:
+        if can_delete_time_report(request, report):
+            delete_links[str(report.id)] = Link(
+                text=_('Delete'),
+                url=layout.csrf_protected_url(request.link(report)),
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _('Do you really want to delete this time report?'),
+                        _('This cannot be undone.'),
+                        _('Delete time report'),
+                        _('Cancel'),
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=request.class_link(
+                            TimeReportCollection
+                        ),
+                    ),
                 ),
-                Intercooler(
-                    request_method='DELETE',
-                    redirect_after=request.class_link(TimeReportCollection)
-                )
             )
-        )
-        return Markup(link(layout))
 
     return {
         'layout': layout,
@@ -151,6 +150,7 @@ def view_time_reports(
         'title': layout.title,
         'reports': self.batch,
         'report_tickets': report_tickets,
+        'delete_links': delete_links,
         'months': months,
         'years': years,
         'default_month': default_month,
@@ -158,7 +158,6 @@ def view_time_reports(
         'selected_month': selected_month,
         'selected_year': selected_year,
         'export_url': export_url,
-        'get_delete_link': get_delete_link,
     }
 
 
@@ -183,7 +182,9 @@ def edit_time_report(
             request.link(TimeReportCollection(request.app))
         )
 
-    layout = TimeReportLayout(self, request)
+    layout = TimeReportCollectionLayout(
+        TimeReportCollection(request.app), request
+    )
 
     if form.submitted(request):
         form.update_model(self)
