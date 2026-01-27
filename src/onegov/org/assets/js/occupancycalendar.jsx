@@ -74,12 +74,12 @@ oc.events = [
 
 oc.overlappingEvents = {};
 
-oc.passEventsToCalendar = function(calendar, target) {
-    var cal = $(calendar);
+oc.popupOpen = false;
 
+oc.passEventsToCalendar = function(calendar, target) {
     _.each(oc.events, function(eventName) {
         target.on(eventName, _.debounce(function(_e, data) {
-            cal.trigger(eventName, [data, calendar]);
+            $(window).trigger(eventName, [data, calendar]);
         }));
     });
 };
@@ -194,6 +194,9 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         }
         // add blockers on selection
         fcOptions.select = function(info) {
+            if (oc.popupOpen) {
+                return;
+            }
             var keys = Object.keys(oc.overlappingEvents);
             if (keys.length !== 1) {
                 // this shouldn't happen, but when it does just cancel
@@ -238,7 +241,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
             var calendar = $(info.el).closest('.fc').get(0) || $('.fc').get(0);
             oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {
                 info.revert();
-                oc.showErrorPopup(calendar, $(calendar).find('.event-' + event.id), str);
+                oc.showErrorPopup(info.view.calendar, $(calendar).find('.event-' + event.id), str);
             });
         };
 
@@ -583,7 +586,7 @@ oc.addDeleteBlockerHandler = function(event, element, view) {
         ).done(function() {
             view.calendar.refetchEvents();
         }).fail(function() {
-            oc.showErrorPopup($(element).closest('.fc'), element, locale('Failed to delete'));
+            oc.showErrorPopup(view.calendar, element, locale('Failed to delete'));
         });
     });
 };
@@ -627,21 +630,25 @@ oc.post = function(calendar, url, onerror) {
     oc.request(calendar, url, 'ic-post-to', onerror);
 };
 
-oc.add_blocker = function(calendar, url, start, end, reason, wholeDay) {
+oc.add_blocker = function(calendar, event, url, start, end, reason, wholeDay) {
     url = new Url(url);
     url.query.start = start;
     url.query.end = end;
     url.query.reason = reason;
     url.query.whole_day = wholeDay && '1' || '0';
 
-    oc.post(calendar, url.toString());
+    oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {
+        oc.showErrorPopup(calendar, $('.event-' + event.id), str);
+    });
 };
 
-oc.edit_blocker = function(calendar, url, reason) {
+oc.edit_blocker = function(calendar, event, url, reason) {
     url = new Url(url);
     url.query.reason = reason;
 
-    oc.post(calendar, url.toString());
+    oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {
+        oc.showErrorPopup(calendar, $('.event-' + event.id), str);
+    });
 };
 
 // popup handler implementation
@@ -650,7 +657,8 @@ oc.showBlockerPopup = function(calendar, element, start, end, wholeDay, event) {
     var form = $('<div class="reservation-form">').appendTo(wrapper);
 
     // Render the blocker form
-    oc.BlockerForm.render(
+    var form = oc.BlockerForm.render(
+        calendar,
         form.get(0),
         start,
         end,
@@ -660,6 +668,7 @@ oc.showBlockerPopup = function(calendar, element, start, end, wholeDay, event) {
             oc.targetEvent = $(element);
             oc.add_blocker(
                 calendar,
+                event,
                 event.extendedProps.blockurl,
                 state.start,
                 state.end,
@@ -671,6 +680,7 @@ oc.showBlockerPopup = function(calendar, element, start, end, wholeDay, event) {
     );
 
     oc.showPopup(calendar, element, wrapper);
+    setTimeout(form.updateSelection, 100);
 };
 
 oc.showBlockerEditPopup = function(calendar, element, event) {
@@ -685,6 +695,7 @@ oc.showBlockerEditPopup = function(calendar, element, event) {
             oc.targetEvent = $(element);
             oc.edit_blocker(
                 calendar,
+                event,
                 event.extendedProps.seturl,
                 state.reason,
             );
@@ -708,12 +719,14 @@ oc.showPopup = function(calendar, element, content, position, extraClasses) {
         tooltipanchor: element,
         type: 'tooltip',
         onopen: function() {
+            oc.popupOpen = true;
             oc.onPopupOpen.call(this, calendar);
             setTimeout(function() {
                 $(window).trigger('resize');
             }, 0);
         },
         onclose: function() {
+            oc.popupOpen = false;
             $(element).closest('.fc-event').removeClass('has-popup');
             calendar.unselect();
         },
@@ -921,6 +934,24 @@ oc.BlockerForm = React.createClass({
 
         return state;
     },
+    updateSelection: function() {
+        if (!this.isValidState()) {
+            return;
+        }
+
+        var sel = {};
+        if (!this.props.partlyAvailable) {
+            sel.start = this.props.start.toDate();
+            sel.end = this.props.end.toDate();
+        } else if (this.props.wholeDay && this.state.wholeDay) {
+            sel.start = this.props.minStart.toDate();
+            sel.end = this.props.maxEnd.toDate();
+        } else {
+            sel.start = this.parseTime(this.props.start.clone(), this.state.start).toDate();
+            sel.end = this.parseTime(this.props.end.clone(), this.state.end).toDate();
+        }
+        this.props.calendar.select(sel);
+    },
     componentDidMount: function() {
         var node = $(ReactDOM.findDOMNode(this));
 
@@ -937,12 +968,18 @@ oc.BlockerForm = React.createClass({
         switch (name) {
             case 'reserve-whole-day':
                 state.wholeDay = e.target.value === 'yes';
+                // setState is asynchronous so we slightly delay this
+                setTimeout(this.updateSelection, 100);
                 break;
             case 'start':
                 state.start = e.target.value;
+                // setState is asynchronous so we slightly delay this
+                setTimeout(this.updateSelection, 100);
                 break;
             case 'end':
                 state.end = e.target.value === '00:00' && '24:00' || e.target.value;
+                // setState is asynchronous so we slightly delay this
+                setTimeout(this.updateSelection, 100);
                 break;
             case 'reason':
                 state.reason = e.target.value || null;
@@ -1016,12 +1053,10 @@ oc.BlockerForm = React.createClass({
         return enddate !== null && enddate <= this.props.maxEnd;
     },
     isValidState: function() {
-        if (this.props.partlyAvailable) {
-            if (this.props.wholeDay && this.state.wholeDay) {
-                return true;
-            } else {
-                return this.isValidStart(this.state.start) && this.isValidEnd(this.state.end);
-            }
+        if (!this.props.partlyAvailable || (this.props.wholeDay && this.state.wholeDay)) {
+            return true;
+        } else {
+            return this.isValidStart(this.state.start) && this.isValidEnd(this.state.end);
         }
     },
     // eslint-disable-next-line complexity
@@ -1100,26 +1135,29 @@ oc.BlockerForm = React.createClass({
     }
 });
 
-oc.BlockerForm.render = function(element, start, end, wholeDay, event, onSubmit) {
+oc.BlockerForm.render = function(calendar, element, start, end, wholeDay, event, onSubmit) {
 
     var partlyAvailable = event.extendedProps.partlyAvailable;
     var fullyAvailable = event.extendedProps.fullyAvailable;
     var minStart = moment.max(moment(event.start), moment());
     var maxEnd = moment(event.end);
+    var wholeRange = !partlyAvailable || wholeDay;
 
-    ReactDOM.render(
+    return ReactDOM.render(
         <oc.BlockerForm
+            calendar={calendar}
             partlyAvailable={partlyAvailable}
             fullyAvailable={fullyAvailable}
-            start={wholeDay && minStart || moment.max(start, minStart)}
-            end={wholeDay && maxEnd || moment.min(end, maxEnd)}
+            start={wholeRange && minStart || moment.max(start, minStart)}
+            end={wholeRange && maxEnd || moment.min(end, maxEnd)}
             minStart={minStart}
             maxEnd={maxEnd}
             wholeDay={event.extendedProps.wholeDay}
             wholeDayDefault={wholeDay}
             onSubmit={onSubmit}
         />,
-        element);
+        element
+    );
 };
 
 

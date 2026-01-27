@@ -1900,8 +1900,9 @@ $editbar-bg-color: $topbar-link-bg-hover;
 
     .label-text {
         color: $form-label-font-color;
-        display: inline-block;
+        display: block;
         font-size: .875rem;
+        font-weight: normal;
         margin-right: 1rem;
     }
 
