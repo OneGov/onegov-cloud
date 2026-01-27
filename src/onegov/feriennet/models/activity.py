@@ -83,9 +83,10 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
             'bank_beneficiary',
         )
 
+        if not self.user.data:
+            return ''
+
         for key in details_keys:
-            if not self.user.data:
-                continue
             if value := self.user.data.get(key):
                 details.append(value)
 
