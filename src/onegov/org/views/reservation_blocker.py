@@ -5,7 +5,7 @@ import pytz
 import sedate
 import transaction
 
-from datetime import time
+from datetime import time, timedelta
 from libres.db.models import ReservationBlocker
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
@@ -159,6 +159,8 @@ def adjust_blocker(
     except Exception:
         raise exc.HTTPBadRequest() from None
 
+    # NOTE: FullCalendar ends are exclusive but for us they're inclusive
+    new_end -= timedelta(microseconds=1)
     token = self.token
     resource = request.app.libres_resources.by_reservation(self)
     assert resource is not None
@@ -173,7 +175,16 @@ def adjust_blocker(
         .filter(ReservationBlocker.id == blocker_id)
         .one_or_none()
     )
-    if blocker is None or blocker.display_start() < sedate.utcnow():
+    if (
+        blocker is None
+        or blocker.display_start() < sedate.utcnow()
+        or not request.session.query(
+            blocker
+            .target_allocations()
+            .filter(Allocation.partly_available.is_(True))
+            .exists()
+        ).scalar()
+    ):
         return respond_with_error(
             request,
             _('Blocker not adjustable')

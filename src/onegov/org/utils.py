@@ -736,6 +736,7 @@ class AvailabilityEventInfo:
             ) if blockable else None,
             'partlyAvailable': self.allocation.partly_available,
             'fullyAvailable': self.allocation.availability == 100.0,
+            'wholeDay': self.allocation.whole_day,
             'kind': 'allocation',
         }
 

@@ -7327,7 +7327,7 @@ msgid "There are no future reservations"
 msgstr "Es gibt keine zukünftige Reservationen"
 
 msgid "Blocker not adjustable"
-msgstr "Dieser Sperrzeit kann nicht mehr angepasst werden"
+msgstr "Diese Sperrzeit kann nicht angepasst werden"
 
 msgid "Cannot move blocker into the past"
 msgstr "Eine Sperrzeit kann nicht in die Vergangenheit verschoben werden"
