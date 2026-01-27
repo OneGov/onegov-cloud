@@ -19,11 +19,13 @@ fetch(apiUrl)
             .nodeContent((node) => {
                 const hasLongWord = node.data.name.split(' ').some(word => word.length > 15);
                 const hyphenClass = hasLongWord ? ' hyphens' : '';
-                return `<div class="d3-orgchart-node ${hyphenClass}"
-                    style="width:${node.width}px;height:${node.height}px"
-                > 
-                    ${node.data.name}
-                </div>`;
+                return `
+                    <a href="${node.data.url}">
+                        <div class="d3-orgchart-node ${hyphenClass}" style="width:${node.width}px;height:${node.height}px">
+                            <span>${node.data.name}</span>
+                        </div>
+                    </a>
+                `;
             })
             .container('.chart-container').data(flattenedData).render();
     })

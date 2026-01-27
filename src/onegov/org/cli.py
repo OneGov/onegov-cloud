@@ -22,6 +22,7 @@ import requests
 import transaction
 import yaml
 
+from onegov.agency.upgrade import migrate_homepage_structure_for_agency
 from onegov.core.orm.utils import QueryChain
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
                                    TimerangeTooLong)
@@ -3306,3 +3307,21 @@ def check_forms(
                     fg='yellow' if notok_counter > 0 else 'green')
 
     return check_formcode
+
+
+@cli.command('migrate-agency', context_settings={'singular': True})
+@pass_group_context
+def migrate_agency(
+    group_context: GroupContext
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Migrates the database from an old agency to the new agency like in the
+    upgrades.
+
+    """
+
+    def migrate_to_new_agency(request: OrgRequest, app: OrgApp) -> None:
+        context: UpgradeContext = Bunch(session=app.session())  # type:ignore
+        migrate_theme_options(context)
+        migrate_homepage_structure_for_agency(context)
+
+    return migrate_to_new_agency

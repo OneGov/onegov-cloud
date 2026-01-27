@@ -1785,47 +1785,71 @@ a.category-anchor {
 }
 
 // D3 Org Chart customisations
-.d3-orgchart-node {
-    padding: 1rem;
-    font-weight: bold;
-    font-size: 1rem;
-    border: 2px solid rgba(0,0,0,0.04) !important;
-    border-radius: .7rem !important;
-    box-shadow: 0 0 17px 0 rgba(0,0,0,0.07);
-    color: #444;
-    transition: all 200ms linear;
-    background: white;
+.chart-container {
+    border: 1px solid $smoke;
+    border-radius: .7rem;
 
-    &.hyphens {
-        hyphens: auto;
+    .loading-info {
+        padding: 1rem;
+
+        .fa-spinner {
+            margin-right: 1rem;
+        }
     }
 
-    &:hover {
-        border: 2px solid $primary-color !important;
-    }
-}
-
-.node-button-div {
-    span {
-        font-size: .8rem !important;
+    &:has(svg) .loading-info {
+        display: none;
     }
 
-    > div {
-        padding: .5rem !important;
+    .d3-orgchart-node {
+        padding: .7rem 1rem;
+        font-weight: bold;
+        font-size: 1rem;
+        border: 2px solid rgba(0,0,0,0.04) !important;
+        border-radius: .7rem !important;
+        box-shadow: 0 0 17px 0 rgba(0,0,0,0.07);
+        color: #444;
         transition: all 200ms linear;
+        background: white;
+
+        span {
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            display: -webkit-box;
+        }
+
+        &.hyphens {
+            hyphens: auto;
+        }
+
+        &:hover {
+            border: 2px solid $primary-color !important;
+        }
     }
-}
 
-.node-button-g:hover .node-button-div {
-    span {
-        color: $primary-color !important;
+    .node-button-div {
+        span {
+            font-size: .8rem !important;
+        }
 
-        path {
-            stroke: $primary-color !important;
-       }
+        > div {
+            padding: .5rem !important;
+            transition: all 200ms linear;
+        }
     }
 
-    > div {
-        border: 2px solid $primary-color !important;
+    .node-button-g:hover .node-button-div {
+        span {
+            color: $primary-color !important;
+
+            path {
+                stroke: $primary-color !important;
+            }
+        }
+
+        > div {
+            border: 2px solid $primary-color !important;
+        }
     }
 }

@@ -4,6 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
+import textwrap
 from markupsafe import Markup
 from onegov.core.upgrade import upgrade_task
 from onegov.core.upgrade import UpgradeContext
@@ -53,3 +54,44 @@ def replace_removed_export_fields(context: UpgradeContext) -> None:
                     *export_fields[idx + 1:]
                 ]
                 agency.meta['export_fields'] = export_fields
+
+
+@upgrade_task('Add structure for foundation layout')
+def migrate_homepage_structure_for_agency(context: UpgradeContext) -> None:
+    org = context.session.query(Organisation).first()
+
+    if org is None:
+        return
+
+    org.meta['homepage_structure'] = textwrap.dedent("""\
+    <row-wide bgcolor="gray">
+        <column span="12">
+            <row class="columns">
+                <column span="4">
+                    <icon_link
+                        icon="fa-user"
+                        title="Alle Personen"
+                        link="./people"
+                        text="Personen"
+                    />
+                </column>
+                <column span="4">
+                    <icon_link
+                        icon="fa-briefcase"
+                        link="./organizations"
+                        title="Alle Organisationen"
+                        text="Organisationen"
+                    />
+                </column>
+                <column span="4">
+                    <icon_link
+                        icon="fa-folder-open"
+                        link="./organizations/pdf"
+                        title="Staatskalender"
+                        text="PDF-Ausdruck inklusive Inhaltsverzeichnis"
+                    />
+                </column>
+            </row>
+        </column>
+    </row-wide>
+    """)

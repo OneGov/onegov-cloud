@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-15 14:35+0100\n"
+"POT-Creation-Date: 2026-01-21 15:30+0100\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -368,6 +368,9 @@ msgstr "Organisationen als interaktives Diagramm anzeigen"
 
 msgid "Back to list view"
 msgstr "Zurück zur Listenansicht"
+
+msgid "Loading agencies..."
+msgstr "Organisationen werden geladen ..."
 
 msgid "Export this agency and its children as a PDF"
 msgstr "Organisation als PDF speichern"

@@ -158,6 +158,7 @@ ul.agency-nav {
         &::before {
             @include icon-bold($chevron-down);
             color: $anchor-font-color;
+            margin-right: .5rem;
         }
 
         &.active::before {
