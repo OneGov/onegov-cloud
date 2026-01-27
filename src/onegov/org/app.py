@@ -12,7 +12,7 @@ from more.content_security import SELF
 from more.content_security import NONE
 from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework, utils
-from onegov.core.framework import default_content_security_policy
+from onegov.core.framework import default_content_security_policy, model_predicate
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm.cache import orm_cached, request_cached
 from onegov.core.templates import PageTemplate, render_template
@@ -24,6 +24,7 @@ from onegov.org import _, directives
 from onegov.org.auth import MTANAuth
 from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.initial_content import create_new_organisation
+from onegov.org.layout import Layout, DefaultLayout
 from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
@@ -69,7 +70,6 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
     event_search_widget = directive(directives.EventSearchWidgetAction)
     settings_view = directive(directives.SettingsView)
     boardlet = directive(directives.Boardlet)
-    layout = directive(directives.Layout)
 
     #: cronjob settings
     send_ticket_statistics = True
@@ -492,6 +492,12 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         return URL(request.link(dashboard)).path()
 
 
+@OrgApp.predicate_fallback(OrgApp.get_layout_class, model_predicate)
+def model_not_found(self, model: object) -> type[Layout]:
+    print('*** tschupre using DEFAULTLAYOUT ORG for model', model)
+    return DefaultLayout
+
+
 @OrgApp.webasset_path()
 def get_shared_assets_path() -> str:
     return utils.module_path('onegov.shared', 'assets/js')
@@ -499,7 +505,7 @@ def get_shared_assets_path() -> str:
 
 @OrgApp.setting(section='i18n', name='locales')
 def get_i18n_used_locales() -> set[str]:
-    return {'de_CH', 'fr_CH'}
+    return {'de_CH', 'fr_CH', 'it_CH'}
 
 
 @OrgApp.setting(section='i18n', name='localedirs')

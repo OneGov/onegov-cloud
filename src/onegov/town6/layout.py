@@ -3,6 +3,7 @@ from __future__ import annotations
 import secrets
 from functools import cached_property
 
+from onegov.core import Framework
 from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
 from onegov.core.static import StaticFile
 from onegov.core.utils import append_query_param, to_html_ul
@@ -288,7 +289,6 @@ class SettingsLayout(OrgSettingsLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=Topic)
 class PageLayout(OrgTopicLayout, AdjacencyListLayout):
 
     app: TownApp
@@ -301,7 +301,6 @@ class PageLayout(OrgTopicLayout, AdjacencyListLayout):
         )
 
 
-@TownApp.layout(model=News)
 class NewsLayout(OrgNewsLayout, AdjacencyListLayout):
 
     app: TownApp
@@ -416,7 +415,6 @@ class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=FormDefinition)
 class FormDefinitionLayout(OrgFormDefinitionLayout, DefaultLayout):
 
     app: TownApp
@@ -442,7 +440,6 @@ class PersonCollectionLayout(OrgPersonCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=Person)
 class PersonLayout(OrgPersonLayout, DefaultLayout):
 
     app: TownApp
@@ -461,7 +458,6 @@ class ArchivedTicketsLayout(OrgArchivedTicketsLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=Ticket)
 class TicketLayout(OrgTicketLayout, DefaultLayout):
 
     app: TownApp
@@ -574,7 +570,6 @@ class ResourceRecipientsFormLayout(
     request: TownRequest
 
 
-@TownApp.layout(model=Resource)
 class ResourceLayout(OrgResourceLayout, DefaultLayout):
 
     app: TownApp
@@ -655,7 +650,6 @@ class OccurrencesLayout(OrgOccurrencesLayout, DefaultLayout):
         return links
 
 
-@TownApp.layout(model=Occurrence)
 class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
 
     app: TownApp
@@ -686,7 +680,6 @@ class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
     cls_before='EventLayout',
     cls_after='TicketChatMessageLayout'
 )
-@TownApp.layout(model=Event)
 class EventLayout(StepsLayoutExtension, OrgEventLayout, DefaultLayout):
 
     app: TownApp
@@ -727,7 +720,6 @@ class ImageSetCollectionLayout(OrgImageSetCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=ImageSet)
 class ImageSetLayout(OrgImageSetLayout, DefaultLayout):
 
     app: TownApp
@@ -740,7 +732,6 @@ class UserManagementLayout(OrgUserManagementLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=User)
 class UserLayout(OrgUserLayout, DefaultLayout):
 
     app: TownApp
@@ -798,7 +789,6 @@ class DirectoryCollectionLayout(OrgDirectoryCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=Directory)
 class DirectoryLayout(OrgDirectoryLayout, DefaultLayout):
 
     app: TownApp
@@ -932,7 +922,6 @@ class DirectoryEntryCollectionLayout(
 
 
 @step_sequences.registered_step(1, _('Form'), cls_after='FormSubmissionLayout')
-@TownApp.layout(model=DirectoryEntry)
 class DirectoryEntryLayout(
     StepsLayoutExtension,
     OrgDirectoryEntryLayout,
@@ -968,7 +957,6 @@ class DashboardLayout(OrgDashboardLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=GeneralFile)
 class GeneralFileCollectionLayout(DefaultLayout):
 
     def __init__(self, model: Any, request: TownRequest) -> None:
@@ -1146,7 +1134,6 @@ class MeetingCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=Meeting)
 class MeetingLayout(DefaultLayout):
 
     @cached_property
@@ -1216,7 +1203,6 @@ class MeetingLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=MeetingItem)
 class MeetingItemLayout(DefaultLayout):
 
     @cached_property
@@ -1275,7 +1261,6 @@ class RISParliamentarianCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=RISParliamentarian)
 class RISParliamentarianLayout(DefaultLayout):
 
     @cached_property
@@ -1457,7 +1442,6 @@ class RISParliamentaryGroupCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=RISParliamentaryGroup)
 class RISParliamentaryGroupLayout(DefaultLayout):
 
     @cached_property
@@ -1593,7 +1577,6 @@ class RISCommissionCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=RISCommission)
 class RISCommissionLayout(DefaultLayout):
 
     @cached_property
@@ -1686,7 +1669,21 @@ class PoliticalBusinessCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=PoliticalBusiness)
+def register_layout_for(model):
+    def decorator(cls):
+        @TownApp.get_layout_class.register(model=model)
+        def _factory(self, model: object):
+            print(f'*** tschupre matched! Returning {cls.__name} for {model}')
+            return cls
+
+        # Debug: verify registration happened
+        print(f'*** tschupre registered {cls.__name__} for {model}')
+
+        return cls
+    return decorator
+
+
+@register_layout_for(PoliticalBusiness)
 class PoliticalBusinessLayout(DefaultLayout):
 
     @cached_property

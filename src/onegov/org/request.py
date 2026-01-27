@@ -289,16 +289,6 @@ class OrgRequest(CoreRequest):
         """
         Get the registered layout for a model instance.
         """
-        layout_registry = self.app.config.layout_registry
-        model_type = model if isinstance(model, type) else type(model)
-
-        layout_class = None
-        for cls in model_type.mro():
-            layout_class = layout_registry.get(cls)
-            if layout_class:
-                break
-
-        if layout_class is None:
-            layout_class = DefaultLayout
-
+        layout_class = self.app.get_layout_class(model)
+        assert layout_class is not None
         return layout_class(model, self)

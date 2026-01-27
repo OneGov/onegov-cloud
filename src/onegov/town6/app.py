@@ -6,7 +6,8 @@ import pytz
 from sedate import replace_timezone
 
 from onegov.api import ApiApp
-from onegov.core import utils
+from onegov.core import utils, Framework
+from onegov.core.framework import model_predicate
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.templates import render_template
 from onegov.core.utils import module_path
@@ -30,6 +31,7 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.org.exceptions import MTANAccessLimitExceeded
     from onegov.org.models import Organisation
+    from onegov.town6.layout import Layout, DefaultLayout
     from onegov.town6.request import TownRequest
 
 
@@ -76,6 +78,13 @@ class TownApp(OrgApp, FoundationApp, ApiApp):
         return False
 
 
+@TownApp.predicate_fallback(TownApp.get_layout_class, model_predicate)
+def model_not_found(self, model: object) -> type[Layout]:
+    print('*** tschupre using DEFAULTLAYOUT TOWN6 for model', model)
+    from onegov.town6.layout import DefaultLayout
+    return DefaultLayout
+
+
 @TownApp.webasset_path()
 def get_shared_assets_path() -> str:
     return utils.module_path('onegov.shared', 'assets/js')
@@ -105,7 +114,7 @@ def get_theme() -> TownTheme:
 
 @TownApp.setting(section='i18n', name='locales')
 def get_i18n_used_locales() -> set[str]:
-    return {'de_CH', 'fr_CH'}
+    return {'de_CH', 'fr_CH', 'it_CH'}
 
 
 @TownApp.setting(section='i18n', name='localedirs')
