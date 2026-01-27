@@ -148,17 +148,23 @@ class EditorTranslatorForm(Form, FormChoicesMixin):
         validators=[Optional()]
     )
 
+    contract_number = StringField(
+        label=_('Contract Number'), validators=[Optional()]
+    )
+
     def update_model(self, model: Translator) -> None:
         model.pers_id = self.pers_id.data or None
+        model.contract_number = self.contract_number.data or None
 
 
 class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     request: TranslatorAppRequest
 
-    pers_id = IntegerField(
-        label=_('Personal ID'),
-        validators=[Optional()]
+    pers_id = IntegerField(label=_('Personal ID'), validators=[Optional()])
+
+    contract_number = StringField(
+        label=_('Contract Number'), validators=[Optional()]
     )
 
     admission = RadioField(
@@ -529,6 +535,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         model.last_name = self.last_name.data
         model.iban = self.iban.data
         model.pers_id = self.pers_id.data or None
+        model.contract_number = self.contract_number.data or None
         model.admission = self.admission.data
         model.withholding_tax = self.withholding_tax.data
         model.self_employed = self.self_employed.data

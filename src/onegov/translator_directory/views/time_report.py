@@ -357,9 +357,11 @@ def generate_accounting_export_rows(
 
     for report in reports:
         translator = report.translator
-        # the view has checked for missing pers_id before
+        # the view has checked for missing pers_id/contract_number before
         assert translator.pers_id is not None
+        assert translator.contract_number is not None
         pers_nr = str(translator.pers_id)
+        contract_nr = translator.contract_number
         date_str = report.assignment_date.strftime('%d.%m.%Y')
 
         duration_hours, effective_rate, _ = calculate_accounting_values(report)
@@ -391,7 +393,7 @@ def generate_accounting_export_rows(
             '0',
             '0',
             '0',
-            '1',
+            contract_nr,
             '0',
             '',
             '0',
@@ -428,7 +430,7 @@ def generate_accounting_export_rows(
                 '0',
                 '0',
                 '0',
-                '1',
+                contract_nr,
                 '0',
                 '',
                 '0',
@@ -465,7 +467,7 @@ def generate_accounting_export_rows(
                 '0',
                 '0',
                 '0',
-                '1',
+                contract_nr,
                 '0',
                 '',
                 '0',
@@ -527,6 +529,23 @@ def export_accounting_csv(
             _(
                 'Cannot export: The following translators are missing '
                 'a personnel number (Personal-Nr.): ${names}',
+                mapping={'names': translator_names},
+            ),
+            'warning',
+        )
+        return request.redirect(request.link(self))
+
+    missing_contract_nr = [
+        r for r in confirmed_reports if not r.translator.contract_number
+    ]
+    if missing_contract_nr:
+        translator_names = ', '.join(
+            r.translator.title for r in missing_contract_nr
+        )
+        request.message(
+            _(
+                'Cannot export: The following translators are missing '
+                'a contract number (Vertragsnummer): ${names}',
                 mapping={'names': translator_names},
             ),
             'warning',
