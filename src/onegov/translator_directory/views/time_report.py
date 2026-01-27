@@ -357,11 +357,10 @@ def generate_accounting_export_rows(
 
     for report in reports:
         translator = report.translator
-        # the view has checked for missing pers_id/contract_number before
+        # the view has checked for missing pers_id before
         assert translator.pers_id is not None
-        assert translator.contract_number is not None
         pers_nr = str(translator.pers_id)
-        contract_nr = translator.contract_number
+        contract_nr = translator.contract_number or ''
         date_str = report.assignment_date.strftime('%d.%m.%Y')
 
         duration_hours, effective_rate, _ = calculate_accounting_values(report)
@@ -544,13 +543,12 @@ def export_accounting_csv(
         )
         request.message(
             _(
-                'Cannot export: The following translators are missing '
+                'Export warning: The following translators are missing '
                 'a contract number (Vertragsnummer): ${names}',
                 mapping={'names': translator_names},
             ),
             'warning',
         )
-        return request.redirect(request.link(self))
 
     output = StringIO()
     writer = csv.writer(output, delimiter=';')
