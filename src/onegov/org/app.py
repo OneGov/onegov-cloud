@@ -498,7 +498,7 @@ def get_shared_assets_path() -> str:
 
 @OrgApp.setting(section='i18n', name='locales')
 def get_i18n_used_locales() -> set[str]:
-    return {'de_CH', 'fr_CH'}
+    return {'de_CH', 'fr_CH', 'it_CH'}
 
 
 @OrgApp.setting(section='i18n', name='localedirs')
@@ -565,22 +565,15 @@ def org_content_security_policy() -> ContentSecurityPolicy:
 
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://checkout.stripe.com')
-    policy.connect_src.add('https://*.google-analytics.com')
-    policy.connect_src.add('https://stats.g.doubleclick.net')
     policy.connect_src.add('https://map.geo.bs.ch')
     policy.connect_src.add('https://wmts.geo.bs.ch')
     policy.connect_src.add('https://maps.zg.ch')
     policy.connect_src.add('https://api.mapbox.com')
-    policy.connect_src.add('https://stats.seantis.ch')
-    policy.connect_src.add('https://analytics.seantis.ch')
     policy.connect_src.add('https://geodesy.geo.admin.ch')
     policy.connect_src.add('https://wms.geo.admin.ch/')
 
-    policy.connect_src.add('https://*.projuventute.ch')
+    # FIXME: which one do we need this for?
     policy.connect_src.add('https://cdn.jsdelivr.net')
-    policy.connect_src.add('https://*.usercentrics.eu')
-
-    policy.script_src.add('https:')
 
     return policy
 
@@ -678,6 +671,7 @@ def get_render_mtan_access_limit_exceeded(
     return render_mtan_access_limit_exceeded
 
 
+# FIXME: It might be a little more robust to override apply_policy instead
 @OrgApp.tween_factory(under=content_security_policy_tween_factory)
 def enable_iframes_tween_factory(
     app: OrgApp,

@@ -15,3 +15,5 @@ else:
 
     class unaccent(ReturnTypeFromArgs):  # noqa: N801
         """ Produce an UNACCENT expression. """
+
+        inherit_cache = True

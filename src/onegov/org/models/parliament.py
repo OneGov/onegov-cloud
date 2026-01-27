@@ -141,10 +141,12 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
         return f'{self.last_name} {self.first_name}'
 
     #: political businesses participations [0..n]
-    political_businesses: relationship[list[PoliticalBusinessParticipation]]
-    political_businesses = relationship(
-        'PoliticalBusinessParticipation',
-        back_populates='parliamentarian',
+    political_businesses: (
+        relationship)[list[PoliticalBusinessParticipation]] = (
+        relationship(
+            'PoliticalBusinessParticipation',
+            back_populates='parliamentarian',
+        )
     )
 
     @hybrid_property
@@ -237,12 +239,11 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
     def fts_last_change(self) -> None:
         return None
 
-    political_businesses: relationship[list[PoliticalBusiness]]
-    political_businesses = relationship(
+    political_businesses: relationship[list[PoliticalBusiness]] = relationship(
         'PoliticalBusiness',
         secondary=par_political_business_parliamentary_groups,
         back_populates='parliamentary_groups',
-        passive_deletes=True
+        passive_deletes=True,
     )
 
 

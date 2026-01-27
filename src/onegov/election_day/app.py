@@ -5,14 +5,11 @@ import re
 from dectate import directive
 from more.content_security import NONE
 from more.content_security import SELF
-from more.content_security import UNSAFE_EVAL
-from more.content_security import UNSAFE_INLINE
 from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework
 from onegov.core import utils
 from onegov.core.filestorage import FilestorageFile
 from onegov.core.framework import current_language_tween_factory
-from onegov.core.framework import default_content_security_policy
 from onegov.core.framework import transaction_tween_factory
 from onegov.election_day.directives import CsvFileAction
 from onegov.election_day.directives import JsonFileAction
@@ -35,7 +32,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Iterator
-    from more.content_security import ContentSecurityPolicy
     from onegov.core.cache import RedisCacheRegion
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
@@ -158,14 +154,6 @@ def get_i18n_used_locales() -> set[str]:
 @ElectionDayApp.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale() -> str:
     return 'de_CH'
-
-
-@ElectionDayApp.setting(section='content_security_policy', name='default')
-def org_content_security_policy() -> ContentSecurityPolicy:
-    policy = default_content_security_policy()
-    policy.script_src.remove(UNSAFE_EVAL)
-    policy.script_src.remove(UNSAFE_INLINE)
-    return policy
 
 
 @ElectionDayApp.tween_factory(under=content_security_policy_tween_factory)

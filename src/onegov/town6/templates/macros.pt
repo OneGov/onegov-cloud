@@ -1567,7 +1567,7 @@
     <div class="occurrence subpage-cards medium-12 small-12 cell" tal:define="use_links use_links|True">
         <div class="card">
             <a href="${use_links and request.link(occurrence)}">
-                <div class="show-for-small-only" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: cover;"></div>
+                <div class="show-for-small-only" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: contain; background-position: center center; background-repeat: no-repeat;"></div>
                 <div class="grid-x align-middle">
                     <div class="cell medium-7 card-section">
                         <h5>${occurrence.title}</h5>
@@ -1626,7 +1626,7 @@
                         </tal:b>
                     </div>
                     <div class="cell medium-5 align-self-top">
-                        <div class="show-for-medium" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: cover; border-radius: 0 .7rem;"></div>
+                        <div class="show-for-medium" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: contain; background-position: center center; background-repeat: no-repeat; border-radius: 0 .7rem;"></div>
                         <span class="button hollow event-more-link" style="margin: 1.5rem 1rem 1.5rem 0.7rem; display: block;" i18n:translate="">Learn more</span>
                     </div>
                 </div>
@@ -2457,6 +2457,8 @@
 </metal:resource_subgroup>
 
 <metal:file_details define-macro="file-details" i18n:domain="onegov.town6">
+    <!--! FIXME: Make this work without ic-on-success -->
+    <?python request.require_unsafe_eval() ?>
     <div class="file-details">
         <a class="file-preview" href="${request.link(file)}" tal:condition="extension == 'pdf'">
             <img class="pdf-preview" src="${request.link(file, name='medium')}">
@@ -2792,6 +2794,8 @@
 </metal:signature_status>
 
 <metal:file_info define-macro="file-info" i18n:domain="onegov.town6">
+    <!--! FIXME: Make file-details work without ic-on-success -->
+    <?python request.require_unsafe_eval() ?>
     <tal:b define="
         file_number file.number|file.id;
         file_upload file.upload_date|file.created;
@@ -2831,6 +2835,8 @@
 </metal:file_info>
 
 <metal:uploaded_image define-macro="uploaded_image" i18n:domain="onegov.town6">
+    <!--! FIXME: Make this work without ic-on-success -->
+    <?python request.require_unsafe_eval() ?>
     <div id="image-${index}" class="image-container">
         <a href="${image.url}" tal:condition="image" class="editable-alt" data-note-update-url="${image.extra}">
             <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt" alt="${image.alt}" width="${image.width}" height="${image.height}" />

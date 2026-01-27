@@ -121,10 +121,11 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     )
 
     #: the registration window linked with this submission
-    registration_window: relationship[FormRegistrationWindow | None]
-    registration_window = relationship(
-        'FormRegistrationWindow',
-        back_populates='submissions'
+    registration_window: relationship[FormRegistrationWindow | None] = (
+        relationship(
+            'FormRegistrationWindow',
+            back_populates='submissions'
+        )
     )
 
     #: payment options -> copied from the definition at the moment of
@@ -241,13 +242,14 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
 
         @registration_state.expression  # type:ignore[no-redef]
         def registration_state(cls):
-            return case((
+            return case(
                 (cls.spots == 0, None),
                 (cls.claimed == None, 'open'),
                 (cls.claimed == 0, 'cancelled'),
                 (cls.claimed == cls.spots, 'confirmed'),
-                (cls.claimed < cls.spots, 'partial')
-            ), else_=None)
+                (cls.claimed < cls.spots, 'partial'),
+                else_=None
+            )
 
     @property
     def payable_reference(self) -> str:
@@ -372,10 +374,11 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
     )
 
     #: the submission window linked with this submission
-    submission_window: relationship[SurveySubmissionWindow | None]
-    submission_window = relationship(
-        'SurveySubmissionWindow',
-        back_populates='submissions'
+    submission_window: relationship[SurveySubmissionWindow | None] = (
+        relationship(
+            'SurveySubmissionWindow',
+            back_populates='submissions'
+        )
     )
 
     #: extensions

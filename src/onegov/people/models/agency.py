@@ -123,13 +123,14 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     #: a reference to the organization chart
     organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
 
-    memberships: relationship[AppenderQuery[AgencyMembership]]
-    memberships = relationship(
-        AgencyMembership,
-        back_populates='agency',
-        cascade='all, delete-orphan',
-        lazy='dynamic',
-        order_by='AgencyMembership.order_within_agency'
+    memberships: relationship[AppenderQuery[AgencyMembership]] = (
+        relationship(
+            AgencyMembership,
+            back_populates='agency',
+            cascade='all, delete-orphan',
+            lazy='dynamic',
+            order_by='AgencyMembership.order_within_agency'
+        )
     )
 
     if TYPE_CHECKING:

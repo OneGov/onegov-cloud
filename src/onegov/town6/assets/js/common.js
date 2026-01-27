@@ -148,7 +148,7 @@ var processCommonNodes = function(elements, out_of_band) {
         var target = $(e.target);
         var checked = target.is(':checked');
 
-        target.closest('.image-box').toggleClass('selected', checked);
+        target.closest('.image-container').toggleClass('selected', checked);
     });
 };
 

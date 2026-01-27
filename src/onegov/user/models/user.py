@@ -3,7 +3,7 @@ from __future__ import annotations
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import data_property, dict_property, TimestampMixin
-from onegov.core.orm.types import JSON, UUID, LowercaseText
+from onegov.core.orm.types import JSON, UUID, LowercaseText, UTCDateTime
 from onegov.core.security import forget, remembered
 from onegov.core.utils import is_valid_yubikey_format
 from onegov.core.utils import remove_repeated_dots
@@ -11,7 +11,7 @@ from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
 from onegov.user.i18n import _
-from onegov.user.models.group import UserGroup, group_association_table
+from onegov.user.models.group import UserGroup
 from sedate import utcnow
 from sqlalchemy import Boolean, Column, Index, Text, func
 from sqlalchemy import UniqueConstraint
@@ -23,16 +23,27 @@ from uuid import uuid4, UUID as UUIDType
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from datetime import datetime
     from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
     from onegov.core.types import AppenderQuery
     from onegov.user import RoleMapping
+    from sqlalchemy import Table
     from typing_extensions import TypedDict
 
     class SessionDict(TypedDict):
         address: str | None
         timestamp: str
         agent: str | None
+
+    # HACK: We experienced flaky behavior with mypy when importing this
+    #       symbol normally, so for now we'll just declare what this
+    #       symbol is, so it doesn't have to retrieved from the other module
+    #       eventually we can hopefully get rid of this again and just
+    #       import normally.
+    group_association_table: Table
+else:
+    from onegov.user.models.group import group_association_table
 
 
 class User(Base, TimestampMixin, ORMSearchable):
@@ -156,6 +167,11 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     #: true if the user is active
     active: Column[bool] = Column(Boolean, nullable=False, default=True)
+
+    #: timestamp of the last successful login
+    last_login: Column[datetime | None] = Column(
+        UTCDateTime, nullable=True, default=None
+    )
 
     #: the signup token used by the user
     signup_token: Column[str | None] = Column(

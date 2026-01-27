@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from onegov.core.upgrade import upgrade_task
-from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.types import JSON, UUID, UTCDateTime
 from onegov.user import User, UserCollection
 from sqlalchemy import Boolean, Column, Text
 from sqlalchemy.sql import text
@@ -301,3 +301,38 @@ def move_group_id_to_association_table(context: UpgradeContext) -> None:
 
     context.session.flush()
     context.operations.drop_column('users', 'group_id')
+
+
+@upgrade_task('Add last_login column')
+def add_last_login_column(context: UpgradeContext) -> None:
+    if not context.has_table('users'):
+        return
+
+    if not context.has_column('users', 'last_login'):
+        context.operations.add_column(
+            'users', Column('last_login', UTCDateTime, nullable=True)
+        )
+
+        # Pre-populate last_login from existing session data
+        context.operations.execute(
+            """
+            UPDATE users
+            SET last_login = subquery.max_timestamp::timestamp
+            FROM (
+                SELECT
+                    id,
+                    MAX(
+                        (session_value->>'timestamp')::timestamp
+                    ) as max_timestamp
+                FROM
+                    users,
+                    LATERAL jsonb_each(data->'sessions')
+                        AS session_entries(session_key, session_value)
+                WHERE
+                    data->'sessions' IS NOT NULL
+                    AND jsonb_typeof(data->'sessions') = 'object'
+                GROUP BY id
+            ) AS subquery
+            WHERE users.id = subquery.id;
+        """
+        )

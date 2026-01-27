@@ -316,18 +316,22 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     picture = NamedFile()
 
     #: A parliamentarian may have n roles
-    roles: relationship[list[ParliamentarianRole]]
-    roles = relationship(
-        'ParliamentarianRole',
-        cascade='all, delete-orphan',
-        back_populates='parliamentarian',
-        order_by='desc(ParliamentarianRole.start)',
+    roles: relationship[list[ParliamentarianRole]] = (
+        relationship(
+            'ParliamentarianRole',
+            cascade='all, delete-orphan',
+            back_populates='parliamentarian',
+            order_by='desc(ParliamentarianRole.start)',
+        )
     )
 
     #: A parliamentarian's interest ties
     interests: dict_property[dict[str, Any]] = content_property(default=dict)
 
-    @hybrid_property
+    if TYPE_CHECKING:
+        active: Column[bool]
+
+    @hybrid_property  # type: ignore[no-redef]
     def active(self) -> bool:
         if not self.roles and not self.commission_memberships:
             return True
@@ -397,11 +401,12 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         return False
 
     #: A parliamentarian may be part of n commissions
-    commission_memberships: relationship[list[CommissionMembership]]
-    commission_memberships = relationship(
-        'CommissionMembership',
-        cascade='all, delete-orphan',
-        back_populates='parliamentarian',
+    commission_memberships: relationship[list[CommissionMembership]] = (
+        relationship(
+            'CommissionMembership',
+            cascade='all, delete-orphan',
+            back_populates='parliamentarian',
+        )
     )
 
     def __repr__(self) -> str:

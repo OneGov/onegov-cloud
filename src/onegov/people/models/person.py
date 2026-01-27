@@ -180,12 +180,13 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: some remarks about the person
     notes: Column[str | None] = Column(Text, nullable=True)
 
-    memberships: relationship[AppenderQuery[AgencyMembership]]
-    memberships = relationship(
-        AgencyMembership,
-        back_populates='person',
-        cascade='all, delete-orphan',
-        lazy='dynamic',
+    memberships: relationship[AppenderQuery[AgencyMembership]] = (
+        relationship(
+            AgencyMembership,
+            back_populates='person',
+            cascade='all, delete-orphan',
+            lazy='dynamic',
+        )
     )
 
     def vcard_object(

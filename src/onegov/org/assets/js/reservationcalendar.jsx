@@ -748,8 +748,6 @@ rc.renderPartitions = function(event, element, view) {
     }
 
     var calendar = view.calendar;
-    var free = _.template('<div style="height:<%= height %>%;" class="partition-free"></div>');
-    var used = _.template('<div style="height:<%= height %>%;" class="partition-occupied"></div>');
 
     // build the individual partitions
     var event_partitions = rc.adjustPartitions(
@@ -762,9 +760,9 @@ rc.renderPartitions = function(event, element, view) {
     _.each(event_partitions, function(partition) {
         var reserved = partition[1];
         if (reserved === false) {
-            partitions += free({height: partition[0]});
+            partitions += '<div style="height:'+partition[0]+'%;" class="partition-free"></div>';
         } else {
-            partitions += used({height: partition[0]});
+            partitions += '<div style="height:'+partition[0]+'%;" class="partition-occupied"></div>';
         }
     });
 

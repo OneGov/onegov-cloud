@@ -6,10 +6,17 @@ from datetime import date, datetime, time, UTC
 from decimal import Decimal
 from onegov.core.custom import msgpack
 from onegov.core.i18n.translation_string import TranslationMarkup
+from onegov.core.orm import ModelBase, SessionManager
 from markupsafe import Markup
+from sqlalchemy import Column, Integer, Text
+from sqlalchemy.ext.declarative import declarative_base
 from translationstring import TranslationString
-from typing import NamedTuple
 from uuid import uuid4
+
+
+from typing import NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import Base  # noqa: F401
 
 
 class Point:
@@ -72,6 +79,29 @@ def test_custom_msgpack() -> None:
 ])
 def test_roundtrip(data: object) -> None:
     assert msgpack.unpackb(msgpack.packb(data)) == data
+
+
+def test_sqlalchemy_row_roundtrip(postgres_dsn: str) -> None:
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
+
+    class Document(Base):
+        __tablename__ = 'documents'
+        id: Column[int] = Column(Integer, primary_key=True)
+        body: Column[str | None] = Column(Text, nullable=True)
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('msgpack')
+    session = mgr.session()
+    doc = Document(id=1, body='test')
+    session.add(doc)
+    session.flush()
+
+    result = session.query(Document.id, Document.body).one()
+    roundtripped = msgpack.unpackb(msgpack.packb(result))
+    assert result == roundtripped
+    assert result._asdict() == roundtripped._asdict()
 
 
 def test_not_serializable() -> None:

@@ -2,23 +2,19 @@ from __future__ import annotations
 
 import json
 import os
-from uuid import uuid4
-
+import pytest
 import re
 import tempfile
 import textwrap
-
-import pytest
 import transaction
 import warnings
 
 from base64 import b64decode
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from decimal import Decimal
 from freezegun import freeze_time
 from io import BytesIO
 from libres.db.models import Reservation
-
 from onegov.core.utils import module_path, normalize_for_url
 from onegov.file import FileCollection
 from onegov.form import FormSubmission
@@ -34,10 +30,12 @@ from sqlalchemy import exc
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared.utils import add_reservation
 from unittest.mock import patch
+from urllib.parse import quote
+from uuid import uuid4
 from webtest import Upload
 
-from typing import TYPE_CHECKING
 
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from unittest.mock import MagicMock
     from .conftest import Client
@@ -1089,6 +1087,66 @@ def test_auto_accept_reservations(client: Client) -> None:
     assert 'You can pick it up at the counter' in page
 
 
+@freeze_time("2015-08-28", tick=True)
+def test_blocker_views(client: Client) -> None:
+    # prepare the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.definition = 'Note = ___'
+    resource.pick_up = 'You can pick it up at the counter'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 29), datetime(2015, 8, 29)),
+        whole_day=True,
+        partly_available=True
+    )
+
+    add_blocker = client.bound_add_blocker(allocations[0])
+    transaction.commit()
+
+    client.login_admin()
+
+    # create a blocker
+    result = add_blocker(whole_day=True, reason='Cleaning')
+    assert result.json == {'success': True}
+
+    blocker = scheduler.managed_blockers().one()
+    assert blocker.reason == 'Cleaning'
+
+    # change the reason
+    client.post(
+        f'/reservation-blocker/{blocker.resource}/{blocker.id}/set-reason'
+        f'?blocker-id={blocker.id}&reason=No+reason'
+        f'&csrf-token={client.csrf_token}'
+    )
+
+    blocker = scheduler.managed_blockers().one()
+    assert blocker.reason == 'No reason'
+
+    # adjust the time
+    new_start = blocker.display_start() + timedelta(hours=1)
+    new_end = blocker.display_end() - timedelta(hours=1)
+    result = client.post(
+        f'/reservation-blocker/{blocker.resource}/{blocker.id}/adjust'
+        f'?blocker-id={blocker.id}&start={quote(new_start.isoformat())}'
+        f'&end={quote(new_end.isoformat())}&csrf-token={client.csrf_token}'
+    )
+    assert result.json == {'success': True}
+
+    blocker = scheduler.managed_blockers().one()
+    assert blocker.display_start() == new_start
+    assert blocker.display_end() == new_end
+
+    # delete the blocker
+    client.delete(
+        f'/reservation-blocker/{blocker.resource}/{blocker.id}'
+        f'?csrf-token={client.csrf_token}'
+    )
+    assert scheduler.managed_blockers().one_or_none() is None
+
+
 @pytest.mark.parametrize(
     'reject_type', ['reject-all', 'reject-all-with-message']
 )
@@ -1415,7 +1473,8 @@ def test_reserve_allocation_change_email(client: Client) -> None:
         'new@example.org')
 
 
-@freeze_time("2015-08-28", tick=True)
+# NOTE: We're at UTC+2 in summertime in Europe/Zurich
+@freeze_time("2015-08-28 07:15:00", tick=True)
 def test_reserve_allocation_adjustment_pre_acceptance(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
@@ -1424,7 +1483,7 @@ def test_reserve_allocation_adjustment_pre_acceptance(client: Client) -> None:
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
-        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        dates=(datetime(2015, 8, 28, 9), datetime(2015, 8, 28, 13)),
         whole_day=False,
         partly_available=True
     )
@@ -1456,9 +1515,15 @@ def test_reserve_allocation_adjustment_pre_acceptance(client: Client) -> None:
 
     # try an invalid adjustment
     adjust = ticket.click('Anpassen', index=0)
-    adjust.form['start_time'] = '09:00'
+    adjust.form['end_time'] = '13:05'
     adjust = adjust.form.submit()
     assert 'Zeitraum liegt ausserhalb' in adjust
+
+    # try another invalid adjustment
+    adjust.form['start_time'] = '09:00'
+    adjust.form['end_time'] = '12:00'
+    adjust = adjust.form.submit()
+    assert 'kann nicht in die Vergangenheit verschoben werden' in adjust
 
     # adjust it (valid this time)
     adjust.form['start_time'] = '10:00'
@@ -1479,7 +1544,9 @@ def test_reserve_allocation_adjustment_pre_acceptance(client: Client) -> None:
     # see if the slots are partitioned correctly
     url = '/resource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
     slots = client.get(url).json
-    assert slots[0]['partitions'] == [[25.0, True], [75.0, False]]
+    assert slots[0]['partitions'] == [
+        [25.0, False], [25.0, True], [50.0, False]
+    ]
 
 
 @freeze_time("2015-08-28", tick=True)
@@ -1524,8 +1591,21 @@ def test_reserve_allocation_adjustment_post_acceptance(client: Client) -> None:
     # accept it
     ticket = ticket.click('Alle Reservationen annehmen').follow()
 
-    # it can't be adjusted
-    assert 'Anpassen' not in ticket
+    # it can still be adjusted
+    assert 'Anpassen' in ticket
+    adjust = ticket.click('Anpassen', index=0)
+    # but there is a warning
+    assert 'Diese Reservation wurde bereits angenommen' in adjust
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '11:00'
+    ticket = adjust.form.submit().follow()
+    assert "10:00" in ticket
+    assert "11:00" in ticket
+
+    # see if the slots are partitioned correctly
+    url = '/resource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
+    slots = client.get(url).json
+    assert slots[0]['partitions'] == [[25.0, True], [75.0, False]]
 
 
 @freeze_time("2015-08-28", tick=True)
@@ -3501,6 +3581,7 @@ def test_manual_reservation_payment_allocation_override(
     reserve_per_item = client.bound_reserve(allocations_per_item[0])
     reserve_per_hour = client.bound_reserve(allocations_per_hour[0])
     transaction.commit()
+    close_all_sessions()
 
     # create a reservation of each type
     reserve_inherit()
@@ -3510,12 +3591,13 @@ def test_manual_reservation_payment_allocation_override(
 
     page = client.get('/resource/tageskarte/form')
     page.form['email'] = 'info@example.org'
-    assert '20.00' in page.form.submit().follow()
-    assert '24.00' in page.form.submit().follow()
-    assert '23.00' in page.form.submit().follow()
-    assert '67.00' in page.form.submit().follow()
+    confirmation_page = page.form.submit().follow()
+    assert '20.00' in confirmation_page
+    assert '24.00' in confirmation_page
+    assert '23.00' in confirmation_page
+    assert '67.00' in confirmation_page
 
-    ticket = page.form.submit().follow().form.submit().follow()
+    ticket = confirmation_page.form.submit().follow()
     assert 'RSV-' in ticket.text
 
     # mark it as paid

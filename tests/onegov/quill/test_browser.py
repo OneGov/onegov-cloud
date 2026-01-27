@@ -37,6 +37,7 @@ def quill_app(request: pytest.FixtureRequest) -> Iterator[QuillTestApp]:
     @_QuillTestApp.form(model=Root, form=QuillForm)
     def handle_form(self: Root, request: CoreRequest, form: QuillForm) -> str:
         request.include('quill')
+        nonce = request.content_security_policy_nonce('script')
         return f"""
             <!doctype html>
             <html>
@@ -45,7 +46,7 @@ def quill_app(request: pytest.FixtureRequest) -> Iterator[QuillTestApp]:
                         {form.x()}
                         {form.y()}
                     </form>
-                    <script>
+                    <script nonce="{nonce}">
                         window.addEventListener("load", function() {{
                             loaded = true;
                         }});

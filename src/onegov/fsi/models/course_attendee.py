@@ -127,12 +127,13 @@ class CourseAttendee(Base, ORMSearchable):
         default=dict
     )
 
-    subscriptions: relationship[AppenderQuery[CourseSubscription]]
-    subscriptions = relationship(
-        'CourseSubscription',
-        back_populates='attendee',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
+    subscriptions: relationship[AppenderQuery[CourseSubscription]] = (
+        relationship(
+            'CourseSubscription',
+            back_populates='attendee',
+            lazy='dynamic',
+            cascade='all, delete-orphan'
+        )
     )
 
     @property

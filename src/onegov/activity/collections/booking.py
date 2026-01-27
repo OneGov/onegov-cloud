@@ -72,12 +72,20 @@ class BookingCollection(GenericCollection[Booking]):
         query = self.query().with_entities(Booking.id)
 
         if states != '*':
+            # FIXME: This is to deal with the fact, that our argument type
+            #        cannot reject a plain string.
+            if isinstance(states, str):
+                states = (states, )
             query = query.filter(Booking.state.in_(states))
 
         if periods != '*':
             query = query.filter(Booking.period_id.in_(periods))
 
         if usernames != '*':
+            # FIXME: This is to deal with the fact, that our argument type
+            #        cannot reject a plain string.
+            if isinstance(usernames, str):
+                usernames = (usernames, )
             query = query.filter(Booking.username.in_(usernames))
 
         return query.count()
@@ -95,7 +103,7 @@ class BookingCollection(GenericCollection[Booking]):
 
         return self.count(
             usernames=(username, ),
-            periods=periods.subquery(),
+            periods=periods.scalar_subquery(),
             states=states
         )
 

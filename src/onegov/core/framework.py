@@ -40,7 +40,7 @@ from libres.db.models import ORMBase
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
-from more.content_security import NONE, SELF, UNSAFE_INLINE, UNSAFE_EVAL
+from more.content_security import NONE, SELF, UNSAFE_INLINE
 from more.transaction import TransactionApp
 from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
@@ -82,6 +82,7 @@ if TYPE_CHECKING:
     from typing_extensions import ParamSpec
     from webob import Response
 
+    from .analytics import AnalyticsProvider
     from .mail import Attachment
     from .metadata import Metadata
     from .security.permissions import Intent
@@ -123,6 +124,7 @@ class Framework(
     #: framework directives
     form = directive(directives.HtmlHandleFormAction)
     cronjob = directive(directives.CronjobAction)
+    analytics_provider = directive(directives.AnalyticsProviderAction)
     static_directory = directive(directives.StaticDirectoryAction)
     template_variables = directive(directives.TemplateVariablesAction)
     replace_setting = directive(directives.ReplaceSettingAction)
@@ -643,6 +645,7 @@ class Framework(
         content_security_policy_report_uri: str | None = None,
         content_security_policy_report_only: bool = False,
         content_security_policy_report_sample_rate: float = 0.0,
+        content_security_policy_extra_script_src: list[str] | None = None,
         **cfg: Any
     ) -> None:
 
@@ -653,6 +656,9 @@ class Framework(
             content_security_policy_report_only)
         self.content_security_policy_report_sample_rate = (
             content_security_policy_report_sample_rate)
+        self.content_security_policy_extra_script_src = (
+            content_security_policy_extra_script_src or []
+        )
 
     def configure_sentry(
         self,
@@ -666,6 +672,22 @@ class Framework(
     @property
     def is_sentry_supported(self) -> bool:
         return getattr(self, 'sentry_dsn', None) and True or False
+
+    def configure_analytics_providers(self, **cfg: Any) -> None:
+        self.analytics_providers_configs = cfg.get('analytics_providers', {})
+
+    @cached_property
+    def available_analytics_providers(self) -> dict[str, AnalyticsProvider]:
+        return {
+            name: provider
+            for name, _provider_cfg in self.analytics_providers_configs.items()
+            if (cls := self.config.analytics_provider_registry.get(
+                (provider_cfg := _provider_cfg or {}).get('provider', name)
+            )) is not None
+            if (
+                provider := cls.configure(name=name, **provider_cfg)
+            ) is not None
+        }
 
     def set_application_id(self, application_id: str) -> None:
         """ Set before the request is handled. Gets the schema from the
@@ -1633,17 +1655,21 @@ def default_content_security_policy() -> ContentSecurityPolicy:
         # enable inline styles and external stylesheets
         style_src={SELF, 'https:', UNSAFE_INLINE},
 
-        # enable inline scripts, eval and external scripts
+        # enable inline scripts and external scripts for sentry
         script_src={
             SELF,
             'https://browser.sentry-cdn.com',
             'https://js.sentry-cdn.com',
-            UNSAFE_INLINE,
-            UNSAFE_EVAL
         },
 
         # by default limit to self (allow pdf viewer etc)
         object_src={NONE},
+
+        # only allow setting <base> to self
+        base_uri={SELF},
+
+        # only allow submitting forms to self
+        form_action={SELF},
 
         # disable all mixed content (https -> http)
         block_all_mixed_content=True,
@@ -1676,6 +1702,16 @@ def default_policy_apply_factory(
 
         policy.report_uri = report_uri or ''
         policy.report_only = report_only
+
+        if script_srcs := request.app.content_security_policy_extra_script_src:
+            # NOTE: We don't want to modify the original CSP
+            #       we don't care with report_uri and report_only
+            #       since we set it for every request, but if this
+            #       setting changes we would no longer produce the
+            #       correct CSP, if we modified it previously.
+            policy = policy.copy()
+            for script_src in script_srcs:
+                policy.script_src.add(script_src)
 
         policy.apply(response)
 

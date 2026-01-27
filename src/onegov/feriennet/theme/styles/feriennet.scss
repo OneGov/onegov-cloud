@@ -136,7 +136,7 @@ svg {
     Forms
 */
 @media #{$medium-up} {
-    .two-columns {
+    form.two-columns {
         column-count: 2;
         column-gap: 4rem;
 

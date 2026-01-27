@@ -266,7 +266,8 @@ def delete_old_tans(request: OrgRequest) -> None:
     query = request.session.query(TAN).filter(TAN.created < cutoff)
     # cronjobs happen outside a regular request, so we don't need
     # to synchronize with the session
-    query.delete(synchronize_session=False)
+    with request.app.session_manager.ignore_bulk_deletes():
+        query.delete(synchronize_session=False)
 
 
 def delete_old_tan_accesses(request: OrgRequest) -> None:
@@ -282,7 +283,8 @@ def delete_old_tan_accesses(request: OrgRequest) -> None:
     query = request.session.query(TANAccess).filter(TANAccess.created < cutoff)
     # cronjobs happen outside a regular request, so we don't need
     # to synchronize with the session
-    query.delete(synchronize_session=False)
+    with request.app.session_manager.ignore_bulk_deletes():
+        query.delete(synchronize_session=False)
 
 
 @OrgApp.cronjob(hour='*', minute='*/15', timezone='UTC')
@@ -1013,7 +1015,7 @@ def get_news_for_push_notification(session: Session) -> Query[News]:
 
     news_with_sent_notifications = session.query(
         PushNotification.news_id
-    ).subquery()
+    ).scalar_subquery()  # type: ignore[attr-defined]
     query = query.filter(~News.id.in_(news_with_sent_notifications))
     only_public_news = query.filter(
         or_(
