@@ -27,6 +27,25 @@ oc.defaultOptions = {
     editable: false,
 
     /*
+        Url which returns all available resources in the following format:
+        {
+            'group': [
+                {
+                    'name': 'name',
+                    'title': 'title',
+                    'url': 'url'
+                }
+            ]
+        }
+    */
+    resourcesUrl: null,
+
+    /*
+        The name of the currently active resource
+    */
+    resourceActive: null,
+
+    /*
         The view shown initially
     */
     view: 'dayGridMonth',
@@ -322,6 +341,9 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
 
     // history handling
     oc.setupHistory(options);
+
+    // resource switching mechanism
+    oc.setupResourceSwitch(options, ocOptions.resourcesUrl, ocOptions.resourceActive);
 
     // setup allocation refresh handling
     options.afterSetup.push(oc.setupReservationsRefetch);
@@ -826,6 +848,56 @@ oc.bustIECache = function(originalUrl) {
     var url = new Url(originalUrl);
     url.query['ie-cache'] = (new Date()).getTime();
     return url.toString();
+};
+
+// setup the ability to switch to other resources
+oc.setupResourceSwitch = function(options, resourcesUrl, active) {
+    if (!resourcesUrl) {
+        return;
+    }
+
+    options.afterSetup.push(function(_calendar, element) {
+        var setup = function(choices) {
+            var container = $(element).find('.fc-toolbar-chunk').eq(1);
+
+            if (options.fc.headerToolbar.right === '') {
+                container.css('float', 'right');
+            }
+
+            var lookup = {};
+
+            if (Object.keys(choices).length >= 1) {
+
+                var switcher = $('<select>').append(
+                    _.map(choices, function(resources, group) {
+                        return $('<optgroup>').attr('label', group || '').append(
+                            _.map(resources, function(resource) {
+                                lookup[resource.name] = resource.url;
+
+                                return $('<option>')
+                                    .attr('value', resource.name)
+                                    .attr('selected', resource.name === active)
+                                    .text(resource.title);
+                            })
+                        );
+                    })
+                );
+
+                switcher.change(function() {
+                    var url = new Url(lookup[$(this).val()]);
+                    url.query = (new Url(window.location.href)).query;
+
+                    window.location = url;
+                });
+
+                container.append(switcher);
+            } else {
+                container.hide();
+            }
+        };
+
+        $.getJSON(resourcesUrl, setup);
+    });
 };
 
 

@@ -307,20 +307,28 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             result += f'#{fragment}'
         return result
 
-    def class_link(
+    def class_link(  # type:ignore[override]
         self,
         model: type[Any],
         variables: dict[str, Any] | None = None,
         name: str = '',
-        app: Framework | Sentinel = SAME_APP,  # type:ignore[override]
+        app: Framework | Sentinel = SAME_APP,
+        query_params: SupportsItems[str, str] | None = None,
+        fragment: str | None = None,
     ) -> str:
         """ Extends the default class link generating function of Morepath. """
-        return self.transform(super().class_link(
+        query_params = query_params or {}
+        result = self.transform(super().class_link(
             model,
             variables=variables,
             name=name,
             app=app
         ))
+        for key, value in query_params.items():
+            result = append_query_param(result, key, value)
+        if fragment:
+            result += f'#{fragment}'
+        return result
 
     def filestorage_link(self, path: str) -> str | None:
         """ Takes the given filestorage path and returns an url if the path

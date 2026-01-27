@@ -809,11 +809,27 @@ def view_resources_json(
     request: OrgRequest
 ) -> JSON_ro:
 
-    def transform(resource: Resource) -> JSON_ro:
+    view = request.GET.get('view', '')
+    is_occupancy = view == 'occupancy'
+    if is_occupancy and not request.is_logged_in:
+        # NOTE: Only logged in users can see occupancy
+        return {}
+
+    filter_occupancy = is_occupancy and request.has_role('member')
+
+    def transform(resource: Resource) -> JSON_ro | None:
+        # NOTE: Exclude resources where members are not allowed to see
+        #       the occupancy
+        if (
+            filter_occupancy
+            and not getattr(self, 'occupancy_is_visible_to_members', False)
+        ):
+            return None
+
         return {
             'name': resource.name,
             'title': resource.title,
-            'url': request.link(resource),
+            'url': request.link(resource, name=view),
         }
 
     @request.after
@@ -1250,6 +1266,11 @@ def view_occupancy(
         'resource': self,
         'layout': layout or ResourceLayout(self, request),
         'feed': request.link(self, name='occupancy-json'),
+        'resources_url': request.class_link(
+            ResourceCollection,
+            name='json',
+            query_params={'view': 'occupancy'}
+        )
     }
 
 
@@ -1417,6 +1438,7 @@ def view_my_reservations(
         'title': _('My Reservations'),
         'resource': Bunch(
             type='room',
+            name='',
             date=date,
             view=request.GET.get('view'),
             highlights_min=request.GET.get('highlights_min'),
