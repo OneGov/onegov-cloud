@@ -215,23 +215,26 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return query
 
     #: An election may have related elections
-    related_elections: relationship[AppenderQuery[ElectionRelationship]]
-    related_elections = relationship(
-        'ElectionRelationship',
-        foreign_keys='ElectionRelationship.source_id',
-        cascade='all, delete-orphan',
-        back_populates='source',
-        lazy='dynamic'
+    related_elections: relationship[AppenderQuery[ElectionRelationship]] = (
+        relationship(
+            'ElectionRelationship',
+            foreign_keys='ElectionRelationship.source_id',
+            cascade='all, delete-orphan',
+            back_populates='source',
+            lazy='dynamic'
+        )
     )
 
     #: An election may be related by other elections
-    referencing_elections: relationship[AppenderQuery[ElectionRelationship]]
-    referencing_elections = relationship(
-        'ElectionRelationship',
-        foreign_keys='ElectionRelationship.target_id',
-        cascade='all, delete-orphan',
-        back_populates='target',
-        lazy='dynamic'
+    referencing_elections: (
+        relationship[AppenderQuery[ElectionRelationship]]) = (
+        relationship(
+            'ElectionRelationship',
+            foreign_keys='ElectionRelationship.target_id',
+            cascade='all, delete-orphan',
+            back_populates='target',
+            lazy='dynamic'
+        )
     )
 
     #: An election may be part of an election compound
@@ -396,11 +399,12 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     )
 
     #: notifcations linked to this election
-    notifications: relationship[AppenderQuery[Notification]]
-    notifications = relationship(  # type:ignore[misc]
-        'onegov.election_day.models.notification.Notification',
-        back_populates='election',
-        lazy='dynamic'
+    notifications: relationship[AppenderQuery[Notification]] = (
+        relationship(  # type:ignore[misc]
+            'onegov.election_day.models.notification.Notification',
+            back_populates='election',
+            lazy='dynamic'
+        )
     )
 
     #: screens linked to this election

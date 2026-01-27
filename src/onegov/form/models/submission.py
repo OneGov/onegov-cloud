@@ -121,10 +121,11 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     )
 
     #: the registration window linked with this submission
-    registration_window: relationship[FormRegistrationWindow | None]
-    registration_window = relationship(
-        'FormRegistrationWindow',
-        back_populates='submissions'
+    registration_window: relationship[FormRegistrationWindow | None] = (
+        relationship(
+            'FormRegistrationWindow',
+            back_populates='submissions'
+        )
     )
 
     #: payment options -> copied from the definition at the moment of
@@ -373,10 +374,11 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
     )
 
     #: the submission window linked with this submission
-    submission_window: relationship[SurveySubmissionWindow | None]
-    submission_window = relationship(
-        'SurveySubmissionWindow',
-        back_populates='submissions'
+    submission_window: relationship[SurveySubmissionWindow | None] = (
+        relationship(
+            'SurveySubmissionWindow',
+            back_populates='submissions'
+        )
     )
 
     #: extensions
