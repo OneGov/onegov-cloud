@@ -5,20 +5,28 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="cell small-12">
-                <div tal:condition="export_link"
-                     style="margin-bottom: 1rem;">
-                    <tal:b replace="export_link(layout)" />
+                <div style="display: flex; align-items: center;
+                            gap: 0.5rem; margin-bottom: 1rem;
+                            flex-wrap: wrap;">
+                    <a tal:condition="not: archive"
+                       href="${archive_toggle_url}"
+                       class="button secondary round small"
+                       >${archive_toggle_text}</a>
+                    <a tal:condition="archive"
+                       href="${archive_toggle_url}"
+                       class="button primary round small"
+                       >${archive_toggle_text}</a>
+                    <tal:b condition="export_link"
+                           replace="export_link(layout)" />
                 </div>
                 <div class="time-reports-list">
-                    <div tal:condition="archive"
-                         class="callout secondary"
-                         style="margin-bottom: 1rem;">
-                        <p i18n:translate="">
-                            Showing archived (exported) time reports.
-                        </p>
-                    </div>
-                    <p tal:condition="not: reports" i18n:translate="">
+                    <p tal:condition="python: not reports and not archive"
+                       i18n:translate="">
                         No time reports found
+                    </p>
+                    <p tal:condition="python: not reports and archive"
+                       i18n:translate="">
+                        No archived time reports found
                     </p>
                     <table class="fullwidth" tal:condition="reports">
                         <thead>
@@ -57,7 +65,7 @@
                                           class="label secondary"
                                           i18n:translate="">Pending</span>
                                     <span tal:condition="python: report.status == 'confirmed' and not report.exported"
-                                          class="label warning"
+                                          class="label"
                                           i18n:translate="">Confirmed</span>
                                     <span tal:condition="python: report.status == 'confirmed' and report.exported"
                                           class="label success"
@@ -82,9 +90,6 @@
                     <div class="pagination-centered">
                         <div metal:use-macro="layout.macros['pagination']"
                              tal:define="collection model; current_page model;" />
-                    </div>
-                    <div style="margin-top: 1rem;">
-                        <a href="${archive_toggle_url}">${archive_toggle_text}</a>
                     </div>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-28 18:40+0100\n"
+"POT-Creation-Date: 2026-01-28 20:34+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -968,11 +968,11 @@ msgstr "Zulassung verweigert."
 msgid "Proposed changes applied"
 msgstr "Vorgeschlagene Änderungen übernommen"
 
-msgid "Showing archived (exported) time reports."
-msgstr "Zeigt archivierte (exportierte) Zeiterfassungen an."
-
 msgid "No time reports found"
 msgstr "Keine Zeiterfassungen gefunden"
+
+msgid "No archived time reports found"
+msgstr ""
 
 msgid "Created"
 msgstr "Erstellt"
@@ -1067,8 +1067,8 @@ msgstr "${count} Zeiterfassungen exportieren"
 msgid "Export ${count} time reports for accounting?"
 msgstr "${count} Zeiterfassungen für die Buchhaltung exportieren?"
 
-msgid "Reports will be marked as exported."
-msgstr "Zeiterfassungen werden als exportiert markiert."
+msgid "Reports can only be exported once and will appear in the archive."
+msgstr "Zeiterfassungen können nur einmal exportiert werden und erscheinen danach im Archiv."
 
 msgid "Export"
 msgstr "Exportieren"
@@ -1196,6 +1196,9 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
+
+#~ msgid "Showing archived (exported) time reports."
+#~ msgstr "Zeigt archivierte (exportierte) Zeiterfassungen an."
 
 #~ msgid ""
 #~ "No confirmed time reports available for export. Time reports must be "

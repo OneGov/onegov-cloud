@@ -8,6 +8,7 @@ from io import StringIO
 from webob import Response
 from webob.exc import HTTPForbidden
 from datetime import datetime
+from sedate import utcnow
 from decimal import Decimal
 from uuid import uuid4
 from onegov.core.mail import Attachment
@@ -100,14 +101,17 @@ def view_time_reports(
             url=layout.csrf_protected_url(
                 request.link(self, 'export-accounting')
             ),
-            attrs={'class': 'button primary'},
+            attrs={'class': 'button primary round small'},
             traits=(
                 Confirm(
                     _(
                         'Export ${count} time reports for accounting?',
                         mapping={'count': unexported_count},
                     ),
-                    _('Reports will be marked as exported.'),
+                    _(
+                        'Reports can only be exported once '
+                        'and will appear in the archive.'
+                    ),
                     _('Export'),
                     _('Cancel'),
                 ),
@@ -616,7 +620,7 @@ def export_accounting_csv(
     for row in generate_accounting_export_rows(confirmed_reports):
         writer.writerow(row)
 
-    now = datetime.utcnow()
+    now = utcnow()
     batch_id = uuid4()
     for report in confirmed_reports:
         report.exported = True
