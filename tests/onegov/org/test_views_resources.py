@@ -2293,7 +2293,7 @@ def test_occupancy_view(client: Client) -> None:
     assert occupancy.status_code == 200
     data = occupancy.json
     assert data['count'] == 1
-    assert data['pending'] == 0
+    assert data['pending'] == 1
     assert data['utilization'] == 100.0
 
 
