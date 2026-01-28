@@ -48,6 +48,7 @@ function handleBulkAddCommission() {
   function filterCommissionOptions() {
     // Hide commission options that have no parliamentarians
     const commissionOptions = commissionSelect.querySelectorAll('option');
+    let firstValidCommission = null;
 
     commissionOptions.forEach(option => {
       // Skip the empty/placeholder option
@@ -62,8 +63,15 @@ function handleBulkAddCommission() {
       if (parliamentarians.length === 0) {
         option.style.display = 'none';
         option.disabled = true;
+      } else if (!firstValidCommission) {
+        firstValidCommission = commissionId;
       }
     });
+
+    // If the selected commission is not in the data, default to first valid
+    if (commissionSelect.value && !commissionParliamentarians[commissionSelect.value]) {
+      commissionSelect.value = firstValidCommission || '';
+    }
 
     // Update the chosen dropdown to reflect changes
     $(commissionSelect).trigger('chosen:updated');
