@@ -744,6 +744,12 @@ msgstr "Zulassung erteilen"
 msgid "Refuse admission"
 msgstr "Zulassung verweigern"
 
+msgid "Do you really want to delete this time report?"
+msgstr "Möchten Sie diese Zeiterfassung wirklich löschen?"
+
+msgid "Delete time report"
+msgstr "Zeiterfassung löschen"
+
 msgid "Mutation"
 msgstr "Mutation"
 
@@ -984,6 +990,9 @@ msgstr "Keine Zeiterfassungen gefunden"
 msgid "Created"
 msgstr "Erstellt"
 
+msgid "Actions"
+msgstr "Aktionen"
+
 msgid "View Ticket"
 msgstr "Ticket anzeigen"
 
@@ -1154,6 +1163,9 @@ msgstr "QR-Rechnung nur für bestätigte Zeiterfassungen verfügbar"
 
 msgid "Could not generate QR bill"
 msgstr "QR-Rechnung konnte nicht erstellt werden"
+
+msgid "Time report deleted"
+msgstr "Zeiterfassung gelöscht"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"

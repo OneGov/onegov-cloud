@@ -86,6 +86,7 @@
                             <th i18n:translate="">Total</th>
                             <th i18n:translate="">Status</th>
                             <th i18n:translate="">Ticket</th>
+                            <th i18n:translate="">Actions</th>
                         </thead>
                         <tbody>
                             <tr tal:repeat="report reports">
@@ -119,6 +120,12 @@
                                        tal:condition="ticket"
                                        i18n:translate="">View Ticket</a>
                                     <span tal:condition="not: ticket">-</span>
+                                </td>
+                                <td tal:define="delete_link delete_links.get(
+                                    str(report.id))">
+                                    <tal:b condition="delete_link"
+                                           replace="delete_link(layout)" />
+                                    <span tal:condition="not: delete_link">-</span>
                                 </td>
                             </tr>
                         </tbody>

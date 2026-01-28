@@ -6,6 +6,7 @@ import json
 from onegov.translator_directory.i18n import _
 from io import StringIO
 from webob import Response
+from webob.exc import HTTPForbidden
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
@@ -20,6 +21,7 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
 
+from onegov.core.elements import Confirm, Intercooler, Link
 from onegov.core.security import Private, Personal
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.org.cli import close_ticket
@@ -33,7 +35,6 @@ from onegov.translator_directory.forms.time_report import (
 from onegov.translator_directory.generate_docx import gendered_greeting
 from onegov.translator_directory.layout import (
     TimeReportCollectionLayout,
-    TimeReportLayout,
     TranslatorLayout,
 )
 from onegov.translator_directory.models.ticket import (
@@ -120,12 +121,36 @@ def view_time_reports(
         for ticket in tickets
     }
 
+    delete_links = {}
+    for report in self.batch:
+        if can_delete_time_report(request, report):
+            delete_links[str(report.id)] = Link(
+                text=_('Delete'),
+                url=layout.csrf_protected_url(request.link(report)),
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _('Do you really want to delete this time report?'),
+                        _('This cannot be undone.'),
+                        _('Delete time report'),
+                        _('Cancel'),
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=request.class_link(
+                            TimeReportCollection
+                        ),
+                    ),
+                ),
+            )
+
     return {
         'layout': layout,
         'model': self,
         'title': layout.title,
         'reports': self.batch,
         'report_tickets': report_tickets,
+        'delete_links': delete_links,
         'months': months,
         'years': years,
         'default_month': default_month,
@@ -157,7 +182,9 @@ def edit_time_report(
             request.link(TimeReportCollection(request.app))
         )
 
-    layout = TimeReportLayout(self, request)
+    layout = TimeReportCollectionLayout(
+        TimeReportCollection(request.app), request
+    )
 
     if form.submitted(request):
         form.update_model(self)
@@ -285,7 +312,7 @@ def accept_time_report(
             travel_info = {
                 'from_address': translator_address,
                 'to_location': location_name,
-                'distance': time_report.travel_distance
+                'one_way_travel_distance': time_report.travel_distance,
             }
 
         send_ticket_mail(
@@ -920,7 +947,7 @@ def generate_time_report_pdf_bytes(
                 f"{request.translate(_('Travel'))} "
                 f"({request.translate(_('from'))} {translator_address} "
                 f"{request.translate(_('to'))} {location_name}, "
-                f"{time_report.travel_distance} km \u00d7 2)"
+                f"{time_report.travel_distance} km)"
             )
         else:
             travel_label = (
@@ -936,7 +963,7 @@ def generate_time_report_pdf_bytes(
         travel_label = (
             f"{request.translate(_('Travel'))} "
             f"({request.translate(_('from'))} {translator_address}, "
-            f"{translator.drive_distance} km \u00d7 2)"
+            f"{translator.drive_distance} km)"
         )
 
     html_content += f"""
@@ -1104,3 +1131,53 @@ def generate_qr_bill_pdf_for_translator(
     response.content_type = 'application/pdf'
     response.content_disposition = f'inline; filename="{filename}"'
     return response
+
+
+def can_delete_time_report(
+    request: TranslatorAppRequest,
+    time_report: TranslatorTimeReport,
+) -> bool:
+    """Check if user can delete a time report.
+
+    Only admins and accountants for the specific finanzstelle can delete.
+    """
+    if request.is_admin:
+        return True
+
+    if not request.current_user:
+        return False
+
+    try:
+        accountant_emails = get_accountant_emails_for_finanzstelle(
+            request, time_report.finanzstelle
+        )
+        return request.current_user.username in accountant_emails
+    except ValueError:
+        return False
+
+
+@TranslatorDirectoryApp.view(
+    model=TranslatorTimeReport,
+    request_method='DELETE',
+    permission=Personal,
+)
+def delete_time_report(
+    self: TranslatorTimeReport,
+    request: TranslatorAppRequest,
+) -> None:
+    """Delete a time report. Only admins and accountants can delete."""
+
+    request.assert_valid_csrf_token()
+
+    if not can_delete_time_report(request, self):
+        raise HTTPForbidden()
+
+    ticket = self.get_ticket(request.session)
+    if ticket:
+        assert isinstance(ticket.handler, TimeReportHandler)
+        if ticket.handler.ticket_deletable:
+            ticket.handler.prepare_delete_ticket()
+            request.session.delete(ticket)
+
+    request.session.delete(self)
+    request.success(_('Time report deleted'))
