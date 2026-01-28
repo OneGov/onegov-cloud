@@ -218,6 +218,15 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     def on_request(self) -> None:
         self.set_default_value_to_settlement_run_start()
 
+        if not self.request.is_admin:  # type: ignore[attr-defined]
+            self.type.choices = [
+                (key, value)
+                for key, value in TYPES.items()
+                if key != 'plenary'
+            ]
+        else:
+            self.type.choices = list(TYPES.items())
+
         if (
             hasattr(self.request.identity, 'role')
             and self.request.identity.role == 'parliamentarian'
