@@ -83,12 +83,13 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     )
 
     #: link between forms and registration windows
-    registration_windows: relationship[list[FormRegistrationWindow]]
-    registration_windows = relationship(
-        FormRegistrationWindow,
-        back_populates='form',
-        order_by='FormRegistrationWindow.start',
-        cascade='all, delete-orphan'
+    registration_windows: relationship[list[FormRegistrationWindow]] = (
+        relationship(
+            FormRegistrationWindow,
+            back_populates='form',
+            order_by='FormRegistrationWindow.start',
+            cascade='all, delete-orphan'
+        )
     )
 
     #: the currently active registration window
@@ -104,30 +105,32 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     #:
     #: this could of course be done more conventionally, but this is cooler 😅
     #:
-    current_registration_window: relationship[FormRegistrationWindow | None]
-    current_registration_window = relationship(
-        'FormRegistrationWindow', viewonly=True, uselist=False,
-        primaryjoin="""and_(
-            FormRegistrationWindow.name == FormDefinition.name,
-            FormRegistrationWindow.id == select((
-                FormRegistrationWindow.id,
-            )).where(
-                FormRegistrationWindow.name == FormDefinition.name
-            ).order_by(
-                func.least(
-                    cast(
-                        func.now().op('AT TIME ZONE')(
-                            FormRegistrationWindow.timezone
-                        ), Date
-                    ).op('<->')(FormRegistrationWindow.start),
-                    cast(
-                        func.now().op('AT TIME ZONE')(
-                            FormRegistrationWindow.timezone
-                        ), Date
-                    ).op('<->')(FormRegistrationWindow.end)
-                )
-            ).limit(1).scalar_subquery()
-        )"""
+    current_registration_window: (
+        relationship)[FormRegistrationWindow | None] = (
+        relationship(
+            'FormRegistrationWindow', viewonly=True, uselist=False,
+            primaryjoin="""and_(
+                FormRegistrationWindow.name == FormDefinition.name,
+                FormRegistrationWindow.id == select((
+                    FormRegistrationWindow.id,
+                )).where(
+                    FormRegistrationWindow.name == FormDefinition.name
+                ).order_by(
+                    func.least(
+                        cast(
+                            func.now().op('AT TIME ZONE')(
+                                FormRegistrationWindow.timezone
+                            ), Date
+                        ).op('<->')(FormRegistrationWindow.start),
+                        cast(
+                            func.now().op('AT TIME ZONE')(
+                                FormRegistrationWindow.timezone
+                            ), Date
+                        ).op('<->')(FormRegistrationWindow.end)
+                    )
+                ).limit(1).scalar_subquery()
+            )"""
+        )
     )
 
     #: lead text describing the form
@@ -269,38 +272,42 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
     )
 
     #: link between surveys and submission windows
-    submission_windows: relationship[list[SurveySubmissionWindow]]
-    submission_windows = relationship(
-        SurveySubmissionWindow,
-        back_populates='survey',
-        order_by='SurveySubmissionWindow.start',
-        cascade='all, delete-orphan'
+    submission_windows: relationship[list[SurveySubmissionWindow]] = (
+        relationship(
+            SurveySubmissionWindow,
+            back_populates='survey',
+            order_by='SurveySubmissionWindow.start',
+            cascade='all, delete-orphan'
+        )
     )
 
-    current_submission_window: relationship[SurveySubmissionWindow | None]
-    current_submission_window = relationship(
-        'SurveySubmissionWindow', viewonly=True, uselist=False,
-        primaryjoin="""and_(
-            SurveySubmissionWindow.name == SurveyDefinition.name,
-            SurveySubmissionWindow.id == select((
-                SurveySubmissionWindow.id,
-            )).where(
-                SurveySubmissionWindow.name == SurveyDefinition.name
-            ).order_by(
-                func.least(
-                    cast(
-                        func.now().op('AT TIME ZONE')(
-                            SurveySubmissionWindow.timezone
-                        ), Date
-                    ).op('<->')(SurveySubmissionWindow.start),
-                    cast(
-                        func.now().op('AT TIME ZONE')(
-                            SurveySubmissionWindow.timezone
-                        ), Date
-                    ).op('<->')(SurveySubmissionWindow.end)
-                )
-            ).limit(1).scalar_subquery()
-        )"""
+    current_submission_window: relationship[SurveySubmissionWindow | None] = (
+        relationship(
+            'SurveySubmissionWindow',
+            viewonly=True,
+            uselist=False,
+            primaryjoin="""and_(
+                SurveySubmissionWindow.name == SurveyDefinition.name,
+                SurveySubmissionWindow.id == select((
+                    SurveySubmissionWindow.id,
+                )).where(
+                    SurveySubmissionWindow.name == SurveyDefinition.name
+                ).order_by(
+                    func.least(
+                        cast(
+                            func.now().op('AT TIME ZONE')(
+                                SurveySubmissionWindow.timezone
+                            ), Date
+                        ).op('<->')(SurveySubmissionWindow.start),
+                        cast(
+                            func.now().op('AT TIME ZONE')(
+                                SurveySubmissionWindow.timezone
+                            ), Date
+                        ).op('<->')(SurveySubmissionWindow.end)
+                    )
+                ).limit(1).scalar_subquery()
+            )""",
+        )
     )
 
     #: lead text describing the survey

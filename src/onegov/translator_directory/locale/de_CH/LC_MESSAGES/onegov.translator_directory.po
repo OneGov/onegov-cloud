@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-27 10:44+0100\n"
+"POT-Creation-Date: 2026-01-27 14:34+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -586,6 +586,9 @@ msgstr "Bitte wählen Sie einen Standort"
 msgid "End time must be after start time"
 msgstr "Endzeit muss nach Startzeit liegen"
 
+msgid "Contract Number"
+msgstr "Vertragsnummer"
+
 msgid "Address"
 msgstr "Anschrift"
 
@@ -1142,6 +1145,13 @@ msgstr ""
 "Export nicht möglich: Den folgenden Übersetzern fehlt eine Personalnummer "
 "(Personal-Nr.): ${names}"
 
+#, python-format
+msgid ""
+"Export warning: The following translators are missing a contract number "
+"(Vertragsnummer): ${names}"
+msgstr ""
+"Export-Warnung: Den folgenden Übersetzern fehlt eine Vertragsnummer: ${names}"
+
 msgid "Ticket Number"
 msgstr "Ticket-Nummer"
 
@@ -1217,13 +1227,3 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 msgid "Download"
 msgstr "Herunterladen"
 
-#~ msgid ""
-#~ "Your time report has been successfully submitted and is now under review."
-#~ msgstr ""
-#~ "Ihre Zeiterfassung wurde erfolgreich eingereicht und wird nun geprüft."
-
-#~ msgid "View your time report"
-#~ msgstr "Zeiterfassung anzeigen"
-
-#~ msgid "Your time report has been submitted"
-#~ msgstr "Ihre Zeiterfassung wurde eingereicht"

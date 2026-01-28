@@ -49,7 +49,6 @@ __all__ = (
     'ImportLayout',
     'LegislativePeriodCollectionLayout',
     'LegislativePeriodLayout',
-    'PASCommissionMembershipLayout',
     'PASParliamentarianCollectionLayout',
     'PASParliamentarianLayout',
     'PASParliamentarianRoleLayout',

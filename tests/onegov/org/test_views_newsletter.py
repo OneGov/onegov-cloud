@@ -754,3 +754,48 @@ def test_newsletter_test_delivery(client: Client) -> None:
     newsletter = NewsletterCollection(client.app.session()).query().one()
     assert newsletter.sent is None
     assert not newsletter.recipients
+
+
+def test_newsletter_copy_paste(client: Client) -> None:
+
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    client.logout()
+
+    client.login_editor()
+
+    newsletters = client.get('/newsletters')
+    new = newsletters.click('Newsletter')
+    new.form['title'] = 'Original Newsletter'
+    new.form['lead'] = 'This is the original content'
+    newsletter = new.form.submit().follow()
+
+    assert newsletter.pyquery('h1').text() == 'Original Newsletter'
+    assert 'This is the original content' in newsletter
+
+    copy_link = newsletter.pyquery('a.copy-link').attr('href')
+    assert copy_link is not None
+    client.get(copy_link)
+
+    newsletters = client.get('/newsletters')
+    paste_link = newsletters.pyquery('a.paste-link').attr('href')
+    assert paste_link is not None
+
+    paste = client.get(paste_link)
+    assert paste.form['title'].value == 'Original Newsletter'
+    assert paste.form['lead'].value == 'This is the original content'
+
+    paste.form['title'] = 'Copied Newsletter'
+    copied = paste.form.submit().follow()
+
+    assert copied.pyquery('h1').text() == 'Copied Newsletter'
+    assert 'This is the original content' in copied
+
+    newsletters = client.get('/newsletters')
+    assert 'Original Newsletter' in newsletters
+    assert 'Copied Newsletter' in newsletters
+
+    collection = NewsletterCollection(client.app.session())
+    assert collection.query().count() == 2

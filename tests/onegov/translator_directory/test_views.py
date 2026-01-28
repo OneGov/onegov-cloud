@@ -225,7 +225,7 @@ def test_view_translator(client: Client) -> None:
             dl.find('dd').text_content().strip()
             for dl in page.pyquery('dl')
         }
-        assert len(values) == 26
+        assert len(values) == 27
         assert values['Nachname'] == 'BOB'
         assert values['Vorname'] == 'Uncle'
         assert values['Personal Nr.'] == '978654'
@@ -316,8 +316,10 @@ def test_view_translator(client: Client) -> None:
     assert '978654' in page
     page = page.click('Bearbeiten')
     page.form['pers_id'] = 123456
+    page.form['contract_number'] = 'CN-123'
     page = page.form.submit().follow()
     assert '123456' in page
+    assert 'CN-123' in page
     client.logout()
 
     # edit some key attribute
@@ -335,6 +337,7 @@ def test_view_translator(client: Client) -> None:
     page.form['email'] = 'aunt.maggie@translators.com'
     page.form['iban'] = 'CH5604835012345678009'
     page.form['pers_id'] = 234567
+    page.form['contract_number'] = 'CN-456'
     page.form['admission'] = 'in_progress'
     page.form['withholding_tax'] = True
     page.form['self_employed'] = True
@@ -396,7 +399,7 @@ def test_view_translator(client: Client) -> None:
         dl.find('dd').text_content().strip()
         for dl in page.pyquery('dl')
     }
-    assert len(values) == 42
+    assert len(values) == 43
     assert values['Nachname'] == 'MAGGIE'
     assert values['Vorname'] == 'Aunt'
     assert values['AHV-Nr.'] == '756.1111.1111.13'
@@ -423,6 +426,7 @@ def test_view_translator(client: Client) -> None:
     assert values['Ort'] == 'Somecity'
     assert values['PLZ'] == '4052'
     assert values['Personal Nr.'] == '234567'
+    assert values['Vertragsnummer'] == 'CN-456'
     assert values['Quellensteuer'] == 'Ja'
     assert values['Referenzen Behörden'] == 'Kt. ZG'
     assert values['Selbständig'] == 'Ja'

@@ -307,3 +307,13 @@ def make_assignment_type_non_nullable(context: UpgradeContext) -> None:
         context.operations.alter_column(
             'translator_time_reports', 'assignment_type', nullable=False
         )
+
+
+@upgrade_task('Add contract number column to translator')
+def add_contract_number_to_translator(context: UpgradeContext) -> None:
+    if not context.has_table('translators'):
+        return
+    if not context.has_column('translators', 'contract_number'):
+        context.operations.add_column(
+            'translators', Column('contract_number', Text)
+        )
