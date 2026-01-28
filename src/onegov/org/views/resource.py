@@ -41,7 +41,7 @@ from onegov.ticket import Ticket, TicketInvoice
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
-from sqlalchemy import and_, func, select, cast as sa_cast, Boolean
+from sqlalchemy import and_, cast as sa_cast, func, or_, select, Boolean
 from sqlalchemy.orm import undefer, joinedload, Session
 from webob import exc
 
@@ -1245,6 +1245,46 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     )
 
 
+@OrgApp.json(model=Resource, name='occupancy-stats', permission=Personal)
+def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
+    """ Returns stats for the selected date range.
+
+    """
+    assert_visible_by_members(self, request)
+
+    start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
+
+    if not (start and end):
+        raise exc.HTTPBadRequest()
+
+    accepted = func.coalesce(Reservation.data['accepted'] == True, False)
+    stats = dict(
+        self.scheduler.managed_reservations()
+        .filter(Reservation.status == 'approved')
+        .filter(or_(
+            and_(
+                Reservation.start <= start,
+                start <= Reservation.end
+            ),
+            and_(
+                start <= Reservation.start,
+                Reservation.start <= end
+            )
+        ))
+        .group_by(accepted)
+        .with_entities(accepted, func.count(Reservation.id))
+    )
+
+    layout = DefaultLayout(self, request)
+
+    return {
+        'range': layout.format_date_range(start.date(), end.date()),
+        'count': stats.get(True, 0) + stats.get(False, 0),
+        'pending': stats.get(False, 0),
+        'utilization': 100.0 - self.scheduler.availability(start, end),
+    }
+
+
 @OrgApp.html(
     model=Resource,
     permission=Personal,
@@ -1266,6 +1306,7 @@ def view_occupancy(
         'resource': self,
         'layout': layout or ResourceLayout(self, request),
         'feed': request.link(self, name='occupancy-json'),
+        'stats_url': request.link(self, name='occupancy-stats'),
         'resources_url': request.class_link(
             ResourceCollection,
             name='json',
