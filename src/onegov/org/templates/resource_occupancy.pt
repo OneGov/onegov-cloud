@@ -14,6 +14,7 @@
             data-highlights-max="${resource.highlights_max or ''}"
             data-resources-url="${resources_url|None}"
             data-resource-active="${resource.name}"
+            data-stats-url="${stats_url|None}"
             data-pdf-url="${pdf_url|None}"
         ></div>
 
