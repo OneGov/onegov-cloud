@@ -8,8 +8,8 @@ from io import StringIO
 from webob import Response
 from webob.exc import HTTPForbidden
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 from decimal import Decimal
+from uuid import uuid4
 from onegov.core.mail import Attachment
 from onegov.core.utils import module_path
 from onegov.translator_directory.qrbill import (
@@ -79,32 +79,44 @@ def view_time_reports(
 
     layout = TimeReportCollectionLayout(self, request)
 
-    now = datetime.now()
-    current_year = now.year
-    last_month = now - relativedelta(months=1)
-    default_month = last_month.month
-    default_year = last_month.year
+    if self.archive:
+        archive_toggle_url = request.link(
+            TimeReportCollection(request.app, archive=False)
+        )
+        archive_toggle_text = _('Show active reports')
+    else:
+        archive_toggle_url = request.link(
+            TimeReportCollection(request.app, archive=True)
+        )
+        archive_toggle_text = _('Show archived (exported) reports')
 
-    selected_month = self.month if self.month is not None else None
-    selected_year = self.year if self.year is not None else None
-
-    months = [
-        (1, request.translate(_('January'))),
-        (2, request.translate(_('February'))),
-        (3, request.translate(_('March'))),
-        (4, request.translate(_('April'))),
-        (5, request.translate(_('May'))),
-        (6, request.translate(_('June'))),
-        (7, request.translate(_('July'))),
-        (8, request.translate(_('August'))),
-        (9, request.translate(_('September'))),
-        (10, request.translate(_('October'))),
-        (11, request.translate(_('November'))),
-        (12, request.translate(_('December'))),
-    ]
-
-    years = [current_year, current_year - 1, current_year - 2]
-    export_url = request.link(self, 'export-accounting')
+    unexported_count = self.for_accounting_export().count()
+    export_link = None
+    if unexported_count > 0 and not self.archive:
+        export_link = Link(
+            text=_(
+                'Export ${count} reports', mapping={'count': unexported_count}
+            ),
+            url=layout.csrf_protected_url(
+                request.link(self, 'export-accounting')
+            ),
+            attrs={'class': 'button primary'},
+            traits=(
+                Confirm(
+                    _(
+                        'Export ${count} time reports for accounting?',
+                        mapping={'count': unexported_count},
+                    ),
+                    _('Reports will be marked as exported.'),
+                    _('Export'),
+                    _('Cancel'),
+                ),
+                Intercooler(
+                    request_method='POST',
+                    redirect_after=request.link(self),
+                ),
+            ),
+        )
 
     report_ids = [str(report.id) for report in self.batch]
     tickets = (
@@ -151,13 +163,10 @@ def view_time_reports(
         'reports': self.batch,
         'report_tickets': report_tickets,
         'delete_links': delete_links,
-        'months': months,
-        'years': years,
-        'default_month': default_month,
-        'default_year': default_year,
-        'selected_month': selected_month,
-        'selected_year': selected_year,
-        'export_url': export_url,
+        'export_link': export_link,
+        'archive': self.archive,
+        'archive_toggle_url': archive_toggle_url,
+        'archive_toggle_text': archive_toggle_text,
     }
 
 
@@ -520,28 +529,13 @@ def export_accounting_csv(
     self: TimeReportCollection,
     request: TranslatorAppRequest,
 ) -> Response:
-    """Export confirmed time reports as CSV for accounting."""
+    """Export confirmed, unexported time reports as CSV for accounting."""
 
-    try:
-        year = int(str(request.POST.get('year', '0')))
-        month = int(str(request.POST.get('month', '0')))
-    except (ValueError, TypeError):
-        request.message(_('Invalid form data'), 'warning')
-        return request.redirect(request.link(self))
+    request.assert_valid_csrf_token()
 
-    if not (1 <= month <= 12) or year < 2000:
-        request.message(_('Invalid form data'), 'warning')
-        return request.redirect(request.link(self))
-
-    confirmed_reports = list(self.for_accounting_export(year, month))
+    confirmed_reports = list(self.for_accounting_export())
     if not confirmed_reports:
-        request.message(
-            _(
-                'No confirmed time reports found for ${month}/${year}',
-                mapping={'month': month, 'year': year},
-            ),
-            'warning',
-        )
+        request.message(_('No unexported time reports found'), 'warning')
         return request.redirect(request.link(self))
 
     missing_pers_id = [
@@ -622,9 +616,17 @@ def export_accounting_csv(
     for row in generate_accounting_export_rows(confirmed_reports):
         writer.writerow(row)
 
+    now = datetime.utcnow()
+    batch_id = uuid4()
+    for report in confirmed_reports:
+        report.exported = True
+        report.exported_at = now
+        report.export_batch_id = batch_id
+
     csv_content = output.getvalue()
     csv_bytes = csv_content.encode('iso-8859-1')
-    filename = f'translator_export_{year}_{month:02d}.csv'
+    today = datetime.now().strftime('%Y-%m-%d')
+    filename = f'translator_export_{today}.csv'
     response = Response(csv_bytes)
     response.content_type = 'text/csv; charset=iso-8859-1'
     response.content_disposition = f'attachment; filename="{filename}"'

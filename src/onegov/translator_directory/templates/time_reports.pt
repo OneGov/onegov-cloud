@@ -5,74 +5,18 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="cell small-12">
-                <div tal:condition="not: layout.has_confirmed_reports"
-                     class="callout warning"
+                <div tal:condition="export_link"
                      style="margin-bottom: 1rem;">
-                    <p i18n:translate="">
-                        No confirmed time reports available for export.
-                        Time reports must be confirmed before they can be exported.
-                    </p>
-                </div>
-                <div tal:condition="layout.has_confirmed_reports"
-                     style="margin-bottom: 1rem;">
-                    <div class="grid-x grid-padding-x">
-                        <div class="cell small-12">
-                            <form method="get" id="time-reports-filter">
-                                <div class="grid-x grid-padding-x">
-                                    <div class="cell small-12 medium-4">
-                                        <label>
-                                            <span i18n:translate="">
-                                                Month
-                                            </span>
-                                            <select name="month">
-                                                <option
-                                                    tal:repeat="month_item months"
-                                                    value="${month_item[0]}"
-                                                    selected="${month_item[0] == (selected_month or default_month) or None}">
-                                                    ${month_item[1]}
-                                                </option>
-                                            </select>
-                                        </label>
-                                    </div>
-                                    <div class="cell small-12 medium-4">
-                                        <label>
-                                            <span i18n:translate="">
-                                                Year
-                                            </span>
-                                            <select name="year">
-                                                <option
-                                                    tal:repeat="year_item years"
-                                                    value="${year_item}"
-                                                    selected="${year_item == (selected_year or default_year) or None}">
-                                                    ${year_item}
-                                                </option>
-                                            </select>
-                                        </label>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="cell small-12">
-                            <form action="${export_url}"
-                                  method="POST"
-                                  class="grid-x grid-padding-x">
-                                <input type="hidden"
-                                       name="month"
-                                       value="${selected_month or default_month}" />
-                                <input type="hidden"
-                                       name="year"
-                                       value="${selected_year or default_year}" />
-                                <button type="submit"
-                                        class="button primary">
-                                    <span i18n:translate="">
-                                        Export für Buchhaltung
-                                    </span>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                    <tal:b replace="export_link(layout)" />
                 </div>
                 <div class="time-reports-list">
+                    <div tal:condition="archive"
+                         class="callout secondary"
+                         style="margin-bottom: 1rem;">
+                        <p i18n:translate="">
+                            Showing archived (exported) time reports.
+                        </p>
+                    </div>
                     <p tal:condition="not: reports" i18n:translate="">
                         No time reports found
                     </p>
@@ -110,9 +54,14 @@
                                     report.total_compensation)}</td>
                                 <td>
                                     <span tal:condition="report.status == 'pending'"
+                                          class="label secondary"
                                           i18n:translate="">Pending</span>
-                                    <span tal:condition="report.status == 'confirmed'"
+                                    <span tal:condition="python: report.status == 'confirmed' and not report.exported"
+                                          class="label warning"
                                           i18n:translate="">Confirmed</span>
+                                    <span tal:condition="python: report.status == 'confirmed' and report.exported"
+                                          class="label success"
+                                          i18n:translate="">Exported</span>
                                 </td>
                                 <td tal:define="ticket report_tickets.get(
                                     str(report.id))">
@@ -133,6 +82,9 @@
                     <div class="pagination-centered">
                         <div metal:use-macro="layout.macros['pagination']"
                              tal:define="collection model; current_page model;" />
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <a href="${archive_toggle_url}">${archive_toggle_text}</a>
                     </div>
                 </div>
             </div>

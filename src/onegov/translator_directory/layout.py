@@ -658,17 +658,3 @@ class TimeReportCollectionLayout(DefaultLayout):
         assert isinstance(links, list)
         links.append(Link(_('Time Reports')))
         return links
-
-    @cached_property
-    def has_confirmed_reports(self) -> bool:
-        """Check if there are any confirmed reports available."""
-        from onegov.translator_directory.models.time_report import (
-            TranslatorTimeReport,
-        )
-
-        return (
-            self.model.session.query(TranslatorTimeReport)
-            .filter(TranslatorTimeReport.status == 'confirmed')
-            .count()
-            > 0
-        )
