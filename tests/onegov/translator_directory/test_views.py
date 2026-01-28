@@ -3246,6 +3246,7 @@ def test_export_time_reports(
 
     session.expire_all()
     report = session.query(TranslatorTimeReport).get(report_id)
+    assert report is not None
     assert report.status == 'confirmed'
     assert report.exported is False
 
@@ -3267,6 +3268,7 @@ def test_export_time_reports(
 
     response = client.post(export_url)
     assert response.headers['Content-Type'] == 'text/csv; charset=iso-8859-1'
+    assert response.content_disposition is not None
     assert 'translator_export_' in response.content_disposition
 
     csv_content = response.body.decode('iso-8859-1')
@@ -3275,6 +3277,7 @@ def test_export_time_reports(
     # Verify report is marked as exported with timestamp and batch id
     session.expire_all()
     report = session.query(TranslatorTimeReport).get(report_id)
+    assert report is not None
     assert report.exported is True
     assert report.exported_at is not None
     assert report.export_batch_id is not None
@@ -3293,4 +3296,5 @@ def test_export_time_reports(
 
     # Batch id is preserved
     report = session.query(TranslatorTimeReport).get(report_id)
+    assert report is not None
     assert report.export_batch_id == batch_id
