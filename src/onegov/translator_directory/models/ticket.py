@@ -8,15 +8,13 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import linkify
 from onegov.org import _
 from onegov.org.models.ticket import OrgTicketMixin
+from onegov.org.utils import get_current_tickets_url
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
 from onegov.core.elements import Intercooler
 from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection,
-)
-from onegov.translator_directory.collections.time_report import (
-    TimeReportCollection,
 )
 from onegov.translator_directory.constants import (
     TIME_REPORT_INTERPRETING_TYPES,
@@ -225,7 +223,7 @@ class TimeReportHandler(Handler):
     def ticket_deletable(self) -> bool:
         if self.deleted:
             return True
-        if self.time_report and self.time_report.status == 'confirmed':
+        if self.time_report and self.time_report.status != 'confirmed':
             return True
         return False
 
@@ -664,9 +662,7 @@ class TimeReportHandler(Handler):
                         ),
                         Intercooler(
                             request_method='DELETE',
-                            redirect_after=request.class_link(
-                                TimeReportCollection
-                            ),
+                            redirect_after=get_current_tickets_url(request),
                         ),
                     ),
                 )

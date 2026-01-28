@@ -1174,7 +1174,10 @@ def delete_time_report(
 
     ticket = self.get_ticket(request.session)
     if ticket:
-        request.session.delete(ticket)
+        assert isinstance(ticket.handler, TimeReportHandler)
+        if ticket.handler.ticket_deletable:
+            ticket.handler.prepare_delete_ticket()
+            request.session.delete(ticket)
 
     request.session.delete(self)
     request.success(_('Time report deleted'))
