@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 function handleBulkAddCommission() {
+    // Sync the displayed parliamentarian checkboxes with the selected
+    // commission. Hides checkboxes for parliamentarians not in the
+    // commission.
 
    if (!window.location.href.includes('new-commission-bulk')) {
         return;
@@ -24,7 +27,9 @@ function handleBulkAddCommission() {
       // Filter commission options to only show those with parliamentarians
       filterCommissionOptions();
       // Initial update based on selected commission
-      updateParliamentarians(commissionSelect.value);
+      if (commissionSelect.value) {
+        updateParliamentarians(commissionSelect.value);
+      }
       isInitialLoad = false;
     })
     .catch(error => {
@@ -103,6 +108,13 @@ function handleBulkAddCommission() {
 
 
 function handleAttendanceFormSync() {
+    // Pre-restrict interdependent dropdown values to prevent invalid
+    // combinations. When a user selects a commission or parliamentarian,
+    // the other dropdown dynamically filters to show only valid pairings.
+    // This improves UX by preventing form submissions with mismatched
+    // selections and making the valid options immediately clear.
+
+    // Applies to *single* attendance form only.
    if (!window.location.href.includes('attendences/new')) {
         return;
     }
@@ -115,7 +127,7 @@ function handleAttendanceFormSync() {
     return;
   }
 
-  // Store all parliamentarians by commission
+  // Store commission->parliamentarians and parliamentarian->commissions
   let commissionParliamentarians = {};
   let parliamentarianCommissions = {};
   const baseUrl = window.location.href.split("/").slice(0, -2).join("/");
