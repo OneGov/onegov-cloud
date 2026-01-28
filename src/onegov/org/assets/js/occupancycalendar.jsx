@@ -62,6 +62,11 @@ oc.defaultOptions = {
     highlights_max: null,
 
     /*
+        Base url for calculating the stats for the current date range
+    */
+    stats_url: null,
+
+    /*
         Base url for exporting the current date range as a PDF
     */
     pdf_url: null
@@ -308,7 +313,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         for (var i = 0; i < renderers.length; i++) {
             renderers[i](info.view, $(info.el));
         }
-        oc.setupViewNavigation(info.view.calendar, $(info.view.calendar.el), views, ocOptions.pdf_url);
+        oc.setupViewNavigation(info.view.calendar, $(info.view.calendar.el), views, ocOptions.stats_url, ocOptions.pdf_url);
         return null;
     };
 
@@ -430,7 +435,7 @@ oc.getGranularity = function(view_name) {
     return view_name.toLowerCase();
 };
 
-oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
+oc.setupViewNavigation = function(calendar, element, views, stats_url, pdf_url) {
     var chunk = $(element).find('.fc-header-toolbar .fc-toolbar-chunk:last-child');
     var i18n = calendar.currentData.availableRawLocales[calendar.getOption('locale')];
     var granularity_group = $('<div class="fc-button-group"></div>');
@@ -517,9 +522,12 @@ oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
             var wrapper = $('<div class="reservation-actions">');
             var form = $('<div class="reservation-form">').appendTo(wrapper);
 
-            oc.PDFExportForm.render(
+            oc.ExportForm.render(
                 form.get(0),
                 calendar,
+                true,
+                locale("Export as PDF"),
+                locale("Download"),
                 function(state) {
                     var url = new Url(pdf_url || '/');
                     url.query.start = state.start;
@@ -528,7 +536,7 @@ oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
                         url.query.accepted = '1';
                     }
                     window.location = url.toString();
-                    pdf_btn.popup('hide');
+                    $(this).closest('.popup').popup('hide');
                 }
             );
 
@@ -544,6 +552,58 @@ oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
     // append our groups
     granularity_group.appendTo(chunk);
     view_group.appendTo(chunk);
+
+    if (stats_url) {
+        var stats_btn = $('<button class="fc-button fc-button-primary"></button');
+        stats_btn.attr('aria-pressed', 'false');
+        stats_btn.html('<span class="fa fa-bar-chart fa-chart-bar"></span>');
+        stats_btn.attr('title', locale("Utilization"));
+        stats_btn.click(function() {
+            var wrapper = $('<div class="reservation-actions">');
+            var form = $('<div class="reservation-form">').appendTo(wrapper);
+            var lang = document.documentElement.getAttribute('lang') || 'en';
+
+            oc.ExportForm.render(
+                form.get(0),
+                calendar,
+                false,
+                locale("Utilization"),
+                locale("Select"),
+                function(state) {
+                    var url = new Url(stats_url || '/');
+                    url.query.start = state.start;
+                    url.query.end = state.end;
+                    $(this).closest('.popup').popup('hide');
+                    $.ajax(url.toString()).done(function(data) {
+                        var wrapper = $('<div class="reservation-actions">');
+                        ReactDOM.render(
+                            (
+                            <div>
+                                <h3>{locale("Reservations")}</h3>
+                                <p>{data.range}</p>
+                                <h3>{locale("Count")}</h3>
+                                <p>{data.count} {data.pending && (
+                                    <span>({data.pending} {locale("pending approval")})</span>
+                                )}</p>
+                                <h3>{locale("Utilization")}</h3>
+                                <p>{data.utilization.toLocaleString(lang, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}%</p>
+                            </div>
+                            ),
+                            wrapper.get(0)
+                        );
+                        oc.showPopup(calendar, stats_btn, wrapper);
+                    });
+                }
+            );
+
+            oc.showPopup(calendar, stats_btn, wrapper);
+        });
+
+        stats_btn.appendTo(chunk);
+    }
 };
 
 // highlight events implementation
@@ -764,7 +824,7 @@ oc.onPopupOpen = function(calendar) {
 
     var links = popup.find('a:not(.internal)');
 
-    // hookup all links with intercool
+    // hookup all links with intercooler
     links.each(function(_ix, link) {
         Intercooler.processNodes($(link));
     });
@@ -1235,15 +1295,18 @@ oc.BlockerEditForm.render = function(element, event, onSubmit) {
 };
 
 /*
-    Allows to fine-adjust the date range for the PDF export.
+    Allows to fine-adjust the date range for a export.
 */
-oc.PDFExportForm = React.createClass({
+oc.ExportForm = React.createClass({
     getInitialState: function() {
-        return {
+        var state = {
             start: this.props.start.format('YYYY-MM-DD'),
             end: this.props.end.format('YYYY-MM-DD'),
-            accepted: true
         };
+        if (this.props.accepted) {
+            state.accepted = true;
+        }
+        return state;
     },
     componentDidMount: function() {
         var node = $(ReactDOM.findDOMNode(this));
@@ -1293,7 +1356,7 @@ oc.PDFExportForm = React.createClass({
 
         return (
             <form>
-                <h3>{locale("Export as PDF")}</h3>
+                <h3>{this.props.formTitle}</h3>
                 <div className="field split">
                     <div>
                         <label htmlFor="start">{locale("From")}</label>
@@ -1312,28 +1375,33 @@ oc.PDFExportForm = React.createClass({
                         />
                     </div>
                 </div>
-                <div className="field checkbox">
-                    <div>
-                        <label className="label-text">
-                            <input name="accepted" type="checkbox"
-                                defaultChecked={this.state.accepted}
-                                onChange={this.handleInputChange}
-                            />
-                            {locale("Accepted reservations only")}
-                        </label>
+                {this.props.accepted && (
+                    <div className="field checkbox">
+                        <div>
+                            <label className="label-text">
+                                <input name="accepted" type="checkbox"
+                                    defaultChecked={this.state.accepted}
+                                    onChange={this.handleInputChange}
+                                />
+                                {locale("Accepted reservations only")}
+                            </label>
+                        </div>
                     </div>
-                </div>
+                )}
 
-                <button className={isValid && "button" || "button secondary"} disabled={!isValid} onClick={this.handleButton}>{locale("Download")}</button>
+                <button className={isValid && "button" || "button secondary"} disabled={!isValid} onClick={this.handleButton}>{this.props.submitTitle}</button>
             </form>
         );
 
     }
 });
 
-oc.PDFExportForm.render = function(element, calendar, onSubmit) {
+oc.ExportForm.render = function(element, calendar, accepted, formTitle, submitTitle, onSubmit) {
     ReactDOM.render(
-        <oc.PDFExportForm
+        <oc.ExportForm
+            formTitle={formTitle}
+            submitTitle={submitTitle}
+            accepted={accepted}
             start={moment(calendar.view.currentStart)}
             end={moment(calendar.view.currentEnd).subtract(1, 'day')}
             onSubmit={onSubmit}
