@@ -3179,3 +3179,118 @@ def test_delete_time_report_admin(
     session.expire_all()
     time_report = session.query(TranslatorTimeReport).get(report_id)
     assert time_report is None
+
+
+def test_export_time_reports(
+    client: 'Client',
+) -> None:
+    """Test exporting confirmed time reports as CSV."""
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    )
+    translator.pers_id = 12345
+    translator_id = translator.id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(
+        name='migrationsamt_und_passbuero'
+    )
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'telephonic'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '10:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '11:30'
+    page.form['case_number'] = 'EXPORT-TEST'
+    page = page.form.submit().follow()
+
+    report = (
+        session.query(TranslatorTimeReport)
+        .filter_by(translator_id=translator_id)
+        .first()
+    )
+    assert report is not None
+    report_id = report.id
+    assert report.status == 'pending'
+    assert report.exported is False
+
+    # Claim and accept the time report to confirm it
+    client.login_editor()
+    ticket = report.get_ticket(session)
+    assert ticket is not None
+    ticket_url = (
+        f'/ticket/{ticket.handler_code}/{ticket.id.hex}'
+    )
+    ticket_page = client.get(ticket_url)
+    ticket_page = ticket_page.click('Ticket annehmen').follow()
+    accept_url = ticket_page.pyquery(
+        'a.accept-link'
+    )[0].attrib['ic-post-to']
+    client.post(accept_url)
+
+    session.expire_all()
+    report = session.query(TranslatorTimeReport).get(report_id)
+    assert report.status == 'confirmed'
+    assert report.exported is False
+
+    # Verify export button is shown
+    page = client.get('/time-reports')
+    assert 'TRANSLATOR, Test' in page
+    assert 'export-accounting' in page
+
+    # Extract csrf-protected export URL from ic-post-to
+    page_text = str(page)
+    export_match = re.search(
+        r'ic-post-to="([^"]*export-accounting[^"]*)"',
+        page_text,
+    )
+    assert export_match is not None, (
+        'No export intercooler link found'
+    )
+    export_url = export_match.group(1)
+
+    response = client.post(export_url)
+    assert response.headers['Content-Type'] == 'text/csv; charset=iso-8859-1'
+    assert 'translator_export_' in response.content_disposition
+
+    csv_content = response.body.decode('iso-8859-1')
+    assert '12345' in csv_content
+
+    # Verify report is marked as exported with timestamp and batch id
+    session.expire_all()
+    report = session.query(TranslatorTimeReport).get(report_id)
+    assert report.exported is True
+    assert report.exported_at is not None
+    assert report.export_batch_id is not None
+    batch_id = report.export_batch_id
+
+    # Default view no longer shows exported reports
+    page = client.get('/time-reports')
+    assert 'Keine Zeiterfassungen gefunden' in page
+
+    # Archive view shows exported reports
+    page = client.get('/time-reports?archive=true')
+
+    table = page.pyquery('.time-reports-list')[0].text_content()
+    assert 'Exportiert' in table
+    assert 'TRANSLATOR, Test' in table
+
+    # Batch id is preserved
+    report = session.query(TranslatorTimeReport).get(report_id)
+    assert report.export_batch_id == batch_id
