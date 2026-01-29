@@ -12,6 +12,7 @@ from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.file import File
+from wtforms.validators import ValidationError as WtfValidationError
 
 
 from typing import TYPE_CHECKING
@@ -579,8 +580,10 @@ def test_introduce_required_field_fail(session: Session) -> None:
         Seats *= 0..99
     """
 
-    with pytest.raises(ValidationError):
+    with pytest.raises((ValidationError, WtfValidationError)) as error:
         session.flush()
+        assert ('"Seats": New fields cannot be required initially.'
+                in str(error))
 
 
 def test_introduce_required_field(session: Session) -> None:

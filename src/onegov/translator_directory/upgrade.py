@@ -317,3 +317,31 @@ def add_contract_number_to_translator(context: UpgradeContext) -> None:
         context.operations.add_column(
             'translators', Column('contract_number', Text)
         )
+
+
+@upgrade_task('Add exported column to time reports')
+def add_exported_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'exported'):
+        context.add_column_with_defaults(
+            table='translator_time_reports',
+            column=Column('exported', Boolean, nullable=False, default=False),
+            default=lambda x: False,
+        )
+
+
+@upgrade_task('Add export tracking columns to time reports')
+def add_export_tracking_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'exported_at'):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column('exported_at', UTCDateTime, nullable=True),
+        )
+    if not context.has_column('translator_time_reports', 'export_batch_id'):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column('export_batch_id', UUID, nullable=True),
+        )

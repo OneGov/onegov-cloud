@@ -51,6 +51,7 @@ from typing import cast, Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence, Iterator
     from onegov.core.types import JSON_ro, RenderData, EmailJsonDict
+    from onegov.directory.migration import DirectoryMigration
     from onegov.directory.models.directory import DirectoryEntryForm
     from onegov.org.models.directory import ExtendedDirectoryEntryForm
     from onegov.org.request import OrgRequest
@@ -233,15 +234,15 @@ def handle_edit_directory(
                             'The requested change cannot be performed, '
                             'as it is incompatible with existing entries'
                         ))
+                        alert_migration_errors(migration, request)
                     else:
                         if not request.params.get('confirm'):
                             form.action += '&confirm=1'
                             save_changes = False
 
             if save_changes:
-                form.populate_obj(self.directory)
-
                 try:
+                    form.populate_obj(self.directory)
                     self.session.flush()
                 except ValidationError as e:
                     error = e
@@ -296,6 +297,52 @@ def handle_edit_directory(
         'error_translate': lambda text: request.translate(_(text)),
         'directory': self.directory,
     }
+
+
+def alert_migration_errors(
+    migration: DirectoryMigration,
+    request: OrgRequest
+) -> None:
+    if migration.multiple_option_changes_in_one_step():
+        request.alert(
+            _(
+                'Do not mix adding, removing, and renaming options in the '
+                'same migration. Please use separate migrations for each '
+                'option.'
+            )
+        )
+
+    if migration.added_required_fields():
+        field_names = migration.get_added_required_field_ids()
+        request.alert(_(
+            '${fields}: New fields cannot be required initially. '
+            'Require them in a separate migration step.', mapping={
+                'fields': ', '.join(f'"{f}"' for f in field_names)
+            }
+        ))
+
+    if len(migration.changes.renamed_options) > 1:
+        request.alert(
+            _(
+                'Renaming multiple options in the same migration is not '
+                'supported. Please use separate migrations for each option.'
+            )
+        )
+
+    # check for incompatible type changes
+    for changed in migration.changes.changed_fields:
+        old = migration.changes.old[changed]
+        new = migration.changes.new[changed]
+
+        if not migration.fieldtype_migrations.possible(old.type, new.type):
+            request.alert(_(
+                'Cannot convert field "${field}" from type "${old_type}" '
+                'to "${new_type}".', mapping={
+                    'field': changed,
+                    'old_type': old.type,
+                    'new_type': new.type
+                }
+            ))
 
 
 @OrgApp.view(

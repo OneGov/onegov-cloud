@@ -1,8 +1,52 @@
 # Changes
 
+## 2026.3
+
+`2026-01-29` | [e17f907a3b...cafeeaf3b0](https://github.com/OneGov/onegov-cloud/compare/e17f907a3b^...cafeeaf3b0)
+
+### Feriennet
+
+##### Banner
+
+`Feature` | [PRO-1474](https://linear.app/projuventute/issue/PRO-1474) | [09587de5de](https://github.com/onegov/onegov-cloud/commit/09587de5dec6f8da0f64717cc926937b4a535983)
+
+### Org
+
+##### Adds a resource switcher to the occupancy view
+
+`Feature` | [OGC-2873](https://linear.app/onegovcloud/issue/OGC-2873) | [3943814f00](https://github.com/onegov/onegov-cloud/commit/3943814f00d40378b65be76af3100f4f9ec34114)
+
+##### Adds an utilization stats button to the occupancy view
+
+`Feature` | [OGC-2062](https://linear.app/onegovcloud/issue/OGC-2062) | [0baff1be97](https://github.com/onegov/onegov-cloud/commit/0baff1be97f0105c4f9fb3fdb37c292a93e91350)
+
+##### Adds missing access hints in boardlets
+
+`Bugfix` | [cd3d24431a](https://github.com/onegov/onegov-cloud/commit/cd3d24431a59ab8edde4049e50eb5b8ba5decb51)
+
+##### Resolve fixme for TagField
+
+`Bugfix` | [92b85f250f](https://github.com/onegov/onegov-cloud/commit/92b85f250f0f9cd3d0101ed082ff9d057c3a43bf)
+
+##### Fixes reservation blockers for non-partly available allocations
+
+`Bugfix` | [OGC-2937](https://linear.app/onegovcloud/issue/OGC-2937) | [92064770d5](https://github.com/onegov/onegov-cloud/commit/92064770d54e48997a5d471a859def6ab336f022)
+
+### Search
+
+##### Adds it_ch to used locales for Org and Town6
+
+`Feature` | [OGC-2931](https://linear.app/onegovcloud/issue/OGC-2931) | [138cf9df78](https://github.com/onegov/onegov-cloud/commit/138cf9df78942706cddb5c1f7a55cb373d3cb59e)
+
+### Town6
+
+##### Allow to copy newsletter.
+
+`Feature` | [OGC-1663](https://linear.app/onegovcloud/issue/OGC-1663) | [9af1fd1d74](https://github.com/onegov/onegov-cloud/commit/9af1fd1d74a7297f6314e7c093b0363220e399fc)
+
 ## 2026.2
 
-`2026-01-23` | [7fe7cf163c...023c5e9877](https://github.com/OneGov/onegov-cloud/compare/7fe7cf163c^...023c5e9877)
+`2026-01-23` | [7fe7cf163c...2f191d9543](https://github.com/OneGov/onegov-cloud/compare/7fe7cf163c^...2f191d9543)
 
 ### Core
 
@@ -2571,46 +2615,4 @@ The new default is to apply extra pricing per item, existing resources
 will still use the old default of "one-off".
 
 `Feature` | [OGC-2262](https://linear.app/onegovcloud/issue/OGC-2262) | [a94bdc2daf](https://github.com/onegov/onegov-cloud/commit/a94bdc2dafd2318deb21618a1613125807d20d05)
-
-## 2025.24
-
-`2025-05-23` | [2a00905128...f104144b6b](https://github.com/OneGov/onegov-cloud/compare/2a00905128^...f104144b6b)
-
-### Landsgemeinde
-
-##### Allow Fullscreen for Videos
-
-`Bugfix` | [OGC-2231](https://linear.app/onegovcloud/issue/OGC-2231) | [eb98dcf795](https://github.com/onegov/onegov-cloud/commit/eb98dcf7951ff1a14ebb9efedf1e1b69379e49fe)
-
-### Org
-
-##### Adds optional proportional discounts for reservations to formcode
-
-`Feature` | [OGC-2252](https://linear.app/onegovcloud/issue/OGC-2252) | [c2a46995af](https://github.com/onegov/onegov-cloud/commit/c2a46995af5e77701e20e29acd192a132cb9f8b7)
-
-##### Allows key codes in tickets with future reservations to be edited
-
-`Feature` | [OGC-2205](https://linear.app/onegovcloud/issue/OGC-2205) | [5fc2303cc7](https://github.com/onegov/onegov-cloud/commit/5fc2303cc7c8f16cb4e551a168311452082eae0b)
-
-##### Add icons and links or tiktok and linkedIn
-
-`Bugfix` | [OGC-2249](https://linear.app/onegovcloud/issue/OGC-2249) | [dff0d2db74](https://github.com/onegov/onegov-cloud/commit/dff0d2db745356273d4edebed048e6fa63404d29)
-
-### Reservation
-
-##### Switches libres JSON columns from `TEXT` to `JSONB`
-
-`Performance` | [OGC-2035](https://linear.app/onegovcloud/issue/OGC-2035) | [10219ad990](https://github.com/onegov/onegov-cloud/commit/10219ad9906e18f5d91b76f503d18212b288054e)
-
-### Search
-
-##### Replaces `langdetect` with `lingua-language-detector`
-
-`Performance` | [OGC-1781](https://linear.app/onegovcloud/issue/OGC-1781) | [23578296b5](https://github.com/onegov/onegov-cloud/commit/23578296b580b3c9342b77f53d10147e8cc9c7b7)
-
-### Wil
-
-##### Adds daily cron job to import events from saiten
-
-`Feature` | [OGC-2184](https://linear.app/onegovcloud/issue/OGC-2184) | [2a00905128](https://github.com/onegov/onegov-cloud/commit/2a00905128f4d06b99d8a53dd7343d7355459571)
 
