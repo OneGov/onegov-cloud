@@ -222,6 +222,9 @@ def add_bulk_attendence(
                     parliamentarian_id=parliamentarian_id, **data
                 )
                 attendence.bulk_edit_id = bulk_edit_id
+                # Note: If abschluss is set in this bulk operation, the
+                # members in raw_parl_ids will be immediately blocked from
+                # adding new attendances in this settlement run
                 Change.add(request, 'add', attendence)
         else:
             request.warning(_('No parliamentarians selected'))
