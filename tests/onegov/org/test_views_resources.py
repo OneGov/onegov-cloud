@@ -2287,6 +2287,14 @@ def test_occupancy_view(client: Client) -> None:
         '/resource/tageskarte/occupancy-json?start=2015-08-28&end=2015-08-29'
     )
     assert occupancy.status_code == 200
+    occupancy = client.get(
+        '/resource/tageskarte/occupancy-stats?start=2015-08-28&end=2015-08-29'
+    )
+    assert occupancy.status_code == 200
+    data = occupancy.json
+    assert data['count'] == 1
+    assert data['pending'] == 1
+    assert data['utilization'] == 100.0
 
 
 def test_occupancy_view_member_access(client: Client) -> None:
@@ -2316,6 +2324,10 @@ def test_occupancy_view_member_access(client: Client) -> None:
     assert occupancy.status_code == 200
 
     occupancy = client.get('/resource/test/occupancy-json')
+    assert occupancy.status_code == 200
+    occupancy = client.get(
+        '/resource/test/occupancy-stats?start=2015-08-28&end=2015-08-29'
+    )
     assert occupancy.status_code == 200
 
 

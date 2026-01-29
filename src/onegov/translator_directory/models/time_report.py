@@ -6,7 +6,16 @@ from uuid import uuid4
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
-from sqlalchemy import ARRAY, Column, Date, Enum, Float, ForeignKey, Integer
+from sqlalchemy import (
+    ARRAY,
+    Boolean,
+    Column,
+    Date,
+    Enum,
+    Float,
+    ForeignKey,
+    Integer,
+)
 from sqlalchemy import Numeric, Text
 from sqlalchemy.orm import relationship
 
@@ -122,6 +131,15 @@ class TranslatorTimeReport(Base, TimestampMixin):
         Enum('pending', 'confirmed', name='time_report_status'),  # type: ignore[arg-type]
         nullable=False,
         default='pending',
+    )
+
+    exported: Column[bool] = Column(Boolean, nullable=False, default=False)
+
+    exported_at: Column[datetime | None] = Column(UTCDateTime, nullable=True)
+
+    export_batch_id: Column[uuid.UUID | None] = Column(
+        UUID,  # type:ignore[arg-type]
+        nullable=True,
     )
 
     SURCHARGE_RATES: dict[str, Decimal] = {

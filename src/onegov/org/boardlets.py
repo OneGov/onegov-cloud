@@ -130,7 +130,9 @@ class TicketBoardlet(OrgBoardlet):
 def get_icon_for_access_level(access: str) -> str:
     access_icons = {
         'public': 'fas fa-eye',
+        'mtan': 'far fa-mobile',
         'secret': 'fas fa-user-secret',  # nosec: B105
+        'secret_mtan': 'fas fa-mobile',
         'private': 'fas fa-lock',
         'member': 'fas fa-users'
     }
@@ -144,11 +146,13 @@ def get_icon_for_access_level(access: str) -> str:
 def get_icon_title(request: OrgRequest, access: str) -> str:
     access_texts = {
         'public': 'Public',
+        'mtan': 'This site is public but requires submitting an mTAN',
         'secret': 'Through URL only (not listed)',  # nosec: B105
+        'secret_mtan': 'This site is secret and requires submitting an mTAN',
         'private': 'Only by privileged users',
         'member': 'Only by privileged users and members'
     }
-    if access not in ['public', 'secret', 'private', 'member']:
+    if access not in access_texts:
         raise ValueError(f'Invalid access: {access}')
 
     a = request.translate(_('Access'))

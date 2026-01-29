@@ -1907,6 +1907,8 @@ def adjust_reservation(
         request.assert_valid_csrf_token()
         new_start = isodate.parse_datetime(request.GET['start'])
         new_end = isodate.parse_datetime(request.GET['end'])
+        # NOTE: FullCalendar ends are exclusive but for us they're inclusive
+        new_end -= timedelta(microseconds=1)
     elif not form.submitted(request):
         return show_form()
     else:

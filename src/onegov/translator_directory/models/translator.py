@@ -88,6 +88,9 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     # Personal-Nr.
     pers_id: Column[int | None] = Column(Integer)
 
+    # Vertragsnummer / AnsV-Nr. (Anstellungsverhältnis-Nr.)
+    contract_number: Column[str | None] = Column(Text)
+
     # Zulassung / admission
     admission: Column[AdmissionState] = Column(
         Enum(*ADMISSIONS, name='admission_state'),  # type:ignore[arg-type]

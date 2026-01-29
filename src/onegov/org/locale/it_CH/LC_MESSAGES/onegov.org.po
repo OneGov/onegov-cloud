@@ -3506,6 +3506,9 @@ msgstr "Iscritti"
 msgid "Test"
 msgstr "Test"
 
+msgid "Copy"
+msgstr "Copia"
+
 msgid "Delete newsletter"
 msgstr "Elimina newsletter"
 
@@ -4176,9 +4179,6 @@ msgstr "Eliminare iFrame"
 #, python-format
 msgid "Do you really want to delete the iFrame \"${title}\"?"
 msgstr "Si vuole davvero eliminare l'iFrame \"${title}\"?"
-
-msgid "Copy"
-msgstr "Copia"
 
 msgid "A News cannot be pasted as Topic"
 msgstr "Una notizia non può essere incollata come argomento"
@@ -6927,6 +6927,15 @@ msgstr "Aggiunta una nuova newsletter"
 
 msgid "New Newsletter"
 msgstr "Nuova newsletter"
+
+msgid "Invalid clipboard content"
+msgstr "Contenuto degli appunti non valido"
+
+msgid "Newsletter pasted successfully"
+msgstr "Newsletter incollata con successo"
+
+msgid "Paste Newsletter"
+msgstr "Incolla newsletter"
 
 msgid "Edit Newsletter"
 msgstr "Modifica la newsletter"

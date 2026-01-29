@@ -5,76 +5,28 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="cell small-12">
-                <div tal:condition="not: layout.has_confirmed_reports"
-                     class="callout warning"
-                     style="margin-bottom: 1rem;">
-                    <p i18n:translate="">
-                        No confirmed time reports available for export.
-                        Time reports must be confirmed before they can be exported.
-                    </p>
-                </div>
-                <div tal:condition="layout.has_confirmed_reports"
-                     style="margin-bottom: 1rem;">
-                    <div class="grid-x grid-padding-x">
-                        <div class="cell small-12">
-                            <form method="get" id="time-reports-filter">
-                                <div class="grid-x grid-padding-x">
-                                    <div class="cell small-12 medium-4">
-                                        <label>
-                                            <span i18n:translate="">
-                                                Month
-                                            </span>
-                                            <select name="month">
-                                                <option
-                                                    tal:repeat="month_item months"
-                                                    value="${month_item[0]}"
-                                                    selected="${month_item[0] == (selected_month or default_month) or None}">
-                                                    ${month_item[1]}
-                                                </option>
-                                            </select>
-                                        </label>
-                                    </div>
-                                    <div class="cell small-12 medium-4">
-                                        <label>
-                                            <span i18n:translate="">
-                                                Year
-                                            </span>
-                                            <select name="year">
-                                                <option
-                                                    tal:repeat="year_item years"
-                                                    value="${year_item}"
-                                                    selected="${year_item == (selected_year or default_year) or None}">
-                                                    ${year_item}
-                                                </option>
-                                            </select>
-                                        </label>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="cell small-12">
-                            <form action="${export_url}"
-                                  method="POST"
-                                  class="grid-x grid-padding-x">
-                                <input type="hidden"
-                                       name="month"
-                                       value="${selected_month or default_month}" />
-                                <input type="hidden"
-                                       name="year"
-                                       value="${selected_year or default_year}" />
-                                <button type="submit"
-                                        class="button primary">
-                                    <span i18n:translate="">
-                                        Export für Buchhaltung
-                                    </span>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                <div style="display: flex; align-items: center;
+                            gap: 0.5rem; margin-bottom: 1rem;
+                            flex-wrap: wrap;">
+                    <a tal:condition="not: archive"
+                       href="${archive_toggle_url}"
+                       class="button secondary round small"
+                       >${archive_toggle_text}</a>
+                    <a tal:condition="archive"
+                       href="${archive_toggle_url}"
+                       class="button primary round small"
+                       >${archive_toggle_text}</a>
+                    <tal:b condition="export_link"
+                           replace="export_link(layout)" />
                 </div>
                 <div class="time-reports-list">
-                    <p tal:condition="not: reports" i18n:translate="">
+                    <p tal:condition="python: not reports and not archive"
+                       i18n:translate="">
                         No time reports found
+                    </p>
+                    <p tal:condition="python: not reports and archive"
+                       i18n:translate="">
+                        No archived time reports found
                     </p>
                     <table class="fullwidth" tal:condition="reports">
                         <thead>
@@ -86,6 +38,7 @@
                             <th i18n:translate="">Total</th>
                             <th i18n:translate="">Status</th>
                             <th i18n:translate="">Ticket</th>
+                            <th i18n:translate="">Actions</th>
                         </thead>
                         <tbody>
                             <tr tal:repeat="report reports">
@@ -109,9 +62,14 @@
                                     report.total_compensation)}</td>
                                 <td>
                                     <span tal:condition="report.status == 'pending'"
+                                          class="label secondary"
                                           i18n:translate="">Pending</span>
-                                    <span tal:condition="report.status == 'confirmed'"
+                                    <span tal:condition="python: report.status == 'confirmed' and not report.exported"
+                                          class="label"
                                           i18n:translate="">Confirmed</span>
+                                    <span tal:condition="python: report.status == 'confirmed' and report.exported"
+                                          class="label success"
+                                          i18n:translate="">Exported</span>
                                 </td>
                                 <td tal:define="ticket report_tickets.get(
                                     str(report.id))">
@@ -119,6 +77,12 @@
                                        tal:condition="ticket"
                                        i18n:translate="">View Ticket</a>
                                     <span tal:condition="not: ticket">-</span>
+                                </td>
+                                <td tal:define="delete_link delete_links.get(
+                                    str(report.id))">
+                                    <tal:b condition="delete_link"
+                                           replace="delete_link(layout)" />
+                                    <span tal:condition="not: delete_link">-</span>
                                 </td>
                             </tr>
                         </tbody>

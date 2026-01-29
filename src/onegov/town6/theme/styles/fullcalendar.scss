@@ -760,10 +760,10 @@
 
     .label-text {
         color: $form-label-color;
-        display: inline-block;
+        display: block;
         font-size: .875rem;
+        font-weight: normal;
         margin-right: 1rem;
-        width: 100%;
     }
 
     label {
