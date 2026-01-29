@@ -119,6 +119,7 @@ def test_add_vacation_activity(scenario: Scenario) -> None:
         realname=None,
         phone='041 312 4567',
         complete_profile=False,
+        email='info@donutshop.org'
     )
 
     activity = scenario.add_activity(
@@ -138,8 +139,9 @@ def test_add_vacation_activity(scenario: Scenario) -> None:
     assert activity.text == Markup('<h1>Attack of the Killer Donuts</h1>')
     assert activity.username == owner.username
 
-    assert activity.organiser == ['maxi@example.org', '041 312 4567']
-    assert activity.organiser_text == 'maxi@example.org 041 312 4567'
+    assert activity.organizer_name == 'maxi@example.org'
+    assert activity.organization_text == 'info@donutshop.org 041 312 4567'
+    assert activity.organizer_details_text == ''
 
     # set user realname and data
     owner.realname = 'Max'
@@ -147,16 +149,9 @@ def test_add_vacation_activity(scenario: Scenario) -> None:
         'organisation': 'Donut Lovers Inc.',
         'place': 'Donut City',
         'zip_code': '12345',
+        'emergency': 'Max 079 123 4567',
     }
 
-    assert activity.organiser == [
-        'maxi@example.org',
-        'Max',
-        'Donut Lovers Inc.',
-        '12345',
-        'Donut City',
-    ]
-    assert (
-        activity.organiser_text
-        == 'maxi@example.org Max Donut Lovers Inc. 12345 Donut City'
-    )
+    assert activity.organizer_name == 'Max'
+    assert activity.organization_text == 'Donut Lovers Inc. 12345 Donut City'
+    assert activity.organizer_details_text == 'Max 079 123 4567'
