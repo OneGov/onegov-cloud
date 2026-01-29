@@ -553,3 +553,128 @@ def force_delete_languages(
             request.session.flush()
 
     return do_delete_languages
+
+
+@cli.command(
+    name='recalculate-travel-details', context_settings={'singular': True}
+)
+@click.option('--dry-run/-no-dry-run', default=False)
+@click.option(
+    '--status',
+    type=click.Choice(['pending', 'confirmed', 'all']),
+    default='all',
+    help='Which reports to fix',
+)
+def recalculate_travel_details_cli(
+    dry_run: bool, status: str
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
+    r"""Recalculate travel compensation and distance for open time reports.
+
+    This fixes incorrect travel calculations due to old logic errors.
+    Only updates reports that have not yet been exported to accounting.
+
+    Example:
+        onegov-translator --select /translator_directory/zug \
+            recalculate-travel-details --dry-run
+    """
+
+    def do_recalculate(
+        request: TranslatorAppRequest, app: TranslatorDirectoryApp
+    ) -> None:
+        from decimal import Decimal
+        from onegov.translator_directory.models.time_report import (
+            TranslatorTimeReport,
+        )
+        from onegov.translator_directory.utils import (
+            calculate_distance_to_location,
+        )
+
+        # Query open time reports (not exported)
+        query = request.session.query(TranslatorTimeReport).filter(
+            TranslatorTimeReport.exported == False
+        )
+
+        # Filter by status if specified
+        if status == 'pending':
+            query = query.filter(TranslatorTimeReport.status == 'pending')
+        elif status == 'confirmed':
+            query = query.filter(TranslatorTimeReport.status == 'confirmed')
+
+        reports = query.all()
+        updated_count = 0
+        skipped_count = 0
+
+        click.secho(f'Processing {len(reports)} time reports...', fg='blue')
+
+        for report in reports:
+            translator = report.translator
+            if not translator:
+                click.secho(
+                    f'Skipping report {report.id}: translator not found',
+                    fg='yellow',
+                )
+                skipped_count += 1
+                continue
+
+            # Calculate travel details
+            compensation = Decimal('0')
+            distance = None
+
+            # Skip travel calculation if requested
+            if report.assignment_type == 'on-site':
+                one_way_km = None
+
+                # Try to calculate distance if we have coordinates
+                if translator.coordinates:
+                    location_key = report.assignment_location or ''
+                    one_way_km = calculate_distance_to_location(
+                        request, translator.coordinates, location_key, None
+                    )
+
+                # Fall back to translator's drive_distance
+                if one_way_km is None and translator.drive_distance:
+                    one_way_km = float(translator.drive_distance)
+
+                # Calculate compensation based on distance tiers
+                if one_way_km is not None:
+                    distance = one_way_km
+                    if one_way_km <= 25:
+                        compensation = Decimal('20')
+                    elif one_way_km <= 50:
+                        compensation = Decimal('50')
+                    elif one_way_km <= 100:
+                        compensation = Decimal('100')
+                    else:
+                        compensation = Decimal('150')
+
+            # Update the report
+            old_comp = report.travel_compensation
+            old_dist = report.travel_distance
+            report.travel_compensation = compensation
+            report.travel_distance = distance
+
+            # Recalculate total compensation
+            breakdown = report.calculate_compensation_breakdown()
+            report.total_compensation = breakdown['total']
+
+            if old_comp != compensation or old_dist != distance:
+                click.secho(
+                    f'✓ {translator.title}: '
+                    f'comp {old_comp}→{compensation}, '
+                    f'dist {old_dist}→{distance}',
+                    fg='green',
+                )
+                updated_count += 1
+            else:
+                skipped_count += 1
+
+        click.secho(f'Updated: {updated_count}/{len(reports)}', fg='green')
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Dry run: transaction aborted', fg='yellow')
+        else:
+            request.session.flush()
+            click.secho('Changes committed', fg='green')
+
+    return do_recalculate
