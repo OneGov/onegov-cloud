@@ -884,9 +884,12 @@ def test_directory_explicitly_link_referenced_files(client: Client) -> None:
         page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
+
     pdf_url = (
         client.get('/files')
-        .pyquery('[ic-trigger-from="#button-1"]')
+        .pyquery(f'[ic-trigger-from="#button-{pdf.id}"]')
         .attr('ic-get-from')
         .removesuffix('/details')
     )
@@ -894,7 +897,6 @@ def test_directory_explicitly_link_referenced_files(client: Client) -> None:
 
     create_directory(client, text=pdf_link)
 
-    session = client.app.session()
     pdf = FileCollection(session).query().one()
     directory = (
         DirectoryCollection(session).query()

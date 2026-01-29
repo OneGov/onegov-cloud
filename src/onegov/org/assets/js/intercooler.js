@@ -1732,11 +1732,8 @@ var Intercooler = Intercooler || (function() {
   }
 
   function computeArgs(args) {
-    try {
-      return eval("[" + args + "]")
-    } catch (e) {
-      return [$.trim(args)];
-    }
+    // PATCH: Removed eval
+    return [$.trim(args)];
   }
 
   function makeApplyAction(target, action, args) {

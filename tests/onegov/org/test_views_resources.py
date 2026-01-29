@@ -207,9 +207,11 @@ def test_resources_explicitly_link_referenced_files(client: Client) -> None:
         page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
     pdf_url = (
         admin.get('/files')
-        .pyquery('[ic-trigger-from="#button-1"]')
+        .pyquery(f'[ic-trigger-from="#button-{pdf.id}"]')
         .attr('ic-get-from')
         .removesuffix('/details')
     )
@@ -226,7 +228,6 @@ def test_resources_explicitly_link_referenced_files(client: Client) -> None:
     resource_page = new_item.form.submit().follow()
     assert 'Dorf Bike' in resource_page
 
-    session = client.app.session()
     pdf = FileCollection(session).query().one()
     resource = (
         ResourceCollection(client.app.libres_context).query()

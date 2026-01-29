@@ -44,7 +44,7 @@ def test_sign_document(client: Client) -> None:
         page: ExtendedResponse,
         token: str
     ) -> ExtendedResponse:
-        rex = r"'(http://\w+/\w+/\w+/sign?[^']+)'"
+        rex = r'"(http://\w+/\w+/\w+/sign?[^"]+)"'
         url = re.search(rex, page.text).group(1)  # type: ignore[union-attr]
         return client.post(url, {'token': token})
 
