@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-10-13 11:02+0200\n"
+"POT-Creation-Date: 2026-01-29 10:45+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -47,6 +47,14 @@ msgstr "Verwaltung"
 msgid "Profile"
 msgstr "Profil"
 
+msgid "Cannot create attendance in closed settlement run."
+msgstr ""
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
+
+msgid "Attendance date must be within a settlement run."
+msgstr "Anwesenheitsdatum muss innerhalb eines Abrechnungslaufs liegen."
+
 msgid "No within an active settlement run."
 msgstr "Nicht in einem aktiven Abrechungslauf"
 
@@ -88,8 +96,8 @@ msgstr "Ziel-Parlamentarier:in nicht gefunden."
 
 msgid "You can only edit your own or your commission members' attendance."
 msgstr ""
-"Sie können nur für sich selbst oder Ihre Kommissionsmitglieder "
-"Anwesenheiten bearbeiten."
+"Sie können nur für sich selbst oder Ihre Kommissionsmitglieder Anwesenheiten "
+"bearbeiten."
 
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
@@ -756,11 +764,6 @@ msgstr ""
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
 
-msgid "Cannot create attendance in closed settlement run."
-msgstr ""
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
-
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
 
@@ -778,10 +781,6 @@ msgstr "Keine Parlamentarier:innen ausgewählt"
 
 msgid "Added commission session"
 msgstr "Kommissionssitzung hinzugefügt"
-
-msgid "Cannot edit attendance in closed settlement run."
-msgstr ""
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
 
 msgid "Edit plenary session"
 msgstr "Plenarsitzung bearbeiten"
@@ -834,8 +833,8 @@ msgstr "Kommissionsitzung hinzugefügt"
 msgid "Data Import (JSON)"
 msgstr "Import (JSON)"
 
-msgid "Dashboard"
-msgstr "Startseite"
+msgid "Overview"
+msgstr "Übersicht"
 
 msgid "Import completed successfully"
 msgstr "Import erfolgreich abgeschlossen"
@@ -953,3 +952,9 @@ msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
 
+#~ msgid "Cannot edit attendance in closed settlement run."
+#~ msgstr ""
+#~ "Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
+
+#~ msgid "Dashboard"
+#~ msgstr "Startseite"
