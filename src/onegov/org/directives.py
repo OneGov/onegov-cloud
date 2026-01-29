@@ -5,6 +5,9 @@ from itertools import count
 
 
 from typing import cast, Any, ClassVar, Literal, TYPE_CHECKING
+
+from onegov.core import Framework
+
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.elements import LinkGroup
@@ -302,7 +305,7 @@ class Layout(Action):
     """
 
     config = {
-        'layout_registry': dict
+        'app_class': Framework
     }
 
     def __init__(self, model: type) -> None:
@@ -310,13 +313,17 @@ class Layout(Action):
 
     def identifier(  # type:ignore[override]
         self,
-        layout_registry: dict[type, Layout]
+        app_class: type[Framework]
     ) -> str:
         return str(self.model)
 
     def perform(  # type:ignore[override]
         self,
-        layout: Layout,
-        layout_registry: dict[type, Layout]
+        obj: type[Layout],
+        app_class: type[Framework]
     ) -> None:
-        layout_registry[self.model] = layout
+
+        app_class.get_layout_class.register(
+            model=self.model,
+            func=lambda app_class, model: obj
+        )

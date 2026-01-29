@@ -6,7 +6,6 @@ from onegov.core.orm import orm_cached
 from onegov.core.request import CoreRequest
 from onegov.core.security import Private
 from onegov.core.utils import normalize_for_url
-from onegov.org.layout import DefaultLayout, Layout
 from onegov.org.models import News, TANAccessCollection, Topic
 from onegov.page import Page, PageCollection
 from onegov.user import User
@@ -19,6 +18,7 @@ if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
     from onegov.core.analytics import AnalyticsProvider
     from onegov.org.app import OrgApp
+    from onegov.org.layout import DefaultLayout, Layout
     from onegov.ticket import Ticket
 
 
@@ -289,16 +289,10 @@ class OrgRequest(CoreRequest):
         """
         Get the registered layout for a model instance.
         """
-        layout_registry = self.app.config.layout_registry
-        model_type = model if isinstance(model, type) else type(model)
+        layout_class = self.app.get_layout_class(model)
 
-        layout_class = None
-        for cls in model_type.mro():
-            layout_class = layout_registry.get(cls)
-            if layout_class:
-                break
-
-        if layout_class is None:
-            layout_class = DefaultLayout
+        # if layout_class is None:
+        #     layout_class = DefaultLayout
+        assert layout_class is not None
 
         return layout_class(model, self)

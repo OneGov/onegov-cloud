@@ -37,6 +37,7 @@ from dectate import directive
 from functools import cached_property, wraps
 from itsdangerous import BadSignature, Signer
 from libres.db.models import ORMBase
+from morepath import dispatch_method
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
@@ -46,6 +47,8 @@ from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
+from reg import ClassIndex
+
 from onegov.core import cache, log, utils
 from onegov.core import directives
 from onegov.core.crypto import stored_random_token
@@ -68,6 +71,7 @@ from webob.exc import HTTPConflict, HTTPServiceUnavailable
 
 
 from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from _typeshed.wsgi import WSGIApplication, WSGIEnvironment, StartResponse
@@ -77,6 +81,7 @@ if TYPE_CHECKING:
     from gettext import GNUTranslations
     from morepath.request import Request
     from morepath.settings import SettingRegistry
+    from onegov.org.layout import Layout
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
     from typing_extensions import ParamSpec
@@ -1551,6 +1556,20 @@ class Framework(
         return Fernet(
             self.hashed_identity_key
         ).decrypt(cyphertext).decode('utf-8')
+
+    @dispatch_method()
+    def get_layout_class(app_class, obj: object) -> type[Layout] | None:
+        return None
+
+
+@Framework.predicate(
+    Framework.get_layout_class,
+    name='model',
+    default=None,
+    index=ClassIndex
+)
+def layout_predicate(app_class: type[Framework], obj: object) -> type[Layout]:
+    return obj if isinstance(obj, type) else obj.__class__
 
 
 @Framework.webasset_url()
