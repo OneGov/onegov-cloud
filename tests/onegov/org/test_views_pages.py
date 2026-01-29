@@ -665,8 +665,8 @@ def test_view_page_as_member(client: Client) -> None:
 def test_add_iframe(client: Client) -> None:
     fs = client.app.filestorage
     assert fs is not None
-    data = {
-        'allowed_domains': ['https://www.seantis.ch/']
+    data = {  # with and without trailing slash
+        'allowed_domains': ['https://www.seantis.ch/', 'https://www.myorg.org']
     }
     with fs.open('allowed_iframe_domains.yml', 'w') as f:
         yaml.dump(data, f)
@@ -675,13 +675,21 @@ def test_add_iframe(client: Client) -> None:
     page = client.get('/topics/organisation').click('iFrame')
     page.form['title'] = "Success"
     page.form['url'] = "https://www.seantis.ch/success-stories/"
-    page = page.form.submit()
-    assert 'iframe' in page
-    assert 'https://www.seantis.ch/success-stories/' in page
+    page = page.form.submit().follow()
+    assert 'Die Domäne der URL ist für iFrames nicht zulässig.' not in page
+    assert 'iFrame wurde hinzugefügt' in page
 
     csp_str = page.headers['Content-Security-Policy']
     csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp_str.split(';')}
     assert "https://www.seantis.ch/" in csp['child-src']
+    assert "https://www.myorg.org" in csp['child-src']
+
+    page = client.get('/topics/organisation').click('iFrame')
+    page.form['title'] = "Fine"
+    page.form['url'] = "https://www.myorg.org/success-stories/"
+    page = page.form.submit().follow()
+    assert 'Die Domäne der URL ist für iFrames nicht zulässig.' not in page
+    assert 'iFrame wurde hinzugefügt' in page
 
     page = client.get('/topics/organisation').click('iFrame')
     page.form['title'] = "Failure"
