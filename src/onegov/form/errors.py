@@ -57,3 +57,14 @@ class FieldCompileError(FormError):
 class MixedTypeError(FormError):
     def __init__(self, field_name: str):
         self.field_name = field_name
+
+
+class RequiredFieldAddedError(FormError):
+    """
+    Directory Migration: A added field cannot be required at first one
+    directory entries exist. Make it mandatory in a separate migration step.
+    """
+
+    def __init__(self, field_names: list[str], *args: object) -> None:
+        super().__init__(*args)
+        self.field_names = field_names

@@ -12,13 +12,15 @@ from datetime import datetime
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from mimetypes import types_map
+
 from onegov.form import _
 from onegov.form.errors import (
     DuplicateLabelError,
     InvalidIndentSyntax,
     EmptyFieldsetError,
     InvalidCommentIndentSyntax,
-    InvalidCommentLocationSyntax
+    InvalidCommentLocationSyntax,
+    RequiredFieldAddedError
 )
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
@@ -294,6 +296,17 @@ class ValidFormDefinition:
         except AttributeError as exception:
             raise ValidationError(
                 field.gettext(self.message)
+            ) from exception
+        except RequiredFieldAddedError as exception:
+            message = _(
+                '${fields}: New fields cannot be required initially. '
+                'Require them in a separate migration step.', mapping={
+                    'fields': ', '.join(f'"{f}"' for f in
+                                        exception.field_names)
+                }
+            )
+            raise ValidationError(
+                field.gettext(message)
             ) from exception
 
         if self.require_email_field:
