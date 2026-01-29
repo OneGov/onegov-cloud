@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-28 20:34+0100\n"
+"POT-Creation-Date: 2026-01-29 01:23+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -744,6 +744,15 @@ msgstr "Zulassung erteilen"
 msgid "Refuse admission"
 msgstr "Zulassung verweigern"
 
+msgid "Delete Time Report"
+msgstr "Zeiterfassung löschen"
+
+msgid "Do you really want to delete this time report?"
+msgstr "Möchten Sie diese Zeiterfassung wirklich löschen?"
+
+msgid "Delete time report"
+msgstr "Zeiterfassung löschen"
+
 msgid "Mutation"
 msgstr "Mutation"
 
@@ -821,12 +830,6 @@ msgstr "Übersetzer/in anzeigen"
 
 msgid "Accept time report"
 msgstr "Zeiterfassung abschliessen"
-
-msgid "Do you really want to delete this time report?"
-msgstr "Möchten Sie diese Zeiterfassung wirklich löschen?"
-
-msgid "Delete time report"
-msgstr "Zeiterfassung löschen"
 
 msgid "Accreditations"
 msgstr "Akkreditierungen"
@@ -1068,7 +1071,9 @@ msgid "Export ${count} time reports for accounting?"
 msgstr "${count} Zeiterfassungen für die Buchhaltung exportieren?"
 
 msgid "Reports can only be exported once and will appear in the archive."
-msgstr "Zeiterfassungen können nur einmal exportiert werden und erscheinen danach im Archiv."
+msgstr ""
+"Zeiterfassungen können nur einmal exportiert werden und erscheinen danach im "
+"Archiv."
 
 msgid "Export"
 msgstr "Exportieren"

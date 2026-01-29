@@ -12,12 +12,15 @@ from onegov.translator_directory import _
 from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
 from onegov.town6.layout import DefaultLayout as BaseLayout
+from onegov.town6.layout import TicketLayout as TownTicketLayout
 from onegov.org.models import Organisation
+from onegov.org.utils import get_current_tickets_url
 from onegov.translator_directory.collections.documents import \
     TranslatorDocumentCollection
 from onegov.translator_directory.collections.language import LanguageCollection
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection,
+)
 from onegov.translator_directory.constants import (
     member_can_see, editor_can_see, translator_can_see,
     GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS,
@@ -657,4 +660,59 @@ class TimeReportCollectionLayout(DefaultLayout):
         links = super().breadcrumbs
         assert isinstance(links, list)
         links.append(Link(_('Time Reports')))
+        return links
+
+
+class TicketLayout(TownTicketLayout):
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        from onegov.translator_directory.models.ticket import (
+            TimeReportHandler,
+        )
+
+        links = super().editbar_links
+        if links is None:
+            return None
+
+        if not self.request.is_manager:
+            return links
+
+        if self.model.handler_code != 'TRP':
+            return links
+
+        if self.model.state is not None:
+            return links
+
+        handler = self.model.handler  # type: ignore[unreachable]
+        if not isinstance(handler, TimeReportHandler):
+            return links
+
+        if not handler.can_delete_time_report(self.request):
+            return links
+
+        if handler.time_report is None:
+            return links
+
+        delete_link = Link(
+            text=_('Delete Time Report'),
+            url=self.csrf_protected_url(
+                self.request.link(handler.time_report)
+            ),
+            attrs={'class': ('ticket-button', 'ticket-delete')},
+            traits=(
+                Confirm(
+                    _('Do you really want to delete this time report?'),
+                    _('This cannot be undone.'),
+                    _('Delete time report'),
+                    _('Cancel'),
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=get_current_tickets_url(self.request),
+                ),
+            ),
+        )
+
+        links.append(delete_link)
         return links
