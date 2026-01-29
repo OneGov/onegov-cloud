@@ -599,8 +599,8 @@ def edit_attendence(
             ):
                 request.alert(error)
                 return {
-                    'layout': AttendenceLayout(self, request),
-                    'title': AttendenceLayout(self, request).title,
+                    'layout': AttendenceCollectionLayout(self, request),
+                    'title': _('New plenary session'),
                     'form': form,
                     'form_width': 'large'
                 }

@@ -5816,6 +5816,10 @@ h2 + div.timeline {
     table-layout: fixed;
     width: 100%;
 
+    thead tr {
+        background-color: $white;
+    }
+
     th {
         padding-top: 2rem;
     }

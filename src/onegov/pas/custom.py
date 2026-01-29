@@ -193,6 +193,7 @@ def validate_attendance_date(
     1. Date is not in a closed settlement run
     2. Date is within some settlement run
     """
+
     if check_attendance_in_closed_settlement_run(session, attendance_date):
         return _('Cannot create attendance in closed settlement run.')
     if check_attendance_outside_any_settlement_run(session, attendance_date):
