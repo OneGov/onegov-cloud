@@ -1177,51 +1177,57 @@ var Intercooler = Intercooler || (function() {
             triggerEvent($(window), 'scroll');
           }, 100); // Trigger a scroll in case element is already viewable
         } else {
-          if(eventString.indexOf("sse:") == 0) {
-            //Server-sent event, find closest event source and register for it
-            var sourceElt = elt.closest(getICAttributeSelector('ic-sse-src'));
-            if(sourceElt.length > 0) {
-              registerSSE(sourceElt, splitTriggerOn[0].substr(4))
-            }
-          } else {
-            $(getTriggeredElement(elt)).on(eventString, function(e) {
-              var onBeforeTrigger = closestAttrValue(elt, 'ic-on-beforeTrigger');
-              if (onBeforeTrigger) {
-                if (globalEval(onBeforeTrigger, [["elt", elt], ["evt", e], ["elt", elt]]) == false) {
-                  log(elt, "ic-trigger cancelled by ic-on-beforeTrigger", "DEBUG");
+          // PATCH: enclosed the following in a function in order to properly
+          //        capture the variables defined within the loop for the
+          //        the event handler, otherwise the variables will always
+          //        retain the value of the final iteration.
+          (function(triggerOn, splitTriggerOn, eventString, eventModifier) {
+            if(eventString.indexOf("sse:") == 0) {
+              //Server-sent event, find closest event source and register for it
+              var sourceElt = elt.closest(getICAttributeSelector('ic-sse-src'));
+              if(sourceElt.length > 0) {
+                registerSSE(sourceElt, splitTriggerOn[0].substr(4))
+              }
+            } else {
+              $(getTriggeredElement(elt)).on(eventString, function(e) {
+                var onBeforeTrigger = closestAttrValue(elt, 'ic-on-beforeTrigger');
+                if (onBeforeTrigger) {
+                  if (globalEval(onBeforeTrigger, [["elt", elt], ["evt", e], ["elt", elt]]) == false) {
+                    log(elt, "ic-trigger cancelled by ic-on-beforeTrigger", "DEBUG");
+                    return false;
+                  }
+                }
+
+                if (eventModifier == 'changed') {
+                  var currentVal = elt.val();
+                  var previousVal = elt.data('ic-previous-val');
+                  elt.data('ic-previous-val', currentVal);
+                  if (currentVal != previousVal) {
+                    fireICRequest(elt);
+                  }
+                } else if (eventModifier == 'once') {
+                  var alreadyTriggered = elt.data('ic-already-triggered');
+                  elt.data('ic-already-triggered', true);
+                  if (alreadyTriggered !== true) {
+                    fireICRequest(elt);
+                  }
+                } else {
+                  fireICRequest(elt);
+                }
+                if (preventDefault(elt, e)) {
+                  e.preventDefault();
                   return false;
                 }
+                return true;
+              });
+              if(eventString && (eventString.indexOf("timeout:") == 0)) {
+                var timeout = parseInterval(eventString.split(":")[1]);
+                setTimeout(function () {
+                  $(getTriggeredElement(elt)).trigger(eventString);
+                }, timeout);
               }
-
-              if (eventModifier == 'changed') {
-                var currentVal = elt.val();
-                var previousVal = elt.data('ic-previous-val');
-                elt.data('ic-previous-val', currentVal);
-                if (currentVal != previousVal) {
-                  fireICRequest(elt);
-                }
-              } else if (eventModifier == 'once') {
-                var alreadyTriggered = elt.data('ic-already-triggered');
-                elt.data('ic-already-triggered', true);
-                if (alreadyTriggered !== true) {
-                  fireICRequest(elt);
-                }
-              } else {
-                fireICRequest(elt);
-              }
-              if (preventDefault(elt, e)) {
-                e.preventDefault();
-                return false;
-              }
-              return true;
-            });
-            if(eventString && (eventString.indexOf("timeout:") == 0)) {
-              var timeout = parseInterval(eventString.split(":")[1]);
-              setTimeout(function () {
-                $(getTriggeredElement(elt)).trigger(eventString);
-              }, timeout);
             }
-          }
+          })(triggerOn, splitTriggerOn, eventString, eventModifier);
         }
       }
     }

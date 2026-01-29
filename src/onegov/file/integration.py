@@ -358,7 +358,7 @@ class DepotApp(App):
 
     @property
     def signing_service_config(self) -> SigningServiceConfig:
-        if not self.signing_services:
+        if not getattr(self, 'signing_services', None):
             raise RuntimeError('No signing service config path set')
 
         paths = (
@@ -607,6 +607,12 @@ def handle_rename(self: File, request: CoreRequest) -> None:
     # only rename if we're given a new name
     if not isinstance(name, str) or not name:
         return
+
+    _, old_ext = os.path.splitext(self.name)
+    _, new_ext = os.path.splitext(name)
+    if old_ext and new_ext != old_ext:
+        # prevent changing the file extension (adding one is allowed)
+        name = f'{name}.{old_ext}'
 
     self.name = name
     self._update_metadata(filename=self.name)

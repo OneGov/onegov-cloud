@@ -40,6 +40,8 @@ var processCommonNodes = function(elements, out_of_band) {
         if (_.isUndefined(elements.data('ic-event-id'))) {
             Intercooler.processNodes(targets);
         }
+        // attach foundation specific event-handlers to new DOM nodes
+        targets.foundation();
     }
 
     // intercooler redirects
