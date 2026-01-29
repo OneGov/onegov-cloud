@@ -681,14 +681,16 @@ class TicketLayout(TownTicketLayout):
         if self.model.handler_code != 'TRP':
             return links
 
-        if self.model.state is not None:
+        if self.model.state != 'open':
             return links
 
-        handler = self.model.handler  # type: ignore[unreachable]
+        handler = self.model.handler
         if not isinstance(handler, TimeReportHandler):
             return links
 
-        if not handler.can_delete_time_report(self.request):
+        if not handler.can_delete_time_report(
+            self.request  # type: ignore[arg-type]
+        ):
             return links
 
         if handler.time_report is None:
