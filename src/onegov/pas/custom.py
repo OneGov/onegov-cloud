@@ -168,6 +168,41 @@ def check_attendance_in_closed_settlement_run(
     )).scalar()
 
 
+def check_attendance_outside_any_settlement_run(
+    session: Session, attendance_date: date
+) -> bool:
+    """Check if attendance date is outside all settlement runs.
+
+    Returns True if the date is NOT within any settlement run
+    (neither open nor closed).
+    """
+    return not session.query(
+        exists().where(
+            (SettlementRun.start <= attendance_date)
+            & (SettlementRun.end >= attendance_date)
+        )
+    ).scalar()
+
+
+def validate_attendance_date(
+    session: Session, attendance_date: date
+) -> str | None:
+    """Validate attendance date for creation/editing.
+
+    Returns error message if invalid, None if valid.
+    Checks:
+    1. Date is not in a closed settlement run
+    2. Date is within some settlement run
+    """
+    from onegov.pas import _
+
+    if check_attendance_in_closed_settlement_run(session, attendance_date):
+        return _('Cannot create attendance in closed settlement run.')
+    if check_attendance_outside_any_settlement_run(session, attendance_date):
+        return _('Attendance date must be within a settlement run.')
+    return None
+
+
 def get_current_rate_set(session: Session, run: SettlementRun) -> RateSet:
     rat_set = (
         session.query(RateSet).filter(RateSet.year == run.start.year).first()

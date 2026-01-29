@@ -975,7 +975,7 @@ msgid "No time reports found"
 msgstr "Keine Zeiterfassungen gefunden"
 
 msgid "No archived time reports found"
-msgstr ""
+msgstr "Keine archivierten Zeiterfassungen gefunden"
 
 msgid "Created"
 msgstr "Erstellt"

@@ -47,6 +47,14 @@ msgstr "Verwaltung"
 msgid "Profile"
 msgstr "Profil"
 
+msgid "Cannot create attendance in closed settlement run."
+msgstr ""
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
+
+msgid "Attendance date must be within a settlement run."
+msgstr "Anwesenheitsdatum muss innerhalb eines Abrechnungslaufs liegen."
+
 msgid "No within an active settlement run."
 msgstr "Nicht in einem aktiven Abrechungslauf"
 
@@ -759,11 +767,6 @@ msgstr ""
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
 
-msgid "Cannot create attendance in closed settlement run."
-msgstr ""
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
-
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
 
@@ -782,6 +785,7 @@ msgstr "Keine Parlamentarier:innen ausgewählt"
 msgid "Added commission session"
 msgstr "Kommissionssitzung hinzugefügt"
 
+<<<<<<< HEAD
 msgid "You do not have permission to edit plenary sessions."
 msgstr "Sie haben keine Berechtigung, Plenarsitzungen zu bearbeiten."
 
@@ -789,6 +793,8 @@ msgid "Cannot edit attendance in closed settlement run."
 msgstr ""
 "Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
 
+=======
+>>>>>>> 976277348 (Pas: Validate attendance to be within a settlement run.)
 msgid "Edit plenary session"
 msgstr "Plenarsitzung bearbeiten"
 
@@ -962,5 +968,12 @@ msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
 
+<<<<<<< HEAD
+=======
+#~ msgid "Cannot edit attendance in closed settlement run."
+#~ msgstr ""
+#~ "Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
+
+>>>>>>> 976277348 (Pas: Validate attendance to be within a settlement run.)
 #~ msgid "Dashboard"
 #~ msgstr "Startseite"
