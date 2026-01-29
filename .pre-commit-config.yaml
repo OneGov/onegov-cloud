@@ -35,7 +35,7 @@ repos:
         - stylelint@16.19.1
         - stylelint-config-standard-scss@15.0.0
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.0.0-rc.1
+    rev: v10.0.0-rc.2
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'

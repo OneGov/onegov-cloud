@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-01-28 19:41+0100\n"
+"POT-Creation-Date: 2026-01-29 10:57+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -770,6 +770,9 @@ msgstr "Noch keine Abrechnungsläufe erfasst"
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
 
+msgid "Cannot book attendance - abschluss already set for this settlement run"
+msgstr "Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für diesen Abrechnungslauf"
+
 msgid "Added a new attendence"
 msgstr "Neue Anwesenheit hinzugefügt"
 
@@ -779,30 +782,19 @@ msgstr "Neu"
 msgid "New commission session"
 msgstr "Neue Kommissionssitzung"
 
+#, python-format
+msgid "Cannot book attendance - abschluss already set for: ${names}"
+msgstr "Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für: ${names}"
+
 msgid "No parliamentarians selected"
 msgstr "Keine Parlamentarier:innen ausgewählt"
 
 msgid "Added commission session"
 msgstr "Kommissionssitzung hinzugefügt"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> aa4f20fba (fix: Restrict bulk plenary booking to admins only)
 msgid "You do not have permission to edit plenary sessions."
 msgstr "Sie haben keine Berechtigung, Plenarsitzungen zu bearbeiten."
 
-msgid "Cannot edit attendance in closed settlement run."
-msgstr ""
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
-
-<<<<<<< HEAD
-=======
->>>>>>> 976277348 (Pas: Validate attendance to be within a settlement run.)
-=======
->>>>>>> 47d334944 (fix: Restrict bulk plenary booking to admins only)
->>>>>>> aa4f20fba (fix: Restrict bulk plenary booking to admins only)
 msgid "Edit plenary session"
 msgstr "Plenarsitzung bearbeiten"
 
@@ -821,6 +813,10 @@ msgstr "Anwesenheiten löschen"
 msgid "Edit commission session"
 msgstr "Kommissionssitzung bearbeiten"
 
+#, python-format
+msgid "Cannot edit attendance - abschluss already set for: ${names}"
+msgstr "Anwesenheit kann nicht bearbeitet werden - Abschluss bereits gesetzt für: ${names}"
+
 msgid "You do not have permission to add plenary sessions."
 msgstr "Sie haben keine Berechtigung, Plenarsitzungen hinzuzufügen."
 
@@ -829,6 +825,9 @@ msgstr "Neue Plenarsitzung"
 
 msgid "Added plenary session"
 msgstr "Plenarsitzung hinzugefügt"
+
+msgid "Cannot edit attendance - abschluss already set for this settlement run"
+msgstr "Anwesenheit kann nicht bearbeitet werden - Abschluss bereits gesetzt für diesen Abrechnungslauf"
 
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
@@ -976,3 +975,6 @@ msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
 
+#~ msgid "Cannot edit attendance in closed settlement run."
+#~ msgstr ""
+#~ "Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."

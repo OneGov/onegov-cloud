@@ -12,7 +12,10 @@ from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import (AttendenceCollection,
                                     PASParliamentarianCollection)
-from onegov.pas.custom import validate_attendance_date
+from onegov.pas.custom import (
+    validate_attendance_date,
+    has_user_set_abschluss_for_settlement_run,
+)
 from onegov.pas.forms import AttendenceAddCommissionBulkForm, AttendenceAddForm
 from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
@@ -112,6 +115,29 @@ def add_attendence(
                     'form_width': 'large',
                 }
 
+            if not request.is_admin:
+                assert form.parliamentarian_id.data is not None
+                assert form.date.data is not None
+                if has_user_set_abschluss_for_settlement_run(
+                    request.session,
+                    form.parliamentarian_id.data,
+                    form.date.data,
+                ):
+                    request.alert(
+                        _(
+                            'Cannot book attendance - abschluss already '
+                            'set for this settlement run'
+                        )
+                    )
+                    return {
+                        'layout': AttendenceCollectionLayout(
+                            self, request
+                        ),
+                        'title': _('New attendence'),
+                        'form': form,
+                        'form_width': 'large',
+                    }
+
         attendence = self.add(**form.get_useful_data())
         Change.add(request, 'add', attendence)
         request.success(_('Added a new attendence'))
@@ -159,6 +185,35 @@ def add_bulk_attendence(
 
         data = form.get_useful_data()
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
+            if not request.is_admin:
+                assert form.date.data is not None
+                blocked_parls = []
+                for parl_id in raw_parl_ids:
+                    assert isinstance(parl_id, str)
+                    if has_user_set_abschluss_for_settlement_run(
+                        request.session, parl_id, form.date.data
+                    ):
+                        parl = PASParliamentarianCollection(request.app).by_id(
+                            parl_id
+                        )
+                        if parl:
+                            blocked_parls.append(parl.title)
+
+                if blocked_parls:
+                    request.alert(
+                        _(
+                            'Cannot book attendance - abschluss already set '
+                            'for: ${names}',
+                            mapping={'names': ', '.join(blocked_parls)},
+                        )
+                    )
+                    return {
+                        'layout': AttendenceCollectionLayout(self, request),
+                        'title': _('New commission session'),
+                        'form': form,
+                        'form_width': 'large',
+                    }
+
             # Remove static field; choices are set dynamically via JS
             data.pop('parliamentarian_id', None)
             bulk_edit_id = uuid.uuid4()
@@ -321,7 +376,6 @@ def edit_commission_bulk_attendence(
     request.include('custom')
 
     if form.submitted(request):
-        # Check if attendance date is in a closed settlement run
         if form.date.data:
             if error := validate_attendance_date(
                 request.session, form.date.data
@@ -336,6 +390,32 @@ def edit_commission_bulk_attendence(
 
         data = form.get_useful_data()
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
+            if not request.is_admin:
+                assert form.date.data is not None
+                blocked_parls = []
+                for parl_id in raw_parl_ids:
+                    assert isinstance(parl_id, str)
+                    if has_user_set_abschluss_for_settlement_run(
+                        request.session, parl_id, form.date.data
+                    ):
+                        parl = PASParliamentarianCollection(request.app).by_id(
+                            parl_id
+                        )
+                        if parl:
+                            blocked_parls.append(parl.title)
+
+                if blocked_parls:
+                    request.alert(
+                        _(
+                            'Cannot edit attendance - abschluss already set '
+                            'for: ${names}',
+                            mapping={'names': ', '.join(blocked_parls)},
+                        )
+                    )
+                    return request.redirect(
+                        request.class_link(AttendenceCollection)
+                    )
+
             data.pop('parliamentarian_id', None)
             collection = AttendenceCollection(request.session)
             memberships = request.session.query(
@@ -510,18 +590,37 @@ def edit_attendence(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        # Check if attendance date is in a closed settlement run
         if form.date.data:
             if error := validate_attendance_date(
                 request.session, form.date.data
             ):
                 request.alert(error)
                 return {
-                    'layout': AttendenceCollectionLayout(self, request),
-                    'title': _('New plenary session'),
+                    'layout': AttendenceLayout(self, request),
+                    'title': AttendenceLayout(self, request).title,
                     'form': form,
                     'form_width': 'large'
                 }
+
+            if not request.is_admin:
+                assert form.date.data is not None
+                if has_user_set_abschluss_for_settlement_run(
+                    request.session,
+                    str(self.parliamentarian_id),
+                    form.date.data,
+                ):
+                    request.alert(
+                        _(
+                            'Cannot edit attendance - abschluss already set '
+                            'for this settlement run'
+                        )
+                    )
+                    return {
+                        'layout': AttendenceLayout(self, request),
+                        'title': AttendenceLayout(self, request).title,
+                        'form': form,
+                        'form_width': 'large',
+                    }
 
         form.populate_obj(self)
         Change.add(request, 'edit', self)

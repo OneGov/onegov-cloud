@@ -96,7 +96,6 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     abschluss = BooleanField(
         label=_('Abschluss'),
         description=_('Mark as completed/closed'),
-        depends_on=('type', '!plenary'),
     )
 
     def _can_edit_parliamentarian(

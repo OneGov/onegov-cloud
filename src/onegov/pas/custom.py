@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date
 from onegov.core.elements import Link
 from sqlalchemy import exists
 from onegov.org.custom import logout_path
@@ -9,15 +10,15 @@ from onegov.org.models import GeneralFileCollection
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.pas.collections import ImportLogCollection
-from onegov.user import Auth
+from onegov.pas.models import Attendence
 from onegov.pas.models import SettlementRun, RateSet
+from onegov.user import Auth
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.pas.request import PasRequest
-    from datetime import date
     from sqlalchemy.orm import Session
 
 
@@ -136,8 +137,6 @@ def get_top_navigation(request: PasRequest) -> list[Link]:
 
 
 def get_current_settlement_run(session: Session) -> SettlementRun | None:
-    from datetime import date
-
     today = date.today()
     query = session.query(SettlementRun)
     query = query.filter(
@@ -194,13 +193,49 @@ def validate_attendance_date(
     1. Date is not in a closed settlement run
     2. Date is within some settlement run
     """
-    from onegov.pas import _
-
     if check_attendance_in_closed_settlement_run(session, attendance_date):
         return _('Cannot create attendance in closed settlement run.')
     if check_attendance_outside_any_settlement_run(session, attendance_date):
         return _('Attendance date must be within a settlement run.')
     return None
+
+
+def has_user_set_abschluss_for_settlement_run(
+    session: Session, parliamentarian_id: str, attendance_date: date
+) -> bool:
+    """Check if parliamentarian has set abschluss in settlement run.
+
+    Args:
+        session: Database session
+        parliamentarian_id: UUID of the parliamentarian
+        attendance_date: Date to check which settlement run it belongs to
+
+    Returns:
+        True if parliamentarian has any attendance with abschluss=True
+        in the settlement run containing the given date.
+    """
+    settlement_run = (
+        session.query(SettlementRun)
+        .filter(
+            SettlementRun.start <= attendance_date,
+            SettlementRun.end >= attendance_date,
+        )
+        .first()
+    )
+
+    if not settlement_run:
+        return False
+
+    has_abschluss = session.query(
+        exists().where(
+            (Attendence.parliamentarian_id == parliamentarian_id)
+            & (Attendence.date >= settlement_run.start)
+            & (Attendence.date <= settlement_run.end)
+            & (Attendence.abschluss == True)
+        )
+    ).scalar()
+
+    return has_abschluss
 
 
 def get_current_rate_set(session: Session, run: SettlementRun) -> RateSet:
