@@ -162,9 +162,11 @@ def test_pages_explicitly_link_referenced_files(client: Client) -> None:
         ]
         files.form.submit()
 
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
     pdf_url = (
         admin.get('/files')
-        .pyquery('[ic-trigger-from="#button-1"]')
+        .pyquery(f'[ic-trigger-from="#button-{pdf.id}"]')
         .attr('ic-get-from')
         .removesuffix('/details')
     )
@@ -180,7 +182,6 @@ def test_pages_explicitly_link_referenced_files(client: Client) -> None:
     new_page.form['text'] = pdf_link
     new_page.form.submit().follow()
 
-    session = client.app.session()
     pdf = FileCollection(session).query().one()
     page = (
         PageCollection(session).query()

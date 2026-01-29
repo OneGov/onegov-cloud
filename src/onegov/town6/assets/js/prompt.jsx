@@ -31,11 +31,22 @@ var Prompt = React.createClass({
 
     render: function() {
         return (
-            <div className="reveal small dialog" data-reveal id={Math.floor((Math.random() * 1000) + 1)}>
+            <div
+                className="reveal small dialog"
+                data-reveal
+                id={Math.floor((Math.random() * 1000) + 1)}
+            >
                 <h3>{this.props.question}</h3>
                 <p>{this.props.info}</p>
 
-                <input type="text" placeholder={this.props.placeholder} value={this.state.value} onChange={this.handleChange} />
+                <input
+                    name={this.props.name}
+                    type="text"
+                    placeholder={this.props.placeholder}
+                    value={this.state.value}
+                    autoComplete="off"
+                    onChange={this.handleChange}
+                />
 
                 <a className="button secondary cancel">
                     {this.props.cancel}
@@ -61,8 +72,11 @@ var showPrompt = function(options) {
 
     $('body').append(el);
 
+    var defer_close = options.defer_close || false;
+
     var prompt = ReactDOM.render(
         <Prompt
+            name={options.name || 'prompt'}
             question={options.question}
             info={options.info}
             ok={options.ok}
@@ -83,14 +97,18 @@ var showPrompt = function(options) {
     });
 
     prompt_el.find('a.ok').click(function() {
-        options.success.call(options.target, prompt.state.value.trim());
-        dropPrompt(prompt_el);
+        options.success();
+        if (!defer_close){
+            dropPrompt(prompt_el);
+        }
         return false;
     });
 
     prompt_el.find('input, a.ok').enter(function(e) {
-        options.success.call(options.target, prompt.state.value.trim());
-        dropPrompt(prompt_el);
+        options.success();
+        if (!defer_close){
+            dropPrompt(prompt_el);
+        }
         return false;
     });
 
@@ -98,6 +116,7 @@ var showPrompt = function(options) {
         prompt_el.find('input').focus().select();
     });
     prompt_el.foundation('open');
+    return prompt_el;
 };
 
 var dropPrompt = function(el) {
@@ -107,27 +126,34 @@ var dropPrompt = function(el) {
 
 // sets up a prompt
 jQuery.fn.prompt = function() {
-    /* eslint no-eval: 0 */
-
-    $(this).click(function() {
-        showPrompt({
-            question: $(this).data('prompt'),
-            info: $(this).data('prompt-info'),
-            ok: $(this).data('prompt-ok'),
-            cancel: $(this).data('prompt-cancel'),
-            value: $(this).data('prompt-value'),
-            success: eval($(this).data('prompt-success')),
-            placeholder: $(this).data('prompt-placeholder'),
-            target: $(this)
+    return this.each(function() {
+        var that = $(this);
+        intercept(this, 'click', function(e, on_submit) {
+            var prompt_el = showPrompt({
+                defer_close: true,
+                question: $(this).data('prompt'),
+                info: $(this).data('prompt-info'),
+                ok: $(this).data('prompt-ok'),
+                cancel: $(this).data('prompt-cancel'),
+                name: $(this).data('prompt-name') || 'prompt',
+                value: $(this).data('prompt-value'),
+                placeholder: $(this).data('prompt-placeholder'),
+                success: on_submit,
+            });
+            that.one('complete.ic', function() {
+                dropPrompt(prompt_el);
+            });
+            e.preventDefault();
+            return false;
         });
     });
 };
 
 // hooks the targeted elements up
-$(document).ready(function() {
-    $('[data-prompt]').prompt();
-});
-
 $(document).on('process-common-nodes', function(_e, elements) {
     $(elements).find('[data-prompt]').prompt();
+});
+
+$(document).ready(function() {
+    $('[data-prompt]').prompt();
 });
