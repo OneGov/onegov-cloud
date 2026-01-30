@@ -42,6 +42,7 @@ from onegov.pas.utils import (
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
     is_commission_president,
+    round_to_five_rappen,
 )
 from onegov.pas.views.abschlussliste import (
     generate_abschlussliste_xlsx,
@@ -628,7 +629,8 @@ def generate_settlement_pdf(
     entity_type: Literal['all', 'commission', 'party', 'parliamentarian'],
     entity: PASCommission | Party | PASParliamentarian | None = None,
 ) -> bytes:
-    """ Entry point for almost all settlement PDF generations. """
+    """ Entry point for almost all settlement PDF generations excluding
+    parliamentarians addressed personally"""
     font_config = FontConfiguration()
     css_path = module_path('onegov.pas', 'views/templates/settlement_pdf.css')
     with open(css_path) as f:
@@ -726,19 +728,16 @@ def _generate_settlement_html(
        <html>
        <head><meta charset="utf-8"></head>
        <body>
+           <div class="table-title">{subtitle}</div>
            <table class="journal-table">
                <thead>
                    <tr>
-                       <th colspan="7">{subtitle}</th>
-                   </tr>
-                   <tr>
-                       <th>Datum</th>
-                       <th>Pers-Nr</th>
-                       <th>Person</th>
-                       <th>Typ</th>
-                       <th>Wert</th>
-                       <th>CHF</th>
-                       <th>CHF + TZ</th>
+                       <th style="width:40pt">Datum</th>
+                       <th style="width:90pt">Person</th>
+                       <th style="width:252pt">Typ</th>
+                       <th style="width:15pt">Wert</th>
+                       <th style="width:35pt">CHF</th>
+                       <th style="width:35pt">CHF + TZ</th>
                    </tr>
                </thead>
                <tbody>
@@ -746,15 +745,17 @@ def _generate_settlement_html(
 
     for settlement_row in settlement_data:
         name = f'{settlement_row[1].first_name} {settlement_row[1].last_name}'
+        chf_rounded = round_to_five_rappen(settlement_row[4])
+        chf_cola_rounded = round_to_five_rappen(settlement_row[5])
         html += f"""
            <tr>
                <td>{settlement_row[0].strftime('%d.%m.%Y')}</td>
-               <td>{settlement_row[1].personnel_number}</td>
                <td>{name}</td>
                <td>{settlement_row[2]}</td>
                <td class="numeric">{settlement_row[3]}</td>
-               <td class="numeric">{settlement_row[4]:,.2f}</td>
-               <td class="numeric">{settlement_row[5]:,.2f}</td>
+               <td class="numeric">{format_swiss_number(chf_rounded)}</td>
+               <td class="numeric">{format_swiss_number(
+                   chf_cola_rounded)}</td>
            </tr>
        """
 
@@ -779,11 +780,16 @@ def _generate_settlement_html(
         html += f"""
            <tr>
                <td>{total_row[0]}</td>
-               <td class="numeric">{format_swiss_number(total_row[1])}</td>
-               <td class="numeric">{format_swiss_number(total_row[2])}</td>
-               <td class="numeric">{format_swiss_number(total_row[3])}</td>
-               <td class="numeric">{format_swiss_number(total_row[4])}</td>
-               <td class="numeric">{format_swiss_number(total_row[5])}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(total_row[1]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(total_row[2]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(total_row[3]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(total_row[4]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(total_row[5]))}</td>
            </tr>
        """
 
@@ -793,11 +799,16 @@ def _generate_settlement_html(
         html += f"""
            <tr class="total-row">
                <td>{final_row[0]}</td>
-               <td class="numeric">{format_swiss_number(final_row[1])}</td>
-               <td class="numeric">{format_swiss_number(final_row[2])}</td>
-               <td class="numeric">{format_swiss_number(final_row[3])}</td>
-               <td class="numeric">{format_swiss_number(final_row[4])}</td>
-               <td class="numeric">{format_swiss_number(final_row[5])}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(final_row[1]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(final_row[2]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(final_row[3]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(final_row[4]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(final_row[5]))}</td>
            </tr>
        """
 
