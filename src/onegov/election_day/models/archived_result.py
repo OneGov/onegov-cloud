@@ -15,7 +15,7 @@ from onegov.election_day.models.election import Election
 from onegov.election_day.models.election_compound import ElectionCompound
 from onegov.election_day.models.mixins import DomainOfInfluenceMixin
 from onegov.election_day.models.mixins import TitleTranslationsMixin
-from onegov.election_day.models.vote import Vote
+from onegov.election_day.models.vote import Vote, ComplexVote
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -24,9 +24,9 @@ from sqlalchemy import Integer
 from sqlalchemy import Text
 from uuid import uuid4
 
-
 from typing import Any
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     import datetime
     import uuid
@@ -39,13 +39,11 @@ if TYPE_CHECKING:
 
     ResultType: TypeAlias = Literal['election', 'election_compound', 'vote']
 
-
 meta_local_property = dictionary_based_property_factory('local')
 
 
 class ArchivedResult(Base, ContentMixin, TimestampMixin,
                      DomainOfInfluenceMixin, TitleTranslationsMixin):
-
     """ Stores the result of an election or vote. """
 
     __tablename__ = 'archived_results'
@@ -110,6 +108,21 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     )
     title = translation_hybrid(title_translations)
 
+    title_proposal: dict_property[str] = meta_property(
+        'title_proposal',
+        default=''
+    )
+
+    title_counter_proposal: dict_property[str] = meta_property(
+        'title_counter_proposal',
+        default=''
+    )
+
+    title_tie_breaker: dict_property[str] = meta_property(
+        'title_tie_breaker',
+        default=''
+    )
+
     def title_prefix(self, request: ElectionDayRequest) -> str:
         if self.is_fetched(request) and self.domain == 'municipality':
             return self.name or ''
@@ -146,6 +159,42 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     #: The yeas rate of a vote.
     yeas_percentage: dict_property[float] = meta_property(
         'yeas_percentage',
+        default=0.0
+    )
+
+    #: The nays rate of a vote proposal for complex votes.
+    nays_percentage_proposal: dict_property[float] = meta_property(
+        'nays_percentage_proposal',
+        default=100.0
+    )
+
+    #: The yeas rate of a vote.
+    yeas_percentage_proposal: dict_property[float] = meta_property(
+        'yeas_percentage_proposal',
+        default=0.0
+    )
+
+    #: The nays rate of a vote counterproposal for complex votes.
+    nays_percentage_counter_proposal: dict_property[float] = meta_property(
+        'nays_percentage_counter_proposal',
+        default=100.0
+    )
+
+    #: The yeas rate of a vote counterproposal for complex votes.
+    yeas_percentage_counter_proposal: dict_property[float] = meta_property(
+        'yeas_percentage_counter_proposal',
+        default=0.0
+    )
+
+    #: The nays rate of a vote tiebreaker for complex votes.
+    nays_percentage_tie_breaker: dict_property[float] = meta_property(
+        'nays_percentage_tie_breaker',
+        default=100.0
+    )
+
+    #: The yeas rate of a vote tiebreaker for complex votes.
+    yeas_percentage_tie_breaker: dict_property[float] = meta_property(
+        'yeas_percentage_tie_breaker',
         default=0.0
     )
 
@@ -197,6 +246,46 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
         elif self.type == 'election_compound':
             return ElectionCompound
         raise NotImplementedError
+
+    def is_complex_vote(self, request: ElectionDayRequest) -> bool:
+        """ Returns True if this result represents a complex vote. """
+        # circular import
+        from onegov.election_day.collections import VoteCollection
+
+        if not self.external_id:
+            return False
+
+        vote = VoteCollection(request.session).by_id(self.external_id)
+        if isinstance(vote, ComplexVote):  # other options to test? new column?
+            # test if additional columns filled, otherwise populate them
+            if (self.nays_percentage_proposal == 100.0 or
+                    self.yeas_percentage_proposal == 0.0 or
+                    self.nays_percentage_counter_proposal == 100.0 or
+                    self.yeas_percentage_counter_proposal == 0.0 or
+                    self.nays_percentage_tie_breaker == 100.0 or
+                    self.yeas_percentage_tie_breaker == 0.0 or
+                    self.title_proposal == ''):
+                for ballot in vote.ballots:
+                    if ballot.type == 'proposal':
+                        self.title_proposal = ballot.title or self.title or ''
+                        self.nays_percentage_proposal = ballot.nays_percentage
+                        self.yeas_percentage_proposal = ballot.yeas_percentage
+                    if ballot.type == 'counter-proposal':
+                        self.title_counter_proposal = ballot.title or ''
+                        self.nays_percentage_counter_proposal = (
+                            ballot.nays_percentage)
+                        self.yeas_percentage_counter_proposal = (
+                            ballot.yeas_percentage)
+                    if ballot.type == 'tie-breaker':
+                        self.title_tie_breaker = ballot.title or ''
+                        self.nays_percentage_tie_breaker = (
+                            ballot.nays_percentage)
+                        self.yeas_percentage_tie_breaker = (
+                            ballot.yeas_percentage)
+
+            return True
+
+        return False
 
     def is_fetched(self, request: ElectionDayRequest) -> bool:
         """ Returns True, if this results has been fetched from another
@@ -251,6 +340,30 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
         if self.is_fetched_by_municipality(request):
             return self.local_yeas_percentage
         return self.yeas_percentage
+
+    def display_nays_percentage_proposal(self) -> float:
+        """ Returns the proposal nays rate for complex votes. """
+        return self.nays_percentage_proposal
+
+    def display_yeas_percentage_proposal(self) -> float:
+        """ Returns the proposal yeas rate for complex votes. """
+        return self.yeas_percentage_proposal
+
+    def display_nays_percentage_counter_proposal(self) -> float:
+        """ Returns the counterproposal nays rate for complex votes. """
+        return self.nays_percentage_counter_proposal
+
+    def display_yeas_percentage_counter_proposal(self) -> float:
+        """ Returns the counterproposal yeas rate for complex votes. """
+        return self.yeas_percentage_counter_proposal
+
+    def display_nays_percentage_tie_breaker(self) -> float:
+        """ Returns the tiebreaker nays rate for complex votes. """
+        return self.nays_percentage_tie_breaker
+
+    def display_yeas_percentage_tie_breaker(self) -> float:
+        """ Returns the tiebreaker yeas rate for complex votes. """
+        return self.yeas_percentage_tie_breaker
 
     def copy_from(self, source: Self) -> None:
         self.date = source.date
