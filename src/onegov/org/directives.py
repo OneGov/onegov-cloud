@@ -6,11 +6,10 @@ from itertools import count
 
 from typing import cast, Any, ClassVar, Literal, TYPE_CHECKING
 
-from onegov.core import Framework
-
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.elements import LinkGroup
+    from onegov.core import Framework
     from onegov.directory.models import DirectoryEntry
     from onegov.event.models import Occurrence
     from onegov.org.models import Boardlet as _Boardlet
@@ -304,9 +303,7 @@ class Layout(Action):
     for search results.
     """
 
-    config = {
-        'app_class': Framework
-    }
+    app_class_arg = True
 
     def __init__(self, model: type) -> None:
         self.model = model
@@ -323,7 +320,7 @@ class Layout(Action):
         app_class: type[Framework]
     ) -> None:
 
-        app_class.get_layout_class.register(
+        app_class.get_layout_class.register(  # type:ignore[attr-defined]
             model=self.model,
             func=lambda app_class, model: obj
         )
