@@ -435,10 +435,12 @@ def test_commission_president_can_add_for_commission_members(
         client, 'Member', 'Follower', 'member.follower@example.org'
     )
 
-    setup_commission_with_members(session, 'Finance Commission',
-                                president, member)
+    commission = setup_commission_with_members(
+        session, 'Finance Commission', president, member
+    )
 
     member_id = member.id
+    commission_id = commission.id
     transaction.commit()
 
     client.login('president.leader@example.org', 'test')
@@ -452,7 +454,8 @@ def test_commission_president_can_add_for_commission_members(
     form_page.form['parliamentarian_id'] = str(member_id)
     form_page.form['date'] = date.today().isoformat()
     form_page.form['duration'] = '2.0'
-    form_page.form['type'] = 'plenary'
+    form_page.form['type'] = 'commission'
+    form_page.form['commission_id'] = str(commission_id)
 
     response = form_page.form.submit()
     assert 'Das Formular enthält Fehler' not in response
@@ -471,7 +474,7 @@ def test_commission_president_can_add_for_commission_members(
 
     assert created_attendance is not None
     assert created_attendance.parliamentarian_id == member_id
-    assert created_attendance.type == 'plenary'
+    assert created_attendance.type == 'commission'
 
 
 def test_commission_president_cannot_add_for_other_commission_members(

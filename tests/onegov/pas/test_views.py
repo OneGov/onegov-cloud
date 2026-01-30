@@ -835,3 +835,62 @@ def test_add_new_user_without_activation_email(
     login.form['username'] = 'secondadmin@example.org'
     login.form['password'] = password
     assert login.form.submit().status_code == 302
+
+
+def test_settlement_run_complete_translation(
+    client: Client[TestPasApp],
+) -> None:
+    """Test that 'Complete' is translated to 'Abgeschlossen' in the
+    settlement run view."""
+    client.login_admin()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+
+    add_rate_set(settings, [])
+
+    page = settings.click('Abrechnungsläufe')
+    page = page.click(href='new')
+    page.form['name'] = 'Q1'
+    page.form['start'] = '2024-01-01'
+    page.form['end'] = '2024-03-31'
+    page.form['closed'] = False
+    page = page.form.submit().follow()
+
+    page = settings.click('Parteien')
+    page = page.click(href='new')
+    page.form['name'] = 'TestParty'
+    page = page.form.submit().follow()
+
+    page = settings.click('Parlamentarier:innen')
+    page = page.click(href='new')
+    page.form['gender'] = 'male'
+    page.form['first_name'] = 'Test'
+    page.form['last_name'] = 'Person'
+    page.form['shipping_method'] = 'a'
+    page.form['shipping_address'] = 'Address'
+    page.form['shipping_address_zip_code'] = 'ZIP'
+    page.form['shipping_address_city'] = 'City'
+    page.form['email_primary'] = 'test.person@example.org'
+    page = page.form.submit().follow()
+
+    page = settings.click('Kommissionen')
+    page = page.click(href='new')
+    page.form['name'] = 'TestCommission'
+    page = page.form.submit().follow()
+
+    page = page.click(href='new-membership')
+    page.form['role'] = 'member'
+    page.form['start'] = '2020-01-01'
+    page = page.form.submit().follow()
+
+    page = page.click(href='add-attendence')
+    page.form['date'] = '2024-02-02'
+    page.form['duration'] = '1'
+    page.form['type'] = 'commission'
+    page.form['abschluss'] = True
+    page = page.form.submit().follow()
+
+    page = settings.click('Abrechnungsläufe')
+    page = page.click('Q1')
+
+    assert '✓ Abgeschlossen' in page
+    assert '✓ Complete' not in page
