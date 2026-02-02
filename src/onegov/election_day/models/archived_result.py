@@ -92,6 +92,10 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     counted_entities: Column[int | None] = Column(Integer, nullable=True)
 
     @property
+    def vote_finalized(self) -> bool:
+        return self.counted_entities == self.total_entities
+
+    @property
     def progress(self) -> tuple[int, int]:
         return self.counted_entities or 0, self.total_entities or 0
 
