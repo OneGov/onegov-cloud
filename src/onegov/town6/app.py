@@ -78,8 +78,8 @@ class TownApp(OrgApp, FoundationApp, ApiApp):
         return False
 
 
-@TownApp.predicate_fallback(TownApp.get_layout_class, layout_predicate)
-def layout_not_found(app_class: type[TownApp], obj: object) -> type[Layout]:
+@TownApp.predicate_fallback(TownApp.get_layout, layout_predicate)
+def layout_not_found(self: type[TownApp], obj: object) -> type[Layout]:
     # circular import
     from onegov.town6.layout import DefaultLayout
     return DefaultLayout

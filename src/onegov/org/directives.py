@@ -320,7 +320,7 @@ class Layout(Action):
         app_class: type[Framework]
     ) -> None:
 
-        app_class.get_layout_class.register(  # type:ignore[attr-defined]
+        app_class.get_layout.register(  # type:ignore[attr-defined]
             model=self.model,
             func=lambda app_class, model: obj
         )

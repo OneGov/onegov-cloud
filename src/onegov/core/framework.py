@@ -1558,17 +1558,17 @@ class Framework(
         ).decrypt(cyphertext).decode('utf-8')
 
     @dispatch_method()
-    def get_layout_class(app_class, obj: object) -> type[Layout] | None:
+    def get_layout(self, obj: object) -> type[Layout] | None:
         return None
 
 
 @Framework.predicate(
-    Framework.get_layout_class,
+    Framework.get_layout,
     name='model',
     default=None,
     index=ClassIndex
 )
-def layout_predicate(app_class: type[Framework], obj: object) -> type[Layout]:
+def layout_predicate(self: type[Framework], obj: object) -> type[Layout]:
     return obj if isinstance(obj, type) else obj.__class__
 
 

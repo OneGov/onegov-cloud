@@ -289,7 +289,7 @@ class OrgRequest(CoreRequest):
         """
         Get the registered layout for a model instance.
         """
-        layout_class = self.app.get_layout_class(model)
+        layout_class = self.app.get_layout(model)
 
         # if layout_class is None:
         #     layout_class = DefaultLayout
