@@ -1578,7 +1578,7 @@ def layout_predicate(
     obj: object,
     request: CoreRequest
 ) -> type[Layout]:
-    return obj if isinstance(obj, type) else obj.__class__
+    return obj.__class__
 
 
 @Framework.webasset_url()
