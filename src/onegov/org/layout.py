@@ -25,22 +25,28 @@ from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.core.utils import linkify, paragraphify
-from onegov.directory import DirectoryCollection
+from onegov.directory import DirectoryCollection, Directory, DirectoryEntry
+from onegov.event import Event
+from onegov.event import Occurrence
 from onegov.event import OccurrenceCollection
 from onegov.file import File
-from onegov.form import FormCollection, as_internal_id
+from onegov.form import as_internal_id
+from onegov.form import FormCollection
+from onegov.form import FormDefinition
 from onegov.org.models.document_form import (
     FormDocument,
     FormDocumentCollection)
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
+from onegov.org.app import OrgApp
 from onegov.org.exports.base import OrgExport
 from onegov.org.models import CitizenDashboard, GeneralFile
 from onegov.org.models import ExportCollection, Editor
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
 from onegov.org.models import ImageFileCollection
+from onegov.org.models import ImageSet
 from onegov.org.models import ImageSetCollection
 from onegov.org.models import News
 from onegov.org.models import PageMove
@@ -49,27 +55,31 @@ from onegov.org.models import PublicationCollection
 from onegov.org.models import ResourceRecipientCollection
 from onegov.org.models import Search
 from onegov.org.models import SiteCollection
+from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.open_graph import OpenGraphMixin
+from onegov.org.request import OrgRequest
 from onegov.org.theme.org_theme import user_options
 from onegov.org.utils import IMG_URLS, get_current_tickets_url
 from onegov.pay import PaymentCollection, PaymentProviderCollection
-from onegov.people import PersonCollection
+from onegov.people import PersonCollection, Person
 from onegov.qrcode import QrCode
+from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
+from onegov.ticket import Ticket
 from onegov.ticket import TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
-from onegov.user import Auth, UserCollection, UserGroupCollection
+from onegov.user import Auth, User, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
 from operator import itemgetter
 from sedate import to_timezone
 from translationstring import TranslationString
 
-
 from typing import overload, Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -79,17 +89,13 @@ if TYPE_CHECKING:
     from onegov.core.security.permissions import Intent
     from onegov.core.templates import MacrosLookup
     from onegov.directory import DirectoryEntryCollection
-    from onegov.event import Event, Occurrence
-    from onegov.form import FormDefinition, FormSubmission
+    from onegov.form import FormSubmission
     from onegov.form.models.definition import (
         SurveySubmission, SurveyDefinition)
     from onegov.org.models import (
-        ExtendedDirectory, ExtendedDirectoryEntry, ImageSet, Organisation)
-    from onegov.org.app import OrgApp
-    from onegov.org.request import OrgRequest, PageMeta
-    from onegov.reservation import Resource
-    from onegov.ticket import Ticket
-    from onegov.user import User, UserGroup
+        ExtendedDirectory, ExtendedDirectoryEntry, Organisation)
+    from onegov.org.request import PageMeta
+    from onegov.user import UserGroup
     from sedate.types import TzInfoOrName
     from typing import TypeAlias, TypeVar
     from webob import Response
@@ -1062,6 +1068,7 @@ class SettingsLayout(DefaultLayout):
         return bc
 
 
+@OrgApp.layout(model=Topic, request=OrgRequest)
 class PageLayout(AdjacencyListLayout):
 
     @cached_property
@@ -1082,6 +1089,7 @@ class PageLayout(AdjacencyListLayout):
         return tuple(self.get_sidebar(type='topic'))
 
 
+@OrgApp.layout(model=News, request=OrgRequest)
 class NewsLayout(AdjacencyListLayout):
 
     @cached_property
@@ -1344,6 +1352,7 @@ class FormCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=FormDefinition, request=OrgRequest)
 class FormDefinitionLayout(DefaultLayout):
 
     @property
@@ -1677,6 +1686,7 @@ class PersonCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=Person, request=OrgRequest)
 class PersonLayout(DefaultLayout):
 
     @cached_property
@@ -1774,8 +1784,8 @@ class ArchivedTicketsLayout(DefaultLayout):
         return links
 
 
+@OrgApp.layout(model=Ticket, request=OrgRequest)
 class TicketLayout(DefaultLayout):
-
     model: Ticket
 
     def __init__(self, model: Ticket, request: OrgRequest) -> None:
@@ -2310,8 +2320,8 @@ class ResourceRecipientsFormLayout(DefaultLayout):
         ]
 
 
+@OrgApp.layout(model=Resource, request=OrgRequest)
 class ResourceLayout(DefaultLayout):
-
     model: Resource
 
     def __init__(self, model: Resource, request: OrgRequest) -> None:
@@ -2646,8 +2656,8 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
         return list(links())
 
 
+@OrgApp.layout(model=Occurrence, request=OrgRequest)
 class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
-
     app: OrgApp
     request: OrgRequest
     model: Occurrence
@@ -2761,8 +2771,8 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
         return None
 
 
+@OrgApp.layout(model=Event, request=OrgRequest)
 class EventLayout(EventLayoutMixin, DefaultLayout):
-
     app: OrgApp
     request: OrgRequest
     model: Event
@@ -3061,8 +3071,8 @@ class ImageSetCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=ImageSet, request=OrgRequest)
 class ImageSetLayout(DefaultLayout):
-
     model: ImageSet
 
     def __init__(self, model: ImageSet, request: OrgRequest) -> None:
@@ -3171,8 +3181,8 @@ class UserManagementLayout(DefaultLayout):
         return links
 
 
+@OrgApp.layout(model=User, request=OrgRequest)
 class UserLayout(DefaultLayout):
-
     if TYPE_CHECKING:
         model: User
 
@@ -3484,6 +3494,7 @@ class DirectoryCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=Directory, request=OrgRequest)
 class DirectoryLayout(DefaultLayout):
 
     @cached_property
@@ -3731,6 +3742,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
         )
 
 
+@OrgApp.layout(model=DirectoryEntry, request=OrgRequest)
 class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
     request: OrgRequest
     model: ExtendedDirectoryEntry
@@ -3871,6 +3883,7 @@ class DashboardLayout(DefaultLayout):
         ]
 
 
+@OrgApp.layout(model=GeneralFile, request=OrgRequest)
 class GeneralFileCollectionLayout(DefaultLayout):
     def __init__(self, model: Any, request: OrgRequest) -> None:
         request.include('common')
