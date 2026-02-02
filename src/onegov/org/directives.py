@@ -3,13 +3,11 @@ from __future__ import annotations
 from dectate import Action
 from itertools import count
 
-
 from typing import cast, Any, ClassVar, Literal, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.elements import LinkGroup
-    from onegov.core import Framework
     from onegov.directory.models import DirectoryEntry
     from onegov.event.models import Occurrence
     from onegov.org.models import Boardlet as _Boardlet
@@ -295,32 +293,3 @@ class Boardlet(Action):
             'order': self.order,
             'icon': self.icon,
         }
-
-
-class Layout(Action):
-    """
-    Registers a layout for a model. This is used to show breadcrumbs
-    for search results.
-    """
-
-    app_class_arg = True
-
-    def __init__(self, model: type) -> None:
-        self.model = model
-
-    def identifier(  # type:ignore[override]
-        self,
-        app_class: type[Framework]
-    ) -> str:
-        return str(self.model)
-
-    def perform(  # type:ignore[override]
-        self,
-        obj: type[Layout],
-        app_class: type[Framework]
-    ) -> None:
-
-        app_class.get_layout.register(  # type:ignore[attr-defined]
-            model=self.model,
-            func=lambda app_class, model: obj
-        )

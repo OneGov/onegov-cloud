@@ -134,6 +134,7 @@ class Framework(
     template_variables = directive(directives.TemplateVariablesAction)
     replace_setting = directive(directives.ReplaceSettingAction)
     replace_setting_section = directive(directives.ReplaceSettingSectionAction)
+    layout = directive(directives.Layout)
 
     #: sets the same-site cookie directive, (may need removal inside iframes)
     same_site_cookie_policy: str | None = 'Lax'
@@ -1558,7 +1559,11 @@ class Framework(
         ).decrypt(cyphertext).decode('utf-8')
 
     @dispatch_method()
-    def get_layout(self, obj: object) -> type[Layout] | None:
+    def get_layout(
+        self,
+        obj: object,
+        request: CoreRequest
+    ) -> type[Layout] | None:
         return None
 
 
@@ -1568,7 +1573,11 @@ class Framework(
     default=None,
     index=ClassIndex
 )
-def layout_predicate(self: type[Framework], obj: object) -> type[Layout]:
+def layout_predicate(
+    self: type[Framework],
+    obj: object,
+    request: CoreRequest
+) -> type[Layout]:
     return obj if isinstance(obj, type) else obj.__class__
 
 

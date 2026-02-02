@@ -9,8 +9,8 @@ from morepath.directive import SettingAction
 from morepath.settings import SettingRegistry, SettingSection
 from onegov.core.utils import Bunch
 
-
 from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable, Mapping
@@ -18,7 +18,8 @@ if TYPE_CHECKING:
     from wtforms import Form
 
     from .analytics import AnalyticsProvider
-    from .request import CoreRequest
+    from onegov.core import Framework
+    from onegov.core.request import CoreRequest
 
 
 _T = TypeVar('_T')
@@ -388,3 +389,41 @@ class ReplaceSettingAction(SettingAction):
     """
 
     depends = [ReplaceSettingSectionAction]
+
+
+class Layout(Action):
+    """
+    Registers a layout for a model. This is used to show breadcrumbs
+    for search results.
+    """
+
+    app_class_arg = True
+
+    def __init__(self, model: type, request: CoreRequest) -> None:
+        self.model = model
+        self.request = request
+
+    def identifier(  # type:ignore[override]
+        self,
+        app_class: type[Framework]
+    ) -> str:
+        return str(self.model)
+
+    def perform(  # type:ignore[override]
+        self,
+        obj: type[Layout],
+        app_class: type[Framework]
+    ) -> None:
+
+        def layout_for_obj(
+            app_self: type[Framework],
+            model: object,
+            request: CoreRequest
+        ) -> type[Layout]:
+            return obj
+
+        app_class.get_layout.register(  # type:ignore[attr-defined]
+            model=self.model,
+            request_class=self.request,
+            func=layout_for_obj
+        )
