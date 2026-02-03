@@ -35,7 +35,7 @@ def get_global_tools(request: AgencyRequest) -> Iterator[Link | LinkGroup]:
 
 def get_top_navigation(request: AgencyRequest) -> Iterator[NavigationEntry]:
     yield (
-        Bunch(id=-2, access='public', published=True),  
+        Bunch(id=-2, access='public', published=True),
         Link(  # type:ignore[misc]
             text=_('People'),
             url=request.class_link(ExtendedPersonCollection)
@@ -43,7 +43,7 @@ def get_top_navigation(request: AgencyRequest) -> Iterator[NavigationEntry]:
         ()
     )
     yield (
-        Bunch(id=-1, access='public', published=True),  
+        Bunch(id=-1, access='public', published=True),
         Link(  # type:ignore[misc]
             text=_('Agencies'),
             url=request.class_link(ExtendedAgencyCollection)
