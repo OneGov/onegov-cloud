@@ -414,14 +414,8 @@ class Layout(Action):
         app_class: type[Framework]
     ) -> None:
 
-        def layout_for_obj(
-            app_self: type[Framework],
-            model: object,
-            request: CoreRequest
-        ) -> type[Layout]:
-            return obj
-
-        app_class.get_layout.register(  # type:ignore[attr-defined]
-            model=self.model,
-            func=layout_for_obj
-        )
+        layout_obj = obj
+        # `lambda self, obj` is required to match the signature
+        app_class.get_layout.register(
+            lambda self, obj: layout_obj,
+            model=self.model)
