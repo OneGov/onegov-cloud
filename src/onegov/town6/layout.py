@@ -79,7 +79,6 @@ from onegov.org.models import MeetingCollection
 from onegov.org.models import MeetingItem
 from onegov.org.models import News
 from onegov.org.models import PageMove
-from onegov.org.models import PoliticalBusiness
 from onegov.org.models import PoliticalBusinessCollection
 from onegov.org.models import RISCommission
 from onegov.org.models import RISCommissionCollection
@@ -98,7 +97,6 @@ from onegov.ticket import Ticket
 from onegov.user import User
 from onegov.town6 import _
 from onegov.town6.theme import user_options
-from onegov.town6.request import TownRequest
 from onegov.town6 import TownApp
 
 
@@ -112,6 +110,7 @@ if TYPE_CHECKING:
     from onegov.org.models import ExtendedDirectoryEntry
     from onegov.org.request import PageMeta
     from onegov.page import Page
+    from onegov.town6.request import TownRequest
     from typing import TypeAlias
 
     NavigationEntry: TypeAlias = tuple[
@@ -287,7 +286,7 @@ class SettingsLayout(OrgSettingsLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=Topic, request=TownRequest)
+@TownApp.layout(model=Topic)
 class PageLayout(OrgTopicLayout, AdjacencyListLayout):
 
     app: TownApp
@@ -300,7 +299,7 @@ class PageLayout(OrgTopicLayout, AdjacencyListLayout):
         )
 
 
-@TownApp.layout(model=News, request=TownRequest)
+@TownApp.layout(model=News)
 class NewsLayout(OrgNewsLayout, AdjacencyListLayout):
 
     app: TownApp
@@ -415,7 +414,7 @@ class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=FormDefinition, request=TownRequest)
+@TownApp.layout(model=FormDefinition)
 class FormDefinitionLayout(OrgFormDefinitionLayout, DefaultLayout):
 
     app: TownApp
@@ -441,7 +440,7 @@ class PersonCollectionLayout(OrgPersonCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=Person, request=TownRequest)
+@TownApp.layout(model=Person)
 class PersonLayout(OrgPersonLayout, DefaultLayout):
 
     app: TownApp
@@ -460,7 +459,7 @@ class ArchivedTicketsLayout(OrgArchivedTicketsLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=Ticket, request=TownRequest)
+@TownApp.layout(model=Ticket)
 class TicketLayout(OrgTicketLayout, DefaultLayout):
 
     app: TownApp
@@ -573,7 +572,7 @@ class ResourceRecipientsFormLayout(
     request: TownRequest
 
 
-@TownApp.layout(model=Resource, request=TownRequest)
+@TownApp.layout(model=Resource)
 class ResourceLayout(OrgResourceLayout, DefaultLayout):
 
     app: TownApp
@@ -654,7 +653,7 @@ class OccurrencesLayout(OrgOccurrencesLayout, DefaultLayout):
         return links
 
 
-@TownApp.layout(model=Occurrence, request=TownRequest)
+@TownApp.layout(model=Occurrence)
 class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
 
     app: TownApp
@@ -685,7 +684,7 @@ class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
     cls_before='EventLayout',
     cls_after='TicketChatMessageLayout'
 )
-@TownApp.layout(model=Event, request=TownRequest)
+@TownApp.layout(model=Event)
 class EventLayout(StepsLayoutExtension, OrgEventLayout, DefaultLayout):
 
     app: TownApp
@@ -726,7 +725,7 @@ class ImageSetCollectionLayout(OrgImageSetCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=ImageSet, request=TownRequest)
+@TownApp.layout(model=ImageSet)
 class ImageSetLayout(OrgImageSetLayout, DefaultLayout):
 
     app: TownApp
@@ -739,7 +738,7 @@ class UserManagementLayout(OrgUserManagementLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=User, request=TownRequest)
+@TownApp.layout(model=User)
 class UserLayout(OrgUserLayout, DefaultLayout):
 
     app: TownApp
@@ -797,7 +796,7 @@ class DirectoryCollectionLayout(OrgDirectoryCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=Directory, request=TownRequest)
+@TownApp.layout(model=Directory)
 class DirectoryLayout(OrgDirectoryLayout, DefaultLayout):
 
     app: TownApp
@@ -931,7 +930,7 @@ class DirectoryEntryCollectionLayout(
 
 
 @step_sequences.registered_step(1, _('Form'), cls_after='FormSubmissionLayout')
-@TownApp.layout(model=DirectoryEntry, request=TownRequest)
+@TownApp.layout(model=DirectoryEntry)
 class DirectoryEntryLayout(
     StepsLayoutExtension,
     OrgDirectoryEntryLayout,
@@ -967,7 +966,7 @@ class DashboardLayout(OrgDashboardLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=GeneralFile, request=TownRequest)
+@TownApp.layout(model=GeneralFile)
 class GeneralFileCollectionLayout(DefaultLayout):
 
     def __init__(self, model: Any, request: TownRequest) -> None:
@@ -1145,7 +1144,7 @@ class MeetingCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=Meeting, request=TownRequest)
+@TownApp.layout(model=Meeting)
 class MeetingLayout(DefaultLayout):
 
     @cached_property
@@ -1215,7 +1214,7 @@ class MeetingLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=MeetingItem, request=TownRequest)
+@TownApp.layout(model=MeetingItem)
 class MeetingItemLayout(DefaultLayout):
 
     @cached_property
@@ -1276,7 +1275,7 @@ class RISParliamentarianCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=RISParliamentarian, request=TownRequest)
+@TownApp.layout(model=RISParliamentarian)
 class RISParliamentarianLayout(DefaultLayout):
 
     @cached_property
@@ -1458,7 +1457,7 @@ class RISParliamentaryGroupCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=RISParliamentaryGroup, request=TownRequest)
+@TownApp.layout(model=RISParliamentaryGroup)
 class RISParliamentaryGroupLayout(DefaultLayout):
 
     @cached_property
@@ -1594,7 +1593,7 @@ class RISCommissionCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=RISCommission, request=TownRequest)
+@TownApp.layout(model=RISCommission)
 class RISCommissionLayout(DefaultLayout):
 
     @cached_property
@@ -1687,7 +1686,7 @@ class PoliticalBusinessCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=PoliticalBusiness, request=TownRequest)
+# @TownApp.layout(model=PoliticalBusiness)
 class PoliticalBusinessLayout(DefaultLayout):
 
     @cached_property

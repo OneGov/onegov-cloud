@@ -61,7 +61,6 @@ from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.open_graph import OpenGraphMixin
-from onegov.org.request import OrgRequest
 from onegov.org.theme.org_theme import user_options
 from onegov.org.utils import IMG_URLS, get_current_tickets_url
 from onegov.pay import PaymentCollection, PaymentProviderCollection
@@ -94,6 +93,7 @@ if TYPE_CHECKING:
         SurveySubmission, SurveyDefinition)
     from onegov.org.models import (
         ExtendedDirectory, ExtendedDirectoryEntry, Organisation)
+    from onegov.org.request import OrgRequest
     from onegov.org.request import PageMeta
     from onegov.user import UserGroup
     from sedate.types import TzInfoOrName
@@ -1068,7 +1068,7 @@ class SettingsLayout(DefaultLayout):
         return bc
 
 
-@OrgApp.layout(model=Topic, request=OrgRequest)
+@OrgApp.layout(model=Topic)
 class PageLayout(AdjacencyListLayout):
 
     @cached_property
@@ -1089,7 +1089,7 @@ class PageLayout(AdjacencyListLayout):
         return tuple(self.get_sidebar(type='topic'))
 
 
-@OrgApp.layout(model=News, request=OrgRequest)
+@OrgApp.layout(model=News)
 class NewsLayout(AdjacencyListLayout):
 
     @cached_property
@@ -1352,7 +1352,7 @@ class FormCollectionLayout(DefaultLayout):
         return None
 
 
-@OrgApp.layout(model=FormDefinition, request=OrgRequest)
+@OrgApp.layout(model=FormDefinition)
 class FormDefinitionLayout(DefaultLayout):
 
     @property
@@ -1686,7 +1686,7 @@ class PersonCollectionLayout(DefaultLayout):
         return None
 
 
-@OrgApp.layout(model=Person, request=OrgRequest)
+@OrgApp.layout(model=Person)
 class PersonLayout(DefaultLayout):
 
     @cached_property
@@ -1784,7 +1784,7 @@ class ArchivedTicketsLayout(DefaultLayout):
         return links
 
 
-@OrgApp.layout(model=Ticket, request=OrgRequest)
+@OrgApp.layout(model=Ticket)
 class TicketLayout(DefaultLayout):
     model: Ticket
 
@@ -2320,7 +2320,7 @@ class ResourceRecipientsFormLayout(DefaultLayout):
         ]
 
 
-@OrgApp.layout(model=Resource, request=OrgRequest)
+@OrgApp.layout(model=Resource)
 class ResourceLayout(DefaultLayout):
     model: Resource
 
@@ -2656,7 +2656,7 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
         return list(links())
 
 
-@OrgApp.layout(model=Occurrence, request=OrgRequest)
+@OrgApp.layout(model=Occurrence)
 class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
     app: OrgApp
     request: OrgRequest
@@ -2771,7 +2771,7 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
         return None
 
 
-@OrgApp.layout(model=Event, request=OrgRequest)
+@OrgApp.layout(model=Event)
 class EventLayout(EventLayoutMixin, DefaultLayout):
     app: OrgApp
     request: OrgRequest
@@ -3071,7 +3071,7 @@ class ImageSetCollectionLayout(DefaultLayout):
         return None
 
 
-@OrgApp.layout(model=ImageSet, request=OrgRequest)
+@OrgApp.layout(model=ImageSet)
 class ImageSetLayout(DefaultLayout):
     model: ImageSet
 
@@ -3181,7 +3181,7 @@ class UserManagementLayout(DefaultLayout):
         return links
 
 
-@OrgApp.layout(model=User, request=OrgRequest)
+@OrgApp.layout(model=User)
 class UserLayout(DefaultLayout):
     if TYPE_CHECKING:
         model: User
@@ -3494,7 +3494,7 @@ class DirectoryCollectionLayout(DefaultLayout):
         return None
 
 
-@OrgApp.layout(model=Directory, request=OrgRequest)
+@OrgApp.layout(model=Directory)
 class DirectoryLayout(DefaultLayout):
 
     @cached_property
@@ -3742,7 +3742,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
         )
 
 
-@OrgApp.layout(model=DirectoryEntry, request=OrgRequest)
+@OrgApp.layout(model=DirectoryEntry)
 class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
     request: OrgRequest
     model: ExtendedDirectoryEntry
@@ -3883,7 +3883,7 @@ class DashboardLayout(DefaultLayout):
         ]
 
 
-@OrgApp.layout(model=GeneralFile, request=OrgRequest)
+@OrgApp.layout(model=GeneralFile)
 class GeneralFileCollectionLayout(DefaultLayout):
     def __init__(self, model: Any, request: OrgRequest) -> None:
         request.include('common')

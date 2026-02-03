@@ -1562,7 +1562,6 @@ class Framework(
     def get_layout(
         self,
         obj: object,
-        request: CoreRequest
     ) -> type[Layout] | None:
         return None
 
@@ -1576,7 +1575,6 @@ class Framework(
 def layout_predicate(
     self: type[Framework],
     obj: object,
-    request: CoreRequest
 ) -> type[Layout]:
     return obj.__class__
 

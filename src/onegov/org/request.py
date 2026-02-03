@@ -290,7 +290,7 @@ class OrgRequest(CoreRequest):
         Get the registered layout for a model instance.
         """
 
-        layout_class = self.app.get_layout(model, self)
+        layout_class = self.app.get_layout(model)
         assert layout_class is not None
 
         return layout_class(model, self)

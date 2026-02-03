@@ -399,9 +399,8 @@ class Layout(Action):
 
     app_class_arg = True
 
-    def __init__(self, model: type, request: CoreRequest) -> None:
+    def __init__(self, model: type) -> None:
         self.model = model
-        self.request = request
 
     def identifier(  # type:ignore[override]
         self,
@@ -424,6 +423,5 @@ class Layout(Action):
 
         app_class.get_layout.register(  # type:ignore[attr-defined]
             model=self.model,
-            request_class=self.request,
             func=layout_for_obj
         )
