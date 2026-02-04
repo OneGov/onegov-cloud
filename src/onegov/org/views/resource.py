@@ -1344,7 +1344,7 @@ def view_my_reservations_json(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(stmt.c).where(and_(
+    records = request.session.execute(select(*stmt.c).where(and_(
         func.lower(stmt.c.email) == request.authenticated_email.lower(),
         start <= stmt.c.start,
         stmt.c.start <= end
@@ -1402,7 +1402,7 @@ def view_my_reservations_pdf(
     if request.GET.get('accepted') == '1':
         conditions.append(stmt.c.accepted.is_(True))
 
-    records = request.session.execute(select(stmt.c).where(and_(*conditions)))
+    records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
     content = MyReservationsPdf.from_reservations(request, [
         utils.MyReservationEventInfo(
@@ -1589,7 +1589,7 @@ def view_my_reservations_ical(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(stmt.c).where(and_(
+    records = request.session.execute(select(*stmt.c).where(and_(
         func.lower(stmt.c.email) == email.lower(),
         s <= stmt.c.start, stmt.c.start <= e,
         # only include accepted reservations in ICS file

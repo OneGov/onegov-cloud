@@ -135,13 +135,14 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
 
         # A bit of a hack :|
         number_of_mandates = select(
-            [Election.number_of_mandates],
-            whereclause=text('elections.id = election_results.election_id')
-        ).scalar_subquery()
+            Election.number_of_mandates
+        ).where(text(
+            'elections.id = election_results.election_id'
+        )).scalar_subquery()
         return (
-                number_of_mandates * (
+            number_of_mandates * (
                 cls.received_ballots - cls.blank_ballots - cls.invalid_ballots
-        ) - cls.blank_votes - cls.invalid_votes
+            ) - cls.blank_votes - cls.invalid_votes
         )
 
     #: an election result may contain n list results

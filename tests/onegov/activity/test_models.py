@@ -2997,7 +2997,8 @@ def test_occasion_costs_all_inclusive_free(scenario: Scenario) -> None:
     scenario.commit()
     scenario.refresh()
 
-    cost = scenario.session.query(Occasion.total_cost).scalar()
+    cost = scenario.session.query(Occasion.total_cost
+        ).outerjoin(Occasion.period).scalar()
     assert cost == 0
 
     occasion = scenario.session.query(Occasion).first()
@@ -3012,7 +3013,8 @@ def test_occasion_costs_all_inclusive_paid(scenario: Scenario) -> None:
     scenario.commit()
     scenario.refresh()
 
-    cost = scenario.session.query(Occasion.total_cost).scalar()
+    cost = scenario.session.query(Occasion.total_cost
+        ).outerjoin(Occasion.period).scalar()
     assert cost == 20
 
     occasion = scenario.session.query(Occasion).first()
@@ -3027,7 +3029,8 @@ def test_occasion_costs_free(scenario: Scenario) -> None:
     scenario.commit()
     scenario.refresh()
 
-    cost = scenario.session.query(Occasion.total_cost).scalar()
+    cost = scenario.session.query(
+        Occasion.total_cost).outerjoin(Occasion.period).scalar()
     assert cost == 0
 
     occasion = scenario.session.query(Occasion).first()
@@ -3042,7 +3045,8 @@ def test_occasion_costs_partial(scenario: Scenario) -> None:
     scenario.commit()
     scenario.refresh()
 
-    cost = scenario.session.query(Occasion.total_cost).scalar()
+    cost = scenario.session.query(
+        Occasion.total_cost).outerjoin(Occasion.period).scalar()
     assert cost == 10
 
     occasion = scenario.session.query(Occasion).first()
@@ -3057,7 +3061,8 @@ def test_occasion_costs_full(scenario: Scenario) -> None:
     scenario.commit()
     scenario.refresh()
 
-    cost = scenario.session.query(Occasion.total_cost).scalar()
+    cost = scenario.session.query(
+        Occasion.total_cost).outerjoin(Occasion.period).scalar()
     assert cost == 30
 
     occasion = scenario.session.query(Occasion).first()
@@ -3072,7 +3077,8 @@ def test_occasion_costs_custom(scenario: Scenario) -> None:
     scenario.commit()
     scenario.refresh()
 
-    cost = scenario.session.query(Occasion.total_cost).scalar()
+    cost = scenario.session.query(
+        Occasion.total_cost).outerjoin(Occasion.period).scalar()
     assert cost == 25
 
     occasion = scenario.session.query(Occasion).first()

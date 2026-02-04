@@ -170,9 +170,9 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
     @counted.expression  # type:ignore[no-redef]
     def counted(cls) -> ColumnElement[bool]:
-        expr = select([
+        expr = select(
             func.coalesce(func.bool_and(BallotResult.counted), False)
-        ])
+        )
         expr = expr.where(BallotResult.ballot_id == cls.id)
         return expr.label('counted')
 
@@ -232,12 +232,12 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
         """
 
-        expr = select([
+        expr = select(
             func.coalesce(
                 func.sum(getattr(BallotResult, attribute)),
                 0
             )
-        ])
+        )
         expr = expr.where(BallotResult.ballot_id == cls.id)
         return expr.label(attribute)
 

@@ -218,7 +218,7 @@ def test_pdf_preview_creation(session: Session) -> None:
     thumb = DepotManager.get().get(pdf.reference['thumbnail_medium']['id'])  # type: ignore[union-attr]
     image = Image.open(thumb)
 
-    assert (0, 91, 161, 255) in set(image.getdata())
+    assert (0, 91, 161, 255) in set(image.get_flattened_data())
 
     w, h = image.size
     assert h == 512
@@ -539,7 +539,7 @@ def test_1n1_associated_file_cleanup(session: Session) -> None:
 def test_named_file() -> None:
 
     class MyFile(File):
-        pass
+        __mapper_args__ = {'polymorphic_identity': 'my_file'}
 
     class CustomBlogPost(Blogpost):
         x = NamedFile(cls=MyFile)

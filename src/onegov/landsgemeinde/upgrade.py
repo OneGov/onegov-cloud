@@ -7,9 +7,7 @@ from __future__ import annotations
 from onegov.core.upgrade import upgrade_task
 from onegov.core.upgrade import UpgradeContext
 from onegov.core.orm.types import UTCDateTime
-from sqlalchemy import Column, Enum
-from sqlalchemy import Text
-from sqlalchemy import Time
+from sqlalchemy import text, Column, Enum, Text, Time
 from onegov.landsgemeinde.collections import VotumCollection
 from onegov.core.utils import relative_url
 
@@ -112,18 +110,18 @@ def add_draft_state_to_agenda_item(context: UpgradeContext) -> None:
     op = context.operations
     tmp_type.create(op.get_bind(), checkfirst=False)
 
-    op.execute("""
+    op.execute(text("""
         ALTER  TABLE landsgemeinde_agenda_items ALTER COLUMN state TYPE
         agenda_item_state_ USING state::text::agenda_item_state_;
-    """)
+    """))
 
     old_type.drop(op.get_bind(), checkfirst=False)
     new_type.create(context.operations.get_bind(), checkfirst=False)
 
-    op.execute("""
+    op.execute(text("""
         ALTER TABLE landsgemeinde_agenda_items ALTER COLUMN state TYPE
         agenda_item_state USING state::text::agenda_item_state
-    """)
+    """))
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
 
 
@@ -153,18 +151,18 @@ def add_draft_state_to_assembly(context: UpgradeContext) -> None:
     op = context.operations
     tmp_type.create(op.get_bind(), checkfirst=False)
 
-    op.execute("""
+    op.execute(text("""
         ALTER  TABLE landsgemeinde_assemblies ALTER COLUMN state TYPE
         assembly_state_ USING state::text::assembly_state_;
-    """)
+    """))
 
     old_type.drop(op.get_bind(), checkfirst=False)
     new_type.create(context.operations.get_bind(), checkfirst=False)
 
-    op.execute("""
+    op.execute(text("""
         ALTER TABLE landsgemeinde_assemblies ALTER COLUMN state TYPE
         assembly_state USING state::text::assembly_state
-    """)
+    """))
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
 
 
@@ -194,16 +192,16 @@ def add_draft_state_to_votum(context: UpgradeContext) -> None:
     op = context.operations
     tmp_type.create(op.get_bind(), checkfirst=False)
 
-    op.execute("""
+    op.execute(text("""
         ALTER  TABLE landsgemeinde_vota ALTER COLUMN state TYPE
         votum_item_state_ USING state::text::votum_item_state_;
-    """)
+    """))
 
     old_type.drop(op.get_bind(), checkfirst=False)
     new_type.create(context.operations.get_bind(), checkfirst=False)
 
-    op.execute("""
+    op.execute(text("""
         ALTER TABLE landsgemeinde_vota ALTER COLUMN state TYPE
         votum_item_state USING state::text::votum_item_state
-    """)
+    """))
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)

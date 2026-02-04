@@ -13,7 +13,7 @@ from onegov.core.utils import scan_morepath_modules
 from onegov.search import ORMSearchable, SearchApp, SearchIndex
 from onegov.search.datamanager import IndexerDataManager
 from sqlalchemy import func, Boolean, Column, Integer, Text
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 from webtest import TestApp as Client
 
 

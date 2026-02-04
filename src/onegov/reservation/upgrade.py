@@ -9,7 +9,7 @@ from libres.db.models.types.json_type import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.reservation import LibresIntegration
 from onegov.reservation import Resource
-from sqlalchemy import Column, Enum, Text
+from sqlalchemy import text, Column, Enum, Text
 
 
 from typing import TYPE_CHECKING
@@ -113,9 +113,9 @@ def make_resource_polymorphic_type_non_nullable(
     context: UpgradeContext
 ) -> None:
     if context.has_table('reservations'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE resources SET type = 'generic' WHERE type IS NULL;
-        """)
+        """))
 
         context.operations.alter_column('resources', 'type', nullable=False)
 
@@ -154,16 +154,16 @@ def translate_default_views_to_their_new_names(
     context: UpgradeContext
 ) -> None:
     if context.has_table('resources'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE resources SET content = jsonb_set(
                 content, '{default_view}', '"dayGridMonth"'
             ) WHERE content->>'default_view' = 'month';
-        """)
-        context.operations.execute("""
+        """))
+        context.operations.execute(text("""
             UPDATE resources SET content = jsonb_set(
                 content, '{default_view}', '"timeGridWeek"'
             ) WHERE content->>'default_view' = 'agendaWeek';
-        """)
+        """))
 
 
 @upgrade_task('Add source_type column to reserved_slots')
@@ -199,19 +199,19 @@ def make_allocation_and_reservation_type_not_nullable(
         context.has_table('allocations')
         and context.has_column('allocations', 'type')
     ):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE allocations
                SET type = 'generic'
              WHERE type IS NULL;
-        """)
+        """))
         context.operations.alter_column('allocations', 'type', nullable=False)
     if (
         context.has_table('reservations')
         and context.has_column('reservations', 'type')
     ):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE reservations
                SET type = 'generic'
              WHERE type IS NULL;
-        """)
+        """))
         context.operations.alter_column('reservations', 'type', nullable=False)

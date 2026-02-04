@@ -298,7 +298,7 @@ class NotificationTemplateSendForm(Form):
             )
         )
 
-        query = select(stmt.c).where(
+        query = select(*stmt.c).where(
             stmt.c.period_id == self.period.id
         )
 

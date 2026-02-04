@@ -32,12 +32,11 @@ from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
 from sedate import utcnow
-from sqlalchemy import and_, func, inspect, select
+from sqlalchemy import and_, func, inspect, select, text
 from sqlalchemy import Column, ForeignKey, Integer, Text
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import declarative_base, relationship  # type: ignore[attr-defined]
 from sqlalchemy_utils import aggregated
 from threading import Thread
 from webob.exc import HTTPUnauthorized, HTTPConflict
@@ -152,20 +151,22 @@ def test_create_schema(postgres_dsn: str) -> None:
 
     def existing_schemas() -> set[str]:
         # DO NOT copy this query, it's insecure (which is fine in testing)
-        return set(
-            r['schema_name'] for r in mgr.engine.execute(
-                'SELECT schema_name FROM information_schema.schemata'
-            )
-        )
+        with mgr.engine.connect() as conn:
+            return {
+                schema_name for schema_name, in conn.execute(text(
+                    'SELECT schema_name FROM information_schema.schemata'
+                ))
+            }
 
     def schema_tables(schema: str) -> set[str]:
         # DO NOT copy this query, it's insecure (which is fine in testing)
-        return set(
-            r['tablename'] for r in mgr.engine.execute((
-                "SELECT tablename FROM pg_catalog.pg_tables "
-                "WHERE schemaname = '{}'".format(schema)
-            ))
-        )
+        with mgr.engine.connect() as conn:
+            return {
+                tablename for tablename, in conn.execute(text(
+                    "SELECT tablename FROM pg_catalog.pg_tables "
+                    "WHERE schemaname = '{}'".format(schema)
+                ))
+            }
 
     assert 'testing' in existing_schemas()
     assert 'new' not in existing_schemas()
@@ -441,7 +442,8 @@ def test_json_type(postgres_dsn: str) -> None:
 
     # our json type automatically coreces None to an empty dict
     assert session.query(Test).filter(Test.id == 1).one().data == {}
-    assert session.execute('SELECT data::text from test').scalar() == '{}'
+    assert session.execute(text(
+        'SELECT data::text from test')).scalar() == '{}'
 
     test = Test(id=2, data={'foo': 'bar'})
     session.add(test)
@@ -654,11 +656,11 @@ def test_markup_text(postgres_dsn: str) -> None:
     session.add(test3)
     transaction.commit()
 
-    test1 = session.query(Test).get(1)  # type: ignore[assignment]
+    test1 = session.get(Test, 1)  # type: ignore[attr-defined]
     assert test1.html == Markup('&lt;script&gt;unvetted&lt;/script&gt;')
-    test2 = session.query(Test).get(2)  # type: ignore[assignment]
+    test2 = session.get(Test, 2)  # type: ignore[attr-defined]
     assert test2.html == Markup('<b>this is fine</b>')
-    test3 = session.query(Test).get(3)  # type: ignore[assignment]
+    test3 = session.get(Test, 3)  # type: ignore[attr-defined]
     assert test3.html == Markup('&nbsp;')
 
     mgr.dispose()
@@ -2281,7 +2283,7 @@ def test_selectable_sql_query(session: Session) -> None:
     """)
 
     columns = session.execute(
-        select((stmt.c.column_name, )).where(
+        select(stmt.c.column_name).where(  # type: ignore[arg-type]
             and_(
                 stmt.c.table_name == 'pg_group',
                 stmt.c.is_updatable == True
@@ -2294,7 +2296,7 @@ def test_selectable_sql_query(session: Session) -> None:
     assert columns[1].column_name == 'grosysid'
 
     columns = session.execute(
-        select((stmt.c.column_name, )).where(
+        select(stmt.c.column_name).where(  # type: ignore[arg-type]
             and_(
                 stmt.c.table_name == 'pg_group',
                 stmt.c.is_updatable == False
@@ -2315,7 +2317,7 @@ def test_selectable_sql_query_with_array(session: Session) -> None:
         GROUP BY "table"
     """)
 
-    query = session.execute(select((stmt.c.table, stmt.c.columns)))
+    query = session.execute(select(stmt.c.table, stmt.c.columns))  # type: ignore[arg-type]
     table = next(query)
 
     assert isinstance(table.columns, list)
@@ -2468,7 +2470,9 @@ def test_postgres_timezone(postgres_dsn: str) -> None:
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
     session = mgr.session()
-    assert session.execute('show timezone;').scalar() in valid_timezones, """
+    assert session.execute(
+        text('show timezone;')
+    ).scalar() in valid_timezones, """
     Run
         ALTER DATABASE onegov SET timezone TO 'UTC';
     to change the default timezone, then restart postgres service.

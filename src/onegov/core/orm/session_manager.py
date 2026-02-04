@@ -62,7 +62,7 @@ CONNECTION_LIFETIME = 60 * 60
 
 
 def query_schemas(
-    connection: Connection | Engine,
+    connection: Connection,
     namespace: str | None = None
 ) -> Iterator[str]:
     """ Yields all schemas or the ones with the given namespace. """
@@ -335,7 +335,7 @@ class SessionManager:
             # connections which are closed when returned (unlimited)
             engine_config['max_overflow'] = -1
 
-        self.engine = create_engine(self.dsn, **engine_config)
+        self.engine = create_engine(self.dsn, future=True, **engine_config)
         self.register_engine(self.engine)
 
         self.session_factory = scoped_session(
@@ -347,6 +347,7 @@ class SessionManager:
                 #       work with the default strategy, so we would need
                 #       to manually change the strategy for them.
                 query_cls=ForceFetchQueryClass,
+                future=True,
                 **session_config
             ),
             scopefunc=self._scopefunc,
@@ -751,9 +752,9 @@ class SessionManager:
         #
         # this is the *only* place where this happens - if anyone
         # knows how to do this using sqlalchemy/psycopg2, come forward!
-        conn = self.engine.execution_options(schema=None)
-        conn.execute('CREATE SCHEMA "{}"'.format(schema))
-        conn.execute('COMMIT')
+        engine = self.engine.execution_options(schema=None)
+        with engine.begin() as conn:
+            conn.execute(text(f'CREATE SCHEMA "{schema}"'))
 
     def create_schema_if_not_exists(
         self,
@@ -796,18 +797,20 @@ class SessionManager:
         database.
 
         """
-        return list(query_schemas(self.engine, namespace))
+        with self.engine.connect() as conn:
+            return list(query_schemas(conn, namespace))
 
     def is_schema_found_on_database(self, schema: str) -> bool:
         """ Returns True if the given schema exists on the database. """
 
-        conn = self.engine.execution_options(schema=None)
-        result = conn.execute(text(
-            'SELECT EXISTS(SELECT 1 FROM information_schema.schemata '
-            'WHERE schema_name = :schema)'
-        ), schema=schema)
+        engine = self.engine.execution_options(schema=None)
+        with engine.connect() as conn:
+            result = conn.execute(text(
+                'SELECT EXISTS(SELECT 1 FROM information_schema.schemata '
+                'WHERE schema_name = :schema)'
+            ), {'schema': schema})
 
-        return result.first()[0]
+            return result.first()[0]
 
     def create_required_extensions(self) -> None:
         """ Creates the required extensions once per lifetime of the manager.
@@ -818,13 +821,14 @@ class SessionManager:
             # extensions are a all added to a shared schema (a reserved schema)
             self.create_schema_if_not_exists('extensions', validate=False)
 
-            conn = self.engine.execution_options(schema='extensions')
+            engine = self.engine.execution_options(schema='extensions')
             for ext in self.required_extensions - self.created_extensions:
-                conn.execute(
-                    'CREATE EXTENSION IF NOT EXISTS "{}" '
-                    'SCHEMA "extensions"'.format(ext)
-                )
-                conn.execute('COMMIT')
+                assert '"' not in ext
+                with engine.begin() as conn:
+                    conn.execute(text(
+                        f'CREATE EXTENSION IF NOT EXISTS "{ext}" '
+                        f'SCHEMA "extensions"'
+                    ))
                 self.created_extensions.add(ext)
 
     def ensure_schema_exists(self, schema: str) -> None:
@@ -847,22 +851,21 @@ class SessionManager:
             self.create_required_extensions()
             self.create_schema_if_not_exists(schema)
 
-            conn = self.engine.execution_options(schema=schema)
+            engine = self.engine.execution_options(schema=schema)
             declared_classes = set()
 
             try:
-                for base in self.bases:
-                    base.metadata.schema = schema
-                    base.metadata.create_all(conn)
+                with engine.begin() as conn:
+                    for base in self.bases:
+                        base.metadata.schema = schema
+                        base.metadata.create_all(conn)
 
-                    declared_classes.update(
-                        base.registry._class_registry.values()
-                    )
+                        declared_classes.update(
+                            base.registry._class_registry.values()
+                        )
 
-                if self.on_schema_init.receivers:
-                    self.on_schema_init.send(schema, connection=conn)
-
-                conn.execute('COMMIT')
+                    if self.on_schema_init.receivers:
+                        self.on_schema_init.send(schema, connection=conn)
             finally:
                 # reset the schema on the global base variable - this state
                 # sticks around otherwise and haunts us in the tests

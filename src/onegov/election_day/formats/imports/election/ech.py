@@ -143,7 +143,7 @@ def import_information_delivery(
 
     # query existing compounds
     existing_compounds = session.query(ElectionCompound).filter(
-        Election.date == polling_day
+        ElectionCompound.date == polling_day
     ).all()
 
     # query existing elections

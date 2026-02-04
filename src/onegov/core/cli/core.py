@@ -416,7 +416,8 @@ class GroupContext(GroupContextGuard):
         # engine setup
         engine = create_engine(appcfg.configuration['dsn'], poolclass=NullPool)
 
-        return list(query_schemas(engine, namespace=appcfg.namespace))
+        with engine.begin() as conn:
+            return list(query_schemas(conn, namespace=appcfg.namespace))
 
     def split_match(self, match: str) -> tuple[str, str]:
         match = match.lstrip('/')

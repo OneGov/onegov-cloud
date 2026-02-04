@@ -101,11 +101,9 @@ def view_my_invoices(
     q = q.order_by(
         BookingPeriod.execution_start,
         BookingPeriodInvoice.id,
-        case(
-            [
-                (ActivityInvoiceItem.group == 'donation', 2),
-                (ActivityInvoiceItem.family != None, 1),
-            ],
+        case(  # type: ignore[call-overload]
+            (ActivityInvoiceItem.group == 'donation', 2),
+            (ActivityInvoiceItem.family != None, 1),
             else_=0
         ),
         ActivityInvoiceItem.group,

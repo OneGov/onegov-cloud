@@ -314,8 +314,8 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
         )
 
         topics = topics.order_by(desc(Topic.published_or_created))
-        topics = topics.options(undefer('created'))
-        topics = topics.options(undefer('content'))
+        topics = topics.options(undefer(Topic.created))
+        topics = topics.options(undefer(Topic.content))
         return topics
 
     @property
@@ -415,8 +415,8 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
             )
 
         news = news.order_by(desc(News.published_or_created))
-        news = news.options(undefer('created'))
-        news = news.options(undefer('content'))
+        news = news.options(undefer(News.created))
+        news = news.options(undefer(News.content))
         return news
 
     def sticky(self) -> Query[News]:

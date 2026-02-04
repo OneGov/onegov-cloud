@@ -142,7 +142,7 @@ def view_ticket(
     """)
 
     counts = request.session.execute(
-        select(stmt.c).where(stmt.c.channel_id == self.number)).first()
+        select(*stmt.c).where(stmt.c.channel_id == self.number)).first()
 
     # if we have a payment, show the payment button
     is_manager = request.is_manager_for_model(self)

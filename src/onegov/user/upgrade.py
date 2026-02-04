@@ -59,32 +59,32 @@ def change_ownership_by_name(
     # transfer all ownership without using models (which might or
     # might not be available here)
     if context.has_table('activities'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE activities
-            SET username = '{new_username}'
-            WHERE username = '{old_username}'
-        """.format(new_username=new_username, old_username=old_username))
+            SET username = :new_username
+            WHERE username = :old_username
+        """), {'new_username': new_username, 'old_username': old_username})
 
     if context.has_table('attendees'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE attendees
-            SET username = '{new_username}'
-            WHERE username = '{old_username}'
-        """.format(new_username=new_username, old_username=old_username))
+            SET username = :new_username
+            WHERE username = :old_username
+        """), {'new_username': new_username, 'old_username': old_username})
 
     if context.has_table('bookings'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE bookings
-            SET username = '{new_username}'
-            WHERE username = '{old_username}'
-        """.format(new_username=new_username, old_username=old_username))
+            SET username = :new_username
+            WHERE username = :old_username
+        """), {'new_username': new_username, 'old_username': old_username})
 
     if context.has_table('invoice_items'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE invoice_items
-            SET username = '{new_username}'
-            WHERE username = '{old_username}'
-        """.format(new_username=new_username, old_username=old_username))
+            SET username = :new_username
+            WHERE username = :old_username
+        """), {'new_username': new_username, 'old_username': old_username})
 
 
 def change_ownership_by_id(
@@ -93,11 +93,11 @@ def change_ownership_by_id(
     new_userid: uuid.UUID
 ) -> None:
     if context.has_table('tickets'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE tickets
-            SET user_id = '{new_userid}'
-            WHERE user_id = '{old_userid}'
-        """.format(old_userid=old_userid.hex, new_userid=new_userid.hex))
+            SET user_id = :new_userid
+            WHERE user_id = :old_userid
+        """), {'old_userid': old_userid, 'new_userid': new_userid})
 
 
 @upgrade_task('Force lowercase usernames')
@@ -175,10 +175,10 @@ def force_lowercase_usernames(context: UpgradeContext) -> None:
             change_ownership_by_name(context, other.username, 'temp')
 
             # delete the other user
-            context.operations.execute("""
+            context.operations.execute(text("""
                 DELETE from users
-                WHERE id = '{}'
-            """.format(other.id.hex))
+                WHERE id = :user_id
+            """), {'user_id': other.id})
 
         # switch the remaining user
         change_ownership_by_name(context, remaining.username, 'temp')
@@ -258,9 +258,9 @@ def make_user_models_polymorphic_type_non_nullable(
 ) -> None:
     for table in ('users', 'groups', 'role_mappings'):
         if context.has_table(table):
-            context.operations.execute(f"""
+            context.operations.execute(text(f"""
                 UPDATE {table} SET type = 'generic' WHERE type IS NULL;
-            """)
+            """))
 
             context.operations.alter_column(table, 'type', nullable=False)
 
@@ -274,9 +274,9 @@ def add_scope_column(context: UpgradeContext) -> None:
         'tans', Column('scope', Text, nullable=True, index=True)
     )
 
-    context.operations.execute(
+    context.operations.execute(text(
         "UPDATE tans set scope = 'mtan_access' WHERE scope IS NULL;"
-    )
+    ))
 
     context.session.flush()
     context.operations.alter_column('tans', 'scope', nullable=False)
@@ -292,12 +292,12 @@ def move_group_id_to_association_table(context: UpgradeContext) -> None:
 
     assert context.has_table('user_group_associations')
 
-    context.operations.execute("""
+    context.operations.execute(text("""
         INSERT INTO user_group_associations
         SELECT id AS user_id, group_id
           FROM users
          WHERE group_id IS NOT NULL;
-    """)
+    """))
 
     context.session.flush()
     context.operations.drop_column('users', 'group_id')
@@ -314,8 +314,7 @@ def add_last_login_column(context: UpgradeContext) -> None:
         )
 
         # Pre-populate last_login from existing session data
-        context.operations.execute(
-            """
+        context.operations.execute(text("""
             UPDATE users
             SET last_login = subquery.max_timestamp::timestamp
             FROM (
@@ -334,5 +333,4 @@ def add_last_login_column(context: UpgradeContext) -> None:
                 GROUP BY id
             ) AS subquery
             WHERE users.id = subquery.id;
-        """
-        )
+        """))

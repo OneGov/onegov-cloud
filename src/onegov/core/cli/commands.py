@@ -30,7 +30,7 @@ from onegov.core.upgrade import RawUpgradeRunner
 from onegov.core.upgrade import UpgradeRunner
 from onegov.server.config import Config
 from pydantic import PostgresDsn
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm.session import close_all_sessions
 from time import sleep
 from transaction import commit
@@ -99,7 +99,8 @@ def delete(
             app.session_manager.dispose()
 
             engine = create_engine(dsn)
-            engine.execute('DROP SCHEMA "{}" CASCADE'.format(app.schema))
+            with engine.begin() as conn:
+                conn.execute(text(f'DROP SCHEMA "{app.schema}" CASCADE'))
             engine.raw_connection().invalidate()
             engine.dispose()
 

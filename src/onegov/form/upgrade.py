@@ -14,7 +14,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.form import FormDefinitionCollection
 from onegov.form import FormFile
 from onegov.form import FormSubmission
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Column, Integer, Text, text
 from sqlalchemy.engine.reflection import Inspector
 
 
@@ -43,10 +43,10 @@ def migrate_form_submission_files_to_onegov_file(
 ) -> None:
     submission_ids = [
         row[0] for row in
-        context.session.execute("""
+        context.session.execute(text("""
             SELECT submission_id
             FROM submission_files
-        """)
+        """))
     ]
 
     if not submission_ids:
@@ -59,10 +59,10 @@ def migrate_form_submission_files_to_onegov_file(
         )
     }
 
-    for row in context.session.execute("""
+    for row in context.session.execute(text("""
         SELECT submission_id, field_id, filedata
         FROM submission_files
-    """):
+    """)):
         submission_id, field_id, filedata = row
         submission = submissions[submission_id]
 
@@ -85,7 +85,7 @@ def migrate_form_submission_files_to_onegov_file(
         submission.files.append(replacement)
 
     context.session.flush()
-    context.session.execute('DROP TABLE IF EXISTS submission_files')
+    context.session.execute(text('DROP TABLE IF EXISTS submission_files'))
 
 
 @upgrade_task('Add payment_method to definitions and submissions')
@@ -159,9 +159,9 @@ def add_registration_window_columns(context: UpgradeContext) -> None:
 @upgrade_task('Make form polymorphic type non-nullable')
 def make_form_polymorphic_type_non_nullable(context: UpgradeContext) -> None:
     if context.has_table('forms'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE forms SET type = 'generic' WHERE type IS NULL;
-        """)
+        """))
 
         context.operations.alter_column('forms', 'type', nullable=False)
 

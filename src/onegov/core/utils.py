@@ -780,9 +780,8 @@ def get_unique_hstore_keys(
         sqlalchemy.func.skeys(column).label('keys'))
 
     query = sqlalchemy.select(
-        [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
-        distinct=True
-    ).select_from(base.subquery())
+        sqlalchemy.func.array_agg(sqlalchemy.column('keys'))
+    ).select_from(base.subquery()).distinct()
 
     keys = session.execute(query).scalar()
     return set(keys) if keys else set()

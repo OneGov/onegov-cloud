@@ -77,10 +77,10 @@ def view_allocations_json(self: Resource, request: OrgRequest) -> JSON_ro:
     query = query.options(defer(Allocation.data))
     query = query.options(defer(Allocation.group))
     query = query.options(
-        defaultload('reserved_slots')
-        .defer('reservation_token')
-        .defer('allocation_id')
-        .defer('end'))
+        defaultload(Allocation.reserved_slots)
+        .defer(ReservedSlot.reservation_token)
+        .defer(ReservedSlot.allocation_id)
+        .defer(ReservedSlot.end))
 
     # but only return the master allocations
     return tuple(

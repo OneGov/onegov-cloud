@@ -217,7 +217,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         cls,
         period_id: uuid.UUID
     ) -> ColumnElement[float | None]:
-        return select([
+        return select(
             # force the result to be a float instead of a decimal
             type_coerce(
                 func.sum(
@@ -231,7 +231,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
                 ),
                 Numeric(asdecimal=False)
             )
-        ]).where(and_(
+        ).where(and_(
             Booking.period_id == period_id,
             Booking.attendee_id == cls.id
         )).label('happiness')

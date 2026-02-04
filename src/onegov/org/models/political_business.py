@@ -407,13 +407,10 @@ class PoliticalBusinessCollection(
     def years_for_entries(self) -> list[int]:
         """ Returns a list of years for which there are entries in the db """
 
-        years = self.session.query(
-            func.extract('year', PoliticalBusiness.entry_date).label('year')
-        ).filter(
+        year = func.extract('year', PoliticalBusiness.entry_date).label('year')
+        years = self.session.query(year).filter(
             PoliticalBusiness.entry_date.isnot(None)
-        ).distinct().order_by(
-            PoliticalBusiness.entry_date.desc()
-        )
+        ).distinct().order_by(year.desc())
 
         # convert to a list of integers, remove duplicates, and sort
         return sorted({int(year[0]) for year in years}, reverse=True)
@@ -433,16 +430,14 @@ class PoliticalBusinessCollection(
         """ Returns political businesses by given parliamentarian id """
         return (
             self.session.query(PoliticalBusiness)
-            .join(PoliticalBusinessParticipation)
-            .filter(
+            .filter(PoliticalBusiness.participants.any(
                 PoliticalBusinessParticipation.parliamentarian_id ==
                 parliamentarian_id
-            )
+            ))
             .order_by(
                 PoliticalBusiness.entry_date.desc(),
                 PoliticalBusiness.title
             )
-            .distinct()
         )
 
 

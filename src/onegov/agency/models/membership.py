@@ -65,7 +65,7 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
             set_committed_value(
                 self,
                 'person',
-                session.query(ExtendedPerson).get(self.person_id)
+                session.get(ExtendedPerson, self.person_id)
             )
         if self.agency_id is not None and self.agency is None:
             # retrieve the agency
@@ -73,7 +73,7 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
             set_committed_value(
                 self,
                 'agency',
-                session.query(ExtendedAgency).get(self.agency_id)
+                session.get(ExtendedAgency, self.agency_id)
             )
 
     # Todo: It is very unclear how this should be used. In the PDF rendering,

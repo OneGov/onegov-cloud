@@ -515,10 +515,10 @@ class ActivityCollection(RangedPagination[ActivityT]):
         base = self.query_base().with_entities(
             func.skeys(self.model_class._tags).label('keys'))
 
-        query = select([func.array_agg(column('keys'))], distinct=True)
+        query = select(func.array_agg(column('keys')))
         query = query.select_from(base.subquery())
 
-        tags = self.session.execute(query).scalar()
+        tags = self.session.execute(query.distinct()).scalar()
 
         return set(tags) if tags else set()
 

@@ -4,12 +4,11 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from sqlalchemy import Column, Text
-
 from onegov.core.upgrade import upgrade_task
+from sqlalchemy import text, Column, Text
 
+
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.upgrade import UpgradeContext
 
@@ -34,9 +33,9 @@ def make_message_type_not_nullable(context: UpgradeContext) -> None:
         return
 
     if context.has_column('messages', 'type'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE messages
                SET type = 'generic'
              WHERE type IS NULL;
-        """)
+        """))
         context.operations.alter_column('messages', 'type', nullable=False)
