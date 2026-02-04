@@ -555,6 +555,8 @@ def get_theme() -> OrgTheme:
 def org_content_security_policy() -> ContentSecurityPolicy:
     policy = default_content_security_policy()
 
+    policy.script_src.add('https://checkout.stripe.com')
+
     policy.child_src.add(SELF)
     policy.child_src.add('https://*.youtube.com')
     policy.child_src.add('https://*.vimeo.com')
