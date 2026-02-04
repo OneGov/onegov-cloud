@@ -161,6 +161,8 @@ def view_agencies_sort(
 ) -> RenderData:
 
     layout = AgencyCollectionLayout(self, request)
+    layout.edit_mode = True
+    layout.editmode_links = layout.editmode_links[1:]
 
     return {
         'title': _('Sort'),
@@ -209,6 +211,9 @@ def view_agency_sort(
 ) -> RenderData:
 
     layout = AgencyLayout(self, request)
+    layout.edit_mode = True
+    layout.editmode_links = layout.editmode_links[1:]
+
     return {
         'title': _('Sort'),
         'layout': layout,
@@ -283,6 +288,7 @@ def add_root_agency(
     layout = AgencyCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -313,6 +319,7 @@ def add_agency(
     layout = AgencyLayout(self, request)
     layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -468,7 +475,7 @@ def move_agency(
 
     layout = AgencyLayout(self, request)
     layout.breadcrumbs.append(Link(_('Move'), '#'))
-
+    layout.edit_mode = True
     return {
         'layout': layout,
         'title': self.title,

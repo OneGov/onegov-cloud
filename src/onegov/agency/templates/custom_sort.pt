@@ -18,7 +18,6 @@
                         </ul>
                     </dd>
                 </dl>
-                <a href="${request.link(layout.model)}" class="button" i18n:translate="">Back</a>
             </div>
         </div>
     </tal:block>

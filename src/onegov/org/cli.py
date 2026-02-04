@@ -22,7 +22,6 @@ import requests
 import transaction
 import yaml
 
-from onegov.agency.upgrade import migrate_homepage_structure_for_agency
 from onegov.core.orm.utils import QueryChain
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
                                    TimerangeTooLong)
@@ -3322,6 +3321,42 @@ def migrate_agency(
     def migrate_to_new_agency(request: OrgRequest, app: OrgApp) -> None:
         context: UpgradeContext = Bunch(session=app.session())  # type:ignore
         migrate_theme_options(context)
-        migrate_homepage_structure_for_agency(context)
+        org = context.session.query(Organisation).first()
+
+        if org is None:
+            return
+
+        org.meta['homepage_structure'] = textwrap.dedent("""\
+        <row-wide bgcolor="gray">
+            <column span="12">
+                <row class="columns">
+                    <column span="4">
+                        <icon_link
+                            icon="fa-user"
+                            title="Alle Personen"
+                            link="./people"
+                            text="Personen"
+                        />
+                    </column>
+                    <column span="4">
+                        <icon_link
+                            icon="fa-briefcase"
+                            link="./organizations"
+                            title="Alle Organisationen"
+                            text="Organisationen"
+                        />
+                    </column>
+                    <column span="4">
+                        <icon_link
+                            icon="fa-folder-open"
+                            link="./organizations/pdf"
+                            title="Staatskalender"
+                            text="PDF-Ausdruck inklusive Inhaltsverzeichnis"
+                        />
+                    </column>
+                </row>
+            </column>
+        </row-wide>
+        """)
 
     return migrate_to_new_agency
