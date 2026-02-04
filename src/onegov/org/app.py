@@ -556,6 +556,8 @@ def org_content_security_policy() -> ContentSecurityPolicy:
     policy = default_content_security_policy()
 
     policy.script_src.add('https://checkout.stripe.com')
+    policy.script_src.add('https://pay.datatrans.com')
+    policy.script_src.add('https://pay.sandbox.datatrans.com')
 
     policy.child_src.add(SELF)
     policy.child_src.add('https://*.youtube.com')
