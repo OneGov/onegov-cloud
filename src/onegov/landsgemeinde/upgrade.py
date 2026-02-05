@@ -206,3 +206,79 @@ def add_draft_state_to_votum(context: UpgradeContext) -> None:
         votum_item_state USING state::text::votum_item_state
     """))
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
+
+
+@upgrade_task('Cache assembly_date on LandsgemeindeFile.meta')
+def cache_assembly_date_on_landsgemeinde_file(context: UpgradeContext) -> None:
+    if context.has_table('files_for_landsgemeinde_assemblies_files'):
+        context.operations.execute(text("""
+            UPDATE files
+               SET meta = jsonb_set(
+                       files.meta,
+                       '{assembly_date}',
+                       (
+                           '"__date__@' || to_char(
+                              linked.assembly_date,
+                              'YYYY-MM-DD'
+                           ) || '"'
+                       )::jsonb
+                   )
+              FROM (
+                SELECT assemblies.date AS assembly_date,
+                       link.file_id as file_id
+                  FROM landsgemeinde_assemblies AS assemblies
+                  JOIN files_for_landsgemeinde_assemblies_files AS link
+                    ON link.landsgemeinde_assemblies_id = assemblies.id
+              ) AS linked
+             WHERE linked.file_id = files.id
+        """))
+    if context.has_table('files_for_landsgemeinde_agenda_items_files'):
+        context.operations.execute(text("""
+            UPDATE files
+               SET meta = jsonb_set(
+                       files.meta,
+                       '{assembly_date}',
+                       (
+                           '"__date__@' || to_char(
+                              linked.assembly_date,
+                              'YYYY-MM-DD'
+                           ) || '"'
+                       )::jsonb
+                   )
+              FROM (
+                SELECT assemblies.date AS assembly_date,
+                       link.file_id as file_id
+                  FROM landsgemeinde_assemblies AS assemblies
+                  JOIN landsgemeinde_agenda_items AS items
+                    ON items.assembly_id = assemblies.id
+                  JOIN files_for_landsgemeinde_agenda_items_files AS link
+                    ON link.landsgemeinde_agenda_items_id = items.id
+              ) AS linked
+             WHERE linked.file_id = files.id
+        """))
+    if context.has_table('files_for_landsgemeinde_vota_files'):
+        context.operations.execute(text("""
+            UPDATE files
+               SET meta = jsonb_set(
+                       files.meta,
+                       '{assembly_date}',
+                       (
+                           '"__date__@' || to_char(
+                              linked.assembly_date,
+                              'YYYY-MM-DD'
+                           ) || '"'
+                       )::jsonb
+                   )
+              FROM (
+                SELECT assemblies.date AS assembly_date,
+                       link.file_id as file_id
+                  FROM landsgemeinde_assemblies AS assemblies
+                  JOIN landsgemeinde_agenda_items AS items
+                    ON items.assembly_id = assemblies.id
+                  JOIN landsgemeinde_vota AS vota
+                    ON vota.agenda_item_id = items.id
+                  JOIN files_for_landsgemeinde_vota_files AS link
+                    ON link.landsgemeinde_vota_id = vota.id
+              ) AS linked
+             WHERE linked.file_id = files.id
+        """))

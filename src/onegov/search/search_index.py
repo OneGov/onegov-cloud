@@ -48,10 +48,14 @@ class SearchIndex(Base, UTCPublicationMixin):
     #: Access level of entry (AccessExtension::access)
     access = Column(String, nullable=False, default='public', index=True)
 
-    #: Timestamp of the last change to the entry (Searchable::es_last_change)
+    # FIXME: This might be a bit of a misnomer now, or we want to split this
+    #        into two separate columns. This is more of a reference date for
+    #        when this entry is relevant. So it affectes time-based search
+    #        and time-based relevance.
+    #: Timestamp of the last change to the entry (Searchable::fts_last_change)
     last_change = Column(UTCDateTime, nullable=True, index=True)
 
-    #: Tags associated with the entry (Searchable::es_tags)
+    #: Tags associated with the entry (Searchable::fts_tags)
     _tags: Column[list[str] | None] = Column(
         'tags',
         ARRAY(String),
