@@ -8,20 +8,25 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.mixins import TimestampedVideoMixin
+from onegov.landsgemeinde.observer import observes
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.attributes import flag_modified
+from sqlalchemy.orm.attributes import set_committed_value
 from uuid import uuid4
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-    from datetime import date as date_t
+    from datetime import date as date_t, datetime
+    from onegov.file import File
     from onegov.landsgemeinde.models import AgendaItem
     from onegov.landsgemeinde.models import Assembly
     from translationstring import TranslationString
@@ -61,8 +66,27 @@ class Votum(
     }
 
     @property
+    def fts_last_change(self) -> datetime:
+        self._fetch_if_necessary()
+        return self.agenda_item.fts_last_change
+
+    @property
     def fts_suggestion(self) -> tuple[str, ...]:
         return ()
+
+    def _fetch_if_necessary(self) -> None:
+        session = object_session(self)
+        if session is None:
+            return
+
+        if self.agenda_item_id is not None and self.agenda_item is None:
+            # retrieve the assembly
+            from onegov.landsgemeinde.models import AgendaItem  # type: ignore[unreachable]
+            set_committed_value(
+                self,
+                'agenda_item',
+                session.get(AgendaItem, self.agenda_item_id)
+            )
 
     #: the internal id of the votum
     id: Column[uuid.UUID] = Column(
@@ -143,3 +167,17 @@ class Votum(
             self.person_place
         )
         return ', '.join(d for d in details if d)
+
+    @observes('files', 'agenda_item.assembly.date')
+    def update_assembly_date(self, files: list[File], date: date_t) -> None:
+        # NOTE: Makes sure we will get reindexed, it doesn't really
+        #       matter what we flag as modified, we just pick something.
+        flag_modified(self, 'number')
+        if not files or date is None:
+            # nothing else to do
+            return
+
+        for file in files:
+            if file.meta.get('assembly_date') != date:
+                file.meta['assembly_date'] = date
+                flag_modified(file, 'meta')

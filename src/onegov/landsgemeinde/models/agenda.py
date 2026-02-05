@@ -14,6 +14,7 @@ from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.votum import Votum
 from onegov.landsgemeinde.models.mixins import TimestampedVideoMixin
+from onegov.landsgemeinde.observer import observes
 from onegov.org.models.extensions import SidebarLinksExtension
 from onegov.search import ORMSearchable
 from sqlalchemy import Boolean
@@ -22,7 +23,10 @@ from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.attributes import flag_modified
+from sqlalchemy.orm.attributes import set_committed_value
 from uuid import uuid4
 
 
@@ -30,7 +34,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterator
-    from datetime import date as date_t
+    from datetime import date as date_t, datetime
     from onegov.file.models.file import File
     from onegov.landsgemeinde.models import Assembly
     from translationstring import TranslationString
@@ -67,6 +71,11 @@ class AgendaItem(
     }
 
     @property
+    def fts_last_change(self) -> datetime:
+        self._fetch_if_necessary()
+        return self.assembly.fts_last_change
+
+    @property
     def fts_suggestion(self) -> list[str]:
         def suggestions() -> Iterator[str]:
             for line in self.title.splitlines():
@@ -80,6 +89,20 @@ class AgendaItem(
                     yield line[2:].lstrip()
 
         return list(suggestions())
+
+    def _fetch_if_necessary(self) -> None:
+        session = object_session(self)
+        if session is None:
+            return
+
+        if self.assembly_id is not None and self.assembly is None:
+            # retrieve the assembly
+            from onegov.landsgemeinde.models import Assembly  # type: ignore[unreachable]
+            set_committed_value(
+                self,
+                'assembly',
+                session.get(Assembly, self.assembly_id)
+            )
 
     #: the internal id of the agenda item
     id: Column[uuid.UUID] = Column(
@@ -183,3 +206,17 @@ class AgendaItem(
             self.files = [*value, self.memorial_pdf]
         else:
             self.files = value
+
+    @observes('files', 'assembly.date')
+    def update_assembly_date(self, files: list[File], date: date_t) -> None:
+        # NOTE: Makes sure we will get reindexed, it doesn't really
+        #       matter what we flag as modified, we just pick something.
+        flag_modified(self, 'number')
+        if not files or date is None:
+            # nothing else to do
+            return
+
+        for file in files:
+            if file.meta.get('assembly_date') != date:
+                file.meta['assembly_date'] = date
+                flag_modified(file, 'meta')

@@ -12,8 +12,24 @@
 
         <div class="grid-x" tal:condition="connection">
             <div class="cell small-12 medium-8">
-                <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${request.link(model, name='suggest')}" data-typeahead-target="${request.link(model)}" data-typeahead-filter-params='["type"]'>
+                <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${request.link(model, name='suggest')}" data-typeahead-target="${request.link(model)}" data-typeahead-filter-params='["type"${form.start and form.end and ",\"start\",\"end\""|""}]'>
                 <div class="two-columns" tal:condition="form.type">${form.type()}</div>
+                <div class="two-columns" tal:condition="form.start and form.end|nothing">
+                    <ul>
+                        <li tal:define="content form.start()">
+                            <div>
+                                <label for="start" i18n:translate>From</label>
+                                ${form.start()}
+                            </div>
+                        </li>
+                        <li tal:define="content form.end()">
+                            <div>
+                                <label for="end" i18n:translate>To</label>
+                                ${form.end()}
+                            </div>
+                        </li>
+                    </ul>
+                </div>
                 <label for="search">${searchlabel}</label>
                 <div class="input-group">
                     ${form.q(class_='input-group-field')}
