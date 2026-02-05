@@ -162,6 +162,15 @@ def test_view_archive_simple_results(election_day_app_zg: TestApp) -> None:
         'Counter proposal',
         'Tie breaker',
     }),
+    ('counterproposal accepted', {
+        'Complex Vote',
+        'Gegenentwurf',  # result
+        '50.98',  # yeas percentage
+        '49.02',  # nays percentage
+        '11 von 11',
+        'Counter proposal',
+        'Tie breaker',
+    }),
 ])
 def test_view_archive_complex_results(
     election_day_app_zg: TestApp,

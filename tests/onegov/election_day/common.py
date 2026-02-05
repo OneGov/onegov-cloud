@@ -383,6 +383,7 @@ def upload_complex_vote(
         'interim',
         'proposal declined',
         'proposal accepted',
+        'counterproposal accepted'
     )
 
     if create:
@@ -395,20 +396,21 @@ def upload_complex_vote(
         new.form['type'] = 'complex'
         new.form.submit()
 
+    types = ('proposal', 'counter-proposal', 'tie-breaker')
     csv = (
         'entity_id,yeas,nays,eligible_voters,empty,invalid,status,type,'
         'counted\n'
     )
 
     if result == 'interim':
-        for type_ in ('proposal', 'counter-proposal', 'tie-breaker'):
+        for type_ in types:
             if canton == 'zg':
                 csv += (
                     f'1701,3049,5111,13828,54,3,interim,{type_},true\n'
                 )
 
     if result == 'proposal declined':
-        for type_ in ('proposal', 'counter-proposal', 'tie-breaker'):
+        for type_ in types:
             if canton == 'zg':
                 csv += (
                     f'1701,3049,5111,13828,54,3,final,{type_},true\n'
@@ -424,14 +426,14 @@ def upload_complex_vote(
                     f'1711,3821,7405,16516,80,1,final,{type_},true\n'
                 )
 
-        for type_ in ('proposal', 'counter-proposal', 'tie-breaker'):
+        for type_ in types:
             if canton == 'gr':
                 csv += (
                     f'3506,3049,5111,13828,54,3,final,{type_},true\n'
                 )
 
     if result == 'proposal accepted':
-        for type_ in ('proposal', 'counter-proposal', 'tie-breaker'):
+        for type_ in types:
             if canton == 'zg':
                 csv += (
                     f'1701,3049,3111,13828,54,3,final,{type_},true\n'
@@ -446,6 +448,39 @@ def upload_complex_vote(
                     f'1710,651,743,2016,8,,final,{type_},true\n'
                     f'1711,3821,4405,16516,80,1,final,{type_},true\n'
                 )
+
+    if result == 'counterproposal accepted':
+        for type_ in ('proposal', 'counter-proposal'):
+            if canton == 'zg':
+                csv += (
+                    f'1701,3049,3111,13828,54,3,final,{type_},true\n'
+                    f'1702,2190,2347,9687,60,,final,{type_},true\n'
+                    f'1703,1497,1089,5842,15,1,final,{type_},true\n'
+                    f'1704,599,171,2917,17,,final,{type_},true\n'
+                    f'1705,307,522,1289,10,1,final,{type_},true\n'
+                    f'1706,811,298,3560,18,,final,{type_},true\n'
+                    f'1707,1302,779,6068,17,,final,{type_},true\n'
+                    f'1708,1211,1350,5989,17,,final,{type_},true\n'
+                    f'1709,1096,1083,5245,18,1,final,{type_},true\n'
+                    f'1710,651,743,2016,8,,final,{type_},true\n'
+                    f'1711,3821,4405,16516,80,1,final,{type_},true\n'
+                )
+
+        if canton == 'zg':
+            type_ = 'tie-breaker'
+            csv += (
+                f'1701,3049,5111,13828,54,3,final,{type_},true\n'
+                f'1702,2190,3347,9687,60,,final,{type_},true\n'
+                f'1703,1497,2089,5842,15,1,final,{type_},true\n'
+                f'1704,599,1171,2917,17,,final,{type_},true\n'
+                f'1705,307,522,1289,10,1,final,{type_},true\n'
+                f'1706,811,1298,3560,18,,final,{type_},true\n'
+                f'1707,1302,1779,6068,17,,final,{type_},true\n'
+                f'1708,1211,2350,5989,17,,final,{type_},true\n'
+                f'1709,1096,2083,5245,18,1,final,{type_},true\n'
+                f'1710,651,743,2016,8,,final,{type_},true\n'
+                f'1711,3821,7405,16516,80,1,final,{type_},true\n'
+            )
 
     upload = client.get('/vote/complex-vote/upload')
     upload.form['proposal'] = Upload(
