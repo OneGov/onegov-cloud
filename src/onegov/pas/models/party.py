@@ -86,11 +86,12 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
     description = dict_markup_property('content')
 
     #: A party may have n roles
-    roles: relationship[list[PASParliamentarianRole]]
-    roles = relationship(
+    roles: relationship[list[PASParliamentarianRole]] = (
+        relationship(
         'PASParliamentarianRole',
         cascade='all, delete-orphan',
         back_populates='party'
+        )
     )
 
     def __repr__(self) -> str:

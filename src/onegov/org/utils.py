@@ -736,6 +736,7 @@ class AvailabilityEventInfo:
             ) if blockable else None,
             'partlyAvailable': self.allocation.partly_available,
             'fullyAvailable': self.allocation.availability == 100.0,
+            'wholeDay': self.allocation.whole_day,
             'kind': 'allocation',
         }
 
@@ -1561,10 +1562,15 @@ def group_by_column(
     # groupby expects the input iterable (records) to already be sorted
     records = sorted(records, key=group_key)
     for group, items in groupby(records, group_key):
-        grouped[group] = [
-            transform(i)
+        entries = [
+            t
             for i in sorted(items, key=sort_key)
+            if (t := transform(i)) is not None
         ]
+        # NOTE: Since transform can remove entries we only add the group
+        #       if it is still non-empty.
+        if entries:
+            grouped[group] = entries
 
     return grouped
 

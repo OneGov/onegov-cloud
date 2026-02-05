@@ -88,6 +88,9 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     # Personal-Nr.
     pers_id: Column[int | None] = Column(Integer)
 
+    # Vertragsnummer / AnsV-Nr. (Anstellungsverhältnis-Nr.)
+    contract_number: Column[str | None] = Column(Text)
+
     # Zulassung / admission
     admission: Column[AdmissionState] = Column(
         Enum(*ADMISSIONS, name='admission_state'),  # type:ignore[arg-type]
@@ -223,14 +226,17 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     operation_comments: Column[str | None] = Column(Text)
 
     # List of types of interpreting the interpreter can do
-    expertise_interpreting_types: dict_property[Sequence[InterpretingType]]
-    expertise_interpreting_types = meta_property(default=tuple)
+    expertise_interpreting_types: dict_property[Sequence[InterpretingType]] = (
+        meta_property(default=tuple)
+    )
 
     # List of types of professional guilds
-    expertise_professional_guilds: dict_property[Sequence[str]]
-    expertise_professional_guilds = meta_property(default=tuple)
-    expertise_professional_guilds_other: dict_property[Sequence[str]]
-    expertise_professional_guilds_other = meta_property(default=tuple)
+    expertise_professional_guilds: dict_property[Sequence[str]] = (
+        meta_property(default=tuple)
+    )
+    expertise_professional_guilds_other: dict_property[Sequence[str]] = (
+        meta_property(default=tuple)
+    )
 
     @property
     def expertise_professional_guilds_all(self) -> Sequence[str]:

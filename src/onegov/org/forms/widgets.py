@@ -16,7 +16,7 @@ class UploadOrLinkExistingFileWidget(UploadWidget):
 
     file_details_template = Markup("""
         <div ic-trigger-from="#button-{file_id}"
-             ic-trigger-on="click once"
+             ic-trigger-on="click once, change"
              ic-get-from="{details_url}"
              class="file-preview-wrapper"></div>
     """)
@@ -58,8 +58,6 @@ class UploadOrLinkExistingFileWidget(UploadWidget):
             # interactive preview widget
             request = field.meta.request
             request.include('prompt')
-            # FIXME: Make file-details work without ic-on-success
-            request.require_unsafe_eval()
             data['preview'] = self.file_details_template.format(
                 file_id=file.id,
                 details_url=request.link(file, 'details')

@@ -157,10 +157,11 @@ class ParliamentarianRole(Base, TimestampMixin):
     )
 
     #: The parliamentary group
-    parliamentary_group: relationship[ParliamentaryGroup | None]
-    parliamentary_group = relationship(
-        'ParliamentaryGroup',
-        back_populates='roles'
+    parliamentary_group: relationship[ParliamentaryGroup | None] = (
+        relationship(
+            'ParliamentaryGroup',
+            back_populates='roles'
+        )
     )
 
     #: The parliamentary group role value

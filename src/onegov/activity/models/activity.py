@@ -136,10 +136,11 @@ class Activity(Base, ContentMixin, TimestampMixin):
     )
 
     #: The publication requests linked to this activity
-    publication_requests: relationship[list[PublicationRequest]]
-    publication_requests = relationship(
-        'PublicationRequest',
-        back_populates='activity'
+    publication_requests: relationship[list[PublicationRequest]] = (
+        relationship(
+            'PublicationRequest',
+            back_populates='activity'
+        )
     )
 
     __mapper_args__ = {

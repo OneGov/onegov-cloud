@@ -119,8 +119,9 @@ class Change(Base, ContentMixin, TimestampMixin):
         return None
 
     #: The changes
-    changes: dict_property[dict[str, str | int | None] | None]
-    changes = content_property()
+    changes: dict_property[dict[str, str | int | None] | None] = (
+        content_property()
+    )
 
     @property
     def date(self) -> date | None:

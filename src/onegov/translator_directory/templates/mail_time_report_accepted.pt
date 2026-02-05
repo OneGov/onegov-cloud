@@ -26,7 +26,7 @@
             <strong i18n:translate>Travel Distance:</strong><br/>
             <span i18n:translate>from</span> ${travel_info['from_address']}<br/>
             <span i18n:translate>to</span> ${travel_info['to_location']}<br/>
-            ${travel_info['distance']} km × 2
+            ${travel_info['one_way_travel_distance']} km
         </p>
 
         <p>

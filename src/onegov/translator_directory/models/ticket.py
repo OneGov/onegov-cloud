@@ -3,17 +3,19 @@ from __future__ import annotations
 from functools import cached_property
 from markupsafe import Markup, escape
 from onegov.translator_directory.models.time_report import TranslatorTimeReport
-from onegov.core.elements import Link, LinkGroup
+from onegov.core.elements import Confirm, Link, LinkGroup
 from onegov.core.templates import render_macro
 from onegov.core.utils import linkify
 from onegov.org import _
 from onegov.org.models.ticket import OrgTicketMixin
+from onegov.org.utils import get_current_tickets_url
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
 from onegov.core.elements import Intercooler
 from onegov.translator_directory.collections.documents import (
-    TranslatorDocumentCollection)
+    TranslatorDocumentCollection,
+)
 from onegov.translator_directory.constants import (
     TIME_REPORT_INTERPRETING_TYPES,
     INTERPRETING_TYPES,
@@ -26,7 +28,10 @@ from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.mutation import TranslatorMutation
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.constants import TRANSLATOR_FA_ICON
-from onegov.translator_directory.utils import get_custom_text
+from onegov.translator_directory.utils import (
+    get_accountant_emails_for_finanzstelle,
+    get_custom_text,
+)
 
 from typing import Any, TYPE_CHECKING
 
@@ -218,9 +223,24 @@ class TimeReportHandler(Handler):
     def ticket_deletable(self) -> bool:
         if self.deleted:
             return True
-        if self.time_report and self.time_report.status == 'confirmed':
+        if self.time_report and self.time_report.status != 'confirmed':
             return True
         return False
+
+    def can_delete_time_report(self, request: TranslatorAppRequest) -> bool:
+        if not self.time_report:
+            return False
+        if request.is_admin:
+            return True
+        if not request.current_user:
+            return False
+        try:
+            accountant_emails = get_accountant_emails_for_finanzstelle(
+                request, self.time_report.finanzstelle
+            )
+            return request.current_user.username in accountant_emails
+        except ValueError:
+            return False
 
     @cached_property
     def email(self) -> str:
@@ -484,7 +504,7 @@ class TimeReportHandler(Handler):
                     f"({request.translate(_('from'))} "
                     f"{escape(translator_address)} "
                     f"{request.translate(_('to'))} {escape(location_name)}, "
-                    f"{report.travel_distance} km \u00d7 2)"
+                    f"{report.travel_distance} km)"
                 )
             else:
                 travel_label = (
@@ -502,7 +522,7 @@ class TimeReportHandler(Handler):
                 f"{request.translate(_('Travel'))} "
                 f"({request.translate(_('from'))} "
                 f"{escape(translator_address)}, "
-                f"{report.translator.drive_distance} km \u00d7 2)"
+                f"{report.translator.drive_distance} km)"
             )
 
         summary_parts.extend(
@@ -618,6 +638,32 @@ class TimeReportHandler(Handler):
                             request_method='POST',
                             redirect_after=request.link(self.ticket)
                         )
+                    ),
+                )
+            )
+
+        if self.time_report and self.can_delete_time_report(request):
+            time_report_links.append(
+                Link(
+                    text=_('Delete'),
+                    url=request.csrf_protected_url(
+                        request.link(self.time_report)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete '
+                                'this time report?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Delete time report'),
+                            _('Cancel'),
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=get_current_tickets_url(request),
+                        ),
                     ),
                 )
             )

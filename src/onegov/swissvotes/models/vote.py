@@ -32,12 +32,12 @@ from sqlalchemy.orm import deferred
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
 
-
 from typing import Any
 from typing import Generic
 from typing import NamedTuple
 from typing import TYPE_CHECKING
 from typing_extensions import TypeVar
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from datetime import date as date_t
@@ -91,9 +91,9 @@ class encoded_property:  # noqa: N801
         )
 
     def __get__(
-        self,
-        instance: HasCodes[T],
-        owner: type[object]
+            self,
+            instance: HasCodes[T],
+            owner: type[object]
     ) -> T | None:
         value = getattr(instance, f'_{self.name}')
         return instance.codes(self.name).get(value)
@@ -110,19 +110,19 @@ class localized_property(Generic[StrT]):  # noqa: N801
             value_fr = Column(Text)
             value = localized_property()
     """
+
     def __set_name__(
-        self,
-        owner: type[HasSessionManager],
-        name: str
+            self,
+            owner: type[HasSessionManager],
+            name: str
     ) -> None:
         self.name = name
 
     def __get__(
-        self,
-        instance: HasSessionManager,
-        owner: type[HasSessionManager]
+            self,
+            instance: HasSessionManager,
+            owner: type[HasSessionManager]
     ) -> StrT:
-
         default: StrT = getattr(instance, f'{self.name}_de')
         assert instance.session_manager is not None
         assert instance.session_manager.current_locale is not None
@@ -132,7 +132,6 @@ class localized_property(Generic[StrT]):  # noqa: N801
 
 
 class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
-
     """ A single vote as defined by the code book.
 
     There are a lot of columns:
@@ -237,10 +236,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             ))
 
         if attribute in (
-            'position_council_of_states',
-            'position_federal_council',
-            'position_national_council',
-            'position_parliament',
+                'position_council_of_states',
+                'position_federal_council',
+                'position_national_council',
+                'position_parliament',
         ):
             return OrderedDict((
                 (1, _('Accepting')),
@@ -399,8 +398,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     def campaign_links(self) -> dict[str, list[str]]:
         result: dict[str, list[str]] = {}
         for position, label in (
-            ('yes', _('Campaign for a Yes')),
-            ('no', _('Campaign for a No'))
+                ('yes', _('Campaign for a Yes')),
+                ('no', _('Campaign for a No'))
         ):
             for number in (1, 2, 3):
                 link = getattr(self, f'link_campaign_{position}_{number}', '')
@@ -411,15 +410,19 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     # Campaign finances
     campaign_finances_yea_total: Column[int | None] = Column(Integer())
     campaign_finances_nay_total: Column[int | None] = Column(Integer())
-    campaign_finances_yea_donors_de: dict_property[str | None]
-    campaign_finances_yea_donors_de = content_property()
-    campaign_finances_yea_donors_fr: dict_property[str | None]
-    campaign_finances_yea_donors_fr = content_property()
+    campaign_finances_yea_donors_de: dict_property[str | None] = (
+        content_property()
+    )
+    campaign_finances_yea_donors_fr: dict_property[str | None] = (
+        content_property()
+    )
     campaign_finances_yea_donors = localized_property()
-    campaign_finances_nay_donors_de: dict_property[str | None]
-    campaign_finances_nay_donors_de = content_property()
-    campaign_finances_nay_donors_fr: dict_property[str | None]
-    campaign_finances_nay_donors_fr = content_property()
+    campaign_finances_nay_donors_de: dict_property[str | None] = (
+        content_property()
+    )
+    campaign_finances_nay_donors_fr: dict_property[str | None] = (
+        content_property()
+    )
     campaign_finances_nay_donors = localized_property()
     campaign_finances_link_de: dict_property[str | None] = content_property()
     campaign_finances_link_fr: dict_property[str | None] = content_property()
@@ -462,12 +465,12 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
         # order: MfG, SA, BS
         for key, attribute, label in (
-            ('yea', 'posters_mfg_yea', _('Link eMuseum.ch')),
-            ('nay', 'posters_mfg_nay', _('Link eMuseum.ch')),
-            ('yea', 'posters_sa_yea', _('Link Social Archives')),
-            ('nay', 'posters_sa_nay', _('Link Social Archives')),
-            ('yea', 'posters_bs_yea', _('Link Basel Poster Collection')),
-            ('nay', 'posters_bs_nay', _('Link Basel Poster Collection')),
+                ('yea', 'posters_mfg_yea', _('Link eMuseum.ch')),
+                ('nay', 'posters_mfg_nay', _('Link eMuseum.ch')),
+                ('yea', 'posters_sa_yea', _('Link Social Archives')),
+                ('nay', 'posters_sa_nay', _('Link Social Archives')),
+                ('yea', 'posters_bs_yea', _('Link Basel Poster Collection')),
+                ('nay', 'posters_bs_nay', _('Link Basel Poster Collection')),
         ):
             images = getattr(self, f'{attribute}_imgs')
             urls = (getattr(self, attribute) or '').strip().split(' ')
@@ -484,8 +487,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                     )
 
         for key, attribute, label in (
-            ('yea', 'campaign_material_yea', _('Swissvotes database')),
-            ('nay', 'campaign_material_nay', _('Swissvotes database')),
+                ('yea', 'campaign_material_yea', _('Swissvotes database')),
+                ('nay', 'campaign_material_nay', _('Swissvotes database')),
         ):
             for image in getattr(self, attribute):
                 result[key].append(
@@ -624,15 +627,19 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     recommendations_other_no_de: Column[str | None] = Column(Text)
     recommendations_other_no_fr: Column[str | None] = Column(Text)
     recommendations_other_no = localized_property()
-    recommendations_other_counter_proposal_de: Column[str | None]
-    recommendations_other_counter_proposal_de = Column(Text)
-    recommendations_other_counter_proposal_fr: Column[str | None]
-    recommendations_other_counter_proposal_fr = Column(Text)
+    recommendations_other_counter_proposal_de: Column[str | None] = (
+        Column(Text)
+    )
+    recommendations_other_counter_proposal_fr: Column[str | None] = (
+        Column(Text)
+    )
     recommendations_other_counter_proposal = localized_property()
-    recommendations_other_popular_initiative_de: Column[str | None]
-    recommendations_other_popular_initiative_de = Column(Text)
-    recommendations_other_popular_initiative_fr: Column[str | None]
-    recommendations_other_popular_initiative_fr = Column(Text)
+    recommendations_other_popular_initiative_de: Column[str | None] = (
+        Column(Text)
+    )
+    recommendations_other_popular_initiative_fr: Column[str | None] = (
+        Column(Text)
+    )
     recommendations_other_popular_initiative = localized_property()
     recommendations_other_free_de: Column[str | None] = Column(Text)
     recommendations_other_free_fr: Column[str | None] = Column(Text)
@@ -659,9 +666,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
 
     def group_recommendations(
-        self,
-        recommendations: Iterable[tuple[T, int | None]],
-        ignore_unknown: bool = False
+            self,
+            recommendations: Iterable[tuple[T, int | None]],
+            ignore_unknown: bool = False
     ) -> dict[str, list[T]]:
         """ Group the given recommendations by slogan. """
 
@@ -721,7 +728,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @cached_property
     def recommendations_divergent_parties(
-        self
+            self
     ) -> dict[str, list[tuple[Actor, Region]]]:
         """ The divergent recommendations of the parties grouped by slogans.
 
@@ -762,64 +769,93 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     # Electoral strength
     national_council_election_year: Column[int | None] = Column(Integer)
-    national_council_share_fdp: Column[Decimal | None]
-    national_council_share_fdp = Column(Numeric(13, 10))
-    national_council_share_cvp: Column[Decimal | None]
-    national_council_share_cvp = Column(Numeric(13, 10))
-    national_council_share_sps: Column[Decimal | None]
-    national_council_share_sps = Column(Numeric(13, 10))
-    national_council_share_svp: Column[Decimal | None]
-    national_council_share_svp = Column(Numeric(13, 10))
-    national_council_share_lps: Column[Decimal | None]
-    national_council_share_lps = Column(Numeric(13, 10))
-    national_council_share_ldu: Column[Decimal | None]
-    national_council_share_ldu = Column(Numeric(13, 10))
-    national_council_share_evp: Column[Decimal | None]
-    national_council_share_evp = Column(Numeric(13, 10))
-    national_council_share_csp: Column[Decimal | None]
-    national_council_share_csp = Column(Numeric(13, 10))
-    national_council_share_pda: Column[Decimal | None]
-    national_council_share_pda = Column(Numeric(13, 10))
-    national_council_share_poch: Column[Decimal | None]
-    national_council_share_poch = Column(Numeric(13, 10))
-    national_council_share_gps: Column[Decimal | None]
-    national_council_share_gps = Column(Numeric(13, 10))
-    national_council_share_sd: Column[Decimal | None]
-    national_council_share_sd = Column(Numeric(13, 10))
-    national_council_share_rep: Column[Decimal | None]
-    national_council_share_rep = Column(Numeric(13, 10))
-    national_council_share_edu: Column[Decimal | None]
-    national_council_share_edu = Column(Numeric(13, 10))
-    national_council_share_fps: Column[Decimal | None]
-    national_council_share_fps = Column(Numeric(13, 10))
-    national_council_share_lega: Column[Decimal | None]
-    national_council_share_lega = Column(Numeric(13, 10))
-    national_council_share_kvp: Column[Decimal | None]
-    national_council_share_kvp = Column(Numeric(13, 10))
-    national_council_share_glp: Column[Decimal | None]
-    national_council_share_glp = Column(Numeric(13, 10))
-    national_council_share_bdp: Column[Decimal | None]
-    national_council_share_bdp = Column(Numeric(13, 10))
-    national_council_share_mcg: Column[Decimal | None]
-    national_council_share_mcg = Column(Numeric(13, 10))
-    national_council_share_mitte: Column[Decimal | None]
-    national_council_share_mitte = Column(Numeric(13, 10))
-    national_council_share_ubrige: Column[Decimal | None]
-    national_council_share_ubrige = Column(Numeric(13, 10))
-    national_council_share_yeas: Column[Decimal | None]
-    national_council_share_yeas = Column(Numeric(13, 10))
-    national_council_share_nays: Column[Decimal | None]
-    national_council_share_nays = Column(Numeric(13, 10))
-    national_council_share_none: Column[Decimal | None]
-    national_council_share_none = Column(Numeric(13, 10))
-    national_council_share_empty: Column[Decimal | None]
-    national_council_share_empty = Column(Numeric(13, 10))
-    national_council_share_free_vote: Column[Decimal | None]
-    national_council_share_free_vote = Column(Numeric(13, 10))
-    national_council_share_neutral: Column[Decimal | None]
-    national_council_share_neutral = Column(Numeric(13, 10))
-    national_council_share_unknown: Column[Decimal | None]
-    national_council_share_unknown = Column(Numeric(13, 10))
+    national_council_share_fdp: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_cvp: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_sps: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_svp: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_lps: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_ldu: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_evp: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_csp: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_pda: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_poch: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_gps: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_sd: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_rep: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_edu: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_fps: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_lega: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_kvp: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_glp: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_bdp: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_mcg: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_mitte: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_ubrige: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_yeas: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_nays: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_none: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_empty: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_free_vote: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_neutral: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
+    national_council_share_unknown: Column[Decimal | None] = (
+        Column(Numeric(13, 10))
+    )
 
     @cached_property
     def has_national_council_share_data(self) -> bool:
@@ -833,7 +869,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             share and a recommendation regarding this vote is present
         """
         if (
-            self.national_council_election_year and (
+                self.national_council_election_year and (
                 self.national_council_share_yeas
                 or self.national_council_share_nays
                 or self.national_council_share_none
@@ -842,7 +878,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 or self.national_council_share_neutral
                 or self.national_council_share_unknown
                 or self.sorted_actors_list
-            )
+        )
         ):
             return True
 
@@ -1147,10 +1183,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         self.reindex_files()
 
     def get_file(
-        self,
-        name: str,
-        locale: str | None = None,
-        fallback: bool = True
+            self,
+            name: str,
+            locale: str | None = None,
+            fallback: bool = True
     ) -> SwissVoteFile | None:
         """ Returns the requested localized file.
 

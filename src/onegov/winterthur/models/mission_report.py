@@ -82,11 +82,12 @@ class MissionReport(Base, ContentMixin, AccessExtension):
         default='single'
     )
 
-    used_vehicles: relationship[list[MissionReportVehicleUse]]
-    used_vehicles = relationship(
-        'MissionReportVehicleUse',
-        cascade='all, delete-orphan',
-        back_populates='mission_report'
+    used_vehicles: relationship[list[MissionReportVehicleUse]] = (
+        relationship(
+            'MissionReportVehicleUse',
+            cascade='all, delete-orphan',
+            back_populates='mission_report'
+        )
     )
 
     @property
