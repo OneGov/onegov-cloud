@@ -209,8 +209,11 @@ class AgendaItem(
 
     @observes('files', 'assembly.date')
     def update_assembly_date(self, files: list[File], date: date_t) -> None:
+        # NOTE: Makes sure we will get reindexed, it doesn't really
+        #       matter what we flag as modified, we just pick something.
+        flag_modified(self, 'number')
         if not files or date is None:
-            # nothing to do
+            # nothing else to do
             return
 
         for file in files:
