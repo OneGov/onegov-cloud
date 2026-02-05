@@ -9,7 +9,7 @@ from onegov.core.cronjobs import parse_cron, Job
 from onegov.core.utils import scan_morepath_modules
 from pytest_localserver.http import WSGIServer  # type: ignore[import-untyped]
 from sedate import replace_timezone
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 from time import sleep
 from webtest import TestApp as Client
 

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from functools import cached_property
-
 from onegov.activity import Activity, BookingPeriodCollection, Occasion
 from onegov.activity import BookingCollection
 from onegov.core.elements import Link, Confirm, Intercooler, Block
@@ -15,16 +14,15 @@ from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.feriennet.models import InvoiceAction, VacationActivity
-from onegov.town6.layout import DefaultLayout as BaseLayout
-from onegov.town6.layout import UserLayout as TownUserLayout
 from onegov.pay import PaymentProviderCollection
 from onegov.ticket import TicketCollection
+from onegov.town6.layout import DefaultLayout as BaseLayout
+from onegov.town6.layout import UserLayout as TownUserLayout
+from onegov.user.collections.user import UserCollection
+from sqlalchemy import text
 
 
 from typing import Any, NamedTuple, TYPE_CHECKING
-
-from onegov.user.collections.user import UserCollection
-
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from markupsafe import Markup
@@ -574,7 +572,7 @@ class BillingCollectionLayout(DefaultLayout):
 
     @property
     def families(self) -> Iterator[FamilyRow]:
-        yield from self.app.session().execute("""
+        yield from self.app.session().execute(text("""
             SELECT
                 text
                     || ' ('
@@ -593,7 +591,7 @@ class BillingCollectionLayout(DefaultLayout):
             WHERE family IS NOT NULL
             GROUP BY family, text
             ORDER BY text
-        """)
+        """))
 
     @property
     def family_removal_links(self) -> Iterator[Link]:

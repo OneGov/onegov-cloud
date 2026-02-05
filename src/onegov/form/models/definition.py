@@ -111,9 +111,9 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
             'FormRegistrationWindow', viewonly=True, uselist=False,
             primaryjoin="""and_(
                 FormRegistrationWindow.name == FormDefinition.name,
-                FormRegistrationWindow.id == select((
-                    FormRegistrationWindow.id,
-                )).where(
+                FormRegistrationWindow.id == select(
+                    FormRegistrationWindow.id
+                ).where(
                     FormRegistrationWindow.name == FormDefinition.name
                 ).order_by(
                     func.least(
@@ -288,9 +288,9 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
             uselist=False,
             primaryjoin="""and_(
                 SurveySubmissionWindow.name == SurveyDefinition.name,
-                SurveySubmissionWindow.id == select((
-                    SurveySubmissionWindow.id,
-                )).where(
+                SurveySubmissionWindow.id == select(
+                    SurveySubmissionWindow.id
+                ).where(
                     SurveySubmissionWindow.name == SurveyDefinition.name
                 ).order_by(
                     func.least(

@@ -301,13 +301,11 @@ class Search(Pagination[Any]):
                 #       results per type more effectively. Currently files
                 #       are he most egregious offender though, so we just
                 #       hardcode this into the query.
-                * case(
-                    [
-                        (SearchIndex.owner_tablename == 'files', 0.1),
-                        # NOTE: Tickets may be excluded entirely in the
-                        #       future but for now we'll de-prioritize them
-                        (SearchIndex.owner_tablename == 'tickets', 0.2),
-                    ],
+                * case(  # type: ignore[call-overload]
+                    (SearchIndex.owner_tablename == 'files', 0.1),
+                    # NOTE: Tickets may be excluded entirely in the
+                    #       future but for now we'll de-prioritize them
+                    (SearchIndex.owner_tablename == 'tickets', 0.2),
                     else_=1.0
                 )
             ).desc().label('rank')

@@ -330,7 +330,7 @@ def test_view_private_field(client: Client) -> None:
     transaction.commit()
 
     session = client.app.session()  # Get fresh session
-    person = session.query(Person).get(person_id)  # type: ignore[assignment]  # Reload person with new
+    person = session.get(Person, person_id)  # type: ignore[attr-defined]  # Reload person with new
 
     # Authorize
     headers = {"Authorization": f"Bearer {uuid}"}

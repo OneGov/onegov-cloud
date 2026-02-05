@@ -2,13 +2,12 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
 
 import textwrap
-from typing import TYPE_CHECKING
 
 from markupsafe import Markup
-
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.core.utils import module_path
 from onegov.feriennet.models import NotificationTemplate
@@ -18,6 +17,8 @@ from onegov.org.models import Organisation
 from onegov.page import PageCollection
 from onegov.user import UserCollection, User
 
+
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
 

@@ -153,9 +153,9 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     @counted.expression  # type:ignore[no-redef]
     def counted(cls) -> ColumnElement[bool]:
-        expr = select([
+        expr = select(
             func.coalesce(func.bool_and(ElectionResult.counted), False)
-        ])
+        )
         expr = expr.where(ElectionResult.election_id == cls.id)
         expr = expr.label('counted')
 
@@ -299,12 +299,12 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
         """
 
-        expr = select([
+        expr = select(
             func.coalesce(
                 func.sum(getattr(ElectionResult, attribute)),
                 0
             )
-        ])
+        )
         expr = expr.where(ElectionResult.election_id == cls.id)
         return expr.label(attribute)
 

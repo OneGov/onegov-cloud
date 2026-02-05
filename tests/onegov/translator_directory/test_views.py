@@ -105,7 +105,7 @@ def get_accountant_email(client: Client) -> str:
     return emails[0]
 
 
-def collect_emails(client: Client) -> list['EmailJsonDict']:
+def collect_emails(client: Client) -> list[EmailJsonDict]:
     """Collect all emails from client and flush the queue."""
     all_emails = []
     for i in range(10):
@@ -120,14 +120,14 @@ def collect_emails(client: Client) -> list['EmailJsonDict']:
 
 
 def filter_emails_by_recipient(
-    emails: list['EmailJsonDict'], recipient: str
-) -> list['EmailJsonDict']:
+    emails: list[EmailJsonDict], recipient: str
+) -> list[EmailJsonDict]:
     """Filter emails to only those sent to the specified recipient."""
     return [e for e in emails if recipient in e['To']]
 
 
 def extract_ticket_link_from_email(
-    emails: list['EmailJsonDict'], recipient: str
+    emails: list[EmailJsonDict], recipient: str
 ) -> str:
     """Extract ticket link from email sent to recipient."""
     matching_emails = [e for e in emails if recipient in e['To']]
@@ -3113,10 +3113,10 @@ def test_time_report_telephonic_no_location(client: Client) -> None:
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
 def test_delete_time_report(
-    broadcast: 'MagicMock',
-    authenticate: 'MagicMock',
-    connect: 'MagicMock',
-    client: 'Client',
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
 ) -> None:
     """Test that admins and accountants can delete time reports."""
     session = client.app.session()
@@ -3177,7 +3177,7 @@ def test_delete_time_report(
     assert response.status_code == 200
 
     session.expire_all()
-    time_report = session.query(TranslatorTimeReport).get(report_id)
+    time_report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
     assert time_report is None
 
 
@@ -3185,10 +3185,10 @@ def test_delete_time_report(
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
 def test_delete_time_report_admin(
-    broadcast: 'MagicMock',
-    authenticate: 'MagicMock',
-    connect: 'MagicMock',
-    client: 'Client',
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
 ) -> None:
     """Test that admin can delete time reports."""
     session = client.app.session()
@@ -3245,13 +3245,11 @@ def test_delete_time_report_admin(
     assert response.status_code == 200
 
     session.expire_all()
-    time_report = session.query(TranslatorTimeReport).get(report_id)
+    time_report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
     assert time_report is None
 
 
-def test_export_time_reports(
-    client: 'Client',
-) -> None:
+def test_export_time_reports(client: Client) -> None:
     """Test exporting confirmed time reports as CSV."""
     session = client.app.session()
     create_languages(session)
@@ -3313,7 +3311,7 @@ def test_export_time_reports(
     client.post(accept_url)
 
     session.expire_all()
-    report = session.query(TranslatorTimeReport).get(report_id)
+    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
     assert report is not None
     assert report.status == 'confirmed'
     assert report.exported is False
@@ -3344,7 +3342,7 @@ def test_export_time_reports(
 
     # Verify report is marked as exported with timestamp and batch id
     session.expire_all()
-    report = session.query(TranslatorTimeReport).get(report_id)
+    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
     assert report is not None
     assert report.exported is True
     assert report.exported_at is not None
@@ -3363,6 +3361,6 @@ def test_export_time_reports(
     assert 'TRANSLATOR, Test' in table
 
     # Batch id is preserved
-    report = session.query(TranslatorTimeReport).get(report_id)
+    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
     assert report is not None
     assert report.export_batch_id == batch_id

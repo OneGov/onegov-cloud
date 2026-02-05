@@ -47,7 +47,7 @@ class AddressCollection(GenericCollection[WinterthurAddress]):
                 unaccent(street)
         """)
 
-        return self.session.execute(select(query.c))
+        return self.session.execute(select(*query.c))
 
     def last_updated(self) -> datetime | None:
         result = self.query().first()

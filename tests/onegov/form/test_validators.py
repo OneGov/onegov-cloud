@@ -9,7 +9,7 @@ from onegov.form.validators import ValidPhoneNumber
 from pytest import raises
 from sqlalchemy import Column
 from sqlalchemy import Text
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 

@@ -108,7 +108,7 @@ class BillingCollection:
     def invoices_by_period(self) -> Query[InvoicesByPeriodRow]:
         invoices = self.invoices_by_period_query.c
 
-        query = select(invoices).where(invoices.period_id == self.period_id)
+        query = select(*invoices).where(invoices.period_id == self.period_id)
 
         if self.username:
             query = query.where(invoices.username == self.username)
@@ -387,7 +387,7 @@ class BookingInvoiceBridge:
         """)
         self.billed_attendees = {
             r.attendee_id for r in session.execute(
-                select(stmt.c).where(stmt.c.period_id == period.id)
+                select(*stmt.c).where(stmt.c.period_id == period.id)
             )
         }
 

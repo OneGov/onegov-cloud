@@ -9,7 +9,7 @@ from onegov.core.i18n.translation_string import TranslationMarkup
 from onegov.core.orm import ModelBase, SessionManager
 from markupsafe import Markup
 from sqlalchemy import Column, Integer, Text
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 from translationstring import TranslationString
 from uuid import uuid4
 

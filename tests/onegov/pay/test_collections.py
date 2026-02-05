@@ -11,7 +11,7 @@ from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProvider
 from sqlalchemy import Column
 from sqlalchemy import Text
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 from uuid import uuid4
 
 

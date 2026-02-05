@@ -208,7 +208,7 @@ def summarized_property(name: str) -> Column[int]:
 
             @classmethod
             def aggregate_results_expression(cls, attribute):
-                expr = select([func.sum(getattr(Result, attribute))])
+                expr = select(func.sum(getattr(Result, attribute)))
                 expr = expr.where(Result.xxx_id == cls.id)
                 expr = expr.label(attribute)
                 return expr

@@ -187,14 +187,14 @@ class ExtendedPersonCollection(
         letter = func.upper(func.unaccent(letter))
         query = self.session.query(letter.distinct().label('letter'))
         query = query.order_by(letter)
-        return [r.letter for r in query]
+        return [letter for letter, in query]
 
     @cached_property
     def used_agencies(self) -> list[str]:
         """ Returns a list of all the agencies people are members of.
 
         """
-        query = self.session.query(Agency.title).distinct()
-        query = query.join(Agency.memberships)
+        query = self.session.query(Agency.title)
+        query = query.filter(Agency.memberships.any())
         query = query.order_by(func.upper(func.unaccent(Agency.title)))
-        return [r.title for r in query]
+        return [title for title, in query]

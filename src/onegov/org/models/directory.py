@@ -547,7 +547,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
             set_committed_value(  # type: ignore[unreachable]
                 self,
                 'directory',
-                session.query(ExtendedDirectory).get(self.directory_id)
+                session.get(ExtendedDirectory, self.directory_id)
             )
 
     @property

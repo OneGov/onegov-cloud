@@ -228,3 +228,5 @@ jobs:
         LC_ALL: C.UTF-8
         LANG: C.UTF-8
         SKIP_DRIVER_MANAGER: '1'
+        # TEMPORARY: Remove after upgrade to SQLAlchemy 2.0
+        SQLALCHEMY_WARN_20: '1'
