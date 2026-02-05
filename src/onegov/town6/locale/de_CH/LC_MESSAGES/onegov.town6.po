@@ -17,15 +17,6 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Events"
-msgstr "Veranstaltungen"
-
-msgid "Latest news"
-msgstr "Aktuelles"
-
-msgid "Topics"
-msgstr "Themen"
-
 msgid "Chats"
 msgstr "Chats"
 
@@ -1105,6 +1096,9 @@ msgstr "Zoom"
 
 msgid "Show more"
 msgstr "Mehr anzeigen"
+
+msgid "What are you searching for?"
+msgstr "Wonach suchen Sie?"
 
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
