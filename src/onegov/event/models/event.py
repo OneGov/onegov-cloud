@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import warnings
-
 from datetime import datetime, timedelta
 from dateutil import rrule
 from dateutil.rrule import rrulestr
@@ -33,6 +31,7 @@ from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
+from sqlalchemy.orm.attributes import set_committed_value
 from translationstring import TranslationString
 from uuid import uuid4
 
@@ -423,13 +422,9 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         for start in self.occurrence_dates(limit=False):
             occurrence = self.spawn_occurrence(start)
-            occurrence.event = self
+            set_committed_value(occurrence, 'event', self)
 
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    'ignore', 'Object of type <Occurrence> not in session')
-
-                session = object_session(self)
+            if session := object_session(occurrence):
                 session.expunge(occurrence)
                 session.flush()
 
@@ -447,6 +442,8 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         # clear old occurrences
         self.occurrences = []
+        if session := object_session(self):
+            session.flush()
 
         # do not create occurrences unless the event is published
         if self.state != 'published':
@@ -458,7 +455,11 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         # create all occurrences for this and next year
         for start in self.occurrence_dates():
-            self.occurrences.append(self.spawn_occurrence(start))
+            occ = self.spawn_occurrence(start)
+            occ.event = self
+            if session := object_session(self):
+                session.add(occ)
+            self.occurrences.append(occ)
 
         for occ in self.occurrences:
             occ.filter_keywords = self.filter_keywords
