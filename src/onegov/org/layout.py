@@ -36,7 +36,9 @@ from onegov.form import FormDefinition
 from onegov.org.models.document_form import (
     FormDocument,
     FormDocumentCollection)
-from onegov.newsletter import NewsletterCollection, RecipientCollection
+from onegov.newsletter import Newsletter
+from onegov.newsletter import NewsletterCollection
+from onegov.newsletter import RecipientCollection
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.app import OrgApp
@@ -1591,6 +1593,7 @@ class SurveyCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=FormDocument)
 class FormDocumentLayout(DefaultLayout):
 
     @cached_property
@@ -2885,6 +2888,7 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
         return [edit_link, delete_link]
 
 
+@OrgApp.layout(model=Newsletter)
 class NewsletterLayout(DefaultLayout):
 
     @cached_property

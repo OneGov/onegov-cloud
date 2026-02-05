@@ -11,6 +11,7 @@ from onegov.chat.models import Chat
 from onegov.directory import DirectoryCollection, DirectoryEntry, Directory
 from onegov.event import Event
 from onegov.event import OccurrenceCollection, Occurrence
+from onegov.newsletter import Newsletter
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.org.layout import (
     Layout as OrgLayout,
@@ -72,7 +73,7 @@ from onegov.org.layout import (
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
 from onegov.form import FormDefinition
-from onegov.org.models import GeneralFile
+from onegov.org.models import GeneralFile, PoliticalBusiness
 from onegov.org.models import ImageSet
 from onegov.org.models import Meeting
 from onegov.org.models import MeetingCollection
@@ -88,6 +89,7 @@ from onegov.org.models import RISParliamentaryGroup
 from onegov.org.models import RISParliamentaryGroupCollection
 from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+from onegov.org.models.document_form import FormDocument
 from onegov.page import PageCollection
 from onegov.people import Person
 from onegov.reservation import Resource
@@ -402,6 +404,7 @@ class SurveySubmissionLayout(
         return 2
 
 
+@TownApp.layout(model=FormDocument)
 class FormDocumentLayout(OrgFormDocumentLayout, DefaultLayout):
 
     app: TownApp
@@ -707,6 +710,7 @@ class EventLayout(StepsLayoutExtension, OrgEventLayout, DefaultLayout):
         return 2
 
 
+@TownApp.layout(model=Newsletter)
 class NewsletterLayout(OrgNewsletterLayout, DefaultLayout):
 
     app: TownApp
@@ -1686,7 +1690,7 @@ class PoliticalBusinessCollectionLayout(DefaultLayout):
         return None
 
 
-# @TownApp.layout(model=PoliticalBusiness)
+@TownApp.layout(model=PoliticalBusiness)
 class PoliticalBusinessLayout(DefaultLayout):
 
     @cached_property
