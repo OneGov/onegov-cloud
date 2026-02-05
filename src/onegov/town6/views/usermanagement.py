@@ -70,8 +70,10 @@ def town_handle_manage_user(
     request: TownRequest,
     form: ManageUserForm
 ) -> RenderData | Response:
+    layout = UserManagementLayout(self, request)
+    layout.edit_mode = True
     return handle_manage_user(
-        self, request, form, UserManagementLayout(self, request))
+        self, request, form, layout)
 
 
 @TownApp.form(
@@ -86,5 +88,7 @@ def town_handle_new_user(
     request: TownRequest,
     form: NewUserForm
 ) -> RenderData:
+    layout = UserManagementLayout(self, request)
+    layout.edit_mode = True
     return handle_new_user(
-        self, request, form, UserManagementLayout(self, request))
+        self, request, form, layout)

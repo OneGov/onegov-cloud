@@ -7,44 +7,47 @@
         <metal:hint use-macro="layout.macros['access_hint_long']" tal:define="item agency"/>
         <metal:hint use-macro="layout.macros['publication_hint_long']" tal:define="item agency"/>
 
-        <div class="row">
+        <div class="grid-x grid-padding-x">
 
-            <div class="columns medium-8">
+            <div class="cell medium-7">
 
                 <div metal:use-macro="layout.macros['agency_card']" />
 
             </div>
-            <div class="columns medium-4">
+            <div class="cell medium-4 medium-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div tal:condition="agency.pdf_file" class="agency-exports side-panel">
+                        <h3 i18n:translate>Exports</h3>
+                        <ul class="agency-export-list">
+                            <li>
+                                <a href="${request.link(agency.pdf)}" target="_blank" i18n:translate>
+                                    Export this agency and its children as a PDF
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
-                <div tal:condition="agency.pdf_file" class="agency-exports borderless-side-panel">
-                    <h2 i18n:translate>Exports</h2>
-                    <ul class="agency-export-list">
-                        <li>
-                            <a href="${request.link(agency.pdf)}" target="_blank" i18n:translate>
-                                Export this agency and its children as a PDF
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <div tal:condition="request.app.org.meta.report_changes|True" class="borderless-side-panel">
-                    <h2 i18n:translate>Changes</h2>
-                    <div class="submit-yours">
-                        <p i18n:translate>The contact form can be used to report changes to incorrect information of the persons or organizations listed. The form is not intended for contacting or sending messages to the respective persons and organizations.</p>
-                        <a href="${request.link(agency.proxy(), 'report-change')}">
-                            <b i18n:translate>Report change</b>
-                        </a>
+                    <div tal:condition="request.app.org.meta.report_changes|True" class="side-panel">
+                        <h3 i18n:translate>Changes</h3>
+                        <div class="submit-yours">
+                            <p i18n:translate>The contact form can be used to report changes to incorrect information of the persons or organizations listed. The form is not intended for contacting or sending messages to the respective persons and organizations.</p>
+                            <ul class="more-list">
+                                <li><a class="list-link" href="${request.link(agency.proxy(), 'report-change')}">
+                                <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                                <span i18n:translate class="list-title">Report change</span>
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div tal:condition="agency.coordinates" class="side-panel">
+                        <h3>Karte</h3>
+                        <div class="marker-map agency-map"
+                            data-lat="${agency.coordinates.lat}"
+                            data-lon="${agency.coordinates.lon}"
+                            data-zoom="${agency.coordinates.zoom}">
+                        </div>
                     </div>
                 </div>
-                <div tal:condition="agency.coordinates" class="borderless-side-panel">
-                    <h2>Karte</h2>
-                    <div class="marker-map agency-map"
-                        data-lat="${agency.coordinates.lat}"
-                        data-lon="${agency.coordinates.lon}"
-                        data-zoom="${agency.coordinates.zoom}">
-                    </div>
-                </div>
-
             </div>
     </tal:block>
 </div>

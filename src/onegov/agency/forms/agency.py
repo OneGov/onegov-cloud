@@ -209,8 +209,6 @@ class MoveAgencyForm(Form):
     )
 
     def on_request(self) -> None:
-        self.request.include('common')
-        self.request.include('chosen')
 
         agencies = ExtendedAgencyCollection(self.request.session)
         self.parent_id.choices = [
