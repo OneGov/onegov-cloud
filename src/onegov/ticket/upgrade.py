@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
 
 from decimal import Decimal
@@ -14,6 +15,7 @@ from sqlalchemy import column, text, update, func, and_, true, false, Numeric
 from sqlalchemy.orm import load_only, selectinload
 from sqlalchemy.dialects.postgresql import ARRAY, HSTORE
 from uuid import uuid4
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
