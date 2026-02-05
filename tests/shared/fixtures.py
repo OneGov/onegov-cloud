@@ -192,7 +192,7 @@ def postgres_dsn(
     close_all_sessions()
     SessionManager(postgres.url(), None).dispose()  # type: ignore[arg-type]
 
-    engine = create_engine(postgres.url())
+    engine = create_engine(postgres.url(), future=True)
     with engine.begin() as conn:
         results = conn.execute(text(
             "SELECT DISTINCT table_schema FROM information_schema.tables"))

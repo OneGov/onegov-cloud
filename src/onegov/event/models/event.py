@@ -24,8 +24,8 @@ from pytz import UTC
 from sedate import standardize_date
 from sedate import to_timezone, utcnow
 from sqlalchemy import and_
-from sqlalchemy import Column
 from sqlalchemy import desc
+from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
@@ -239,6 +239,14 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         """ Automatically update the occurrences if shared attributes change
         """
 
+        # FIXME: This is insanely messy, since we delete and add all the
+        #        occurrences for every attribute we change, for one, we
+        #        could optimize this by only deleting existing occurences
+        #        if occurence_dates no longer matches the existing
+        #        occurrences, and we could do this only once at the end
+        #        when the new state is flushed, instead of for every
+        #        individual attribute change. An observer would probably
+        #        get us there.
         super().__setattr__(name, value)
         if name in ('state', 'title', 'name', 'location', 'tags',
                     'filter_keywords', 'start', 'end', 'timezone',
@@ -442,8 +450,6 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         # clear old occurrences
         self.occurrences = []
-        if session := object_session(self):
-            session.flush()
 
         # do not create occurrences unless the event is published
         if self.state != 'published':
@@ -456,7 +462,6 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         # create all occurrences for this and next year
         for start in self.occurrence_dates():
             occ = self.spawn_occurrence(start)
-            occ.event = self
             if session := object_session(self):
                 session.add(occ)
             self.occurrences.append(occ)

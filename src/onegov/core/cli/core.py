@@ -414,9 +414,13 @@ class GroupContext(GroupContextGuard):
         # creating your engine should usually be avoided, be sure to only
         # copy this code when you don't need the typical session manager
         # engine setup
-        engine = create_engine(appcfg.configuration['dsn'], poolclass=NullPool)
+        engine = create_engine(
+            appcfg.configuration['dsn'],
+            poolclass=NullPool,
+            future=True
+        )
 
-        with engine.begin() as conn:
+        with engine.connect() as conn:
             return list(query_schemas(conn, namespace=appcfg.namespace))
 
     def split_match(self, match: str) -> tuple[str, str]:

@@ -98,7 +98,7 @@ def delete(
             dsn = app.session_manager.dsn
             app.session_manager.dispose()
 
-            engine = create_engine(dsn)
+            engine = create_engine(dsn, future=True)
             with engine.begin() as conn:
                 conn.execute(text(f'DROP SCHEMA "{app.schema}" CASCADE'))
             engine.raw_connection().invalidate()

@@ -674,7 +674,7 @@ class RawUpgradeRunner:
         if not schemas:
             return 0
 
-        engine = create_engine(dsn, poolclass=StaticPool)
+        engine = create_engine(dsn, poolclass=StaticPool, future=True)
         connection = engine.connect()
         executions = 0
 
