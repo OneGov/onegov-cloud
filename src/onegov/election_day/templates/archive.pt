@@ -168,7 +168,7 @@
                                                     <td class="right-aligned">
                                                         ${layout.format_number(vote.display_yeas_percentage(request))}
                                                     </td>
-                                                    <td class="right-aligned" tal:condition="vote.vote_finalized">
+                                                    <td class="right-aligned">
                                                         ${layout.format_number(vote.display_nays_percentage(request))}
                                                     </td>
                                                 </tal:block>
@@ -187,8 +187,8 @@
                                         <tr>
                                             <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small">
                                                 <span> -</span>
-                                                <!--? ensure title translation -->
-                                                <span>${vote.title_proposal}</span>
+                                                <span tal:condition="vote.title_proposal">${vote.title_proposal}</span>
+                                                <span tal:condition="not vote.title_proposal" i18n:translate>Proposal</span>
                                             </th>
                                             <td></td>
                                             <td class="right-aligned" tal:condition="vote.has_results">
@@ -199,11 +199,11 @@
                                             </td>
                                             <td></td>
                                         </tr>
-                                        <tr>  <!-- condition? -->
+                                        <tr>
                                             <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small">
                                                 <span> -</span>
-                                                <!--? ensure title translation -->
-                                                <span>${vote.title_counter_proposal}</span>
+                                                <span tal:condition="vote.title_counter_proposal">${vote.title_counter_proposal}</span>
+                                                <span tal:condition="not vote.title_counter_proposal" i18n:translate>Counter Proposal</span>
                                             </th>
                                             <td>
 
@@ -216,11 +216,11 @@
                                             </td>
                                             <td></td>
                                         </tr>
-                                        <tr>  <!-- condition? -->
+                                        <tr>
                                             <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small">
                                                 <span> -</span>
-                                                <!--? ensure title translation -->
-                                                <span>${vote.title_tie_breaker}</span>
+                                                <span tal:condition="vote.title_tie_breaker">${vote.title_tie_breaker}</span>
+                                                <span tal:condition="not vote.title_tie_breaker" i18n:translate>Tie-Breaker</span>
                                             </th>
                                             <td>
 

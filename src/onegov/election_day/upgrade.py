@@ -279,3 +279,32 @@ def add_active_inactive_since_columns(context: UpgradeContext) -> None:
              WHERE modified IS NOT NULL
                AND type = 'sms'
         """)
+
+
+@upgrade_task('Add translation columns to archived results')
+def add_translation_columns_to_archived_results(
+    context: UpgradeContext
+) -> None:
+    # for complex votes we need translations for proposal title,
+    # counter proposal title and tie breaker title.
+    if not context.has_column('archived_results',
+                              'title_proposal_translations'):
+        context.operations.add_column(
+            'archived_results',
+            Column(
+                'title_proposal_translations', HSTORE, nullable=True)
+        )
+    if not context.has_column('archived_results',
+                              'title_counter_proposal_translations'):
+        context.operations.add_column(
+            'archived_results',
+            Column(
+                'title_counter_proposal_translations', HSTORE, nullable=True)
+        )
+    if not context.has_column('archived_results',
+                              'title_tie_breaker_translations'):
+        context.operations.add_column(
+            'archived_results',
+            Column(
+                'title_tie_breaker_translations', HSTORE, nullable=True)
+        )

@@ -93,6 +93,9 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
 
     @property
     def vote_finalized(self) -> bool:
+        if self.total_entities == 0:
+            return False
+
         return self.counted_entities == self.total_entities
 
     @property
@@ -112,20 +115,28 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     )
     title = translation_hybrid(title_translations)
 
-    title_proposal: dict_property[str] = meta_property(
-        'title_proposal',
-        default=''
+    #: Proposal title of the election/vote (complex votes)
+    title_proposal_translations: Column[Mapping[str, str]] = Column(
+        HSTORE,
+        nullable=True
+    )
+    title_proposal = translation_hybrid(title_proposal_translations)
+
+    #: Counterproposal title of the election/vote (complex votes)
+    title_counter_proposal_translations: Column[Mapping[str, str]] = Column(
+        HSTORE,
+        nullable=True
+    )
+    title_counter_proposal = translation_hybrid(
+        title_counter_proposal_translations
     )
 
-    title_counter_proposal: dict_property[str] = meta_property(
-        'title_counter_proposal',
-        default=''
+    #: Tiebreaker title of the election/vote (complex votes)
+    title_tie_breaker_translations: Column[Mapping[str, str]] = Column(
+        HSTORE,
+        nullable=True
     )
-
-    title_tie_breaker: dict_property[str] = meta_property(
-        'title_tie_breaker',
-        default=''
-    )
+    title_tie_breaker = translation_hybrid(title_tie_breaker_translations)
 
     def title_prefix(self, request: ElectionDayRequest) -> str:
         if self.is_fetched(request) and self.domain == 'municipality':
@@ -251,15 +262,17 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
             return ElectionCompound
         raise NotImplementedError
 
-    def is_complex_vote(self, request: ElectionDayRequest) -> bool:
-        """ Returns True if this result represents a complex vote. """
+    def vote(self, request: ElectionDayRequest) -> Vote | None:
         # circular import
         from onegov.election_day.collections import VoteCollection
 
         if not self.external_id:
             return False
+        return VoteCollection(request.session).by_id(self.external_id)
 
-        vote = VoteCollection(request.session).by_id(self.external_id)
+    def is_complex_vote(self, request: ElectionDayRequest) -> bool:
+        """ Returns True if this result represents a complex vote. """
+        vote = self.vote(request)
         if isinstance(vote, ComplexVote):  # other options to test? new column?
             # test if additional columns filled, otherwise populate them
             if (self.nays_percentage_proposal == 100.0 or
@@ -269,23 +282,35 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
                     self.nays_percentage_tie_breaker == 100.0 or
                     self.yeas_percentage_tie_breaker == 0.0 or
                     self.title_proposal == ''):
-                for ballot in vote.ballots:
-                    if ballot.type == 'proposal':
-                        self.title_proposal = ballot.title or self.title or ''
-                        self.nays_percentage_proposal = ballot.nays_percentage
-                        self.yeas_percentage_proposal = ballot.yeas_percentage
-                    if ballot.type == 'counter-proposal':
-                        self.title_counter_proposal = ballot.title or ''
-                        self.nays_percentage_counter_proposal = (
-                            ballot.nays_percentage)
-                        self.yeas_percentage_counter_proposal = (
-                            ballot.yeas_percentage)
-                    if ballot.type == 'tie-breaker':
-                        self.title_tie_breaker = ballot.title or ''
-                        self.nays_percentage_tie_breaker = (
-                            ballot.nays_percentage)
-                        self.yeas_percentage_tie_breaker = (
-                            ballot.yeas_percentage)
+                self.title_proposal_translations = (
+                        vote.title_translations or {})
+                ballot = vote.proposal
+                self.nays_percentage_proposal = ballot.nays_percentage
+                self.yeas_percentage_proposal = ballot.yeas_percentage
+
+                ballot = vote.counter_proposal
+                self.title_counter_proposal_translations = (
+                    ballot.title_translations or {}
+                    # {}
+                )
+                self.nays_percentage_counter_proposal = (
+                    ballot.nays_percentage
+                )
+                self.yeas_percentage_counter_proposal = (
+                    ballot.yeas_percentage
+                )
+
+                ballot = vote.tie_breaker
+                self.title_tie_breaker_translations = (
+                    ballot.title_translations or {}
+                    # {}
+                )
+                self.nays_percentage_tie_breaker = (
+                    ballot.nays_percentage
+                )
+                self.yeas_percentage_tie_breaker = (
+                    ballot.yeas_percentage
+                )
 
             return True
 
@@ -380,7 +405,18 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
         self.counted_entities = source.counted_entities
         self.has_results = source.has_results
         self.url = source.url
-        self.title_translations = deepcopy(dict(source.title_translations))
+        self.title_translations = deepcopy(
+            dict(source.title_translations)
+        )
+        self.title_proposal_translations = deepcopy(
+            dict(source.title_proposal_translations)
+        )
+        self.title_counter_proposal_translations = deepcopy(
+            dict(source.title_counter_proposal_translations)
+        )
+        self.title_tie_breaker_translations = deepcopy(
+            dict(source.title_tie_breaker_translations)
+        )
         self.shortcode = source.shortcode
         self.domain = source.domain
         self.meta = deepcopy(dict(source.meta))
