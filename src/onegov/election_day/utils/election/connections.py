@@ -46,7 +46,7 @@ def get_connection_results_api(
         )
     )
     conn_query = connection_query.c
-    query = select(conn_query).where(conn_query.election_id == election.id)
+    query = select(*conn_query).where(conn_query.election_id == election.id)
     results = session.execute(query)
 
     data: dict[str, Any] = LastUpdatedOrderedDict({})

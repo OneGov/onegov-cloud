@@ -12,7 +12,7 @@ from onegov.user.errors import (
     InvalidActivationTokenError,
     UnknownUserError,
 )
-from sqlalchemy import sql, or_
+from sqlalchemy import or_, exists, text
 
 
 from typing import overload, Any, TypeVar, TYPE_CHECKING
@@ -188,14 +188,14 @@ class UserCollection:
     @property
     def tags(self) -> tuple[str, ...]:
         """ All available tags. """
-        records = self.session.execute("""
+        records = self.session.execute(text("""
             SELECT DISTINCT tags FROM (
                 SELECT jsonb_array_elements(data->'tags') AS tags
                 FROM users
             ) AS elements ORDER BY tags
-        """)
+        """))
 
-        return tuple(r[0] for r in records)
+        return tuple(tag for tag, in records)
 
     @property
     def sources(self) -> tuple[str, ...]:
@@ -205,17 +205,17 @@ class UserCollection:
         records = records.filter(User.source.isnot(None))
         records = records.order_by(User.source).distinct()
 
-        return tuple(r[0] for r in records)
+        return tuple(source for source, in records)
 
     @property
     def usernames(self) -> tuple[tuple[str, str], ...]:
         """ All available usernames. """
-        records = self.session.execute("""
+        records = self.session.execute(text("""
             SELECT username, initcap(realname)
             FROM users ORDER BY COALESCE(initcap(realname), username)
-        """)
+        """))
 
-        return tuple((r[0], r[1]) for r in records)
+        return tuple((username, realname) for username, realname in records)
 
     def usernames_by_tags(self, tags: list[str]) -> tuple[str, ...]:
         """ All usernames where the user's tags match at least one tag
@@ -223,12 +223,12 @@ class UserCollection:
 
         """
 
-        records = self.session.execute("""
+        records = self.session.execute(text("""
             SELECT username FROM users
             WHERE data->'tags' ?| :tags
-        """, {'tags': tags})
+        """), {'tags': tags})
 
-        return tuple(r.username for r in records)
+        return tuple(username for username, in records)
 
     def exists(self, username: str) -> bool:
         """ Returns True if the given username exists.
@@ -238,7 +238,7 @@ class UserCollection:
         care about finding out anything about the user.
 
         """
-        query = self.session.query(sql.exists().where(
+        query = self.session.query(exists().where(
             User.username == username))
 
         return query.scalar()

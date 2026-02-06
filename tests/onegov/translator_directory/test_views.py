@@ -105,7 +105,7 @@ def get_accountant_email(client: Client) -> str:
     return emails[0]
 
 
-def collect_emails(client: Client) -> list['EmailJsonDict']:
+def collect_emails(client: Client) -> list[EmailJsonDict]:
     """Collect all emails from client and flush the queue."""
     all_emails = []
     for i in range(10):
@@ -120,14 +120,14 @@ def collect_emails(client: Client) -> list['EmailJsonDict']:
 
 
 def filter_emails_by_recipient(
-    emails: list['EmailJsonDict'], recipient: str
-) -> list['EmailJsonDict']:
+    emails: list[EmailJsonDict], recipient: str
+) -> list[EmailJsonDict]:
     """Filter emails to only those sent to the specified recipient."""
     return [e for e in emails if recipient in e['To']]
 
 
 def extract_ticket_link_from_email(
-    emails: list['EmailJsonDict'], recipient: str
+    emails: list[EmailJsonDict], recipient: str
 ) -> str:
     """Extract ticket link from email sent to recipient."""
     matching_emails = [e for e in emails if recipient in e['To']]
@@ -2215,6 +2215,74 @@ def test_view_time_reports(client: Client) -> None:
     assert '162.75' in page
 
 
+def test_time_reports_finanzstelle_filtering(client: Client) -> None:
+    """Test that non-admin users only see reports from their finanzstelle."""
+
+    session = client.app.session()
+    translators = TranslatorCollection(client.app)
+    translator1 = translators.add(
+        first_name='Test1',
+        last_name='Translator1',
+        admission='certified',
+        email='translator1@example.org',
+    )
+    translator2 = translators.add(
+        first_name='Test2',
+        last_name='Translator2',
+        admission='certified',
+        email='translator2@example.org',
+    )
+
+    report1 = TranslatorTimeReport(
+        translator_id=translator1.id,
+        assignment_type='consecutive',
+        finanzstelle='migrationsamt',
+        duration=90,
+        case_number='CASE-001',
+        assignment_date=date(2025, 1, 15),
+        hourly_rate=Decimal('90.0'),
+        travel_compensation=Decimal('50.0'),
+        total_compensation=Decimal('162.75'),
+        status='pending',
+    )
+    report2 = TranslatorTimeReport(
+        translator_id=translator2.id,
+        assignment_type='consecutive',
+        finanzstelle='polizei',
+        duration=120,
+        case_number='CASE-002',
+        assignment_date=date(2025, 1, 16),
+        hourly_rate=Decimal('100.0'),
+        travel_compensation=Decimal('60.0'),
+        total_compensation=Decimal('200.00'),
+        status='pending',
+    )
+    session.add(report1)
+    session.add(report2)
+    session.flush()
+    transaction.commit()
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_group')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt',
+        'accountant_emails': ['accountant@example.org'],
+    }
+
+    session.add(User(
+        username='accountant@example.org',
+        password_hash=hash_password('password'),
+        role='member'
+    ))
+    transaction.commit()
+
+    client.login(username='accountant@example.org', password='password')
+    page = client.get('/time-reports')
+
+    assert '162.75' in page
+    assert '200.00' not in page
+
+
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
@@ -3045,10 +3113,10 @@ def test_time_report_telephonic_no_location(client: Client) -> None:
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
 def test_delete_time_report(
-    broadcast: 'MagicMock',
-    authenticate: 'MagicMock',
-    connect: 'MagicMock',
-    client: 'Client',
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
 ) -> None:
     """Test that admins and accountants can delete time reports."""
     session = client.app.session()
@@ -3109,7 +3177,7 @@ def test_delete_time_report(
     assert response.status_code == 200
 
     session.expire_all()
-    time_report = session.query(TranslatorTimeReport).get(report_id)
+    time_report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
     assert time_report is None
 
 
@@ -3117,10 +3185,10 @@ def test_delete_time_report(
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
 def test_delete_time_report_admin(
-    broadcast: 'MagicMock',
-    authenticate: 'MagicMock',
-    connect: 'MagicMock',
-    client: 'Client',
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
 ) -> None:
     """Test that admin can delete time reports."""
     session = client.app.session()
@@ -3177,13 +3245,11 @@ def test_delete_time_report_admin(
     assert response.status_code == 200
 
     session.expire_all()
-    time_report = session.query(TranslatorTimeReport).get(report_id)
+    time_report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
     assert time_report is None
 
 
-def test_export_time_reports(
-    client: 'Client',
-) -> None:
+def test_export_time_reports(client: Client) -> None:
     """Test exporting confirmed time reports as CSV."""
     session = client.app.session()
     create_languages(session)
@@ -3245,7 +3311,7 @@ def test_export_time_reports(
     client.post(accept_url)
 
     session.expire_all()
-    report = session.query(TranslatorTimeReport).get(report_id)
+    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
     assert report is not None
     assert report.status == 'confirmed'
     assert report.exported is False
@@ -3276,7 +3342,7 @@ def test_export_time_reports(
 
     # Verify report is marked as exported with timestamp and batch id
     session.expire_all()
-    report = session.query(TranslatorTimeReport).get(report_id)
+    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
     assert report is not None
     assert report.exported is True
     assert report.exported_at is not None
@@ -3295,6 +3361,6 @@ def test_export_time_reports(
     assert 'TRANSLATOR, Test' in table
 
     # Batch id is preserved
-    report = session.query(TranslatorTimeReport).get(report_id)
+    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
     assert report is not None
     assert report.export_batch_id == batch_id

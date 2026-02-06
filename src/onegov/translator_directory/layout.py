@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 from functools import cached_property
 from datetime import datetime
 from dateutil.relativedelta import relativedelta

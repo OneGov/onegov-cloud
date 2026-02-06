@@ -129,13 +129,24 @@ def test_view_attendence_as_parliamentarian(
     assert user is not None
     user.password = 'test'
 
+    # Create commission and add parliamentarian to it
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='Test Commission')
+    membership = PASCommissionMembership(
+        parliamentarian_id=parliamentarian.id,
+        commission_id=commission.id,
+        role='member',
+    )
+    session.add(membership)
+
     # Create attendence
     attendences = AttendenceCollection(session)
     attendence = attendences.add(
         parliamentarian_id=parliamentarian.id,
         type='commission',
         date=date.today(),
-        duration=120
+        duration=120,
+        commission_id=commission.id,
     )
 
     # Get the attendence ID before committing
@@ -163,7 +174,7 @@ def test_view_attendence_as_parliamentarian(
     # Fill out and submit the form
     page.form['date'] = '2024-01-15'
     page.form['duration'] = '3.5'
-    page.form['type'] = 'plenary'
+    page.form['type'] = 'study'
     page.form['parliamentarian_id'].select(text='Bob Viewer')
 
     # Submit the form
@@ -178,6 +189,10 @@ def test_parliamentarian_cannot_edit_others_attendence(
     when editing their own attendance"""
     session = client.app.session()
 
+    # Create commission
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='Test Commission')
+
     parliamentarians = PASParliamentarianCollection(client.app)
     alice = parliamentarians.add(
         first_name='Alice',
@@ -188,6 +203,12 @@ def test_parliamentarian_cannot_edit_others_attendence(
         first_name='Bob', last_name='Two', email_primary='bob.two@example.org'
     )
 
+    # Add alice to commission
+    alice_membership = PASCommissionMembership(
+        parliamentarian_id=alice.id, commission_id=commission.id, role='member'
+    )
+    session.add(alice_membership)
+
     users = UserCollection(session)
     alice_user = users.by_username('alice.one@example.org')
     assert alice_user is not None
@@ -197,9 +218,10 @@ def test_parliamentarian_cannot_edit_others_attendence(
     attendences = AttendenceCollection(session)
     alice_attendence = attendences.add(
         parliamentarian_id=alice.id,
-        type='plenary',
+        type='commission',
         date=date.today(),
         duration=120,
+        commission_id=commission.id,
     )
 
     alice_attendence_id = alice_attendence.id
@@ -213,7 +235,7 @@ def test_parliamentarian_cannot_edit_others_attendence(
 
     page.form['date'] = '2024-01-15'
     page.form['duration'] = '3.5'
-    page.form['type'] = 'plenary'
+    page.form['type'] = 'commission'
 
     page.form['parliamentarian_id'].force_value(bob_id)
 

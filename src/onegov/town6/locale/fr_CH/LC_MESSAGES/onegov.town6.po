@@ -1108,6 +1108,9 @@ msgstr "Zoom avant/arrière"
 msgid "Show more"
 msgstr "Afficher plus"
 
+msgid "What are you searching for?"
+msgstr "Que recherchez-vous ?"
+
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
 "photos to an album and mark it as available for the homepage."

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import warnings
-
 from datetime import datetime, timedelta
 from dateutil import rrule
 from dateutil.rrule import rrulestr
@@ -26,13 +24,14 @@ from pytz import UTC
 from sedate import standardize_date
 from sedate import to_timezone, utcnow
 from sqlalchemy import and_
-from sqlalchemy import Column
 from sqlalchemy import desc
+from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
+from sqlalchemy.orm.attributes import set_committed_value
 from translationstring import TranslationString
 from uuid import uuid4
 
@@ -240,6 +239,14 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         """ Automatically update the occurrences if shared attributes change
         """
 
+        # FIXME: This is insanely messy, since we delete and add all the
+        #        occurrences for every attribute we change, for one, we
+        #        could optimize this by only deleting existing occurences
+        #        if occurence_dates no longer matches the existing
+        #        occurrences, and we could do this only once at the end
+        #        when the new state is flushed, instead of for every
+        #        individual attribute change. An observer would probably
+        #        get us there.
         super().__setattr__(name, value)
         if name in ('state', 'title', 'name', 'location', 'tags',
                     'filter_keywords', 'start', 'end', 'timezone',
@@ -423,13 +430,9 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         for start in self.occurrence_dates(limit=False):
             occurrence = self.spawn_occurrence(start)
-            occurrence.event = self
+            set_committed_value(occurrence, 'event', self)
 
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    'ignore', 'Object of type <Occurrence> not in session')
-
-                session = object_session(self)
+            if session := object_session(occurrence):
                 session.expunge(occurrence)
                 session.flush()
 
@@ -458,7 +461,10 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         # create all occurrences for this and next year
         for start in self.occurrence_dates():
-            self.occurrences.append(self.spawn_occurrence(start))
+            occ = self.spawn_occurrence(start)
+            if session := object_session(self):
+                session.add(occ)
+            self.occurrences.append(occ)
 
         for occ in self.occurrences:
             occ.filter_keywords = self.filter_keywords

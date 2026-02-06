@@ -67,6 +67,12 @@ class UploadedFileField(UploadedFileFieldBase):
     #       columns using this type, we may need to change some of the
     #       methods if we do that though
     # impl = JSON
+    # TODO: Check if caching this is maybe ok after all, we allow it for
+    #       JSON after all, but there is some metadata that's stored on
+    #       disk and potentially not synced, so maybe it's correct that
+    #       this is unsafe, but it's possible we could make this safe
+    #       by making some modifications to ProcessedUploadedFile
+    cache_ok = False
 
     def load_dialect_impl(
         self,

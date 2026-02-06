@@ -279,4 +279,18 @@ FINANZSTELLE: dict[str, Finanzstelle] = {
         city='Schaffhausen',
         kostenstelle='3030',
     ),
+    'verkehrsabteilung_staatsanwaltschaft': Finanzstelle(
+        name='Verkehrsabteilung der Staatsanwaltschaft',
+        street='Bahnhofstrasse 29',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='2466',
+    ),
+    'jugendanwaltschaft': Finanzstelle(
+        name='Abteilung Jugendanwaltschaft',
+        street='J.J. Wepfer-Strasse 6',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='2466',
+    ),
 }

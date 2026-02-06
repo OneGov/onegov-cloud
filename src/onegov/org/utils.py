@@ -1648,14 +1648,14 @@ def emails_for_new_ticket(
     )
 
     for email, name in query.join(UserGroup.users).with_entities(
-        case([(
+        case((
             UserGroup.meta['shared_email'].isnot(None),
-            UserGroup.meta['shared_email'].astext,
-        )], else_=User.username),
-        case([(
+            UserGroup.meta['shared_email'].astext
+        ), else_=User.username),
+        case((  # type: ignore[arg-type]
             UserGroup.meta['shared_email'].isnot(None),
             UserGroup.name,
-        )], else_=User.realname),
+        ), else_=User.realname),
     ).distinct():
 
         if email in seen:

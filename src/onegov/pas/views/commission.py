@@ -13,11 +13,15 @@ from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import PASCommissionCollection
+from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.forms import AttendenceAddCommissionForm
 from onegov.pas.forms import CommissionForm
 from onegov.pas.layouts import PASCommissionCollectionLayout
 from onegov.pas.layouts import PASCommissionLayout
-from onegov.pas.custom import check_attendance_in_closed_settlement_run
+from onegov.pas.custom import (
+    validate_attendance_date,
+    has_user_set_abschluss_for_settlement_run,
+)
 from onegov.pas.models import Change
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
@@ -181,14 +185,11 @@ def pas_add_plenary_attendence(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        # Check if attendance date is in a closed settlement run
         if form.date.data:
-            if check_attendance_in_closed_settlement_run(
+            if error := validate_attendance_date(
                 request.session, form.date.data
             ):
-                request.alert(
-                    _('Cannot create attendance in closed settlement run.')
-                )
+                request.alert(error)
                 return {
                     'layout': PASCommissionLayout(self, request),
                     'title': _('New commission meeting'),
@@ -198,6 +199,35 @@ def pas_add_plenary_attendence(
 
         data = form.get_useful_data()
         parliamentarian_ids = data.pop('parliamentarian_id')
+
+        if not request.is_admin:
+            assert form.date.data is not None
+            blocked_parls = []
+            for parl_id in parliamentarian_ids:
+                if has_user_set_abschluss_for_settlement_run(
+                    request.session, str(parl_id), form.date.data
+                ):
+                    parl = PASParliamentarianCollection(request.app).by_id(
+                        parl_id
+                    )
+                    if parl:
+                        blocked_parls.append(parl.title)
+
+            if blocked_parls:
+                request.alert(
+                    _(
+                        'Cannot book attendance - abschluss already set for: '
+                        '${names}',
+                        mapping={'names': ', '.join(blocked_parls)},
+                    )
+                )
+                return {
+                    'layout': PASCommissionLayout(self, request),
+                    'title': _('New commission meeting'),
+                    'form': form,
+                    'form_width': 'large',
+                }
+
         collection = AttendenceCollection(request.session)
         for parliamentarian_id in parliamentarian_ids:
             attendence = collection.add(

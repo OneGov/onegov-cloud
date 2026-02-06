@@ -3,11 +3,13 @@ from __future__ import annotations
 import click
 import transaction
 
+from openpyxl import load_workbook
 from onegov.core.cli import command_group
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory import log
 from onegov.translator_directory.models.language import Language
+from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import (
     update_drive_distances, geocode_translator_addresses)
 from onegov.user import User
@@ -678,3 +680,235 @@ def recalculate_travel_details_cli(
             click.secho('Changes committed', fg='green')
 
     return do_recalculate
+
+
+@cli.command(
+    name='import-contract-numbers', context_settings={'singular': True}
+)
+@click.option(
+    '--file',
+    '-f',
+    required=True,
+    type=click.Path(exists=True),
+    help='Path to Excel file with contract numbers',
+)
+@click.option('--dry-run/-no-dry-run', default=False)
+def import_contract_numbers_cli(
+    file: str, dry_run: bool
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
+    r"""Import contract numbers from Excel file and update translators.
+
+    The Excel file must have columns:
+    - 'Ma-Nr.' (personnel number, preferred for matching)
+    - 'Vertragsnummer' (contract number to update)
+    - 'Mitarbeiter' (optional, used as fallback for name-based matching)
+
+    If translator not found by Ma-Nr., will search by name from Mitarbeiter
+    column (supports formats: "Lastname, Firstname" or "Firstname Lastname").
+
+    Example:
+        onegov-translator --select /translator_directory/schaffhausen \
+            import-contract-numbers -f /tmp/file.xlsx --dry-run
+    """
+
+    def do_import(
+        request: TranslatorAppRequest, app: TranslatorDirectoryApp
+    ) -> None:
+        try:
+            wb = load_workbook(file)
+            ws = wb.active
+            if ws is None:
+                click.secho(
+                    'Fehler: Kein aktives Arbeitsblatt in Excel-Datei '
+                    'gefunden',
+                    fg='red',
+                )
+                return
+
+            headers = {}
+            for col_idx, cell in enumerate(ws[1], start=1):
+                if cell.value:
+                    headers[cell.value] = col_idx
+
+            required = {'Ma-Nr.', 'Vertragsnummer'}
+            if not required.issubset(headers.keys()):
+                click.secho(
+                    f'Fehler: Excel-Datei muss folgende Spalten enthalten: '
+                    f'{required}',
+                    fg='red',
+                )
+                return
+
+            ma_nr_col = headers['Ma-Nr.']
+            contract_col = headers['Vertragsnummer']
+            mitarbeiter_col = headers.get('Mitarbeiter')
+
+            def find_by_name(name_str: str) -> Translator | None:
+                """Parse name string and search for translator."""
+                if not name_str:
+                    return None
+                parts = [p.strip() for p in name_str.split(',')]
+                if len(parts) == 2:
+                    last_name, first_name = parts
+                else:
+                    parts = name_str.split()
+                    if len(parts) < 2:
+                        return None
+                    first_name = ' '.join(parts[:-1])
+                    last_name = parts[-1]
+
+                translator = (
+                    request.session.query(Translator)
+                    .filter(
+                        Translator.first_name.ilike(first_name),
+                        Translator.last_name.ilike(last_name),
+                    )
+                    .first()
+                )
+                if translator:
+                    return translator
+
+                translator = (
+                    request.session.query(Translator)
+                    .filter(
+                        Translator.first_name.ilike(last_name),
+                        Translator.last_name.ilike(first_name),
+                    )
+                    .first()
+                )
+                return translator
+
+            updated_by_number = 0
+            updated_by_name = 0
+            not_found = []
+            errors = []
+
+            for row_idx, row in enumerate(
+                ws.iter_rows(min_row=2, values_only=False), start=2
+            ):
+                ma_nr_cell = row[ma_nr_col - 1]
+                contract_cell = row[contract_col - 1]
+                mitarbeiter_cell = (
+                    row[mitarbeiter_col - 1] if mitarbeiter_col else None
+                )
+
+                if ma_nr_cell.value is None:
+                    continue
+
+                try:
+                    pers_id = int(ma_nr_cell.value)  # type: ignore[arg-type]
+                except (ValueError, TypeError):
+                    errors.append(
+                        f'Zeile {row_idx}: Ungültige Ma-Nr. '
+                        f'"{ma_nr_cell.value}"'
+                    )
+                    continue
+
+                contract_number = contract_cell.value
+                if not contract_number:
+                    continue
+
+                found_by_number = (
+                    request.session.query(Translator)
+                    .filter_by(pers_id=pers_id)
+                    .first()
+                )
+
+                found_by_name = None
+                if mitarbeiter_cell and mitarbeiter_cell.value:
+                    found_by_name = find_by_name(str(mitarbeiter_cell.value))
+
+                if found_by_number:
+                    translator = found_by_number
+                    matched_by = 'number'
+                elif found_by_name:
+                    translator = found_by_name
+                    matched_by = 'name'
+                else:
+                    not_found.append(
+                        (
+                            pers_id,
+                            (
+                                mitarbeiter_cell.value
+                                if mitarbeiter_cell
+                                else None
+                            ),
+                        )
+                    )
+                    continue
+
+                old_contract = translator.contract_number
+                translator.contract_number = str(contract_number)
+
+                if matched_by == 'number':
+                    updated_by_number += 1
+                else:
+                    updated_by_name += 1
+
+                click.secho(
+                    f'✓ {translator.title}: contract '
+                    f'{old_contract}→{translator.contract_number}',
+                    fg='green',
+                )
+
+            click.secho('\nImport-Zusammenfassung:')
+            total_updated = updated_by_number + updated_by_name
+            total_entries = total_updated + len(not_found)
+            click.secho(f'Verarbeitete CSV-Zeilen: {total_entries}', fg='blue')
+            click.secho(f'Aktualisiert: {total_updated}', fg='green')
+            click.secho(f'  - Nach Nummer: {updated_by_number}')
+            click.secho(f'  - Nach Name: {updated_by_name}')
+
+            total_translators = request.session.query(Translator).count()
+            click.secho(
+                f'\nGesamtzahl Übersetzer im System: {total_translators}',
+                fg='blue',
+            )
+
+            if not_found:
+                click.secho(f'Nicht gefunden: {len(not_found)}', fg='red')
+                for pers_id, name in not_found:
+                    click.secho(f'  - Ma-Nr. {pers_id} ({name})')
+
+            if errors:
+                click.secho(f'Fehler: {len(errors)}', fg='red')
+                for error in errors[:10]:
+                    click.secho(f'  - {error}')
+                if len(errors) > 10:
+                    click.secho(f'  ... und {len(errors) - 10} weitere')
+
+            without_contract = (
+                request.session.query(Translator)
+                .filter(
+                    (Translator.contract_number == None)
+                    | (Translator.contract_number == ''),
+                    Translator.email != None,
+                )
+                .order_by(Translator.last_name, Translator.first_name)
+                .all()
+            )
+
+            if without_contract:
+                click.secho(
+                    f'\nÜbersetzer ohne Vertragsnummer: '
+                    f'{len(without_contract)}',
+                    fg='yellow',
+                )
+                for translator in without_contract:
+                    ma_nr = translator.pers_id or 'N/A'
+                    name = translator.title
+                    click.secho(f'  - Ma-Nr. {ma_nr} ({name})')
+
+            if dry_run:
+                transaction.abort()
+                click.secho('\nTestlauf: Transaktion abgebrochen', fg='yellow')
+            else:
+                request.session.flush()
+                click.secho('\nÄnderungen gespeichert', fg='green')
+
+        except Exception as e:
+            click.secho(f'Fehler beim Lesen der Excel-Datei: {e}', fg='red')
+            if dry_run:
+                transaction.abort()
+
+    return do_import

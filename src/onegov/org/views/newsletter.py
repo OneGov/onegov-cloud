@@ -37,7 +37,6 @@ from onegov.org.utils import extract_categories_and_subcategories
 from onegov.org.utils import ORDERED_ACCESS
 from onegov.org.views.utils import show_tags, show_filters
 from sedate import utcnow
-from sqlalchemy import desc
 from sqlalchemy.orm import undefer
 from string import Template
 from webob.exc import HTTPNotFound
@@ -60,12 +59,12 @@ def get_newsletter_form(
 
     news = request.session.query(News)
     news = news.filter(News.parent != None)
-    news = news.order_by(desc(News.created))
-    news = news.options(undefer('created'))
+    news = news.order_by(News.created.desc())
+    news = news.options(undefer(News.created))
     form = form.with_news(request, news)
 
     publications = PublicationCollection(request.session).query()
-    publications = publications.order_by(desc(File.created))
+    publications = publications.order_by(File.created.desc())
     form = form.with_publications(request, publications)
 
     occurrences = OccurrenceCollection(request.session).query()
@@ -125,9 +124,9 @@ def newsletter_news_by_access(
     query = request.session.query(News)
     query = query.filter(News.access.in_(access_levels))  # type: ignore
     query = query.filter(News.published == True)
-    query = query.order_by(desc(News.created))
-    query = query.options(undefer('created'))
-    query = query.options(undefer('content'))
+    query = query.order_by(News.created.desc())
+    query = query.options(undefer(News.created))
+    query = query.options(undefer(News.content))
     query = query.filter(News.id.in_(news_ids))
 
     return query.all()
@@ -147,9 +146,9 @@ def visible_news_by_newsletter(
         return None
 
     query = request.session.query(News)
-    query = query.order_by(desc(News.created))
-    query = query.options(undefer('created'))
-    query = query.options(undefer('content'))
+    query = query.order_by(News.created.desc())
+    query = query.options(undefer(News.created))
+    query = query.options(undefer(News.content))
     query = query.filter(News.id.in_(news_ids))
 
     return request.exclude_invisible(query.all())
@@ -302,7 +301,7 @@ def handle_newsletters(
 
     query = self.query()
     query = query.options(undefer(Newsletter.created))
-    query = query.order_by(desc(Newsletter.created))
+    query = query.order_by(Newsletter.created.desc())
 
     # newsletters which were not sent yet are private
     if not request.is_manager:

@@ -96,7 +96,6 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     abschluss = BooleanField(
         label=_('Abschluss'),
         description=_('Mark as completed/closed'),
-        depends_on=('type', '!plenary'),
     )
 
     def _can_edit_parliamentarian(
@@ -217,6 +216,15 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
 
     def on_request(self) -> None:
         self.set_default_value_to_settlement_run_start()
+
+        if not self.request.is_admin:  # type: ignore[attr-defined]
+            self.type.choices = [
+                (key, value)
+                for key, value in TYPES.items()
+                if key != 'plenary'
+            ]
+        else:
+            self.type.choices = list(TYPES.items())
 
         if (
             hasattr(self.request.identity, 'role')

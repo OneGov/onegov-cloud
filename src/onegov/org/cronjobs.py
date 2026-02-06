@@ -350,7 +350,7 @@ def ticket_statistics_users(app: OrgApp) -> list[User]:
     users = UserCollection(app.session()).query()
     users = users.filter(User.active == True)
     users = users.filter(User.role.in_(app.settings.org.status_mail_roles))
-    users = users.options(undefer('data'))
+    users = users.options(undefer(User.data))
     return users.all()
 
 

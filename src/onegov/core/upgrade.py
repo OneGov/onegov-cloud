@@ -407,7 +407,9 @@ class UpgradeTransaction:
     """
 
     def __init__(self, context: UpgradeContext):
-        self.operations_transaction = context.operations_connection.begin()
+        conn = context.operations_connection
+        tx = conn.begin_nested() if conn.in_transaction() else conn.begin()
+        self.operations_transaction = tx
         self.session = context.session
 
     def flush(self) -> None:
@@ -551,15 +553,15 @@ class UpgradeContext:
             return False
 
         # HACK: ALTER TYPE has to be run outside transaction
-        self.operations.execute('COMMIT')
+        self.operations.execute(text('COMMIT'))
         for value in missing:
             # NOTE: This should be safe just by virtue of naming
             #       restrictions on classes and enum members
-            self.operations.execute(
+            self.operations.execute(text(
                 f"ALTER TYPE {enum_name} ADD VALUE '{value}'"
-            )
+            ))
         # start a new transaction
-        self.operations.execute('BEGIN')
+        self.operations.execute(text('BEGIN'))
         return True
 
     def models(self, table: str) -> Iterator[Any]:
@@ -602,8 +604,8 @@ class UpgradeContext:
             yield
 
     def is_empty_table(self, table: str) -> bool:
-        return self.operations_connection.execute(
-            f'SELECT * FROM {table} LIMIT 1').rowcount == 0
+        return self.operations_connection.execute(text(
+            f'SELECT * FROM {table} LIMIT 1')).rowcount == 0
 
     def add_column_with_defaults(
         self,
@@ -672,7 +674,7 @@ class RawUpgradeRunner:
         if not schemas:
             return 0
 
-        engine = create_engine(dsn, poolclass=StaticPool)
+        engine = create_engine(dsn, poolclass=StaticPool, future=True)
         connection = engine.connect()
         executions = 0
 

@@ -55,7 +55,7 @@ from onegov.translator_directory.utils import (
     get_accountant_emails_for_finanzstelle,
 )
 from onegov.org.models.message import TimeReportMessage
-from onegov.user import User
+from onegov.user import User, UserGroup
 from sqlalchemy import func
 
 
@@ -122,7 +122,29 @@ def view_time_reports(
             ),
         )
 
-    report_ids = [str(report.id) for report in self.batch]
+    reports = list(self.batch)
+
+    if not request.is_admin and request.current_user:
+        groups = (
+            request.session.query(UserGroup)
+            .filter(UserGroup.meta['finanzstelle'].astext.isnot(None))
+            .all()
+        )
+
+        user_finanzstelles = []
+        for group in groups:
+            accountant_emails = group.meta.get('accountant_emails', [])
+            if request.current_user.username in accountant_emails:
+                finanzstelle = group.meta.get('finanzstelle')
+                if finanzstelle:
+                    user_finanzstelles.append(finanzstelle)
+
+        if user_finanzstelles:
+            reports = [
+                r for r in reports if r.finanzstelle in user_finanzstelles
+            ]
+
+    report_ids = [str(report.id) for report in reports]
     tickets = (
         request.session.query(TimeReportTicket)
         .filter(
@@ -138,7 +160,7 @@ def view_time_reports(
     }
 
     delete_links = {}
-    for report in self.batch:
+    for report in reports:
         if can_delete_time_report(request, report):
             delete_links[str(report.id)] = Link(
                 text=_('Delete'),
@@ -164,7 +186,7 @@ def view_time_reports(
         'layout': layout,
         'model': self,
         'title': layout.title,
-        'reports': self.batch,
+        'reports': reports,
         'report_tickets': report_tickets,
         'delete_links': delete_links,
         'export_link': export_link,

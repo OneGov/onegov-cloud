@@ -2,14 +2,13 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
 
 from onegov.core.upgrade import upgrade_task
 from onegov.core.upgrade import UpgradeContext
 from onegov.core.orm.types import UTCDateTime
-from sqlalchemy import Column, Enum
-from sqlalchemy import Text
-from sqlalchemy import Time
+from sqlalchemy import text, Column, Enum, Text, Time
 from onegov.landsgemeinde.collections import VotumCollection
 from onegov.core.utils import relative_url
 
@@ -112,18 +111,18 @@ def add_draft_state_to_agenda_item(context: UpgradeContext) -> None:
     op = context.operations
     tmp_type.create(op.get_bind(), checkfirst=False)
 
-    op.execute("""
+    op.execute(text("""
         ALTER  TABLE landsgemeinde_agenda_items ALTER COLUMN state TYPE
         agenda_item_state_ USING state::text::agenda_item_state_;
-    """)
+    """))
 
     old_type.drop(op.get_bind(), checkfirst=False)
     new_type.create(context.operations.get_bind(), checkfirst=False)
 
-    op.execute("""
+    op.execute(text("""
         ALTER TABLE landsgemeinde_agenda_items ALTER COLUMN state TYPE
         agenda_item_state USING state::text::agenda_item_state
-    """)
+    """))
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
 
 
@@ -153,18 +152,18 @@ def add_draft_state_to_assembly(context: UpgradeContext) -> None:
     op = context.operations
     tmp_type.create(op.get_bind(), checkfirst=False)
 
-    op.execute("""
+    op.execute(text("""
         ALTER  TABLE landsgemeinde_assemblies ALTER COLUMN state TYPE
         assembly_state_ USING state::text::assembly_state_;
-    """)
+    """))
 
     old_type.drop(op.get_bind(), checkfirst=False)
     new_type.create(context.operations.get_bind(), checkfirst=False)
 
-    op.execute("""
+    op.execute(text("""
         ALTER TABLE landsgemeinde_assemblies ALTER COLUMN state TYPE
         assembly_state USING state::text::assembly_state
-    """)
+    """))
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
 
 
@@ -194,16 +193,92 @@ def add_draft_state_to_votum(context: UpgradeContext) -> None:
     op = context.operations
     tmp_type.create(op.get_bind(), checkfirst=False)
 
-    op.execute("""
+    op.execute(text("""
         ALTER  TABLE landsgemeinde_vota ALTER COLUMN state TYPE
         votum_item_state_ USING state::text::votum_item_state_;
-    """)
+    """))
 
     old_type.drop(op.get_bind(), checkfirst=False)
     new_type.create(context.operations.get_bind(), checkfirst=False)
 
-    op.execute("""
+    op.execute(text("""
         ALTER TABLE landsgemeinde_vota ALTER COLUMN state TYPE
         votum_item_state USING state::text::votum_item_state
-    """)
+    """))
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
+
+
+@upgrade_task('Cache assembly_date on LandsgemeindeFile.meta')
+def cache_assembly_date_on_landsgemeinde_file(context: UpgradeContext) -> None:
+    if context.has_table('files_for_landsgemeinde_assemblies_files'):
+        context.operations.execute(text("""
+            UPDATE files
+               SET meta = jsonb_set(
+                       files.meta,
+                       '{assembly_date}',
+                       (
+                           '"__date__@' || to_char(
+                              linked.assembly_date,
+                              'YYYY-MM-DD'
+                           ) || '"'
+                       )::jsonb
+                   )
+              FROM (
+                SELECT assemblies.date AS assembly_date,
+                       link.file_id as file_id
+                  FROM landsgemeinde_assemblies AS assemblies
+                  JOIN files_for_landsgemeinde_assemblies_files AS link
+                    ON link.landsgemeinde_assemblies_id = assemblies.id
+              ) AS linked
+             WHERE linked.file_id = files.id
+        """))
+    if context.has_table('files_for_landsgemeinde_agenda_items_files'):
+        context.operations.execute(text("""
+            UPDATE files
+               SET meta = jsonb_set(
+                       files.meta,
+                       '{assembly_date}',
+                       (
+                           '"__date__@' || to_char(
+                              linked.assembly_date,
+                              'YYYY-MM-DD'
+                           ) || '"'
+                       )::jsonb
+                   )
+              FROM (
+                SELECT assemblies.date AS assembly_date,
+                       link.file_id as file_id
+                  FROM landsgemeinde_assemblies AS assemblies
+                  JOIN landsgemeinde_agenda_items AS items
+                    ON items.assembly_id = assemblies.id
+                  JOIN files_for_landsgemeinde_agenda_items_files AS link
+                    ON link.landsgemeinde_agenda_items_id = items.id
+              ) AS linked
+             WHERE linked.file_id = files.id
+        """))
+    if context.has_table('files_for_landsgemeinde_vota_files'):
+        context.operations.execute(text("""
+            UPDATE files
+               SET meta = jsonb_set(
+                       files.meta,
+                       '{assembly_date}',
+                       (
+                           '"__date__@' || to_char(
+                              linked.assembly_date,
+                              'YYYY-MM-DD'
+                           ) || '"'
+                       )::jsonb
+                   )
+              FROM (
+                SELECT assemblies.date AS assembly_date,
+                       link.file_id as file_id
+                  FROM landsgemeinde_assemblies AS assemblies
+                  JOIN landsgemeinde_agenda_items AS items
+                    ON items.assembly_id = assemblies.id
+                  JOIN landsgemeinde_vota AS vota
+                    ON vota.agenda_item_id = items.id
+                  JOIN files_for_landsgemeinde_vota_files AS link
+                    ON link.landsgemeinde_vota_id = vota.id
+              ) AS linked
+             WHERE linked.file_id = files.id
+        """))

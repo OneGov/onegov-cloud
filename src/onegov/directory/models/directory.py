@@ -206,6 +206,11 @@ class Directory(Base, ContentMixin, TimestampMixin,
             publication_start=start,
             publication_end=end,
         )
+        # NOTE: If we're part of a session, we need to add the entry to
+        #       that same session. This no longer happens automagically
+        #       through relationships in SQLAlchemy 2+
+        if session := object_session(self):
+            session.add(entry)
 
         return self.update(entry, values, set_name=True)
 

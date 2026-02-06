@@ -161,6 +161,10 @@ def test_views(client_with_fts: Client[TestApp]) -> None:
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=ullamco')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=aliquip')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=consequat')
+    assert 'Landsgemeinde vom 07. Mai' in client.get(
+        '/search?q=ipsum&start=2023-05-07&end=2023-05-07')
+    assert 'Landsgemeinde vom 07. Mai' not in client.get(
+        '/search?q=ipsum&start=2023-05-08&end=2023-05-08')
 
     # states view
     page = client_with_fts.get('/assembly/2023-05-07/states')
