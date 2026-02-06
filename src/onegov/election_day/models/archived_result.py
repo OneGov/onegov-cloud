@@ -262,56 +262,21 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
             return ElectionCompound
         raise NotImplementedError
 
-    def vote(self, request: ElectionDayRequest) -> Vote | None:
+    def is_complex_vote(self, request: ElectionDayRequest) -> bool:
+        """ Returns True if this result represents a complex vote. """
+
+        print('*** tschupre is_complex_vote called ***')
         # circular import
         from onegov.election_day.collections import VoteCollection
 
         if not self.external_id:
             return False
-        return VoteCollection(request.session).by_id(self.external_id)
 
-    def is_complex_vote(self, request: ElectionDayRequest) -> bool:
-        """ Returns True if this result represents a complex vote. """
-        vote = self.vote(request)
+        vote = VoteCollection(request.session).by_id(self.external_id)
+        if vote is None:
+            return False
+
         if isinstance(vote, ComplexVote):  # other options to test? new column?
-            # test if additional columns filled, otherwise populate them
-            if (self.nays_percentage_proposal == 100.0 or
-                    self.yeas_percentage_proposal == 0.0 or
-                    self.nays_percentage_counter_proposal == 100.0 or
-                    self.yeas_percentage_counter_proposal == 0.0 or
-                    self.nays_percentage_tie_breaker == 100.0 or
-                    self.yeas_percentage_tie_breaker == 0.0 or
-                    self.title_proposal == ''):
-                self.title_proposal_translations = (
-                        vote.title_translations or {})
-                ballot = vote.proposal
-                self.nays_percentage_proposal = ballot.nays_percentage
-                self.yeas_percentage_proposal = ballot.yeas_percentage
-
-                ballot = vote.counter_proposal
-                self.title_counter_proposal_translations = (
-                    ballot.title_translations or {}
-                    # {}
-                )
-                self.nays_percentage_counter_proposal = (
-                    ballot.nays_percentage
-                )
-                self.yeas_percentage_counter_proposal = (
-                    ballot.yeas_percentage
-                )
-
-                ballot = vote.tie_breaker
-                self.title_tie_breaker_translations = (
-                    ballot.title_translations or {}
-                    # {}
-                )
-                self.nays_percentage_tie_breaker = (
-                    ballot.nays_percentage
-                )
-                self.yeas_percentage_tie_breaker = (
-                    ballot.yeas_percentage
-                )
-
             return True
 
         return False
