@@ -280,7 +280,7 @@ def add_active_inactive_since_columns(context: UpgradeContext) -> None:
             UPDATE subscribers SET active_since = created
              WHERE modified IS NOT NULL
                AND type = 'sms'
-        """)
+        """))
 
 
 @upgrade_task('Add translation columns to archived results')
