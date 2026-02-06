@@ -389,8 +389,6 @@ def upload_complex_vote(
     if create:
         new = client.get('/manage/votes/new-vote')
         new.form['title_de'] = 'Complex Vote'
-        new.form['counter_proposal_title_de'] = 'Counter proposal'
-        new.form['tie_breaker_title_de'] = 'Tie breaker'
         new.form['date'] = '2022-01-01'
         new.form['domain'] = 'federation'
         new.form['type'] = 'complex'

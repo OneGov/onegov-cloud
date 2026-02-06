@@ -409,13 +409,13 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
             dict(source.title_translations)
         )
         self.title_proposal_translations = deepcopy(
-            dict(source.title_proposal_translations)
+            dict(source.title_proposal_translations or {})
         )
         self.title_counter_proposal_translations = deepcopy(
-            dict(source.title_counter_proposal_translations)
+            dict(source.title_counter_proposal_translations or {})
         )
         self.title_tie_breaker_translations = deepcopy(
-            dict(source.title_tie_breaker_translations)
+            dict(source.title_tie_breaker_translations or {})
         )
         self.shortcode = source.shortcode
         self.domain = source.domain

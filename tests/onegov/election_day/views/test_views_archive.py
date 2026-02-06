@@ -141,8 +141,8 @@ def test_view_archive_simple_results(election_day_app_zg: TestApp) -> None:
         '37.37',  # yeas percentage
         '62.63',  # nays percentage
         '1 von 11',
-        'Counter proposal',
-        'Tie breaker',
+        'Gegenentwurf/Gegenvorschlag',  # default title counterproposal
+        'Stichfrage',  # default title tie-breaker
     }),
     ('proposal declined', {
         'Complex Vote',
@@ -150,8 +150,8 @@ def test_view_archive_simple_results(election_day_app_zg: TestApp) -> None:
         '37.21',  # yeas percentage
         '62.79',  # nays percentage
         '11 von 11',
-        'Counter proposal',
-        'Tie breaker',
+        'Gegenentwurf/Gegenvorschlag',  # default title counterproposal
+        'Stichfrage',  # default title tie-breaker
     }),
     ('proposal accepted', {
         'Complex Vote',
@@ -159,8 +159,8 @@ def test_view_archive_simple_results(election_day_app_zg: TestApp) -> None:
         '50.98',  # yeas percentage
         '49.02',  # nays percentage
         '11 von 11',
-        'Counter proposal',
-        'Tie breaker',
+        'Gegenentwurf/Gegenvorschlag',  # default title counterproposal
+        'Stichfrage',  # default title tie-breaker
     }),
     ('counterproposal accepted', {
         'Complex Vote',
@@ -168,8 +168,8 @@ def test_view_archive_simple_results(election_day_app_zg: TestApp) -> None:
         '50.98',  # yeas percentage
         '49.02',  # nays percentage
         '11 von 11',
-        'Counter proposal',
-        'Tie breaker',
+        'Gegenentwurf/Gegenvorschlag',  # default title counterproposal
+        'Stichfrage',  # default title tie-breaker
     }),
 ])
 def test_view_archive_complex_results(
