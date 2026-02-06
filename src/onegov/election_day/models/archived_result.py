@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -116,23 +117,25 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     title = translation_hybrid(title_translations)
 
     #: Proposal title of the election/vote (complex votes)
-    title_proposal_translations: Column[Mapping[str, str]] = Column(
+    title_proposal_translations: Column[Mapping[str, str] | None] = Column(
         HSTORE,
         nullable=True
     )
     title_proposal = translation_hybrid(title_proposal_translations)
 
     #: Counterproposal title of the election/vote (complex votes)
-    title_counter_proposal_translations: Column[Mapping[str, str]] = Column(
-        HSTORE,
-        nullable=True
+    title_counter_proposal_translations: Column[Mapping[str, str] | None] = (
+        Column(
+            HSTORE,
+            nullable=True
+        )
     )
     title_counter_proposal = translation_hybrid(
         title_counter_proposal_translations
     )
 
     #: Tiebreaker title of the election/vote (complex votes)
-    title_tie_breaker_translations: Column[Mapping[str, str]] = Column(
+    title_tie_breaker_translations: Column[Mapping[str, str] | None] = Column(
         HSTORE,
         nullable=True
     )
@@ -265,7 +268,6 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     def is_complex_vote(self, request: ElectionDayRequest) -> bool:
         """ Returns True if this result represents a complex vote. """
 
-        print('*** tschupre is_complex_vote called ***')
         # circular import
         from onegov.election_day.collections import VoteCollection
 

@@ -8,7 +8,8 @@ from onegov.election_day.collections.elections import ElectionCollection
 from onegov.election_day.collections.election_compounds import \
     ElectionCompoundCollection
 from onegov.election_day.collections.votes import VoteCollection
-from onegov.election_day.models import ArchivedResult, ComplexVote
+from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Vote
