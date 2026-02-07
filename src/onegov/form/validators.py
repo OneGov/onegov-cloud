@@ -124,18 +124,7 @@ class FileSizeLimit:
         if not field.data:
             return
 
-        if isinstance(field.data, list):  # UploadMultipleField
-            for data in field.data:
-                if not data:
-                    continue  # in case of file deletion
-
-                self.validate_filesize(field, data)
-
-        else:
-            self.validate_filesize(field, field.data)
-
-    def validate_filesize(self, field: Field, data: dict[Any, Any]) -> None:
-        if data.get('size', 0) > self.max_bytes:
+        if field.data.get('size', 0) > self.max_bytes:
             message = field.gettext(self.message).format(
                 humanize.naturalsize(self.max_bytes)
             )
