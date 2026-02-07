@@ -144,7 +144,7 @@ def get_summary(
             return get_election_compound_summary(
                 item, None, item.adjusted_url(request)
             )
-        if item.type == 'vote':
+        if item.type in ('vote', 'complex_vote'):
             return get_vote_summary(
                 item, None, item.adjusted_url(request)
             )
