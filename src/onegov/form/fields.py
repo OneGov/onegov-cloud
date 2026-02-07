@@ -18,7 +18,7 @@ from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log, _
 from onegov.form.utils import path_to_filename
-from onegov.form.validators import ValidPhoneNumber
+from onegov.form.validators import ValidPhoneNumber, WhitelistedMimeType
 from onegov.form.widgets import ChosenSelectWidget
 from onegov.form.widgets import LinkPanelWidget
 from onegov.form.widgets import DurationInput
@@ -59,7 +59,7 @@ from typing import Any, IO, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from datetime import datetime
-    from onegov.core.types import FileDict as StrictFileDict
+    from onegov.core.types import FileDict as StrictFileDict, LaxFileDict
     from onegov.file import File
     from onegov.form import Form
     from onegov.form.types import (
@@ -274,28 +274,58 @@ class UploadField(FileField):
     file: IO[bytes] | None
     filename: str | None
 
-    if TYPE_CHECKING:
-        def __init__(
-            self,
-            label: str | None = None,
-            validators: Validators[FormT, Self] | None = None,
-            filters: Sequence[Filter] = (),
-            description: str = '',
-            id: str | None = None,
-            default: Sequence[StrictFileDict] = (),
-            widget: Widget[Self] | None = None,
-            render_kw: dict[str, Any] | None = None,
-            name: str | None = None,
-            _form: BaseForm | None = None,
-            _prefix: str = '',
-            _translations: _SupportsGettextAndNgettext | None = None,
-            _meta: DefaultMeta | None = None,
-            # onegov specific kwargs that get popped off
-            *,
-            fieldset: str | None = None,
-            depends_on: Sequence[Any] | None = None,
-            pricing: PricingRules | None = None,
-        ): ...
+    def __init__(
+        self,
+        label: str | None = None,
+        validators: Validators[FormT, Self] | None = None,
+        filters: Sequence[Filter] = (),
+        description: str = '',
+        id: str | None = None,
+        default: LaxFileDict | None = None,
+        widget: Widget[Self] | None = None,
+        render_kw: dict[str, Any] | None = None,
+        name: str | None = None,
+        allowed_mimetypes: Sequence[str] | None = None,
+        _form: BaseForm | None = None,
+        _prefix: str = '',
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
+        # onegov specific kwargs that get popped off
+        *,
+        fieldset: str | None = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
+    ):
+        validator = (
+            WhitelistedMimeType(allowed_mimetypes)
+            if allowed_mimetypes
+            else WhitelistedMimeType()
+        )
+
+        if validators:
+            validators = list(validators)
+            if not any(isinstance(validator, WhitelistedMimeType)
+                for validator in validators
+            ):
+                validators.append(validator)
+        else:
+            validators = [validator]
+
+        super().__init__(
+            label=label,
+            validators=validators,
+            filters=filters,
+            description=description,
+            id=id,
+            default=default,
+            widget=widget,
+            render_kw=render_kw,
+            name=name,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta,
+        )
 
     # this is not quite accurate, since it is either a dictionary with all
     # the keys or none of the keys, which would make type narrowing easier
@@ -474,6 +504,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
         upload_widget: Widget[UploadField] | None = None,
+        allowed_mimetypes: Sequence[str] | None = None,
         _form: BaseForm | None = None,
         _prefix: str = '',
         _translations: _SupportsGettextAndNgettext | None = None,
@@ -492,11 +523,11 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
         # a lot of the arguments we just pass through to the subfield
         unbound_field = self.upload_field_class(
-            validators=validators,  # type:ignore[arg-type]
             filters=filters,
             description=description,
             widget=upload_widget,
             render_kw=render_kw,
+            allowed_mimetypes=allowed_mimetypes,
             **extra_arguments
         )
         super().__init__(
@@ -507,6 +538,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             id=id,
             default=default,
             widget=widget,  # type:ignore[arg-type]
+            validators=[*(validators or ())],
             render_kw=render_kw,
             name=name,
             _form=_form,
