@@ -124,7 +124,7 @@
                             </tbody>
                         </table>
 
-                        <table class="overview vote tablesaw" data-tablesaw-mode="stack"  tal:condition="type == 'vote'"
+                        <table class="overview vote tablesaw" data-tablesaw-mode="stack"  tal:condition="type in ('vote', 'complex_vote')"
                             tal:define="votes_started any(item.has_results for item in archive_items[date][domain][type])"
                         >
                             <thead>
@@ -142,7 +142,7 @@
                             </thead>
                             <tbody>
                                 <tal:block tal:repeat="vote archive_items[date][domain][type]">
-                                    <tal:block tal:condition="vote.is_complex_vote(request)">
+                                    <tal:block tal:condition="vote.is_complex_vote">
                                         <tr>
                                             <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small">
                                                 <a href="${vote.adjusted_url(request)}">
@@ -235,7 +235,7 @@
                                         </tr>
                                     </tal:block>
 
-                                    <tal:block tal:condition="not vote.is_complex_vote(request)">
+                                    <tal:block tal:condition="not vote.is_complex_vote">
                                         <tr>
                                             <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small">
                                                 <a href="${vote.adjusted_url(request)}">

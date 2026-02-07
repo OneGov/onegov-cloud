@@ -38,7 +38,9 @@ if TYPE_CHECKING:
     from typing import Self
     from typing import TypeAlias
 
-    ResultType: TypeAlias = Literal['election', 'election_compound', 'vote']
+    ResultType: TypeAlias = Literal[
+        'election', 'election_compound', 'vote', 'complex_vote'
+    ]
 
 meta_local_property = dictionary_based_property_factory('local')
 
@@ -74,7 +76,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     #: Type of the result
     type: Column[ResultType] = Column(
         Enum(  # type:ignore[arg-type]
-            'vote', 'election', 'election_compound',
+            'vote', 'complex_vote', 'election', 'election_compound',
             name='type_of_result'
         ),
         nullable=False
@@ -256,29 +258,24 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     )
 
     @property
-    def type_class(self) -> _type[Election | ElectionCompound | Vote]:
+    def type_class(
+        self
+    ) -> _type[Election | ElectionCompound | Vote | ComplexVote]:
         if self.type == 'vote':
             return Vote
+        elif self.type == 'complex_vote':
+            return ComplexVote
         elif self.type == 'election':
             return Election
         elif self.type == 'election_compound':
             return ElectionCompound
         raise NotImplementedError
 
-    def is_complex_vote(self, request: ElectionDayRequest) -> bool:
+    @property
+    def is_complex_vote(self) -> bool:
         """ Returns True if this result represents a complex vote. """
 
-        # circular import
-        from onegov.election_day.collections import VoteCollection
-
-        if not self.external_id:
-            return False
-
-        vote = VoteCollection(request.session).by_id(self.external_id)
-        if vote is None:
-            return False
-
-        if isinstance(vote, ComplexVote):  # other options to test? new column?
+        if self.type == 'complex_vote':
             return True
 
         return False

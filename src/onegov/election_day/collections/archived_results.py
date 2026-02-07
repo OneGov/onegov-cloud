@@ -186,7 +186,8 @@ class ArchivedResultCollection:
                 lambda j: order.get(j.domain, 99),
                 lambda j: groupbydict(
                     (item for item in j if item.url not in compounded),
-                    lambda k: 'vote' if k.type == 'vote' else 'election'
+                    lambda k: 'vote'
+                    if k.type in ('vote', 'complex_vote') else 'election'
                 )
             )
         )
@@ -333,6 +334,7 @@ class ArchivedResultCollection:
             result.direct = item.direct
 
             if isinstance(item, ComplexVote):
+                result.type = 'complex_vote'
                 result.title_proposal_translations = (
                     item.title_translations or {}
                 )
