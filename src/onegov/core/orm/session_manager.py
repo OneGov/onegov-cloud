@@ -1,18 +1,23 @@
 from __future__ import annotations
 
-import threading
 import re
+import sys
+import threading
+import transaction
+import warnings
 import weakref
 import zope.sqlalchemy
 
 from blinker import Signal
 from contextlib import contextmanager
 from functools import lru_cache
+from onegov.core import log
 from onegov.core.custom import json
-from sqlalchemy import create_engine, event, text
+from sqlalchemy import create_engine, event, select, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm.query import Query
+from sqlalchemy.sql import Delete, Update
 from sqlalchemy_utils.aggregates import manager as aggregates_manager
 
 
@@ -20,7 +25,9 @@ from typing import Any, Self, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.engine import Connection, Engine
+    from sqlalchemy.orm import ORMExecuteState  # type: ignore[attr-defined]
     from sqlalchemy.orm.session import Session, SessionTransaction
+    from types import FrameType
 
     _T = TypeVar('_T')
     _S = TypeVar('_S', bound=Session)
@@ -55,7 +62,7 @@ CONNECTION_LIFETIME = 60 * 60
 
 
 def query_schemas(
-    connection: Connection | Engine,
+    connection: Connection,
     namespace: str | None = None
 ) -> Iterator[str]:
     """ Yields all schemas or the ones with the given namespace. """
@@ -71,6 +78,43 @@ def query_schemas(
     for (schema, ) in connection.execute(query):
         if not prefix or schema.startswith(prefix):
             yield schema
+
+
+# NOTE: Currently this is only used in a safety escape hatch
+#       so we don't care if it's not covered by tests for now
+def get_warning_stacklevel() -> int:  # pragma: no cover
+    # NOTE: When we emit a warning for an ORM event, we want to see
+    #       where it was triggered from, so we have enough context
+    #       in order to potentially fix the cause of the warning.
+    #       We use this function to walk the stack until we're outside
+    #       of SQLAlchemy's code. (Two stack levels up should be SQLAlchemy
+    #       code) This code is adapted from SQLAlchemy's warning
+    #       emitting code.
+    stacklevel = 2
+    frame: FrameType | None
+    try:
+        frame = sys._getframe(stacklevel)
+    except ValueError:
+        # NOTE: This shouldn't really happen, 1 stacklevel is whoever
+        #       calls this function, which is the SessionManager and
+        #       2 stacklevels should be whoever is calling the event
+        #       handler in the SessionManager, which is SQLAlchemy.
+        #       So there should be way more than 2 parent frames.
+        return 0
+    except BaseException:
+        # NOTE: This shouldn't really happen but if _getframe() doesn't
+        #       work, we don't want to crash.
+        return 0
+    else:
+        # NOTE: This relies on SQLAlchemy having set things up to be this
+        #       way in their modules.
+        while frame is not None and re.match(
+            r'^(?:sqlalchemy\.|alembic\.)',
+            frame.f_globals.get('__name__', '')
+        ):
+            frame = frame.f_back
+            stacklevel += 1
+    return stacklevel
 
 
 class SessionManager:
@@ -249,6 +293,7 @@ class SessionManager:
         self.current_schema: str | None = None
 
         self._ignore_bulk_updates = False
+        self._ignore_bulk_deletes = False
 
         self.on_schema_init = Signal()
         self.on_transaction_join = Signal()
@@ -290,13 +335,19 @@ class SessionManager:
             # connections which are closed when returned (unlimited)
             engine_config['max_overflow'] = -1
 
-        self.engine = create_engine(self.dsn, **engine_config)
+        self.engine = create_engine(self.dsn, future=True, **engine_config)
         self.register_engine(self.engine)
 
         self.session_factory = scoped_session(
             sessionmaker(
                 bind=self.engine,
+                # NOTE: We should consider getting rid of this, now
+                #       that we're no longer forced to 'fetch' in order
+                #       to get ORM updates. However some queries will not
+                #       work with the default strategy, so we would need
+                #       to manually change the strategy for them.
                 query_cls=ForceFetchQueryClass,
+                future=True,
                 **session_config
             ),
             scopefunc=self._scopefunc,
@@ -319,6 +370,23 @@ class SessionManager:
             yield self
         finally:
             self._ignore_bulk_updates = previous_state
+
+    @contextmanager
+    def ignore_bulk_deletes(self) -> Iterator[Self]:
+        """ Ensures bulk delete don't get blocked when we can't emit
+        delete events for each changed object.
+
+        In some cases we know that a bulk delete is fine, even if it
+        doesn't fully propagate through our event hooks. This function
+        should only be rarely used however, where the speed increase
+        outweighs the potential synchrocity issues.
+        """
+        previous_state = self._ignore_bulk_deletes
+        self._ignore_bulk_deletes = True
+        try:
+            yield self
+        finally:
+            self._ignore_bulk_deletes = previous_state
 
     def register_engine(self, engine: Engine) -> None:
         """ Takes the given engine and registers it with the schema
@@ -400,6 +468,93 @@ class SessionManager:
                     to have both aggregates and bulk updates/deletes.
                 """
 
+        @event.listens_for(session, 'do_orm_execute')  # type: ignore[untyped-decorator]
+        def augment_bulk_updates_and_inserts(
+            orm_execution_state: ORMExecuteState
+        ) -> None:
+            if not orm_execution_state.is_orm_statement:
+                return
+
+            stmt = orm_execution_state.statement
+            if isinstance(stmt, Update):
+                if self._ignore_bulk_updates:
+                    return
+
+                model = orm_execution_state.bind_mapper.class_
+                prevent_bulk_changes_on_aggregate_modules(model)
+                if not self.on_update.receivers:
+                    return
+                is_update = True
+            elif isinstance(stmt, Delete):
+                if self._ignore_bulk_deletes:
+                    return
+
+                model = orm_execution_state.bind_mapper.class_
+                prevent_bulk_changes_on_aggregate_modules(model)
+                if not self.on_delete.receivers:
+                    return
+                is_update = False
+            else:
+                return
+
+            # if there is already a RETURNING we're in trouble
+            assert not stmt.returning_column_descriptions, """
+                Bulk queries with a custom RETURNING cannot currently be
+                supported because it is unclear what rows were affected.
+                By default you should be getting model instances back.
+            """
+
+            # add a RETURNING to the statement
+            stmt = stmt.returning(model)
+
+            # construct a dummy ORM select statement that generates the
+            # entities based on the raw returned rows
+            orm_stmt = select(model).from_statement(  # type: ignore[attr-defined]
+                stmt).execution_options(populate_existing=True)
+
+            savepoint = transaction.savepoint()
+            try:
+                result = orm_execution_state.invoke_statement(orm_stmt)
+            # NOTE: We want to avoid hard failures here, but we still want to
+            #       fail in tests, so we emit a warning, since we don't want
+            #       this to ever trigger ideally, we don't expect coverage
+            except NotImplementedError:  # pragma: no cover
+                savepoint.rollback()
+                log.warning(
+                    'Results from a bulk query could not be retrieved for '
+                    'further processing by on_update/on_delete handlers, '
+                    'so some caches or search indexes may be temporarly '
+                    'invalid.'
+                )
+                warnings.warn(
+                    f'Failed to retrieve results from bulk query:\n'
+                    f'{stmt.compile()}',
+                    UserWarning,
+                    stacklevel=get_warning_stacklevel()
+                )
+                return
+
+            rowcount = 0
+            if is_update:
+                for obj in result.scalars().unique():
+                    self.on_update.send(self.current_schema, obj=obj)
+                    rowcount += 1
+            else:
+                session = orm_execution_state.session
+                for obj in result.scalars().unique():
+                    # NOTE: Ensure this is not treated as a persisted instance
+                    session.expunge(obj)
+                    self.on_delete.send(
+                        self.current_schema,
+                        session=session,
+                        obj=obj
+                    )
+                    rowcount += 1
+
+            # HACK: This attribute needs to be present
+            result.rowcount = rowcount
+            return result
+
         @event.listens_for(session, 'after_flush')  # type:ignore[untyped-decorator]
         def on_after_flush(
             session: Session,
@@ -415,43 +570,6 @@ class SessionManager:
                 for obj in session.deleted:
                     self.on_delete.send(
                         self.current_schema, session=session, obj=obj)
-
-        @event.listens_for(session, 'after_bulk_update')  # type:ignore[untyped-decorator]
-        def on_after_bulk_update(update_context: Any) -> None:
-            if self._ignore_bulk_updates:
-                return
-
-            prevent_bulk_changes_on_aggregate_modules(
-                update_context.mapper.class_)
-
-            if self.on_update.receivers:
-                assert hasattr(update_context, 'matched_objects'), """
-                    Bulk queries which use synchronize_session=False or
-                    synchronize_session='fetch' cannot be supported because
-                    it is unclear what rows were affected. Manually update
-                    values instead (even though it's way slower). There's no
-                    better solution at the moment.
-                """
-
-                for obj in update_context.matched_objects:
-                    self.on_update.send(self.current_schema, obj=obj)
-
-        @event.listens_for(session, 'after_bulk_delete')  # type:ignore[untyped-decorator]
-        def on_after_bulk_delete(delete_context: Any) -> None:
-            prevent_bulk_changes_on_aggregate_modules(
-                delete_context.mapper.class_)
-
-            if self.on_delete.receivers:
-                for row in delete_context.matched_rows:
-                    obj = delete_context.mapper.class_(**{
-                        c.name: v for c, v
-                        in zip(delete_context.mapper.primary_key, row)
-                    })
-                    self.on_delete.send(
-                        self.current_schema,
-                        session=delete_context.session,
-                        obj=obj
-                    )
 
         @event.listens_for(session, 'after_begin')  # type: ignore[untyped-decorator]
         def on_after_begin(
@@ -634,9 +752,9 @@ class SessionManager:
         #
         # this is the *only* place where this happens - if anyone
         # knows how to do this using sqlalchemy/psycopg2, come forward!
-        conn = self.engine.execution_options(schema=None)
-        conn.execute('CREATE SCHEMA "{}"'.format(schema))
-        conn.execute('COMMIT')
+        engine = self.engine.execution_options(schema=None)
+        with engine.begin() as conn:
+            conn.execute(text(f'CREATE SCHEMA "{schema}"'))
 
     def create_schema_if_not_exists(
         self,
@@ -679,18 +797,20 @@ class SessionManager:
         database.
 
         """
-        return list(query_schemas(self.engine, namespace))
+        with self.engine.connect() as conn:
+            return list(query_schemas(conn, namespace))
 
     def is_schema_found_on_database(self, schema: str) -> bool:
         """ Returns True if the given schema exists on the database. """
 
-        conn = self.engine.execution_options(schema=None)
-        result = conn.execute(text(
-            'SELECT EXISTS(SELECT 1 FROM information_schema.schemata '
-            'WHERE schema_name = :schema)'
-        ), schema=schema)
+        engine = self.engine.execution_options(schema=None)
+        with engine.connect() as conn:
+            result = conn.execute(text(
+                'SELECT EXISTS(SELECT 1 FROM information_schema.schemata '
+                'WHERE schema_name = :schema)'
+            ), {'schema': schema})
 
-        return result.first()[0]
+            return result.first()[0]
 
     def create_required_extensions(self) -> None:
         """ Creates the required extensions once per lifetime of the manager.
@@ -701,13 +821,14 @@ class SessionManager:
             # extensions are a all added to a shared schema (a reserved schema)
             self.create_schema_if_not_exists('extensions', validate=False)
 
-            conn = self.engine.execution_options(schema='extensions')
+            engine = self.engine.execution_options(schema='extensions')
             for ext in self.required_extensions - self.created_extensions:
-                conn.execute(
-                    'CREATE EXTENSION IF NOT EXISTS "{}" '
-                    'SCHEMA "extensions"'.format(ext)
-                )
-                conn.execute('COMMIT')
+                assert '"' not in ext
+                with engine.begin() as conn:
+                    conn.execute(text(
+                        f'CREATE EXTENSION IF NOT EXISTS "{ext}" '
+                        f'SCHEMA "extensions"'
+                    ))
                 self.created_extensions.add(ext)
 
     def ensure_schema_exists(self, schema: str) -> None:
@@ -730,20 +851,21 @@ class SessionManager:
             self.create_required_extensions()
             self.create_schema_if_not_exists(schema)
 
-            conn = self.engine.execution_options(schema=schema)
+            engine = self.engine.execution_options(schema=schema)
             declared_classes = set()
 
             try:
-                for base in self.bases:
-                    base.metadata.schema = schema
-                    base.metadata.create_all(conn)
+                with engine.begin() as conn:
+                    for base in self.bases:
+                        base.metadata.schema = schema
+                        base.metadata.create_all(conn)
 
-                    declared_classes.update(base._decl_class_registry.values())
+                        declared_classes.update(
+                            base.registry._class_registry.values()
+                        )
 
-                if self.on_schema_init.receivers:
-                    self.on_schema_init.send(schema, connection=conn)
-
-                conn.execute('COMMIT')
+                    if self.on_schema_init.receivers:
+                        self.on_schema_init.send(schema, connection=conn)
             finally:
                 # reset the schema on the global base variable - this state
                 # sticks around otherwise and haunts us in the tests

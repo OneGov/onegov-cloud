@@ -71,6 +71,8 @@ jobs:
         python -m pip install --upgrade uv
         uv pip compile setup.cfg -U \
         | uv pip install .[mypy,lint] -r /dev/stdin
+        # TEMPORARY: Uninstall types-urllib3, since we don't use v1
+        uv pip uninstall types-urllib3
 
     - name: Linting
       run: |
@@ -226,3 +228,5 @@ jobs:
         LC_ALL: C.UTF-8
         LANG: C.UTF-8
         SKIP_DRIVER_MANAGER: '1'
+        # TEMPORARY: Remove after upgrade to SQLAlchemy 2.0
+        SQLALCHEMY_WARN_20: '1'

@@ -393,9 +393,11 @@ def test_forms_explicitly_link_referenced_files(client: Client) -> None:
         page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
     pdf_url = (
         admin.get('/files')
-        .pyquery('[ic-trigger-from="#button-1"]')
+        .pyquery(f'[ic-trigger-from="#button-{pdf.id}"]')
         .attr('ic-get-from')
         .removesuffix('/details')
     )
@@ -411,7 +413,6 @@ def test_forms_explicitly_link_referenced_files(client: Client) -> None:
     form_page.form['definition'] = "email *= @@@"
     form_page = form_page.form.submit().follow()
 
-    session = client.app.session()
     pdf = FileCollection(session).query().one()
     form = FormDefinitionCollection(session).by_name('my-form')
     assert form is not None

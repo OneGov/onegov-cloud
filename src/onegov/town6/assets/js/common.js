@@ -28,6 +28,14 @@ var addModalDownload = function(parent, rawData, fmt) {
 var processCommonNodes = function(elements, out_of_band) {
     var targets = $(elements);
 
+    // intercooler integration (only done for dynamic content, and if
+    // the nodes weren't already processed by intercooler)
+    if (out_of_band !== false) {
+        if (_.isUndefined(elements.data('ic-event-id'))) {
+            Intercooler.processNodes(targets);
+        }
+    }
+
     // intercooler redirects
     setupRedirectAfter(targets.find('a'));
 
@@ -148,7 +156,7 @@ var processCommonNodes = function(elements, out_of_band) {
         var target = $(e.target);
         var checked = target.is(':checked');
 
-        target.closest('.image-box').toggleClass('selected', checked);
+        target.closest('.image-container').toggleClass('selected', checked);
     });
 };
 

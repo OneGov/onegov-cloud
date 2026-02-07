@@ -8,6 +8,7 @@ from onegov.pas.importer.orchestrator import KubImporter
 from onegov.pas.log import CompositeOutputHandler, LogOutputHandler
 from onegov.pas.importer.output_handlers import DatabaseOutputHandler
 from onegov.user import UserCollection
+from sqlalchemy.orm import selectinload
 
 from typing import Any, TYPE_CHECKING, cast
 if TYPE_CHECKING:
@@ -71,7 +72,13 @@ def hourly_user_account_sync(request: PasRequest) -> None:
 
     try:
         collection = PASParliamentarianCollection(request.app)
-        parliamentarians = collection.query().all()
+        parliamentarians = (
+            collection.query()
+            .options(
+                selectinload(collection.model_class.commission_memberships)
+            )
+            .all()
+        )
 
         users = UserCollection(request.session)
         # We also need to use username.lower() to avoid potential

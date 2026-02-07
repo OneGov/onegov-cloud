@@ -25,7 +25,7 @@ filterwarnings = [
 [tool.coverage.run]
 data_file = "/tmp/.coverage"
 include = ["*/onegov/*"]
-omit = ["*/tests/*", "**/upgrade.py"]
+omit = ["*/tests/*"]
 
 [tool.coverage.report]
 ignore_errors = true
@@ -39,7 +39,8 @@ exclude_lines = [
     "raise NotImplementedError",
     "raise AssertionError[(].unreachable.[)]",
     "if TYPE_CHECKING:",
-    "if __name__ == .__main__."
+    "if __name__ == .__main__.",
+    '''\A(?s:.*# pragma: exclude file.*)\Z'''
 ]
 
 [tool.mypy]
@@ -206,6 +207,8 @@ ignore = [
     "RUF031",
     "RUF052",
     "RUF056",
+    # TODO: Brings lots of violations, needs cleanup in all __init__.py files
+    "RUF067",
     # TODO: We would like to enable SIM102, but it has a ton of
     #       violations, so it's a big job to clean it up
     "SIM102",

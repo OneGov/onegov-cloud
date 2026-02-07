@@ -17,6 +17,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.elements import Link, LinkGroup
+    from sqlalchemy.orm import Session
     from typing import TypeVar
 
     _T = TypeVar('_T')
@@ -130,15 +131,17 @@ def test_agency_collection_layout() -> None:
     ]
 
 
-def test_agency_layout() -> None:
+def test_agency_layout(session: Session) -> None:
     request: Any = DummyRequest()
-    model = ExtendedAgency('Agency')  # type: ignore[call-arg]
+    model = ExtendedAgency(title='Agency', name='agency')
+    session.add(model)
 
     layout = AgencyLayout(model, request)
     assert isinstance(layout.collection, ExtendedAgencyCollection)
     assert layout.editbar_links is None
-    assert path(layout.breadcrumbs) == \
-        'DummyOrg/ExtendedAgencyCollection/ExtendedAgency'
+    assert path(
+        layout.breadcrumbs
+    ) == 'DummyOrg/ExtendedAgencyCollection/ExtendedAgency'
     assert layout.move_agency_url_template == (
         "AgencyMove{"
         "'subject_id': '{subject_id}', "
@@ -213,13 +216,14 @@ def test_extended_person_collection_layout() -> None:
     assert layout.agency_path(child) == 'Root > Child'
 
 
-def test_extended_person_layout() -> None:
+def test_extended_person_layout(session: Session) -> None:
     request: Any = DummyRequest()
     model = ExtendedPerson(
         first_name="Hans",
         last_name="Maulwurf",
         email="hans.maulwurf@springfield.com"
     )
+    session.add(model)
 
     layout = ExtendedPersonLayout(model, request)
     assert layout.editbar_links is None

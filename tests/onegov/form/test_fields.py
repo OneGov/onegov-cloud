@@ -10,7 +10,7 @@ from datetime import datetime
 from onegov.core.utils import Bunch
 from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectField, TagsField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import CssField
 from onegov.form.fields import DateTimeLocalField
@@ -27,9 +27,8 @@ from onegov.form.validators import (
     ValidPhoneNumber, WhitelistedMimeType, MIME_TYPES_JSON, MIME_TYPES_PDF)
 from unittest.mock import patch
 from wtforms import FileField, Field
-from wtforms.validators import Optional
+from wtforms.validators import Optional, DataRequired
 from wtforms.validators import URL
-
 
 from typing import Any, TYPE_CHECKING, Self, Sequence
 
@@ -724,3 +723,55 @@ def test_url_field() -> None:
     field = field.bind(form, 'url')  # type: ignore[attr-defined]
     assert field.default_scheme == 'https'
     assert field.render_kw == {'size': 15, 'placeholder': '...'}
+
+
+def test_tags_field() -> None:
+    form = Form()
+    field = TagsField()
+    field = field.bind(form, 'tags')  # type: ignore[attr-defined]
+    assert not field.validators
+
+    field.process_formdata([])
+    assert field.data == []
+    assert field.validate(form)
+
+    field.process_formdata([''])
+    assert field.data == []
+    assert field.validate(form)
+
+    field.process_formdata(['[]'])
+    assert field.data == ['[]']
+    assert field.validate(form)
+
+    field.process_formdata(['()'])
+    assert field.data == ['()']
+    assert field.validate(form)
+
+    field.process_formdata(['labels, keywords, markers'])
+    assert field.data == ['labels', 'keywords', 'markers']
+    assert field.validate(form)
+
+    field.process_formdata(['ding dong, ping pong'])
+    assert field.data == ['ding dong', 'ping pong']
+    assert field.validate(form)
+
+    field.process_formdata(['take, this', 'ignore, that'])
+    assert field.data == ['take', 'this']
+    assert field.validate(form)
+
+    form = Form()
+    field = TagsField(validators=[DataRequired()])
+    field = field.bind(form, 'tags')  # type: ignore[attr-defined]
+    assert len(field.validators) == 1
+
+    field.process_formdata([''])
+    assert not field.validate(form)
+    assert field.errors == ['This field is required.']
+
+    field.process_formdata([' ,  '])
+    assert not field.validate(form)
+    assert field.errors == ['This field is required.']
+
+    field.process_formdata(['t, ags', 'don\'t care'])
+    assert field.data == ['t', 'ags']
+    assert field.validate(form)

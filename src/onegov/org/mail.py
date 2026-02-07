@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from onegov.core.templates import render_template
 from onegov.org.layout import DefaultMailLayout
+from onegov.ticket import Ticket, TicketCollection
+from ulid import ULID
 
 
 from typing import cast, Any, Literal, TYPE_CHECKING
@@ -12,7 +14,6 @@ if TYPE_CHECKING:
     from onegov.core.mail import Attachment
     from onegov.core.types import SequenceOrScalar
     from onegov.org.request import OrgRequest
-    from onegov.ticket import Ticket
     from typing import TypedDict, Required
     from typing_extensions import Unpack
 
@@ -164,6 +165,42 @@ def send_ticket_mail(
 
     if 'reply_to' not in kwargs and ticket.handler.reply_to:
         kwargs['reply_to'] = ticket.handler.reply_to
+
+    headers = kwargs.setdefault('headers', {})
+    if headers is None:
+        headers = kwargs['headers'] = {}
+
+    message_id = headers.setdefault(
+        'Message-ID',
+        # NOTE: We use ULIDs so we can easily get a chronological history
+        #       even if there are multiple tickets grouped into the same
+        #       e-mail thread.
+        f'<{ULID()}@{request.domain}>'
+    )
+    if ticket.customer_message_ids is None:
+        ticket.customer_message_ids = []
+
+    references = sorted(
+        customer_message_id
+        for customer_message_ids, in TicketCollection(request.session)
+        .by_order(ticket.order_id)
+        .with_entities(Ticket.customer_message_ids)
+        for customer_message_id in customer_message_ids
+    ) if ticket.order_id else ticket.customer_message_ids
+
+    if references:
+        # we are replying to the last message sent for this group of tickets
+        headers.setdefault('In-Reply-To', references[-1])
+
+        # and we are also referencing the 10 latest messages
+        headers.setdefault('References', ' '.join(references[-10:]))
+
+    # finally append the new message id
+    ticket.customer_message_ids.append(message_id)
+
+    # we flush in order to make sure subsequent calls to `send_ticket_mail`
+    # in the same request will have access to the full list of message ids
+    request.session.flush()
 
     send_transactional_html_mail(
         request=request,

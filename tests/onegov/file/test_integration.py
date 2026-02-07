@@ -15,6 +15,7 @@ from datetime import timedelta
 from depot.manager import DepotManager
 from io import BytesIO
 from onegov.core import Framework
+from onegov.core.request import CoreRequest
 from onegov.core.security.rules import has_permission_not_logged_in
 from onegov.core.utils import Bunch
 from onegov.core.utils import scan_morepath_modules, module_path, is_uuid
@@ -74,7 +75,16 @@ def app(
 
     backend = request.param
 
+    class BypassCSRFRequest(CoreRequest):
+        def assert_valid_csrf_token(
+            self,
+            signed_value: str | bytes | None = None,
+            salt: str | bytes | None = None
+        ) -> None:
+            return
+
     class App(Framework, DepotApp):
+        request_class = BypassCSRFRequest
         anonymous_access = False
 
     @App.permission_rule(model=object, permission=object, identity=None)
@@ -154,6 +164,37 @@ def test_serve_secret_file(app: TestApp) -> None:
     assert 'filename="readme.txt"' in result.content_disposition
     assert 'X-Robots-Tag' in result.headers
     assert result.headers['X-Robots-Tag'] == 'noindex'
+
+
+def test_rename_file(app: TestApp) -> None:
+    app.anonymous_access = True
+    ensure_correct_depot(app)
+
+    transaction.begin()
+    files = FileCollection(app.session())
+    file_id = files.add('readme.txt', b'README').id
+    transaction.commit()
+
+    client = Client(app)
+    result = client.post(f'/storage/{file_id}/rename')
+    file = files.by_id(file_id)
+    assert file is not None
+    assert file.name == 'readme.txt'
+
+    client.post(f'/storage/{file_id}/rename', {'name': 'execute_me.exe'})
+    file = files.by_id(file_id)
+    assert file is not None
+    assert file.name == 'execute_me.exe.txt'
+
+    client.post(f'/storage/{file_id}/rename', {'name': 'lazy'})
+    file = files.by_id(file_id)
+    assert file is not None
+    assert file.name == 'lazy.txt'
+
+    client.post(f'/storage/{file_id}/rename', {'name': 'readme.txt'})
+    file = files.by_id(file_id)
+    assert file is not None
+    assert file.name == 'readme.txt'
 
 
 def test_application_separation(app: TestApp) -> None:

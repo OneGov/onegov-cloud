@@ -16,7 +16,7 @@ class UploadOrLinkExistingFileWidget(UploadWidget):
 
     file_details_template = Markup("""
         <div ic-trigger-from="#button-{file_id}"
-             ic-trigger-on="click once"
+             ic-trigger-on="click once, change"
              ic-get-from="{details_url}"
              class="file-preview-wrapper"></div>
     """)

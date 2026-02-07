@@ -58,23 +58,12 @@
                             <h4>
                                 ${commission['commission_name']}
                                 <span class="completion-ratio">(${commission['completion_ratio']})</span>
-                                <span tal:condition="commission['is_complete']" class="status-indicator complete">✓ Complete</span>
+                                <span tal:condition="commission['is_complete']" class="status-indicator complete" i18n:translate="">✓ Complete</span>
                                 <span tal:condition="not commission['is_complete']" class="status-indicator incomplete" i18n:translate="">⚠ Incomplete</span>
                             </h4>
                         </div>
 
                         <div class="member-lists">
-                            <div tal:condition="commission['complete_members']" class="complete-members">
-                                <h5 i18n:translate="">Members who have closed their attendance:</h5>
-                                <ul>
-                                    <li tal:repeat="member commission['complete_members']"
-                                        class="completed">
-                                        ${member['name']}
-                                        <span class="attendance-status completed" i18n:translate="">✓ (closed)</span>
-                                    </li>
-                                </ul>
-                            </div>
-
                             <div tal:condition="commission['incomplete_members']" class="incomplete-members">
                                 <h5 i18n:translate="">Members who have not closed their attendance:</h5>
                                 <ul>
@@ -86,6 +75,21 @@
                                     </li>
                                 </ul>
                             </div>
+
+                            <ul tal:condition="commission['complete_members']" class="accordion complete-members" data-accordion data-allow-all-closed="true">
+                                <li class="accordion-item" data-accordion-item>
+                                    <a href="#" class="accordion-title" i18n:translate="">Members who have closed their attendance:</a>
+                                    <div class="accordion-content" data-tab-content>
+                                        <ul>
+                                            <li tal:repeat="member commission['complete_members']"
+                                                class="completed">
+                                                ${member['name']}
+                                                <span class="attendance-status completed" i18n:translate="">✓ (closed)</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>

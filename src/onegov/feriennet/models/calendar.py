@@ -133,7 +133,7 @@ class AttendeeCalendar(Calendar, name='attendee'):
         records: Query[AttendeeCalendarRow]
         # FIXME: Should this exclude cancelled occasions, or does an accepted
         #        booking guarantee that the occassion is not cancelled?
-        records = session.execute(select(stmt.c).where(and_(
+        records = session.execute(select(*stmt.c).where(and_(
             stmt.c.attendee_id == self.attendee_id,
             stmt.c.state == 'accepted',
             stmt.c.confirmed == True

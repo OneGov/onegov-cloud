@@ -1900,8 +1900,9 @@ $editbar-bg-color: $topbar-link-bg-hover;
 
     .label-text {
         color: $form-label-font-color;
-        display: inline-block;
+        display: block;
         font-size: .875rem;
+        font-weight: normal;
         margin-right: 1rem;
     }
 
@@ -3146,19 +3147,54 @@ button {
 }
 
 .occupancy-calendar {
-    .fc-view:not(.fc-list), .fc-view:not(.fc-list) + .fc-popover {
-        .event-accepted,
-        .event-accepted .fc-bg,
-        .event-accepted .fc-content {
+    .fc-view:not(.fc-list) .fc-event,
+    .fc-view:not(.fc-list) + .fc-popover .fc-event,
+    .fc-view-harness:has(.fc-view:not(.fc-list)) ~ .fc-event-dragging {
+        &.event-accepted,
+        &.event-accepted .fc-bg,
+        &.event-accepted .fc-content {
             border-width: 0;
             background-color: $blue-dark;
         }
 
-        .event-pending,
-        .event-pending .fc-bg,
-        .event-pending .fc-content {
+        &.event-pending,
+        &.event-pending .fc-bg,
+        &.event-pending .fc-content {
             border-width: 0;
             background-color: lighten(desaturate($blue-dark, 50%), 10%);
+        }
+
+        &.event-blocker, &.fc-event-mirror:not(.event-accepted,.event-pending) {
+            border-width: 0;
+            background-color: $red;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0, 0, 0, 0.1) 10px,
+                rgba(0, 0, 0, 0.1) 20px
+            );
+
+            & .fc-event-main {
+                position: relative;
+                padding: 2px 4px !important;
+                padding-right: 20px !important;
+                font-weight: bold;
+                font-size: .875rem;
+            }
+
+            & .delete-blocker {
+                display: inline-block;
+                position: absolute;
+                padding: 2px 6px;
+                top: 0;
+                right: 0;
+                font-size: .75rem;
+
+                &:hover {
+                    opacity: .75;
+                }
+            }
         }
     }
 
@@ -5779,6 +5815,10 @@ h2 + div.timeline {
     // used for better performance
     table-layout: fixed;
     width: 100%;
+
+    thead tr {
+        background-color: $white;
+    }
 
     th {
         padding-top: 2rem;

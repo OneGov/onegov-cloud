@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dateutil.parser import isoparse
 from functools import cached_property
+from onegov.agency import _
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
@@ -105,6 +106,10 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
     form_class = AuthenticatedPersonMutationForm
 
     @property
+    def title(self) -> str:
+        return self.request.translate(_('People'))
+
+    @property
     def collection(self) -> ExtendedPersonCollection:
         result = ExtendedPersonCollection(
             self.session,
@@ -200,6 +205,10 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
     app: AgencyApp
     endpoint = 'agencies'
     filters = {'parent', 'title'} | UPDATE_FILTER_PARAMS
+
+    @property
+    def title(self) -> str:
+        return self.request.translate(_('Agencies'))
 
     @property
     def collection(self) -> PaginatedAgencyCollection:

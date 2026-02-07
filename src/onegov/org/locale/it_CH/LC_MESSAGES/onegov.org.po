@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-12-19 12:13+0100\n"
+"POT-Creation-Date: 2026-01-27 10:35+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -13,6 +13,15 @@ msgstr ""
 "Generated-By: xls-to-po 1.0\n"
 "gengo-order-id: 7629694\n"
 "X-Generator: Poedit 3.0.1\n"
+
+msgid "Plausible"
+msgstr "Plausible"
+
+msgid "Matomo"
+msgstr "Matomo"
+
+msgid "Siteimprove"
+msgstr "Siteimprove"
 
 msgid "Important information regarding online payments"
 msgstr "Informazioni importanti sui pagamenti online"
@@ -588,8 +597,14 @@ msgstr "Vista principale"
 msgid "Hide these labels on the main view"
 msgstr "Nascondi queste etichette nella vista principale"
 
-msgid "Address"
-msgstr "Indirizzo"
+msgid "Contact Information Sidebar"
+msgstr "Barra laterale delle informazioni di contatto"
+
+msgid ""
+"The contact information is displayed in the sidebar without field names."
+msgstr ""
+"Le informazioni di contatto sono visualizzate nella barra laterale senza "
+"nomi di campo."
 
 msgid "Filters"
 msgstr "Filtri"
@@ -706,6 +721,9 @@ msgstr "Notifiche"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informazioni da fornire in aggiunta all'e-mail"
+
+msgid "Address"
+msgstr "Indirizzo"
 
 msgid "Phone"
 msgstr "Telefono"
@@ -2302,11 +2320,31 @@ msgstr "Swisstopo (predefinito)"
 msgid "Swisstopo Aerial"
 msgstr "Swisstopo fotografia aerea"
 
-msgid "Analytics Code"
-msgstr "Codice Analytics"
+msgid "Analytics Provider"
+msgstr "Fornitore di Analytics"
 
-msgid "JavaScript for web statistics support"
-msgstr "JavaScript per il supporto delle statistiche web"
+msgid "Domain name"
+msgstr "Nome di dominio"
+
+msgid ""
+"This should match the domain defined in plausible you may also leave this "
+"empty, in which case we will submit the domain of the current request."
+msgstr ""
+"Questo dovrebbe corrispondere al dominio definito in plausibile. È anche "
+"possibile lasciare questo campo vuoto, nel qual caso invieremo il dominio "
+"della richiesta corrente."
+
+msgid "Matomo Site ID"
+msgstr "ID sito Matomo"
+
+msgid "Siteimprove Site ID"
+msgstr "ID sito Siteimprove"
+
+msgid "Google Tag ID"
+msgstr "ID Google Tag"
+
+msgid "Not a valid Google Tag ID"
+msgstr "ID Google Tag non valido"
 
 msgid "Analytics URL"
 msgstr "URL Analytics"
@@ -3468,6 +3506,9 @@ msgstr "Iscritti"
 msgid "Test"
 msgstr "Test"
 
+msgid "Copy"
+msgstr "Copia"
+
 msgid "Delete newsletter"
 msgstr "Elimina newsletter"
 
@@ -4139,9 +4180,6 @@ msgstr "Eliminare iFrame"
 msgid "Do you really want to delete the iFrame \"${title}\"?"
 msgstr "Si vuole davvero eliminare l'iFrame \"${title}\"?"
 
-msgid "Copy"
-msgstr "Copia"
-
 msgid "A News cannot be pasted as Topic"
 msgstr "Una notizia non può essere incollata come argomento"
 
@@ -4352,6 +4390,13 @@ msgstr "Rinominato:"
 
 msgid "Changed:"
 msgstr "Modificato:"
+
+msgid ""
+"Please note, that data for existing entries that use the removed option will "
+"be lost."
+msgstr ""
+"Si prega di notare che i dati per gli elementi esistenti che utilizzano "
+"l'opzione rimossa andranno persi."
 
 msgid "Confirm"
 msgstr "Conferma"
@@ -6049,6 +6094,9 @@ msgstr ""
 "Per eliminare questa allocazione, è necessario prima annullare tutte le "
 "prenotazioni esistenti."
 
+msgid "Blocker"
+msgstr "Bloccante"
+
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Esiste un'allocazione in conflitto per il periodo di tempo richiesto."
 
@@ -6351,6 +6399,36 @@ msgstr "Errore di sintassi nel campo ${field_name}"
 #, python-format
 msgid "Error: Duplicate label ${label}"
 msgstr "Errore: etichetta ${label} duplicata"
+
+msgid ""
+"Do not mix adding, removing, and renaming options in the same migration. "
+"Please use separate migrations for each option."
+msgstr ""
+"Non mescolare l'aggiunta, la rimozione e la ridenominazione delle opzioni "
+"nella stessa migrazione. Utilizzare migrazioni separate per ogni opzione."
+
+#, python-format
+msgid ""
+"${fields}: New fields cannot be required initially. Require them in a "
+"separate migration step."
+msgstr ""
+"${fields}: I nuovi campi non possono essere inizialmente obbligatori. "
+"Rendili obbligatori in un passaggio di migrazione separato."
+
+msgid ""
+"Renaming multiple options in the same migration is not supported. Please use "
+"separate migrations for each option."
+msgstr ""
+"Rinominare più opzioni nella stessa migrazione non è supportato. Utilizzare "
+"migrazioni separate per ogni opzione."
+
+#, python-format
+msgid ""
+"Cannot convert field \"${field}\" from type \"${old_type}\" to "
+"\"${new_type}\"."
+msgstr ""
+"Impossibile convertire il campo \"${field}\" dal tipo \"${old_type}\" a "
+"\"${new_type}\"."
 
 msgid "The directory was deleted"
 msgstr "La cartella è stata cancellata"
@@ -6850,6 +6928,15 @@ msgstr "Aggiunta una nuova newsletter"
 msgid "New Newsletter"
 msgstr "Nuova newsletter"
 
+msgid "Invalid clipboard content"
+msgstr "Contenuto degli appunti non valido"
+
+msgid "Newsletter pasted successfully"
+msgstr "Newsletter incollata con successo"
+
+msgid "Paste Newsletter"
+msgstr "Incolla newsletter"
+
 msgid "Edit Newsletter"
 msgstr "Modifica la newsletter"
 
@@ -7239,8 +7326,20 @@ msgstr "Aggiunta una nuova prenotazione"
 msgid "Reservation not adjustable"
 msgstr "Prenotazione non regolabile"
 
+msgid ""
+"This reservation has already been accepted, but changes will not lead to a "
+"new confirmation e-mail so please make sure you inform the customer of the "
+"performed changes, so they have a record of it."
+msgstr ""
+"Questa prenotazione è già stata accettata, ma le modifiche non comporteranno "
+"l'invio di una nuova e-mail di conferma, quindi assicurati di informare il "
+"cliente delle modifiche apportate, in modo che ne abbia traccia."
+
 msgid "Adjust reservation"
 msgstr "Regolare la prenotazione"
+
+msgid "Cannot move reservation into the past"
+msgstr "Impossibile spostare la prenotazione nel passato"
 
 msgid "The reservation was adjusted"
 msgstr "La prenotazione è stata regolata"
@@ -7250,6 +7349,15 @@ msgstr "La prenotazione è rimasta invariata"
 
 msgid "There are no future reservations"
 msgstr "Non ci sono prenotazioni future"
+
+msgid "Blocker not adjustable"
+msgstr "Bloccante non regolabile"
+
+msgid "Cannot move blocker into the past"
+msgstr "Impossibile spostare il bloccante nel passato"
+
+msgid "Blocker no longer exists"
+msgstr "Il bloccante non esiste più"
 
 msgid "Added a new daypass"
 msgstr "Aggiunto un nuovo biglietto giornaliero"
@@ -7711,6 +7819,12 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "Analytics Code"
+#~ msgstr "Codice Analytics"
+
+#~ msgid "JavaScript for web statistics support"
+#~ msgstr "JavaScript per il supporto delle statistiche web"
 
 #~ msgid ""
 #~ "The \"Always send email notifications for new ticket messages\" setting "

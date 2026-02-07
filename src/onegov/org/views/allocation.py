@@ -77,10 +77,10 @@ def view_allocations_json(self: Resource, request: OrgRequest) -> JSON_ro:
     query = query.options(defer(Allocation.data))
     query = query.options(defer(Allocation.group))
     query = query.options(
-        defaultload('reserved_slots')
-        .defer('reservation_token')
-        .defer('allocation_id')
-        .defer('end'))
+        defaultload(Allocation.reserved_slots)
+        .defer(ReservedSlot.reservation_token)
+        .defer(ReservedSlot.allocation_id)
+        .defer(ReservedSlot.end))
 
     # but only return the master allocations
     return tuple(
@@ -452,11 +452,11 @@ def handle_edit_rule(
         )
         # .. without the ones with slots
         deletable_candidates = candidates.filter(
-            Allocation.id.notin_(slots.subquery()))
+            Allocation.id.notin_(slots.scalar_subquery()))
 
         # .. without the ones with reservations
         deletable_candidates = deletable_candidates.filter(
-            Allocation.group.notin_(reservations.subquery()))
+            Allocation.group.notin_(reservations.scalar_subquery()))
 
         # delete the allocations
         deleted_count = deletable_candidates.delete('fetch')
@@ -464,8 +464,8 @@ def handle_edit_rule(
         # we need to update any undeletedable allocations with
         # the new rule_id and the new access
         updatable_candidates = candidates.filter(or_(
-            Allocation.id.in_(slots.subquery()),
-            Allocation.group.in_(reservations.subquery())
+            Allocation.id.in_(slots.scalar_subquery()),
+            Allocation.group.in_(reservations.scalar_subquery())
         ))
 
         # .. but only future ones (so we don't keep an ever-growing
@@ -722,14 +722,15 @@ def handle_delete_rule(self: Resource, request: OrgRequest) -> None:
 
     # .. without the ones with slots
     candidates = candidates.filter(
-        Allocation.id.notin_(slots.subquery()))
+        Allocation.id.notin_(slots.scalar_subquery()))
 
     # .. without the ones with reservations
     candidates = candidates.filter(
-        Allocation.group.notin_(reservations.subquery()))
+        Allocation.group.notin_(reservations.scalar_subquery()))
 
     # delete the allocations
-    count = candidates.delete('fetch')
+    for count, candidate in enumerate(candidates, start=1):
+        request.session.delete(candidate)
 
     delete_rule(self, rule_id)
 

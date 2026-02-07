@@ -131,17 +131,17 @@ class SearchApp(morepath.App):
                            AND nspname = :schema
                     )
                     FROM pg_ts_config
-                """), schema=schema).scalar():
+                """), {'schema': schema}).scalar():
                     # the dictionary already exists
                     dict_name = 'german_unaccent'
                 else:
                     try:
-                        connection.execute("""
+                        connection.execute(text("""
                             CREATE TEXT SEARCH DICTIONARY german_unaccent (
                                 template = unaccent,
                                 rules = 'german'
                             )
-                        """)
+                        """))
                     except Exception:
                         index_log.exception(
                             'Failed to create german_unaccent dictionary '
@@ -164,28 +164,28 @@ class SearchApp(morepath.App):
                        AND nspname = :schema
                 )
                 FROM pg_ts_config
-            """), locale=locale, schema=schema).scalar():
+            """), {'locale': locale, 'schema': schema}).scalar():
                 # configuration already exists
                 if dict_created:
                     # drop the old configuration that isn't yet using
                     # the dictionary we just created
-                    connection.execute(f"""
+                    connection.execute(text(f"""
                         DROP TEXT SEARCH CONFIGURATION {locale}
-                    """)
+                    """))
                 else:
                     continue
 
             # NOTE: Since we only allow lang != simple these three
             #       variables can only have very specific safe values
             #       so we don't need to escape them.
-            connection.execute(f"""
+            connection.execute(text(f"""
                 CREATE TEXT SEARCH CONFIGURATION {locale} (
                     COPY = {lang}
                 );
                 ALTER TEXT SEARCH CONFIGURATION {locale}
                     ALTER MAPPING FOR hword, hword_part, word
                     WITH {dict_name}, {lang}_stem;
-            """)
+            """))
             index_log.info(f'Created {locale} search configuration')
 
     def fts_may_use_private_search(self, request: CoreRequest) -> bool:

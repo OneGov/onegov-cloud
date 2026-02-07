@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import pytest
 import transaction
 
 from collection_json import Collection  # type: ignore[import-untyped]
@@ -13,10 +14,53 @@ from unittest.mock import patch
 from uuid import uuid4
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from tests.shared.client import Client
     from .conftest import App
+
+
+@pytest.fixture(autouse=True)
+def patch_collection_json(monkeypatch: pytest.MonkeyPatch) -> None:
+    # FIXME: We should probably get rid of collection_json, since it
+    #        is unmaintained and doesn't follow the spec properly by
+    #        raising for unknown properties, rather than ignoring them
+    def Collection__init__(
+        self: Any,
+        href: str,
+        links: Any = None,
+        items: Any = None,
+        queries: Any = None,
+        template: Any = None,
+        error: Any = None,
+        version: str = '1.0',
+        **extra: Any
+    ) -> None:
+        self.version = version
+        self.href = href
+        self.error = error
+        self.template = template
+        self.items = items
+        self.links = links
+        self.queries = queries
+
+    def Query__init__(
+        self: Any,
+        href: str,
+        rel: str,
+        name: str | None = None,
+        prompt: str | None = None,
+        data: dict[str, str] | None = None,
+        **extra: Any,
+    ) -> None:
+        self.href = href
+        self.rel = rel
+        self.name = name
+        self.prompt = prompt
+        self.data = data
+
+    monkeypatch.setattr(Collection, '__init__', Collection__init__)
+    monkeypatch.setattr('collection_json.Query.__init__', Query__init__)
 
 
 def test_view_api(client: Client, app: App) -> None:
@@ -51,6 +95,8 @@ def test_view_api(client: Client, app: App) -> None:
         'collection': {
             'version': '1.0',
             'href': 'http://localhost/api/endpoint',
+            'title': 'Test Endpoint',
+            'description': 'This is just for testing',
             'links': [
                 {'href': None, 'rel': 'prev'},
                 {'href': None, 'rel': 'next'}
@@ -284,7 +330,7 @@ def test_view_private_field(client: Client) -> None:
     transaction.commit()
 
     session = client.app.session()  # Get fresh session
-    person = session.query(Person).get(person_id)  # type: ignore[assignment]  # Reload person with new
+    person = session.get(Person, person_id)  # type: ignore[attr-defined]  # Reload person with new
 
     # Authorize
     headers = {"Authorization": f"Bearer {uuid}"}

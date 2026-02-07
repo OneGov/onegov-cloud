@@ -331,10 +331,10 @@ def view_online_payments(
 
     payment_ids = session.query(table.c.payment_id)
     payment_ids = payment_ids.filter(
-        table.c.invoice_items_id.in_(invoice_item_ids.subquery()))
+        table.c.invoice_items_id.in_(invoice_item_ids.scalar_subquery()))
 
     payments = session.query(Payment).filter(
-        Payment.id.in_(payment_ids.subquery()))
+        Payment.id.in_(payment_ids.scalar_subquery()))  # type: ignore[attr-defined]
 
     payments = payments.order_by(desc(Payment.created))
 

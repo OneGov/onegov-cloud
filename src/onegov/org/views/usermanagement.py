@@ -363,6 +363,6 @@ def handle_new_user(
         'layout': layout,
         'title': _('New User'),
         'form': form,
-        'password': None,
+        'password': None,  # nosec: B105
         'sent_email': False
     }

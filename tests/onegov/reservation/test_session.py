@@ -5,13 +5,13 @@ import morepath
 from datetime import datetime
 from libres import new_scheduler
 from onegov.core.framework import Framework
+from onegov.core.orm import Base as CoreBase
 from onegov.core.utils import scan_morepath_modules
 from onegov.reservation import LibresIntegration, ResourceCollection
-from sqlalchemy import Column, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import text, Column, Integer
+from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 from uuid import uuid4
 from webtest import TestApp as Client
-from onegov.core.orm import Base as CoreBase
 
 
 from typing import Any, TYPE_CHECKING
@@ -57,17 +57,17 @@ def test_setup_database(postgres_dsn: str, redis_url: str) -> None:
     c = Client(app)
     c.get('/')
 
-    tables = app.session().execute(
+    tables = app.session().execute(text(
         "SELECT table_name FROM information_schema.tables "
         "WHERE table_schema = 'public'"
-    )
+    ))
 
     assert not tables.fetchall()
 
-    tables = app.session().execute(
+    tables = app.session().execute(text(
         "SELECT table_name FROM information_schema.tables "
         "WHERE table_schema = 'libres-foo'"
-    )
+    ))
 
     tables = set(r[0] for r in tables.fetchall())
 
@@ -96,10 +96,10 @@ def test_libres_context(postgres_dsn: str) -> None:
     app.set_application_id('libres/foo')
     app.session_manager.set_current_schema('libres-foo')
 
-    tables = app.session().execute(
+    tables = app.session().execute(text(
         "SELECT table_name FROM information_schema.tables "
         "WHERE table_schema = 'libres-foo'"
-    )
+    ))
 
     tables = set(r[0] for r in tables.fetchall())
 

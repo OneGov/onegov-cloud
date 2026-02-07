@@ -5,11 +5,13 @@ from onegov.form import as_internal_id
 from onegov.form import flatten_fieldsets
 from onegov.form import parse_form
 from onegov.form import parse_formcode
+from onegov.form.parser.core import OptionsField
 from sqlalchemy.orm import object_session, joinedload, undefer
 from sqlalchemy.orm.attributes import get_history
-
+from wtforms import ValidationError
 
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
     from datetime import date, datetime, time
@@ -58,14 +60,21 @@ class DirectoryMigration:
 
     @property
     def possible(self) -> bool:
+        """ Returns True if the migration is possible, False otherwise. """
         if not self.directory.entries:
             return True
 
         if not self.changes:
             return True
 
-        if not self.changes.changed_fields:
-            return True
+        if len(self.changes.renamed_options) > 1:
+            return False
+
+        if self.multiple_option_changes_in_one_step():
+            return False
+
+        if self.added_required_fields():
+            return False
 
         for changed in self.changes.changed_fields:
             old = self.changes.old[changed]
@@ -104,6 +113,15 @@ class DirectoryMigration:
         should only be used if you know what you are doing.
 
         """
+        if self.added_required_fields():
+            raise ValidationError(
+                '${fields}: New fields cannot be required initially. '
+                  'Require them in a separate migration step.'.format(
+                    fields=', '.join(
+                        f'"{f}"' for f in self.get_added_required_field_ids())
+                )
+            )
+
         assert self.possible
 
         self.migrate_directory()
@@ -142,6 +160,8 @@ class DirectoryMigration:
         self.remove_old_fields(values)
         self.rename_fields(values)
         self.convert_fields(values)
+        self.rename_options(values)
+        self.remove_old_options(values)
 
     def add_new_fields(self, values: dict[str, Any]) -> None:
         for added in self.changes.added_fields:
@@ -170,6 +190,62 @@ class DirectoryMigration:
             changed = as_internal_id(changed)
             values[changed] = convert(values[changed])
 
+    def rename_options(self, values: dict[str, Any]) -> None:
+        for old_option, new_option in self.changes.renamed_options.items():
+            old_label = old_option[1]
+            new_label = new_option[1]
+            for key, val in list(values.items()):
+                if isinstance(val, list):
+                    values[key] = [
+                        new_label if v == old_label else v for v in val
+                    ]
+
+                elif val == old_label:
+                    values[key] = new_label
+
+    def remove_old_options(self, values: dict[str, Any]) -> None:
+        for human_id, label in self.changes.removed_options:
+            id = as_internal_id(human_id)
+            if id in values:
+                if isinstance(values[id], list):
+                    values[id] = [v for v in values[id] if v != label]
+                elif values[id] == label:
+                    values[id] = None
+
+    def multiple_option_changes_in_one_step(self) -> bool:
+        """
+        Returns True if there are multiple changes e.g. added and
+        removed options.
+        """
+
+        if (
+            (self.changes.added_options and self.changes.removed_options)
+            or (self.changes.added_options and self.changes.renamed_options)
+            or (self.changes.removed_options and self.changes.renamed_options)
+        ):
+            return True
+        return False
+
+    def added_required_fields(self) -> bool:
+        """
+        Identify newly added fields that are set to be required. Newly added
+        fields shall not be required if entries exist, make them required
+        in a separate migration step.
+        """
+        if self.directory.entries:
+            return any(
+                f.required for f in self.changes.new.values()
+                if f.human_id in self.changes.added_fields
+            )
+
+        return False
+
+    def get_added_required_field_ids(self) -> list[str]:
+        return [
+            f.human_id for f in self.changes.new.values()
+            if f.required and f.human_id in self.changes.added_fields
+        ]
+
 
 class FieldTypeMigrations:
     """ Contains methods to migrate fields from one type to another. """
@@ -194,10 +270,6 @@ class FieldTypeMigrations:
 
         return getattr(self, explicit, getattr(self, generic, None))
 
-    # FIXME: A lot of these converters currently don't work if the value
-    #        happens to be None, which should be possible for every field
-    #        as long as its optional, or do we skip converting None
-    #        explicitly somewhere?!
     def any_to_text(self, value: Any) -> str:
         return str(value if value is not None else '').strip()
 
@@ -214,16 +286,16 @@ class FieldTypeMigrations:
         return value
 
     def date_to_text(self, value: date) -> str:
-        return '{:%d.%m.%Y}'.format(value)
+        return '{:%d.%m.%Y}'.format(value) if value else ''
 
     def datetime_to_text(self, value: datetime) -> str:
-        return '{:%d.%m.%Y %H:%M}'.format(value)
+        return '{:%d.%m.%Y %H:%M}'.format(value) if value else ''
 
     def time_to_text(self, value: time) -> str:
-        return '{:%H:%M}'.format(value)
+        return '{:%H:%M}'.format(value) if value else ''
 
     def radio_to_checkbox(self, value: str) -> list[str]:
-        return [value]
+        return [value] if value else []
 
     def text_to_url(self, value: str) -> str:
         return value
@@ -255,6 +327,9 @@ class StructuralChanges:
         self.detect_removed_fields()
         self.detect_renamed_fields()  # modifies added/removed fields
         self.detect_changed_fields()
+        self.detect_added_options()
+        self.detect_removed_options()
+        self.detect_renamed_options()
 
     def __bool__(self) -> bool:
         return bool(
@@ -262,6 +337,9 @@ class StructuralChanges:
             or self.removed_fields
             or self.renamed_fields
             or self.changed_fields
+            or self.added_options
+            or self.removed_options
+            or self.renamed_options  # radio and checkboxes
         )
 
     def detect_removed_fieldsets(self) -> None:
@@ -378,3 +456,69 @@ class StructuralChanges:
             new = self.new[new_id]
             if old.required != new.required or old.type != new.type:
                 self.changed_fields.append(new_id)
+
+    def detect_added_options(self) -> None:
+        self.added_options = []
+
+        for old_id, old_field in self.old.items():
+            if isinstance(old_field, OptionsField) and old_id in self.new:
+                new_field = self.new[old_id]
+                if isinstance(new_field, OptionsField):
+                    new_labels = [r.label for r in new_field.choices]
+                    old_labels = [r.label for r in old_field.choices]
+
+                    for n in new_labels:
+                        if n not in old_labels:
+                            self.added_options.append((old_id, n))
+
+    def detect_removed_options(self) -> None:
+        self.removed_options = []
+
+        for old_id, old_field in self.old.items():
+            if isinstance(old_field, OptionsField) and old_id in self.new:
+                new_field = self.new[old_id]
+                if isinstance(new_field, OptionsField):
+                    new_labels = [r.label for r in new_field.choices]
+                    old_labels = [r.label for r in old_field.choices]
+
+                    for o in old_labels:
+                        if o not in new_labels:
+                            self.removed_options.append((old_id, o))
+
+    def detect_renamed_options(self) -> None:
+        self.renamed_options = {}
+
+        for old_id, old_field in self.old.items():
+            if isinstance(old_field, OptionsField) and old_id in self.new:
+                new_field = self.new[old_id]
+                if isinstance(new_field, OptionsField):
+                    old_labels = [r.label for r in old_field.choices]
+                    new_labels = [r.label for r in new_field.choices]
+
+                    if old_labels == new_labels:
+                        continue
+
+                    # test if re-ordered
+                    if set(old_labels) == set(new_labels):
+                        continue
+
+                    # only consider renames if the number of options
+                    # remains the same
+                    if len(old_labels) != len(new_labels):
+                        continue
+
+                    for o_label, n_label in zip(old_labels, new_labels):
+                        if o_label != n_label:
+                            self.renamed_options[(old_id, o_label)] = (
+                                old_id,
+                                n_label
+                            )
+
+                        self.added_options = [
+                            ao for ao in self.added_options
+                            if ao not in self.renamed_options.values()
+                        ]
+                        self.removed_options = [
+                            ro for ro in self.removed_options
+                            if ro not in self.renamed_options.keys()
+                        ]

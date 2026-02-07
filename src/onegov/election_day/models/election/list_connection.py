@@ -116,11 +116,11 @@ class ListConnection(Base, TimestampMixin):
 
         """
 
-        expr = select([
+        expr = select(
             func.coalesce(
                 func.sum(getattr(List, attribute)),
                 0
             )
-        ])
+        )
         expr = expr.where(List.connection_id == cls.id)
         return expr.label(attribute)

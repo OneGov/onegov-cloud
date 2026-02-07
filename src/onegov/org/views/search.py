@@ -26,7 +26,8 @@ if TYPE_CHECKING:
 def search(
     self: Search,
     request: OrgRequest,
-    layout: DefaultLayout | None = None
+    layout: DefaultLayout | None = None,
+    search_form_class: type[SearchForm] | None = None,
 ) -> RenderData | Response:
     layout = layout or DefaultLayout(self, request)
     assert isinstance(layout.breadcrumbs, list)
@@ -65,7 +66,7 @@ def search(
             return morepath.redirect(url)
 
     form = request.get_form(
-        SearchForm,
+        search_form_class or SearchForm,
         formdata=request.params,
         model=self,
         pass_model=True,

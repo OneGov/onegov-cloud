@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-25 08:49+0100\n"
+"POT-Creation-Date: 2026-01-27 10:29+0100\n"
 "PO-Revision-Date: 2022-03-07 13:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -233,6 +233,14 @@ msgstr ""
 
 #, python-format
 msgid ""
+"${fields}: New fields cannot be required initially. Require them in a "
+"separate migration step."
+msgstr ""
+"${fields}: I nuovi campi non possono essere inizialmente obbligatori. "
+"Rendili obbligatori in un passaggio di migrazione separato."
+
+#, python-format
+msgid ""
 "Invalid field type for field '{label}'. For filters only 'select' or "
 "'multiple select' fields are allowed."
 msgstr ""
@@ -265,6 +273,9 @@ msgstr "Deve essere durante o dopo il {date}."
 #, python-format
 msgid "Needs to be on or before {date}."
 msgstr "Deve essere durante o prima del {date}."
+
+msgid "Not a valid domain."
+msgstr "Dominio non valido."
 
 msgid "Uploaded file"
 msgstr "File caricato"

@@ -202,11 +202,11 @@ def get_candidates_data(
     if election.completed:
         order.insert(0, desc(Candidate.elected))
     if lists and sort_by_lists:
-        order.insert(0, case(
-            [
+        order.insert(0, case(  # type: ignore[call-overload]
+            *(
                 (column == name, index)
                 for index, name in enumerate(lists, 1)
-            ],
+            ),
             else_=0
         ))
     candidates = candidates.order_by(*order)
@@ -286,17 +286,18 @@ def get_candidates_results_by_entity(
         Candidate.first_name,
         CandidateResult.votes
     )
-    results = results.outerjoin(Candidate, ElectionResult)
+    results = results.outerjoin(Candidate)
+    results = results.outerjoin(ElectionResult)
     results = results.filter(ElectionResult.election_id == election.id)
     results = results.filter(Candidate.election_id == election.id)
     if candidates:
         results = results.order_by(
             ElectionResult.name,
-            case(
-                [
+            case(  # type: ignore[call-overload]
+                *(
                     (Candidate.id == candidate.id, index)
                     for index, candidate in enumerate(candidates, 1)
-                ],
+                ),
                 else_=0
             )
         )

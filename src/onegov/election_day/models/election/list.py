@@ -96,29 +96,33 @@ class List(Base, TimestampMixin):
     )
 
     #: a list contains additional votes from other lists
-    panachage_results: relationship[list[ListPanachageResult]]
-    panachage_results = relationship(
-        'ListPanachageResult',
-        foreign_keys='ListPanachageResult.target_id',
-        cascade='all, delete-orphan',
-        back_populates='target'
+    panachage_results: relationship[list[ListPanachageResult]] = (
+        relationship(
+            'ListPanachageResult',
+            foreign_keys='ListPanachageResult.target_id',
+            cascade='all, delete-orphan',
+            back_populates='target'
+        )
     )
 
     #: a list contains to other lists lost votes
-    panachage_results_lost: relationship[list[ListPanachageResult]]
-    panachage_results_lost = relationship(
-        'ListPanachageResult',
-        foreign_keys='ListPanachageResult.source_id',
-        cascade='all, delete-orphan',
-        back_populates='source'
+    panachage_results_lost: relationship[list[ListPanachageResult]] = (
+        relationship(
+            'ListPanachageResult',
+            foreign_keys='ListPanachageResult.source_id',
+            cascade='all, delete-orphan',
+            back_populates='source'
+        )
     )
 
     #: an list contains n (outgoing) candidate panachage results
-    candidate_panachage_results: relationship[list[CandidatePanachageResult]]
-    candidate_panachage_results = relationship(
-        'CandidatePanachageResult',
-        cascade='all, delete-orphan',
-        back_populates='list'
+    candidate_panachage_results: (
+        relationship)[list[CandidatePanachageResult]] = (
+        relationship(
+            'CandidatePanachageResult',
+            cascade='all, delete-orphan',
+            back_populates='list'
+        )
     )
 
     #: the total votes
@@ -139,12 +143,12 @@ class List(Base, TimestampMixin):
 
         """
 
-        expr = select([
+        expr = select(
             func.coalesce(
                 func.sum(getattr(ListResult, attribute)),
                 0
             )
-        ])
+        )
         expr = expr.where(ListResult.list_id == cls.id)
         return expr.label(attribute)
 

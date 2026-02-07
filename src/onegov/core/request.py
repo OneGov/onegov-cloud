@@ -15,7 +15,7 @@ from itsdangerous import (
     URLSafeSerializer,
     URLSafeTimedSerializer
 )
-from more.content_security import ContentSecurityRequest
+from more.content_security import ContentSecurityRequest, UNSAFE_EVAL
 from more.webassets.core import IncludeRequest
 from morepath.authentication import NO_IDENTITY
 from morepath.error import LinkError
@@ -50,6 +50,7 @@ if TYPE_CHECKING:
     from wtforms import Form
     from uuid import UUID
 
+    from .analytics import AnalyticsProvider
     from .templates import TemplateLoader
 
     _BaseRequest = morepath.Request
@@ -306,20 +307,28 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             result += f'#{fragment}'
         return result
 
-    def class_link(
+    def class_link(  # type:ignore[override]
         self,
         model: type[Any],
         variables: dict[str, Any] | None = None,
         name: str = '',
-        app: Framework | Sentinel = SAME_APP,  # type:ignore[override]
+        app: Framework | Sentinel = SAME_APP,
+        query_params: SupportsItems[str, str] | None = None,
+        fragment: str | None = None,
     ) -> str:
         """ Extends the default class link generating function of Morepath. """
-        return self.transform(super().class_link(
+        query_params = query_params or {}
+        result = self.transform(super().class_link(
             model,
             variables=variables,
             name=name,
             app=app
         ))
+        for key, value in query_params.items():
+            result = append_query_param(result, key, value)
+        if fragment:
+            result += f'#{fragment}'
+        return result
 
     def filestorage_link(self, path: str) -> str | None:
         """ Takes the given filestorage path and returns an url if the path
@@ -883,6 +892,26 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ Returns the chameleon template loader. """
         registry = self.app.config.template_engine_registry
         return registry._template_loaders['.pt']
+
+    @property
+    def analytics_provider(self) -> AnalyticsProvider | None:
+        """ Returns the active analytics provider. """
+        return None
+
+    @property
+    def analytics_code(self) -> Markup | None:
+        """ Return the embeddable code for the active analytics provider. """
+        provider = self.analytics_provider
+        if provider is None:
+            return None
+
+        return provider.code(self)
+
+    def require_unsafe_eval(self) -> None:
+        # FIXME: We currently use some intercooler features in some views
+        #        that require unsafe-eval, we should try to get rid of them
+        #        by writing some custom JavaScript handlers (ic-on-XXX).
+        self.content_security_policy.script_src.add(UNSAFE_EVAL)
 
     # NOTE: We override this so we pass an instance of ourselves
     #       to resolve_model, rather than a base Request instance

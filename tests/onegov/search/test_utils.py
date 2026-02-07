@@ -3,7 +3,7 @@ from __future__ import annotations
 from onegov.search import ORMSearchable, Searchable, SearchableContent
 from onegov.search import utils
 from sqlalchemy import Column, Integer, Text
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.orm import declarative_base, declared_attr  # type: ignore[attr-defined]
 
 
 from typing import Any, TYPE_CHECKING
@@ -97,7 +97,7 @@ def test_get_polymorphic_base() -> None:
         type: Column[str] = Column(
             Text, nullable=False, default=lambda: 'type')
 
-        @declared_attr
+        @declared_attr  # type: ignore[untyped-decorator]
         def __mapper_args__(cls) -> dict[str, Any]:
             return {
                 'polymorphic_on': 'type',
@@ -128,7 +128,7 @@ def test_get_polymorphic_base() -> None:
         type: Column[str] = Column(
             Text, nullable=False, default=lambda: 'generic')
 
-        @declared_attr
+        @declared_attr  # type: ignore[untyped-decorator]
         def __mapper_args__(cls) -> dict[str, Any]:
             return {
                 'polymorphic_on': cls.type,

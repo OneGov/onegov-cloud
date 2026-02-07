@@ -416,8 +416,9 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     minimum_price_total: dict_property[float | None] = meta_property()
     payment_method: dict_property[PaymentMethod | None] = meta_property()
 
-    search_widget_config: dict_property[dict[str, Any] | None]
-    search_widget_config = content_property()
+    search_widget_config: dict_property[dict[str, Any] | None] = (
+        content_property()
+    )
 
     marker_icon: dict_property[str | None] = content_property()
     marker_color: dict_property[str | None] = content_property()
@@ -546,7 +547,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
             set_committed_value(  # type: ignore[unreachable]
                 self,
                 'directory',
-                session.query(ExtendedDirectory).get(self.directory_id)
+                session.get(ExtendedDirectory, self.directory_id)
             )
 
     @property

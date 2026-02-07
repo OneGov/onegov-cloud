@@ -44,9 +44,9 @@
                     <p i18n:translate="">No files uploaded yet</p>
                 </tal:b>
 
-                <table tal:condition="count" class="files">
-                    <tbody>
-                        <tal:b repeat="(group, files) grouped">
+                <tal:b tal:condition="count">
+                    <table class="files" tal:repeat="(group, files) grouped">
+                        <thead>
                             <tr>
                                 <th>
                                     <span tal:condition="model.order_by == 'name'">
@@ -84,15 +84,14 @@
                                     </a>
                                 </th>
                             </tr>
+                        </thead>
 
-                            <tal:b tal:repeat="file files">
-                                <tal:b metal:use-macro="layout.macros.file_info" />
-                            </tal:b>
-
-                            <tr tal:condition="len(files) % 2 == 0" style="height: 0;"></tr>
-                        </tal:b>
-                    </tbody>
-                </table>
+                        <tbody tal:repeat="file files">
+                            <tr style="height: 0;"></tr>
+                            <tal:b metal:use-macro="layout.macros.file_info" />
+                        </tbody>
+                    </table>
+                </tal:b>
             </div>
         </div>
     </tal:b>

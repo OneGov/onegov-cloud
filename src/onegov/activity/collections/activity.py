@@ -374,6 +374,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
         now = utcnow()
 
+        filters_applied = False
         if self.filter.timelines:
             conditions = []
 
@@ -392,20 +393,25 @@ class ActivityCollection(RangedPagination[ActivityT]):
             # when we apply the occasion conditions to the activites query
             # since we'd be looking for activities without occasions
             if conditions:
+                filters_applied = True
                 o = o.filter(or_(*conditions))
 
         if self.filter.volunteers:
+            filters_applied = True
             o = o.filter(Occasion.seeking_volunteers.in_(
                 self.filter.volunteers))
 
         if self.filter.period_ids:
+            filters_applied = True
             o = o.filter(Occasion.period_id.in_(self.filter.period_ids))
 
         if self.filter.durations:
+            filters_applied = True
             o = o.filter(Occasion.duration.in_(
                 int(d) for d in self.filter.durations))
 
         if self.filter.age_ranges:
+            filters_applied = True
             o = o.filter(or_(
                 *(
                     Occasion.age.overlaps(  # type:ignore[attr-defined]
@@ -415,6 +421,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
             ))
 
         if self.filter.price_ranges:
+            filters_applied = True
             o = o.join(BookingPeriod)
             o = o.filter(or_(
                 *(
@@ -426,6 +433,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
             ))
 
         if self.filter.dateranges:
+            filters_applied = True
             o = o.filter(Occasion.active_days.op('&&')(array(  # type:ignore
                 tuple(
                     dt.toordinal()
@@ -435,11 +443,13 @@ class ActivityCollection(RangedPagination[ActivityT]):
             )
 
         if self.filter.weekdays:
+            filters_applied = True
             o = o.filter(
                 Occasion.weekdays.op('<@')(array(  # type:ignore[call-overload]
                     self.filter.weekdays)))
 
         if self.filter.available:
+            filters_applied = True
             conditions = []
 
             for amount in self.filter.available:
@@ -456,8 +466,8 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
         # if no filter was applied to the occasion subquery, we ignore it since
         # we would otherwise get zero results
-        if o._criterion is not None:
-            query = query.filter(model_class.id.in_(o.subquery()))
+        if filters_applied:
+            query = query.filter(model_class.id.in_(o.scalar_subquery()))
 
         return query.order_by(self.model_class.order)
 
@@ -505,10 +515,10 @@ class ActivityCollection(RangedPagination[ActivityT]):
         base = self.query_base().with_entities(
             func.skeys(self.model_class._tags).label('keys'))
 
-        query = select([func.array_agg(column('keys'))], distinct=True)
+        query = select(func.array_agg(column('keys')))
         query = query.select_from(base.subquery())
 
-        tags = self.session.execute(query).scalar()
+        tags = self.session.execute(query.distinct()).scalar()
 
         return set(tags) if tags else set()
 

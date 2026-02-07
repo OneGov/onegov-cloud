@@ -20,7 +20,8 @@ from onegov.form.errors import (
     InvalidIndentSyntax,
     EmptyFieldsetError,
     InvalidCommentIndentSyntax,
-    InvalidCommentLocationSyntax
+    InvalidCommentLocationSyntax,
+    RequiredFieldAddedError
 )
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
@@ -32,6 +33,7 @@ from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import HostnameValidation
 from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import StopValidation
@@ -387,6 +389,17 @@ class ValidFormDefinition:
         except AttributeError as exception:
             raise ValidationError(
                 field.gettext(self.message)
+            ) from exception
+        except RequiredFieldAddedError as exception:
+            message = _(
+                '${fields}: New fields cannot be required initially. '
+                'Require them in a separate migration step.', mapping={
+                    'fields': ', '.join(f'"{f}"' for f in
+                                        exception.field_names)
+                }
+            )
+            raise ValidationError(
+                field.gettext(message)
             ) from exception
 
         if self.require_email_field:
@@ -817,3 +830,20 @@ class ValidDateRange:
             raise ValidationError(
                 field.gettext(self.message).format(date=max_str)
             )
+
+
+class ValidHostname(HostnameValidation):
+    """ Makes sure the given input is a valid hostname.
+
+    Expects an :class:`wtforms.StringField` instance.
+
+    """
+
+    message = _('Not a valid domain.')
+
+    def __call__(self, form: Form, field: Field) -> None:  # type: ignore[override]
+        if not field.data:
+            return
+
+        if not super().__call__(field.data):
+            raise ValidationError(self.message)

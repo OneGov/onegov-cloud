@@ -127,12 +127,13 @@ class CourseAttendee(Base, ORMSearchable):
         default=dict
     )
 
-    subscriptions: relationship[AppenderQuery[CourseSubscription]]
-    subscriptions = relationship(
-        'CourseSubscription',
-        back_populates='attendee',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
+    subscriptions: relationship[AppenderQuery[CourseSubscription]] = (
+        relationship(
+            'CourseSubscription',
+            back_populates='attendee',
+            lazy='dynamic',
+            cascade='all, delete-orphan'
+        )
     )
 
     @property
@@ -261,7 +262,7 @@ class CourseAttendee(Base, ORMSearchable):
         session = object_session(self)
         excl = session.query(CourseEvent.id).join(CourseSubscription)
         excl = excl.filter(CourseSubscription.attendee_id == self.id)
-        excl = excl.subquery('excl')
+        excl = excl.scalar_subquery()
 
         last_subscribed_event = session.query(
             CourseEvent).join(CourseSubscription).filter(

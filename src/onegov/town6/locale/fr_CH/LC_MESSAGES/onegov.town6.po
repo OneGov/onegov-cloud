@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-12-19 12:13+0100\n"
+"POT-Creation-Date: 2026-01-27 10:35+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -15,6 +15,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Lingua 3.12\n"
+
+msgid "Events"
+msgstr "Événements"
+
+msgid "Latest news"
+msgstr "Dernières nouvelles"
+
+msgid "Topics"
+msgstr "Sujets"
 
 msgid "Chats"
 msgstr "Chats"
@@ -194,9 +203,6 @@ msgstr ""
 "Saisissez une liste de catégories pour les liens d'intérêt. Chaque catégorie "
 "doit être séparée par un point-virgule. Exemple : Cat 1 texte ; Cat 2 "
 "texte ; Cat 3 texte"
-
-msgid "Events"
-msgstr "Événements"
 
 msgid "All events"
 msgstr "Tous les événements"
@@ -618,6 +624,13 @@ msgstr "Renommé :"
 
 msgid "Changed:"
 msgstr "Changé :"
+
+msgid ""
+"Please note, that data for existing entries that use the removed option will "
+"be lost."
+msgstr ""
+"Veuillez noter que les données des entrées existantes qui utilisent l'option "
+"supprimée seront perdues."
 
 msgid "Confirm"
 msgstr "Confirmer"
@@ -1094,6 +1107,9 @@ msgstr "Zoom avant/arrière"
 
 msgid "Show more"
 msgstr "Afficher plus"
+
+msgid "What are you searching for?"
+msgstr "Que recherchez-vous ?"
 
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
@@ -1632,9 +1648,6 @@ msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
 "Pour utiliser votre compte, vous aurez besoin de la Yubikey avec le numéro "
 "de série ${number}"
-
-msgid "Latest news"
-msgstr "Dernières nouvelles"
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "

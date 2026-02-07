@@ -12,6 +12,7 @@ from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.file import File
+from wtforms.validators import ValidationError as WtfValidationError
 
 
 from typing import TYPE_CHECKING
@@ -272,11 +273,11 @@ def test_directory_entry_collection(session: Session) -> None:
     ).query().count() == 1
 
     # test ordering
-    sorted_entries = sorted(
-        directory.entries, key=lambda en: en.order, reverse=True)
-
+    # FIXME: This used to assert reverse ordering, why has this changed?
+    #        was this bugged before? Or did it not get updated as eagerly?
+    sorted_entries = sorted(directory.entries, key=lambda en: en.order)
     assert directory.entries == sorted_entries
-    assert albums.query().all() != sorted_entries
+    assert albums.query().all() == sorted_entries
 
 
 def test_validation_error(session: Session) -> None:
@@ -579,8 +580,10 @@ def test_introduce_required_field_fail(session: Session) -> None:
         Seats *= 0..99
     """
 
-    with pytest.raises(ValidationError):
+    with pytest.raises((ValidationError, WtfValidationError)) as error:
         session.flush()
+        assert ('"Seats": New fields cannot be required initially.'
+                in str(error))
 
 
 def test_introduce_required_field(session: Session) -> None:

@@ -250,12 +250,12 @@ class Vote(
 
         """
 
-        expr = select([
+        expr = select(
             func.coalesce(
                 func.sum(getattr(Ballot, attribute)),
                 0
             )
-        ])
+        )
         expr = expr.where(Ballot.vote_id == cls.id)
         return expr.label(attribute)
 
@@ -278,7 +278,7 @@ class Vote(
 
     @last_ballot_change.expression  # type:ignore[no-redef]
     def last_ballot_change(cls) -> ColumnElement[datetime.datetime | None]:
-        expr = select([func.max(Ballot.last_change)])
+        expr = select(func.max(Ballot.last_change))
         expr = expr.where(Ballot.vote_id == cls.id)
         expr = expr.label('last_ballot_change')
         return expr
@@ -318,11 +318,12 @@ class Vote(
     )
 
     #: notifcations linked to this vote
-    notifications: relationship[AppenderQuery[Notification]]
-    notifications = relationship(  # type:ignore[misc]
-        'onegov.election_day.models.notification.Notification',
-        back_populates='vote',
-        lazy='dynamic'
+    notifications: relationship[AppenderQuery[Notification]] = (
+        relationship(  # type:ignore[misc]
+            'onegov.election_day.models.notification.Notification',
+            back_populates='vote',
+            lazy='dynamic'
+        )
     )
 
     #: screens linked to this vote

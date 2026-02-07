@@ -108,7 +108,7 @@ class BillingCollection:
     def invoices_by_period(self) -> Query[InvoicesByPeriodRow]:
         invoices = self.invoices_by_period_query.c
 
-        query = select(invoices).where(invoices.period_id == self.period_id)
+        query = select(*invoices).where(invoices.period_id == self.period_id)
 
         if self.username:
             query = query.where(invoices.username == self.username)
@@ -286,7 +286,7 @@ class BillingCollection:
 
         # delete all existing invoices
         invoice_ids = invoices.query().with_entities(
-            BookingPeriodInvoice.id).subquery()
+            BookingPeriodInvoice.id).scalar_subquery()
 
         def delete_queries() -> Iterator[Query[Any]]:
             yield session.query(InvoiceReference).filter(
@@ -387,7 +387,7 @@ class BookingInvoiceBridge:
         """)
         self.billed_attendees = {
             r.attendee_id for r in session.execute(
-                select(stmt.c).where(stmt.c.period_id == period.id)
+                select(*stmt.c).where(stmt.c.period_id == period.id)
             )
         }
 

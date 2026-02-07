@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-12-19 12:13+0100\n"
+"POT-Creation-Date: 2026-01-27 10:35+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -191,9 +191,6 @@ msgstr ""
 "Geben Sie eine Liste von Kategorien für Interessensbindungen ein. Jede "
 "Kategorie sollte durch ein Semikolon getrennt sein. Beispiel: Kat 1 Text; "
 "Kat 2 Text; Kat 3 Text"
-
-msgid "Events"
-msgstr "Veranstaltungen"
 
 msgid "All events"
 msgstr "Alle Veranstaltungen"
@@ -614,6 +611,13 @@ msgstr "Umbenannt:"
 
 msgid "Changed:"
 msgstr "Verändert:"
+
+msgid ""
+"Please note, that data for existing entries that use the removed option will "
+"be lost."
+msgstr ""
+"Bitte beachten Sie, dass Daten für bestehende Einträge, die die entfernte "
+"Option verwenden, verloren gehen."
 
 msgid "Confirm"
 msgstr "Bestätigen"
@@ -1092,6 +1096,9 @@ msgstr "Zoom"
 
 msgid "Show more"
 msgstr "Mehr anzeigen"
+
+msgid "What are you searching for?"
+msgstr "Wonach suchen Sie?"
 
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
@@ -1632,9 +1639,6 @@ msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
 "Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer "
 "${number}"
-
-msgid "Latest news"
-msgstr "Aktuelles"
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "

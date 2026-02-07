@@ -30,20 +30,19 @@ from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.layout import NewsletterLayout
 from onegov.org.layout import RecipientLayout
+from onegov.org.models import Clipboard
 from onegov.org.models import News
 from onegov.org.models import PublicationCollection
-from onegov.org.utils import ORDERED_ACCESS, \
-    extract_categories_and_subcategories
+from onegov.org.utils import extract_categories_and_subcategories
+from onegov.org.utils import ORDERED_ACCESS
+from onegov.org.views.utils import show_tags, show_filters
 from sedate import utcnow
-from sqlalchemy import desc
 from sqlalchemy.orm import undefer
 from string import Template
 from webob.exc import HTTPNotFound
 
-from onegov.org.views.utils import show_tags, show_filters
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.types import EmailJsonDict, RenderData
@@ -60,18 +59,27 @@ def get_newsletter_form(
 
     news = request.session.query(News)
     news = news.filter(News.parent != None)
-    news = news.order_by(desc(News.created))
-    news = news.options(undefer('created'))
+    news = news.order_by(News.created.desc())
+    news = news.options(undefer(News.created))
     form = form.with_news(request, news)
 
     publications = PublicationCollection(request.session).query()
-    publications = publications.order_by(desc(File.created))
+    publications = publications.order_by(File.created.desc())
     form = form.with_publications(request, publications)
 
     occurrences = OccurrenceCollection(request.session).query()
-    occurrences = OccurrenceCollection(request.session).query()
-    occurrences = occurrences.order_by(
-        Occurrence.start, Occurrence.title
+    occurrences = occurrences.order_by(None).order_by(
+        Occurrence.start, Occurrence.title, Occurrence.event_id
+    )
+    # FIXME: Upgrading to SQLALchemy 1.4 revealed a bug here, it used to just
+    #        be distinct on `Occurrence.event_id`, but DISTINCT ON can't start
+    #        with different columns than ORDER BY, so previously SQLAlchemy
+    #        probably automatically corrected the DISTINCT ON, so it would work
+    #        it seems that there are tests that rely on every occurrence being
+    #        present, not just the next one, so it's unclear what this DISTINCT
+    #        ON accomplishes. It's possible we can get rid of it altogether.
+    occurrences = occurrences.distinct(
+        Occurrence.start, Occurrence.title, Occurrence.event_id
     )
     form = form.with_occurrences(request, occurrences)
 
@@ -116,9 +124,9 @@ def newsletter_news_by_access(
     query = request.session.query(News)
     query = query.filter(News.access.in_(access_levels))  # type: ignore
     query = query.filter(News.published == True)
-    query = query.order_by(desc(News.created))
-    query = query.options(undefer('created'))
-    query = query.options(undefer('content'))
+    query = query.order_by(News.created.desc())
+    query = query.options(undefer(News.created))
+    query = query.options(undefer(News.content))
     query = query.filter(News.id.in_(news_ids))
 
     return query.all()
@@ -138,9 +146,9 @@ def visible_news_by_newsletter(
         return None
 
     query = request.session.query(News)
-    query = query.order_by(desc(News.created))
-    query = query.options(undefer('created'))
-    query = query.options(undefer('content'))
+    query = query.order_by(News.created.desc())
+    query = query.options(undefer(News.created))
+    query = query.options(undefer(News.content))
     query = query.filter(News.id.in_(news_ids))
 
     return request.exclude_invisible(query.all())
@@ -293,7 +301,7 @@ def handle_newsletters(
 
     query = self.query()
     query = query.options(undefer(Newsletter.created))
-    query = query.order_by(desc(Newsletter.created))
+    query = query.order_by(Newsletter.created.desc())
 
     # newsletters which were not sent yet are private
     if not request.is_manager:
@@ -447,6 +455,53 @@ def handle_new_newsletter(
         'layout': layout,
         'title': _('New Newsletter'),
         'size': 'large'
+    }
+
+
+@OrgApp.form(
+    model=NewsletterCollection,
+    name='new-paste',
+    template='form.pt',
+    permission=Private,
+    form=get_newsletter_form,
+)
+def handle_paste_newsletter(
+    self: NewsletterCollection,
+    request: OrgRequest,
+    form: NewsletterForm,
+    layout: NewsletterLayout | None = None,
+) -> RenderData | Response:
+    clipboard = Clipboard.from_session(request)
+    source = clipboard.get_object()
+
+    if not isinstance(source, Newsletter):
+        request.alert(_('Invalid clipboard content'))
+        return morepath.redirect(request.link(self))
+
+    if form.submitted(request):
+        assert form.title.data is not None
+        try:
+            newsletter = self.add(title=form.title.data, html=Markup(''))
+        except AlreadyExistsError:
+            request.alert(_('A newsletter with this name already exists'))
+        else:
+            form.update_model(newsletter, request)
+            clipboard.clear()
+
+            request.success(_('Newsletter pasted successfully'))
+            return morepath.redirect(request.link(newsletter))
+    elif request.method == 'GET':
+        form.apply_model(source)
+
+    layout = layout or NewsletterLayout(self, request)
+    layout.include_editor()
+    layout.edit_mode = True
+
+    return {
+        'form': form,
+        'layout': layout,
+        'title': _('Paste Newsletter'),
+        'size': 'large',
     }
 
 

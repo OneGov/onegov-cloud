@@ -19,12 +19,15 @@ from onegov.form.display import TimezoneDateTimeFieldRenderer
 from onegov.org.models import ExtendedDirectoryEntry
 from purl import URL
 from pytz import UTC
+from textwrap import dedent
 from sedate import standardize_date, utcnow, to_timezone, replace_timezone
 from tests.shared.utils import (
     create_image, get_meta, extract_filename_from_response)
 from webtest import Upload
 
 from typing import TYPE_CHECKING
+
+
 if TYPE_CHECKING:
     from onegov.org.models import ExtendedDirectory
     from sedate.types import TzInfoOrName
@@ -884,9 +887,12 @@ def test_directory_explicitly_link_referenced_files(client: Client) -> None:
         page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
+
     pdf_url = (
         client.get('/files')
-        .pyquery('[ic-trigger-from="#button-1"]')
+        .pyquery(f'[ic-trigger-from="#button-{pdf.id}"]')
         .attr('ic-get-from')
         .removesuffix('/details')
     )
@@ -894,7 +900,6 @@ def test_directory_explicitly_link_referenced_files(client: Client) -> None:
 
     create_directory(client, text=pdf_link)
 
-    session = client.app.session()
     pdf = FileCollection(session).query().one()
     directory = (
         DirectoryCollection(session).query()
@@ -1061,3 +1066,122 @@ def test_create_directory_accordion_layout(client: Client) -> None:
     q2 = q2.form.submit().follow()
     assert question in q2
     assert answer not in q2
+
+
+def test_directory_migration(client: Client) -> None:
+    # tests changing radio and checkbox options in directory structure
+
+    client.login_admin()
+    page = (client.get('/directories').click('Verzeichnis'))
+    page.form['title'] = 'Order sweets'
+    page.form['structure'] = dedent("""
+        Nickname *= ___
+        Do you want sweets? =
+            (x) Yes
+            ( ) No
+        Choice =
+            [ ] Gummi Bear
+            [ ] Lolipop
+    """)
+    page.form['title_format'] = '[Nickname]'
+    page = page.form.submit()
+    assert not page.pyquery('.alert-box')
+
+    page = client.get('/directories/order-sweets')
+    page = page.click('Eintrag')
+    page.form['nickname'] = 'Max'
+    page.form['do_you_want_sweets_'] = 'Yes'
+    page.form['choice'] = ['Lolipop', 'Gummi Bear']
+    page = page.form.submit()
+    assert not page.pyquery('.alert-box')
+
+    # add options
+    page = client.get('/directories/order-sweets').click('Konfigurieren')
+    page.form['structure'] = dedent("""
+        Nickname *= ___
+        Do you want sweets? =
+            (x) Yes
+            ( ) No
+            ( ) Not sure
+        Choice =
+            [ ] Donut
+            [ ] Gummi Bear
+            [ ] Chocolate
+            [ ] Lolipop
+            [ ] Ice cream
+    """)
+    page = page.form.submit()
+    page.forms['main-form'].submit()  # confirm migration
+
+    # rename multiple options
+    page = client.get('/directories/order-sweets').click('Konfigurieren')
+    page.form['structure'] = dedent("""
+        Nickname *= ___
+        Do you want sweets? =
+            (x) Yes
+            ( ) No
+            ( ) Not sure
+        Choice =
+            [ ] Donut Hole
+            [ ] Gummi Bears
+            [ ] Chocolate
+            [ ] Lolipop
+            [ ] Ice cream
+    """)
+    page = page.form.submit()
+    assert page.pyquery('.alert-box')
+    assert 'Die verlangte Änderung kann nicht durchgeführt werden' in page
+    assert ('Das Umbenennen mehrerer Optionen in derselben Migration '
+            'wird nicht unterstützt') in page
+
+    # rename single options
+    page = client.get('/directories/order-sweets').click('Konfigurieren')
+    page.form['structure'] = dedent("""
+        Nickname *= ___
+        Do you want sweets? =
+            ( ) Yes
+            ( ) No
+            ( ) Not sure
+        Choice =
+            [ ] Donut Hole
+            [ ] Gummi Bear
+            [ ] Chocolate
+            [ ] Lolipop
+            [ ] Ice cream
+    """)
+    page = page.form.submit()
+    page.forms['main-form'].submit()  # confirm migration
+
+    # remove (selected) options
+    page = client.get('/directories/order-sweets').click('Konfigurieren')
+    page.form['structure'] = dedent("""
+        Nickname *= ___
+        Do you want sweets? =
+            ( ) Yes
+            ( ) No
+            ( ) Not sure
+        Choice =
+            [ ] Donut Hole
+            [ ] Chocolate
+            [ ] Ice cream
+    """)
+    page = page.form.submit()
+    page.forms['main-form'].submit()  # confirm migration
+
+    # switch checkbox -> radio which is invalid
+    page = client.get('/directories/order-sweets').click('Konfigurieren')
+    page.form['structure'] = dedent("""
+        Nickname *= ___
+        Do you want sweets? =
+            ( ) Yes
+            ( ) Not sure
+        Choice =
+            ( ) Donut Hole
+            ( ) Chocolate
+            ( ) Ice cream
+    """)
+    page = page.form.submit()
+    assert page.pyquery('.alert')
+    assert 'Die verlangte Änderung kann nicht durchgeführt' in page
+    assert ('Feld "Choice" kann nicht von Typ "checkbox" zu "radio" '
+            'konvertiert werden') in page

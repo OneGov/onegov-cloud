@@ -55,7 +55,11 @@ class DerivedAttributesMixin:
 
     @accepted.expression  # type:ignore[no-redef]
     def accepted(cls) -> ColumnElement[bool | None]:
-        return case({True: cls.yeas > cls.nays}, cls.counted)
+        return case(
+            (cls.counted.is_(False), None),
+            (cls.yeas > cls.nays, True),
+            else_=False
+        )
 
 
 class DerivedBallotsCountMixin:
@@ -90,10 +94,10 @@ class DerivedBallotsCountMixin:
     @turnout.expression  # type:ignore[no-redef]
     def turnout(cls) -> ColumnElement[float]:
         return case(
-            [(
+            (
                 cls.eligible_voters > 0,
                 cast(cls.cast_ballots, Float)
                 / cast(cls.eligible_voters, Float) * 100
-            )],
+            ),
             else_=0
         )

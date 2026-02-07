@@ -200,6 +200,16 @@ class ApiEndpoint(Generic[_M]):
         self.page = int(page) if page else page
         self.batch_size = 100
 
+    @property
+    def title(self) -> str | None:
+        """ Return a human readable title for this endpoint """
+        return None
+
+    @property
+    def description(self) -> str | None:
+        """ Return a human readable description for this endpoint """
+        return None
+
     def for_page(self, page: int | None) -> Self | None:
         """ Return a new endpoint instance with the given page while keeping
         the current filters.

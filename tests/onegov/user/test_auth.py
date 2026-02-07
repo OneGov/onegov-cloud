@@ -48,6 +48,7 @@ class DummyApp:
 
 def test_auth_login(session: Session) -> None:
     UserCollection(session).add('AzureDiamond', 'hunter2', 'irc-user')
+    session.expire_all()
     auth = Auth(DummyApp(session))  # type: ignore[arg-type]
 
     request: Any = None
@@ -330,3 +331,66 @@ def test_signup_expired(session: Session) -> None:
                 client_addr='127.0.0.1'
             )
         )
+
+
+def test_last_login_timestamp(session: Session, redis_url: str) -> None:
+
+    class App(Framework, UserApp):
+        pass
+
+    @App.identity_policy()
+    def get_identity_policy() -> IdentityPolicy:
+        return IdentityPolicy()
+
+    @App.path(path='/auth', model=Auth)
+    def get_auth() -> Auth:
+        return Auth(DummyApp(session), to='/')  # type: ignore[arg-type]
+
+    @App.view(model=Auth)
+    def view_auth(self: Auth, request: CoreRequest) -> Response | str:
+        return (
+            self.login_to(
+                request.GET['username'], request.GET['password'], request
+            )
+            or 'Error'
+        )
+
+    App.commit()
+
+    UserCollection(session).add('testuser', 'testpass', 'member')
+    transaction.commit()
+
+    app = App()
+    app.namespace = 'test'
+    app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.application_id = 'test/last-login'
+
+    client = Client(app)
+
+    user = UserCollection(session).by_username('testuser')
+    assert user is not None
+    assert user.last_login is None
+
+    before_login = utcnow()
+    response = client.get('/auth?username=testuser&password=testpass')
+    after_login = utcnow()
+
+    assert response.status_code == 302
+
+    session.expire_all()
+    user = UserCollection(session).by_username('testuser')
+    assert user is not None
+    assert user.last_login is not None
+    assert before_login <= user.last_login <= after_login
+
+    first_login = user.last_login
+    time.sleep(0.1)
+
+    response = client.get('/auth?username=testuser&password=testpass')
+    assert response.status_code == 302
+
+    session.expire_all()
+    user = UserCollection(session).by_username('testuser')
+    assert user is not None
+    assert user.last_login is not None
+    assert user.last_login > first_login

@@ -6,7 +6,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.gis.models import Coordinates, CoordinatesMixin
 from sqlalchemy import Column
 from sqlalchemy import Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 
 
 from typing import TYPE_CHECKING

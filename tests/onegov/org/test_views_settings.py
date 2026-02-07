@@ -54,11 +54,11 @@ def test_settings(client: Client) -> None:
 
     # analytics settings
     settings = client.get('/analytics-settings')
-    settings.form['analytics_code'] = '<script>alert("Hi!");</script>'
+    settings.form['analytics_provider_name'] = 'plausible'
     settings.form.submit()
 
     settings = client.get('/analytics-settings')
-    assert '<script>alert("Hi!");</script>' in settings.text
+    assert 'src="https://dummy-plausible.test/script.js"' in settings.text
 
     # header settings
     color = '#006fbb'
@@ -85,27 +85,67 @@ def test_settings(client: Client) -> None:
     settings.form['announcement_font_color'] = color
     page = settings.form.submit().follow()
     assert (
-        f'<a href="https://govikon.ch" '
-        f'style="color:{color}; font-size: 2.5rem">'
-    ) in page
+               f'<a href="https://govikon.ch" '
+               f'style="color:{color}; font-size: 2.5rem">'
+           ) in page
     assert text in page
     assert '' in page
     assert (
-        f'<div id="header_announcement" '
-        f'style="background-color: {bg_color};">'
-    ) in page
+               f'<div id="header_announcement" '
+               f'style="background-color: {bg_color};">'
+           ) in page
     assert (
-        f'<a style="color: {color}" href="https://other-town.ch"'
-    ) in page
+               f'<a style="color: {color}" href="https://other-town.ch"'
+           ) in page
 
     # module settings
     settings = client.get('/event-settings')
     assert client.app.org.event_filter_type == 'tags'
     assert settings.form['event_filter_type'].value == 'tags'
+    settings.form['event_locations'] = 'loc A, loc B'
+    page = settings.form.submit().follow()
+
+
+def test_settings_tags(client: Client) -> None:
+    client.login_admin()
+
+    settings = client.get('/event-settings')
+    settings.form.submit()
+    assert client.app.org.event_locations == []
+
+    settings = client.get('/event-settings')
+    settings.form['event_locations'] = ''
+    settings.form.submit()
+    assert client.app.org.event_locations == []
+
+    settings = client.get('/event-settings')
+    settings.form['event_locations'] = '[]'
+    settings.form.submit()
+    assert client.app.org.event_locations == ['[]']
+    settings = client.get('/event-settings')
+    assert settings.form['event_locations'].value == '[]'  # not visible on UI
+
+    settings = client.get('/event-settings')
+    settings.form['event_locations'] = '()'
+    settings.form.submit()
+    assert client.app.org.event_locations == ['()']
+    settings = client.get('/event-settings')
+    assert settings.form['event_locations'].value == '()'  # not visible on UI
+
+    settings.form['event_locations'] = 'Tag A, BBBB'
+    settings.form.submit()
+    assert client.app.org.event_locations == ['Tag A', 'BBBB']
+    settings = client.get('/event-settings')
+    assert settings.form['event_locations'].value == 'Tag A,BBBB'
+
+    settings.form['event_locations'] = ['take, this', 'ignore that']
+    settings.form.submit()
+    assert client.app.org.event_locations == ['take', 'this']
+    settings = client.get('/event-settings')
+    assert settings.form['event_locations'].value == 'take,this'
 
 
 def test_api_keys_create_and_delete(client: Client) -> None:
-
     client.login_admin()
 
     settings = client.get('/api-keys')

@@ -31,8 +31,7 @@ class ScopedPropertyObserver(sqlalchemy_utils.observer.PropertyObserver):
     """
 
     _global_observer: ClassVar[ScopedPropertyObserver]
-    _scoped_observers: ClassVar[dict[str, ScopedPropertyObserver]]
-    _scoped_observers = {}
+    _scoped_observers: ClassVar[dict[str, ScopedPropertyObserver]] = {}
 
     def __new__(cls, dotted_name: str | None) -> ScopedPropertyObserver:  # noqa: PYI034
 

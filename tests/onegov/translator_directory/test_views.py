@@ -105,15 +105,29 @@ def get_accountant_email(client: Client) -> str:
     return emails[0]
 
 
+def collect_emails(client: Client) -> list[EmailJsonDict]:
+    """Collect all emails from client and flush the queue."""
+    all_emails = []
+    for i in range(10):
+        try:
+            email = client.get_email(i)
+            if email:
+                all_emails.append(email)
+        except IndexError:
+            break
+    # client.flush_email_queue()
+    return all_emails
+
+
 def filter_emails_by_recipient(
-    emails: list['EmailJsonDict'], recipient: str
-) -> list['EmailJsonDict']:
+    emails: list[EmailJsonDict], recipient: str
+) -> list[EmailJsonDict]:
     """Filter emails to only those sent to the specified recipient."""
     return [e for e in emails if recipient in e['To']]
 
 
 def extract_ticket_link_from_email(
-    emails: list['EmailJsonDict'], recipient: str
+    emails: list[EmailJsonDict], recipient: str
 ) -> str:
     """Extract ticket link from email sent to recipient."""
     matching_emails = [e for e in emails if recipient in e['To']]
@@ -211,7 +225,7 @@ def test_view_translator(client: Client) -> None:
             dl.find('dd').text_content().strip()
             for dl in page.pyquery('dl')
         }
-        assert len(values) == 26
+        assert len(values) == 27
         assert values['Nachname'] == 'BOB'
         assert values['Vorname'] == 'Uncle'
         assert values['Personal Nr.'] == '978654'
@@ -302,8 +316,10 @@ def test_view_translator(client: Client) -> None:
     assert '978654' in page
     page = page.click('Bearbeiten')
     page.form['pers_id'] = 123456
+    page.form['contract_number'] = 'CN-123'
     page = page.form.submit().follow()
     assert '123456' in page
+    assert 'CN-123' in page
     client.logout()
 
     # edit some key attribute
@@ -321,6 +337,7 @@ def test_view_translator(client: Client) -> None:
     page.form['email'] = 'aunt.maggie@translators.com'
     page.form['iban'] = 'CH5604835012345678009'
     page.form['pers_id'] = 234567
+    page.form['contract_number'] = 'CN-456'
     page.form['admission'] = 'in_progress'
     page.form['withholding_tax'] = True
     page.form['self_employed'] = True
@@ -382,7 +399,7 @@ def test_view_translator(client: Client) -> None:
         dl.find('dd').text_content().strip()
         for dl in page.pyquery('dl')
     }
-    assert len(values) == 42
+    assert len(values) == 43
     assert values['Nachname'] == 'MAGGIE'
     assert values['Vorname'] == 'Aunt'
     assert values['AHV-Nr.'] == '756.1111.1111.13'
@@ -409,6 +426,7 @@ def test_view_translator(client: Client) -> None:
     assert values['Ort'] == 'Somecity'
     assert values['PLZ'] == '4052'
     assert values['Personal Nr.'] == '234567'
+    assert values['Vertragsnummer'] == 'CN-456'
     assert values['Quellensteuer'] == 'Ja'
     assert values['Referenzen Behörden'] == 'Kt. ZG'
     assert values['Selbständig'] == 'Ja'
@@ -2197,6 +2215,74 @@ def test_view_time_reports(client: Client) -> None:
     assert '162.75' in page
 
 
+def test_time_reports_finanzstelle_filtering(client: Client) -> None:
+    """Test that non-admin users only see reports from their finanzstelle."""
+
+    session = client.app.session()
+    translators = TranslatorCollection(client.app)
+    translator1 = translators.add(
+        first_name='Test1',
+        last_name='Translator1',
+        admission='certified',
+        email='translator1@example.org',
+    )
+    translator2 = translators.add(
+        first_name='Test2',
+        last_name='Translator2',
+        admission='certified',
+        email='translator2@example.org',
+    )
+
+    report1 = TranslatorTimeReport(
+        translator_id=translator1.id,
+        assignment_type='consecutive',
+        finanzstelle='migrationsamt',
+        duration=90,
+        case_number='CASE-001',
+        assignment_date=date(2025, 1, 15),
+        hourly_rate=Decimal('90.0'),
+        travel_compensation=Decimal('50.0'),
+        total_compensation=Decimal('162.75'),
+        status='pending',
+    )
+    report2 = TranslatorTimeReport(
+        translator_id=translator2.id,
+        assignment_type='consecutive',
+        finanzstelle='polizei',
+        duration=120,
+        case_number='CASE-002',
+        assignment_date=date(2025, 1, 16),
+        hourly_rate=Decimal('100.0'),
+        travel_compensation=Decimal('60.0'),
+        total_compensation=Decimal('200.00'),
+        status='pending',
+    )
+    session.add(report1)
+    session.add(report2)
+    session.flush()
+    transaction.commit()
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_group')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt',
+        'accountant_emails': ['accountant@example.org'],
+    }
+
+    session.add(User(
+        username='accountant@example.org',
+        password_hash=hash_password('password'),
+        role='member'
+    ))
+    transaction.commit()
+
+    client.login(username='accountant@example.org', password='password')
+    page = client.get('/time-reports')
+
+    assert '162.75' in page
+    assert '200.00' not in page
+
+
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
@@ -2232,6 +2318,7 @@ def test_time_report_workflow(
 
     page = page.click('Zeit erfassen')
     page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
     page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
@@ -2248,19 +2335,9 @@ def test_time_report_workflow(
     mail_to_submitter = client.get_email(0)
     assert 'TRANSLATOR, Test' in mail_to_submitter['Subject']
 
-    all_emails = []
-    for i in range(10):
-        try:
-            email = client.get_email(i)
-            if email:
-                all_emails.append(email)
-        except IndexError:
-            break
-    client.flush_email_queue()
-
     accountant_email = get_accountant_email(client)
     accountant_emails = filter_emails_by_recipient(
-        all_emails, accountant_email
+        collect_emails(client), accountant_email
     )
     assert len(accountant_emails) >= 1
 
@@ -2280,7 +2357,7 @@ def test_time_report_workflow(
     ticket_link = link_match.group(1)
 
     translator_emails = filter_emails_by_recipient(
-        all_emails, 'translator@example.org'
+        collect_emails(client), 'translator@example.org'
     )
     assert len(translator_emails) >= 1
     mail_to_translator = translator_emails[0]
@@ -2318,7 +2395,7 @@ def test_time_report_workflow(
     assert report.duration == 90
     assert report.hourly_rate == 90.0
     assert report.surcharge_types == ['weekend_holiday']  # Saturday
-    assert report.travel_compensation == 100.0
+    assert report.travel_compensation == Decimal('50.00')
     assert report.case_number == 'CASE-123'
     assert report.status == 'pending'
 
@@ -2404,7 +2481,18 @@ def test_time_report_workflow(
     edit_links = ticket_page.pyquery('a.edit-link')
     assert len(edit_links) == 0
 
-    mail_to_translator = client.get_email(0, flush_queue=True)
+    emails = collect_emails(client)
+    translator_emails = filter_emails_by_recipient(
+        emails, 'translator@example.org'
+    )
+    acceptance_emails = [
+        e
+        for e in translator_emails
+        if 'Zeiterfassung akzeptiert' in e['Subject']
+    ]
+    assert len(acceptance_emails) > 0
+    mail_to_translator = acceptance_emails[0]
+
     assert 'TRANSLATOR, Test' in mail_to_translator['Subject']
     assert 'translator@example.org' in mail_to_translator['To']
     assert 'Zeiterfassung akzeptiert' in mail_to_translator['Subject']
@@ -2464,6 +2552,7 @@ def test_time_report_skip_travel_calculation(
     page = page.click('Zeit erfassen')
 
     page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
     page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
@@ -2522,6 +2611,7 @@ def test_time_report_edit_toggle_skip_travel(
     page = page.click('Zeit erfassen')
 
     page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
     page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
@@ -2533,22 +2623,12 @@ def test_time_report_edit_toggle_skip_travel(
 
     translator = session.query(Translator).filter_by(id=translator_id).one()
     report = translator.time_reports[0]
-    assert report.travel_compensation == Decimal('100')
+    assert report.travel_compensation == Decimal('50')
     assert report.travel_distance == 35.0
-
-    all_emails = []
-    for i in range(10):
-        try:
-            email = client.get_email(i)
-            if email:
-                all_emails.append(email)
-        except IndexError:
-            break
-    client.flush_email_queue()
 
     accountant_email = get_accountant_email(client)
     accountant_emails = filter_emails_by_recipient(
-        all_emails, accountant_email
+        collect_emails(client), accountant_email
     )
     assert len(accountant_emails) >= 1
 
@@ -2651,6 +2731,7 @@ def test_time_report_skip_travel_ticket_html_unchanged_after_edit(
     page = page.click('Zeit erfassen')
 
     page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
     page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
@@ -2663,19 +2744,9 @@ def test_time_report_skip_travel_ticket_html_unchanged_after_edit(
 
     assert 'Zeiterfassung zur Überprüfung eingereicht' in page
 
-    all_emails = []
-    for i in range(10):
-        try:
-            email = client.get_email(i)
-            if email:
-                all_emails.append(email)
-        except IndexError:
-            break
-    client.flush_email_queue()
-
     accountant_email = get_accountant_email(client)
     ticket_link = extract_ticket_link_from_email(
-        all_emails, accountant_email
+        collect_emails(client), accountant_email
     )
 
     client.login_editor()
@@ -2740,6 +2811,7 @@ def test_time_report_workflow_self_employed(
     page = client.get(f'/translator/{translator_id}')
     page = page.click('Zeit erfassen')
     page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
     page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
@@ -2749,20 +2821,13 @@ def test_time_report_workflow_self_employed(
     page.form['is_urgent'] = False
     page.form['notes'] = 'Test notes'
     page = page.form.submit().follow()
+
     assert 'Zeiterfassung zur Überprüfung eingereicht' in page
 
-    all_emails = []
-    for i in range(10):
-        try:
-            email = client.get_email(i)
-            if email:
-                all_emails.append(email)
-        except IndexError:
-            break
-    client.flush_email_queue()
-
     accountant_email = get_accountant_email(client)
-    ticket_link = extract_ticket_link_from_email(all_emails, accountant_email)
+    ticket_link = extract_ticket_link_from_email(
+        collect_emails(client), accountant_email
+    )
 
     session = client.app.session()
     translator = session.query(Translator).filter_by(id=translator_id).one()
@@ -2782,7 +2847,18 @@ def test_time_report_workflow_self_employed(
     page = client.post(accept_url).follow()
     assert 'Zeiterfassung akzeptiert' in page
 
-    mail_to_translator = client.get_email(0, flush_queue=True)
+    emails = collect_emails(client)
+    translator_emails = filter_emails_by_recipient(
+        emails, 'self-employed@example.org'
+    )
+    acceptance_emails = [
+        e
+        for e in translator_emails
+        if 'Zeiterfassung akzeptiert' in e['Subject']
+    ]
+    assert len(acceptance_emails) > 0
+    mail_to_translator = acceptance_emails[0]
+
     assert 'MUSTER, Hans' in mail_to_translator['Subject']
     assert 'self-employed@example.org' in mail_to_translator['To']
     assert 'Zeiterfassung akzeptiert' in mail_to_translator['Subject']
@@ -2847,6 +2923,7 @@ def test_time_report_workflow_self_employed_missing_iban(
     page = client.get(f'/translator/{translator_id}')
     page = page.click('Zeit erfassen')
     page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
     page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
@@ -2856,18 +2933,10 @@ def test_time_report_workflow_self_employed_missing_iban(
     page.form['is_urgent'] = False
     page = page.form.submit().follow()
 
-    all_emails = []
-    for i in range(10):
-        try:
-            email = client.get_email(i)
-            if email:
-                all_emails.append(email)
-        except IndexError:
-            break
-    client.flush_email_queue()
-
     accountant_email = get_accountant_email(client)
-    ticket_link = extract_ticket_link_from_email(all_emails, accountant_email)
+    ticket_link = extract_ticket_link_from_email(
+        collect_emails(client), accountant_email
+    )
 
     session = client.app.session()
     translator = session.query(Translator).filter_by(id=translator_id).one()
@@ -2965,3 +3034,333 @@ def test_user_groups(client: Client) -> None:
         .all()
     )
     assert len(all_groups) == 2
+
+
+def test_time_report_telephonic_no_location(client: Client) -> None:
+    """Test that telephonic time reports have no assignment_location."""
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    ).id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='test_group')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+
+    # Side quest: verify location field is required
+    # (Pretend we forgot to set  set location (real use case))
+    page.form['assignment_type'] = 'on-site'
+    page.form['finanzstelle'] = 'polizei'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '10:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '11:30'
+    page.form['case_number'] = 'PHONE-123'
+    page.form['notes'] = 'Telephonic interpretation'
+    page = page.form.submit()
+    assert 'Bitte wählen Sie einen Standort' in page
+
+    # proceed testing
+    page.form['assignment_type'] = 'telephonic'
+    page.form['assignment_location'] = 'migrationsamt'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '10:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '11:30'
+    page.form['case_number'] = 'PHONE-123'
+    page.form['notes'] = 'Telephonic interpretation'
+    page = page.form.submit().follow()
+
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    time_report = (
+        session.query(TranslatorTimeReport)
+        .filter_by(translator_id=translator_id)
+        .first()
+    )
+    assert time_report is not None
+    assert time_report.assignment_type == 'telephonic'
+    assert time_report.assignment_location is None
+
+    accountant_email = get_accountant_email(client)
+    ticket_link = extract_ticket_link_from_email(
+        collect_emails(client), accountant_email
+    )
+
+    client.login_editor()
+    ticket_page = client.get(ticket_link)
+    ticket_page = ticket_page.click('Ticket annehmen').follow()
+    # Einsatzort should be hidden as there it has not been set
+    assert 'Einsatzort' not in ticket_page
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_delete_time_report(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    """Test that admins and accountants can delete time reports."""
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    )
+    translator_id = translator.id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'telephonic'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '10:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '11:30'
+    page.form['case_number'] = 'DELETE-TEST'
+    page = page.form.submit().follow()
+
+    time_report = (
+        session.query(TranslatorTimeReport)
+        .filter_by(translator_id=translator_id)
+        .first()
+    )
+    assert time_report is not None
+    report_id = time_report.id
+
+    client.login_member()
+    page = client.get('/time-reports')
+    assert 'Delete</a>' not in str(page)
+
+    client.login_editor()
+    page = client.get('/time-reports')
+    csrf_token_match = re.search(
+        r'\?csrf-token=([a-zA-Z0-9\._\-]+)', str(page)
+    )
+    assert csrf_token_match is not None
+    csrf_token = csrf_token_match.group(1)
+
+    response = client.delete(
+        f'/time-report/{report_id}?csrf-token={csrf_token}',
+    )
+    assert response.status_code == 200
+
+    session.expire_all()
+    time_report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
+    assert time_report is None
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_delete_time_report_admin(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    """Test that admin can delete time reports."""
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    )
+    translator_id = translator.id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='polizei')
+    user_group.meta = {
+        'finanzstelle': 'polizei',
+        'accountant_emails': ['other@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'telephonic'
+    page.form['finanzstelle'] = 'polizei'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '10:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '11:30'
+    page.form['case_number'] = 'ADMIN-DELETE'
+    page = page.form.submit().follow()
+
+    time_report = (
+        session.query(TranslatorTimeReport)
+        .filter_by(translator_id=translator_id)
+        .first()
+    )
+    assert time_report is not None
+    report_id = time_report.id
+
+    client.login_admin()
+    page = client.get('/time-reports')
+    csrf_token_match = re.search(
+        r'\?csrf-token=([a-zA-Z0-9\._\-]+)', str(page)
+    )
+    assert csrf_token_match is not None
+    csrf_token = csrf_token_match.group(1)
+
+    response = client.delete(
+        f'/time-report/{report_id}?csrf-token={csrf_token}',
+    )
+    assert response.status_code == 200
+
+    session.expire_all()
+    time_report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
+    assert time_report is None
+
+
+def test_export_time_reports(client: Client) -> None:
+    """Test exporting confirmed time reports as CSV."""
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    )
+    translator.pers_id = 12345
+    translator_id = translator.id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(
+        name='migrationsamt_und_passbuero'
+    )
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'telephonic'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '10:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '11:30'
+    page.form['case_number'] = 'EXPORT-TEST'
+    page = page.form.submit().follow()
+
+    report = (
+        session.query(TranslatorTimeReport)
+        .filter_by(translator_id=translator_id)
+        .first()
+    )
+    assert report is not None
+    report_id = report.id
+    assert report.status == 'pending'
+    assert report.exported is False
+
+    # Claim and accept the time report to confirm it
+    client.login_editor()
+    ticket = report.get_ticket(session)
+    assert ticket is not None
+    ticket_url = (
+        f'/ticket/{ticket.handler_code}/{ticket.id.hex}'
+    )
+    ticket_page = client.get(ticket_url)
+    ticket_page = ticket_page.click('Ticket annehmen').follow()
+    accept_url = ticket_page.pyquery(
+        'a.accept-link'
+    )[0].attrib['ic-post-to']
+    client.post(accept_url)
+
+    session.expire_all()
+    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
+    assert report is not None
+    assert report.status == 'confirmed'
+    assert report.exported is False
+
+    # Verify export button is shown
+    page = client.get('/time-reports')
+    assert 'TRANSLATOR, Test' in page
+    assert 'export-accounting' in page
+
+    # Extract csrf-protected export URL from ic-post-to
+    page_text = str(page)
+    export_match = re.search(
+        r'ic-post-to="([^"]*export-accounting[^"]*)"',
+        page_text,
+    )
+    assert export_match is not None, (
+        'No export intercooler link found'
+    )
+    export_url = export_match.group(1)
+
+    response = client.post(export_url)
+    assert response.headers['Content-Type'] == 'text/csv; charset=iso-8859-1'
+    assert response.content_disposition is not None
+    assert 'translator_export_' in response.content_disposition
+
+    csv_content = response.body.decode('iso-8859-1')
+    assert '12345' in csv_content
+
+    # Verify report is marked as exported with timestamp and batch id
+    session.expire_all()
+    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
+    assert report is not None
+    assert report.exported is True
+    assert report.exported_at is not None
+    assert report.export_batch_id is not None
+    batch_id = report.export_batch_id
+
+    # Default view no longer shows exported reports
+    page = client.get('/time-reports')
+    assert 'Keine Zeiterfassungen gefunden' in page
+
+    # Archive view shows exported reports
+    page = client.get('/time-reports?archive=true')
+
+    table = page.pyquery('.time-reports-list')[0].text_content()
+    assert 'Exportiert' in table
+    assert 'TRANSLATOR, Test' in table
+
+    # Batch id is preserved
+    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
+    assert report is not None
+    assert report.export_batch_id == batch_id

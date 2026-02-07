@@ -7,7 +7,7 @@
         <metal:hint use-macro="layout.macros['access_hint_long']" tal:define="item page"/>
         <tal:b metal:use-macro="layout.macros.page_content" />
     </tal:b>
-    <tal:b metal:fill-slot="after-text">
+    <tal:b metal:fill-slot="after-text" tal:condition="pdf">
         <a i18n:attributes="title" title="Download Form" class="button" href="${request.link(pdf)}"><i class="fa fa-file-pdf-o"></i> ${pdf.name}</a>
     </tal:b>
 </div>

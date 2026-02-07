@@ -8,7 +8,6 @@ from onegov.core.orm.observer import observes
 from onegov.core.orm.session_manager import SessionManager, query_schemas
 from onegov.core.orm.sql import as_selectable, as_selectable_from_path
 from sqlalchemy import event, inspect
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import Query
 from sqlalchemy_utils import TranslationHybrid
@@ -20,8 +19,12 @@ from typing import overload, Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from sqlalchemy import Column
+    from sqlalchemy.ext.declarative import declarative_base
     from sqlalchemy_utils.i18n import _TranslatableColumn
     from typing import Self
+else:
+    # TODO: Move this import back out
+    from sqlalchemy.orm import declarative_base
 
 _T = TypeVar('_T')
 

@@ -235,8 +235,9 @@ class GeneralFile(File, SearchableFile):
     fts_type_title = _('Files')
 
     #: the access of all the linked models
-    linked_accesses: dict_property[dict[str, str]]
-    linked_accesses = meta_property(default=dict)
+    linked_accesses: dict_property[dict[str, str]] = (
+        meta_property(default=dict)
+    )
 
     @property
     def access(self) -> str:
@@ -347,7 +348,7 @@ class GeneralFileCollection(
 
     @property
     def statement(self) -> Select:
-        stmt = select(self.file_list.c)
+        stmt = select(*self.file_list.c)
 
         if self.order_by == 'name':
             order = self.file_list.c.order

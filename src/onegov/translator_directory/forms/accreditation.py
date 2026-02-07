@@ -161,7 +161,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
-        validators=[ValidSwissSocialSecurityNumber(), InputRequired()],
+        validators=[ValidSwissSocialSecurityNumber(), Optional()],
         fieldset=_('Identification / Bank details'),
     )
 

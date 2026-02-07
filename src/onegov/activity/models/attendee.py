@@ -217,20 +217,21 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         cls,
         period_id: uuid.UUID
     ) -> ColumnElement[float | None]:
-        return select([
+        return select(
             # force the result to be a float instead of a decimal
             type_coerce(
                 func.sum(
-                    case([
+                    case(
                         (Booking.state == 'accepted', Booking.priority + 1),
-                    ], else_=0)
+                        else_=0
+                    )
                 ) / cast(
                     # force the division to produce a float instead of an int
                     func.sum(Booking.priority) + func.count(Booking.id), Float
                 ),
                 Numeric(asdecimal=False)
             )
-        ]).where(and_(
+        ).where(and_(
             Booking.period_id == period_id,
             Booking.attendee_id == cls.id
         )).label('happiness')

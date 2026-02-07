@@ -731,8 +731,7 @@ class TagsField(StringField):
             return
 
         values_str = valuelist[0]
-        if isinstance(values_str, str) and values_str != '[]':
-            # FIXME: Shouldn't this strip [] from the ends?
+        if isinstance(values_str, str) and values_str != '':
             values = (v.strip() for v in values_str.split(','))
             self.data = [v for v in values if v]
         else:

@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     class ResultsByDistrictRow(NamedTuple):
         name: str
         counted: bool
-        accepted: bool
+        accepted: bool | None
         yeas: int
         nays: int
         yeas_percentage: float
@@ -133,7 +133,11 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
             cast(func.coalesce(func.nullif(yeas + nays, 0), 1), Float)
         )
         nays_percentage = 100 - yeas_percentage
-        accepted = case({True: yeas > nays}, counted)
+        accepted = case(  # type: ignore[call-overload]
+            (counted.is_(False), None),
+            (yeas > nays, True),
+            else_=False
+        )
         results = session.query(BallotResult).filter(
             BallotResult.ballot_id == self.id
         ).with_entities(
@@ -166,9 +170,9 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
     @counted.expression  # type:ignore[no-redef]
     def counted(cls) -> ColumnElement[bool]:
-        expr = select([
+        expr = select(
             func.coalesce(func.bool_and(BallotResult.counted), False)
-        ])
+        )
         expr = expr.where(BallotResult.ballot_id == cls.id)
         return expr.label('counted')
 
@@ -228,12 +232,12 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
         """
 
-        expr = select([
+        expr = select(
             func.coalesce(
                 func.sum(getattr(BallotResult, attribute)),
                 0
             )
-        ])
+        )
         expr = expr.where(BallotResult.ballot_id == cls.id)
         return expr.label(attribute)
 

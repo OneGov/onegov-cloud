@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-19 12:13+0100\n"
+"POT-Creation-Date: 2026-01-27 10:35+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -14,6 +14,15 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "gengo-order-id: 7629695\n"
 "X-Generator: Poedit 3.0.1\n"
+
+msgid "Plausible"
+msgstr "Plausible"
+
+msgid "Matomo"
+msgstr "Matomo"
+
+msgid "Siteimprove"
+msgstr "Siteimprove"
 
 msgid "Important information regarding online payments"
 msgstr "Wichtige Information bezüglich Online-Zahlungen"
@@ -586,8 +595,13 @@ msgstr "Hauptansicht"
 msgid "Hide these labels on the main view"
 msgstr "Diese Feldnamen auf der Hauptansicht verstecken"
 
-msgid "Address"
-msgstr "Adresse"
+msgid "Contact Information Sidebar"
+msgstr "Kontaktinformation Seitenleiste"
+
+msgid ""
+"The contact information is displayed in the sidebar without field names."
+msgstr ""
+"Die Kontaktinformation wird in der Seitenleiste ohne Feldnamen angezeigt."
 
 msgid "Filters"
 msgstr "Filter"
@@ -704,6 +718,9 @@ msgstr "Mitteilungen"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Zusätzliche zur E-Mail benötigte Informationen des Antragstellers"
+
+msgid "Address"
+msgstr "Adresse"
 
 msgid "Phone"
 msgstr "Telefon"
@@ -2296,11 +2313,31 @@ msgstr "Swisstopo (Standard)"
 msgid "Swisstopo Aerial"
 msgstr "Swisstopo Luftbild"
 
-msgid "Analytics Code"
-msgstr "Analytics Code"
+msgid "Analytics Provider"
+msgstr "Analytics Anbieter"
 
-msgid "JavaScript for web statistics support"
-msgstr "JavaScript für Web-Statistik"
+msgid "Domain name"
+msgstr "Domainname"
+
+msgid ""
+"This should match the domain defined in plausible you may also leave this "
+"empty, in which case we will submit the domain of the current request."
+msgstr ""
+"Dies muss mit der gewählten Domain im Plausible-Dashboard übereinstimmen. "
+"Dieses Feld kann im Zweifelsfall auch leer gelassen werden, so wird jeweils "
+"der aktuelle Domainname verwendet."
+
+msgid "Matomo Site ID"
+msgstr "Matomo Site/Website/Standort ID"
+
+msgid "Siteimprove Site ID"
+msgstr "Siteimprove Site ID"
+
+msgid "Google Tag ID"
+msgstr "Google Tag ID"
+
+msgid "Not a valid Google Tag ID"
+msgstr "Keine gültige Google Tag ID"
 
 msgid "Analytics URL"
 msgstr "Analytics URL"
@@ -3462,6 +3499,9 @@ msgstr "Abonnenten"
 msgid "Test"
 msgstr "Test"
 
+msgid "Copy"
+msgstr "Kopieren"
+
 msgid "Delete newsletter"
 msgstr "Newsletter löschen"
 
@@ -3642,10 +3682,12 @@ msgid "Topic to inherit from"
 msgstr "Adresse aus diesem Thema übernehmen"
 
 msgid "Hide contact info in sidebar"
-msgstr "Kontaktinformationen in Sidebar ausblenden"
+msgstr "Kontaktinformationen in der Seitenleiste ausblenden"
 
 msgid "Show people on bottom of main page (instead of sidebar)"
-msgstr "Personen am unteren Rand der Hauptseite anzeigen (statt in Sidebar)"
+msgstr ""
+"Personen am unteren Rand der Hauptseite anzeigen (statt in in der "
+"Seitenleiste)"
 
 msgid "Select additional person"
 msgstr "Zusätzliche Person auswählen"
@@ -3691,13 +3733,13 @@ msgstr ""
 "Seitenleiste angezeigt, wenn diese Option abgewählt ist."
 
 msgid "Sidebar links"
-msgstr "Links in der Sidebar"
+msgstr "Links in der Seitenleiste"
 
 msgid "Contact link"
 msgstr "Kontaktlink"
 
 msgid "Sidebar contact"
-msgstr "Kontakt in der Sidebar"
+msgstr "Kontakt in der Seitenleiste"
 
 msgid "Please provide a URL if contact link text is set"
 msgstr "Bitte geben Sie eine URL an, wenn der Kontaktlink-Text gesetzt ist"
@@ -4133,9 +4175,6 @@ msgstr "iFrame löschen"
 msgid "Do you really want to delete the iFrame \"${title}\"?"
 msgstr "Möchten Sie wirklich das iFrame \"${title}\" löschen?"
 
-msgid "Copy"
-msgstr "Kopieren"
-
 msgid "A News cannot be pasted as Topic"
 msgstr "Eine Nachricht kann nicht als Thema eingefügt werden"
 
@@ -4349,6 +4388,13 @@ msgstr "Umbenannt:"
 
 msgid "Changed:"
 msgstr "Verändert:"
+
+msgid ""
+"Please note, that data for existing entries that use the removed option will "
+"be lost."
+msgstr ""
+"Bitte beachten Sie, dass Daten für bestehende Einträge, die die entfernte "
+"Option verwenden, verloren gehen."
 
 msgid "Confirm"
 msgstr "Bestätigen"
@@ -6054,6 +6100,9 @@ msgstr ""
 "Um die Verfügbarkeit zu löschen, müssen zuerst alle bestehenden "
 "Reservationen abgesagt werden."
 
+msgid "Blocker"
+msgstr "Sperrzeit"
+
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Es besteht bereits eine Verfügbarkeit im gewünschten Zeitraum."
 
@@ -6362,6 +6411,38 @@ msgstr "Syntaxfehler im Feld ${field_name}"
 #, python-format
 msgid "Error: Duplicate label ${label}"
 msgstr "Fehler: ${label} zweifach erfasst"
+
+msgid ""
+"Do not mix adding, removing, and renaming options in the same migration. "
+"Please use separate migrations for each option."
+msgstr ""
+"Mischen Sie nicht das Hinzufügen, Entfernen und Umbenennen von Optionen in "
+"derselben Migration. Bitte verwenden Sie für jede Option separate "
+"Migrationen."
+
+#, python-format
+msgid ""
+"${fields}: New fields cannot be required initially. Require them in a "
+"separate migration step."
+msgstr ""
+"${fields}: Neue Felder können zunächst nicht als erforderlich markiert "
+"werden. Markieren Sie diese in einem separaten Migrationsschritt als "
+"erforderlich."
+
+msgid ""
+"Renaming multiple options in the same migration is not supported. Please use "
+"separate migrations for each option."
+msgstr ""
+"Das Umbenennen mehrerer Optionen in derselben Migration wird nicht "
+"unterstützt. Bitte verwenden Sie für jede Option separate Migrationen."
+
+#, python-format
+msgid ""
+"Cannot convert field \"${field}\" from type \"${old_type}\" to "
+"\"${new_type}\"."
+msgstr ""
+"Feld \"${field}\" kann nicht von Typ \"${old_type}\" zu \"${new_type}\" "
+"konvertiert werden."
 
 msgid "The directory was deleted"
 msgstr "Das Verzeichnis wurde gelöscht"
@@ -6859,6 +6940,15 @@ msgstr "Ein neuer Newsletter wurde hinzugefügt"
 msgid "New Newsletter"
 msgstr "Neuer Newsletter"
 
+msgid "Invalid clipboard content"
+msgstr "Ungültiger Inhalt in der Zwischenablage"
+
+msgid "Newsletter pasted successfully"
+msgstr "Newsletter erfolgreich eingefügt"
+
+msgid "Paste Newsletter"
+msgstr "Newsletter einfügen"
+
 msgid "Edit Newsletter"
 msgstr "Newsletter Bearbeiten"
 
@@ -7250,8 +7340,21 @@ msgstr "Eine neue Reservation wurde hinzugefügt"
 msgid "Reservation not adjustable"
 msgstr "Diese Reservation ist nicht anpassbar"
 
+msgid ""
+"This reservation has already been accepted, but changes will not lead to a "
+"new confirmation e-mail so please make sure you inform the customer of the "
+"performed changes, so they have a record of it."
+msgstr ""
+"Diese Reservation wurde bereits angenommen und Änderungen führen nicht zu "
+"einem neuen Bestätigungs-Mail. Bitte stellen Sie sicher, dass der Kunde über "
+"diese Änderung informiert wird, z.B. via send der Terminübersicht oder einer "
+"Nachricht."
+
 msgid "Adjust reservation"
 msgstr "Reservation Anpassen"
+
+msgid "Cannot move reservation into the past"
+msgstr "Eine Reservation kann nicht in die Vergangenheit verschoben werden"
 
 msgid "The reservation was adjusted"
 msgstr "Die Reservation wurde angepasst"
@@ -7261,6 +7364,15 @@ msgstr "Die Reservation ist unverändert geblieben"
 
 msgid "There are no future reservations"
 msgstr "Es gibt keine zukünftige Reservationen"
+
+msgid "Blocker not adjustable"
+msgstr "Diese Sperrzeit kann nicht angepasst werden"
+
+msgid "Cannot move blocker into the past"
+msgstr "Eine Sperrzeit kann nicht in die Vergangenheit verschoben werden"
+
+msgid "Blocker no longer exists"
+msgstr "Diese Sperrzeit existiert nicht mehr"
 
 msgid "Added a new daypass"
 msgstr "Eine neue Tageskarte wurde hinzugefügt"

@@ -59,7 +59,7 @@ class MissionReportFileCollection(BaseImageFileCollection[MissionReportFile]):
             self.session.query(table)
                 .with_entities(table.c.missionreportfile_id)
                 .filter(table.c.mission_reports_id == self.report.id)
-                .subquery()
+                .scalar_subquery()
         ))
 
         return query

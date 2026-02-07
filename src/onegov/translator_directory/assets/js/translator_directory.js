@@ -21,4 +21,16 @@ function moveMailTemplateButtonToEnd() {
 
 document.addEventListener("DOMContentLoaded", function() {
     moveMailTemplateButtonToEnd();
+
+    // Auto-set end date to match start date in time report form for convenience while typing
+    const startDateField = document.querySelector(
+        'input[name="start_date"]'
+    );
+    const endDateField = document.querySelector('input[name="end_date"]');
+
+    if (startDateField && endDateField) {
+        startDateField.addEventListener('change', function() {
+            endDateField.value = startDateField.value;
+        });
+    }
 });

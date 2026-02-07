@@ -194,20 +194,22 @@ class PoliticalBusiness(
     entry_date: Column[date | None] = Column(Date, nullable=True)
 
     #: may have participants (Verfasser/Beteiligte) depending on the type
-    participants: relationship[list[PoliticalBusinessParticipation]]
-    participants = relationship(
-        'PoliticalBusinessParticipation',
-        back_populates='political_business',
-        order_by='desc(PoliticalBusinessParticipation.participant_type)',
+    participants: relationship[list[PoliticalBusinessParticipation]] = (
+        relationship(
+            'PoliticalBusinessParticipation',
+            back_populates='political_business',
+            order_by='desc(PoliticalBusinessParticipation.participant_type)',
+        )
     )
 
     #: parliamentary groups (Fraktionen)
-    parliamentary_groups: relationship[list[RISParliamentaryGroup]]
-    parliamentary_groups = relationship(
-        'RISParliamentaryGroup',
-        secondary=par_political_business_parliamentary_groups,
-        back_populates='political_businesses',
-        passive_deletes=True
+    parliamentary_groups: relationship[list[RISParliamentaryGroup]] = (
+        relationship(
+            'RISParliamentaryGroup',
+            secondary=par_political_business_parliamentary_groups,
+            back_populates='political_businesses',
+            passive_deletes=True
+        )
     )
 
     meeting_items: relationship[list[MeetingItem]] = relationship(
@@ -223,9 +225,10 @@ class PoliticalBusiness(
     def display_name(cls) -> ColumnElement[str]:
         return func.concat(
             func.coalesce(cls.number, ''),
-            case([
-                (and_(cls.number.isnot(None), cls.number != ''), ' ')
-            ], else_=''),
+            case(
+                (and_(cls.number.isnot(None), cls.number != ''), ' '),
+                else_=''
+            ),
             cls.title
         )
 
@@ -268,10 +271,11 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     )
 
     #: the related political business
-    political_business: relationship[PoliticalBusiness]
-    political_business = relationship(
-        'PoliticalBusiness',
-        back_populates='participants',
+    political_business: relationship[PoliticalBusiness] = (
+        relationship(
+            'PoliticalBusiness',
+            back_populates='participants',
+        )
     )
 
     #: the related parliamentarian
@@ -403,13 +407,10 @@ class PoliticalBusinessCollection(
     def years_for_entries(self) -> list[int]:
         """ Returns a list of years for which there are entries in the db """
 
-        years = self.session.query(
-            func.extract('year', PoliticalBusiness.entry_date).label('year')
-        ).filter(
+        year = func.extract('year', PoliticalBusiness.entry_date).label('year')
+        years = self.session.query(year).filter(
             PoliticalBusiness.entry_date.isnot(None)
-        ).distinct().order_by(
-            PoliticalBusiness.entry_date.desc()
-        )
+        ).distinct().order_by(year.desc())
 
         # convert to a list of integers, remove duplicates, and sort
         return sorted({int(year[0]) for year in years}, reverse=True)
@@ -429,16 +430,14 @@ class PoliticalBusinessCollection(
         """ Returns political businesses by given parliamentarian id """
         return (
             self.session.query(PoliticalBusiness)
-            .join(PoliticalBusinessParticipation)
-            .filter(
+            .filter(PoliticalBusiness.participants.any(
                 PoliticalBusinessParticipation.parliamentarian_id ==
                 parliamentarian_id
-            )
+            ))
             .order_by(
                 PoliticalBusiness.entry_date.desc(),
                 PoliticalBusiness.title
             )
-            .distinct()
         )
 
 
@@ -458,5 +457,4 @@ class PoliticalBusinessParticipationCollection(
         self,
         parliamentarian_id: uuid.UUID
     ) -> Query[PoliticalBusinessParticipation]:
-        query = super().query()
-        return query.filter_by(parliamentarian_id=parliamentarian_id)
+        return self.query().filter_by(parliamentarian_id=parliamentarian_id)

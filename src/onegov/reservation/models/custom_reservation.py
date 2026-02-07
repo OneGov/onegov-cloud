@@ -11,7 +11,7 @@ from sqlalchemy.orm import object_session
 
 
 class CustomReservation(Reservation, ModelBase, Payable):
-    __mapper_args__ = {'polymorphic_identity': 'custom'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'custom'}
 
     @property
     def allocation_obj(self) -> Allocation | None:
@@ -41,9 +41,6 @@ class CustomReservation(Reservation, ModelBase, Payable):
 
         """
         if self.display_start() < utcnow():
-            return False
-
-        if self.data and self.data.get('accepted'):
             return False
 
         return object_session(self).query(

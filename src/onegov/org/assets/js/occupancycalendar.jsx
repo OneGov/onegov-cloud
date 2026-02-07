@@ -27,6 +27,25 @@ oc.defaultOptions = {
     editable: false,
 
     /*
+        Url which returns all available resources in the following format:
+        {
+            'group': [
+                {
+                    'name': 'name',
+                    'title': 'title',
+                    'url': 'url'
+                }
+            ]
+        }
+    */
+    resourcesUrl: null,
+
+    /*
+        The name of the currently active resource
+    */
+    resourceActive: null,
+
+    /*
         The view shown initially
     */
     view: 'dayGridMonth',
@@ -43,6 +62,11 @@ oc.defaultOptions = {
     highlights_max: null,
 
     /*
+        Base url for calculating the stats for the current date range
+    */
+    stats_url: null,
+
+    /*
         Base url for exporting the current date range as a PDF
     */
     pdf_url: null
@@ -53,12 +77,14 @@ oc.events = [
     'oc-reservations-changed'
 ];
 
-oc.passEventsToCalendar = function(calendar, target) {
-    var cal = $(calendar);
+oc.overlappingEvents = {};
 
+oc.popupOpen = false;
+
+oc.passEventsToCalendar = function(calendar, target) {
     _.each(oc.events, function(eventName) {
         target.on(eventName, _.debounce(function(_e, data) {
-            cal.trigger(eventName, [data, calendar]);
+            $(window).trigger(eventName, [data, calendar]);
         }));
     });
 };
@@ -77,7 +103,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
             snapDuration: '00:15',
             editable: ocOptions.editable,
             eventResizableFromStart: ocOptions.editable,
-            selectable: false,
+            selectable: ocOptions.editable,
             initialView: ocOptions.view,
             locale: window.locale.language,
             multiMonthMaxColumns: 1
@@ -143,21 +169,84 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
 
     // implements editing
     if (ocOptions.editable) {
+        // add blockers on selection
+        fcOptions.selectMirror = true;
+        fcOptions.unselectCancel = '.popup';
+        fcOptions.selectOverlap = function(event) {
+            if (event.display === 'background') {
+                oc.overlappingEvents[event.id] = event;
+                return true;
+            } else {
+                oc.overlappingEvents = {};
+                return false;
+            }
+        };
+        fcOptions.selectAllow = function(info) {
+            // we only know what to do if we overlap a single valid allocation
+            // we only allow to add blockers in the future
+            var keys = Object.keys(oc.overlappingEvents);
+            if (
+                keys.length === 1
+                && oc.overlappingEvents[keys[0]].extendedProps.blockable
+                && oc.overlappingEvents[keys[0]].extendedProps.blockurl
+                && info.start >= Date.now()
+            ) {
+                return true;
+            } else {
+                oc.overlappingEvents = {};
+                return false;
+            }
+        }
+        // add blockers on selection
+        fcOptions.select = function(info) {
+            if (oc.popupOpen) {
+                return;
+            }
+            var keys = Object.keys(oc.overlappingEvents);
+            if (keys.length !== 1) {
+                // this shouldn't happen, but when it does just cancel
+                oc.overlappingEvents = {};
+                info.view.calendar.unselect();
+                return;
+            }
+            var event = oc.overlappingEvents[keys[0]];
+            oc.overlappingEvents = {};
+            var view = info.view;
+            var start = moment(info.start);
+            var end = moment(info.end);
+            var wholeDay = false;
+            if (view.type === "dayGridMonth" || view.type === "multiMonthYear") {
+                end = end.subtract(1, 'days');
+                wholeDay = true;
+            }
+            oc.showBlockerPopup(view.calendar, $(view.calendar.el).find('.event-' + event.id).get(0) || view.calendar.el, start, end, wholeDay, event);
+        }
 
+        // edit blocker reason on click
+        fcOptions.eventClick = function(info) {
+            if (info.event.extendedProps.kind !== 'blocker') {
+                return;
+            }
+            if (!info.event.extendedProps.seturl) {
+                return;
+            }
+            oc.showBlockerEditPopup(info.view.calendar, info.el, info.event);
+        };
+
+        // edit events on drag&drop, resize
         fcOptions.eventOverlap = function(stillEvent, _movingEvent) {
             return stillEvent.display === 'background';
         };
 
-        // edit events on drag&drop, resize
         fcOptions.eventDrop = fcOptions.eventResize = function(info) {
             var event = info.event;
             var url = new Url(event.extendedProps.editurl);
             url.query.start = event.startStr;
             url.query.end = event.endStr;
-            var calendar = $(info.el).closest('.fc');
+            var calendar = $(info.el).closest('.fc').get(0) || $('.fc').get(0);
             oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {
                 info.revert();
-                oc.showErrorPopup(calendar, calendar.find('.event-' + event.id), str);
+                oc.showErrorPopup(info.view.calendar, $(calendar).find('.event-' + event.id), str);
             });
         };
 
@@ -170,12 +259,26 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
     // after event rendering
     options.eventRenderers.push(oc.highlightEvents);
     options.eventRenderers.push(oc.addEventBackground);
+    options.eventRenderers.push(oc.addDeleteBlockerHandler);
+
+    // add id to class names so we can easily find the element
+    fcOptions.eventClassNames = function(info) {
+        return 'event-' + info.event.id;
+    }
 
     // render additional content lines
     fcOptions.eventContent = function(info, h) {
         var event = info.event;
         if (event.display === 'background') {
             return null;
+        }
+        if (event.extendedProps.kind === 'blocker') {
+            return h('div', {title: event.title}, [
+                event.title,
+                h('div', {class: 'delete-blocker', title: locale('Delete')}, [
+                    h('i', {class: 'fa fas fa-times'})
+                ])
+            ]);
         }
         var lines = event.title.split('\n');
         var attrs = {class: 'fc-title'};
@@ -210,12 +313,45 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         for (var i = 0; i < renderers.length; i++) {
             renderers[i](info.view, $(info.el));
         }
-        oc.setupViewNavigation(info.view.calendar, $(info.view.calendar.el), views, ocOptions.pdf_url);
+        oc.setupViewNavigation(info.view.calendar, $(info.view.calendar.el), views, ocOptions.stats_url, ocOptions.pdf_url);
         return null;
     };
 
+    fcOptions.eventsSet = function(events) {
+        // expand visible range if necessary
+        var minTime = ocOptions.minTime;
+        var maxTime = ocOptions.maxTime;
+        var changed = false;
+        for (var i = 0; i < events.length; i++) {
+            var event = events[i];
+            // snap to the start of the hour
+            var start = moment(event.start).startOf('hour').format('HH:mm');
+            if (start < minTime) {
+                minTime = start;
+                changed = true;
+            }
+            // snap to the start of the next hour
+            // unless the event ends on the hour
+            var end = moment(event.end);
+            end = end.minutes() === 0 ? end.format('HH:mm') : end.startOf('hour').add(1, 'hour').format('HH:mm');
+            end = end == '00:00' ? '24:00' : end;
+            if (end > maxTime) {
+                maxTime = end;
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            this.setOption('slotMinTime', minTime);
+            this.setOption('slotMaxTime', maxTime);
+        }
+    }
+
     // history handling
     oc.setupHistory(options);
+
+    // resource switching mechanism
+    oc.setupResourceSwitch(options, ocOptions.resourcesUrl, ocOptions.resourceActive);
 
     // setup allocation refresh handling
     options.afterSetup.push(oc.setupReservationsRefetch);
@@ -299,7 +435,7 @@ oc.getGranularity = function(view_name) {
     return view_name.toLowerCase();
 };
 
-oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
+oc.setupViewNavigation = function(calendar, element, views, stats_url, pdf_url) {
     var chunk = $(element).find('.fc-header-toolbar .fc-toolbar-chunk:last-child');
     var i18n = calendar.currentData.availableRawLocales[calendar.getOption('locale')];
     var granularity_group = $('<div class="fc-button-group"></div>');
@@ -386,9 +522,12 @@ oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
             var wrapper = $('<div class="reservation-actions">');
             var form = $('<div class="reservation-form">').appendTo(wrapper);
 
-            oc.PDFExportForm.render(
+            oc.ExportForm.render(
                 form.get(0),
                 calendar,
+                true,
+                locale("Export as PDF"),
+                locale("Download"),
                 function(state) {
                     var url = new Url(pdf_url || '/');
                     url.query.start = state.start;
@@ -397,11 +536,11 @@ oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
                         url.query.accepted = '1';
                     }
                     window.location = url.toString();
-                    pdf_btn.popup('hide');
+                    $(this).closest('.popup').popup('hide');
                 }
             );
 
-            rc.showPopup(calendar, pdf_btn, wrapper);
+            oc.showPopup(calendar, pdf_btn, wrapper);
         });
 
         pdf_btn.appendTo(view_group);
@@ -413,6 +552,58 @@ oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
     // append our groups
     granularity_group.appendTo(chunk);
     view_group.appendTo(chunk);
+
+    if (stats_url) {
+        var stats_btn = $('<button class="fc-button fc-button-primary"></button');
+        stats_btn.attr('aria-pressed', 'false');
+        stats_btn.html('<span class="fa fa-bar-chart fa-chart-bar"></span>');
+        stats_btn.attr('title', locale("Utilization"));
+        stats_btn.click(function() {
+            var wrapper = $('<div class="reservation-actions">');
+            var form = $('<div class="reservation-form">').appendTo(wrapper);
+            var lang = document.documentElement.getAttribute('lang') || 'en';
+
+            oc.ExportForm.render(
+                form.get(0),
+                calendar,
+                false,
+                locale("Utilization"),
+                locale("Select"),
+                function(state) {
+                    var url = new Url(stats_url || '/');
+                    url.query.start = state.start;
+                    url.query.end = state.end;
+                    $(this).closest('.popup').popup('hide');
+                    $.ajax(url.toString()).done(function(data) {
+                        var wrapper = $('<div class="reservation-actions">');
+                        ReactDOM.render(
+                            (
+                            <div>
+                                <h3>{locale("Reservations")}</h3>
+                                <p>{data.range}</p>
+                                <h3>{locale("Count")}</h3>
+                                <p>{data.count} {data.pending && (
+                                    <span>({data.pending} {locale("pending approval")})</span>
+                                )}</p>
+                                <h3>{locale("Utilization")}</h3>
+                                <p>{data.utilization.toLocaleString(lang, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}%</p>
+                            </div>
+                            ),
+                            wrapper.get(0)
+                        );
+                        oc.showPopup(calendar, stats_btn, wrapper);
+                    });
+                }
+            );
+
+            oc.showPopup(calendar, stats_btn, wrapper);
+        });
+
+        stats_btn.appendTo(chunk);
+    }
 };
 
 // highlight events implementation
@@ -431,7 +622,7 @@ oc.highlightEvents = function(event, element, view) {
 
 // adds a fc-bg div to the views where we need it
 oc.addEventBackground = function(event, element, view) {
-    if (event.display === 'background') {
+    if (event.extendedProps.kind !== 'reservation') {
         return;
     }
 
@@ -441,9 +632,29 @@ oc.addEventBackground = function(event, element, view) {
     $('<div class="fc-bg"></div>').insertAfter($('.fc-content', element));
 };
 
+// adds a click handler to the delete button
+oc.addDeleteBlockerHandler = function(event, element, view) {
+    if (event.extendedProps.kind !== 'blocker' || !event.extendedProps.deleteurl) {
+        return;
+    }
+
+    $(element).find('.delete-blocker').click(function(ev) {
+        ev.stopPropagation();
+        $.ajax(
+            event.extendedProps.deleteurl,
+            {method: 'DELETE'}
+        ).done(function() {
+            view.calendar.refetchEvents();
+        }).fail(function() {
+            oc.showErrorPopup(view.calendar, element, locale('Failed to delete'));
+        });
+    });
+};
+
 oc.setupReservationsRefetch = function(calendar) {
     $(window).on('oc-reservations-changed', function() {
         calendar.refetchEvents();
+        calendar.unselect();
     });
 };
 
@@ -479,6 +690,82 @@ oc.post = function(calendar, url, onerror) {
     oc.request(calendar, url, 'ic-post-to', onerror);
 };
 
+oc.add_blocker = function(calendar, event, url, start, end, reason, wholeDay) {
+    url = new Url(url);
+    url.query.start = start;
+    url.query.end = end;
+    url.query.reason = reason;
+    url.query.whole_day = wholeDay && '1' || '0';
+
+    oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {
+        oc.showErrorPopup(calendar, $('.event-' + event.id), str);
+    });
+};
+
+oc.edit_blocker = function(calendar, event, url, reason) {
+    url = new Url(url);
+    url.query.reason = reason;
+
+    oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {
+        oc.showErrorPopup(calendar, $('.event-' + event.id), str);
+    });
+};
+
+// popup handler implementation
+oc.showBlockerPopup = function(calendar, element, start, end, wholeDay, event) {
+    var wrapper = $('<div class="reservation-actions">');
+    var form = $('<div class="reservation-form">').appendTo(wrapper);
+
+    // Render the blocker form
+    var form = oc.BlockerForm.render(
+        calendar,
+        form.get(0),
+        start,
+        end,
+        wholeDay,
+        event,
+        function(state) {
+            oc.targetEvent = $(element);
+            oc.add_blocker(
+                calendar,
+                event,
+                event.extendedProps.blockurl,
+                state.start,
+                state.end,
+                state.reason,
+                state.wholeDay
+            );
+            $(this).closest('.popup').popup('hide');
+        }
+    );
+
+    oc.showPopup(calendar, element, wrapper);
+    setTimeout(form.updateSelection, 100);
+};
+
+oc.showBlockerEditPopup = function(calendar, element, event) {
+    var wrapper = $('<div class="reservation-actions">');
+    var form = $('<div class="reservation-form">').appendTo(wrapper);
+
+    // Render the blocker form
+    oc.BlockerEditForm.render(
+        form.get(0),
+        event,
+        function(state) {
+            oc.targetEvent = $(element);
+            oc.edit_blocker(
+                calendar,
+                event,
+                event.extendedProps.seturl,
+                state.reason,
+            );
+            $(this).closest('.popup').popup('hide');
+        }
+    );
+
+    oc.showPopup(calendar, element, wrapper);
+};
+
 oc.showErrorPopup = function(calendar, element, message) {
     oc.showPopup(calendar, element, message, 'top', ['error']);
 };
@@ -492,13 +779,16 @@ oc.showPopup = function(calendar, element, content, position, extraClasses) {
         tooltipanchor: element,
         type: 'tooltip',
         onopen: function() {
+            oc.popupOpen = true;
             oc.onPopupOpen.call(this, calendar);
             setTimeout(function() {
                 $(window).trigger('resize');
             }, 0);
         },
         onclose: function() {
+            oc.popupOpen = false;
             $(element).closest('.fc-event').removeClass('has-popup');
+            calendar.unselect();
         },
         closebutton: true,
         closebuttonmarkup: '<a href="#" class="close">×</a>'
@@ -534,7 +824,7 @@ oc.onPopupOpen = function(calendar) {
 
     var links = popup.find('a:not(.internal)');
 
-    // hookup all links with intercool
+    // hookup all links with intercooler
     links.each(function(_ix, link) {
         Intercooler.processNodes($(link));
     });
@@ -633,16 +923,390 @@ oc.bustIECache = function(originalUrl) {
     return url.toString();
 };
 
+// setup the ability to switch to other resources
+oc.setupResourceSwitch = function(options, resourcesUrl, active) {
+    if (!resourcesUrl) {
+        return;
+    }
+
+    options.afterSetup.push(function(_calendar, element) {
+        var setup = function(choices) {
+            var container = $(element).find('.fc-toolbar-chunk').eq(1);
+
+            if (options.fc.headerToolbar.right === '') {
+                container.css('float', 'right');
+            }
+
+            var lookup = {};
+
+            if (Object.keys(choices).length >= 1) {
+
+                var switcher = $('<select>').append(
+                    _.map(choices, function(resources, group) {
+                        return $('<optgroup>').attr('label', group || '').append(
+                            _.map(resources, function(resource) {
+                                lookup[resource.name] = resource.url;
+
+                                return $('<option>')
+                                    .attr('value', resource.name)
+                                    .attr('selected', resource.name === active)
+                                    .text(resource.title);
+                            })
+                        );
+                    })
+                );
+
+                switcher.change(function() {
+                    var url = new Url(lookup[$(this).val()]);
+                    url.query = (new Url(window.location.href)).query;
+
+                    window.location = url;
+                });
+
+                container.append(switcher);
+            } else {
+                container.hide();
+            }
+        };
+
+        $.getJSON(resourcesUrl, setup);
+    });
+};
+
+
 /*
-    Allows to fine-adjust the date range for the PDF export.
+    Allows to fine-adjust the reservation blocker before adding it.
 */
-oc.PDFExportForm = React.createClass({
+oc.BlockerForm = React.createClass({
     getInitialState: function() {
-        return {
+        var state = {reason: null};
+        if (this.props.wholeDay && this.props.wholeDayDefault && this.props.fullyAvailable) {
+            state.start = "";
+            state.end = "";
+            state.wholeDay = true;
+        } else {
+            state.start = this.props.start.format('HH:mm');
+            state.end = this.props.end.format('HH:mm');
+            state.wholeDay = false;
+        }
+
+        state.end = state.end === '00:00' && '24:00' || state.end;
+
+        return state;
+    },
+    updateSelection: function() {
+        if (!this.isValidState()) {
+            return;
+        }
+
+        var sel = {};
+        if (!this.props.partlyAvailable) {
+            sel.start = this.props.start.toDate();
+            sel.end = this.props.end.toDate();
+        } else if (this.props.wholeDay && this.state.wholeDay) {
+            sel.start = this.props.minStart.toDate();
+            sel.end = this.props.maxEnd.toDate();
+        } else {
+            sel.start = this.parseTime(this.props.start.clone(), this.state.start).toDate();
+            sel.end = this.parseTime(this.props.end.clone(), this.state.end).toDate();
+        }
+        this.props.calendar.select(sel);
+    },
+    componentDidMount: function() {
+        var node = $(ReactDOM.findDOMNode(this));
+
+        // the timeout is set to 100ms because the popup will do its own focusing
+        // after 50ms (we could use it, but we want to focus AND select)
+        setTimeout(function() {
+            node.find('input:first').focus().select();
+        }, 100);
+    },
+    handleInputChange: function(e) {
+        var state = _.extend({}, this.state);
+        var name = e.target.getAttribute('name');
+
+        switch (name) {
+            case 'reserve-whole-day':
+                state.wholeDay = e.target.value === 'yes';
+                // setState is asynchronous so we slightly delay this
+                setTimeout(this.updateSelection, 100);
+                break;
+            case 'start':
+                state.start = e.target.value;
+                // setState is asynchronous so we slightly delay this
+                setTimeout(this.updateSelection, 100);
+                break;
+            case 'end':
+                state.end = e.target.value === '00:00' && '24:00' || e.target.value;
+                // setState is asynchronous so we slightly delay this
+                setTimeout(this.updateSelection, 100);
+                break;
+            case 'reason':
+                state.reason = e.target.value || null;
+                break;
+            default:
+                throw Error("Unknown input element: " + name);
+        }
+
+        this.setState(state);
+    },
+    handleButton: function(e) {
+        var node = ReactDOM.findDOMNode(this);
+        var self = this;
+
+        $(node).find('input').each(function(_ix, el) {
+            $(el).blur();
+        });
+
+        setTimeout(function() {
+            self.props.onSubmit.call(node, self.state);
+        }, 0);
+
+        e.preventDefault();
+    },
+    handleTimeInputFocus: function(e) {
+        if (!Modernizr.inputtypes.time) {
+            e.target.select();
+            e.preventDefault();
+        }
+    },
+    handleTimeInputMouseUp: function(e) {
+        if (!Modernizr.inputtypes.time) {
+            e.preventDefault();
+        }
+    },
+    handleTimeInputBlur: function(e) {
+        if (!Modernizr.inputtypes.time) {
+            e.target.value = OneGov.utils.inferTime(e.target.value);
+            this.handleInputChange(e);
+        }
+    },
+    parseTime: function(date, time) {
+        time = OneGov.utils.inferTime(time);
+
+        if (!time.match(/^[0-2]{1}[0-9]{1}:?[0-5]{1}[0-9]{1}$/)) {
+            return null;
+        }
+
+        var hour = parseInt(time.split(':')[0], 10);
+        var minute = parseInt(time.split(':')[1], 10);
+
+        if (hour < 0 || 24 < hour) {
+            return null;
+        }
+
+        if (minute < 0 || 60 < minute) {
+            return null;
+        }
+
+        date.hour(hour);
+        date.minute(minute);
+
+        return date;
+    },
+    isValidStart: function(start) {
+        var startdate = this.parseTime(this.props.start.clone(), start);
+        return startdate !== null && this.props.minStart <= startdate;
+    },
+    isValidEnd: function(end) {
+        var enddate = this.parseTime(this.props.start.clone(), end);
+        return enddate !== null && enddate <= this.props.maxEnd;
+    },
+    isValidState: function() {
+        if (!this.props.partlyAvailable || (this.props.wholeDay && this.state.wholeDay)) {
+            return true;
+        } else {
+            return this.isValidStart(this.state.start) && this.isValidEnd(this.state.end);
+        }
+    },
+    // eslint-disable-next-line complexity
+    render: function() {
+        var buttonEnabled = this.isValidState();
+        var showWholeDay = this.props.partlyAvailable && this.props.wholeDay;
+        var showTimeRange = this.props.partlyAvailable && (!this.props.wholeDay || !this.state.wholeDay);
+
+        return (
+            <form>
+                <h3>{locale("Blocker")}</h3>
+                {showWholeDay && (
+                    <div className="field">
+                        <span className="label-text">{locale("Whole day")}</span>
+
+                        <input id="reserve-whole-day-yes"
+                            name="reserve-whole-day"
+                            type="radio"
+                            value="yes"
+                            checked={this.state.wholeDay}
+                            onChange={this.handleInputChange}
+                        />
+                        <label htmlFor="reserve-whole-day-yes">{locale("Yes")}</label>
+                        <input id="reserve-whole-day-no"
+                            name="reserve-whole-day"
+                            type="radio"
+                            value="no"
+                            checked={!this.state.wholeDay}
+                            onChange={this.handleInputChange}
+                        />
+                        <label htmlFor="reserve-whole-day-no">{locale("No")}</label>
+                    </div>
+                )}
+
+                {showTimeRange && (
+                    <div className="field split">
+                        <div>
+                            <label htmlFor="start">{locale("From")}</label>
+                            <input name="start" type="time" size="4"
+                                defaultValue={this.state.start}
+                                onChange={this.handleInputChange}
+                                onFocus={this.handleTimeInputFocus}
+                                onMouseUp={this.handleTimeInputMouseUp}
+                                onBlur={this.handleTimeInputBlur}
+                                className={this.isValidStart(this.state.start) && 'valid' || 'invalid'}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="end">{locale("Until")}</label>
+                            <input name="end" type="time" size="4"
+                                defaultValue={this.state.end}
+                                onChange={this.handleInputChange}
+                                onFocus={this.handleTimeInputFocus}
+                                onMouseUp={this.handleTimeInputMouseUp}
+                                onBlur={this.handleTimeInputBlur}
+                                className={this.isValidEnd(this.state.end) && 'valid' || 'invalid'}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                <div className="field">
+                    <div>
+                        <label htmlFor="reason">{locale("Reason")}</label>
+                        <input name="reason" type="text" size="30"
+                            defaultValue={this.state.reason || ''}
+                            onChange={this.handleInputChange}
+                        />
+                    </div>
+                </div>
+
+                <button className={buttonEnabled && "button" || "button secondary"} disabled={!buttonEnabled} onClick={this.handleButton}>{locale("Add")}</button>
+            </form>
+        );
+
+    }
+});
+
+oc.BlockerForm.render = function(calendar, element, start, end, wholeDay, event, onSubmit) {
+
+    var partlyAvailable = event.extendedProps.partlyAvailable;
+    var fullyAvailable = event.extendedProps.fullyAvailable;
+    var minStart = moment.max(moment(event.start), moment());
+    var maxEnd = moment(event.end);
+    var wholeRange = !partlyAvailable || wholeDay;
+
+    return ReactDOM.render(
+        <oc.BlockerForm
+            calendar={calendar}
+            partlyAvailable={partlyAvailable}
+            fullyAvailable={fullyAvailable}
+            start={wholeRange && minStart || moment.max(start, minStart)}
+            end={wholeRange && maxEnd || moment.min(end, maxEnd)}
+            minStart={minStart}
+            maxEnd={maxEnd}
+            wholeDay={event.extendedProps.wholeDay}
+            wholeDayDefault={wholeDay}
+            onSubmit={onSubmit}
+        />,
+        element
+    );
+};
+
+
+/*
+    Allows to change the properties of an existing blocker.
+*/
+oc.BlockerEditForm = React.createClass({
+    getInitialState: function() {
+        return {reason: this.props.reason};
+    },
+    componentDidMount: function() {
+        var node = $(ReactDOM.findDOMNode(this));
+
+        // the timeout is set to 100ms because the popup will do its own focusing
+        // after 50ms (we could use it, but we want to focus AND select)
+        setTimeout(function() {
+            node.find('input:first').focus().select();
+        }, 100);
+    },
+    handleInputChange: function(e) {
+        var state = _.extend({}, this.state);
+        var name = e.target.getAttribute('name');
+
+        switch (name) {
+            case 'reason':
+                state.reason = e.target.value || null;
+                break;
+            default:
+                throw Error("Unknown input element: " + name);
+        }
+
+        this.setState(state);
+    },
+    handleButton: function(e) {
+        var node = ReactDOM.findDOMNode(this);
+        var self = this;
+
+        $(node).find('input').each(function(_ix, el) {
+            $(el).blur();
+        });
+
+        setTimeout(function() {
+            self.props.onSubmit.call(node, self.state);
+        }, 0);
+
+        e.preventDefault();
+    },
+    render: function() {
+        return (
+            <form>
+                <div className="field">
+                    <div>
+                        <label htmlFor="reason">{locale("Reason")}</label>
+                        <input name="reason" type="text" size="30"
+                            defaultValue={this.state.reason || ''}
+                            onChange={this.handleInputChange}
+                        />
+                    </div>
+                </div>
+
+                <button className="button" onClick={this.handleButton}>{locale("Update")}</button>
+            </form>
+        );
+
+    }
+});
+
+oc.BlockerEditForm.render = function(element, event, onSubmit) {
+    ReactDOM.render(
+        <oc.BlockerEditForm
+            reason={event.title}
+            onSubmit={onSubmit}
+        />,
+        element);
+};
+
+/*
+    Allows to fine-adjust the date range for a export.
+*/
+oc.ExportForm = React.createClass({
+    getInitialState: function() {
+        var state = {
             start: this.props.start.format('YYYY-MM-DD'),
             end: this.props.end.format('YYYY-MM-DD'),
-            accepted: true
         };
+        if (this.props.accepted) {
+            state.accepted = true;
+        }
+        return state;
     },
     componentDidMount: function() {
         var node = $(ReactDOM.findDOMNode(this));
@@ -692,7 +1356,7 @@ oc.PDFExportForm = React.createClass({
 
         return (
             <form>
-                <h3>{locale("Export as PDF")}</h3>
+                <h3>{this.props.formTitle}</h3>
                 <div className="field split">
                     <div>
                         <label htmlFor="start">{locale("From")}</label>
@@ -711,28 +1375,33 @@ oc.PDFExportForm = React.createClass({
                         />
                     </div>
                 </div>
-                <div className="field checkbox">
-                    <div>
-                        <label className="label-text">
-                            <input name="accepted" type="checkbox"
-                                defaultChecked={this.state.accepted}
-                                onChange={this.handleInputChange}
-                            />
-                            {locale("Accepted reservations only")}
-                        </label>
+                {this.props.accepted && (
+                    <div className="field checkbox">
+                        <div>
+                            <label className="label-text">
+                                <input name="accepted" type="checkbox"
+                                    defaultChecked={this.state.accepted}
+                                    onChange={this.handleInputChange}
+                                />
+                                {locale("Accepted reservations only")}
+                            </label>
+                        </div>
                     </div>
-                </div>
+                )}
 
-                <button className={isValid && "button" || "button secondary"} disabled={!isValid} onClick={this.handleButton}>{locale("Download")}</button>
+                <button className={isValid && "button" || "button secondary"} disabled={!isValid} onClick={this.handleButton}>{this.props.submitTitle}</button>
             </form>
         );
 
     }
 });
 
-oc.PDFExportForm.render = function(element, calendar, onSubmit) {
+oc.ExportForm.render = function(element, calendar, accepted, formTitle, submitTitle, onSubmit) {
     ReactDOM.render(
-        <oc.PDFExportForm
+        <oc.ExportForm
+            formTitle={formTitle}
+            submitTitle={submitTitle}
+            accepted={accepted}
             start={moment(calendar.view.currentStart)}
             end={moment(calendar.view.currentEnd).subtract(1, 'day')}
             onSubmit={onSubmit}
