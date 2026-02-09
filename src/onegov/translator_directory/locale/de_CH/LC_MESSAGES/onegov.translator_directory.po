@@ -675,8 +675,8 @@ msgstr ""
 "ausgewählten Finanzstelle. Ihre E-Mail-Adressen werden für "
 "Benachrichtigungen verwendet."
 
-msgid "All accountant users must have the editor role"
-msgstr "Alle Benutzer des Rechnungswesen müssen Editoren sein."
+msgid "All accountant users must have the editor or admin role"
+msgstr "Alle Benutzer des Rechnungswesen müssen Editoren oder Administratoren sein."
 
 msgid "Add"
 msgstr "Hinzufügen"
