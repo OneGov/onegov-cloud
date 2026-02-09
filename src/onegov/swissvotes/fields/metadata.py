@@ -6,7 +6,6 @@ from onegov.form.validators import FileSizeLimit
 from onegov.swissvotes import _
 from onegov.swissvotes.models import ColumnMapperMetadata
 from openpyxl import load_workbook
-from wtforms.meta import DefaultMeta
 from wtforms.validators import ValidationError
 
 from typing import Any
@@ -21,6 +20,7 @@ if TYPE_CHECKING:
     from onegov.form.types import Widget
     from typing import Self
     from wtforms.form import BaseForm
+    from wtforms.meta import DefaultMeta
     from wtforms.meta import _SupportsGettextAndNgettext
 
 
@@ -65,8 +65,6 @@ class SwissvoteMetadataField(UploadField):
         kwargs.setdefault('render_kw', {})
         kwargs['render_kw']['force_simple'] = True
 
-        data: dict[Decimal, dict[str, Any]]  # type:ignore[assignment]
-        
         super().__init__(
             label=label,
             validators=validators,

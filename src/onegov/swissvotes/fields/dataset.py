@@ -82,7 +82,7 @@ class SwissvoteDatasetField(UploadField):
             widget=widget,
             render_kw=render_kw,
             name=name,
-            allowed_mimetypes=list(mimetypes),
+            allowed_mimetypes=mimetypes,
             _form=_form,
             _prefix=_prefix,
             _translations=_translations,
@@ -107,7 +107,6 @@ class SwissvoteDatasetField(UploadField):
 
         """
 
-        super().post_validate(form, validation_stopped)
         if validation_stopped:
             return
 
@@ -226,3 +225,5 @@ class SwissvoteDatasetField(UploadField):
             ))
 
         self.data = data
+
+        super().post_validate(form, validation_stopped)
