@@ -7,7 +7,6 @@ from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import InputRequiredIf
-from onegov.form.validators import WhitelistedMimeType
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.validators import DataRequired
@@ -41,8 +40,10 @@ class UploadRestForm(Form):
         label=_('Results'),
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES | ALLOWED_MIME_TYPES_XML),
             FileSizeLimit(50 * 1024 * 1024)
         ],
+        allowed_mimetypes=(
+            ALLOWED_MIME_TYPES | ALLOWED_MIME_TYPES_XML,
+        ),
         render_kw={'force_simple': True}
     )

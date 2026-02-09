@@ -8,8 +8,7 @@ from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import (
     MIME_TYPES_IMAGE,
-    ValidPhoneNumber,
-    WhitelistedMimeType
+    ValidPhoneNumber
 )
 from onegov.org import _
 from onegov.parliament.models.parliamentarian import GENDERS
@@ -53,9 +52,8 @@ class ParliamentarianForm(NamedFileForm):
     picture = UploadField(
         label=_('Picture'),
         fieldset=_('Basic properties'),
-        validators=[
-            WhitelistedMimeType(MIME_TYPES_IMAGE)
-        ]
+        validators=[],
+        allowed_mimetypes=MIME_TYPES_IMAGE,
     )
 
     party = StringField(

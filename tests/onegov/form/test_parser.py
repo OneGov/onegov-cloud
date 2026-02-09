@@ -367,21 +367,22 @@ def test_parse_fileinput() -> None:
     assert isinstance(form['file'], FileField)
     assert form['file'].widget.multiple is False  # type: ignore[attr-defined]
 
-    # verify attached mime type validator
+    assert form.validate()
+    assert form['file'].mimetypes == {'application/pdf', 'application/msword'}
     assert form['file'].validators
-    validator = find_validator(form['file'], WhitelistedMimeType)
-    assert validator
-    assert validator.whitelist == {  # type:ignore[attr-defined]
-        'application/msword', 'application/pdf'
-    }
-    assert find_validator(form['file'], FileSizeLimit)
+    any(isinstance(v, FileSizeLimit) for v in form['file'].validators)
 
     form = parse_form("File *= *.*")()
+
+    assert form['file'].label.text == 'File'
+    assert isinstance(form['file'], FileField)
+    assert form['file'].widget.multiple is False  # type: ignore[attr-defined]
+
+    assert not form.validate()
+    assert form.errors == {'file': ['This field is required.']}
     assert form['file'].validators
-    validator = find_validator(form['file'], WhitelistedMimeType)
-    assert validator
-    assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
-    assert find_validator(form['file'], FileSizeLimit)
+    assert form['file'].mimetypes == WhitelistedMimeType.whitelist
+    any(isinstance(v, FileSizeLimit) for v in form['file'].validators)
 
     # ensure nickname field did not get validators from the upload field
     form = parse_form("Nickname = ___\nFile = *.pdf|*.doc")()
@@ -396,21 +397,20 @@ def test_parse_multiplefileinput() -> None:
     assert isinstance(form['files'], FileField)
     assert form['files'].widget.multiple is True  # type: ignore[attr-defined]
 
-    # verify attached mime type validator
-    assert form['files'].validators
-    validator = find_validator(form['files'], WhitelistedMimeType)
-    assert validator
-    assert validator.whitelist == {  # type:ignore[attr-defined]
-        'application/msword', 'application/pdf'
-    }
-    assert find_validator(form['files'], FileSizeLimit)
+    assert form.validate()
+    assert form['files'].mimetypes == {'application/pdf', 'application/msword'}
+    assert not form['files'].validators
+    any(isinstance(v, FileSizeLimit) for v in form['files'].validators)
 
     form = parse_form("My files *= *.* (multiple)")()
-    assert form['my_files'].validators
-    validator = find_validator(form['my_files'], WhitelistedMimeType)
-    assert validator
-    assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
-    assert find_validator(form['my_files'], FileSizeLimit)
+    assert form['my_files'].label.text == 'My files'
+    assert isinstance(form['my_files'], FileField)
+    assert form['my_files'].widget.multiple is True
+
+    assert form.validate()
+    assert form['my_files'].mimetypes == WhitelistedMimeType.whitelist
+    assert not form['my_files'].validators
+    any(isinstance(v, FileSizeLimit) for v in form['my_files'].validators)
 
 
 def test_parse_radio() -> None:
@@ -637,13 +637,13 @@ def test_dependent_validation() -> None:
     assert not form.validate()
     assert form.errors == {
         'method_attachment': [
-            'Files of this type are not supported.',
             'The file is too large, please provide a file smaller '
-            'than 100.0 MB.'
+            'than 100.0 MB.',
+            'Files of this type are not supported.',
         ]
     }
 
-    # upload selected with large attachment and wrong type
+    # upload selected
     fs_pdf = FileStorage(
         stream=BytesIO(b'%PDF-1.4\n%'),
         filename='test.pdf',

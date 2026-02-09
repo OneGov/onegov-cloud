@@ -14,7 +14,6 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import PanelField
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit, MIME_TYPES_PDF
-from onegov.form.validators import WhitelistedMimeType
 from re import findall
 from sqlalchemy import or_
 from wtforms.fields import BooleanField
@@ -323,9 +322,9 @@ class ElectionForm(Form):
     explanations_pdf = UploadField(
         label=_('Explanations (PDF)'),
         validators=[
-            WhitelistedMimeType(MIME_TYPES_PDF),
             FileSizeLimit(100 * 1024 * 1024)
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         fieldset=_('Related link')
     )
 

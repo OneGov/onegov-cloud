@@ -6,8 +6,7 @@ from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import (
     ValidPhoneNumber,
-    MIME_TYPES_IMAGE,
-    WhitelistedMimeType
+    MIME_TYPES_IMAGE
 )
 from onegov.parliament.models.parliamentarian import GENDERS
 from onegov.parliament.models.parliamentarian import SHIPPING_METHODS
@@ -69,9 +68,8 @@ class PASParliamentarianForm(NamedFileForm):
     picture = UploadField(
         label=_('Picture'),
         fieldset=_('Basic properties'),
-        validators=[
-            WhitelistedMimeType(MIME_TYPES_IMAGE),
-        ]
+        validators=[],
+        allowed_mimetypes=MIME_TYPES_IMAGE,
     )
 
     shipping_method = TranslatedSelectField(

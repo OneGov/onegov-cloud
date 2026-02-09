@@ -3,7 +3,6 @@ from __future__ import annotations
 from decimal import Decimal
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
 from onegov.swissvotes import _
 from onegov.swissvotes.models import ColumnMapperMetadata
 from openpyxl import load_workbook
@@ -54,19 +53,31 @@ class SwissvoteMetadataField(UploadField):
     else:
         def __init__(self, *args, **kwargs):
             kwargs.setdefault('validators', [])
-            kwargs['validators'].append(
-                WhitelistedMimeType({
-                    'application/excel',
-                    'application/octet-stream',
-                    'application/vnd.ms-excel',
-                    'application/vnd.ms-office',
-                    (
-                        'application/vnd.openxmlformats-officedocument'
-                        '.spreadsheetml.sheet'
-                    ),
-                    'application/zip'
-                })
-            )
+            # tschupre check back here, use allowed_mimetypes instead of whitelistedmimetype
+            # kwargs['validators'].append(
+            #     WhitelistedMimeType({
+            #         'application/excel',
+            #         'application/octet-stream',
+            #         'application/vnd.ms-excel',
+            #         'application/vnd.ms-office',
+            #         (
+            #             'application/vnd.openxmlformats-officedocument'
+            #             '.spreadsheetml.sheet'
+            #         ),
+            #         'application/zip'
+            #     })
+            # )
+            kwargs['allowed_mimetypes'] = {
+                'application/excel',
+                'application/octet-stream',
+                'application/vnd.ms-excel',
+                'application/vnd.ms-office',
+                (
+                    'application/vnd.openxmlformats-officedocument'
+                    '.spreadsheetml.sheet'
+                ),
+                'application/zip'
+            }
             kwargs['validators'].append(FileSizeLimit(10 * 1024 * 1024))
 
             kwargs.setdefault('render_kw', {})

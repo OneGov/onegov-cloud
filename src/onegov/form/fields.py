@@ -296,20 +296,17 @@ class UploadField(FileField):
         depends_on: Sequence[Any] | None = None,
         pricing: PricingRules | None = None,
     ):
-        validator = (
-            WhitelistedMimeType(allowed_mimetypes)
-            if allowed_mimetypes
-            else WhitelistedMimeType()
-        )
-
         if validators:
-            validators = list(validators)
-            if not any(isinstance(validator, WhitelistedMimeType)
-                for validator in validators
-            ):
-                validators.append(validator)
+            validators = list(validators)  # needed?
+            assert not any(isinstance(v, WhitelistedMimeType)
+                           for v in validators), (
+                'Use parameter "allowed_mimetypes" instead of adding a '
+                'WhitelistedMimeType validator directly'
+            )
+        if allowed_mimetypes:
+            self.mimetypes = (mime for mime in allowed_mimetypes)
         else:
-            validators = [validator]
+            self.mimetypes = WhitelistedMimeType.whitelist
 
         super().__init__(
             label=label,
@@ -413,6 +410,16 @@ class UploadField(FileField):
             return binary_to_dictionary(self.file.read(), self.filename)  # type: ignore[return-value]
         finally:
             self.file.seek(0)
+
+    def post_validate(
+        self,
+        form: BaseForm,
+        validation_stopped: bool
+    ) -> None:
+        if self.data and self.mimetypes:
+            if self.data.get('mimetype') not in self.mimetypes:
+                raise ValidationError(_(
+                    'Files of this type are not supported.'))
 
 
 class UploadFileWithORMSupport(UploadField):
@@ -521,6 +528,11 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         if upload_widget is None:
             upload_widget = self.upload_widget
 
+        if allowed_mimetypes:
+            self.mimetypes = (mime for mime in allowed_mimetypes)
+        else:
+            self.mimetypes = WhitelistedMimeType.whitelist
+
         # a lot of the arguments we just pass through to the subfield
         unbound_field = self.upload_field_class(
             filters=filters,
@@ -528,6 +540,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             widget=upload_widget,
             render_kw=render_kw,
             allowed_mimetypes=allowed_mimetypes,
+            validators=[*(validators or ())],
             **extra_arguments
         )
         super().__init__(
@@ -538,7 +551,6 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             id=id,
             default=default,
             widget=widget,  # type:ignore[arg-type]
-            validators=[*(validators or ())],
             render_kw=render_kw,
             name=name,
             _form=_form,
@@ -599,6 +611,16 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
             if hasattr(value, 'file') or hasattr(value, 'stream'):
                 self.append_entry_from_field_storage(value)
+
+    def post_validate(
+        self,
+        form: BaseForm,
+        validation_stopped: bool
+    ) -> None:
+        if self.data and self.mimetypes:
+            if self.data.get('mimetype') not in self.mimetypes:
+                raise ValidationError(_(
+                    'Files of this type are not supported.'))
 
 
 class _DummyFile:

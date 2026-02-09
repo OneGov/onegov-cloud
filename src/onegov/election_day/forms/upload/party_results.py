@@ -6,7 +6,6 @@ from onegov.election_day.forms.upload.common import MAX_FILE_SIZE
 from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
 from wtforms.validators import DataRequired
 
 
@@ -16,8 +15,8 @@ class UploadPartyResultsForm(Form):
         label=_('Party results'),
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True}
     )

@@ -4,7 +4,7 @@ from onegov.activity import BookingPeriod, BookingPeriodCollection
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.form.fields import UploadField
-from onegov.form.validators import WhitelistedMimeType, FileSizeLimit
+from onegov.form.validators import FileSizeLimit
 from wtforms.fields import SelectField
 from wtforms.validators import InputRequired, DataRequired, ValidationError
 
@@ -27,9 +27,13 @@ class BankStatementImportForm(Form):
         label=_('ISO 20022 XML'),
         validators=[
             DataRequired(),
-            WhitelistedMimeType({'text/plain', 'text/xml', 'application/xml'}),
             FileSizeLimit(10 * 1024 * 1024)
         ],
+        allowed_mimetypes={
+            'text/plain',
+            'text/xml',
+            'application/xml'
+        },
         render_kw={'force_simple': True}
     )
 
