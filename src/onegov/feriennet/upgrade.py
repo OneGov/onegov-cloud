@@ -35,36 +35,65 @@ def install_default_feriennet_page_structure(context: UpgradeContext) -> None:
         return
 
     org.meta['homepage_structure'] = textwrap.dedent("""\
+        <slider height-d="100vh" height-m="55vw" />
         <row>
-            <column span="8">
-                <slider />
-                <news />
-            </column>
-            <column span="4">
-                <registration />
-
-                <panel>
-                    <links>
-                        <link url="./personen"
-                            description="Personen">
-                            Team
-                        </link>
-                        <link url="./formular/kontakt"
-                            description="Anfragen">
-                            Kontakt
-                        </link>
-                        <link url="./aktuelles"
-                            description="Neuigkeiten">
-                            Aktuelles
-                        </link>
-                        <link url="./fotoalben"
-                            description="Impressionen">
-                            Fotoalben
-                        </link>
-                    </links>
-                </panel>
+            <column span="12">
+                <row>
+                    <column span="12">
+                        <title>Angebote</title>
+                        <activities/>
+                    </column>
+                </row>
             </column>
         </row>
+        <row-wide bgcolor="gray">
+            <column span="12">
+                <row>
+                    <column span="12">
+                        <homepage-tiles show-title="True"/>
+                    </column>
+                </row>
+            </column>
+        </row-wide>
+        <row-wide bgcolor="primary">
+            <row class="columns small-up-1 medium-up-2 large-up-3 align-center">
+                <column class="cell">
+                    <icon_link
+                        icon="fa-envelope"
+                        title="Kontakt"
+                        link="/form/kontakt"
+                        text="Haben Sie Fragen oder Anregungen?"
+                    />
+                </column>
+                <column class="cell">
+                    <icon_link
+                        icon="fa-images"
+                        link="/photoalbums"
+                        title="Fotoalben"
+                        text="Impressionen der Aktivitäten"
+                    />
+                </column>
+                <column class="cell">
+                    <icon_link
+                        icon="fa-child"
+                        link="/activities/volunteer"
+                        title="Helfen"
+                        text="Helfen sie mit"
+                    />
+                </column>
+            </row>
+        </row-wide>
+
+        <row-wide>
+            <column span="12">
+                <row>
+                    <column span="12">
+                        <title>News</title>
+                        <news />
+                    </column>
+                </row>
+            </column>
+        </row-wide>
     """)
 
 
