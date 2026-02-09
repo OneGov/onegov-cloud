@@ -29,7 +29,7 @@ from onegov.form.errors import MixedTypeError
 from onegov.form.types import BaseFormT, FieldT
 from stdnum.exceptions import (
     ValidationError as StdnumValidationError)
-from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
+from wtforms import DateField, DateTimeLocalField, RadioField, TimeField, Field
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
@@ -124,7 +124,22 @@ class FileSizeLimit:
         if not field.data:
             return
 
-        if field.data.get('size', 0) > self.max_bytes:
+        if isinstance(field.data, list):  # UploadMultipleField
+            for data in field.data:
+                if not data:
+                    continue  # in case of file deletion
+
+                self.validate_file_size_limit(field, data)
+
+        else:
+            self.validate_file_size_limit(field, field.data)
+
+    def validate_file_size_limit(
+        self,
+        field: Field,
+        data: dict[Any, Any]
+    ) -> None:
+        if data.get('size', 0) > self.max_bytes:
             message = field.gettext(self.message).format(
                 humanize.naturalsize(self.max_bytes)
             )
