@@ -285,7 +285,7 @@ class UploadField(FileField):
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
-        allowed_mimetypes: Sequence[str] | None = None,
+        allowed_mimetypes: set[str] | None = None,
         _form: BaseForm | None = None,
         _prefix: str = '',
         _translations: _SupportsGettextAndNgettext | None = None,
@@ -304,7 +304,7 @@ class UploadField(FileField):
                 'WhitelistedMimeType validator directly'
             )
         if allowed_mimetypes:
-            self.mimetypes = {mime for mime in allowed_mimetypes}
+            self.mimetypes = set(allowed_mimetypes)
         else:
             self.mimetypes = WhitelistedMimeType.whitelist
 
@@ -511,7 +511,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
         upload_widget: Widget[UploadField] | None = None,
-        allowed_mimetypes: Sequence[str] | None = None,
+        allowed_mimetypes: set[str] | None = None,
         _form: BaseForm | None = None,
         _prefix: str = '',
         _translations: _SupportsGettextAndNgettext | None = None,
@@ -529,7 +529,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             upload_widget = self.upload_widget
 
         if allowed_mimetypes:
-            self.mimetypes = {mime for mime in allowed_mimetypes}
+            self.mimetypes = set(allowed_mimetypes)
         else:
             self.mimetypes = WhitelistedMimeType.whitelist
 

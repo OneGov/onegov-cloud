@@ -6,8 +6,8 @@ from onegov.form.validators import FileSizeLimit
 from onegov.swissvotes import _
 from onegov.swissvotes.models import ColumnMapperMetadata
 from openpyxl import load_workbook
+from wtforms.meta import DefaultMeta
 from wtforms.validators import ValidationError
-
 
 from typing import Any
 from typing import TYPE_CHECKING
@@ -22,70 +22,66 @@ if TYPE_CHECKING:
     from typing import Self
     from wtforms.form import BaseForm
     from wtforms.meta import _SupportsGettextAndNgettext
-    from wtforms.meta import DefaultMeta
 
 
 class SwissvoteMetadataField(UploadField):
     """ An upload field expecting Swissvotes metadata (XLSX). """
 
-    if TYPE_CHECKING:
-        def __init__(
-            self,
-            label: str | None = None,
-            validators: Validators[FormT, Self] | None = None,
-            filters: Sequence[Filter] = (),
-            description: str = '',
-            id: str | None = None,
-            default: Sequence[StrictFileDict] = (),
-            widget: Widget[Self] | None = None,
-            render_kw: dict[str, Any] | None = None,
-            name: str | None = None,
-            _form: BaseForm | None = None,
-            _prefix: str = '',
-            _translations: _SupportsGettextAndNgettext | None = None,
-            _meta: DefaultMeta | None = None,
-            # onegov specific kwargs that get popped off
-            *,
-            fieldset: str | None = None,
-            depends_on: Sequence[Any] | None = None,
-            pricing: PricingRules | None = None,
-        ) -> None: ...
-    else:
-        def __init__(self, *args, **kwargs):
-            kwargs.setdefault('validators', [])
-            # tschupre check back here, use allowed_mimetypes instead of whitelistedmimetype
-            # kwargs['validators'].append(
-            #     WhitelistedMimeType({
-            #         'application/excel',
-            #         'application/octet-stream',
-            #         'application/vnd.ms-excel',
-            #         'application/vnd.ms-office',
-            #         (
-            #             'application/vnd.openxmlformats-officedocument'
-            #             '.spreadsheetml.sheet'
-            #         ),
-            #         'application/zip'
-            #     })
-            # )
-            kwargs['allowed_mimetypes'] = {
-                'application/excel',
-                'application/octet-stream',
-                'application/vnd.ms-excel',
-                'application/vnd.ms-office',
-                (
-                    'application/vnd.openxmlformats-officedocument'
-                    '.spreadsheetml.sheet'
-                ),
-                'application/zip'
-            }
-            kwargs['validators'].append(FileSizeLimit(10 * 1024 * 1024))
+    def __init__(
+        self,
+        label: str | None = None,
+        validators: Validators[FormT, Self] | None = None,
+        filters: Sequence[Filter] = (),
+        description: str = '',
+        id: str | None = None,
+        default: Sequence[StrictFileDict] = (),
+        widget: Widget[Self] | None = None,
+        render_kw: dict[str, Any] | None = None,
+        name: str | None = None,
+        _form: BaseForm | None = None,
+        _prefix: str = '',
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
+        # onegov specific kwargs that get popped off
+        *,
+        fieldset: str | None = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
+    ) -> None:
+        kwargs = {}
+        kwargs.setdefault('validators', [])
+        kwargs['allowed_mimetypes'] = {
+            'application/excel',
+            'application/octet-stream',
+            'application/vnd.ms-excel',
+            'application/vnd.ms-office',
+            (
+                'application/vnd.openxmlformats-officedocument'
+                '.spreadsheetml.sheet'
+            ),
+            'application/zip'
+        }
+        kwargs['validators'].append(FileSizeLimit(10 * 1024 * 1024))
+        kwargs.setdefault('render_kw', {})
+        kwargs['render_kw']['force_simple'] = True
 
-            kwargs.setdefault('render_kw', {})
-            kwargs['render_kw']['force_simple'] = True
-
-            super().__init__(*args, **kwargs)
-
-    data: dict[Decimal, dict[str, Any]]  # type:ignore[assignment]
+        data: dict[Decimal, dict[str, Any]]  # type:ignore[assignment]
+        
+        super().__init__(
+            label=label,
+            validators=validators,
+            filters=filters,
+            description=description,
+            id=id,
+            default=default,
+            widget=widget,
+            render_kw=render_kw,
+            name=name,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta,
+        )
 
     def post_validate(
         self,

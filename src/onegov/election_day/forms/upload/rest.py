@@ -42,8 +42,6 @@ class UploadRestForm(Form):
             DataRequired(),
             FileSizeLimit(50 * 1024 * 1024)
         ],
-        allowed_mimetypes=(
-            ALLOWED_MIME_TYPES | ALLOWED_MIME_TYPES_XML,
-        ),
+        allowed_mimetypes=ALLOWED_MIME_TYPES | ALLOWED_MIME_TYPES_XML,
         render_kw={'force_simple': True}
     )
