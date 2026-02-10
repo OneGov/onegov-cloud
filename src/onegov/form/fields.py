@@ -58,6 +58,7 @@ from wtforms.widgets import CheckboxInput, ColorInput, TextInput
 from typing import Any, IO, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import Collection
     from datetime import datetime
     from onegov.core.types import FileDict as StrictFileDict
     from onegov.file import File
@@ -285,7 +286,7 @@ class UploadField(FileField):
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
-        allowed_mimetypes: set[str] | None = None,
+        allowed_mimetypes: Collection[str] | None = None,
         _form: BaseForm | None = None,
         _prefix: str = '',
         _translations: _SupportsGettextAndNgettext | None = None,
@@ -297,7 +298,6 @@ class UploadField(FileField):
         pricing: PricingRules | None = None,
     ):
         if validators:
-            validators = list(validators)  # needed?
             assert not any(isinstance(v, WhitelistedMimeType)
                            for v in validators), (
                 'Use parameter "allowed_mimetypes" instead of adding a '
@@ -511,7 +511,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
         upload_widget: Widget[UploadField] | None = None,
-        allowed_mimetypes: set[str] | None = None,
+        allowed_mimetypes: Collection[str] | None = None,
         _form: BaseForm | None = None,
         _prefix: str = '',
         _translations: _SupportsGettextAndNgettext | None = None,

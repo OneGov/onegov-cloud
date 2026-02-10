@@ -29,7 +29,7 @@ from unittest.mock import patch
 from wtforms.validators import Optional, DataRequired
 from wtforms.validators import URL
 
-from typing import Any, TYPE_CHECKING, Self, Sequence
+from typing import Any, TYPE_CHECKING, Self, Sequence, Collection
 
 if TYPE_CHECKING:
     from webob.request import _FieldStorageWithFile
@@ -62,7 +62,7 @@ def create_file(
 def test_upload_field() -> None:
     def create_field(
         validators: Validators[FormT, Self] | None = None,  # type:ignore[misc]
-        allowed_mimetypes: Sequence[str] | None = None,
+        allowed_mimetypes: Collection[str] | None = None,
     ) -> tuple[Form, UploadField]:
         form = Form()
         field = UploadField(
