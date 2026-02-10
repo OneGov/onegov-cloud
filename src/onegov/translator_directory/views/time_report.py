@@ -55,7 +55,7 @@ from onegov.translator_directory.utils import (
     get_accountant_emails_for_finanzstelle,
 )
 from onegov.org.models.message import TimeReportMessage
-from onegov.user import User, UserGroup
+from onegov.user import User
 from sqlalchemy import func
 
 
@@ -91,6 +91,10 @@ def view_time_reports(
         )
         archive_toggle_text = _('Show archived (exported) reports')
 
+    query = self.query()
+    query = self._apply_finanzstelle_filter(query, request)
+    reports = list(query)
+
     unexported_count = self.for_accounting_export(request).count()
     export_link = None
     if unexported_count > 0 and not self.archive:
@@ -117,28 +121,6 @@ def view_time_reports(
                 ),
             ),
         )
-
-    reports = list(self.batch)
-
-    if not request.is_admin and request.current_user:
-        groups = (
-            request.session.query(UserGroup)
-            .filter(UserGroup.meta['finanzstelle'].astext.isnot(None))
-            .all()
-        )
-
-        user_finanzstelles = []
-        for group in groups:
-            accountant_emails = group.meta.get('accountant_emails', [])
-            if request.current_user.username in accountant_emails:
-                finanzstelle = group.meta.get('finanzstelle')
-                if finanzstelle:
-                    user_finanzstelles.append(finanzstelle)
-
-        if user_finanzstelles:
-            reports = [
-                r for r in reports if r.finanzstelle in user_finanzstelles
-            ]
 
     report_ids = [str(report.id) for report in reports]
     tickets = (

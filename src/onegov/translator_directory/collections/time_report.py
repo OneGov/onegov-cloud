@@ -59,22 +59,12 @@ class TimeReportCollection(
     def page_by_index(self, index: int) -> Self:
         return self.__class__(self.app, index, self.archive)
 
-    def for_accounting_export(
-        self, request: TranslatorAppRequest | None = None
-    ) -> Query[TranslatorTimeReport]:
-        """Query confirmed but not yet exported time reports.
-
-        For non-admin users, only returns reports for finanzstelles where
-        they are listed as accountants.
-        """
-        query = (
-            self.session.query(TranslatorTimeReport)
-            .filter(TranslatorTimeReport.status == 'confirmed')
-            .filter(TranslatorTimeReport.exported == False)
-        )
-
-        if not request or request.is_admin or not request.current_user:
-            return query
+    def _get_user_finanzstelles(
+        self, request: TranslatorAppRequest
+    ) -> list[str]:
+        """Get finanzstelles where user is listed as accountant."""
+        if request.is_admin or not request.current_user:
+            return []
 
         user_finanzstelles = []
         groups = (
@@ -90,9 +80,36 @@ class TimeReportCollection(
                 if finanzstelle:
                     user_finanzstelles.append(finanzstelle)
 
+        return user_finanzstelles
+
+    def _apply_finanzstelle_filter(
+        self,
+        query: Query[TranslatorTimeReport],
+        request: TranslatorAppRequest,
+    ) -> Query[TranslatorTimeReport]:
+        """Apply finanzstelle filter for non-admin users."""
+        user_finanzstelles = self._get_user_finanzstelles(request)
         if user_finanzstelles:
             query = query.filter(
                 TranslatorTimeReport.finanzstelle.in_(user_finanzstelles)
             )
-
         return query
+
+    def for_accounting_export(
+        self, request: TranslatorAppRequest | None = None
+    ) -> Query[TranslatorTimeReport]:
+        """Query confirmed but not yet exported time reports.
+
+        For non-admin users, only returns reports for finanzstelles where
+        they are listed as accountants.
+        """
+        query = (
+            self.session.query(TranslatorTimeReport)
+            .filter(TranslatorTimeReport.status == 'confirmed')
+            .filter(TranslatorTimeReport.exported == False)
+        )
+
+        if not request or request.is_admin:
+            return query
+
+        return self._apply_finanzstelle_filter(query, request)
