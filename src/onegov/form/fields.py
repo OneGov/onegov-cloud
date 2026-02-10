@@ -282,7 +282,7 @@ class UploadField(FileField):
         filters: Sequence[Filter] = (),
         description: str = '',
         id: str | None = None,
-        default: Sequence[StrictFileDict] | None = None,
+        default: StrictFileDict | None = None,
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
@@ -306,7 +306,7 @@ class UploadField(FileField):
         if allowed_mimetypes:
             self.mimetypes = set(allowed_mimetypes)
         else:
-            self.mimetypes = WhitelistedMimeType.whitelist
+            self.mimetypes = set(WhitelistedMimeType.whitelist)
 
         super().__init__(
             label=label,
@@ -531,7 +531,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         if allowed_mimetypes:
             self.mimetypes = set(allowed_mimetypes)
         else:
-            self.mimetypes = WhitelistedMimeType.whitelist
+            self.mimetypes = set(WhitelistedMimeType.whitelist)
 
         # a lot of the arguments we just pass through to the subfield
         unbound_field = self.upload_field_class(

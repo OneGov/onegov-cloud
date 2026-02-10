@@ -202,4 +202,4 @@ class SwissvoteMetadataField(UploadField):
                 }
             ))
 
-        self.data = data
+        self.data = data  # type: ignore[assignment]
