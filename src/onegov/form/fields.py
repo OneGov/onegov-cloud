@@ -304,7 +304,7 @@ class UploadField(FileField):
                 'WhitelistedMimeType validator directly'
             )
         if allowed_mimetypes:
-            self.mimetypes = allowed_mimetypes
+            self.mimetypes = set(allowed_mimetypes)
         else:
             self.mimetypes = WhitelistedMimeType.whitelist
 
@@ -529,7 +529,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             upload_widget = self.upload_widget
 
         if allowed_mimetypes:
-            self.mimetypes = allowed_mimetypes
+            self.mimetypes = set(allowed_mimetypes)
         else:
             self.mimetypes = WhitelistedMimeType.whitelist
 
