@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-01-27 10:35+0100\n"
+"POT-Creation-Date: 2026-02-10 14:27+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -542,18 +542,19 @@ msgstr "Sotto le entrate"
 msgid "Definition"
 msgstr "Definizione"
 
-msgid "Coordinates"
-msgstr "Coordinate"
+msgid "Coordinates/Map"
+msgstr "Coordinate/Mappa"
 
-msgid "Entries have no coordinates"
-msgstr "Gli elementi non hanno coordinate"
-
-msgid "Coordinates are shown on each entry"
-msgstr "Le coordinate sono mostrate in corrispondenza di ogni elemento"
-
-msgid "Coordinates are shown on the directory and on each entry"
+msgid "Entries have no coordinates, hence no map will be shown"
 msgstr ""
-"Le coordinate sono mostrate sulla rubrica e in corrispondenza di ogni "
+"Gli elementi non hanno coordinate, quindi non verrà mostrata alcuna mappa"
+
+msgid "Coordinates/Map are shown on each entry"
+msgstr "Le coordinate/mappa sono mostrate in corrispondenza di ogni elemento"
+
+msgid "Coordinates/Map are shown on the directory and on each entry"
+msgstr ""
+"Le coordinate/mappa sono mostrate sulla rubrica e in corrispondenza di ogni "
 "elemento"
 
 msgid "Title-Format"
@@ -965,6 +966,9 @@ msgstr "URL evento esterno"
 
 msgid "Event Registration URL"
 msgstr "URL di registrazione all'evento"
+
+msgid "Coordinates"
+msgstr "Coordinate"
 
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "L'indicatore può essere spostato trascinandolo con il mouse"
