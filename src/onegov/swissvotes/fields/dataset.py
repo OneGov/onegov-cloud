@@ -143,6 +143,8 @@ class SwissvoteDatasetField(UploadField):
                 mapping={'columns': ', '.join(missing)}
             ))
 
+        super().post_validate(form, validation_stopped)
+
         value: Any | None
         for index in range(2, sheet.max_row + 1):
             vote = SwissVote()
@@ -225,5 +227,3 @@ class SwissvoteDatasetField(UploadField):
             ))
 
         self.data = data
-
-        super().post_validate(form, validation_stopped)
