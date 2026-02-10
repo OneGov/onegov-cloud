@@ -115,10 +115,6 @@ def view_time_reports(
                     _('Export'),
                     _('Cancel'),
                 ),
-                Intercooler(
-                    request_method='POST',
-                    redirect_after=request.link(self),
-                ),
             ),
         )
 
@@ -549,7 +545,6 @@ def generate_accounting_export_rows(
     model=TimeReportCollection,
     name='export-accounting',
     permission=Personal,
-    request_method='POST',
 )
 def export_accounting_csv(
     self: TimeReportCollection,
