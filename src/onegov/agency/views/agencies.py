@@ -137,12 +137,14 @@ def view_agencies_json(
 
     tree = [to_node(a) for a in self.roots]
 
+    name = request.translate(_('Agencies'))
+
     return {
         'tree': [
             {
             'id': 0,
             'url': request.link(self),
-            'name': _('Agencies'),
+            'name': name,
             'children': tree
             }
         ]

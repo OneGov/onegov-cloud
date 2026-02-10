@@ -577,11 +577,11 @@ msgstr "Daten"
 msgid "Level ${lvl}"
 msgstr "Ebene ${lvl}"
 
-#~ msgid "Views"
-#~ msgstr "Ansichten"
+msgid "Views"
+msgstr "Ansichten"
 
-#~ msgid "View agencies as interactive diagram"
-#~ msgstr "Organisationen als interaktives Diagramm anzeigen"
+msgid "View agencies as interactive diagram"
+msgstr "Organisationen als interaktives Diagramm anzeigen"
 
 #~ msgid "Address"
 #~ msgstr "Adresse"

@@ -22,6 +22,15 @@
                             </li>
                         </ul>
 
+                        <h3 i18n:translate="">Views</h3>
+                        <ul class="more-list">
+                            <li>
+                                <a class="list-link" href="${request.link(agencies_collection, 'chart')}">
+                                    <i class="fas fa-project-diagram" aria-hidden="true"></i>
+                                    <span i18n:translate class="list-title">View agencies as interactive diagram</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
