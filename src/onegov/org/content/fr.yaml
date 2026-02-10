@@ -99,62 +99,48 @@ organisation:
     opening_hours_html: Du lundi au vendredi, de 09 h 00 à 17 h 00.
     twitter_url: https://twitter.com/seantis
     homepage_structure: |
-      <slider height-d="100vh" height-m="55vw" />
       <row>
-          <column span="12">
-              <row>
-                  <column span="12">
-                      <title>Activités</title>
-                      <activities/>
-                  </column>
-              </row>
-          </column>
-      </row>
-      <row-wide bgcolor="gray">
-          <column span="12">
-              <row>
-                  <column span="12">
-                      <homepage-tiles show-title="True"/>
-                  </column>
-              </row>
-          </column>
-      </row-wide>
-      <row-wide bgcolor="primary">
-          <row class="columns small-up-1 medium-up-2 large-up-3 align-center">
-              <column class="cell">
-                  <icon_link
-                      icon="fa-envelope"
-                      title="Contact"
-                      link="/form/kontakt"
-                      text="Vous avez des questions ou des suggestions?"
-                  />
-              </column>
-              <column class="cell">
-                  <icon_link
-                      icon="fa-images"
-                      link="/photoalbums"
-                      title="Photos"
-                      text="Impressions des activités"
-                  />
-              </column>
-              <column class="cell">
-                  <icon_link
-                      icon="fa-child"
-                      link="/activities/volunteer"
-                      title="Aider"
-                      text="Aidez nous"
-                  />
-              </column>
-          </row>
-      </row-wide>
+        <column span="8">
+          <slider />
+          <news />
+        </column>
+        <column span="4">
+          <panel>
+            <links title="Services">
+              <link url="./forms"
+                    description="Demandes et réponses">
+                    Formulaires
+              </link>
+              <link url="./resources"
+                    description="Pièces et cartes journalières">
+                    Réservations
+              </link>
+            </links>
+          </panel>
 
-      <row-wide>
-          <column span="12">
-              <row>
-                  <column span="12">
-                      <title>Nouvelles</title>
-                      <news />
-                  </column>
-              </row>
-          </column>
-      </row-wide>
+          <panel>
+            <events />
+          </panel>
+
+          <panel>
+            <links title="Contacts et photos">
+              <link url="./people"
+                    description="Tous les contacts">
+                Personnes
+              </link>
+              <link url="./photoalbums"
+                    description="Impressions">
+                Albums photo
+              </link>
+              <link url="./a-z"
+                    description="Catalogue de A à Z">
+                Sujets
+              </link>
+            </links>
+          </panel>
+
+          <panel>
+            <directories />
+          </panel>
+        </column>
+      </row>
