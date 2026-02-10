@@ -91,7 +91,7 @@ def view_time_reports(
         )
         archive_toggle_text = _('Show archived (exported) reports')
 
-    unexported_count = self.for_accounting_export().count()
+    unexported_count = self.for_accounting_export(request).count()
     export_link = None
     if unexported_count > 0 and not self.archive:
         export_link = Link(
@@ -559,7 +559,7 @@ def export_accounting_csv(
 
     request.assert_valid_csrf_token()
 
-    confirmed_reports = list(self.for_accounting_export())
+    confirmed_reports = list(self.for_accounting_export(request))
     if not confirmed_reports:
         request.message(_('No unexported time reports found'), 'warning')
         return request.redirect(request.link(self))
