@@ -168,7 +168,7 @@ class AttachmentsForm(Form):
         validators=[
             FileSizeLimit(120 * 1024 * 1024)
         ],
-        allowed_mimetypes=PDF_MIME_TYPES,
+        allowed_mimetypes=XLSX_MIME_TYPES,
         fieldset=_('Voting campaign'),
     )
 
@@ -186,7 +186,7 @@ class AttachmentsForm(Form):
         validators=[
             FileSizeLimit(120 * 1024 * 1024)
         ],
-        allowed_mimetypes=PDF_MIME_TYPES,
+        allowed_mimetypes=XLSX_MIME_TYPES,
         fieldset=_('Vote'),
     )
 
