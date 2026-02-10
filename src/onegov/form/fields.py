@@ -282,7 +282,7 @@ class UploadField(FileField):
         filters: Sequence[Filter] = (),
         description: str = '',
         id: str | None = None,
-        default: StrictFileDict | None = None,
+        default: Sequence[StrictFileDict] | None = None,
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
@@ -304,7 +304,7 @@ class UploadField(FileField):
                 'WhitelistedMimeType validator directly'
             )
         if allowed_mimetypes:
-            self.mimetypes = set(allowed_mimetypes)
+            self.mimetypes = allowed_mimetypes
         else:
             self.mimetypes = WhitelistedMimeType.whitelist
 
@@ -529,7 +529,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             upload_widget = self.upload_widget
 
         if allowed_mimetypes:
-            self.mimetypes = set(allowed_mimetypes)
+            self.mimetypes = allowed_mimetypes
         else:
             self.mimetypes = WhitelistedMimeType.whitelist
 
@@ -611,16 +611,6 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
             if hasattr(value, 'file') or hasattr(value, 'stream'):
                 self.append_entry_from_field_storage(value)
-
-    def post_validate(
-        self,
-        form: BaseForm,
-        validation_stopped: bool
-    ) -> None:
-        if self.data and self.mimetypes:
-            if self.data.get('mimetype') not in self.mimetypes:
-                raise ValidationError(_(
-                    'Files of this type are not supported.'))
 
 
 class _DummyFile:

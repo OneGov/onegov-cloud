@@ -54,7 +54,10 @@ class SwissvoteDatasetField(UploadField):
     ) -> None:
 
         if validators:
-            validators.append(FileSizeLimit(10 * 1024 * 1024))
+            validator_list = list(validators)
+        else:
+            validator_list = []
+        validator_list.append(FileSizeLimit(10 * 1024 * 1024))
 
         if not render_kw:
             render_kw = {}
@@ -74,7 +77,7 @@ class SwissvoteDatasetField(UploadField):
 
         super().__init__(
             label=label,
-            validators=validators,
+            validators=validator_list,
             filters=filters,
             description=description,
             id=id,
