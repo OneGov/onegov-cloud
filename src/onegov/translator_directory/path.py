@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from onegov.core.converters import LiteralConverter
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.collections.language import LanguageCollection
+from onegov.translator_directory.collections.ticket import (
+    TimeReportFilteredTicketCollection,
+    TimeReportFilteredArchivedTicketCollection,
+)
 from onegov.translator_directory.collections.time_report import (
     TimeReportCollection,
 )
@@ -16,12 +21,17 @@ from onegov.translator_directory.models.time_report import (
     TranslatorTimeReport,
 )
 from onegov.translator_directory.models.translator import Translator
+from onegov.ticket.collection import (
+    ArchivedTicketCollection,
+    TicketCollection,
+)
 from uuid import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.translator_directory.request import TranslatorAppRequest
+    from onegov.ticket.collection import ExtendedTicketState
 
 
 @TranslatorDirectoryApp.path(
@@ -169,3 +179,71 @@ def get_time_report(
     request: TranslatorAppRequest, id: UUID
 ) -> TranslatorTimeReport | None:
     return request.session.query(TranslatorTimeReport).filter_by(id=id).first()
+
+
+@TranslatorDirectoryApp.path(
+    model=TicketCollection,
+    path='/tickets/{handler}/{state}',
+    converters={
+        'page': int,
+        'state': LiteralConverter(
+            'open', 'pending', 'closed', 'archived', 'all', 'unfinished'
+        ),
+    },
+)
+def get_tickets(
+    request: TranslatorAppRequest,
+    handler: str = 'ALL',
+    state: ExtendedTicketState | None = 'open',
+    page: int = 0,
+    group: str | None = None,
+    owner: str | None = None,
+    submitter: str | None = None,
+    q: str | None = None,
+    extra_parameters: dict[str, str] | None = None,
+) -> TicketCollection | None:
+
+    if state is None:
+        return None
+
+    return TimeReportFilteredTicketCollection(
+        request.session,
+        handler=handler,
+        state=state,
+        page=page,
+        group=group,
+        owner=owner or '*',
+        submitter=submitter or '*',
+        term=q,
+        extra_parameters=extra_parameters,
+        request=request,
+    )
+
+
+@TranslatorDirectoryApp.path(
+    model=ArchivedTicketCollection,
+    path='/tickets-archive/{handler}',
+    converters={'page': int},
+)
+def get_archived_tickets(
+    request: TranslatorAppRequest,
+    handler: str = 'ALL',
+    page: int = 0,
+    group: str | None = None,
+    owner: str | None = None,
+    submitter: str | None = None,
+    q: str | None = None,
+    extra_parameters: dict[str, str] | None = None,
+) -> ArchivedTicketCollection | None:
+    return TimeReportFilteredArchivedTicketCollection(
+        request.session,
+        handler=handler,
+        state='archived',
+        page=page,
+        group=group,
+        owner=owner or '*',
+        submitter=submitter or '*',
+        term=q,
+        extra_parameters=extra_parameters,
+        request=request,
+    )
