@@ -98,7 +98,8 @@ def test_upload_field() -> None:
     assert data['data']
     assert dictionary_to_binary(data) == b'foo'  # type: ignore[arg-type]
     assert field.filename == 'foo.txt'
-    assert field.file.read() == b'foo'  # type: ignore[attr-defined]
+    assert field.file
+    assert field.file.read() == b'foo'
     assert field.mimetypes == WhitelistedMimeType.whitelist
     assert field.validate(form)
 

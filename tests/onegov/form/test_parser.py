@@ -368,7 +368,7 @@ def test_parse_fileinput() -> None:
     assert form['file'].widget.multiple is False  # type: ignore[attr-defined]
 
     assert form.validate()
-    assert form['file'].mimetypes == {'application/pdf', 'application/msword'}
+    assert form['file'].mimetypes == {'application/pdf', 'application/msword'}  # type: ignore[attr-defined]
     assert form['file'].validators
     any(isinstance(v, FileSizeLimit) for v in form['file'].validators)
 
@@ -376,12 +376,12 @@ def test_parse_fileinput() -> None:
 
     assert form['file'].label.text == 'File'
     assert isinstance(form['file'], FileField)
-    assert form['file'].widget.multiple is False  # type: ignore[attr-defined]
+    assert form['file'].widget.multiple is False  # type:ignore[attr-defined]
 
     assert not form.validate()
     assert form.errors == {'file': ['This field is required.']}
     assert form['file'].validators
-    assert form['file'].mimetypes == WhitelistedMimeType.whitelist
+    assert form['file'].mimetypes == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
     any(isinstance(v, FileSizeLimit) for v in form['file'].validators)
 
     # ensure nickname field did not get validators from the upload field
@@ -398,17 +398,17 @@ def test_parse_multiplefileinput() -> None:
     assert form['files'].widget.multiple is True  # type: ignore[attr-defined]
 
     assert form.validate()
-    assert form['files'].mimetypes == {'application/pdf', 'application/msword'}
+    assert form['files'].mimetypes == {'application/pdf', 'application/msword'}  # type:ignore[attr-defined]
     assert not form['files'].validators
     any(isinstance(v, FileSizeLimit) for v in form['files'].validators)
 
     form = parse_form("My files *= *.* (multiple)")()
     assert form['my_files'].label.text == 'My files'
     assert isinstance(form['my_files'], FileField)
-    assert form['my_files'].widget.multiple is True
+    assert form['my_files'].widget.multiple is True  # type:ignore[attr-defined]
 
     assert form.validate()
-    assert form['my_files'].mimetypes == WhitelistedMimeType.whitelist
+    assert form['my_files'].mimetypes == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
     assert not form['my_files'].validators
     any(isinstance(v, FileSizeLimit) for v in form['my_files'].validators)
 
