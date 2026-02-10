@@ -618,14 +618,9 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         validation_stopped: bool
     ) -> None:
         if self.data and self.mimetypes:
-            if isinstance(self.data, list):
-                for item in self.data:
-                    self.validate_mimetype(item)
-
-    def validate_mimetype(self, data: FileDict) -> None:
-        if data.get('mimetype') not in self.mimetypes:
-            raise ValidationError(_(
-                'Files of this type are not supported.'))
+            if self.data.get('mimetype') not in self.mimetypes:
+                raise ValidationError(_(
+                    'Files of this type are not supported.'))
 
 
 class _DummyFile:

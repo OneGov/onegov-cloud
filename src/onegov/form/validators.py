@@ -130,6 +130,7 @@ class FileSizeLimit:
                     continue  # in case of file deletion
 
                 self.validate_file_size_limit(field, data)
+
         else:
             self.validate_file_size_limit(field, field.data)
 
@@ -224,7 +225,7 @@ class WhitelistedMimeType:
     :class:`onegov.form.fields.UploadMultipleField` instance.
     """
 
-    whitelist: set[str] = {
+    whitelist: Collection[str] = {
         *MIME_TYPES_DOCUMENT,
         *MIME_TYPES_XML,
         *MIME_TYPES_ARCHIVE,
@@ -236,7 +237,7 @@ class WhitelistedMimeType:
 
     message = _('Files of this type are not supported.')
 
-    def __init__(self, whitelist: set[str] | None = None):
+    def __init__(self, whitelist: Collection[str] | None = None):
         if whitelist is not None:
             self.whitelist = whitelist
 
@@ -250,6 +251,7 @@ class WhitelistedMimeType:
                     continue  # in case of file deletion
 
                 self.validate_mimetype(field, data)
+
         else:
             self.validate_mimetype(field, field.data)
 

@@ -711,10 +711,10 @@ class DirectoryImportForm(Form):
             DataRequired(),
             FileSizeLimit(500 * 1024 * 1024)
         ],
-        allowed_mimetypes={
+        allowed_mimetypes=(
             'application/zip',
             'application/octet-stream'
-        },
+        ),
         render_kw={'force_simple': True}
     )
 

@@ -38,7 +38,7 @@ class SwissvoteDatasetField(UploadField):
         filters: Sequence[Filter] = (),
         description: str = '',
         id: str | None = None,
-        default: StrictFileDict | None = None,
+        default: Sequence[StrictFileDict] = (),
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
@@ -54,10 +54,7 @@ class SwissvoteDatasetField(UploadField):
     ) -> None:
 
         if validators:
-            validator_list = list(validators)
-        else:
-            validator_list = []
-        validator_list.append(FileSizeLimit(10 * 1024 * 1024))
+            validators.append(FileSizeLimit(10 * 1024 * 1024))
 
         if not render_kw:
             render_kw = {}

@@ -34,7 +34,7 @@ class SwissvoteMetadataField(UploadField):
         filters: Sequence[Filter] = (),
         description: str = '',
         id: str | None = None,
-        default: StrictFileDict | None = None,
+        default: Sequence[StrictFileDict] = (),
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
@@ -48,7 +48,7 @@ class SwissvoteMetadataField(UploadField):
         depends_on: Sequence[Any] | None = None,
         pricing: PricingRules | None = None,
     ) -> None:
-        kwargs: dict[str, Any] = {}
+        kwargs = {}
         kwargs.setdefault('validators', [])
         kwargs['allowed_mimetypes'] = {
             'application/excel',
