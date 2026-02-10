@@ -38,7 +38,7 @@ class SwissvoteDatasetField(UploadField):
         filters: Sequence[Filter] = (),
         description: str = '',
         id: str | None = None,
-        default: Sequence[StrictFileDict] = (),
+        default: StrictFileDict | None = None,
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,

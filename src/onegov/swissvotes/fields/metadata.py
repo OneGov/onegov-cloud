@@ -27,6 +27,8 @@ if TYPE_CHECKING:
 class SwissvoteMetadataField(UploadField):
     """ An upload field expecting Swissvotes metadata (XLSX). """
 
+    data: dict[Decimal, dict[str, dict[str, Any]]]  # type: ignore[assignment]
+
     def __init__(
         self,
         label: str | None = None,
@@ -34,7 +36,7 @@ class SwissvoteMetadataField(UploadField):
         filters: Sequence[Filter] = (),
         description: str = '',
         id: str | None = None,
-        default: Sequence[StrictFileDict] | None = (),
+        default: StrictFileDict | None = None,
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
@@ -202,4 +204,4 @@ class SwissvoteMetadataField(UploadField):
                 }
             ))
 
-        self.data = data  # type: ignore[assignment]
+        self.data = data
