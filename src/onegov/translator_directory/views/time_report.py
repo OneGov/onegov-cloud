@@ -91,6 +91,13 @@ def view_time_reports(
         )
         archive_toggle_text = _('Show archived (exported) reports')
 
+    user_finanzstelles = self._get_user_finanzstelles(request)
+    finanzstelle_names = []
+    for fs_key in user_finanzstelles:
+        fs_info = FINANZSTELLE.get(fs_key)
+        if fs_info:
+            finanzstelle_names.append(fs_info.name)
+
     query = self.query()
     query = self._apply_finanzstelle_filter(query, request)
     reports = list(query)
@@ -171,6 +178,7 @@ def view_time_reports(
         'archive': self.archive,
         'archive_toggle_url': archive_toggle_url,
         'archive_toggle_text': archive_toggle_text,
+        'finanzstelle_names': finanzstelle_names,
     }
 
 

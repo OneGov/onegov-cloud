@@ -62,8 +62,12 @@ class TimeReportCollection(
     def _get_user_finanzstelles(
         self, request: TranslatorAppRequest
     ) -> list[str]:
-        """Get finanzstelles where user is listed as accountant."""
-        if request.is_admin or not request.current_user:
+        """Get finanzstelles where user is listed as accountant.
+
+        Returns finanzstelles regardless of admin status - if an admin
+        is in a user group with finanzstelle, that should be honored.
+        """
+        if not request.current_user:
             return []
 
         user_finanzstelles = []
@@ -87,7 +91,11 @@ class TimeReportCollection(
         query: Query[TranslatorTimeReport],
         request: TranslatorAppRequest,
     ) -> Query[TranslatorTimeReport]:
-        """Apply finanzstelle filter for non-admin users."""
+        """Apply finanzstelle filter based on user's group membership.
+
+        If user is in finanzstelle groups: filter by those finanzstelles.
+        If user is not in any groups but is admin: show all (no filter).
+        """
         user_finanzstelles = self._get_user_finanzstelles(request)
         if user_finanzstelles:
             query = query.filter(
@@ -100,8 +108,9 @@ class TimeReportCollection(
     ) -> Query[TranslatorTimeReport]:
         """Query confirmed but not yet exported time reports.
 
-        For non-admin users, only returns reports for finanzstelles where
-        they are listed as accountants.
+        Filters by user's finanzstelle groups if they are in any.
+        If user is in finanzstelle groups (admin or not): filter applied.
+        If user is admin but not in any groups: show all.
         """
         query = (
             self.session.query(TranslatorTimeReport)
@@ -109,7 +118,7 @@ class TimeReportCollection(
             .filter(TranslatorTimeReport.exported == False)
         )
 
-        if not request or request.is_admin:
+        if not request:
             return query
 
         return self._apply_finanzstelle_filter(query, request)

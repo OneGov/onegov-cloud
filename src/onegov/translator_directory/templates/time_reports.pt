@@ -5,6 +5,24 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="cell small-12">
+                <div class="callout secondary"
+                     tal:condition="python: finanzstelle_names or not archive"
+                     style="margin-bottom: 1rem;">
+                    <p tal:condition="finanzstelle_names" >
+                        <strong i18n:translate="">
+                            Showing time reports for:
+                        </strong>
+                        <span tal:content="', '.join(finanzstelle_names)">
+                            Finanzstelle names
+                        </span>
+                    </p>
+                    <p style=""
+                       tal:condition="not: archive">
+                        <em i18n:translate="">
+                            Note: Export will only include confirmed reports.
+                        </em>
+                    </p>
+                </div>
                 <div style="display: flex; align-items: center;
                             gap: 0.5rem; margin-bottom: 1rem;
                             flex-wrap: wrap;">
