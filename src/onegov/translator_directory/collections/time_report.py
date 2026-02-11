@@ -59,6 +59,10 @@ class TimeReportCollection(
     def page_by_index(self, index: int) -> Self:
         return self.__class__(self.app, index, self.archive)
 
+    @property
+    def batch(self) -> tuple[TranslatorTimeReport, ...]:
+        return tuple(self.transform_batch_query(self.cached_subset))
+
     def _get_user_finanzstelles(
         self, request: TranslatorAppRequest
     ) -> list[str]:
