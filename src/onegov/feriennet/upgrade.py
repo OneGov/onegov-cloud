@@ -56,7 +56,8 @@ def install_default_feriennet_page_structure(context: UpgradeContext) -> None:
             </column>
         </row-wide>
         <row-wide bgcolor="primary">
-            <row class="columns small-up-1 medium-up-2 large-up-3 align-center">
+            <row 
+                class="columns small-up-1 medium-up-2 large-up-3 align-center">
                 <column class="cell">
                     <icon_link
                         icon="fa-envelope"
