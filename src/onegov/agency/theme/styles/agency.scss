@@ -151,7 +151,6 @@ ul.agency-nav {
     }
 
     .collapsible {
-
         border-top: 1px solid $gray;
         cursor: pointer;
         display: flex;
@@ -167,11 +166,11 @@ ul.agency-nav {
         + .details,
         + * .details {
             @media #{$small-only} {
+                background: white;
                 display: flex;
                 justify-content: center;
-                margin-top: -0.8rem;
-                background: white;
                 margin-bottom: .5rem;
+                margin-top: -.8rem;
             }
         }
 
