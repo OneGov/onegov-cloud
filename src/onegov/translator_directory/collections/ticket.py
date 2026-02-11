@@ -113,7 +113,6 @@ class TimeReportFilteredTicketCollection(
 
         if (
             not self.request
-            or self.request.is_admin
             or (not self.request.current_user)
         ):
             return query
@@ -164,7 +163,6 @@ class TimeReportFilteredArchivedTicketCollection(
 
         if (
             not self.request
-            or self.request.is_admin
             or (not self.request.current_user)
         ):
             return query
