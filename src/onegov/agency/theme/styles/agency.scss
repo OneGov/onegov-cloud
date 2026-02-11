@@ -152,14 +152,27 @@ ul.agency-nav {
 
     .collapsible {
 
-        @include hairline;
+        border-top: 1px solid $gray;
         cursor: pointer;
         display: flex;
         padding: .5rem;
         transition: background .3s;
 
         &.active a.title:first-of-type {
-            width: calc(100% - 225px);
+            @media #{$medium-up} {
+                width: calc(100% - 225px);
+            }
+        }
+
+        + .details,
+        + * .details {
+            @media #{$small-only} {
+                display: flex;
+                justify-content: center;
+                margin-top: -0.8rem;
+                background: white;
+                margin-bottom: .5rem;
+            }
         }
 
         &::before {
