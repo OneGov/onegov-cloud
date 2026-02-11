@@ -371,7 +371,7 @@
         <tal:b tal:define="agency_id str(agency.id)" tal:condition="(agency.access == 'public' and agency.published) or request.is_logged_in">
             <div
                 tal:condition="not: content_only|False"
-                class="collapsible"
+                class="collapsible ${'active' if layout.prerender_content(agency_id) else ''}"
                 id="trigger-${agency_id}"
                 ic-action="toggleClass:active">
 
