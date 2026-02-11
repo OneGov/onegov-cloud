@@ -262,3 +262,108 @@ def test_get_commission_closure_status(pas_app: TestPasApp) -> None:
         # All members should be in incomplete list with no attendance
         for member in commission['incomplete_members']:
             assert member['has_attendance'] is False
+
+
+def test_attendance_outside_any_settlement_run(
+    pas_app: TestPasApp,
+) -> None:
+    """Test that attendance cannot be created outside any settlement run."""
+    from onegov.pas.custom import check_attendance_outside_any_settlement_run
+
+    session = pas_app.session()
+
+    # Create TWO settlement runs with a gap between them
+    settlement_runs = SettlementRunCollection(session)
+
+    # Q1 2024: Jan 1 - Mar 31
+    q1_run = settlement_runs.add(
+        name='Q1 2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 3, 31),
+        active=True,
+    )
+
+    # Q2 2024: Apr 1 - Jun 30
+    q2_run = settlement_runs.add(
+        name='Q2 2024',
+        start=date(2024, 4, 1),
+        end=date(2024, 6, 30),
+        active=True,
+    )
+
+    session.flush()
+    transaction.commit()
+
+    # Test 1: Dates within settlement runs should return False
+    # (meaning they ARE within a settlement run)
+    assert (
+        check_attendance_outside_any_settlement_run(
+            session, date(2024, 1, 15)
+        )
+        is False
+    )
+    assert (
+        check_attendance_outside_any_settlement_run(
+            session, date(2024, 6, 30)
+        )
+        is False
+    )
+
+    # Test 2: Dates OUTSIDE all settlement runs should return True
+    # (meaning they are NOT within any settlement run)
+
+    # Before any settlement run
+    assert (
+        check_attendance_outside_any_settlement_run(
+            session, date(2023, 12, 31)
+        )
+        is True
+    )
+
+    # Days between Q1 and Q2 (no gap in this setup, Q2 starts day after Q1)
+    # But if they had a gap, dates in between would return True
+    # Q1 ends Mar 31, Q2 starts Apr 1
+
+    # After all settlement runs
+    assert (
+        check_attendance_outside_any_settlement_run(
+            session, date(2024, 7, 1)
+        )
+        is True
+    )
+    assert (
+        check_attendance_outside_any_settlement_run(
+            session, date(2025, 6, 15)
+        )
+        is True
+    )
+
+    # Test 3: Boundary dates
+    # Exactly at start of Q1
+    assert (
+        check_attendance_outside_any_settlement_run(
+            session, date(2024, 1, 1)
+        )
+        is False
+    )
+    # Day before Q1
+    assert (
+        check_attendance_outside_any_settlement_run(
+            session, date(2023, 12, 31)
+        )
+        is True
+    )
+    # Exactly at end of Q1
+    assert (
+        check_attendance_outside_any_settlement_run(
+            session, date(2024, 3, 31)
+        )
+        is False
+    )
+    # Day after Q1 (before Q2 starts)
+    assert (
+        check_attendance_outside_any_settlement_run(
+            session, date(2024, 4, 1)
+        )
+        is False
+    )

@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
 
 from sqlalchemy import Column
@@ -45,8 +46,8 @@ def make_pages_polymorphic_type_non_nullable(
     context: UpgradeContext
 ) -> None:
     if context.has_table('pages'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE pages SET type = 'generic' WHERE type IS NULL;
-        """)
+        """))
 
         context.operations.alter_column('pages', 'type', nullable=False)

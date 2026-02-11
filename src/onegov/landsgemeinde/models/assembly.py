@@ -12,14 +12,18 @@ from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.agenda import AgendaItem
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.mixins import StartTimeMixin
+from onegov.landsgemeinde.observer import observes
 from onegov.org.models.extensions import SidebarLinksExtension
 from onegov.search import ORMSearchable
+from sedate import as_datetime
+from sedate import standardize_date
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import Text
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.attributes import flag_modified
 from uuid import uuid4
 
 
@@ -63,6 +67,10 @@ class Assembly(
     def fts_type_title(cls, request: LandsgemeindeRequest) -> str:  # type: ignore[override]
         from onegov.landsgemeinde.layouts import DefaultLayout
         return DefaultLayout(None, request).assembly_type_plural
+
+    @property
+    def fts_last_change(self) -> datetime:
+        return standardize_date(as_datetime(self.date), 'Europe/Zurich')
 
     @property
     def fts_suggestion(self) -> tuple[str, ...]:
@@ -158,3 +166,14 @@ class Assembly(
         for file in value:
             if file.name not in existing_files:
                 self.files.append(file)
+
+    @observes('files', 'date')
+    def update_assembly_date(self, files: list[File], date: date_t) -> None:
+        if not files or date is None:
+            # nothing to do
+            return
+
+        for file in files:
+            if file.meta.get('assembly_date') != date:
+                file.meta['assembly_date'] = date
+                flag_modified(file, 'meta')

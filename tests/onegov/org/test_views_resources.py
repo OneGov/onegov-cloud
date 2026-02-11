@@ -41,6 +41,7 @@ if TYPE_CHECKING:
     from .conftest import Client
 
 
+@freeze_time("2015-08-05", tick=True)
 def test_resource_slots(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.add("Foo", 'Europe/Zurich')
@@ -79,18 +80,18 @@ def test_resource_slots(client: Client) -> None:
     assert result[0]['start'] == '2015-08-04T00:00:00+02:00'
     assert result[0]['end'] == '2015-08-05T00:00:00+02:00'
     assert result[0]['classNames'] == ['event-in-past', 'event-available']
-    assert result[0]['title'] == "Ganztägig \nVerfügbar"
+    assert result[0]['title'] == "Ganztägig"
 
     assert result[1]['start'] == '2015-08-05T00:00:00+02:00'
     assert result[1]['end'] == '2015-08-06T00:00:00+02:00'
-    assert result[1]['classNames'] == ['event-in-past', 'event-available']
+    assert result[1]['classNames'] == ['event-available']
     assert result[1]['title'] == "Ganztägig \nVerfügbar"
 
     url = '/resource/foo/slots?start=2015-08-06&end=2015-08-06'
     result = client.get(url).json
 
     assert len(result) == 1
-    assert result[0]['classNames'] == ['event-in-past', 'event-unavailable']
+    assert result[0]['classNames'] == ['event-unavailable']
     assert result[0]['title'] == "12:00 - 16:00 \nBesetzt"
 
 
@@ -207,9 +208,11 @@ def test_resources_explicitly_link_referenced_files(client: Client) -> None:
         page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
     pdf_url = (
         admin.get('/files')
-        .pyquery('[ic-trigger-from="#button-1"]')
+        .pyquery(f'[ic-trigger-from="#button-{pdf.id}"]')
         .attr('ic-get-from')
         .removesuffix('/details')
     )
@@ -226,7 +229,6 @@ def test_resources_explicitly_link_referenced_files(client: Client) -> None:
     resource_page = new_item.form.submit().follow()
     assert 'Dorf Bike' in resource_page
 
-    session = client.app.session()
     pdf = FileCollection(session).query().one()
     resource = (
         ResourceCollection(client.app.libres_context).query()
@@ -663,6 +665,7 @@ def test_reserved_resources_fields(client: Client) -> None:
     assert "Meeting Room" in room
 
 
+@freeze_time("2015-08-04", tick=True)
 def test_allocations(client: Client) -> None:
     client.login_admin()
     items = client.get('/resources').click('Gegenstand')
@@ -2287,6 +2290,14 @@ def test_occupancy_view(client: Client) -> None:
         '/resource/tageskarte/occupancy-json?start=2015-08-28&end=2015-08-29'
     )
     assert occupancy.status_code == 200
+    occupancy = client.get(
+        '/resource/tageskarte/occupancy-stats?start=2015-08-28&end=2015-08-29'
+    )
+    assert occupancy.status_code == 200
+    data = occupancy.json
+    assert data['count'] == 1
+    assert data['pending'] == 1
+    assert data['utilization'] == 100.0
 
 
 def test_occupancy_view_member_access(client: Client) -> None:
@@ -2316,6 +2327,10 @@ def test_occupancy_view_member_access(client: Client) -> None:
     assert occupancy.status_code == 200
 
     occupancy = client.get('/resource/test/occupancy-json')
+    assert occupancy.status_code == 200
+    occupancy = client.get(
+        '/resource/test/occupancy-stats?start=2015-08-28&end=2015-08-29'
+    )
     assert occupancy.status_code == 200
 
 

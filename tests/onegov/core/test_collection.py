@@ -5,7 +5,7 @@ import pytest
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import SessionManager
 from sqlalchemy import Column, Integer, Text
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 
 
 from typing import Any, TYPE_CHECKING

@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 
 
 def parse(expr: ParserElement, text: str) -> ParseResults:
-    return expr.parseString(text)
+    return expr.parse_string(text)
 
 
 @pytest.mark.parametrize('comment,output', [

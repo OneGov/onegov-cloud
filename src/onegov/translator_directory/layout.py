@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 from functools import cached_property
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -12,15 +11,15 @@ from onegov.translator_directory import _
 from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
 from onegov.town6.layout import DefaultLayout as BaseLayout
+from onegov.town6.layout import TicketLayout as TownTicketLayout
 from onegov.org.models import Organisation
+from onegov.org.utils import get_current_tickets_url
 from onegov.translator_directory.collections.documents import \
     TranslatorDocumentCollection
 from onegov.translator_directory.collections.language import LanguageCollection
-from onegov.translator_directory.collections.time_report import (
-    TimeReportCollection,
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection,
 )
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
 from onegov.translator_directory.constants import (
     member_can_see, editor_can_see, translator_can_see,
     GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS,
@@ -31,10 +30,10 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from decimal import Decimal
-    from onegov.translator_directory.models.language import Language
-    from onegov.translator_directory.models.time_report import (
-        TranslatorTimeReport,
+    from onegov.translator_directory.collections.time_report import (
+        TimeReportCollection,
     )
+    from onegov.translator_directory.models.language import Language
     from markupsafe import Markup
     from onegov.translator_directory.models.translator import (
         AdmissionState, Gender, Translator)
@@ -662,39 +661,59 @@ class TimeReportCollectionLayout(DefaultLayout):
         links.append(Link(_('Time Reports')))
         return links
 
-    @cached_property
-    def has_confirmed_reports(self) -> bool:
-        """Check if there are any confirmed reports available."""
-        from onegov.translator_directory.models.time_report import (
-            TranslatorTimeReport,
-        )
 
-        return (
-            self.model.session.query(TranslatorTimeReport)
-            .filter(TranslatorTimeReport.status == 'confirmed')
-            .count()
-            > 0
-        )
-
-
-class TimeReportLayout(DefaultLayout):
-
-    if TYPE_CHECKING:
-        model: TranslatorTimeReport
-
-        def __init__(
-            self, model: TranslatorTimeReport, request: TranslatorAppRequest
-        ) -> None: ...
+class TicketLayout(TownTicketLayout):
 
     @cached_property
-    def breadcrumbs(self) -> list[Link]:
-        links = super().breadcrumbs
-        assert isinstance(links, list)
-        links.append(
-            Link(
-                text=_('Time Reports'),
-                url=self.request.class_link(TimeReportCollection),
-            )
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        from onegov.translator_directory.models.ticket import (
+            TimeReportHandler,
         )
-        links.append(Link(self.model.title))
+
+        links = super().editbar_links
+        if links is None:
+            return None
+
+        if not self.request.is_manager:
+            return links
+
+        if self.model.handler_code != 'TRP':
+            return links
+
+        if self.model.state != 'open':
+            return links
+
+        handler = self.model.handler
+        if not isinstance(handler, TimeReportHandler):
+            return links
+
+        if not handler.can_delete_time_report(
+            self.request  # type: ignore[arg-type]
+        ):
+            return links
+
+        if handler.time_report is None:
+            return links
+
+        delete_link = Link(
+            text=_('Delete Time Report'),
+            url=self.csrf_protected_url(
+                self.request.link(handler.time_report)
+            ),
+            attrs={'class': ('ticket-button', 'ticket-delete')},
+            traits=(
+                Confirm(
+                    _('Do you really want to delete this time report?'),
+                    _('This cannot be undone.'),
+                    _('Delete time report'),
+                    _('Cancel'),
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=get_current_tickets_url(self.request),
+                ),
+            ),
+        )
+
+        links.append(delete_link)
         return links

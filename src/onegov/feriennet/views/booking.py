@@ -155,7 +155,7 @@ def related_attendees(
         module_path('onegov.feriennet', 'queries/related_attendees.sql'))
 
     related: Query[RelatedAttendeeRow] = session.execute(
-        select(stmt.c).where(
+        select(*stmt.c).where(
             and_(
                 stmt.c.occasion_id.in_(occasion_ids),
                 stmt.c.booking_state == 'accepted',

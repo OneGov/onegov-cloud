@@ -14,14 +14,13 @@ from onegov.core.orm import SessionManager
 from onegov.core.orm.types import HSTORE
 from onegov.core.utils import Bunch, linkify_phone, _phone_ch, to_html_ul
 from sqlalchemy import Column, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 from unittest.mock import patch
 from urlextract import URLExtract
 from uuid import uuid4
 from yubico_client import Yubico  # type: ignore[import-untyped]
 
 from typing import Any, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from onegov.core.orm import Base  # noqa: F401

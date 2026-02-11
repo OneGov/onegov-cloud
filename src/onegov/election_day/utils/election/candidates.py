@@ -286,17 +286,18 @@ def get_candidates_results_by_entity(
         Candidate.first_name,
         CandidateResult.votes
     )
-    results = results.outerjoin(Candidate, ElectionResult)
+    results = results.outerjoin(Candidate)
+    results = results.outerjoin(ElectionResult)
     results = results.filter(ElectionResult.election_id == election.id)
     results = results.filter(Candidate.election_id == election.id)
     if candidates:
         results = results.order_by(
             ElectionResult.name,
-            case(
-                [
+            case(  # type: ignore[call-overload]
+                *(
                     (Candidate.id == candidate.id, index)
                     for index, candidate in enumerate(candidates, 1)
-                ],
+                ),
                 else_=0
             )
         )

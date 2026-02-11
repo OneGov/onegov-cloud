@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-23 23:49+0100\n"
+"POT-Creation-Date: 2026-01-29 01:23+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -586,6 +586,9 @@ msgstr "Bitte wählen Sie einen Standort"
 msgid "End time must be after start time"
 msgstr "Endzeit muss nach Startzeit liegen"
 
+msgid "Contract Number"
+msgstr "Vertragsnummer"
+
 msgid "Address"
 msgstr "Anschrift"
 
@@ -672,8 +675,8 @@ msgstr ""
 "ausgewählten Finanzstelle. Ihre E-Mail-Adressen werden für "
 "Benachrichtigungen verwendet."
 
-msgid "All accountant users must have the editor role"
-msgstr "Alle Benutzer des Rechnungswesen müssen Editoren sein."
+msgid "All accountant users must have the editor or admin role"
+msgstr "Alle Benutzer des Rechnungswesen müssen Editoren oder Administratoren sein."
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -740,6 +743,15 @@ msgstr "Zulassung erteilen"
 
 msgid "Refuse admission"
 msgstr "Zulassung verweigern"
+
+msgid "Delete Time Report"
+msgstr "Zeiterfassung löschen"
+
+msgid "Do you really want to delete this time report?"
+msgstr "Möchten Sie diese Zeiterfassung wirklich löschen?"
+
+msgid "Delete time report"
+msgstr "Zeiterfassung löschen"
 
 msgid "Mutation"
 msgstr "Mutation"
@@ -959,27 +971,20 @@ msgstr "Zulassung verweigert."
 msgid "Proposed changes applied"
 msgstr "Vorgeschlagene Änderungen übernommen"
 
-msgid ""
-"No confirmed time reports available for export. Time reports must be "
-"confirmed before they can be exported."
-msgstr ""
-"Keine bestätigten Zeiterfassungen für den Export verfügbar. Zeiterfassungen "
-"müssen bestätigt werden, bevor sie exportiert werden können."
-
-msgid "Month"
-msgstr "Monat"
-
-msgid "Year"
-msgstr "Jahr"
-
-msgid "Export für Buchhaltung"
-msgstr "Export für Buchhaltung"
-
 msgid "No time reports found"
 msgstr "Keine Zeiterfassungen gefunden"
 
+msgid "No archived time reports found"
+msgstr "Keine archivierten Zeiterfassungen gefunden"
+
 msgid "Created"
 msgstr "Erstellt"
+
+msgid "Actions"
+msgstr "Aktionen"
+
+msgid "Exported"
+msgstr "Exportiert"
 
 msgid "View Ticket"
 msgstr "Ticket anzeigen"
@@ -1051,41 +1056,27 @@ msgstr "E-Mail / Benutzername / Kürzel"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
-msgid "January"
-msgstr "Januar"
+msgid "Show active reports"
+msgstr "Aktive Zeiterfassungen anzeigen"
 
-msgid "February"
-msgstr "Februar"
+msgid "Show archived (exported) reports"
+msgstr "Archivierte (exportierte) Zeiterfassungen anzeigen"
 
-msgid "March"
-msgstr "März"
+#, python-format
+msgid "Export ${count} reports"
+msgstr "${count} Zeiterfassungen exportieren"
 
-msgid "April"
-msgstr "April"
+#, python-format
+msgid "Export ${count} time reports for accounting?"
+msgstr "${count} Zeiterfassungen für die Buchhaltung exportieren?"
 
-msgid "May"
-msgstr "Mai"
+msgid "Reports can only be exported once and will appear in the archive."
+msgstr ""
+"Zeiterfassungen können nur einmal exportiert werden und erscheinen danach im "
+"Archiv."
 
-msgid "June"
-msgstr "Juni"
-
-msgid "July"
-msgstr "Juli"
-
-msgid "August"
-msgstr "August"
-
-msgid "September"
-msgstr "September"
-
-msgid "October"
-msgstr "Oktober"
-
-msgid "November"
-msgstr "November"
-
-msgid "December"
-msgstr "Dezember"
+msgid "Export"
+msgstr "Exportieren"
 
 msgid "Only pending time reports can be edited"
 msgstr "Nur ausstehende Zeiterfassungen können bearbeitet werden"
@@ -1118,12 +1109,8 @@ msgstr ""
 msgid "Time report accepted"
 msgstr "Zeiterfassung akzeptiert"
 
-msgid "Invalid form data"
-msgstr "Ungültige Formulardaten"
-
-#, python-format
-msgid "No confirmed time reports found for ${month}/${year}"
-msgstr "Keine bestätigten Zeiterfassungen gefunden für ${month}/${year}"
+msgid "No unexported time reports found"
+msgstr "Keine nicht-exportierten Zeiterfassungen gefunden"
 
 #, python-format
 msgid ""
@@ -1132,6 +1119,13 @@ msgid ""
 msgstr ""
 "Export nicht möglich: Den folgenden Übersetzern fehlt eine Personalnummer "
 "(Personal-Nr.): ${names}"
+
+#, python-format
+msgid ""
+"Export warning: The following translators are missing a contract number "
+"(Vertragsnummer): ${names}"
+msgstr ""
+"Export-Warnung: Den folgenden Übersetzern fehlt eine Vertragsnummer: ${names}"
 
 msgid "Ticket Number"
 msgstr "Ticket-Nummer"
@@ -1144,6 +1138,9 @@ msgstr "QR-Rechnung nur für bestätigte Zeiterfassungen verfügbar"
 
 msgid "Could not generate QR bill"
 msgstr "QR-Rechnung konnte nicht erstellt werden"
+
+msgid "Time report deleted"
+msgstr "Zeiterfassung gelöscht"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
@@ -1205,13 +1202,65 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 msgid "Download"
 msgstr "Herunterladen"
 
+#~ msgid "Showing archived (exported) time reports."
+#~ msgstr "Zeigt archivierte (exportierte) Zeiterfassungen an."
+
 #~ msgid ""
-#~ "Your time report has been successfully submitted and is now under review."
+#~ "No confirmed time reports available for export. Time reports must be "
+#~ "confirmed before they can be exported."
 #~ msgstr ""
-#~ "Ihre Zeiterfassung wurde erfolgreich eingereicht und wird nun geprüft."
+#~ "Keine bestätigten Zeiterfassungen für den Export verfügbar. "
+#~ "Zeiterfassungen müssen bestätigt werden, bevor sie exportiert werden "
+#~ "können."
 
-#~ msgid "View your time report"
-#~ msgstr "Zeiterfassung anzeigen"
+#~ msgid "Month"
+#~ msgstr "Monat"
 
-#~ msgid "Your time report has been submitted"
-#~ msgstr "Ihre Zeiterfassung wurde eingereicht"
+#~ msgid "Year"
+#~ msgstr "Jahr"
+
+#~ msgid "Export für Buchhaltung"
+#~ msgstr "Export für Buchhaltung"
+
+#~ msgid "January"
+#~ msgstr "Januar"
+
+#~ msgid "February"
+#~ msgstr "Februar"
+
+#~ msgid "March"
+#~ msgstr "März"
+
+#~ msgid "April"
+#~ msgstr "April"
+
+#~ msgid "May"
+#~ msgstr "Mai"
+
+#~ msgid "June"
+#~ msgstr "Juni"
+
+#~ msgid "July"
+#~ msgstr "Juli"
+
+#~ msgid "August"
+#~ msgstr "August"
+
+#~ msgid "September"
+#~ msgstr "September"
+
+#~ msgid "October"
+#~ msgstr "Oktober"
+
+#~ msgid "November"
+#~ msgstr "November"
+
+#~ msgid "December"
+#~ msgstr "Dezember"
+
+#~ msgid "Invalid form data"
+#~ msgstr "Ungültige Formulardaten"
+
+#, python-format
+#~ msgid "No confirmed time reports found for ${month}/${year}"
+#~ msgstr "Keine bestätigten Zeiterfassungen gefunden für ${month}/${year}"

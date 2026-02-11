@@ -15,9 +15,9 @@ repos:
         exclude: .pre-commit-config.yaml
       - id: pt_structure
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.14
+    rev: v0.15.0
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: [ "--fix" ]
   - repo: https://github.com/PyCQA/flake8
     rev: 7.3.0

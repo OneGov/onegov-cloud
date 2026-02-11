@@ -255,7 +255,7 @@ class BookingPeriodMeta(_BookinPeriodMeta, BookingPeriodMixin):
     #       the many redundant calls to `phase`.
 
     def materialize(self, session: Session) -> BookingPeriod:
-        period = session.query(BookingPeriod).get(self.id)
+        period = session.get(BookingPeriod, self.id)  # type: ignore[attr-defined]
         assert period is not None
         return period
 

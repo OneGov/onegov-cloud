@@ -8,10 +8,9 @@ from onegov.core.orm import Base, Base as MyBase, SessionManager
 from onegov.core.orm.types import UUID
 from onegov.pay.models import Payable, Payment, PaymentProvider, ManualPayment
 from onegov.pay.collections import PaymentCollection
-from sqlalchemy import Column
-from sqlalchemy import Text
+from sqlalchemy import text, Column, Text
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 from uuid import uuid4
 
 # NOTE:
@@ -50,9 +49,8 @@ def test_payment_with_different_bases(postgres_dsn: str) -> None:
     # Explicitly add libres.db.models.ORMBase to the session manager's bases
     # if it was successfully imported. This ensures tables for models on
     # this base (like libres.db.models.Reservation) are created.
-    if _libres_db_models_ORMBase:  # type: ignore[truthy-function]
-        if _libres_db_models_ORMBase not in mgr.bases:
-            mgr.bases.append(_libres_db_models_ORMBase)
+    if _libres_db_models_ORMBase not in mgr.bases:
+        mgr.bases.append(_libres_db_models_ORMBase)
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
@@ -148,11 +146,11 @@ def test_payment_referential_integrity(postgres_dsn: str) -> None:
     session.delete(session.query(Order).one())
     transaction.commit()
 
-    assert not list(session.execute("select * from orders"))
-    assert not list(session.execute("select * from payments"))
-    assert not list(session.execute(
+    assert not list(session.execute(text("select * from orders")))
+    assert not list(session.execute(text("select * from payments")))
+    assert not list(session.execute(text(
         "select * from payments_for_orders_payment"
-    ))
+    )))
 
     mgr.dispose()
 

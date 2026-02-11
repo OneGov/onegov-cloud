@@ -9,7 +9,10 @@ var setupOccupancyCalendar = function(calendar) {
         date: calendar.data('date'),
         highlights_min: calendar.data('highlights-min'),
         highlights_max: calendar.data('highlights-max'),
-        pdf_url: calendar.data('pdf-url')
+        stats_url: calendar.data('stats-url'),
+        pdf_url: calendar.data('pdf-url'),
+        resourcesUrl: calendar.data('resources-url'),
+        resourceActive: calendar.data('resource-active')
     });
 };
 

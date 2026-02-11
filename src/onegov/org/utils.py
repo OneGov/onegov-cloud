@@ -518,7 +518,34 @@ class AllocationEventInfo:
         return int(self.quota * self.availability / 100)
 
     @property
+    def in_past(self) -> bool:
+        return self.allocation.end < sedate.utcnow()
+
+    @property
+    def outside_booking_window(self) -> bool:
+        return self.request.is_manager and (
+            self.resource.is_past_deadline(
+                # for partly available allocations we use the end of the
+                # allocation, since some small sliver of the allocation
+                # may still be before the deadline, we could get a slightly
+                # more accurate result by subtracting the raster, but it
+                # doesn't seem worth the extra CPU cycles.
+                self.allocation.end
+                if self.allocation.partly_available
+                else self.allocation.start
+            ) or self.resource.is_before_lead_time(
+                self.allocation.start
+            )
+        )
+
+    @property
     def event_title(self) -> str:
+        if self.in_past or self.outside_booking_window:
+            # NOTE: Only show the time slot, since the information for
+            #       why this slot cannot be reserved still/yet is too
+            #       complex to summarize in a single word/short sentence.
+            return self.event_time
+
         if self.allocation.partly_available:
             available = self.translate(_('${percent}% Available', mapping={
                 'percent': int(self.availability)
@@ -547,23 +574,10 @@ class AllocationEventInfo:
 
     @property
     def event_classes(self) -> Iterator[str]:
-        if self.allocation.end < sedate.utcnow():
+        if self.in_past:
             yield 'event-in-past'
 
-        elif not self.request.is_manager and (
-            self.resource.is_past_deadline(
-                # for partly available allocations we use the end of the
-                # allocation, since some small sliver of the allocation
-                # may still be before the deadline, we could get a slightly
-                # more accurate result by subtracting the raster, but it
-                # doesn't seem worth the extra CPU cycles.
-                self.allocation.end
-                if self.allocation.partly_available
-                else self.allocation.start
-            ) or self.resource.is_before_lead_time(
-                self.allocation.start
-            )
-        ):
+        elif self.outside_booking_window:
             yield 'event-outside-booking-window'
 
         if self.quota > 1:
@@ -736,6 +750,7 @@ class AvailabilityEventInfo:
             ) if blockable else None,
             'partlyAvailable': self.allocation.partly_available,
             'fullyAvailable': self.allocation.availability == 100.0,
+            'wholeDay': self.allocation.whole_day,
             'kind': 'allocation',
         }
 
@@ -1561,10 +1576,15 @@ def group_by_column(
     # groupby expects the input iterable (records) to already be sorted
     records = sorted(records, key=group_key)
     for group, items in groupby(records, group_key):
-        grouped[group] = [
-            transform(i)
+        entries = [
+            t
             for i in sorted(items, key=sort_key)
+            if (t := transform(i)) is not None
         ]
+        # NOTE: Since transform can remove entries we only add the group
+        #       if it is still non-empty.
+        if entries:
+            grouped[group] = entries
 
     return grouped
 
@@ -1642,14 +1662,14 @@ def emails_for_new_ticket(
     )
 
     for email, name in query.join(UserGroup.users).with_entities(
-        case([(
+        case((
             UserGroup.meta['shared_email'].isnot(None),
-            UserGroup.meta['shared_email'].astext,
-        )], else_=User.username),
-        case([(
+            UserGroup.meta['shared_email'].astext
+        ), else_=User.username),
+        case((  # type: ignore[arg-type]
             UserGroup.meta['shared_email'].isnot(None),
             UserGroup.name,
-        )], else_=User.realname),
+        ), else_=User.realname),
     ).distinct():
 
         if email in seen:

@@ -1753,31 +1753,55 @@
 </metal:photoswipe>
 
 <metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
-    <div tal:condition="link_mp4 or link_webm" class="homepage-video" data-max-height="${max_height if max_height else '100vh'}"
-    >
-        <video id="autoplay-video" autoplay playsinline loop muted
-            data-link-mp4="${link_mp4}"
-            data-link-mp4-low-res="${link_mp4_low_res}"
-            data-link-webm="${link_webm}"
-            data-link-webm-low-res="${link_webm_low_res}"
-        >
-            Your browser does not support the video tag.
-        </video>
-        <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer">
-            <div class="dark-overlay" tal:condition="text"></div>
-            <div class="grid-container" tal:condition="text">
-                <div class="text">
-                    <p tal:condition="text and button_url">
-                        <tal:b >
-                            <span>${text}</span>
-                        </tal:b>
-                    </p>
-                    <tal:b tal:condition="text and not button_url">
-                        <span>${text}</span>
-                    </tal:b>
-                    <tal:b tal:condition="button_url|False">
-                        <a class="button" href="${button_url}">${button_text}<tal:b condition="not: button_text" i18n:translate="">Show more</tal:b></a>
-                    </tal:b>
+    <div class="homepage-video-container">
+        <div tal:condition="link_mp4 or link_webm" class="homepage-video" data-max-height="${max_height if max_height else '100vh'}" tal:define="searchbox searchbox|'true';">
+            <video id="autoplay-video" autoplay playsinline loop muted
+                data-link-mp4="${link_mp4}"
+                data-link-mp4-low-res="${link_mp4_low_res}"
+                data-link-webm="${link_webm}"
+                data-link-webm-low-res="${link_webm_low_res}"
+            >
+                Your browser does not support the video tag.
+            </video>
+            <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer">
+                <div class="dark-overlay" tal:condition="text">
+                    <div class="grid-container text-container" tal:condition="text">
+                        <div class="text">
+                            <p tal:condition="text and button_url">
+                                <tal:b >
+                                    <span>${text}</span>
+                                </tal:b>
+                            </p>
+                            <tal:b tal:condition="text and not button_url">
+                                <span>${text}</span>
+                            </tal:b>
+                            <tal:b tal:condition="button_url|False">
+                                <a class="button" href="${button_url}">${button_text}<tal:b condition="not: button_text" i18n:translate="">Show more</tal:b></a>
+                            </tal:b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="homepage-searchbox-wrapper ${searchbox_position|''}" tal:condition="not searchbox == 'false'|True">
+            <div class="grid-container">
+                <div class="grid-x grid-padding-x">
+                    <div class="cell small-12 medium-6 large-5">
+                        <form class="searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                            <div class="input-group">
+                                <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
+                                <div class="typeahead">
+                                    <div class="cell small-12" data-typeahead-container>
+                                    </div>
+                                </div>
+                                <div class="input-group-button">
+                                    <button class="button" type="submit">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1815,8 +1839,8 @@
         </div>
 </metal:icon_links>
 
-<metal:slider define-macro="slider" i18n:domain="onegov.town6">
-    <div tal:condition="images" class="orbit slider homepage-image-slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200" tal:define="height height|None;">
+<metal:slider define-macro="slider" i18n:domain="onegov.town6" tal:define="searchbox searchbox|'true';">
+    <div tal:condition="images" class="orbit slider homepage-image-slider ${'' if searchbox == 'false' else 'with-searchbox'}" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200" tal:define="height height|None;">
         <div class="orbit-wrapper">
             <div tal:condition="images and len(images) > 1" class="orbit-controls show-for-medium">
                 <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
@@ -1827,11 +1851,11 @@
                     <figure class="orbit-figure">
                         <div class="orbit-image" style="background-image:url(${image.src})" data-image-url="${image.src}"></div>
                         <div class="dark-overlay" tal:condition="image.note"></div>
-                        <div class="grid-container" tal:condition="image.note">
+                        <div class="grid-container text-container" tal:condition="image.note">
                             <div class="text">
                                 <span>${image.note}</span>
                             </div>
-                        </div>
+                      </div>
                     </figure>
                 </li>
             </ul>
@@ -1844,6 +1868,28 @@
                 This space holds images from your photo-albums. To show photos add a few
                 photos to an album and mark it as available for the homepage.
             </tal:b>
+        </div>
+    </div>
+    <div class="homepage-searchbox-wrapper" tal:condition="not searchbox == 'false'|True">
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x">
+                <div class="cell small-12 medium-6 large-7">
+                    <form class="searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                        <div class="input-group">
+                            <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
+                            <div class="typeahead">
+                                <div class="cell small-12" data-typeahead-container>
+                                </div>
+                            </div>
+                            <div class="input-group-button">
+                                <button class="button" type="submit">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </metal:slider>
@@ -2457,8 +2503,6 @@
 </metal:resource_subgroup>
 
 <metal:file_details define-macro="file-details" i18n:domain="onegov.town6">
-    <!--! FIXME: Make this work without ic-on-success -->
-    <?python request.require_unsafe_eval() ?>
     <div class="file-details">
         <a class="file-preview" href="${request.link(file)}" tal:condition="extension == 'pdf'">
             <img class="pdf-preview" src="${request.link(file, name='medium')}">
@@ -2511,14 +2555,16 @@
                 >
                 <div tal:condition="file.published" class="file-status-tag">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       ic-target="#button-${file.id}"
+                       ic-success-action="change"
                        class="is-published">
                         <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
                     </a>
                 </div>
                 <div tal:condition="not:file.published" class="file-status-tag">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       ic-target="#button-${file.id}"
+                       ic-success-action="change"
                        class="is-not-published">
                         <i class="far fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
                     </a>
@@ -2531,16 +2577,16 @@
                                 <legend tal:condition="publish_date" i18n:translate>Will be published on:</legend>
                                 <legend tal:condition="not:publish_date" i18n:translate>Publication date:</legend>
                                 <div class="publication-settings-input">
-                                    <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
+                                    <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-target="#button-${file.id}" ic-success-action="change" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
 
-                                    <select name="hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                    <select name="hour" ic-post-to="${post_url}" ic-target="#button-${file.id}" ic-success-action="change">
                                         <option tal:condition="not:publish_date"></option>
                                         <tal:b repeat="hour range(24)" tal:define="publish_time publish_date and '{:0>2}:00'.format(publish_date.hour)">
                                             <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time" value="${time}">${time}</option>
                                         </tal:b>
                                     </select>
 
-                                    <a ic-post-to="${post_url}&clear_start_date=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                    <a ic-post-to="${post_url}&clear_start_date=1" ic-target="#button-${file.id}" ic-success-action="change">
                                         <i class="far fa-times-circle"></i>
                                         <span class="show-for-sr" i18n:translate>Reset</span>
                                     </a>
@@ -2551,16 +2597,16 @@
                             <legend tal:condition="publish_end_date" i18n:translate>Will be published until:</legend>
                             <legend tal:condition="not:publish_end_date" i18n:translate>Publication end date:</legend>
                             <div class="publication-settings-input">
-                                <input type="date" name="end-date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_end_date and publish_end_date.date().isoformat() or ''}" required="required">
+                                <input type="date" name="end-date" class="small" ic-post-to="${post_url}" ic-target="#button-${file.id}" ic-success-action="change" value="${publish_end_date and publish_end_date.date().isoformat() or ''}" required="required">
 
-                                <select name="end-hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                <select name="end-hour" ic-post-to="${post_url}" ic-target="#button-${file.id}" ic-success-action="change">
                                     <option tal:condition="not:publish_end_date"></option>
                                     <tal:b repeat="hour range(24)" tal:define="publish_end_time publish_end_date and '{:0>2}:00'.format(publish_end_date.hour)">
                                         <option tal:define="end_time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_end_time == end_time" value="${end_time}">${end_time}</option>
                                     </tal:b>
                                 </select>
 
-                                <a ic-post-to="${post_url}&clear_end_date=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                <a ic-post-to="${post_url}&clear_end_date=1" ic-target="#button-${file.id}" ic-success-action="change">
                                     <i class="far fa-times-circle"></i>
                                     <span class="show-for-sr" i18n:translate>Reset</span>
                                 </a>
@@ -2578,7 +2624,8 @@
                 >
                 <div tal:condition="file.publication" class="file-status-tag">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       ic-target="#button-${file.id}"
+                       ic-success-action="change"
                        class="is-a-publication">
                         <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Publication</span>
                     </a>
@@ -2586,7 +2633,8 @@
 
                 <div tal:condition="not:file.publication" class="file-status-tag">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       ic-target="#button-${file.id}"
+                       ic-success-action="change"
                        class="is-not-a-publication">
                         <i class="far fa-fw fa-times-circle" aria-hidden="true"></i> <span i18n:translate>Not a publication</span>
                     </a>
@@ -2636,23 +2684,8 @@
     <div class="file-actions">
         <a class="button secondary confirm delete" role="button"
             ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
-            ic-on-success="
-                var cfd = $(elt).closest('tr');  // current file details row
-                var cfi = cfd.prev();  // current file info row
-                var rbfi = cfi.prev();  // row before current file info
-                var rafd = cfd.next();  // row after current file details
-
-                cfi.remove();  // remove current file info row
-                cfd.remove();  // remove current file details row
-
-                // if file is last in group, remove the group tr as well
-                if (!rbfi.is('[id^=\'details-\']') &&
-                    !rbfi.hasClass('file-info') &&
-                    !rafd.is('[id^=\'details-\']') &&
-                    !rafd.hasClass('file-info')) {
-                    rbfi.remove();  // remove line before file-info row
-                }
-            "
+            ic-target="closest tbody"
+            ic-success-action="remove"
             data-confirm="Do you really want to delete this file?"
             data-confirm-extra="${file.name}"
             data-confirm-yes="Delete File"
@@ -2662,25 +2695,15 @@
             <span i18n:translate >Delete</span>
         </a>
         <a class="button secondary rename prompt" role="button"
+            ic-post-to="${request.csrf_protected_url(request.link(file, 'rename'))}"
+            ic-include='.dialog [name="name"]'
+            ic-target="#button-${file.id}"
+            ic-success-action="change"
             data-prompt="Please provide the new name for the file"
             data-prompt-ok="Rename"
             data-prompt-cancel="Cancel"
+            data-prompt-name="name"
             data-prompt-value="${file.name}"
-            data-prompt-success="(function(value) {
-                var url = '${request.link(file, 'rename')}?csrf-token=${layout.csrf_token}';
-                var ext = '.${file.name.split('.')[-1].strip()}';
-                var elt = $(this);
-
-                value = value.substring(value.length - ext.length, value.length) === ext && value || value + ext;
-
-                jQuery.post(url, {'name': value}, function() {
-                    var actions = elt;
-
-                    actions.closest('tr').prev().find('td:first').text(value);
-                    actions.find('a.prompt').data('prompt-value', value);
-                    actions.find('a.delete').data('confirm-extra', value);
-                });
-            })"
             i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel" >
            <span class="fa fa-edit" aria-hidden="true"></span>
            <span i18n:translate>Rename</span>
@@ -2692,18 +2715,15 @@
         <a class="button secondary" role="button"
            ic-get-from="${request.link(file, 'links')}"
            ic-target="#links-${id}"
-           ic-on-success="
-               var modal = $('#links-${id}-modal');
-               modal.foundation();
-               modal.foundation('open');
-               modal.focus();
-           ">
+           ic-action-target="#links-${id}-modal-opener"
+           ic-success-action="click">
             <span class="fa fa-link" aria-hidden="true"></span>
             <span i18n:translate>Linked Pages</span>
             <span class="ic-indicator fa fa-spinner fa-spin" style="display: none"></span>
        </a>
     </div>
     <div style="display:none;">
+        <button id="links-${id}-modal-opener" data-open="links-${id}-modal" tabindex="-1" aria-hidden="true"></button>
         <div id="links-${id}-modal" class="reveal large dialog" data-reveal>
             <h2 i18n:translate>Links to <tal:b i18n:name="filename">${file.name}</tal:b></h2>
             <ul id="links-${id}"></ul>
@@ -2742,28 +2762,18 @@
         <tal:b condition="not file.signed and may_sign">
             <a tal:condition="not:file.signed" class="is-not-signed signature-status"
                 role="button"
+                ic-post-to="${request.csrf_protected_url(request.link(file, 'sign'))}"
+                ic-include='.dialog [name="token"]'
+                ic-target="closest .file-status-tag"
+                ic-action-target="this"
+                ic-beforeSend-action="addClass:signing"
+                ic-complete-action="removeClass:signing"
                 data-prompt="Please enter your yubikey to apply a digital seal to this file"
+                data-prompt-name="token"
                 data-prompt-ok="Sign"
                 data-prompt-cancel="Cancel"
                 data-prompt-placeholder="Plug your YubiKey into a USB slot and press it."
                 data-prompt-info="Published documents with a digital seal can be discovered through the site-search and in the list of documents with a digital seal. This action will be logged and cannot be undone."
-                data-prompt-success="(function(value) {
-                    var url = '${request.link(file, 'sign')}?csrf-token=${layout.csrf_token}';
-                    var elt = $(this);
-                    var row = elt.closest('tr');
-
-                    elt.toggleClass('signing', true);
-                    window.elt = elt;
-
-                    jQuery.post(url, {'token': value}, function(data) {
-                        var target = elt.closest('.signature-status').parent();
-                        target.html(data);
-                        processCommonNodes(target);
-                        row.prev().addClass('signed');
-                    }).always(function() {
-                        elt.toggleClass('signing', false);
-                    });
-                })"
                 i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel;data-prompt-info;data-prompt-placeholder"
             >
                 <i class="fa fa-fw fa-unlock" aria-hidden="true"></i>
@@ -2794,10 +2804,7 @@
 </metal:signature_status>
 
 <metal:file_info define-macro="file-info" i18n:domain="onegov.town6">
-    <!--! FIXME: Make file-details work without ic-on-success -->
-    <?python request.require_unsafe_eval() ?>
     <tal:b define="
-        file_number file.number|file.id;
         file_upload file.upload_date|file.created;
         file_publish_end file.publish_end_date|None;
     ">
@@ -2806,7 +2813,7 @@
                 ${file.name}
             </td>
             <td>
-                <a id="button-${file_number}" data-ogc-toggle="#details-${file_number}">
+                <a id="button-${file.id}" data-ogc-toggle="#details-${file.id}">
                     <i class="fa fa-chevron-down rotate" aria-hidden="true"></i>
                 </a>
             </td>
@@ -2821,10 +2828,10 @@
             </td>
         </tr>
         <!-- Hidden Detail-Row -->
-        <tr id="details-${file_number}" class="hidden">
+        <tr id="details-${file.id}" class="hidden">
             <td colspan="5">
-                <div ic-trigger-from="#button-${file_number}"
-                     ic-trigger-on="click once"
+                <div ic-trigger-from="#button-${file.id}"
+                     ic-trigger-on="click once, change"
                      ic-get-from="${actions_url(file.id)}"
                      class="file-preview-wrapper"
                 >
@@ -2835,16 +2842,15 @@
 </metal:file_info>
 
 <metal:uploaded_image define-macro="uploaded_image" i18n:domain="onegov.town6">
-    <!--! FIXME: Make this work without ic-on-success -->
-    <?python request.require_unsafe_eval() ?>
     <div id="image-${index}" class="image-container">
         <a href="${image.url}" tal:condition="image" class="editable-alt" data-note-update-url="${image.extra}">
             <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt" alt="${image.alt}" width="${image.width}" height="${image.height}" />
             <img tal:condition="not:image.alt" data-src="${image.src}" class="lazyload missing-alt static-alt" alt="Click to add a description" i18n:attributes="alt" width="${image.width}" height="${image.height}"/>
         </a>
         <a class="delete confirm"
-           ic-delete-from="${image.url}?csrf-token=${layout.csrf_token}"
-           ic-on-success="$('#image-${index}').remove();"
+           ic-delete-from="${request.csrf_protected_url(image.url)}"
+           ic-target="#image-${index}"
+           ic-success-action="remove"
            data-confirm="Do you really want to delete the image?"
            data-confirm-yes="Delete Image"
            data-confirm-no="Cancel"

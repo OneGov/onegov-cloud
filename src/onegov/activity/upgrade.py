@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
 
 import string
@@ -32,6 +33,7 @@ from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import select
+from sqlalchemy import text
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import ARRAY
 
@@ -59,10 +61,10 @@ def support_multiple_dates_per_occasion(context: UpgradeContext) -> None:
         context.operations.alter_column(
             'occasions', name, server_default=None)
 
-    context.session.execute("""
+    context.session.execute(text("""
         INSERT INTO occasion_dates ("timezone", "start", "end", "occasion_id")
         SELECT "timezone", "start", "end", "id" FROM occasions
-    """)
+    """))
 
     context.session.flush()
 
@@ -130,12 +132,12 @@ def add_active_days(context: UpgradeContext) -> None:
 
     # This will be removed in an upgrade step further down again and is not
     # compatible with postgres 13- and 14+.
-    # context.session.execute(
+    # context.session.execute(text(
     #     'CREATE AGGREGATE "{}".array_cat_agg(anyarray) '
     #     '(SFUNC=array_cat, STYPE=anyarray)'.format(
     #         context.schema
     #     )
-    # )
+    # ))
 
     context.operations.add_column('activities', Column(
         'active_days', ARRAY(Integer), nullable=True
@@ -173,18 +175,18 @@ def remove_denied_activity_state(context: UpgradeContext) -> None:
 
     op = context.operations
 
-    op.execute("""
+    op.execute(text("""
         ALTER TABLE activities ALTER COLUMN state TYPE Text;
         UPDATE activities SET state = 'archived' WHERE state = 'denied';
         DROP TYPE activity_state;
-    """)
+    """))
 
     new_type.create(op.get_bind())
 
-    op.execute("""
+    op.execute(text("""
         ALTER TABLE activities ALTER COLUMN state
         TYPE activity_state USING state::text::activity_state;
-    """)
+    """))
 
 
 @upgrade_task('Add weekdays')
@@ -437,7 +439,7 @@ def add_invoice_references(context: UpgradeContext) -> None:
 
     # the references might have been created already in the previous upgrade
     # step, if it was executed with the latest release
-    context.session.execute('DELETE FROM invoice_references')
+    context.session.execute(text('DELETE FROM invoice_references'))
 
     for invoice in invoices:
         context.session.add(
@@ -498,7 +500,7 @@ def make_group_code_nullable(context: UpgradeContext) -> None:
     context.operations.alter_column('bookings', 'group_code', nullable=True)
 
     # nobody uses groups yet, so we can safely reset it all to NULL
-    context.operations.execute('UPDATE bookings SET group_code = NULL')
+    context.operations.execute(text('UPDATE bookings SET group_code = NULL'))
 
 
 @upgrade_task('Adds exempt_from_booking_limit to occasion')
@@ -602,12 +604,12 @@ def improve_period_dates_constraint(context: UpgradeContext) -> None:
 
 @upgrade_task('Drop deadline_date')
 def drop_deadline_date(context: UpgradeContext) -> None:
-    context.session.execute("""
+    context.session.execute(text("""
             UPDATE periods SET booking_end = deadline_date
             WHERE deadline_date IS NOT NULL
               AND execution_start <= deadline_date
               AND deadline_date <= execution_end
-        """)
+        """))
 
     context.operations.drop_column('periods', 'deadline_date')
 
@@ -669,18 +671,18 @@ def make_activity_polymorphic_type_non_nullable(
     context: UpgradeContext
 ) -> None:
     if context.has_table('activities'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE activities SET type = 'generic' WHERE type IS NULL;
-        """)
+        """))
 
         context.operations.alter_column('activities', 'type', nullable=False)
 
 
 @upgrade_task('Cleanup activity aggregates')
 def cleanup_activity_aggregates(context: UpgradeContext) -> None:
-    context.operations.execute(f"""
+    context.operations.execute(text(f"""
         DROP AGGREGATE IF EXISTS "{context.schema}".array_cat_agg(anyarray);
-    """)
+    """))
 
 
 @upgrade_task('Add differing attendee address')

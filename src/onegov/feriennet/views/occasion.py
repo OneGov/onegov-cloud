@@ -19,6 +19,7 @@ from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
 from onegov.org.layout import DefaultMailLayout
 from onegov.user import User, UserCollection
+from sqlalchemy import text
 
 
 from typing import TYPE_CHECKING
@@ -201,12 +202,12 @@ def book_occasion(
 ) -> RenderData | Response:
 
     # for the "nth. occasion" title
-    number: int = request.session.execute("""
+    number: int = request.session.execute(text("""
         SELECT count(*) FROM occasions
         WHERE activity_id = :activity_id
           AND "order" <= :order
           AND "period_id" = :period_id
-    """, {
+    """), {
         'activity_id': self.activity_id,
         'order': self.order,
         'period_id': self.period.id

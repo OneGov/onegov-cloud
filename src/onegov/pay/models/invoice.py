@@ -183,7 +183,7 @@ class Invoice(Base, TimestampMixin):
 
     @total_amount.expression  # type:ignore[no-redef]
     def total_amount(cls) -> ColumnElement[Decimal]:
-        return select([func.sum(InvoiceItem.amount)]).where(
+        return select(func.sum(InvoiceItem.amount)).where(
             InvoiceItem.invoice_id == cls.id
         ).label('total_amount')
 
@@ -200,7 +200,7 @@ class Invoice(Base, TimestampMixin):
 
     @outstanding_amount.expression  # type:ignore[no-redef]
     def outstanding_amount(cls) -> ColumnElement[Decimal]:
-        return select([func.sum(InvoiceItem.amount)]).where(
+        return select(func.sum(InvoiceItem.amount)).where(
             and_(
                 InvoiceItem.invoice_id == cls.id,
                 InvoiceItem.paid == False
@@ -220,7 +220,7 @@ class Invoice(Base, TimestampMixin):
 
     @paid_amount.expression  # type:ignore[no-redef]
     def paid_amount(cls) -> ColumnElement[Decimal]:
-        return select([func.sum(InvoiceItem.amount)]).where(
+        return select(func.sum(InvoiceItem.amount)).where(
             and_(
                 InvoiceItem.invoice_id == cls.id,
                 InvoiceItem.paid == True

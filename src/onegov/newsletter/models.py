@@ -113,7 +113,7 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
 
     @property
     def open_recipients(self) -> tuple[Recipient, ...]:
-        received = select([newsletter_recipients.c.recipient_id]).where(
+        received = select(newsletter_recipients.c.recipient_id).where(  # type: ignore[arg-type]
             newsletter_recipients.c.newsletter_id == self.name)
 
         return tuple(object_session(self).query(Recipient).filter(
