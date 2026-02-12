@@ -2061,6 +2061,31 @@
 </metal:search_result_people>
 
 
+<metal:search_result_par_parliamentarians define-macro="search_result_par_parliamentarians" i18n:domain="onegov.town6">
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <div class="search-preview" tal:condition="result.function|nothing">${result.function}</div>
+    <div class="search-preview" tal:condition="not:result.active|nothing" i18n:translate>Former member or parliament</div>
+    <div class="search-preview" tal:condition="result.roles|nothing" tal:repeat="role result.roles">
+        <div class="search-preview" tal:condition="role.role_label">
+            <span>${role.role_label}</span> <span i18n:translate>Parliament</span>
+        </div>
+        <div tal:condition="role.parliamentary_group">
+            ${role.parliamentary_group_role_label}
+            <span i18n:translate>Parliamentary Group</span>
+            ${role.parliamentary_group.title}
+        </div>
+    </div>
+    <div class="search-preview" tal:condition="result.commission_memberships|nothing" tal:repeat="role result.commission_memberships">
+        <span>${role.role_label}</span> <span>${role.commission.title}
+    </div>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
+</metal:search_result_par_parliamentarians>
+
+
 <metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.town6">
     <a href="${result.url}" class="list-link">
         <span class="h5 list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></span>

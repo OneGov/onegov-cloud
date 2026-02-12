@@ -19,8 +19,8 @@ from vobject import vCard
 from vobject.vcard import Address
 from vobject.vcard import Name
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Collection
