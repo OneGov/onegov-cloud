@@ -542,18 +542,17 @@ msgstr "Unterhalb der Einträge"
 msgid "Definition"
 msgstr "Definition"
 
-msgid "Coordinates/Map"
-msgstr "Koordinaten/Karte"
+msgid "Map"
+msgstr "Karte"
 
-msgid "Entries have no coordinates, hence no map will be shown"
-msgstr "Einträge haben keine Koordinaten, daher wird keine Karte angezeigt"
+msgid "Do not show map"
+msgstr "Keine Karte anzeigen"
 
-msgid "Coordinates/Map are shown on each entry"
-msgstr "Koordinaten/Karte werden auf den Einträgen angezeigt"
+msgid "Show map only on entries"
+msgstr "Karte nur auf den Einträgen anzeigen"
 
-msgid "Coordinates/Map are shown on the directory and on each entry"
-msgstr ""
-"Koordinaten/Karte werden im Verzeichnis und auf den Einträgen angezeigt"
+msgid "Show map in directory overview and on entries"
+msgstr "Karte in der Verzeichnisübersicht und den Einträgen anzeigen"
 
 msgid "Title-Format"
 msgstr "Titel-Format"

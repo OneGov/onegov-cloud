@@ -540,20 +540,17 @@ msgstr "Sous les entrées"
 msgid "Definition"
 msgstr "Définition"
 
-msgid "Coordinates/Map"
-msgstr "Coordonnées/Carte"
+msgid "Map"
+msgstr "Carte"
 
-msgid "Entries have no coordinates, hence no map will be shown"
-msgstr ""
-"Les entrées ne possèdent pas de coordonnées, par conséquent aucune carte ne "
-"sera affichée"
+msgid "Do not show map"
+msgstr "Ne pas afficher la carte"
 
-msgid "Coordinates/Map are shown on each entry"
-msgstr "Les coordonnées/carte sont affichées sur chaque entrée"
+msgid "Show map only on entries"
+msgstr "Afficher la carte uniquement sur les entrées"
 
-msgid "Coordinates/Map are shown on the directory and on each entry"
-msgstr ""
-"Les coordonnées/carte sont affichées sur le répertoire et sur chaque entrée"
+msgid "Show map in directory overview and on entries"
+msgstr "Afficher la carte dans la vue d'ensemble du dossier et sur les entrées"
 
 msgid "Title-Format"
 msgstr "Format Titre"
