@@ -29,12 +29,10 @@ from unittest.mock import patch
 from wtforms.validators import Optional, DataRequired
 from wtforms.validators import URL
 
-from typing import Any, TYPE_CHECKING, Self, Sequence, Collection
+from typing import Any, TYPE_CHECKING, Sequence, Collection
 
 if TYPE_CHECKING:
     from webob.request import _FieldStorageWithFile
-    from onegov.form.types import (
-        FormT, Validators)
 
 
 class DummyPostData(dict[str, Any]):
@@ -61,12 +59,10 @@ def create_file(
 
 def test_upload_field() -> None:
     def create_field(
-        validators: Validators[FormT, Self] | None = None,  # type:ignore[misc]
         allowed_mimetypes: Collection[str] | None = None,
     ) -> tuple[Form, UploadField]:
         form = Form()
         field = UploadField(
-            validators=validators,
             allowed_mimetypes=allowed_mimetypes,
         )
         field = field.bind(form, 'upload')  # type: ignore[attr-defined]
@@ -267,12 +263,10 @@ def test_upload_field() -> None:
 
 def test_upload_multiple_field() -> None:
     def create_field(
-        validators: Validators[FormT, Self] | None = None,  # type:ignore[misc]
         allowed_mimetypes: Sequence[str] | None = None,
     ) -> tuple[Form, UploadMultipleField]:
         form = Form()
         field = UploadMultipleField(
-            validators=validators,
             allowed_mimetypes=allowed_mimetypes,
         )
         field = field.bind(form, 'uploads')  # type: ignore[attr-defined]
