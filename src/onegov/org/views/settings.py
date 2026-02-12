@@ -571,7 +571,7 @@ def handle_ticket_data_deletion_settings(
 @OrgApp.form(
     model=Organisation, name='vat-settings', template='form.pt',
     permission=Secret, form=VATSettingsForm, setting=_('Value Added Tax'),
-    icon='fa-file-invoice-dollar', order=450)
+    icon='fa-money', order=450)
 def handle_vat_settings(
         self: Organisation,
         request: OrgRequest,
