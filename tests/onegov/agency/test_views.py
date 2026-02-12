@@ -874,7 +874,8 @@ def test_footer_settings_custom_links(client: Client[AgencyApp]) -> None:
     settings.form['custom_link_2_url'] = None
 
     page = settings.form.submit().follow()
-    assert f'<a href="{custom_url}">{custom_name}</a>' in page
+    assert (f'<a class="footer-link" '
+            f'href="{custom_url}">{custom_name}</a>') in page
     assert 'Custom2' not in page
 
 
