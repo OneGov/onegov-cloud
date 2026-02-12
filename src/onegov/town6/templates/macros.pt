@@ -2053,8 +2053,10 @@
     <a href="${request.link(result)}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
-    <div class="search-preview" tal:condition="result.function|nothing">${result.function}</div>
-    <div class="search-preview" tal:condition="not:result.function|nothing" i18n:translate>People</div>
+    <div class="search-preview" tal:condition="result.organisation_texts|nothing" tal:repeat="org result.organisation_texts">
+        ${org}
+    </div>
+    <div class="search-preview" tal:condition="result.function|nothing"><i>${result.function}</i></div>
     <div tal:condition="request.get_layout(result)">
         <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
     </div>
