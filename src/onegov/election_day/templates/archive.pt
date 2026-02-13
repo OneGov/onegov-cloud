@@ -185,7 +185,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small">
+                                            <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small title-indent">
                                                 <span> -</span>
                                                 <span tal:condition="vote.title_proposal">${vote.title_proposal}</span>
                                                 <span tal:condition="not vote.title_proposal" i18n:translate>Proposal</span>
@@ -200,7 +200,7 @@
                                             <td></td>
                                         </tr>
                                         <tr>
-                                            <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small">
+                                            <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small title-indent">
                                                 <span> -</span>
                                                 <span tal:condition="vote.title_counter_proposal">${vote.title_counter_proposal}</span>
                                                 <span tal:condition="not vote.title_counter_proposal" i18n:translate>Counter Proposal</span>
@@ -217,7 +217,7 @@
                                             <td></td>
                                         </tr>
                                         <tr>
-                                            <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small">
+                                            <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small title-indent">
                                                 <span> -</span>
                                                 <span tal:condition="vote.title_tie_breaker">${vote.title_tie_breaker}</span>
                                                 <span tal:condition="not vote.title_tie_breaker" i18n:translate>Tie-Breaker</span>
