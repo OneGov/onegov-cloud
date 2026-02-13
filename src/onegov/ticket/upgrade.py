@@ -6,12 +6,13 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from __future__ import annotations
 
 from decimal import Decimal
-from onegov.core.orm.types import JSON, UTCDateTime, UUID
+from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.pay import PaymentProvider
 from onegov.ticket import Ticket, TicketInvoice
-from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, String, Text
-from sqlalchemy import column, text, update, func, and_, true, false, Numeric
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Numeric
+from sqlalchemy import String, Text, UUID
+from sqlalchemy import column, text, update, func, and_, true, false
 from sqlalchemy.orm import load_only, selectinload
 from sqlalchemy.dialects.postgresql import ARRAY, HSTORE
 from uuid import uuid4
@@ -162,16 +163,16 @@ def add_closed_on_column_to_ticket(context: UpgradeContext) -> None:
         'tickets', Column('closed_on', UTCDateTime, nullable=True)
     )
 
-    stmt = update(Ticket.__table__).where(
+    stmt = update(Ticket).where(
         and_(
-            Ticket.__table__.c.state.in_(('closed', 'archived')),
-            Ticket.__table__.c.reaction_time.isnot(None),
-            Ticket.__table__.c.process_time.isnot(None)
+            Ticket.state.in_(('closed', 'archived')),
+            Ticket.reaction_time.is_not(None),
+            Ticket.process_time.is_not(None)
         )
     ).values(
-        closed_on=Ticket.__table__.c.created +
-                  func.make_interval(secs=Ticket.__table__.c.reaction_time) +
-                  func.make_interval(secs=Ticket.__table__.c.process_time)
+        closed_on=Ticket.created +
+                  func.make_interval(secs=Ticket.reaction_time) +
+                  func.make_interval(secs=Ticket.process_time)
     )
     context.session.execute(stmt)
     context.session.flush()
@@ -306,8 +307,8 @@ def add_payment_id_to_ticket(context: UpgradeContext) -> None:
         ))
     ):
         if (payment := ticket.handler.payment) is not None:
-            stmt = update(Ticket.__table__).where(
-                Ticket.__table__.c.id == ticket.id
+            stmt = update(Ticket).where(
+                Ticket.id == ticket.id
             ).values(
                 payment_id=payment.id
             )
@@ -428,7 +429,7 @@ def add_new_invoice_columns(context: UpgradeContext) -> None:
         if payment.source in sources_that_charge_fee_to_customer:
             amount = payment.net_amount
         else:
-            amount = payment.amount
+            amount = payment.amount  # type: ignore[assignment]
         item = invoice.add(
             text=ticket.title,
             group='migration',

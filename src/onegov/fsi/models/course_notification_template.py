@@ -1,30 +1,27 @@
 from __future__ import annotations
 
-from uuid import uuid4
-
+from datetime import datetime
 from markupsafe import Markup
-from sqlalchemy import Column, Text, ForeignKey, Enum, UniqueConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, Enum, UniqueConstraint
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi import _
 
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterable
-    from datetime import datetime
     from onegov.fsi.request import FsiRequest
     from typing import Self, TypeAlias
     from .course_event import CourseEvent
 
-    NotificationType: TypeAlias = Literal[
-        'info', 'reservation', 'reminder', 'cancellation',
-    ]
 
+NotificationType: TypeAlias = Literal[
+    'info', 'reservation', 'reminder', 'cancellation',
+]
 
 NOTIFICATION_TYPES: tuple[NotificationType, ...] = (
     'info', 'reservation', 'reminder', 'cancellation')
@@ -108,9 +105,8 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
                       )
 
     # the notification type used to choose the correct chameleon template
-    type: Column[NotificationType] = Column(
-        Enum(*NOTIFICATION_TYPES, name='notification_types'),  # type:ignore
-        nullable=False,
+    type: Mapped[NotificationType] = mapped_column(
+        Enum(*NOTIFICATION_TYPES, name='notification_types'),
     )
 
     __mapper_args__ = {
@@ -119,34 +115,30 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
     }
 
     # One-To-Many relationship with course
-    course_event_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('fsi_course_events.id'),
-        nullable=False
+    course_event_id: Mapped[UUID] = mapped_column(
+        ForeignKey('fsi_course_events.id')
     )
 
-    course_event: relationship[CourseEvent] = relationship(
-        'CourseEvent',
+    course_event: Mapped[CourseEvent] = relationship(
         back_populates='notification_templates',
         overlaps='info_template,reservation_template,'
-                 'cancellation_template,reminder_template'  # type: ignore[call-arg]
+                 'cancellation_template,reminder_template'
     )
 
     #: The public id of the notification template
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The subject of the notification would be according to template type
-    subject: Column[str | None] = Column(Text, default=get_template_default)
+    subject: Mapped[str | None] = mapped_column(default=get_template_default)
 
     #: The body text injected in plaintext (not html)
-    text: Column[str | None] = Column(Text)
+    text: Mapped[str | None]
 
     # when email based on template was sent last time
-    last_sent: Column[datetime | None] = Column(UTCDateTime)
+    last_sent: Mapped[datetime | None]
 
     def duplicate(self) -> Self:
         return self.__class__(

@@ -772,12 +772,12 @@ def view_mail_templates(
             ),
         }
 
-        docx_template_id, = (
+        docx_template_id = (
             GeneralFileCollection(request.session)
             .query()
             .filter(File.name == template_name)
             .with_entities(File.id)
-            .first()
+            .scalar()
         )
         docx_f = get_file(request.app, docx_template_id)
         assert docx_f is not None

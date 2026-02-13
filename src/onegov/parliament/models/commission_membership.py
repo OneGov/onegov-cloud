@@ -1,31 +1,28 @@
 from __future__ import annotations
 
+from datetime import date
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.parliament import _
-from sqlalchemy import Column
-from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
+from uuid import UUID
 
 
 from typing import Literal, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from datetime import date
-
     from onegov.parliament.models import Commission, Parliamentarian
 
-    MembershipRole: TypeAlias = Literal[
-        'guest',
-        'member',
-        'extended_member',
-        'president',
-    ]
+MembershipRole: TypeAlias = Literal[
+    'guest',
+    'member',
+    'extended_member',
+    'president',
+]
 
 ROLES: dict[MembershipRole, str] = {
     'guest': _('Guest'),
@@ -39,11 +36,7 @@ class CommissionMembership(Base, TimestampMixin):
 
     __tablename__ = 'par_commission_memberships'
 
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -51,40 +44,28 @@ class CommissionMembership(Base, TimestampMixin):
     }
 
     #: Internal ID
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The start date
-    start: Column[date | None] = Column(
-        Date,
-        nullable=True
-    )
+    start: Mapped[date | None]
 
     #: The end date
-    end: Column[date | None] = Column(
-        Date,
-        nullable=True
-    )
+    end: Mapped[date | None]
 
     #: The role value
-    role: Column[MembershipRole] = Column(
+    role: Mapped[MembershipRole] = mapped_column(
         Enum(
-            *ROLES.keys(),  # type:ignore[arg-type]
+            *ROLES.keys(),
             name='pas_commission_membership_role'
         ),
-        nullable=False,
         default='member'
     )
 
     #: The function of the person in this commission
-    function: Column[str | None] = Column(
-        Text,
-        nullable=True,
-        default=None
-    )
+    function: Mapped[str | None]
 
     #: The role as translated text
     @property
@@ -92,29 +73,23 @@ class CommissionMembership(Base, TimestampMixin):
         return ROLES.get(self.role, '')
 
     #: the id of the commission
-    commission_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('par_commissions.id'),
-        nullable=False
+    commission_id: Mapped[UUID] = mapped_column(
+        ForeignKey('par_commissions.id')
     )
 
     #: the related commission (which may have any number of memberships)
-    commission: relationship[Commission] = relationship(
-        'Commission',
+    commission: Mapped[Commission] = relationship(
         back_populates='memberships',
         lazy='joined',
     )
 
     #: the id of the parliamentarian
-    parliamentarian_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('par_parliamentarians.id'),
-        nullable=False
+    parliamentarian_id: Mapped[UUID] = mapped_column(
+        ForeignKey('par_parliamentarians.id')
     )
 
     #: the related parliamentarian (which may have any number of memberships)
-    parliamentarian: relationship[Parliamentarian] = relationship(
-        'Parliamentarian',
+    parliamentarian: Mapped[Parliamentarian] = relationship(
         back_populates='commission_memberships',
         lazy='joined',
     )

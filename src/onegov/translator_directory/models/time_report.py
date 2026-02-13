@@ -1,33 +1,21 @@
 from __future__ import annotations
 
+from datetime import date, datetime
 from decimal import Decimal
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID, UTCDateTime
-from sqlalchemy import (
-    ARRAY,
-    Boolean,
-    Column,
-    Date,
-    Enum,
-    Float,
-    ForeignKey,
-    Integer,
-)
-from sqlalchemy import Numeric, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy import ARRAY, Enum, Float, ForeignKey, Numeric, Text
+from sqlalchemy.orm import mapped_column, relationship, Mapped
 
 
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
-    import uuid
-    from datetime import date, datetime
+    from onegov.user import User
     from sqlalchemy.orm import Session
     from .translator import Translator
-    from onegov.user import User
     from .ticket import TimeReportTicket
 
 TimeReportStatus = Literal['pending', 'confirmed']
@@ -38,109 +26,88 @@ class TranslatorTimeReport(Base, TimestampMixin):
 
     __tablename__ = 'translator_time_reports'
 
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4,
     )
 
-    translator_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    translator_id: Mapped[UUID] = mapped_column(
         ForeignKey('translators.id', ondelete='CASCADE'),
-        nullable=False,
     )
 
-    translator: relationship[Translator] = relationship(
-        'Translator', back_populates='time_reports'
+    translator: Mapped[Translator] = relationship(
+        back_populates='time_reports'
     )
 
-    created_by_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
+    created_by_id: Mapped[UUID | None] = mapped_column(
         ForeignKey('users.id', ondelete='SET NULL'),
-        nullable=True,
     )
 
-    created_by: relationship[User | None] = relationship('User')
+    created_by: Mapped[User | None] = relationship('User')
 
-    assignment_type: Column[str] = Column(Text, nullable=False)
+    assignment_type: Mapped[str]
 
-    assignment_location: Column[str | None] = Column(
-        Text,
-        nullable=True,
+    assignment_location: Mapped[str | None] = mapped_column(
         comment='Key of selected assignment location for on-site work'
     )
 
-    finanzstelle: Column[str] = Column(
-        Text,
-        nullable=False,
-    )
+    finanzstelle: Mapped[str]
 
     #: The duration in minutes (including break)
-    duration: Column[int] = Column(Integer, nullable=False)
+    duration: Mapped[int]
 
     #: Break time in minutes
-    break_time: Column[int] = Column(Integer, nullable=False, default=0)
+    break_time: Mapped[int] = mapped_column(default=0)
 
     #: Night work duration in MINUTES (20:00-06:00)
-    night_minutes: Column[int] = Column(Integer, nullable=False, default=0)
+    night_minutes: Mapped[int] = mapped_column(default=0)
 
     #: Weekend/holiday work duration in MINUTES
-    weekend_holiday_minutes: Column[int] = Column(
-        Integer, nullable=False, default=0
-    )
+    weekend_holiday_minutes: Mapped[int] = mapped_column(default=0)
 
-    case_number: Column[str | None] = Column(Text)
+    case_number: Mapped[str | None]
 
-    assignment_date: Column[date] = Column(Date, nullable=False)
+    assignment_date: Mapped[date]
 
-    start: Column[datetime | None] = Column(UTCDateTime)
+    start: Mapped[datetime | None]
 
-    end: Column[datetime | None] = Column(UTCDateTime)
+    end: Mapped[datetime | None]
 
-    hourly_rate: Column[Decimal] = Column(
+    hourly_rate: Mapped[Decimal] = mapped_column(
         Numeric(precision=10, scale=2),
-        nullable=False,
     )
 
-    surcharge_types: Column[list[str] | None] = Column(
+    surcharge_types: Mapped[list[str] | None] = mapped_column(
         ARRAY(Text),
-        nullable=True,
         default=list,
     )
 
-    travel_compensation: Column[Decimal] = Column(
+    travel_compensation: Mapped[Decimal] = mapped_column(
         Numeric(precision=10, scale=2),
-        nullable=False,
-        default=0,
+        default=lambda: Decimal('0'),
     )
 
-    travel_distance: Column[float | None] = Column(
-        Float(precision=2),  # type:ignore[arg-type]
-        nullable=True,
+    travel_distance: Mapped[float | None] = mapped_column(
+        Float(precision=2),
         comment='One-way travel distance in km'
     )
 
-    total_compensation: Column[Decimal] = Column(
+    total_compensation: Mapped[Decimal] = mapped_column(
         Numeric(precision=10, scale=2),
-        nullable=False,
     )
 
-    notes: Column[str | None] = Column(Text)
+    notes: Mapped[str | None]
 
-    status: Column[TimeReportStatus] = Column(
-        Enum('pending', 'confirmed', name='time_report_status'),  # type: ignore[arg-type]
-        nullable=False,
+    status: Mapped[TimeReportStatus] = mapped_column(
+        Enum('pending', 'confirmed', name='time_report_status'),
         default='pending',
     )
 
-    exported: Column[bool] = Column(Boolean, nullable=False, default=False)
+    exported: Mapped[bool] = mapped_column(default=False)
 
-    exported_at: Column[datetime | None] = Column(UTCDateTime, nullable=True)
+    exported_at: Mapped[datetime | None]
 
-    export_batch_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        nullable=True,
-    )
+    export_batch_id: Mapped[UUID | None]
 
     SURCHARGE_RATES: dict[str, Decimal] = {
         'night_work': Decimal('50'),

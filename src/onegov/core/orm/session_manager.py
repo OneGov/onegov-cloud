@@ -24,30 +24,29 @@ from sqlalchemy_utils.aggregates import manager as aggregates_manager
 from typing import Any, Self, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from sqlalchemy.engine import Connection, Engine
-    from sqlalchemy.orm import ORMExecuteState  # type: ignore[attr-defined]
+    from sqlalchemy.engine import Connection, Engine, Result
+    from sqlalchemy.orm import DeclarativeBase, ORMExecuteState
     from sqlalchemy.orm.session import Session, SessionTransaction
     from types import FrameType
 
-    _T = TypeVar('_T')
-    _S = TypeVar('_S', bound=Session)
 
-    # FIXME: we can lift this out of type checking context in SQLAlchemy 2.0
-    class ForceFetchQueryClass(Query[_T]):
-        def delete(self, synchronize_session: Any = None) -> int:
-            ...
+_T = TypeVar('_T')
+_S = TypeVar('_S', bound='Session')
 
-else:
 
-    class ForceFetchQueryClass(Query):
-        """ Alters the builtin query class, ensuring that the delete query
-        always fetches the data first, which is important for the bulk delete
-        events to get the actual objects affected by the change.
+class ForceFetchQueryClass(Query[_T]):
+    """ Alters the builtin query class, ensuring that the delete query
+    always fetches the data first, which is important for the bulk delete
+    events to get the actual objects affected by the change.
 
-        """
+    """
 
-        def delete(self, synchronize_session: Any = None) -> int:
-            return super().delete('fetch')
+    def delete(
+        self,
+        synchronize_session: Any = None,
+        delete_args: dict[str, Any] | None = None,
+    ) -> int:
+        return super().delete('fetch')
 
 
 # Limits the lifteime of sessions for n seconds. Postgres will automatically
@@ -146,7 +145,7 @@ class SessionManager:
     def __init__(
         self,
         dsn: str,
-        base: type[Any],  # FIXME: use DeclarativeBase in SQLAlchemy 2.0
+        base: type[DeclarativeBase],
         engine_config: dict[str, Any] | None = None,  # TODO: TypedDict?
         session_config: dict[str, Any] | None = None,  # TODO: TypedDict?
         pool_config: dict[str, Any] | None = None  # TODO: TypedDict?
@@ -398,7 +397,7 @@ class SessionManager:
 
         """
 
-        @event.listens_for(engine, 'before_cursor_execute')  # type:ignore[untyped-decorator]
+        @event.listens_for(engine, 'before_cursor_execute')
         def activate_schema(
             connection: Connection,
             cursor: Any,
@@ -411,8 +410,8 @@ class SessionManager:
             """
 
             # execution options have priority!
-            if 'schema' in connection._execution_options:  # type:ignore
-                schema = connection._execution_options['schema']  # type:ignore
+            if 'schema' in connection._execution_options:
+                schema = connection._execution_options['schema']
             else:
                 if 'session' in connection.info:
                     schema = connection.info['session'].info['schema']
@@ -422,7 +421,7 @@ class SessionManager:
             if schema is not None:
                 cursor.execute('SET search_path TO %s, extensions', (schema, ))
 
-        @event.listens_for(engine, 'before_cursor_execute')  # type:ignore[untyped-decorator]
+        @event.listens_for(engine, 'before_cursor_execute')
         def limit_session_lifetime(
             connection: Connection,
             cursor: Any,
@@ -436,7 +435,7 @@ class SessionManager:
                 (f'{CONNECTION_LIFETIME}s', )
             )
 
-    def register_session(self, session: Session) -> None:
+    def register_session(self, session: Session | scoped_session[Any]) -> None:
         """ Takes the given session and registers it with zope.sqlalchemy and
         various orm events.
 
@@ -468,34 +467,36 @@ class SessionManager:
                     to have both aggregates and bulk updates/deletes.
                 """
 
-        @event.listens_for(session, 'do_orm_execute')  # type: ignore[untyped-decorator]
+        @event.listens_for(session, 'do_orm_execute')
         def augment_bulk_updates_and_inserts(
             orm_execution_state: ORMExecuteState
-        ) -> None:
+        ) -> Result[Any] | None:
             if not orm_execution_state.is_orm_statement:
-                return
+                return None
 
             stmt = orm_execution_state.statement
             if isinstance(stmt, Update):
                 if self._ignore_bulk_updates:
-                    return
+                    return None
 
+                assert orm_execution_state.bind_mapper is not None
                 model = orm_execution_state.bind_mapper.class_
-                prevent_bulk_changes_on_aggregate_modules(model)
+                prevent_bulk_changes_on_aggregate_modules(model)  # type: ignore[arg-type]
                 if not self.on_update.receivers:
-                    return
+                    return None
                 is_update = True
             elif isinstance(stmt, Delete):
                 if self._ignore_bulk_deletes:
-                    return
+                    return None
 
+                assert orm_execution_state.bind_mapper is not None
                 model = orm_execution_state.bind_mapper.class_
-                prevent_bulk_changes_on_aggregate_modules(model)
+                prevent_bulk_changes_on_aggregate_modules(model)  # type: ignore[arg-type]
                 if not self.on_delete.receivers:
-                    return
+                    return None
                 is_update = False
             else:
-                return
+                return None
 
             # if there is already a RETURNING we're in trouble
             assert not stmt.returning_column_descriptions, """
@@ -509,7 +510,7 @@ class SessionManager:
 
             # construct a dummy ORM select statement that generates the
             # entities based on the raw returned rows
-            orm_stmt = select(model).from_statement(  # type: ignore[attr-defined]
+            orm_stmt = select(model).from_statement(
                 stmt).execution_options(populate_existing=True)
 
             savepoint = transaction.savepoint()
@@ -532,7 +533,7 @@ class SessionManager:
                     UserWarning,
                     stacklevel=get_warning_stacklevel()
                 )
-                return
+                return None
 
             rowcount = 0
             if is_update:
@@ -552,10 +553,10 @@ class SessionManager:
                     rowcount += 1
 
             # HACK: This attribute needs to be present
-            result.rowcount = rowcount
+            result.rowcount = rowcount  # type: ignore[attr-defined]
             return result
 
-        @event.listens_for(session, 'after_flush')  # type:ignore[untyped-decorator]
+        @event.listens_for(session, 'after_flush')
         def on_after_flush(
             session: Session,
             flush_context: Any
@@ -571,7 +572,7 @@ class SessionManager:
                     self.on_delete.send(
                         self.current_schema, session=session, obj=obj)
 
-        @event.listens_for(session, 'after_begin')  # type: ignore[untyped-decorator]
+        @event.listens_for(session, 'after_begin')
         def on_after_begin(
             session: Session,
             transaction: SessionTransaction,
@@ -581,7 +582,7 @@ class SessionManager:
                 self.on_transaction_join.send(
                     self.current_schema, session=session)
 
-        @event.listens_for(session, 'after_attach')  # type: ignore[untyped-decorator]
+        @event.listens_for(session, 'after_attach')
         def on_after_attach(session: Session, instance: object) -> None:
             if self.on_transaction_join.receivers:
                 self.on_transaction_join.send(
@@ -810,7 +811,7 @@ class SessionManager:
                 'WHERE schema_name = :schema)'
             ), {'schema': schema})
 
-            return result.first()[0]
+            return result.scalar()  # type: ignore[return-value]
 
     def create_required_extensions(self) -> None:
         """ Creates the required extensions once per lifetime of the manager.
@@ -852,7 +853,7 @@ class SessionManager:
             self.create_schema_if_not_exists(schema)
 
             engine = self.engine.execution_options(schema=schema)
-            declared_classes = set()
+            declared_classes: set[Any] = set()
 
             try:
                 with engine.begin() as conn:

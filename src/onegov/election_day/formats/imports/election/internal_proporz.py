@@ -573,10 +573,12 @@ def import_election_internal_proporz(
     list_uids = {r['list_id']: r['id'] for r in lists.values()}
     list_uids['999'] = None
     session = object_session(election)
-    session.bulk_insert_mappings(ListConnection, connections.values())
-    session.bulk_insert_mappings(ListConnection, subconnections.values())
-    session.bulk_insert_mappings(List, lists.values())
-    session.bulk_insert_mappings(ListPanachageResult, (
+    assert session is not None
+    # FIXME: Switch to regular `session.execute` with insert statements
+    session.bulk_insert_mappings(ListConnection, connections.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(ListConnection, subconnections.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(List, lists.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(ListPanachageResult, (  # type: ignore[arg-type]
         {
             'id': uuid4(),
             'source_id': list_uids[source],
@@ -586,15 +588,15 @@ def import_election_internal_proporz(
         for list_id in list_panachage
         for source, votes in list_panachage[list_id].items()
     ))
-    session.bulk_insert_mappings(Candidate, candidates.values())
-    session.bulk_insert_mappings(ElectionResult, results.values())
-    session.bulk_insert_mappings(ListResult, (
+    session.bulk_insert_mappings(Candidate, candidates.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(ElectionResult, results.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(ListResult, (  # type: ignore[arg-type]
         dict(**list_result, election_result_id=result_uids[entity_id])
         for entity_id, values in list_results.items()
         for list_result in values.values()
     ))
-    session.bulk_insert_mappings(CandidateResult, candidate_results)
-    session.bulk_insert_mappings(CandidatePanachageResult, (
+    session.bulk_insert_mappings(CandidateResult, candidate_results)  # type: ignore[arg-type]
+    session.bulk_insert_mappings(CandidatePanachageResult, (  # type: ignore[arg-type]
         {
             'id': uuid4(),
             'election_result_id': result_uids[panachage_result['entity_id']],

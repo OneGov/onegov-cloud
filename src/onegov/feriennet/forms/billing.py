@@ -110,11 +110,12 @@ class ManualBookingForm(Form):
     @property
     def available_usernames(self) -> Query[tuple[str, str]]:
         return (
-            self.usercollection.query()
+            self.usercollection.query()  # type: ignore[return-value]
             .with_entities(User.username, User.realname)
             .filter(func.trim(func.coalesce(User.realname, '')) != '')
             .filter(User.active == True)
             .order_by(func.unaccent(func.lower(User.realname)))
+            .tuples()
         )
 
     @property

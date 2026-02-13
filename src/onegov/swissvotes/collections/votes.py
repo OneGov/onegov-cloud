@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.swissvotes.app import SwissvotesApp
     from sqlalchemy.orm import Query
-    from sqlalchemy.sql import ColumnElement
+    from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
     from typing import Self
 
 T = TypeVar('T')
@@ -303,13 +303,13 @@ class SwissVoteCollection(Pagination[SwissVote]):
             return []
 
         def match(
-            column: ColumnElement[str] | ColumnElement[str | None],
+            column: SQLCoreOperations[str | None],
             language: str
         ) -> ColumnElement[bool]:
             return column.op('@@')(func.to_tsquery(language, term))
 
         def match_convert(
-            column: ColumnElement[str] | ColumnElement[str | None],
+            column: SQLCoreOperations[str | None],
             language: str
         ) -> ColumnElement[bool]:
             return match(func.to_tsvector(language, column), language)
@@ -353,16 +353,16 @@ class SwissVoteCollection(Pagination[SwissVote]):
         query = self.session.query(SwissVote)
 
         def in_or_none(
-            column: ColumnElement[T] | ColumnElement[T | None],
+            column: SQLCoreOperations[T] | SQLCoreOperations[T | None],
             values: list[T],
             extra: dict[T, T] | None = None
         ) -> ColumnElement[bool]:
 
             extra = extra or {}
             values = values + [x for y, x in extra.items() if y in values]
-            statement = column.in_(values)
+            statement: ColumnElement[bool] = column.in_(values)
             if -1 in values:
-                statement = or_(statement, column.is_(None))  # type:ignore[no-untyped-call]
+                statement = or_(statement, column.is_(None))
             return statement
 
         if self.from_date:

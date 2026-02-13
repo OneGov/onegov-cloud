@@ -599,7 +599,7 @@ class UniqueColumnValue:
         self.table = table
 
     def __call__(self, form: Form, field: Field) -> None:
-        if field.name not in self.table.__table__.columns:  # type:ignore
+        if field.name not in self.table.__table__.columns:
             raise RuntimeError('The field name must match a column!')
 
         if hasattr(form, 'model'):

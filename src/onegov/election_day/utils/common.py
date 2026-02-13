@@ -14,20 +14,19 @@ from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
-    from onegov.core.types import AppenderQuery
     from onegov.election_day.models import ArchivedResult
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Election
     from onegov.election_day.models import Municipality
     from onegov.election_day.models import Notification
     from onegov.election_day.request import ElectionDayRequest
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import DynamicMapped
     from sqlalchemy.orm import Session
     from typing import Protocol
     from webob.response import Response
 
     class HasNotifications(Protocol):
-        notifications: relationship[AppenderQuery[Notification]]
+        notifications: DynamicMapped[Notification]
 
 _T = TypeVar('_T')
 _KT = TypeVar('_KT')

@@ -59,8 +59,7 @@ class InvoiceItemExport(FeriennetExport):
             Activity._tags.label('tags')
         ).join(Occasion).filter(
             Occasion.period_id == period.id
-        )
-        activities = activities.subquery()
+        ).subquery()
 
         q = session.query(ActivityInvoiceItem, activities.c.tags, Attendee)
         q = q.join(BookingPeriodInvoice).join(User)

@@ -368,13 +368,17 @@ def get_settlement_run_export(
     if not settlement_run:
         return None
 
-    model_map: dict[str, type] = {
+    model_map: dict[str, type[Party | PASCommission | PASParliamentarian]] = {
         'Party': Party,
         'PASCommission': PASCommission,
         'PASParliamentarian': PASParliamentarian,
     }
-    entity = (
-        session.query(model_map.get(literal_type))
+    model = model_map.get(literal_type)
+    if model is None:
+        return None
+
+    entity: Party | PASCommission | PASParliamentarian | None = (
+        session.query(model)  # type: ignore[assignment]
         .filter_by(id=entity_id)
         .first()
     )

@@ -31,6 +31,7 @@ def activity_links(request: FeriennetRequest, user: User) -> LinkGroup:
             VacationActivity.name,
             VacationActivity.title
         )
+        .tuples()
     )
 
     return LinkGroup(
@@ -52,6 +53,7 @@ def attendee_links(request: FeriennetRequest, user: User) -> LinkGroup:
         .filter_by(username=user.username)
         .order_by(Attendee.name)
         .with_entities(Attendee.id, Attendee.name)
+        .tuples()
     )
 
     return LinkGroup(

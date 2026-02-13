@@ -6,24 +6,24 @@ import sedate
 from functools import cached_property
 from onegov.core.collection import Pagination
 from onegov.core.custom import msgpack
-from onegov.core.orm.types import UUID as UUIDType
 from onegov.pay.collections import InvoiceCollection
 from onegov.ticket import handlers as global_handlers
 from onegov.ticket.models.invoice import TicketInvoice
 from onegov.ticket.models.invoice_item import TicketInvoiceItem
 from onegov.ticket.models.ticket import Ticket
-from sqlalchemy import and_, cast, desc, func, or_
+from sqlalchemy import and_, cast, desc, func, or_, UUID as UUIDType
 from sqlalchemy.orm import contains_eager, joinedload, selectinload, undefer
 from uuid import UUID
 
 
 from typing import Any, ClassVar, Literal, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
     from datetime import date, datetime
     from onegov.ticket.models.ticket import TicketState
     from sedate.types import Direction, TzInfo
     from sqlalchemy.orm import Query, Session
+    from sqlalchemy.sql.elements import SQLColumnExpression
     from typing import TypeAlias, TypedDict
 
     ExtendedTicketState: TypeAlias = TicketState | Literal['all', 'unfinished']
@@ -170,11 +170,11 @@ class TicketCollectionPagination(Pagination[Ticket]):
             self.owner, submitter, self.term, self.extra_parameters
         )
 
-    def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
+    def groups_by_handler_code(self) -> Query[tuple[str, Sequence[str]]]:
         return self.query().with_entities(
             Ticket.handler_code,
             func.array_agg(Ticket.group.distinct())
-        ).group_by(Ticket.handler_code)
+        ).group_by(Ticket.handler_code).tuples()
 
 
 @msgpack.make_serializable(tag=60)
@@ -286,7 +286,7 @@ class TicketCollection(TicketCollectionPagination):
         return self.query().filter(Ticket.handler_id == handler_id).first()
 
     def get_count(self, excl_archived: bool = True) -> TicketCount:
-        query: Query[tuple[str, int]] = self.query().with_entities(
+        query = self.query().with_entities(
             Ticket.state, func.count(Ticket.state)
         )
 
@@ -295,7 +295,7 @@ class TicketCollection(TicketCollectionPagination):
 
         query = query.group_by(Ticket.state)
 
-        return TicketCount(**dict(query))
+        return TicketCount(**dict(query.tuples()))  # type: ignore[misc]
 
     def by_handler_data_id(
         self,
@@ -434,6 +434,9 @@ class TicketInvoiceCollection(
         if self.reservation_start or self.reservation_end:
             from onegov.reservation import Reservation
 
+            token_col: SQLColumnExpression[UUID]
+            start_col: SQLColumnExpression[datetime | None]
+            end_col: SQLColumnExpression[datetime | None]
             if self.reservation_reference_date == 'any':
                 subquery = self.session.query(Reservation.token)
                 token_col = Reservation.token

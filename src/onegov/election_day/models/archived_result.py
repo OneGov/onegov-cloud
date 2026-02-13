@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import datetime
+
+from collections.abc import Mapping
 from copy import deepcopy
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
@@ -9,35 +12,27 @@ from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins.content import dictionary_based_property_factory
 from onegov.core.orm.types import HSTORE
-from onegov.core.orm.types import UTCDateTime
-from onegov.core.orm.types import UUID
 from onegov.election_day.models.election import Election
 from onegov.election_day.models.election_compound import ElectionCompound
 from onegov.election_day.models.mixins import DomainOfInfluenceMixin
 from onegov.election_day.models.mixins import TitleTranslationsMixin
 from onegov.election_day.models.vote import Vote
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import Date
 from sqlalchemy import Enum
-from sqlalchemy import Integer
-from sqlalchemy import Text
-from uuid import uuid4
+from sqlalchemy.orm import mapped_column, Mapped
+from uuid import uuid4, UUID
 
 
 from typing import Any
+from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import datetime
-    import uuid
     from builtins import type as _type
-    from collections.abc import Mapping
     from onegov.election_day.request import ElectionDayRequest
-    from typing import Literal
     from typing import Self
     from typing import TypeAlias
 
-    ResultType: TypeAlias = Literal['election', 'election_compound', 'vote']
+
+ResultType: TypeAlias = Literal['election', 'election_compound', 'vote']
 
 
 meta_local_property = dictionary_based_property_factory('local')
@@ -51,30 +46,23 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     __tablename__ = 'archived_results'
 
     #: Identifies the result
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The date of the election/vote
-    date: Column[datetime.date] = Column(Date, nullable=False)
+    date: Mapped[datetime.date]
 
     #: The last change of the results election/vote
-    last_modified: Column[datetime.datetime | None] = Column(
-        UTCDateTime,
-        nullable=True
-    )
+    last_modified: Mapped[datetime.datetime | None]
 
     #: The last change of election/vote
-    last_result_change: Column[datetime.datetime | None] = Column(
-        UTCDateTime,
-        nullable=True
-    )
+    last_result_change: Mapped[datetime.datetime | None]
 
     #: Type of the result
-    type: Column[ResultType] = Column(
-        Enum(  # type:ignore[arg-type]
+    type: Mapped[ResultType] = mapped_column(
+        Enum(
             'vote', 'election', 'election_compound',
             name='type_of_result'
         ),
@@ -82,32 +70,29 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     )
 
     #: Origin of the result
-    schema: Column[str] = Column(Text, nullable=False)
+    schema: Mapped[str]
 
     #: The name of the principal
-    name: Column[str] = Column(Text, nullable=False)
+    name: Mapped[str]
 
     #: Total number of political entities
-    total_entities: Column[int | None] = Column(Integer, nullable=True)
+    total_entities: Mapped[int | None]
 
     #: Number of already counted political entities
-    counted_entities: Column[int | None] = Column(Integer, nullable=True)
+    counted_entities: Mapped[int | None]
 
     @property
     def progress(self) -> tuple[int, int]:
         return self.counted_entities or 0, self.total_entities or 0
 
     #: Number of already counted political entities
-    has_results: Column[bool | None] = Column(Boolean, nullable=True)
+    has_results: Mapped[bool | None]
 
     #: The link to the detailed results
-    url: Column[str] = Column(Text, nullable=False)
+    url: Mapped[str]
 
     #: Title of the election/vote
-    title_translations: Column[Mapping[str, str]] = Column(
-        HSTORE,
-        nullable=False
-    )
+    title_translations: Mapped[Mapping[str, str]] = mapped_column(HSTORE)
     title = translation_hybrid(title_translations)
 
     def title_prefix(self, request: ElectionDayRequest) -> str:
@@ -117,7 +102,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
         return ''
 
     #: Shortcode for cantons that use it
-    shortcode: Column[str | None] = Column(Text, nullable=True)
+    shortcode: Mapped[str | None]
 
     #: The id of the election/vote.
     external_id: dict_property[str | None] = meta_property('id')

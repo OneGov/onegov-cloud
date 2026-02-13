@@ -2,87 +2,65 @@ from __future__ import annotations
 
 import sedate
 
+from datetime import date, datetime
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.form.models.submission import SurveySubmission
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import Date
 from sqlalchemy import ForeignKey
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 from sqlalchemy.schema import CheckConstraint
-from sqlalchemy.sql.elements import quoted_name
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from datetime import date, datetime
     from onegov.form.models.definition import SurveyDefinition
 
 
-daterange = Column(  # type:ignore[call-overload]
-    quoted_name('DATERANGE("start", "end")', quote=False))
-
-
 class SurveySubmissionWindow(Base, TimestampMixin):
-    """ Defines a submission window during which a form definition
+    """ Defines a submission window during which a survey definition
     may be used to create submissions.
 
     Submissions created thusly are attached to the currently active
     survey window.
-
-    submission windows may not overlap.
 
     """
 
     __tablename__ = 'submission_windows'
 
     #: the public id of the submission window
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the name of the survey to which this submission window belongs
-    name: Column[str] = Column(
-        Text,
-        ForeignKey('surveys.name'),
-        nullable=False
-    )
+    name: Mapped[str] = mapped_column(ForeignKey('surveys.name'))
 
     #: the title of the submission window
-    title = Column(Text)
+    title: Mapped[str | None]
 
     #: the survey to which this submission window belongs
-    survey: relationship[SurveyDefinition] = relationship(
-        'SurveyDefinition',
+    survey: Mapped[SurveyDefinition] = relationship(
         back_populates='submission_windows'
     )
 
     #: true if the submission window is enabled
-    enabled: Column[bool] = Column(Boolean, nullable=False, default=True)
+    enabled: Mapped[bool] = mapped_column(default=True)
 
     #: the start date of the window
-    start: Column[date] = Column(Date, nullable=False)
+    start: Mapped[date]
 
     #: the end date of the window
-    end: Column[date] = Column(Date, nullable=False)
+    end: Mapped[date]
 
     #: the timezone of the window
-    timezone: Column[str] = Column(
-        Text,
-        nullable=False,
-        default='Europe/Zurich'
-    )
+    timezone: Mapped[str] = mapped_column(default='Europe/Zurich')
 
     #: submissions linked to this
-    submissions: relationship[list[SurveySubmission]] = relationship(
-        SurveySubmission,
+    submissions: Mapped[list[SurveySubmission]] = relationship(
         back_populates='submission_window'
     )
 

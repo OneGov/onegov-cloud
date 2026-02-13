@@ -73,7 +73,7 @@ class PayableCollection(Pagination[_P]):
 
     def query(self) -> QueryChain[_P]:
         return QueryChain(tuple(
-            self.session.query(cls).options(
+            self.session.query(cls).options(  # type: ignore[misc]
                 joinedload(cls.payment)  # type:ignore[attr-defined]
             )
             for cls in self.classes
