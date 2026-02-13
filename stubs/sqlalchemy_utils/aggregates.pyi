@@ -12,7 +12,6 @@ class AggregatedAttribute(declared_attr[_T]):
     column: MappedColumn[_T]
     relationship: str
     def __init__(self, fget: Callable[[Any], ColumnElement[_T]], relationship: str, column: MappedColumn[_T], *args: Incomplete, **kwargs: Incomplete) -> None: ...
-    def __get__(desc, self: object | None, cls: type | None) -> MappedColumn[_T]: ...  # type: ignore[override]
 
 class AggregatedValue(Generic[_T]):
     class_: type[DeclarativeBase]
