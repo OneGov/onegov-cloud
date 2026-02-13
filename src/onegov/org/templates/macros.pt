@@ -1521,13 +1521,6 @@
 </metal:search_result_people>
 
 
-<metal:search_result_par_parliamentarians define-macro="search_result_par_parliamentarians" i18n:domain="onegov.org">
-    <a href="${request.link(result)}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
-    <p tal:condition="result.function|nothing">${result.function}</p>
-    <p tal:condition="not:result.function|nothing" i18n:translate>Parliamentarian</p>
-</metal:search_result_par_parliamentarians>
-
-
 <metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.org">
     <a href="${result.url}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
     <a class="edit-link" href="${request.link(result, name='edit')}" tal:condition="request.is_manager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
