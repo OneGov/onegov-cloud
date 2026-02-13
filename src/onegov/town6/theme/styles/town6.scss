@@ -241,14 +241,6 @@ footer {
     }
 }
 
-/*
-   Reset z-index for breadcrumbs links so earlier to prevent breadcrumbs
-    from overlapping search results
-*/
-.breadcrumbs a,
-.breadcrumbs .breadcrumb-item a {
-    z-index: 0;
-}
 
 /*
     page text

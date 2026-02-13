@@ -156,7 +156,7 @@
     font-style: normal;  // undo italics
 }
 
-.breadcrumbs {
+.search-breadcrumbs {
     background-color: rgba(128, 128, 128, .1);
     border-radius: .4rem;
     padding: .1rem .5rem;
@@ -167,6 +167,7 @@
     .breadcrumb-item {
         a {
             color: $jumbo !important;
+            z-index: 0;
         }
 
         padding: .2rem 0 !important;
