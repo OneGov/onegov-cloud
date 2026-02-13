@@ -98,20 +98,20 @@ class DirectoryBaseForm(Form):
         render_kw={'rows': 32, 'data-editor': 'form'})
 
     enable_map = RadioField(
-        label=_('Coordinates'),
+        label=_('Map'),
         fieldset=_('General'),
         choices=[
             (
                 'no',
-                _('Entries have no coordinates')
+                _('Do not show map')
             ),
             (
                 'entry',
-                _('Coordinates are shown on each entry')
+                _('Show map only on entries')
             ),
             (
                 'everywhere',
-                _('Coordinates are shown on the directory and on each entry')
+                _('Show map in directory overview and on entries')
             ),
         ],
         default='everywhere')
