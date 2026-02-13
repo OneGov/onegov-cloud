@@ -2088,6 +2088,28 @@
 </metal:search_result_par_parliamentarians>
 
 
+<metal:search_result_par_political_businesses define-macro="search_result_par_political_businesses" i18n:domain="onegov.town6">
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <div class="search-preview" tal:condition="result.number|nothing">
+        <span i18n:translate>Number:</span>
+        <span>${result.number}</span>
+    </div>
+    <div class="search-preview" tal:condition="result.entry_date|nothing">
+        <span i18n:translate>Entry Date:</span>
+        <span>${layout.format_date(result.entry_date, 'date')}</span>
+    </div>
+    <div class="search-preview" tal:condition="result.status|nothing">
+        <span i18n:translate>Status:</span>
+        <span>${result.status.capitalize()}</span>
+    </div>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
+</metal:search_result_par_political_businesses>
+
+
 <metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.town6">
     <a href="${result.url}" class="list-link">
         <span class="h5 list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></span>
