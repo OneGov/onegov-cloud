@@ -7,7 +7,7 @@ from sedate import replace_timezone
 
 from onegov.api import ApiApp
 from onegov.core import utils
-from onegov.core.framework import layout_predicate
+from onegov.core.framework import layout_predicate, Framework
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.templates import render_template
 from onegov.core.utils import module_path
@@ -78,7 +78,7 @@ class TownApp(OrgApp, FoundationApp, ApiApp):
         return False
 
 
-@TownApp.predicate_fallback(TownApp.get_layout, layout_predicate)
+@TownApp.predicate_fallback(Framework.get_layout, layout_predicate)
 def layout_not_found(self: type[TownApp], obj: object) -> type[Layout]:
     # circular import
     from onegov.town6.layout import DefaultLayout
