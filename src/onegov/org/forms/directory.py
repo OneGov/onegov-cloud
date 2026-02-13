@@ -19,7 +19,6 @@ from onegov.form.fields import UploadField
 from onegov.form.filters import as_float
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import ValidFormDefinition
-from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentForm, ChangeAdjacencyListUrlForm
@@ -710,12 +709,12 @@ class DirectoryImportForm(Form):
         label=_('Import'),
         validators=[
             DataRequired(),
-            WhitelistedMimeType({
-                'application/zip',
-                'application/octet-stream'
-            }),
             FileSizeLimit(500 * 1024 * 1024)
         ],
+        allowed_mimetypes=(
+            'application/zip',
+            'application/octet-stream'
+        ),
         render_kw={'force_simple': True}
     )
 

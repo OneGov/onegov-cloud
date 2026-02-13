@@ -305,7 +305,10 @@ class UploadMultipleWidget(FileInput):
         """)
 
         if force_simple or len(field) == 0:
-            return simple_template.format(input_html)
+            return simple_template.format(input_html) + Markup('\n').join(
+                Markup('<small class="error">{}</small>').format(error)
+                for error in field.errors
+            )
         else:
             existing_html = Markup('').join(
                 subfield(

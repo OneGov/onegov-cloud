@@ -442,10 +442,15 @@ def handle_file_upload(
         content=fs.file
     )
 
-    supported_content_types = getattr(self, 'supported_content_types', 'all')
+    supported_content_types = self.supported_content_types  # type:ignore[attr-defined]
 
     if supported_content_types != 'all':
         if file.reference.content_type not in supported_content_types:
+            # Fail the post request from upload.js with status code 415
+            # (Unsupported Media Type). Raising the HTTP exception here causes
+            # the request transaction to abort and roll back any previous
+            # changes (including the `self.add(...)` above), so the file won't
+            # be persisted if the content type is unsupported.
             raise exc.HTTPUnsupportedMediaType()
 
     return file
