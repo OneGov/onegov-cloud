@@ -195,7 +195,6 @@
                                             <td class="right-aligned" tal:condition="vote.has_results">
                                                 ${layout.format_number(vote.display_nays_percentage_proposal())}
                                             </td>
-                                            <td></td>
                                         </tr>
                                         <tr>
                                             <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small title-indent">
@@ -203,16 +202,13 @@
                                                 <span tal:condition="vote.title_counter_proposal">${vote.title_counter_proposal}</span>
                                                 <span tal:condition="not vote.title_counter_proposal" i18n:translate>Counter Proposal</span>
                                             </th>
-                                            <td>
-
-                                            </td>
+                                            <td></td>
                                             <td class="right-aligned" tal:condition="vote.has_results">
                                                 ${layout.format_number(vote.display_yeas_percentage_counter_proposal())}
                                             </td>
                                             <td class="right-aligned" tal:condition="vote.has_results">
                                                 ${layout.format_number(vote.display_nays_percentage_counter_proposal())}
                                             </td>
-                                            <td></td>
                                         </tr>
                                         <tr>
                                             <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small title-indent">
@@ -220,16 +216,13 @@
                                                 <span tal:condition="vote.title_tie_breaker">${vote.title_tie_breaker}</span>
                                                 <span tal:condition="not vote.title_tie_breaker" i18n:translate>Tie-Breaker</span>
                                             </th>
-                                            <td>
-
-                                            </td>
+                                            <td></td>
                                             <td class="right-aligned" tal:condition="vote.has_results">
                                                 ${layout.format_number(vote.display_yeas_percentage_tie_breaker())}
                                             </td>
                                             <td class="right-aligned" tal:condition="vote.has_results">
                                                 ${layout.format_number(vote.display_nays_percentage_tie_breaker())}
                                             </td>
-                                            <td></td>
                                         </tr>
                                     </tal:block>
 
