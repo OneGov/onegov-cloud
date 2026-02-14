@@ -41,7 +41,8 @@ if TYPE_CHECKING:
     from onegov.core.elements import Trait
     from onegov.core.types import RenderData
     from onegov.feriennet.request import FeriennetRequest
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.engine import Result
+    from sqlalchemy.orm import Session
     from typing import NamedTuple
     from webob import Response
 
@@ -154,7 +155,7 @@ def related_attendees(
     stmt = as_selectable_from_path(
         module_path('onegov.feriennet', 'queries/related_attendees.sql'))
 
-    related: Query[RelatedAttendeeRow] = session.execute(
+    related: Result[RelatedAttendeeRow] = session.execute(
         select(*stmt.c).where(
             and_(
                 stmt.c.occasion_id.in_(occasion_ids),
@@ -166,7 +167,7 @@ def related_attendees(
 
     result = defaultdict(list)
 
-    for r in related:
+    for r in related.tuples():
         result[r.occasion_id].append(r)
 
     return result

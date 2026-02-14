@@ -1,17 +1,15 @@
 from __future__ import annotations
 
-from onegov.core.orm.types import UUID
 from onegov.pay import Invoice
 from onegov.user import User
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import UUID
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterable
     from decimal import Decimal
     from onegov.activity.models import ActivityInvoiceItem
@@ -26,28 +24,20 @@ class BookingPeriodInvoice(Invoice):
     }
 
     #: the period to which this invoice belongs to
-    period_id: Column[uuid.UUID] = Column(  # type: ignore[assignment]
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('periods.id'),
-        nullable=True
-    )
-    period: relationship[BookingPeriod] = relationship(
+    period_id: Mapped[UUID] = mapped_column(ForeignKey('periods.id'))
+    period: Mapped[BookingPeriod] = relationship(
         'BookingPeriod',
         back_populates='invoices'
     )
 
     #: the user to which the invoice belongs
-    user_id: Column[uuid.UUID] = Column(  # type: ignore[assignment]
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('users.id'),
-        nullable=True
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
     # FIXME: Do we need this backref? It's across module boundaries, so
     #        not the best for proper module isolation
-    user: relationship[User] = relationship(User, backref='invoices')
+    user: Mapped[User] = relationship(User, backref='invoices')
 
     if TYPE_CHECKING:
-        items: relationship[list[ActivityInvoiceItem]]  # type: ignore[assignment]
+        items: Mapped[list[ActivityInvoiceItem]]  # type: ignore[assignment]
 
     @property
     def has_donation(self) -> bool:
@@ -64,7 +54,7 @@ class BookingPeriodInvoice(Invoice):
         quantity: Decimal,
         *,
         organizer: str = '',
-        attendee_id: uuid.UUID | None = None,
+        attendee_id: UUID | None = None,
         flush: bool = True,
         **kwargs: Any  # FIXME: type safety for optional arguments
     ) -> ActivityInvoiceItem:

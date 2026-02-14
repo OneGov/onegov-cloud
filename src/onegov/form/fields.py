@@ -402,7 +402,7 @@ class UploadFileWithORMSupport(UploadField):
         self.file.filename = self.filename  # type:ignore[attr-defined]
         self.file.seek(0)
 
-        return self.file_class(  # type:ignore[misc]
+        return self.file_class(
             name=self.filename,
             reference=as_fileintent(self.file, self.filename)
         )

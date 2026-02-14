@@ -9,7 +9,6 @@ from onegov.core.orm.mixins import (
     ContentMixin, TimestampMixin, dict_property, content_property,
     meta_property)
 from onegov.core.orm.mixins.content import dict_markup_property
-from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.file import File, MultiAssociatedFiles
 from onegov.form import FormCollection
@@ -21,12 +20,12 @@ from onegov.org.models import (AccessExtension, ContactExtension,
                                CoordinatesExtension, GeneralFileLinkExtension,
                                HoneyPotExtension)
 from onegov.search import SearchableContent
-from sqlalchemy import Column, Text
+from sqlalchemy.orm import mapped_column, Mapped
+from uuid import UUID
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from sqlalchemy.orm import Query, Session
 
 
@@ -52,16 +51,15 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
     }
 
     #: An internal id for references (not public)
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: A nice id for the url, readable by humans
-    name: Column[str] = Column(Text, nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(unique=True)
 
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: Describes the document briefly
     lead: dict_property[str | None] = meta_property()
@@ -74,12 +72,12 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
         backref_suffix='pdf')
 
     # The collection name this model should appear in
-    member_of: Column[str | None] = Column(Text, nullable=True)
+    member_of: Mapped[str | None]
 
-    group: Column[str | None] = Column(Text, nullable=True)
+    group: Mapped[str | None]
 
     #: The normalized title for sorting
-    order: Column[str] = Column(Text, nullable=False, index=True)
+    order: Mapped[str] = mapped_column(index=True)
 
     pdf_extract: dict_property[str | None] = content_property()
 

@@ -1,24 +1,16 @@
 from __future__ import annotations
 
-from onegov.core.orm.types import UTCDateTime
-from uuid import uuid4
+from datetime import datetime
 from onegov.core.collection import GenericCollection
-from sedate import utcnow
-from sqlalchemy import (
-    Column,
-    String,
-    ForeignKey,
-    Integer,
-    UniqueConstraint,
-)
-from sqlalchemy.orm import relationship, backref
-from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm import Base
+from sedate import utcnow
+from sqlalchemy import String, ForeignKey, UniqueConstraint
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 
-from typing import Any, ClassVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from sqlalchemy.orm import Query, Session
     from onegov.org.models import News
 
@@ -27,36 +19,31 @@ class PushNotification(Base):
     """
     Keeps track of all outbound push notifications to prevent duplicates.
     """
-    __tablename__: ClassVar[str] = 'push_notification'
+    __tablename__ = 'push_notification'
 
     #: The internal ID of the notification
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type: ignore[arg-type]
-        nullable=False,
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The ID of the news item that triggered the notification
-    news_id: Column[int] = Column(
-        Integer,
-        ForeignKey('pages.id', ondelete='CASCADE'),
-        nullable=False
+    news_id: Mapped[int] = mapped_column(
+        ForeignKey('pages.id', ondelete='CASCADE')
     )
-    news: relationship[News] = relationship(
-        'News',
-        backref=backref('sent_notifications', passive_deletes=True),
+    news: Mapped[News] = relationship(
+        back_populates='sent_notifications',
         foreign_keys=[news_id]
     )
 
     #: The topic/channel the notification was sent to
-    topic_id: Column[str] = Column(String, nullable=False)
+    topic_id: Mapped[str] = mapped_column(String)
 
     #: When the notification was sent
-    sent_at = Column(UTCDateTime, nullable=False, default=utcnow)
+    sent_at: Mapped[datetime] = mapped_column(default=utcnow)
 
     #: Response information from the notification service
-    response_data: Column[dict[str, Any] | None] = Column(JSON, nullable=True)
+    response_data: Mapped[dict[str, Any] | None]
 
     @classmethod
     def was_notification_sent(

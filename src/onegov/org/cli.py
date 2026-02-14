@@ -679,9 +679,7 @@ def fetch(
                     )
                 )
                 if tag:
-                    query = query.filter(
-                        Event._tags.has_any(array(tag))  # type:ignore
-                    )
+                    query = query.filter(Event._tags.has_any(array(tag)))
                 if location:
                     query = query.filter(
                         or_(*(
@@ -698,7 +696,7 @@ def fetch(
                     for event_ in query:
                         event_._es_skip = True
                         yield EventImportItem(
-                            event=Event(  # type:ignore[misc]
+                            event=Event(
                                 state=event_.state,
                                 title=event_.title,
                                 start=event_.start,
@@ -849,7 +847,7 @@ def fix_directory_files(
                     file = request.session.query(File).filter_by(
                         id=file_id).first()
                     if file and file.type != 'directory':
-                        new = DirectoryFile(  # type:ignore[misc]
+                        new = DirectoryFile(
                             id=random_token(),
                             name=file.name,
                             note=file.note,

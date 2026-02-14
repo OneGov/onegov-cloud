@@ -98,7 +98,7 @@ class ScopedPropertyObserver(sqlalchemy_utils.observer.PropertyObserver):
 
     def update_generator_registry(
         self,
-        mapper: Mapper,
+        mapper: Mapper[Any],
         class_: type[Any]
     ) -> None:
 

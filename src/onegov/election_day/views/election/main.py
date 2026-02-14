@@ -14,7 +14,6 @@ from onegov.election_day.utils.election import get_candidates_results
 from onegov.election_day.utils.election import get_connection_results
 from onegov.election_day.utils.election.lists import get_list_results
 from onegov.election_day.utils.parties import get_party_results
-from sqlalchemy.orm import object_session
 
 
 from typing import TYPE_CHECKING
@@ -160,7 +159,7 @@ def view_election_json(
         }
     }
 
-    session = object_session(self)
+    session = request.session
 
     if self.type == 'majorz':
         if self.majority_type == 'absolute':

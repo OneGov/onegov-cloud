@@ -30,7 +30,7 @@ from onegov.reservation import Resource
 from onegov.ticket import Ticket, TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
 from operator import add, attrgetter
-from sqlalchemy import case, nullsfirst  # type:ignore[attr-defined]
+from sqlalchemy import case, nullsfirst
 from webob.exc import HTTPBadRequest
 
 
@@ -42,14 +42,13 @@ if TYPE_CHECKING:
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
     from onegov.form import Form, FormSubmission
-    from onegov.org.models import ImageFile
     from onegov.org.request import OrgRequest
     from onegov.pay import InvoiceItem
     from onegov.pay.types import PriceDict
     from onegov.reservation import Allocation, Reservation
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
-    from sqlalchemy.orm import Query
-    from sqlalchemy import Column
+    from sqlalchemy.orm import InstrumentedAttribute, Query
+    from sqlalchemy.sql.elements import ColumnElement
     from typing import Self, TypeAlias, TypeVar
     from uuid import UUID
 
@@ -261,21 +260,26 @@ def set_image_sizes(
             return match.group(1)
         return None
 
-    images_dict = {get_image_id(img): img for img in images}
+    images_dict = {
+        image_id: img
+        for img in images
+        if (image_id := get_image_id(img)) is not None
+    }
 
     if images_dict:
-        q: Query[ImageFile]
-        q = FileCollection(request.session, type='image').query()
-        q = q.with_entities(File.id, File.reference)
-        q = q.filter(File.id.in_(images_dict))
 
-        sizes = {i.id: i.reference for i in q}
+        uploaded_files = dict(
+            FileCollection(request.session, type='image').query()
+            .with_entities(File.id, File.reference)
+            .filter(File.id.in_(images_dict))
+            .tuples()
+        )
 
-        for id, image in images_dict.items():
-            if id in sizes:
+        for image_id, image in images_dict.items():
+            if (uploaded := uploaded_files.get(image_id)) is not None:
                 with suppress(AttributeError):
-                    image.set('width', sizes[id].size[0])
-                    image.set('height', sizes[id].size[1])
+                    image.set('width', uploaded.size[0])
+                    image.set('height', uploaded.size[1])
 
 
 def parse_fullcalendar_request(
@@ -1497,8 +1501,8 @@ def predict_next_value(
 def group_by_column(
     request: OrgRequest,
     query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[_SortT],
     default_group: str | None = None,
     transform: Callable[[_T], _T] | None = None
 ) -> dict[str, list[_T]]: ...
@@ -1508,8 +1512,8 @@ def group_by_column(
 def group_by_column(
     request: OrgRequest,
     query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[_SortT],
     default_group: str | None,
     transform: Callable[[_T], _TransformedT]
 ) -> dict[str, list[_TransformedT]]: ...
@@ -1519,8 +1523,8 @@ def group_by_column(
 def group_by_column(
     request: OrgRequest,
     query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[_SortT],
     default_group: str | None = None,
     *,
     transform: Callable[[_T], _TransformedT]
@@ -1530,8 +1534,8 @@ def group_by_column(
 def group_by_column(
     request: OrgRequest,
     query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[_SortT],
     default_group: str | None = None,
     transform: Callable[[Any], Any] | None = None
 ) -> dict[str, list[Any]]:
@@ -1654,7 +1658,7 @@ def emails_for_new_ticket(
     # then there can't be any exclusive permissions for any
     # specific group we're not a part of, since then we won't
     # have permission to access the ticket
-    general_condition = TicketPermission.group.is_(None)
+    general_condition: ColumnElement[bool] = TicketPermission.group.is_(None)
     if exclusive_group_ids:
         general_condition &= UserGroup.id.in_(exclusive_group_ids)
     query = query.filter(
@@ -1666,7 +1670,7 @@ def emails_for_new_ticket(
             UserGroup.meta['shared_email'].isnot(None),
             UserGroup.meta['shared_email'].astext
         ), else_=User.username),
-        case((  # type: ignore[arg-type]
+        case((
             UserGroup.meta['shared_email'].isnot(None),
             UserGroup.name,
         ), else_=User.realname),

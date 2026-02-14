@@ -1,13 +1,12 @@
 from __future__ import annotations
 
+from datetime import datetime
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UTCDateTime
-from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
@@ -17,32 +16,32 @@ from onegov.landsgemeinde.models.mixins import TimestampedVideoMixin
 from onegov.landsgemeinde.observer import observes
 from onegov.org.models.extensions import SidebarLinksExtension
 from onegov.search import ORMSearchable
-from sqlalchemy import Boolean
-from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.orm.attributes import set_committed_value
 from uuid import uuid4
+from uuid import UUID
 
 
+from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterator
-    from datetime import date as date_t, datetime
+    from datetime import date as date_t
     from onegov.file.models.file import File
     from onegov.landsgemeinde.models import Assembly
     from translationstring import TranslationString
-    from typing import Literal
     from typing import TypeAlias
 
-    AgendaItemState: TypeAlias = Literal[
-        'draft', 'scheduled', 'ongoing', 'completed']
+
+AgendaItemState: TypeAlias = Literal[
+    'draft', 'scheduled', 'ongoing', 'completed'
+]
 
 
 STATES: dict[AgendaItemState, TranslationString] = {
@@ -105,49 +104,38 @@ class AgendaItem(
             )
 
     #: the internal id of the agenda item
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the external id of the agenda item
-    number: Column[int] = Column(Integer, nullable=False)
+    number: Mapped[int]
 
     #: the state of the agenda item
-    state: Column[AgendaItemState] = Column(
-        Enum(*STATES.keys(), name='agenda_item_state'),  # type:ignore
-        nullable=False
+    state: Mapped[AgendaItemState] = mapped_column(
+        Enum(*STATES.keys(), name='agenda_item_state')
     )
 
     #: True if the item has been declared irrelevant
-    irrelevant: Column[bool] = Column(Boolean, nullable=False, default=False)
+    irrelevant: Mapped[bool] = mapped_column(default=False)
 
     #: True if the item has been tacitly accepted
-    tacitly_accepted: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    tacitly_accepted: Mapped[bool] = mapped_column(default=False)
 
     #: the assembly this agenda item belongs to
-    assembly_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    assembly_id: Mapped[UUID] = mapped_column(
         ForeignKey(
             'landsgemeinde_assemblies.id',
             onupdate='CASCADE',
             ondelete='CASCADE'
-        ),
-        nullable=False
+        )
     )
 
-    assembly: relationship[Assembly] = relationship(
-        'Assembly',
-        back_populates='agenda_items',
-    )
+    assembly: Mapped[Assembly] = relationship(back_populates='agenda_items')
 
     #: Title of the agenda item (not translated)
-    title: Column[str] = Column(Text, nullable=False, default=lambda: '')
+    title: Mapped[str] = mapped_column(default=lambda: '')
 
     #: The memorial of the assembly
     memorial_pdf = NamedFile(cls=LandsgemeindeFile)
@@ -168,15 +156,14 @@ class AgendaItem(
     resolution_tags: dict_property[list[str] | None] = content_property()
 
     #: An agenda item contains n vota
-    vota: relationship[list[Votum]] = relationship(
-        Votum,
+    vota: Mapped[list[Votum]] = relationship(
         cascade='all, delete-orphan',
         back_populates='agenda_item',
         order_by='Votum.number',
     )
 
     #: The timestamp of the last modification
-    last_modified = Column(UTCDateTime)
+    last_modified: Mapped[datetime | None]
 
     def stamp(self) -> None:
         self.last_modified = self.timestamp()

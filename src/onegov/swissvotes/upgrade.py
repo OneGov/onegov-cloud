@@ -231,7 +231,7 @@ def add_media_fields(context: UpgradeContext) -> None:
     )
     for column, type_ in columns:
         if not context.has_column('swissvotes', column):
-            context.operations.add_column('swissvotes', Column(column, type_))
+            context.operations.add_column('swissvotes', Column(column, type_))  # type: ignore[misc]
 
 
 @upgrade_task(

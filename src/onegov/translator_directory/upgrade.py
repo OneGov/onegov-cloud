@@ -5,10 +5,10 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 # pragma: exclude file
 from __future__ import annotations
 
-from onegov.core.orm.types import JSON, UUID, UTCDateTime
+from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from sqlalchemy import ARRAY, Column, Boolean, Enum, Float, ForeignKey, Integer
-from sqlalchemy import Text
+from sqlalchemy import Text, UUID
 
 
 @upgrade_task('Change withholding tax column to boolean')
@@ -86,7 +86,7 @@ def add_translator_type(context: UpgradeContext) -> None:
         context.add_column_with_defaults(
             table='translators',
             column=Column('state', state, nullable=False, default='published'),
-            default=lambda x: 'published'
+            default=lambda x: 'published'  # type: ignore
         )
 
 
@@ -133,7 +133,7 @@ def add_status_column_to_time_reports(context: UpgradeContext) -> None:
             column=Column(
                 'status', status_enum, nullable=False, default='pending'
             ),
-            default=lambda x: 'pending',
+            default=lambda x: 'pending',  # type: ignore
         )
 
 

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from onegov.translator_directory.forms.translator import (
         TranslatorSearchForm)
     from sqlalchemy.orm import Query
-    from sqlalchemy.sql import ColumnElement
+    from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
     from typing import Self
 
 
@@ -302,7 +302,7 @@ class TranslatorCollection(
         )
 
     @property
-    def search_columns(self) -> list[ColumnElement[Any]]:
+    def search_columns(self) -> list[SQLCoreOperations[str | None]]:
         """ The columns used for text search. """
 
         return [

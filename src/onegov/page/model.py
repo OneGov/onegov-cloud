@@ -20,8 +20,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from datetime import datetime
-    from sqlalchemy import Column
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import Mapped
     from sqlalchemy.sql import ColumnElement
 
 
@@ -33,21 +32,19 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin,
 
     if TYPE_CHECKING:
         # we override these relationships to be more specific
-        parent: relationship[Page | None]
-        children: relationship[list[Page]]
+        parent: Mapped[Page | None]
+        children: Mapped[list[Page]]
 
         @property
         def root(self) -> Page: ...
         @property
         def ancestors(self) -> Iterator[Page]: ...
 
-        # HACK: Workaround for hybrid_property not working until SQLAlchemy 2.0
-        published_or_created: Column[datetime]
-    else:
-        @hybrid_property
-        def published_or_created(self) -> datetime:
-            return self.publication_start or self.created
+    @hybrid_property
+    def published_or_created(self) -> datetime:
+        return self.publication_start or self.created
 
-        @published_or_created.expression  # type:ignore[no-redef]
-        def published_or_created(cls) -> ColumnElement[datetime]:
-            return func.coalesce(Page.publication_start, Page.created)
+    @published_or_created.inplace.expression
+    @classmethod
+    def _published_or_created_expression(cls) -> ColumnElement[datetime]:
+        return func.coalesce(Page.publication_start, Page.created)

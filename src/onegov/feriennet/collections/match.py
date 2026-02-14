@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.activity.models import BookingPeriod, BookingPeriodMeta
     from sqlalchemy.orm import Session
-    from sqlalchemy.sql.selectable import Alias
+    from sqlalchemy.sql import Subquery
     from typing import Self, TypeAlias
     from uuid import UUID
 
@@ -83,7 +83,7 @@ class MatchCollection:
             return 0
 
     @property
-    def occasions_by_state(self) -> Alias:
+    def occasions_by_state(self) -> Subquery:
         return as_selectable_from_path(
             module_path('onegov.feriennet', 'queries/occasions_by_state.sql'))
 
@@ -131,4 +131,4 @@ class MatchCollection:
 
         query = query.order_by(columns.title, columns.start)
 
-        return self.session.execute(query)
+        return self.session.execute(query).tuples()

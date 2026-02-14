@@ -48,15 +48,16 @@ def view_resource_recipients(
             yes_button_text=_('Delete Recipient')
         )
 
-    q = ResourceCollection(request.app.libres_context).query()
-    q = q.order_by(Resource.group, Resource.name)
-    q = q.with_entities(Resource.group, Resource.title, Resource.id)
-
     default_group = request.translate(_('General'))
 
     resources = {
-        r.id.hex: f'{r.group or default_group} - {r.title}'
-        for r in q
+        resource_id.hex: f'{group or default_group} - {title}'
+        for group, title, resource_id in (
+            ResourceCollection(request.app.libres_context).query()
+            .with_entities(Resource.group, Resource.title, Resource.id)
+            .order_by(Resource.group, Resource.name)
+            .tuples()
+        )
     }
 
     return {

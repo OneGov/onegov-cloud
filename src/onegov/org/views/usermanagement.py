@@ -178,20 +178,22 @@ def ticket_links(request: OrgRequest, user: User) -> LinkGroup:
     tickets = TicketCollection(request.session).query()
     tickets = tickets.filter_by(user_id=user.id)
     tickets = tickets.order_by(Ticket.number)
-    tickets = tickets.with_entities(
-        Ticket.id, Ticket.number, Ticket.handler_code)
 
     return LinkGroup(
         title=_('Tickets'),
         links=[
             Link(
-                ticket.number,
+                number,
                 request.class_link(Ticket, {
-                    'handler_code': ticket.handler_code,
-                    'id': ticket.id
+                    'handler_code': handler_code,
+                    'id': ticket_id
                 }),
             )
-            for ticket in tickets
+            for ticket_id, number, handler_code in tickets.with_entities(
+                Ticket.id,
+                Ticket.number,
+                Ticket.handler_code
+            ).tuples()
         ]
     )
 

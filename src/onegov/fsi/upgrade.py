@@ -39,7 +39,7 @@ def add_attendee_permissions_col(context: UpgradeContext) -> None:
         context.add_column_with_defaults(
             'fsi_attendees',
             Column('permissions', ARRAY(Text), default=list),
-            default=lambda x: []
+            default=lambda x: []  # type: ignore
         )
 
 
@@ -180,5 +180,5 @@ def add_evaluation_url_to_course(context: UpgradeContext) -> None:
         context.add_column_with_defaults(
             'fsi_courses',
             Column('evaluation_url', Text, nullable=True),
-            default=lambda x: None
+            default=lambda x: None  # type: ignore
         )

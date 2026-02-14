@@ -9,9 +9,9 @@ from icalendar import vRecur
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.event.models.mixins import OccurrenceMixin
 from onegov.event.models.occurrence import Occurrence
 from onegov.file import File
@@ -25,34 +25,34 @@ from sedate import standardize_date
 from sedate import to_timezone, utcnow
 from sqlalchemy import and_
 from sqlalchemy import desc
-from sqlalchemy import Column
 from sqlalchemy import Enum
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm.attributes import set_committed_value
 from translationstring import TranslationString
 from uuid import uuid4
+from uuid import UUID
 
 
 from typing import IO
+from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterator
-    from onegov.core.orm.mixins import dict_property
     from onegov.core.request import CoreRequest
     from sqlalchemy.orm import Query
-    from typing import Literal
     from typing import TypeAlias
 
-    EventState: TypeAlias = Literal[
-        'initiated',
-        'submitted',
-        'published',
-        'withdrawn'
-    ]
+
+EventState: TypeAlias = Literal[
+    'initiated',
+    'submitted',
+    'published',
+    'withdrawn'
+]
 
 
 class EventFile(File):
@@ -76,19 +76,17 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     occurrence_dates_year_limit = 2
 
     #: Internal number of the event
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: State of the event
-    state: Column[EventState] = Column(
-        Enum(  # type: ignore[arg-type]
+    state: Mapped[EventState] = mapped_column(
+        Enum(
             'initiated', 'submitted', 'published', 'withdrawn',
             name='event_state'
         ),
-        nullable=False,
         default='initiated'
     )
 
@@ -120,7 +118,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     source_updated: dict_property[str | None] = meta_property()
 
     #: Recurrence of the event (RRULE, see RFC2445)
-    recurrence: Column[str | None] = Column(Text, nullable=True)
+    recurrence: Mapped[str | None]
 
     #: The access property of the event, taken from onegov.org. Not ideal to
     #: have this defined here, instead of using an AccessExtension, but that
@@ -171,7 +169,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         else:
             try:
-                setattr(self, blob, EventFile(  # type: ignore[misc]
+                setattr(self, blob, EventFile(
                     name=filename,
                     reference=as_fileintent(content, filename)
                 ))
@@ -179,11 +177,10 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
                 setattr(self, blob, None)
 
     #: Occurrences of the event
-    occurrences: relationship[list[Occurrence]] = relationship(
-        'Occurrence',
+    occurrences: Mapped[list[Occurrence]] = relationship(
         cascade='all, delete-orphan',
         back_populates='event',
-        lazy='joined',
+        lazy='selectin',
     )
 
     # HACK: We don't want to set up translations in this module for this single
@@ -256,6 +253,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     @property
     def base_query(self) -> Query[Occurrence]:
         session = object_session(self)
+        assert session is not None
         return session.query(Occurrence).filter_by(event_id=self.id)
 
     @property
@@ -407,7 +405,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         end = start + (self.end - self.start)
         name = f'{self.name}-{start.date().isoformat()}'
 
-        return Occurrence(  # type:ignore[misc]
+        return Occurrence(
             title=self.title,
             name=name,
             location=self.location,

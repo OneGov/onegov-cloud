@@ -13,19 +13,16 @@ from onegov.core.orm import ModelBase
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property)
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.file import MultiAssociatedFiles
 from onegov.form import parse_form
 from onegov.pay import InvoiceItemMeta, Price, process_payment
 from sedate import align_date_to_day, utcnow
-from sqlalchemy import Column, Text
-from sqlalchemy.orm import relationship
-from uuid import uuid4
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     # type gets shadowed by type in model, so we use Type as an alias
     from builtins import type as type_t
     from collections.abc import Sequence
@@ -45,7 +42,7 @@ if TYPE_CHECKING:
     #       type checking on Scheduler.name, we have to pretend we
     #       created a subclass
     class _OurScheduler(Scheduler):
-        name: uuid.UUID  # type:ignore[assignment]
+        name: UUID  # type:ignore[assignment]
 
 
 @lru_cache(maxsize=1)
@@ -82,39 +79,34 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     __tablename__ = 'resources'
 
     #: the unique id
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: a nice id for the url, readable by humans
     # FIXME: This probably should've been nullable=False
-    name: Column[str | None] = Column(Text, primary_key=False, unique=True)
+    name: Mapped[str | None] = mapped_column(unique=True)
 
     #: the title of the resource
-    title: Column[str] = Column(Text, primary_key=False, nullable=False)
+    title: Mapped[str]
 
     #: the timezone this resource resides in
-    timezone: Column[str] = Column(Text, nullable=False)
+    timezone: Mapped[str]
 
     #: the custom form definition used when creating a reservation
-    definition: Column[str | None] = Column(Text, nullable=True)
+    definition: Mapped[str | None]
 
     #: the group to which this resource belongs to (may be any kind of string)
-    group: Column[str | None] = Column(Text, nullable=True)
+    group: Mapped[str | None]
 
     #: the subgroup to which this resource belongs to
-    subgroup: Column[str | None] = Column(Text, nullable=True)
+    subgroup: Mapped[str | None]
 
     #: the type of the resource, this can be used to create custom polymorphic
     #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     #: the payment method
     payment_method: dict_property[PaymentMethod | None] = content_property()
@@ -197,24 +189,31 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         'polymorphic_identity': 'generic'
     }
 
-    allocations: relationship[list[Allocation]] = relationship(
-        Allocation,
+    allocations: Mapped[list[Allocation]] = relationship(
         cascade='all, delete-orphan',
         primaryjoin='Resource.id == Allocation.resource',
         foreign_keys='Allocation.resource'
     )
 
+    if TYPE_CHECKING:
+        # NOTE: We don't want these to end up in __annotations__
+        #       since they should not be mapped by SQLAlchemy
+        date: datetime.date | None
+        highlights_min: int | None
+        highlights_max: int | None
+        view: str | None
+
     #: the date to jump to in the view (if not None) -> not in the db!
-    date: datetime.date | None = None
+    date = None
 
     #: a range of allocation ids to highlight in the view (if not None)
-    highlights_min: int | None = None
-    highlights_max: int | None = None
+    highlights_min = None
+    highlights_max = None
 
     #: the view to open in the calendar (fullCalendar view name)
-    view: str | None = 'dayGridMonth'
+    view = 'dayGridMonth'
 
-    @deadline.setter
+    @deadline.inplace.setter
     def set_deadline(self, value: tuple[int, DeadlineUnit] | None) -> None:
         value = value or None
 

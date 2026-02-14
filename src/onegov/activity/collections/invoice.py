@@ -132,7 +132,7 @@ class BookingPeriodInvoiceCollection(
         optimistic: bool = False
     ) -> BookingPeriodInvoice:
 
-        invoice = BookingPeriodInvoice(  # type: ignore[misc]
+        invoice = BookingPeriodInvoice(
             id=uuid4(),
             period_id=period_id or self.period_id,
             user_id=user_id or self.user_id)

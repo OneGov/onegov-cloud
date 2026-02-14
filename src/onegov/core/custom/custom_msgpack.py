@@ -6,8 +6,8 @@ import ormsgpack
 
 from decimal import Decimal
 from markupsafe import Markup
-from sqlalchemy.engine.result import result_tuple  # type: ignore[attr-defined]
-from sqlalchemy.engine.row import Row  # type: ignore[import-untyped]
+from sqlalchemy.engine.result import result_tuple
+from sqlalchemy.engine.row import Row
 from types import GeneratorType
 from uuid import UUID
 

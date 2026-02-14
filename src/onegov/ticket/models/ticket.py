@@ -1,40 +1,37 @@
 from __future__ import annotations
 
+from datetime import datetime
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import JSON, UUID
-from onegov.core.orm.types import UTCDateTime
 from onegov.search import ORMSearchable
 from onegov.ticket import handlers
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
 from sedate import utcnow
-from sqlalchemy import Boolean, Column, Enum, Integer, String, Text
+from sqlalchemy import Enum, String
 from sqlalchemy import ForeignKey, Index
 from sqlalchemy.dialects.postgresql import ARRAY, HSTORE
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.mutable import MutableDict, MutableList
-from sqlalchemy.orm import deferred, relationship
+from sqlalchemy.orm import mapped_column, relationship, Mapped
 from translationstring import TranslationString
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from onegov.pay.models.payment import Payment
     from collections.abc import Sequence
-    from datetime import datetime
     from onegov.core.request import CoreRequest
     from onegov.ticket.handler import Handler
     from onegov.ticket.models import TicketInvoice
 
-    TicketState = Literal[
-        'open',
-        'pending',
-        'closed',
-        'archived'
-    ]
+
+TicketState = Literal[
+    'open',
+    'pending',
+    'closed',
+    'archived'
+]
 
 
 class Ticket(Base, TimestampMixin, ORMSearchable):
@@ -44,8 +41,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
     #: the internal number of the ticket -> may be used as an access key
     #: for anonymous users
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
@@ -53,160 +49,128 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: the unique ticket number known to the end-user -> do *not* use this to
     #: access the ticket as an anonymous user, the number is unique, but it's
     #: not unguessable!
-    number: Column[str] = Column(Text, unique=True, nullable=False)
+    number: Mapped[str] = mapped_column(unique=True)
 
     #: the title of the ticket
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: the subtitle of the ticket for extra information about it's content
-    subtitle: Column[str | None] = Column(Text, nullable=True)
+    subtitle: Mapped[str | None]
 
     #: the group this ticket belongs to. used to differentiate tickets
     #: belonging to one specific handler (handler -> group -> title)
-    group: Column[str] = Column(Text, nullable=False)
+    group: Mapped[str]
 
     #: several tickets can belong to the same order, they will show up
     #: as related tickets
-    order_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type: ignore[arg-type]
-        nullable=True,
-        index=True
-    )
+    order_id: Mapped[UUID | None] = mapped_column(index=True)
 
     #: Tags/Categories of the ticket
-    _tags: Column[dict[str, str] | None] = Column(  # type: ignore[call-overload]
-        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
-        nullable=True,
+    _tags: Mapped[dict[str, str] | None] = mapped_column(
+        MutableDict.as_mutable(HSTORE),
         name='tags'
     )
 
     #: Message-IDs of sent customer e-mails (for mail client threading)
-    customer_message_ids: Column[list[str] | None] = deferred(Column(
-        MutableList.as_mutable(ARRAY(String)),  # type: ignore[no-untyped-call]
-        nullable=True
-    ))
+    customer_message_ids: Mapped[list[str] | None] = mapped_column(
+        MutableList.as_mutable(ARRAY(String)),
+        deferred=True
+    )
 
     #: the data associated with the selected tags at the time they were
     #: selected
-    tag_meta: Column[dict[str, Any] | None] = Column(  # type: ignore[call-overload]
-        JSON,
-        nullable=True,
-        name='tags_meta'
-    )
+    tag_meta: Mapped[dict[str, Any] | None] = mapped_column(name='tags_meta')
 
     #: the name of the handler associated with this ticket, may be used to
     #: create custom polymorphic subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    handler_code: Column[str] = Column(Text, nullable=False, index=True)
+    handler_code: Mapped[str] = mapped_column(index=True)
 
     #: a unique id for the handler record
-    handler_id: Column[str] = Column(
-        Text,
-        nullable=False,
-        index=True,
-        unique=True
-    )
+    handler_id: Mapped[str] = mapped_column(unique=True)
 
     #: the data associated with the handler, not meant to be loaded in a list,
     #: therefore deferred.
-    handler_data: Column[dict[str, Any]] = deferred(
-        Column(JSON, nullable=False, default=dict)
+    handler_data: Mapped[dict[str, Any]] = mapped_column(
+        default=dict,
+        deferred=True,
     )
 
     #: the email address of the person submitting the ticket. This is stored
     #: redudantly so we can easily search and present users with their own
     #: tickets. This can be missing, once the ticket has been redacted.
-    ticket_email: Column[str | None] = Column(Text, nullable=True, index=True)
+    ticket_email: Mapped[str | None] = mapped_column(index=True)
 
     #: an optional link to the invoice record, if there is one
-    invoice_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
+    invoice_id: Mapped[UUID | None] = mapped_column(
         ForeignKey('invoices.id'),
-        nullable=True,
         index=True
     )
 
-    invoice: relationship[TicketInvoice | None] = relationship(
-        'TicketInvoice',
+    invoice: Mapped[TicketInvoice | None] = relationship(
         back_populates='ticket',
     )
 
     #: an optional link to the payment record, if there is one
     #: there can be an invoice without a payment, if the invoice
     #: totals a zero amount
-    payment_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
+    payment_id: Mapped[UUID | None] = mapped_column(
         ForeignKey('payments.id'),
-        nullable=True,
         index=True
     )
 
-    payment: relationship[Payment | None] = relationship(
-        'Payment',
+    payment: Mapped[Payment | None] = relationship(
         back_populates='ticket'
     )
 
     #: a snapshot of the ticket containing the last summary that made any sense
     #: use this before deleting the model behind a ticket, lest your ticket
     #: becomes nothing more than a number.
-    snapshot: Column[dict[str, Any]] = deferred(
-        Column(JSON, nullable=False, default=dict)
+    snapshot: Mapped[dict[str, Any]] = mapped_column(
+        default=dict,
+        deferred=True
     )
 
     #: the time the ticket was closed
-    closed_on: Column[datetime | None] = Column(UTCDateTime, nullable=True)
+    closed_on: Mapped[datetime | None]
 
     #: a timestamp recorded every time the state changes
-    last_state_change: Column[datetime | None] = Column(
-        UTCDateTime,
-        nullable=True
-    )
+    last_state_change: Mapped[datetime | None]
 
     #: the time in seconds between the ticket's creation and the time it
     #: got accepted (changed from open to pending)
-    reaction_time: Column[int | None] = Column(Integer, nullable=True)
+    reaction_time: Mapped[int | None]
 
     #: the time in seconds a ticket was in the pending state -
     #: may be a moving target, so use :attr:`current_process_time` to get the
     #: adjusted process_time based on the current time.
     #: ``process_time`` itself is only accurate if the ticket is closed, so in
     #: reports make sure to account for the ticket state.
-    process_time: Column[int | None] = Column(Integer, nullable=True)
+    process_time: Mapped[int | None]
 
     #: true if the notifications for this ticket should be muted
-    muted: Column[bool] = Column(Boolean, nullable=False, default=False)
+    muted: Mapped[bool] = mapped_column(default=False)
 
-    if TYPE_CHECKING:
-        created: Column[datetime]
-    else:
-
-        # override the created attribute from the timestamp mixin - we don't
-        # want it to be deferred by default because we usually need it
-        @declared_attr  # type:ignore[no-redef]
-        def created(cls) -> Column[datetime]:
-            return Column(UTCDateTime, default=cls.timestamp)
+    # override the created attribute from the timestamp mixin - we don't
+    # want it to be deferred by default because we usually need it
+    created: Mapped[datetime] = mapped_column(deferred=False)
 
     #: the state of this ticket (open, pending, closed, archived)
-    state: Column[TicketState] = Column(
-        Enum(  # type:ignore[arg-type]
+    state: Mapped[TicketState] = mapped_column(
+        Enum(
             'open',
             'pending',
             'closed',
             'archived',
             name='ticket_state'
         ),
-        nullable=False,
         default='open'
     )
 
     #: the user that owns this ticket with this ticket (optional)
-    user_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey(User.id),
-        nullable=True
-    )
-    user: relationship[User | None] = relationship(User, backref='tickets')
+    user_id: Mapped[UUID | None] = mapped_column(ForeignKey(User.id))
+    user: Mapped[User | None] = relationship(back_populates='tickets')
 
     __mapper_args__ = {
         'polymorphic_on': handler_code

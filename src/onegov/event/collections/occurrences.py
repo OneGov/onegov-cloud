@@ -374,7 +374,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         """
         counts: dict[str, int] = defaultdict(int)
 
-        base = self.session.query(Occurrence._tags.keys())  # type:ignore
+        base = self.session.query(Occurrence._tags.keys())
         base = base.filter(func.DATE(Occurrence.end) >= date.today())
 
         for keys, in base:
@@ -537,7 +537,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         if self.tags:
             query = query.filter(
-                Occurrence._tags.has_any(array(self.tags))  # type:ignore
+                Occurrence._tags.has_any(array(self.tags))
             )
 
         if self.filter_keywords:
@@ -546,15 +546,13 @@ class OccurrenceCollection(Pagination[Occurrence]):
             values = [val for sublist in keywords.values() for val in sublist]
             values.sort()
 
-            values = [
-                Event.filter_keywords[keyword].has_any(  # type:ignore[index]
-                    array(values)  # type:ignore[call-overload]
-                )
+            value_filters = [
+                Event.filter_keywords[keyword].has_any(array(values))
                 for keyword in keywords.keys()
             ]
 
-            if values:
-                query = query.filter(and_(*values))
+            if value_filters:
+                query = query.filter(and_(*value_filters))
 
         if self.locations:
 

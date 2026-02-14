@@ -3,10 +3,8 @@ from __future__ import annotations
 import math
 
 from functools import cached_property
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from sqlalchemy.inspection import inspect
-
-from onegov.core.orm import func
 
 
 from typing import Any, Generic, Literal, TypeVar, TYPE_CHECKING
@@ -14,9 +12,9 @@ if TYPE_CHECKING:
     from _typeshed import SupportsItems
     from abc import abstractmethod
     from collections.abc import Collection, Iterable, Iterator, Sequence
-    from sqlalchemy import Column
+    from sqlalchemy import ColumnElement
+    from sqlalchemy.sql.elements import SQLCoreOperations
     from sqlalchemy.orm import Query, Session
-    from sqlalchemy.sql.elements import ClauseElement
     from typing import Protocol
     from typing import Self
     from uuid import UUID
@@ -27,7 +25,7 @@ if TYPE_CHECKING:
     #       use the same kind of primary key, then we can reduce
     #       this type union to something more specific
     PKType = UUID | str | int
-    TextColumn = Column[str] | Column[str | None]
+    TextColumn = ColumnElement[str] | ColumnElement[str | None]
 
     # NOTE: To avoid referencing onegov.form from onegov.core and
     #       introducing a cross-dependency, we use a Protocol to
@@ -51,7 +49,11 @@ class GenericCollection(Generic[_M]):
         raise NotImplementedError
 
     @cached_property
-    def primary_key(self) -> Column[str] | Column[UUID] | Column[int]:
+    def primary_key(self) -> (
+        ColumnElement[str]
+        | ColumnElement[UUID]
+        | ColumnElement[int]
+    ):
         return inspect(self.model_class).primary_key[0]
 
     def query(self) -> Query[_M]:
@@ -61,13 +63,8 @@ class GenericCollection(Generic[_M]):
         return self.query().filter(self.primary_key == id).first()
 
     def by_ids(self, ids: Collection[PKType]) -> list[_M]:
-        # FIXME: This type error is a bug in the sqlalchemy-stubs
-        #        plugin, it might go away with SQLAlchemy 2.0, since
-        #        Column is being treated like a descriptor, even though
-        #        it is not, and there's a hidden descriptor inserted
-        #        into the DeclarativeBase to wrap the Column.
         return self.query().filter(
-            self.primary_key.in_(ids)  # type:ignore[union-attr]
+            self.primary_key.in_(ids)
         ).all() if ids else []
 
     # NOTE: Subclasses should be more specific, so we get type
@@ -111,17 +108,17 @@ class SearcheableCollection(GenericCollection[_M]):
 
     @staticmethod
     def match_term(
-        column: Column[str] | Column[str | None],
+        column: SQLCoreOperations[str | None],
         language: str,
         term: str
-    ) -> ClauseElement:
+    ) -> ColumnElement[bool]:
         """
         Usage:
         model.filter(match_term(model.col, 'german', 'my search term'))
 
         """
-        document_tsvector = func.to_tsvector(language, column)  # type:ignore
-        ts_query_object = func.to_tsquery(language, term)  # type:ignore
+        document_tsvector = func.to_tsvector(language, column)
+        ts_query_object = func.to_tsquery(language, term)
         return document_tsvector.op('@@')(ts_query_object)
 
     @staticmethod
@@ -146,10 +143,10 @@ class SearcheableCollection(GenericCollection[_M]):
 
     def filter_text_by_locale(
         self,
-        column: Column[str] | Column[str | None],
+        column: SQLCoreOperations[str | None],
         term: str,
         locale: str | None = None
-    ) -> ClauseElement:
+    ) -> ColumnElement[bool]:
         """
         Returns an SqlAlchemy filter statement based on the search term.
         If no locale is provided, it will use english as language.
@@ -194,7 +191,7 @@ class SearcheableCollection(GenericCollection[_M]):
             raise NotImplementedError
 
     @property
-    def term_filter(self) -> Iterator[ClauseElement]:
+    def term_filter(self) -> Iterator[ColumnElement[bool]]:
         assert self.term_filter_cols
         term = self.__class__.term_to_tsquery_string(self.term)
 

@@ -29,18 +29,27 @@ from onegov.pas.importer.types import (  # noqa: TC002
     PersonData,
 )
 
-from typing import Any, Literal, TYPE_CHECKING, TypedDict
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     import logging
     from onegov.parliament.models.parliamentarian_role import (
         ParliamentaryGroupRole, PartyRole, Role)
     from collections.abc import Sequence
     from sqlalchemy.orm import Session
+    from typing import TypeAlias, TypedDict
 
     class ImportCategoryResult(TypedDict):
         created: list[Any]
         updated: list[Any]
         processed: int
+
+    RoleKey: TypeAlias = tuple[
+        UUID,
+        UUID | None,
+        UUID | None,
+        str,
+        str | None
+    ]
 
 
 class DataImporter:
@@ -897,8 +906,8 @@ class MembershipImporter(DataImporter):
             )
 
         # Define the precise structure for the role key tuple
-        role_key_type = tuple[UUID, UUID | None, UUID | None, str, str | None]
-        existing_roles_map: dict[role_key_type, PASParliamentarianRole] = {}
+        existing_roles_map: dict[RoleKey, PASParliamentarianRole] = {}
+        current_role_key: RoleKey
         if parliamentarian_ids:
             # Fetch all roles for the relevant parliamentarians
             # We'll filter/map them client-side
@@ -917,38 +926,38 @@ class MembershipImporter(DataImporter):
                 )
                 .all()
             )
-            for role_obj in existing_roles:
+            for role_obj_ in existing_roles:
                 # Create a unique key based on the role type and relevant IDs
                 # Use the defined role_key_type hint for clarity
-                if role_obj.party_id or role_obj.parliamentary_group_id:
+                if role_obj_.party_id or role_obj_.parliamentary_group_id:
                     # Fraktion/Party Role (assuming role='member')
                     current_role_key = (
-                        role_obj.parliamentarian_id,
-                        role_obj.party_id,
-                        role_obj.parliamentary_group_id,
+                        role_obj_.parliamentarian_id,
+                        role_obj_.party_id,
+                        role_obj_.parliamentary_group_id,
                         'member',  # Explicitly add role type for uniqueness
                         None,  # Placeholder for additional_information
                     )
-                elif role_obj.additional_information:
+                elif role_obj_.additional_information:
                     # Sonstige Role (assuming role='member')
                     current_role_key = (
-                        role_obj.parliamentarian_id,
+                        role_obj_.parliamentarian_id,
                         None,  # party_id
                         None,  # group_id
                         'member',  # Explicitly add role type
-                        role_obj.additional_information,
+                        role_obj_.additional_information,
                     )
                 else:
                     # Kantonsrat Role (or potentially others without
                     # party/group/add.info)
                     current_role_key = (
-                        role_obj.parliamentarian_id,
+                        role_obj_.parliamentarian_id,
                         None,  # party_id
                         None,  # group_id
-                        role_obj.role,  # Use the actual role
+                        role_obj_.role,  # Use the actual role
                         None,  # Placeholder for additional_information
                     )
-                existing_roles_map[current_role_key] = role_obj
+                existing_roles_map[current_role_key] = role_obj_
             self.logger.debug(
                 f'Pre-fetched {len(existing_roles_map)} existing '
                 f'parliamentarian roles.'
@@ -1129,9 +1138,7 @@ class MembershipImporter(DataImporter):
                             # Add the new role to the map
                             # Ensure the key matches RoleKey type
                             if parliamentarian.id:
-                                current_role_key_after_create: (
-                                    role_key_type
-                                ) = (
+                                current_role_key_after_create: RoleKey = (
                                     parliamentarian.id,
                                     role_obj.party_id,
                                     role_obj.parliamentary_group_id,
@@ -1232,7 +1239,7 @@ class MembershipImporter(DataImporter):
                         else None
                     )
 
-                    current_role_key = (  # type: ignore[assignment]
+                    current_role_key = (
                         parliamentarian.id,
                         None,  # party_id
                         None,  # group_id

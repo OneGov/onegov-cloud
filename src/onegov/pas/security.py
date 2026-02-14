@@ -111,7 +111,7 @@ def restrict_attendence_access(
                     User.parliamentarian.has(id=model.parliamentarian_id)  # type: ignore[attr-defined]
                 ).first()
 
-                if attendance_owner and attendance_owner.parliamentarian:
+                if attendance_owner and attendance_owner.parliamentarian:  # type: ignore[attr-defined]
                     # Check if president leads any commission where attendance
                     # owner is a member
                     for pres_membership in (
@@ -124,7 +124,7 @@ def restrict_attendence_access(
                             # Check if attendance owner is member of this
                             # commission
                             for member_membership in (
-                                attendance_owner.parliamentarian
+                                attendance_owner.parliamentarian  # type: ignore[attr-defined]
                                 .commission_memberships
                             ):
                                 if (

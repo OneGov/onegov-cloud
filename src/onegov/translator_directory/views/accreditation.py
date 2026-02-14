@@ -143,7 +143,7 @@ def grant_accreditation(
         # store a PDF of the ticket on the translator
         pdf_content = TicketPdf.from_ticket(request, self.ticket)
         self.target.files.append(
-            File(  # type:ignore[misc]
+            File(
                 id=random_token(),
                 name='Ticket.pdf',
                 note='Antrag',

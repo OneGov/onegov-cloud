@@ -9,7 +9,7 @@ from onegov.search.datamanager import IndexerDataManager
 from onegov.search.search_index import SearchIndex
 from onegov.search.utils import language_from_locale
 from operator import itemgetter
-from sqlalchemy import and_, bindparam, func, text, String
+from sqlalchemy import and_, bindparam, delete, func, text, String
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.dialects.postgresql import insert, ARRAY
@@ -20,7 +20,7 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import InstrumentedAttribute, Session
     from sqlalchemy.sql import ColumnElement
     from typing import TypeAlias
     from typing import TypedDict
@@ -52,9 +52,9 @@ if TYPE_CHECKING:
 
     Task: TypeAlias = IndexTask | DeleteTask
     PKColumn: TypeAlias = (
-        ColumnElement[UUID | None]
-        | ColumnElement[int | None]
-        | ColumnElement[str | None]
+        InstrumentedAttribute[UUID | None]
+        | InstrumentedAttribute[int | None]
+        | InstrumentedAttribute[str | None]
     )
 
 
@@ -209,7 +209,7 @@ class Indexer:
             assert schema is not None
             assert owner_id_column is not None
 
-            title_vector = None
+            title_vector: ColumnElement[str] | None = None
             for language in self.languages:
                 title_vector_part = func.setweight(
                     func.to_tsvector(
@@ -223,7 +223,7 @@ class Indexer:
                 else:
                     title_vector = title_vector.op('||')(title_vector_part)
 
-            data_vector = func.setweight(
+            data_vector: ColumnElement[str] = func.setweight(
                 func.array_to_tsvector(
                     bindparam('_tags', type_=ARRAY(String))
                 ),
@@ -242,7 +242,7 @@ class Indexer:
                     )
 
             stmt = (
-                insert(SearchIndex.__table__)
+                insert(SearchIndex)
                 .values(
                     {
                         owner_id_column: bindparam('_owner_id'),
@@ -286,7 +286,7 @@ class Indexer:
                     # since our unique constraints are partial indeces
                     # we need this index_where clause, otherwise postgres
                     # will not be able to infer the matching constraint
-                    index_where=owner_id_column.isnot(None)  # type: ignore[no-untyped-call]
+                    index_where=owner_id_column.is_not(None)
                 )
             )
             params = list(params_dict.values())
@@ -361,7 +361,7 @@ class Indexer:
             assert tablename is not None
             assert owner_id_column is not None
             stmt = (
-                SearchIndex.__table__.delete()
+                delete(SearchIndex)
                 .where(and_(
                     SearchIndex.owner_tablename == tablename,
                     owner_id_column.in_(owner_ids)
@@ -748,9 +748,10 @@ class ORMEventTranslator:
         """
         if session is None:
             session = object_session(obj)
+            assert session is not None
         task = self.index_task(schema, obj)
         if task is not None:
-            self.put(object_session(obj), task)
+            self.put(session, task)
 
     def delete(
         self,
@@ -764,4 +765,5 @@ class ORMEventTranslator:
         """
         if session is None:
             session = object_session(obj)
+            assert session is not None
         self.put(session, self.delete_task(schema, obj))

@@ -28,7 +28,7 @@ class UTCDateTime(_Base):
     def __init__(self) -> None:
         super().__init__(timezone=False)
 
-    def process_bind_param(  # type:ignore[override]
+    def process_bind_param(
         self,
         value: datetime | None,
         dialect: Dialect

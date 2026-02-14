@@ -17,7 +17,8 @@ if TYPE_CHECKING:
     from onegov.core.types import JSON_ro, RenderData
     from onegov.feriennet.layout import DefaultLayout
     from onegov.feriennet.request import FeriennetRequest
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.engine import Result
+    from sqlalchemy.orm import Session
     from typing import NamedTuple
     from typing import Self
     from uuid import UUID
@@ -77,7 +78,7 @@ class VolunteerCart:
     def card_items(
         self,
         need_id: UUID | None = None
-    ) -> Query[CardItemRow]:
+    ) -> Result[CardItemRow]:
         stmt = as_selectable_from_path(
             module_path('onegov.feriennet', 'queries/card_items.sql'))
 
@@ -86,7 +87,7 @@ class VolunteerCart:
         else:
             need_ids = (need_id, )
 
-        query = select(stmt.c).where(stmt.c.need_id.in_(need_ids))
+        query = select(*stmt.c).where(stmt.c.need_id.in_(need_ids))
         return self.session.execute(query)
 
     def overlaps(self, need_id: UUID) -> bool:
@@ -108,7 +109,7 @@ class VolunteerCart:
         localize: bool = True
     ) -> Iterator[RenderData]:
 
-        grouped = groupby(self.card_items(), key=lambda i: i.need_id)
+        grouped = groupby(self.card_items().tuples(), key=lambda i: i.need_id)
 
         def date(record: CardItemRow) -> str:
             start = record.start

@@ -133,7 +133,7 @@ def view_get_file_collection(
         Link(_('Files'), '#')
     ]
 
-    files = tuple(self.files)
+    files = tuple(self.files.tuples())
 
     # XXX build somewhat manually for more speed
     locale = Locale.parse(request.locale)

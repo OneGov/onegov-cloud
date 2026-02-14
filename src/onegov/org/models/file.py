@@ -18,12 +18,13 @@ from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
 from operator import attrgetter, itemgetter
 from sedate import standardize_date, utcnow
-from sqlalchemy import asc, desc, select, nullslast  # type: ignore
+from sqlalchemy import asc, desc, select, nullslast
 
 from typing import (
     overload, Any, Generic, Literal, NamedTuple, TypeVar, TYPE_CHECKING)
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
+    from sqlalchemy.engine import Result
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import Select
     from typing import Self
@@ -346,7 +347,7 @@ class GeneralFileCollection(
         return tuple(self.get_date_intervals(today=sedate.utcnow()))
 
     @property
-    def statement(self) -> Select:
+    def statement(self) -> Select[FileRow]:
         stmt = select(*self.file_list.c)
 
         if self.order_by == 'name':
@@ -363,7 +364,7 @@ class GeneralFileCollection(
         return stmt.order_by(nullslast(direction(order)))
 
     @property
-    def files(self) -> Query[FileRow]:
+    def files(self) -> Result[FileRow]:
         return self.session.execute(self.statement)
 
     def group(self, record: FileRow) -> str:

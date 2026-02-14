@@ -1,21 +1,17 @@
 from __future__ import annotations
 
 from markupsafe import escape, Markup
-from onegov.core.orm.types import JSON, MarkupText
+from onegov.core.orm.types import MarkupText
 from sqlalchemy import type_coerce
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.hybrid import ExprComparator
-from sqlalchemy.orm import deferred
-from sqlalchemy.orm.attributes import create_proxied_attribute
-from sqlalchemy.orm.interfaces import InspectionAttrInfo
-from sqlalchemy.schema import Column
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapped_column, Mapped
 
 
-from typing import overload, Any, Generic, Protocol, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from sqlalchemy.orm.attributes import QueryableAttribute
-    from sqlalchemy.sql import ColumnElement
+    from sqlalchemy.ext.hybrid import _HybridClassLevelAccessor
+    from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
     from typing import Self
 
     class HasHTML(Protocol):
@@ -98,19 +94,14 @@ class ContentMixin:
 
     """
 
-    if TYPE_CHECKING:
-        meta: Column[dict[str, Any]]
-        content: Column[dict[str, Any]]
+    #: metadata associated with the object, for storing small amounts of data
+    meta: Mapped[dict[str, Any]] = mapped_column(default=dict)
 
-    #: metadata associated with the form, for storing small amounts of data
-    @declared_attr  # type:ignore[no-redef]
-    def meta(cls) -> Column[dict[str, Any]]:
-        return Column(JSON, nullable=False, default=dict)
-
-    #: content associated with the form, for storing things like long texts
-    @declared_attr  # type:ignore[no-redef]
-    def content(cls) -> Column[dict[str, Any]]:
-        return deferred(Column(JSON, nullable=False, default=dict))
+    #: content associated with the object, for storing things like long texts
+    content: Mapped[dict[str, Any]] = mapped_column(
+        default=dict,
+        deferred=True
+    )
 
 
 def is_valid_default(default: object | None) -> bool:
@@ -126,7 +117,7 @@ def is_valid_default(default: object | None) -> bool:
     return False
 
 
-class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
+class dict_property(hybrid_property[_T]):  # noqa: N801
     """ Enables access of dictionaries through properties.
 
     Usage::
@@ -309,112 +300,15 @@ class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
                 value_type = type(default)
 
         self.value_type = value_type
-        self.custom_getter = None
-        self.custom_expression = None
-        self.custom_setter = None
-        self.custom_deleter = None
-        # compatibility with ExprComparator
-        self.update_expr = None
 
-    def __set_name__(self, owner: type[object], name: str) -> None:
-        """ Sets the dictionary key, if none is provided. """
-
-        if self.key is None:
-            self.key = name
-
-    @property
-    def getter(self) -> Callable[[Callable[[Any], _T]], Self]:
-        def wrapper(fn: Callable[[Any], _T]) -> Any:
-            self.custom_getter = fn
-            return self
-
-        return wrapper
-
-    @property
-    def setter(self) -> Callable[[Callable[[Any, _T], None]], Self]:
-        def wrapper(fn: Callable[[Any, _T], None]) -> Any:
-            self.custom_setter = fn
-            return self
-
-        return wrapper
-
-    @property
-    def deleter(self) -> Callable[[Callable[[Any], None]], Self]:
-        def wrapper(fn: Callable[[Any], None]) -> Any:
-            self.custom_deleter = fn
-            return self
-
-        return wrapper
-
-    @property
-    def expression(
-        self
-    ) -> Callable[[Callable[[Any], ColumnElement[_T]]], Self]:
-        def wrapper(fn: Callable[[Any], ColumnElement[_T]]) -> Any:
-            self.custom_expression = fn
-            return self
-
-        return wrapper
-
-    def _expr(self, owner: type[Any]) -> QueryableAttribute | None:
-        # FIXME: We should be able to remove this Any in SQlAlchemy 2.0
-        expr: Any
-        if self.custom_expression is not None:
-            expr = self.custom_expression(owner)
-        elif self.custom_getter is None:
-            column: Column[dict[str, Any]] = getattr(owner, self.attribute)
-            expr = column[self.key]
-            if self.value_type is None:
-                pass
-            elif issubclass(self.value_type, str):
-                expr = expr.as_string()
-            elif issubclass(self.value_type, bool):
-                expr = expr.as_boolean()
-            elif issubclass(self.value_type, float):
-                expr = expr.as_float()
-            elif issubclass(self.value_type, int):
-                expr = expr.as_integer()
-        else:
-            return None
-
-        # FIXME: This will need to change for SQLAlchemy 1.4/2.0
-        comparator = ExprComparator(owner, expr, self)  # type:ignore[call-arg]
-        proxy_attr = create_proxied_attribute(self)
-        return proxy_attr(
-            owner,
-            self.attribute,
-            self,
-            comparator,
-            doc=comparator.__doc__ or self.__doc__
+        super().__init__(
+            fget=self._default_getter,
+            fset=self._default_setter,
+            fdel=self._default_deleter,
+            expr=self._default_expr,
         )
 
-    @overload
-    def __get__(
-        self,
-        instance: None,
-        owner: type[object]
-    ) -> QueryableAttribute | None: ...
-
-    @overload
-    def __get__(
-        self,
-        instance: object,
-        owner: type[object]
-    ) -> _T: ...
-
-    def __get__(
-        self,
-        instance: object | None,
-        owner: type[object]
-    ) -> _T | QueryableAttribute | None:
-
-        if instance is None:
-            return self._expr(owner)
-
-        # pass control wholly to the custom getter if available
-        if self.custom_getter:
-            return self.custom_getter(instance)
-
+    def _default_getter(self, instance: object) -> _T:
         # get the value in the dictionary
         data = getattr(instance, self.attribute, None)
 
@@ -422,29 +316,49 @@ class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
             return data[self.key]
 
         # fallback to the default
-        return self.default() if callable(self.default) else self.default
+        return self.default() if callable(self.default) else self.default  # type: ignore[return-value]
 
-    def __set__(self, instance: object, value: _T) -> None:
+    def _default_setter(self, instance: object, value: _T) -> None:
+        getattr(instance, self.attribute)[self.key] = value
+
+    def _default_deleter(self, instance: object) -> None:
+        del getattr(instance, self.attribute)[self.key]
+
+    def _default_expr(self, owner: type[Any]) -> ColumnElement[_T]:
+        column: ColumnElement[dict[str, Any]] = getattr(owner, self.attribute)
+        expr = column[self.key]
+        if self.value_type is None:
+            pass
+        elif issubclass(self.value_type, str):
+            expr = expr.as_string()
+        elif issubclass(self.value_type, bool):
+            expr = expr.as_boolean()
+        elif issubclass(self.value_type, float):
+            expr = expr.as_float()
+        elif issubclass(self.value_type, int):
+            expr = expr.as_integer()
+        return expr
+
+    def __set_name__(self, owner: type[object], name: str) -> None:
+        """ Sets the dictionary key, if none is provided. """
+
+        if self.key is None:
+            self.key = name
+
+        if not hasattr(self, '__name__'):
+            self.__name__ = name
+
+    def __set__(
+        self,
+        instance: object,
+        value: SQLCoreOperations[_T] | _T
+    ) -> None:
 
         # create the dictionary if it does not exist yet
         if getattr(instance, self.attribute) is None:
             setattr(instance, self.attribute, {})
 
-        # pass control to the custom setter if available
-        if self.custom_setter:
-            return self.custom_setter(instance, value)
-
-        # fallback to just setting the value
-        getattr(instance, self.attribute)[self.key] = value
-
-    def __delete__(self, instance: object) -> None:
-
-        # pass control to the custom deleter if available
-        if self.custom_deleter:
-            return self.custom_deleter(instance)
-
-        # fallback to just removing the value
-        del getattr(instance, self.attribute)[self.key]
+        super().__set__(instance, value)
 
 
 class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
@@ -486,67 +400,47 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
             default,  # type:ignore[arg-type]
             Markup  # type:ignore[arg-type]
         )
-        # FIXME: This isn't super robust, we should instead
-        #        override _expr to perform the type coercion
-        #        but for that we should probably refactor
-        #        the entire thing a bit to make it more easily
-        #        extensible
-        self.custom_expression = lambda owner: type_coerce(
+
+    def _default_expr(self, owner: type[Any]) -> ColumnElement[_MarkupT]:
+        return type_coerce(
             getattr(owner, self.attribute)[self.key].as_string(),
-            MarkupText()
+            MarkupText()  # type: ignore[arg-type]
         )
+
+    @overload
+    def __get__(self, instance: Any, owner: None) -> Self: ...
 
     @overload
     def __get__(
         self,
         instance: None,
         owner: type[object]
-    ) -> QueryableAttribute | None: ...
+    ) -> _HybridClassLevelAccessor[_MarkupT]: ...
 
     @overload
-    def __get__(
-        self,
-        instance: object,
-        owner: type[object]
-    ) -> _MarkupT: ...
+    def __get__(self, instance: object, owner: type[object]) -> _MarkupT: ...
 
     def __get__(
         self,
         instance: object | None,
-        owner: type[object]
-    ) -> _MarkupT | QueryableAttribute | None:
+        owner: type[object] | None
+    ) -> Self | _HybridClassLevelAccessor[_MarkupT] | _MarkupT:
 
-        if instance is None:
-            return self._expr(owner)
+        value = super().__get__(instance, owner)
+        if owner is None or instance is None or value is None:
+            return value  # type: ignore[return-value]
 
-        # pass control wholly to the custom getter if available
-        if self.custom_getter:
-            # NOTE: It would be safer to sanitize the text, in case someone
-            #       bypassed this property to insert raw unsanitized markup
-            #       However, this would also add a ton of static overhead.
-            #       If we decide we want the additional safety, we should
-            #       use an approach like OCQMS' lazy Sanitized text type.
-            return Markup(self.custom_getter(instance))  # nosec: B704
-
-        # get the value in the dictionary
-        data = getattr(instance, self.attribute, None)
-
-        if data is not None and self.key in data:
-            value = data[self.key]
-            # NOTE: It would be safer to sanitize the text, in case someone
-            #       bypassed this property to insert raw unsanitized markup
-            #       However, this would also add a ton of static overhead.
-            #       If we decide we want the additional safety, we should
-            #       use an approach like OCQMS' lazy Sanitized text type.
-            return None if value is None else Markup(value)  # nosec: B704
-
-        # fallback to the default
-        return self.default() if callable(self.default) else self.default
+        # NOTE: It would be safer to sanitize the text, in case someone
+        #       bypassed this property to insert raw unsanitized markup
+        #       However, this would also add a ton of static overhead.
+        #       If we decide we want the additional safety, we should
+        #       use an approach like OCQMS' lazy Sanitized text type.
+        return Markup(value)  # nosec: B704
 
     def __set__(
         self,
         instance: object,
-        value: _MarkupT | str | HasHTML
+        value: SQLCoreOperations[_MarkupT] | _MarkupT | str | HasHTML
     ) -> None:
         super().__set__(
             instance,

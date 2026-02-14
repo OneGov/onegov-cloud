@@ -291,4 +291,4 @@ class AuditCollection(
         return tuple(self.session.query(Course.id, Course.name).filter(
             Course.hidden_from_public == False,
             Course.mandatory_refresh != None
-        ))
+        ).tuples())
