@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from sqlalchemy.orm import selectinload
+
 from onegov.activity import ActivityFilter
 from onegov.feriennet import FeriennetApp, _
-
 
 from typing import TYPE_CHECKING
 
@@ -69,7 +70,8 @@ class ActivitiesWidget:
             activity_ids = (o.activity_id for o in occasions)
             unique_activity_ids = list(dict.fromkeys(activity_ids))[:6]
             activities = VacationActivityCollection(layout.app.session()
-                                                    ).query(
+                                                    ).query().options(
+                selectinload(VacationActivity.occasions)
             ).filter(VacationActivity.id.in_(unique_activity_ids)).all()
 
             if len(activities) < 6:
@@ -80,7 +82,9 @@ class ActivitiesWidget:
                 rest_activities = VacationActivityCollection(
                     layout.app.session(),
                     filter=filter_obj,
-                    ).query().filter(
+                    ).query().options(
+                    selectinload(VacationActivity.occasions)
+                ).filter(
                     VacationActivity.id.notin_(unique_activity_ids)).limit(
                         6 - len(activities))
                 activities = activities + rest_activities.all()
