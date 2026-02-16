@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numbers
+from math import isclose
 
 import babel.dates
 import re
@@ -2488,7 +2489,7 @@ class AllocationEditFormLayout(DefaultLayout):
             if not self.request.is_manager:
                 return
 
-            if self.model.availability == 100.0:
+            if isclose(self.model.availability, 100.0):
                 yield Link(
                     _('Delete'),
                     self.csrf_protected_url(

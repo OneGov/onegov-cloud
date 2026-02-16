@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import colorsys
 import hashlib
+from math import isclose
+
 import phonenumbers
 import re
 import sedate
@@ -627,7 +629,7 @@ class AllocationEventInfo:
                 )),
             )
 
-            if self.availability == 100.0:
+            if isclose(self.availability, 100.0):
                 yield DeleteLink(
                     _('Delete'),
                     self.request.link(self.allocation),
@@ -749,7 +751,7 @@ class AvailabilityEventInfo:
                 self.request.link(self.allocation, name='add-blocker')
             ) if blockable else None,
             'partlyAvailable': self.allocation.partly_available,
-            'fullyAvailable': self.allocation.availability == 100.0,
+            'fullyAvailable': isclose(self.allocation.availability, 100.0),
             'wholeDay': self.allocation.whole_day,
             'kind': 'allocation',
         }
@@ -1227,7 +1229,7 @@ class FindYourSpotEventInfo:
             else:
                 yield 'event-unavailable'
         else:
-            if self.availability == 100.0 or (
+            if isclose(self.availability, 100.0) or (
                 self.availability > 100.0 and self.adjustable
             ):
                 yield 'event-available'
