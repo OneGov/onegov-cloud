@@ -47,8 +47,10 @@ class PlausibleAPI:
                 )
             else:
                 log.exception('HTTP error occurred')
+            return {}
         except Exception:
             log.exception('An error occurred')
+            return {}
 
         return response.json()
 
@@ -74,7 +76,7 @@ class PlausibleAPI:
 
         results = r.get('results', [])
         if not results:
-            return figures
+            return []
 
         figures = results[0].get('metrics', figures)
 
