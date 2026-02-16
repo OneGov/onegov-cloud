@@ -413,7 +413,7 @@ class TranslatorTimeReportForm(Form):
 
                 travel_comp = getattr(obj, 'travel_compensation', None)
                 travel_dist = getattr(obj, 'travel_distance', None)
-                if travel_dist and (
+                if travel_dist is not None and (
                     assignment_type == 'on-site'
                     and travel_comp == Decimal('0')
                     and isclose(travel_dist, 0.0)
