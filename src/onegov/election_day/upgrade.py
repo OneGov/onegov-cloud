@@ -281,3 +281,64 @@ def add_active_inactive_since_columns(context: UpgradeContext) -> None:
              WHERE modified IS NOT NULL
                AND type = 'sms'
         """))
+
+
+@upgrade_task('Add translation columns to archived results')
+def add_translation_columns_to_archived_results(
+    context: UpgradeContext
+) -> None:
+    # for complex votes we need translations for proposal title,
+    # counter proposal title and tie breaker title.
+    if not context.has_column('archived_results',
+                              'title_proposal_translations'):
+        context.operations.add_column(
+            'archived_results',
+            Column(
+                'title_proposal_translations', HSTORE, nullable=True)
+        )
+    if not context.has_column('archived_results',
+                              'title_counter_proposal_translations'):
+        context.operations.add_column(
+            'archived_results',
+            Column(
+                'title_counter_proposal_translations', HSTORE, nullable=True)
+        )
+    if not context.has_column('archived_results',
+                              'title_tie_breaker_translations'):
+        context.operations.add_column(
+            'archived_results',
+            Column(
+                'title_tie_breaker_translations', HSTORE, nullable=True)
+        )
+
+
+@upgrade_task('Add complex vot to ArchivedResult type')
+def add_complex_vote_to_archived_result_type(context: UpgradeContext) -> None:
+    old_type = Enum(
+        'election', 'election_compound', 'vote',
+        name='type_of_result'
+    )
+    new_type = Enum(
+        'election', 'election_compound', 'vote', 'complex_vote',
+        name='type_of_result'
+    )
+    tmp_type = Enum(
+        'election', 'election_compound', 'vote', 'complex_vote',
+        name='_type_of_result'
+    )
+
+    tmp_type.create(context.operations.get_bind(), checkfirst=False)
+    context.operations.execute(text(
+        'ALTER TABLE archived_results ALTER COLUMN type '
+        'TYPE _type_of_result USING type::text::_type_of_result'
+    ))
+
+    old_type.drop(context.operations.get_bind(), checkfirst=False)
+
+    new_type.create(context.operations.get_bind(), checkfirst=False)
+    context.operations.execute(text(
+        'ALTER TABLE archived_results ALTER COLUMN type '
+        'TYPE type_of_result USING type::text::type_of_result'
+    ))
+
+    tmp_type.drop(context.operations.get_bind(), checkfirst=False)

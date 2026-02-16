@@ -185,6 +185,7 @@ def send_ticket_mail(
         for customer_message_ids, in TicketCollection(request.session)
         .by_order(ticket.order_id)
         .with_entities(Ticket.customer_message_ids)
+        if customer_message_ids
         for customer_message_id in customer_message_ids
     ) if ticket.order_id else ticket.customer_message_ids
 

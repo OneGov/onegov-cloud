@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+
 from sedate import to_timezone
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
+from math import isclose
+
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, TimeField
 from onegov.translator_directory import _
@@ -410,10 +413,10 @@ class TranslatorTimeReportForm(Form):
 
                 travel_comp = getattr(obj, 'travel_compensation', None)
                 travel_dist = getattr(obj, 'travel_distance', None)
-                if (
+                if travel_dist is not None and (
                     assignment_type == 'on-site'
                     and travel_comp == Decimal('0')
-                    and travel_dist == 0.0
+                    and isclose(travel_dist, 0.0)
                 ):
                     self.skip_travel_calculation.data = True
 

@@ -694,7 +694,9 @@ oc.add_blocker = function(calendar, event, url, start, end, reason, wholeDay) {
     url = new Url(url);
     url.query.start = start;
     url.query.end = end;
-    url.query.reason = reason;
+    if (reason) {
+        url.query.reason = reason;
+    }
     url.query.whole_day = wholeDay && '1' || '0';
 
     oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {

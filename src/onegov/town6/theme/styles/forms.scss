@@ -70,6 +70,7 @@ form {
     }
 
     label {
+        margin-top: .5rem;
 
         &.error, .upload-widget.error {
             color: $alert-color;
@@ -90,6 +91,10 @@ form {
         li input[type="radio"] {
             margin-bottom: .25rem;
         }
+    }
+
+    .group-label {
+        margin-top: .5rem;
     }
 
     .duration-widget label {
