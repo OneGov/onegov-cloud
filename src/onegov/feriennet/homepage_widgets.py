@@ -82,7 +82,7 @@ class ActivitiesWidget:
                 rest_activities = VacationActivityCollection(
                     layout.app.session(),
                     filter=filter_obj,
-                    ).query().options(
+                ).query().options(
                     selectinload(VacationActivity.occasions)
                 ).filter(
                     VacationActivity.id.notin_(unique_activity_ids)).limit(
