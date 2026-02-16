@@ -69,24 +69,29 @@ class ActivitiesWidget:
 
             activity_ids = (o.activity_id for o in occasions)
             unique_activity_ids = list(dict.fromkeys(activity_ids))[:6]
-            activities = VacationActivityCollection(layout.app.session()
-                                                    ).query().options(
-                selectinload(VacationActivity.occasions)
-            ).filter(VacationActivity.id.in_(unique_activity_ids)).all()
+            activities = (
+                VacationActivityCollection(layout.app.session())
+                .query()
+                .options(selectinload(VacationActivity.occasions))
+                .filter(VacationActivity.id.in_(unique_activity_ids))
+                .all()
+            )
 
             if len(activities) < 6:
                 filter_obj = ActivityFilter()
                 filter_obj.period_ids = (
                 {layout.app.active_period.id
                  } if layout.app.active_period else set())
-                rest_activities = VacationActivityCollection(
-                    layout.app.session(),
-                    filter=filter_obj,
-                ).query().options(
-                    selectinload(VacationActivity.occasions)
-                ).filter(
-                    VacationActivity.id.notin_(unique_activity_ids)).limit(
-                        6 - len(activities))
+                rest_activities = (
+                    VacationActivityCollection(
+                        layout.app.session(),
+                        filter=filter_obj,
+                    )
+                    .query()
+                    .options(selectinload(VacationActivity.occasions))
+                    .filter(VacationActivity.id.notin_(unique_activity_ids))
+                    .limit(6 - len(activities))
+                )
                 activities = activities + rest_activities.all()
         else:
             activities = []
