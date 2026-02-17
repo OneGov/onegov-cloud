@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import re
+from math import isclose
+
 import stdnum.ch.esr as esr
 
 from collections import defaultdict
@@ -106,10 +108,10 @@ class Transaction:
         if self.duplicate:
             return 'duplicate'
 
-        if self.confidence == 1:
+        if isclose(self.confidence, 1):
             return 'success'
 
-        if self.confidence == 0.5:
+        if isclose(self.confidence, 0.5):
             return 'warning'
 
         return 'unknown'

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import collections
 import hashlib
+from math import isclose
+
 import icalendar
 import morepath
 import secrets
@@ -658,7 +660,7 @@ def view_find_your_spot(
                         continue
 
                     for slot in slots:
-                        if slot.availability == 100.0:
+                        if isclose(slot.availability, 100.0):
                             try:
                                 room = rooms_dict[room_id]
                                 assert hasattr(room, 'bound_session_id')
