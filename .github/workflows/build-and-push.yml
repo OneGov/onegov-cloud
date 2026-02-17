@@ -15,8 +15,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      attestations: write
-      id-token: write
 
     outputs:
       version: ${{ steps.meta.outputs.version }}
@@ -46,13 +44,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v3
-        with:
-          subject-name: ghcr.io/onegov/onegov-cloud
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
+          provenance: false
 
   test-image:
     needs: build-and-push-image
