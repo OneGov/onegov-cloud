@@ -212,7 +212,7 @@ def restricts_ticket(
     model: TicketCollection,
     permission: object
 ) -> bool:
-    return identity.role == 'admin'
+    return identity.role in ('admin', 'editor')
 
 
 @TranslatorDirectoryApp.permission_rule(
