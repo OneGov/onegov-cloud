@@ -3315,4 +3315,3 @@ def test_export_time_reports(client: Client) -> None:
     assert report is not None
     assert report.status == 'confirmed'
     assert report.exported is False
-
