@@ -1,8 +1,12 @@
 # Changes
 
+## 2026.8
+
+`2026-02-17` | [56a0169055...fc50ac547f](https://github.com/OneGov/onegov-cloud/compare/56a0169055^...fc50ac547f)
+
 ## 2026.7
 
-`2026-02-17` | [f20e7fc393...e060cb4a33](https://github.com/OneGov/onegov-cloud/compare/f20e7fc393^...e060cb4a33)
+`2026-02-17` | [f20e7fc393...2189bbd8f8](https://github.com/OneGov/onegov-cloud/compare/f20e7fc393^...2189bbd8f8)
 
 ### Feriennet
 
@@ -2439,20 +2443,4 @@ Order imagesets by lat change
 ##### Provide files to political business template
 
 `Bugfix` | [OGC-2419](https://linear.app/onegovcloud/issue/OGC-2419) | [fe887383ec](https://github.com/onegov/onegov-cloud/commit/fe887383ecd1a1210577e62541f4c28f83868d2d)
-
-## 2025.30
-
-`2025-07-03` | [5fb710d69d...5725423a04](https://github.com/OneGov/onegov-cloud/compare/5fb710d69d^...5725423a04)
-
-### Org
-
-##### Allows subscription to confirmed personal reservations via iCal
-
-`Feature` | [OGC-2399](https://linear.app/onegovcloud/issue/OGC-2399) | [5fb710d69d](https://github.com/onegov/onegov-cloud/commit/5fb710d69d4b6df8476c6021c5e74a8ae2f94796)
-
-### Pay
-
-##### Silences 3D-Secure Verification errors
-
-`Bugfix` | [92d3e8da7f](https://github.com/onegov/onegov-cloud/commit/92d3e8da7fd1b41ae6949bbbd26670136ed81903)
 
