@@ -747,6 +747,8 @@ def view_activities_for_volunteers(
         current = sum(v.state == 'confirmed' for v in need.volunteers)
         return current < needed
 
+    self.batch_size = 24
+
     return {
         'activities': self.batch if show_activities else None,
         'layout': layout,
