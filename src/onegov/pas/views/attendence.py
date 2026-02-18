@@ -380,6 +380,9 @@ def edit_commission_bulk_attendence(
 ) -> RenderData | Response:
     request.include('custom')
 
+    type_label = request.translate(self.type_label)
+    title = _('Edit ${type}', mapping={'type': type_label})
+
     if form.submitted(request):
         if form.date.data:
             if error := validate_attendance_date(
@@ -388,7 +391,7 @@ def edit_commission_bulk_attendence(
                 request.alert(error)
                 return {
                     'layout': AttendenceCollectionLayout(self, request),
-                    'title': _('Edit commission session'),
+                    'title': title,
                     'form': form,
                     'form_width': 'large'
                 }
@@ -500,7 +503,7 @@ def edit_commission_bulk_attendence(
 
     return {
         'layout': layout,
-        'title': _('Edit commission session'),
+        'title': title,
         'form': form,
         'form_width': 'large'
     }
