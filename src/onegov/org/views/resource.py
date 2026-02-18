@@ -13,6 +13,7 @@ from isodate import parse_date, ISO8601Error
 from itertools import islice
 from libres.db.models import ReservationBlocker
 from libres.modules.errors import LibresError
+from math import isclose
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
 from onegov.core.utils import module_path, Bunch
@@ -658,7 +659,7 @@ def view_find_your_spot(
                         continue
 
                     for slot in slots:
-                        if slot.availability == 100.0:
+                        if isclose(slot.availability, 100.0, abs_tol=.005):
                             try:
                                 room = rooms_dict[room_id]
                                 assert hasattr(room, 'bound_session_id')

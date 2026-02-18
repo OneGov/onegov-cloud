@@ -19,6 +19,7 @@ from libres.modules import errors as libres_errors
 from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
 from markupsafe import escape, Markup
+from math import isclose
 from onegov.core.layout import Layout
 from onegov.core.mail import coerce_address
 from onegov.file import File, FileCollection
@@ -631,7 +632,7 @@ class AllocationEventInfo:
                 )),
             )
 
-            if self.availability == 100.0:
+            if isclose(self.availability, 100.0, abs_tol=.005):
                 yield DeleteLink(
                     _('Delete'),
                     self.request.link(self.allocation),
@@ -753,7 +754,11 @@ class AvailabilityEventInfo:
                 self.request.link(self.allocation, name='add-blocker')
             ) if blockable else None,
             'partlyAvailable': self.allocation.partly_available,
-            'fullyAvailable': self.allocation.availability == 100.0,
+            'fullyAvailable': isclose(
+                self.allocation.availability,
+                100.0,
+                abs_tol=.005
+            ),
             'wholeDay': self.allocation.whole_day,
             'kind': 'allocation',
         }
@@ -1231,7 +1236,7 @@ class FindYourSpotEventInfo:
             else:
                 yield 'event-unavailable'
         else:
-            if self.availability == 100.0 or (
+            if isclose(self.availability, 100.0, abs_tol=.005) or (
                 self.availability > 100.0 and self.adjustable
             ):
                 yield 'event-available'

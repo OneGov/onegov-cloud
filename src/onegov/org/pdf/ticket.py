@@ -9,6 +9,7 @@ from bleach import Cleaner
 from bleach.linkifier import LinkifyFilter
 from lxml import etree
 from markupsafe import Markup
+from math import isclose
 from onegov.chat import MessageCollection
 from onegov.org import _
 from onegov.org.constants import (
@@ -225,7 +226,10 @@ class TicketPdf(OrgPdf):
             return
 
         show_cost_object = any(item.cost_object for item in invoice.items)
-        show_quantity = any(item.quantity != 1.0 for item in invoice.items)
+        show_quantity = any(
+            isclose(item.quantity, 1.0)
+            for item in invoice.items
+        )
         show_vat = any(item.vat for item in invoice.items)
         item_groups = group_invoice_items(invoice.items)
         headers = [_('Booking Text')]

@@ -109,7 +109,8 @@ class Transaction:
         if self.confidence == 1:
             return 'success'
 
-        if self.confidence == 0.5:
+        # NOTE: This value is never calculated we set it exactly
+        if self.confidence == 0.5:  # noqa: RUF069
             return 'warning'
 
         return 'unknown'
