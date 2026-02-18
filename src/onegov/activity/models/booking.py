@@ -90,7 +90,10 @@ class Booking(Base, TimestampMixin):
     )
 
     #: the period this booking belongs to
-    @aggregated('occasion', mapped_column(ForeignKey('periods.id')))
+    @aggregated('occasion', mapped_column(
+        ForeignKey('periods.id'),
+        nullable=False
+    ))
     def period_id(self) -> ColumnElement[UUID]:
         return func.coalesce(Occasion.period_id, None)
 

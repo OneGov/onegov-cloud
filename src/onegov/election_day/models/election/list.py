@@ -64,7 +64,7 @@ class List(Base, TimestampMixin):
     )
 
     #: the list connection this list belongs to
-    connection: Mapped[ListConnection] = relationship(
+    connection: Mapped[ListConnection | None] = relationship(
         back_populates='lists'
     )
 

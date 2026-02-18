@@ -768,9 +768,9 @@ def test_proporz_election_results(session: Session) -> None:
     votes = session.query(Candidate.votes, Candidate.family_name)
     votes = votes.order_by(Candidate.votes)
     assert [vote[0] for vote in votes] == expected
-    assert sorted(set((
-        (c.party, c.list.name) for c in election.candidates
-    ))) == [
+    assert sorted({
+        (c.party, c.list and c.list.name) for c in election.candidates
+    }) == [
         ('Democratic Party', 'Kwik-E-Major'),
         ('Democratic Party', 'Partey B'),
         ('Republican Party', 'Partey A'),

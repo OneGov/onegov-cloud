@@ -67,8 +67,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
         Enum(
             'vote', 'complex_vote', 'election', 'election_compound',
             name='type_of_result'
-        ),
-        nullable=False
+        )
     )
 
     #: Origin of the result

@@ -100,7 +100,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
     municipality: Mapped[str | None]
 
     #: Access the user linked to this activity
-    user: Mapped[User] = relationship(User)
+    user: Mapped[User] = relationship()
 
     #: The occasions linked to this activity
     occasions: Mapped[list[Occasion]] = relationship(

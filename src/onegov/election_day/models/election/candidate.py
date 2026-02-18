@@ -83,7 +83,7 @@ class Candidate(Base, TimestampMixin):
     )
 
     #: the list this candidate belongs to
-    list: Mapped[List] = relationship(
+    list: Mapped[List | None] = relationship(
         back_populates='candidates'
     )
 

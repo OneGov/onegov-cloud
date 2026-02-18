@@ -31,10 +31,7 @@ class BookingPeriodInvoice(Invoice):
         #       what the type annotation says
         nullable=True
     )
-    period: Mapped[BookingPeriod] = relationship(
-        'BookingPeriod',
-        back_populates='invoices'
-    )
+    period: Mapped[BookingPeriod] = relationship(back_populates='invoices')
 
     #: the user to which the invoice belongs
     user_id: Mapped[UUID] = mapped_column(
@@ -44,7 +41,7 @@ class BookingPeriodInvoice(Invoice):
     )
     # FIXME: Do we need this backref? It's across module boundaries, so
     #        not the best for proper module isolation
-    user: Mapped[User] = relationship(User, backref='invoices')
+    user: Mapped[User] = relationship(backref='invoices')
 
     if TYPE_CHECKING:
         items: Mapped[list[ActivityInvoiceItem]]  # type: ignore[assignment]

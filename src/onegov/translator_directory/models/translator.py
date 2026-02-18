@@ -134,7 +134,6 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     # the user account related to this translator
     user: Mapped[User] = relationship(
-        'User',
         primaryjoin='foreign(Translator.email) == User.username',
         uselist=False,
         backref=backref('translator', uselist=False, passive_deletes='all')
@@ -146,10 +145,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     availability: Mapped[str | None]
 
-    confirm_name_reveal: Mapped[bool | None] = mapped_column(
-        nullable=True,
-        default=False
-    )
+    confirm_name_reveal: Mapped[bool | None] = mapped_column(default=False)
 
     # The translator applies to be in the directory and gets a decision
     date_of_application: Mapped[date | None]
@@ -157,25 +153,21 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     # Language Information
     mother_tongues: Mapped[list[Language]] = relationship(
-        'Language',
         secondary=mother_tongue_association_table,
         back_populates='mother_tongues'
     )
     # Arbeitssprache - Wort
     spoken_languages: Mapped[list[Language]] = relationship(
-        'Language',
         secondary=spoken_association_table,
         back_populates='speakers'
     )
     # Arbeitssprache - Schrift
     written_languages: Mapped[list[Language]] = relationship(
-        'Language',
         secondary=written_association_table,
         back_populates='writers'
     )
     # Arbeitssprache - Kommunikationsüberwachung
     monitoring_languages: Mapped[list[Language]] = relationship(
-        'Language',
         secondary=monitoring_association_table,
         back_populates='monitors'
     )

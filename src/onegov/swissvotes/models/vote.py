@@ -1068,8 +1068,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     campaign_material_nay = FileSubCollection()
     campaign_material_other = FileSubCollection()
     campaign_material_metadata: Mapped[dict[str, Any]] = mapped_column(
-        JSON,
-        nullable=False,
         default=dict
     )
 

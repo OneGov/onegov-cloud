@@ -43,7 +43,7 @@ class TranslatorTimeReport(Base, TimestampMixin):
         ForeignKey('users.id', ondelete='SET NULL'),
     )
 
-    created_by: Mapped[User | None] = relationship('User')
+    created_by: Mapped[User | None] = relationship()
 
     assignment_type: Mapped[str]
 

@@ -73,13 +73,13 @@ class PartyResult(Base, TimestampMixin):
     #: used instead of total_votes by election compounds
     voters_count: Mapped[Decimal | None] = mapped_column(
         Numeric(12, 2),
-        default=lambda: 0
+        default=lambda: Decimal('0')
     )
 
     #: the voters count as percentage
     voters_count_percentage: Mapped[Decimal | None] = mapped_column(
         Numeric(12, 2),
-        default=lambda: 0
+        default=lambda: Decimal('0')
     )
 
     #: all translations of the party name

@@ -32,7 +32,8 @@ class ElectionRelationship(Base):
 
     #: The target election ID.
     target_id: Mapped[str] = mapped_column(
-        ForeignKey('elections.id', onupdate='CASCADE')
+        ForeignKey('elections.id', onupdate='CASCADE'),
+        primary_key=True
     )
 
     #: The source election.

@@ -98,9 +98,9 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
     #: newsletters can't have actual recipients removed from them.
     #: onegov.newsletter does not make any guarantees here
     recipients: Mapped[list[Recipient]] = relationship(
-        'Recipient',
         secondary=newsletter_recipients,
-        back_populates='newsletters')
+        back_populates='newsletters'
+    )
 
     #: whether the newsletter should only show previews instead of full text
     show_only_previews: Mapped[bool] = mapped_column(default=True)

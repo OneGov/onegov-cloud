@@ -56,8 +56,7 @@ class DataSource(Base, TimestampMixin):
             'majorz',
             'proporz',
             name='type_of_data_source'
-        ),
-        nullable=False
+        )
     )
 
     #: A configuration may contain n items

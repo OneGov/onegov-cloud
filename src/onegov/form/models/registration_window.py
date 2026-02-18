@@ -7,10 +7,10 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.form.models.submission import FormSubmission
 from sqlalchemy import and_
-from sqlalchemy import ForeignKey
 from sqlalchemy import or_
 from sqlalchemy import text
 from sqlalchemy import Column
+from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import ExcludeConstraint
 from sqlalchemy.orm import mapped_column, object_session, relationship, Mapped
 from sqlalchemy.schema import CheckConstraint
@@ -51,7 +51,6 @@ class FormRegistrationWindow(Base, TimestampMixin):
 
     #: the form to which this registration window belongs
     form: Mapped[FormDefinition] = relationship(
-        'FormDefinition',
         back_populates='registration_windows'
     )
 

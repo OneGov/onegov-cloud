@@ -163,7 +163,7 @@ def add_closed_on_column_to_ticket(context: UpgradeContext) -> None:
         'tickets', Column('closed_on', UTCDateTime, nullable=True)
     )
 
-    stmt = update(Ticket).where(
+    stmt = update(Ticket.__table__).where(  # type: ignore[arg-type]
         and_(
             Ticket.state.in_(('closed', 'archived')),
             Ticket.reaction_time.is_not(None),

@@ -42,7 +42,7 @@ class ListConnection(Base, TimestampMixin):
     )
 
     #: the election this result belongs to
-    election: Mapped[ProporzElection] = relationship(
+    election: Mapped[ProporzElection | None] = relationship(
         back_populates='list_connections'
     )
 
@@ -52,7 +52,7 @@ class ListConnection(Base, TimestampMixin):
     )
 
     # the parent
-    parent: Mapped[ListConnection] = relationship(
+    parent: Mapped[ListConnection | None] = relationship(
         back_populates='children',
         remote_side='ListConnection.id'
     )

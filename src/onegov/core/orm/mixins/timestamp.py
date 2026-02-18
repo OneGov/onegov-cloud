@@ -24,7 +24,12 @@ class TimestampMixin:
     def timestamp() -> datetime:
         return utcnow()
 
-    created: Mapped[datetime] = mapped_column(default=timestamp)
+    created: Mapped[datetime] = mapped_column(
+        default=timestamp,
+        # FIXME: This should almost certainly have not been nullable, but
+        #        we need a migration for existing tables to fix this.
+        nullable=True
+    )
     modified: Mapped[datetime | None] = mapped_column(onupdate=timestamp)
 
     def force_update(self) -> None:

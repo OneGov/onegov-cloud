@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from math import isclose
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
+from math import isclose
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, TimeField
 from onegov.translator_directory import _

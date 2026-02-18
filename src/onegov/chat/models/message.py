@@ -64,7 +64,12 @@ class Message(Base):
 
     #: the time this message was created - not taken from the timestamp mixin
     #: because here we don't want it to be deferred
-    created: Mapped[datetime] = mapped_column(default=sedate.utcnow)
+    created: Mapped[datetime] = mapped_column(
+        default=sedate.utcnow,
+        # FIXME: This should almost certainly have not been nullable, but
+        #        we need a migration for existing tables to fix this.
+        nullable=True
+    )
 
     #: the time this message was modified - not taken from the timestamp mixin
     #: because here we don't want it to be deferred
@@ -110,14 +115,10 @@ class Message(Base):
         """
         return self.text
 
-    if TYPE_CHECKING:
-        # workaround for sqlalchemy-stubs
-        edited: Mapped[bool]
-    else:
-        @hybrid_property
-        def edited(self) -> bool:
-            # use != instead of "is None" as we want this translated into SQL
-            return self.modified != None
+    @hybrid_property
+    def edited(self) -> bool:
+        # use != instead of "is None" as we want this translated into SQL
+        return self.modified != None
 
     @classmethod
     def bound_messages(cls, session: Session) -> MessageCollection[Self]:

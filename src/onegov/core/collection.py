@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 
 from functools import cached_property
-from sqlalchemy import func, or_
+from sqlalchemy import func, literal_column, or_
 from sqlalchemy.inspection import inspect
 
 
@@ -12,18 +12,18 @@ if TYPE_CHECKING:
     from _typeshed import SupportsItems
     from abc import abstractmethod
     from collections.abc import Collection, Iterable, Iterator, Sequence
-    from sqlalchemy import ColumnElement
-    from sqlalchemy.sql.elements import SQLCoreOperations
+    from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
     from sqlalchemy.orm import DeclarativeBase, Query, Session
     from typing import Protocol
     from typing import Self
+    from typing import TypeAlias
     from uuid import UUID
 
     # TODO: Maybe PKType should be generic as well? Or if we always
     #       use the same kind of primary key, then we can reduce
     #       this type union to something more specific
-    PKType = UUID | str | int
-    TextColumn = ColumnElement[str] | ColumnElement[str | None]
+    PKType: TypeAlias = UUID | str | int
+    TextColumn: TypeAlias = ColumnElement[str] | ColumnElement[str | None]
 
     # NOTE: To avoid referencing onegov.form from onegov.core and
     #       introducing a cross-dependency, we use a Protocol to
@@ -115,8 +115,9 @@ class SearcheableCollection(GenericCollection[_M]):
         model.filter(match_term(model.col, 'german', 'my search term'))
 
         """
-        document_tsvector = func.to_tsvector(language, column)
-        ts_query_object = func.to_tsquery(language, term)
+        lang: ColumnElement[str] = literal_column(repr(language))
+        document_tsvector = func.to_tsvector(lang, column)
+        ts_query_object = func.to_tsquery(lang, term)
         return document_tsvector.op('@@')(ts_query_object)
 
     @staticmethod

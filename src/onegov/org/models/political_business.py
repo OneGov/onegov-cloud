@@ -190,7 +190,6 @@ class PoliticalBusiness(
     #: may have participants (Verfasser/Beteiligte) depending on the type
     participants: Mapped[list[PoliticalBusinessParticipation]] = (
         relationship(
-            'PoliticalBusinessParticipation',
             back_populates='political_business',
             order_by='desc(PoliticalBusinessParticipation.participant_type)',
         )

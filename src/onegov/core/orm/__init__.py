@@ -45,6 +45,7 @@ DB_CONNECTION_ERRORS = (
 )
 
 
+#: The base for all OneGov Core ORM Models
 class ModelBase:
 
     #: set by :class:`onegov.core.orm.cache.OrmCacheDescriptor`, this attribute
@@ -92,7 +93,6 @@ class ModelBase:
         return SessionManager.get_active()
 
 
-#: The base for all OneGov Core ORM Models
 class Base(DeclarativeBase, ModelBase):
 
     registry = registry(type_annotation_map={
@@ -220,7 +220,7 @@ def configure_listener(
 
     """
 
-    def mark_as_changed(obj: Base, *args: Any, **kwargs: Any) -> None:
+    def mark_as_changed(obj: Base, *args: object, **kwargs: object) -> None:
         if obj.is_cached and (session := object_session(obj)):
             mark_changed(session)
 
@@ -231,7 +231,7 @@ def configure_listener(
     event.listen(instance, 'dispose_collection', mark_as_changed)
 
 
-event.listen(Base, 'attribute_instrument', configure_listener)
+event.listen(ModelBase, 'attribute_instrument', configure_listener)
 
 
 def share_session_manager(query: Query[Any]) -> None:

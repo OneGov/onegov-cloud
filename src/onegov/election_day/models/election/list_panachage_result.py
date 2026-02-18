@@ -42,7 +42,7 @@ class ListPanachageResult(Base, TimestampMixin):
     )
 
     #: the source list this result belongs to, empty if blank list
-    source: Mapped[List] = relationship(
+    source: Mapped[List | None] = relationship(
         foreign_keys='ListPanachageResult.source_id',
         back_populates='panachage_results_lost'
     )

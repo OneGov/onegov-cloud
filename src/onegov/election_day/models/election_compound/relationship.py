@@ -32,7 +32,8 @@ class ElectionCompoundRelationship(Base):
 
     #: The target election compound ID.
     target_id: Mapped[str] = mapped_column(
-        ForeignKey('election_compounds.id', onupdate='CASCADE')
+        ForeignKey('election_compounds.id', onupdate='CASCADE'),
+        primary_key=True
     )
 
     #: The source election compound.

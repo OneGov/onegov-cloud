@@ -222,7 +222,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     )
 
     #: The election compound this election belongs to
-    election_compound: Mapped[ElectionCompound] = relationship(
+    election_compound: Mapped[ElectionCompound | None] = relationship(
         back_populates='elections'
     )
 

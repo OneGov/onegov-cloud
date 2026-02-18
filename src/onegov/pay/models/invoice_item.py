@@ -41,10 +41,7 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
     #: the invoice this item belongs to
     # FIXME: Shouldn't this be nullable=False?
     invoice_id: Mapped[UUID | None] = mapped_column(ForeignKey('invoices.id'))
-    invoice: Mapped[Invoice] = relationship(
-        'Invoice',
-        back_populates='items'
-    )
+    invoice: Mapped[Invoice] = relationship(back_populates='items')
 
     #: the item group (all items with the same text are visually grouped)
     group: Mapped[str]
@@ -101,8 +98,7 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
 
     #: the VAT factor (`net_amount` times the factor yields `amount`)
     vat_factor: Mapped[Decimal | None] = mapped_column(
-        Numeric(precision=5, scale=4),
-        nullable=True
+        Numeric(precision=5, scale=4)
     )
 
     @property
