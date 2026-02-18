@@ -364,6 +364,15 @@ msgstr "Massenbuchung Plenarsitzung"
 msgid "Commission meeting (bulk)"
 msgstr "Massenbuchung Kommissionssitzung"
 
+msgid "Commission session (bulk)"
+msgstr "Massenbuchung Kommissionssitzung"
+
+msgid "New commission session (bulk)"
+msgstr "Neue Massenbuchung Kommissionssitzung"
+
+msgid "Added session"
+msgstr "Sitzung hinzugefügt"
+
 msgid "Edit"
 msgstr "Bearbeiten"
 
