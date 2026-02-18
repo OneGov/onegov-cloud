@@ -139,7 +139,7 @@ class Scenario(BaseScenario, Generic[ActivityT]):
     ) -> None:
         super().__init__(session, test_password)
         self.activity_model = activity_model
-        self.activity_type = inspect(activity_model).polymorphic_identity
+        self.activity_type = inspect(activity_model).polymorphic_identity  # type: ignore[assignment]
 
         self.faker = Faker()
 

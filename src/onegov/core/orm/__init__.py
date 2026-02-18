@@ -14,7 +14,7 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import registry
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Query
-from sqlalchemy_utils import TranslationHybrid
+from sqlalchemy_utils import TranslationHybrid as BaseTranslationHybrid
 from zope.sqlalchemy import mark_changed
 from sqlalchemy.exc import InterfaceError, OperationalError
 from uuid import UUID as PythonUUID
@@ -26,8 +26,9 @@ from .types import UTCDateTime
 
 from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator
+    from collections.abc import Callable, Iterator, Mapping
     from sqlalchemy.ext.hybrid import hybrid_property
+    from sqlalchemy.orm import Mapped
     from sqlalchemy_utils.i18n import _TranslatableColumn
     from typing import Self
 
@@ -106,6 +107,18 @@ class Base(DeclarativeBase, ModelBase):
         #       sound fun, but we may tackle it eventually...
         str: Text
     })
+
+
+class TranslationHybrid(BaseTranslationHybrid):
+    # NOTE: This works around the fact that `MappedColumn` does not expose
+    #       the column's `key` attribute in the way it exposes its `name`
+    #       attribute, so we need to pass the actual column, instead of the
+    #       `MappedColumn` to preserve the same API in SQLAlchemy 2.0.
+    def __call__(
+        self,
+        attr: Mapped[Mapping[str, str]] | Mapped[Mapping[str, str] | None]
+    ) -> hybrid_property[str | None]:
+        return super().__call__(attr.column)  # type: ignore[union-attr]
 
 
 #: A translation hybrid integrated with OneGov Core. See also:

@@ -4,8 +4,7 @@ import pytest
 
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import SessionManager
-from sqlalchemy import Column, Integer, Text
-from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
+from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
 
 
 from typing import Any, TYPE_CHECKING
@@ -112,15 +111,14 @@ def test_pagination_negative_page_index() -> None:
 
 
 def test_generic_collection(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class Document(Base):
         __tablename__ = 'document'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str | None]
 
     class DocumentCollection(GenericCollection[Document]):
 

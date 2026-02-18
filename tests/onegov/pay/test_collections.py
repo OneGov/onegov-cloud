@@ -3,22 +3,16 @@ from __future__ import annotations
 import pytest
 
 from decimal import Decimal
-from onegov.core.orm import Base
-from onegov.core.orm import SessionManager
-from onegov.core.orm.types import UUID
+from onegov.core.orm import Base, SessionManager
 from onegov.pay import Payable, PayableCollection
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProvider
-from sqlalchemy import Column
-from sqlalchemy import Text
-from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
-from uuid import uuid4
+from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
+from uuid import uuid4, UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from onegov.core.orm import Base as MyBase  # noqa: F401
     from sqlalchemy.orm import Session
 
 
@@ -59,25 +53,21 @@ def test_payment_collection_crud(session: Session) -> None:
     assert payments.query().count() == 0
 
 
-# FIXME: flaky test
-@pytest.mark.flaky(reruns=5, only_rerun=None)
 def test_payable_collection(postgres_dsn: str) -> None:
-
-    # avoid confusing mypy
-    if not TYPE_CHECKING:
-        MyBase = declarative_base()
+    class MyBase(DeclarativeBase):
+        registry = registry()
 
     class Order(MyBase, Payable):
         __tablename__ = 'orders'
 
-        id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid4)  # type: ignore[arg-type]
-        title: Column[str | None] = Column(Text)
+        id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+        title: Mapped[str | None]
 
     class Newspaper(MyBase, Payable):
         __tablename__ = 'newspapers'
 
-        id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid4)  # type: ignore[arg-type]
-        title: Column[str | None] = Column(Text)
+        id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+        title: Mapped[str | None]
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.bases.append(MyBase)

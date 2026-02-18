@@ -51,8 +51,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator, Mapping
     from fs.base import FS, SubFS
     from re import Match
-    from sqlalchemy import ColumnElement
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import InstrumentedAttribute, Session
     from types import ModuleType
     from webob import Response
     from .request import CoreRequest
@@ -768,10 +767,7 @@ def scan_morepath_modules(cls: type[morepath.App]) -> None:
 
 def get_unique_hstore_keys(
     session: Session,
-    column: ColumnElement[dict[str, Any]]
-            | ColumnElement[dict[str, Any] | None]
-            | ColumnElement[Mapping[str, Any]]
-            | ColumnElement[Mapping[str, Any] | None]
+    column: InstrumentedAttribute[Mapping[str, Any] | None]
 ) -> set[str]:
     """ Returns a set of keys found in an hstore column over all records
     of its table.

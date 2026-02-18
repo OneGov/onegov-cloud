@@ -8,14 +8,13 @@ from sqlalchemy.orm import joinedload
 
 from typing import overload, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.orm import Base
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import DeclarativeBase, Session
     from typing import Self
 
 
-# FIXME: This should be Intersection[Base, Payable] once this feature
-#        gets added to typing_extensions
-_P = TypeVar('_P', bound='Base')
+# FIXME: This should be Intersection[DeclarativeBase, Payable] once this
+#        feature gets added to typing_extensions
+_P = TypeVar('_P', bound='DeclarativeBase')
 
 
 class PayableCollection(Pagination[_P]):
@@ -39,7 +38,7 @@ class PayableCollection(Pagination[_P]):
 
     @overload
     def __init__(
-        self: PayableCollection[Base],
+        self: PayableCollection[DeclarativeBase],
         session: Session,
         cls: Literal['*'] = '*',
         page: int = 0
@@ -64,7 +63,7 @@ class PayableCollection(Pagination[_P]):
         ) -> QueryChain[_P]: ...
 
     @property
-    def classes(self) -> tuple[type[Base], ...]:
+    def classes(self) -> tuple[type[DeclarativeBase], ...]:
         if self.cls != '*':
             return (self.cls, )
 

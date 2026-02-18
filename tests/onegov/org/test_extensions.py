@@ -627,12 +627,12 @@ def test_general_file_link_extension_deduplication(
         pages_id = topic.id
         file_id = topic.files[0].id
 
-        count, = session.execute(text("""
+        count = session.execute(text("""
             SELECT COUNT(*)
               FROM files_for_pages_files
              WHERE pages_id = :pages_id
                AND file_id = :file_id
-        """), {'pages_id': pages_id, 'file_id': file_id}).fetchone()
+        """), {'pages_id': pages_id, 'file_id': file_id}).scalar()
         assert count == 1
 
 

@@ -42,9 +42,9 @@ from wtforms.validators import ValidationError
 from typing import Generic, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
-    from onegov.core.orm import Base
     from onegov.form import Form
     from onegov.form.types import BaseValidator, FieldCondition
+    from sqlalchemy.orm import DeclarativeBase
     from wtforms import Field, StringField
     from wtforms.form import BaseForm
 
@@ -595,7 +595,7 @@ class UniqueColumnValue:
 
     """
 
-    def __init__(self, table: type[Base]):
+    def __init__(self, table: type[DeclarativeBase]):
         self.table = table
 
     def __call__(self, form: Form, field: Field) -> None:

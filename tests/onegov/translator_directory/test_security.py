@@ -263,7 +263,7 @@ def test_security_permissions(translator_app: TestApp) -> None:
     assert_no_access(None, model)
 
     # Topic
-    model = Topic(title='Topic', access='public')  # type: ignore[misc]
+    model = Topic(title='Topic', access='public')
     assert_admin(users['admin'], model)
     assert_editor(users['editor'], model)
     assert_member(users['member'], model)
@@ -271,7 +271,7 @@ def test_security_permissions(translator_app: TestApp) -> None:
     assert_anonymous(users['anonymous'], model)
     assert_anonymous(None, model)
 
-    model = Topic(title='Topic', access='secret')  # type: ignore[misc]
+    model = Topic(title='Topic', access='secret')
     assert_admin(users['admin'], model)
     assert_editor(users['editor'], model)
     assert_member(users['member'], model)
@@ -279,7 +279,7 @@ def test_security_permissions(translator_app: TestApp) -> None:
     assert_anonymous(users['anonymous'], model)
     assert_anonymous(None, model)
 
-    model = Topic(title='Topic', access='private')  # type: ignore[misc]
+    model = Topic(title='Topic', access='private')
     assert_admin(users['admin'], model)
     assert_editor(users['editor'], model)
     assert_no_access(users['member'], model)
@@ -287,7 +287,7 @@ def test_security_permissions(translator_app: TestApp) -> None:
     assert_no_access(users['anonymous'], model)
     assert_no_access(None, model)
 
-    model = Topic(title='Topic', access='member')  # type: ignore[misc]
+    model = Topic(title='Topic', access='member')
     assert_admin(users['admin'], model)
     assert_editor(users['editor'], model)
     assert_member(users['member'], model)

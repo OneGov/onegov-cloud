@@ -14,12 +14,10 @@ if TYPE_CHECKING:
     from collections.abc import Collection, Iterable, Iterator, Sequence
     from sqlalchemy import ColumnElement
     from sqlalchemy.sql.elements import SQLCoreOperations
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.orm import DeclarativeBase, Query, Session
     from typing import Protocol
     from typing import Self
     from uuid import UUID
-
-    from onegov.core.orm import Base
 
     # TODO: Maybe PKType should be generic as well? Or if we always
     #       use the same kind of primary key, then we can reduce
@@ -36,7 +34,7 @@ if TYPE_CHECKING:
         def get_useful_data(self) -> SupportsItems[str, Any]: ...
 
 
-_M = TypeVar('_M', bound='Base')
+_M = TypeVar('_M', bound='DeclarativeBase')
 
 
 class GenericCollection(Generic[_M]):

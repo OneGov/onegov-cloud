@@ -88,7 +88,7 @@ class Indexer:
         :return: True if the indexing was successful, False otherwise
 
         """
-        params_dict = {}
+        params_list = []
 
         if not isinstance(tasks, list):
             tasks = [tasks]
@@ -163,7 +163,7 @@ class Indexer:
 
                 # NOTE: We use a dictionary to avoid duplicate updates for
                 #       the same model, only the latest update will count
-                params_dict[_owner_id] = {
+                params = {
                     '_owner_id': _owner_id,
                     '_owner_type': _owner_type,
                     '_owner_tablename': tablename,
@@ -186,6 +186,7 @@ class Indexer:
                         for k, v in _properties.items()
                     }
                 }
+                params_list.append(params)
                 for field in _properties.keys():
                     _config = _mapping.mapping.get(field, {})
                     _weight = _config.get('weight')
@@ -196,7 +197,7 @@ class Indexer:
                         )
                         _weight = 'C'
                     for lang in self.languages:
-                        params_dict[_owner_id][
+                        params[
                             f'_weight__{field}__{lang}'
                         ] = chr(ord(_weight) + 1) if (
                             'localized' in _config.get('type', '')
@@ -241,57 +242,53 @@ class Indexer:
                         )
                     )
 
-            stmt = (
-                insert(SearchIndex)
-                .values(
-                    {
-                        owner_id_column: bindparam('_owner_id'),
-                        SearchIndex.owner_type: bindparam('_owner_type'),
-                        SearchIndex.owner_tablename:
-                            bindparam('_owner_tablename'),
-                        SearchIndex.publication_start:
-                            bindparam('_publication_start'),
-                        SearchIndex.publication_end:
-                            bindparam('_publication_end'),
-                        SearchIndex.public: bindparam('_public'),
-                        SearchIndex.access: bindparam('_access'),
-                        SearchIndex.last_change: bindparam('_last_change'),
-                        SearchIndex._tags:
-                            bindparam('_tags', type_=ARRAY(String)),
-                        SearchIndex.suggestion: bindparam('_suggestion'),
-                        SearchIndex.title_vector: title_vector,
-                        SearchIndex.data_vector: data_vector,
-                    }
-                )
-                # we may have already indexed this model
-                # so perform an update instead
-                .on_conflict_do_update(
-                    index_elements=[
-                        SearchIndex.owner_tablename,
-                        owner_id_column
-                    ],
-                    set_={
-                        # the owner_type can change, although uncommon
-                        'owner_type': bindparam('_owner_type'),
-                        'publication_start': bindparam('_publication_start'),
-                        'publication_end': bindparam('_publication_end'),
-                        'public': bindparam('_public'),
-                        'access': bindparam('_access'),
-                        'last_change': bindparam('_last_change'),
-                        'tags': bindparam('_tags', type_=ARRAY(String)),
-                        'suggestion': bindparam('_suggestion'),
-                        'title_vector': title_vector,
-                        'data_vector': data_vector,
-                    },
-                    # since our unique constraints are partial indeces
-                    # we need this index_where clause, otherwise postgres
-                    # will not be able to infer the matching constraint
-                    index_where=owner_id_column.is_not(None)
-                )
+            stmt = insert(SearchIndex.__table__).values(  # type: ignore[arg-type]
+                {
+                    owner_id_column: bindparam('_owner_id'),
+                    SearchIndex.owner_type: bindparam('_owner_type'),
+                    SearchIndex.owner_tablename:
+                        bindparam('_owner_tablename'),
+                    SearchIndex.publication_start:
+                        bindparam('_publication_start'),
+                    SearchIndex.publication_end:
+                        bindparam('_publication_end'),
+                    SearchIndex.public: bindparam('_public'),
+                    SearchIndex.access: bindparam('_access'),
+                    SearchIndex.last_change: bindparam('_last_change'),
+                    SearchIndex._tags:
+                        bindparam('_tags', type_=ARRAY(String)),
+                    SearchIndex.suggestion: bindparam('_suggestion'),
+                    SearchIndex.title_vector: title_vector,
+                    SearchIndex.data_vector: data_vector,
+                }
             )
-            params = list(params_dict.values())
+            # we may have already indexed this model
+            # so perform an update instead
+            stmt = stmt.on_conflict_do_update(
+                index_elements=[
+                    SearchIndex.owner_tablename,
+                    owner_id_column
+                ],
+                set_={
+                    # the owner_type can change, although uncommon
+                    'owner_type': stmt.excluded.owner_type,
+                    'publication_start': stmt.excluded.publication_start,
+                    'publication_end': stmt.excluded.publication_end,
+                    'public': stmt.excluded.public,
+                    'access': stmt.excluded.access,
+                    'last_change': stmt.excluded.last_change,
+                    'tags': stmt.excluded.tags,
+                    'suggestion': stmt.excluded.suggestion,
+                    'title_vector': stmt.excluded.title_vector,
+                    'data_vector': stmt.excluded.data_vector,
+                },
+                # since our unique constraints are partial indeces
+                # we need this index_where clause, otherwise postgres
+                # will not be able to infer the matching constraint
+                index_where=owner_id_column.is_not(None)
+            )
             with session.begin_nested():
-                session.execute(stmt, params)
+                session.execute(stmt, params_list)
         except Exception:
             index_log.exception(
                 f'Error creating index schema {schema} of '
@@ -361,7 +358,7 @@ class Indexer:
             assert tablename is not None
             assert owner_id_column is not None
             stmt = (
-                delete(SearchIndex)
+                delete(SearchIndex.__table__)  # type: ignore[arg-type]
                 .where(and_(
                     SearchIndex.owner_tablename == tablename,
                     owner_id_column.in_(owner_ids)

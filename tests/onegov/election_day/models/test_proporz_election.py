@@ -240,14 +240,14 @@ def test_proporz_election_create_all_models(session: Session) -> None:
     if not TYPE_CHECKING:
         # NOTE: Can't be true at type checking time
         assert connection.parent is None
-    assert connection.children == [subconnection]
+    assert connection.children.all() == [subconnection]
 
     if not TYPE_CHECKING:
         # NOTE: Can't be true at type checking time
         assert subconnection.election is None
     assert subconnection.lists == [list_]
     assert subconnection.parent == connection
-    assert subconnection.children == []
+    assert subconnection.children.all() == []
 
     assert list_.candidates == [candidate]
     assert list_.results == [list_result]
@@ -975,21 +975,21 @@ def test_proporz_election_attachments(
 
 
 def test_proporz_election_historical_party_strengths(session: Session) -> None:
-    first = ProporzElection(  # type: ignore[misc]
+    first = ProporzElection(
         title='First',
         domain='federation',
         date=date(2014, 1, 1),
         number_of_mandates=1,
         colors={'a': 'x'}
     )
-    second = ProporzElection(  # type: ignore[misc]
+    second = ProporzElection(
         title='Second',
         domain='federation',
         date=date(2018, 1, 1),
         number_of_mandates=1,
         colors={'a': 'y', 'b': 'y'}
     )
-    third = ProporzElection(  # type: ignore[misc]
+    third = ProporzElection(
         title='Third',
         domain='federation',
         date=date(2022, 1, 1),

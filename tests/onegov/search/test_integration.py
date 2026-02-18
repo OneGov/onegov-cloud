@@ -12,14 +12,13 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.utils import scan_morepath_modules
 from onegov.search import ORMSearchable, SearchApp, SearchIndex
 from onegov.search.datamanager import IndexerDataManager
-from sqlalchemy import func, Boolean, Column, Integer, Text
-from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
+from sqlalchemy import func
+from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
 from webtest import TestApp as Client
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.orm import Base  # noqa: F401
     from onegov.core.request import CoreRequest
 
 
@@ -35,6 +34,8 @@ def test_app_integration() -> None:
 
 
 def test_search_query(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, SearchApp):
         pass
@@ -47,18 +48,14 @@ def test_search_query(postgres_dsn: str) -> None:
     def default_locale() -> str:
         return 'en'
 
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
-
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str] = Column(Text, nullable=False)
-        body: Column[str | None] = Column(Text, nullable=True)
-        public: Column[bool] = Column(Boolean, nullable=False)
-        language: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
+        body: Mapped[str | None]
+        public: Mapped[bool]
+        language: Mapped[str]
 
         fts_title_property = 'title'
         fts_properties = {
@@ -131,6 +128,8 @@ def test_search_query(postgres_dsn: str) -> None:
 
 
 def test_transaction_abort(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, SearchApp):
         pass
@@ -143,15 +142,11 @@ def test_transaction_abort(postgres_dsn: str) -> None:
     def default_locale() -> str:
         return 'en'
 
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
-
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
 
         fts_public = True
         fts_title_property = 'title'
@@ -189,6 +184,8 @@ def test_transaction_abort(postgres_dsn: str) -> None:
 
 
 def test_savepoint(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, SearchApp):
         pass
@@ -201,15 +198,11 @@ def test_savepoint(postgres_dsn: str) -> None:
     def default_locale() -> str:
         return 'en'
 
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
-
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
 
         fts_public = True
         fts_title_property = 'title'
@@ -259,6 +252,8 @@ def test_savepoint(postgres_dsn: str) -> None:
 
 
 def test_reindex(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, SearchApp):
         pass
@@ -271,15 +266,11 @@ def test_reindex(postgres_dsn: str) -> None:
     def default_locale() -> str:
         return 'en'
 
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
-
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
 
         fts_public = True
         fts_title_property = 'title'
@@ -326,6 +317,8 @@ def test_orm_integration(
     postgres_dsn: str,
     redis_url: str
 ) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, SearchApp):
         pass
@@ -338,16 +331,12 @@ def test_orm_integration(
     def default_locale() -> str:
         return 'en'
 
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
-
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str] = Column(Text, nullable=False)
-        body: Column[str | None] = Column(Text, nullable=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
+        body: Mapped[str | None]
 
         @property
         def fts_suggestion(self) -> str:
@@ -461,6 +450,8 @@ def test_orm_integration(
 
 
 def test_alternate_id_property(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, SearchApp):
         pass
@@ -473,15 +464,11 @@ def test_alternate_id_property(postgres_dsn: str) -> None:
     def default_locale() -> str:
         return 'en'
 
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
-
     class MyUser(Base, ORMSearchable):
         __tablename__ = 'my-users'
 
-        name: Column[str] = Column(Text, primary_key=True)
-        fullname: Column[str] = Column(Text, nullable=False)
+        name: Mapped[str] = mapped_column(primary_key=True)
+        fullname: Mapped[str]
 
         @property
         def fts_suggestion(self) -> str:
@@ -532,6 +519,8 @@ def test_alternate_id_property(postgres_dsn: str) -> None:
 
 
 def test_orm_polymorphic(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, SearchApp):
         pass
@@ -543,10 +532,6 @@ def test_orm_polymorphic(postgres_dsn: str) -> None:
     @App.setting(section='i18n', name='default_locale')
     def default_locale() -> str:
         return 'en'
-
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
 
     class MyPage(Base, ORMSearchable):
         __tablename__ = 'my-pages'
@@ -561,9 +546,9 @@ def test_orm_polymorphic(postgres_dsn: str) -> None:
         def fts_suggestion(self) -> str:
             return self.content or ''
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        content: Column[str | None] = Column(Text, nullable=True)
-        type: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        content: Mapped[str | None]
+        type: Mapped[str]
 
         __mapper_args__ = {
             "polymorphic_on": 'type'
@@ -626,6 +611,8 @@ def test_orm_polymorphic(postgres_dsn: str) -> None:
 
 
 def test_orm_polymorphic_sublcass_only(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, SearchApp):
         pass
@@ -638,16 +625,12 @@ def test_orm_polymorphic_sublcass_only(postgres_dsn: str) -> None:
     def default_locale() -> str:
         return 'en'
 
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
-
     class Secret(Base):
         __tablename__ = 'secrets'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        content: Column[str | None] = Column(Text, nullable=True)
-        type: Column[str | None] = Column(Text, nullable=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        content: Mapped[str | None]
+        type: Mapped[str | None]
 
         __mapper_args__ = {
             "polymorphic_on": 'type'
@@ -698,6 +681,8 @@ def test_orm_polymorphic_sublcass_only(postgres_dsn: str) -> None:
 
 
 def test_suggestions(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, SearchApp):
         pass
@@ -710,17 +695,13 @@ def test_suggestions(postgres_dsn: str) -> None:
     def default_locale() -> str:
         return 'en'
 
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
-
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str] = Column(Text, nullable=False)
-        public: Column[bool] = Column(Boolean, nullable=False)
-        language: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
+        public: Mapped[bool]
+        language: Mapped[str]
 
         fts_title_property = 'title'
         fts_properties = {
@@ -737,9 +718,9 @@ def test_suggestions(postgres_dsn: str) -> None:
 
     class MyPerson(Base, ORMSearchable):
         __tablename__ = 'my-people'
-        id: Column[int] = Column(Integer, primary_key=True)
-        first_name: Column[str] = Column(Text, nullable=False)
-        last_name: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        first_name: Mapped[str]
+        last_name: Mapped[str]
 
         @property
         def title(self) -> str:
@@ -843,6 +824,8 @@ def test_suggestions(postgres_dsn: str) -> None:
 
 
 def test_language_detection(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, SearchApp):
         pass
@@ -855,15 +838,11 @@ def test_language_detection(postgres_dsn: str) -> None:
     def default_locale() -> str:
         return 'en'
 
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
-
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
 
         fts_title_property = 'title'
         fts_properties = {
@@ -915,6 +894,9 @@ def test_language_detection(postgres_dsn: str) -> None:
 
 
 def test_language_update(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
+
     class App(Framework, SearchApp):
         pass
 
@@ -926,15 +908,11 @@ def test_language_update(postgres_dsn: str) -> None:
     def default_locale() -> str:
         return 'de'
 
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
-
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
 
         fts_title_property = 'title'
         fts_properties = {
@@ -979,6 +957,8 @@ def test_language_update(postgres_dsn: str) -> None:
 
 
 def test_date_decay(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, SearchApp):
         pass
@@ -991,16 +971,12 @@ def test_date_decay(postgres_dsn: str) -> None:
     def default_locale() -> str:
         return 'de'
 
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
-
     class Document(Base, ORMSearchable, TimestampMixin):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str] = Column(Text, nullable=False)
-        body: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
+        body: Mapped[str]
 
         fts_title_property = 'title'
         fts_properties = {'title': {'type': 'localized', 'weight': 'A'}}
@@ -1062,7 +1038,7 @@ def test_date_decay(postgres_dsn: str) -> None:
                 1e-6
             ).desc()
         )
-        return [doc_id for doc_id, in search]  # type: ignore[misc]
+        return [doc_id for doc_id, in search]
 
     assert search('Dokument') == [2, 1]
 

@@ -53,7 +53,7 @@ def test_message_file(session: Session) -> None:
     session.add(Message(
         text='Selfie',
         channel_id='#public',
-        file=File(name='selfie.png', reference=create_image(2048, 2048))  # type: ignore[misc]
+        file=File(name='selfie.png', reference=create_image(2048, 2048))
     ))
 
     session.flush()
