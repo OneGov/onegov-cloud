@@ -255,8 +255,9 @@ class Scenario(BaseScenario, Generic[ActivityT]):
         user.data['email'] = email if email else ''
 
         if complete_profile:
-            user.realname = (
-                f'{self.faker.first_name()}\u00A0{self.faker.last_name()}')
+            if user.realname is None:
+                user.realname = (f'{self.faker.first_name()}'
+                                f'\u00A0{self.faker.last_name()}')
             user.data = user.data or {}
             user.data['salutation'] = self.faker.random_element(('mr', 'ms'))
             user.data['address'] = self.faker.address()
