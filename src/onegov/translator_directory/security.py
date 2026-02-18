@@ -206,13 +206,15 @@ def disable_translator_docs_coll_access_anon(
 
 @TranslatorDirectoryApp.permission_rule(
     model=TicketCollection, permission=object)
-def restricts_ticket(
+def restrict_tickets(
     app: TranslatorDirectoryApp,
     identity: Identity,
     model: TicketCollection,
     permission: object
 ) -> bool:
-    return identity.role in ('admin', 'editor')
+    if identity.role not in ('admin', 'editor'):
+        return False
+    return permission in getattr(app.settings.roles, identity.role)
 
 
 @TranslatorDirectoryApp.permission_rule(
