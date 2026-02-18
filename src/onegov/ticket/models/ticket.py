@@ -152,10 +152,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: true if the notifications for this ticket should be muted
     muted: Mapped[bool] = mapped_column(default=False)
 
-    # override the created attribute from the timestamp mixin - we don't
-    # want it to be deferred by default because we usually need it
-    created: Mapped[datetime] = mapped_column(deferred=False)
-
     #: the state of this ticket (open, pending, closed, archived)
     state: Mapped[TicketState] = mapped_column(
         Enum(

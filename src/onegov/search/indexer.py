@@ -88,7 +88,13 @@ class Indexer:
         :return: True if the indexing was successful, False otherwise
 
         """
-        params_list = []
+        # NOTE: Since we might receive multiple IndexTasks for the same
+        #       row, we use a dictionary to deduplicate those tasks into
+        #       the final task in this list. Performing the IndexTasks
+        #       in sequence would lead to the same result anyways and
+        #       this avoid ON CONFLICT triggering multiple times for the
+        #       same row, which is not allowed.
+        params_dict = {}
 
         if not isinstance(tasks, list):
             tasks = [tasks]
@@ -163,7 +169,7 @@ class Indexer:
 
                 # NOTE: We use a dictionary to avoid duplicate updates for
                 #       the same model, only the latest update will count
-                params = {
+                params_dict[_owner_id] = {
                     '_owner_id': _owner_id,
                     '_owner_type': _owner_type,
                     '_owner_tablename': tablename,
@@ -186,7 +192,6 @@ class Indexer:
                         for k, v in _properties.items()
                     }
                 }
-                params_list.append(params)
                 for field in _properties.keys():
                     _config = _mapping.mapping.get(field, {})
                     _weight = _config.get('weight')
@@ -197,7 +202,7 @@ class Indexer:
                         )
                         _weight = 'C'
                     for lang in self.languages:
-                        params[
+                        params_dict[_owner_id][
                             f'_weight__{field}__{lang}'
                         ] = chr(ord(_weight) + 1) if (
                             'localized' in _config.get('type', '')
@@ -288,7 +293,7 @@ class Indexer:
                 index_where=owner_id_column.is_not(None)
             )
             with session.begin_nested():
-                session.execute(stmt, params_list)
+                session.execute(stmt, list(params_dict.values()))
         except Exception:
             index_log.exception(
                 f'Error creating index schema {schema} of '

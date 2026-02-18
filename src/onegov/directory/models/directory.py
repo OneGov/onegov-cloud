@@ -244,7 +244,6 @@ class Directory(Base, ContentMixin, TimestampMixin,
         }
 
         if self.file_fields:
-            assert session is not None
 
             def get_value_field_from_note(file_id: str) -> Any:
                 id, __, idx = file_id.rpartition(':')
@@ -271,6 +270,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 )
 
                 if delete:
+                    assert session is not None
                     session.delete(file)
 
             for field in self.file_fields:
@@ -282,6 +282,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 if isinstance(field_values, dict):
                     updated[field.id] = field_values
                     file_id = field_values['data'].lstrip('@')
+                    assert session is not None
                     with session.no_autoflush:
                         f = session.query(File).filter_by(id=file_id).first()
                         if f and f.type != 'directory':
@@ -299,6 +300,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     updated[field.id] = field_values
                     for idx, field_value in enumerate(field_values):
                         file_id = field_value['data'].lstrip('@')
+                        assert session is not None
                         with session.no_autoflush:
                             f = session.query(File).filter_by(
                                 id=file_id

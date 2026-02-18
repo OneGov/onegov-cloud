@@ -218,6 +218,13 @@ class DirectoryArchiveReader:
 
         """
         meta_data = self.read_metadata()
+        # FIXME: It is a little fragile that we don't add the newly created
+        #        target to a session, since some of the logic depends on
+        #        there being a session, afterwards both the directory and the
+        #        entries would need to be added to the session in order for
+        #        them to get properly persisted...
+        #        Since we only ever seem to omit the target parameter in tests
+        #        it's probably best to just no longer make it optional.
         directory = target or Directory.get_polymorphic_class(
             meta_data.get('type', 'generic'),
             Directory

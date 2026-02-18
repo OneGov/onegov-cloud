@@ -84,7 +84,10 @@ class Booking(Base, TimestampMixin):
     cost: Mapped[Decimal | None] = mapped_column(Numeric(precision=8, scale=2))
 
     #: the calculated score of the booking
-    score: Mapped[Decimal] = mapped_column(Numeric(precision=14, scale=9))
+    score: Mapped[Decimal] = mapped_column(
+        Numeric(precision=14, scale=9),
+        default=lambda: Decimal('0')
+    )
 
     #: the period this booking belongs to
     @aggregated('occasion', mapped_column(ForeignKey('periods.id')))
