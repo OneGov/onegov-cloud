@@ -10,6 +10,7 @@ from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
 from sqlalchemy import func
+from sqlalchemy import literal_column
 from sqlalchemy import or_
 from xlsxwriter.workbook import Workbook
 
@@ -306,13 +307,15 @@ class SwissVoteCollection(Pagination[SwissVote]):
             column: SQLCoreOperations[str | None],
             language: str
         ) -> ColumnElement[bool]:
-            return column.op('@@')(func.to_tsquery(language, term))
+            return column.op('@@')(func.to_tsquery(
+                literal_column(repr(language)), term))
 
         def match_convert(
             column: SQLCoreOperations[str | None],
             language: str
         ) -> ColumnElement[bool]:
-            return match(func.to_tsvector(language, column), language)
+            return match(func.to_tsvector(
+                literal_column(repr(language)), column), language)
 
         if not self.full_text:
             return [

@@ -3,7 +3,7 @@ from __future__ import annotations
 from onegov.core.collection import Pagination
 from onegov.core.orm.utils import QueryChain
 from onegov.pay import Payment
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 
 from typing import overload, Literal, TypeVar, TYPE_CHECKING
@@ -73,7 +73,9 @@ class PayableCollection(Pagination[_P]):
     def query(self) -> QueryChain[_P]:
         return QueryChain(tuple(
             self.session.query(cls).options(  # type: ignore[misc]
-                joinedload(cls.payment)  # type:ignore[attr-defined]
+                joinedload(cls.payment)
+                if hasattr(cls, 'payment') else
+                selectinload(cls.payments)  # type: ignore[attr-defined]
             )
             for cls in self.classes
         ))

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from libres.db.models import ORMBase as LibresORMBase
 from decimal import Decimal
 from onegov.core.orm import Base, SessionManager
 from onegov.pay import Payable, PayableCollection
@@ -71,6 +72,11 @@ def test_payable_collection(postgres_dsn: str) -> None:
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.bases.append(MyBase)
+    # Explicitly add libres.db.models.ORMBase to the session manager's bases
+    # if it was successfully imported. This ensures tables for models on
+    # this base (like libres.db.models.Reservation) are created.
+    if LibresORMBase not in mgr.bases:
+        mgr.bases.append(LibresORMBase)
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
