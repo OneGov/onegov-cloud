@@ -544,11 +544,13 @@ def test_registration_submission_state(session: Session) -> None:
     )
 
     def query_registration_state() -> RegistrationState | None:
-        q = forms.submissions.query()
-        q = q.with_entities(FormSubmission.registration_state)
-        q = q.order_by(FormSubmission.created.desc())
-
-        return q.scalar()
+        result = (
+            forms.submissions.query()
+            .with_entities(FormSubmission.registration_state)
+            .order_by(FormSubmission.created.desc())
+            .first()
+        )
+        return result and result[0]
 
     assert submission.registration_state is None
     assert query_registration_state() is None

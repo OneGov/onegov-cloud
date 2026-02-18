@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from onegov.core.utils import groupbylist
 from onegov.election_day.models import Candidate
 from onegov.election_day.models import CandidateResult
@@ -33,7 +34,7 @@ if TYPE_CHECKING:
         first_name: str
         elected: bool
         party: str | None
-        percentage: float
+        percentage: Decimal
         list_name: str | None
         list_id: str | None
 
@@ -77,8 +78,12 @@ def get_candidates_results(
                 ElectionResult.id.in_(election_result_ids)
             )
         num_accounted = accounted.scalar() or 1
+        # NOTE: rounding to N-digits is only supported by NUMERIC
         percentage = func.round(
-            100 * func.sum(CandidateResult.votes) / float(num_accounted), 1
+            Decimal('100')
+            * func.sum(CandidateResult.votes)
+            / Decimal(num_accounted),
+            1
         ).label('percentage')
 
     result = session.query(

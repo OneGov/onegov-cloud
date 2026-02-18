@@ -24,14 +24,24 @@ class BookingPeriodInvoice(Invoice):
     }
 
     #: the period to which this invoice belongs to
-    period_id: Mapped[UUID] = mapped_column(ForeignKey('periods.id'))
+    period_id: Mapped[UUID] = mapped_column(
+        ForeignKey('periods.id'),
+        # NOTE: This is only not nullable for this class and subclasses
+        #       in the database it still needs to be nullable, despite
+        #       what the type annotation says
+        nullable=True
+    )
     period: Mapped[BookingPeriod] = relationship(
         'BookingPeriod',
         back_populates='invoices'
     )
 
     #: the user to which the invoice belongs
-    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey('users.id'),
+        # NOTE: Same thing here as for period_id
+        nullable=True
+    )
     # FIXME: Do we need this backref? It's across module boundaries, so
     #        not the best for proper module isolation
     user: Mapped[User] = relationship(User, backref='invoices')
