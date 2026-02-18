@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import re
-from math import isclose
-
 import stdnum.ch.esr as esr
 
 from collections import defaultdict
@@ -108,10 +106,11 @@ class Transaction:
         if self.duplicate:
             return 'duplicate'
 
-        if isclose(self.confidence, 1):
+        if self.confidence == 1:
             return 'success'
 
-        if isclose(self.confidence, 0.5):
+        # NOTE: This value is never calculated we set it exactly
+        if self.confidence == 0.5:  # noqa: RUF069
             return 'warning'
 
         return 'unknown'
@@ -284,7 +283,7 @@ def match_iso_20022_to_usernames(
     username_by_ref = dict(q2.with_entities(
         InvoiceReference.reference,
         User.username
-    ))
+    ).tuples())
 
     # Get the items matching the given period
     q3 = items(period_id=period_id).outerjoin(InvoiceReference).with_entities(

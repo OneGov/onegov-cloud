@@ -4,6 +4,7 @@ from onegov.parliament.models import Commission
 from onegov.pas.i18n import _
 from onegov.search import ORMSearchable
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 
 
 from typing import TYPE_CHECKING
@@ -27,8 +28,7 @@ class PASCommission(Commission, ORMSearchable):
         return self.name
 
     #: A commission may hold meetings
-    attendences: relationship[list[Attendence]] = relationship(
-        'Attendence',
+    attendences: Mapped[list[Attendence]] = relationship(
         cascade='all, delete-orphan',
         back_populates='commission'
     )

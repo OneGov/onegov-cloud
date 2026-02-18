@@ -3177,7 +3177,7 @@ def test_delete_time_report(
     assert response.status_code == 200
 
     session.expire_all()
-    time_report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
+    time_report = session.get(TranslatorTimeReport, report_id)
     assert time_report is None
 
 
@@ -3245,7 +3245,7 @@ def test_delete_time_report_admin(
     assert response.status_code == 200
 
     session.expire_all()
-    time_report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
+    time_report = session.get(TranslatorTimeReport, report_id)
     assert time_report is None
 
 
@@ -3311,7 +3311,7 @@ def test_export_time_reports(client: Client) -> None:
     client.post(accept_url)
 
     session.expire_all()
-    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
+    report = session.get(TranslatorTimeReport, report_id)
     assert report is not None
     assert report.status == 'confirmed'
     assert report.exported is False

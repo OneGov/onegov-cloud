@@ -218,7 +218,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
             name = self.request.translate(field.label.text)
             name = name.replace(' (PDF)', '')
             if field.data:
-                return File(  # type:ignore[misc]
+                return File(
                     id=random_token(),
                     name=f'{name}.pdf',
                     note=category,

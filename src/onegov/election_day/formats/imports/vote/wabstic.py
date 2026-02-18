@@ -317,9 +317,11 @@ def import_vote_wabstic(
     ballot_ids = {b: vote.ballot(b).id for b in used_ballot_types}
 
     session = object_session(vote)
+    assert session is not None
     session.flush()
+    # FIXME: Switch to regular `session.execute` with insert statements
     session.bulk_insert_mappings(
-        BallotResult,
+        BallotResult,  # type: ignore[arg-type]
         (
             dict(**result, ballot_id=ballot_ids[ballot_type])
             for ballot_type in used_ballot_types

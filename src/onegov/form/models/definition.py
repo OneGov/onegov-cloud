@@ -14,9 +14,8 @@ from onegov.form.models.survey_window import SurveySubmissionWindow
 from onegov.form.parser import parse_form
 from onegov.form.utils import hash_definition
 from onegov.form.extensions import Extendable
-from sqlalchemy import Column, Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import object_session, relationship
+from sqlalchemy.orm import mapped_column, object_session, relationship, Mapped
 
 
 from typing import TYPE_CHECKING, Any
@@ -30,6 +29,8 @@ if TYPE_CHECKING:
     from onegov.pay.types import PaymentMethod
     from typing import Self
     from onegov.core.request import CoreRequest
+else:
+    PaymentMethod = str
 
 
 class FormDefinition(Base, ContentMixin, TimestampMixin,
@@ -46,46 +47,40 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
         return self.name
 
     #: the name of the form (key, part of the url)
-    name: Column[str] = Column(Text, nullable=False, primary_key=True)
+    name: Mapped[str] = mapped_column(primary_key=True)
 
     #: the title of the form
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: the form as parsable string
-    definition: Column[str] = Column(Text, nullable=False)
+    definition: Mapped[str]
 
     #: hint on how to get to the resource
     pick_up: dict_property[str | None] = content_property()
 
     #: the group to which this resource belongs to (may be any kind of string)
-    group: Column[str | None] = Column(Text, nullable=True)
+    group: Mapped[str | None]
 
     #: The normalized title for sorting
-    order: Column[str] = Column(Text, nullable=False, index=True)
+    order: Mapped[str] = mapped_column(index=True)
 
     #: the checksum of the definition, forms and submissions with matching
     #: checksums are guaranteed to have the exact same definition
-    checksum: Column[str] = Column(Text, nullable=False)
+    checksum: Mapped[str]
 
     #: the type of the form, this can be used to create custom polymorphic
     #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     #: link between forms and submissions
-    submissions: relationship[list[FormSubmission]] = relationship(
-        FormSubmission,
+    submissions: Mapped[list[FormSubmission]] = relationship(
         back_populates='form'
     )
 
     #: link between forms and registration windows
-    registration_windows: relationship[list[FormRegistrationWindow]] = (
+    registration_windows: Mapped[list[FormRegistrationWindow]] = (
         relationship(
-            FormRegistrationWindow,
             back_populates='form',
             order_by='FormRegistrationWindow.start',
             cascade='all, delete-orphan'
@@ -105,10 +100,9 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     #:
     #: this could of course be done more conventionally, but this is cooler 😅
     #:
-    current_registration_window: (
-        relationship)[FormRegistrationWindow | None] = (
+    current_registration_window: Mapped[FormRegistrationWindow | None] = (
         relationship(
-            'FormRegistrationWindow', viewonly=True, uselist=False,
+            viewonly=True,
             primaryjoin="""and_(
                 FormRegistrationWindow.name == FormDefinition.name,
                 FormRegistrationWindow.id == select(
@@ -144,11 +138,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
 
     #: payment options ('manual' for out of band payments without cc, 'free'
     #: for both manual and cc payments, 'cc' for forced cc payments)
-    payment_method: Column[PaymentMethod] = Column(
-        Text,  # type:ignore[arg-type]
-        nullable=False,
-        default='manual'
-    )
+    payment_method: Mapped[PaymentMethod] = mapped_column(default='manual')
 
     #: the minimum price total a form submission must exceed in order to
     #: be submitted
@@ -188,6 +178,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     ) -> bool:
 
         session = object_session(self)
+        assert session is not None
         query = session.query(FormSubmission.id)
         query = query.filter(FormSubmission.name == self.name)
 
@@ -247,45 +238,41 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         return self.name
 
     #: the name of the form (key, part of the url)
-    name: Column[str] = Column(Text, nullable=False, primary_key=True)
+    name: Mapped[str] = mapped_column(primary_key=True)
 
     #: the title of the form
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: the form as parsable string
-    definition: Column[str] = Column(Text, nullable=False)
+    definition: Mapped[str]
 
     #: the group to which this resource belongs to (may be any kind of string)
-    group: Column[str | None] = Column(Text, nullable=True)
+    group: Mapped[str | None]
 
     #: The normalized title for sorting
-    order: Column[str] = Column(Text, nullable=False, index=True)
+    order: Mapped[str] = mapped_column(index=True)
 
     #: the checksum of the definition, forms and submissions with matching
     #: checksums are guaranteed to have the exact same definition
-    checksum: Column[str] = Column(Text, nullable=False)
+    checksum: Mapped[str]
 
     #: link between surveys and submissions
-    submissions: relationship[list[SurveySubmission]] = relationship(
-        SurveySubmission,
+    submissions: Mapped[list[SurveySubmission]] = relationship(
         back_populates='survey'
     )
 
     #: link between surveys and submission windows
-    submission_windows: relationship[list[SurveySubmissionWindow]] = (
+    submission_windows: Mapped[list[SurveySubmissionWindow]] = (
         relationship(
-            SurveySubmissionWindow,
             back_populates='survey',
             order_by='SurveySubmissionWindow.start',
             cascade='all, delete-orphan'
         )
     )
 
-    current_submission_window: relationship[SurveySubmissionWindow | None] = (
+    current_submission_window: Mapped[SurveySubmissionWindow | None] = (
         relationship(
-            'SurveySubmissionWindow',
             viewonly=True,
-            uselist=False,
             primaryjoin="""and_(
                 SurveySubmissionWindow.name == SurveyDefinition.name,
                 SurveySubmissionWindow.id == select(
@@ -341,6 +328,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
     ) -> bool:
 
         session = object_session(self)
+        assert session is not None
         query = session.query(SurveySubmission.id)
         query = query.filter(SurveySubmission.name == self.name)
 

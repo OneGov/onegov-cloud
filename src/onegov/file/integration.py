@@ -323,6 +323,7 @@ class DepotApp(App):
 
         mb = 1024 ** 2
         session = object_session(file)
+        assert session is not None
 
         with SpooledTemporaryFile(max_size=16 * mb, mode='wb') as signed:
             old_digest = digest(file.reference.file)

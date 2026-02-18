@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from onegov.core.orm import SessionManager
     from onegov.swissvotes.models import SwissVote
     from onegov.swissvotes.models import TranslatablePage
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import Mapped
     from typing import Protocol
     from typing import TypeVar
 
@@ -30,7 +30,7 @@ class SwissVoteFile(File):
 
     if TYPE_CHECKING:
         # backrefs created through associated
-        linked_swissvotes: relationship[list[SwissVote]]
+        linked_swissvotes: Mapped[list[SwissVote]]
 
     @property
     def locale(self) -> str:
@@ -48,7 +48,7 @@ class TranslatablePageFile(File):
 
     if TYPE_CHECKING:
         # backrefs created through associated
-        linked_swissvotes_page: relationship[list[TranslatablePage]]
+        linked_swissvotes_page: Mapped[list[TranslatablePage]]
 
     @property
     def locale(self) -> str:

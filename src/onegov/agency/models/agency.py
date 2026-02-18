@@ -16,6 +16,8 @@ from onegov.user import RoleMapping
 from sqlalchemy import func
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import DynamicMapped
+from sqlalchemy.orm import Mapped
 
 
 from typing import Any
@@ -26,7 +28,6 @@ if TYPE_CHECKING:
     from depot.io.interfaces import StoredFile
     from markupsafe import Markup
     from onegov.agency.request import AgencyRequest
-    from onegov.core.types import AppenderQuery
     from uuid import UUID
 
 
@@ -57,8 +58,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
     #: The PDF for the agency and all its suborganizations.
     pdf = associated(AgencyPdf, 'pdf', 'one-to-one')
 
-    role_mappings: relationship[list[RoleMapping]] = relationship(
-        RoleMapping,
+    role_mappings: DynamicMapped[RoleMapping] = relationship(
         primaryjoin=(
             "and_("
             "foreign(RoleMapping.content_id) == cast(ExtendedAgency.id, TEXT),"
@@ -68,24 +68,21 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         backref='agency',
         sync_backref=False,
         viewonly=True,
-        lazy='dynamic'
-    )  # type:ignore[call-arg]
+    )
 
     trait = 'agency'
 
     if TYPE_CHECKING:
         # we only allow relating to other ExtendedAgency
-        parent: relationship[ExtendedAgency | None]
-        children: relationship[list[ExtendedAgency]]  # type:ignore
+        parent: Mapped[ExtendedAgency | None]
+        children: Mapped[list[ExtendedAgency]]  # type: ignore[assignment]
 
         @property
         def root(self) -> ExtendedAgency: ...
         @property
         def ancestors(self) -> Iterator[ExtendedAgency]: ...
         # we only allow ExtendedAgencyMembership memberships
-        memberships: relationship[  # type:ignore[assignment]
-            AppenderQuery[ExtendedAgencyMembership]
-        ]
+        memberships: DynamicMapped[ExtendedAgencyMembership]  # type: ignore[assignment]
 
     @property
     def pdf_file(self) -> StoredFile | None:
@@ -99,7 +96,6 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         except (OSError, Exception):
             return None
 
-    # FIXME: asymmetric property
     @pdf_file.setter
     def pdf_file(self, value: IO[bytes] | bytes) -> None:
         """ Sets the PDF content for the agency (and all its
@@ -150,6 +146,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         """ Appends a person to the agency with the given title. """
 
         session = object_session(self)
+        assert session is not None
 
         order_within_person = session.query(func.coalesce(
             func.max(ExtendedAgencyMembership.order_within_person),

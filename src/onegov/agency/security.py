@@ -97,7 +97,9 @@ def has_model_permission(
             RoleMapping.role == 'editor',
             RoleMapping.group_id.in_(identity.groupids)
         )
-        if object_session(model).query(roles.exists()).scalar():
+        session = object_session(model)
+        assert session is not None
+        if session.query(roles.exists()).scalar():
             return True
 
     # Check the role mappings of the parent

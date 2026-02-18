@@ -8,12 +8,11 @@ from onegov.election_day.models.vote import Vote
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 
 
 from typing import TYPE_CHECKING
@@ -57,46 +56,40 @@ class Screen(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'election_day_screens'
 
     #: Identifies the screen
-    id: Column[int] = Column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
     #: A unique number for the path
-    number: Column[int] = Column(Integer, unique=True, nullable=False)
+    number: Mapped[int] = mapped_column(unique=True)
 
     #: The vote
-    vote_id: Column[str | None] = Column(
-        Text,
-        ForeignKey(Vote.id, onupdate='CASCADE'), nullable=True
+    vote_id: Mapped[str | None] = mapped_column(
+        ForeignKey(Vote.id, onupdate='CASCADE')
     )
-    vote: relationship[Vote | None] = relationship(
-        'Vote',
+    vote: Mapped[Vote | None] = relationship(
         back_populates='screens'
     )
 
     #: The election
-    election_id: Column[str | None] = Column(
-        Text,
-        ForeignKey(Election.id, onupdate='CASCADE'), nullable=True
+    election_id: Mapped[str | None] = mapped_column(
+        ForeignKey(Election.id, onupdate='CASCADE')
     )
-    election: relationship[Election | None] = relationship(
-        'Election',
+    election: Mapped[Election | None] = relationship(
         back_populates='screens'
     )
 
     #: The election compound
-    election_compound_id: Column[str | None] = Column(
-        Text,
-        ForeignKey(ElectionCompound.id, onupdate='CASCADE'), nullable=True
+    election_compound_id: Mapped[str | None] = mapped_column(
+        ForeignKey(ElectionCompound.id, onupdate='CASCADE')
     )
-    election_compound: relationship[ElectionCompound | None] = relationship(
-        'ElectionCompound',
+    election_compound: Mapped[ElectionCompound | None] = relationship(
         back_populates='screens'
     )
 
     #: The domain of the election compound part.
-    domain: Column[str | None] = Column(Text, nullable=True)
+    domain: Mapped[str | None]
 
     #: The domain segment of the election compound part.
-    domain_segment: Column[str | None] = Column(Text, nullable=True)
+    domain_segment: Mapped[str | None]
 
     @property
     def election_compound_part(self) -> ElectionCompoundPart | None:
@@ -107,22 +100,22 @@ class Screen(Base, ContentMixin, TimestampMixin):
         return None
 
     #: The title
-    description: Column[str | None] = Column(Text, nullable=True)
+    description: Mapped[str | None]
 
     #: The type
-    type: Column[str] = Column(Text, nullable=False)
+    type: Mapped[str]
 
     #: The content of the screen
-    structure: Column[str] = Column(Text, nullable=False)
+    structure: Mapped[str]
 
     #: Additional CSS
-    css: Column[str | None] = Column(Text, nullable=True)
+    css: Mapped[str | None]
 
     #: The group this screen belongs to, used for cycling
-    group: Column[str | None] = Column(Text, nullable=True)
+    group: Mapped[str | None]
 
     #: The duration this screen is presented if cycling
-    duration: Column[int | None] = Column(Integer, nullable=True)
+    duration: Mapped[int | None]
 
     @property
     def model(
@@ -154,9 +147,10 @@ class Screen(Base, ContentMixin, TimestampMixin):
     def next(self) -> Screen | None:
         if self.group:
             session = object_session(self)
+            assert session is not None
             query = session.query(Screen.number, Screen)
             query = query.filter_by(group=self.group).order_by(Screen.number)
-            screens = OrderedDict(query.all())
+            screens = OrderedDict(query.tuples().all())
             if len(screens) > 1:
                 keys = tuple(screens.keys())
                 index = (keys.index(self.number) + 1) % len(screens)

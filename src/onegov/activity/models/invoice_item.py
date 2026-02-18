@@ -1,17 +1,14 @@
 from __future__ import annotations
 
-from onegov.core.orm.types import UUID
 from onegov.pay import InvoiceItem
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column, Mapped
+from uuid import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from onegov.activity.models import BookingPeriodInvoice
-    from sqlalchemy.orm import relationship
 
 
 class ActivityInvoiceItem(InvoiceItem):
@@ -27,14 +24,12 @@ class ActivityInvoiceItem(InvoiceItem):
     }
 
     #: the attendee, if the item is connected to an attendee
-    attendee_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('attendees.id'),
-        nullable=True
+    attendee_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey('attendees.id')
     )
 
     #: organizer (if the item is an activity)
-    organizer: Column[str | None] = Column(Text, nullable=True)
+    organizer: Mapped[str | None]
 
     if TYPE_CHECKING:
-        invoice: relationship[BookingPeriodInvoice]
+        invoice: Mapped[BookingPeriodInvoice]
