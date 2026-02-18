@@ -307,7 +307,7 @@ def test_security_permissions(translator_app: TestApp) -> None:
     # TicketCollection
     model = TicketCollection(session)
     assert_admin(users['admin'], model)
-    assert_no_access(users['editor'], model)  # restricted
+    assert_editor(users['editor'], model)
     assert_no_access(users['member'], model)  # restricted
     assert_no_access(users['translator'], model)  # restricted
     assert_no_access(users['anonymous'], model)  # restricted
