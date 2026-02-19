@@ -234,20 +234,8 @@ class WhitelistedMimeType:
         if not field.data:
             return
 
-        if isinstance(field.data, list):  # UploadMultipleField
-            for data in field.data:
-                if not data:
-                    continue  # in case of file deletion
-
-                self.validate_mimetype(field, data)
-
-        else:
-            self.validate_mimetype(field, field.data)
-
-    def validate_mimetype(self, field: Field, data: dict[Any, Any]) -> None:
-        if data['mimetype'] not in self.whitelist:
-            message = field.gettext(self.message)
-            raise ValidationError(field.gettext(message))
+        if field.data['mimetype'] not in self.whitelist:
+            raise ValidationError(field.gettext(self.message))
 
 
 class ExpectedExtensions(WhitelistedMimeType):
