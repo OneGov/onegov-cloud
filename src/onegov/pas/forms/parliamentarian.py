@@ -68,7 +68,6 @@ class PASParliamentarianForm(NamedFileForm):
     picture = UploadField(
         label=_('Picture'),
         fieldset=_('Basic properties'),
-        validators=[],
         allowed_mimetypes=MIME_TYPES_IMAGE,
     )
 
