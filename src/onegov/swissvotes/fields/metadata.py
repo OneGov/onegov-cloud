@@ -50,7 +50,8 @@ class SwissvoteMetadataField(UploadField):
         depends_on: Sequence[Any] | None = None,
         pricing: PricingRules | None = None,
     ) -> None:
-        allowed_mimetypes = {
+
+        mimetypes = {
             'application/excel',
             'application/octet-stream',
             'application/vnd.ms-excel',
@@ -72,11 +73,14 @@ class SwissvoteMetadataField(UploadField):
             widget=widget,
             render_kw={**(render_kw or {}), 'force_simple': True},
             name=name,
-            allowed_mimetypes=allowed_mimetypes,
+            allowed_mimetypes=mimetypes,
             _form=_form,
             _prefix=_prefix,
             _translations=_translations,
             _meta=_meta,
+            fieldset=fieldset,
+            depends_on=depends_on,
+            pricing=pricing
         )
 
     def post_validate(
@@ -92,7 +96,6 @@ class SwissvoteMetadataField(UploadField):
 
         """
 
-        super().post_validate(form, validation_stopped)
         if validation_stopped:
             return
 
@@ -128,6 +131,8 @@ class SwissvoteMetadataField(UploadField):
                 'Some columns are missing: ${columns}.',
                 mapping={'columns': ', '.join(missing)}
             ))
+
+        super().post_validate(form, validation_stopped)
 
         value: Any | None
         for index in range(2, sheet.max_row + 1):
