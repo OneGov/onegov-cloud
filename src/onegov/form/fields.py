@@ -416,6 +416,8 @@ class UploadField(FileField):
         form: BaseForm,
         validation_stopped: bool
     ) -> None:
+        if validation_stopped:
+            return
         if self.data and self.mimetypes:
             if self.data.get('mimetype') not in self.mimetypes:
                 raise ValidationError(_(
