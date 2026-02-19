@@ -50,9 +50,7 @@ class SwissvoteMetadataField(UploadField):
         depends_on: Sequence[Any] | None = None,
         pricing: PricingRules | None = None,
     ) -> None:
-        kwargs: dict[str, Any] = {}
-        kwargs.setdefault('validators', [])
-        kwargs['allowed_mimetypes'] = {
+        allowed_mimetypes = {
             'application/excel',
             'application/octet-stream',
             'application/vnd.ms-excel',
@@ -63,20 +61,18 @@ class SwissvoteMetadataField(UploadField):
             ),
             'application/zip'
         }
-        kwargs['validators'].append(FileSizeLimit(10 * 1024 * 1024))
-        kwargs.setdefault('render_kw', {})
-        kwargs['render_kw']['force_simple'] = True
 
         super().__init__(
             label=label,
-            validators=validators,
+            validators=[*(validators or ()), FileSizeLimit(10 * 1024 * 1024)],
             filters=filters,
             description=description,
             id=id,
             default=default,
             widget=widget,
-            render_kw=render_kw,
+            render_kw={**(render_kw or {}), 'force_simple': True},
             name=name,
+            allowed_mimetypes=allowed_mimetypes,
             _form=_form,
             _prefix=_prefix,
             _translations=_translations,
