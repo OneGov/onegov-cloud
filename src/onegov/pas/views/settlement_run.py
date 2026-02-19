@@ -636,11 +636,14 @@ def generate_settlement_pdf(
     with open(css_path) as f:
         css = CSS(string=f.read())
 
+    subtitle = 'Einträge Journal'
+
     if entity_type == 'commission' and isinstance(entity, PASCommission):
         settlement_data = _get_commission_settlement_data(
             settlement_run, request, entity
         )
         totals = _get_commission_totals(settlement_run, request, entity)
+        subtitle = f'Einträge Sitzungen: «{entity.name}»'
 
     elif entity_type == 'party' and isinstance(entity, Party):
         settlement_data = _get_party_settlement_data(
@@ -658,7 +661,7 @@ def generate_settlement_pdf(
     html = _generate_settlement_html(
         settlement_data=settlement_data,
         totals=totals,
-        subtitle='Einträge Journal',
+        subtitle=subtitle,
     )
 
     return HTML(string=html).write_pdf(
