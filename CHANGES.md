@@ -1,8 +1,53 @@
 # Changes
 
+## 2026.9
+
+`2026-02-19` | [01dce7374a...51ed0825eb](https://github.com/OneGov/onegov-cloud/compare/01dce7374a^...51ed0825eb)
+
+### Core
+
+##### Upgrades to SQLAlchemy 2.0
+
+`Feature` | [OGC-2945](https://linear.app/onegovcloud/issue/OGC-2945) | [dea56b3a58](https://github.com/onegov/onegov-cloud/commit/dea56b3a588dcccaada62728638773f5bdfb967b)
+
+### Feriennet
+
+##### Update homepage template
+
+`Feature` | [65a5d96515](https://github.com/onegov/onegov-cloud/commit/65a5d965159661bea145f415ffdbc3cd6639206d)
+
+##### Fix problem with selecting user for manual booking
+
+- The dropdown for the users now pre-selects the correct user again.
+- The users are now displayed correctly again and can be selected
+
+`Bugfix` | [PRO-1481](https://linear.app/projuventute/issue/PRO-1481) | [574e4844b6](https://github.com/onegov/onegov-cloud/commit/574e4844b6e79a980688a40b82bbafedebaf89ff)
+
+##### Fix problem with volunteer list
+
+Newly loaded activity needs could not be added to the volunteers list
+
+`Bugfix` | [PRO-1480](https://linear.app/projuventute/issue/PRO-1480) | [8a1f72e2ac](https://github.com/onegov/onegov-cloud/commit/8a1f72e2ac3ab1476626427ce186b2479be65af9)
+
+### Pas
+
+##### Add bulk operations for shortest meeting.
+
+`Feature` | [OGC-2941](https://linear.app/onegovcloud/issue/OGC-2941) | [3b7d41a6c8](https://github.com/onegov/onegov-cloud/commit/3b7d41a6c85dc095915d6f7659e6099ad2a6a7c7)
+
+##### Granular improvements based on feedback.
+
+`Feature` | [OGC-2941](https://linear.app/onegovcloud/issue/OGC-2941) | [51ed0825eb](https://github.com/onegov/onegov-cloud/commit/51ed0825eb506b72922902e286a2e08a95b7f7a8)
+
+### Town 6
+
+##### Fix form size when files are attached
+
+`Bugfix` | [OGC-2908](https://linear.app/onegovcloud/issue/OGC-2908) | [01dce7374a](https://github.com/onegov/onegov-cloud/commit/01dce7374a84d28bce8f9950164d14c6c7f295da)
+
 ## 2026.8
 
-`2026-02-17` | [56a0169055...fc50ac547f](https://github.com/OneGov/onegov-cloud/compare/56a0169055^...fc50ac547f)
+`2026-02-17` | [56a0169055...e39ad8b3da](https://github.com/OneGov/onegov-cloud/compare/56a0169055^...e39ad8b3da)
 
 ## 2026.7
 
@@ -2423,24 +2468,4 @@ Order imagesets by lat change
 ##### Fix calendar view (cleaner solution)
 
 `Bugfix` | [OGC-2432](https://linear.app/onegovcloud/issue/OGC-2432) | [45679a46fb](https://github.com/onegov/onegov-cloud/commit/45679a46fbe371e321dbf2f956bcdddf6e14aeb1)
-
-## 2025.31
-
-`2025-07-07` | [fe887383ec...c31c34321c](https://github.com/OneGov/onegov-cloud/compare/fe887383ec^...c31c34321c)
-
-### Org
-
-##### Vimeo unlisted videos
-
-`Feature` | [OGC-2412](https://linear.app/onegovcloud/issue/OGC-2412) | [1fec99e1b9](https://github.com/onegov/onegov-cloud/commit/1fec99e1b9505559e6e07930a55511c151367dc6)
-
-### Ris
-
-##### Show date and time of meeting
-
-`Feature` | [OGC-2254](https://linear.app/onegovcloud/issue/OGC-2254) | [7b7a5861b4](https://github.com/onegov/onegov-cloud/commit/7b7a5861b45e8ff8d8128ff0c07a565b3dbf3c67)
-
-##### Provide files to political business template
-
-`Bugfix` | [OGC-2419](https://linear.app/onegovcloud/issue/OGC-2419) | [fe887383ec](https://github.com/onegov/onegov-cloud/commit/fe887383ecd1a1210577e62541f4c28f83868d2d)
 
