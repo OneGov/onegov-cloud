@@ -942,7 +942,7 @@ def test_from_import(session: Session) -> None:
 
     added, updated, purged = events.from_import([
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title A',
                 location='Location A',
@@ -966,7 +966,7 @@ def test_from_import(session: Session) -> None:
             pdf_filename=None,
         ),
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title B',
                 location='Location B',
@@ -994,7 +994,7 @@ def test_from_import(session: Session) -> None:
 
     def items() -> Iterator[EventImportItem]:
         yield EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title C',
                 location='Location C',
@@ -1024,7 +1024,7 @@ def test_from_import(session: Session) -> None:
     # Already imported
     assert events.from_import([
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title C',
                 location='Location C',
@@ -1052,7 +1052,7 @@ def test_from_import(session: Session) -> None:
     # Update and purge
     a, u, p = events.from_import([
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title',
                 location='Location A',
@@ -1087,7 +1087,7 @@ def test_from_import(session: Session) -> None:
     events.by_name('title-c').withdraw()  # type: ignore[union-attr]
     assert events.from_import([
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title C',
                 location='Location C',
@@ -1116,7 +1116,7 @@ def test_from_import(session: Session) -> None:
     # future only events option
     a, u, p = events.from_import([
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title D past',
                 location='Location D past',
@@ -1140,7 +1140,7 @@ def test_from_import(session: Session) -> None:
             pdf_filename=None,
         ),
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title D future',
                 location='Location D future',

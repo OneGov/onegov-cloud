@@ -1,24 +1,22 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from datetime import datetime
 from functools import cached_property
 from json import JSONDecodeError
 from logging import getLogger
 from logging import NullHandler
 from onegov.core.collection import _M
 from onegov.core.orm import Base
-from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.form.fields import HoneyPotField
 from onegov.form.utils import get_fields_from_class
 from onegov.user import User
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import Boolean
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
-from sqlalchemy import Text
-from sqlalchemy.orm import backref
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
-from uuid import uuid4
+from sqlalchemy.orm import Mapped
+from uuid import uuid4, UUID
 from webob.exc import HTTPException
 from webob.multidict import MultiDict
 from wtforms import HiddenField
@@ -26,9 +24,7 @@ from wtforms import HiddenField
 
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, NoReturn, overload
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterator
-    from datetime import datetime
     from onegov.core import Framework
     from onegov.core.collection import PKType
     from onegov.core.request import CoreRequest
@@ -39,7 +35,7 @@ if TYPE_CHECKING:
 
     _DefaultT = TypeVar('_DefaultT')
     _EmptyT = TypeVar('_EmptyT')
-    _IdT = TypeVar('_IdT', bound=uuid.UUID | str | int, contravariant=True)
+    _IdT = TypeVar('_IdT', bound=UUID | str | int, contravariant=True)
 
     class PaginationWithById(Protocol[_M, _IdT]):
         def by_id(self, id: _IdT) -> _M | None: ...
@@ -512,40 +508,25 @@ class ApiKey(Base):
 
     __tablename__ = 'api_keys'
 
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type: ignore[arg-type]
-        nullable=False,
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the id of the user that created the api key
-    user_id: Column[uuid.UUID] = Column(
-        UUID,  # type: ignore[arg-type]
-        ForeignKey('users.id'),
-        nullable=False
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
 
     #: the user that created the api key
-    user: relationship[User] = relationship(
-        User,
-        backref=backref(
-            'api_keys', cascade='all,delete-orphan', lazy='dynamic'
-        )
-    )
+    user: Mapped[User] = relationship(back_populates='api_keys')
 
     #: the name of the api key, may be any string
-    name: Column[str] = Column(Text, nullable=False)
+    name: Mapped[str]
 
     #: whether or not the api key can submit changes
-    read_only: Column[bool] = Column(Boolean, default=True, nullable=False)
+    read_only: Mapped[bool] = mapped_column(default=True)
 
     #: the last time a token was generated based on this api key
-    last_used: Column[datetime | None] = Column(UTCDateTime, nullable=True)
+    last_used: Mapped[datetime | None]
 
     #: the key itself
-    key: Column[uuid.UUID] = Column(
-        UUID,  # type: ignore[arg-type]
-        nullable=False,
-        default=uuid4
-    )
+    key: Mapped[UUID] = mapped_column(default=uuid4)

@@ -5,7 +5,7 @@ from onegov.pas.i18n import _
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from onegov.search import ORMSearchable
 from sqlalchemy import or_
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import backref, relationship, Mapped
 
 
 from typing import TYPE_CHECKING
@@ -40,24 +40,21 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
         )
 
     #: A parliamentarian may attend meetings
-    attendences: relationship[list[Attendence]] = relationship(
-        'Attendence',
+    attendences: Mapped[list[Attendence]] = relationship(
         cascade='all, delete-orphan',
         back_populates='parliamentarian'
     )
 
     # the user account related to this parliamentarian
-    user: relationship[User] = relationship(
-        'User',
+    user: Mapped[User] = relationship(
         primaryjoin='foreign(PASParliamentarian.email_primary) == '
                     'User.username',
-        uselist=False,
         backref=backref('parliamentarian', uselist=False,
                         passive_deletes='all')
     )
 
     if TYPE_CHECKING:
-        roles: relationship[list[PASParliamentarianRole]]  # type: ignore[assignment]
+        roles: Mapped[list[PASParliamentarianRole]]  # type: ignore[assignment]
 
     def get_party_during_period(
         self, start_date: date, end_date: date, session: Session

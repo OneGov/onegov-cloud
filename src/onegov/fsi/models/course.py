@@ -1,22 +1,21 @@
 from __future__ import annotations
 
+from markupsafe import Markup
 from onegov.core.html import html_to_text
 from onegov.core.orm import Base
-from onegov.core.orm.types import MarkupText, UUID
 from onegov.fsi.i18n import _
 from onegov.search import ORMSearchable
 from sedate import utcnow
-from sqlalchemy import Column, Text, Boolean, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
-from uuid import uuid4
+from sqlalchemy.orm import DynamicMapped
+from sqlalchemy.orm import Mapped
+from uuid import uuid4, UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from markupsafe import Markup
-    from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
     from .course_event import CourseEvent
 
@@ -32,40 +31,27 @@ class Course(Base, ORMSearchable):
         'description': {'type': 'localized', 'weight': 'B'},
     }
 
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
-    name: Column[str] = Column(Text, nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(unique=True)
 
-    description: Column[Markup] = Column(MarkupText, nullable=False)
+    description: Mapped[Markup]
 
     # saved as integer (years), accessed as years
-    refresh_interval: Column[int | None] = Column(Integer)
+    refresh_interval: Mapped[int | None]
 
     # If the course has to be refreshed after some interval
-    mandatory_refresh: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    mandatory_refresh: Mapped[bool] = mapped_column(default=False)
 
     # hides the course in the collection for non-admins
-    hidden_from_public: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    hidden_from_public: Mapped[bool] = mapped_column(default=False)
 
-    evaluation_url: Column[str | None] = Column(Text)
+    evaluation_url: Mapped[str | None]
 
-    events: relationship[AppenderQuery[CourseEvent]] = relationship(
-        'CourseEvent',
-        back_populates='course',
-        lazy='dynamic'
-    )
+    events: DynamicMapped[CourseEvent] = relationship(back_populates='course')
 
     @property
     def title(self) -> str:

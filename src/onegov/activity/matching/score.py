@@ -188,7 +188,7 @@ class PreferOrganiserChildren:
                     .filter(Activity.id.in_(
                         session.query(Occasion.activity_id)
                         .filter(Occasion.period_id == booking.period_id)
-                        .scalar_subquery()  # type: ignore[attr-defined]
+                        .scalar_subquery()
                     ))
                 }
 
@@ -281,11 +281,9 @@ class PreferGroups:
                 )
 
                 group_scores = {
-                    r.group_code:
-                    max(.5, .7 - 0.1 * (r.count - 2))
-                    + unique_score_modifier(r.group_code)
-
-                    for r in query
+                    group_code: max(.5, .7 - 0.1 * (count - 2))
+                                + unique_score_modifier(group_code)
+                    for group_code, count in query
                 }
 
             return group_scores.get(booking.group_code, 0)

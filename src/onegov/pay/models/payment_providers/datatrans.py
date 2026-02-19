@@ -26,7 +26,7 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.pay.types import FeePolicy
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import Mapped
     from transaction.interfaces import ITransaction
 
 
@@ -289,7 +289,7 @@ class DatatransPayment(Payment):
         # our provider should always be DatatransProvdider, we could
         # assert if we really wanted to make sure, but it would
         # add a lot of assertions...
-        provider: relationship[DatatransProvider]
+        provider: Mapped[DatatransProvider]
 
     # NOTE: We don't seem to get information about fees from datatrans
     #       so the only thing we know for sure is that a customer will
@@ -483,6 +483,7 @@ class DatatransProvider(PaymentProvider[DatatransPayment]):
             raise DatatransPaymentError('refno is missing')
 
         session = object_session(self)
+        assert session is not None
         payment = self.payment(
             id=uuid5(DATATRANS_NAMESPACE, tx.refno),
             amount=amount,
@@ -567,6 +568,7 @@ class DatatransProvider(PaymentProvider[DatatransPayment]):
 
     def sync(self) -> None:
         session = object_session(self)
+        assert session is not None
         query = session.query(self.payment_class)
         # TODO: We currenly only sync open payments, although it may
         #       be possible for paid payments to transition to failed

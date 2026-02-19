@@ -101,7 +101,7 @@ def view_my_invoices(
     q = q.order_by(
         BookingPeriod.execution_start,
         BookingPeriodInvoice.id,
-        case(  # type: ignore[call-overload]
+        case(
             (ActivityInvoiceItem.group == 'donation', 2),
             (ActivityInvoiceItem.family != None, 1),
             else_=0

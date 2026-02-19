@@ -729,6 +729,7 @@ class DirectoryImportForm(Form):
 
     def run_import(self, target: ExtendedDirectory) -> int:
         session = object_session(target)
+        assert session is not None
 
         count = 0
 

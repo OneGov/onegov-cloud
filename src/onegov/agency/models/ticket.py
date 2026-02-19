@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 
 class AgencyMutationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'AGN'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'AGN'}
 
     if TYPE_CHECKING:
         @property
@@ -39,7 +39,7 @@ class AgencyMutationTicket(OrgTicketMixin, Ticket):
 
 
 class PersonMutationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'PER'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'PER'}
 
     if TYPE_CHECKING:
         @property

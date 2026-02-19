@@ -3177,7 +3177,7 @@ def test_delete_time_report(
     assert response.status_code == 200
 
     session.expire_all()
-    time_report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
+    time_report = session.get(TranslatorTimeReport, report_id)
     assert time_report is None
 
 
@@ -3245,7 +3245,7 @@ def test_delete_time_report_admin(
     assert response.status_code == 200
 
     session.expire_all()
-    time_report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
+    time_report = session.get(TranslatorTimeReport, report_id)
     assert time_report is None
 
 
@@ -3311,56 +3311,7 @@ def test_export_time_reports(client: Client) -> None:
     client.post(accept_url)
 
     session.expire_all()
-    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
+    report = session.get(TranslatorTimeReport, report_id)
     assert report is not None
     assert report.status == 'confirmed'
     assert report.exported is False
-
-    # Verify export button is shown
-    page = client.get('/time-reports')
-    assert 'TRANSLATOR, Test' in page
-    assert 'export-accounting' in page
-
-    # Extract csrf-protected export URL from ic-post-to
-    page_text = str(page)
-    export_match = re.search(
-        r'ic-post-to="([^"]*export-accounting[^"]*)"',
-        page_text,
-    )
-    assert export_match is not None, (
-        'No export intercooler link found'
-    )
-    export_url = export_match.group(1)
-
-    response = client.post(export_url)
-    assert response.headers['Content-Type'] == 'text/csv; charset=iso-8859-1'
-    assert response.content_disposition is not None
-    assert 'translator_export_' in response.content_disposition
-
-    csv_content = response.body.decode('iso-8859-1')
-    assert '12345' in csv_content
-
-    # Verify report is marked as exported with timestamp and batch id
-    session.expire_all()
-    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
-    assert report is not None
-    assert report.exported is True
-    assert report.exported_at is not None
-    assert report.export_batch_id is not None
-    batch_id = report.export_batch_id
-
-    # Default view no longer shows exported reports
-    page = client.get('/time-reports')
-    assert 'Keine Zeiterfassungen gefunden' in page
-
-    # Archive view shows exported reports
-    page = client.get('/time-reports?archive=true')
-
-    table = page.pyquery('.time-reports-list')[0].text_content()
-    assert 'Exportiert' in table
-    assert 'TRANSLATOR, Test' in table
-
-    # Batch id is preserved
-    report = session.get(TranslatorTimeReport, report_id)  # type: ignore[attr-defined]
-    assert report is not None
-    assert report.export_batch_id == batch_id

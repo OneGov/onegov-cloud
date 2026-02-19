@@ -100,7 +100,6 @@ var VolunteerCart = React.createClass({
 });
 
 jQuery.fn.volunteerCart = function() {
-
     var container = $(this);
     if (!container.get(0)) { return; }
     var el = container.get(0);
@@ -125,9 +124,13 @@ jQuery.fn.volunteerCart = function() {
     window.volunteerCart = cart;
 };
 
+$(document).ready(function() {
+    $('.volunteer-cart-widget').volunteerCart();
+});
+
 Intercooler.ready((elt) => {
     $(elt).find('.volunteer-cart-widget').volunteerCart();
-    $(elt).find('#activities .needs a').click(function() {
+    $(elt).find('.needs a').click(function() {
         var btn = $(this);
         var need = btn.data('need');
         var error_container = btn.data('error-container');

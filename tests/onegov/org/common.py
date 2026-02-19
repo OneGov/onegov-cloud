@@ -31,7 +31,7 @@ def edit_bar_links(page: Any, attrib: str | None = None) -> list[Any]:
 
 
 class EchoTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'EHO'}  # type: ignore[dict-item]
+    __mapper_args__ = {'polymorphic_identity': 'EHO'}
 
 
 class EchoHandler(Handler):

@@ -189,6 +189,10 @@ ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
         'Staatsanwaltschaft Allgemeine Abteilung',
         'Beckenstube 5, 8200 Schaffhausen'
     ),
+    'staatsanwaltschaft_postgebaeude': (
+        'Staatsanwaltschaft Allgemeine Abteilung Postgebäude',
+        'Bahnhofstrasse 34, 8200 Schaffhausen',
+    ),
     'verkehrsabteilung_staatsanwaltschaft': (
         'Verkehrsabteilung der Staatsanwaltschaft',
         'Bahnhofstrasse 29, 8200 Schaffhausen'

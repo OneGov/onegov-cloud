@@ -149,6 +149,7 @@ class DirectoryMigration:
         """
         update = self.changes and True or False
         session = object_session(entry)
+        assert session is not None
 
         if not session._flushing:
             return

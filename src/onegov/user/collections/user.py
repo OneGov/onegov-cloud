@@ -167,7 +167,7 @@ class UserCollection:
         #        like phone_number, for SQLAlchemy 2.0 we will probably do
         #        that transformation anyways unless we want to switch all
         #        the models to being dataclasses
-        user = User(  # type:ignore[misc]
+        user = User(
             username=username,
             password=password,
             role=role,
