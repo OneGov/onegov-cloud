@@ -53,16 +53,6 @@ class SwissvoteDatasetField(UploadField):
         pricing: PricingRules | None = None,
     ) -> None:
 
-        if validators:
-            validator_list = list(validators)
-        else:
-            validator_list = []
-        validator_list.append(FileSizeLimit(10 * 1024 * 1024))
-
-        if not render_kw:
-            render_kw = {}
-        render_kw['force_simple'] = True
-
         mimetypes = {
             'application/excel',
             'application/octet-stream',
@@ -77,13 +67,13 @@ class SwissvoteDatasetField(UploadField):
 
         super().__init__(
             label=label,
-            validators=validator_list,
+            validators=[*(validators or ()), FileSizeLimit(10 * 1024 * 1024)],
             filters=filters,
             description=description,
             id=id,
             default=default,
             widget=widget,
-            render_kw=render_kw,
+            render_kw={**(render_kw or {}), 'force_simple': True},
             name=name,
             allowed_mimetypes=mimetypes,
             _form=_form,
