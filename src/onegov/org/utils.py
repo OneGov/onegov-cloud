@@ -19,6 +19,7 @@ from libres.modules import errors as libres_errors
 from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
 from markupsafe import escape, Markup
+from math import isclose
 from onegov.core.layout import Layout
 from onegov.core.mail import coerce_address
 from onegov.file import File, FileCollection
@@ -30,7 +31,7 @@ from onegov.reservation import Resource
 from onegov.ticket import Ticket, TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
 from operator import add, attrgetter
-from sqlalchemy import case, nullsfirst  # type:ignore[attr-defined]
+from sqlalchemy import case, nullsfirst
 from webob.exc import HTTPBadRequest
 
 
@@ -42,14 +43,13 @@ if TYPE_CHECKING:
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
     from onegov.form import Form, FormSubmission
-    from onegov.org.models import ImageFile
     from onegov.org.request import OrgRequest
     from onegov.pay import InvoiceItem
     from onegov.pay.types import PriceDict
     from onegov.reservation import Allocation, Reservation
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
-    from sqlalchemy.orm import Query
-    from sqlalchemy import Column
+    from sqlalchemy.orm import InstrumentedAttribute, Query
+    from sqlalchemy.sql.elements import ColumnElement
     from typing import Self, TypeAlias, TypeVar
     from uuid import UUID
 
@@ -261,21 +261,26 @@ def set_image_sizes(
             return match.group(1)
         return None
 
-    images_dict = {get_image_id(img): img for img in images}
+    images_dict = {
+        image_id: img
+        for img in images
+        if (image_id := get_image_id(img)) is not None
+    }
 
     if images_dict:
-        q: Query[ImageFile]
-        q = FileCollection(request.session, type='image').query()
-        q = q.with_entities(File.id, File.reference)
-        q = q.filter(File.id.in_(images_dict))
 
-        sizes = {i.id: i.reference for i in q}
+        uploaded_files = dict(
+            FileCollection(request.session, type='image').query()
+            .with_entities(File.id, File.reference)
+            .filter(File.id.in_(images_dict))
+            .tuples()
+        )
 
-        for id, image in images_dict.items():
-            if id in sizes:
+        for image_id, image in images_dict.items():
+            if (uploaded := uploaded_files.get(image_id)) is not None:
                 with suppress(AttributeError):
-                    image.set('width', sizes[id].size[0])
-                    image.set('height', sizes[id].size[1])
+                    image.set('width', uploaded.size[0])
+                    image.set('height', uploaded.size[1])
 
 
 def parse_fullcalendar_request(
@@ -518,7 +523,34 @@ class AllocationEventInfo:
         return int(self.quota * self.availability / 100)
 
     @property
+    def in_past(self) -> bool:
+        return self.allocation.end < sedate.utcnow()
+
+    @property
+    def outside_booking_window(self) -> bool:
+        return self.request.is_manager and (
+            self.resource.is_past_deadline(
+                # for partly available allocations we use the end of the
+                # allocation, since some small sliver of the allocation
+                # may still be before the deadline, we could get a slightly
+                # more accurate result by subtracting the raster, but it
+                # doesn't seem worth the extra CPU cycles.
+                self.allocation.end
+                if self.allocation.partly_available
+                else self.allocation.start
+            ) or self.resource.is_before_lead_time(
+                self.allocation.start
+            )
+        )
+
+    @property
     def event_title(self) -> str:
+        if self.in_past or self.outside_booking_window:
+            # NOTE: Only show the time slot, since the information for
+            #       why this slot cannot be reserved still/yet is too
+            #       complex to summarize in a single word/short sentence.
+            return self.event_time
+
         if self.allocation.partly_available:
             available = self.translate(_('${percent}% Available', mapping={
                 'percent': int(self.availability)
@@ -547,23 +579,10 @@ class AllocationEventInfo:
 
     @property
     def event_classes(self) -> Iterator[str]:
-        if self.allocation.end < sedate.utcnow():
+        if self.in_past:
             yield 'event-in-past'
 
-        elif not self.request.is_manager and (
-            self.resource.is_past_deadline(
-                # for partly available allocations we use the end of the
-                # allocation, since some small sliver of the allocation
-                # may still be before the deadline, we could get a slightly
-                # more accurate result by subtracting the raster, but it
-                # doesn't seem worth the extra CPU cycles.
-                self.allocation.end
-                if self.allocation.partly_available
-                else self.allocation.start
-            ) or self.resource.is_before_lead_time(
-                self.allocation.start
-            )
-        ):
+        elif self.outside_booking_window:
             yield 'event-outside-booking-window'
 
         if self.quota > 1:
@@ -613,7 +632,7 @@ class AllocationEventInfo:
                 )),
             )
 
-            if self.availability == 100.0:
+            if isclose(self.availability, 100.0, abs_tol=.005):
                 yield DeleteLink(
                     _('Delete'),
                     self.request.link(self.allocation),
@@ -735,7 +754,11 @@ class AvailabilityEventInfo:
                 self.request.link(self.allocation, name='add-blocker')
             ) if blockable else None,
             'partlyAvailable': self.allocation.partly_available,
-            'fullyAvailable': self.allocation.availability == 100.0,
+            'fullyAvailable': isclose(
+                self.allocation.availability,
+                100.0,
+                abs_tol=.005
+            ),
             'wholeDay': self.allocation.whole_day,
             'kind': 'allocation',
         }
@@ -1213,7 +1236,7 @@ class FindYourSpotEventInfo:
             else:
                 yield 'event-unavailable'
         else:
-            if self.availability == 100.0 or (
+            if isclose(self.availability, 100.0, abs_tol=.005) or (
                 self.availability > 100.0 and self.adjustable
             ):
                 yield 'event-available'
@@ -1483,8 +1506,8 @@ def predict_next_value(
 def group_by_column(
     request: OrgRequest,
     query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[_SortT],
     default_group: str | None = None,
     transform: Callable[[_T], _T] | None = None
 ) -> dict[str, list[_T]]: ...
@@ -1494,8 +1517,8 @@ def group_by_column(
 def group_by_column(
     request: OrgRequest,
     query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[_SortT],
     default_group: str | None,
     transform: Callable[[_T], _TransformedT]
 ) -> dict[str, list[_TransformedT]]: ...
@@ -1505,8 +1528,8 @@ def group_by_column(
 def group_by_column(
     request: OrgRequest,
     query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[_SortT],
     default_group: str | None = None,
     *,
     transform: Callable[[_T], _TransformedT]
@@ -1516,8 +1539,8 @@ def group_by_column(
 def group_by_column(
     request: OrgRequest,
     query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[_SortT],
     default_group: str | None = None,
     transform: Callable[[Any], Any] | None = None
 ) -> dict[str, list[Any]]:
@@ -1640,7 +1663,7 @@ def emails_for_new_ticket(
     # then there can't be any exclusive permissions for any
     # specific group we're not a part of, since then we won't
     # have permission to access the ticket
-    general_condition = TicketPermission.group.is_(None)
+    general_condition: ColumnElement[bool] = TicketPermission.group.is_(None)
     if exclusive_group_ids:
         general_condition &= UserGroup.id.in_(exclusive_group_ids)
     query = query.filter(
@@ -1652,7 +1675,7 @@ def emails_for_new_ticket(
             UserGroup.meta['shared_email'].isnot(None),
             UserGroup.meta['shared_email'].astext
         ), else_=User.username),
-        case((  # type: ignore[arg-type]
+        case((
             UserGroup.meta['shared_email'].isnot(None),
             UserGroup.name,
         ), else_=User.realname),

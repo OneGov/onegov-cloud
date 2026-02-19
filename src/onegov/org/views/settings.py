@@ -36,7 +36,7 @@ from uuid import uuid4
 from webob.exc import HTTPNotFound
 
 
-from typing import Any, TYPE_CHECKING
+from typing import cast, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import RenderData
@@ -524,6 +524,7 @@ def handle_api_keys(
                 ),
             )
             # delete_link is temporarily stored on the object itself
+            api_key = cast('ApiKeyWithDeleteLink', api_key)
             api_key.delete_link = api_key_delete_link
             yield api_key
 
@@ -571,7 +572,7 @@ def handle_ticket_data_deletion_settings(
 @OrgApp.form(
     model=Organisation, name='vat-settings', template='form.pt',
     permission=Secret, form=VATSettingsForm, setting=_('Value Added Tax'),
-    icon='fa-file-invoice-dollar', order=450)
+    icon='fa-money', order=450)
 def handle_vat_settings(
         self: Organisation,
         request: OrgRequest,

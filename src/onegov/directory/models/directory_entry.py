@@ -4,24 +4,20 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
-from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
-from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import mapped_column, relationship, Mapped
 from translationstring import TranslationString
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Collection
     from .directory import Directory
 
@@ -56,39 +52,32 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     }
 
     #: An interal id for references (not public)
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The public id of the directory entry
-    name: Column[str] = Column(Text, nullable=False)
+    name: Mapped[str]
 
     #: The directory this entry belongs to
-    directory_id: Column[UUID] = Column(
-        ForeignKey('directories.id'), nullable=False)
+    directory_id: Mapped[UUID] = mapped_column(ForeignKey('directories.id'))
 
     #: the polymorphic type of the entry
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     #: The order of the entry in the directory
-    order: Column[str] = Column(Text, nullable=False, index=True)
+    order: Mapped[str] = mapped_column(index=True)
 
     #: The title of the entry
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: Describes the entry briefly
-    lead: Column[str | None] = Column(Text, nullable=True)
+    lead: Mapped[str | None]
 
     #: All keywords defined for this entry (indexed)
-    _keywords: Column[dict[str, str] | None] = Column(  # type:ignore
-        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
-        nullable=True,
+    _keywords: Mapped[dict[str, str] | None] = mapped_column(
+        MutableDict.as_mutable(HSTORE),
         name='keywords'
     )
 
@@ -102,10 +91,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         Index('unique_entry_name', 'directory_id', 'name', unique=True),
     )
 
-    directory: relationship[Directory] = relationship(
-        'Directory',
-        back_populates='entries'
-    )
+    directory: Mapped[Directory] = relationship(back_populates='entries')
 
     @property
     def external_link(self) -> str | None:
@@ -127,8 +113,6 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     def keywords(self) -> set[str]:
         return set(self._keywords.keys()) if self._keywords else set()
 
-    # FIXME: asymmetric properties are not supported by mypy, switch to
-    #        a custom descriptor, if desired.
     @keywords.setter
     def keywords(self, value: Collection[str] | None) -> None:
         self._keywords = dict.fromkeys(value, '') if value else None

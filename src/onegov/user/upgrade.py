@@ -7,9 +7,9 @@ from __future__ import annotations
 
 from collections import defaultdict
 from onegov.core.upgrade import upgrade_task
-from onegov.core.orm.types import JSON, UUID, UTCDateTime
+from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.user import User, UserCollection
-from sqlalchemy import Boolean, Column, Text
+from sqlalchemy import Boolean, Column, Text, UUID
 from sqlalchemy.sql import text
 
 

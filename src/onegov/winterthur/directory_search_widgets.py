@@ -148,7 +148,7 @@ class InlineDirectorySearch:
             query = query.order_by(False)
             query = query.order_by(
                 func.array_position(
-                    array(ids),  # type:ignore[call-overload]
+                    array(ids),
                     DirectoryEntry.id
                 )
             )

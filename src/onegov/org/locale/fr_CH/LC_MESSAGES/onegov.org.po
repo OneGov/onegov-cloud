@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-27 10:35+0100\n"
+"POT-Creation-Date: 2026-02-10 14:27+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -540,17 +540,17 @@ msgstr "Sous les entrées"
 msgid "Definition"
 msgstr "Définition"
 
-msgid "Coordinates"
-msgstr "Coordonnées"
+msgid "Map"
+msgstr "Carte"
 
-msgid "Entries have no coordinates"
-msgstr "Les entrées ne possèdent pas de coordonnées"
+msgid "Do not show map"
+msgstr "Ne pas afficher la carte"
 
-msgid "Coordinates are shown on each entry"
-msgstr "Les coordonnées sont affichées sur chaque entrée"
+msgid "Show map only on entries"
+msgstr "Afficher la carte uniquement sur les entrées"
 
-msgid "Coordinates are shown on the directory and on each entry"
-msgstr "Les coordonnées sont affichées sur le répertoire et sur chaque entrée"
+msgid "Show map in directory overview and on entries"
+msgstr "Afficher la carte dans la vue d'ensemble du dossier et sur les entrées"
 
 msgid "Title-Format"
 msgstr "Format Titre"
@@ -962,6 +962,9 @@ msgstr "URL de l'événement externe"
 
 msgid "Event Registration URL"
 msgstr "URL de l'inscription à l'événement"
+
+msgid "Coordinates"
+msgstr "Coordonnées"
 
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "Le curseur peut être déplacé avec la souris"

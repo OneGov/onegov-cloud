@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from onegov.core.utils import groupbylist
 from onegov.election_day.models import Candidate
 from onegov.election_day.models import CandidateResult
@@ -33,7 +34,7 @@ if TYPE_CHECKING:
         first_name: str
         elected: bool
         party: str | None
-        percentage: float
+        percentage: Decimal
         list_name: str | None
         list_id: str | None
 
@@ -77,8 +78,12 @@ def get_candidates_results(
                 ElectionResult.id.in_(election_result_ids)
             )
         num_accounted = accounted.scalar() or 1
+        # NOTE: rounding to N-digits is only supported by NUMERIC
         percentage = func.round(
-            100 * func.sum(CandidateResult.votes) / float(num_accounted), 1
+            Decimal('100')
+            * func.sum(CandidateResult.votes)
+            / Decimal(num_accounted),
+            1
         ).label('percentage')
 
     result = session.query(
@@ -149,6 +154,7 @@ def get_candidates_data(
     elected = election.type == 'proporz' if elected is None else elected
 
     session = object_session(election)
+    assert session is not None
 
     colors = election.colors
     column = Candidate.party
@@ -182,8 +188,7 @@ def get_candidates_data(
         election_result_id = session.query(ElectionResult.id).filter(
             ElectionResult.election_id == election.id,
             ElectionResult.name.in_(entities)
-        )
-        election_result_id = [result.id for result in election_result_id]
+        ).scalar_subquery()
         candidates = candidates.filter(
             CandidateResult.election_result_id.in_(election_result_id)
         )
@@ -194,15 +199,15 @@ def get_candidates_data(
         Candidate.list_id,
         Candidate.party
     )
-    order = [
+    order: list[Any] = [
         desc('votes'),
         Candidate.family_name,
         Candidate.first_name
     ]
     if election.completed:
-        order.insert(0, desc(Candidate.elected))
+        order.insert(0, Candidate.elected.desc())
     if lists and sort_by_lists:
-        order.insert(0, case(  # type: ignore[call-overload]
+        order.insert(0, case(
             *(
                 (column == name, index)
                 for index, name in enumerate(lists, 1)
@@ -259,8 +264,9 @@ def get_candidates_results_by_entity(
     """
 
     session = object_session(election)
+    assert session is not None
 
-    query = session.query(
+    query: Query[CandidateRow] = session.query(  # type: ignore[assignment]
         Candidate.id,
         Candidate.family_name,
         Candidate.first_name,
@@ -280,7 +286,7 @@ def get_candidates_results_by_entity(
     query = query.filter(Candidate.election_id == election.id)
     candidates = query.all()
 
-    results = session.query(
+    results: Query[ResultRow] = session.query(  # type: ignore[assignment]
         ElectionResult.name,
         Candidate.family_name,
         Candidate.first_name,
@@ -293,7 +299,7 @@ def get_candidates_results_by_entity(
     if candidates:
         results = results.order_by(
             ElectionResult.name,
-            case(  # type: ignore[call-overload]
+            case(
                 *(
                     (Candidate.id == candidate.id, index)
                     for index, candidate in enumerate(candidates, 1)

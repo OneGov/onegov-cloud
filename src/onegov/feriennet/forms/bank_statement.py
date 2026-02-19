@@ -39,16 +39,17 @@ class BankStatementImportForm(Form):
 
     @property
     def period_choices(self) -> list[_Choice]:
-        periods = BookingPeriodCollection(self.request.session)
-
-        q = periods.query()
-        q = q.with_entities(BookingPeriod.id, BookingPeriod.title)
-        q = q.order_by(
-            BookingPeriod.active.desc(),
-            BookingPeriod.prebooking_start.desc()
-        )
-
-        return [(period_id.hex, title) for period_id, title in q]
+        return [
+            (period_id.hex, title)
+            for period_id, title in (
+                BookingPeriodCollection(self.request.session).query()
+                .with_entities(BookingPeriod.id, BookingPeriod.title)
+                .order_by(
+                    BookingPeriod.active.desc(),
+                    BookingPeriod.prebooking_start.desc()
+                )
+            )
+        ]
 
     def load_periods(self) -> None:
         self.period.choices = self.period_choices

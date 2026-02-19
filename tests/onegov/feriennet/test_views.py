@@ -3789,3 +3789,45 @@ def test_admin_user_no_delete_button(
 
     # Check that delete button is not present for admin users
     assert page.pyquery('a.delete-link').length == 0
+
+
+def test_add_manual_booking(client: Client, scenario: Scenario) -> None:
+    scenario.add_period(title="2019", confirmed=True, finalized=False)
+    scenario.add_activity(title="Fishing", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_user(username='tom@example.org', role='member',
+                      realname="Tom",
+    phone="000 000 00 11", email="tom@example.org")
+    scenario.add_attendee(name="Dustin")
+    scenario.add_booking(state='accepted', cost=100)
+    scenario.commit()
+
+    client.login_admin()
+
+    settings = client.get('/feriennet-settings')
+    settings.form['bank_account'] = 'CH6309000000250097798'
+    settings.form['bank_beneficiary'] = 'Initech'
+    settings.form.submit()
+
+    page = client.get('/billing')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page.form.submit()
+
+    page = client.get('/billing')
+
+    form = page.click('Manuelle Buchung hinzufügen')
+    form.form['username'] = 'tom@example.org'
+    form.form['booking_text'] = 'Discount for being nice to the admin'
+    form.form['discount'] = '20'
+    form.form.submit()
+
+    page_url = (
+        client.get('/billing')
+        .pyquery('.item-header + div')
+        .attr('ic-get-from')
+    )
+
+    page = client.get(page_url)
+    assert 'Tom' in page
+    assert 'Discount for being nice to the admin' in page

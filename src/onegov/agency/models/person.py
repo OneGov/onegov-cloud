@@ -15,8 +15,7 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.agency.models import ExtendedAgencyMembership
     from onegov.agency.request import AgencyRequest
-    from onegov.core.types import AppenderQuery
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import DynamicMapped
 
 
 class ExtendedPerson(Person, AccessExtension, PublicationExtension):
@@ -51,13 +50,13 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
 
     if TYPE_CHECKING:
         # we only allow ExtendedAgencyMembership memberships
-        memberships: relationship[  # type:ignore[assignment]
-            AppenderQuery[ExtendedAgencyMembership]
-        ]
+        memberships: DynamicMapped[ExtendedAgencyMembership]  # type: ignore[assignment]
 
     @property
     def phone_internal(self) -> str:
-        org = object_session(self).query(Organisation).one()
+        session = object_session(self)
+        assert session is not None
+        org = session.query(Organisation).one()
         number = getattr(self, org.agency_phone_internal_field)
         digits = org.agency_phone_internal_digits
         return number.replace(' ', '')[-digits:] if number and digits else ''

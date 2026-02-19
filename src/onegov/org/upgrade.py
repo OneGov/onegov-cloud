@@ -13,7 +13,7 @@ import yaml
 from itertools import chain
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, find_models
-from onegov.core.orm.types import JSON, UTCDateTime, UUID
+from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.core.utils import normalize_for_url
 from onegov.directory import DirectoryEntry
@@ -31,7 +31,7 @@ from onegov.people import Person
 from onegov.reservation import Resource
 from onegov.ticket import TicketPermission
 from onegov.user import User, UserGroup
-from sqlalchemy import Column, Enum, ForeignKey, Text, Boolean, text
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Text, UUID, text
 from sqlalchemy.orm import undefer, selectinload, load_only
 
 
@@ -220,7 +220,7 @@ def fix_directory_file_identity(context: UpgradeContext) -> None:
                 file = context.session.query(File).filter_by(
                     id=file_id).first()
                 if file and file.type != 'directory':
-                    new = DirectoryFile(  # type:ignore[misc]
+                    new = DirectoryFile(
                         id=random_token(),
                         name=file.name,
                         note=file.note,
@@ -367,7 +367,7 @@ def add_submission_window_id_to_survey_submissions(
                 ForeignKey('submission_windows.id'),
                 nullable=True
             ),
-            default=None
+            default=None  # type: ignore[arg-type]
         )
 
 
@@ -466,7 +466,7 @@ def create_hierarchy_and_move_organisations_to_content(
     session = context.app.session()
     # Use only columns that definitely exist to avoid error
     people = session.query(Person).options(
-        load_only('id', 'content')
+        load_only(Person.id, Person.content)
     ).all()
     hierarchy: dict[str, set[str]] = {}
     for person in people:
@@ -506,7 +506,6 @@ def convert_directories_to_ticket_permissions(context: UpgradeContext) -> None:
         UserGroup.meta['directories'].isnot(None)
     ).options(selectinload(UserGroup.ticket_permissions)):
         directories = set(user_group.meta['directories'])
-        assert hasattr(user_group, 'ticket_permissions')
         for permission in user_group.ticket_permissions:
             if permission.handler_code != 'DIR':
                 continue
@@ -556,7 +555,7 @@ def add_party_column_to_par_parliamentarians(context: UpgradeContext) -> None:
                 Text,
                 nullable=True
             ),
-            default=None
+            default=None  # type: ignore[arg-type]
         )
 
 

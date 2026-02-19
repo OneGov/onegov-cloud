@@ -1,28 +1,30 @@
+from _typeshed import Incomplete
 from collections.abc import Callable, Iterable
-from typing import Any, TypeVar
+from typing import Any, Generic, TypeVar
 
 from sqlalchemy import Column
-from sqlalchemy.orm import Query, Session
-from sqlalchemy.sql import Update
+from sqlalchemy.orm import DeclarativeBase, MappedColumn, Session, declared_attr
+from sqlalchemy.sql import ColumnElement, Subquery, Update
 
-_ColumnT = TypeVar('_ColumnT', bound=Column[Any])
+_T = TypeVar('_T')
 
-class AggregatedValue:
-    # FIXME: should be type[DelarativeBase] in SQLAlchemy 2.0
-    class_: type[Any]
-    attr: Column[Any]
+class AggregatedAttribute(declared_attr[_T]):
+    column: MappedColumn[_T]
+    relationship: str
+    def __init__(self, fget: Callable[[Any], ColumnElement[_T]], relationship: str, column: MappedColumn[_T], *args: Incomplete, **kwargs: Incomplete) -> None: ...
+
+class AggregatedValue(Generic[_T]):
+    class_: type[DeclarativeBase]
+    attr: Column[_T]
     path: str
-    # FIXME: This should be a valid SQLAlchemy expression or generic function
-    expr: Any
-    def __init__(self, class_: type[Any], attr: Column[Any], path: str, expr: Any): ...
+    expr: ColumnElement[_T]
+    def __init__(self, class_: type[Any], attr: Column[_T], path: str, expr: Any): ...
     @property
-    def aggregate_query(self) -> Query[Any]: ...
-    # FIXME: This should be Iterable[DeclarativeBase] in SQLAlchemy 2.0
-    def update_query(self, objects: Iterable[Any]) -> Update | None: ...
+    def aggregate_query(self) -> Subquery: ...
+    def update_query(self, objects: Iterable[DeclarativeBase]) -> Update | None: ...
 
 class AggregationManager:
-    # FIXME: should be type[DelarativeBase] in SQLAlchemy 2.0
-    generator_registry: dict[type[Any], list[AggregatedValue]]
+    generator_registry: dict[type[DeclarativeBase], list[AggregatedValue[Any]]]
     def reset(self) -> None: ...
     def register_listeners(self) -> None: ...
     def update_generator_registry(self) -> None: ...
@@ -30,5 +32,4 @@ class AggregationManager:
 
 manager: AggregationManager
 
-# technically it returns AggregatedAttribute, but its __get__ always return the Column
-def aggregated(relationship: str, column: _ColumnT) -> Callable[[Callable[[Any], Any]], _ColumnT]: ...
+def aggregated(relationship: str, column: MappedColumn[_T]) -> Callable[[Callable[[Any], ColumnElement[_T]]], AggregatedAttribute[_T]]: ...

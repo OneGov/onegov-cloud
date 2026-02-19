@@ -6,18 +6,15 @@ import string
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.core.utils import batched, hash_dictionary
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
-from sqlalchemy import Text
 from sqlalchemy import UniqueConstraint
-from sqlalchemy.orm import relationship, validates
+from sqlalchemy.orm import mapped_column, relationship, validates, Mapped
+from uuid import UUID
 
 
 from typing import Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from sqlalchemy.orm import Session
     from onegov.pay.models import Invoice
 
@@ -59,34 +56,26 @@ class InvoiceReference(Base, TimestampMixin):
     __tablename__ = 'invoice_references'
 
     #: the unique reference
-    reference: Column[str] = Column(Text, primary_key=True)
+    reference: Mapped[str] = mapped_column(primary_key=True)
 
     #: the referenced invoice
-    invoice_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('invoices.id'),
-        nullable=False
-    )
-    invoice: relationship[Invoice] = relationship(
-        'Invoice',
-        back_populates='references'
-    )
+    invoice_id: Mapped[UUID] = mapped_column(ForeignKey('invoices.id'))
+    invoice: Mapped[Invoice] = relationship(back_populates='references')
 
     #: the schema used to generate the invoice
-    schema: Column[str] = Column(Text, nullable=False)
+    schema: Mapped[str]
 
     #: groups schema name and its config to identify records created by a
     #: given schema and config
-    bucket: Column[str] = Column(Text, nullable=False)
+    bucket: Mapped[str]
 
     __table_args__ = (
         UniqueConstraint(
             'bucket', 'invoice_id', name='unique_bucket_invoice_id'),
     )
 
-    @validates
+    @validates('schema')
     def validate_schema(self, field: str, value: str) -> str:
-
         if value not in KNOWN_SCHEMAS:
             raise ValueError(f'{value} is an unknown schema')
 

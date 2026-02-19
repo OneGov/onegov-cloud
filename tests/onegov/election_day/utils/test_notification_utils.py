@@ -26,8 +26,8 @@ def test_segment_models() -> None:
     ]
     votes = [
         Vote(domain='canton'),
-        Vote(domain='municipality', domain_segment='A'),  # type: ignore[misc]
-        Vote(domain='municipality', domain_segment='B'),  # type: ignore[misc]
+        Vote(domain='municipality', domain_segment='A'),
+        Vote(domain='municipality', domain_segment='B'),
     ]
     segments = segment_models(elections, compounds, votes)
     assert len(segments) == 4

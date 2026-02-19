@@ -2,16 +2,10 @@ from __future__ import annotations
 
 from onegov.core.orm import observes, Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.user import UserGroup
-from sqlalchemy import Boolean, CheckConstraint, Column, ForeignKey, Text
-from sqlalchemy.orm import backref, object_session, relationship
-from uuid import uuid4
-
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    import uuid
+from sqlalchemy import CheckConstraint, ForeignKey
+from sqlalchemy.orm import mapped_column, object_session, relationship, Mapped
+from uuid import uuid4, UUID
 
 
 class TicketPermission(Base, TimestampMixin):
@@ -25,55 +19,42 @@ class TicketPermission(Base, TimestampMixin):
     __tablename__ = 'ticket_permissions'
 
     #: the id
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the user group needed for accessing the tickets
-    user_group_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey(UserGroup.id),
-        nullable=False
-    )
-    user_group: relationship[UserGroup] = relationship(
-        UserGroup,
-        backref=backref(
-            'ticket_permissions',
-            cascade='all, delete-orphan',
-        )
+    user_group_id: Mapped[UUID] = mapped_column(ForeignKey(UserGroup.id))
+    user_group: Mapped[UserGroup] = relationship(
+        back_populates='ticket_permissions'
     )
 
     #: the handler code this permission addresses
-    handler_code: Column[str] = Column(Text, nullable=False)
+    handler_code: Mapped[str]
 
     #: the group this permission addresses
-    group: Column[str | None] = Column(Text, nullable=True)
+    group: Mapped[str | None]
 
     #: whether or not this permission is exclusive
     #: if a permission is exclusive, the same permission may not
     #: be given non-exclusively to another group, but multiple groups
     #: may have the same exclusive or non-exclusive permission
-    exclusive: Column[bool] = Column(
-        Boolean,
-        nullable=False,
+    exclusive: Mapped[bool] = mapped_column(
         default=True,
         index=True
     )
 
     #: whether or not to immediately send notifications about new tickets
-    immediate_notification: Column[bool] = Column(
-        Boolean,
-        nullable=False,
+    immediate_notification: Mapped[bool] = mapped_column(
         default=False,
         index=True
     )
 
     __table_args__ = (
         CheckConstraint(
-            exclusive.isnot_distinct_from(True)
-            | immediate_notification.isnot_distinct_from(True),
+            exclusive.is_not_distinct_from(True)
+            | immediate_notification.is_not_distinct_from(True),
             name='no_redundant_ticket_permissions'
         ),
     )
@@ -97,6 +78,7 @@ class TicketPermission(Base, TimestampMixin):
             return
 
         session = object_session(self)
+        assert session is not None
         query = session.query(TicketPermission)
 
         # we can't conflict with ourselves, only with other permissions
@@ -110,7 +92,7 @@ class TicketPermission(Base, TimestampMixin):
             TicketPermission.handler_code == self.handler_code
         )
         query = query.filter(
-            TicketPermission.group.isnot_distinct_from(self.group)
+            TicketPermission.group.is_not_distinct_from(self.group)
         )
 
         # the exact same permission may only exist once per user group

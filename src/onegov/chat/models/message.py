@@ -2,20 +2,19 @@ from __future__ import annotations
 
 import sedate
 
+from datetime import datetime
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
-from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.file import File
-from sqlalchemy import Column, Text
 from sqlalchemy import event
 from sqlalchemy import inspect
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapped_column, Mapped
 from ulid import ULID
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from datetime import datetime
     from onegov.chat.collections import MessageCollection
     from onegov.core.request import CoreRequest
     from sqlalchemy.orm import Session
@@ -37,8 +36,7 @@ class Message(Base):
     __tablename__ = 'messages'
 
     #: the public id of the message - uses ulid for absolute ordering
-    id: Column[str] = Column(
-        Text,
+    id: Mapped[str] = mapped_column(
         primary_key=True,
         default=lambda: str(ULID())
     )
@@ -46,34 +44,36 @@ class Message(Base):
     #: channel to which this message belongs -> this might one day be
     #: linked to an actual channel record - for now it's just a string that
     #: binds all messages with the same string together
-    channel_id: Column[str] = Column(Text, index=True, nullable=False)
+    channel_id: Mapped[str] = mapped_column(index=True)
 
     #: optional owner of the message -> this is just an identifier, it isn't
     #: necessarily linked to the user table
-    owner: Column[str | None] = Column(Text, nullable=True)
+    owner: Mapped[str | None]
 
     #: the polymorphic type of the message
-    type: Column[str] = Column(Text, nullable=False, default='generic')
+    type: Mapped[str] = mapped_column(default='generic')
 
     #: meta information specific to this message and maybe its type -> we
     #: don't use the meta/content mixin yet as we might not need the content
     #: property
-    meta: Column[dict[str, Any]] = Column(JSON, nullable=False, default=dict)
+    meta: Mapped[dict[str, Any]] = mapped_column(default=dict)
 
     #: the text of the message, maybe None for certain use cases (say if the
     # content of the message is generated from the meta property)
-    text: Column[str | None] = Column(Text, nullable=True)
+    text: Mapped[str | None]
 
     #: the time this message was created - not taken from the timestamp mixin
     #: because here we don't want it to be deferred
-    created: Column[datetime] = Column(UTCDateTime, default=sedate.utcnow)
+    created: Mapped[datetime] = mapped_column(
+        default=sedate.utcnow,
+        # FIXME: This should almost certainly have not been nullable, but
+        #        we need a migration for existing tables to fix this.
+        nullable=True
+    )
 
     #: the time this message was modified - not taken from the timestamp mixin
     #: because here we don't want it to be deferred
-    modified: Column[datetime | None] = Column(
-        UTCDateTime,
-        onupdate=sedate.utcnow
-    )
+    modified: Mapped[datetime | None] = mapped_column(onupdate=sedate.utcnow)
 
     #: a single optional file associated with this message
     file = associated(File, 'file', 'one-to-one')
@@ -115,14 +115,10 @@ class Message(Base):
         """
         return self.text
 
-    if TYPE_CHECKING:
-        # workaround for sqlalchemy-stubs
-        edited: Column[bool]
-    else:
-        @hybrid_property
-        def edited(self) -> bool:
-            # use != instead of "is None" as we want this translated into SQL
-            return self.modified != None
+    @hybrid_property
+    def edited(self) -> bool:
+        # use != instead of "is None" as we want this translated into SQL
+        return self.modified != None
 
     @classmethod
     def bound_messages(cls, session: Session) -> MessageCollection[Self]:
@@ -132,13 +128,13 @@ class Message(Base):
         """
         from onegov.chat import MessageCollection  # XXX circular import
 
-        return MessageCollection(
+        return MessageCollection(  # type: ignore[return-value]
             session=session,
             type=inspect(cls).polymorphic_identity
         )
 
 
-@event.listens_for(Message, 'init')  # type:ignore[untyped-decorator]
+@event.listens_for(Message, 'init')
 def init(
     target: Message,
     args: tuple[Any, ...],

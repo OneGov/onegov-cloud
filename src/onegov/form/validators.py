@@ -44,9 +44,9 @@ from typing import Generic, TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
-    from onegov.core.orm import Base
     from onegov.form import Form
     from onegov.form.types import BaseValidator, FieldCondition
+    from sqlalchemy.orm import DeclarativeBase
     from wtforms import Field, StringField
     from wtforms.form import BaseForm
 
@@ -692,11 +692,11 @@ class UniqueColumnValue:
 
     """
 
-    def __init__(self, table: type[Base]):
+    def __init__(self, table: type[DeclarativeBase]):
         self.table = table
 
     def __call__(self, form: Form, field: Field) -> None:
-        if field.name not in self.table.__table__.columns:  # type:ignore
+        if field.name not in self.table.__table__.columns:
             raise RuntimeError('The field name must match a column!')
 
         if hasattr(form, 'model'):

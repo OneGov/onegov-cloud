@@ -627,7 +627,7 @@ def test_delete_event(session: Session) -> None:
 
 def test_as_ical() -> None:
     url = 'https://example.org/my-event'
-    event = Event(  # type: ignore[misc]
+    event = Event(
         state='initiated',
         timezone='Europe/Zurich',
         start=tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich'),

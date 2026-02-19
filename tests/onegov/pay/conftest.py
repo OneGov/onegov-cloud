@@ -25,7 +25,7 @@ def reset_payment() -> Iterator[None]:
 
         for key in (Payment.registered_links or ()):
             try:
-                del cls.__mapper__._props[key]  # type: ignore[attr-defined]
+                del cls.__mapper__._props[key]
             except KeyError:
                 pass
 

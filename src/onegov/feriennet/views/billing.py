@@ -334,7 +334,7 @@ def view_online_payments(
         table.c.invoice_items_id.in_(invoice_item_ids.scalar_subquery()))
 
     payments = session.query(Payment).filter(
-        Payment.id.in_(payment_ids.scalar_subquery()))  # type: ignore[attr-defined]
+        Payment.id.in_(payment_ids.scalar_subquery()))
 
     payments = payments.order_by(desc(Payment.created))
 
@@ -444,7 +444,10 @@ def view_execute_import(
                                      period_id=invoice, schema=schema))
 
     users = dict(
-        request.session.query(User).with_entities(User.username, User.id))
+        request.session.query(User)
+        .with_entities(User.username, User.id)
+        .tuples()
+    )
 
     payments = {
         users[t.username]: t for t in transactions if t.state == 'success'}

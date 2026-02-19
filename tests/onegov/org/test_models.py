@@ -365,7 +365,7 @@ def test_sitecollection(org_app: TestOrgApp) -> None:
 
 
 def test_holidays() -> None:
-    o = Organisation(holiday_settings={})  # type: ignore[misc]
+    o = Organisation(holiday_settings={})
 
     assert date(2000, 1, 1) not in o.holidays
     assert date(2000, 1, 2) not in o.holidays
