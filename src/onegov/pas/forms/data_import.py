@@ -41,8 +41,7 @@ class DataImportForm(Form):
             'JSON file containing membership data (who is member of '
             'what organization).'
         ),
-        validators=[],  # no validators as files are not stored
-        allowed_mimetypes=tuple(MIME_TYPES_JSON),
+        allowed_mimetypes=MIME_TYPES_JSON,
     )
 
     validate_schema = BooleanField(
