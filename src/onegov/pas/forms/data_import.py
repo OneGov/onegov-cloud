@@ -33,8 +33,7 @@ class DataImportForm(Form):
             'JSON file containing organization data (commissions, '
             'parties, etc.).'
         ),
-        validators=[],  # no validators as files are not stored
-        allowed_mimetypes=tuple(MIME_TYPES_JSON),
+        allowed_mimetypes=MIME_TYPES_JSON,
     )
     memberships_source = UploadMultipleField(
         label=_('Memberships Data (JSON)'),
