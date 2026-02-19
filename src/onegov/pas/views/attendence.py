@@ -519,6 +519,7 @@ def add_plenary_attendence(self: AttendenceCollection,
     request: PasRequest,
     form: AttendenceAddPlenaryForm
 ) -> RenderData | Response:
+    request.include('custom')
 
     if not request.is_admin:
         request.alert(_('You do not have permission to add plenary sessions.'))
