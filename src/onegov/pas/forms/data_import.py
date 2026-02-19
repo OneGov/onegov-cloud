@@ -25,8 +25,7 @@ class DataImportForm(Form):
     people_source = UploadMultipleField(
         label=_('People Data (JSON)'),
         description=_('JSON file containing parliamentarian data.'),
-        validators=[],  # no validators as files are not stored
-        allowed_mimetypes=tuple(MIME_TYPES_JSON),
+        allowed_mimetypes=MIME_TYPES_JSON,
     )
     organizations_source = UploadMultipleField(
         label=_('Organizations Data (JSON)'),
