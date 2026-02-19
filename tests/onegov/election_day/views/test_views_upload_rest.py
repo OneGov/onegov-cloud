@@ -98,9 +98,23 @@ def test_view_rest_validation(election_day_app_zg: TestApp) -> None:
         'type': [{'message': 'This field is required.'}],
     }
 
-    # Invalid type
+    # Invalid type #1
     result = client.post('/upload', status=400, params=(('type', 'xyz'),)).json
     assert result['errors']['type'] == [{'message': 'Not a valid choice.'}]
+
+    # Invalid type #2 (file instead of string as type)
+    params = (
+        ('type', Upload('delivery.xml', 'a'.encode('utf-8'))),
+        ('results', Upload('delivery.xml', 'a'.encode('utf-8'))),
+    )
+    result = client.post('/upload', params=params, status=400).json
+    assert result['status'] == 'error'
+    assert 'type' in result['errors']
+    assert result['errors']['type'] == [
+        {'message': 'Not a valid choice.'},
+        {'message': 'A file was submitted instead of a string. '
+                    'Use --form "type=xml" instead of --form "type=@file"'}
+    ]
 
     # No vote
     params = (
