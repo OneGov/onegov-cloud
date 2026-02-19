@@ -540,7 +540,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             widget=upload_widget,
             render_kw=render_kw,
             allowed_mimetypes=allowed_mimetypes,
-            validators=[*(validators or ())],
+            validators=validators,  # type: ignore[arg-type]
             **extra_arguments
         )
         super().__init__(
