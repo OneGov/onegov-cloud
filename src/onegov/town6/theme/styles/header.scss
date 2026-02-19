@@ -194,6 +194,7 @@ $settings-icon: '\f1de';
     .citizen-login::before { @include icon-bold("\f2f6"); }
     .citizen-tickets::before { @include icon-bold('\f3ff'); }
     .citizen-reservations::before { @include icon('\f073'); }
+    .newsletter::before { @include icon($send-link-icon); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;

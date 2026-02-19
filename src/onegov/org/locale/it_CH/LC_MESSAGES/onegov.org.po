@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-02-10 14:27+0100\n"
+"POT-Creation-Date: 2026-02-18 16:10+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -279,6 +279,9 @@ msgstr "Moduli"
 
 msgid "Surveys"
 msgstr "Sondaggi"
+
+msgid "Newsletter"
+msgstr "Abbonamento alla newsletter"
 
 msgid "Management"
 msgstr "Gestione"
@@ -1037,9 +1040,6 @@ msgstr "Gli eventi non vengono salvati."
 
 msgid "Expected header line with the following columns:"
 msgstr "La prima riga deve avere i seguenti nomi di colonna:"
-
-msgid "Map"
-msgstr "Mappa"
 
 msgid "Comment"
 msgstr "Commento"
@@ -2616,6 +2616,13 @@ msgstr ""
 msgid "Enable newsletter"
 msgstr "Attiva la newsletter"
 
+msgid ""
+"Enables the newsletter module for admins and show a \"Subscribe to "
+"newsletter\" option for the users on the news page."
+msgstr ""
+"Abilita il modulo newsletter per gli amministratori e mostra l'opzione "
+"\"Iscriviti alla newsletter\" agli utenti nella pagina delle notizie."
+
 msgid "Allow secret content in newsletter"
 msgstr "Consentire contenuti segreti nella newsletter"
 
@@ -3494,9 +3501,6 @@ msgstr "Puoi ripubblicare un evento importato in un secondo momento."
 
 msgid "Re-publish event"
 msgstr "Ripubblica l'evento"
-
-msgid "Newsletter"
-msgstr "Abbonamento alla newsletter"
 
 msgid "New"
 msgstr "Nuovo"
@@ -5027,8 +5031,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 

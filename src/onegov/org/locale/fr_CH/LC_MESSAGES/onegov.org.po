@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-02-10 14:27+0100\n"
+"POT-Creation-Date: 2026-02-18 16:10+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -277,6 +277,9 @@ msgstr "Formulaires"
 
 msgid "Surveys"
 msgstr "Enquêtes"
+
+msgid "Newsletter"
+msgstr "Newsletter"
 
 msgid "Management"
 msgstr "Gestion"
@@ -1036,9 +1039,6 @@ msgstr "Les événements ne sont pas sauvegardés."
 
 msgid "Expected header line with the following columns:"
 msgstr "La première ligne doit avoir les noms de colonne suivants:"
-
-msgid "Map"
-msgstr "Carte"
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -2613,6 +2613,13 @@ msgstr ""
 msgid "Enable newsletter"
 msgstr "Activer la newsletter"
 
+msgid ""
+"Enables the newsletter module for admins and show a \"Subscribe to "
+"newsletter\" option for the users on the news page."
+msgstr ""
+"Active le module newsletter pour les administrateurs et affiche une option « "
+"S'abonner à la newsletter » pour les utilisateurs sur la page d'actualités."
+
 msgid "Allow secret content in newsletter"
 msgstr "Autoriser le contenu secret dans la newsletter"
 
@@ -3495,9 +3502,6 @@ msgstr "Vous pouvez republier un événement importé plus tard."
 
 msgid "Re-publish event"
 msgstr "Republier l'événement"
-
-msgid "Newsletter"
-msgstr "Newsletter"
 
 msgid "New"
 msgstr "Nouveau"
@@ -5042,8 +5046,8 @@ msgstr "Nouveau message du client dans le ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 

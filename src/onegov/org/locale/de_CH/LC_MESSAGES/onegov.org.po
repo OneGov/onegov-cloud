@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-02-10 14:27+0100\n"
+"POT-Creation-Date: 2026-02-18 16:10+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -278,6 +278,9 @@ msgstr "Formulare"
 
 msgid "Surveys"
 msgstr "Umfragen"
+
+msgid "Newsletter"
+msgstr "Newsletter"
 
 msgid "Management"
 msgstr "Verwaltung"
@@ -1035,9 +1038,6 @@ msgstr "Die Veranstaltungen werden nicht gespeichert."
 
 msgid "Expected header line with the following columns:"
 msgstr "Die erste Zeile soll folgende Spaltennamen haben:"
-
-msgid "Map"
-msgstr "Karte"
 
 msgid "Comment"
 msgstr "Kommentar"
@@ -2606,6 +2606,13 @@ msgstr ""
 msgid "Enable newsletter"
 msgstr "Newsletter aktivieren"
 
+msgid ""
+"Enables the newsletter module for admins and show a \"Subscribe to "
+"newsletter\" option for the users on the news page."
+msgstr ""
+"Aktiviert das Newsletter-Modul für Administratoren und zeigt den Benutzern "
+"auf der Nachrichtenseite die Option \"Newsletter abonnieren\" an."
+
 msgid "Allow secret content in newsletter"
 msgstr "Geheimen Inhalt im Newsletter erlauben"
 
@@ -3489,9 +3496,6 @@ msgstr "Sie können importierte Veranstaltungen später wieder veröffentlichen.
 
 msgid "Re-publish event"
 msgstr "Veranstaltung wieder veröffentlichen"
-
-msgid "Newsletter"
-msgstr "Newsletter"
 
 msgid "New"
 msgstr "Neu"
@@ -5037,8 +5041,8 @@ msgstr "Neue Kunden Nachricht in Ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -7841,6 +7845,13 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid ""
+#~ "Enables the newsletter module for admins and show a \"Subscribe to "
+#~ "newsletter\" option for the users on thenews page."
+#~ msgstr ""
+#~ "Aktiviert das Newsletter-Modul für Administratoren und zeigt den "
+#~ "Benutzern auf der News-Seite die Option \"Newsletter abonnieren\" an."
 
 #~ msgid "Political Parties"
 #~ msgstr "Parteien"

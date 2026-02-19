@@ -3,6 +3,7 @@ from __future__ import annotations
 from onegov.chat import MessageCollection, TextModuleCollection
 from onegov.core.elements import Link, LinkGroup
 from onegov.form.collection import FormCollection, SurveyCollection
+from onegov.newsletter import NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.models import (
     CitizenDashboard,
@@ -226,6 +227,16 @@ def get_global_tools(
                 attrs={'class': 'surveys'}
             )
         )
+
+        if request.app.org.show_newsletter:
+            links.append(
+                Link(
+                    _('Newsletter'),
+                    request.class_link(
+                        NewsletterCollection),
+                    attrs={'class': 'newsletter'}
+                )
+            )
 
         yield LinkGroup(_('Management'), classes=('management', ), links=links)
 

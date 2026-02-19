@@ -1470,6 +1470,9 @@ class NewsletterSettingsForm(Form):
 
     show_newsletter = BooleanField(
         label=_('Enable newsletter'),
+        description=_('Enables the newsletter module for admins and show a '
+                      '"Subscribe to newsletter" option for the users on the '
+                      'news page.'),
         default=False
     )
 
