@@ -65,7 +65,9 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     )
 
     #: the user owning the attendee
-    username: Mapped[str] = mapped_column(ForeignKey('users.username'))
+    username: Mapped[str] = mapped_column(
+        ForeignKey('users.username', onupdate='CASCADE')
+    )
 
     #: the name of the attendee (incl. first / lastname )
     name: Mapped[str]

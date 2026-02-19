@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from onegov.core.security import Secret
 
+from onegov.org.forms import ChangeUsernameForm, NewUserForm
 from onegov.org.views.usermanagement import (
     view_usermanagement, handle_create_signup_link, view_user,
-    handle_manage_user, get_manage_user_form, handle_new_user)
+    handle_manage_user, handle_change_username, get_manage_user_form,
+    handle_new_user)
 from onegov.town6 import TownApp
-from onegov.org.forms import NewUserForm
 from onegov.town6.layout import UserManagementLayout, UserLayout
 from onegov.user import User, UserCollection
 from onegov.user.forms import SignupLinkForm
@@ -71,6 +72,23 @@ def town_handle_manage_user(
     form: ManageUserForm
 ) -> RenderData | Response:
     return handle_manage_user(
+        self, request, form, UserManagementLayout(self, request))
+
+
+@TownApp.form(
+    model=User,
+    template='form.pt',
+    form=ChangeUsernameForm,
+    pass_model=True,
+    permission=Secret,
+    name='change-username'
+)
+def town_handle_change_username(
+    self: User,
+    request: TownRequest,
+    form: ChangeUsernameForm
+) -> RenderData | Response:
+    return handle_change_username(
         self, request, form, UserManagementLayout(self, request))
 
 

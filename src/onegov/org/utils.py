@@ -22,6 +22,7 @@ from markupsafe import escape, Markup
 from math import isclose
 from onegov.core.layout import Layout
 from onegov.core.mail import coerce_address
+from onegov.core.security import Secret
 from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
@@ -29,7 +30,7 @@ from onegov.org.models.search import Search
 from onegov.pay import InvoiceItemMeta, Price
 from onegov.reservation import Resource
 from onegov.ticket import Ticket, TicketCollection, TicketPermission
-from onegov.user import User, UserGroup
+from onegov.user import Auth, User, UserGroup
 from operator import add, attrgetter
 from sqlalchemy import case, nullsfirst
 from webob.exc import HTTPBadRequest
@@ -38,7 +39,8 @@ from webob.exc import HTTPBadRequest
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
-    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import (
+        Callable, Collection, Iterable, Iterator, Sequence)
     from libres.db.models import ReservationBlocker
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
@@ -1903,3 +1905,30 @@ def group_invoice_items(
             key=sort_key
         )
     }
+
+
+def can_change_username(
+    user: User,
+    request: OrgRequest,
+    configured_factors: Collection[str] | None = None
+) -> bool:
+    if not request.has_permission(user, Secret):
+        return False
+
+    if user.source:
+        return False
+
+    if user.role not in request.app.settings.user.change_username_roles:
+        return False
+
+    assert request.current_user is not None
+    second_factor = (request.current_user.second_factor or {}).get('type')
+    # NOTE: For now we only allow second factors that don't require multiple
+    #       steps, so we can do it all in a single form
+    if second_factor not in ('yubikey', 'totp'):
+        return False
+
+    if configured_factors is None:
+        configured_factors = Auth.from_request(request).factors
+
+    return second_factor in configured_factors

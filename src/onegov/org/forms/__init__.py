@@ -57,6 +57,7 @@ from onegov.org.forms.ticket import TicketAssignmentForm
 from onegov.org.forms.ticket import TicketChangeTagForm
 from onegov.org.forms.ticket import TicketChatMessageForm
 from onegov.org.forms.ticket import TicketNoteForm
+from onegov.org.forms.user import ChangeUsernameForm
 from onegov.org.forms.user import ManageUserForm
 from onegov.org.forms.user import ManageUserGroupForm
 from onegov.org.forms.user import NewUserForm
@@ -67,6 +68,7 @@ __all__ = (
     'AddReservationForm',
     'AllocationRuleForm',
     'AnalyticsSettingsForm',
+    'ChangeUsernameForm',
     'CitizenLoginForm',
     'ConfirmCitizenLoginForm',
     'CommissionForm',

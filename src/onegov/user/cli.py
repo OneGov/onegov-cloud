@@ -244,6 +244,58 @@ def list(
     return list_users
 
 
+@cli.command(name='change-username', context_settings={
+    'singular': True,
+    'skip_search_indexing': True
+})
+@click.argument('old_username')
+@click.argument('new_username')
+def change_username(
+    old_username: str,
+    new_username: str
+) -> Callable[[CoreRequest, Framework], None]:
+    """ Changes the password of the given username. """
+
+    # normalize the new_username, so we print back what we're
+    # actually going to store in the database
+    new_username = new_username.lower()
+
+    def change(request: CoreRequest, app: Framework) -> None:
+        users = UserCollection(app.session())
+
+        user = users.by_username(old_username)
+        if user is None:
+            abort(f'{old_username} does not exist')
+
+        if new_username.lower() == old_username:
+            abort(
+                'The old and new username are the same. '
+                'Usernames are case insensitive.'
+            )
+
+        if user.source:
+            abort('Users from an external user source cannot change username')
+
+        if user.role not in app.settings.user.change_username_roles:
+            abort(f'Users with role {user.role} cannot change username')
+
+        if users.exists(new_username):
+            abort(f'{new_username} already exists')
+
+        user.logout_all_sessions(request.app)
+        user.username = new_username
+
+        # Run application-specific callback
+        app.settings.user.change_username_callback(user, request)
+
+        click.secho(
+            f'{old_username} was changed to {new_username}',
+            fg='green'
+        )
+
+    return change
+
+
 @cli.command(name='change-password', context_settings={
     'singular': True,
     'skip_search_indexing': True
