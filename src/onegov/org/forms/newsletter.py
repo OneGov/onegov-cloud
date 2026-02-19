@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired
 from onegov.core.csv import convert_excel_to_csv, CSVFile
 from onegov.form.fields import UploadField
 from onegov.org.forms.fields import HtmlField
-from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import FileSizeLimit, MIME_TYPES_EXCEL
 from wtforms.fields import BooleanField
 from onegov.core.layout import Layout
 from onegov.file.utils import name_without_extension
@@ -357,19 +357,7 @@ class NewsletterSubscriberImportExportForm(Form):
             DataRequired(),
             FileSizeLimit(10 * 1024 * 1024)
         ],
-        allowed_mimetypes={
-            'application/excel',
-            'application/vnd.ms-excel',
-            (
-                'application/'
-                'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            ),
-            'application/vnd.ms-office',
-            'application/octet-stream',
-            'application/zip',
-            'text/csv',
-            'text/plain',
-        },
+        allowed_mimetypes=MIME_TYPES_EXCEL,
         render_kw={'force_simple': True}
     )
 
