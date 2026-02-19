@@ -442,7 +442,7 @@ def handle_file_upload(
         content=fs.file
     )
 
-    supported_content_types = self.supported_content_types  # type:ignore[attr-defined]
+    supported_content_types = getattr(self, 'supported_content_types', WhitelistedMimeType.whitelist)
 
     if supported_content_types != 'all':
         if file.reference.content_type not in supported_content_types:
