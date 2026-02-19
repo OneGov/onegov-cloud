@@ -40,7 +40,7 @@ from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 
 
-from typing import Generic, TYPE_CHECKING, Any
+from typing import Generic, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
