@@ -28,6 +28,12 @@ def get_global_tools(request: AgencyRequest) -> Iterator[Link | LinkGroup]:
                 attrs={'class': 'hidden-contents'}
             ))
 
+            item.links.append(Link(
+                _('Documentation'),
+                'https://docs.admin.digital',
+                attrs={'class': 'documentation'}
+            ))
+
         yield item
 
 

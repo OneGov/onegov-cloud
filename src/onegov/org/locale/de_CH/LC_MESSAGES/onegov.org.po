@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-02-10 14:27+0100\n"
+"POT-Creation-Date: 2026-02-20 10:50+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -278,6 +278,9 @@ msgstr "Formulare"
 
 msgid "Surveys"
 msgstr "Umfragen"
+
+msgid "Documentation"
+msgstr "Dokumentation"
 
 msgid "Management"
 msgstr "Verwaltung"
@@ -1035,9 +1038,6 @@ msgstr "Die Veranstaltungen werden nicht gespeichert."
 
 msgid "Expected header line with the following columns:"
 msgstr "Die erste Zeile soll folgende Spaltennamen haben:"
-
-msgid "Map"
-msgstr "Karte"
 
 msgid "Comment"
 msgstr "Kommentar"

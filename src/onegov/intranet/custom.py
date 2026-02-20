@@ -70,6 +70,11 @@ def get_global_tools(
                     Link(
                         _('Users'), request.class_link(UserCollection),
                         attrs={'class': 'user'}
+                    ),
+                    Link(
+                        _('Documentation'),
+                        'https://docs.admin.digital',
+                        attrs={'class': 'documentation'}
                     )
                 )
             )

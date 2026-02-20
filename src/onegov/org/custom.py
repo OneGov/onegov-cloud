@@ -227,6 +227,14 @@ def get_global_tools(
             )
         )
 
+        links.append(
+            Link(
+                _('Documentation'),
+                'https://docs.admin.digital',
+                attrs={'class': 'documentation'}
+            )
+        )
+
         yield LinkGroup(_('Management'), classes=('management', ), links=links)
 
     # Tickets

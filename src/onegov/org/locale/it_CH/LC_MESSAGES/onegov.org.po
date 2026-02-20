@@ -280,6 +280,9 @@ msgstr "Moduli"
 msgid "Surveys"
 msgstr "Sondaggi"
 
+msgid "Documentation"
+msgstr "Documentazione"
+
 msgid "Management"
 msgstr "Gestione"
 
