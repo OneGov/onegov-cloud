@@ -45,9 +45,18 @@ def import_votes_ech(
     if not delivery.vote_base_delivery:
         return [], set(), set()
 
+    errors = []
     vote_base_delivery = delivery.vote_base_delivery
     assert vote_base_delivery.polling_day is not None
     polling_day = vote_base_delivery.polling_day.to_date()
+
+    if polling_day.year not in principal.entities:
+        errors.append(
+            FileImportError(
+                _('Cannot import votes. '
+                  f'Year {polling_day.year} does not exist.'),
+            ))
+        return errors, set(), set()
     entities = principal.entities[polling_day.year]
 
     # extract vote and ballot structure
@@ -97,7 +106,6 @@ def import_votes_ech(
     deleted = {vote for vote in existing_votes if vote not in votes.values()}
 
     # update information and add results
-    errors = []
     for vote_info in vote_base_delivery.vote_info:
 
         # titles and domain

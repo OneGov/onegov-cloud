@@ -4,8 +4,8 @@ from datetime import date
 from onegov.election_day.models import Election
 from onegov.election_day.models import ProporzElection
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from tests.onegov.election_day.conftest import ImportTestDatasets
@@ -18,7 +18,17 @@ def test_import_ech_election_gr(
     # The datasets contain an election information and an election result
     # delivery for the SRW and NRW 2023
 
-    # initial import
+    results = import_test_datasets(
+        api_format='ech',
+        principal='gr',
+        dataset_name='elections-invalid-year'
+    )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
+    assert errors
+    assert (errors[0].error ==
+            'Cannot import election information. Year 2083 does not exist.')
+
     results = import_test_datasets(
         api_format='ech',
         principal='gr',
@@ -88,6 +98,17 @@ def test_import_ech_election_gr(
     assert not deleted
 
     # import of results
+    results = import_test_datasets(
+        api_format='ech',
+        principal='gr',
+        dataset_name='elections-results-invalid-year'
+    )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
+    assert errors
+    assert (errors[0].error ==
+            'Cannot import election results. Year 2083 does not exist.')
+
     results = import_test_datasets(
         api_format='ech',
         principal='gr',

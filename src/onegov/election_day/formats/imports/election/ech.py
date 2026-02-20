@@ -134,12 +134,19 @@ def import_information_delivery(
     """ Import an election information delivery. """
 
     assert delivery is not None
+    errors = set()
 
     # get polling date and entities
     assert delivery.polling_day is not None
     polling_day = delivery.polling_day.to_date()
-    entities = principal.entities[polling_day.year]
-    errors = set()
+    if polling_day.year not in principal.entities:
+        errors.add(
+            FileImportError(
+                _('Cannot import election information. '
+                  f'Year {polling_day.year} does not exist.'),
+            ))
+        return polling_day, [], [], set(), errors
+    entities = principal.entities[polling_day.year]  # tschupre
 
     # query existing compounds
     existing_compounds = session.query(ElectionCompound).filter(
@@ -385,6 +392,14 @@ def import_result_delivery(
     errors: set[FileImportError]
 ) -> None:
     """ Import an election result delivery. """
+
+    if polling_day.year not in principal.entities:
+        errors.add(
+            FileImportError(
+                _('Cannot import election results. '
+                  f'Year {polling_day.year} does not exist.'),
+            ))
+        return
 
     entities = principal.entities[polling_day.year]
 
