@@ -86,7 +86,19 @@ def view_upload_rest(
     errors: dict[str, list[FileImportError | str]] = {}
 
     form = request.get_form(UploadRestForm, model=self, csrf_support=False)
-    if not form.validate():
+    try:
+        valid = form.validate()
+    except TypeError:
+        valid = False
+
+        if (isinstance(form.type.data, str) and
+                form.type.data.startswith('FieldStorage')):
+            form.type.errors = [*form.type.errors, _(
+                'A file was submitted instead of a string. '
+                'Use --form "type=xml" instead of --form "type=@file"'
+            )]
+
+    if not valid:
         status_code = 400
         return {
             'status': 'error',
@@ -188,6 +200,8 @@ def view_upload_rest(
                 session,
                 request.app.default_locale
             )
+        else:
+            err = 'Invalid type. Valid are vote, election, parties and xml.'
         if err:
             errors.setdefault('results', []).extend(err)
 
