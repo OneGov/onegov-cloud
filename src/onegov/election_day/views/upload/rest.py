@@ -201,7 +201,10 @@ def view_upload_rest(
                 request.app.default_locale
             )
         else:
-            err = ['Invalid type. Valid are vote, election, parties and xml.']  # type: ignore[list-item]
+            raise AssertionError(
+                "Unexpected form.type.data; expected one of "
+                "'vote', 'election', 'parties', or 'xml'."
+            )
         if err:
             errors.setdefault('results', []).extend(err)
 
