@@ -24,6 +24,7 @@ from onegov.election_day.views.upload import set_locale
 from onegov.election_day.views.upload import translate_errors
 from onegov.election_day.views.upload import unsupported_year_error
 from sqlalchemy import or_
+from webob.compat import cgi_FieldStorage
 from webob.exc import HTTPUnauthorized
 
 
@@ -91,8 +92,7 @@ def view_upload_rest(
     except TypeError:
         valid = False
 
-        if (isinstance(form.type.data, str) and
-                form.type.data.startswith('FieldStorage')):
+        if isinstance(request.POST.get('type'), cgi_FieldStorage):
             form.type.errors = [*form.type.errors, _(
                 'A file was submitted instead of a string. '
                 'Use --form "type=xml" instead of --form "type=@file"'
