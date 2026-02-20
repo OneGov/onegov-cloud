@@ -201,7 +201,7 @@ def view_upload_rest(
                 request.app.default_locale
             )
         else:
-            err = 'Invalid type. Valid are vote, election, parties and xml.'
+            err = ['Invalid type. Valid are vote, election, parties and xml.']  # type: ignore[list-item]
         if err:
             errors.setdefault('results', []).extend(err)
 
