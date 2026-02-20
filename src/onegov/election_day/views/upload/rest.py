@@ -89,7 +89,7 @@ def view_upload_rest(
     form = request.get_form(UploadRestForm, model=self, csrf_support=False)
     try:
         valid = form.validate()
-    except TypeError:
+    except TypeError as ex:
         valid = False
 
         if isinstance(request.POST.get('type'), cgi_FieldStorage):
@@ -97,6 +97,14 @@ def view_upload_rest(
                 'A file was submitted instead of a string. '
                 'Use --form "type=xml" instead of --form "type=@file"'
             )]
+        else:
+            form.form_errors = [
+                *form.errors, f'Form validation type error: {ex}'
+            ]
+
+    except Exception as ex:
+        valid = False
+        form.form_errors = [*form.errors, f'Form validation error: {ex}']
 
     if not valid:
         status_code = 400
