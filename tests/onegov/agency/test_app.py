@@ -84,7 +84,8 @@ def test_app_custom(agency_app: AgencyApp) -> None:
         {'Account': ['User Profile', 'Logout']},
         {'Management': ['Overview', 'Timeline', 'Files', 'Images', 'Payments',
                         'Invoices', 'Text modules', 'Archived Tickets',
-                        'Forms', 'Surveys', 'Hidden contents']},
+                        'Forms', 'Surveys', 'Hidden contents',
+                        'Documentation']},
         {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
                      'Closed Tickets']}
     ]
@@ -96,7 +97,8 @@ def test_app_custom(agency_app: AgencyApp) -> None:
         {'Management': ['Overview', 'Timeline', 'Files', 'Images', 'Payments',
                         'Invoices', 'Text modules', 'Settings', 'Users',
                         'User groups', 'Link Check', 'Archived Tickets',
-                        'Forms', 'Surveys', 'Hidden contents']},
+                        'Forms', 'Surveys', 'Hidden contents',
+                        'Documentation']},
         {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
                      'Closed Tickets']}
     ]

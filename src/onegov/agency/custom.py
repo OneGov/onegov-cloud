@@ -22,16 +22,12 @@ def get_global_tools(request: AgencyRequest) -> Iterator[Link | LinkGroup]:
 
         if title == 'Management':
             assert isinstance(item.links, list)
-            item.links.append(Link(
+
+            # insert prio documenation, seoncd last
+            item.links.insert(-1, Link(
                 text=_('Hidden contents'),
                 url=request.class_link(Organisation, name='view-hidden'),
                 attrs={'class': 'hidden-contents'}
-            ))
-
-            item.links.append(Link(
-                _('Documentation'),
-                'https://docs.admin.digital',
-                attrs={'class': 'documentation'}
             ))
 
         yield item

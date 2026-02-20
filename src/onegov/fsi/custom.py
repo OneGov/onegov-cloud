@@ -89,13 +89,6 @@ def get_base_tools(request: FsiRequest) -> Iterator[Link | LinkGroup]:
                 )
             )
 
-            links.append(
-                Link(
-                    _('Documentation'),
-                    'https://docs.admin.digital',
-                    attrs={'class': 'documentation'}
-                )
-            )
         if request.is_admin:
             links.append(
                 Link(
@@ -126,6 +119,14 @@ def get_base_tools(request: FsiRequest) -> Iterator[Link | LinkGroup]:
                 )
             )
         if request.is_manager:
+            links.append(
+                Link(
+                    _('Documentation'),
+                    'https://docs.admin.digital',
+                    attrs={'class': 'documentation'}
+                )
+            )
+
             yield LinkGroup(_('Management'), classes=('management',),
                             links=links)
 
