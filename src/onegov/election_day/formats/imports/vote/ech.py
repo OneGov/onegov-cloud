@@ -53,8 +53,8 @@ def import_votes_ech(
     if polling_day.year not in principal.entities:
         errors.append(
             FileImportError(
-                _('Cannot import votes. '
-                  f'Year {polling_day.year} does not exist.'),
+                _('Cannot import votes. Year ${year} does not exist.',
+                  mapping={'year': polling_day.year})
             ))
         return errors, set(), set()
     entities = principal.entities[polling_day.year]

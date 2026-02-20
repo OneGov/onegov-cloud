@@ -143,7 +143,8 @@ def import_information_delivery(
         errors.add(
             FileImportError(
                 _('Cannot import election information. '
-                  f'Year {polling_day.year} does not exist.'),
+                  'Year ${year} does not exist.',
+                  mapping={'year': polling_day.year}),
             ))
         return polling_day, [], [], set(), errors
     entities = principal.entities[polling_day.year]  # tschupre
@@ -397,7 +398,8 @@ def import_result_delivery(
         errors.add(
             FileImportError(
                 _('Cannot import election results. '
-                  f'Year {polling_day.year} does not exist.'),
+                  'Year ${year} does not exist.',
+                  mapping={'year': polling_day.year}),
             ))
         return
 
