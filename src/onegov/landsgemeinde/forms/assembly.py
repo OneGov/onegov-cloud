@@ -7,8 +7,12 @@ from onegov.form.fields import PanelField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
-from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
+from onegov.form.validators import (
+    FileSizeLimit,
+    MIME_TYPES_PDF,
+    MIME_TYPES_AUDIO,
+    MIME_TYPES_ARCHIVE
+)
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import Assembly, LandsgemeindeFile
@@ -83,54 +87,54 @@ class AssemblyForm(NamedFileForm):
         label=_('Memorial part 1 (PDF)'),
         fieldset=_('Downloads'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=MIME_TYPES_PDF,
     )
 
     memorial_2_pdf = UploadField(
         label=_('Memorial part 2 (PDF)'),
         fieldset=_('Downloads'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=MIME_TYPES_PDF,
     )
 
     memorial_supplement_pdf = UploadField(
         label=_('Supplement to the memorial (PDF)'),
         fieldset=_('Downloads'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=MIME_TYPES_PDF,
     )
 
     protocol_pdf = UploadField(
         label=_('Protocol (PDF)'),
         fieldset=_('Downloads'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=MIME_TYPES_PDF,
     )
 
     audio_mp3 = UploadField(
         label=_('Audio (MP3)'),
         fieldset=_('Downloads'),
         validators=[
-            WhitelistedMimeType({'audio/mpeg'}),
             FileSizeLimit(600 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=MIME_TYPES_AUDIO
     )
 
     audio_zip = UploadField(
         label=_('Memorial as audio for the visually impaired and blind'),
         fieldset=_('Downloads'),
         validators=[
-            WhitelistedMimeType({'application/zip'}),
             FileSizeLimit(600 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=MIME_TYPES_ARCHIVE,
     )
 
     more_files = UploadMultipleFilesWithORMSupport(

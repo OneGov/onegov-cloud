@@ -24,6 +24,9 @@
                                     <th i18n:translate>
                                         Upload Date
                                     </th>
+                                    <th i18n:translate>
+                                        Published until
+                                    </th>
                                 </tr>
 
                                 <tbody class="upload-filelist"></tbody>

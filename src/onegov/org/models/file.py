@@ -12,6 +12,7 @@ from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
 from onegov.file import SearchableFile
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
+from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.utils import widest_access
@@ -314,7 +315,7 @@ class GeneralFileCollection(
     GroupFilesByDateMixin[GeneralFile]
 ):
 
-    supported_content_types = 'all'
+    supported_content_types = WhitelistedMimeType.whitelist
 
     file_list = as_selectable("""
         SELECT
