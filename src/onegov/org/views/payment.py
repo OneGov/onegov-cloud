@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
-    from onegov.pay.types import AnyPayableBase
+    from onegov.pay.types import AnyPayableBase, PaymentState
     from sqlalchemy.orm import Session
     from typing import type_check_only
     from webob import Response
@@ -292,6 +292,7 @@ def handle_batch_set(
                     #       two state transitions in one action, since it's
                     #       possible to mark the payment as paid without
                     #       marking the invoice as invoiced.
+                    target_state: PaymentState
                     target_state = 'invoiced' if invoice.invoiced else 'open'
                     if payment.state == 'paid':
                         payment.state = target_state

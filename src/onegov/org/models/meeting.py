@@ -1,35 +1,28 @@
 from __future__ import annotations
 
-import uuid
+from datetime import datetime
 from functools import cached_property
-
-from sqlalchemy import func
-from sqlalchemy.ext.hybrid import hybrid_property
-from sedate import utcnow
-
+from markupsafe import Markup
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import dict_property, content_property
-from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable
-from sqlalchemy import Column, Text
-from sqlalchemy.orm import relationship
+from sedate import utcnow
+from sqlalchemy import func
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 from typing import TYPE_CHECKING, Self
 if TYPE_CHECKING:
-    import uuid
-    from datetime import datetime
-    from markupsafe import Markup
-
+    from onegov.org.models import MeetingItem
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-
-    from onegov.org.models import MeetingItem
 
 
 class Meeting(
@@ -78,32 +71,27 @@ class Meeting(
         return self.title
 
     #: Internal ID
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
-        default=uuid.uuid4,
+        default=uuid4,
     )
 
     #: The title of the meeting
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: date and time of the meeting start
-    start_datetime: Column[datetime | None] = (
-        Column(UTCDateTime, nullable=True)
-    )
+    start_datetime: Mapped[datetime | None]
 
     #: date and time of the meeting end
-    end_datetime: Column[datetime | None] = (
-        Column(UTCDateTime, nullable=True)
-    )
+    end_datetime: Mapped[datetime | None]
 
     #: location address of meeting
-    address: Column[Markup] = Column(MarkupText, nullable=False)
+    address: Mapped[Markup]
 
-    description: Column[Markup | None] = Column(MarkupText, nullable=True)
+    description: Mapped[Markup | None]
 
     #: The meeting items
-    meeting_items: relationship[list[MeetingItem]] = (
+    meeting_items: Mapped[list[MeetingItem]] = (
         relationship(
             'MeetingItem',
             cascade='all, delete-orphan',

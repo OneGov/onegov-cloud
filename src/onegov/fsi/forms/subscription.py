@@ -167,6 +167,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
                     CourseEvent).join(CourseSubscription).filter(
                     CourseSubscription.attendee_id == self.attendee_id.data
                     ).order_by(desc(CourseEvent.start)).first()
+                assert last_subscribed_event is not None
                 assert isinstance(self.course_event_id.errors, list)
                 self.course_event_id.errors.append(
                     _('The selected course must take place at least 6 years '

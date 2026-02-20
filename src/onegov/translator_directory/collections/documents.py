@@ -4,6 +4,7 @@ from functools import cached_property
 from itertools import groupby
 
 from onegov.file import File, FileCollection
+from onegov.form.validators import WhitelistedMimeType
 from onegov.translator_directory.models.translator import Translator
 
 
@@ -29,7 +30,7 @@ DEFAULT_DOCUMENT_CATEGORIES = (
 
 class TranslatorDocumentCollection(FileCollection[File]):
 
-    supported_content_types = 'all'
+    supported_content_types = WhitelistedMimeType.whitelist
 
     def __init__(
         self,

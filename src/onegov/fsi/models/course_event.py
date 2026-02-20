@@ -8,17 +8,15 @@ from functools import cached_property
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from sedate import utcnow, to_timezone
-from sqlalchemy import (
-    Column, Boolean, SmallInteger, Enum, Text, Interval, ForeignKey, desc, or_,
-    and_)
+from sqlalchemy import desc, or_, and_, Enum, ForeignKey, SmallInteger
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship, object_session
-from uuid import uuid4
+from sqlalchemy.orm import mapped_column, object_session, relationship
+from sqlalchemy.orm import DynamicMapped, Mapped
+from uuid import uuid4, UUID
 
 from onegov.core.mail import Attachment
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi import _
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_subscription import CourseSubscription
@@ -28,10 +26,8 @@ from onegov.search import ORMSearchable
 
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterable, Iterator
     from markupsafe import Markup
-    from onegov.core.types import AppenderQuery
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Query
     from typing import Self, TypeAlias
@@ -42,10 +38,10 @@ if TYPE_CHECKING:
         ReminderTemplate, SubscriptionTemplate
     )
 
-    EventStatusType: TypeAlias = Literal[
-        'created', 'confirmed', 'canceled', 'planned'
-    ]
 
+EventStatusType: TypeAlias = Literal[
+    'created', 'confirmed', 'canceled', 'planned'
+]
 
 COURSE_EVENT_STATUSES: tuple[EventStatusType, ...] = (
     'created', 'confirmed', 'canceled', 'planned')
@@ -109,19 +105,13 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         'presenter_email': {'type': 'text', 'weight': 'A'},
     }
 
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
-    course_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('fsi_courses.id'),
-        nullable=False
-    )
-    course: relationship[Course] = relationship(
-        'Course',
+    course_id: Mapped[UUID] = mapped_column(ForeignKey('fsi_courses.id'))
+    course: Mapped[Course] = relationship(
         back_populates='events',
         lazy='joined'
     )
@@ -164,46 +154,39 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return to_timezone(self.end, 'Europe/Zurich')
 
     # Event specific information
-    location: Column[str] = Column(Text, nullable=False)
-    start: Column[datetime.datetime] = Column(UTCDateTime, nullable=False)
-    end: Column[datetime.datetime] = Column(UTCDateTime, nullable=False)
-    presenter_name: Column[str] = Column(Text, nullable=False)
-    presenter_company: Column[str] = Column(Text, nullable=False)
-    presenter_email: Column[str | None] = Column(Text)
-    min_attendees: Column[int] = Column(
+    location: Mapped[str]
+    start: Mapped[datetime.datetime]
+    end: Mapped[datetime.datetime]
+    presenter_name: Mapped[str]
+    presenter_company: Mapped[str]
+    presenter_email: Mapped[str | None]
+    min_attendees: Mapped[int] = mapped_column(
         SmallInteger,
-        nullable=False,
         default=1
     )
-    max_attendees: Column[int | None] = Column(SmallInteger, nullable=True)
+    max_attendees: Mapped[int | None] = mapped_column(SmallInteger)
 
-    status: Column[EventStatusType] = Column(
-        Enum(  # type:ignore[arg-type]
-            *COURSE_EVENT_STATUSES, name='status'
-        ),
-        nullable=False, default='created')
+    status: Mapped[EventStatusType] = mapped_column(
+        Enum(*COURSE_EVENT_STATUSES, name='status'),
+        default='created'
+    )
 
-    attendees: relationship[AppenderQuery[CourseAttendee]] = relationship(
-        CourseAttendee,
+    attendees: DynamicMapped[CourseAttendee] = relationship(
         secondary=subscription_table,
         primaryjoin=id == subscription_table.c.course_event_id,
         secondaryjoin=subscription_table.c.attendee_id == CourseAttendee.id,
-        lazy='dynamic',
-        overlaps='course_event,attendee,subscriptions'  # type: ignore[call-arg]
+        overlaps='course_event,attendee,subscriptions'
     )
 
-    subscriptions: relationship[AppenderQuery[CourseSubscription]] = (
+    subscriptions: DynamicMapped[CourseSubscription] = (
         relationship(
-            'CourseSubscription',
             back_populates='course_event',
-            lazy='dynamic',
             cascade='all, delete-orphan',
         )
     )
 
-    notification_templates: relationship[list[CourseNotificationTemplate]] = (
+    notification_templates: Mapped[list[CourseNotificationTemplate]] = (
         relationship(
-            'CourseNotificationTemplate',
             back_populates='course_event',
             cascade='all, delete-orphan',
         )
@@ -211,46 +194,32 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     # The associated notification templates
     # FIXME: Are some of these optional?
-    info_template: relationship[InfoTemplate] = relationship(
-        'InfoTemplate',
-        uselist=False,
-        overlaps='notification_templates'  # type: ignore[call-arg]
+    info_template: Mapped[InfoTemplate] = relationship(
+        overlaps='notification_templates'
     )
-    reservation_template: relationship[SubscriptionTemplate] = relationship(
-        'SubscriptionTemplate',
-        uselist=False,
-        overlaps='notification_templates'  # type: ignore[call-arg]
+    reservation_template: Mapped[SubscriptionTemplate] = relationship(
+        overlaps='notification_templates'
     )
-    cancellation_template: relationship[CancellationTemplate] = relationship(
-        'CancellationTemplate',
-        uselist=False,
-        overlaps='notification_templates'  # type: ignore[call-arg]
+    cancellation_template: Mapped[CancellationTemplate] = relationship(
+        overlaps='notification_templates'
     )
-    reminder_template: relationship[ReminderTemplate] = relationship(
-        'ReminderTemplate',
-        uselist=False,
-        overlaps='notification_templates'  # type: ignore[call-arg]
+    reminder_template: Mapped[ReminderTemplate] = relationship(
+        overlaps='notification_templates'
     )
 
     # hides for members/editors
-    hidden_from_public: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    hidden_from_public: Mapped[bool] = mapped_column(default=False)
 
     # to a locked event, only an admin can place subscriptions
     # FIXME: Is this intentionally nullable?
-    locked_for_subscriptions: Column[bool | None] = Column(
-        Boolean,
+    locked_for_subscriptions: Mapped[bool | None] = mapped_column(
         default=False
     )
 
     # when before course start schedule reminder email
-    schedule_reminder_before: Column[datetime.timedelta] = Column(
-        Interval,
-        nullable=False,
-        default=default_reminder_before)
+    schedule_reminder_before: Mapped[datetime.timedelta] = mapped_column(
+        default=default_reminder_before
+    )
 
     @property
     def description_html(self) -> Markup:
@@ -329,7 +298,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def duplicate(self) -> Self:
         return self.__class__(**self.duplicate_dict)
 
-    def has_reservation(self, attendee_id: uuid.UUID) -> bool:
+    def has_reservation(self, attendee_id: UUID) -> bool:
         return self.subscriptions.filter_by(
             attendee_id=attendee_id).first() is not None
 
@@ -339,7 +308,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         year: int | None = None,
         as_uids: Literal[True] = True,
         exclude_inactive: bool = True
-    ) -> Query[tuple[uuid.UUID]]: ...
+    ) -> Query[tuple[UUID]]: ...
 
     @overload
     def excluded_subscribers(
@@ -364,19 +333,20 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         year: int | None,
         as_uids: bool,
         exclude_inactive: bool = True
-    ) -> Query[tuple[uuid.UUID]] | Query[CourseAttendee]: ...
+    ) -> Query[tuple[UUID]] | Query[CourseAttendee]: ...
 
     def excluded_subscribers(
         self,
         year: int | None = None,
         as_uids: bool = True,
         exclude_inactive: bool = True
-    ) -> Query[tuple[uuid.UUID]] | Query[CourseAttendee]:
+    ) -> Query[tuple[UUID]] | Query[CourseAttendee]:
         """
         Returns a list of attendees / names tuple of UIDS
         of attendees that have booked one of the events of a course in
         the given year."""
         session = object_session(self)
+        assert session is not None
 
         excl = session.query(CourseAttendee.id if as_uids else CourseAttendee)
         excl = excl.join(CourseSubscription).join(CourseEvent)
@@ -423,7 +393,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         as_uids: Literal[True],
         exclude_inactive: bool = True,
         auth_attendee: CourseAttendee | None = None
-    ) -> Query[tuple[uuid.UUID]]: ...
+    ) -> Query[tuple[UUID]]: ...
 
     @overload
     def possible_subscribers(
@@ -434,7 +404,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         as_uids: Literal[True],
         exclude_inactive: bool = True,
         auth_attendee: CourseAttendee | None = None
-    ) -> Query[tuple[uuid.UUID]]: ...
+    ) -> Query[tuple[UUID]]: ...
 
     def possible_subscribers(
         self,
@@ -443,14 +413,15 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         as_uids: bool = False,
         exclude_inactive: bool = True,
         auth_attendee: CourseAttendee | None = None
-    ) -> Query[tuple[uuid.UUID]] | Query[CourseAttendee]:
+    ) -> Query[tuple[UUID]] | Query[CourseAttendee]:
         """Returns the list of possible bookers. Attendees that already have
         a subscription for the parent course in the same year are excluded."""
         session = object_session(self)
+        assert session is not None
 
         excluded = (
             self.excluded_subscribers(year, exclude_inactive)
-            .scalar_subquery()  # type: ignore[union-attr]
+            .scalar_subquery()
         )
 
         # Use this because its less costly
@@ -511,7 +482,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     def can_book(
         self,
-        attendee_or_id: CourseAttendee | uuid.UUID | str,
+        attendee_or_id: CourseAttendee | UUID | str,
         year: int | None = None
     ) -> bool:
 
@@ -523,8 +494,12 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
                 return False
         return True
 
-    def exceeds_six_year_limit(self, attendee_id: str | UUID,
-                               request: FsiRequest) -> bool:
+    def exceeds_six_year_limit(
+        self,
+        attendee_id: str | UUID,
+        request: FsiRequest
+    ) -> bool:
+
         last_subscribed_event = request.session.query(
             CourseEvent).join(CourseSubscription).filter(
             CourseSubscription.attendee_id == attendee_id

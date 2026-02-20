@@ -225,7 +225,7 @@ def test_long_filenames_are_truncated(election_day_app_zg: TestApp) -> None:
         name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
     )
     target = ArchivedResult()
-    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
 
     archive_generator = ArchiveGenerator(election_day_app_zg)

@@ -4,21 +4,21 @@ from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.event.models.mixins import OccurrenceMixin
 from onegov.gis import Coordinates
 from pytz import UTC
 from sedate import to_timezone
 from sedate import utcnow
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
+from uuid import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from onegov.event.models import Event
 
 
@@ -28,23 +28,14 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
     __tablename__ = 'event_occurrences'
 
     #: Internal number of the occurence
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type: ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: Event this occurrence belongs to
-    event_id: Column[uuid.UUID] = Column(
-        UUID,  # type: ignore[arg-type]
-        ForeignKey('events.id'),
-        nullable=False
-    )
-
-    event: relationship[Event] = relationship(
-        'Event',
-        back_populates='occurrences',
-    )
+    event_id: Mapped[UUID] = mapped_column(ForeignKey('events.id'))
+    event: Mapped[Event] = relationship(back_populates='occurrences')
 
     def as_ical(self, url: str | None = None) -> bytes:
         """ Returns the occurrence as iCalendar string. """

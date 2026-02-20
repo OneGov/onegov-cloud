@@ -8,14 +8,14 @@ from __future__ import annotations
 from depot.io.utils import FileIntent
 from io import BytesIO
 from onegov.core.crypto import random_token
-from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import dictionary_to_binary
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormDefinitionCollection
 from onegov.form import FormFile
 from onegov.form import FormSubmission
-from sqlalchemy import Column, Integer, Text, text
+from sqlalchemy import Column, Integer, Text, UUID, text
 from sqlalchemy.engine.reflection import Inspector
 
 
@@ -67,7 +67,7 @@ def migrate_form_submission_files_to_onegov_file(
         submission_id, field_id, filedata = row
         submission = submissions[submission_id]
 
-        replacement = FormFile(  # type:ignore[misc]
+        replacement = FormFile(
             id=random_token(),
             name=submission.data[field_id]['filename'],
             note=field_id,
@@ -177,7 +177,7 @@ def add_title_to_submission_windows(context: UpgradeContext) -> None:
                 Text,
                 nullable=True
             ),
-            default=None
+            default=None  # type: ignore[arg-type]
         )
 
 

@@ -122,7 +122,7 @@ def newsletter_news_by_access(
     access_levels = ORDERED_ACCESS[ORDERED_ACCESS.index(access):]
 
     query = request.session.query(News)
-    query = query.filter(News.access.in_(access_levels))  # type: ignore
+    query = query.filter(News.access.in_(access_levels))
     query = query.filter(News.published == True)
     query = query.order_by(News.created.desc())
     query = query.options(undefer(News.created))

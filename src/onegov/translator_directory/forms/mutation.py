@@ -12,11 +12,10 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TagsField
 from onegov.form.fields import UploadField
-from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import FileSizeLimit, MIME_TYPES_PDF
 from onegov.form.validators import Stdnum
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.validators import ValidSwissSocialSecurityNumber
-from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import Coordinates
 from onegov.gis import CoordinatesField
 from onegov.translator_directory import _
@@ -218,7 +217,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
             name = self.request.translate(field.label.text)
             name = name.replace(' (PDF)', '')
             if field.data:
-                return File(  # type:ignore[misc]
+                return File(
                     id=random_token(),
                     name=f'{name}.pdf',
                     note=category,
@@ -256,10 +255,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     declaration_of_authorization = UploadField(
         label=_('Signed declaration of authorization (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             Optional(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents'),
     )
@@ -267,10 +266,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     letter_of_motivation = UploadField(
         label=_('Short letter of motivation (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             Optional(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents'),
     )
@@ -278,10 +277,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     resume = UploadField(
         label=_('Resume (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             Optional(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents'),
     )
@@ -293,10 +292,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
             'level C2 are mandatory for non-native speakers.'
         ),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             Optional(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents'),
     )
@@ -304,10 +303,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     social_security_card = UploadField(
         label=_('Social security card (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             Optional(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents'),
     )
@@ -315,10 +314,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     passport = UploadField(
         label=_('Identity card, passport or foreigner identity card (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             Optional(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents'),
     )
@@ -326,10 +325,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     passport_photo = UploadField(
         label=_('Current passport photo (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             Optional(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents'),
     )
@@ -338,10 +337,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         label=_('Current extract from the debt collection register (PDF)'),
         description=_('Maximum 6 months since issue.'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             Optional(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents'),
     )
@@ -353,10 +352,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
             'www.strafregister.admin.ch'
         ),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             Optional(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents'),
     )
@@ -365,10 +364,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         label=_('Certificate of Capability (PDF)'),
         description=_('Available from the municipal or city administration.'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             Optional(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents'),
     )
@@ -379,10 +378,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
             'self-employment'
         ),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             Optional(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents'),
     )

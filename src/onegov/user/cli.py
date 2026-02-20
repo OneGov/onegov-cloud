@@ -16,7 +16,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
-    from sqlalchemy.orm import Query
 
 
 cli = command_group()
@@ -220,14 +219,13 @@ def list(
 
     def list_users(request: CoreRequest, app: Framework) -> None:
 
-        users: Query[tuple[str, str, bool, str | None]]
         users = UserCollection(app.session()).query().with_entities(
             User.username, User.role, User.active, User.source
         )
         users = users.order_by(User.username, User.role)
 
         click.echo(f'{app.schema}:')
-        for username, role, active, source in users.all():
+        for username, role, active, source in users.tuples():
             if active_only and not active:
                 continue
 

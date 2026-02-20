@@ -12,18 +12,20 @@ from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
 from onegov.file import SearchableFile
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
+from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
 from operator import attrgetter, itemgetter
 from sedate import standardize_date, utcnow
-from sqlalchemy import asc, desc, select, nullslast  # type: ignore
+from sqlalchemy import asc, desc, select, nullslast
 
 from typing import (
     overload, Any, Generic, Literal, NamedTuple, TypeVar, TYPE_CHECKING)
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
+    from sqlalchemy.engine import Result
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import Select
     from typing import Self
@@ -313,7 +315,7 @@ class GeneralFileCollection(
     GroupFilesByDateMixin[GeneralFile]
 ):
 
-    supported_content_types = 'all'
+    supported_content_types = WhitelistedMimeType.whitelist
 
     file_list = as_selectable("""
         SELECT
@@ -346,7 +348,7 @@ class GeneralFileCollection(
         return tuple(self.get_date_intervals(today=sedate.utcnow()))
 
     @property
-    def statement(self) -> Select:
+    def statement(self) -> Select[FileRow]:
         stmt = select(*self.file_list.c)
 
         if self.order_by == 'name':
@@ -363,7 +365,7 @@ class GeneralFileCollection(
         return stmt.order_by(nullslast(direction(order)))
 
     @property
-    def files(self) -> Query[FileRow]:
+    def files(self) -> Result[FileRow]:
         return self.session.execute(self.statement)
 
     def group(self, record: FileRow) -> str:

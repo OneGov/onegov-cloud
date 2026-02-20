@@ -529,7 +529,7 @@ def import_result_delivery(
                 for panachage_result in candidate.panachage_results:
                     source = panachage_result.list
                     target = panachage_result.candidate.list
-                    if source == target:
+                    if target is None or source == target:
                         continue
                     list_panachage.setdefault(target, {})
                     list_panachage[target].setdefault(source, 0)

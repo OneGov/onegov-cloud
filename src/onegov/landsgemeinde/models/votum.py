@@ -4,38 +4,38 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.mixins import TimestampedVideoMixin
 from onegov.landsgemeinde.observer import observes
 from onegov.search import ORMSearchable
-from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.orm.attributes import set_committed_value
 from uuid import uuid4
+from uuid import UUID
 
 
+from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from datetime import date as date_t, datetime
+    from datetime import date as date_t
+    from datetime import datetime
     from onegov.file import File
     from onegov.landsgemeinde.models import AgendaItem
     from onegov.landsgemeinde.models import Assembly
     from translationstring import TranslationString
-    from typing import Literal
     from typing import TypeAlias
 
-    VotumState: TypeAlias = Literal[
-        'draft', 'scheduled', 'ongoing', 'completed']
 
+VotumState: TypeAlias = Literal[
+    'draft', 'scheduled', 'ongoing', 'completed'
+]
 
 STATES: dict[VotumState, TranslationString] = {
     'draft': _('draft'),
@@ -89,20 +89,18 @@ class Votum(
             )
 
     #: the internal id of the votum
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the state of the votum
-    state: Column[VotumState] = Column(
-        Enum(*STATES.keys(), name='votum_item_state'),  # type:ignore[arg-type]
-        nullable=False
+    state: Mapped[VotumState] = mapped_column(
+        Enum(*STATES.keys(), name='votum_item_state')
     )
 
     #: the external id of the agenda item
-    number: Column[int] = Column(Integer, nullable=False)
+    number: Mapped[int]
 
     #: The main text of the votum
     text = dict_markup_property('content')
@@ -114,38 +112,30 @@ class Votum(
     statement_of_reasons = dict_markup_property('content')
 
     #: The name of the person
-    person_name: Column[str | None] = Column(Text, nullable=True)
+    person_name: Mapped[str | None]
 
     #: The function of the person
-    person_function: Column[str | None] = Column(Text, nullable=True)
+    person_function: Mapped[str | None]
 
     #: The place of the person
-    person_place: Column[str | None] = Column(Text, nullable=True)
+    person_place: Mapped[str | None]
 
     #: The political affiliation of the person (party or parliamentary group)
-    person_political_affiliation: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    person_political_affiliation: Mapped[str | None]
 
     #: A picture of the person
-    person_picture: Column[str | None] = Column(Text, nullable=True)
+    person_picture: Mapped[str | None]
 
     #: the agenda this votum belongs to
-    agenda_item_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    agenda_item_id: Mapped[UUID] = mapped_column(
         ForeignKey(
             'landsgemeinde_agenda_items.id',
             onupdate='CASCADE',
             ondelete='CASCADE'
-        ),
-        nullable=False
+        )
     )
 
-    agenda_item: relationship[AgendaItem] = relationship(
-        'AgendaItem',
-        back_populates='vota',
-    )
+    agenda_item: Mapped[AgendaItem] = relationship(back_populates='vota')
 
     @property
     def date(self) -> date_t:

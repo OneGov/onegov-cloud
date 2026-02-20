@@ -10,7 +10,6 @@ from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import ValidPhoneNumber
-from onegov.form.validators import WhitelistedMimeType
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
 from wtforms.validators import DataRequired
@@ -121,8 +120,8 @@ class SubscribersCleanupForm(Form):
         label=_('File'),
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True},
     )

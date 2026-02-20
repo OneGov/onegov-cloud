@@ -3,19 +3,18 @@ from __future__ import annotations
 from onegov.core.collection import Pagination
 from onegov.core.orm.utils import QueryChain
 from onegov.pay import Payment
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 
 from typing import overload, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.orm import Base
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import DeclarativeBase, Session
     from typing import Self
 
 
-# FIXME: This should be Intersection[Base, Payable] once this feature
-#        gets added to typing_extensions
-_P = TypeVar('_P', bound='Base')
+# FIXME: This should be Intersection[DeclarativeBase, Payable] once this
+#        feature gets added to typing_extensions
+_P = TypeVar('_P', bound='DeclarativeBase')
 
 
 class PayableCollection(Pagination[_P]):
@@ -39,7 +38,7 @@ class PayableCollection(Pagination[_P]):
 
     @overload
     def __init__(
-        self: PayableCollection[Base],
+        self: PayableCollection[DeclarativeBase],
         session: Session,
         cls: Literal['*'] = '*',
         page: int = 0
@@ -64,7 +63,7 @@ class PayableCollection(Pagination[_P]):
         ) -> QueryChain[_P]: ...
 
     @property
-    def classes(self) -> tuple[type[Base], ...]:
+    def classes(self) -> tuple[type[DeclarativeBase], ...]:
         if self.cls != '*':
             return (self.cls, )
 
@@ -73,8 +72,10 @@ class PayableCollection(Pagination[_P]):
 
     def query(self) -> QueryChain[_P]:
         return QueryChain(tuple(
-            self.session.query(cls).options(
-                joinedload(cls.payment)  # type:ignore[attr-defined]
+            self.session.query(cls).options(  # type: ignore[misc]
+                joinedload(cls.payment)
+                if hasattr(cls, 'payment') else
+                selectinload(cls.payments)  # type: ignore[attr-defined]
             )
             for cls in self.classes
         ))

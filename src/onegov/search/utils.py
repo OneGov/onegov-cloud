@@ -12,9 +12,8 @@ from typing import Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from lingua import ConfidenceValue
-    from onegov.core.orm import Base
     from onegov.search.mixins import Searchable
-    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import DeclarativeBase, Query
 
 
 T = TypeVar('T')
@@ -63,14 +62,15 @@ def searchable_sqlalchemy_models(
 
 
 def get_polymorphic_base(
-    model: type[Searchable]
-) -> type[Base | Searchable]:
+    model: type[DeclarativeBase | Searchable]
+) -> type[DeclarativeBase | Searchable]:
     """
     Filter out models that are polymorphic subclasses of other
     models in order to save on queries.
 
     """
     mapper = inspect(model)
+    assert mapper is not None
     if mapper.polymorphic_on is None:
         return model
     return mapper.base_mapper.class_

@@ -3,33 +3,26 @@ from __future__ import annotations
 import sedate
 
 from datetime import date, datetime
+from decimal import Decimal
 from onegov.activity.models.age_barrier import AgeBarrier
 from onegov.activity.models.booking import Booking
 from onegov.activity.models.occasion import Occasion
 from onegov.core.custom import msgpack
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID, JSON
-from sqlalchemy import Boolean
 from sqlalchemy import desc, not_, distinct
 from sqlalchemy import CheckConstraint
 from sqlalchemy import column
-from sqlalchemy import Column
-from sqlalchemy import Date
 from sqlalchemy import Index
-from sqlalchemy import Integer
 from sqlalchemy import Numeric
-from sqlalchemy import Text
-from sqlalchemy.orm import object_session, relationship, joinedload, defer
-from sqlalchemy.orm import validates
-from uuid import uuid4
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from sqlalchemy.orm import defer, joinedload, object_session, validates
+from uuid import uuid4, UUID
 
 
 from typing import Any, ClassVar, NamedTuple, NoReturn, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterator
-    from decimal import Decimal
     from onegov.activity.matching.score import Scoring
     from onegov.activity.models import BookingPeriodInvoice, PublicationRequest
     from sqlalchemy.orm import Session
@@ -44,29 +37,29 @@ class BookingPeriodMixin:
     if TYPE_CHECKING:
         # forward declare required attributes
         @property
-        def active(self) -> Column[bool] | bool: ...
+        def active(self) -> Mapped[bool] | bool: ...
         @property
-        def confirmed(self) -> Column[bool] | bool: ...
+        def confirmed(self) -> Mapped[bool] | bool: ...
         @property
-        def finalized(self) -> Column[bool] | bool: ...
+        def finalized(self) -> Mapped[bool] | bool: ...
         @property
-        def prebooking_start(self) -> Column[date] | date: ...
+        def prebooking_start(self) -> Mapped[date] | date: ...
         @property
-        def prebooking_end(self) -> Column[date] | date: ...
+        def prebooking_end(self) -> Mapped[date] | date: ...
         @property
-        def booking_start(self) -> Column[date] | date: ...
+        def booking_start(self) -> Mapped[date] | date: ...
         @property
-        def booking_end(self) -> Column[date] | date: ...
+        def booking_end(self) -> Mapped[date] | date: ...
         @property
-        def execution_start(self) -> Column[date] | date: ...
+        def execution_start(self) -> Mapped[date] | date: ...
         @property
-        def execution_end(self) -> Column[date] | date: ...
+        def execution_end(self) -> Mapped[date] | date: ...
         @property
-        def book_finalized(self) -> Column[bool] | bool: ...
+        def book_finalized(self) -> Mapped[bool] | bool: ...
         @property
         def max_bookings_per_attendee(
             self
-        ) -> Column[int | None] | int | None: ...
+        ) -> Mapped[int | None] | int | None: ...
 
     def as_local_datetime(
         self,
@@ -216,7 +209,7 @@ class BookingPeriodMixin:
 
 
 class _BookinPeriodMeta(NamedTuple):
-    id: uuid.UUID
+    id: UUID
     title: str
     active: bool
     confirmed: bool
@@ -255,7 +248,7 @@ class BookingPeriodMeta(_BookinPeriodMeta, BookingPeriodMixin):
     #       the many redundant calls to `phase`.
 
     def materialize(self, session: Session) -> BookingPeriod:
-        period = session.get(BookingPeriod, self.id)  # type: ignore[attr-defined]
+        period = session.get(BookingPeriod, self.id)
         assert period is not None
         return period
 
@@ -273,96 +266,79 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
     __tablename__ = 'periods'
 
     #: The public id of this period
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The public title of this period
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: Only one period is active at a time
-    active: Column[bool] = Column(Boolean, nullable=False, default=False)
+    active: Mapped[bool] = mapped_column(default=False)
 
     #: A confirmed period may not be automatically matched anymore and all
     #: booking changes to it are communicated to the customer
-    confirmed: Column[bool] = Column(Boolean, nullable=False, default=False)
+    confirmed: Mapped[bool] = mapped_column(default=False)
 
     #: A confirmable period has a prebooking phase, while an unconfirmable
     # booking does not. An unconfirmable booking starts as `confirmed` for
     # legacy reasons (even though it doesn't sound sane to have an
     # unconfirmable period that is confirmed).
-    confirmable: Column[bool] = Column(Boolean, nullable=False, default=True)
+    confirmable: Mapped[bool] = mapped_column(default=True)
 
     #: A finalized period may not have any change in bookings anymore
-    finalized: Column[bool] = Column(Boolean, nullable=False, default=False)
+    finalized: Mapped[bool] = mapped_column(default=False)
 
     #: A finalizable period may have invoices associated with it, an
     #: unfinalizable period may not
-    finalizable: Column[bool] = Column(Boolean, nullable=False, default=True)
+    finalizable: Mapped[bool] = mapped_column(default=True)
 
     #: An archived period has been entirely completed
-    archived: Column[bool] = Column(Boolean, nullable=False, default=False)
+    archived: Mapped[bool] = mapped_column(default=False)
 
     #: Start of the wishlist-phase
-    prebooking_start: Column[date] = Column(Date, nullable=False)
+    prebooking_start: Mapped[date]
 
     #: End of the wishlist-phase
-    prebooking_end: Column[date] = Column(Date, nullable=False)
+    prebooking_end: Mapped[date]
 
     #: Start of the booking-phase
-    booking_start: Column[date] = Column(Date, nullable=False)
+    booking_start: Mapped[date]
 
     #: End of the booking-phase
-    booking_end: Column[date] = Column(Date, nullable=False)
+    booking_end: Mapped[date]
 
     #: Date of the earliest possible occasion start of this period
-    execution_start: Column[date] = Column(Date, nullable=False)
+    execution_start: Mapped[date]
 
     #: Date of the latest possible occasion end of this period
-    execution_end: Column[date] = Column(Date, nullable=False)
+    execution_end: Mapped[date]
 
     #: Extra data stored on the period
-    data: Column[dict[str, Any]] = Column(JSON, nullable=False, default=dict)
+    data: Mapped[dict[str, Any]] = mapped_column(default=dict)
 
     #: Maximum number of bookings per attendee
-    max_bookings_per_attendee: Column[int | None] = Column(
-        Integer,
-        nullable=True
-    )
+    max_bookings_per_attendee: Mapped[int | None]
 
     #: Base cost for one or many bookings
-    booking_cost: Column[Decimal | None] = Column(
-        Numeric(precision=8, scale=2),
-        nullable=True
+    booking_cost: Mapped[Decimal | None] = mapped_column(
+        Numeric(precision=8, scale=2)
     )
 
     #: True if the booking cost is meant for all bookings in a period
     #: or for each single booking
-    all_inclusive: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    all_inclusive: Mapped[bool] = mapped_column(default=False)
 
     #: True if the costs of an occasions need to be paid to the organiser
-    pay_organiser_directly: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    pay_organiser_directly: Mapped[bool] = mapped_column(default=False)
 
     #: Time between bookings in minutes
-    minutes_between: Column[int | None] = Column(
-        Integer,
-        nullable=True,
-        default=0
-    )
+    minutes_between: Mapped[int | None] = mapped_column(default=0)
 
     #: The alignment of bookings in the matching
     # FIXME: Restrict this to what is actually allowed i.e. Literal['day', ...]
-    alignment: Column[str | None] = Column(Text, nullable=True)
+    alignment: Mapped[str | None]
 
     #: Deadline for booking occasions. A deadline of 3 means that 3 days before
     #: an occasion is set to start, bookings are disabled.
@@ -373,31 +349,23 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
     #: Also, if deadline_days is None, bookings can't be created in a
     #: finalized period either, as deadline_days is a prerequisite for the
     #: book_finalized setting.
-    deadline_days: Column[int | None] = Column(Integer, nullable=True)
+    deadline_days: Mapped[int | None]
 
     #: True if bookings can be created by normal users in finalized periods.
     #: The deadline_days are still applied for these normal users.
     #: Admins can always create bookings during any time, deadline_days and
     #: book_finalized are ignored.
-    book_finalized: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    book_finalized: Mapped[bool] = mapped_column(default=False)
 
     #: Date after which no bookings can be canceled by a mere member
-    cancellation_date: Column[date | None] = Column(Date, nullable=True)
+    cancellation_date: Mapped[date | None]
 
     #: Days between the occasion and the cancellation (an alternative to
     #: the cancellation_date)
-    cancellation_days: Column[int | None] = Column(Integer, nullable=True)
+    cancellation_days: Mapped[int | None]
 
     #: The age barrier implementation in use
-    age_barrier_type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default='exact'
-    )
+    age_barrier_type: Mapped[str] = mapped_column(default='exact')
 
     __table_args__ = (
         CheckConstraint((
@@ -424,28 +392,22 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
     )
 
     #: The occasions linked to this period
-    occasions: relationship[list[Occasion]] = relationship(
-        'Occasion',
+    occasions: Mapped[list[Occasion]] = relationship(
         order_by='Occasion.order',
         back_populates='period'
     )
 
     #: The bookings linked to this period
-    bookings: relationship[list[Booking]] = relationship(
-        'Booking',
+    bookings: Mapped[list[Booking]] = relationship(
         back_populates='period'
     )
 
-    invoices: relationship[list[BookingPeriodInvoice]] = relationship(
-        'BookingPeriodInvoice',
+    invoices: Mapped[list[BookingPeriodInvoice]] = relationship(
         back_populates='period'
     )
 
-    publication_requests: relationship[list[PublicationRequest]] = (
-        relationship(
-            'PublicationRequest',
-            back_populates='period'
-        )
+    publication_requests: Mapped[list[PublicationRequest]] = relationship(
+        back_populates='period'
     )
 
     @validates('age_barrier_type')
@@ -472,6 +434,7 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
             return
 
         session = object_session(self)
+        assert session is not None
         model = self.__class__
 
         active_period = (
@@ -503,10 +466,13 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
 
         self.confirmed = True
 
+        session = object_session(self)
+        assert session is not None
+
         # open bookings are marked as denied during completion
         # and the booking costs are copied over permanently (so they can't
         # change anymore)
-        b = object_session(self).query(Booking)
+        b = session.query(Booking)
         b = b.filter(Booking.period_id == self.id)
         b = b.options(joinedload(Booking.occasion))
         b = b.options(
@@ -534,8 +500,9 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
         self.active = False
 
         session = object_session(self)
+        assert session is not None
 
-        def future_periods() -> Iterator[uuid.UUID]:
+        def future_periods() -> Iterator[UUID]:
             p = session.query(BookingPeriod)
             p = p.order_by(desc(BookingPeriod.execution_start))
             p = p.with_entities(BookingPeriod.id)
@@ -593,9 +560,12 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
         # circular import
         from onegov.activity.matching.score import Scoring
 
+        session = object_session(self)
+        assert session is not None
         return Scoring.from_settings(
             settings=self.data.get('match-settings', {}),
-            session=object_session(self))
+            session=session
+        )
 
     @scoring.setter
     def scoring(self, scoring: Scoring) -> None:

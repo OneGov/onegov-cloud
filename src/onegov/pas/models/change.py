@@ -3,34 +3,34 @@ from __future__ import annotations
 from datetime import date
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.pas import _
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import PASCommission
 from onegov.pas.models.parliamentarian import PASParliamentarian
-from sqlalchemy import Column, Text
 from sqlalchemy import Enum
 from sqlalchemy import String
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
+from uuid import UUID
 
 
+from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Literal
     from typing import TypeAlias
-    import uuid
 
-    from onegov.core.orm.mixins import dict_property
     from onegov.town6.request import TownRequest
 
-    Action: TypeAlias = Literal[
-        'add',
-        'edit',
-        'delete'
-    ]
+Action: TypeAlias = Literal[
+    'add',
+    'edit',
+    'delete'
+]
 
 ACTIONS: list[Action] = [
     'add',
@@ -44,23 +44,16 @@ class Change(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'par_changes'
 
     #: Internal ID
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The user id responsible for the change
-    user_id: Column[str | None] = Column(
-        String,
-        nullable=True
-    )
+    user_id: Mapped[str | None] = mapped_column(String)
 
     #: The username responsible for the change
-    user_name: Column[str | None] = Column(
-        String,
-        nullable=True
-    )
+    user_name: Mapped[str | None] = mapped_column(String)
 
     @property
     def user(self) -> str | None:
@@ -73,12 +66,11 @@ class Change(Base, ContentMixin, TimestampMixin):
         return self.user_name or self.user_id
 
     #: The type of change
-    action: Column[Action] = Column(
+    action: Mapped[Action] = mapped_column(
         Enum(
-            *ACTIONS,  # type:ignore[arg-type]
+            *ACTIONS,
             name='par_actions'
-        ),
-        nullable=False
+        )
     )
 
     @property
@@ -92,17 +84,10 @@ class Change(Base, ContentMixin, TimestampMixin):
         raise NotImplementedError()
 
     #: The model behind this change
-    model: Column[str] = Column(
-        String,
-        nullable=False
-    )
+    model: Mapped[str] = mapped_column(String)
 
     #: The polymorphic type of change
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -114,6 +99,7 @@ class Change(Base, ContentMixin, TimestampMixin):
         attendence_id = (self.changes or {}).get('id')
         if self.model == 'attendence' and attendence_id:
             session = object_session(self)
+            assert session is not None
             query = session.query(Attendence).filter_by(id=attendence_id)
             return query.first()
         return None
@@ -136,6 +122,7 @@ class Change(Base, ContentMixin, TimestampMixin):
         parliamentarian_id = (self.changes or {}).get('parliamentarian_id')
         if self.model == 'attendence' and parliamentarian_id:
             session = object_session(self)
+            assert session is not None
             query = session.query(PASParliamentarian).filter_by(
                 id=parliamentarian_id
             )
@@ -147,6 +134,7 @@ class Change(Base, ContentMixin, TimestampMixin):
         commission_id = (self.changes or {}).get('commission_id')
         if self.model == 'attendence' and commission_id:
             session = object_session(self)
+            assert session is not None
             query = session.query(PASCommission).filter_by(id=commission_id)
             return query.first()
         return None

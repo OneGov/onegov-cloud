@@ -20,6 +20,7 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from uuid import UUID
 
 
 def export_election_internal_proporz(
@@ -38,6 +39,7 @@ def export_election_internal_proporz(
     """
 
     session = object_session(election)
+    assert session is not None
 
     ids = session.query(ElectionResult.id)
     ids = ids.filter(ElectionResult.election_id == election.id)
@@ -108,25 +110,27 @@ def export_election_internal_proporz(
         list_results_grouped[key] = {g[2]: g[0] for g in group}
 
     # We need to collect the panachage results per list
-    list_ids = session.query(List.id, List.list_id)
-    list_ids = list_ids.filter(List.election_id == election.id)
-    list_ids = dict(list_ids)
+    list_ids_q = session.query(List.id, List.list_id)
+    list_ids_q = list_ids_q.filter(List.election_id == election.id)
+    list_ids: dict[UUID | None, str] = dict(list_ids_q.tuples())
     list_ids[None] = '999'
     list_panachage_results = session.query(ListPanachageResult)
     list_panachage_results = list_panachage_results.filter(
         ListPanachageResult.target_id.in_(list_ids)
     )
     list_panachage: dict[str, dict[str, int]] = {}
-    for result in list_panachage_results:
-        target = list_ids[result.target_id]
-        source = list_ids[result.source_id]
+    for list_result in list_panachage_results:
+        target = list_ids[list_result.target_id]
+        source = list_ids[list_result.source_id]
         list_panachage.setdefault(target, {})
-        list_panachage[target][source] = result.votes
+        list_panachage[target][source] = list_result.votes
 
     # We need to collect the panchage results per candidate
-    candidate_ids = session.query(Candidate.id, Candidate.candidate_id)
-    candidate_ids = candidate_ids.filter(Candidate.election_id == election.id)
-    candidate_ids = dict(candidate_ids)
+    candidate_ids_q = session.query(Candidate.id, Candidate.candidate_id)
+    candidate_ids_q = candidate_ids_q.filter(
+        Candidate.election_id == election.id
+    )
+    candidate_ids = dict(candidate_ids_q.tuples())
     candidate_panachage_results = session.query(
         CandidatePanachageResult.target_id,
         CandidatePanachageResult.source_id,
@@ -140,13 +144,13 @@ def export_election_internal_proporz(
         CandidatePanachageResult.target_id.in_(candidate_ids)
     )
     candidate_panachage: dict[str, dict[str, dict[str, int]]] = {}
-    for result in candidate_panachage_results:
-        target = candidate_ids[result.target_id]
-        source = list_ids[result.source_id]
-        entity = result.entity_id
+    for candidate_result in candidate_panachage_results:
+        target = candidate_ids[candidate_result.target_id]
+        source = list_ids[candidate_result.source_id]
+        entity = candidate_result.entity_id
         candidate_panachage.setdefault(entity, {})
         candidate_panachage[entity].setdefault(target, {})
-        candidate_panachage[entity][target][source] = result.votes
+        candidate_panachage[entity][target][source] = candidate_result.votes
 
     titles = election.title_translations or {}
     short_titles = election.short_title_translations or {}

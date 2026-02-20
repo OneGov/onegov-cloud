@@ -139,7 +139,7 @@ def rename_associated_tables(context: UpgradeContext) -> None:
                 # point while still having the old one - we therefore drop the
                 # newly created table (which should be empty at this time).
                 sql = text(f'SELECT count(*) FROM {new_name}')
-                assert context.session.execute(sql).fetchone().count == 0, f"""
+                assert context.session.execute(sql).scalar_one() == 0, f"""
                     Can not rename the associated table "{old_name}" to
                     "{new_name}", the new table "{new_name}" already exists
                     and contains values.
@@ -234,7 +234,7 @@ def change_adjacency_list_order_to_numeric(context: UpgradeContext) -> None:
         )
 
     table_names: set[str] = {
-        cls.__tablename__  # type: ignore[attr-defined]
+        cls.__tablename__
         for cls in chain(
             find_models(Base, is_concrete_subclass),
             find_models(ORMBase, is_concrete_subclass),

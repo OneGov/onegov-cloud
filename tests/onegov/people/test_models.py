@@ -134,7 +134,7 @@ def test_vcard(session: Session) -> None:
     assert "NOTE;CHARSET=utf-8:Has bad vision." in vcard
     assert "END:VCARD" in vcard
 
-    vcard = person.memberships[0].vcard()
+    vcard = person.memberships[0].vcard()  # type: ignore[union-attr]
     assert "BEGIN:VCARD" in vcard
     assert "VERSION:3.0" in vcard
     assert "ADR;CHARSET=utf-8:;;Fakestreet 1;Kappel am Albis;;1234;" in vcard
@@ -269,7 +269,7 @@ def test_agency_organigram(
     with open(organigram[0], 'rb') as organigram_file:
         session = test_app.session()
         session.add(
-            Agency(  # type: ignore[misc]
+            Agency(
                 title="Agency",
                 name="agency",
                 organigram_file=organigram_file
@@ -335,11 +335,11 @@ def test_agency_polymorphism(session: Session) -> None:
 
 def test_agency_sort_children(session: Session) -> None:
     parent = Agency(id=1, name='parent', title='agency')
-    session.add(Agency(id=2, name='child_1', parent=parent, order=10,  # type: ignore[misc]
+    session.add(Agency(id=2, name='child_1', parent=parent, order=10,
                        title="Bjorm Guomundsdóttir's"))
-    session.add(Agency(id=3, name='child_2', parent=parent, order=11,  # type: ignore[misc]
+    session.add(Agency(id=3, name='child_2', parent=parent, order=11,
                        title="Björn Guðmundsdóttir's"))
-    session.add(Agency(id=4, name='child_3', parent=parent, order=11,  # type: ignore[misc]
+    session.add(Agency(id=4, name='child_3', parent=parent, order=11,
                        title="Björk Guomundsdottir's"))
     session.flush()
     assert [c.title for c in parent.children] == [

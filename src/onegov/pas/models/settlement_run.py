@@ -1,22 +1,23 @@
 from __future__ import annotations
 
+from datetime import date
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.pas.i18n import _
 from onegov.search import ORMSearchable
-from sqlalchemy import Boolean, Column, Date, Text
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
+from uuid import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from datetime import date
-    from onegov.core.orm.mixins import dict_property
+    from sqlalchemy.sql import ColumnElement
 
 
 class SettlementRun(Base, ContentMixin, TimestampMixin, ORMSearchable):
@@ -34,54 +35,38 @@ class SettlementRun(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return self.name
 
     #: Internal ID
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the name
-    name: Column[str] = Column(
-        Text,
-        nullable=False
-    )
+    name: Mapped[str]
 
     #: The start date
-    start: Column[date] = Column(
-        Date,
-        nullable=False
-    )
+    start: Mapped[date]
 
     #: The end date
-    end: Column[date] = Column(
-        Date,
-        nullable=False
-    )
+    end: Mapped[date]
 
     #: Whether this settlement run is closed
-    closed: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    closed: Mapped[bool] = mapped_column(default=False)
 
     #: The description
     description: dict_property[str | None] = content_property()
 
-    if TYPE_CHECKING:
-        active: Column[bool]
-    else:
-        @hybrid_property
-        def active(self) -> bool:
-            return not self.closed
+    @hybrid_property
+    def active(self) -> bool:
+        return not self.closed
 
-        @active.setter
-        def active(self, value: bool) -> None:
-            self.closed = not value
+    @active.inplace.setter
+    def _active_setter(self, value: bool) -> None:
+        self.closed = not value
 
-        @active.expression
-        def active(cls):
-            return ~cls.closed
+    @active.inplace.expression
+    @classmethod
+    def _active_expression(cls) -> ColumnElement[bool]:
+        return ~cls.closed
 
     @classmethod
     def get_run_number_for_year(cls, input_date: date) -> int:

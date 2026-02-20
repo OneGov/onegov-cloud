@@ -15,17 +15,15 @@ from onegov.form.models import (
     FormRegistrationWindow,
     FormFile
 )
+from onegov.form.models.definition import SurveyDefinition
+from onegov.form.models.submission import SurveySubmission
+from onegov.form.models.survey_window import SurveySubmissionWindow
 from sedate import replace_timezone, utcnow
 from sqlalchemy import func, exc, inspect
 from uuid import uuid4, UUID
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
-
-from onegov.form.models.definition import SurveyDefinition
-from onegov.form.models.submission import SurveySubmission
-from onegov.form.models.survey_window import SurveySubmissionWindow
-
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator
     from onegov.form import Form
@@ -466,7 +464,7 @@ class FormSubmissionCollection:
         for field_id in files_to_add:
             field = getattr(form, field_id)
 
-            f = FormFile(  # type:ignore[misc]
+            f = FormFile(
                 id=random_token(),
                 name=field.filename,
                 note=field_id,
@@ -507,7 +505,7 @@ class FormSubmissionCollection:
                         # skip this subfield
                         continue
 
-                    f = FormFile(  # type:ignore[misc]
+                    f = FormFile(
                         id=random_token(),
                         name=field.filename,
                         note=new_key,

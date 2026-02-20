@@ -245,6 +245,12 @@ pre {
     transform: scale(1.1);
 }
 
+ul#parliamentarian_id {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+}
+
 #parliamentarian_id li.animate-in {
     animation: bubble-in 0.4s ease forwards;
 }
