@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
+    from translationstring import TranslationString
+
     from tests.onegov.election_day.conftest import ImportTestDatasets
 
 
@@ -24,9 +26,10 @@ def test_import_ech_election_gr(
         dataset_name='elections-invalid-year'
     )
     assert len(results) == 1
+    errors: TranslationString
     errors, updated, deleted = next(iter(results.values()))
     assert errors
-    assert (errors[0].error ==
+    assert (errors[0].error.interpolate() ==
             'Cannot import election information. Year 2083 does not exist.')
 
     results = import_test_datasets(
@@ -106,7 +109,7 @@ def test_import_ech_election_gr(
     assert len(results) == 1
     errors, updated, deleted = next(iter(results.values()))
     assert errors
-    assert (errors[0].error ==
+    assert (errors[0].error.interpolate() ==
             'Cannot import election results. Year 2083 does not exist.')
 
     results = import_test_datasets(
