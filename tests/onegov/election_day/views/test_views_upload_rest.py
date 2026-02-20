@@ -117,7 +117,7 @@ def test_view_rest_validation(election_day_app_zg: TestApp) -> None:
     ]
 
     # No vote
-    params = (
+    params = (  # type:ignore[assignment]
         ('id', 'vote-id'),
         ('type', 'vote'),
         ('results', Upload('results.csv', 'a'.encode('utf-8'))),
@@ -126,7 +126,7 @@ def test_view_rest_validation(election_day_app_zg: TestApp) -> None:
     assert result['errors']['id'] == [{'message': 'Invalid id'}]
 
     # No election or compound
-    params = (
+    params = (  # type:ignore[assignment]
         ('id', 'election-id'),
         ('type', 'election'),
         ('results', Upload('results.csv', 'a'.encode('utf-8'))),
@@ -136,7 +136,7 @@ def test_view_rest_validation(election_day_app_zg: TestApp) -> None:
 
     # Wrong election type
     create_election(election_day_app_zg, 'majorz')
-    params = (
+    params = (  # type:ignore[assignment]
         ('id', 'election'),
         ('type', 'parties'),
         ('results', Upload('results.csv', 'a'.encode('utf-8'))),
