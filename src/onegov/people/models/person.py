@@ -93,7 +93,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     @property
     def organisation_texts(self) -> list[str]:
-        parts = []
+        parts: list[str] = []
         if self.organisations_multiple:
             it = iter(self.organisations_multiple)
             parts.extend(

@@ -17,8 +17,9 @@ from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
     from onegov.core.analytics import AnalyticsProvider
+    from onegov.core.layout import Layout
     from onegov.org.app import OrgApp
-    from onegov.org.layout import DefaultLayout, Layout
+    from onegov.org.layout import DefaultLayout
     from onegov.ticket import Ticket
 
 
