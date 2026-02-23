@@ -8,6 +8,7 @@ import time
 import transaction
 import uuid
 
+from collections.abc import Callable, Mapping
 from datetime import datetime
 from dogpile.cache.api import NO_VALUE
 from markupsafe import Markup
@@ -25,18 +26,18 @@ from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm import orm_cached, request_cached
-from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
+from onegov.core.orm.types import HSTORE, JSON, UTCDateTime
 from onegov.core.orm.types import LowercaseText, MarkupText
 from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
 from sedate import utcnow
-from sqlalchemy import and_, func, inspect, select, text
-from sqlalchemy import Column, ForeignKey, Integer, Text
+from sqlalchemy import and_, func, inspect, select, text, ForeignKey, Integer
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import declarative_base, relationship  # type: ignore[attr-defined]
+from sqlalchemy.orm import mapped_column, registry, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped
 from sqlalchemy_utils import aggregated
 from threading import Thread
 from webob.exc import HTTPUnauthorized, HTTPConflict
@@ -45,9 +46,7 @@ from webtest import TestApp as Client
 
 from typing import Any, NamedTuple, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping
     from onegov.core.request import CoreRequest
-    from onegov.core.orm import Base
     from onegov.core.types import JSON_ro
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import ColumnElement
@@ -73,13 +72,12 @@ def test_is_valid_schema(postgres_dsn: str) -> None:
 
 
 def test_independent_sessions(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Document(Base):
         __tablename__ = 'document'
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     mgr = SessionManager(postgres_dsn, Base)
 
@@ -101,13 +99,12 @@ def test_independent_sessions(postgres_dsn: str) -> None:
 
 
 def test_independent_managers(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Document(Base):
         __tablename__ = 'document'
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     one = SessionManager(postgres_dsn, Base)
     two = SessionManager(postgres_dsn, Base)
@@ -134,15 +131,14 @@ def test_independent_managers(postgres_dsn: str) -> None:
 
 
 def test_create_schema(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Document(Base):
         __tablename__ = 'document'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str | None] = Column(Text)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str | None]
 
     mgr = SessionManager(postgres_dsn, Base)
 
@@ -180,15 +176,14 @@ def test_create_schema(postgres_dsn: str) -> None:
 
 
 def test_schema_bound_session(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Document(Base):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str | None] = Column(Text)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str | None]
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('foo')
@@ -213,9 +208,8 @@ def test_schema_bound_session(postgres_dsn: str) -> None:
 
 
 def test_session_scope(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     mgr = SessionManager(postgres_dsn, Base)
 
@@ -240,10 +234,8 @@ def test_session_scope(postgres_dsn: str) -> None:
 
 
 def test_orm_scenario(postgres_dsn: str, redis_url: str) -> None:
-    # test a somewhat complete ORM scenario in which create and read data
-    # for different applications
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class App(Framework):
         pass
@@ -251,8 +243,8 @@ def test_orm_scenario(postgres_dsn: str, redis_url: str) -> None:
     class Document(Base):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
 
     class DocumentCollection:
 
@@ -345,9 +337,8 @@ def test_orm_scenario(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_i18n_with_request(postgres_dsn: str, redis_url: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class App(Framework):
         pass
@@ -355,13 +346,11 @@ def test_i18n_with_request(postgres_dsn: str, redis_url: str) -> None:
     class Document(Base):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
-        title_translations: Column[Mapping[str, str]]
-        title_translations = Column(HSTORE, nullable=False)
+        title_translations: Mapped[Mapping[str, str]] = mapped_column(HSTORE)
         title = translation_hybrid(title_translations)
-        html_translations: Column[Mapping[str, str]]
-        html_translations = Column(HSTORE, nullable=False)
+        html_translations: Mapped[Mapping[str, str]] = mapped_column(HSTORE)
         html = translation_markup_hybrid(html_translations)
 
     @App.path(model=Document, path='document')
@@ -421,15 +410,14 @@ def test_i18n_with_request(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_json_type(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Test(Base):
         __tablename__ = 'test'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        data: Column[dict[str, Any] | None] = Column(JSON, nullable=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        data: Mapped[dict[str, Any] | None] = mapped_column(JSON)
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -472,13 +460,12 @@ def test_json_type(postgres_dsn: str) -> None:
 
 
 def test_session_manager_sharing(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Test(Base):
         __tablename__ = 'test'
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -498,15 +485,16 @@ def test_session_manager_sharing(postgres_dsn: str) -> None:
 
 
 def test_session_manager_i18n(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Test(Base):
         __tablename__ = 'test'
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
-        text_translations: Column[Mapping[str, str] | None] = Column(HSTORE)
+        text_translations: Mapped[Mapping[str, str] | None] = mapped_column(
+            HSTORE
+        )
         text = translation_hybrid(text_translations)
 
     mgr = SessionManager(postgres_dsn, Base)
@@ -570,14 +558,16 @@ def test_session_manager_i18n(postgres_dsn: str) -> None:
 
 
 def test_uuid_type(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Test(Base):
         __tablename__ = 'test'
 
-        id = Column(UUID, primary_key=True, default=uuid.uuid4)
+        id: Mapped[uuid.UUID] = mapped_column(
+            primary_key=True,
+            default=uuid.uuid4
+        )
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -594,14 +584,13 @@ def test_uuid_type(postgres_dsn: str) -> None:
 
 
 def test_lowercase_text(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Test(Base):
         __tablename__ = 'test'
 
-        id = Column(LowercaseText, primary_key=True)
+        id = mapped_column(LowercaseText, primary_key=True)
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -621,15 +610,14 @@ def test_lowercase_text(postgres_dsn: str) -> None:
 
 
 def test_markup_text(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Test(Base):
         __tablename__ = 'test'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        html: Column[Markup | None] = Column(MarkupText)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        html: Mapped[Markup | None] = mapped_column(MarkupText)
 
     class Nbsp:
         def __html__(self) -> str:
@@ -656,26 +644,25 @@ def test_markup_text(postgres_dsn: str) -> None:
     session.add(test3)
     transaction.commit()
 
-    test1 = session.get(Test, 1)  # type: ignore[attr-defined]
+    test1 = session.get(Test, 1)  # type: ignore[assignment]
     assert test1.html == Markup('&lt;script&gt;unvetted&lt;/script&gt;')
-    test2 = session.get(Test, 2)  # type: ignore[attr-defined]
+    test2 = session.get(Test, 2)  # type: ignore[assignment]
     assert test2.html == Markup('<b>this is fine</b>')
-    test3 = session.get(Test, 3)  # type: ignore[attr-defined]
+    test3 = session.get(Test, 3)  # type: ignore[assignment]
     assert test3.html == Markup('&nbsp;')
 
     mgr.dispose()
 
 
 def test_utc_datetime_naive(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Test(Base):
         __tablename__ = 'test'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        date: Column[datetime | None] = Column(UTCDateTime)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        date: Mapped[datetime | None] = mapped_column(UTCDateTime)
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -691,15 +678,14 @@ def test_utc_datetime_naive(postgres_dsn: str) -> None:
 
 
 def test_utc_datetime_aware(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Test(Base):
         __tablename__ = 'test'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        date: Column[datetime | None] = Column(UTCDateTime)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        date: Mapped[datetime | None] = mapped_column(UTCDateTime)
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -719,14 +705,13 @@ def test_utc_datetime_aware(postgres_dsn: str) -> None:
 
 
 def test_timestamp_mixin(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Test(Base, TimestampMixin):
         __tablename__ = 'test'
 
-        id = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -758,14 +743,13 @@ def test_timestamp_mixin(postgres_dsn: str) -> None:
 
 
 def test_content_mixin(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry(type_annotation_map={dict[str, Any]: JSON})
 
     class Test(Base, ContentMixin):
         __tablename__ = 'test'
 
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -784,16 +768,16 @@ def test_content_mixin(postgres_dsn: str) -> None:
 
 
 def test_extensions_schema(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Data(Base):
         __tablename__ = 'data'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        data: Column[dict[str, Any] | None]
-        data = Column(MutableDict.as_mutable(HSTORE))  # type: ignore[no-untyped-call]
+        id: Mapped[int] = mapped_column(primary_key=True)
+        data: Mapped[dict[str, Any] | None] = mapped_column(
+            MutableDict.as_mutable(HSTORE)
+        )
 
     mgr = SessionManager(postgres_dsn, Base)
 
@@ -822,13 +806,12 @@ def test_extensions_schema(postgres_dsn: str) -> None:
 
 
 def test_serialization_failure(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Data(Base):
         __tablename__ = 'data'
-        id = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     class MayFailThread(Thread):
 
@@ -886,9 +869,12 @@ def test_application_retries(
     postgres_dsn: str,
     redis_url: str
 ) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
+
+    class Record(Base):
+        __tablename__ = 'records'
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     class App(Framework):
         pass
@@ -902,10 +888,6 @@ def test_application_retries(
     @App.path(path='/')
     class Root:
         pass
-
-    class Record(Base):
-        __tablename__ = 'records'
-        id = Column(Integer, primary_key=True)
 
     @App.view(model=Root, name='init')
     def init_schema(self: Root, request: CoreRequest) -> None:
@@ -1016,13 +998,12 @@ def test_application_retries(
 
 
 def test_orm_signals_independence(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Document(Base):
         __tablename__ = 'documents'
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     m1 = SessionManager(postgres_dsn, Base)
     m2 = SessionManager(postgres_dsn, Base)
@@ -1054,13 +1035,12 @@ def test_orm_signals_independence(postgres_dsn: str) -> None:
 
 
 def test_orm_signals_schema(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Document(Base):
         __tablename__ = 'documents'
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     mgr = SessionManager(postgres_dsn, Base)
 
@@ -1085,13 +1065,12 @@ def test_orm_signals_schema(postgres_dsn: str) -> None:
 
 
 def test_scoped_signals(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Document(Base):
         __tablename__ = 'documents'
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     mgr = SessionManager(postgres_dsn, Base)
 
@@ -1115,18 +1094,13 @@ def test_scoped_signals(postgres_dsn: str) -> None:
 
 
 def test_orm_signals_data_flushed(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Document(Base):
         __tablename__ = 'documents'
-        id: Column[int] = Column(Integer, primary_key=True)
-        body: Column[str | None] = Column(
-            Text,
-            nullable=True,
-            default=lambda: 'asdf'
-        )
+        id: Mapped[int] = mapped_column(primary_key=True)
+        body: Mapped[str | None] = mapped_column(default=lambda: 'asdf')
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('foo')
@@ -1168,24 +1142,25 @@ def test_pickle_model(postgres_dsn: str) -> None:
 
 
 def test_orm_signals(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Document(Base):
         __tablename__ = 'documents'
-        id: Column[int] = Column(Integer, primary_key=True)
-        body: Column[str | None] = Column(Text, nullable=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        body: Mapped[str | None]
 
     class Comment(Base):
         __tablename__ = 'comments'
-        id: Column[int] = Column(Integer, primary_key=True)
-        document_id: Column[int] = Column(Integer, primary_key=True)
-        body: Column[str | None] = Column(Text, nullable=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        document_id: Mapped[int] = mapped_column(primary_key=True)
+        body: Mapped[str | None]
 
     mgr = SessionManager(postgres_dsn, Base)
 
-    inserted, updated, deleted = [], [], []
+    inserted: list[tuple[Document | Comment, str]] = []
+    updated: list[tuple[Document | Comment, str]] = []
+    deleted: list[tuple[Document | Comment, str]] = []
 
     @mgr.on_insert.connect
     def on_insert(schema: str, obj: Document | Comment) -> None:
@@ -1288,8 +1263,8 @@ def test_orm_signals(postgres_dsn: str) -> None:
     assert deleted[1][1] == 'foo'
 
     # ensure these objects are detached
-    assert inspect(deleted[0][0]).detached
-    assert inspect(deleted[1][0]).detached
+    assert inspect(deleted[0][0]).detached  # type: ignore[attr-defined]
+    assert inspect(deleted[1][0]).detached  # type: ignore[attr-defined]
 
     # and stay deleted
     transaction.commit()
@@ -1297,19 +1272,18 @@ def test_orm_signals(postgres_dsn: str) -> None:
 
 
 def test_get_polymorphic_class() -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Plain(Base):
         __tablename__ = 'plain'
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     class PolyBase(Base):
         __tablename__ = 'polymorphic'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        type: Column[str | None] = Column(Text)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        type: Mapped[str | None]
 
         __mapper_args__ = {
             'polymorphic_on': 'type'
@@ -1348,16 +1322,14 @@ def test_get_polymorphic_class() -> None:
 
 
 def test_dict_properties(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Site(Base):
         __tablename__ = 'sites'
-        id: Column[int] = Column(Integer, primary_key=True)
-        users: Column[dict[str, Any] | None] = Column(
+        id: Mapped[int] = mapped_column(primary_key=True)
+        users: Mapped[dict[str, Any]] = mapped_column(
             JSON,
-            nullable=False,
             default=dict
         )
         group: dict_property[str | None]
@@ -1407,13 +1379,12 @@ def test_dict_properties(postgres_dsn: str) -> None:
 
 
 def test_content_properties(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry(type_annotation_map={dict[str, Any]: JSON})
 
     class Content(Base, ContentMixin):
         __tablename__ = 'content'
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
         # different attribute name than key
         _type: dict_property[str | None] = meta_property('type')
         # explicitly set value_type
@@ -1421,12 +1392,12 @@ def test_content_properties(postgres_dsn: str) -> None:
         # implicitly set value type from default
         value: dict_property[int] = meta_property('value', default=1)
 
-        @name.setter
+        @name.inplace.setter
         def _set_name(self, value: str | None) -> None:
             self.content['name'] = value
             self.content['name2'] = value
 
-        @name.deleter
+        @name.inplace.deleter
         def _delete_name(self) -> None:
             del self.content['name']
             del self.content['name2']
@@ -1485,20 +1456,19 @@ def test_content_properties(postgres_dsn: str) -> None:
 
 
 def test_find_models() -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Mixin:
         pass
 
     class A(Base):
         __tablename__ = 'plain'
-        id = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     class B(Base, Mixin):
         __tablename__ = 'polymorphic'
-        id = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     results = list(find_models(Base, lambda cls: issubclass(cls, Mixin)))
     assert results == [B]
@@ -1525,32 +1495,28 @@ def test_sqlalchemy_aggregate(postgres_dsn: str) -> None:
     manager.construct_aggregate_queries = count_calls(  # type: ignore[method-assign]
         manager.construct_aggregate_queries)
 
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Thread(Base):
         __tablename__ = 'thread'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        name: Column[str | None] = Column(Text)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        name: Mapped[str | None]
 
-        @aggregated('comments', Column(Integer))
+        @aggregated('comments', mapped_column(Integer))
         def comment_count(self) -> ColumnElement[int]:
-            return func.count('1')
+            return func.count(text('1'))
 
-        comments: relationship[list[Comment]] = relationship(
-            'Comment',
-            backref='thread'
-        )
+        comments: Mapped[list[Comment]] = relationship(back_populates='thread')
 
     class Comment(Base):
         __tablename__ = 'comment'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        content: Column[str | None] = Column(Text)
-        thread_id: Column[int | None] = Column(Integer, ForeignKey(Thread.id))
-        thread: relationship[Thread | None]
+        id: Mapped[int] = mapped_column(primary_key=True)
+        content: Mapped[str | None]
+        thread_id: Mapped[int | None] = mapped_column(ForeignKey(Thread.id))
+        thread: Mapped[Thread | None] = relationship(back_populates='comments')
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('foo')
@@ -1581,9 +1547,15 @@ def test_sqlalchemy_aggregate(postgres_dsn: str) -> None:
 
 
 def test_orm_cache(postgres_dsn: str, redis_url: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str | None]
+        body: Mapped[str | None]
 
     if TYPE_CHECKING:
         class DocumentRow(NamedTuple):
@@ -1594,41 +1566,30 @@ def test_orm_cache(postgres_dsn: str, redis_url: str) -> None:
 
         @orm_cached(policy='on-table-change:documents')
         def documents(self) -> Query[DocumentRow]:
-            return self.session().query(Document).with_entities(
+            return self.session().query(  # type: ignore[return-value]
                 Document.id,
                 Document.title
             )
 
         @orm_cached(policy='on-table-change:documents')
-        def untitled_documents(self) -> list[Document]:
-            q = self.session().query(Document)
-            q = q.with_entities(Document.id, Document.title)
-            q = q.filter(Document.title == None)
-
-            return q.all()
+        def untitled_documents(self) -> list[DocumentRow]:
+            return self.session().query(  # type: ignore[return-value]
+                Document.id,
+                Document.title
+            ).filter(Document.title == None).all()
 
         @orm_cached(policy='on-table-change:documents')
-        def first_document(self) -> Document | None:
-            q = self.session().query(Document)
-            q = q.with_entities(Document.id, Document.title)
-
-            return q.first()
+        def first_document(self) -> DocumentRow | None:
+            return self.session().query(  # type: ignore[return-value]
+                Document.id,
+                Document.title
+            ).first()
 
         @orm_cached(policy=lambda o: o.title == 'Secret')  # type: ignore[attr-defined]
-        def secret_document(self) -> Document | None:
-            q = self.session().query(Document)
-            q = q.with_entities(Document.id)
-            q = q.filter(Document.title == 'Secret')
-
-            doc = q.first()
-            return doc.id if doc else None
-
-    class Document(Base):
-        __tablename__ = 'documents'
-
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str | None] = Column(Text, nullable=True)
-        body: Column[str | None] = Column(Text, nullable=True)
+        def secret_document(self) -> int | None:
+            return self.session().query(
+                Document.id
+            ).filter(Document.title == 'Secret').scalar()
 
     # this is required for the transactions to actually work, usually this
     # would be onegov.server's job
@@ -1732,9 +1693,14 @@ def test_orm_cache(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_orm_cache_flush(postgres_dsn: str, redis_url: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str | None]
 
     if TYPE_CHECKING:
         class DocumentRow(NamedTuple):
@@ -1748,17 +1714,7 @@ def test_orm_cache_flush(postgres_dsn: str, redis_url: str) -> None:
 
         @orm_cached(policy='on-table-change:documents')
         def bar(self) -> DocumentRow:
-            return (
-                self.session().query(Document)
-                .with_entities(Document.title)
-                .one()
-            )
-
-    class Document(Base):
-        __tablename__ = 'documents'
-
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str | None] = Column(Text, nullable=True)
+            return self.session().query(Document.title).one()  # type: ignore[return-value]
 
     scan_morepath_modules(App)
 
@@ -1793,9 +1749,15 @@ def test_orm_cache_flush(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_request_cache(postgres_dsn: str, redis_url: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str | None]
+        body: Mapped[str | None]
 
     if TYPE_CHECKING:
         class DocumentRow(NamedTuple):
@@ -1807,37 +1769,29 @@ def test_request_cache(postgres_dsn: str, redis_url: str) -> None:
             title: str | None
             body: str | None
 
-    class Document(Base):
-        __tablename__ = 'documents'
-
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str | None] = Column(Text, nullable=True)
-        body: Column[str | None] = Column(Text, nullable=True)
-
     class App(Framework):
 
         @request_cached
         def untitled_documents(self) -> list[DocumentRow]:
-            q = self.session().query(Document)
-            q = q.with_entities(Document.id, Document.title)
-            q = q.filter(Document.title == None)
-
-            return q.all()
+            return self.session().query(  # type: ignore[return-value]
+                Document.id,
+                Document.title
+            ).filter(Document.title == None).all()
 
         @request_cached
         def first_document(self) -> DocumentRow | None:
-            q = self.session().query(Document)
-            q = q.with_entities(Document.id, Document.title)
-
-            return q.first()
+            return self.session().query(  # type: ignore[return-value]
+                Document.id,
+                Document.title
+            ).first()
 
         @request_cached
         def secret_document(self) -> ExtendedRow | None:
-            q = self.session().query(Document)
-            q = q.with_entities(Document.id, Document.title, Document.body)
-            q = q.filter(Document.title == 'Secret')
-
-            return q.first()
+            return self.session().query(  # type: ignore[return-value]
+                Document.id,
+                Document.title,
+                Document.body
+            ).filter(Document.title == 'Secret').first()
 
     # this is required for the transactions to actually work, usually this
     # would be onegov.server's job
@@ -1906,9 +1860,14 @@ def test_request_cache(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_request_cache_flush(postgres_dsn: str, redis_url: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str | None]
 
     if TYPE_CHECKING:
         class DocumentRow(NamedTuple):
@@ -1918,16 +1877,7 @@ def test_request_cache_flush(postgres_dsn: str, redis_url: str) -> None:
 
         @orm_cached(policy='on-table-change:documents')
         def foo(self) -> DocumentRow:
-            return (
-                self.session().query(Document)
-                .with_entities(Document.title).one()
-            )
-
-    class Document(Base):
-        __tablename__ = 'documents'
-
-        id: Column[int] = Column(Integer, primary_key=True)
-        title: Column[str | None] = Column(Text, nullable=True)
+            return self.session().query(Document.title).one()  # type: ignore[return-value]
 
     scan_morepath_modules(App)
 
@@ -1961,15 +1911,14 @@ def test_request_cache_flush(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_associable_one_to_one(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Address(Base, Associable):
         __tablename__ = 'adresses'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        town: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        town: Mapped[str]
 
     class Addressable:
         address = associated(Address, 'address', 'one-to-one')
@@ -1977,14 +1926,14 @@ def test_associable_one_to_one(postgres_dsn: str) -> None:
     class Company(Base, Addressable):
         __tablename__ = 'companies'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        name: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        name: Mapped[str]
 
     class Person(Base, Addressable):
         __tablename__ = 'people'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        name: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        name: Mapped[str]
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -2034,15 +1983,14 @@ def test_associable_one_to_one(postgres_dsn: str) -> None:
 
 
 def test_associable_one_to_many(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Address(Base, Associable):
         __tablename__ = 'adresses'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        town: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        town: Mapped[str]
 
     class Addressable:
         addresses = associated(Address, 'addresses', 'one-to-many')
@@ -2050,14 +1998,14 @@ def test_associable_one_to_many(postgres_dsn: str) -> None:
     class Company(Base, Addressable):
         __tablename__ = 'companies'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        name: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        name: Mapped[str]
 
     class Person(Base, Addressable):
         __tablename__ = 'people'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        name: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        name: Mapped[str]
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -2101,15 +2049,14 @@ def test_associable_one_to_many(postgres_dsn: str) -> None:
 
 
 def test_associable_many_to_many(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Address(Base, Associable):
         __tablename__ = 'adresses'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        town: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        town: Mapped[str]
 
     class Addressable:
         addresses = associated(Address, 'addresses', 'many-to-many')
@@ -2117,14 +2064,14 @@ def test_associable_many_to_many(postgres_dsn: str) -> None:
     class Company(Base, Addressable):
         __tablename__ = 'companies'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        name: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        name: Mapped[str]
 
     class Person(Base, Addressable):
         __tablename__ = 'people'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        name: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        name: Mapped[str]
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -2164,29 +2111,28 @@ def test_associable_many_to_many(postgres_dsn: str) -> None:
 
 
 def test_associable_multiple(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Address(Base, Associable):
         __tablename__ = 'adresses'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        town: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        town: Mapped[str]
 
     class Person(Base, Associable):
         __tablename__ = 'people'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        name: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        name: Mapped[str]
 
         address = associated(Address, 'address', 'one-to-one')
 
     class Company(Base):
         __tablename__ = 'companies'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        name: Column[str] = Column(Text, nullable=False)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        name: Mapped[str]
 
         address = associated(
             Address, 'address', 'one-to-one', onupdate='CASCADE'
@@ -2283,26 +2229,26 @@ def test_selectable_sql_query(session: Session) -> None:
     """)
 
     columns = session.execute(
-        select(stmt.c.column_name).where(  # type: ignore[arg-type]
+        select(stmt.c.column_name).where(
             and_(
                 stmt.c.table_name == 'pg_group',
                 stmt.c.is_updatable == True
             )
         ).order_by(stmt.c.column_name)
-    ).fetchall()
+    ).tuples().all()
 
     assert columns == [('groname', ), ('grosysid', )]
     assert columns[0].column_name == 'groname'
     assert columns[1].column_name == 'grosysid'
 
     columns = session.execute(
-        select(stmt.c.column_name).where(  # type: ignore[arg-type]
+        select(stmt.c.column_name).where(
             and_(
                 stmt.c.table_name == 'pg_group',
                 stmt.c.is_updatable == False
             )
         ).order_by(stmt.c.column_name)
-    ).fetchall()
+    ).tuples().all()
 
     assert columns == [('grolist', )]
     assert columns[0].column_name == 'grolist'
@@ -2317,7 +2263,7 @@ def test_selectable_sql_query_with_array(session: Session) -> None:
         GROUP BY "table"
     """)
 
-    query = session.execute(select(stmt.c.table, stmt.c.columns))  # type: ignore[arg-type]
+    query = session.execute(select(stmt.c.table, stmt.c.columns))
     table = next(query)
 
     assert isinstance(table.columns, list)
@@ -2340,9 +2286,8 @@ def test_i18n_translation_hybrid_independence(
     postgres_dsn: str,
     redis_url: str
 ) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class App(Framework):
         pass
@@ -2350,10 +2295,9 @@ def test_i18n_translation_hybrid_independence(
     class Document(Base):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
-        title_translations: Column[Mapping[str, str] | None]
-        title_translations = Column(HSTORE, nullable=False)
+        title_translations: Mapped[Mapping[str, str]] = mapped_column(HSTORE)
         title = translation_hybrid(title_translations)
 
     @App.path(model=Document, path='/document')
@@ -2437,14 +2381,13 @@ def test_i18n_translation_hybrid_independence(
 
 
 def test_unaccent_expression(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Test(Base):
         __tablename__ = 'test'
 
-        text: Column[str] = Column(Text, primary_key=True)
+        text: Mapped[str] = mapped_column(primary_key=True)
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -2466,7 +2409,8 @@ def test_postgres_timezone(postgres_dsn: str) -> None:
 
     valid_timezones = ('UTC', 'GMT', 'Etc/UTC')
 
-    Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
     session = mgr.session()

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections import OrderedDict
-from onegov.core.orm.types import UUID
 from onegov.core.security import Private
 from onegov.form import FormDefinition
 from onegov.form import FormRegistrationWindow
@@ -15,7 +14,7 @@ from onegov.core.elements import Link
 from onegov.org.utils import keywords_first
 from onegov.ticket import Ticket
 from sedate import align_range_to_day, as_datetime, standardize_date
-from sqlalchemy import and_
+from sqlalchemy import and_, UUID as UUIDType
 
 
 from typing import Any, NamedTuple, TYPE_CHECKING
@@ -28,6 +27,7 @@ if TYPE_CHECKING:
     from onegov.pay.types import PaymentMethod
     from sedate.types import DateLike, TzInfoOrName
     from sqlalchemy.orm import Query
+    from uuid import UUID
     from webob import Response
 
     class FormSubmissionRow(NamedTuple):
@@ -132,7 +132,7 @@ def configure_subset(
 ) -> Query[FormSubmissionRow]:
     subset = subset.join(
         Ticket,
-        FormSubmission.id == Ticket.handler_id.cast(UUID)
+        FormSubmission.id == Ticket.handler_id.cast(UUIDType)
     )
 
     subset = subset.join(

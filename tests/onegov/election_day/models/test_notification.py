@@ -288,7 +288,7 @@ def test_email_notification_vote(
         simple_vote = session.query(Vote).one()
 
         session.add(
-            ComplexVote(  # type: ignore[misc]
+            ComplexVote(
                 title_translations={
                     'de_CH': "Vorlage mit Gegenentwurf",
                     'fr_CH': "Vote avec contre-projet",
@@ -559,7 +559,7 @@ def test_email_notification_election(
         majorz = session.query(Election).one()
 
         session.add(
-            ProporzElection(  # type: ignore[misc]
+            ProporzElection(
                 title_translations={
                     'de_CH': "Proporzwahl",
                     'fr_CH': "Election selon le système proportionnel",
@@ -1091,13 +1091,13 @@ def test_email_notification_send_segmented(
         )
     ]
     votes = [
-        Vote(  # type: ignore[misc]
+        Vote(
             title="AbstimmungZ",
             domain='municipality',
             domain_segment='Zug',
             date=date(2011, 1, 1),
         ),
-        Vote(  # type: ignore[misc]
+        Vote(
             title="AbstimmungB",
             domain='municipality',
             domain_segment='Baar',
@@ -1199,7 +1199,7 @@ def test_sms_notification(
         election_compound = session.query(ElectionCompound).one()
 
         session.add(
-            Vote(  # type: ignore[misc]
+            Vote(
                 title="Vote",
                 domain='municipality',
                 domain_segment='Zug',
@@ -1209,7 +1209,7 @@ def test_sms_notification(
         vote = session.query(Vote).one()
 
         session.add(
-            Vote(  # type: ignore[misc]
+            Vote(
                 title="Vote",
                 domain='municipality',
                 domain_segment='Baar',

@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import collections
 import hashlib
-from math import isclose
-
 import icalendar
 import morepath
 import secrets
@@ -15,11 +13,11 @@ from isodate import parse_date, ISO8601Error
 from itertools import islice
 from libres.db.models import ReservationBlocker
 from libres.modules.errors import LibresError
+from math import isclose
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
 from onegov.core.utils import module_path, Bunch
 from onegov.core.orm import as_selectable_from_path
-from onegov.core.orm.types import UUID as UUIDType
 from onegov.form import as_internal_id, FormSubmission
 from onegov.org.cli import close_ticket
 from onegov.org.forms.resource import AllResourcesExportForm
@@ -43,7 +41,8 @@ from onegov.ticket import Ticket, TicketInvoice
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
-from sqlalchemy import and_, cast as sa_cast, func, or_, select, Boolean
+from sqlalchemy import and_, cast as sa_cast, func, or_, select
+from sqlalchemy import Boolean, UUID as UUIDType
 from sqlalchemy.orm import undefer, joinedload, Session
 from webob import exc
 
@@ -660,7 +659,7 @@ def view_find_your_spot(
                         continue
 
                     for slot in slots:
-                        if isclose(slot.availability, 100.0):
+                        if isclose(slot.availability, 100.0, abs_tol=.005):
                             try:
                                 room = rooms_dict[room_id]
                                 assert hasattr(room, 'bound_session_id')
@@ -1275,6 +1274,7 @@ def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
         ))
         .group_by(accepted)
         .with_entities(accepted, func.count(Reservation.id))
+        .tuples()
     )
 
     layout = DefaultLayout(self, request)

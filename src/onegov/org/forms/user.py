@@ -312,9 +312,9 @@ class ManageUserGroupForm(Form):
         if self.users.data:
             users = UserCollection(session).query()
             users = users.filter(User.id.in_(self.users.data))
-            model.users = users.all()  # type:ignore[assignment]
+            model.users = users.all()
         else:
-            model.users = []  # type:ignore[assignment]
+            model.users = []
 
         exclusive_permissions = self.exclusive_permissions
         immediate_notifications = self.immediate_notifications
@@ -365,8 +365,6 @@ class ManageUserGroupForm(Form):
     def apply_model(self, model: UserGroup) -> None:
         self.name.data = model.name
         self.users.data = [str(u.id) for u in model.users]
-        # FIXME: backref across module boundaries
-        assert hasattr(model, 'ticket_permissions')
         self.ticket_permissions.data = [
             f'{permission.handler_code}-{permission.group}'
             if permission.group else permission.handler_code

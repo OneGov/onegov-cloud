@@ -168,7 +168,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         self.show_as_thumbnails = show_as_thumbnails
 
     def __setattr__(self, name: str, value: object) -> None:
-        self.changed()  # type:ignore[no-untyped-call]
+        self.changed()
         return super().__setattr__(name, value)
 
     def missing_fields(self, formcode: str | None) -> dict[str, list[str]]:
@@ -310,4 +310,4 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         return keywords
 
 
-DirectoryConfiguration.associate_with(DirectoryConfigurationStorage)  # type:ignore[no-untyped-call]
+DirectoryConfiguration.associate_with(DirectoryConfigurationStorage)

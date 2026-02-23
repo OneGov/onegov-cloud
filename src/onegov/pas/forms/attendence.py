@@ -419,13 +419,26 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
         ]
 
 
+BULK_MEETING_TYPES: dict[str, str] = {
+    'commission': _('Commission meeting'),
+    'shortest': _('Shortest meeting'),
+}
+
+
 class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
-    """ Kind of like AttendenceAddPlenaryForm but for commissions. """
+    """Bulk form for commission-based meetings (commission or shortest)."""
 
     date = DateField(
         label=_('Date'),
         validators=[InputRequired()],
         default=datetime.date.today
+    )
+
+    type = RadioField(
+        label=_('Type'),
+        choices=list(BULK_MEETING_TYPES.items()),
+        validators=[InputRequired()],
+        default='commission',
     )
 
     duration = FloatField(
@@ -452,7 +465,6 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
         result['duration'] = int(60 * (result.get('duration') or 0))
-        result['type'] = 'commission'
         return result
 
     def on_request(self) -> None:

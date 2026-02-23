@@ -9,7 +9,6 @@ from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_connection_results_api
 from onegov.election_day.utils.election import get_connections_data
-from sqlalchemy.orm import object_session
 from onegov.election_day import _
 
 
@@ -90,7 +89,7 @@ def view_election_connections_table(
     return {
         'model': self,
         'layout': ElectionLayout(self, request),
-        'connections': get_connection_results_api(self, object_session(self)),
+        'connections': get_connection_results_api(self, request.session),
         'type': 'election-table',
         'scope': 'connections'
     }
@@ -112,7 +111,7 @@ def view_election_connections(
     return {
         'election': self,
         'layout': layout,
-        'connections': get_connection_results_api(self, object_session(self)),
+        'connections': get_connection_results_api(self, request.session),
         'skip_rendering': hide_connections_chart(self, request),
         'help_text': election_incomplete_text,
     }

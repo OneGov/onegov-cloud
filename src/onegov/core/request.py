@@ -40,8 +40,7 @@ if TYPE_CHECKING:
     from onegov.core.i18n.translation_string import TranslationMarkup
     from onegov.core.security.permissions import Intent
     from onegov.core.types import MessageType
-    from sqlalchemy import Column
-    from sqlalchemy.orm import relationship, Session
+    from sqlalchemy.orm import Mapped, Session
     from translationstring import _ChameleonTranslate
     from typing import Literal, Protocol, TypeGuard
     from webob import Response
@@ -60,22 +59,22 @@ if TYPE_CHECKING:
     #       to be present on a user.
     class GroupLike(Protocol):
         @property
-        def id(self) -> UUID | Column[UUID]: ...
+        def id(self) -> Mapped[UUID] | UUID: ...
         @property
-        def name(self) -> str | Column[str | None] | None: ...
+        def name(self) -> Mapped[str | None] | str | None: ...
 
     class UserLike(Protocol):
         @property
-        def id(self) -> UUID | Column[UUID]: ...
+        def id(self) -> Mapped[UUID] | UUID: ...
         @property
-        def username(self) -> str | Column[str]: ...
+        def username(self) -> Mapped[str] | str: ...
         @property
         def groups(self) -> (
-            Sequence[GroupLike]
-            | relationship[Sequence[GroupLike]]
+            Mapped[Sequence[GroupLike]]
+            | Sequence[GroupLike]
         ): ...
         @property
-        def role(self) -> str | Column[str]: ...
+        def role(self) -> Mapped[str] | str: ...
 
 else:
     _BaseRequest = object

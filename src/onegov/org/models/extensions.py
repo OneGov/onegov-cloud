@@ -7,7 +7,6 @@ from collections import OrderedDict
 from functools import cached_property
 
 from markupsafe import Markup
-
 from onegov.core.i18n import get_translation_bound_meta
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (
@@ -46,7 +45,7 @@ from wtforms.utils import unset_value
 from wtforms.validators import InputRequired, ValidationError
 
 
-from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
+from typing import cast, Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
@@ -54,8 +53,7 @@ if TYPE_CHECKING:
     from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
     from onegov.org.models import ImageSet
-    from sqlalchemy import Column
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import Mapped
     from typing import type_check_only, Protocol
     from wtforms import Field
     from wtforms.fields.choices import _Choice
@@ -97,8 +95,8 @@ class ContentExtension:
 
     if TYPE_CHECKING:
         # forward declare content attributes
-        meta: Column[dict[str, Any]]
-        content: Column[dict[str, Any]]
+        meta: Mapped[dict[str, Any]]
+        content: Mapped[dict[str, Any]]
 
     @property
     def content_extensions(self) -> Iterator[type[ContentExtension]]:
@@ -265,8 +263,8 @@ class ContactExtension(ContentExtension):
 
     contact: dict_property[str | None] = content_property()
 
-    @contact.setter  # type:ignore[no-redef]
-    def contact(self, value: str | None) -> None:
+    @contact.inplace.setter
+    def _contact_setter(self, value: str | None) -> None:
         self.content['contact'] = value
         if self.inherit_contact:
             # no need to update the cache
@@ -279,8 +277,8 @@ class ContactExtension(ContentExtension):
 
     inherit_contact: dict_property[bool] = content_property(default=False)
 
-    @inherit_contact.setter  # type:ignore[no-redef]
-    def inherit_contact(self, value: bool) -> None:
+    @inherit_contact.inplace.setter
+    def _inherit_contact_setter(self, value: bool) -> None:
         self.content['inherit_contact'] = value
 
         # clear cache (don't update eagerly since it involves a query)
@@ -289,8 +287,8 @@ class ContactExtension(ContentExtension):
 
     contact_inherited_from: dict_property[int | None] = content_property()
 
-    @contact_inherited_from.setter  # type:ignore[no-redef]
-    def contact_inherited_from(self, value: int | None) -> None:
+    @contact_inherited_from.inplace.setter
+    def _contact_inherited_from_setter(self, value: int | None) -> None:
         self.content['contact_inherited_from'] = value
         if not self.inherit_contact:
             # no need to clear the cache
@@ -306,7 +304,9 @@ class ContactExtension(ContentExtension):
             if self.contact_inherited_from is None:
                 return None
 
-            pages = PageCollection(object_session(self))
+            session = object_session(self)
+            assert session is not None
+            pages = PageCollection(session)
             page = pages.by_id(self.contact_inherited_from)
             contact = getattr(page, 'contact', None)
         else:
@@ -461,14 +461,16 @@ class PersonLinkExtension(ContentExtension):
         if not (people_items := self.content.get('people')):
             return None
 
+        session = object_session(self)
+        assert session is not None
         people = OrderedDict(people_items)
-        query = PersonCollection(object_session(self)).query()
+        query = PersonCollection(session).query()
         query = query.filter(Person.id.in_(people.keys()))
 
         result = []
 
-        person: PersonWithFunction
-        for person in query.all():  # type:ignore[assignment]
+        for person in query:
+            person = cast('PersonWithFunction', person)
             function, show_function = people[person.id.hex]
             person.person = person.id.hex
             person.context_specific_function = function
@@ -841,6 +843,7 @@ def _files_observer(
 
     # remove ourselves if the link has been deleted
     state = inspect(self)
+    assert state is not None
     for file in state.attrs.files.history.deleted or ():
         if key in file.meta.get('linked_accesses', ()):
             del file.meta['linked_accesses'][key]
@@ -894,6 +897,7 @@ def _content_file_link_observer(
 
     key = str(self.id)
     session = object_session(self)
+    assert session is not None
     collection = FileCollection['GeneralFile'](session, type='general')
     files = collection.query().filter(File.id.in_(file_ids))
     published = getattr(self, 'published', True)
@@ -929,7 +933,7 @@ class GeneralFileLinkExtension(ContentExtension):
     if TYPE_CHECKING:
         # forward declare required attributes
         id: Any
-        files: relationship[list[File]]
+        files: Mapped[list[File]]
         access: dict_property[str]
 
         def files_observer(
@@ -1234,7 +1238,9 @@ class InlinePhotoAlbumExtension(ContentExtension):
         from onegov.org.models import ImageSetCollection
         if not self.photo_album_id:
             return None
-        return ImageSetCollection(object_session(self)).by_id(
+        session = object_session(self)
+        assert session is not None
+        return ImageSetCollection(session).by_id(
             self.photo_album_id
         )
 

@@ -4,7 +4,6 @@ from dateutil.parser import parse
 from decimal import Decimal
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
 from onegov.swissvotes import _
 from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import SwissVote
@@ -32,48 +31,59 @@ if TYPE_CHECKING:
 class SwissvoteDatasetField(UploadField):
     """ An upload field expecting a Swissvotes dataset (XLSX). """
 
-    if TYPE_CHECKING:
-        def __init__(
-            self,
-            label: str | None = None,
-            validators: Validators[FormT, Self] | None = None,
-            filters: Sequence[Filter] = (),
-            description: str = '',
-            id: str | None = None,
-            default: Sequence[StrictFileDict] = (),
-            widget: Widget[Self] | None = None,
-            render_kw: dict[str, Any] | None = None,
-            name: str | None = None,
-            _form: BaseForm | None = None,
-            _prefix: str = '',
-            _translations: _SupportsGettextAndNgettext | None = None,
-            _meta: DefaultMeta | None = None,
-            # onegov specific kwargs that get popped off
-            *,
-            fieldset: str | None = None,
-            depends_on: Sequence[Any] | None = None,
-            pricing: PricingRules | None = None,
-        ) -> None: ...
-    else:
-        def __init__(self, *args, **kwargs):
-            kwargs.setdefault('validators', [])
-            kwargs['validators'].append(
-                WhitelistedMimeType({
-                    'application/excel',
-                    'application/octet-stream',
-                    'application/vnd.ms-excel',
-                    'application/vnd.ms-office',
-                    (
-                        'application/vnd.openxmlformats-officedocument'
-                        '.spreadsheetml.sheet'
-                    ),
-                    'application/zip'
-                })
-            )
-            kwargs['validators'].append(FileSizeLimit(10 * 1024 * 1024))
-            kwargs.setdefault('render_kw', {})['force_simple'] = True
+    def __init__(
+        self,
+        label: str | None = None,
+        validators: Validators[FormT, Self] | None = None,
+        filters: Sequence[Filter] = (),
+        description: str = '',
+        id: str | None = None,
+        default: StrictFileDict | None = None,
+        widget: Widget[Self] | None = None,
+        render_kw: dict[str, Any] | None = None,
+        name: str | None = None,
+        _form: BaseForm | None = None,
+        _prefix: str = '',
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
+        # onegov specific kwargs that get popped off
+        *,
+        fieldset: str | None = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
+    ) -> None:
 
-            super().__init__(*args, **kwargs)
+        mimetypes = {
+            'application/excel',
+            'application/octet-stream',
+            'application/vnd.ms-excel',
+            'application/vnd.ms-office',
+            (
+                'application/vnd.openxmlformats-officedocument'
+                '.spreadsheetml.sheet'
+            ),
+            'application/zip'
+        }
+
+        super().__init__(
+            label=label,
+            validators=[*(validators or ()), FileSizeLimit(10 * 1024 * 1024)],
+            filters=filters,
+            description=description,
+            id=id,
+            default=default,
+            widget=widget,
+            render_kw={**(render_kw or {}), 'force_simple': True},
+            name=name,
+            allowed_mimetypes=mimetypes,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta,
+            fieldset=fieldset,
+            depends_on=depends_on,
+            pricing=pricing
+        )
 
     data: list[SwissVote]  # type:ignore[assignment]
 
@@ -90,7 +100,6 @@ class SwissvoteDatasetField(UploadField):
 
         """
 
-        super().post_validate(form, validation_stopped)
         if validation_stopped:
             return
 
@@ -126,6 +135,8 @@ class SwissvoteDatasetField(UploadField):
                 'Some columns are missing: ${columns}.',
                 mapping={'columns': ', '.join(missing)}
             ))
+
+        super().post_validate(form, validation_stopped)
 
         value: Any | None
         for index in range(2, sheet.max_row + 1):

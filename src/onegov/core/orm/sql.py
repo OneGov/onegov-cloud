@@ -15,14 +15,14 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from pglast.ast import RawStmt  # type:ignore[import-untyped]
-    from sqlalchemy.sql.selectable import Alias
+    from sqlalchemy.sql import Subquery
     from sqlalchemy.types import TypeEngine
 
 
 NESTED_TYPE = re.compile(r'(\w+)\((\w+)\)')
 
 
-def as_selectable(query: str, alias: str | None = None) -> Alias:
+def as_selectable(query: str, alias: str | None = None) -> Subquery:
     """ Takes a raw SQL query and turns it into a selectable SQLAlchemy
     expression using annotations in comments.
 
@@ -83,7 +83,7 @@ def type_by_string(
 
 
 @lru_cache(maxsize=64)
-def as_selectable_from_path(path: str) -> Alias:
+def as_selectable_from_path(path: str) -> Subquery:
     alias = os.path.basename(path).split('.', 1)[0]
 
     with open(path) as f:

@@ -218,6 +218,13 @@ class DirectoryArchiveReader:
 
         """
         meta_data = self.read_metadata()
+        # FIXME: It is a little fragile that we don't add the newly created
+        #        target to a session, since some of the logic depends on
+        #        there being a session, afterwards both the directory and the
+        #        entries would need to be added to the session in order for
+        #        them to get properly persisted...
+        #        Since we only ever seem to omit the target parameter in tests
+        #        it's probably best to just no longer make it optional.
         directory = target or Directory.get_polymorphic_class(
             meta_data.get('type', 'generic'),
             Directory
@@ -227,8 +234,11 @@ class DirectoryArchiveReader:
             directory = self.apply_metadata(directory, meta_data)
 
         if skip_existing and target:
+            session = object_session(target)
+            assert session is not None
             existing = {
-                e.name for e in object_session(target).query(DirectoryEntry)
+                entry_name
+                for entry_name, in session.query(DirectoryEntry)
                 .filter_by(directory_id=target.id)
                 .with_entities(DirectoryEntry.name)
             }
@@ -459,7 +469,9 @@ class DirectoryArchiveWriter:
         write = getattr(self, f'write_{self.format}')
         write(self.path / f'data.{self.format}', data)
 
-        self.write_paths(object_session(directory), paths, fid_to_entry)
+        session = object_session(directory)
+        assert session is not None
+        self.write_paths(session, paths, fid_to_entry)
 
     def write_paths(
         self,

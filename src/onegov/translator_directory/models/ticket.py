@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 
 
 class TranslatorMutationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'TRN'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'TRN'}
 
     if TYPE_CHECKING:
         handler: TranslatorMutationHandler
@@ -183,7 +183,7 @@ class TranslatorMutationHandler(Handler):
 
 
 class TimeReportTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'TRP'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'TRP'}
     es_type_name = 'translator_time_reports'
 
     def reference_group(self, request: OrgRequest) -> str:
@@ -681,7 +681,7 @@ class TimeReportHandler(Handler):
 
 
 class AccreditationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'AKK'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'AKK'}
 
     if TYPE_CHECKING:
         handler: AccreditationHandler

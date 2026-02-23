@@ -1,6 +1,6 @@
 @page {
     size: A4;
-    margin: 2.5cm 0.75cm 2cm 0.75cm;  /* top right bottom left */
+    margin: 6cm 0.75cm 2cm 3cm;  /* top right bottom left */
     @top-right {
         content: "Staatskanzlei";
         font-family: Helvetica, Arial, sans-serif;
@@ -17,19 +17,19 @@ body {
 .first-line {
     font-size: 7pt;
     text-decoration: underline;
-    margin-left: 1.0cm;
+    margin-left: 0;
     margin-bottom: 0.2cm;
 }
 
 .address {
-    margin-left: 1.0cm;
+    margin-left: 0;
     margin-bottom: 0.5cm;
     font-size: 8pt;
     line-height: 1.4;
 }
 
 .date {
-    margin-left: 1.0cm;
+    margin-left: 0;
     margin-bottom: 2cm;
     font-size: 8pt;
 }

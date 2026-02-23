@@ -21,8 +21,12 @@ from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import (
-    FileSizeLimit, ValidPhoneNumber, ValidFilterFormDefinition)
-from onegov.form.validators import WhitelistedMimeType
+    FileSizeLimit,
+    ValidPhoneNumber,
+    ValidFilterFormDefinition,
+    MIME_TYPES_EXCEL,
+    MIME_TYPES_PDF,
+)
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.utils import complete_url
@@ -124,13 +128,13 @@ class EventForm(Form):
         file_class=EventFile,
         validators=[
             Optional(),
-            WhitelistedMimeType({
-                'image/gif',
-                'image/jpeg',
-                'image/png'
-            }),
             FileSizeLimit(5 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=(
+            'image/gif',
+            'image/jpeg',
+            'image/png',
+        )
     )
 
     pdf = UploadFileWithORMSupport(
@@ -138,11 +142,9 @@ class EventForm(Form):
         file_class=EventFile,
         validators=[
             Optional(),
-            WhitelistedMimeType({
-                'application/pdf',
-            }),
             FileSizeLimit(5 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=MIME_TYPES_PDF,
     )
 
     location = StringField(
@@ -537,21 +539,9 @@ class EventImportForm(Form):
         label=_('Import'),
         validators=[
             DataRequired(),
-            WhitelistedMimeType({
-                'application/excel',
-                'application/vnd.ms-excel',
-                (
-                    'application/'
-                    'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                ),
-                'application/vnd.ms-office',
-                'application/octet-stream',
-                'application/zip',
-                'text/csv',
-                'text/plain',
-            }),
             FileSizeLimit(10 * 1024 * 1024)
         ],
+        allowed_mimetypes=MIME_TYPES_EXCEL,
         render_kw={'force_simple': True}
     )
 

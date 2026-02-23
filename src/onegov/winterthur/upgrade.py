@@ -36,7 +36,7 @@ def add_mission_count_and_type_to_reports(context: UpgradeContext) -> None:
                 'mission_type',
                 Enum(*MISSION_TYPES, name='mission_type'),
                 default='single'),
-            default=lambda x: 'single'
+            default=lambda x: 'single'  # type: ignore
         )
 
     if not context.has_column('mission_reports', 'mission_count'):

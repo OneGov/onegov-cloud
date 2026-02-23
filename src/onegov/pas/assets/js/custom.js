@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     handleBulkAddCommission();
     handleAttendanceFormSync();
+    handleParliamentarianCounter();
 });
 
 
@@ -112,6 +113,31 @@ function handleBulkAddCommission() {
       }
     });
   }
+}
+
+
+function handleParliamentarianCounter() {
+    if (!window.location.href.includes('/new-bulk')) {
+        return;
+    }
+
+    var $list = $('#parliamentarian_id');
+    if (!$list.length || !$list.is('ul')) {
+        return;
+    }
+
+    var $counter = $('<li><strong></strong></li>');
+    $list.prepend($counter);
+
+    function update() {
+        var $boxes = $list.find("input[type='checkbox']");
+        var total = $boxes.length;
+        var checked = $boxes.filter(':checked').length;
+        $counter.find('strong').text(checked + ' / ' + total);
+    }
+
+    update();
+    $list.on('change', 'input[type="checkbox"]', update);
 }
 
 

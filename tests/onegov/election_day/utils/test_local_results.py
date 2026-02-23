@@ -36,7 +36,7 @@ def test_add_local_results_simple(session: Session) -> None:
     assert not target.local
 
     # no vote
-    source = ArchivedResult(type='vote', external_id='id')  # type: ignore[misc]
+    source = ArchivedResult(type='vote', external_id='id')
     add_local_results(source, target, bern, session)
     assert not target.local
 
@@ -45,14 +45,14 @@ def test_add_local_results_simple(session: Session) -> None:
     session.flush()
     vote = session.query(Vote).one()
 
-    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
     assert not target.local
 
     # no results
     assert vote.proposal  # create
 
-    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
     assert not target.local
 
@@ -66,14 +66,14 @@ def test_add_local_results_simple(session: Session) -> None:
     session.flush()
     proposal = session.query(BallotResult).one()
 
-    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
     assert not target.local
 
     # simple vote
     proposal.counted = True
 
-    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
     assert target.local
     assert target.local_answer == 'rejected'
@@ -110,7 +110,7 @@ def test_add_local_results_complex(session: Session) -> None:
     assert not target.local
 
     # no vote
-    source = ArchivedResult(type='vote', external_id='id')  # type: ignore[misc]
+    source = ArchivedResult(type='vote', external_id='id')
     add_local_results(source, target, bern, session)
     assert not target.local
 
@@ -127,7 +127,7 @@ def test_add_local_results_complex(session: Session) -> None:
     assert vote.tie_breaker  # create
     session.flush()
 
-    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
     assert not target.local
 
@@ -155,7 +155,7 @@ def test_add_local_results_complex(session: Session) -> None:
     counter = vote.counter_proposal.results[0]
     tie = vote.tie_breaker.results[0]
 
-    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
     assert not target.local
 

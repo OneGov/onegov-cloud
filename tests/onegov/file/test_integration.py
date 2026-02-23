@@ -425,7 +425,7 @@ def test_sign_file(app: TestApp) -> None:
         path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
 
         with open(path, 'rb') as f:
-            app.session().add(File(name='sample.pdf', reference=f))  # type: ignore[misc]
+            app.session().add(File(name='sample.pdf', reference=f))
 
         with open(path, 'rb') as f:
             old_digest = hashlib.sha256(f.read()).hexdigest()
@@ -478,7 +478,7 @@ def test_sign_transaction(app: TestApp, temporary_path: Path) -> None:
         path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
 
         with open(path, 'rb') as f:
-            app.session().add(File(name='sample.pdf', reference=f))  # type: ignore[misc]
+            app.session().add(File(name='sample.pdf', reference=f))
 
         with open(path, 'rb') as f:
             old_digest = hashlib.sha256(f.read()).hexdigest()
@@ -526,7 +526,7 @@ def test_find_by_content_signed(app: TestApp, temporary_path: Path) -> None:
         transaction.begin()
 
         with open(path, 'rb') as f:
-            app.session().add(File(name='sample.pdf', reference=f))  # type: ignore[misc]
+            app.session().add(File(name='sample.pdf', reference=f))
 
         transaction.commit()
 
@@ -561,7 +561,7 @@ def test_signature_file_messages(app: TestApp) -> None:
         transaction.begin()
         path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
         with open(path, 'rb') as f:
-            app.session().add(File(name='sample.pdf', reference=f))  # type: ignore[misc]
+            app.session().add(File(name='sample.pdf', reference=f))
         transaction.commit()
 
         pdf = app.session().query(File).one()

@@ -38,11 +38,14 @@ class PeriodSelectForm(Form):
 
     @property
     def period_choices(self) -> list[_Choice]:
-        q = BookingPeriodCollection(self.request.session).query()
-        q = q.with_entities(BookingPeriod.id, BookingPeriod.title)
-        q = q.order_by(BookingPeriod.execution_start)
-
-        return [(row.id.hex, row.title) for row in q]
+        return [
+            (row.id.hex, row.title)
+            for row in (
+                BookingPeriodCollection(self.request.session).query()
+                .with_entities(BookingPeriod.id, BookingPeriod.title)
+                .order_by(BookingPeriod.execution_start)
+            )
+        ]
 
     @property
     def selected_period(self) -> BookingPeriod | None:

@@ -52,9 +52,7 @@ strict = true
 implicit_reexport = true
 warn_unreachable = true
 warn_return_any = false
-# FIXME: remove sqlalchemy when upgrading to SQlAlchemy 2.0
-untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types,selenium.webdriver.chrome.webdriver"
-plugins = "sqlmypy"
+untyped_calls_exclude = "pycurl,selenium.webdriver.chrome.webdriver"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
 [[tool.mypy.overrides]]

@@ -11,6 +11,7 @@ from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.attendence import TYPES
 from onegov.pas.utils import is_commission_president
 from onegov.pas.utils import format_swiss_number
+from onegov.pas.utils import round_to_five_rappen
 from onegov.core.utils import module_path
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
@@ -83,7 +84,8 @@ def generate_parliamentarian_settlement_pdf(
                 <p>Staatskanzlei, Seestrasse 2, 6300 Zug</p><br>
             </div>
             <div class="address">
-                {parliamentarian.formal_greeting}<br>
+                {parliamentarian.formal_greeting.split()[0]}<br>
+                {parliamentarian.first_name} {parliamentarian.last_name}<br>
                 {parliamentarian.shipping_address}<br>
                 {parliamentarian.shipping_address_zip_code}
                 {parliamentarian.shipping_address_city}
@@ -123,8 +125,9 @@ def generate_parliamentarian_settlement_pdf(
                 <td>{entry.date.strftime('%d.%m.%Y')}</td>
                 <td>{entry.type_description}</td>
                 <td class="numeric">{format_swiss_number(
-                    entry.calculated_value)}</td>
-                <td class="numeric">{format_swiss_number(entry.base_rate)}</td>
+                    round_to_five_rappen(entry.calculated_value))}</td>
+                <td class="numeric">{format_swiss_number(
+                    round_to_five_rappen(entry.base_rate))}</td>
             </tr>
         """
         if entry.type_description not in ['Total', 'Auszahlung']:
@@ -163,25 +166,29 @@ def generate_parliamentarian_settlement_pdf(
             entry.calculated_value
             for entry in type_totals[type_key]['entries']
         )
+        total_value_rounded = round_to_five_rappen(total_value)
         total_value_str = (
-            format_swiss_number(total_value) if type_key != 'expenses' else '-'
+            format_swiss_number(total_value_rounded)
+            if type_key != 'expenses'
+            else '-'
         )
         base_total = type_totals[type_key]['total']
-        # Apply cost of living adjustment
         total_chf = base_total * cola_multiplier
-        total += total_chf
+        total_chf_rounded = round_to_five_rappen(total_chf)
+        total += total_chf_rounded
         html += f"""
             <tr>
                 <td>{type_name}</td>
                 <td class="numeric">{total_value_str}</td>
-                <td class="numeric">{format_swiss_number(total_chf)}</td>
+                <td class="numeric">{format_swiss_number(
+                    total_chf_rounded)}</td>
             </tr>
         """
     html += f"""
             <tr class="merge-cells">
                 <td>Auszahlung</td>
-                <td colspan="2" class="numeric">{format_swiss_number(total)}
-                </td>
+                <td colspan="2" class="numeric">{format_swiss_number(
+                    total)}</td>
             </tr>
         </tbody>
     </table>

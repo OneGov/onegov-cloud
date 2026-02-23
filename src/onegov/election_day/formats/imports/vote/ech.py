@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.formats.imports.common import ECHImportResultType
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
     from onegov.election_day.models import Municipality
     from sqlalchemy.orm import Session
     from xsdata_ech.e_ch_0252_1_0 import Delivery as DeliveryV1
@@ -91,6 +93,7 @@ def import_votes_ech(
         votes[identification] = vote
 
     # delete obsolete votes
+    deleted: set[ElectionCompound | Election | Vote]
     deleted = {vote for vote in existing_votes if vote not in votes.values()}
 
     # update information and add results

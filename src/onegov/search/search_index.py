@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from datetime import datetime
+from uuid import UUID
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import UTCPublicationMixin
-from onegov.core.orm.types import UUID, UTCDateTime
-from sqlalchemy import Boolean, Column, Integer, String
-from sqlalchemy import CheckConstraint, Index
+from sqlalchemy import CheckConstraint, Index, String
 from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR
+from sqlalchemy.orm import mapped_column, Mapped
 
 
 from typing import TYPE_CHECKING
@@ -25,51 +26,50 @@ class SearchIndex(Base, UTCPublicationMixin):
 
     __tablename__ = 'search_index'
 
-    id = Column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
     #: Class name of the original model associated with the index entry
-    owner_type = Column(String, nullable=False, index=True)
+    owner_type: Mapped[str] = mapped_column(String, index=True)
 
     #: Table name of the original model associated with the index entry
-    owner_tablename = Column(String, nullable=False, index=True)
+    owner_tablename: Mapped[str] = mapped_column(String, index=True)
 
     #: Integer id of the original model if applicable
-    owner_id_int = Column(Integer, nullable=True)
+    owner_id_int: Mapped[int | None] = mapped_column()
 
     #: UUID id of the original model if applicable
-    owner_id_uuid = Column(UUID, nullable=True)
+    owner_id_uuid: Mapped[UUID | None] = mapped_column()
 
     #: String id of the original model if applicable
-    owner_id_str = Column(String, nullable=True)
+    owner_id_str: Mapped[str | None] = mapped_column(String)
 
     #: Indicates if entry is public (Searchable::fts_public)
-    public = Column(Boolean, nullable=False, default=False)
+    public: Mapped[bool] = mapped_column(default=False)
 
     #: Access level of entry (AccessExtension::access)
-    access = Column(String, nullable=False, default='public', index=True)
+    access: Mapped[str] = mapped_column(String, default='public', index=True)
 
     # FIXME: This might be a bit of a misnomer now, or we want to split this
     #        into two separate columns. This is more of a reference date for
     #        when this entry is relevant. So it affectes time-based search
     #        and time-based relevance.
     #: Timestamp of the last change to the entry (Searchable::fts_last_change)
-    last_change = Column(UTCDateTime, nullable=True, index=True)
+    last_change: Mapped[datetime | None] = mapped_column(index=True)
 
     #: Tags associated with the entry (Searchable::fts_tags)
-    _tags: Column[list[str] | None] = Column(
-        'tags',
+    _tags: Mapped[list[str] | None] = mapped_column(
         ARRAY(String),
-        nullable=True,
+        name='tags',
     )
 
     #: Suggestions for search functionality (Searchable::fts_suggestion)
-    suggestion: Column[list[str] | None] = Column(ARRAY(String), nullable=True)
+    suggestion: Mapped[list[str] | None] = mapped_column(ARRAY(String))
 
     #: Postgres full-text search (fts) index (title)
-    title_vector = Column(TSVECTOR, nullable=False)
+    title_vector: Mapped[str] = mapped_column(TSVECTOR)
 
     #: Postgres full-text search (fts) index (data)
-    data_vector = Column(TSVECTOR, nullable=False)
+    data_vector: Mapped[str] = mapped_column(TSVECTOR)
 
     __mapper_args__ = {
         'polymorphic_on': owner_type
@@ -86,21 +86,21 @@ class SearchIndex(Base, UTCPublicationMixin):
             owner_tablename,
             owner_id_int,
             unique=True,
-            postgresql_where=owner_id_int.isnot(None)
+            postgresql_where=owner_id_int.is_not(None)
         ),
         Index(
             'uq_search_index_owner_tablename_id_uuid',
             owner_tablename,
             owner_id_uuid,
             unique=True,
-            postgresql_where=owner_id_uuid.isnot(None),
+            postgresql_where=owner_id_uuid.is_not(None),
         ),
         Index(
             'uq_search_index_owner_tablename_id_str',
             owner_tablename,
             owner_id_str,
             unique=True,
-            postgresql_where=owner_id_str.isnot(None),
+            postgresql_where=owner_id_str.is_not(None),
         ),
         # avoid more than one owner_id being set per row
         CheckConstraint(
@@ -126,19 +126,19 @@ class SearchIndex(Base, UTCPublicationMixin):
             'ix_search_index_owner_type_id_int',
             owner_type,
             owner_id_int,
-            postgresql_where=owner_id_int.isnot(None)
+            postgresql_where=owner_id_int.is_not(None)
         ),
         Index(
             'ix_search_index_owner_type_id_uuid',
             owner_type,
             owner_id_uuid,
-            postgresql_where=owner_id_uuid.isnot(None),
+            postgresql_where=owner_id_uuid.is_not(None),
         ),
         Index(
             'ix_search_index_owner_type_id_str',
             owner_type,
             owner_id_str,
-            postgresql_where=owner_id_str.isnot(None),
+            postgresql_where=owner_id_str.is_not(None),
         ),
         # compound index for public and access lookups
         Index(

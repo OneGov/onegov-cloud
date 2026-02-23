@@ -44,7 +44,7 @@ if TYPE_CHECKING:
     from onegov.gis import CoordinatesField
     from onegov.org.request import OrgRequest
     from onegov.pay.types import PaymentMethod
-    from sqlalchemy.orm import Query, Session, relationship
+    from sqlalchemy.orm import Mapped, Query, Session
     from typing import type_check_only
     from typing import TypeAlias
     from uuid import UUID
@@ -454,7 +454,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
             form_class: type[DirectoryEntryForm],  # type:ignore[override]
             extensions: Collection[str]
         ) -> type[ExtendedDirectoryEntryForm]: ...
-        entries: relationship[list[ExtendedDirectoryEntry]]  # type: ignore[assignment]
+        entries: Mapped[list[ExtendedDirectoryEntry]]  # type: ignore[assignment]
 
     def form_class_for_submissions(
         self,
@@ -493,8 +493,10 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
         submission_id: UUID
     ) -> DirectorySubmissionAction:
 
+        session = object_session(self)
+        assert session is not None
         return DirectorySubmissionAction(
-            session=object_session(self),
+            session=session,
             directory_id=self.id,
             action=action,
             submission_id=submission_id
@@ -502,6 +504,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
 
     def remove_old_pending_submissions(self) -> None:
         session = object_session(self)
+        assert session is not None
         horizon = sedate.utcnow() - timedelta(hours=24)
 
         submissions = session.query(FormSubmission).filter(and_(
@@ -523,7 +526,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
 
     if TYPE_CHECKING:
         # technically not enforced, but it should be a given
-        directory: relationship[ExtendedDirectory]
+        directory: Mapped[ExtendedDirectory]
 
     fts_type_title = _('Directory entries')
     fts_public = True

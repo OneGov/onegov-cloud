@@ -19,7 +19,6 @@ from onegov.activity import Occasion
 from onegov.activity import OccasionNeed
 from onegov.core.crypto import random_token
 from onegov.core.orm.sql import as_selectable
-from onegov.core.orm.types import UUID
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.core.utils import Bunch
 from onegov.pay import InvoiceReference
@@ -35,6 +34,7 @@ from sqlalchemy import Numeric
 from sqlalchemy import select
 from sqlalchemy import text
 from sqlalchemy import Text
+from sqlalchemy import UUID
 from sqlalchemy.dialects.postgresql import ARRAY
 
 
@@ -355,7 +355,7 @@ def add_invoices(context: UpgradeContext) -> None:
 
     mapping = {
         r.id: Bunch(record=r, invoice=None)
-        for r in context.session.execute(select(stmt.c))
+        for r in context.session.execute(select(*stmt.c))
     }
 
     created = {}  # type:ignore[var-annotated]
@@ -435,7 +435,7 @@ def add_invoice_references(context: UpgradeContext) -> None:
         FROM invoices
     """)
 
-    invoices = context.session.execute(select(stmt.c))
+    invoices = context.session.execute(select(*stmt.c))
 
     # the references might have been created already in the previous upgrade
     # step, if it was executed with the latest release

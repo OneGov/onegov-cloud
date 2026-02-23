@@ -38,6 +38,10 @@ if TYPE_CHECKING:
     from onegov.ticket import Ticket
     from onegov.user import User
 
+    class ActivityRow:
+        title: str
+        name: str
+
 
 class DefaultLayout(BaseLayout):
 
@@ -66,7 +70,11 @@ class DefaultLayout(BaseLayout):
 
         return True
 
-    def offer_again_link(self, activity: VacationActivity, title: str) -> Link:
+    def offer_again_link(
+        self,
+        activity: VacationActivity | ActivityRow,
+        title: str
+    ) -> Link:
         return Link(
             text=title,
             url=self.request.class_link(
@@ -135,16 +143,16 @@ class VacationActivityCollectionLayout(DefaultLayout):
 
     @property
     def offer_again_links(self) -> LinkGroup | None:
-        q = self.app.session().query(VacationActivity)
-        q = q.filter_by(username=self.request.current_username)
-        q = q.filter_by(state='archived')
-        q = q.with_entities(
-            VacationActivity.title,
-            VacationActivity.name,
+        activities: tuple[ActivityRow, ...] = tuple(
+            self.app.session().query(VacationActivity)  # type: ignore[arg-type]
+            .with_entities(
+                VacationActivity.title,
+                VacationActivity.name,
+            )
+            .filter_by(username=self.request.current_username)
+            .filter_by(state='archived')
+            .order_by(VacationActivity.order)
         )
-        q = q.order_by(VacationActivity.order)
-
-        activities = tuple(q)
 
         if activities:
             return LinkGroup(
@@ -591,7 +599,7 @@ class BillingCollectionLayout(DefaultLayout):
             WHERE family IS NOT NULL
             GROUP BY family, text
             ORDER BY text
-        """))
+        """)).tuples()
 
     @property
     def family_removal_links(self) -> Iterator[Link]:

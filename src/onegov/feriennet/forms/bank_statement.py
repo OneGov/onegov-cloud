@@ -4,7 +4,7 @@ from onegov.activity import BookingPeriod, BookingPeriodCollection
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.form.fields import UploadField
-from onegov.form.validators import WhitelistedMimeType, FileSizeLimit
+from onegov.form.validators import FileSizeLimit
 from wtforms.fields import SelectField
 from wtforms.validators import InputRequired, DataRequired, ValidationError
 
@@ -27,24 +27,29 @@ class BankStatementImportForm(Form):
         label=_('ISO 20022 XML'),
         validators=[
             DataRequired(),
-            WhitelistedMimeType({'text/plain', 'text/xml', 'application/xml'}),
             FileSizeLimit(10 * 1024 * 1024)
         ],
+        allowed_mimetypes={
+            'text/plain',
+            'text/xml',
+            'application/xml'
+        },
         render_kw={'force_simple': True}
     )
 
     @property
     def period_choices(self) -> list[_Choice]:
-        periods = BookingPeriodCollection(self.request.session)
-
-        q = periods.query()
-        q = q.with_entities(BookingPeriod.id, BookingPeriod.title)
-        q = q.order_by(
-            BookingPeriod.active.desc(),
-            BookingPeriod.prebooking_start.desc()
-        )
-
-        return [(period_id.hex, title) for period_id, title in q]
+        return [
+            (period_id.hex, title)
+            for period_id, title in (
+                BookingPeriodCollection(self.request.session).query()
+                .with_entities(BookingPeriod.id, BookingPeriod.title)
+                .order_by(
+                    BookingPeriod.active.desc(),
+                    BookingPeriod.prebooking_start.desc()
+                )
+            )
+        ]
 
     def load_periods(self) -> None:
         self.period.choices = self.period_choices

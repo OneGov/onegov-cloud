@@ -12,6 +12,7 @@ from typing import overload, Any, Literal, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import ColumnElement
+    from sqlalchemy.sql.selectable import ScalarSelect
 
 
 InvoiceT = TypeVar('InvoiceT', bound=Invoice)
@@ -83,7 +84,7 @@ class InvoiceCollection(GenericCollection[InvoiceT], Generic[InvoiceT, ItemT]):
 
         return query
 
-    def _invoice_ids(self) -> Query[tuple[UUID]]:
+    def _invoice_ids(self) -> ScalarSelect[UUID]:
         Invoice = self.model_class  # noqa: N806
         return self.query().with_entities(Invoice.id).scalar_subquery()
 

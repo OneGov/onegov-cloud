@@ -429,9 +429,11 @@ def import_election_wabstic_majorz(
     result_uids = {entity_id: uuid4() for entity_id in added_results}
 
     session = object_session(election)
-    session.bulk_insert_mappings(Candidate, added_candidates.values())
+    assert session is not None
+    # FIXME: Switch to regular `session.execute` with insert statements
+    session.bulk_insert_mappings(Candidate, added_candidates.values())  # type: ignore[arg-type]
     session.bulk_insert_mappings(
-        ElectionResult,
+        ElectionResult,  # type: ignore[arg-type]
         (
             {
                 'id': result_uids[entity_id],
@@ -455,7 +457,7 @@ def import_election_wabstic_majorz(
         )
     )
     session.bulk_insert_mappings(
-        CandidateResult,
+        CandidateResult,  # type: ignore[arg-type]
         (
             {
                 'id': uuid4(),
@@ -498,7 +500,7 @@ def import_election_wabstic_majorz(
                 'counted': False
             }
         )
-    session.bulk_insert_mappings(ElectionResult, result_inserts)
+    session.bulk_insert_mappings(ElectionResult, result_inserts)  # type: ignore[arg-type]
     session.flush()
     session.expire_all()
 

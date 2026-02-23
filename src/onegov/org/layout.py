@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import numbers
-from math import isclose
 
 import babel.dates
 import re
@@ -13,6 +12,7 @@ from dateutil.rrule import rrulestr
 from decimal import Decimal
 from functools import cached_property
 from markupsafe import Markup
+from math import isclose
 from os.path import splitext, basename
 
 from onegov.chat import TextModuleCollection
@@ -2489,7 +2489,7 @@ class AllocationEditFormLayout(DefaultLayout):
             if not self.request.is_manager:
                 return
 
-            if isclose(self.model.availability, 100.0):
+            if isclose(self.model.availability, 100.0, abs_tol=.005):
                 yield Link(
                     _('Delete'),
                     self.csrf_protected_url(

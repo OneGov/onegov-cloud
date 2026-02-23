@@ -426,7 +426,7 @@ def import_elections_internal(
             csv_file = f.extractfile(member)
             assert csv_file is not None
             if not election:
-                election = model_mapping[election_type](  # type: ignore[misc]
+                election = model_mapping[election_type](
                     title=f'{election_type}_{api}_{name}',
                     date=election_date,
                     number_of_mandates=number_of_mandates,
@@ -510,7 +510,7 @@ def import_election_compounds_internal(
                     domain='canton',
                 )
                 for index in range(len(domain_segment)):
-                    proporz_election = ProporzElection(  # type: ignore[misc]
+                    proporz_election = ProporzElection(
                         title=f'proporz_{api}_{domain_segment[index]}',
                         date=election_date,
                         shortcode=f'{index}',
@@ -633,7 +633,7 @@ def import_elections_wabstic(
             else:
                 election_date = date_
             if not election:
-                election = model_mapping[election_type](  # type: ignore[misc]
+                election = model_mapping[election_type](
                     title=f'{election_type}_{api}_{folder}',
                     date=election_date,
                     number_of_mandates=number_of_mandates,
@@ -731,7 +731,7 @@ def import_votes_internal(
 
             csv_file = f.extractfile(member).read()  # type: ignore[union-attr]
             if not vote:
-                vote = model_mapping[vote_type](  # type: ignore[misc]
+                vote = model_mapping[vote_type](
                     title=f'{vote_type}_{api}_{name}',
                     date=vote_date,
                     domain=domain,

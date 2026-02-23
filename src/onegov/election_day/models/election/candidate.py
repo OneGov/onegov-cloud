@@ -1,23 +1,23 @@
 from __future__ import annotations
 
+from builtins import list as list_t
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
-from onegov.election_day.models.election.candidate_result import \
-    CandidateResult
+from onegov.election_day.models.election.candidate_result import (
+    CandidateResult)
 from onegov.election_day.models.election.election_result import ElectionResult
 from onegov.election_day.models.mixins import summarized_property
-from sqlalchemy import Boolean
-from sqlalchemy import Column
+from onegov.election_day.types import Gender
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
-from sqlalchemy import Integer
 from sqlalchemy import select
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
+from uuid import UUID
 
 
 from typing import cast, TYPE_CHECKING
@@ -28,11 +28,7 @@ if TYPE_CHECKING:
     from onegov.election_day.models import ProporzElection
     from onegov.election_day.types import DistrictPercentage
     from onegov.election_day.types import EntityPercentage
-    from onegov.election_day.types import Gender
     from sqlalchemy.sql import ColumnElement
-    import uuid
-
-    list_t = list
 
 
 class Candidate(Base, TimestampMixin):
@@ -41,78 +37,68 @@ class Candidate(Base, TimestampMixin):
     __tablename__ = 'candidates'
 
     #: the internal id of the candidate
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the external id of the candidate
-    candidate_id: Column[str] = Column(Text, nullable=False)
+    candidate_id: Mapped[str]
 
     #: the family name
-    family_name: Column[str] = Column(Text, nullable=False)
+    family_name: Mapped[str]
 
     #: the first name
-    first_name: Column[str] = Column(Text, nullable=False)
+    first_name: Mapped[str]
 
     #: True if the candidate is elected
-    elected: Column[bool] = Column(Boolean, nullable=False)
+    elected: Mapped[bool]
 
     #: the gender
-    gender: Column[Gender | None] = Column(
-        Enum(  # type:ignore[arg-type]
+    gender: Mapped[Gender | None] = mapped_column(
+        Enum(
             'male',
             'female',
             'undetermined',
             name='candidate_gender'
-        ),
-        nullable=True
+        )
     )
 
     #: the year of birth
-    year_of_birth: Column[int | None] = Column(Integer, nullable=True)
+    year_of_birth: Mapped[int | None]
 
     #: the election id this candidate belongs to
-    election_id: Column[str] = Column(
-        Text,
+    election_id: Mapped[str] = mapped_column(
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
-        nullable=False
     )
 
     #: the election this candidate belongs to
-    election: relationship[Election] = relationship(
-        'Election',
+    election: Mapped[Election] = relationship(
         back_populates='candidates'
     )
 
     #: the list id this candidate belongs to
-    list_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('lists.id', ondelete='CASCADE'),
-        nullable=True
+    list_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey('lists.id', ondelete='CASCADE')
     )
 
     #: the list this candidate belongs to
-    list: relationship[List] = relationship(
-        'List',
+    list: Mapped[List | None] = relationship(
         back_populates='candidates'
     )
 
     #: the party name
-    party: Column[str | None] = Column(Text, nullable=True)
+    party: Mapped[str | None]
 
     #: a candidate contains n results
-    results: relationship[list_t[CandidateResult]] = relationship(
-        'CandidateResult',
+    results: Mapped[list_t[CandidateResult]] = relationship(
         cascade='all, delete-orphan',
         back_populates='candidate'
     )
 
     #: a (proporz) candidate contains votes from other other lists
-    panachage_results: relationship[list_t[CandidatePanachageResult]] = (
+    panachage_results: Mapped[list_t[CandidatePanachageResult]] = (
         relationship(
-            'CandidatePanachageResult',
             cascade='all, delete-orphan',
             back_populates='candidate'
         )
@@ -165,6 +151,7 @@ class Candidate(Base, TimestampMixin):
             ).subquery()
 
             session = object_session(self)
+            assert session is not None
             results = session.query(
                 results_sub.c.id,
                 results_sub.c.counted,
@@ -223,7 +210,7 @@ class Candidate(Base, TimestampMixin):
 
             totals_by_district = self.election.votes_by_district.subquery()
 
-            query = query.with_entities(
+            subquery = query.with_entities(
                 ElectionResult.district.label('name'),
                 func.array_agg(ElectionResult.entity_id).label('entities'),
                 func.coalesce(
@@ -231,12 +218,13 @@ class Candidate(Base, TimestampMixin):
                 ).label('counted'),
                 func.sum(CandidateResult.votes).label('votes'),
             )
-            query = query.group_by(ElectionResult.district)
-            query = query.order_by(None)
+            subquery = subquery.group_by(ElectionResult.district)
+            subquery = subquery.order_by(None)
 
-            results_sub = query.subquery()
+            results_sub = subquery.subquery()
 
             session = object_session(self)
+            assert session is not None
             results = session.query(
                 results_sub.c.name,
                 results_sub.c.entities,

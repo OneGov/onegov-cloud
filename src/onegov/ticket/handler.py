@@ -56,7 +56,9 @@ class Handler:
 
     @property
     def session(self) -> Session:
-        return object_session(self.ticket)
+        session = object_session(self.ticket)
+        assert session is not None
+        return session
 
     def refresh(self) -> None:
         """ Updates the current ticket with the latest data from the handler.

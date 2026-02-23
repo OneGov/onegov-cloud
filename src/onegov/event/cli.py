@@ -265,7 +265,7 @@ def import_json(
                 if 'Im Dreiklang'.lower() not in location.lower():
                     location = f'Im Dreiklang, {location}'
 
-            event = Event(  # type: ignore[misc]
+            event = Event(
                 state='initiated',
                 name=events._get_unique_name(title),
                 title=title,
@@ -301,7 +301,7 @@ def import_json(
 
                 if buffer:
                     filename = item['images'][0]['name'] or 'event-image'
-                    event.image = EventFile(  # type:ignore[misc]
+                    event.image = EventFile(
                         name=filename,
                         reference=as_fileintent(buffer, filename)
                     )
@@ -311,7 +311,7 @@ def import_json(
 
                 if buffer:
                     filename = item['attachements'][0]['name'] or 'attachment'
-                    event.pdf = EventFile(  # type:ignore[misc]
+                    event.pdf = EventFile(
                         name=filename,
                         reference=as_fileintent(buffer, filename)
                     )
@@ -497,7 +497,7 @@ def import_guidle(
                             pdf = download_file(pdf_url)
 
                     for index, schedule in enumerate(offer.schedules()):
-                        event = Event(  # type:ignore[misc]
+                        event = Event(
                             state='initiated',
                             title=offer.title,
                             start=schedule.start,

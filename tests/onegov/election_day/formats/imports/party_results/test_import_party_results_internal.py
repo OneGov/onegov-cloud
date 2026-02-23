@@ -518,7 +518,7 @@ def test_import_party_results_internal_domains(session: Session) -> None:
     principal = Canton('bl')
 
     session.add(
-        ProporzElection(  # type: ignore[misc]
+        ProporzElection(
             title='election',
             domain='region',
             domain_segment='Allschwil',

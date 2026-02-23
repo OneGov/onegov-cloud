@@ -78,9 +78,10 @@ def get_accountant_ticket_count(
             )
         )
         .group_by(Ticket.state)
+        .tuples()
     )
 
-    return TicketCount(**dict(query))
+    return TicketCount(**dict(query))  # type: ignore[misc]
 
 
 def get_global_tools(

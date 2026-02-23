@@ -203,7 +203,7 @@ def test_election_compound_utils_parties(
     assert not errors
     session.add(election)
 
-    election_compound = ElectionCompound(  # type: ignore[misc]
+    election_compound = ElectionCompound(
         title='Compound',
         domain='canton',
         date=date(2014, 1, 1),

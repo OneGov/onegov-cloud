@@ -5,7 +5,6 @@ from onegov.election_day.forms.upload.common import MAX_FILE_SIZE
 from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
 from wtforms.validators import DataRequired
 
 
@@ -15,9 +14,9 @@ class UploadWabstiVoteForm(Form):
         label='SG_Gemeinden',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True}
     )
 
@@ -25,8 +24,8 @@ class UploadWabstiVoteForm(Form):
         label='SG_Geschaefte.csv',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True}
     )

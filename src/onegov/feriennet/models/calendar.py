@@ -16,8 +16,9 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.activity.models.booking import BookingState
     from onegov.feriennet.request import FeriennetRequest
-    from sqlalchemy.orm import Query, Session
-    from sqlalchemy.sql.selectable import Alias
+    from sqlalchemy.engine import Result
+    from sqlalchemy.orm import Session
+    from sqlalchemy.sql import Subquery
     from typing import NamedTuple
     from typing import Self
     from uuid import UUID
@@ -89,7 +90,7 @@ class AttendeeCalendar(Calendar, name='attendee'):
         self.attendee = attendee
 
     @property
-    def attendee_calendar(self) -> Alias:
+    def attendee_calendar(self) -> Subquery:
         return as_selectable_from_path(
             module_path('onegov.feriennet', 'queries/attendee_calendar.sql'))
 
@@ -130,7 +131,7 @@ class AttendeeCalendar(Calendar, name='attendee'):
         session = request.session
         stmt = self.attendee_calendar
 
-        records: Query[AttendeeCalendarRow]
+        records: Result[AttendeeCalendarRow]
         # FIXME: Should this exclude cancelled occasions, or does an accepted
         #        booking guarantee that the occassion is not cancelled?
         records = session.execute(select(*stmt.c).where(and_(
@@ -141,7 +142,7 @@ class AttendeeCalendar(Calendar, name='attendee'):
 
         datestamp = utcnow()
 
-        for record in records:
+        for record in records.tuples():
             event = icalendar.Event()
 
             event.add('uid', record.uid)

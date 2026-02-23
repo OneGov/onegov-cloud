@@ -9,7 +9,6 @@ from onegov.form import FormCollection
 from onegov.form import FormExtension
 from onegov.form import FormRegistrationWindow
 from onegov.form import FormSubmission
-from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 from webob.multidict import MultiDict
 from wtforms.validators import ValidationError
@@ -544,12 +543,14 @@ def test_registration_submission_state(session: Session) -> None:
         state='complete',
     )
 
-    def query_registration_state() -> RegistrationState:
-        q = forms.submissions.query()
-        q = q.with_entities(FormSubmission.registration_state)
-        q = q.order_by(desc(FormSubmission.created))
-
-        return q.first().registration_state
+    def query_registration_state() -> RegistrationState | None:
+        result = (
+            forms.submissions.query()
+            .with_entities(FormSubmission.registration_state)
+            .order_by(FormSubmission.created.desc())
+            .first()
+        )
+        return result and result[0]
 
     assert submission.registration_state is None
     assert query_registration_state() is None

@@ -170,6 +170,8 @@ def add_bulk_attendence(
 ) -> RenderData | Response:
     request.include('custom')
 
+    title = _('New commission session (bulk)')
+
     if form.submitted(request):
         if form.date.data:
             if error := validate_attendance_date(
@@ -178,7 +180,7 @@ def add_bulk_attendence(
                 request.alert(error)
                 return {
                     'layout': AttendenceCollectionLayout(self, request),
-                    'title': _('New commission session'),
+                    'title': title,
                     'form': form,
                     'form_width': 'large',
                 }
@@ -209,7 +211,7 @@ def add_bulk_attendence(
                     )
                     return {
                         'layout': AttendenceCollectionLayout(self, request),
-                        'title': _('New commission session'),
+                        'title': title,
                         'form': form,
                         'form_width': 'large',
                     }
@@ -230,19 +232,19 @@ def add_bulk_attendence(
             request.warning(_('No parliamentarians selected'))
             return request.redirect(request.class_link(AttendenceCollection))
 
-        request.success(_('Added commission session'))
+        request.success(_('Added session'))
 
         return request.redirect(request.link(self))
 
     layout = AttendenceCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_('New commission session'), '#'))
+    layout.breadcrumbs.append(Link(title, '#'))
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _('New commission session'),
+        'title': title,
         'form': form,
-        'form_width': 'large'
+        'form_width': 'large',
     }
 
 
@@ -378,6 +380,9 @@ def edit_commission_bulk_attendence(
 ) -> RenderData | Response:
     request.include('custom')
 
+    type_label = request.translate(self.type_label)
+    title = _('Edit ${type}', mapping={'type': type_label})
+
     if form.submitted(request):
         if form.date.data:
             if error := validate_attendance_date(
@@ -386,7 +391,7 @@ def edit_commission_bulk_attendence(
                 request.alert(error)
                 return {
                     'layout': AttendenceCollectionLayout(self, request),
-                    'title': _('Edit commission session'),
+                    'title': title,
                     'form': form,
                     'form_width': 'large'
                 }
@@ -498,7 +503,7 @@ def edit_commission_bulk_attendence(
 
     return {
         'layout': layout,
-        'title': _('Edit commission session'),
+        'title': title,
         'form': form,
         'form_width': 'large'
     }
@@ -514,6 +519,7 @@ def add_plenary_attendence(self: AttendenceCollection,
     request: PasRequest,
     form: AttendenceAddPlenaryForm
 ) -> RenderData | Response:
+    request.include('custom')
 
     if not request.is_admin:
         request.alert(_('You do not have permission to add plenary sessions.'))

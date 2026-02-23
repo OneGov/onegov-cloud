@@ -302,9 +302,10 @@ class CitizenTicketBoardlet(OrgBoardlet):
             self.session.query(
                 Ticket.state,
                 func.count(Ticket.id)
-            ).filter(
-                func.lower(Ticket.ticket_email) == email.lower()
-            ).group_by(Ticket.state)
+            )
+            .filter(func.lower(Ticket.ticket_email) == email.lower())
+            .group_by(Ticket.state)
+            .tuples()
         ) if (email := self.request.authenticated_email) else {}
 
         yield BoardletFact(

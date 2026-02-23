@@ -1,38 +1,11 @@
 from __future__ import annotations
 
+from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import JSONObject
-    from typing import Literal
     from typing import TypedDict
     from typing import TypeAlias
-
-    DomainOfInfluence: TypeAlias = Literal[
-        'federation',
-        'canton',
-        'region',
-        'district',
-        'municipality',
-        'none',
-    ]
-
-    Status: TypeAlias = Literal[
-        'unknown',
-        'interim',
-        'final',
-    ]
-
-    Gender: TypeAlias = Literal[
-        'male',
-        'female',
-        'undetermined',
-    ]
-
-    BallotType: TypeAlias = Literal[
-        'proposal',
-        'counter-proposal',
-        'tie-breaker',
-    ]
 
     class EntityPercentage(TypedDict):
         counted: bool
@@ -108,3 +81,30 @@ if TYPE_CHECKING:
         embed: JSONObject
         media: JSONObject
         data: DataJson
+
+DomainOfInfluence: TypeAlias = Literal[
+    'federation',
+    'canton',
+    'region',
+    'district',
+    'municipality',
+    'none',
+]
+
+Status: TypeAlias = Literal[
+    'unknown',
+    'interim',
+    'final',
+]
+
+Gender: TypeAlias = Literal[
+    'male',
+    'female',
+    'undetermined',
+]
+
+BallotType: TypeAlias = Literal[
+    'proposal',
+    'counter-proposal',
+    'tie-breaker',
+]

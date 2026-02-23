@@ -5,39 +5,36 @@ from onegov.activity.models.period import BookingPeriod
 from onegov.activity.utils import extract_thumbnail, extract_municipality
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
+    dict_property,
     dict_markup_property,
-    ContentMixin,
     meta_property,
+    ContentMixin,
     TimestampMixin,
 )
-from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.user import User
-from sqlalchemy import Column, Enum, Text, ForeignKey
+from sqlalchemy import Enum, ForeignKey
 from sqlalchemy import exists, and_
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import object_session, relationship
-from uuid import uuid4
+from sqlalchemy.orm import mapped_column, object_session, relationship, Mapped
+from uuid import uuid4, UUID
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterable
     from onegov.activity.collections import PublicationRequestCollection
     from onegov.activity.models import BookingPeriodMeta, PublicationRequest
-    from onegov.core.orm.mixins import dict_property
-    from typing import Literal
     from typing import Self, TypeAlias
 
-    ActivityState: TypeAlias = Literal[
-        'preview',
-        'proposed',
-        'accepted',
-        'archived'
-    ]
 
+ActivityState: TypeAlias = Literal[
+    'preview',
+    'proposed',
+    'accepted',
+    'archived'
+]
 
 # Note, a database migration is needed if these states are changed
 ACTIVITY_STATES: tuple[ActivityState, ...] = (
@@ -60,20 +57,19 @@ class Activity(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'activities'
 
     #: An internal id for references (not public)
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: A nice id for the url, readable by humans
-    name: Column[str] = Column(Text, nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(unique=True)
 
     #: The title of the activity
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: The normalized title for sorting
-    order: Column[str] = Column(Text, nullable=False, index=True)
+    order: Mapped[str] = mapped_column(index=True)
 
     #: Describes the activity briefly
     lead: dict_property[str | None] = meta_property()
@@ -85,35 +81,29 @@ class Activity(Base, ContentMixin, TimestampMixin):
     thumbnail: dict_property[str | None] = meta_property()
 
     #: Tags/Categories of the activity
-    _tags: Column[dict[str, str] | None] = Column(  # type:ignore
-        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
-        nullable=True,
+    _tags: Mapped[dict[str, str] | None] = mapped_column(
+        MutableDict.as_mutable(HSTORE),
         name='tags'
     )
 
     #: The user to which this activity belongs to (organiser)
-    username: Column[str] = Column(
-        Text,
-        ForeignKey(User.username),
-        nullable=False
-    )
+    username: Mapped[str] = mapped_column(ForeignKey(User.username))
 
     #: The user which initially reported this activity (same as username, but
     #: this value may not change after initialisation)
-    reporter: Column[str] = Column(Text, nullable=False)
+    reporter: Mapped[str]
 
     #: Describes the location of the activity
-    location: Column[str | None] = Column(Text, nullable=True)
+    location: Mapped[str | None]
 
     #: The municipality in which the activity is held, from the location
-    municipality: Column[str | None] = Column(Text, nullable=True)
+    municipality: Mapped[str | None]
 
     #: Access the user linked to this activity
-    user: relationship[User] = relationship(User)
+    user: Mapped[User] = relationship()
 
     #: The occasions linked to this activity
-    occasions: relationship[list[Occasion]] = relationship(
-        Occasion,
+    occasions: Mapped[list[Occasion]] = relationship(
         order_by='Occasion.order',
         back_populates='activity'
     )
@@ -122,25 +112,17 @@ class Activity(Base, ContentMixin, TimestampMixin):
     #: subclasses of this class. See
     #: `<http://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     #: the state of the activity
-    state: Column[ActivityState] = Column(
-        Enum(*ACTIVITY_STATES, name='activity_state'),  # type:ignore[arg-type]
-        nullable=False,
+    state: Mapped[ActivityState] = mapped_column(
+        Enum(*ACTIVITY_STATES, name='activity_state'),
         default='preview'
     )
 
     #: The publication requests linked to this activity
-    publication_requests: relationship[list[PublicationRequest]] = (
-        relationship(
-            'PublicationRequest',
-            back_populates='activity'
-        )
+    publication_requests: Mapped[list[PublicationRequest]] = relationship(
+        back_populates='activity'
     )
 
     __mapper_args__ = {
@@ -184,6 +166,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
         is active if its period is the currently active period.
         """
         session = object_session(self)
+        assert session is not None
         active_periods = session.query(BookingPeriod.id).filter_by(active=True)
         return [
             occasion for occasion in self.occasions
@@ -219,7 +202,9 @@ class Activity(Base, ContentMixin, TimestampMixin):
         from onegov.activity.collections.publication_request import (
             PublicationRequestCollection)
 
-        return PublicationRequestCollection(object_session(self))
+        session = object_session(self)
+        assert session is not None
+        return PublicationRequestCollection(session)
 
     @property
     def latest_request(self) -> PublicationRequest | None:
@@ -249,7 +234,9 @@ class Activity(Base, ContentMixin, TimestampMixin):
         self,
         period: BookingPeriod | BookingPeriodMeta
     ) -> bool:
-        q = object_session(self).query(
+        session = object_session(self)
+        assert session is not None
+        q = session.query(
             exists().where(and_(
                 Occasion.activity_id == self.id,
                 Occasion.period_id == period.id

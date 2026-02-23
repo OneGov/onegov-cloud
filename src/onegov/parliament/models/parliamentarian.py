@@ -1,52 +1,47 @@
 from __future__ import annotations
 
 from datetime import date
-from sqlalchemy import and_, or_, exists
-from sqlalchemy.ext.hybrid import hybrid_property
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import dict_property, content_property
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.parliament import _
-from sqlalchemy import Column
-from sqlalchemy import Date
+from sqlalchemy import and_, or_, exists
 from sqlalchemy import Enum
-from sqlalchemy import Text
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
+from uuid import UUID
 
 
-from typing import Literal, TypeAlias, TYPE_CHECKING, Any
-
+from typing import Any, Literal, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from onegov.parliament.models import (
         CommissionMembership,
         ParliamentarianRole,
     )
+    from sqlalchemy.sql import ColumnElement
 
-    Gender: TypeAlias = Literal[
-        'male',
-        'female',
-    ]
-    ShippingMethod: TypeAlias = Literal[
-        'a',
-        'plus',
-        'registered',
-        'confidential',
-        'personal',
-    ]
-
+Gender: TypeAlias = Literal[
+    'male',
+    'female',
+]
+ShippingMethod: TypeAlias = Literal[
+    'a',
+    'plus',
+    'registered',
+    'confidential',
+    'personal',
+]
 
 GENDERS: dict[Gender, str] = {
     'male': _('male'),
     'female': _('female'),
 }
-
 
 SHIPPING_METHODS: dict[ShippingMethod, str] = {
     'a': _('A mail'),
@@ -61,11 +56,7 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
 
     __tablename__ = 'par_parliamentarians'
 
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -77,8 +68,7 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         return f'{self.first_name} {self.last_name}'
 
     #: Internal ID
-    id: Column[uuid.UUID] = Column(
-        UUID,   # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
@@ -88,50 +78,32 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     # Note: Value can only be None if the data is imported from an Excel file.
     # Fixme: The excel data import will not be used in the future so we will be
     # able to make this Non-Nullable soon.
-    external_kub_id: Column[uuid.UUID | None] = Column(
-        UUID,   # type:ignore[arg-type]
-        nullable=True,
+    external_kub_id: Mapped[UUID | None] = mapped_column(
         default=uuid4,
         unique=True
     )
 
     #: The first name
-    first_name: Column[str] = Column(
-        Text,
-        nullable=False
-    )
+    first_name: Mapped[str]
 
     #: The last name
-    last_name: Column[str] = Column(
-        Text,
-        nullable=False
-    )
+    last_name: Mapped[str]
 
     #: The personnel number
-    personnel_number: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    personnel_number: Mapped[str | None]
 
     #: The contract number
-    contract_number: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    contract_number: Mapped[str | None]
 
     #: Wahlkreis
-    district: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    district: Mapped[str | None]
 
     #: The gender value
-    gender: Column[Gender] = Column(
+    gender: Mapped[Gender] = mapped_column(
         Enum(
-            *GENDERS.keys(),  # type:ignore[arg-type]
+            *GENDERS.keys(),
             name='pas_gender'
         ),
-        nullable=False,
         default='male'
     )
 
@@ -149,12 +121,11 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         return 'Herr ' + self.first_name + ' ' + self.last_name
 
     #: The shipping method value
-    shipping_method: Column[ShippingMethod] = Column(
+    shipping_method: Mapped[ShippingMethod] = mapped_column(
         Enum(
-            *SHIPPING_METHODS.keys(),   # type:ignore[arg-type]
+            *SHIPPING_METHODS.keys(),
             name='pas_shipping_methods'
         ),
-        nullable=False,
         default='a'
     )
 
@@ -164,174 +135,93 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         return SHIPPING_METHODS.get(self.shipping_method, '')
 
     #: The shipping address
-    shipping_address: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    shipping_address: Mapped[str | None]
 
     #: The shipping address addition
-    shipping_address_addition: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    shipping_address_addition: Mapped[str | None]
 
     #: The shipping address zip code
-    shipping_address_zip_code: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    shipping_address_zip_code: Mapped[str | None]
 
     #: The shipping address city
-    shipping_address_city: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    shipping_address_city: Mapped[str | None]
 
     #: The private address
-    private_address: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    private_address: Mapped[str | None]
 
     #: The private address addition
-    private_address_addition: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    private_address_addition: Mapped[str | None]
 
     #: The private address zip code
-    private_address_zip_code: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    private_address_zip_code: Mapped[str | None]
 
     #: The private address city
-    private_address_city: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    private_address_city: Mapped[str | None]
 
     #: The date of birth
-    date_of_birth: Column[date | None] = Column(
-        Date,
-        nullable=True
-    )
+    date_of_birth: Mapped[date | None]
 
     #: The date of death
-    date_of_death: Column[date | None] = Column(
-        Date,
-        nullable=True
-    )
+    date_of_death: Mapped[date | None]
 
     #: The place of origin
-    place_of_origin: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    place_of_origin: Mapped[str | None]
 
-    party: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    party: Mapped[str | None]
 
     #: The occupation
-    occupation: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    occupation: Mapped[str | None]
 
     #: The academic title
-    academic_title: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    academic_title: Mapped[str | None]
 
     #: The salutation
-    salutation: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    salutation: Mapped[str | None]
 
     #: The salutation used in the address
-    salutation_for_address: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    salutation_for_address: Mapped[str | None]
 
     #: The salutation used for letters
-    salutation_for_letter: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    salutation_for_letter: Mapped[str | None]
 
     #: How bills should be delivered
-    forwarding_of_bills: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    forwarding_of_bills: Mapped[str | None]
 
     #: The private phone number
-    phone_private: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    phone_private: Mapped[str | None]
 
     #: The mobile phone number
-    phone_mobile: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    phone_mobile: Mapped[str | None]
 
     #: The business phone number
-    phone_business: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    phone_business: Mapped[str | None]
 
     #: The primary email address
-    email_primary: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    email_primary: Mapped[str | None]
 
     #: The secondary email address
-    email_secondary: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    email_secondary: Mapped[str | None]
 
     #: The website
-    website: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    website: Mapped[str | None]
 
     #: The remarks
-    remarks: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
+    remarks: Mapped[str | None]
 
     #: A picture
     picture = NamedFile()
 
     #: A parliamentarian may have n roles
-    roles: relationship[list[ParliamentarianRole]] = (
-        relationship(
-            'ParliamentarianRole',
-            cascade='all, delete-orphan',
-            back_populates='parliamentarian',
-            order_by='desc(ParliamentarianRole.start)',
-        )
+    roles: Mapped[list[ParliamentarianRole]] = relationship(
+        cascade='all, delete-orphan',
+        back_populates='parliamentarian',
+        order_by='desc(ParliamentarianRole.start)',
     )
 
     #: A parliamentarian's interest ties
     interests: dict_property[dict[str, Any]] = content_property(default=dict)
 
-    if TYPE_CHECKING:
-        active: Column[bool]
-
-    @hybrid_property  # type: ignore[no-redef]
+    @hybrid_property
     def active(self) -> bool:
         if not self.roles and not self.commission_memberships:
             return True
@@ -346,8 +236,9 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
 
         return False
 
-    @active.expression  # type:ignore[no-redef]
-    def active(cls):
+    @active.inplace.expression
+    @classmethod
+    def _active_expression(cls) -> ColumnElement[bool]:
         from onegov.parliament.models import (
             CommissionMembership,
             ParliamentarianRole,
@@ -401,12 +292,9 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         return False
 
     #: A parliamentarian may be part of n commissions
-    commission_memberships: relationship[list[CommissionMembership]] = (
-        relationship(
-            'CommissionMembership',
-            cascade='all, delete-orphan',
-            back_populates='parliamentarian',
-        )
+    commission_memberships: Mapped[list[CommissionMembership]] = relationship(
+        cascade='all, delete-orphan',
+        back_populates='parliamentarian',
     )
 
     def __repr__(self) -> str:

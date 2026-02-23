@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 def test_oauth_url() -> None:
-    provider = StripeConnect(client_id='foo', client_secret='bar')  # type: ignore[misc]
+    provider = StripeConnect(client_id='foo', client_secret='bar')
 
     url = provider.oauth_url('https://handle-incoming-request', '', {})
     assert 'response_type=code' in url
@@ -36,7 +36,7 @@ def test_oauth_url() -> None:
 
 
 def test_process_oauth_response() -> None:
-    provider = StripeConnect(  # type: ignore[misc]
+    provider = StripeConnect(
         client_id='foo',
         client_secret='bar',
         oauth_gateway='https://oauth.onegovcloud.ch/',

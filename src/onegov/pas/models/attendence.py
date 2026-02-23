@@ -1,35 +1,32 @@
 from __future__ import annotations
 
+import datetime
 from decimal import ROUND_HALF_UP, Decimal
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.pas import _
-from sqlalchemy import Boolean
-from sqlalchemy import Column, Text
-from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
+from uuid import UUID
 
 
+from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    import datetime
     from onegov.pas.models import PASCommission
     from onegov.pas.models import PASParliamentarian
-    from typing import Literal
     from typing import TypeAlias
 
-    AttendenceType: TypeAlias = Literal[
-        'plenary',
-        'commission',
-        'study',
-        'shortest',
-    ]
+AttendenceType: TypeAlias = Literal[
+    'plenary',
+    'commission',
+    'study',
+    'shortest',
+]
 
 TYPES: dict[AttendenceType, str] = {
     'plenary': _('Plenary session'),
@@ -44,11 +41,7 @@ class Attendence(Base, TimestampMixin):
     __tablename__ = 'par_attendence'
 
     #: The polymorphic type of attendence
-    poly_type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    poly_type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': poly_type,
@@ -56,49 +49,35 @@ class Attendence(Base, TimestampMixin):
     }
 
     #: Internal ID
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The date
-    date: Column[datetime.date] = Column(
-        Date,
-        nullable=False
-    )
+    date: Mapped[datetime.date]
 
     #: The duration in minutes
-    duration: Column[int] = Column(
-        Integer,
-        nullable=False
-    )
+    duration: Mapped[int]
 
     #: The type
-    type: Column[AttendenceType] = Column(
+    type: Mapped[AttendenceType] = mapped_column(
         Enum(
-            *TYPES.keys(),  # type:ignore[arg-type]
+            *TYPES.keys(),
             name='par_attendence_type'
         ),
-        nullable=False,
         default='plenary'
     )
 
     #: Tracks grouped attendance records to enable future batch
     #: modifications. Only relevant if added in bulk.
-    bulk_edit_id: Column[uuid.UUID | None] = Column(
-        UUID  # type:ignore[arg-type]
-    )
+    bulk_edit_id: Mapped[UUID | None]
 
     #: Whether this attendance submission is closed/completed
     #: This is only relevant for commission attendance, not plenary sessions.
     #: Parliamentarians use this to signal they have recorded all their
     #: commission activities for a settlement run.
-    abschluss: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    abschluss: Mapped[bool] = mapped_column(default=False)
 
     #: The type as translated text
     @property
@@ -106,28 +85,22 @@ class Attendence(Base, TimestampMixin):
         return TYPES.get(self.type, '')
 
     #: The id of the parliamentarian
-    parliamentarian_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    parliamentarian_id: Mapped[UUID] = mapped_column(
         ForeignKey('par_parliamentarians.id'),
-        nullable=False
     )
 
     #: The parliamentarian
-    parliamentarian: relationship[PASParliamentarian] = relationship(
-        'PASParliamentarian',
+    parliamentarian: Mapped[PASParliamentarian] = relationship(
         back_populates='attendences'
     )
 
     #: the id of the commission
-    commission_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
+    commission_id: Mapped[UUID | None] = mapped_column(
         ForeignKey('par_commissions.id'),
-        nullable=True
     )
 
     #: the related commission (which may have any number of memberships)
-    commission: relationship[PASCommission | None] = relationship(
-        'PASCommission',
+    commission: Mapped[PASCommission | None] = relationship(
         back_populates='attendences'
     )
 

@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 def test_election_compound_part_model(session: Session) -> None:
     session.add(
-        ElectionCompound(  # type: ignore[misc]
+        ElectionCompound(
             title='Elections',
             short_title='E',
             domain='canton',
@@ -83,7 +83,7 @@ def test_election_compound_part_model(session: Session) -> None:
     # Add two elections
     last_result_change = datetime(2015, 6, 14, 14, 1, tzinfo=UTC)
     session.add(
-        Election(  # type: ignore[misc]
+        Election(
             title="First election",
             domain='region',
             domain_segment='First Region',
@@ -94,7 +94,7 @@ def test_election_compound_part_model(session: Session) -> None:
         )
     )
     session.add(
-        Election(  # type: ignore[misc]
+        Election(
             title="Second election",
             domain='region',
             domain_segment='Second Region',
@@ -332,19 +332,19 @@ def test_election_compound_part_model(session: Session) -> None:
 def test_election_compound_part_historical_party_strengths(
     session: Session
 ) -> None:
-    first_compound = ElectionCompound(  # type: ignore[misc]
+    first_compound = ElectionCompound(
         title='First',
         domain='canton',
         date=date(2014, 1, 1),
         colors={'a': 'x'}
     )
-    second_compound = ElectionCompound(  # type: ignore[misc]
+    second_compound = ElectionCompound(
         title='Second',
         domain='canton',
         date=date(2018, 1, 1),
         colors={'a': 'y', 'b': 'y'}
     )
-    third_compound = ElectionCompound(  # type: ignore[misc]
+    third_compound = ElectionCompound(
         title='Third',
         domain='canton',
         date=date(2022, 1, 1),

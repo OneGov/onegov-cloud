@@ -8,9 +8,9 @@ from onegov.pas.collections import (
     AttendenceCollection,
 )
 from onegov.pas.custom import get_current_rate_set
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 from onegov.pas.models.attendence import TYPES
-from onegov.pas.utils import is_commission_president
+from onegov.pas.utils import is_commission_president, round_to_five_rappen
 
 
 from typing import TYPE_CHECKING
@@ -117,8 +117,8 @@ def generate_fibu_export_rows(
                 attendance.commission.type if attendance.commission else None
             )
         )
-        rate_with_cola = (Decimal(str(base_rate)) * cola_multiplier).quantize(
-            Decimal('0.01'), rounding=ROUND_HALF_UP
+        rate_with_cola = round_to_five_rappen(
+            Decimal(str(base_rate)) * cola_multiplier
         )
 
         # Get fibu konto based on attendance type

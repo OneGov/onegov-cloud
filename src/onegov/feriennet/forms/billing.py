@@ -106,15 +106,16 @@ class ManualBookingForm(Form):
     def text(self) -> str | None:
         return self.booking_text.data
 
-    @property
-    def available_usernames(self) -> list[tuple[str, str]]:
-        query = (self.usercollection.query()
+    @cached_property
+    def available_usernames(self) -> tuple[tuple[str, str], ...]:
+        return tuple(
+            (username, realname)
+            for username, realname in self.usercollection.query()
             .with_entities(User.username, User.realname)
             .filter(func.trim(func.coalesce(User.realname, '')) != '')
             .filter(User.active == True)
-            .order_by(func.unaccent(func.lower(User.realname))))
-
-        return [(value, title) for value, title in query]
+            .order_by(func.unaccent(func.lower(User.realname)))
+        )
 
     @property
     def users(self) -> tuple[str, ...]:

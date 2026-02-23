@@ -717,7 +717,7 @@ class Form(BaseForm):
         return {k: v for k, v in self.data.items() if k not in exclude}
 
     @property
-    def no_autoflush(self) -> ContextManager[None]:
+    def no_autoflush(self) -> ContextManager[object]:
         """ A convenience attribute for handling a no_autoflush when there
         may not yet be a request bound to the form.
 

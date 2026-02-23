@@ -16,40 +16,11 @@ body {
 
 table {
     border-collapse: collapse;
-    margin-top: 1cm;
+    margin-top: 0;
     width: 100%;
     table-layout: fixed;
 }
 
-/* Journal entries table - updated column widths */
-.journal-table th:nth-child(1), /* Date */
-.journal-table td:nth-child(1) {
-    width: 20pt;
-}
-
-.journal-table th:nth-child(2), /* Personnel Number */
-.journal-table td:nth-child(2) {
-    width: 20pt;
-}
-
-.journal-table th:nth-child(3), /* Person */
-.journal-table td:nth-child(3) {
-    width: 80pt;
-}
-
-.journal-table th:nth-child(4), /* Type */
-.journal-table td:nth-child(4) {
-    width: 170pt;
-}
-
-.journal-table th:nth-child(5), /* Value */
-.journal-table td:nth-child(5),
-.journal-table th:nth-child(6), /* CHF */
-.journal-table td:nth-child(6),
-.journal-table th:nth-child(7), /* CHF + TZ */
-.journal-table td:nth-child(7) {
-    width: 30pt;
-}
 
 /* Party summary table */
 .summary-table th:nth-child(1), /* Name */
@@ -70,14 +41,13 @@ table {
     width: 60pt;
 }
 
-/* Dark header for title row */
-th[colspan="7"] { /* Updated colspan to 7 for journal table */
+.table-title {
     background-color: #707070;
     color: white;
     font-weight: bold;
-    text-align: left;
     padding: 2pt;
     border: 1pt solid #000;
+    margin-top: 1cm;
 }
 
 th:not([colspan]) {

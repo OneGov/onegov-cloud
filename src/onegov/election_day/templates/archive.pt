@@ -173,6 +173,8 @@
                                                     </td>
                                                 </tal:block>
                                                 <tal:block tal:case="False">
+                                                    <td class="right-aligned" tal:condition="vote.has_results"></td>
+                                                    <td class="right-aligned" tal:condition="vote.has_results"></td>
                                                 </tal:block>
                                             </tal:block>
                                             <td class="right-aligned" tal:condition="vote.has_results and not communal_instance" >

@@ -9,7 +9,7 @@ from onegov.search.datamanager import IndexerDataManager
 from onegov.search.search_index import SearchIndex
 from onegov.search.utils import language_from_locale
 from operator import itemgetter
-from sqlalchemy import and_, bindparam, func, text, String
+from sqlalchemy import and_, bindparam, delete, func, text, String
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.dialects.postgresql import insert, ARRAY
@@ -20,7 +20,7 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import InstrumentedAttribute, Session
     from sqlalchemy.sql import ColumnElement
     from typing import TypeAlias
     from typing import TypedDict
@@ -52,9 +52,9 @@ if TYPE_CHECKING:
 
     Task: TypeAlias = IndexTask | DeleteTask
     PKColumn: TypeAlias = (
-        ColumnElement[UUID | None]
-        | ColumnElement[int | None]
-        | ColumnElement[str | None]
+        InstrumentedAttribute[UUID | None]
+        | InstrumentedAttribute[int | None]
+        | InstrumentedAttribute[str | None]
     )
 
 
@@ -88,6 +88,12 @@ class Indexer:
         :return: True if the indexing was successful, False otherwise
 
         """
+        # NOTE: Since we might receive multiple IndexTasks for the same
+        #       row, we use a dictionary to deduplicate those tasks into
+        #       the final task in this list. Performing the IndexTasks
+        #       in sequence would lead to the same result anyways and
+        #       this avoid ON CONFLICT triggering multiple times for the
+        #       same row, which is not allowed.
         params_dict = {}
 
         if not isinstance(tasks, list):
@@ -209,7 +215,7 @@ class Indexer:
             assert schema is not None
             assert owner_id_column is not None
 
-            title_vector = None
+            title_vector: ColumnElement[str] | None = None
             for language in self.languages:
                 title_vector_part = func.setweight(
                     func.to_tsvector(
@@ -223,7 +229,7 @@ class Indexer:
                 else:
                     title_vector = title_vector.op('||')(title_vector_part)
 
-            data_vector = func.setweight(
+            data_vector: ColumnElement[str] = func.setweight(
                 func.array_to_tsvector(
                     bindparam('_tags', type_=ARRAY(String))
                 ),
@@ -241,57 +247,53 @@ class Indexer:
                         )
                     )
 
-            stmt = (
-                insert(SearchIndex.__table__)
-                .values(
-                    {
-                        owner_id_column: bindparam('_owner_id'),
-                        SearchIndex.owner_type: bindparam('_owner_type'),
-                        SearchIndex.owner_tablename:
-                            bindparam('_owner_tablename'),
-                        SearchIndex.publication_start:
-                            bindparam('_publication_start'),
-                        SearchIndex.publication_end:
-                            bindparam('_publication_end'),
-                        SearchIndex.public: bindparam('_public'),
-                        SearchIndex.access: bindparam('_access'),
-                        SearchIndex.last_change: bindparam('_last_change'),
-                        SearchIndex._tags:
-                            bindparam('_tags', type_=ARRAY(String)),
-                        SearchIndex.suggestion: bindparam('_suggestion'),
-                        SearchIndex.title_vector: title_vector,
-                        SearchIndex.data_vector: data_vector,
-                    }
-                )
-                # we may have already indexed this model
-                # so perform an update instead
-                .on_conflict_do_update(
-                    index_elements=[
-                        SearchIndex.owner_tablename,
-                        owner_id_column
-                    ],
-                    set_={
-                        # the owner_type can change, although uncommon
-                        'owner_type': bindparam('_owner_type'),
-                        'publication_start': bindparam('_publication_start'),
-                        'publication_end': bindparam('_publication_end'),
-                        'public': bindparam('_public'),
-                        'access': bindparam('_access'),
-                        'last_change': bindparam('_last_change'),
-                        'tags': bindparam('_tags', type_=ARRAY(String)),
-                        'suggestion': bindparam('_suggestion'),
-                        'title_vector': title_vector,
-                        'data_vector': data_vector,
-                    },
-                    # since our unique constraints are partial indeces
-                    # we need this index_where clause, otherwise postgres
-                    # will not be able to infer the matching constraint
-                    index_where=owner_id_column.isnot(None)  # type: ignore[no-untyped-call]
-                )
+            stmt = insert(SearchIndex.__table__).values(  # type: ignore[arg-type]
+                {
+                    owner_id_column: bindparam('_owner_id'),
+                    SearchIndex.owner_type: bindparam('_owner_type'),
+                    SearchIndex.owner_tablename:
+                        bindparam('_owner_tablename'),
+                    SearchIndex.publication_start:
+                        bindparam('_publication_start'),
+                    SearchIndex.publication_end:
+                        bindparam('_publication_end'),
+                    SearchIndex.public: bindparam('_public'),
+                    SearchIndex.access: bindparam('_access'),
+                    SearchIndex.last_change: bindparam('_last_change'),
+                    SearchIndex._tags:
+                        bindparam('_tags', type_=ARRAY(String)),
+                    SearchIndex.suggestion: bindparam('_suggestion'),
+                    SearchIndex.title_vector: title_vector,
+                    SearchIndex.data_vector: data_vector,
+                }
             )
-            params = list(params_dict.values())
+            # we may have already indexed this model
+            # so perform an update instead
+            stmt = stmt.on_conflict_do_update(
+                index_elements=[
+                    SearchIndex.owner_tablename,
+                    owner_id_column
+                ],
+                set_={
+                    # the owner_type can change, although uncommon
+                    'owner_type': stmt.excluded.owner_type,
+                    'publication_start': stmt.excluded.publication_start,
+                    'publication_end': stmt.excluded.publication_end,
+                    'public': stmt.excluded.public,
+                    'access': stmt.excluded.access,
+                    'last_change': stmt.excluded.last_change,
+                    'tags': stmt.excluded.tags,
+                    'suggestion': stmt.excluded.suggestion,
+                    'title_vector': stmt.excluded.title_vector,
+                    'data_vector': stmt.excluded.data_vector,
+                },
+                # since our unique constraints are partial indeces
+                # we need this index_where clause, otherwise postgres
+                # will not be able to infer the matching constraint
+                index_where=owner_id_column.is_not(None)
+            )
             with session.begin_nested():
-                session.execute(stmt, params)
+                session.execute(stmt, list(params_dict.values()))
         except Exception:
             index_log.exception(
                 f'Error creating index schema {schema} of '
@@ -361,7 +363,7 @@ class Indexer:
             assert tablename is not None
             assert owner_id_column is not None
             stmt = (
-                SearchIndex.__table__.delete()
+                delete(SearchIndex.__table__)  # type: ignore[arg-type]
                 .where(and_(
                     SearchIndex.owner_tablename == tablename,
                     owner_id_column.in_(owner_ids)
@@ -748,9 +750,10 @@ class ORMEventTranslator:
         """
         if session is None:
             session = object_session(obj)
+            assert session is not None
         task = self.index_task(schema, obj)
         if task is not None:
-            self.put(object_session(obj), task)
+            self.put(session, task)
 
     def delete(
         self,
@@ -764,4 +767,5 @@ class ORMEventTranslator:
         """
         if session is None:
             session = object_session(obj)
+            assert session is not None
         self.put(session, self.delete_task(schema, obj))

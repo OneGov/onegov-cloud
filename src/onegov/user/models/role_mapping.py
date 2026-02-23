@@ -3,14 +3,13 @@ from __future__ import annotations
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.user.models.group import UserGroup
 from onegov.user.models.user import User
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
-from uuid import uuid4, UUID as UUIDType
+from sqlalchemy.orm import Mapped
+from uuid import uuid4, UUID
 
 
 class RoleMapping(Base, ContentMixin, TimestampMixin):
@@ -39,11 +38,7 @@ class RoleMapping(Base, ContentMixin, TimestampMixin):
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -51,44 +46,30 @@ class RoleMapping(Base, ContentMixin, TimestampMixin):
     }
 
     #: the id of the role mapping
-    id: Column[UUIDType] = Column(
-        UUID,  # type:ignore[arg-type]
-        nullable=False,
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the role is relevant for security in onegov.core
-    role: Column[str] = Column(Text, nullable=False)
+    role: Mapped[str]
 
     #: the id of the group this mapping belongs to
-    group_id: Column[UUIDType | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey(UserGroup.id),
-        nullable=True
-    )
+    group_id: Mapped[UUID | None] = mapped_column(ForeignKey(UserGroup.id))
 
     #: the group this mapping belongs to
-    group: relationship[UserGroup | None] = relationship(
-        UserGroup,
+    group: Mapped[UserGroup | None] = relationship(
         back_populates='role_mappings'
     )
 
     #: the username of the user this mapping belongs to
-    username: Column[str | None] = Column(
-        Text,
-        ForeignKey(User.username),
-        nullable=True
-    )
+    username: Mapped[str | None] = mapped_column(ForeignKey(User.username))
 
     #: the user this mapping belongs to
-    user: relationship[User | None] = relationship(
-        User,
-        back_populates='role_mappings'
-    )
+    user: Mapped[User | None] = relationship(back_populates='role_mappings')
 
     #: the content this mapping belongs to
-    content_id: Column[str] = Column(Text, nullable=False)
+    content_id: Mapped[str]
 
     #: the content type (table name) this mapping belongs to
-    content_type: Column[str] = Column(Text, nullable=False)
+    content_type: Mapped[str]

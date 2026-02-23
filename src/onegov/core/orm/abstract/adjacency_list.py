@@ -7,14 +7,15 @@ from itertools import chain
 from lazy_object_proxy import Proxy  # type:ignore[import-untyped]
 from onegov.core.orm import Base, observes
 from onegov.core.utils import is_sorted, normalize_for_url, increment_name
-from sqlalchemy import Column, ForeignKey, Integer, Text, Numeric
+from sqlalchemy import ForeignKey, Numeric
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (
-    backref,
     object_session,
+    mapped_column,
     relationship,
-    validates
+    validates,
+    Mapped
 )
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.schema import Index
@@ -68,76 +69,83 @@ class AdjacencyList(Base):
 
     #: the id fo the db record (only relevant internally)
     #: do not change this id after creation as that would destroy the tree
-    id: Column[int] = Column(Integer, primary_key=True)
-
-    if TYPE_CHECKING:
-        parent_id: Column[int | None]
-        # subclasses need to override with the correct relationship
-        # with generics there's an issue with class vs instance access
-        # technically AdjacencyList is abstract, so as long as we force
-        # subclasses to bind a type we could make this type safe, but
-        # there is no way to express this in mypy, we could write a
-        # mypy plugin to ensure these relationships get generated
-        # properly...
-        parent: relationship[AdjacencyList | None]
-        children: relationship[Sequence[AdjacencyList]]
+    id: Mapped[int] = mapped_column(primary_key=True)
 
     #: the id of the parent
-    @declared_attr  # type:ignore[no-redef]
-    def parent_id(cls) -> Column[int | None]:
-        return Column(Integer, ForeignKey('{}.id'.format(cls.__tablename__)))
+    @declared_attr
+    @classmethod
+    def parent_id(cls) -> Mapped[int | None]:
+        return mapped_column(
+            ForeignKey(f'{cls.__tablename__}.id')
+        )
 
     #: the name of the item - think of this as the id or better yet
     #: the url segment e.g. ``parent-item/child-item``
     #:
     #: automatically generated from the title if not provided
-    name: Column[str] = Column(Text, nullable=False)
+    name: Mapped[str]
 
     #: the human readable title of the item
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: the type of the item, this can be used to create custom polymorphic
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: Column[str] = Column(
-        Text, nullable=False, default=lambda: 'generic')
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
-    @declared_attr  # type:ignore[no-redef]
-    def children(cls) -> relationship[list[Self]]:
+    # subclasses need to override with the correct relationship
+    # with generics there's an issue with class vs instance access
+    # technically AdjacencyList is abstract, so as long as we force
+    # subclasses to bind a type we could make this type safe, but
+    # there is no way to express this in mypy, we could write a
+    # mypy plugin to ensure these relationships get generated
+    # properly...
+    @declared_attr
+    @classmethod
+    def children(cls) -> Mapped[list[Self]]:
         return relationship(
-            cls.__name__,  # type:ignore[attr-defined]
+            cls.__name__,
             order_by=cls.order,
-
             # cascade deletions - it's not the job of this model to prevent
             # the user from deleting all his content
             cascade='all, delete-orphan',
+            back_populates='parent'
+        )
 
+    @declared_attr
+    @classmethod
+    def parent(cls) -> Mapped[Self | None]:
+        return relationship(
+            cls.__name__,
             # many to one + adjacency list - remote_side
             # is required to reference the 'remote'
             # column in the join condition.
-            backref=backref('parent', remote_side=cls.id)
+            remote_side=cls.id,
+            back_populates='children'
         )
 
     #: the order of the items - items are added at the end by default
     # FIXME: This should probably have been nullable=False
-    order: Column[Decimal] = Column(
+    order: Mapped[Decimal] = mapped_column(
         Numeric(precision=30, scale=15),
         default=Decimal('65536')  # Default middle value (2**16)
     )
 
     # default sort order is order, id
-    @declared_attr
-    def __mapper_args__(cls):  # type:ignore
+    @declared_attr.directive
+    @classmethod
+    def __mapper_args__(cls) -> dict[str, Any]:
         return {
             'polymorphic_on': cls.type,
             'polymorphic_identity': 'generic'
         }
 
-    @declared_attr
-    def __table_args__(cls):  # type:ignore
+    @declared_attr.directive
+    @classmethod
+    def __table_args__(cls) -> tuple[Any, ...]:
 
-        prefix: str = cls.__name__.lower()  # type:ignore[attr-defined]
+        prefix: str = cls.__name__.lower()
         return (
             # make sure that no children of a single parent share a name
             Index(
@@ -176,14 +184,9 @@ class AdjacencyList(Base):
         """
         return AdjacencyListCollection.sort_key
 
-    if TYPE_CHECKING:
-        @observes('title')
-        def sort_on_title_change(self, title: str) -> None: ...
-
-    @declared_attr  # type:ignore[no-redef]
-    def sort_on_title_change(
-        cls
-    ) -> Callable[[Self, str], None]:
+    @declared_attr.directive
+    @classmethod
+    def sort_on_title_change(cls) -> Callable[[Self, str], None]:
         """ Makes sure the A-Z sorting is kept when a title changes. """
 
         class OldItemProxy(Proxy):  # type:ignore[misc]
@@ -215,6 +218,10 @@ class AdjacencyList(Base):
                 calculuate_midpoint_order(siblings, self, self.sort_key)
 
         return sort_on_title_change
+
+    if not TYPE_CHECKING:
+        # NOTE: Avoids confusing SQLAlchemy
+        del sort_on_title_change.fget.__annotations__
 
     def __init__(
         self,
@@ -257,6 +264,8 @@ class AdjacencyList(Base):
         itself.
 
         """
+        session = object_session(self)
+        assert session is not None
 
         # FIXME: There is a subtle issue here if we use this mixin in a
         #        polymorphic class, since it will only return siblings of
@@ -265,7 +274,7 @@ class AdjacencyList(Base):
         #        ancestors, parent, children, etc. We could use inspect
         #        to determine whether or not the model is polymorphic
         #        and to retrieve the base class.
-        query = object_session(self).query(self.__class__)
+        query = session.query(self.__class__)
         query = query.order_by(self.__class__.order)
         query = query.filter(self.__class__.parent == self.parent)
 
