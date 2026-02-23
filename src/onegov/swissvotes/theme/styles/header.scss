@@ -1,8 +1,8 @@
 header {
     margin-bottom: .75rem;
 
-    .languages {
-        background-color: $primary-color;
+    .top-header {
+        border-bottom: 2px solid $primary-color;
 
         ul {
             margin: 0 .9375rem;
@@ -14,11 +14,15 @@ header {
         }
 
         a {
-            color: $white;
+            text-decoration: none;
+            color: $primary-color;
         }
+
     }
 
     .title {
+        border-bottom: 2px solid $primary-color;
+
         img {
             margin: 1.75rem 0;
 

@@ -37,25 +37,25 @@
 </head>
 <body tal:attributes="layout.custom_body_attributes|{}">
     <header>
-        <div class="languages">
-            <div class="row">
-                <nav role="navigation" class="right">
-                    <ul class="inline-list">
-                        <tal:block tal:repeat="(locale, lang, title, href) layout.locales">
-                            <li tal:condition="request.locale != locale">
-                                <a rel="alternate" href="${href}" lang="${lang}" hreflang="${lang}">${lang}</a>
-                            </li>
-                        </tal:block>
-                    </ul>
-                </nav>
+        <div class="top-header">
+            <div class="row row-wide">
+                <div class="columns">
+                    <nav role="navigation" class="right">
+                        <ul class="inline-list">
+                            <tal:block tal:repeat="(locale, lang, title, href) layout.locales">
+                                <li tal:condition="request.locale != locale">
+                                    <a rel="alternate" href="${href}" lang="${lang}" hreflang="${lang}">${lang}</a>
+                                </li>
+                            </tal:block>
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
         <div class="title">
-            <div class="row">
-                <div class="columns small-12 small-only-text-center">
-                    <a href="${layout.homepage_url}"><img src="${layout.static_path}/images/logo.svg" height="100" alt="Swissvotes"></a>
-                    <a href="http://unibe.ch"><img class="right hide-for-small" src="${layout.static_path}/images/logo_unibe.svg" height="100" alt="Universität Basel"></a>
-                    <a href="https://anneepolitique.swiss"><img class="right hide-for-small" src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
+            <div class="row row-wide">
+                <div class="columns">
+                    <a href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
                     <div class="clearfix"></div>
                 </div>
             </div>
