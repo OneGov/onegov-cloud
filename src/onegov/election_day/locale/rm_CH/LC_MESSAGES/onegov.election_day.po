@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-10 16:58+0100\n"
+"POT-Creation-Date: 2026-02-20 12:30+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -106,11 +106,19 @@ msgstr "Colur nunvalaivla: : ${col}"
 msgid "File not supported"
 msgstr "Format da datoteca betg sustegnì"
 
+#, python-format
+msgid "Cannot import election information. Year ${year} does not exist."
+msgstr "Betg stà pussaivel da importar las infurmaziuns da l'elecziun. L'onn ${year} n'exista betg."
+
 msgid "Domain not supported"
 msgstr "Domain betg supportà"
 
 msgid "Changing types is not supported"
 msgstr "La midada da tipas na vegn betg sustegnida"
+
+#, python-format
+msgid "Cannot import election results. Year ${year} does not exist."
+msgstr "Betg stà pussaivel da importar ils resultats da l'elecziun. L'onn ${year} n'exista betg."
 
 msgid "Election does not exist"
 msgstr "L'elecziun na datti betg"
@@ -212,6 +220,10 @@ msgstr "Nagins resultats da partidas per l'onn ${year}"
 
 msgid "Panachage results ids and id not consistent"
 msgstr "Inconsistenza tranter Panachage results ids ed id"
+
+#, python-format
+msgid "Cannot import votes. Year ${year} does not exist."
+msgstr "Betg stà pussaivel da importar las votaziuns. L'onn ${year} n'exista betg."
 
 msgid "Vote type not supported"
 msgstr "Tip da votaziun betg sustegnida"
@@ -942,12 +954,12 @@ msgstr "Naginas candidaturas."
 msgid "Download diagram"
 msgstr "Telechargiar il diagram"
 
+#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
-#.
 msgid "figcaption_connections"
 msgstr ""
 "Il diagram mussa la repartiziun da las vuschs e dals mandats sin las "
@@ -972,11 +984,11 @@ msgstr "Anc betg elegì ina candidata u in candidat."
 msgid "Note on the voters count"
 msgstr "Infurmaziun concernent il dumber d'electurs"
 
+#.
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
-#.
 msgid "figcaption_list_groups"
 msgstr ""
 "En in emprim pass – tar l'uschenumnada attribuziun superiura – vegnan "
@@ -1087,17 +1099,17 @@ msgstr "Vuschs vidas"
 msgid "Invalid votes"
 msgstr "Vuschs nunvalaivlas"
 
+#.
 #. Default: Turnout
 #. Default: Voter turnout
-#.
 msgid "turnout_vote"
 msgstr "Participaziun a la votaziun"
 
 msgid "List connection"
 msgstr "Colliaziun da glistas"
 
-#. Default: Votes
 #.
+#. Default: Votes
 msgid "single_votes"
 msgstr "Vuschs"
 
@@ -1304,10 +1316,10 @@ msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
 msgid "Line"
 msgstr "Lingia"
 
+#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
-#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Il diagram mussa las vuschs gudagnadas ed ils mandats da las partidas. Las "
@@ -1320,10 +1332,10 @@ msgstr "Onn"
 msgid "Difference"
 msgstr "Differenza"
 
+#.
 #. Default: The diagram shows the origin of votes won and lost by panache. On
 #. the left side are the lost votes, on the right side the won votes. The width
 #. of the bars and the connections is proportional to the number of votes.
-#.
 msgid "figcaption_panachage"
 msgstr ""
 "Il diagram mussa la derivanza da las vuschs gudagnadas e perdidas cun "

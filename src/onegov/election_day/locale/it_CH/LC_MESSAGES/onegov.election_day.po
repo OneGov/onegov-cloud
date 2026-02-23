@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-10 16:58+0100\n"
+"POT-Creation-Date: 2026-02-20 12:30+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -105,11 +105,19 @@ msgstr "Colore non valido: ${col}"
 msgid "File not supported"
 msgstr "Formato file non supportato"
 
+#, python-format
+msgid "Cannot import election information. Year ${year} does not exist."
+msgstr "Non è possibile importare le informazioni sull'elezione. L'anno ${year} non esiste."
+
 msgid "Domain not supported"
 msgstr "Livello non supportato"
 
 msgid "Changing types is not supported"
 msgstr "l cambiamento di tipi non è supportato"
+
+#, python-format
+msgid "Cannot import election results. Year ${year} does not exist."
+msgstr "Non è possibile importare i risultati dell'elezione. L'anno ${year} non esiste."
 
 msgid "Election does not exist"
 msgstr "L'elezione non esiste"
@@ -206,6 +214,10 @@ msgstr "Nessun risultato di partito per l'anno ${year}"
 
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids e id non coerente"
+
+#, python-format
+msgid "Cannot import votes. Year ${year} does not exist."
+msgstr "Non è possibile importare i voti. L'anno ${year} non esiste."
 
 msgid "Vote type not supported"
 msgstr "Tipo di votazione non supportato"
@@ -931,12 +943,12 @@ msgstr "Nessuna candidatura."
 msgid "Download diagram"
 msgstr "Scarica il diagramma"
 
+#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
-#.
 msgid "figcaption_connections"
 msgstr ""
 "Il diagramma mostra la distribuzione dei voti e dei mandati in lista e nelle "
@@ -960,11 +972,11 @@ msgstr "Ancora nessun candidato eletto."
 msgid "Note on the voters count"
 msgstr "Indicazione riguardo al numero di elettori"
 
+#.
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
-#.
 msgid "figcaption_list_groups"
 msgstr ""
 "In una prima fase, la cosiddetta sovraripartizione, tutti i voti espressi "
@@ -1074,17 +1086,17 @@ msgstr "Voti in bianco"
 msgid "Invalid votes"
 msgstr "Voti nulli"
 
+#.
 #. Default: Turnout
 #. Default: Voter turnout
-#.
 msgid "turnout_vote"
 msgstr "Partecipazione al voto"
 
 msgid "List connection"
 msgstr "Collegamenti tra liste"
 
-#. Default: Votes
 #.
+#. Default: Votes
 msgid "single_votes"
 msgstr "Voti"
 
@@ -1285,10 +1297,10 @@ msgstr "I Suoi risultati non hanno potuto essere caricati."
 msgid "Line"
 msgstr "Riga"
 
+#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
-#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Il diagramma mostra i voti e i mandati dei partiti. Le barre cerchiate "
@@ -1301,10 +1313,10 @@ msgstr "Anno"
 msgid "Difference"
 msgstr "Differenza"
 
+#.
 #. Default: The diagram shows the origin of votes won and lost by panache. On
 #. the left side are the lost votes, on the right side the won votes. The width
 #. of the bars and the connections is proportional to the number of votes.
-#.
 msgid "figcaption_panachage"
 msgstr ""
 "Il diagramma mostra l'origine dei voti guadagnati e la destinazione dei voti "

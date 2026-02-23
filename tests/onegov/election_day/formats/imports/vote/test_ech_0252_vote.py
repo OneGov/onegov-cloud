@@ -18,7 +18,17 @@ def test_import_ech_vote_gr(
     # The datasets contain empty and intermediate results from the 3.3.2024
     # two federal and 4 communal votes, one of these 4 is a complex vote.
 
-    # initial import
+    results = import_test_datasets(
+        api_format='ech',
+        principal='gr',
+        dataset_name='votes-invalid-year'
+    )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
+    assert errors
+    assert (errors[0].error.interpolate() ==  # type: ignore[attr-defined]
+            'Cannot import votes. Year 2084 does not exist.')
+
     results = import_test_datasets(
         api_format='ech',
         principal='gr',
