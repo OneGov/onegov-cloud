@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from onegov.core.orm import Base, SessionManager
     from onegov.core.request import CoreRequest
     from sqlalchemy.engine import Connection
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import DeclarativeBase, Session
 
 
 class SearchApp(morepath.App):
@@ -131,17 +131,17 @@ class SearchApp(morepath.App):
                            AND nspname = :schema
                     )
                     FROM pg_ts_config
-                """), schema=schema).scalar():
+                """), {'schema': schema}).scalar():
                     # the dictionary already exists
                     dict_name = 'german_unaccent'
                 else:
                     try:
-                        connection.execute("""
+                        connection.execute(text("""
                             CREATE TEXT SEARCH DICTIONARY german_unaccent (
                                 template = unaccent,
                                 rules = 'german'
                             )
-                        """)
+                        """))
                     except Exception:
                         index_log.exception(
                             'Failed to create german_unaccent dictionary '
@@ -164,28 +164,28 @@ class SearchApp(morepath.App):
                        AND nspname = :schema
                 )
                 FROM pg_ts_config
-            """), locale=locale, schema=schema).scalar():
+            """), {'locale': locale, 'schema': schema}).scalar():
                 # configuration already exists
                 if dict_created:
                     # drop the old configuration that isn't yet using
                     # the dictionary we just created
-                    connection.execute(f"""
+                    connection.execute(text(f"""
                         DROP TEXT SEARCH CONFIGURATION {locale}
-                    """)
+                    """))
                 else:
                     continue
 
             # NOTE: Since we only allow lang != simple these three
             #       variables can only have very specific safe values
             #       so we don't need to escape them.
-            connection.execute(f"""
+            connection.execute(text(f"""
                 CREATE TEXT SEARCH CONFIGURATION {locale} (
                     COPY = {lang}
                 );
                 ALTER TEXT SEARCH CONFIGURATION {locale}
                     ALTER MAPPING FOR hword, hword_part, word
                     WITH {dict_name}, {lang}_stem;
-            """)
+            """))
             index_log.info(f'Created {locale} search configuration')
 
     def fts_may_use_private_search(self, request: CoreRequest) -> bool:
@@ -211,7 +211,7 @@ class SearchApp(morepath.App):
             for model in searchable_sqlalchemy_models(base)
         }
 
-    def indexable_base_models(self) -> set[type[Searchable | Base]]:
+    def indexable_base_models(self) -> set[type[Searchable | DeclarativeBase]]:
         return {
             get_polymorphic_base(model)
             for model in self.searchable_models()
@@ -248,7 +248,7 @@ class SearchApp(morepath.App):
                     task
                     for obj in query
                     if (
-                        task := self.fts_orm_events.index_task(schema, obj)
+                        task := self.fts_orm_events.index_task(schema, obj)  # type: ignore[arg-type]
                     ) is not None
                 ), session)
                 session.execute(text('COMMIT'))
@@ -261,10 +261,12 @@ class SearchApp(morepath.App):
                 )
             finally:
                 session.invalidate()
-                session.bind.dispose()
+                if session.bind and hasattr(session.bind, 'dispose'):
+                    session.bind.dispose()
 
         with ThreadPoolExecutor() as executor:
             executor.map(reindex_model, self.indexable_base_models())
 
         session.invalidate()
-        session.bind.dispose()
+        if session.bind and hasattr(session.bind, 'dispose'):
+            session.bind.dispose()

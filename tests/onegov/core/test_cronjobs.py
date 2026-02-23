@@ -9,7 +9,7 @@ from onegov.core.cronjobs import parse_cron, Job
 from onegov.core.utils import scan_morepath_modules
 from pytest_localserver.http import WSGIServer  # type: ignore[import-untyped]
 from sedate import replace_timezone
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import registry, DeclarativeBase
 from time import sleep
 from webtest import TestApp as Client
 
@@ -22,6 +22,9 @@ if TYPE_CHECKING:
 
 def test_run_cronjob(postgres_dsn: str, redis_url: str) -> None:
     result = 0
+
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework):
         pass
@@ -45,7 +48,7 @@ def test_run_cronjob(postgres_dsn: str, redis_url: str) -> None:
     app.namespace = 'municipalities'
     app.configure_application(
         dsn=postgres_dsn,
-        base=declarative_base(),
+        base=Base,
         redis_url=redis_url
     )
     # don't initialize ORMBase

@@ -23,6 +23,7 @@ from onegov.file.integration import (
 )
 from onegov.file.utils import extension_for_content_type
 from onegov.file.errors import AlreadySignedError, InvalidTokenError
+from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _, OrgApp
 from onegov.core.elements import Link
 from onegov.org.layout import (
@@ -133,7 +134,7 @@ def view_get_file_collection(
         Link(_('Files'), '#')
     ]
 
-    files = tuple(self.files)
+    files = tuple(self.files.tuples())
 
     # XXX build somewhat manually for more speed
     locale = Locale.parse(request.locale)
@@ -152,8 +153,6 @@ def view_get_file_collection(
         for group, files in groupby(files, key=self.group)
     )
 
-    # FIXME: Make file-details work without ic-on-success
-    request.require_unsafe_eval()
     return {
         'layout': layout,
         'title': _('Files'),
@@ -444,10 +443,16 @@ def handle_file_upload(
         content=fs.file
     )
 
-    supported_content_types = getattr(self, 'supported_content_types', 'all')
+    supported_content_types = getattr(
+        self, 'supported_content_types', WhitelistedMimeType.whitelist)
 
     if supported_content_types != 'all':
         if file.reference.content_type not in supported_content_types:
+            # Fail the post request from upload.js with status code 415
+            # (Unsupported Media Type). Raising the HTTP exception here causes
+            # the request transaction to abort and roll back any previous
+            # changes (including the `self.add(...)` above), so the file won't
+            # be persisted if the content type is unsupported.
             raise exc.HTTPUnsupportedMediaType()
 
     return file

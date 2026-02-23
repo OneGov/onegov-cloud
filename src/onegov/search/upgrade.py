@@ -2,11 +2,12 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
 
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.search.utils import searchable_sqlalchemy_models
-from sqlalchemy import inspect, Column, String
+from sqlalchemy import inspect, text, Column, String
 from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR
 
 
@@ -36,6 +37,7 @@ def make_last_change_nullable(context: UpgradeContext) -> None:
 def change_tags_from_hstore_to_array(context: UpgradeContext) -> None:
     if context.has_table('search_index'):
         ins = inspect(context.engine)
+        assert ins is not None
         for meta in ins.get_columns('search_index', context.schema):
             if meta['name'] == 'tags':
                 current_type = meta['type']
@@ -65,7 +67,7 @@ def split_title_and_data_tsvector_columns(context: UpgradeContext) -> None:
         # truncate the search index so we don't have to worry about
         # new columns that can't be NULL, the search index will be
         # re-generated after the upgrade steps in production anyways
-        context.operations.execute('TRUNCATE search_index')
+        context.operations.execute(text('TRUNCATE search_index'))
         context.operations.drop_index(
             'ix_search_index_fts_idx',
             'search_index'

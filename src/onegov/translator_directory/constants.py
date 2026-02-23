@@ -10,6 +10,7 @@ member_can_see = (
     'first_name',
     'last_name',
     'pers_id',
+    'contract_number',
     'admission',
     'withholding_tax',
     'self_employed',
@@ -65,6 +66,7 @@ field_order = (
     'first_name',
     'last_name',
     'pers_id',
+    'contract_number',
     'admission',
     'withholding_tax',
     'self_employed',
@@ -187,6 +189,10 @@ ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
         'Staatsanwaltschaft Allgemeine Abteilung',
         'Beckenstube 5, 8200 Schaffhausen'
     ),
+    'staatsanwaltschaft_postgebaeude': (
+        'Staatsanwaltschaft Allgemeine Abteilung Postgebäude',
+        'Bahnhofstrasse 34, 8200 Schaffhausen',
+    ),
     'verkehrsabteilung_staatsanwaltschaft': (
         'Verkehrsabteilung der Staatsanwaltschaft',
         'Bahnhofstrasse 29, 8200 Schaffhausen'
@@ -276,5 +282,19 @@ FINANZSTELLE: dict[str, Finanzstelle] = {
         zip_code='8200',
         city='Schaffhausen',
         kostenstelle='3030',
+    ),
+    'verkehrsabteilung_staatsanwaltschaft': Finanzstelle(
+        name='Verkehrsabteilung der Staatsanwaltschaft',
+        street='Bahnhofstrasse 29',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='2466',
+    ),
+    'jugendanwaltschaft': Finanzstelle(
+        name='Abteilung Jugendanwaltschaft',
+        street='J.J. Wepfer-Strasse 6',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='2466',
     ),
 }

@@ -61,8 +61,15 @@ var Upload = function(element) {
                     processCommonNodes($(xhr.responseText).appendTo(filelist), true);
                 }
             } else {
+                var errText = locale(xhr.statusText || 'Upload failed') ;
+
                 bar.find('.meter').css('width', '100%');
-                bar.addClass('alert').attr('data-error', xhr.statusText);
+                bar.addClass('has-error').attr('data-error', errText);
+                bar.find('.upload-error').text(errText).attr('aria-hidden', 'false').show();
+                bar.attr('title', errText);
+
+                // keep the bar visible but mark as failed
+                bar.find('.upload-filename').addClass('muted');
             }
 
             // eslint-disable-next-line no-use-before-define
@@ -82,9 +89,19 @@ var Upload = function(element) {
     };
 
     var queue_upload = function(file) {
-        var bar = $('<div class="progress"><span class="meter" style="width: 0%"></span></div>')
-            .attr('data-filename', file.name)
-            .prependTo(progress);
+        var bar = $(
+            '<div class="progress" role="status" aria-live="polite">' +
+                '<div class="progress-main">' +
+                    '<span class="upload-filename"></span>' +
+                    '<span class="meter" style="width: 0%"></span>' +
+                '</div>' +
+                '<div class="upload-error" role="alert" aria-hidden="true" style="display:none;"></div>' +
+            '</div>'
+        ).attr('data-filename', file.name)
+         .prependTo(progress);
+
+        bar.find('.upload-filename').text(file.name);
+
         upload_queue.push({file: file, bar: bar});
     };
 

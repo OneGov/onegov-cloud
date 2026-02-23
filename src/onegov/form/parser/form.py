@@ -256,9 +256,9 @@ def handle_field(
             dependency=dependency,
             required=field.required,
             validators=[
-                expected_extensions,
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ],
+            allowed_mimetypes=expected_extensions.whitelist,
             render_kw={'accept': accept},
             description=field.field_help
         )
@@ -274,9 +274,9 @@ def handle_field(
             dependency=dependency,
             required=field.required,
             validators=[
-                expected_extensions,
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ],
+            allowed_mimetypes=expected_extensions.whitelist,
             render_kw={'accept': accept},
             description=field.field_help
         )

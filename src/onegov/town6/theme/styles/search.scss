@@ -173,3 +173,12 @@
         padding: .2rem 0 !important;
     }
 }
+
+.typeahead {
+    margin-top: 2.5rem;
+    position: absolute;
+}
+
+.input-group-field:not(:focus) + .typeahead:not(:hover) {
+    display: none;
+}

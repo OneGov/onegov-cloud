@@ -27,6 +27,25 @@ oc.defaultOptions = {
     editable: false,
 
     /*
+        Url which returns all available resources in the following format:
+        {
+            'group': [
+                {
+                    'name': 'name',
+                    'title': 'title',
+                    'url': 'url'
+                }
+            ]
+        }
+    */
+    resourcesUrl: null,
+
+    /*
+        The name of the currently active resource
+    */
+    resourceActive: null,
+
+    /*
         The view shown initially
     */
     view: 'dayGridMonth',
@@ -43,6 +62,11 @@ oc.defaultOptions = {
     highlights_max: null,
 
     /*
+        Base url for calculating the stats for the current date range
+    */
+    stats_url: null,
+
+    /*
         Base url for exporting the current date range as a PDF
     */
     pdf_url: null
@@ -55,12 +79,12 @@ oc.events = [
 
 oc.overlappingEvents = {};
 
-oc.passEventsToCalendar = function(calendar, target) {
-    var cal = $(calendar);
+oc.popupOpen = false;
 
+oc.passEventsToCalendar = function(calendar, target) {
     _.each(oc.events, function(eventName) {
         target.on(eventName, _.debounce(function(_e, data) {
-            cal.trigger(eventName, [data, calendar]);
+            $(window).trigger(eventName, [data, calendar]);
         }));
     });
 };
@@ -175,6 +199,9 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         }
         // add blockers on selection
         fcOptions.select = function(info) {
+            if (oc.popupOpen) {
+                return;
+            }
             var keys = Object.keys(oc.overlappingEvents);
             if (keys.length !== 1) {
                 // this shouldn't happen, but when it does just cancel
@@ -219,7 +246,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
             var calendar = $(info.el).closest('.fc').get(0) || $('.fc').get(0);
             oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {
                 info.revert();
-                oc.showErrorPopup(calendar, $(calendar).find('.event-' + event.id), str);
+                oc.showErrorPopup(info.view.calendar, $(calendar).find('.event-' + event.id), str);
             });
         };
 
@@ -286,7 +313,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         for (var i = 0; i < renderers.length; i++) {
             renderers[i](info.view, $(info.el));
         }
-        oc.setupViewNavigation(info.view.calendar, $(info.view.calendar.el), views, ocOptions.pdf_url);
+        oc.setupViewNavigation(info.view.calendar, $(info.view.calendar.el), views, ocOptions.stats_url, ocOptions.pdf_url);
         return null;
     };
 
@@ -322,6 +349,9 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
 
     // history handling
     oc.setupHistory(options);
+
+    // resource switching mechanism
+    oc.setupResourceSwitch(options, ocOptions.resourcesUrl, ocOptions.resourceActive);
 
     // setup allocation refresh handling
     options.afterSetup.push(oc.setupReservationsRefetch);
@@ -405,7 +435,7 @@ oc.getGranularity = function(view_name) {
     return view_name.toLowerCase();
 };
 
-oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
+oc.setupViewNavigation = function(calendar, element, views, stats_url, pdf_url) {
     var chunk = $(element).find('.fc-header-toolbar .fc-toolbar-chunk:last-child');
     var i18n = calendar.currentData.availableRawLocales[calendar.getOption('locale')];
     var granularity_group = $('<div class="fc-button-group"></div>');
@@ -492,9 +522,12 @@ oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
             var wrapper = $('<div class="reservation-actions">');
             var form = $('<div class="reservation-form">').appendTo(wrapper);
 
-            oc.PDFExportForm.render(
+            oc.ExportForm.render(
                 form.get(0),
                 calendar,
+                true,
+                locale("Export as PDF"),
+                locale("Download"),
                 function(state) {
                     var url = new Url(pdf_url || '/');
                     url.query.start = state.start;
@@ -503,7 +536,7 @@ oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
                         url.query.accepted = '1';
                     }
                     window.location = url.toString();
-                    pdf_btn.popup('hide');
+                    $(this).closest('.popup').popup('hide');
                 }
             );
 
@@ -519,6 +552,58 @@ oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
     // append our groups
     granularity_group.appendTo(chunk);
     view_group.appendTo(chunk);
+
+    if (stats_url) {
+        var stats_btn = $('<button class="fc-button fc-button-primary"></button');
+        stats_btn.attr('aria-pressed', 'false');
+        stats_btn.html('<span class="fa fa-bar-chart fa-chart-bar"></span>');
+        stats_btn.attr('title', locale("Utilization"));
+        stats_btn.click(function() {
+            var wrapper = $('<div class="reservation-actions">');
+            var form = $('<div class="reservation-form">').appendTo(wrapper);
+            var lang = document.documentElement.getAttribute('lang') || 'en';
+
+            oc.ExportForm.render(
+                form.get(0),
+                calendar,
+                false,
+                locale("Utilization"),
+                locale("Select"),
+                function(state) {
+                    var url = new Url(stats_url || '/');
+                    url.query.start = state.start;
+                    url.query.end = state.end;
+                    $(this).closest('.popup').popup('hide');
+                    $.ajax(url.toString()).done(function(data) {
+                        var wrapper = $('<div class="reservation-actions">');
+                        ReactDOM.render(
+                            (
+                            <div>
+                                <h3>{locale("Reservations")}</h3>
+                                <p>{data.range}</p>
+                                <h3>{locale("Count")}</h3>
+                                <p>{data.count} {data.pending && (
+                                    <span>({data.pending} {locale("pending approval")})</span>
+                                )}</p>
+                                <h3>{locale("Utilization")}</h3>
+                                <p>{data.utilization.toLocaleString(lang, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}%</p>
+                            </div>
+                            ),
+                            wrapper.get(0)
+                        );
+                        oc.showPopup(calendar, stats_btn, wrapper);
+                    });
+                }
+            );
+
+            oc.showPopup(calendar, stats_btn, wrapper);
+        });
+
+        stats_btn.appendTo(chunk);
+    }
 };
 
 // highlight events implementation
@@ -561,7 +646,7 @@ oc.addDeleteBlockerHandler = function(event, element, view) {
         ).done(function() {
             view.calendar.refetchEvents();
         }).fail(function() {
-            oc.showErrorPopup($(element).closest('.fc'), element, locale('Failed to delete'));
+            oc.showErrorPopup(view.calendar, element, locale('Failed to delete'));
         });
     });
 };
@@ -605,21 +690,27 @@ oc.post = function(calendar, url, onerror) {
     oc.request(calendar, url, 'ic-post-to', onerror);
 };
 
-oc.add_blocker = function(calendar, url, start, end, reason, wholeDay) {
+oc.add_blocker = function(calendar, event, url, start, end, reason, wholeDay) {
     url = new Url(url);
     url.query.start = start;
     url.query.end = end;
-    url.query.reason = reason;
+    if (reason) {
+        url.query.reason = reason;
+    }
     url.query.whole_day = wholeDay && '1' || '0';
 
-    oc.post(calendar, url.toString());
+    oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {
+        oc.showErrorPopup(calendar, $('.event-' + event.id), str);
+    });
 };
 
-oc.edit_blocker = function(calendar, url, reason) {
+oc.edit_blocker = function(calendar, event, url, reason) {
     url = new Url(url);
     url.query.reason = reason;
 
-    oc.post(calendar, url.toString());
+    oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {
+        oc.showErrorPopup(calendar, $('.event-' + event.id), str);
+    });
 };
 
 // popup handler implementation
@@ -628,7 +719,8 @@ oc.showBlockerPopup = function(calendar, element, start, end, wholeDay, event) {
     var form = $('<div class="reservation-form">').appendTo(wrapper);
 
     // Render the blocker form
-    oc.BlockerForm.render(
+    var form = oc.BlockerForm.render(
+        calendar,
         form.get(0),
         start,
         end,
@@ -638,6 +730,7 @@ oc.showBlockerPopup = function(calendar, element, start, end, wholeDay, event) {
             oc.targetEvent = $(element);
             oc.add_blocker(
                 calendar,
+                event,
                 event.extendedProps.blockurl,
                 state.start,
                 state.end,
@@ -649,6 +742,7 @@ oc.showBlockerPopup = function(calendar, element, start, end, wholeDay, event) {
     );
 
     oc.showPopup(calendar, element, wrapper);
+    setTimeout(form.updateSelection, 100);
 };
 
 oc.showBlockerEditPopup = function(calendar, element, event) {
@@ -663,6 +757,7 @@ oc.showBlockerEditPopup = function(calendar, element, event) {
             oc.targetEvent = $(element);
             oc.edit_blocker(
                 calendar,
+                event,
                 event.extendedProps.seturl,
                 state.reason,
             );
@@ -686,12 +781,14 @@ oc.showPopup = function(calendar, element, content, position, extraClasses) {
         tooltipanchor: element,
         type: 'tooltip',
         onopen: function() {
+            oc.popupOpen = true;
             oc.onPopupOpen.call(this, calendar);
             setTimeout(function() {
                 $(window).trigger('resize');
             }, 0);
         },
         onclose: function() {
+            oc.popupOpen = false;
             $(element).closest('.fc-event').removeClass('has-popup');
             calendar.unselect();
         },
@@ -729,7 +826,7 @@ oc.onPopupOpen = function(calendar) {
 
     var links = popup.find('a:not(.internal)');
 
-    // hookup all links with intercool
+    // hookup all links with intercooler
     links.each(function(_ix, link) {
         Intercooler.processNodes($(link));
     });
@@ -828,6 +925,56 @@ oc.bustIECache = function(originalUrl) {
     return url.toString();
 };
 
+// setup the ability to switch to other resources
+oc.setupResourceSwitch = function(options, resourcesUrl, active) {
+    if (!resourcesUrl) {
+        return;
+    }
+
+    options.afterSetup.push(function(_calendar, element) {
+        var setup = function(choices) {
+            var container = $(element).find('.fc-toolbar-chunk').eq(1);
+
+            if (options.fc.headerToolbar.right === '') {
+                container.css('float', 'right');
+            }
+
+            var lookup = {};
+
+            if (Object.keys(choices).length >= 1) {
+
+                var switcher = $('<select>').append(
+                    _.map(choices, function(resources, group) {
+                        return $('<optgroup>').attr('label', group || '').append(
+                            _.map(resources, function(resource) {
+                                lookup[resource.name] = resource.url;
+
+                                return $('<option>')
+                                    .attr('value', resource.name)
+                                    .attr('selected', resource.name === active)
+                                    .text(resource.title);
+                            })
+                        );
+                    })
+                );
+
+                switcher.change(function() {
+                    var url = new Url(lookup[$(this).val()]);
+                    url.query = (new Url(window.location.href)).query;
+
+                    window.location = url;
+                });
+
+                container.append(switcher);
+            } else {
+                container.hide();
+            }
+        };
+
+        $.getJSON(resourcesUrl, setup);
+    });
+};
+
 
 /*
     Allows to fine-adjust the reservation blocker before adding it.
@@ -849,6 +996,24 @@ oc.BlockerForm = React.createClass({
 
         return state;
     },
+    updateSelection: function() {
+        if (!this.isValidState()) {
+            return;
+        }
+
+        var sel = {};
+        if (!this.props.partlyAvailable) {
+            sel.start = this.props.start.toDate();
+            sel.end = this.props.end.toDate();
+        } else if (this.props.wholeDay && this.state.wholeDay) {
+            sel.start = this.props.minStart.toDate();
+            sel.end = this.props.maxEnd.toDate();
+        } else {
+            sel.start = this.parseTime(this.props.start.clone(), this.state.start).toDate();
+            sel.end = this.parseTime(this.props.end.clone(), this.state.end).toDate();
+        }
+        this.props.calendar.select(sel);
+    },
     componentDidMount: function() {
         var node = $(ReactDOM.findDOMNode(this));
 
@@ -865,12 +1030,18 @@ oc.BlockerForm = React.createClass({
         switch (name) {
             case 'reserve-whole-day':
                 state.wholeDay = e.target.value === 'yes';
+                // setState is asynchronous so we slightly delay this
+                setTimeout(this.updateSelection, 100);
                 break;
             case 'start':
                 state.start = e.target.value;
+                // setState is asynchronous so we slightly delay this
+                setTimeout(this.updateSelection, 100);
                 break;
             case 'end':
                 state.end = e.target.value === '00:00' && '24:00' || e.target.value;
+                // setState is asynchronous so we slightly delay this
+                setTimeout(this.updateSelection, 100);
                 break;
             case 'reason':
                 state.reason = e.target.value || null;
@@ -944,12 +1115,10 @@ oc.BlockerForm = React.createClass({
         return enddate !== null && enddate <= this.props.maxEnd;
     },
     isValidState: function() {
-        if (this.props.partlyAvailable) {
-            if (this.props.wholeDay && this.state.wholeDay) {
-                return true;
-            } else {
-                return this.isValidStart(this.state.start) && this.isValidEnd(this.state.end);
-            }
+        if (!this.props.partlyAvailable || (this.props.wholeDay && this.state.wholeDay)) {
+            return true;
+        } else {
+            return this.isValidStart(this.state.start) && this.isValidEnd(this.state.end);
         }
     },
     // eslint-disable-next-line complexity
@@ -1028,26 +1197,29 @@ oc.BlockerForm = React.createClass({
     }
 });
 
-oc.BlockerForm.render = function(element, start, end, wholeDay, event, onSubmit) {
+oc.BlockerForm.render = function(calendar, element, start, end, wholeDay, event, onSubmit) {
 
     var partlyAvailable = event.extendedProps.partlyAvailable;
     var fullyAvailable = event.extendedProps.fullyAvailable;
     var minStart = moment.max(moment(event.start), moment());
     var maxEnd = moment(event.end);
+    var wholeRange = !partlyAvailable || wholeDay;
 
-    ReactDOM.render(
+    return ReactDOM.render(
         <oc.BlockerForm
+            calendar={calendar}
             partlyAvailable={partlyAvailable}
             fullyAvailable={fullyAvailable}
-            start={wholeDay && minStart || moment.max(start, minStart)}
-            end={wholeDay && maxEnd || moment.min(end, maxEnd)}
+            start={wholeRange && minStart || moment.max(start, minStart)}
+            end={wholeRange && maxEnd || moment.min(end, maxEnd)}
             minStart={minStart}
             maxEnd={maxEnd}
             wholeDay={event.extendedProps.wholeDay}
             wholeDayDefault={wholeDay}
             onSubmit={onSubmit}
         />,
-        element);
+        element
+    );
 };
 
 
@@ -1125,15 +1297,18 @@ oc.BlockerEditForm.render = function(element, event, onSubmit) {
 };
 
 /*
-    Allows to fine-adjust the date range for the PDF export.
+    Allows to fine-adjust the date range for a export.
 */
-oc.PDFExportForm = React.createClass({
+oc.ExportForm = React.createClass({
     getInitialState: function() {
-        return {
+        var state = {
             start: this.props.start.format('YYYY-MM-DD'),
             end: this.props.end.format('YYYY-MM-DD'),
-            accepted: true
         };
+        if (this.props.accepted) {
+            state.accepted = true;
+        }
+        return state;
     },
     componentDidMount: function() {
         var node = $(ReactDOM.findDOMNode(this));
@@ -1183,7 +1358,7 @@ oc.PDFExportForm = React.createClass({
 
         return (
             <form>
-                <h3>{locale("Export as PDF")}</h3>
+                <h3>{this.props.formTitle}</h3>
                 <div className="field split">
                     <div>
                         <label htmlFor="start">{locale("From")}</label>
@@ -1202,28 +1377,33 @@ oc.PDFExportForm = React.createClass({
                         />
                     </div>
                 </div>
-                <div className="field checkbox">
-                    <div>
-                        <label className="label-text">
-                            <input name="accepted" type="checkbox"
-                                defaultChecked={this.state.accepted}
-                                onChange={this.handleInputChange}
-                            />
-                            {locale("Accepted reservations only")}
-                        </label>
+                {this.props.accepted && (
+                    <div className="field checkbox">
+                        <div>
+                            <label className="label-text">
+                                <input name="accepted" type="checkbox"
+                                    defaultChecked={this.state.accepted}
+                                    onChange={this.handleInputChange}
+                                />
+                                {locale("Accepted reservations only")}
+                            </label>
+                        </div>
                     </div>
-                </div>
+                )}
 
-                <button className={isValid && "button" || "button secondary"} disabled={!isValid} onClick={this.handleButton}>{locale("Download")}</button>
+                <button className={isValid && "button" || "button secondary"} disabled={!isValid} onClick={this.handleButton}>{this.props.submitTitle}</button>
             </form>
         );
 
     }
 });
 
-oc.PDFExportForm.render = function(element, calendar, onSubmit) {
+oc.ExportForm.render = function(element, calendar, accepted, formTitle, submitTitle, onSubmit) {
     ReactDOM.render(
-        <oc.PDFExportForm
+        <oc.ExportForm
+            formTitle={formTitle}
+            submitTitle={submitTitle}
+            accepted={accepted}
             start={moment(calendar.view.currentStart)}
             end={moment(calendar.view.currentEnd).subtract(1, 'day')}
             onSubmit={onSubmit}

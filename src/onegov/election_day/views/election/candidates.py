@@ -11,7 +11,6 @@ from onegov.election_day.utils import get_entity_filter
 from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
-from sqlalchemy.orm import object_session
 
 
 from typing import TYPE_CHECKING
@@ -105,7 +104,7 @@ def view_election_candidates(
     entities = get_entity_filter(request, self, 'candidates', entity)
     candidates = get_candidates_results(
         self,
-        object_session(self),
+        request.session,
         entities=[entity] if entity else None
     ).all()
     any_elected = any(candidate.elected for candidate in candidates)
@@ -142,7 +141,7 @@ def view_election_lists_table(
     assert isinstance(entity, str)
     candidates = get_candidates_results(
         self,
-        object_session(self),
+        request.session,
         entities=[entity] if entity else None
     ).all()
 

@@ -13,11 +13,11 @@ from isodate import parse_date, ISO8601Error
 from itertools import islice
 from libres.db.models import ReservationBlocker
 from libres.modules.errors import LibresError
+from math import isclose
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
 from onegov.core.utils import module_path, Bunch
 from onegov.core.orm import as_selectable_from_path
-from onegov.core.orm.types import UUID as UUIDType
 from onegov.form import as_internal_id, FormSubmission
 from onegov.org.cli import close_ticket
 from onegov.org.forms.resource import AllResourcesExportForm
@@ -41,7 +41,8 @@ from onegov.ticket import Ticket, TicketInvoice
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
-from sqlalchemy import and_, func, select, cast as sa_cast, Boolean
+from sqlalchemy import and_, cast as sa_cast, func, or_, select
+from sqlalchemy import Boolean, UUID as UUIDType
 from sqlalchemy.orm import undefer, joinedload, Session
 from webob import exc
 
@@ -658,7 +659,7 @@ def view_find_your_spot(
                         continue
 
                     for slot in slots:
-                        if slot.availability == 100.0:
+                        if isclose(slot.availability, 100.0, abs_tol=.005):
                             try:
                                 room = rooms_dict[room_id]
                                 assert hasattr(room, 'bound_session_id')
@@ -809,11 +810,27 @@ def view_resources_json(
     request: OrgRequest
 ) -> JSON_ro:
 
-    def transform(resource: Resource) -> JSON_ro:
+    view = request.GET.get('view', '')
+    is_occupancy = view == 'occupancy'
+    if is_occupancy and not request.is_logged_in:
+        # NOTE: Only logged in users can see occupancy
+        return {}
+
+    filter_occupancy = is_occupancy and request.has_role('member')
+
+    def transform(resource: Resource) -> JSON_ro | None:
+        # NOTE: Exclude resources where members are not allowed to see
+        #       the occupancy
+        if (
+            filter_occupancy
+            and not getattr(self, 'occupancy_is_visible_to_members', False)
+        ):
+            return None
+
         return {
             'name': resource.name,
             'title': resource.title,
-            'url': request.link(resource),
+            'url': request.link(resource, name=view),
         }
 
     @request.after
@@ -1229,6 +1246,47 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     )
 
 
+@OrgApp.json(model=Resource, name='occupancy-stats', permission=Personal)
+def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
+    """ Returns stats for the selected date range.
+
+    """
+    assert_visible_by_members(self, request)
+
+    start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
+
+    if not (start and end):
+        raise exc.HTTPBadRequest()
+
+    accepted = func.coalesce(Reservation.data['accepted'] == True, False)
+    stats = dict(
+        self.scheduler.managed_reservations()
+        .filter(Reservation.status == 'approved')
+        .filter(or_(
+            and_(
+                Reservation.start <= start,
+                start <= Reservation.end
+            ),
+            and_(
+                start <= Reservation.start,
+                Reservation.start <= end
+            )
+        ))
+        .group_by(accepted)
+        .with_entities(accepted, func.count(Reservation.id))
+        .tuples()
+    )
+
+    layout = DefaultLayout(self, request)
+
+    return {
+        'range': layout.format_date_range(start.date(), end.date()),
+        'count': stats.get(True, 0) + stats.get(False, 0),
+        'pending': stats.get(False, 0),
+        'utilization': 100.0 - self.scheduler.availability(start, end),
+    }
+
+
 @OrgApp.html(
     model=Resource,
     permission=Personal,
@@ -1250,6 +1308,12 @@ def view_occupancy(
         'resource': self,
         'layout': layout or ResourceLayout(self, request),
         'feed': request.link(self, name='occupancy-json'),
+        'stats_url': request.link(self, name='occupancy-stats'),
+        'resources_url': request.class_link(
+            ResourceCollection,
+            name='json',
+            query_params={'view': 'occupancy'}
+        )
     }
 
 
@@ -1282,7 +1346,7 @@ def view_my_reservations_json(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(stmt.c).where(and_(
+    records = request.session.execute(select(*stmt.c).where(and_(
         func.lower(stmt.c.email) == request.authenticated_email.lower(),
         start <= stmt.c.start,
         stmt.c.start <= end
@@ -1340,7 +1404,7 @@ def view_my_reservations_pdf(
     if request.GET.get('accepted') == '1':
         conditions.append(stmt.c.accepted.is_(True))
 
-    records = request.session.execute(select(stmt.c).where(and_(*conditions)))
+    records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
     content = MyReservationsPdf.from_reservations(request, [
         utils.MyReservationEventInfo(
@@ -1417,6 +1481,7 @@ def view_my_reservations(
         'title': _('My Reservations'),
         'resource': Bunch(
             type='room',
+            name='',
             date=date,
             view=request.GET.get('view'),
             highlights_min=request.GET.get('highlights_min'),
@@ -1526,7 +1591,7 @@ def view_my_reservations_ical(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(stmt.c).where(and_(
+    records = request.session.execute(select(*stmt.c).where(and_(
         func.lower(stmt.c.email) == email.lower(),
         s <= stmt.c.start, stmt.c.start <= e,
         # only include accepted reservations in ICS file

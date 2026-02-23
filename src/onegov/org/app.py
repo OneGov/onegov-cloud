@@ -507,7 +507,7 @@ def get_shared_assets_path() -> str:
 
 @OrgApp.setting(section='i18n', name='locales')
 def get_i18n_used_locales() -> set[str]:
-    return {'de_CH', 'fr_CH'}
+    return {'de_CH', 'fr_CH', 'it_CH'}
 
 
 @OrgApp.setting(section='i18n', name='localedirs')
@@ -563,6 +563,10 @@ def get_theme() -> OrgTheme:
 @OrgApp.setting(section='content_security_policy', name='default')
 def org_content_security_policy() -> ContentSecurityPolicy:
     policy = default_content_security_policy()
+
+    policy.script_src.add('https://checkout.stripe.com')
+    policy.script_src.add('https://pay.datatrans.com')
+    policy.script_src.add('https://pay.sandbox.datatrans.com')
 
     policy.child_src.add(SELF)
     policy.child_src.add('https://*.youtube.com')

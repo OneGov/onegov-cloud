@@ -15,9 +15,9 @@ repos:
         exclude: .pre-commit-config.yaml
       - id: pt_structure
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.13
+    rev: v0.15.2
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: [ "--fix" ]
   - repo: https://github.com/PyCQA/flake8
     rev: 7.3.0
@@ -27,7 +27,7 @@ repos:
         additional_dependencies:
         - flake8-type-checking>=3.0.0
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v17.0.0
+    rev: v17.3.0
     hooks:
     - id: stylelint
       files: '^src/.*\.scss'
@@ -35,7 +35,7 @@ repos:
         - stylelint@16.19.1
         - stylelint-config-standard-scss@15.0.0
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.0.0-rc.0
+    rev: v10.0.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'

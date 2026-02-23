@@ -10,18 +10,19 @@ from onegov.search import SearchIndex
 from onegov.search.utils import language_from_locale
 from markupsafe import Markup
 from operator import itemgetter
-from sedate import utcnow
+from sedate import align_date_to_day, as_datetime, replace_timezone, utcnow
 from sqlalchemy import case, func, inspect, type_coerce
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import escape_like
 
 
 from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from datetime import date
     from onegov.org.request import OrgRequest
     from onegov.search import Searchable
     from sqlalchemy.orm import Query
+    from uuid import UUID
     from wtforms.fields.choices import _Choice
 
 
@@ -36,7 +37,9 @@ class Search(Pagination[Any]):
         request: OrgRequest,
         query: str,
         types: Iterable[str] | str | None = None,
-        page: int = 0
+        start: date | None = None,
+        end: date | None = None,
+        page: int = 0,
     ) -> None:
         self.request = request
         self.query = query
@@ -45,6 +48,8 @@ class Search(Pagination[Any]):
             if types and isinstance(types, str)
             else set(types or ())
         )
+        self.start = start
+        self.end = end
         self.page = page  # page index
 
         self.number_of_results: int | None = None
@@ -142,7 +147,14 @@ class Search(Pagination[Any]):
         return self.page
 
     def page_by_index(self, index: int) -> Search:
-        return Search(self.request, self.query, self.types, index)
+        return Search(
+            self.request,
+            self.query,
+            self.types,
+            self.start,
+            self.end,
+            index
+        )
 
     @cached_property
     def batch(self) -> tuple[Any, ...]:
@@ -245,6 +257,21 @@ class Search(Pagination[Any]):
             if types:
                 query = query.filter(SearchIndex.owner_type.in_(types))
 
+        if self.start is not None:
+            # NOTE: This will need to change if we allow different timezones
+            #       but when we do, we should probably store it on the request
+            #       rather than our layouts.
+            start = replace_timezone(as_datetime(self.start), 'Europe/Zurich')
+            query = query.filter(SearchIndex.last_change >= start)
+
+        if self.end is not None:
+            # NOTE: This will need to change if we allow different timezones
+            #       but when we do, we should probably store it on the request
+            #       rather than our layouts.
+            end = replace_timezone(as_datetime(self.end), 'Europe/Zurich')
+            end = align_date_to_day(end, 'Europe/Zurich', 'up')
+            query = query.filter(SearchIndex.last_change <= end)
+
         return query
 
     @cached_property
@@ -302,12 +329,10 @@ class Search(Pagination[Any]):
                 #       are he most egregious offender though, so we just
                 #       hardcode this into the query.
                 * case(
-                    [
-                        (SearchIndex.owner_tablename == 'files', 0.1),
-                        # NOTE: Tickets may be excluded entirely in the
-                        #       future but for now we'll de-prioritize them
-                        (SearchIndex.owner_tablename == 'tickets', 0.2),
-                    ],
+                    (SearchIndex.owner_tablename == 'files', 0.1),
+                    # NOTE: Tickets may be excluded entirely in the
+                    #       future but for now we'll de-prioritize them
+                    (SearchIndex.owner_tablename == 'tickets', 0.2),
                     else_=1.0
                 )
             ).desc().label('rank')
@@ -359,7 +384,7 @@ class Search(Pagination[Any]):
                 #       since been removed.
                 continue
 
-            primary_key, = inspect(base_model).primary_key
+            primary_key, = inspect(base_model).primary_key  # type: ignore[union-attr]
 
             results_by_id.update(
                 self.request.session.query(primary_key, base_model)
@@ -424,8 +449,9 @@ class Search(Pagination[Any]):
                 ).distinct()
             ).subquery()
             # FIXME: This could be a lot faster if suggestions were
-            #        their own table, we also don't handle normalization
-            #        of accents/umlauts yet for auto-complete
+            #        their own table, we also don't handle language
+            #        specific normalization of accents/umlauts yet
+            #        for auto-complete
             return tuple(
                 suggestion
                 for suggestion, in self.request.session

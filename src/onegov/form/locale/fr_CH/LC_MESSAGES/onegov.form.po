@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-07 17:12+0100\n"
+"POT-Creation-Date: 2026-01-27 10:29+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -231,6 +231,14 @@ msgid ""
 msgstr ""
 "Le groupe '{label}' est vide et ne sera pas visible. Supprimez le groupe "
 "vide ou ajoutez des champs."
+
+#, python-format
+msgid ""
+"${fields}: New fields cannot be required initially. Require them in a "
+"separate migration step."
+msgstr ""
+"${fields}: Les nouveaux champs ne peuvent pas être requis au départ. Exigez-"
+"les dans une étape de migration séparée."
 
 #, python-format
 msgid ""

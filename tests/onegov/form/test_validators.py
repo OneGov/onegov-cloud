@@ -7,9 +7,7 @@ from onegov.form.validators import ValidSwissSocialSecurityNumber
 from onegov.form.validators import UniqueColumnValue
 from onegov.form.validators import ValidPhoneNumber
 from pytest import raises
-from sqlalchemy import Column
-from sqlalchemy import Text
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
 from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 
@@ -26,13 +24,12 @@ else:
 
 
 def test_unique_column_value_validator(postgres_dsn: str) -> None:
-    # avoid confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class Dummy(Base):
         __tablename__ = 'dummies'
-        name: Column[str] = Column(Text, nullable=False, primary_key=True)
+        name: Mapped[str] = mapped_column(primary_key=True)
 
     class Field(BaseField):
         def __init__(self, name: str, data: str) -> None:

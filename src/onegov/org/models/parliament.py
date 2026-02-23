@@ -17,7 +17,7 @@ from onegov.parliament.models import ParliamentaryGroup
 from onegov.search import ORMSearchable
 from sedate import utcnow
 from sqlalchemy import and_, or_, exists
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
@@ -141,12 +141,8 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
         return f'{self.last_name} {self.first_name}'
 
     #: political businesses participations [0..n]
-    political_businesses: (
-        relationship)[list[PoliticalBusinessParticipation]] = (
-        relationship(
-            'PoliticalBusinessParticipation',
-            back_populates='parliamentarian',
-        )
+    political_businesses: Mapped[list[PoliticalBusinessParticipation]] = (
+        relationship(back_populates='parliamentarian')
     )
 
     @hybrid_property
@@ -239,8 +235,7 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
     def fts_last_change(self) -> None:
         return None
 
-    political_businesses: relationship[list[PoliticalBusiness]] = relationship(
-        'PoliticalBusiness',
+    political_businesses: Mapped[list[PoliticalBusiness]] = relationship(
         secondary=par_political_business_parliamentary_groups,
         back_populates='parliamentary_groups',
         passive_deletes=True,

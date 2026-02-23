@@ -10,33 +10,31 @@ from onegov.core.crypto import random_token
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.directory.errors import ValidationError, DuplicateEntryError
 from onegov.directory.migration import DirectoryMigration
-from onegov.directory.types import DirectoryConfigurationStorage
+from onegov.directory.types import (
+    DirectoryConfiguration, DirectoryConfigurationStorage)
 from onegov.file import File, MultiAssociatedFiles
 from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import SearchableContent
 from sedate import to_timezone
-from sqlalchemy import Boolean, Column
-from sqlalchemy import func, exists, and_
-from sqlalchemy import Integer
-from sqlalchemy import Text
+from sqlalchemy import and_, exists, func, text, Integer
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy_utils import aggregated
 from translationstring import TranslationString
-from uuid import uuid4
+from uuid import uuid4, UUID
 from wtforms import FieldList
 
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from builtins import type as _type  # type is shadowed in model
     from collections.abc import Mapping, Sequence
     from onegov.form import Form
@@ -45,7 +43,6 @@ if TYPE_CHECKING:
     from sqlalchemy.sql import ColumnElement
     from typing import type_check_only, TypeAlias
     from .directory_entry import DirectoryEntry
-    from ..types import DirectoryConfiguration
 
     InheritType: TypeAlias = 'Literal[_Sentinel.INHERIT]'
 
@@ -84,7 +81,7 @@ class DirectoryFile(File):
         #       a one-to-many relationship on DirectoryEntry. Technically
         #       it's possible to create a DirectoryFile, that isn't linked
         #       to any directory entry, but generally this shouldn't happen
-        linked_directory_entries: relationship[list[DirectoryEntry]]
+        linked_directory_entries: Mapped[list[DirectoryEntry]]
 
     @property
     def directory_entry(self) -> DirectoryEntry | None:
@@ -123,52 +120,45 @@ class Directory(Base, ContentMixin, TimestampMixin,
         return False  # to be overridden downstream
 
     #: An interal id for references (not public)
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The public, unique name of the directory
-    name: Column[str] = Column(Text, nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(unique=True)
 
     #: The title of the directory
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: Describes the directory briefly
-    lead: Column[str | None] = Column(Text, nullable=True)
+    lead: Mapped[str | None]
 
     #: The normalized title for sorting
-    order: Column[str] = Column(Text, nullable=False, index=True)
+    order: Mapped[str] = mapped_column(index=True)
 
     #: The polymorphic type of the directory
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     #: The data structure of the contained entries
-    structure: Column[str] = Column(Text, nullable=False)
+    structure: Mapped[str]
 
     #: The configuration of the contained entries
-    configuration: Column[DirectoryConfiguration] = Column(
-        DirectoryConfigurationStorage,
-        nullable=False
+    configuration: Mapped[DirectoryConfiguration] = mapped_column(
+        DirectoryConfigurationStorage
     )
 
     #: The number of entries in the directory
-    @aggregated('entries', Column(Integer, nullable=False, default=0))
+    @aggregated('entries', mapped_column(Integer, nullable=False, default=0))
     def count(self) -> ColumnElement[int]:
-        return func.count('1')
+        return func.count(text('1'))
 
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'generic'
     }
 
-    entries: relationship[list[DirectoryEntry]] = relationship(
-        'DirectoryEntry',
+    entries: Mapped[list[DirectoryEntry]] = relationship(
         order_by='DirectoryEntry.order',
         back_populates='directory'
     )
@@ -206,6 +196,11 @@ class Directory(Base, ContentMixin, TimestampMixin,
             publication_start=start,
             publication_end=end,
         )
+        # NOTE: If we're part of a session, we need to add the entry to
+        #       that same session. This no longer happens automagically
+        #       through relationships in SQLAlchemy 2+
+        if session := object_session(self):
+            session.add(entry)
 
         return self.update(entry, values, set_name=True)
 
@@ -258,13 +253,13 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
             # files which are not given or whose value is {} are removed
             # (this is in line with onegov.form's file upload field+widget)
-            for f in entry.files:
+            for file in entry.files:
 
                 # this indicates that the file has been renamed
-                if f.note is None or f.note not in known_file_ids:
+                if file.note is None or file.note not in known_file_ids:
                     continue
 
-                value_field = get_value_field_from_note(f.note)
+                value_field = get_value_field_from_note(file.note)
                 if isinstance(value_field, dict):
                     continue
 
@@ -275,7 +270,8 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 )
 
                 if delete:
-                    session.delete(f)
+                    assert session is not None
+                    session.delete(file)
 
             for field in self.file_fields:
                 field_values = values[field.id]
@@ -286,10 +282,11 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 if isinstance(field_values, dict):
                     updated[field.id] = field_values
                     file_id = field_values['data'].lstrip('@')
+                    assert session is not None
                     with session.no_autoflush:
                         f = session.query(File).filter_by(id=file_id).first()
                         if f and f.type != 'directory':
-                            new = DirectoryFile(  # type:ignore[misc]
+                            new = DirectoryFile(
                                 id=random_token(),
                                 name=f.name,
                                 note=f.note,
@@ -303,12 +300,13 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     updated[field.id] = field_values
                     for idx, field_value in enumerate(field_values):
                         file_id = field_value['data'].lstrip('@')
+                        assert session is not None
                         with session.no_autoflush:
                             f = session.query(File).filter_by(
                                 id=file_id
                             ).first()
                             if f and f.type != 'directory':
-                                new = DirectoryFile(  # type:ignore[misc]
+                                new = DirectoryFile(
                                     id=random_token(),
                                     name=f.name,
                                     note=f.note,
@@ -338,7 +336,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                         continue
 
                     # create a new file
-                    new_file = DirectoryFile(  # type:ignore[misc]
+                    new_file = DirectoryFile(
                         id=random_token(),
                         name=field_values.filename,
                         note=field.id,
@@ -396,7 +394,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                         continue
 
                     # create a new file
-                    new_file = DirectoryFile(  # type:ignore[misc]
+                    new_file = DirectoryFile(
                         id=random_token(),
                         name=subfield_values.filename,
                         note=f'{field.id}:{new_idx}',
@@ -438,9 +436,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
             if session:
                 with session.no_autoflush:
                     if self.entry_with_name_exists(name):
-                        # FIXME: I don't think this is necessary, the expunge
-                        #        should already remove the relationship
-                        entry.directory = None  # type:ignore[assignment]
+                        entry.directory = None  # type: ignore[assignment]
                         session.expunge(entry)
                         raise DuplicateEntryError(name)
 
@@ -454,8 +450,9 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
             # if the validation error is captured, the entry is added
             # to the directory, unless we expunge it
-            entry.directory = None  # type:ignore[assignment]
-            session and session.expunge(entry)
+            entry.directory = None  # type: ignore[assignment]
+            if session:
+                session.expunge(entry)
 
             raise ValidationError(entry, form.errors)
 
@@ -477,7 +474,9 @@ class Directory(Base, ContentMixin, TimestampMixin,
         self.migration(structure, configuration).execute()
 
     def entry_with_name_exists(self, name: str) -> bool:
-        return object_session(self).query(exists().where(and_(
+        session = object_session(self)
+        assert session is not None
+        return session.query(exists().where(and_(
             self.entry_cls.name == name,
             self.entry_cls.directory_id == self.id
         ))).scalar()
@@ -603,14 +602,13 @@ class EntryRecipient(Base, TimestampMixin, ContentMixin):
     __tablename__ = 'entry_recipients'
 
     #: the id of the recipient, used in the url
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the email address of the recipient
-    address: Column[str] = Column(Text, nullable=False)
+    address: Mapped[str]
 
     @validates('address')
     def validate_address(self, key: str, address: str) -> str:
@@ -618,21 +616,19 @@ class EntryRecipient(Base, TimestampMixin, ContentMixin):
         return address
 
     #: this token is used for confirm and unsubscribe
-    token: Column[str] = Column(Text, nullable=False, default=random_token)
+    token: Mapped[str] = mapped_column(default=random_token)
 
     #: when recipients are added, they are unconfirmed. At this point they get
     #: one e-mail with a confirmation link. If they ignore said e-mail they
     #: should not get another one.
-    confirmed: Column[bool] = Column(Boolean, nullable=False, default=False)
+    confirmed: Mapped[bool] = mapped_column(default=False)
 
     @property
     def subscription(self) -> EntrySubscription:
         return EntrySubscription(self, self.token)
 
-    directory_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
-        nullable=False
-    )
+    # FIXME: Add missing ForeignKey constraint (requires migration)
+    directory_id: Mapped[UUID]
 
     @property
     def is_inactive(self) -> bool:
@@ -671,7 +667,7 @@ class EntrySubscription:
         self.token = token
 
     @property
-    def recipient_id(self) -> uuid.UUID:
+    def recipient_id(self) -> UUID:
         # even though this seems redundant, we need this property
         # for morepath, so it can match it to the path variable
         return self.recipient.id
@@ -688,6 +684,7 @@ class EntrySubscription:
             return False
 
         session = object_session(self.recipient)
+        assert session is not None
         session.delete(self.recipient)
         session.flush()
 

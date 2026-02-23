@@ -30,12 +30,13 @@ from onegov.search import SearchableContent
 from sedate import replace_timezone
 from sqlalchemy import desc, func, or_, and_
 from sqlalchemy.dialects.postgresql import array
-from sqlalchemy.orm import undefer, object_session
+from sqlalchemy.orm import object_session, relationship, undefer, Mapped
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
+    from onegov.org.models import PushNotification
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Query, Session
     from typing import Self
@@ -89,7 +90,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     @property
     def paste_target(self) -> Topic | News:
         if self.trait == 'link':
-            return self.parent or self  # type:ignore[return-value]
+            return self.parent or self  # type: ignore[return-value]
 
         if self.trait == 'page':
             return self
@@ -182,6 +183,11 @@ class News(Page, TraitInfo, SearchableContent, AccessExtension,
         default=False
     )
 
+    sent_notifications: Mapped[PushNotification] = relationship(
+        back_populates='news',
+        passive_deletes=True
+    )
+
     @observes('content')
     def content_observer(self, content: dict[str, Any]) -> None:
         self.hashtags = self.fts_tags or []
@@ -206,7 +212,7 @@ class News(Page, TraitInfo, SearchableContent, AccessExtension,
     @property
     def paste_target(self) -> Topic | News:
         if self.parent:
-            return self.parent  # type:ignore[return-value]
+            return self.parent  # type: ignore[return-value]
         else:
             return self
 
@@ -275,6 +281,7 @@ class News(Page, TraitInfo, SearchableContent, AccessExtension,
     def push_notifications_were_sent_before(self) -> bool:
         from onegov.org.models import PushNotification
         session = object_session(self)
+        assert session is not None
         query = session.query(PushNotification).filter(
             PushNotification.news_id == self.id)
         return session.query(query.exists()).scalar()
@@ -314,8 +321,8 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
         )
 
         topics = topics.order_by(desc(Topic.published_or_created))
-        topics = topics.options(undefer('created'))
-        topics = topics.options(undefer('content'))
+        topics = topics.options(undefer(Topic.created))
+        topics = topics.options(undefer(Topic.content))
         return topics
 
     @property
@@ -411,12 +418,12 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
 
         if self.filter_tags:
             news = news.filter(
-                News.meta['hashtags'].has_any(array(self.filter_tags))  # type: ignore[call-overload]
+                News.meta['hashtags'].has_any(array(self.filter_tags))
             )
 
         news = news.order_by(desc(News.published_or_created))
-        news = news.options(undefer('created'))
-        news = news.options(undefer('content'))
+        news = news.options(undefer(News.created))
+        news = news.options(undefer(News.content))
         return news
 
     def sticky(self) -> Query[News]:

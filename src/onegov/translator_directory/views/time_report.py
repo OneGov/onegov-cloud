@@ -6,9 +6,11 @@ import json
 from onegov.translator_directory.i18n import _
 from io import StringIO
 from webob import Response
+from webob.exc import HTTPForbidden
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
+from sedate import utcnow
 from decimal import Decimal
+from uuid import uuid4
 from onegov.core.mail import Attachment
 from onegov.core.utils import module_path
 from onegov.translator_directory.qrbill import (
@@ -20,6 +22,7 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
 
+from onegov.core.elements import Confirm, Intercooler, Link
 from onegov.core.security import Private, Personal
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.org.cli import close_ticket
@@ -33,7 +36,6 @@ from onegov.translator_directory.forms.time_report import (
 from onegov.translator_directory.generate_docx import gendered_greeting
 from onegov.translator_directory.layout import (
     TimeReportCollectionLayout,
-    TimeReportLayout,
     TranslatorLayout,
 )
 from onegov.translator_directory.models.ticket import (
@@ -78,34 +80,56 @@ def view_time_reports(
 
     layout = TimeReportCollectionLayout(self, request)
 
-    now = datetime.now()
-    current_year = now.year
-    last_month = now - relativedelta(months=1)
-    default_month = last_month.month
-    default_year = last_month.year
+    if self.archive:
+        archive_toggle_url = request.link(
+            TimeReportCollection(request.app, archive=False)
+        )
+        archive_toggle_text = _('Show active reports')
+    else:
+        archive_toggle_url = request.link(
+            TimeReportCollection(request.app, archive=True)
+        )
+        archive_toggle_text = _('Show archived (exported) reports')
 
-    selected_month = self.month if self.month is not None else None
-    selected_year = self.year if self.year is not None else None
+    user_finanzstelles = self._get_user_finanzstelles(request)
+    finanzstelle_names = []
+    for fs_key in user_finanzstelles:
+        fs_info = FINANZSTELLE.get(fs_key)
+        if fs_info:
+            finanzstelle_names.append(fs_info.name)
 
-    months = [
-        (1, request.translate(_('January'))),
-        (2, request.translate(_('February'))),
-        (3, request.translate(_('March'))),
-        (4, request.translate(_('April'))),
-        (5, request.translate(_('May'))),
-        (6, request.translate(_('June'))),
-        (7, request.translate(_('July'))),
-        (8, request.translate(_('August'))),
-        (9, request.translate(_('September'))),
-        (10, request.translate(_('October'))),
-        (11, request.translate(_('November'))),
-        (12, request.translate(_('December'))),
-    ]
+    query = self.query()
+    query = self._apply_finanzstelle_filter(query, request)
+    reports = list(query)
 
-    years = [current_year, current_year - 1, current_year - 2]
-    export_url = request.link(self, 'export-accounting')
+    unexported_count = self.for_accounting_export(request).count()
+    export_link = None
+    if unexported_count > 0 and not self.archive:
+        export_link = Link(
+            text=_(
+                'Export ${count} reports', mapping={'count': unexported_count}
+            ),
+            url=layout.csrf_protected_url(
+                request.link(self, 'export-accounting')
+            ),
+            attrs={'class': 'button primary round small'},
+            traits=(
+                Confirm(
+                    _(
+                        'Export ${count} time reports for accounting?',
+                        mapping={'count': unexported_count},
+                    ),
+                    _(
+                        'Reports can only be exported once '
+                        'and will appear in the archive.'
+                    ),
+                    _('Export'),
+                    _('Cancel'),
+                ),
+            ),
+        )
 
-    report_ids = [str(report.id) for report in self.batch]
+    report_ids = [str(report.id) for report in reports]
     tickets = (
         request.session.query(TimeReportTicket)
         .filter(
@@ -120,19 +144,41 @@ def view_time_reports(
         for ticket in tickets
     }
 
+    delete_links = {}
+    for report in reports:
+        if can_delete_time_report(request, report):
+            delete_links[str(report.id)] = Link(
+                text=_('Delete'),
+                url=layout.csrf_protected_url(request.link(report)),
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _('Do you really want to delete this time report?'),
+                        _('This cannot be undone.'),
+                        _('Delete time report'),
+                        _('Cancel'),
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=request.class_link(
+                            TimeReportCollection
+                        ),
+                    ),
+                ),
+            )
+
     return {
         'layout': layout,
         'model': self,
         'title': layout.title,
-        'reports': self.batch,
+        'reports': reports,
         'report_tickets': report_tickets,
-        'months': months,
-        'years': years,
-        'default_month': default_month,
-        'default_year': default_year,
-        'selected_month': selected_month,
-        'selected_year': selected_year,
-        'export_url': export_url,
+        'delete_links': delete_links,
+        'export_link': export_link,
+        'archive': self.archive,
+        'archive_toggle_url': archive_toggle_url,
+        'archive_toggle_text': archive_toggle_text,
+        'finanzstelle_names': finanzstelle_names,
     }
 
 
@@ -157,7 +203,9 @@ def edit_time_report(
             request.link(TimeReportCollection(request.app))
         )
 
-    layout = TimeReportLayout(self, request)
+    layout = TimeReportCollectionLayout(
+        TimeReportCollection(request.app), request
+    )
 
     if form.submitted(request):
         form.update_model(self)
@@ -285,7 +333,7 @@ def accept_time_report(
             travel_info = {
                 'from_address': translator_address,
                 'to_location': location_name,
-                'distance': time_report.travel_distance
+                'one_way_travel_distance': time_report.travel_distance,
             }
 
         send_ticket_mail(
@@ -360,6 +408,7 @@ def generate_accounting_export_rows(
         # the view has checked for missing pers_id before
         assert translator.pers_id is not None
         pers_nr = str(translator.pers_id)
+        contract_nr = translator.contract_number or ''
         date_str = report.assignment_date.strftime('%d.%m.%Y')
 
         duration_hours, effective_rate, _ = calculate_accounting_values(report)
@@ -391,7 +440,7 @@ def generate_accounting_export_rows(
             '0',
             '0',
             '0',
-            '1',
+            contract_nr,
             '0',
             '',
             '0',
@@ -428,7 +477,7 @@ def generate_accounting_export_rows(
                 '0',
                 '0',
                 '0',
-                '1',
+                contract_nr,
                 '0',
                 '',
                 '0',
@@ -465,7 +514,7 @@ def generate_accounting_export_rows(
                 '0',
                 '0',
                 '0',
-                '1',
+                contract_nr,
                 '0',
                 '',
                 '0',
@@ -486,34 +535,18 @@ def generate_accounting_export_rows(
     model=TimeReportCollection,
     name='export-accounting',
     permission=Personal,
-    request_method='POST',
 )
 def export_accounting_csv(
     self: TimeReportCollection,
     request: TranslatorAppRequest,
 ) -> Response:
-    """Export confirmed time reports as CSV for accounting."""
+    """Export confirmed, unexported time reports as CSV for accounting."""
 
-    try:
-        year = int(str(request.POST.get('year', '0')))
-        month = int(str(request.POST.get('month', '0')))
-    except (ValueError, TypeError):
-        request.message(_('Invalid form data'), 'warning')
-        return request.redirect(request.link(self))
+    request.assert_valid_csrf_token()
 
-    if not (1 <= month <= 12) or year < 2000:
-        request.message(_('Invalid form data'), 'warning')
-        return request.redirect(request.link(self))
-
-    confirmed_reports = list(self.for_accounting_export(year, month))
+    confirmed_reports = list(self.for_accounting_export(request))
     if not confirmed_reports:
-        request.message(
-            _(
-                'No confirmed time reports found for ${month}/${year}',
-                mapping={'month': month, 'year': year},
-            ),
-            'warning',
-        )
+        request.message(_('No unexported time reports found'), 'warning')
         return request.redirect(request.link(self))
 
     missing_pers_id = [
@@ -532,6 +565,22 @@ def export_accounting_csv(
             'warning',
         )
         return request.redirect(request.link(self))
+
+    missing_contract_nr = [
+        r for r in confirmed_reports if not r.translator.contract_number
+    ]
+    if missing_contract_nr:
+        translator_names = ', '.join(
+            r.translator.title for r in missing_contract_nr
+        )
+        request.message(
+            _(
+                'Export warning: The following translators are missing '
+                'a contract number (Vertragsnummer): ${names}',
+                mapping={'names': translator_names},
+            ),
+            'warning',
+        )
 
     output = StringIO()
     writer = csv.writer(output, delimiter=';')
@@ -578,9 +627,17 @@ def export_accounting_csv(
     for row in generate_accounting_export_rows(confirmed_reports):
         writer.writerow(row)
 
+    now = utcnow()
+    batch_id = uuid4()
+    for report in confirmed_reports:
+        report.exported = True
+        report.exported_at = now
+        report.export_batch_id = batch_id
+
     csv_content = output.getvalue()
     csv_bytes = csv_content.encode('iso-8859-1')
-    filename = f'translator_export_{year}_{month:02d}.csv'
+    today = datetime.now().strftime('%Y-%m-%d')
+    filename = f'translator_export_{today}.csv'
     response = Response(csv_bytes)
     response.content_type = 'text/csv; charset=iso-8859-1'
     response.content_disposition = f'attachment; filename="{filename}"'
@@ -903,7 +960,7 @@ def generate_time_report_pdf_bytes(
                 f"{request.translate(_('Travel'))} "
                 f"({request.translate(_('from'))} {translator_address} "
                 f"{request.translate(_('to'))} {location_name}, "
-                f"{time_report.travel_distance} km \u00d7 2)"
+                f"{time_report.travel_distance} km)"
             )
         else:
             travel_label = (
@@ -919,7 +976,7 @@ def generate_time_report_pdf_bytes(
         travel_label = (
             f"{request.translate(_('Travel'))} "
             f"({request.translate(_('from'))} {translator_address}, "
-            f"{translator.drive_distance} km \u00d7 2)"
+            f"{translator.drive_distance} km)"
         )
 
     html_content += f"""
@@ -1087,3 +1144,53 @@ def generate_qr_bill_pdf_for_translator(
     response.content_type = 'application/pdf'
     response.content_disposition = f'inline; filename="{filename}"'
     return response
+
+
+def can_delete_time_report(
+    request: TranslatorAppRequest,
+    time_report: TranslatorTimeReport,
+) -> bool:
+    """Check if user can delete a time report.
+
+    Only admins and accountants for the specific finanzstelle can delete.
+    """
+    if request.is_admin:
+        return True
+
+    if not request.current_user:
+        return False
+
+    try:
+        accountant_emails = get_accountant_emails_for_finanzstelle(
+            request, time_report.finanzstelle
+        )
+        return request.current_user.username in accountant_emails
+    except ValueError:
+        return False
+
+
+@TranslatorDirectoryApp.view(
+    model=TranslatorTimeReport,
+    request_method='DELETE',
+    permission=Personal,
+)
+def delete_time_report(
+    self: TranslatorTimeReport,
+    request: TranslatorAppRequest,
+) -> None:
+    """Delete a time report. Only admins and accountants can delete."""
+
+    request.assert_valid_csrf_token()
+
+    if not can_delete_time_report(request, self):
+        raise HTTPForbidden()
+
+    ticket = self.get_ticket(request.session)
+    if ticket:
+        assert isinstance(ticket.handler, TimeReportHandler)
+        if ticket.handler.ticket_deletable:
+            ticket.handler.prepare_delete_ticket()
+            request.session.delete(ticket)
+
+    request.session.delete(self)
+    request.success(_('Time report deleted'))

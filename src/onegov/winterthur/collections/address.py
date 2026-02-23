@@ -15,6 +15,7 @@ from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
     from onegov.core.csv import DefaultRow
+    from sqlalchemy.engine import Result
     from sqlalchemy.orm import Query, Session
     from typing import NamedTuple
 
@@ -34,7 +35,7 @@ class AddressCollection(GenericCollection[WinterthurAddress]):
     def model_class(self) -> type[WinterthurAddress]:
         return WinterthurAddress
 
-    def streets(self) -> Query[StreetRow]:
+    def streets(self) -> Result[StreetRow]:
         query = as_selectable("""
             SELECT
                 UPPER(UNACCENT(LEFT(street, 1))) AS letter, -- Text
@@ -47,7 +48,7 @@ class AddressCollection(GenericCollection[WinterthurAddress]):
                 unaccent(street)
         """)
 
-        return self.session.execute(select(query.c))
+        return self.session.execute(select(*query.c))
 
     def last_updated(self) -> datetime | None:
         result = self.query().first()

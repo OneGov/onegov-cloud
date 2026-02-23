@@ -335,8 +335,8 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
         if self.filter.tags:
             query = query.filter(
-                model_class._tags.has_any(  # type:ignore[attr-defined]
-                    array(self.filter.tags)))  # type:ignore[call-overload]
+                model_class._tags.has_any(array(self.filter.tags))
+            )
 
         if self.filter.states:
             query = query.filter(
@@ -414,7 +414,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
             filters_applied = True
             o = o.filter(or_(
                 *(
-                    Occasion.age.overlaps(  # type:ignore[attr-defined]
+                    Occasion.age.overlaps(
                         func.int4range(min_age, max_age + 1))
                     for min_age, max_age in self.filter.age_ranges
                 )
@@ -434,19 +434,18 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
         if self.filter.dateranges:
             filters_applied = True
-            o = o.filter(Occasion.active_days.op('&&')(array(  # type:ignore
-                tuple(
+            o = o.filter(Occasion.active_days.op('&&')(array(
                     dt.toordinal()
                     for start, end in self.filter.dateranges
                     for dt in sedate.dtrange(start, end)
-                )))
+                ))
             )
 
         if self.filter.weekdays:
             filters_applied = True
             o = o.filter(
-                Occasion.weekdays.op('<@')(array(  # type:ignore[call-overload]
-                    self.filter.weekdays)))
+                Occasion.weekdays.op('<@')(array(self.filter.weekdays))
+            )
 
         if self.filter.available:
             filters_applied = True
@@ -515,10 +514,10 @@ class ActivityCollection(RangedPagination[ActivityT]):
         base = self.query_base().with_entities(
             func.skeys(self.model_class._tags).label('keys'))
 
-        query = select([func.array_agg(column('keys'))], distinct=True)
+        query = select(func.array_agg(column('keys')))  # type: ignore[var-annotated]
         query = query.select_from(base.subquery())
 
-        tags = self.session.execute(query).scalar()
+        tags = self.session.execute(query.distinct()).scalar()
 
         return set(tags) if tags else set()
 
@@ -597,7 +596,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
         if not period:
             return
 
-        weeknumbers = {n[:2] for n in self.session.execute(text("""
+        weeknumbers_weeks = {n[:2] for n in self.session.execute(text("""
             SELECT DISTINCT
                 EXTRACT(week FROM start::date),
                 EXTRACT(week FROM "end"::date)
@@ -607,13 +606,13 @@ class ActivityCollection(RangedPagination[ActivityT]):
             WHERE period_id = :period_id
         """), {'period_id': period.id})}
 
-        weeknumbers = {
+        weeknumbers_weeks = {
             tuple(
                 range(int(start), int(end) + 1)
-            ) for start, end in weeknumbers
+            ) for start, end in weeknumbers_weeks
         }
 
-        weeknumbers = {week for weeks in weeknumbers for week in weeks}
+        weeknumbers = {week for weeks in weeknumbers_weeks for week in weeks}
 
         weeks = sedate.weekrange(period.execution_start, period.execution_end)
 
@@ -636,4 +635,4 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
         ages = self.session.execute(query).first()
 
-        return ages and ages or None
+        return ages._tuple() if ages else None

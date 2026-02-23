@@ -96,7 +96,6 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     abschluss = BooleanField(
         label=_('Abschluss'),
         description=_('Mark as completed/closed'),
-        depends_on=('type', '!plenary'),
     )
 
     def _can_edit_parliamentarian(
@@ -217,6 +216,15 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
 
     def on_request(self) -> None:
         self.set_default_value_to_settlement_run_start()
+
+        if not self.request.is_admin:  # type: ignore[attr-defined]
+            self.type.choices = [
+                (key, value)
+                for key, value in TYPES.items()
+                if key != 'plenary'
+            ]
+        else:
+            self.type.choices = list(TYPES.items())
 
         if (
             hasattr(self.request.identity, 'role')
@@ -411,13 +419,26 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
         ]
 
 
+BULK_MEETING_TYPES: dict[str, str] = {
+    'commission': _('Commission meeting'),
+    'shortest': _('Shortest meeting'),
+}
+
+
 class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
-    """ Kind of like AttendenceAddPlenaryForm but for commissions. """
+    """Bulk form for commission-based meetings (commission or shortest)."""
 
     date = DateField(
         label=_('Date'),
         validators=[InputRequired()],
         default=datetime.date.today
+    )
+
+    type = RadioField(
+        label=_('Type'),
+        choices=list(BULK_MEETING_TYPES.items()),
+        validators=[InputRequired()],
+        default='commission',
     )
 
     duration = FloatField(
@@ -444,7 +465,6 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
         result['duration'] = int(60 * (result.get('duration') or 0))
-        result['type'] = 'commission'
         return result
 
     def on_request(self) -> None:

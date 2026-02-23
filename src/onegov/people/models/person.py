@@ -5,16 +5,17 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.mixins import content_property
-from onegov.core.orm.types import UUID
+from onegov.core.orm.mixins import dict_property
 from onegov.core.utils import generate_fts_phonenumbers
 from onegov.people.models import AgencyMembership
 from onegov.search import ORMSearchable
-from sqlalchemy import Column
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import DynamicMapped
+from sqlalchemy.orm import Mapped
 from translationstring import TranslationString
-from uuid import uuid4
+from uuid import uuid4, UUID
 from vobject import vCard
 from vobject.vcard import Address
 from vobject.vcard import Name
@@ -22,10 +23,7 @@ from vobject.vcard import Name
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Collection
-    from onegov.core.orm.mixins.content import dict_property
-    from onegov.core.types import AppenderQuery
     from vobject.base import Component
 
 
@@ -39,11 +37,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -115,95 +109,90 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         return parts
 
     #: the unique id, part of the url
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the salutation used for the person
-    salutation: Column[str | None] = Column(Text, nullable=True)
+    salutation: Mapped[str | None]
 
     #: the academic title of the person
-    academic_title: Column[str | None] = Column(Text, nullable=True)
+    academic_title: Mapped[str | None]
 
     #: the first name of the person
-    first_name: Column[str] = Column(Text, nullable=False)
+    first_name: Mapped[str]
 
     #: the last name of the person
-    last_name: Column[str] = Column(Text, nullable=False)
+    last_name: Mapped[str]
 
     #: when the person was born
-    born: Column[str | None] = Column(Text, nullable=True)
+    born: Mapped[str | None]
 
     #: the profession of the person
-    profession: Column[str | None] = Column(Text, nullable=True)
+    profession: Mapped[str | None]
 
     #: the function of the person
-    function: Column[str | None] = Column(Text, nullable=True)
+    function: Mapped[str | None]
 
     #: an organisation the person belongs to
-    organisation: Column[str | None] = Column(Text, nullable=True)
+    organisation: Mapped[str | None]
 
     #: multiple organisations the person belongs to
     organisations_multiple: dict_property[list[str] | None] = content_property(
     )
 
     # a sub organisation the person belongs to
-    sub_organisation: Column[str | None] = Column(Text, nullable=True)
+    sub_organisation: Mapped[str | None]
 
     #: the political party the person belongs to
-    political_party: Column[str | None] = Column(Text, nullable=True)
+    political_party: Mapped[str | None]
 
     #: the parliamentary group the person belongs to
-    parliamentary_group: Column[str | None] = Column(Text, nullable=True)
+    parliamentary_group: Mapped[str | None]
 
     #: an URL leading to a picture of the person
-    picture_url: Column[str | None] = Column(Text, nullable=True)
+    picture_url: Mapped[str | None]
 
     #: the email of the person
-    email: Column[str | None] = Column(Text, nullable=True)
+    email: Mapped[str | None]
 
     #: the phone number of the person
-    phone: Column[str | None] = Column(Text, nullable=True)
+    phone: Mapped[str | None]
 
     #: the direct phone number of the person
-    phone_direct: Column[str | None] = Column(Text, nullable=True)
+    phone_direct: Mapped[str | None]
 
     #: the website related to the person
-    website: Column[str | None] = Column(Text, nullable=True)
+    website: Mapped[str | None]
 
     #: a second website related to the person
-    website_2: Column[str | None] = Column(Text, nullable=True)
+    website_2: Mapped[str | None]
 
     # agency does not use 'address' anymore. Instead, the 4 following items
     # are being used. The 'address' field is still used in org, town6,
     # volunteers and others
     #: the address of the person
-    address: Column[str | None] = Column(Text, nullable=True)
+    address: Mapped[str | None]
 
     #: the location address (street name and number) of the person
-    location_address: Column[str | None] = Column(Text, nullable=True)
+    location_address: Mapped[str | None]
 
     #: postal code of location and city of the person
-    location_code_city: Column[str | None] = Column(Text, nullable=True)
+    location_code_city: Mapped[str | None]
 
     #: the postal address (street name and number) of the person
-    postal_address: Column[str | None] = Column(Text, nullable=True)
+    postal_address: Mapped[str | None]
 
     #: postal code and city of the person
-    postal_code_city: Column[str | None] = Column(Text, nullable=True)
+    postal_code_city: Mapped[str | None]
 
     #: some remarks about the person
-    notes: Column[str | None] = Column(Text, nullable=True)
+    notes: Mapped[str | None]
 
-    memberships: relationship[AppenderQuery[AgencyMembership]] = (
-        relationship(
-            AgencyMembership,
-            back_populates='person',
-            cascade='all, delete-orphan',
-            lazy='dynamic',
-        )
+    memberships: DynamicMapped[AgencyMembership] = relationship(
+        back_populates='person',
+        cascade='all, delete-orphan',
     )
 
     def vcard_object(

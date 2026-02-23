@@ -8,15 +8,12 @@ from onegov.core.custom import msgpack
 from onegov.core.i18n.translation_string import TranslationMarkup
 from onegov.core.orm import ModelBase, SessionManager
 from markupsafe import Markup
-from sqlalchemy import Column, Integer, Text
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
 from translationstring import TranslationString
 from uuid import uuid4
 
 
-from typing import NamedTuple, TYPE_CHECKING
-if TYPE_CHECKING:
-    from onegov.core.orm import Base  # noqa: F401
+from typing import NamedTuple
 
 
 class Point:
@@ -82,14 +79,13 @@ def test_roundtrip(data: object) -> None:
 
 
 def test_sqlalchemy_row_roundtrip(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
 
     class Document(Base):
         __tablename__ = 'documents'
-        id: Column[int] = Column(Integer, primary_key=True)
-        body: Column[str | None] = Column(Text, nullable=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        body: Mapped[str | None]
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('msgpack')

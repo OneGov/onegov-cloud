@@ -1967,8 +1967,6 @@
 </metal:resource_subgroup>
 
 <metal:file_details define-macro="file-details" i18n:domain="onegov.org">
-    <!--! FIXME: Make this work without ic-on-success -->
-    <?python request.require_unsafe_eval() ?>
     <div class="row">
         <div class="columns small-4">
             <a class="file-preview" href="${request.link(file)}" tal:condition="extension == 'pdf'" tal:attributes="target layout.file_link_target">
@@ -2029,14 +2027,16 @@
                     >
                     <div tal:condition="file.published" class="file-status-tag">
                         <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
-                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                           ic-target="#button-${file.id}"
+                           ic-success-action="change"
                            class="is-published">
                             <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
                         </a>
                     </div>
                     <div tal:condition="not:file.published" class="file-status-tag">
                         <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
-                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                           ic-target="#button-${file.id}"
+                           ic-success-action="change"
                            class="is-not-published">
                             <i class="fa fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
                         </a>
@@ -2049,16 +2049,16 @@
                                 <legend tal:condition="not:publish_date" i18n:translate>Publication date:</legend>
 
                                 <div class="publication-settings-input">
-                                    <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
+                                    <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-target="#button-${file.id}" ic-success-action="change" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
 
-                                    <select name="hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                    <select name="hour" ic-post-to="${post_url}" ic-target="#button-${file.id}" ic-success-action="change">
                                         <option tal:condition="not:publish_date"></option>
                                         <tal:b repeat="hour range(24)" tal:define="publish_time publish_date and '{:0>2}:00'.format(publish_date.hour)">
                                             <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time" value="${time}">${time}</option>
                                         </tal:b>
                                     </select>
 
-                                    <a ic-post-to="${post_url}&clear=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                    <a ic-post-to="${post_url}&clear=1" ic-target="#button-${file.id}" ic-success-action="change">
                                         <i class="fa fa-times-circle" aria-hidden="true"></i>
                                         <span class="show-for-sr" i18n:translate>Reset</span>
                                     </a>
@@ -2075,14 +2075,16 @@
                     >
                     <div tal:condition="file.publication" class="file-status-tag">
                         <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
-                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                           ic-target="#button-${file.id}"
+                           ic-success-action="change"
                            class="is-a-publication">
                             <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Publication</span>
                         </a>
                     </div>
                     <div tal:condition="not:file.publication" class="file-status-tag">
                         <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
-                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                           ic-target="#button-${file.id}"
+                           ic-success-action="change"
                            class="is-not-a-publication">
                             <i class="fa fa-fw fa-times-circle" aria-hidden="true"></i> <span i18n:translate>Not a publication</span>
                         </a>
@@ -2123,11 +2125,8 @@
         <div class="columns small-2 file-actions">
             <a class="button secondary confirm delete" role="button"
                 ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
-                ic-on-success="
-                    var info = $(elt).closest('tr');
-                    info.prev().remove();
-                    info.remove();
-                "
+                ic-target="closest tbody"
+                ic-success-action="remove"
                 data-confirm="Do you really want to delete this file?"
                 data-confirm-extra="${file.name}"
                 data-confirm-yes="Delete File"
@@ -2137,25 +2136,15 @@
                 <span i18n:translate >Delete</span>
             </a>
             <a class="button secondary rename prompt" role="button"
+                ic-post-to="${request.csrf_protected_url(request.link(file, 'rename'))}"
+                ic-include='.dialog [name="name"]'
+                ic-target="#button-${file.id}"
+                ic-success-action="change"
                 data-prompt="Please provide the new name for the file"
                 data-prompt-ok="Rename"
                 data-prompt-cancel="Cancel"
+                data-prompt-name="name"
                 data-prompt-value="${file.name}"
-                data-prompt-success="(function(value) {
-                    var url = '${request.link(file, 'rename')}?csrf-token=${layout.csrf_token}';
-                    var ext = '.${file.name.split('.')[-1].strip()}';
-                    var elt = $(this);
-
-                    value = value.substring(value.length - ext.length, value.length) === ext && value || value + ext;
-
-                    jQuery.post(url, {'name': value}, function() {
-                        var actions = elt;
-
-                        actions.closest('tr').prev().find('td:first').text(value);
-                        actions.find('a.prompt').data('prompt-value', value);
-                        actions.find('a.delete').data('confirm-extra', value);
-                    });
-                })"
                 i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel">
                 <span class="fa fa-edit" aria-hidden="true"></span>
                 <span i18n:translate>Rename</span>
@@ -2167,11 +2156,8 @@
             <a class="button secondary" role="button"
                ic-get-from="${request.link(file, 'links')}"
                ic-target="#links-${id}"
-               ic-on-success="
-                   var modal = $('#links-${id}-modal');
-                   modal.foundation('reveal', 'open');
-                   modal.focus();
-               ">
+               ic-action-target="#links-${id}-modal-opener"
+               ic-success-action="click">
                 <span class="fa fa-link" aria-hidden="true"></span>
                 <span i18n:translate>Linked Pages</span>
                 <span class="ic-indicator fa fa-spinner fa-spin" style="display: none"></span>
@@ -2179,6 +2165,7 @@
         </div>
     </div>
     <div style="display:none;">
+        <button id="links-${id}-modal-opener" data-reveal-id="links-${id}-modal" tabindex="-1" aria-hidden="true"></button>
         <div id="links-${id}-modal" class="reveal-modal medium dialog" data-reveal role="dialog" aria-hidden="true">
             <h2 i18n:translate>Links to <tal:b i18n:name="filename">${file.name}</tal:b></h2>
             <ul id="links-${id}"></ul>
@@ -2217,28 +2204,18 @@
         <tal:b condition="not file.signed and may_sign">
             <a tal:condition="not:file.signed" class="is-not-signed signature-status"
                 role="button"
+                ic-post-to="${request.csrf_protected_url(request.link(file, 'sign'))}"
+                ic-include='.dialog [name="token"]'
+                ic-target="closest .file-status-tag"
+                ic-action-target="this"
+                ic-beforeSend-action="addClass:signing"
+                ic-complete-action="removeClass:signing"
                 data-prompt="Please enter your yubikey to apply a digital seal to this file"
+                data-prompt-name="token"
                 data-prompt-ok="Sign"
                 data-prompt-cancel="Cancel"
                 data-prompt-placeholder="Plug your YubiKey into a USB slot and press it."
                 data-prompt-info="Published documents with a digital seal can be discovered through the site-search and in the list of documents with a digital seal. This action will be logged and cannot be undone."
-                data-prompt-success="(function(value) {
-                    var url = '${request.link(file, 'sign')}?csrf-token=${layout.csrf_token}';
-                    var elt = $(this);
-                    var row = elt.closest('tr');
-
-                    elt.toggleClass('signing', true);
-                    window.elt = elt;
-
-                    jQuery.post(url, {'token': value}, function(data) {
-                        var target = elt.closest('.signature-status').parent();
-                        target.html(data);
-                        processCommonNodes(target);
-                        row.prev().addClass('signed');
-                    }).always(function() {
-                        elt.toggleClass('signing', false);
-                    });
-                })"
                 i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel;data-prompt-info;data-prompt-placeholder"
             >
                 <i class="fa fa-fw fa-unlock" aria-hidden="true"></i>
@@ -2269,18 +2246,13 @@
 </metal:signature_status>
 
 <metal:file_info define-macro="file-info" i18n:domain="onegov.org">
-    <!--! FIXME: Make file-details work without ic-on-success -->
-    <?python request.require_unsafe_eval() ?>
-    <tal:b define="
-        file_number file.number|file.id;
-        file_upload file.upload_date|file.created
-    ">
+    <tal:b define="file_upload file.upload_date|file.created">
         <tr class="file-info ${'signed' if file.signed else ''}">
             <td>
                 ${file.name}
             </td>
             <td>
-                <a id="button-${file_number}" data-toggle="#details-${file_number}" class="untoggled">
+                <a id="button-${file.id}" data-toggle="#details-${file.id}" class="untoggled">
                     <i class="fa fa-chevron-down" aria-hidden="true"></i>
                 </a>
             </td>
@@ -2291,29 +2263,27 @@
                 ${format_date(file_upload)}
             </td>
         </tr>
-        <tr id="details-${file_number}" style="display: none;">
+        <tr id="details-${file.id}" style="display: none;">
             <td colspan="4">
-                <div ic-trigger-from="#button-${file_number}"
-                     ic-trigger-on="click once"
+                <div ic-trigger-from="#button-${file.id}"
+                     ic-trigger-on="click once, change"
                      ic-get-from="${actions_url(file.id)}">
                 </div>
             </td>
         </tr>
-        <tr style="display: none"></tr> <!--! keeps odd/even shading on track -->
     </tal:b>
 </metal:file_info>
 
 <metal:uploaded_image define-macro="uploaded_image" i18n:domain="onegov.org">
-    <!--! FIXME: Make this work without ic-on-success -->
-    <?python request.require_unsafe_eval() ?>
     <li id="image-${index}" class="image-box">
         <a href="${image.url}" tal:attributes="target layout.file_link_target" tal:condition="image" class="editable-alt" data-note-update-url="${image.extra}">
             <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt" alt="${image.alt}" width="${image.width}" height="${image.height}" />
             <img tal:condition="not:image.alt" data-src="${image.src}" class="lazyload missing-alt static-alt" alt="Click to add a description" i18n:attributes="alt" width="${image.width}" height="${image.height}"/>
         </a>
         <a class="delete confirm"
-           ic-delete-from="${image.url}?csrf-token=${layout.csrf_token}"
-           ic-on-success="$('#image-${index}').remove();"
+           ic-delete-from="${request.csrf_protected_url(image.url)}"
+           ic-target="#image-${index}"
+           ic-success-action="remove"
            data-confirm="Do you really want to delete the image?"
            data-confirm-yes="Delete Image"
            data-confirm-no="Cancel"

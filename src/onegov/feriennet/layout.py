@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from functools import cached_property
-
 from onegov.activity import Activity, BookingPeriodCollection, Occasion
 from onegov.activity import BookingCollection
 from onegov.core.elements import Link, Confirm, Intercooler, Block
@@ -15,16 +14,15 @@ from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.feriennet.models import InvoiceAction, VacationActivity
-from onegov.town6.layout import DefaultLayout as BaseLayout
-from onegov.town6.layout import UserLayout as TownUserLayout
 from onegov.pay import PaymentProviderCollection
 from onegov.ticket import TicketCollection
+from onegov.town6.layout import DefaultLayout as BaseLayout
+from onegov.town6.layout import UserLayout as TownUserLayout
+from onegov.user.collections.user import UserCollection
+from sqlalchemy import text
 
 
 from typing import Any, NamedTuple, TYPE_CHECKING
-
-from onegov.user.collections.user import UserCollection
-
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from markupsafe import Markup
@@ -39,6 +37,10 @@ if TYPE_CHECKING:
     from onegov.org.models import Organisation
     from onegov.ticket import Ticket
     from onegov.user import User
+
+    class ActivityRow:
+        title: str
+        name: str
 
 
 class DefaultLayout(BaseLayout):
@@ -68,7 +70,11 @@ class DefaultLayout(BaseLayout):
 
         return True
 
-    def offer_again_link(self, activity: VacationActivity, title: str) -> Link:
+    def offer_again_link(
+        self,
+        activity: VacationActivity | ActivityRow,
+        title: str
+    ) -> Link:
         return Link(
             text=title,
             url=self.request.class_link(
@@ -137,16 +143,16 @@ class VacationActivityCollectionLayout(DefaultLayout):
 
     @property
     def offer_again_links(self) -> LinkGroup | None:
-        q = self.app.session().query(VacationActivity)
-        q = q.filter_by(username=self.request.current_username)
-        q = q.filter_by(state='archived')
-        q = q.with_entities(
-            VacationActivity.title,
-            VacationActivity.name,
+        activities: tuple[ActivityRow, ...] = tuple(
+            self.app.session().query(VacationActivity)  # type: ignore[arg-type]
+            .with_entities(
+                VacationActivity.title,
+                VacationActivity.name,
+            )
+            .filter_by(username=self.request.current_username)
+            .filter_by(state='archived')
+            .order_by(VacationActivity.order)
         )
-        q = q.order_by(VacationActivity.order)
-
-        activities = tuple(q)
 
         if activities:
             return LinkGroup(
@@ -574,7 +580,7 @@ class BillingCollectionLayout(DefaultLayout):
 
     @property
     def families(self) -> Iterator[FamilyRow]:
-        yield from self.app.session().execute("""
+        yield from self.app.session().execute(text("""
             SELECT
                 text
                     || ' ('
@@ -593,7 +599,7 @@ class BillingCollectionLayout(DefaultLayout):
             WHERE family IS NOT NULL
             GROUP BY family, text
             ORDER BY text
-        """)
+        """)).tuples()
 
     @property
     def family_removal_links(self) -> Iterator[Link]:

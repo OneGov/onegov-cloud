@@ -11,11 +11,11 @@ from statistics import mean
 
 from typing import Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Collection
+    from collections.abc import Collection, Iterable
     from datetime import datetime
     from onegov.activity.models import BookingPeriod, BookingPeriodMeta
-    from sqlalchemy.orm import Query, Session
-    from sqlalchemy.sql.selectable import Alias
+    from sqlalchemy.orm import Session
+    from sqlalchemy.sql import Subquery
     from typing import Self, TypeAlias
     from uuid import UUID
 
@@ -83,7 +83,7 @@ class MatchCollection:
             return 0
 
     @property
-    def occasions_by_state(self) -> Alias:
+    def occasions_by_state(self) -> Subquery:
         return as_selectable_from_path(
             module_path('onegov.feriennet', 'queries/occasions_by_state.sql'))
 
@@ -117,9 +117,9 @@ class MatchCollection:
         return occasion.state in self.states
 
     @property
-    def occasions(self) -> Query[OccasionByStateRow]:
+    def occasions(self) -> Iterable[OccasionByStateRow]:
         columns = self.occasions_by_state.c
-        query = select(columns)
+        query = select(*columns)
 
         if not self.states:
             query = query.where(columns.period_id == self.period_id)
@@ -131,4 +131,4 @@ class MatchCollection:
 
         query = query.order_by(columns.title, columns.start)
 
-        return self.session.execute(query)
+        return self.session.execute(query).tuples()

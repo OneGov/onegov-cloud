@@ -114,7 +114,7 @@ def get_theme() -> TownTheme:
 
 @TownApp.setting(section='i18n', name='locales')
 def get_i18n_used_locales() -> set[str]:
-    return {'de_CH', 'fr_CH'}
+    return {'de_CH', 'fr_CH', 'it_CH'}
 
 
 @TownApp.setting(section='i18n', name='localedirs')

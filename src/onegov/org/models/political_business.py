@@ -1,17 +1,16 @@
 from __future__ import annotations
 
 from datetime import date
-from sqlalchemy import and_, or_, func, case
-from sqlalchemy import Column, Date, Enum, ForeignKey, Text
+from sqlalchemy import and_, case, func, or_
+from sqlalchemy import Column, Enum, ForeignKey, UUID as UUIDType
 from sqlalchemy import Table
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
-from uuid import uuid4
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
-from onegov.core.orm.types import UUID
 from onegov.core.utils import toggle
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
@@ -23,8 +22,6 @@ from onegov.search.utils import language_from_locale
 
 from typing import Literal, Self, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-
     from collections.abc import Collection
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import ColumnElement
@@ -102,13 +99,13 @@ par_political_business_parliamentary_groups = Table(
     Base.metadata,
     Column(
         'political_business_id',
-        UUID(as_uuid=True),
+        UUIDType(as_uuid=True),
         ForeignKey('par_political_businesses.id', ondelete='CASCADE'),
         primary_key=True,
     ),
     Column(
         'parliamentary_group_id',
-        UUID(as_uuid=True),
+        UUIDType(as_uuid=True),
         ForeignKey('par_parliamentary_groups.id', ondelete='CASCADE'),
         primary_key=True,
     ),
@@ -160,60 +157,54 @@ class PoliticalBusiness(
         ]
 
     #: Internal ID
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4,
     )
 
     #: The title of the agenda item
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: number of the agenda item
-    number: Column[str | None] = Column(Text, nullable=True)
+    number: Mapped[str | None]
 
     #: business type of the agenda item
-    political_business_type: Column[PoliticalBusinessType] = Column(
+    political_business_type: Mapped[PoliticalBusinessType] = mapped_column(
         Enum(
-            *POLITICAL_BUSINESS_TYPE.keys(),  # type:ignore[arg-type]
+            *POLITICAL_BUSINESS_TYPE.keys(),
             name='par_political_business_type',
         ),
-        nullable=False,
     )
 
     #: status of the political business
-    status: Column[PoliticalBusinessStatus | None] = Column(
+    status: Mapped[PoliticalBusinessStatus | None] = mapped_column(
         Enum(
-            *POLITICAL_BUSINESS_STATUS.keys(),  # type:ignore[arg-type]
+            *POLITICAL_BUSINESS_STATUS.keys(),
             name='par_political_business_status',
         ),
-        nullable=True,
     )
 
     #: entry date of political business
-    entry_date: Column[date | None] = Column(Date, nullable=True)
+    entry_date: Mapped[date | None]
 
     #: may have participants (Verfasser/Beteiligte) depending on the type
-    participants: relationship[list[PoliticalBusinessParticipation]] = (
+    participants: Mapped[list[PoliticalBusinessParticipation]] = (
         relationship(
-            'PoliticalBusinessParticipation',
             back_populates='political_business',
             order_by='desc(PoliticalBusinessParticipation.participant_type)',
         )
     )
 
     #: parliamentary groups (Fraktionen)
-    parliamentary_groups: relationship[list[RISParliamentaryGroup]] = (
+    parliamentary_groups: Mapped[list[RISParliamentaryGroup]] = (
         relationship(
-            'RISParliamentaryGroup',
             secondary=par_political_business_parliamentary_groups,
             back_populates='political_businesses',
             passive_deletes=True
         )
     )
 
-    meeting_items: relationship[list[MeetingItem]] = relationship(
-        'MeetingItem',
+    meeting_items: Mapped[list[MeetingItem]] = relationship(
         back_populates='political_business',
     )
 
@@ -221,8 +212,9 @@ class PoliticalBusiness(
     def display_name(self) -> str:
         return f'{self.number} {self.title}' if self.number else self.title
 
-    @display_name.expression  # type:ignore[no-redef]
-    def display_name(cls) -> ColumnElement[str]:
+    @display_name.inplace.expression
+    @classmethod
+    def _display_name_expression(cls) -> ColumnElement[str]:
         return func.concat(
             func.coalesce(cls.number, ''),
             case(
@@ -243,44 +235,31 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     __tablename__ = 'par_political_business_participants'
 
     #: Internal ID
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4,
     )
 
     #: The id of the political business
-    political_business_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    political_business_id: Mapped[UUID] = mapped_column(
         ForeignKey('par_political_businesses.id'),
-        nullable=False,
     )
 
     #: The id of the parliamentarian
-    parliamentarian_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    parliamentarian_id: Mapped[UUID] = mapped_column(
         ForeignKey('par_parliamentarians.id'),
-        nullable=False,
     )
 
     #: the role of the parliamentarian in the political business
-    participant_type: Column[str | None] = Column(
-        Text,
-        nullable=True,
-        default=None
-    )
+    participant_type: Mapped[str | None]
 
     #: the related political business
-    political_business: relationship[PoliticalBusiness] = (
-        relationship(
-            'PoliticalBusiness',
-            back_populates='participants',
-        )
+    political_business: Mapped[PoliticalBusiness] = relationship(
+        back_populates='participants',
     )
 
     #: the related parliamentarian
-    parliamentarian: relationship[RISParliamentarian] = relationship(
-        'RISParliamentarian',
+    parliamentarian: Mapped[RISParliamentarian] = relationship(
         back_populates='political_businesses',
     )
 
@@ -407,13 +386,10 @@ class PoliticalBusinessCollection(
     def years_for_entries(self) -> list[int]:
         """ Returns a list of years for which there are entries in the db """
 
-        years = self.session.query(
-            func.extract('year', PoliticalBusiness.entry_date).label('year')
-        ).filter(
+        year = func.extract('year', PoliticalBusiness.entry_date).label('year')
+        years = self.session.query(year).filter(
             PoliticalBusiness.entry_date.isnot(None)
-        ).distinct().order_by(
-            PoliticalBusiness.entry_date.desc()
-        )
+        ).distinct().order_by(year.desc())
 
         # convert to a list of integers, remove duplicates, and sort
         return sorted({int(year[0]) for year in years}, reverse=True)
@@ -422,27 +398,25 @@ class PoliticalBusinessCollection(
         """ Returns the given political business by display name or None. """
         return (
             self.query()
-            .filter(PoliticalBusiness.display_name == display_name)  # type:ignore[comparison-overlap]
+            .filter(PoliticalBusiness.display_name == display_name)
             .first()
         )
 
     def by_parliamentarian(
         self,
-        parliamentarian_id: uuid.UUID
+        parliamentarian_id: UUID
     ) -> Query[PoliticalBusiness]:
         """ Returns political businesses by given parliamentarian id """
         return (
             self.session.query(PoliticalBusiness)
-            .join(PoliticalBusinessParticipation)
-            .filter(
+            .filter(PoliticalBusiness.participants.any(
                 PoliticalBusinessParticipation.parliamentarian_id ==
                 parliamentarian_id
-            )
+            ))
             .order_by(
                 PoliticalBusiness.entry_date.desc(),
                 PoliticalBusiness.title
             )
-            .distinct()
         )
 
 
@@ -460,6 +434,6 @@ class PoliticalBusinessParticipationCollection(
 
     def by_parliamentarian_id(
         self,
-        parliamentarian_id: uuid.UUID
+        parliamentarian_id: UUID
     ) -> Query[PoliticalBusinessParticipation]:
         return self.query().filter_by(parliamentarian_id=parliamentarian_id)

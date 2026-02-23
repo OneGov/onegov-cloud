@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import datetime
+
+from collections.abc import Mapping
 from onegov.core.orm import Base, observes
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -15,22 +18,19 @@ from onegov.election_day.models.mixins import summarized_property
 from onegov.election_day.models.mixins import TitleTranslationsMixin
 from onegov.election_day.models.vote.ballot import Ballot
 from onegov.election_day.models.vote.mixins import DerivedBallotsCountMixin
-from sqlalchemy import Column
-from sqlalchemy import Date
 from sqlalchemy import func
 from sqlalchemy import select
-from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import DynamicMapped
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import datetime
-    from collections.abc import Mapping
-    from onegov.core.types import AppenderQuery
     from onegov.election_day.models import DataSourceItem
     from onegov.election_day.models import Notification
     from onegov.election_day.models import Screen
@@ -58,7 +58,7 @@ class Vote(
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: Column[str] = Column(Text, nullable=False)
+    type: Mapped[str] = mapped_column()
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -66,28 +66,24 @@ class Vote(
     }
 
     #: identifies the vote, may be used in the url, generated from the title
-    id: Column[str] = Column(Text, primary_key=True)
+    id: Mapped[str] = mapped_column(primary_key=True)
 
     #: external identifier
-    external_id: Column[str | None] = Column(Text, nullable=True)
+    external_id: Mapped[str | None]
 
     #: shortcode for cantons that use it
-    shortcode: Column[str | None] = Column(Text, nullable=True)
+    shortcode: Mapped[str | None]
 
     #: all translations of the title
-    title_translations: Column[Mapping[str, str]] = Column(
-        HSTORE,
-        nullable=False
-    )
+    title_translations: Mapped[Mapping[str, str]] = mapped_column(HSTORE)
 
     #: the translated title (uses the locale of the request, falls back to the
     #: default locale of the app)
     title = translation_hybrid(title_translations)
 
     #: all translations of the short title
-    short_title_translations: Column[Mapping[str, str] | None] = Column(
-        HSTORE,
-        nullable=True
+    short_title_translations: Mapped[Mapping[str, str] | None] = mapped_column(
+        HSTORE
     )
 
     #: the translated short title (uses the locale of the request, falls back
@@ -101,17 +97,18 @@ class Vote(
         short_title_translations: Mapping[str, str]
     ) -> None:
         if not self.id:
-            self.id = self.id_from_title(object_session(self))
+            session = object_session(self)
+            assert session is not None
+            self.id = self.id_from_title(session)
 
     #: identifies the date of the vote
-    date: Column[datetime.date] = Column(Date, nullable=False)
+    date: Mapped[datetime.date]
 
     #: a vote contains n ballots
-    ballots: relationship[list[Ballot]] = relationship(
-        'Ballot',
+    ballots: Mapped[list[Ballot]] = relationship(
         cascade='all, delete-orphan',
         order_by='Ballot.type',
-        lazy='joined',
+        lazy='selectin',
         back_populates='vote'
     )
 
@@ -250,20 +247,16 @@ class Vote(
 
         """
 
-        expr = select([
+        expr = select(
             func.coalesce(
                 func.sum(getattr(Ballot, attribute)),
                 0
             )
-        ])
+        )
         expr = expr.where(Ballot.vote_id == cls.id)
         return expr.label(attribute)
 
-    if TYPE_CHECKING:
-        last_ballot_change: Column[datetime.datetime | None]
-        last_modified: Column[datetime.datetime | None]
-
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def last_ballot_change(self) -> datetime.datetime | None:
         """ Returns last change of the vote, its ballots and any of its
         results.
@@ -276,14 +269,16 @@ class Vote(
         ]
         return max(changes) if changes else None
 
-    @last_ballot_change.expression  # type:ignore[no-redef]
-    def last_ballot_change(cls) -> ColumnElement[datetime.datetime | None]:
-        expr = select([func.max(Ballot.last_change)])
+    @last_ballot_change.inplace.expression
+    @classmethod
+    def _last_ballot_change_expression(
+        cls
+    ) -> ColumnElement[datetime.datetime | None]:
+        expr = select(func.max(Ballot.last_change))
         expr = expr.where(Ballot.vote_id == cls.id)
-        expr = expr.label('last_ballot_change')
-        return expr
+        return expr.label('last_ballot_change')
 
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def last_modified(self) -> datetime.datetime | None:
         """ Returns last change of the vote, its ballots and any of its
         results.
@@ -305,30 +300,28 @@ class Vote(
 
         return max(changes) if changes else None
 
-    @last_modified.expression  # type:ignore[no-redef]
-    def last_modified(cls) -> ColumnElement[datetime.datetime | None]:
+    @last_modified.inplace.expression
+    @classmethod
+    def _last_modified_expression(
+        cls
+    ) -> ColumnElement[datetime.datetime | None]:
         return func.greatest(
             cls.last_change, cls.last_result_change, cls.last_ballot_change
         )
 
     #: data source items linked to this vote
-    data_sources: relationship[list[DataSourceItem]] = relationship(
-        'DataSourceItem',
+    data_sources: Mapped[list[DataSourceItem]] = relationship(
         back_populates='vote'
     )
 
     #: notifcations linked to this vote
-    notifications: relationship[AppenderQuery[Notification]] = (
-        relationship(  # type:ignore[misc]
-            'onegov.election_day.models.notification.Notification',
-            back_populates='vote',
-            lazy='dynamic'
-        )
+    notifications: DynamicMapped[Notification] = relationship(
+        'onegov.election_day.models.notification.Notification',
+        back_populates='vote',
     )
 
     #: screens linked to this vote
-    screens: relationship[AppenderQuery[Screen]] = relationship(
-        'Screen',
+    screens: DynamicMapped[Screen] = relationship(
         back_populates='vote',
     )
 

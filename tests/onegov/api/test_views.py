@@ -322,6 +322,7 @@ def test_view_private_field(client: Client) -> None:
     # Test non public field
     session = client.app.session()  # Get fresh session after commit
     people = ExtendedPersonCollection(session)
+    person: Person | None
     person = people.add(
         first_name='vorname', last_name='nachname', external_user_id='123456'
     )
@@ -330,7 +331,7 @@ def test_view_private_field(client: Client) -> None:
     transaction.commit()
 
     session = client.app.session()  # Get fresh session
-    person = session.query(Person).get(person_id)  # type: ignore[assignment]  # Reload person with new
+    person = session.get(Person, person_id)  # Reload person with new
 
     # Authorize
     headers = {"Authorization": f"Bearer {uuid}"}

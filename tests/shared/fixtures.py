@@ -29,7 +29,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from shutil import which
 from splinter import Browser
-from sqlalchemy import create_engine, exc
+from sqlalchemy import create_engine, exc, text
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared.browser import ExtendedBrowser
 from tests.shared.postgresql import Postgresql
@@ -192,27 +192,29 @@ def postgres_dsn(
     close_all_sessions()
     SessionManager(postgres.url(), None).dispose()  # type: ignore[arg-type]
 
-    engine = create_engine(postgres.url())
-    results = engine.execute(
-        "SELECT DISTINCT table_schema FROM information_schema.tables")
+    engine = create_engine(postgres.url(), future=True)
+    with engine.begin() as conn:
+        results = conn.execute(text(
+            "SELECT DISTINCT table_schema FROM information_schema.tables"))
 
-    schemas = set(r['table_schema'] for r in results)
+        schemas = {table_schema for table_schema, in results}
 
-    for schema in schemas:
-        if schema.startswith('pg_'):
-            continue
+        for schema in schemas:
+            if schema.startswith('pg_'):
+                continue
 
-        if schema in ('information_schema', 'public'):
-            continue
+            if schema in ('information_schema', 'public'):
+                continue
 
-        # having a bad day because your test doesn't work if run with others?
-        # did you use a session manager? if yes, make sure to use mgr.dispose()
-        # before finishing your test, or use the sesion_manager fixture!
-        engine.execute(f'DROP SCHEMA "{schema}" CASCADE')
+            # having a bad day because your test doesn't work if run with
+            # others? did you use a session manager? if yes, make sure to use
+            # mgr.dispose() before finishing your test, or use the
+            # sesion_manager fixture!
+            conn.execute(text(f'DROP SCHEMA "{schema}" CASCADE'))
 
     # drop all connections
-    with suppress(exc.OperationalError):
-        engine.execute((
+    with suppress(exc.OperationalError), engine.begin() as conn:
+        conn.execute(text(
             "SELECT pg_terminate_backend(pid) FROM pg_stat_activity "
             "WHERE datname='test'"
         ))

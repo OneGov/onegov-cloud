@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
 
 import click
@@ -12,7 +13,7 @@ import yaml
 from itertools import chain
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, find_models
-from onegov.core.orm.types import JSON, UTCDateTime, UUID
+from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.core.utils import normalize_for_url
 from onegov.directory import DirectoryEntry
@@ -30,7 +31,7 @@ from onegov.people import Person
 from onegov.reservation import Resource
 from onegov.ticket import TicketPermission
 from onegov.user import User, UserGroup
-from sqlalchemy import Column, Enum, ForeignKey, Text, Boolean
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Text, UUID, text
 from sqlalchemy.orm import undefer, selectinload, load_only
 
 
@@ -43,15 +44,15 @@ if TYPE_CHECKING:
 def move_town_to_organisation(context: UpgradeContext) -> bool | None:
 
     # if the organisations table does not exist (other modules), skip
-    has_organisations = context.app.session_manager.session().execute("""
+    has_organisations = context.app.session_manager.session().execute(text("""
         select exists (select 1 from information_schema.tables
         where table_schema='{}' and table_name='organisations')
-    """.format(context.app.schema)).scalar()
+    """.format(context.app.schema))).scalar()
 
-    has_towns = context.app.session_manager.session().execute("""
+    has_towns = context.app.session_manager.session().execute(text("""
         select exists (select 1 from information_schema.tables
         where table_schema='{}' and table_name='towns')
-    """.format(context.app.schema)).scalar()
+    """.format(context.app.schema))).scalar()
 
     if not has_organisations or not has_towns:
         return False
@@ -95,11 +96,13 @@ def remove_official_notices_table(context: UpgradeContext) -> bool | None:
 
     session = context.app.session_manager.session()
 
-    organisations_count = session.execute('select count(*) from organisations')
+    organisations_count = session.execute(text(
+        'select count(*) from organisations'))
     if organisations_count.scalar() != 1:
         return False
 
-    notices_count = session.execute('select count(*) from official_notices')
+    notices_count = session.execute(text(
+        'select count(*) from official_notices'))
     if notices_count.scalar() != 0:
         return False
 
@@ -182,13 +185,13 @@ def add_meta_access_property(context: UpgradeContext) -> None:
         # We use update statements here because we need to touch a lot of data.
         #
         # THIS IS UNSAFE, DO NOT COPY & PASTE
-        context.session.execute(f"""
+        context.session.execute(text(f"""
             UPDATE {table} SET meta = meta || jsonb '{{"access": "private"}}'
             WHERE (meta->>'is_hidden_from_public')::boolean = TRUE;
 
             UPDATE {table} SET meta = meta - 'is_hidden_from_public'
             WHERE meta ? 'is_hidden_from_public';
-        """)
+        """))
 
 
 @upgrade_task('Rerender organisation html')
@@ -217,7 +220,7 @@ def fix_directory_file_identity(context: UpgradeContext) -> None:
                 file = context.session.query(File).filter_by(
                     id=file_id).first()
                 if file and file.type != 'directory':
-                    new = DirectoryFile(  # type:ignore[misc]
+                    new = DirectoryFile(
                         id=random_token(),
                         name=file.name,
                         note=file.note,
@@ -364,7 +367,7 @@ def add_submission_window_id_to_survey_submissions(
                 ForeignKey('submission_windows.id'),
                 nullable=True
             ),
-            default=None
+            default=None  # type: ignore[arg-type]
         )
 
 
@@ -463,7 +466,7 @@ def create_hierarchy_and_move_organisations_to_content(
     session = context.app.session()
     # Use only columns that definitely exist to avoid error
     people = session.query(Person).options(
-        load_only('id', 'content')
+        load_only(Person.id, Person.content)
     ).all()
     hierarchy: dict[str, set[str]] = {}
     for person in people:
@@ -503,7 +506,6 @@ def convert_directories_to_ticket_permissions(context: UpgradeContext) -> None:
         UserGroup.meta['directories'].isnot(None)
     ).options(selectinload(UserGroup.ticket_permissions)):
         directories = set(user_group.meta['directories'])
-        assert hasattr(user_group, 'ticket_permissions')
         for permission in user_group.ticket_permissions:
             if permission.handler_code != 'DIR':
                 continue
@@ -553,7 +555,7 @@ def add_party_column_to_par_parliamentarians(context: UpgradeContext) -> None:
                 Text,
                 nullable=True
             ),
-            default=None
+            default=None  # type: ignore[arg-type]
         )
 
 
@@ -577,7 +579,7 @@ def migrate_kaba_config_to_new_format(context: UpgradeContext) -> None:
 
     if context.has_table('resources'):
         # update kaba_components to new format
-        context.session.execute("""
+        context.session.execute(text("""
             UPDATE resources
                SET meta = jsonb_set(
                    meta,
@@ -588,11 +590,11 @@ def migrate_kaba_config_to_new_format(context: UpgradeContext) -> None:
                    ))
                 )
              WHERE meta ? 'kaba_components'
-        """, {'site_id': site_id})
+        """), {'site_id': site_id})
 
     if context.has_table('reservations'):
         # update visits to new format
-        context.session.execute("""
+        context.session.execute(text("""
             UPDATE reservations
                SET data = jsonb_set(
                    data,
@@ -601,7 +603,7 @@ def migrate_kaba_config_to_new_format(context: UpgradeContext) -> None:
                 ) #- '{kaba,visit_id}'
              WHERE data ? 'kaba'
                AND data->'kaba' ? 'visit_id'
-        """, {'site_id': site_id})
+        """), {'site_id': site_id})
 
 
 @upgrade_task('Update political business enum values')
@@ -680,7 +682,7 @@ def update_political_business_type_enum_values(
     if context.has_enum('par_political_business_type'):
         op = context.operations
 
-        op.execute("""
+        op.execute(text("""
             ALTER TABLE par_political_businesses
             ALTER COLUMN political_business_type TYPE Text;
             UPDATE par_political_businesses
@@ -702,16 +704,16 @@ def update_political_business_type_enum_values(
             SET political_business_type = 'miscellaneous'
             WHERE political_business_type = 'report';
             DROP TYPE par_political_business_type;
-        """)
+        """))
 
         new_business_type.create(op.get_bind())
 
-        op.execute("""
+        op.execute(text("""
             ALTER TABLE par_political_businesses
             ALTER COLUMN political_business_type
             TYPE par_political_business_type
             USING political_business_type::text::par_political_business_type;
-        """)
+        """))
 
 
 @upgrade_task('Cache new news hashtags in meta')

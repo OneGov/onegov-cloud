@@ -628,6 +628,13 @@ msgstr "Renommé :"
 msgid "Changed:"
 msgstr "Changé :"
 
+msgid ""
+"Please note, that data for existing entries that use the removed option will "
+"be lost."
+msgstr ""
+"Veuillez noter que les données des entrées existantes qui utilisent l'option "
+"supprimée seront perdues."
+
 msgid "Confirm"
 msgstr "Confirmer"
 
@@ -1103,6 +1110,9 @@ msgstr "Zoom avant/arrière"
 
 msgid "Show more"
 msgstr "Afficher plus"
+
+msgid "What are you searching for?"
+msgstr "Que recherchez-vous ?"
 
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "

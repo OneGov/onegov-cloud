@@ -106,7 +106,7 @@ class RecipientCollection:
             address=address,
             group=group,
             confirmed=confirmed,
-            subscribed_categories=subscribed_categories,  # type: ignore[misc]
+            subscribed_categories=subscribed_categories,
         )
         self.session.add(recipient)
         self.session.flush()

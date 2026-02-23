@@ -1,18 +1,16 @@
 from __future__ import annotations
 
-import uuid
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
-from onegov.core.orm.types import UUID
 from onegov.org.i18n import _
 from onegov.search import ORMSearchable
-from sqlalchemy import Column, Text, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from datetime import datetime
     from onegov.org.models import PoliticalBusiness
     from onegov.org.models import Meeting
@@ -54,44 +52,33 @@ class MeetingItem(Base, ORMSearchable):
         return self.meeting.start_datetime
 
     #: Internal ID
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
-        default=uuid.uuid4,
+        default=uuid4,
     )
 
     #: The title of the meeting item
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: number of the meeting item
-    number: Column[str | None] = Column(Text, nullable=True)
+    number: Mapped[str | None]
 
     #: political business id
-    political_business_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('par_political_businesses.id'),
+    political_business_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey('par_political_businesses.id')
     )
-    political_business: relationship[PoliticalBusiness | None] = relationship(
-        'PoliticalBusiness',
+    political_business: Mapped[PoliticalBusiness | None] = relationship(
         foreign_keys=[political_business_id],
     )
 
     #: link ID only used for mapping after import
-    political_business_link_id: Column[str | None] = Column(
-        Text, nullable=True)
+    political_business_link_id: Mapped[str | None]
 
     #: The id of the meeting
-    meeting_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('par_meetings.id'),
-        nullable=False
-    )
+    meeting_id: Mapped[UUID] = mapped_column(ForeignKey('par_meetings.id'))
 
     #: The meeting
-    meeting: relationship[Meeting] = relationship(
-        'Meeting',
-        back_populates='meeting_items'
-    )
+    meeting: Mapped[Meeting] = relationship(back_populates='meeting_items')
 
     @property
     def display_name(self) -> str:

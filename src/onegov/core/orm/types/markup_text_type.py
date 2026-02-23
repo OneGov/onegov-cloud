@@ -7,12 +7,9 @@ from sqlalchemy.types import TypeDecorator, TEXT
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.engine.interfaces import Dialect
-    _Base = TypeDecorator[Markup]
-else:
-    _Base = TypeDecorator
 
 
-class MarkupText(_Base):
+class MarkupText(TypeDecorator[Markup]):
     """ Text column that contains HTML/XML markup. """
 
     impl = TEXT
@@ -27,7 +24,7 @@ class MarkupText(_Base):
 
         return None if value is None else escape(value)
 
-    def process_literal_param(
+    def process_literal_param(  # type: ignore[override]
         self,
         value: str | None,
         dialect: Dialect

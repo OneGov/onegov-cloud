@@ -468,7 +468,7 @@ class EventCollection(Pagination[Event]):
 
             items.append(
                 EventImportItem(
-                    event=Event(  # type:ignore[misc]
+                    event=Event(
                         state='initiated',
                         title=title,
                         start=start,
@@ -670,7 +670,7 @@ class EventCollection(Pagination[Event]):
                 # Multiple 'single' frequency schedule lead to single events.
                 items.append(
                     EventImportItem(
-                        event=Event(  # type:ignore[misc]
+                        event=Event(
                             state='published',
                             title=title,
                             start=start,
@@ -706,7 +706,7 @@ class EventCollection(Pagination[Event]):
         # a complete set of events
         for event in (
                 self.session.query(Event)
-                .filter(Event.source.notin_(source_ids))):  # type:ignore[union-attr]
+                .filter(Event.source.not_in(source_ids))):
             if event.source:
                 items_to_purge.append(event.source)
                 click.echo(f' - removing event as not in xml stream '

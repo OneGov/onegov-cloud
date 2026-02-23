@@ -130,7 +130,11 @@ class IframeForm(PageBaseForm):
             return
 
         domain = '/'.join(field.data.split('/', 3)[:3])
-        if domain not in self.allowed_domains:
+        allowed_domains = {
+            d.rstrip('/')
+            for d in self.allowed_domains
+        }
+        if domain not in allowed_domains:
             raise ValidationError(
                 _('The domain of the URL is not allowed for iFrames.')
             )

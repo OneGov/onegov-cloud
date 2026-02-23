@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-10-13 11:02+0200\n"
+"POT-Creation-Date: 2026-02-19 00:46+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -47,6 +47,14 @@ msgstr "Verwaltung"
 msgid "Profile"
 msgstr "Profil"
 
+msgid "Cannot create attendance in closed settlement run."
+msgstr ""
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
+
+msgid "Attendance date must be within a settlement run."
+msgstr "Anwesenheitsdatum muss innerhalb eines Abrechnungslaufs liegen."
+
 msgid "No within an active settlement run."
 msgstr "Nicht in einem aktiven Abrechungslauf"
 
@@ -88,11 +96,17 @@ msgstr "Ziel-Parlamentarier:in nicht gefunden."
 
 msgid "You can only edit your own or your commission members' attendance."
 msgstr ""
-"Sie können nur für sich selbst oder Ihre Kommissionsmitglieder "
-"Anwesenheiten bearbeiten."
+"Sie können nur für sich selbst oder Ihre Kommissionsmitglieder Anwesenheiten "
+"bearbeiten."
 
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
+
+msgid "Commission meeting"
+msgstr "Kommissionsitzung"
+
+msgid "Shortest meeting"
+msgstr "Kürzestsitzung"
 
 msgid "Bulk edit group"
 msgstr "Massenbuchungsgruppe"
@@ -281,9 +295,6 @@ msgstr "Halbtag"
 msgid "Member"
 msgstr "Mitglied"
 
-msgid "Commission meeting"
-msgstr "Kommissionsitzung"
-
 msgid "first 2h"
 msgstr "bis 2h"
 
@@ -316,9 +327,6 @@ msgstr "Vize-Präsident:in"
 
 msgid "Vice president: File study"
 msgstr "Vize-Präsident:in: Aktenstudium"
-
-msgid "Shortest meeting"
-msgstr "Kürzestsitzung"
 
 #, python-format
 msgid "Rate set for ${year} alredy exists"
@@ -353,7 +361,7 @@ msgstr "Sitzung"
 msgid "Plenary session (bulk)"
 msgstr "Massenbuchung Plenarsitzung"
 
-msgid "Commission meeting (bulk)"
+msgid "Commission session (bulk)"
 msgstr "Massenbuchung Kommissionssitzung"
 
 msgid "Edit"
@@ -729,14 +737,11 @@ msgstr ""
 "ihre Anwesenheit noch nicht abgeschlossen haben, sind unter jeder Kommission "
 "aufgelistet."
 
+msgid "✓ Complete"
+msgstr "✓ Abgeschlossen"
+
 msgid "⚠ Incomplete"
 msgstr "⚠ Unvollständig"
-
-msgid "Members who have closed their attendance:"
-msgstr "Mitglieder, die ihre Anwesenheit abgeschlossen haben:"
-
-msgid "✓ (closed)"
-msgstr "✓ (abgeschlossen)"
 
 msgid "Members who have not closed their attendance:"
 msgstr "Mitglieder, die ihre Anwesenheit nicht abgeschlossen haben:"
@@ -747,6 +752,12 @@ msgstr "(hat Anwesenheit)"
 msgid "(no attendance)"
 msgstr "(keine Anwesenheit)"
 
+msgid "Members who have closed their attendance:"
+msgstr "Mitglieder, die ihre Anwesenheit abgeschlossen haben:"
+
+msgid "✓ (closed)"
+msgstr "✓ (abgeschlossen)"
+
 msgid ""
 "No commissions with active memberships found for this settlement period."
 msgstr ""
@@ -756,13 +767,13 @@ msgstr ""
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
 
-msgid "Cannot create attendance in closed settlement run."
-msgstr ""
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
-
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
+
+msgid "Cannot book attendance - abschluss already set for this settlement run"
+msgstr ""
+"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für diesen "
+"Abrechnungslauf"
 
 msgid "Added a new attendence"
 msgstr "Neue Anwesenheit hinzugefügt"
@@ -770,18 +781,23 @@ msgstr "Neue Anwesenheit hinzugefügt"
 msgid "New"
 msgstr "Neu"
 
-msgid "New commission session"
-msgstr "Neue Kommissionssitzung"
+msgid "New commission session (bulk)"
+msgstr "Neue Massenbuchung Kommissionssitzung"
+
+#, python-format
+msgid "Cannot book attendance - abschluss already set for: ${names}"
+msgstr ""
+"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für: "
+"${names}"
 
 msgid "No parliamentarians selected"
 msgstr "Keine Parlamentarier:innen ausgewählt"
 
-msgid "Added commission session"
-msgstr "Kommissionssitzung hinzugefügt"
+msgid "Added session"
+msgstr "Sitzung hinzugefügt"
 
-msgid "Cannot edit attendance in closed settlement run."
-msgstr ""
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
+msgid "You do not have permission to edit plenary sessions."
+msgstr "Sie haben keine Berechtigung, Plenarsitzungen zu bearbeiten."
 
 msgid "Edit plenary session"
 msgstr "Plenarsitzung bearbeiten"
@@ -798,14 +814,29 @@ msgstr "Möchten Sie diese Massenbuchung wirklich löschen?"
 msgid "Delete Attendencess"
 msgstr "Anwesenheiten löschen"
 
-msgid "Edit commission session"
-msgstr "Kommissionssitzung bearbeiten"
+#, python-format
+msgid "Edit ${type}"
+msgstr "${type} bearbeiten"
+
+#, python-format
+msgid "Cannot edit attendance - abschluss already set for: ${names}"
+msgstr ""
+"Anwesenheit kann nicht bearbeitet werden - Abschluss bereits gesetzt für: "
+"${names}"
+
+msgid "You do not have permission to add plenary sessions."
+msgstr "Sie haben keine Berechtigung, Plenarsitzungen hinzuzufügen."
 
 msgid "New plenary session"
 msgstr "Neue Plenarsitzung"
 
 msgid "Added plenary session"
 msgstr "Plenarsitzung hinzugefügt"
+
+msgid "Cannot edit attendance - abschluss already set for this settlement run"
+msgstr ""
+"Anwesenheit kann nicht bearbeitet werden - Abschluss bereits gesetzt für "
+"diesen Abrechnungslauf"
 
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
@@ -834,8 +865,8 @@ msgstr "Kommissionsitzung hinzugefügt"
 msgid "Data Import (JSON)"
 msgstr "Import (JSON)"
 
-msgid "Dashboard"
-msgstr "Startseite"
+msgid "Overview"
+msgstr "Übersicht"
 
 msgid "Import completed successfully"
 msgstr "Import erfolgreich abgeschlossen"
@@ -953,3 +984,14 @@ msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
 
+#~ msgid "Commission meeting (bulk)"
+#~ msgstr "Massenbuchung Kommissionssitzung"
+
+#~ msgid "New commission session"
+#~ msgstr "Neue Kommissionssitzung"
+
+#~ msgid "Added commission session"
+#~ msgstr "Kommissionssitzung hinzugefügt"
+
+#~ msgid "Edit commission session"
+#~ msgstr "Kommissionssitzung bearbeiten"

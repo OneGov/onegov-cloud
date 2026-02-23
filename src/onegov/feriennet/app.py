@@ -94,12 +94,12 @@ class FeriennetApp(TownApp):
     @orm_cached(policy='on-table-change:users')
     def user_titles_by_name(self) -> dict[str, str]:
         return dict(UserCollection(self.session()).query().with_entities(
-            User.username, User.title))
+            User.username, User.title).tuples())
 
     @orm_cached(policy='on-table-change:users')
     def user_ids_by_name(self) -> dict[str | None, UUID]:
         return dict(UserCollection(self.session()).query().with_entities(
-            User.username, User.id))
+            User.username, User.id).tuples())
 
     @cached_property
     def sponsors(self) -> list[Sponsor]:

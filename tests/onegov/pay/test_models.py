@@ -4,45 +4,31 @@ import pytest
 import transaction
 
 from decimal import Decimal
-from onegov.core.orm import Base, Base as MyBase, SessionManager
-from onegov.core.orm.types import UUID
+from libres.db.models import ORMBase as LibresORMBase
+from onegov.core.orm import Base, SessionManager
 from onegov.pay.models import Payable, Payment, PaymentProvider, ManualPayment
 from onegov.pay.collections import PaymentCollection
-from sqlalchemy import Column
-from sqlalchemy import Text
+from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.declarative import declarative_base
-from uuid import uuid4
-
-# NOTE:
-# fixes psycopg2.errors.UndefinedTable relation "reservations" does not exist
-from libres.db.models import ORMBase as LibresORMBase
-_libres_db_models_ORMBase = LibresORMBase
-
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    import uuid
-    from onegov.core.orm import Base as MyBase  # noqa: F401
+from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
+from uuid import uuid4, UUID
 
 
 def test_payment_with_different_bases(postgres_dsn: str) -> None:
-
-    # avoid confusing mypy
-    if not TYPE_CHECKING:
-        MyBase = declarative_base()
+    class MyBase(DeclarativeBase):
+        registry = registry()
 
     class Order(MyBase, Payable):
         __tablename__ = 'orders'
 
-        id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid4)  # type: ignore[arg-type]
-        title: Column[str | None] = Column(Text)
+        id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+        title: Mapped[str | None]
 
-    class Subscription(Base, Payable):
+    class Subscription(MyBase, Payable):
         __tablename__ = 'subscriptions'
 
-        id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid4)  # type: ignore[arg-type]
-        title: Column[str | None] = Column(Text)
+        id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+        title: Mapped[str | None]
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.bases.append(MyBase)
@@ -50,9 +36,8 @@ def test_payment_with_different_bases(postgres_dsn: str) -> None:
     # Explicitly add libres.db.models.ORMBase to the session manager's bases
     # if it was successfully imported. This ensures tables for models on
     # this base (like libres.db.models.Reservation) are created.
-    if _libres_db_models_ORMBase:  # type: ignore[truthy-function]
-        if _libres_db_models_ORMBase not in mgr.bases:
-            mgr.bases.append(_libres_db_models_ORMBase)
+    if LibresORMBase not in mgr.bases:
+        mgr.bases.append(LibresORMBase)
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
@@ -93,16 +78,14 @@ def test_payment_with_different_bases(postgres_dsn: str) -> None:
 
 
 def test_payment_referential_integrity(postgres_dsn: str) -> None:
-
-    # avoid confusing mypy
-    if not TYPE_CHECKING:
-        MyBase = declarative_base()
+    class MyBase(DeclarativeBase):
+        registry = registry()
 
     class Order(MyBase, Payable):
         __tablename__ = 'orders'
 
-        id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid4)  # type: ignore[arg-type]
-        title: Column[str | None] = Column(Text)
+        id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+        title: Mapped[str | None]
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.bases.append(MyBase)
@@ -110,9 +93,8 @@ def test_payment_referential_integrity(postgres_dsn: str) -> None:
     # Explicitly add libres.db.models.ORMBase to the session manager's bases
     # if it was successfully imported. This ensures tables for models on
     # this base (like libres.db.models.Reservation) are created.
-    if _libres_db_models_ORMBase:  # type: ignore[truthy-function]
-        if _libres_db_models_ORMBase not in mgr.bases:
-            mgr.bases.append(_libres_db_models_ORMBase)
+    if LibresORMBase not in mgr.bases:
+        mgr.bases.append(LibresORMBase)
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
@@ -148,32 +130,30 @@ def test_payment_referential_integrity(postgres_dsn: str) -> None:
     session.delete(session.query(Order).one())
     transaction.commit()
 
-    assert not list(session.execute("select * from orders"))
-    assert not list(session.execute("select * from payments"))
-    assert not list(session.execute(
+    assert not list(session.execute(text("select * from orders")))
+    assert not list(session.execute(text("select * from payments")))
+    assert not list(session.execute(text(
         "select * from payments_for_orders_payment"
-    ))
+    )))
 
     mgr.dispose()
 
 
 def test_backref(postgres_dsn: str) -> None:
-
-    # avoid confusing mypy
-    if not TYPE_CHECKING:
-        MyBase = declarative_base()
+    class MyBase(DeclarativeBase):
+        registry = registry()
 
     class Product(MyBase, Payable):
         __tablename__ = 'products'
 
-        id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid4)  # type: ignore[arg-type]
-        title: Column[str | None] = Column(Text)
+        id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+        title: Mapped[str | None]
 
     class Part(MyBase, Payable):
         __tablename__ = 'parts'
 
-        id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid4)  # type: ignore[arg-type]
-        title: Column[str | None] = Column(Text)
+        id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+        title: Mapped[str | None]
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.bases.append(MyBase)
@@ -181,9 +161,8 @@ def test_backref(postgres_dsn: str) -> None:
     # Explicitly add libres.db.models.ORMBase to the session manager's bases
     # if it was successfully imported. This ensures tables for models on
     # this base (like libres.db.models.Reservation) are created.
-    if _libres_db_models_ORMBase:  # type: ignore[truthy-function]
-        if _libres_db_models_ORMBase not in mgr.bases:
-            mgr.bases.append(_libres_db_models_ORMBase)
+    if LibresORMBase not in mgr.bases:
+        mgr.bases.append(LibresORMBase)
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
@@ -218,8 +197,8 @@ def test_backref(postgres_dsn: str) -> None:
 
     assert len(car.payment.linked_products) == 1  # type: ignore[attr-defined]
     assert len(car.payment.linked_parts) == 1  # type: ignore[attr-defined]
-    assert len(nut.payment.linked_products) == 1  # type: ignore[attr-defined]
-    assert len(nut.payment.linked_parts) == 1  # type: ignore[attr-defined]
+    assert len(nut.payment.linked_products) == 1
+    assert len(nut.payment.linked_parts) == 1
 
     assert car.payment.links.count() == 2
     assert {r.title for r in car.payment.links} == {"Car", "Nut"}  # type: ignore[attr-defined]
@@ -230,16 +209,14 @@ def test_backref(postgres_dsn: str) -> None:
 
 
 def test_manual_payment(postgres_dsn: str) -> None:
-
-    # avoid confusing mypy
-    if not TYPE_CHECKING:
-        MyBase = declarative_base()
+    class MyBase(DeclarativeBase):
+        registry = registry()
 
     class Product(MyBase, Payable):
         __tablename__ = 'products'
 
-        id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid4)  # type: ignore[arg-type]
-        title: Column[str | None] = Column(Text)
+        id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+        title: Mapped[str | None]
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.bases.append(MyBase)
@@ -247,9 +224,8 @@ def test_manual_payment(postgres_dsn: str) -> None:
     # Explicitly add libres.db.models.ORMBase to the session manager's bases
     # if it was successfully imported. This ensures tables for models on
     # this base (like libres.db.models.Reservation) are created.
-    if _libres_db_models_ORMBase:  # type: ignore[truthy-function]
-        if _libres_db_models_ORMBase not in mgr.bases:
-            mgr.bases.append(_libres_db_models_ORMBase)
+    if LibresORMBase not in mgr.bases:
+        mgr.bases.append(LibresORMBase)
     mgr.set_current_schema('foobar')
     session = mgr.session()
 

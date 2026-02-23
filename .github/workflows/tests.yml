@@ -63,7 +63,7 @@ jobs:
           xdg-utils
 
     - name: Checkout repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Install dependencies
       run: |
@@ -159,7 +159,7 @@ jobs:
         install-chromedriver: true
 
     - name: Checkout repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Get branch name (merge)
       if: github.event_name != 'pull_request'
@@ -228,3 +228,5 @@ jobs:
         LC_ALL: C.UTF-8
         LANG: C.UTF-8
         SKIP_DRIVER_MANAGER: '1'
+        # TEMPORARY: Remove after upgrade to SQLAlchemy 2.0
+        SQLALCHEMY_WARN_20: '1'

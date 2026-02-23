@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
 
 from onegov.core.orm.types import JSON
@@ -230,7 +231,7 @@ def add_media_fields(context: UpgradeContext) -> None:
     )
     for column, type_ in columns:
         if not context.has_column('swissvotes', column):
-            context.operations.add_column('swissvotes', Column(column, type_))
+            context.operations.add_column('swissvotes', Column(column, type_))  # type: ignore[misc]
 
 
 @upgrade_task(

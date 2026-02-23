@@ -388,9 +388,9 @@ def deferred_acceptance_from_database(
     o = session.query(Occasion)
     o = o.filter(Occasion.period_id == period_id)
     o = o.options(
-        defer('meeting_point'),
-        defer('note'),
-        defer('cost')
+        defer(Occasion.meeting_point),
+        defer(Occasion.note),
+        defer(Occasion.cost)
     )
 
     if period.max_bookings_per_attendee:

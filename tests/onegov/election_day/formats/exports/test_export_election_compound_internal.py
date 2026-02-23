@@ -87,7 +87,7 @@ def majorz_election() -> Election:
 
 def proporz_election() -> ProporzElection:
     # election
-    election = ProporzElection(  # type: ignore[misc]
+    election = ProporzElection(
         title='Proporz',
         short_title='P',
         id='proporz',

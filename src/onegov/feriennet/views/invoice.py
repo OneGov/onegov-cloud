@@ -102,10 +102,8 @@ def view_my_invoices(
         BookingPeriod.execution_start,
         BookingPeriodInvoice.id,
         case(
-            [
-                (ActivityInvoiceItem.group == 'donation', 2),
-                (ActivityInvoiceItem.family != None, 1),
-            ],
+            (ActivityInvoiceItem.group == 'donation', 2),
+            (ActivityInvoiceItem.family != None, 1),
             else_=0
         ),
         ActivityInvoiceItem.group,

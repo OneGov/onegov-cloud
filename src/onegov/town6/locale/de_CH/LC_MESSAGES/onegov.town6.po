@@ -17,15 +17,6 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Events"
-msgstr "Veranstaltungen"
-
-msgid "Latest news"
-msgstr "Aktuelles"
-
-msgid "Topics"
-msgstr "Themen"
-
 msgid "Chats"
 msgstr "Chats"
 
@@ -624,6 +615,13 @@ msgstr "Umbenannt:"
 msgid "Changed:"
 msgstr "Verändert:"
 
+msgid ""
+"Please note, that data for existing entries that use the removed option will "
+"be lost."
+msgstr ""
+"Bitte beachten Sie, dass Daten für bestehende Einträge, die die entfernte "
+"Option verwenden, verloren gehen."
+
 msgid "Confirm"
 msgstr "Bestätigen"
 
@@ -1101,6 +1099,9 @@ msgstr "Zoom"
 
 msgid "Show more"
 msgstr "Mehr anzeigen"
+
+msgid "What are you searching for?"
+msgstr "Wonach suchen Sie?"
 
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "

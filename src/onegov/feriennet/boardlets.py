@@ -172,7 +172,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
             Activity.id.in_(
                 self.session.query(Occasion.activity_id)
                 .filter_by(period_id=self.period.id)
-                .scalar_subquery()  # type: ignore[attr-defined]
+                .scalar_subquery()
             )
         ).filter_by(state='accepted').scalar()
 
@@ -399,7 +399,7 @@ class AttendeesBoardlet(FeriennetBoardlet):
         ).filter(Attendee.id.in_(
             self.session.query(Booking.attendee_id)
             .filter_by(period_id=self.period.id)
-            .scalar_subquery()  # type: ignore[attr-defined]
+            .scalar_subquery()
         )).group_by(Attendee.gender)
 
         for gender, count in query:

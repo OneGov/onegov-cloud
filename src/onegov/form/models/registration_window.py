@@ -2,34 +2,28 @@ from __future__ import annotations
 
 import sedate
 
+from datetime import date, datetime
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.form.models.submission import FormSubmission
 from sqlalchemy import and_
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import Date
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
 from sqlalchemy import or_
-from sqlalchemy import Text
 from sqlalchemy import text
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import ExcludeConstraint
-from sqlalchemy.orm import object_session, relationship
+from sqlalchemy.orm import mapped_column, object_session, relationship, Mapped
 from sqlalchemy.schema import CheckConstraint
 from sqlalchemy.sql.elements import quoted_name
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from datetime import date, datetime
     from onegov.form.models.definition import FormDefinition
 
 
-daterange = Column(  # type:ignore[call-overload]
+daterange: Column[Any] = Column(
     quoted_name('DATERANGE("start", "end")', quote=False))
 
 
@@ -47,50 +41,39 @@ class FormRegistrationWindow(Base, TimestampMixin):
     __tablename__ = 'registration_windows'
 
     #: the public id of the registraiton window
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the name of the form to which this registration window belongs
-    name: Column[str] = Column(
-        Text,
-        ForeignKey('forms.name'),
-        nullable=False
-    )
+    name: Mapped[str] = mapped_column(ForeignKey('forms.name'))
 
     #: the form to which this registration window belongs
-    form: relationship[FormDefinition] = relationship(
-        'FormDefinition',
+    form: Mapped[FormDefinition] = relationship(
         back_populates='registration_windows'
     )
 
     #: true if the registration window is enabled
-    enabled: Column[bool] = Column(Boolean, nullable=False, default=True)
+    enabled: Mapped[bool] = mapped_column(default=True)
 
     #: the start date of the window
-    start: Column[date] = Column(Date, nullable=False)
+    start: Mapped[date]
 
     #: the end date of the window
-    end: Column[date] = Column(Date, nullable=False)
+    end: Mapped[date]
 
     #: the timezone of the window
-    timezone: Column[str] = Column(
-        Text,
-        nullable=False,
-        default='Europe/Zurich'
-    )
+    timezone: Mapped[str] = mapped_column(default='Europe/Zurich')
 
     #: the number of spots (None => unlimited)
-    limit: Column[int | None] = Column(Integer, nullable=True)
+    limit: Mapped[int | None]
 
     #: enable an overflow of submissions
-    overflow: Column[bool] = Column(Boolean, nullable=False, default=True)
+    overflow: Mapped[bool] = mapped_column(default=True)
 
     #: submissions linked to this registration window
-    submissions: relationship[list[FormSubmission]] = relationship(
-        FormSubmission,
+    submissions: Mapped[list[FormSubmission]] = relationship(
         back_populates='registration_window'
     )
 
@@ -176,8 +159,9 @@ class FormRegistrationWindow(Base, TimestampMixin):
         submission in order of first come, first serve.
 
         """
-
-        q = object_session(self).query(FormSubmission)
+        session = object_session(self)
+        assert session is not None
+        q = session.query(FormSubmission)
         q = q.filter(FormSubmission.registration_window_id == self.id)
         q = q.filter(FormSubmission.state == 'complete')
         q = q.filter(or_(
@@ -200,7 +184,9 @@ class FormRegistrationWindow(Base, TimestampMixin):
     def claimed_spots(self) -> int:
         """ Returns the number of actually claimed spots. """
 
-        return object_session(self).execute(text("""
+        session = object_session(self)
+        assert session is not None
+        return session.execute(text("""
             SELECT SUM(COALESCE(claimed, 0))
             FROM submissions
             WHERE registration_window_id = :id
@@ -217,7 +203,9 @@ class FormRegistrationWindow(Base, TimestampMixin):
         0. If the claim has been relinquished, the result is 0.
 
         """
-        return object_session(self).execute(text("""
+        session = object_session(self)
+        assert session is not None
+        return session.execute(text("""
             SELECT GREATEST(
                 SUM(
                     CASE WHEN claimed IS NULL THEN spots

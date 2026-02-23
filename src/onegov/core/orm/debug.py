@@ -63,7 +63,7 @@ def analyze_sql_queries(
     queries = {}
     timer = Timer()
 
-    @event.listens_for(Engine, 'before_cursor_execute')  # type:ignore[untyped-decorator]
+    @event.listens_for(Engine, 'before_cursor_execute')
     def before_exec(
         conn: Connection,
         cursor: Any,
@@ -74,7 +74,7 @@ def analyze_sql_queries(
     ) -> None:
         timer.start()
 
-    @event.listens_for(Engine, 'after_cursor_execute')  # type:ignore[untyped-decorator]
+    @event.listens_for(Engine, 'after_cursor_execute')
     def after_exec(
         conn: Connection,
         cursor: Any,

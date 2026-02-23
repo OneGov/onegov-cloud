@@ -11,11 +11,9 @@ from itertools import chain
 from onegov.core import LEVELS
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import JSON
-from sqlalchemy import Column, Text, text, bindparam
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.engine.reflection import Inspector
-from sqlalchemy.orm import load_only
+from sqlalchemy.orm import load_only, mapped_column, Mapped
 from sqlalchemy.pool import StaticPool
 from toposort import toposort
 
@@ -27,6 +25,7 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
     # FIXME: Switch to importlib.resources
     from pkg_resources import Distribution, EntryPoint
+    from sqlalchemy import Column
     from sqlalchemy.engine import Connection
     from sqlalchemy.orm import Query, Session
     from types import CodeType, ModuleType
@@ -61,10 +60,10 @@ class UpgradeState(Base, TimestampMixin):
     __tablename__ = 'upgrades'
 
     # the name of the module (e.g. onegov.core)
-    module = Column(Text, primary_key=True)
+    module: Mapped[str] = mapped_column(primary_key=True)
 
     # a json holding the state of the upgrades
-    state = Column(JSON, nullable=False, default=dict)
+    state: Mapped[dict[str, Any]] = mapped_column(default=dict)
 
     @property
     def executed_tasks(self) -> set[str]:
@@ -407,7 +406,9 @@ class UpgradeTransaction:
     """
 
     def __init__(self, context: UpgradeContext):
-        self.operations_transaction = context.operations_connection.begin()
+        conn = context.operations_connection
+        tx = conn.begin_nested() if conn.in_transaction() else conn.begin()
+        self.operations_transaction = tx
         self.session = context.session
 
     def flush(self) -> None:
@@ -464,8 +465,8 @@ class UpgradeContext:
         #       http://docs.sqlalchemy.org/en/latest/core/pooling.html
         #       #sqlalchemy.pool.AssertionPool
         #
-        conn = session._connection_for_bind(  # type:ignore[attr-defined]
-            session.bind)
+        assert session.bind is not None
+        conn = session._connection_for_bind(session.bind)
         self.operations_connection: Connection = conn
         self.operations = Operations(
             MigrationContext.configure(self.operations_connection))
@@ -490,37 +491,41 @@ class UpgradeContext:
         WHERE table_name = 'table_name'
         AND constraint_name LIKE '%column_name%';
         """
-        return self.session.execute(text("""
-            SELECT EXISTS (
-                SELECT 1 FROM information_schema.table_constraints
-                WHERE table_schema = :schema
-                  AND table_name = :table_name
-                  AND constraint_type = :constraint_type
-                  AND constraint_name = :constraint_name
-            )
-        """
-            ).bindparams(
-                bindparam('schema', self.schema),
-                bindparam('table_name', table_name),
-                bindparam('constraint_name', constraint_name),
-                bindparam('constraint_type', constraint_type),
-        )
-        ).scalar()
+        return self.session.execute(
+            text("""
+                SELECT EXISTS (
+                    SELECT 1 FROM information_schema.table_constraints
+                    WHERE table_schema = :schema
+                      AND table_name = :table_name
+                      AND constraint_type = :constraint_type
+                      AND constraint_name = :constraint_name
+                )
+            """),
+            {
+                'schema': self.schema,
+                'table_name': table_name,
+                'constraint_name': constraint_name,
+                'constraint_type': constraint_type,
+            }
+        ).scalar_one()
 
     def has_enum(self, enum_name: str) -> bool:
-        return self.session.execute(text("""
-            SELECT EXISTS (
-                SELECT 1 FROM pg_type
-                WHERE typname = :enum_name
-                  AND typnamespace = (
-                    SELECT oid FROM pg_namespace
-                    WHERE nspname = :schema
-                  )
-            )
-        """).bindparams(
-            bindparam('schema', self.schema),
-            bindparam('enum_name', enum_name)
-        )).scalar()
+        return self.session.execute(
+            text("""
+                SELECT EXISTS (
+                    SELECT 1 FROM pg_type
+                    WHERE typname = :enum_name
+                      AND typnamespace = (
+                        SELECT oid FROM pg_namespace
+                        WHERE nspname = :schema
+                      )
+                )
+            """),
+            {
+                'schema': self.schema,
+                'enum_name': enum_name,
+            }
+        ).scalar_one()
 
     def has_table(self, table: str) -> bool:
         inspector = Inspector(self.operations_connection)
@@ -551,15 +556,15 @@ class UpgradeContext:
             return False
 
         # HACK: ALTER TYPE has to be run outside transaction
-        self.operations.execute('COMMIT')
+        self.operations.execute(text('COMMIT'))
         for value in missing:
             # NOTE: This should be safe just by virtue of naming
             #       restrictions on classes and enum members
-            self.operations.execute(
+            self.operations.execute(text(
                 f"ALTER TYPE {enum_name} ADD VALUE '{value}'"
-            )
+            ))
         # start a new transaction
-        self.operations.execute('BEGIN')
+        self.operations.execute(text('BEGIN'))
         return True
 
     def models(self, table: str) -> Iterator[Any]:
@@ -572,6 +577,8 @@ class UpgradeContext:
         for base in self.request.app.session_manager.bases:
             yield from find_models(base, has_matching_tablename)
 
+    # FIXME: We can probably get rid of this once we get rid of
+    #        `add_column_with_defaults`
     def records_per_table(
         self,
         table: str,
@@ -579,16 +586,19 @@ class UpgradeContext:
     ) -> Iterator[Any]:
 
         if columns is None:
-            def filter_columns(q: Query[Any]) -> Query[Any]:
+            def filter_columns(model: type[_T], q: Query[_T]) -> Query[_T]:
                 return q
         else:
             column_names = tuple(c.name for c in columns)
 
-            def filter_columns(q: Query[Any]) -> Query[Any]:
-                return q.options(load_only(*column_names))
+            def filter_columns(model: type[_T], q: Query[_T]) -> Query[_T]:
+                return q.options(load_only(*(
+                    getattr(model, name)
+                    for name in column_names
+                )))
 
         for model in self.models(table):
-            yield from filter_columns(self.session.query(model))
+            yield from filter_columns(model, self.session.query(model))
 
     @contextmanager
     def stop_search_updates(self) -> Iterator[None]:
@@ -602,9 +612,10 @@ class UpgradeContext:
             yield
 
     def is_empty_table(self, table: str) -> bool:
-        return self.operations_connection.execute(
-            f'SELECT * FROM {table} LIMIT 1').rowcount == 0
+        return self.operations_connection.execute(text(
+            f'SELECT * FROM {table} LIMIT 1')).rowcount == 0
 
+    # FIXME: Get rid of this and any tasks that use it
     def add_column_with_defaults(
         self,
         table: str,
@@ -672,7 +683,7 @@ class RawUpgradeRunner:
         if not schemas:
             return 0
 
-        engine = create_engine(dsn, poolclass=StaticPool)
+        engine = create_engine(dsn, poolclass=StaticPool, future=True)
         connection = engine.connect()
         executions = 0
 
@@ -803,6 +814,7 @@ class UpgradeRunner:
                     upgrade.abort()
             finally:
                 context.session.invalidate()
-                context.engine.dispose()
+                if context.engine and hasattr(context.engine, 'dispose'):
+                    context.engine.dispose()
 
         return executed

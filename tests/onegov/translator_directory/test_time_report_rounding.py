@@ -450,7 +450,4 @@ def test_telephonic_has_no_travel_compensation(
 
     form.assignment_type.data = 'on-site'
     travel_comp = form.get_travel_compensation(translator)
-    assert travel_comp == Decimal('100'), (
-        'On-site with 35km distance should have 100 compensation '
-        f'(35km * 2 = 70km), got {travel_comp}'
-    )
+    assert travel_comp == Decimal('50')

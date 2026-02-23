@@ -7,7 +7,7 @@ from onegov.pas.models.commission_membership import PASCommissionMembership
 from onegov.pas.models.party import Party
 from onegov.pas.models.parliamentarian import PASParliamentarian
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from babel.numbers import format_decimal
 from datetime import date
 from uuid import UUID
@@ -30,6 +30,16 @@ def format_swiss_number(value: Decimal | int) -> str:
         value = Decimal(value)
 
     return format_decimal(value, format='#,##0.00', locale='de_CH')
+
+
+def round_to_five_rappen(value: Decimal | int) -> Decimal:
+    """Round a decimal value to the nearest 5 Rappen (0.05 CHF)."""
+    if isinstance(value, int):
+        value = Decimal(value)
+
+    return (value / Decimal('0.05')).quantize(
+        Decimal('1'), rounding=ROUND_HALF_UP
+    ) * Decimal('0.05')
 
 
 def is_commission_president(

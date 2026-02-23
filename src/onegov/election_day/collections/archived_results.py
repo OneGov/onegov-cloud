@@ -5,10 +5,11 @@ from datetime import date
 from itertools import groupby
 from onegov.core.collection import Pagination
 from onegov.election_day.collections.elections import ElectionCollection
-from onegov.election_day.collections.election_compounds import \
-    ElectionCompoundCollection
+from onegov.election_day.collections.election_compounds import (
+    ElectionCompoundCollection)
 from onegov.election_day.collections.votes import VoteCollection
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Vote
@@ -38,10 +39,10 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.election_day.app import ElectionDayApp
     from onegov.election_day.request import ElectionDayRequest
-    from sqlalchemy.dialects.postgresql import TSVECTOR
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from sqlalchemy.sql import ColumnElement
+    from sqlalchemy.sql.elements import SQLCoreOperations
     from typing import TypeVar
     from typing import Self
 
@@ -185,7 +186,8 @@ class ArchivedResultCollection:
                 lambda j: order.get(j.domain, 99),
                 lambda j: groupbydict(
                     (item for item in j if item.url not in compounded),
-                    lambda k: 'vote' if k.type == 'vote' else 'election'
+                    lambda k: 'vote'
+                    if k.type in ('vote', 'complex_vote') else 'election'
                 )
             )
         )
@@ -330,6 +332,37 @@ class ArchivedResultCollection:
             result.nays_percentage = item.nays_percentage
             result.yeas_percentage = item.yeas_percentage
             result.direct = item.direct
+
+            if isinstance(item, ComplexVote):
+                result.type = 'complex_vote'
+                result.title_proposal_translations = (
+                    item.title_translations or {}
+                )
+                ballot = item.proposal
+                result.nays_percentage_proposal = ballot.nays_percentage
+                result.yeas_percentage_proposal = ballot.yeas_percentage
+
+                ballot = item.counter_proposal
+                result.title_counter_proposal_translations = (
+                    ballot.title_translations or {}
+                )
+                result.nays_percentage_counter_proposal = (
+                    ballot.nays_percentage
+                )
+                result.yeas_percentage_counter_proposal = (
+                    ballot.yeas_percentage
+                )
+
+                ballot = item.tie_breaker
+                result.title_tie_breaker_translations = (
+                    ballot.title_translations or {}
+                )
+                result.nays_percentage_tie_breaker = (
+                    ballot.nays_percentage
+                )
+                result.yeas_percentage_tie_breaker = (
+                    ballot.yeas_percentage
+                    )
 
         if add_result:
             self.session.add(result)
@@ -477,10 +510,10 @@ class SearchableArchivedResultCollection(
 
     @staticmethod
     def match_term(
-        column: ColumnElement[Any],
+        column: SQLCoreOperations[str | None],
         language: str,
         term: str
-    ) -> ColumnElement[TSVECTOR | None]:
+    ) -> ColumnElement[str | None]:
         """ Generate a clause element for a given search term.
 
         Usage::
@@ -493,10 +526,10 @@ class SearchableArchivedResultCollection(
 
     @staticmethod
     def filter_text_by_locale(
-        column: ColumnElement[Any],
+        column: SQLCoreOperations[str | None],
         term: str,
         locale: str = 'en'
-    ) -> ColumnElement[TSVECTOR | None]:
+    ) -> ColumnElement[str | None]:
         """ Returns an SQLAlchemy filter statement based on the search term.
         If no locale is provided, it will use english as language.
 
@@ -524,8 +557,8 @@ class SearchableArchivedResultCollection(
 
     @property
     def term_filter(self) -> tuple[
-        ColumnElement[TSVECTOR | None],
-        ColumnElement[TSVECTOR | None]
+        ColumnElement[str | None],
+        ColumnElement[str | None]
     ]:
         term = SearchableArchivedResultCollection.term_to_tsquery_string(
             self.term
@@ -602,7 +635,7 @@ class SearchableArchivedResultCollection(
             )
         query = query.order_by(
             ArchivedResult.date.desc(),
-            case(  # type: ignore[call-overload]
+            case(
                 *(
                     (ArchivedResult.domain == domain, index)
                     for index, domain in enumerate(order, 1)

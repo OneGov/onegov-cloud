@@ -623,6 +623,13 @@ msgstr "Rinominato:"
 msgid "Changed:"
 msgstr "Modificato:"
 
+msgid ""
+"Please note, that data for existing entries that use the removed option will "
+"be lost."
+msgstr ""
+"Si prega di notare che i dati per gli elementi esistenti che utilizzano "
+"l'opzione rimossa andranno persi."
+
 #, fuzzy
 msgid "Confirm"
 msgstr "Conferma"
@@ -1103,6 +1110,9 @@ msgstr "Ingrandisci/riduci"
 
 msgid "Show more"
 msgstr "Mostra di più"
+
+msgid "What are you searching for?"
+msgstr "Cosa stai cercando?"
 
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "

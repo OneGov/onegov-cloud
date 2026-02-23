@@ -188,13 +188,13 @@ class AuditCollection(
         """
         ranked = self.ranked_subscription_query().subquery('ranked')
         subquery = self.session.query(
-            CourseSubscription.attendee_id,
+            ranked.c.attendee_id,
             ranked.c.start,
             ranked.c.end,
             ranked.c.name,
             ranked.c.event_completed,
             ranked.c.refresh_interval,
-        ).select_entity_from(ranked)
+        )
         return subquery.filter(ranked.c.rownum == 1)
 
     def filter_attendees_by_role(self, query: Query[T]) -> Query[T]:
@@ -291,4 +291,4 @@ class AuditCollection(
         return tuple(self.session.query(Course.id, Course.name).filter(
             Course.hidden_from_public == False,
             Course.mandatory_refresh != None
-        ))
+        ).tuples())

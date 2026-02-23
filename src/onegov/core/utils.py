@@ -51,8 +51,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator, Mapping
     from fs.base import FS, SubFS
     from re import Match
-    from sqlalchemy import Column
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import InstrumentedAttribute, Session
     from types import ModuleType
     from webob import Response
     from .request import CoreRequest
@@ -768,21 +767,19 @@ def scan_morepath_modules(cls: type[morepath.App]) -> None:
 
 def get_unique_hstore_keys(
     session: Session,
-    column: Column[dict[str, Any]] | Column[dict[str, Any] | None] |
-            Column[Mapping[str, Any]] | Column[Mapping[str, Any] | None]
+    column: InstrumentedAttribute[Mapping[str, Any] | None]
 ) -> set[str]:
     """ Returns a set of keys found in an hstore column over all records
     of its table.
 
     """
 
-    base = session.query(column.keys()).with_entities(  # type:ignore
+    base = session.query(column.keys()).with_entities(
         sqlalchemy.func.skeys(column).label('keys'))
 
-    query = sqlalchemy.select(
-        [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
-        distinct=True
-    ).select_from(base.subquery())
+    query = sqlalchemy.select(  # type: ignore[var-annotated]
+        sqlalchemy.func.array_agg(sqlalchemy.column('keys'))
+    ).select_from(base.subquery()).distinct()
 
     keys = session.execute(query).scalar()
     return set(keys) if keys else set()

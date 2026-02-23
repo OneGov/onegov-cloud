@@ -382,7 +382,6 @@ def test_view_upload_json(
         result = page.form.submit().maybe_follow()
 
         # Add assertions as needed
-        assert result.status_code == 200
         assert result.status_code == 200, f"Import failed: {result.text}"
         return result
 
@@ -522,6 +521,113 @@ def test_simple_attendence_add(client: Client[TestPasApp]) -> None:
     page.form['type'] = 'study'
     page.form['commission_id'].select(text='DD')
     page = page.form.submit().follow()
+    assert 'Neue Anwesenheit hinzugefügt' in page
+
+
+def test_attendance_blocked_outside_any_settlement_run(
+    client: Client[TestPasApp],
+) -> None:
+    """Test that attendance cannot be created outside any settlement run."""
+
+    client.login_admin()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+
+    add_rate_set(settings, [])
+
+    # Create a settlement run with a specific period
+    page = settings.click('Abrechnungsläufe')
+    page = page.click(href='new')
+    page.form['name'] = 'Q2 2024'
+    page.form['start'] = '2024-04-01'
+    page.form['end'] = '2024-06-30'
+    page.form['closed'] = False
+    page = page.form.submit().follow()
+
+    # Create party
+    page = settings.click('Parteien')
+    page = page.click(href='new')
+    page.form['name'] = 'Test Party'
+    page = page.form.submit().follow()
+
+    # Create parliamentarian
+    page = settings.click('Parlamentarier:innen')
+    page = page.click(href='new')
+    page.form['personnel_number'] = '999'
+    page.form['gender'] = 'male'
+    page.form['first_name'] = 'Test'
+    page.form['last_name'] = 'User'
+    page.form['shipping_method'] = 'a'
+    page.form['shipping_address'] = 'Address'
+    page.form['shipping_address_zip_code'] = 'ZIP'
+    page.form['shipping_address_city'] = 'City'
+    page.form['email_primary'] = 'test@example.org'
+    page = page.form.submit().follow()
+
+    # Create commission
+    page = settings.click('Kommissionen')
+    page = page.click(href='new')
+    page.form['name'] = 'Test Commission'
+    page = page.form.submit().follow()
+
+    # Add commission membership
+    page = page.click(href='new-membership')
+    page.form['role'] = 'member'
+    page.form['start'] = '2020-01-01'
+    page = page.form.submit().follow()
+
+    # TEST 1: Try to create attendance BEFORE settlement run period
+    # Should fail - NOT within any settlement run
+    page = (
+        client.get('/')
+        .follow()
+        .click('Anwesenheiten')
+        .click(href='new', index=0)
+    )
+    page.form['date'] = '2024-03-15'  # Before Q2 starts
+    page.form['duration'] = '2'
+    page.form['type'] = 'study'
+    page.form['commission_id'].select(text='Test Commission')
+    result = page.form.submit()
+
+    # Form should NOT be submitted (200 status, not redirect)
+    assert result.status_code == 200
+    assert 'Neue Anwesenheit hinzugefügt' not in result
+    assert 'input' in result and 'date' in result
+
+    # TEST 2: Try to create attendance AFTER settlement run period
+    # Should fail - NOT within any settlement run
+    page = (
+        client.get('/')
+        .follow()
+        .click('Anwesenheiten')
+        .click(href='new', index=0)
+    )
+    page.form['date'] = '2024-07-15'  # After Q2 ends
+    page.form['duration'] = '2'
+    page.form['type'] = 'study'
+    page.form['commission_id'].select(text='Test Commission')
+    result = page.form.submit()
+
+    # Form should NOT be submitted (200 status, not redirect)
+    assert result.status_code == 200
+    assert 'Neue Anwesenheit hinzugefügt' not in result
+    assert 'input' in result and 'date' in result
+
+    # TEST 3: Create attendance WITHIN settlement run period
+    # Should succeed
+    page = (
+        client.get('/')
+        .follow()
+        .click('Anwesenheiten')
+        .click(href='new', index=0)
+    )
+    page.form['date'] = '2024-05-15'  # Within Q2 period
+    page.form['duration'] = '2'
+    page.form['type'] = 'study'
+    page.form['commission_id'].select(text='Test Commission')
+    page = page.form.submit().follow()
+
+    # Should successfully create attendance
     assert 'Neue Anwesenheit hinzugefügt' in page
 
 
@@ -728,3 +834,62 @@ def test_add_new_user_without_activation_email(
     login.form['username'] = 'secondadmin@example.org'
     login.form['password'] = password
     assert login.form.submit().status_code == 302
+
+
+def test_settlement_run_complete_translation(
+    client: Client[TestPasApp],
+) -> None:
+    """Test that 'Complete' is translated to 'Abgeschlossen' in the
+    settlement run view."""
+    client.login_admin()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+
+    add_rate_set(settings, [])
+
+    page = settings.click('Abrechnungsläufe')
+    page = page.click(href='new')
+    page.form['name'] = 'Q1'
+    page.form['start'] = '2024-01-01'
+    page.form['end'] = '2024-03-31'
+    page.form['closed'] = False
+    page = page.form.submit().follow()
+
+    page = settings.click('Parteien')
+    page = page.click(href='new')
+    page.form['name'] = 'TestParty'
+    page = page.form.submit().follow()
+
+    page = settings.click('Parlamentarier:innen')
+    page = page.click(href='new')
+    page.form['gender'] = 'male'
+    page.form['first_name'] = 'Test'
+    page.form['last_name'] = 'Person'
+    page.form['shipping_method'] = 'a'
+    page.form['shipping_address'] = 'Address'
+    page.form['shipping_address_zip_code'] = 'ZIP'
+    page.form['shipping_address_city'] = 'City'
+    page.form['email_primary'] = 'test.person@example.org'
+    page = page.form.submit().follow()
+
+    page = settings.click('Kommissionen')
+    page = page.click(href='new')
+    page.form['name'] = 'TestCommission'
+    page = page.form.submit().follow()
+
+    page = page.click(href='new-membership')
+    page.form['role'] = 'member'
+    page.form['start'] = '2020-01-01'
+    page = page.form.submit().follow()
+
+    page = page.click(href='add-attendence')
+    page.form['date'] = '2024-02-02'
+    page.form['duration'] = '1'
+    page.form['type'] = 'commission'
+    page.form['abschluss'] = True
+    page = page.form.submit().follow()
+
+    page = settings.click('Abrechnungsläufe')
+    page = page.click('Q1')
+
+    assert '✓ Abgeschlossen' in page
+    assert '✓ Complete' not in page

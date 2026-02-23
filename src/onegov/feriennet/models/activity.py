@@ -31,10 +31,9 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'},
         'text': {'type': 'localized', 'weight': 'C'},
-        # FIXME: We may want to split this into more properties
-        #        the organiser's name definitely seems more important
-        #        than their bank account or emergency contact for searching
-        'organiser_text': {'type': 'text', 'weight': 'B'}
+        'organizer_name': {'type': 'text', 'weight': 'B'},
+        'organization_text': {'type': 'text', 'weight': 'B'},
+        'organizer_details_text': {'type': 'text', 'weight': 'D'}
     }
 
     @property
@@ -46,37 +45,51 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         return self.state == 'preview'
 
     @property
-    def organiser(self) -> list[str]:
-        organiser: list[str] = [
-            self.user.username
-        ]
+    def organizer_name(self) -> str:
         if self.user.realname:
-            organiser.append(self.user.realname)
+            return self.user.realname
 
-        userprofile_keys = (
+        return self.user.username
+
+    @property
+    def organization_text(self) -> str:
+
+        organization_keys = (
             'organisation',
             'address',
             'zip_code',
             'place',
             'email',
             'phone',
-            'emergency',
             'website',
+        )
+
+        if not self.user.data:
+            return ''
+
+        return ' '.join(
+            value
+            for key in organization_keys
+            if (value := self.user.data.get(key))
+        )
+
+    @property
+    def organizer_details_text(self) -> str:
+
+        details_keys = (
+            'emergency',
             'bank_account',
             'bank_beneficiary',
         )
 
-        for key in userprofile_keys:
-            if not self.user.data:
-                continue
-            if value := self.user.data.get(key):
-                organiser.append(value)
+        if not self.user.data:
+            return ''
 
-        return organiser
-
-    @property
-    def organiser_text(self) -> str:
-        return ' '.join(self.organiser)
+        return ' '.join(
+            value
+            for key in details_keys
+            if (value := self.user.data.get(key))
+        )
 
     def ordered_tags(
         self,
@@ -107,7 +120,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
 
 class ActivityTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FER'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'FER'}
 
     def reference_group(
         self,

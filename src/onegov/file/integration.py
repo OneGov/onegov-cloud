@@ -18,6 +18,7 @@ from morepath import App
 from onegov.core.custom import json
 from onegov.core.security import Private, Public
 from onegov.core.utils import is_valid_yubikey, yubikey_public_id
+from onegov.file import log
 from onegov.file.collection import FileCollection
 from onegov.file.errors import AlreadySignedError
 from onegov.file.errors import InvalidTokenError
@@ -322,6 +323,7 @@ class DepotApp(App):
 
         mb = 1024 ** 2
         session = object_session(file)
+        assert session is not None
 
         with SpooledTemporaryFile(max_size=16 * mb, mode='wb') as signed:
             old_digest = digest(file.reference.file)
@@ -358,7 +360,7 @@ class DepotApp(App):
 
     @property
     def signing_service_config(self) -> SigningServiceConfig:
-        if not self.signing_services:
+        if not getattr(self, 'signing_services', None):
             raise RuntimeError('No signing service config path set')
 
         paths = (
@@ -608,8 +610,20 @@ def handle_rename(self: File, request: CoreRequest) -> None:
     if not isinstance(name, str) or not name:
         return
 
+    _, old_ext = os.path.splitext(self.name)
+    _, new_ext = os.path.splitext(name)
+    if old_ext and new_ext != old_ext:
+        # prevent changing the file extension (adding one is allowed)
+        name = f'{name}{old_ext}'
+
     self.name = name
-    self._update_metadata(filename=self.name)
+    try:
+        self._update_metadata(filename=self.name)
+    except NotImplementedError:
+        log.warning(
+            'Failed to update file metadata for current storage backend',
+            exc_info=True
+        )
 
     # when updating the name we offer the option not to update the
     # modified date, which is helpful if the files are in modified order
