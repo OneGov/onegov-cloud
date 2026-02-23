@@ -1570,13 +1570,13 @@ class Framework(
     Framework.get_layout,
     name='model',
     default=None,
-    index=ClassIndex
+    index=ClassIndex  # type: ignore[arg-type]
 )
 def layout_predicate(
     self: type[Framework],
     obj: object,
 ) -> type[Layout]:
-    return obj.__class__
+    return obj.__class__  # type: ignore[return-value]
 
 
 @Framework.webasset_url()

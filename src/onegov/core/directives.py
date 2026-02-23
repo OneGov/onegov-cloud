@@ -420,7 +420,7 @@ class Layout(Action):
 
         try:
             # `lambda self, obj` is required to match the signature
-            app_class.get_layout.register(  # ignore:type[attr-defined]
+            app_class.get_layout.register(  # type:ignore[attr-defined]
                 lambda self, obj: layout_obj,
                 model=self.model)
         except RegistrationError as e:
