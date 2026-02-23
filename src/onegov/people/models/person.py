@@ -96,8 +96,9 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         parts = []
         if self.organisations_multiple:
             it = iter(self.organisations_multiple)
-            for item in it:
-                parts.append(f'{item} - {next(it).lstrip("-")}')
+            parts.extend(
+                f'{item} - {next(it).lstrip("-")}' for item in it
+            )
             return parts
 
         if self.organisation and self.sub_organisation:
