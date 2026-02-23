@@ -8,7 +8,6 @@ from onegov.election_day.models import Vote
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
-    from translationstring import TranslationString
     from tests.onegov.election_day.conftest import ImportTestDatasets
 
 
@@ -25,10 +24,9 @@ def test_import_ech_vote_gr(
         dataset_name='votes-invalid-year'
     )
     assert len(results) == 1
-    errors: TranslationString
     errors, updated, deleted = next(iter(results.values()))
     assert errors
-    assert (errors[0].error.interpolate() ==
+    assert (errors[0].error.interpolate() ==  # type: ignore[attr-defined]
             'Cannot import votes. Year 2084 does not exist.')
 
     results = import_test_datasets(
