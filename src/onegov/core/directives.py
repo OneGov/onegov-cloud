@@ -7,6 +7,8 @@ from itertools import count
 from morepath.directive import HtmlAction
 from morepath.directive import SettingAction
 from morepath.settings import SettingRegistry, SettingSection
+from reg import RegistrationError
+
 from onegov.core.utils import Bunch
 
 from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
@@ -415,7 +417,13 @@ class Layout(Action):
     ) -> None:
 
         layout_obj = obj
-        # `lambda self, obj` is required to match the signature
-        app_class.get_layout.register(
-            lambda self, obj: layout_obj,
-            model=self.model)
+
+        try:
+            # `lambda self, obj` is required to match the signature
+            app_class.get_layout.register(
+                lambda self, obj: layout_obj,
+                model=self.model)
+        except RegistrationError as e:
+            # ignore `already have registration for key` error
+            if 'Already have registration for key' not in str(e):
+                raise
