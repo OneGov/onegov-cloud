@@ -1072,7 +1072,7 @@ def test_directory_migration(client: Client) -> None:
     # tests changing radio and checkbox options in directory structure
 
     client.login_admin()
-    page = (client.get('/directories').click('Verzeichnis'))
+    page = (client.get('/directories').click('Verzeichnis', index=0))
     page.form['title'] = 'Order sweets'
     page.form['structure'] = dedent("""
         Nickname *= ___
