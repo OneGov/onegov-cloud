@@ -81,13 +81,13 @@ if TYPE_CHECKING:
     from gettext import GNUTranslations
     from morepath.request import Request
     from morepath.settings import SettingRegistry
-    from onegov.org.layout import Layout
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
     from typing_extensions import ParamSpec
     from webob import Response
 
     from .analytics import AnalyticsProvider
+    from .layout import Layout
     from .mail import Attachment
     from .metadata import Metadata
     from .security.permissions import Intent
