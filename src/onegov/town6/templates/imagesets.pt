@@ -12,7 +12,11 @@
                         <div class="grid-x columns small-up-2 image-card-grid">
                             <tal:b tal:repeat="image imageset.ordered_files">
                                 <div tal:condition="repeat.image.number <= 4" class="cell">
-                                    <img src="${request.link(image)}" alt="${image.note}" width="${image.reference.size[0]}" height="${image.reference.size[1]}" />
+                                    <tal:b tal:define="size getattr(image.reference, 'size', None)">
+                                    <img src="${request.link(image)}" alt="${image.note}"
+                                         tal:attributes="width size and size[0] or None;
+                                                         height size and size[1] or None" />
+                                    </tal:b>
                                 </div>
                             </tal:b>
                         </div>
