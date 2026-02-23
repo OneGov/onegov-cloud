@@ -13,7 +13,6 @@ from more.content_security import NONE
 from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
-from onegov.core.framework import layout_predicate
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm.cache import orm_cached, request_cached
 from onegov.core.templates import PageTemplate, render_template
@@ -50,7 +49,6 @@ if TYPE_CHECKING:
     from morepath.authentication import Identity, NoIdentity
     from onegov.core.mail import Attachment
     from onegov.core.types import EmailJsonDict, SequenceOrScalar
-    from onegov.org.layout import Layout
     from onegov.pay import Price
     from onegov.ticket import Ticket
     from onegov.ticket.collection import TicketCount
@@ -491,13 +489,6 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
             return None
 
         return URL(request.link(dashboard)).path()
-
-
-@OrgApp.predicate_fallback(Framework.get_layout, layout_predicate)
-def layout_not_found(self: type[OrgApp], obj: object) -> type[Layout]:
-    # circular import
-    from onegov.org.layout import DefaultLayout
-    return DefaultLayout
 
 
 @OrgApp.webasset_path()

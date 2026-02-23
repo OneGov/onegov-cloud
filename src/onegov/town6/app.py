@@ -7,7 +7,6 @@ from sedate import replace_timezone
 
 from onegov.api import ApiApp
 from onegov.core import utils
-from onegov.core.framework import layout_predicate, Framework
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.templates import render_template
 from onegov.core.utils import module_path
@@ -31,7 +30,6 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.org.exceptions import MTANAccessLimitExceeded
     from onegov.org.models import Organisation
-    from onegov.town6.layout import Layout
     from onegov.town6.request import TownRequest
 
 
@@ -76,13 +74,6 @@ class TownApp(OrgApp, FoundationApp, ApiApp):
                     if now > open and now < close:
                         return True
         return False
-
-
-@TownApp.predicate_fallback(Framework.get_layout, layout_predicate)
-def layout_not_found(self: type[TownApp], obj: object) -> type[Layout]:
-    # circular import
-    from onegov.town6.layout import DefaultLayout
-    return DefaultLayout
 
 
 @TownApp.webasset_path()

@@ -16,10 +16,12 @@ from math import isclose
 from os.path import splitext, basename
 
 from onegov.chat import TextModuleCollection
+from onegov.core import Framework
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
 from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
+from onegov.core.framework import layout_predicate
 from onegov.form.collection import SurveyCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
@@ -47,6 +49,7 @@ from onegov.org.exports.base import OrgExport
 from onegov.org.models import CitizenDashboard
 from onegov.org.models import Clipboard
 from onegov.org.models import ExportCollection, Editor
+from onegov.org.models import GeneralFile
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
 from onegov.org.models import ImageFileCollection
@@ -922,6 +925,13 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
                 url=self.request.link(self.model),
                 attrs={'class': 'cancel-link'}
             ),]
+
+
+# registers the `DefaultLayout` as the default layout for all models in
+# org. Look for this kind of decorator `@TownApp.layout(model=<ModelName>)`
+@OrgApp.predicate_fallback(Framework.get_layout, layout_predicate)
+def layout_not_found(self: type[OrgApp], obj: object) -> type[Layout]:
+    return DefaultLayout
 
 
 class DefaultMailLayoutMixin:

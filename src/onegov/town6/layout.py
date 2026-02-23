@@ -3,7 +3,9 @@ from __future__ import annotations
 import secrets
 from functools import cached_property
 
+from onegov.core import Framework
 from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
+from onegov.core.framework import layout_predicate
 from onegov.core.static import StaticFile
 from onegov.core.utils import append_query_param, to_html_ul
 from onegov.chat.collections import ChatCollection
@@ -268,6 +270,13 @@ class DefaultLayout(OrgDefaultLayout, Layout):
 
         # fallback to the homepage
         return self.request.link(self.request.app.org, '')
+
+
+# registers the `DefaultLayout` as the default layout for all models in
+# town. Look for this kind of decorator `@TownApp.layout(model=<ModelName>)`
+@TownApp.predicate_fallback(Framework.get_layout, layout_predicate)
+def layout_not_found(self: type[TownApp], obj: object) -> type[Layout]:
+    return DefaultLayout
 
 
 class DefaultMailLayout(OrgDefaultMailLayout, Layout):
