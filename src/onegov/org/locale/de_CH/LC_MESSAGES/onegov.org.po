@@ -7154,7 +7154,7 @@ msgid "Charge fees to customer"
 msgstr "Kreditkarten-Gebühren dem Kunden verrechnen"
 
 msgid "Use sandbox environment (for testing)"
-msgstr "Sandbox Umbegung verwenden (nur für Testing)"
+msgstr "Sandbox Umgebung verwenden (nur für Testing)"
 
 msgid "Customer Name"
 msgstr "Kundenname"
