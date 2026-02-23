@@ -1870,7 +1870,7 @@
             </tal:b>
         </div>
     </div>
-    <div class="homepage-searchbox-wrapper" tal:condition="not searchbox == 'false'|True">
+    <div class="homepage-searchbox-wrapper" tal:condition="len(images) and not searchbox == 'false'|True">
         <div class="grid-container">
             <div class="grid-x grid-padding-x">
                 <div class="cell small-12 medium-6 large-7">
