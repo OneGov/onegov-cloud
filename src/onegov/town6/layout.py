@@ -275,8 +275,8 @@ class DefaultLayout(OrgDefaultLayout, Layout):
 # registers the `DefaultLayout` as the default layout for all models in
 # town. Look for this kind of decorator `@TownApp.layout(model=<ModelName>)`
 @TownApp.predicate_fallback(Framework.get_layout, layout_predicate)
-def layout_not_found(self: type[TownApp], obj: object) -> type[Layout]:
-    return DefaultLayout
+def layout_not_found(self: TownApp, obj: object, request: CoreRequest) -> Layout:
+    return DefaultLayout(obj, request)
 
 
 class DefaultMailLayout(OrgDefaultMailLayout, Layout):
