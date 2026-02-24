@@ -326,18 +326,12 @@ def handle_change_username(
     if form.submitted(request):
         assert form.new_username.data is not None
         old_username = self.username
-        new_username = form.new_username.data
-
-        self.logout_all_sessions(request.app)
-        self.username = new_username
-
-        # Run application-specific callback
-        request.app.settings.user.change_username_callback(self, request)
+        form.populate_obj(self)
         request.success(_(
             'Succesfully changed ${old_username} to ${new_username}',
             mapping={
                 'old_username': old_username,
-                'new_username': new_username
+                'new_username': form.new_username.data
             }
         ))
 

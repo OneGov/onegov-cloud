@@ -24,11 +24,13 @@ from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
     from onegov.org.request import OrgRequest
     from onegov.user.auth.second_factor import AnySecondFactor
     from wtforms.fields.choices import _Choice
+    from wtforms.meta import _MultiDictLike
 
 
 AVAILABLE_ROLES = [
@@ -160,7 +162,7 @@ class ChangeUsernameForm(Form):
         validators=[InputRequired(), Email()]
     )
 
-    yubikey_2fa = StringField(
+    yubikey = StringField(
         label=_('Yubikey'),
         fieldset=_('Confirm action via your second factor'),
         description=_('Plug your YubiKey into a USB slot and press it.'),
@@ -168,7 +170,7 @@ class ChangeUsernameForm(Form):
         render_kw={'autocomplete': 'off'}
     )
 
-    totp_2fa = StringField(
+    totp = StringField(
         label=_('Code'),
         fieldset=_('Confirm action via your second factor'),
         description=_('Enter the six digit code from your authenticator app.'),
@@ -176,17 +178,42 @@ class ChangeUsernameForm(Form):
         render_kw={'autocomplete': 'one-time-code'}
     )
 
-    def process_obj(self, model: User) -> None:  # type:ignore
-        self.model = model
-        self.old_username.text = model.username
+    def process(
+        self,
+        formdata: _MultiDictLike | None = None,
+        obj: object | None = None,
+        data: Mapping[str, Any] | None = None,
+        extra_filters: Mapping[str, Sequence[Any]] | None = None,
+        **kwargs: Any
+    ) -> None:
+
+        # NOTE: We only pass on formdata, since
+        super().process(
+            formdata=formdata,
+            obj=None,
+            data=None,
+            extra_filters=extra_filters,
+        )
+
+        if isinstance(obj, User):
+            self.model = obj
+            self.old_username.text = obj.username
+
+    def populate_obj(self, obj: User) -> None:  # type: ignore[override]
+        assert self.new_username.data is not None
+        request = self.request
+        obj.logout_all_sessions(request.app)
+        obj.username = self.new_username.data
+        # Run application-specific callback
+        request.app.settings.user.change_username_callback(obj, request)
 
     def on_request(self) -> None:
         user = self.request.current_user
         assert user is not None
         if (user.second_factor or {}).get('type') == 'yubikey':
-            self.delete_field('totp_2fa')
+            self.delete_field('totp')
         else:
-            self.delete_field('yubikey_2fa')
+            self.delete_field('yubikey')
 
     def validate_new_username(self, field: EmailField) -> None:
         assert field.data is not None
@@ -216,7 +243,7 @@ class ChangeUsernameForm(Form):
             )
             return False
 
-    def validate_yubikey_2fa(self, field: StringField) -> None:
+    def validate_yubikey(self, field: StringField) -> None:
         assert field.data is not None
         factor = self.factors['yubikey']
         if not self.check_factor(factor, field.data):
@@ -224,7 +251,7 @@ class ChangeUsernameForm(Form):
             log.info(f'Failed login by {client} (Yubikey change-username)')
             raise ValidationError(_('Wrong yubikey.'))
 
-    def validate_totp_2fa(self, field: StringField) -> None:
+    def validate_totp(self, field: StringField) -> None:
         assert field.data is not None
         factor = self.factors['totp']
         if not self.check_factor(factor, field.data):

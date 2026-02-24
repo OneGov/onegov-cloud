@@ -353,5 +353,5 @@ def add_on_update_cascade_to_username_fk(context: UpgradeContext) -> None:
             'users',
             ['username'],
             ['username'],
-            ondelete='CASCADE'
+            onupdate='CASCADE'
         )
