@@ -1,6 +1,6 @@
 @page {
     size: A4;
-    margin: 6cm 0.75cm 2cm 3cm;  /* top right bottom left */
+    margin: 5.5cm 0.75cm 2cm 3cm;  /* top right bottom left. This has to fit "Couvert C6"*/
     @top-right {
         content: "Staatskanzlei";
         font-family: Helvetica, Arial, sans-serif;
