@@ -459,7 +459,9 @@ def test_archived_result_collection_updates(session: Session) -> None:
     assert archive.query().count() == 6
 
     # Test update with official host
+    count = archive.query().count()
     request.link = lambda x: 'http://wab-test.testing.ch/vote/2001'
     request.app.principal.official_host = 'https://wab.govikon.ch'
     result = archive.update(votes[2001], request)
+    assert count == archive.query().count()
     assert result.url == 'https://wab.govikon.ch/vote/2001'
