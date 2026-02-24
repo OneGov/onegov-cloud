@@ -207,15 +207,21 @@ def update_archived_results(host: str, scheme: str) -> Processor:
     """ Update the archive results, e.g. after a database transfer. """
 
     def generate(request: ElectionDayRequest, app: ElectionDayApp) -> None:
-        if app.principal and app.principal.official_host is None:
+        if (
+            app.principal
+            and app.principal.official_host is None
+            or host == 'localhost:8080'
+        ):
             click.secho(
                 'Official host is not set! Do not run this command on '
                 'staging. Uploading results later  may create '
-                'duplicate archived result entries.', fg='red',
+                'duplicate archived result entries.',
+                fg='red',
             )
             click.secho(
                 'Use `/update-results` view or `update archive` '
-                'menu, both available for admins only on the UI', fg='yellow',
+                'menu, both available for admins only on the UI',
+                fg='yellow',
             )
             return
 
