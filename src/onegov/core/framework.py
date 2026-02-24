@@ -1576,8 +1576,9 @@ class Framework(
 def layout_predicate(
     self: type[Framework],
     obj: object,
-) -> type[Layout]:
-    return obj.__class__  # type: ignore[return-value]
+    request: CoreRequest
+) -> type[object]:
+    return obj.__class__
 
 
 @Framework.webasset_url()
