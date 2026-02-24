@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import pyotp
 import re
 import transaction
 
 from onegov.user import UserCollection
+from sqlalchemy.orm import close_all_sessions
 
 
 from typing import TYPE_CHECKING
@@ -71,6 +73,46 @@ def test_change_role(client: Client) -> None:
     editor.form['yubikey'] = ''
     assert editor.form.submit().status_code == 302
     assert user.get('/userprofile', expect_errors=True).status_code == 403
+
+
+# TODO: Test with yubikey 2FA as well? Will require some mocking.
+def test_change_username(client: Client) -> None:
+    # Make sure we start out logged in
+    client.login_admin()
+
+    # configure TOTP for admin user
+    transaction.begin()
+    client.app.totp_enabled = True
+    totp_secret = pyotp.random_base32()
+    totp = pyotp.TOTP(totp_secret)
+    users = UserCollection(client.app.session())
+    admin = users.by_username('admin@example.org')
+    assert admin is not None
+    admin.second_factor = {'type': 'totp', 'data': totp_secret}
+    transaction.commit()
+    close_all_sessions()
+
+    users_page = client.get('/usermanagement')
+    assert 'editor@example.org' in users_page
+    assert 'editor2@example.org' not in users_page
+
+    editor = users_page.click('Ansicht', index=1)
+    editor = editor.click('E-Mail ändern')
+    assert 'editor@example.org' in editor
+    assert 'editor2@example.org' not in editor
+
+    # try to submit with bogus TOTP
+    editor.form['new_username'] = 'editor2@example.org'
+    editor.form['totp'] = 'bogus'
+    editor = editor.form.submit()
+    assert 'Ungültige oder abgelaufenes TOTP eingegeben.' in editor
+
+    # submit with correct TOTP
+    editor.form['totp'] = totp.now()
+    editor.form.submit().follow()
+    users_page = client.get('/usermanagement')
+    assert 'editor@example.org' not in users_page
+    assert 'editor2@example.org' in users_page
 
 
 def test_user_source(client: Client) -> None:

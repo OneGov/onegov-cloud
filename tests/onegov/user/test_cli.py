@@ -4,9 +4,11 @@ import os.path
 import yaml
 
 from click.testing import CliRunner
+from onegov.core.framework import Framework
 from onegov.core.utils import Bunch
 from onegov.user import User
 from onegov.user.cli import cli
+from onegov.user.integration import UserApp
 from unittest.mock import patch
 from transaction import commit
 
@@ -14,6 +16,10 @@ from transaction import commit
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm import SessionManager
+
+
+class TestApp(Framework, UserApp):
+    __test__ = False
 
 
 def test_cli(
@@ -27,7 +33,7 @@ def test_cli(
         'applications': [
             {
                 'path': '/foo/*',
-                'application': 'onegov.core.Framework',
+                'application': 'tests.onegov.user.test_cli.TestApp',
                 'namespace': 'foo',
                 'configuration': {
                     'dsn': postgres_dsn,
@@ -38,7 +44,6 @@ def test_cli(
     }
 
     session_manager.ensure_schema_exists('foo-bar')
-    # session_manager.ensure_schema_exists('foo-zar')
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
 
@@ -204,6 +209,58 @@ def test_cli(
     ])
     assert result.exit_code == 0
     assert 'admin@example.org' not in result.output
+
+    # Change username
+    login('admin@example.org')
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-username', 'admin@example.org',
+        'admin2@example.org'
+    ])
+    assert result.exit_code == 0
+    assert "admin@example.org was changed to admin2@" in result.output
+
+    # List all sessions, check if logged-out
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'list-sessions'
+    ])
+    assert result.exit_code == 0
+    assert 'admin2@example.org' not in result.output
+
+    # Change username back
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-username', 'admin2@example.org',
+        'admin@example.org'
+    ])
+    assert result.exit_code == 0
+    assert "admin2@example.org was changed to admin@" in result.output
+
+    # Add a second user
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'add', 'editor', 'editor@example.org',
+        '--password', 'hunter2',
+        '--no-prompt',
+    ])
+    assert result.exit_code == 0
+    assert 'Adding editor@example.org to foo/bar' in result.output
+    assert 'editor@example.org was added' in result.output
+
+    # Try to change username to existing username
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-username', 'admin@example.org',
+        'editor@example.org'
+    ])
+    assert result.exit_code == 1
+    assert "editor@example.org already exists" in result.output
 
     # Change yubikey
     login('admin@example.org')
@@ -483,7 +540,7 @@ def test_cli_exists_recursive(
         'applications': [
             {
                 'path': '/foo/*',
-                'application': 'onegov.core.Framework',
+                'application': 'tests.onegov.user.test_cli.TestApp',
                 'namespace': 'foo',
                 'configuration': {
                     'dsn': postgres_dsn,
