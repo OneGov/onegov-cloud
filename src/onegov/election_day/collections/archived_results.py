@@ -282,11 +282,19 @@ class ArchivedResultCollection:
 
         url = request.link(item)
         url = replace_url(url, request.app.principal.official_host)
+        renamed = old is not None
         if old:
             old = replace_url(old, request.app.principal.official_host)
         else:
             old = url
         result = self.query().filter_by(url=old).first()
+        if not result and not renamed:
+            # Fallback: schema in case the stored URL uses a different host
+            schema = self.session.info['schema']
+            result = self.query().filter(
+                ArchivedResult.schema == schema,
+                ArchivedResult.meta['id'].astext == item.id
+            ).first()
 
         add_result = False
         if not result:
