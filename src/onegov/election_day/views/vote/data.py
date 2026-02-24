@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.formats import export_vote_internal
@@ -23,8 +25,8 @@ if TYPE_CHECKING:
 )
 def view_vote_data(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
     layout = VoteLayout(self, request, 'data')
@@ -42,12 +44,12 @@ def view_vote_data(
 )
 def view_vote_data_as_json(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ View the raw data as JSON. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -63,12 +65,12 @@ def view_vote_data_as_json(
 )
 def view_vote_data_as_csv(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the raw data as CSV. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {

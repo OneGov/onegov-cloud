@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from wtforms import RadioField
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
@@ -12,22 +14,23 @@ from onegov.form.models.survey_window import SurveySubmissionWindow
 from onegov.form.parser import parse_form
 from onegov.form.utils import hash_definition
 from onegov.form.extensions import Extendable
-from sqlalchemy import Column, Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import object_session, relationship
+from sqlalchemy.orm import mapped_column, object_session, relationship, Mapped
 
 
-# type gets shadowed in the model so we need an alias
-from typing import Type, TYPE_CHECKING, Any
-
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
+    # type gets shadowed in the model so we need an alias
+    from builtins import type as type_t
     from uuid import UUID
     from datetime import date
     from onegov.form import Form
     from onegov.form.types import SubmissionState
     from onegov.pay.types import PaymentMethod
-    from typing_extensions import Self
+    from typing import Self
     from onegov.core.request import CoreRequest
+else:
+    PaymentMethod = str
 
 
 class FormDefinition(Base, ContentMixin, TimestampMixin,
@@ -44,49 +47,44 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
         return self.name
 
     #: the name of the form (key, part of the url)
-    name: 'Column[str]' = Column(Text, nullable=False, primary_key=True)
+    name: Mapped[str] = mapped_column(primary_key=True)
 
     #: the title of the form
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: the form as parsable string
-    definition: 'Column[str]' = Column(Text, nullable=False)
+    definition: Mapped[str]
 
     #: hint on how to get to the resource
     pick_up: dict_property[str | None] = content_property()
 
     #: the group to which this resource belongs to (may be any kind of string)
-    group: 'Column[str | None]' = Column(Text, nullable=True)
+    group: Mapped[str | None]
 
     #: The normalized title for sorting
-    order: 'Column[str]' = Column(Text, nullable=False, index=True)
+    order: Mapped[str] = mapped_column(index=True)
 
     #: the checksum of the definition, forms and submissions with matching
     #: checksums are guaranteed to have the exact same definition
-    checksum: 'Column[str]' = Column(Text, nullable=False)
+    checksum: Mapped[str]
 
     #: the type of the form, this can be used to create custom polymorphic
     #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     #: link between forms and submissions
-    submissions: 'relationship[list[FormSubmission]]' = relationship(
-        FormSubmission,
+    submissions: Mapped[list[FormSubmission]] = relationship(
         back_populates='form'
     )
 
     #: link between forms and registration windows
-    registration_windows: 'relationship[list[FormRegistrationWindow]]'
-    registration_windows = relationship(
-        FormRegistrationWindow,
-        back_populates='form',
-        order_by='FormRegistrationWindow.start',
-        cascade='all, delete-orphan'
+    registration_windows: Mapped[list[FormRegistrationWindow]] = (
+        relationship(
+            back_populates='form',
+            order_by='FormRegistrationWindow.start',
+            cascade='all, delete-orphan'
+        )
     )
 
     #: the currently active registration window
@@ -102,30 +100,31 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     #:
     #: this could of course be done more conventionally, but this is cooler 😅
     #:
-    current_registration_window: 'relationship[FormRegistrationWindow | None]'
-    current_registration_window = relationship(
-        'FormRegistrationWindow', viewonly=True, uselist=False,
-        primaryjoin="""and_(
-            FormRegistrationWindow.name == FormDefinition.name,
-            FormRegistrationWindow.id == select((
-                FormRegistrationWindow.id,
-            )).where(
-                FormRegistrationWindow.name == FormDefinition.name
-            ).order_by(
-                func.least(
-                    cast(
-                        func.now().op('AT TIME ZONE')(
-                            FormRegistrationWindow.timezone
-                        ), Date
-                    ).op('<->')(FormRegistrationWindow.start),
-                    cast(
-                        func.now().op('AT TIME ZONE')(
-                            FormRegistrationWindow.timezone
-                        ), Date
-                    ).op('<->')(FormRegistrationWindow.end)
-                )
-            ).limit(1)
-        )"""
+    current_registration_window: Mapped[FormRegistrationWindow | None] = (
+        relationship(
+            viewonly=True,
+            primaryjoin="""and_(
+                FormRegistrationWindow.name == FormDefinition.name,
+                FormRegistrationWindow.id == select(
+                    FormRegistrationWindow.id
+                ).where(
+                    FormRegistrationWindow.name == FormDefinition.name
+                ).order_by(
+                    func.least(
+                        cast(
+                            func.now().op('AT TIME ZONE')(
+                                FormRegistrationWindow.timezone
+                            ), Date
+                        ).op('<->')(FormRegistrationWindow.start),
+                        cast(
+                            func.now().op('AT TIME ZONE')(
+                                FormRegistrationWindow.timezone
+                            ), Date
+                        ).op('<->')(FormRegistrationWindow.end)
+                    )
+                ).limit(1).scalar_subquery()
+            )"""
+        )
     )
 
     #: lead text describing the form
@@ -139,15 +138,17 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
 
     #: payment options ('manual' for out of band payments without cc, 'free'
     #: for both manual and cc payments, 'cc' for forced cc payments)
-    payment_method: 'Column[PaymentMethod]' = Column(
-        Text,  # type:ignore[arg-type]
-        nullable=False,
-        default='manual'
-    )
+    payment_method: Mapped[PaymentMethod] = mapped_column(default='manual')
 
     #: the minimum price total a form submission must exceed in order to
     #: be submitted
     minimum_price_total: dict_property[float | None] = meta_property()
+
+    #: the reply_to address to supersede the global reply_to address for
+    #: tickets created through this form
+    reply_to: dict_property[str | None] = meta_property()
+
+    custom_above_footer: dict_property[str | None] = meta_property()
 
     __mapper_args__ = {
         'polymorphic_on': 'type',
@@ -155,7 +156,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     }
 
     @property
-    def form_class(self) -> Type['Form']:
+    def form_class(self) -> type_t[Form]:
         """ Parses the form definition and returns a form class. """
 
         return self.extend_form_class(
@@ -173,10 +174,11 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
 
     def has_submissions(
         self,
-        with_state: 'SubmissionState | None' = None
+        with_state: SubmissionState | None = None
     ) -> bool:
 
         session = object_session(self)
+        assert session is not None
         query = session.query(FormSubmission.id)
         query = query.filter(FormSubmission.name == self.name)
 
@@ -187,8 +189,8 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
 
     def add_registration_window(
         self,
-        start: 'date',
-        end: 'date',
+        start: date,
+        end: date,
         *,
         enabled: bool = True,
         timezone: str = 'Europe/Zurich',
@@ -207,7 +209,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
         self.registration_windows.append(window)
         return window
 
-    def for_new_name(self, name: str) -> 'Self':
+    def for_new_name(self, name: str) -> Self:
         return self.__class__(
             name=name,
             title=self.title,
@@ -236,76 +238,76 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         return self.name
 
     #: the name of the form (key, part of the url)
-    name: 'Column[str]' = Column(Text, nullable=False, primary_key=True)
+    name: Mapped[str] = mapped_column(primary_key=True)
 
     #: the title of the form
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: the form as parsable string
-    definition: 'Column[str]' = Column(Text, nullable=False)
+    definition: Mapped[str]
 
     #: the group to which this resource belongs to (may be any kind of string)
-    group: 'Column[str | None]' = Column(Text, nullable=True)
+    group: Mapped[str | None]
 
     #: The normalized title for sorting
-    order: 'Column[str]' = Column(Text, nullable=False, index=True)
+    order: Mapped[str] = mapped_column(index=True)
 
     #: the checksum of the definition, forms and submissions with matching
     #: checksums are guaranteed to have the exact same definition
-    checksum: 'Column[str]' = Column(Text, nullable=False)
+    checksum: Mapped[str]
 
     #: link between surveys and submissions
-    submissions: 'relationship[list[SurveySubmission]]' = relationship(
-        SurveySubmission,
+    submissions: Mapped[list[SurveySubmission]] = relationship(
         back_populates='survey'
     )
 
     #: link between surveys and submission windows
-    submission_windows: 'relationship[list[SurveySubmissionWindow]]'
-    submission_windows = relationship(
-        SurveySubmissionWindow,
-        back_populates='survey',
-        order_by='SurveySubmissionWindow.start',
-        cascade='all, delete-orphan'
+    submission_windows: Mapped[list[SurveySubmissionWindow]] = (
+        relationship(
+            back_populates='survey',
+            order_by='SurveySubmissionWindow.start',
+            cascade='all, delete-orphan'
+        )
     )
 
-    current_submission_window: 'relationship[SurveySubmissionWindow | None]'
-    current_submission_window = relationship(
-        'SurveySubmissionWindow', viewonly=True, uselist=False,
-        primaryjoin="""and_(
-            SurveySubmissionWindow.name == SurveyDefinition.name,
-            SurveySubmissionWindow.id == select((
-                SurveySubmissionWindow.id,
-            )).where(
-                SurveySubmissionWindow.name == SurveyDefinition.name
-            ).order_by(
-                func.least(
-                    cast(
-                        func.now().op('AT TIME ZONE')(
-                            SurveySubmissionWindow.timezone
-                        ), Date
-                    ).op('<->')(SurveySubmissionWindow.start),
-                    cast(
-                        func.now().op('AT TIME ZONE')(
-                            SurveySubmissionWindow.timezone
-                        ), Date
-                    ).op('<->')(SurveySubmissionWindow.end)
-                )
-            ).limit(1)
-        )"""
+    current_submission_window: Mapped[SurveySubmissionWindow | None] = (
+        relationship(
+            viewonly=True,
+            primaryjoin="""and_(
+                SurveySubmissionWindow.name == SurveyDefinition.name,
+                SurveySubmissionWindow.id == select(
+                    SurveySubmissionWindow.id
+                ).where(
+                    SurveySubmissionWindow.name == SurveyDefinition.name
+                ).order_by(
+                    func.least(
+                        cast(
+                            func.now().op('AT TIME ZONE')(
+                                SurveySubmissionWindow.timezone
+                            ), Date
+                        ).op('<->')(SurveySubmissionWindow.start),
+                        cast(
+                            func.now().op('AT TIME ZONE')(
+                                SurveySubmissionWindow.timezone
+                            ), Date
+                        ).op('<->')(SurveySubmissionWindow.end)
+                    )
+                ).limit(1).scalar_subquery()
+            )""",
+        )
     )
 
     #: lead text describing the survey
     lead: dict_property[str | None] = meta_property()
 
     #: content associated with the Survey
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
 
     #: extensions
     extensions: dict_property[list[str]] = meta_property(default=list)
 
     @property
-    def form_class(self) -> Type['Form']:
+    def form_class(self) -> type[Form]:
         """ Parses the survey definition and returns a form class. """
 
         return self.extend_form_class(
@@ -323,22 +325,19 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
 
     def has_submissions(
         self,
-        with_state: 'SubmissionState | None' = None
     ) -> bool:
 
         session = object_session(self)
+        assert session is not None
         query = session.query(SurveySubmission.id)
         query = query.filter(SurveySubmission.name == self.name)
-
-        if with_state is not None:
-            query = query.filter(SurveySubmission.state == with_state)
 
         return session.query(query.exists()).scalar()
 
     def add_submission_window(
         self,
-        start: 'date',
-        end: 'date',
+        start: date,
+        end: date,
         *,
         enabled: bool = True,
         timezone: str = 'Europe/Zurich',
@@ -353,7 +352,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         self.submission_windows.append(window)
         return window
 
-    def get_results(self, request: 'CoreRequest', sw_id: ('UUID | None') = None
+    def get_results(self, request: CoreRequest, sw_id: (UUID | None) = None
                     ) -> dict[str, Any]:
         """ Returns the results of the survey. """
 
@@ -362,8 +361,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         all_fields = form._fields
         all_fields.pop('csrf_token', None)
         fields = all_fields.values()
-        q = request.session.query(SurveySubmission)
-        q = q.filter_by(name=self.name)
+        q = request.session.query(SurveySubmission).filter_by(name=self.name)
         if sw_id:
             submissions = q.filter_by(submission_window_id=sw_id).all()
         else:

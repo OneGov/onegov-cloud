@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 from base64 import b64encode
 from io import StringIO
 from onegov.feriennet import log
 from onegov.feriennet.utils import NAME_SEPARATOR
 from qrbill.bill import QRBill, IBAN_ALLOWED_COUNTRIES, QR_IID
-from stdnum import iban  # type:ignore[import-untyped]
+from stdnum import iban
 
 
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.activity.models import Invoice
+    from onegov.activity.models import BookingPeriodInvoice
     from onegov.feriennet.request import FeriennetRequest
     from onegov.user import User
 
@@ -46,9 +48,9 @@ SUPPORTED_LANGUAGES: dict[str | None, Literal['en', 'de', 'fr', 'it']] = {
 
 def generate_qr_bill(
     schema: str,
-    request: 'FeriennetRequest',
-    user: 'User',
-    invoice: 'Invoice'
+    request: FeriennetRequest,
+    user: User,
+    invoice: BookingPeriodInvoice
 ) -> bytes | None:
     """ Generates a QR Bill and returns it as base64 encoded SVG. """
 

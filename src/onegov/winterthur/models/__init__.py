@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.winterthur.models.address import WinterthurAddress
 from onegov.winterthur.models.mission_report import MissionReport
 from onegov.winterthur.models.mission_report import MissionReportFile

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from cgi import FieldStorage
 from io import BytesIO
 
@@ -14,8 +16,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, HtmlField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import UploadField
-from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
+from onegov.form.validators import FileSizeLimit, MIME_TYPES_IMAGE
 from onegov.gis import CoordinatesField
 from sqlalchemy import func
 from wtforms.fields import StringField
@@ -33,50 +34,47 @@ class ExtendedAgencyForm(Form):
     """ Form to edit agencies. """
 
     title = StringField(
-        label=_("Title"),
+        label=_('Title'),
         validators=[
             InputRequired()
         ],
     )
 
     portrait = HtmlField(
-        label=_("Portrait"),
+        label=_('Portrait'),
         render_kw={'rows': 10}
     )
 
     location_address = TextAreaField(
-        label=_("Location address"),
+        label=_('Location address'),
         render_kw={'rows': 2},
     )
     location_code_city = StringField(
-        label=_("Location Code and City")
+        label=_('Location Code and City')
     )
 
     postal_address = TextAreaField(
-        label=_("Postal address"),
+        label=_('Postal address'),
         render_kw={'rows': 2},
     )
-    postal_code_city = StringField(label=_("Postal Code and City"))
+    postal_code_city = StringField(label=_('Postal Code and City'))
 
-    phone = StringField(label=_("Phone"))
-    phone_direct = StringField(label=_("Alternate Phone Number / Fax"))
-    email = EmailField(label=_("E-Mail"))
-    website = StringField(label=_("Website"), filters=(ensure_scheme, ))
+    phone = StringField(label=_('Phone'))
+    phone_direct = StringField(label=_('Alternate Phone Number / Fax'))
+    email = EmailField(label=_('E-Mail'))
+    website = StringField(label=_('Website'), filters=(ensure_scheme, ))
 
     opening_hours = TextAreaField(
-        label=_("Opening hours"),
+        label=_('Opening hours'),
         render_kw={'rows': 5},
     )
 
     organigram = UploadField(
-        label=_("Organigram"),
+        label=_('Organigram'),
         validators=[
-            WhitelistedMimeType({
-                'image/jpeg',
-                'image/png',
-            }),
             FileSizeLimit(1 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=MIME_TYPES_IMAGE,
     )
 
     coordinates = CoordinatesField(
@@ -85,34 +83,34 @@ class ExtendedAgencyForm(Form):
             'Search for the exact address to set a marker. The zoom of '
             'the map will be saved as well.'
         ),
-        fieldset=_("Map"),
+        fieldset=_('Map'),
         render_kw={'data-map-type': 'marker'},
     )
 
     export_fields = MultiCheckboxField(
-        label=_("Fields to include for each membership"),
+        label=_('Fields to include for each membership'),
         choices=[
-            ('membership.title', _("Membership: Title")),
-            ('membership.since', _("Membership: Since")),
-            ('membership.addition', _("Membership: Addition")),
-            ('person.title', _("Person: Title")),
-            ('person.function', _("Person: Function")),
-            ('person.last_name', _("Person: Last Name")),
-            ('person.first_name', _("Person: First Name")),
-            ('person.born', _("Person: Born")),
-            ('person.academic_title', _("Person: Academic Title")),
-            ('person.profession', _("Person: Profession")),
-            ('person.location_address', _("Person: Location address")),
-            ('person.location_code_city', _("Person: Location Code and City")),
-            ('person.postal_address', _("Person: Postal address")),
-            ('person.postal_code_city', _("Person: Postal Code and City")),
-            ('person.political_party', _("Person: Political Party")),
-            ('person.parliamentary_group', _("Person: Parliamentary Group")),
-            ('person.phone', _("Person: Phone")),
-            ('person.phone_direct', _("Person: Direct Phone")),
+            ('membership.title', _('Membership: Title')),
+            ('membership.since', _('Membership: Since')),
+            ('membership.addition', _('Membership: Addition')),
+            ('person.title', _('Person: Title')),
+            ('person.function', _('Person: Function')),
+            ('person.last_name', _('Person: Last Name')),
+            ('person.first_name', _('Person: First Name')),
+            ('person.born', _('Person: Born')),
+            ('person.academic_title', _('Person: Academic Title')),
+            ('person.profession', _('Person: Profession')),
+            ('person.location_address', _('Person: Location address')),
+            ('person.location_code_city', _('Person: Location Code and City')),
+            ('person.postal_address', _('Person: Postal address')),
+            ('person.postal_code_city', _('Person: Postal Code and City')),
+            ('person.political_party', _('Person: Political Party')),
+            ('person.parliamentary_group', _('Person: Parliamentary Group')),
+            ('person.phone', _('Person: Phone')),
+            ('person.phone_direct', _('Person: Direct Phone')),
         ],
         default=['membership.title', 'person.title'],
-        fieldset=_("PDF Export"),
+        fieldset=_('PDF Export'),
         render_kw={'class_': 'sortable-multi-checkbox'}
     )
 
@@ -199,7 +197,7 @@ class MoveAgencyForm(Form):
     """ Form to move an agency. """
 
     parent_id = ChosenSelectField(
-        label=_("Destination"),
+        label=_('Destination'),
         choices=[],
         validators=[
             InputRequired()
@@ -220,7 +218,7 @@ class MoveAgencyForm(Form):
         ]
         if self.request.has_permission(agencies, Private):
             self.parent_id.choices.insert(
-                0, ('root', self.request.translate(_("- Root -")))
+                0, ('root', self.request.translate(_('- Root -')))
             )
 
     def ensure_valid_parent(self) -> bool:
@@ -235,7 +233,7 @@ class MoveAgencyForm(Form):
             if self.model.id == new_parent_id:
                 assert isinstance(self.parent_id.errors, list)
                 self.parent_id.errors.append(
-                    _("Invalid destination selected"))
+                    _('Invalid destination selected'))
                 return False
 
         return True

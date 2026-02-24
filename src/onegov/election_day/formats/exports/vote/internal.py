@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 
 
@@ -9,8 +11,8 @@ if TYPE_CHECKING:
 
 
 def export_vote_internal(
-    vote: 'Vote',
-    locales: 'Collection[str]'
+    vote: Vote,
+    locales: Collection[str]
 ) -> list[dict[str, Any]]:
     """ Returns all data connected to this vote as list with dicts.
 

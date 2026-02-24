@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import json
 from wtforms.fields import BooleanField, RadioField
+from wtforms.fields.simple import TextAreaField
 from wtforms.validators import InputRequired
 
 from onegov.form import Form
@@ -25,13 +28,14 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
     page_image_position = RadioField(
         fieldset=_('Images'),
         description=_(
-            "Choose the position of the page images on the content pages"),
-        label=_("Page image position"),
+            'Choose the position of the page images on the content pages'),
+        label=_('Page image position'),
         choices=(
-            ('as_content', _("As a content image (between the title and text "
-                             "of a content page)")),
-            ('header', _("As header image (wide above the page content)"))
+            ('as_content', _('As a content image (between the title and text '
+                             'of a content page)')),
+            ('header', _('As header image (wide above the page content)'))
         ),
+        default='as_content'
     )
 
     body_font_family_ui = ChosenSelectField(
@@ -114,39 +118,52 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
         self.delete_field('font_family_sans_serif')
 
         @self.request.after
-        def clear_locale(response: 'Response') -> None:
+        def clear_locale(response: Response) -> None:
             response.delete_cookie('locale')
 
 
 class ChatSettingsForm(Form):
 
-    enable_chat = BooleanField(
+    enable_chat = RadioField(
         label=_('Enable the chat'),
-        default=False
+        choices=[
+            ('disabled', _('Disable chat')),
+            ('people_chat', _('Enable chat for chosen people')),
+            ('chatbot', _('Enable AI chatbot')),
+        ],
+        default='disabled'
+    )
+
+    chat_link = StringField(
+        label=_('Link to chat service'),
+        description=_('https://govikonchatbot.seantis.ch'),
+        depends_on=('enable_chat', 'chatbot'),
+        validators=[InputRequired()]
     )
 
     chat_staff = ChosenSelectMultipleField(
         label=_('Show chat for chosen people'),
-        choices=[]
+        choices=[],
+        depends_on=('enable_chat', 'people_chat')
     )
 
     chat_topics = TagsField(
-        label=_("Chat Topics"),
+        label=_('Chat Topics'),
         description=_(
             "The topics can be chosen on the form at the start of the chat. "
             "Example topics are 'Social', 'Clubs' or 'Planning & Construction'"
             ". If left empty, all Chats get the topic 'General'."),
+        depends_on=('enable_chat', 'people_chat')
     )
 
     specific_opening_hours = BooleanField(
-        label=_("Specific Opening Hours"),
-        description=_("If unchecked, the chat is open 24/7."),
-        fieldset=_("Opening Hours"),
+        label=_('Specific Opening Hours'),
+        description=_('If unchecked, the chat is open 24/7.'),
+        depends_on=('enable_chat', 'people_chat')
     )
 
     opening_hours_chat = StringField(
-        label=_("Opening Hours"),
-        fieldset=_("Opening Hours"),
+        label=_('Opening Hours'),
         depends_on=('specific_opening_hours', 'y'),
         render_kw={'class_': 'many many-opening-hours'}
     )
@@ -157,12 +174,12 @@ class ChatSettingsForm(Form):
 
     def process_obj(
         self,
-        obj: 'Organisation'  # type:ignore[override]
+        obj: Organisation  # type:ignore[override]
     ) -> None:
 
         super().process_obj(obj)
         self.chat_staff.data = obj.chat_staff or []
-        self.enable_chat.data = obj.enable_chat or False
+        self.enable_chat.data = obj.enable_chat or 'disabled'
         self.chat_topics.data = obj.chat_topics or []
         self.specific_opening_hours.data = obj.specific_opening_hours
         if not obj.opening_hours_chat:
@@ -174,7 +191,7 @@ class ChatSettingsForm(Form):
 
     def populate_obj(  # type:ignore[override]
         self,
-        obj: 'Organisation',  # type:ignore[override]
+        obj: Organisation,  # type:ignore[override]
         *args: Any,
         **kwargs: Any
     ) -> None:
@@ -193,9 +210,7 @@ class ChatSettingsForm(Form):
         staff_members = [(
             (p.id.hex, p.username)
         ) for p in people]
-        self.chat_staff.choices = [
-            (v, k) for v, k in staff_members
-        ]
+        self.chat_staff.choices = list(staff_members)
 
     def ensure_valid_opening_hours(self) -> bool:
         if not self.specific_opening_hours.data:
@@ -223,7 +238,7 @@ class ChatSettingsForm(Form):
             if start > end:
                 assert isinstance(self.opening_hours_chat.errors, list)
                 self.opening_hours_chat.errors.append(
-                    _("Start time cannot be later than end time.")
+                    _('Start time cannot be later than end time.')
                 )
                 result = False
         return result
@@ -249,30 +264,57 @@ class ChatSettingsForm(Form):
         opening_hours = opening_hours or []
         return json.dumps({
             'labels': {
-                'day': self.request.translate(_("day")),
-                'start': self.request.translate(_("Start")),
-                'end': self.request.translate(_("End")),
-                'add': self.request.translate(_("Add")),
-                'remove': self.request.translate(_("Remove")),
+                'day': self.request.translate(_('day')),
+                'start': self.request.translate(_('Start')),
+                'end': self.request.translate(_('End')),
+                'add': self.request.translate(_('Add')),
+                'remove': self.request.translate(_('Remove')),
             },
             'values': [
                 {
                     'day': o[0],
                     'start': o[1],
                     'end': o[2],
-                    'error': self.time_errors.get(ix, "")
+                    'error': self.time_errors.get(ix, '')
                 } for ix, o in enumerate(opening_hours)
             ],
             'days': {
-                0: self.request.translate(_("Mo")),
-                1: self.request.translate(_("Tu")),
-                2: self.request.translate(_("We")),
-                3: self.request.translate(_("Th")),
-                4: self.request.translate(_("Fr")),
-                5: self.request.translate(_("Sa")),
-                6: self.request.translate(_("Su"))
+                0: self.request.translate(_('Mo')),
+                1: self.request.translate(_('Tu')),
+                2: self.request.translate(_('We')),
+                3: self.request.translate(_('Th')),
+                4: self.request.translate(_('Fr')),
+                5: self.request.translate(_('Sa')),
+                6: self.request.translate(_('Su'))
             }
         })
 
     def on_request(self) -> None:
         self.populate_chat_staff()
+
+
+class RISSettingsForm(Form):
+
+    ris_enabled = BooleanField(
+        label=_('Enable RIS'),
+        description=_('Enables the RIS integration for this organisation.'),
+        default=False
+    )
+
+    # the url breadcrumbs shall point to for non-logged-in users
+    ris_main_url = StringField(
+        label=_('URL path for the RIS main page'),
+        description=_(
+            'The URL path for the RIS main page for non-logged-in users.'),
+        default='',
+    )
+
+    # predefined categories for interest ties
+    ris_interest_tie_categories = TextAreaField(
+        label=_('Predefined categories for interest ties'),
+        description=_(
+            'Enter a list of categories for interest ties. Each '
+            'category should be separated by a semicolon. '
+            'Example: Cat 1 text; Cat 2 text; Cat 3 text'),
+        render_kw={'rows': 12}
+    )

@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import re
+import shlex
 import subprocess
 
 from functools import cached_property
@@ -59,12 +62,12 @@ class WinterthurApp(OrgApp):
             **cfg
         )
 
-    def enable_iframes(self, request: 'WinterthurRequest') -> None:
+    def enable_iframes(self, request: WinterthurRequest) -> None:
         request.content_security_policy.frame_ancestors |= self.frame_ancestors
         request.include('iframe-resizer')
 
     @property
-    def roadwork_cache(self) -> 'RedisCacheRegion':
+    def roadwork_cache(self) -> RedisCacheRegion:
         # the expiration time is high here, as the expiration is more closely
         # managed by the roadwork client
         return self.get_cache('roadwork', expiration_time=60 * 60 * 24)
@@ -91,7 +94,7 @@ class WinterthurApp(OrgApp):
         if 'legend' in settings:
             # NOTE: We need to wrap this in Markup. It would be cleaner
             #       if we had a proxy settings object with dict_property
-            return Markup(settings['legend'])  # noqa: MS001
+            return Markup(settings['legend'])  # nosec: B704
 
         return DEFAULT_LEGEND
 
@@ -137,7 +140,7 @@ class WinterthurApp(OrgApp):
                 with (path / 'input.pdf').open('wb') as pdf:
                     pdf.write(file.reference.file.read())
 
-                process = subprocess.run((
+                process = subprocess.run((  # nosec:B603
                     'gs',
 
                     # disable read/writes outside of the given files
@@ -157,15 +160,22 @@ class WinterthurApp(OrgApp):
                     '-dPDFFitPage',
 
                     # render in high resolution before downscaling to 300 dpi
-                    f'-r{300}',
-                    f'-dDownScaleFactor={1}',
+                    '-r300',
+                    '-dDownScaleFactor=1',
 
                     # only use the first page
                     '-dLastPage=1',
 
                     # output to png
                     '-sDEVICE=png16m',
-                    f'-sOutputFile={path / "preview.png"}',
+                    '-sOutputFile={}'.format(
+                        shlex.quote(str(path / 'preview.png'))
+                    ),
+
+                    # force landscape orientation in postscript
+                    '-c',
+                    '<</Orientation 3>> setpagedevice',
+                    '-f',
 
                     # from pdf
                     str(path / 'input.pdf')
@@ -173,10 +183,12 @@ class WinterthurApp(OrgApp):
 
                 process.check_returncode()
 
-                with (path / 'preview.png').open('rb') as input:
-                    with fs.open(filename, 'wb') as output:
-                        # NOTE: Bug in type hints of FS
-                        output.write(input.read())  # type:ignore
+                with (
+                    (path / 'preview.png').open('rb') as input,
+                    fs.open(filename, 'wb') as output
+                ):
+                    # NOTE: Bug in type hints of FS
+                    output.write(input.read())  # type:ignore
 
         with fs.open(filename, 'rb') as input:
             # NOTE: Bug in type hints of FS
@@ -186,8 +198,8 @@ class WinterthurApp(OrgApp):
 @WinterthurApp.tween_factory()
 def enable_iframes_tween_factory(
     app: WinterthurApp,
-    handler: 'Callable[[WinterthurRequest], Response]'
-) -> 'Callable[[WinterthurRequest], Response]':
+    handler: Callable[[WinterthurRequest], Response]
+) -> Callable[[WinterthurRequest], Response]:
     iframe_paths = (
         r'/streets.*',
         r'/director(y|ies|y-submission/.*)',
@@ -201,7 +213,7 @@ def enable_iframes_tween_factory(
 
     iframe_path_re = re.compile(rf"({'|'.join(iframe_paths)})")
 
-    def enable_iframes_tween(request: 'WinterthurRequest') -> 'Response':
+    def enable_iframes_tween(request: WinterthurRequest) -> Response:
         """ Enables iframes on matching paths. """
 
         result = handler(request)
@@ -231,7 +243,7 @@ def get_theme() -> WinterthurTheme:
 
 @WinterthurApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[WinterthurApp, str], Organisation]':
+) -> Callable[[WinterthurApp, str], Organisation]:
     return create_new_organisation
 
 
@@ -248,7 +260,7 @@ def get_default_event_search_widget() -> str:
 @WinterthurApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.winterthur', 'locale')
-    return [mine] + get_org_i18n_localedirs()
+    return [mine, *get_org_i18n_localedirs()]
 
 
 @WinterthurApp.webasset_path()
@@ -261,25 +273,30 @@ def get_webasset_output() -> str:
     return 'assets/bundles'
 
 
+@WinterthurApp.webasset('inline-search')
+def get_inline_search_asset() -> Iterator[str]:
+    yield 'inline-search.js'
+
+
 @WinterthurApp.webasset('street-search')
-def get_search_asset() -> 'Iterator[str]':
+def get_street_search_asset() -> Iterator[str]:
     yield 'wade.js'
     yield 'string-score.js'
     yield 'street-search.js'
 
 
 @WinterthurApp.webasset('iframe-resizer')
-def get_iframe_resizer() -> 'Iterator[str]':
+def get_iframe_resizer() -> Iterator[str]:
     yield 'iframe-resizer-options.js'
     yield 'iframe-resizer-contentwindow.js'
 
 
 @WinterthurApp.webasset('iframe-enhancements')
-def get_iframe_enhancements() -> 'Iterator[str]':
+def get_iframe_enhancements() -> Iterator[str]:
     yield 'iframe-enhancements.js'
 
 
 @WinterthurApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield from default_common_asset()
     yield 'winterthur.js'

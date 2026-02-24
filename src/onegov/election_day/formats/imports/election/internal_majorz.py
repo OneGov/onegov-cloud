@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -49,9 +51,9 @@ INTERNAL_MAJORZ_HEADERS = (
 
 
 def parse_election(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str]
-) -> tuple[int | None, 'Status | None']:
+) -> tuple[int | None, Status | None]:
 
     majority = None
     status = None
@@ -65,18 +67,18 @@ def parse_election(
         errors.append(e.args[0])
 
     except Exception:
-        errors.append(_("Invalid election values"))
+        errors.append(_('Invalid election values'))
     if status not in STATI:
-        errors.append(_("Invalid status"))
+        errors.append(_('Invalid status'))
     return majority, status  # type:ignore[return-value]
 
 
 def parse_election_result(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     entities: dict[int, dict[str, str]],
-    election: 'Election',
-    principal: 'Canton | Municipality'
+    election: Election,
+    principal: Canton | Municipality
 ) -> dict[str, Any] | None:
 
     try:
@@ -96,7 +98,7 @@ def parse_election_result(
         errors.append(e.args[0])
 
     except Exception:
-        errors.append(_("Invalid entity values"))
+        errors.append(_('Invalid entity values'))
 
     else:
         if entity_id not in entities and entity_id in EXPATS:
@@ -104,7 +106,7 @@ def parse_election_result(
 
         if entity_id and entity_id not in entities:
             errors.append(_(
-                "${name} is unknown",
+                '${name} is unknown',
                 mapping={'name': entity_id}
             ))
 
@@ -134,7 +136,7 @@ def parse_election_result(
 
 
 def parse_candidate(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     election_id: str,
     colors: dict[str, str]
@@ -154,7 +156,7 @@ def parse_candidate(
     except ValueError as e:
         errors.append(e.args[0])
     except Exception:
-        errors.append(_("Invalid candidate values"))
+        errors.append(_('Invalid candidate values'))
     else:
         if party and color:
             colors[party] = color
@@ -173,7 +175,7 @@ def parse_candidate(
 
 
 def parse_candidate_result(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     counted: bool
 ) -> dict[str, Any] | None:
@@ -191,8 +193,8 @@ def parse_candidate_result(
 
 
 def import_election_internal_majorz(
-    election: 'Election',
-    principal: 'Canton | Municipality',
+    election: Election,
+    principal: Canton | Municipality,
     file: IO[bytes],
     mimetype: str
 ) -> list[FileImportError]:
@@ -205,7 +207,7 @@ def import_election_internal_majorz(
         A list containing errors.
 
     """
-    filename = _("Results")
+    filename = _('Results')
     csv, error = load_csv(
         file, mimetype, expected_headers=INTERNAL_MAJORZ_HEADERS,
         filename=filename,
@@ -264,7 +266,7 @@ def import_election_internal_majorz(
         candidate_results.append(candidate_result)
 
     if not errors and not results:
-        errors.append(FileImportError(_("No data found")))
+        errors.append(FileImportError(_('No data found')))
 
     if errors:
         return errors
@@ -305,9 +307,11 @@ def import_election_internal_majorz(
     election.colors = colors
 
     session = object_session(election)
-    session.bulk_insert_mappings(Candidate, candidates.values())
-    session.bulk_insert_mappings(ElectionResult, results.values())
-    session.bulk_insert_mappings(CandidateResult, candidate_results)
+    assert session is not None
+    # FIXME: Switch to regular `session.execute` with insert statements
+    session.bulk_insert_mappings(Candidate, candidates.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(ElectionResult, results.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(CandidateResult, candidate_results)  # type: ignore[arg-type]
     session.flush()
     session.expire_all()
 

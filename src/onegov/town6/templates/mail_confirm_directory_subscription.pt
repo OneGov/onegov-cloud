@@ -5,10 +5,10 @@
     <tal:b metal:fill-slot="body">
         <p i18n:translate>Hello!</p>
 
-        <p><tal:b i18n:translate>You are recieving this mail because you subscribed to getting notifications on new entries in the following directory:</tal:b><br/>
+        <p><tal:b i18n:translate>You are receiving this mail because you subscribed to getting notifications on new entries in the following directory:</tal:b><br/>
         <a href="${request.link(directory)}">${directory.title}</a></p>
 
-        <p i18n:translate>Plese click the following link to confirm your subscription:</p>
+        <p i18n:translate>Please click the following link to confirm your subscription:</p>
         <p><a class="btn-primary" href="${request.link(subscription, 'confirm')}" i18n:translate>Confirm subscription</a></p>
 
         <p i18n:translate>If you did not subscribe to this notifications you can simply ignore this e-mail.</p>

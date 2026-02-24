@@ -1,15 +1,11 @@
+from __future__ import annotations
+
+from datetime import datetime
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import Text
-from uuid import uuid4
-
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    import uuid
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped
+from uuid import uuid4, UUID
 
 
 class Subscriber(Base, TimestampMixin):
@@ -21,11 +17,7 @@ class Subscriber(Base, TimestampMixin):
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -33,27 +25,32 @@ class Subscriber(Base, TimestampMixin):
     }
 
     #: Identifies the subscriber
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The address of the subscriber, e.g. the phone number or the email
     #: address.
-    address: 'Column[str]' = Column(Text, nullable=False)
+    address: Mapped[str]
 
     #: The locale used by the subscriber
-    locale: 'Column[str]' = Column(Text, nullable=False)
+    locale: Mapped[str]
 
     #: True, if the subscriber has been confirmed
-    active: 'Column[bool | None]' = Column(Boolean, nullable=True)
+    active: Mapped[bool | None]
 
     #: The domain of the election compound part.
-    domain: 'Column[str | None]' = Column(Text, nullable=True)
+    domain: Mapped[str | None]
 
     #: The domain segment of the election compound part.
-    domain_segment: 'Column[str | None]' = Column(Text, nullable=True)
+    domain_segment: Mapped[str | None]
+
+    #: When has this subscriber last been (explicitly) activated.
+    active_since: Mapped[datetime | None]
+
+    #: When has this subscriber last been (explicitly) deactivated.
+    inactive_since: Mapped[datetime | None]
 
 
 class SmsSubscriber(Subscriber):

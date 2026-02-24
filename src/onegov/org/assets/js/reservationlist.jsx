@@ -43,8 +43,12 @@ $.fn.reservationList = function(options) {
         var list = $(element);
 
         // handles clicks on events
-        list.on('click', '.event:not(.event-unavailable,.selected)', function(e) {
+        list.on('click', '.event:not(.event-unavailable)', function(e) {
             var el = $(this);
+            if (!el.hasClass('event-adjustable') && el.hasClass('selected')) {
+                e.preventDefault();
+                return false;
+            }
             var event = {
                 partlyAvailable: el.data('partly-available'),
                 quota: el.data('quota'),
@@ -56,7 +60,30 @@ $.fn.reservationList = function(options) {
                 reserveurl: el.data('reserveurl')
             };
             rl.removeAllPopups();
-            rl.showActionsPopup(list, this, event);
+            var singleSelect = !e.shiftKey && !e.altKey && !e.ctrlKey;
+            if (el.hasClass('event-adjustable')) {
+                rl.showActionsPopup(list, this, event, singleSelect);
+            } else {
+                // by default we only allow one reservation per row
+                // so if we pick another one we delete the other ones
+                // selected in the same row
+                if (singleSelect) {
+                    var delete_existing = el.data('delete');
+                    if (delete_existing !== undefined) {
+                        _.each(delete_existing, function(delete_link) {
+                            rl.delete(list, delete_link);
+                        });
+                    }
+                }
+                rl.reserve(
+                    list,
+                    event.reserveurl,
+                    event.start.format('hh:mm'),
+                    event.end.format('hh:mm'),
+                    1,
+                    event.wholeDay
+                );
+            }
             e.preventDefault();
             return false;
         });
@@ -107,16 +134,22 @@ rl.reserve = function(list, url, start, end, quota, wholeDay) {
 };
 
 // popup handler implementation
-rl.showActionsPopup = function(list, element, event) {
+rl.showActionsPopup = function(list, element, event, singleSelect) {
     var wrapper = $('<div class="reservation-actions">');
     var reservation = $('<div class="reservation-form">').appendTo(wrapper);
 
+    // eslint-disable-next-line no-use-before-define
     ReservationForm.render(reservation.get(0), event, rl.previousReservationState, function(state) {
-        // we only allow one reservation per row, so if we pick another one
-        // we delete the previous one
-        var delete_existing = $(element).data('delete');
-        if (delete_existing !== undefined) {
-            rl.delete(list, delete_existing);
+        // by default we only allow one reservation per row
+        // so if we pick another one we delete the other ones
+        // selected in the same row
+        if (singleSelect) {
+            var delete_existing = $(element).data('delete');
+            if (delete_existing !== undefined) {
+                _.each(delete_existing, function(delete_link) {
+                    rl.delete(list, delete_link);
+                });
+            }
         }
         rl.reserve(
             list,
@@ -218,93 +251,100 @@ rl.bustIECache = function(originalUrl) {
     return url.toString();
 };
 
-// setup the reservation selection on the right
-rl.setupReservationSelect = function(options) {
-    var selection = null;
+rl.updateReservations = function(list, reservationform, data) {
+    // eslint-disable-next-line no-use-before-define
+    ReservationSelection.render(
+        list.siblings('.reservation-selection').get(0),
+        list,
+        data.reservations,
+        data.delete_link,
+        data.prediction,
+        reservationform
+    );
 
-    options.afterSetup.push(function(list) {
-        var view = $(list);
+    // clear list state
+    list.find('.event').removeClass(['selected', 'not-selected'])
+        .removeAttr('data-delete');
 
-        selection = $('<div class="reservation-selection"></div>')
-            .insertAfter(view);
-        $('<div class="clearfix"></div>').insertAfter(selection);
-
-        list.on('rc-reservation-error', function(_e, data, _list, target) {
-            var event = list.find('.has-popup');
-
-            if (!target || target.length === 0) {
-                if (event.length !== 0) {
-                    target = event;
-                } else {
-                    target = list.find('tbody');
+    /* eslint-disable max-nested-callbacks */
+    // determine list state
+    var rows = [];
+    list.find('tbody tr').each(function(index, element) {
+        rows[index] = {
+            row: $(element),
+            // which elements to mark as selected
+            selected: [],
+            // which reservations to delete when changing
+            // the selection
+            reservations: []
+        };
+    });
+    _.each(data.reservations, function(reservation) {
+        var resource = reservation.resource;
+        var isodate = reservation.date.substring(0, 10);
+        var column = list.find('th[data-resource="' + resource + '"]').index();
+        var row = list.find('tr[data-date="' + isodate + '"]');
+        var events = row.children().eq(column).find('.event');
+        var selected = null;
+        if (events.length === 1) {
+            selected = events.eq(0);
+        } else {
+            var target_start = moment(reservation.date);
+            var target_end = moment(target_start)
+                .set('hour', parseInt(reservation.time.substring(8, 10), 10))
+                .set('minute', parseInt(reservation.time.substring(11), 10));
+            events.filter(':not(.event-adjustable)').each(function() {
+                var event = $(this);
+                if (!target_start.isSame(event.data('start'))) {
+                    return;
                 }
-            }
+                if (target_end.isSame(event.data('end'))) {
+                    selected = event;
+                }
+            });
 
-            target = target || list.find('.has-popup') || list.find('.fc-view');
-            rl.showErrorPopup(list, target, data.message);
-        });
-
-        list.on('rc-reservations-changed', function() {
-            $.getJSON(rl.bustIECache(options.reservations), function(data) {
-                ReservationSelection.render(
-                    selection.get(0),
-                    list,
-                    data.reservations,
-                    data.prediction,
-                    options.reservationform
-                );
-
-                // clear list state
-                list.find('.event').removeClass(['selected', 'not-selected'])
-                .removeAttr('data-delete');
-
-                // set list state
-                _.each(data.reservations, function(reservation) {
-                    var resource = reservation.resource;
-                    var isodate = reservation.date.substring(0, 10);
-                    var column = list.find('th[data-resource="'+resource+'"]').index();
-                    var row = list.find('tr[data-date="'+isodate+'"]');
-                    var events = row.children().eq(column).find('.event');
-                    var selected = null;
-                    if (events.length === 1) {
-                        selected = events.eq(0);
-                    } else {
-                        var target_start = moment(reservation.date);
-                        var min_diff = Infinity;
-                        _.each(events, function(event) {
-                            var date = moment(event.data('start'));
-                            var diff = target_start.diff(start);
-                            if (diff < min_diff) {
-                                selected = event;
-                                min_diff = diff;
-                            }
-                        })
+            if (selected === null) {
+                events.filter('.event-adjustable').each(function() {
+                    var event = $(this);
+                    if (target_start.isBefore(event.data('start'))) {
+                        return;
                     }
-                    // visually mark selected event and set delete link
-                    if (selected !== null) {
-                        row.find('.event').removeClass('selected')
-                        .addClass('not-selected').data('delete', reservation.delete);
-                        if (column >= 0) {
-                            // if column < 0 it means the resource is not currently
-                            // visible due to a filter, we still want to show that
-                            // this date already has a reservation pending and if
-                            // pick a different one we want to replace it, like we
-                            // usually do.
-                            selected.removeClass('not-selected').addClass('selected');
-                        }
+                    if (!target_end.isAfter(event.data('end'))) {
+                        selected = event;
                     }
                 });
-
-                rl.loadPreviousReservationState(list, data.reservations);
-            });
-        });
-
-        list.trigger('rc-reservations-changed');
+            }
+        }
+        // record selected event
+        if (selected !== null) {
+            var row_data = rows[row.index()];
+            row_data.reservations.push(reservation.delete);
+            if (column >= 0) {
+                row_data.selected.push(selected);
+            }
+        }
     });
+
+    // set list state
+    _.each(rows, function(row_data) {
+        if (row_data.reservations.length === 0) {
+            return;
+        }
+        row_data.row.find('.event')
+            .removeClass('selected')
+            .addClass('not-selected')
+            .data('delete', row_data.reservations);
+
+        _.each(row_data.selected, function(selected) {
+            selected.removeClass('not-selected').addClass('selected');
+        });
+    });
+    /* eslint-enable max-nested-callbacks */
+    rl.loadPreviousReservationState(data.reservations);
 };
 
 // takes the loaded reservations and deduces the previous state from them
-rl.loadPreviousReservationState = function(list, reservations) {
+rl.loadPreviousReservationState = function(reservations) {
     if (reservations.length > 0) {
         reservations = _.sortBy(reservations, function(reservation) {
             return reservation.created;
@@ -325,6 +365,40 @@ rl.loadPreviousReservationState = function(list, reservations) {
     }
 };
 
+// setup the reservation selection on the right
+rl.setupReservationSelect = function(options) {
+    options.afterSetup.push(function(list) {
+        var view = $(list);
+
+        var selection = $('<div class="reservation-selection"></div>')
+            .insertAfter(view);
+        $('<div class="clearfix"></div>').insertAfter(selection);
+
+        list.on('rc-reservation-error', function(_e, data, _list, target) {
+            var event = list.find('.has-popup');
+
+            if (!target || target.length === 0) {
+                if (event.length !== 0) {
+                    target = event;
+                } else {
+                    target = list.find('tbody');
+                }
+            }
+
+            target = target || list.find('.has-popup') || list.find('.fc-view');
+            rl.showErrorPopup(list, target, data.message);
+        });
+
+        list.on('rc-reservations-changed', function() {
+            $.getJSON(rl.bustIECache(options.reservations), function(data) {
+                rl.updateReservations(list, options.reservationform, data);
+            });
+        });
+
+        list.trigger('rc-reservations-changed');
+    });
+};
+
 rl.roundNumber = function(num) {
     return +Number(Math.round(num + "e+2") + "e-2");
 };
@@ -341,9 +415,23 @@ var ReservationSelection = React.createClass({
             window.location = this.props.reservationform;
         }
     },
+    handleRemoveAll: function() {
+        if (this.props.reservations.length && this.props.delete_link) {
+            var list = $(this.props.list);
+            var reservationform = this.props.reservationform;
+            $.ajax({
+                url: this.props.delete_link,
+                dataType: 'json',
+                method: 'DELETE',
+                success: function(data) {
+                    rl.updateReservations(list, reservationform, data);
+                }
+            });
+        }
+    },
     handleGotoDate: function(isodate) {
-        var row = $(this.props.list).find('tr[data-date="'+isodate+'"]');
-        if(row.length !== 0) {
+        var row = $(this.props.list).find('tr[data-date="' + isodate + '"]');
+        if (row.length !== 0) {
             row[0].scrollIntoView();
         }
     },
@@ -357,6 +445,16 @@ var ReservationSelection = React.createClass({
                     this.props.reservations.length === 0 &&
                         <p>{locale("Select allocations in the list to reserve them")}</p>
                 }
+                {this.props.reservations.length > 8 && (
+                    <div>
+                        <a onClick={self.handleRemoveAll} role="button" className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button alert'}>
+                            {locale("Remove all")}
+                        </a>
+                        <a onClick={self.handleSubmit} role="button" className={this.props.reservations.length === 0 && this.props.delete_link && 'disabled button secondary' || 'button'}>
+                            {locale("Reserve")}
+                        </a>
+                    </div>
+                )}
                 {
                     this.props.reservations.length > 0 &&
                         <ul>{
@@ -376,6 +474,7 @@ var ReservationSelection = React.createClass({
                                                 </span>
                                             )}
                                         </span>
+                                        <span className="reservation-resource">{r.title}</span>
                                         <span className="reservation-time">{r.time}</span>
                                         {r.price && (
                                             <span className="reservation-price">
@@ -388,7 +487,10 @@ var ReservationSelection = React.createClass({
                             })
                         }</ul>
                 }
-                <a onClick={self.handleSubmit} role="button" className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button'}>
+                <a onClick={self.handleRemoveAll} role="button" className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button alert'}>
+                    {locale("Remove all")}
+                </a>
+                <a onClick={self.handleSubmit} role="button" className={this.props.reservations.length === 0 && this.props.delete_link && 'disabled button secondary' || 'button'}>
                     {locale("Reserve")}
                 </a>
             </div>
@@ -396,12 +498,13 @@ var ReservationSelection = React.createClass({
     }
 });
 
-ReservationSelection.render = function(element, list, reservations, prediction, reservationform) {
+ReservationSelection.render = function(element, list, reservations, delete_link, prediction, reservationform) {
     ReactDOM.render(
         <ReservationSelection
             list={list}
             reservations={reservations}
             reservationform={reservationform}
+            delete_link={delete_link}
             prediction={prediction}
         />,
         element);
@@ -571,6 +674,7 @@ var ReservationForm = React.createClass({
             return this.isValidQuota(this.state.quota);
         }
     },
+    // eslint-disable-next-line complexity
     render: function() {
         var buttonEnabled = this.isValidState();
         var showWholeDay = this.props.partlyAvailable && this.props.wholeDay;

@@ -1,11 +1,15 @@
-from onegov.core.elements import Link
+from __future__ import annotations
+
 from onegov.core.security import Private
-from onegov.pas import _
+from onegov.town6.views.parliamentarian_role import (
+    view_parliamentarian_role,
+    edit_parliamentarian_role,
+    delete_parliamentarian_role
+)
 from onegov.pas import PasApp
-from onegov.pas.collections import ParliamentarianRoleCollection
-from onegov.pas.forms import ParliamentarianRoleForm
-from onegov.pas.layouts import ParliamentarianRoleLayout
-from onegov.pas.models import ParliamentarianRole
+from onegov.pas.forms import PASParliamentarianRoleForm
+from onegov.pas.layouts import PASParliamentarianRoleLayout
+from onegov.pas.models import PASParliamentarianRole
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -15,67 +19,44 @@ if TYPE_CHECKING:
 
 
 @PasApp.html(
-    model=ParliamentarianRole,
+    model=PASParliamentarianRole,
     template='parliamentarian_role.pt',
     permission=Private
 )
-def view_parliamentarian_role(
-    self: ParliamentarianRole,
-    request: 'TownRequest'
-) -> 'RenderData':
+def pas_view_parliamentarian_role(
+    self: PASParliamentarianRole,
+    request: TownRequest
+) -> RenderData | Response:
 
-    layout = ParliamentarianRoleLayout(self, request)
-
-    return {
-        'layout': layout,
-        'parliamentarian_role': self,
-        'title': layout.title,
-    }
+    layout = PASParliamentarianRoleLayout(self, request)
+    return view_parliamentarian_role(self, request, layout)
 
 
 @PasApp.form(
-    model=ParliamentarianRole,
+    model=PASParliamentarianRole,
     name='edit',
     template='form.pt',
     permission=Private,
-    form=ParliamentarianRoleForm
+    form=PASParliamentarianRoleForm
 )
-def edit_parliamentarian_role(
-    self: ParliamentarianRole,
-    request: 'TownRequest',
-    form: ParliamentarianRoleForm
-) -> 'RenderData | Response':
+def pas_edit_parliamentarian_role(
+    self: PASParliamentarianRole,
+    request: TownRequest,
+    form: PASParliamentarianRoleForm
+) -> RenderData | Response:
 
-    if form.submitted(request):
-        form.populate_obj(self)
-        request.success(_("Your changes were saved"))
-        return request.redirect(request.link(self.parliamentarian))
-
-    form.process(obj=self)
-
-    layout = ParliamentarianRoleLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
-    layout.editbar_links = []
-
-    return {
-        'layout': layout,
-        'title': layout.title,
-        'form': form,
-        'form_width': 'large'
-    }
+    layout = PASParliamentarianRoleLayout(self, request)
+    return edit_parliamentarian_role(self, request, form, layout)
 
 
 @PasApp.view(
-    model=ParliamentarianRole,
+    model=PASParliamentarianRole,
     request_method='DELETE',
     permission=Private
 )
-def delete_parliamentarian_role(
-    self: ParliamentarianRole,
-    request: 'TownRequest'
+def pas_delete_parliamentarian_role(
+    self: PASParliamentarianRole,
+    request: TownRequest
 ) -> None:
 
-    request.assert_valid_csrf_token()
-
-    collection = ParliamentarianRoleCollection(request.session)
-    collection.delete(self)
+    return delete_parliamentarian_role(self, request)

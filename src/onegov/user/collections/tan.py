@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from hashlib import sha256
 from secrets import choice
 
@@ -30,11 +32,11 @@ class TANCollection(GenericCollection[TAN]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         # NOTE: For disambiguating between e.g. second factor TAN
         #       and temporary privilege escalation TAN
         scope: str,
-        expires_after: 'timedelta' = DEFAULT_EXPIRES_AFTER,
+        expires_after: timedelta = DEFAULT_EXPIRES_AFTER,
     ):
         super().__init__(session)
         self.expires_after = expires_after
@@ -44,7 +46,7 @@ class TANCollection(GenericCollection[TAN]):
     def model_class(self) -> type[TAN]:
         return TAN
 
-    def query(self) -> 'Query[TAN]':
+    def query(self) -> Query[TAN]:
         return self.session.query(TAN).filter(
             TAN.is_active(self.expires_after),
             TAN.scope == self.scope
@@ -57,9 +59,9 @@ class TANCollection(GenericCollection[TAN]):
         self,
         *,
         client: str,
-        created: 'datetime | None' = None,  # for testing
+        created: datetime | None = None,  # for testing
         **meta: Any
-    ) -> '_GeneratedTAN':
+    ) -> _GeneratedTAN:
 
         tan = generate_tan()
         obj = cast('_GeneratedTAN', TAN(
@@ -76,7 +78,7 @@ class TANCollection(GenericCollection[TAN]):
 
         return obj
 
-    def by_client(self, client: str) -> 'Query[TAN]':
+    def by_client(self, client: str) -> Query[TAN]:
         return self.query().filter(TAN.client == client)
 
     def by_tan(self, tan: str) -> TAN | None:

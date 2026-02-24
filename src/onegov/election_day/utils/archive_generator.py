@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from fs import path
 from fs.copy import copy_dir
@@ -26,7 +28,7 @@ if TYPE_CHECKING:
     from fs.subfs import SubFS
     from onegov.election_day import ElectionDayApp
     from typing import TypeVar
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Entity: TypeAlias = Election | ElectionCompound | Vote
     EntityT = TypeVar('EntityT', bound=Entity)
@@ -34,14 +36,14 @@ if TYPE_CHECKING:
 
 class ArchiveGenerator:
     """
-        Iterates over all Votes, Election and ElectionCompounds and runs the
-        csv export function on each of them.
-        This creates a bunch of csv files, which are zipped and the path to
-        the zip is returned.
+    Iterates over all Votes, Election and ElectionCompounds and runs the
+    csv export function on each of them.
+    This creates a bunch of csv files, which are zipped and the path to
+    the zip is returned.
     """
-    archive_dir: 'SubFS[FS]'
+    archive_dir: SubFS[FS]
 
-    def __init__(self, app: 'ElectionDayApp'):
+    def __init__(self, app: ElectionDayApp):
         assert app.filestorage is not None
         self.app = app
         self.session = app.session()
@@ -97,7 +99,7 @@ class ArchiveGenerator:
 
     def get_all_rows_for_votes(
         self,
-        votes: 'Collection[Vote]'
+        votes: Collection[Vote]
     ) -> list[dict[str, Any]]:
 
         locales = sorted(self.app.locales)
@@ -109,8 +111,8 @@ class ArchiveGenerator:
 
     def group_by_year(
         self,
-        entities: 'Iterable[EntityT]'
-    ) -> list[list['EntityT']]:
+        entities: Iterable[EntityT]
+    ) -> list[list[EntityT]]:
         """Creates a list of lists, grouped by year.
 
         :param entities: Iterable of entities
@@ -133,7 +135,7 @@ class ArchiveGenerator:
             groups[entity.date.year].append(entity)
         return list(groups.values())
 
-    def zip_dir(self, base_dir: 'SubFS[FS]') -> str | None:
+    def zip_dir(self, base_dir: SubFS[FS]) -> str | None:
         """Recursively zips a directory (base_dir).
 
         :param base_dir: is a directory in a temporary file system.
@@ -147,27 +149,29 @@ class ArchiveGenerator:
         zip_path = f'{self.archive_parent_dir}/archive.zip'
         self.archive_dir.create(zip_path)
 
-        with self.archive_dir.open(zip_path, mode='wb') as file:
-            with WriteZipFS(file) as zip_filesystem:  # type:ignore[arg-type]
-                counts = base_dir.glob('**/*.csv').count()
-                if counts.files != 0:
-                    if len(base_dir.listdir('/')) != 0:
-                        for entity in base_dir.listdir('/'):
-                            if base_dir.isdir(entity):
-                                copy_dir(
-                                    src_fs=base_dir,
-                                    src_path=entity,
-                                    dst_fs=zip_filesystem,
-                                    dst_path=entity,
-                                )
-                            if base_dir.isfile(entity):
-                                copy_file(
-                                    src_fs=base_dir,
-                                    src_path=entity,
-                                    dst_fs=zip_filesystem,
-                                    dst_path=entity,
-                                )
-                        return zip_path
+        with (
+            self.archive_dir.open(zip_path, mode='wb') as file,
+            WriteZipFS(file) as zip_filesystem  # type:ignore[arg-type]
+        ):
+            counts = base_dir.glob('**/*.csv').count()
+            if counts.files != 0:
+                if len(base_dir.listdir('/')) != 0:
+                    for entity in base_dir.listdir('/'):
+                        if base_dir.isdir(entity):
+                            copy_dir(
+                                src_fs=base_dir,
+                                src_path=entity,
+                                dst_fs=zip_filesystem,
+                                dst_path=entity,
+                            )
+                        if base_dir.isfile(entity):
+                            copy_file(
+                                src_fs=base_dir,
+                                src_path=entity,
+                                dst_fs=zip_filesystem,
+                                dst_path=entity,
+                            )
+                    return zip_path
         return None
 
     def all_counted_votes_with_results(self) -> list[Vote]:
@@ -190,8 +194,8 @@ class ArchiveGenerator:
 
     def filter_by_final_results(
         self,
-        all_entities: 'Iterable[EntityT]'
-    ) -> list['EntityT']:
+        all_entities: Iterable[EntityT]
+    ) -> list[EntityT]:
 
         return [
             entity
@@ -221,7 +225,7 @@ class ArchiveGenerator:
                 dst_path=match.path,
             )
 
-    def export_item(self, item: 'EntityT', dir: str) -> None:
+    def export_item(self, item: EntityT, dir: str) -> None:
         locales = sorted(self.app.locales)
         assert self.app.default_locale
         default_locale = self.app.default_locale

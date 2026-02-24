@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from attr import attrs, attrib
@@ -18,7 +20,7 @@ from saml2.samlp import STATUS_REQUEST_DENIED
 from saml2.samlp import STATUS_UNKNOWN_PRINCIPAL
 
 
-from typing import overload, Any, TYPE_CHECKING
+from typing import overload, Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.cache import RedisCacheRegion
     from onegov.core.framework import Framework
@@ -27,7 +29,6 @@ if TYPE_CHECKING:
     from onegov.user.auth.provider import (
         HasApplicationIdAndNamespace, SAML2Provider)
     from webob import Response
-    from typing_extensions import Self
 
 
 def handle_logout_request(
@@ -48,13 +49,13 @@ def handle_logout_request(
                 success = True
             else:
                 status = status_message_factory(
-                    "Server error", STATUS_REQUEST_DENIED)
+                    'Server error', STATUS_REQUEST_DENIED)
         except KeyError:
             status = status_message_factory(
-                "Server error", STATUS_REQUEST_DENIED)
+                'Server error', STATUS_REQUEST_DENIED)
     else:
         status = status_message_factory(
-            "Wrong user", STATUS_UNKNOWN_PRINCIPAL)
+            'Wrong user', STATUS_UNKNOWN_PRINCIPAL)
 
     # construct the LogoutResponse
     args = conn.response_args(logout_req.message, supported_bindings)
@@ -68,11 +69,11 @@ def handle_logout_request(
 
 
 def finish_logout(
-    request: 'CoreRequest',
-    user: 'User',
+    request: CoreRequest,
+    user: User,
     to: str,
     local: bool = True
-) -> 'Response':
+) -> Response:
     # this always finishes the SAML2 logout, but it may delay
     # the local logout and make it the regular logout view's
     # responsibility
@@ -111,7 +112,7 @@ class SAML2Attributes:
     groups: str
 
     @classmethod
-    def from_cfg(cls, cfg: dict[str, Any]) -> 'Self':
+    def from_cfg(cls, cfg: dict[str, Any]) -> Self:
         return cls(
             source_id=cfg.get('source_id', 'uid'),
             username=cfg.get('username', 'email'),
@@ -122,7 +123,7 @@ class SAML2Attributes:
 
 
 @attrs()
-class SAML2Client():
+class SAML2Client:
 
     metadata: str = attrib()
     """ Paths to the relevant idp metadata XML files """
@@ -135,17 +136,27 @@ class SAML2Client():
     as being created by LDAP instead. Necessary when using LDAP to
     sync the users periodically and deactivate old accounts. """
 
-    want_resonse_signed: bool = attrib()
+    want_response_signed: bool = attrib()
     """ Whether the response from the IdP should be signed """
 
     attributes: SAML2Attributes = attrib()
     """ Mapping of attribute names """
 
     primary: bool = attrib()
+    """ Whether or not this is the primary login provider """
 
-    _connections: dict[str, Connection] = {}
+    slo_enabled: bool = attrib(default=True)
+    """ Whether or not to enable the SLO service """
 
-    def get_binding(self, request: 'CoreRequest') -> str:
+    client_key_file: str | None = attrib(default=None)
+    """ Path to the client key for signing requests. """
+
+    client_cert_file: str | None = attrib(default=None)
+    """ Path to the client certifcate for signing requests. """
+
+    _connections: dict[str, Connection] = attrib(factory=dict, init=False)
+
+    def get_binding(self, request: CoreRequest) -> str:
         if request.method == 'GET':
             return BINDING_HTTP_REDIRECT
         elif request.method == 'POST':
@@ -153,19 +164,19 @@ class SAML2Client():
         else:
             raise NotImplementedError()
 
-    def get_sessions(self, app: 'UserApp | Framework') -> 'Mangled':
+    def get_sessions(self, app: UserApp | Framework) -> Mangled:
         # this can use our short-lived cache, it will likely
         # be deleted before it can expire anyways
         return Mangled(app.cache, 'saml2_sessions')
 
-    def get_redirects(self, app: 'UserApp | Framework') -> 'Mangled':
+    def get_redirects(self, app: UserApp | Framework) -> Mangled:
         # same here
         return Mangled(app.cache, 'saml2_redirects')
 
     def connection(
         self,
-        provider: 'SAML2Provider',
-        request: 'CoreRequest'
+        provider: SAML2Provider,
+        request: CoreRequest
     ) -> Connection:
         """ Returns the SAML2 instance """
         # NOTE: Unfortunately we can't create all the connections
@@ -183,7 +194,7 @@ class SAML2Client():
                     provider_cls, {'name': provider.name}, name='redirect')
                 slo_url = request.class_link(
                     provider_cls, {'name': provider.name}, name='logout')
-                saml_settings = {
+                saml_settings: dict[str, Any] = {
                     # TODO: Support metadata via remote/mdq, multiple idp?
                     'entityid': base_url,
                     'metadata': {'local': [self.metadata]},
@@ -193,10 +204,6 @@ class SAML2Client():
                                 'assertion_consumer_service': [
                                     (acs_url, BINDING_HTTP_REDIRECT),
                                     (acs_url, BINDING_HTTP_POST)
-                                ],
-                                'single_logout_service': [
-                                    (slo_url, BINDING_HTTP_REDIRECT),
-                                    (slo_url, BINDING_HTTP_POST)
                                 ],
                             },
                             'name_id_format': [NAMEID_FORMAT_TRANSIENT],
@@ -209,11 +216,31 @@ class SAML2Client():
                                 self.attributes.first_name,
                                 self.attributes.last_name,
                             ],
-                            'want_response_signed': self.want_resonse_signed,
+                            'want_response_signed': self.want_response_signed,
                             'allow_unsolicited': False,
                         },
                     },
                 }
+
+                if self.slo_enabled:
+                    saml_settings['service']['sp']['endpoints'][
+                        'single_logout_service'
+                    ] = [
+                        (slo_url, BINDING_HTTP_REDIRECT),
+                        (slo_url, BINDING_HTTP_POST)
+                    ]
+
+                if self.client_key_file and self.client_cert_file:
+                    saml_settings['key_file'] = self.client_key_file
+                    saml_settings['cert_file'] = self.client_cert_file
+                    saml_settings['signing_algorithm'] = (
+                        'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512')
+                    saml_settings['digest_algorithm'] = (
+                        'http://www.w3.org/2001/04/xmlenc#sha512')
+                    sp_settings = saml_settings['service']['sp']
+                    sp_settings['authn_requests_signed'] = True
+                    sp_settings['logout_requests_signed'] = True
+                    sp_settings['logout_responses_signed'] = True
 
                 config = Config()
                 config.load(saml_settings)
@@ -228,20 +255,20 @@ class SAML2Client():
                 self._connections[request.app.application_id] = conn
             except Exception as exception:
                 raise ValueError(
-                    f'SAML2 config error: {str(exception)}'
+                    f'SAML2 config error: {exception!s}'
                 ) from exception
         return conn
 
-    def get_name_id(self, user: 'User | None') -> str | None:
+    def get_name_id(self, user: User | None) -> str | None:
         if user and user.data:
             return user.data.get('saml2_transient_id')
         return None
 
     def create_logout_request(
         self,
-        provider: 'SAML2Provider',
-        request: 'CoreRequest',
-        user: 'User | None'
+        provider: SAML2Provider,
+        request: CoreRequest,
+        user: User | None
     ) -> tuple[str | None, Any | None]:
         transient_id = self.get_name_id(user)
         if not transient_id:
@@ -312,9 +339,9 @@ class SAML2Client():
 
     def handle_slo(
         self,
-        provider: 'SAML2Provider',
-        request: 'CoreRequest'
-    ) -> 'Response':
+        provider: SAML2Provider,
+        request: CoreRequest
+    ) -> Response:
 
         # this could be either a request or a response
         saml_request = request.params.get('SAMLRequest')
@@ -389,14 +416,14 @@ class SAML2Client():
 
 
 @attrs
-class SAML2Connections():
+class SAML2Connections:
 
     # instantiated connections for every tenant
     connections: dict[str, SAML2Client] = attrib()
 
     def client(
         self,
-        app: 'HasApplicationIdAndNamespace'
+        app: HasApplicationIdAndNamespace
     ) -> SAML2Client | None:
         if app.application_id in self.connections:
             return self.connections[app.application_id]
@@ -407,16 +434,19 @@ class SAML2Connections():
         return None
 
     @classmethod
-    def from_cfg(cls, config: dict[str, Any]) -> 'Self':
+    def from_cfg(cls, config: dict[str, Any]) -> Self:
         clients = {
             app_id: SAML2Client(
                 metadata=cfg['metadata'],
                 button_text=cfg['button_text'],
                 treat_as_ldap=cfg.get('treat_as_ldap', False),
-                want_resonse_signed=cfg.get('want_resonse_signed', True),
+                want_response_signed=cfg.get('want_resonse_signed', True),
                 attributes=SAML2Attributes.from_cfg(
                     cfg.get('attributes', {})),
                 primary=cfg.get('primary', False),
+                slo_enabled=cfg.get('slo_enabled', True),
+                client_key_file=cfg.get('client_key_file', None),
+                client_cert_file=cfg.get('client_cert_file', None),
             ) for app_id, cfg in config.items()
         }
         return cls(connections=clients)
@@ -428,7 +458,7 @@ class Mangled:
     cache, so valid name_ids cannot be discovered through key listing
     """
 
-    def __init__(self, cache: 'RedisCacheRegion', prefix: str = ''):
+    def __init__(self, cache: RedisCacheRegion, prefix: str = ''):
         self._cache = cache
         self._prefix = prefix
 
@@ -482,13 +512,13 @@ class Mangled:
         return self._cache.get(self.mangle(name_id)) is not NO_VALUE
 
 
-class IdentityCache(Cache):
+class IdentityCache(Cache):  # type:ignore[misc]
     """
     Extension to the dict/shelve based default cache to use our
     redis based dogpile cache instead
     """
 
-    def __init__(self, app: 'Framework'):
+    def __init__(self, app: Framework):
         # for now we use the same expiration time as our session cache
         # we want to be able to initiate a SLO as long as the user is
         # logged in, so we need the identity to remain cached for at

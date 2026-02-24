@@ -1,28 +1,34 @@
+from __future__ import annotations
+
 import base64
 import json
-import re
-from textwrap import dedent
-from datetime import date, timedelta, datetime
-
 import os
-
 import pytest
+import re
 import transaction
-from webtest import Upload
 
+from datetime import date, timedelta, datetime
+from freezegun import freeze_time
 from onegov.chat import MessageCollection
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
+from textwrap import dedent
+from webtest import Upload
 
 
-def get_data_feed_messages(page):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import ExtendedResponse
+    from .conftest import Client
+
+
+def get_data_feed_messages(page: ExtendedResponse) -> Any:
     return json.loads(
         page.pyquery('div.timeline').attr('data-feed-data'))['messages']
 
 
-def test_tickets(client):
+def test_tickets(client: Client) -> None:
 
-    # feed = ticket_page.pyquery('div.timeline').attr('data-feed-data')
     assert client.get(
         '/tickets/ALL/open', expect_errors=True).status_code == 403
 
@@ -99,8 +105,10 @@ def test_tickets(client):
 
     # default is always enable email notifications
     send_msg = ticket_page.request.url + '/message-to-submitter'
-    input_field = client.get(send_msg).pyquery('#notify')
-    assert input_field.attr('disabled') == 'disabled'
+    send_msg_page = client.get(send_msg)
+    assert send_msg_page.pyquery('#notify') == []
+    hint = send_msg_page.pyquery('.field-notify_hint')
+    assert "Die Einstellung" in hint.text()
 
     # Test mail notification on new message
     assert len(os.listdir(client.app.maildir)) == 1
@@ -187,13 +195,54 @@ def test_tickets(client):
     anon.get(ticket_url + '/archive', status=403)
 
 
-def test_ticket_states_idempotent(client):
+def test_tickets_search(client_with_fts: Client) -> None:
+    client = client_with_fts
+    client.login_editor()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "Newsletter"
+    form_page.form['definition'] = """
+        E-Mail *= @@@
+        Name *= ___
+    """
+    form_page = form_page.form.submit()
+
+    client.logout()
+
+    form_page = client.get('/form/newsletter')
+    form_page.form['e_mail'] = 'paul@example.org'
+    form_page.form['name'] = 'Paul Atishon'
+    status_page = form_page.form.submit().follow().form.submit().follow()
+
+    form_page = client.get('/form/newsletter')
+    form_page.form['e_mail'] = 'datz@notarebel.org'
+    form_page.form['name'] = 'Datz Arebal'
+    status_page = form_page.form.submit().follow().form.submit().follow()
+
+    client.login_editor()
+
+    page = client.get('/')
+    assert page.pyquery('.open-tickets').attr('data-count') == '2'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '0'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '0'
+
+    tickets_page = client.get('/tickets/ALL/open')
+    assert len(tickets_page.pyquery('tr.ticket')) == 2
+
+    tickets_page = client.get('/tickets/ALL/open?q=Paul')
+    assert len(tickets_page.pyquery('tr.ticket')) == 1
+
+    tickets_page = client.get('/tickets/ALL/open?q=Datz')
+    assert len(tickets_page.pyquery('tr.ticket')) == 1
+
+
+def test_ticket_states_idempotent(client: Client) -> None:
     client.login_editor()
 
     page = client.get('/forms/new')
     page.form['title'] = "Newsletter"
     page.form['definition'] = "E-Mail *= @@@"
-    page = page.form.submit()
+    page.form.submit()
 
     page = client.get('/form/newsletter')
     page.form['e_mail'] = 'info@seantis.ch'
@@ -211,7 +260,7 @@ def test_ticket_states_idempotent(client):
 
     page.click('Ticket abschliessen')
     page.click('Ticket abschliessen')
-    page = page.click('Ticket abschliessen').follow()
+    page.click('Ticket abschliessen').follow()
     assert len(os.listdir(client.app.maildir)) == 2
     assert len(client.get('/timeline/feed').json['messages']) == 3
 
@@ -225,8 +274,109 @@ def test_ticket_states_idempotent(client):
     assert len(os.listdir(client.app.maildir)) == 3
     assert len(client.get('/timeline/feed').json['messages']) == 4
 
+    page.click('Ticket abschliessen').follow()
+    assert len(os.listdir(client.app.maildir)) == 4
+    assert len(client.get('/timeline/feed').json['messages']) == 5
 
-def test_send_ticket_email(client):
+    page = client.get(
+        client.get('/tickets/ALL/closed')
+        .pyquery('.ticket-number-plain a').attr('href'))
+
+    page.click('Ticket archivieren')
+    page = page.click('Ticket archivieren').follow()
+    assert len(os.listdir(client.app.maildir)) == 4  # no new mail
+    assert len(client.get('/timeline/feed').json['messages']) == 6
+
+    page.click('Aus dem Archiv holen')
+    page.click('Aus dem Archiv holen').follow()
+    assert len(os.listdir(client.app.maildir)) == 4  # no new mail
+    assert len(client.get('/timeline/feed').json['messages']) == 7
+
+    # check timeline messages of ticket
+    messages = client.get('/timeline/feed').json['messages']
+    expected_messages = [
+        'Ticket eröffnet',
+        'Ticket angenommen',
+        'Ticket geschlossen',
+        'Ticket wieder geöffnet',
+        'Ticket geschlossen',
+        'Ticket archiviert',
+        'Ticket aus dem Archiv geholt'
+    ]
+    for message, expected in zip(messages, expected_messages):
+        assert expected in message['html']
+
+
+def test_ticket_states_directory_entry(client: Client) -> None:
+    client.login_admin()
+
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Vereinsverzeichnis"
+    page.form['structure'] = "Vereinsname *= ___"
+    page.form['title_format'] = "[Vereinsname]"
+    page.form['enable_submissions'] = True
+    page.form.submit()
+
+    anon = client.spawn()
+    page = anon.get('/directories/vereinsverzeichnis').click('Eintrag '
+                                                             'vorschlagen')
+    page.form['vereinsname'] = 'Minions Fan Club'
+    page.form['submitter'] = "bob@minionworld.org"
+    page.form.submit().follow().form.submit().follow()
+
+    page = client.get('/tickets/ALL/open')
+    page = page.click('Annehmen').follow()
+
+    # reject
+    url = page.request.url
+    page.click('Eintrag abweisen')
+
+    # withdraw rejection
+    client.get(url).click('Ablehnung zurückziehen')
+
+    # accept entry after rejection withdrawal
+    client.get(url).click('Übernehmen')
+
+    client.get(url).click('Ticket abschliessen')
+
+    page = client.get(
+        client.get('/tickets/ALL/closed')
+        .pyquery('.ticket-number-plain a').attr('href'))
+
+    page = page.click('Ticket wieder öffnen').follow()
+
+    page.click('Ticket abschliessen').follow()
+
+    page = client.get(
+        client.get('/tickets/ALL/closed')
+        .pyquery('.ticket-number-plain a').attr('href'))
+
+    page.click('Ticket archivieren')
+    page = page.click('Ticket archivieren').follow()
+
+    page.click('Aus dem Archiv holen').follow()
+
+    # check timeline messages of ticket
+    assert len(client.get('/timeline/feed').json['messages']) == 10
+    messages = client.get('/timeline/feed').json['messages']
+    expected_messages = [
+        'Ticket eröffnet',
+        'Ticket angenommen',
+        'Verzeichniseintrag abgelehnt',
+        'Ablehnung des Verzeichniseintrags zurückgezogen',
+        'Verzeichniseintrag übernommen',
+        'Ticket geschlossen',
+        'Ticket wieder geöffnet',
+        'Ticket geschlossen',
+        'Ticket archiviert',
+        'Ticket aus dem Archiv geholt'
+    ]
+
+    for message, expected in zip(messages, expected_messages):
+        assert expected in message['html']
+
+
+def test_send_ticket_email(client: Client) -> None:
     anon = client.spawn()
 
     admin = client.spawn()
@@ -234,10 +384,10 @@ def test_send_ticket_email(client):
 
     # make sure submitted event emails are sent to everyone, unless the
     # logged-in user is the same as the user responsible for the event
-    def submit_event(client, email):
+    def submit_event(client: Client, email: str) -> None:
         start = date.today() + timedelta(days=1)
 
-        page = client.get('/events').click("Veranstaltung vorschlagen")
+        page = client.get('/events').click("Veranstaltung erfassen")
         page.form['email'] = email
         page.form['title'] = "My Event"
         page.form['description'] = "My event is an event."
@@ -286,7 +436,7 @@ def test_send_ticket_email(client):
     """), type='custom')
     transaction.commit()
 
-    def submit_form(client, email):
+    def submit_form(client: Client, email: str) -> None:
         page = client.get('/forms').click('Profile')
         page.form['name'] = 'foobar'
         page.form['e_mail'] = email
@@ -304,6 +454,7 @@ def test_send_ticket_email(client):
     # and for reservations
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -316,7 +467,11 @@ def test_send_ticket_email(client):
     reserve = admin.bound_reserve(allocations[0])
     transaction.commit()
 
-    def submit_reservation(client, email, remembered=None):
+    def submit_reservation(
+        client: Client,
+        email: str,
+        remembered: str | None = None
+    ) -> None:
         assert reserve('10:00', '12:00').json == {'success': True}
 
         # fill out the form
@@ -339,7 +494,7 @@ def test_send_ticket_email(client):
     assert 'someone-else@example.org' == client.get_email(0)['To']
 
 
-def test_email_for_new_tickets(client):
+def test_email_for_new_tickets(client: Client) -> None:
     client.login_admin()
 
     # set email adress for new tickets
@@ -363,7 +518,7 @@ def test_email_for_new_tickets(client):
     # same for new events
     start = date.today() + timedelta(days=1)
 
-    page = client.get('/events').click("Veranstaltung vorschlagen")
+    page = client.get('/events').click("Veranstaltung erfassen")
     page.form['email'] = "person@example.org"
     page.form['title'] = "My Event"
     page.form['description'] = "My event is an event."
@@ -379,6 +534,7 @@ def test_email_for_new_tickets(client):
     # and for reservations
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
     allocations = scheduler.allocate(
         dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
@@ -408,7 +564,7 @@ def test_email_for_new_tickets(client):
     assert 'Das folgende Ticket wurde soeben ' in mails[2]['TextBody']
 
 
-def test_ticket_notes(client):
+def test_ticket_notes(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=dedent("""
         First name * = ___
@@ -444,7 +600,7 @@ def test_ticket_notes(client):
 
     # edit the note
     note_url_ex = re.compile(r'http://localhost/ticket-notes/[A-Z0-9]+')
-    note_url = note_url_ex.search(str(page)).group()
+    note_url = note_url_ex.search(str(page)).group()  # type: ignore[union-attr]
 
     page = client.get(note_url + '/edit')
     page.form['text'] = "I will investigate"
@@ -454,7 +610,7 @@ def test_ticket_notes(client):
 
     # delete the note
     csrf_token_ex = re.compile(r'\?csrf-token=[a-zA-Z0-9\._\-]+')
-    csrf_token = csrf_token_ex.search(str(page)).group()
+    csrf_token = csrf_token_ex.search(str(page)).group()  # type: ignore[union-attr]
 
     client.delete(note_url + csrf_token)
     page = client.get(page.request.url)
@@ -472,7 +628,7 @@ def test_ticket_notes(client):
 
     # access the file
     file_url_ex = re.compile(r'http://localhost/storage/[A-Z0-9a-z]+')
-    file_url = file_url_ex.search(str(page)).group()
+    file_url = file_url_ex.search(str(page)).group()  # type: ignore[union-attr]
 
     page = client.get(file_url)
     assert page.body == b"Proof"
@@ -487,7 +643,7 @@ def test_ticket_notes(client):
     assert "Test.txt" in page
 
 
-def test_ticket_chat(client):
+def test_ticket_chat(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=dedent("""
         First name * = ___
@@ -511,7 +667,7 @@ def test_ticket_chat(client):
     assert 'ticket-state-open' in page
 
     # to extract the messages from the page
-    def extract_messages(page):
+    def extract_messages(page: ExtendedResponse) -> Any:
         text = page.pyquery('[data-feed-data]').attr('data-feed-data')
         data = json.loads(text)
 
@@ -657,7 +813,7 @@ def test_ticket_chat(client):
     assert "Ticket wurde bereits geschlossen" in page
 
 
-def test_disable_tickets(client):
+def test_disable_tickets(client: Client) -> None:
     client.login_admin()
 
     # add form
@@ -686,7 +842,8 @@ def test_disable_tickets(client):
     client.login_editor()
     page = client.get('/tickets/ALL/open')
     assert ticket_number in page
-    assert 'hans.maulwurf@simpsons.com' not in page
+    assert 'hans.maulwurf@simpsons.com' not in page.pyquery(
+        '.ticket-group').text()
     assert 'Annehmen' not in page
 
     client.logout()
@@ -694,11 +851,11 @@ def test_disable_tickets(client):
     client.login_admin()
     page = client.get('/tickets/ALL/open')
     assert ticket_number in page
-    assert 'hans.maulwurf@simpsons.com' in page
+    assert 'hans.maulwurf@simpsons.com' in page.pyquery('.ticket-group').text()
     assert 'hans.maulwurf@simpsons.com' in page.click('Annehmen').follow()
 
 
-def test_assign_tickets(client):
+def test_assign_tickets(client: Client) -> None:
     client.login_admin()
 
     # add form
@@ -738,7 +895,8 @@ def test_assign_tickets(client):
 
     page = client.get('/').click('Meine Tickets')
     page = page.click(ticket_number)
-    assert "Ticket zugewiesen (editor@example.org)" in page
+    assert "Ticket zugewiesen" in page
+    assert "(editor@example.org)" in page
 
     # check mail
     assert len(os.listdir(client.app.maildir)) == 2
@@ -749,21 +907,20 @@ def test_assign_tickets(client):
     assert message['To'] == 'editor@example.org'
 
 
-def test_bcc_field_in_ticket_message(client):
+def test_bcc_field_in_ticket_message(client: Client) -> None:
+    anon = client.spawn()
+    editor = client.spawn()
 
     client.login_admin()
-
     form_page = client.get('/forms/new')
     form_page.form['title'] = "Newsletter"
     form_page.form['definition'] = "E-Mail *= @@@"
     form_page.form.submit()
 
-    anon = client.spawn()
     form_page = anon.get('/form/newsletter')
     form_page.form['e_mail'] = 'anonymer-user@example.ch'
     form_page.form.submit().follow().form.submit().follow()
 
-    client.login_admin()
     tickets_page = client.get('/tickets/ALL/open')
     ticket_page = tickets_page.click('Annehmen').follow()
     ticket_url = ticket_page.request.url
@@ -771,16 +928,14 @@ def test_bcc_field_in_ticket_message(client):
     page = client.get(ticket_url).click("Nachricht senden")
     page.form['text'] = "'Bcc' — the photo-bomber of the email world."
     page.form['email_bcc'] = ['editor@example.org']
-    page.form.get('notify').checked = True
     page.form.submit()
 
-    client.login_editor()
-    message = client.get_email(1)
+    message = client.get_email(1, flush_queue=True)
 
     assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
     assert message['Bcc'] == 'editor@example.org'
 
-    def extract_link(text):
+    def extract_link(text: str) -> str | None:
         pattern = r'http://localhost/ticket/FRM/[a-zA-Z0-9]+/status'
         match = re.search(pattern, text)
         return match.group(0) if match else None
@@ -788,9 +943,11 @@ def test_bcc_field_in_ticket_message(client):
     body = message['TextBody']
     assert "'Bcc' — the photo-bomber of the email world." in body
     status_link = extract_link(body)
+    assert status_link is not None
 
-    status_page = client.get(status_link)
-    assert 'Fügen Sie der Anfrage eine Nachricht hinzu' in status_page.text
+    editor.login_editor()
+    status_page = editor.get(status_link)
+    assert 'fügen Sie der Anfrage eine Nachricht hinzu' in status_page.text
 
     # test the reply feature now
     msg = 'Hello from the other side, or should I say, Bcc-side?'
@@ -804,7 +961,7 @@ def test_bcc_field_in_ticket_message(client):
         load='newer-first',
         limit=1
     ).query().first()
-
+    assert last_msg is not None
     assert last_msg.text == msg
     #  Note that if the person in email CC field replies using the link to add
     #  a TicketChatMessage, we have to adjust the owner of the message,
@@ -814,31 +971,25 @@ def test_bcc_field_in_ticket_message(client):
     assert last_msg.owner == 'editor@example.org'
 
     # test invalid email
-    client.login_admin()
+    page = client.get(ticket_url).click("Nachricht senden")
     page.form['text'] = "'Bcc' — the photo-bomber of the email world."
     with pytest.raises(ValueError):
         page.form['email_bcc'] = ['not_an_email']
 
-    return
-    # test multiple CC
-    # this is not set correctly (Only one email is set), reason unclear
-    page.form['email_bcc'].select_multiple(texts=[
-        'editor@example.org', 'member@example.org'
-    ])
-    page.form.get('notify').checked = True
+    # test multiple BCC
+    page.form['email_bcc'] = [
+        'editor@example.org',
+        'member@example.org'
+    ]
     page.form.submit()
 
-    client.login_editor()
-    message = client.get_email(1)
+    message = client.get_email(1, flush_queue=True)
     assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
     assert 'editor@example.org' in message['Bcc']
-    client.login_member()
-    message = client.get_email(1)
-    assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
     assert 'member@example.org' in message['Bcc']
 
 
-def test_email_attachment_in_ticket_message(client):
+def test_email_attachment_in_ticket_message(client: Client) -> None:
 
     client.login_admin()
 
@@ -875,3 +1026,96 @@ def test_email_attachment_in_ticket_message(client):
     assert 'Test.txt' in msg.values()
     decoded_content = base64.b64decode(msg['Content'])
     assert decoded_content == b'attached'
+
+
+def test_hide_personal_mail_in_tickets(client: Client) -> None:
+    admin = client
+    client.login_admin()
+    anon = client.spawn()
+
+    page = admin.get('/ticket-settings')
+    page.form['hide_personal_email'] = True
+    page.form['general_email'] = 'info@organisation.org'
+    page.form.submit()
+
+    page = admin.get('/forms/new')
+    page.form['title'] = 'Test'
+    page.form.submit()
+
+    page = anon.get('/form/test')
+    page.form['e_mail'] = 'anon@example.org'
+    anon_ticketinfo = page.form.submit().follow().form.submit().follow()
+
+    admin_ticketinfo = admin.get('/tickets/ALL/open').click(
+        'Annehmen').follow()
+    assert 'admin@example.org' in admin_ticketinfo
+    assert 'info@organisation.org' not in admin_ticketinfo
+
+    # Admin sends message
+    page = admin_ticketinfo.click('Nachricht senden')
+    page.form['text'] = 'Admin message'
+    page.form.submit().follow()
+
+    # Anon sends message
+    anon_ticketinfo.form['text'] = 'Anon message'
+    anon_ticketinfo.form.submit().follow()
+
+    assert len(os.listdir(client.app.maildir)) == 3
+    mails = list()
+    for i in range(3):
+        mails.append(client.get_email(i))
+    mails = sorted(mails, key=lambda d: d['To'])
+
+    # Admin sees their own email
+    assert 'admin@example' in mails[0]['TextBody']
+    assert 'info@organisation' not in mails[0]['TextBody']
+    assert 'anon@example' in mails[0]['TextBody']
+
+    # Anon only sees general mail in mail and ticket status
+    messsage = mails[1]['TextBody']
+    ticket_status = re.search(r'Anfragestatus überprüfen\]\(([^\)]+)',  # type: ignore[union-attr]
+                              messsage).group(1)
+    anon_ticketinfo = anon.get(ticket_status)
+    assert 'info@organisation.org' in anon_ticketinfo
+    assert 'anon@example.org' not in anon_ticketinfo
+    assert 'admin@example.org' not in anon_ticketinfo
+
+    assert 'info@organisation.org' in mails[2]['TextBody']
+    assert 'admin@example' not in mails[2]['TextBody']
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_my_tickets_view(client: Client) -> None:
+    admin = client.spawn()
+    admin.login_admin()
+
+    # create a form
+    form_page = admin.get('/forms/new')
+    form_page.form['title'] = "Newsletter"
+    form_page.form['definition'] = "E-Mail *= @@@"
+    form_page = form_page.form.submit()
+
+    # create a submission
+    form_page = client.get('/form/newsletter')
+    form_page.form['e_mail'] = 'info@seantis.ch'
+    status_page = form_page.form.submit().follow().form.submit().follow()
+
+    # by default this view is disabled
+    client.get('/tickets/ALL/all/my-tickets', status=404)
+
+    # let's enable it
+    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings.form['citizen_login_enabled'].checked = True
+    settings.form.submit().follow()
+
+    # now we don't have access yet
+    login = client.get('/tickets/ALL/all/my-tickets').follow()
+    login.form['email'] = 'info@seantis.ch'
+    confirm = login.form.submit().follow()
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)['TextBody']
+    token = re.search(r'&token=([^)]+)', message).group(1)  # type: ignore[union-attr]
+    confirm.form['token'] = token
+    tickets = confirm.form.submit().follow()
+    assert tickets.request.path_qs == '/tickets/ALL/all/my-tickets'
+    assert 'Offen' in tickets

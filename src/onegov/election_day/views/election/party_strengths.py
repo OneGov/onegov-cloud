@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.models import Election
@@ -24,8 +26,8 @@ if TYPE_CHECKING:
 )
 def view_election_party_strengths_data(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ Retuns the data used for the grouped bar diagram showing the party
     results.
 
@@ -43,13 +45,13 @@ def view_election_party_strengths_data(
 )
 def view_election_party_strengths_chart(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """" View the party strengths as grouped bar chart. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -68,13 +70,13 @@ def view_election_party_strengths_chart(
 )
 def view_election_compound_party_strengths_table(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """" View the party strengths as table. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     party_years, parties = get_party_results(self)
@@ -102,8 +104,8 @@ def view_election_compound_party_strengths_table(
 )
 def view_election_party_strengths(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
     layout = ElectionLayout(self, request, 'party-strengths')
@@ -129,8 +131,8 @@ def view_election_party_strengths(
 )
 def view_election_party_strengths_svg(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ View the party strengths as SVG. """
 

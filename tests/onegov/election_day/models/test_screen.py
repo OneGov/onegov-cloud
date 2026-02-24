@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import datetime
 from datetime import timezone
@@ -9,7 +11,12 @@ from onegov.election_day.models import Screen
 from onegov.election_day.models import Vote
 
 
-def test_screen(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_screen(session: Session) -> None:
     with freeze_time('2020-01-01 04:00'):
         election = Election(
             title='Election',
@@ -137,7 +144,7 @@ def test_screen(session):
     assert screen.last_modified == datetime(2020, 1, 6, 4, tzinfo=timezone.utc)
 
 
-def test_screen_next(session):
+def test_screen_next(session: Session) -> None:
     screens = {
         number: Screen(
             number=number,

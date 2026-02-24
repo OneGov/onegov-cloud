@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import dectate
 import morepath
 import os
@@ -17,7 +19,35 @@ from uuid import uuid4
 from xml.etree.ElementTree import tostring
 
 
-def get_meta(page, property, returns='content', index=0):
+from typing import overload, Any, IO, Protocol, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    import pytest
+    from collections.abc import Callable, Iterator, Mapping
+    from datetime import datetime
+    from onegov.core.framework import Framework
+    from onegov.core.orm import SessionManager
+    from onegov.reservation import Resource
+    from reportlab.pdfgen.canvas import Canvas
+    from sqlalchemy.orm import Session
+    from tests.shared.client import Client
+    from webob import Response
+    from webtest.response import TestResponse
+
+    _AppT = TypeVar('_AppT', bound=Framework)
+    _ResourceT = TypeVar('_ResourceT', bound=Resource)
+    _BinaryIOT = TypeVar('_BinaryIOT', bound=IO[bytes])
+
+    class HasSessionManager(Protocol):
+        @property
+        def session_manager(self) -> SessionManager | None: ...
+
+
+def get_meta(
+    page: TestResponse,
+    property: str,
+    returns: str = 'content',
+    index: int = 0
+) -> str | None:
     """Searches the page for the meta tag"""
     elems = page.pyquery(f"meta[property='{property}']")
     if not elems:
@@ -26,27 +56,26 @@ def get_meta(page, property, returns='content', index=0):
     return elem.attrib[returns]
 
 
-def encode_map_value(dictionary):
+def encode_map_value(dictionary: Mapping[str, Any]) -> str:
     return b64encode(json.dumps(dictionary).encode('utf-8')).decode('ascii')
 
 
-def decode_map_value(value):
+def decode_map_value(value: str | bytes) -> Any:
     return json.loads(b64decode(value).decode('utf-8'))
 
 
-def open_in_browser(response, browser='firefox'):
+def open_in_browser(response: TestResponse, browser: str = 'firefox') -> None:
     if not shutil.which(browser):
         print(f'{browser} is not installed, skipping...')
         return
     path = f'/tmp/test-{str(uuid4())}.html'
     with open(path, 'w') as f:
         print(response.text, file=f)
-    # os.system(f'{browser} {path} &')
     print(f'Opening file {path} ..')
     os.system(f'{browser} {path} &')
 
 
-def open_in_excel(byte_string, exe='libreoffice'):
+def open_in_excel(byte_string: IO[bytes], exe: str = 'libreoffice') -> None:
     if not shutil.which(exe):
         print(f'{exe} is not installed, skipping...')
         return
@@ -58,7 +87,7 @@ def open_in_excel(byte_string, exe='libreoffice'):
     os.system(f'{cmd} {path} &')
 
 
-def open_pdf(byte_string, exe='evince'):
+def open_pdf(byte_string: IO[bytes], exe: str = 'evince') -> None:
     if not shutil.which(exe):
         print(f'{exe} is not installed, skipping...')
         return
@@ -69,7 +98,32 @@ def open_pdf(byte_string, exe='evince'):
     os.system(f'{cmd} {path} &')
 
 
-def create_image(width=50, height=50, output=None):
+@overload
+def create_image(
+    width: int = 50,
+    height: int = 50,
+    output: None = None
+) -> BytesIO: ...
+@overload
+def create_image(
+    width: int,
+    height: int,
+    output: _BinaryIOT
+) -> _BinaryIOT: ...
+@overload
+def create_image(
+    width: int = 50,
+    height: int = 50,
+    *,
+    output: _BinaryIOT
+) -> _BinaryIOT: ...
+
+
+def create_image(
+    width: int = 50,
+    height: int = 50,
+    output: IO[bytes] | None = None
+) -> IO[bytes]:
     """ Generates a test image and returns it's file handle. """
 
     im = output or BytesIO()
@@ -81,23 +135,31 @@ def create_image(width=50, height=50, output=None):
     image.save(im, 'png')
 
     if not getattr(im, 'name', None):
-        im.name = 'test.png'
+        im.name = 'test.png'  # type: ignore[misc]
 
     im.seek(0)
     return im
 
 
-def create_pdf(filename='simple.pdf'):
+def create_pdf(
+    filename: str = 'simple.pdf',
+    content: str = "Hello, I am a PDF document created with Python!"
+) -> Canvas:
+
     from reportlab.pdfgen import canvas
 
     c = canvas.Canvas(filename)
-    c.drawString(100, 750,
-                 "Hello, I am a PDF document created with Python!")
+    c.drawString(100, 750, content)
     c.save()
     return c
 
 
-def assert_explicit_permissions(module, app_class):
+def assert_explicit_permissions(
+    module: object,
+    app_class: type[Framework]
+) -> None:
+    from onegov.server.utils import patch_morepath
+    patch_morepath()
     morepath.autoscan()
     app_class.commit()
 
@@ -108,15 +170,22 @@ def assert_explicit_permissions(module, app_class):
             )
 
 
-def random_namespace():
+def random_namespace() -> str:
     """ Returns a random namespace. """
     return 'test_' + uuid4().hex
 
 
-def create_app(app_class, request, use_elasticsearch=False,
-               reuse_filestorage=True, use_maildir=True, use_smsdir=True,
-               depot_backend='depot.io.local.LocalFileStorage',
-               depot_storage_path=None, **kwargs):
+def create_app(
+    app_class: type[_AppT],
+    request: pytest.FixtureRequest,
+    enable_search: bool = False,
+    reuse_filestorage: bool = True,
+    use_maildir: bool = True,
+    use_smsdir: bool = True,
+    depot_backend: str = 'depot.io.local.LocalFileStorage',
+    depot_storage_path: str | None = None,
+    **kwargs: Any
+) -> _AppT:
 
     # filestorage can be reused between tries as it is nowadays mainly (if not
     # exclusively) used by the theme compiler
@@ -128,13 +197,6 @@ def create_app(app_class, request, use_elasticsearch=False,
     if not app_class.is_committed():
         scan_morepath_modules(app_class)
         app_class.commit()
-
-    if use_elasticsearch:
-        elasticsearch_hosts = [
-            request.getfixturevalue('es_url')
-        ]
-    else:
-        elasticsearch_hosts = []
 
     if depot_backend == 'depot.io.local.LocalFileStorage':
         if not depot_storage_path:
@@ -168,8 +230,7 @@ def create_app(app_class, request, use_elasticsearch=False,
         identity_secure=False,
         identity_secret='test_identity_secret',
         csrf_secret='test_csrf_secret',
-        enable_elasticsearch=use_elasticsearch,
-        elasticsearch_hosts=elasticsearch_hosts,
+        enable_search=enable_search,
         redis_url=request.getfixturevalue('redis_url'),
         yubikey_client_id='foo',
         yubikey_secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
@@ -185,7 +246,7 @@ def create_app(app_class, request, use_elasticsearch=False,
 
     # cronjobs leave lingering sessions open, in real life this is not a
     # problem, but in testing it leads to connection pool exhaustion
-    app.settings.cronjobs = Bunch(enabled=False)
+    app.settings.cronjobs = Bunch(enabled=False)  # type: ignore[attr-defined]
 
     if use_maildir:
         maildir = request.getfixturevalue('maildir')
@@ -201,7 +262,7 @@ def create_app(app_class, request, use_elasticsearch=False,
             }
         }
 
-        app.maildir = maildir
+        app.maildir = maildir  # type: ignore[attr-defined]
 
     if use_smsdir:
         smsdir = request.getfixturevalue('smsdir')
@@ -216,7 +277,7 @@ def create_app(app_class, request, use_elasticsearch=False,
     return app
 
 
-def extract_filename_from_response(response):
+def extract_filename_from_response(response: Response) -> str | None:
     content_disposition = response.headers.get("content-disposition")
     if content_disposition:
         filename = re.findall('filename="([^"]+)"', content_disposition)
@@ -226,16 +287,16 @@ def extract_filename_from_response(response):
 
 
 def add_reservation(
-    resource,
-    session,
-    start,
-    end,
-    email=None,
-    partly_available=True,
-    reserve=True,
-    approve=True,
-    add_ticket=True
-):
+    resource: _ResourceT,
+    session: Session,
+    start: datetime,
+    end: datetime,
+    email: str | None = None,
+    partly_available: bool = True,
+    reserve: bool = True,
+    approve: bool = True,
+    add_ticket: bool = True
+) -> _ResourceT:
     if not email:
         email = f'{resource.name}@example.org'
 
@@ -261,18 +322,46 @@ def add_reservation(
     return resource
 
 
-def extract_intercooler_delete_link(client, page):
+def extract_intercooler_delete_link(client: Client, page: TestResponse) -> str:
     """ Returns the link that would be called by intercooler.js """
     delete_link = tostring(page.pyquery('a.confirm')[0]).decode('utf-8')
     href = client.extract_href(delete_link)
+    assert href is not None
     return href.replace("http://localhost", "")
 
 
 @contextmanager
-def use_locale(model, locale):
+def use_locale(model: HasSessionManager, locale: str) -> Iterator[None]:
+    assert model.session_manager is not None
     old_locale = model.session_manager.current_locale
     model.session_manager.current_locale = locale
     try:
         yield
     finally:
         model.session_manager.current_locale = old_locale
+
+
+def href_ends_with(end: str) -> Callable[[str | None], bool]:
+    """
+    Returns a function that checks if the href ends with the given string.
+
+    :argument end: The string to check for at the end of the href.
+
+    Usage:
+        response.html.find('a', href=href_ends_with('/newsletters/new'))
+    """
+    return lambda href: href and href.endswith(end) or False
+
+
+def find_link_by_href_end(
+    response: TestResponse,
+    href_end: str
+) -> Any | None:
+    """
+    Returns the link that ends with the given href_end.
+    :param response: a response object
+    :param href_end: the string to check for at the end of the href.
+    :return: link object
+
+    """
+    return response.html.find('a', href=href_ends_with(href_end))

@@ -1,15 +1,25 @@
-from onegov.activity import InvoiceCollection, PeriodCollection, \
-    InvoiceReference
+from __future__ import annotations
+
+import transaction
+
+from onegov.activity import BookingPeriodCollection
+from onegov.activity import BookingPeriodInvoiceCollection
 from datetime import date
 from onegov.core.utils import Bunch
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.exports.booking import BookingExport
 from onegov.feriennet.exports.invoiceitem import InvoiceItemExport
+from onegov.pay import InvoiceReference
 from sqlalchemy import func
-import transaction
 
 
-def test_exports(client, scenario):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from uuid import UUID
+    from .conftest import Client, Scenario
+
+
+def test_exports(client: Client, scenario: Scenario) -> None:
     # add old period
     scenario.add_period(
         confirmed=True,
@@ -43,6 +53,7 @@ def test_exports(client, scenario):
         address='Whatroad 12',
         zip_code='4040',
         place='Someplace',
+        swisspass='123-456-789-0',
         political_municipality='Someotherplace'
     )
 
@@ -59,14 +70,22 @@ def test_exports(client, scenario):
     scenario.refresh()
 
     session = scenario.session
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     period = scenario.latest_period
+    assert period is not None
 
     # create a mock request
-    def invoice_collection(user_id=None, period_id=None):
-        return InvoiceCollection(session, user_id=user_id, period_id=period_id)
+    def invoice_collection(
+        user_id: UUID | None = None,
+        period_id: UUID | None = None
+    ) -> BookingPeriodInvoiceCollection:
+        return BookingPeriodInvoiceCollection(
+            session,
+            user_id=user_id,
+            period_id=period_id
+        )
 
-    def request(admin):
+    def request(admin: bool) -> Any:
         return Bunch(
             app=Bunch(
                 active_period=periods.active(),
@@ -93,15 +112,17 @@ def test_exports(client, scenario):
 
     # Export bookings
     rows = BookingExport().run(
-        form=Bunch(selected_period=scenario.latest_period),
+        form=Bunch(selected_period=scenario.latest_period),  # type: ignore[arg-type]
         session=session
     )
     data = dict(list(rows)[0])
     assert data['Activity Tags'] == "CAMP\nFamily Camp"
     assert data['Attendee Place'] == 'Someplace'
+    assert data['Attendee SwissPass ID'] == '123-456-789-0'
     assert data['Attendee Political Municipality'] == 'Someotherplace'
 
     # Create invoices
+    assert scenario.latest_period is not None
     bills = BillingCollection(
         request(admin=True),
         scenario.latest_period
@@ -111,47 +132,52 @@ def test_exports(client, scenario):
 
     # Export invoice items with tags
     items = InvoiceItemExport().run(
-        form=Bunch(selected_period=scenario.latest_period),
+        form=Bunch(selected_period=scenario.latest_period),  # type: ignore[arg-type]
         session=session
     )
     data = dict(list(items)[0])
     assert data['Activity Tags'] == "CAMP\nFamily Camp"
 
-    invoices = InvoiceCollection(session, scenario.latest_period.id)
+    invoices = BookingPeriodInvoiceCollection(
+        session,
+        scenario.latest_period.id
+    )
     invoice = invoices.query().first()
+    assert invoice is not None
     invoice.references.append(InvoiceReference(
         reference='zzzzzAAAAaaaa',
         schema='esr-v1',
         bucket='esr-v1'
     ))
 
-    invoices = invoices.query_items()
+    invoice_items = invoices.query_items()
 
     # Mark items as paid
-    for item in invoices:
+    for item in invoice_items:
         item.paid = True
         item.payment_date = date(2020, 3, 5)
 
     # Write the item.group of one item in CAPS since this can apparently happen
-    invoices[0].group = func.upper(invoices[0].group)
+    invoice_items[0].group = func.upper(invoice_items[0].group)
 
     transaction.commit()
     scenario.refresh()
 
     # Export invoice items with tags
-    items = list(InvoiceItemExport().run(
-        form=Bunch(selected_period=scenario.latest_period),
+    items_ = list(InvoiceItemExport().run(
+        form=Bunch(selected_period=scenario.latest_period),  # type: ignore[arg-type]
         session=session
     ))
 
     # Prevent double exporting each invoice item when joined with the
     # references on invoice if there are multiple references which is
     # not an edge case
-    assert len(items) == 1
-    data = dict(items[0])
+    assert len(items_) == 1
+    data = dict(items_[0])
     assert len(data['Invoice Item References'].splitlines()) == 2
     assert data['Attendee Address'] == 'Whatroad 12'
     assert data['Attendee Zipcode'] == '4040'
     assert data['Attendee Place'] == 'Someplace'
     assert data['Attendee Political Municipality'] == 'Someotherplace'
+    assert data['Attendee SwissPass ID'] == '123-456-789-0'
     assert data['Invoice Item Payment date'] == date(2020, 3, 5)

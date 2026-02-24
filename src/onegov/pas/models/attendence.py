@@ -1,32 +1,34 @@
+from __future__ import annotations
+
+import datetime
+from decimal import ROUND_HALF_UP, Decimal
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.pas import _
-from onegov.pas.models.commission import Commission
-from onegov.pas.models.parliamentarian import Parliamentarian
-from sqlalchemy import Column
-from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
+from uuid import UUID
 
+
+from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    import datetime
-    from typing import Literal
-    from typing_extensions import TypeAlias
+    from onegov.pas.models import PASCommission
+    from onegov.pas.models import PASParliamentarian
+    from typing import TypeAlias
 
-    AttendenceType: TypeAlias = Literal[
-        'plenary',
-        'commission',
-        'study',
-        'shortest',
-    ]
+AttendenceType: TypeAlias = Literal[
+    'plenary',
+    'commission',
+    'study',
+    'shortest',
+]
 
-TYPES: dict['AttendenceType', str] = {
+TYPES: dict[AttendenceType, str] = {
     'plenary': _('Plenary session'),
     'commission': _('Commission meeting'),
     'study': _('File study'),
@@ -36,36 +38,46 @@ TYPES: dict['AttendenceType', str] = {
 
 class Attendence(Base, TimestampMixin):
 
-    __tablename__ = 'pas_attendence'
+    __tablename__ = 'par_attendence'
+
+    #: The polymorphic type of attendence
+    poly_type: Mapped[str] = mapped_column(default=lambda: 'generic')
+
+    __mapper_args__ = {
+        'polymorphic_on': poly_type,
+        'polymorphic_identity': 'pas_attendence',
+    }
 
     #: Internal ID
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The date
-    date: 'Column[datetime.date]' = Column(
-        Date,
-        nullable=False
-    )
+    date: Mapped[datetime.date]
 
     #: The duration in minutes
-    duration: 'Column[int]' = Column(
-        Integer,
-        nullable=False
-    )
+    duration: Mapped[int]
 
     #: The type
-    type: 'Column[AttendenceType]' = Column(
+    type: Mapped[AttendenceType] = mapped_column(
         Enum(
-            *TYPES.keys(),  # type:ignore[arg-type]
-            name='pas_attendence_type'
+            *TYPES.keys(),
+            name='par_attendence_type'
         ),
-        nullable=False,
         default='plenary'
     )
+
+    #: Tracks grouped attendance records to enable future batch
+    #: modifications. Only relevant if added in bulk.
+    bulk_edit_id: Mapped[UUID | None]
+
+    #: Whether this attendance submission is closed/completed
+    #: This is only relevant for commission attendance, not plenary sessions.
+    #: Parliamentarians use this to signal they have recorded all their
+    #: commission activities for a settlement run.
+    abschluss: Mapped[bool] = mapped_column(default=False)
 
     #: The type as translated text
     @property
@@ -73,27 +85,90 @@ class Attendence(Base, TimestampMixin):
         return TYPES.get(self.type, '')
 
     #: The id of the parliamentarian
-    parliamentarian_id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('pas_parliamentarians.id'),
-        nullable=False
+    parliamentarian_id: Mapped[UUID] = mapped_column(
+        ForeignKey('par_parliamentarians.id'),
     )
 
     #: The parliamentarian
-    parliamentarian: 'relationship[Parliamentarian]' = relationship(
-        Parliamentarian,
+    parliamentarian: Mapped[PASParliamentarian] = relationship(
         back_populates='attendences'
     )
 
     #: the id of the commission
-    commission_id: 'Column[uuid.UUID|None]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('pas_commissions.id'),
-        nullable=True
+    commission_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey('par_commissions.id'),
     )
 
     #: the related commission (which may have any number of memberships)
-    commission: 'relationship[Commission|None]' = relationship(
-        Commission,
+    commission: Mapped[PASCommission | None] = relationship(
         back_populates='attendences'
     )
+
+    def calculate_value(self) -> Decimal:
+        """Calculate the value (in hours) for an attendance record.
+
+        The calculation follows these business rules:
+        - Plenary sessions:
+            * Returns actual hours from duration field for display
+            * CHF calculation is independent and always uses half-day rate
+            * This allows storing actual hours while paying fixed rate
+
+        - Everything else is counted as actual hours:
+            * First 2 hours are counted as given
+            * After 2 hours, time is rounded to nearest 30-minute increment,
+            * and there is another rate applied for the additional time
+            * Example: 2h 40min would be calculated as 2.5 hours
+
+        Examples:
+            >>> # Plenary session
+            >>> attendence.type = 'plenary'
+            >>> attendence.duration = 180  # 3 hours
+            >>> calculate_value(attendence)
+            '3.0'
+
+            >>> # Commission meeting, 2 hours
+            >>> attendence.type = 'commission'
+            >>> attendence.duration = 120  # minutes
+            >>> calculate_value(attendence)
+            '2.0'
+
+            >>> # Study session, 2h 40min
+            >>> attendence.type = 'study'
+            >>> attendence.duration = 160  # minutes
+            >>> calculate_value(attendence)
+            '2.5'
+        """
+        if self.duration < 0:
+            raise ValueError('Duration cannot be negative')
+
+        if self.type == 'plenary':
+            duration_hours = Decimal(str(self.duration)) / Decimal('60')
+            return duration_hours.quantize(
+                Decimal('0.1'), rounding=ROUND_HALF_UP
+            )
+
+        if self.type in ('commission', 'study', 'shortest'):
+            # Convert minutes to hours with Decimal for precise calculation
+            duration_hours = Decimal(str(self.duration)) / Decimal('60')
+
+            if duration_hours <= Decimal('2'):
+                # Round to 1 decimal place
+                return duration_hours.quantize(
+                    Decimal('0.1'), rounding=ROUND_HALF_UP
+                )
+            else:
+                base_hours = Decimal('2')
+                additional_hours = (duration_hours - base_hours)
+                # Round additional time to nearest 0.5
+                additional_hours = (additional_hours * 2).quantize(
+                    Decimal('1.0'), rounding=ROUND_HALF_UP
+                ) / 2
+                total_hours = base_hours + additional_hours
+                return total_hours.quantize(
+                    Decimal('0.1'), rounding=ROUND_HALF_UP
+                )
+
+        raise ValueError(f'Unknown attendance type: {self.type}')
+
+    def __repr__(self) -> str:
+        return f'<Attendence {self.date} {self.type}>'

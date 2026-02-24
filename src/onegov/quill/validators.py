@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.html import html_to_text
 from wtforms.validators import ValidationError
 
@@ -19,7 +21,7 @@ class HtmlDataRequired:
     def __init__(self, message: str | None = None):
         self.message = message
 
-    def __call__(self, form: 'BaseForm', field: 'Field') -> None:
+    def __call__(self, form: BaseForm, field: Field) -> None:
         data = html_to_text(field.data or '').strip()
         if not data:
             if self.message is None:

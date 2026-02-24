@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import requests
 from purl import URL
 
@@ -155,27 +157,27 @@ class MapboxRequests:
     @overload
     def directions(
         self,
-        coordinates: 'Iterable[tuple[str | float, str | float]]',
+        coordinates: Iterable[tuple[str | float, str | float]],
         as_url: Literal[False] = False
     ) -> requests.Response: ...
 
     @overload
     def directions(
         self,
-        coordinates: 'Iterable[tuple[str | float, str | float]]',
+        coordinates: Iterable[tuple[str | float, str | float]],
         as_url: Literal[True]
     ) -> URL: ...
 
     @overload
     def directions(
         self,
-        coordinates: 'Iterable[tuple[str | float, str | float]]',
+        coordinates: Iterable[tuple[str | float, str | float]],
         as_url: bool
     ) -> requests.Response | URL: ...
 
     def directions(
         self,
-        coordinates: 'Iterable[tuple[str | float, str | float]]',
+        coordinates: Iterable[tuple[str | float, str | float]],
         as_url: bool = False
     ) -> requests.Response | URL:
         """
@@ -190,8 +192,8 @@ class MapboxRequests:
 
 
 def outside_bbox(
-    coordinate: 'AnyCoordinates | None',
-    bbox: 'Collection[RealCoordinates] | None'
+    coordinate: AnyCoordinates | None,
+    bbox: Collection[RealCoordinates] | None
 ) -> bool:
     """Checks if the Coordinates instance is inside the bounding box defined
     by the most outward sitting points in an iterable of two+ Coordinates.

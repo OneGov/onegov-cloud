@@ -1,15 +1,37 @@
-from abc import ABCMeta, abstractmethod
+from __future__ import annotations
+
+from abc import abstractmethod
 
 
-from typing import TYPE_CHECKING
+from typing import Protocol, Self, TYPE_CHECKING
 if TYPE_CHECKING:
+    from _typeshed import SupportsRichComparison
     from collections.abc import Sequence
-    from onegov.activity.models import OccasionDate
+    from datetime import datetime
+    from decimal import Decimal
     from onegov.activity.models.booking import BookingState
-    from uuid import UUID
 
 
-class MatchableOccasion(metaclass=ABCMeta):
+class MatchableOccasionDate(Protocol):
+    """ Describes the interface required by the occasion date class used by
+    the algorithm.
+
+    This allows us to untie our implementation from the database.
+
+    """
+    @property
+    def start(self) -> datetime:
+        """ The start of the occasion. """
+
+    @property
+    def end(self) -> datetime:
+        """ The end of the occasion. """
+
+
+# FIXME: We should replace this by typing.Protocol and add some of the
+#        new attributes the algorithm relies on, since this minimal
+#        interface is no longer quite sufficient.
+class MatchableOccasion(Protocol):
     """ Describes the interface required by the occasion class used by
     the algorithm.
 
@@ -19,7 +41,7 @@ class MatchableOccasion(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def id(self) -> 'UUID':
+    def id(self) -> SupportsRichComparison:
         """ The id of the occasion. """
 
     @property
@@ -37,6 +59,11 @@ class MatchableOccasion(metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def dates(self) -> Sequence[MatchableOccasionDate]:
+        """ Returns the dates of the occasion. """
+
+    @property
+    @abstractmethod
     def anti_affinity_group(self) -> str:
         """ Forces the occasion to not be accept an attendee that has an
         occasion of the same anti-affinity-group.
@@ -49,13 +76,16 @@ class MatchableOccasion(metaclass=ABCMeta):
         """
 
 
-class MatchableBooking(metaclass=ABCMeta):
+class MatchableBooking(Protocol):
     """ Describes the interface required by the booking class used by
     the algorithm.
 
     This allows us to untie our implementation from the database.
 
     """
+
+    score: Decimal
+    occasion: MatchableOccasion
 
     @abstractmethod
     def __eq__(self, other: object) -> bool:
@@ -67,22 +97,22 @@ class MatchableBooking(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def id(self) -> 'UUID':
+    def id(self) -> SupportsRichComparison:
         """ The id of the booking. """
 
     @property
     @abstractmethod
-    def occasion_id(self) -> 'UUID':
+    def occasion_id(self) -> SupportsRichComparison:
         """ Returns the id of the occasion this booking belongs to. """
 
     @property
     @abstractmethod
-    def attendee_id(self) -> 'UUID':
+    def attendee_id(self) -> SupportsRichComparison:
         """ Returns the id of the attendee this booking belongs to. """
 
     @property
     @abstractmethod
-    def state(self) -> 'BookingState':
+    def state(self) -> BookingState:
         """ Returns the state of the booking, one of:
 
         * "open" (for unassigned bookings)
@@ -103,10 +133,9 @@ class MatchableBooking(metaclass=ABCMeta):
 
         """
 
-    # FIXME: We probably also need to define an interface for OccasionDate
     @property
     @abstractmethod
-    def dates(self) -> 'Sequence[OccasionDate]':
+    def dates(self) -> Sequence[MatchableOccasionDate]:
         """ Returns the dates of the booking. """
 
     @property
@@ -116,3 +145,11 @@ class MatchableBooking(metaclass=ABCMeta):
         over other bookings (so that groups may stay together).
 
         """
+
+    @abstractmethod
+    def overlaps(
+        self,
+        other: Self,
+        with_anti_affinity_check: bool = False
+    ) -> bool:
+        """ Returns whether or not this overlaps the other booking. """

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
 from onegov.election_day.models import Candidate
@@ -9,7 +11,15 @@ from pytest import mark
 from uuid import uuid4
 
 
-def majorz_election():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from io import BytesIO
+    from onegov.election_day.types import Status
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
+def majorz_election() -> Election:
     eid = uuid4()
     cid = uuid4()
     election = Election(
@@ -50,7 +60,7 @@ def majorz_election():
     return election
 
 
-def test_election_create_all_models(session):
+def test_election_create_all_models(session: Session) -> None:
     election = Election(
         title="Election",
         domain='federation',
@@ -117,7 +127,7 @@ def test_election_create_all_models(session):
     assert session.query(ElectionResult).all() == []
 
 
-def test_election_id_generation(session):
+def test_election_id_generation(session: Session) -> None:
     election = Election(
         title='Legislative Election',
         domain='federation',
@@ -156,7 +166,7 @@ def test_election_id_generation(session):
     assert election.id == 'leg-el'
 
 
-def test_election_hybrid_properties(session):
+def test_election_hybrid_properties(session: Session) -> None:
     # Election
     election = Election(
         title="Election",
@@ -176,7 +186,7 @@ def test_election_hybrid_properties(session):
     assert election.invalid_ballots == 0
     assert election.accounted_votes == 0
     assert election.counted is False
-    assert election.last_modified.date()
+    assert election.last_modified is not None
     assert election.unaccounted_ballots == 0
     assert election.accounted_ballots == 0
     assert election.turnout == 0
@@ -211,6 +221,8 @@ def test_election_hybrid_properties(session):
         )
     session.flush()
 
+    # undo mypy narrowing
+    election = election
     assert election.eligible_voters == 600
     assert election.expats == 60
     assert election.received_ballots == 480
@@ -219,7 +231,7 @@ def test_election_hybrid_properties(session):
     assert election.invalid_ballots == 18
     assert election.accounted_votes == 858
     assert election.counted is True
-    assert election.last_modified.date()
+    assert election.last_modified is not None
     assert election.unaccounted_ballots == 42
     assert election.accounted_ballots == 438
     assert election.turnout == 80.0
@@ -244,24 +256,24 @@ def test_election_hybrid_properties(session):
     assert election_result.turnout == 80.0
     assert election_result.accounted_votes == 143
 
-    assert session.query(ElectionResult.unaccounted_ballots)\
-        .filter_by(entity_id=1).scalar() == 7
-    assert session.query(ElectionResult.accounted_ballots)\
-        .filter_by(entity_id=1).scalar() == 73
-    assert session.query(ElectionResult.turnout)\
-        .filter_by(entity_id=1).scalar() == 80.0
-    assert session.query(ElectionResult.accounted_votes)\
-        .filter_by(entity_id=1).scalar() == 143
+    assert session.query(ElectionResult.unaccounted_ballots).filter_by(
+        entity_id=1).scalar() == 7
+    assert session.query(ElectionResult.accounted_ballots).filter_by(
+        entity_id=1).scalar() == 73
+    assert session.query(ElectionResult.turnout).filter_by(
+        entity_id=1).scalar() == 80.0
+    assert session.query(ElectionResult.accounted_votes).filter_by(
+        entity_id=1).scalar() == 143
 
     election_result.eligible_voters = 0
     session.flush()
     election_result = next(r for r in election.results if r.entity_id == 1)
     assert election_result.turnout == 0
-    assert session.query(ElectionResult.turnout).\
-        filter_by(entity_id=1).scalar() == 0
+    assert session.query(ElectionResult.turnout).filter_by(
+        entity_id=1).scalar() == 0
 
 
-def test_election_counted(session):
+def test_election_counted(session: Session) -> None:
     election = Election(
         title='Legislative Election',
         domain='federation',
@@ -310,12 +322,14 @@ def test_election_counted(session):
     for result in election.results:
         result.counted = True
 
+    # undo mypy narrowing
+    election = election
     assert election.counted is True
     assert election.progress == (2, 2)
     assert election.counted_entities == ['A', 'B']
 
 
-def test_election_last_modified(session):
+def test_election_last_modified(session: Session) -> None:
     with freeze_time("2001-01-01"):
         election = Election(
             title='Legislative Election',
@@ -326,26 +340,32 @@ def test_election_last_modified(session):
 
         session.add(election)
         session.flush()
+        # undo mypy narrrowing
+        election = election
+        assert election.last_modified is not None
         assert election.last_modified.isoformat().startswith('2001')
-        assert session.query(Election.last_modified).scalar()\
-            .isoformat().startswith('2001')
+        assert session.query(
+            Election.last_modified
+        ).scalar().isoformat().startswith('2001')
 
     with freeze_time("2002-01-01"):
         election.last_result_change = election.timestamp()
         session.flush()
         assert election.last_modified.isoformat().startswith('2002')
-        assert session.query(Election.last_modified).scalar()\
-            .isoformat().startswith('2002')
+        assert session.query(
+            Election.last_modified
+        ).scalar().isoformat().startswith('2002')
 
     with freeze_time("2003-01-01"):
         election.domain = 'canton'
         session.flush()
         assert election.last_modified.isoformat().startswith('2003')
-        assert session.query(Election.last_modified).scalar()\
-            .isoformat().startswith('2003')
+        assert session.query(
+            Election.last_modified
+        ).scalar().isoformat().startswith('2003')
 
 
-def test_election_results(session):
+def test_election_results(session: Session) -> None:
     election = Election(
         title='Election',
         domain='federation',
@@ -386,7 +406,7 @@ def test_election_results(session):
 
     session.flush()
 
-    assert sorted((c.votes for c in election.candidates)) == []
+    assert sorted(c.votes for c in election.candidates) == []
 
     # Add 5 candidates
     candidate_1 = Candidate(
@@ -486,12 +506,12 @@ def test_election_results(session):
     assert election.number_of_mandates == election.allocated_mandates
     assert election.elected_candidates == [('Joe', 'Quimby')]
 
-    assert election.votes_by_district.all() == [
+    assert election.votes_by_district.outerjoin(Election.results).all() == [  # type: ignore[comparison-overlap]
         ('election', None, [1, 2], True, 534)
     ]
 
 
-def test_election_meta_data(session):
+def test_election_meta_data(session: Session) -> None:
     election = Election(
         title='Election',
         domain='federation',
@@ -514,7 +534,7 @@ def test_election_meta_data(session):
     assert election.meta['b'] == 2
 
 
-def test_election_status(session):
+def test_election_status(session: Session) -> None:
     election = Election(
         title='Election',
         domain='federation',
@@ -544,8 +564,9 @@ def test_election_status(session):
     session.flush()
     assert election.status is None
 
-    # Test completed calcuation
+    # Test completed calculation
     # ... empty election
+    status: Status | None
     for status, completed in (
         (None, False), ('unknown', False), ('interim', False), ('final', True)
     ):
@@ -593,7 +614,7 @@ def test_election_status(session):
 
 
 @mark.parametrize('clear_all', [True, False])
-def test_election_clear(clear_all, session):
+def test_election_clear(clear_all: bool, session: Session) -> None:
     election = majorz_election()
     session.add(election)
     session.flush()
@@ -610,6 +631,8 @@ def test_election_clear(clear_all, session):
 
     election.clear_results(clear_all)
 
+    # undo mypy narrowing
+    election = election
     assert election.last_result_change is None
     assert election.absolute_majority is None
     assert election.status is None
@@ -626,7 +649,7 @@ def test_election_clear(clear_all, session):
         assert session.query(Candidate).first()
 
 
-def test_election_has_results(session):
+def test_election_has_results(session: Session) -> None:
     election = Election(
         title='Election',
         domain='federation',
@@ -659,7 +682,7 @@ def test_election_has_results(session):
     assert election.has_results is True
 
 
-def test_related_elections(session):
+def test_related_elections(session: Session) -> None:
     first = Election(
         title='First',
         domain='federation',
@@ -718,7 +741,11 @@ def test_related_elections(session):
     assert session.query(ElectionRelationship).all() == []
 
 
-def test_election_rename(election_day_app_zg, explanations_pdf):
+def test_election_rename(
+    election_day_app_zg: TestApp,
+    explanations_pdf: BytesIO
+) -> None:
+
     session = election_day_app_zg.session()
 
     election = majorz_election()
@@ -737,7 +764,11 @@ def test_election_rename(election_day_app_zg, explanations_pdf):
     assert session.query(ElectionResult).one().election_id == 'elerction'
 
 
-def test_election_attachments(election_day_app_zg, explanations_pdf):
+def test_election_attachments(
+    election_day_app_zg: TestApp,
+    explanations_pdf: BytesIO
+) -> None:
+
     model = Election(
         title='Election',
         domain='canton',
@@ -747,6 +778,9 @@ def test_election_attachments(election_day_app_zg, explanations_pdf):
     assert model.explanations_pdf is None
     del model.explanations_pdf
     model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+    # undo my narrowing
+    model = model
+    assert model.explanations_pdf is not None
     assert model.explanations_pdf.name == 'explanations_pdf'
     assert model.explanations_pdf.reference.filename == 'explanations.pdf'
     assert model.explanations_pdf.reference.content_type == 'application/pdf'

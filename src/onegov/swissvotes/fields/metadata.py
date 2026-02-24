@@ -1,12 +1,12 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
 from onegov.swissvotes import _
 from onegov.swissvotes.models import ColumnMapperMetadata
 from openpyxl import load_workbook
 from wtforms.validators import ValidationError
-
 
 from typing import Any
 from typing import TYPE_CHECKING
@@ -18,65 +18,74 @@ if TYPE_CHECKING:
     from onegov.form.types import PricingRules
     from onegov.form.types import Validators
     from onegov.form.types import Widget
-    from typing_extensions import Self
+    from typing import Self
     from wtforms.form import BaseForm
-    from wtforms.meta import _SupportsGettextAndNgettext
     from wtforms.meta import DefaultMeta
+    from wtforms.meta import _SupportsGettextAndNgettext
 
 
 class SwissvoteMetadataField(UploadField):
     """ An upload field expecting Swissvotes metadata (XLSX). """
 
-    if TYPE_CHECKING:
-        def __init__(
-            self,
-            label: str | None = None,
-            validators: Validators[FormT, Self] | None = None,
-            filters: Sequence[Filter] = (),
-            description: str = '',
-            id: str | None = None,
-            default: Sequence[StrictFileDict] = (),
-            widget: Widget[Self] | None = None,
-            render_kw: dict[str, Any] | None = None,
-            name: str | None = None,
-            _form: BaseForm | None = None,
-            _prefix: str = '',
-            _translations: _SupportsGettextAndNgettext | None = None,
-            _meta: DefaultMeta | None = None,
-            # onegov specific kwargs that get popped off
-            *,
-            fieldset: str | None = None,
-            depends_on: Sequence[Any] | None = None,
-            pricing: PricingRules | None = None,
-        ) -> None: ...
-    else:
-        def __init__(self, *args, **kwargs):
-            kwargs.setdefault('validators', [])
-            kwargs['validators'].append(
-                WhitelistedMimeType({
-                    'application/excel',
-                    'application/octet-stream',
-                    'application/vnd.ms-excel',
-                    'application/vnd.ms-office',
-                    (
-                        'application/vnd.openxmlformats-officedocument'
-                        '.spreadsheetml.sheet'
-                    ),
-                    'application/zip'
-                })
-            )
-            kwargs['validators'].append(FileSizeLimit(10 * 1024 * 1024))
+    data: dict[Decimal, dict[str, dict[str, Any]]]  # type: ignore[assignment]
 
-            kwargs.setdefault('render_kw', {})
-            kwargs['render_kw']['force_simple'] = True
+    def __init__(
+        self,
+        label: str | None = None,
+        validators: Validators[FormT, Self] | None = None,
+        filters: Sequence[Filter] = (),
+        description: str = '',
+        id: str | None = None,
+        default: StrictFileDict | None = None,
+        widget: Widget[Self] | None = None,
+        render_kw: dict[str, Any] | None = None,
+        name: str | None = None,
+        _form: BaseForm | None = None,
+        _prefix: str = '',
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
+        # onegov specific kwargs that get popped off
+        *,
+        fieldset: str | None = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
+    ) -> None:
 
-            super().__init__(*args, **kwargs)
+        mimetypes = {
+            'application/excel',
+            'application/octet-stream',
+            'application/vnd.ms-excel',
+            'application/vnd.ms-office',
+            (
+                'application/vnd.openxmlformats-officedocument'
+                '.spreadsheetml.sheet'
+            ),
+            'application/zip'
+        }
 
-    data: dict[Decimal, dict[str, Any]]  # type:ignore[assignment]
+        super().__init__(
+            label=label,
+            validators=[*(validators or ()), FileSizeLimit(10 * 1024 * 1024)],
+            filters=filters,
+            description=description,
+            id=id,
+            default=default,
+            widget=widget,
+            render_kw={**(render_kw or {}), 'force_simple': True},
+            name=name,
+            allowed_mimetypes=mimetypes,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta,
+            fieldset=fieldset,
+            depends_on=depends_on,
+            pricing=pricing
+        )
 
     def post_validate(
         self,
-        form: 'BaseForm',
+        form: BaseForm,
         validation_stopped: bool
     ) -> None:
         """ Make sure the given XLSX is valid (all expected columns are
@@ -87,7 +96,6 @@ class SwissvoteMetadataField(UploadField):
 
         """
 
-        super().post_validate(form, validation_stopped)
         if validation_stopped:
             return
 
@@ -99,10 +107,10 @@ class SwissvoteMetadataField(UploadField):
         try:
             workbook = load_workbook(self.file, data_only=True)
         except Exception as exception:
-            raise ValidationError(_("Not a valid XLSX file.")) from exception
+            raise ValidationError(_('Not a valid XLSX file.')) from exception
 
         if len(workbook.worksheets) < 1:
-            raise ValidationError(_("No data."))
+            raise ValidationError(_('No data.'))
 
         if 'Metadaten zu Scans' not in workbook.sheetnames:
             raise ValidationError(_("Sheet 'Metadaten zu Scans' is missing."))
@@ -114,15 +122,17 @@ class SwissvoteMetadataField(UploadField):
             assert isinstance(sheet, Worksheet)
 
         if sheet.max_row <= 1:
-            raise ValidationError(_("No data."))
+            raise ValidationError(_('No data.'))
 
         headers = [column.value for column in next(sheet.rows)]
         missing = set(mapper.columns.values()) - set(headers)  # type:ignore
         if missing:
             raise ValidationError(_(
-                "Some columns are missing: ${columns}.",
+                'Some columns are missing: ${columns}.',
                 mapping={'columns': ', '.join(missing)}
             ))
+
+        super().post_validate(form, validation_stopped)
 
         value: Any | None
         for index in range(2, sheet.max_row + 1):
@@ -175,7 +185,7 @@ class SwissvoteMetadataField(UploadField):
 
                 else:
                     if not nullable and value is None:
-                        column_errors.append((index, column, "∅"))
+                        column_errors.append((index, column, '∅'))
                     mapper.set_value(metadata, attribute, value)
 
             if not all_columns_empty:
@@ -187,7 +197,7 @@ class SwissvoteMetadataField(UploadField):
 
         if errors:
             raise ValidationError(_(
-                "Some cells contain invalid values: ${errors}.",
+                'Some cells contain invalid values: ${errors}.',
                 mapping={
                     'errors': '; '.join(
                         '{}:{} {}'.format(*error) for error in errors

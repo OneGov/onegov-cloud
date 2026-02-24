@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from datetime import date, datetime
@@ -5,7 +7,6 @@ from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import Form
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
 from onegov.winterthur import _
 from onegov.winterthur.models import MissionReportFile
 from wtforms.fields import BooleanField
@@ -34,24 +35,24 @@ def today() -> date:
 
 class MissionReportForm(Form):
 
-    request: 'WinterthurRequest'
+    request: WinterthurRequest
 
     day = DateField(
-        _("Date"),
+        _('Date'),
         default=today,
         validators=[InputRequired()])
 
     time = TimeField(
-        _("Time"),
+        _('Time'),
         validators=[InputRequired()]
     )
 
     duration = DecimalField(
-        _("Mission duration (h)"),
+        _('Mission duration (h)'),
         validators=[InputRequired(), NumberRange(0, 10000)])
 
     mission_type = RadioField(
-        _("Mission type"),
+        _('Mission type'),
         choices=[
             ('single', _('Single')),
             ('multi', _('Multi'))
@@ -61,31 +62,31 @@ class MissionReportForm(Form):
     )
 
     mission_count = IntegerField(
-        _("Mission count"),
+        _('Mission count'),
         validators=[NumberRange(0, 10000)],
         depends_on=('mission_type', 'multi'),
         default=1
     )
 
     nature = TextAreaField(
-        _("Mission nature"),
+        _('Mission nature'),
         render_kw={'rows': 4},
         validators=[InputRequired()])
 
     location = StringField(
-        _("Location"),
+        _('Location'),
         validators=[InputRequired()])
 
     personnel = IntegerField(
-        _("Mission personnel"),
+        _('Mission personnel'),
         validators=[InputRequired(), NumberRange(0, 10000)])
 
     backup = IntegerField(
-        _("Backup personnel"),
+        _('Backup personnel'),
         validators=[InputRequired(), NumberRange(0, 10000)])
 
     civil_defence = BooleanField(
-        _("Civil Defence involvement"))
+        _('Civil Defence involvement'))
 
     @property
     def date(self) -> datetime:
@@ -119,23 +120,24 @@ class MissionReportForm(Form):
 class MissionReportVehicleForm(Form):
 
     name = StringField(
-        _("Name"),
+        _('Name'),
         validators=[InputRequired()])
 
     description = StringField(
-        _("Description"),
+        _('Description'),
         validators=[InputRequired()])
 
     symbol = UploadFileWithORMSupport(
-        _("Symbol"),
+        _('Symbol'),
         file_class=MissionReportFile,
         validators=[
             Optional(),
-            WhitelistedMimeType(IMAGE_MIME_TYPES_AND_SVG),
             FileSizeLimit(1 * 1024 * 1024)
-        ])
+        ],
+        allowed_mimetypes=IMAGE_MIME_TYPES_AND_SVG,
+    )
 
     website = URLField(
-        _("Website"),
+        _('Website'),
         validators=[URL(), Optional()]
     )

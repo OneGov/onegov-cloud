@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from onegov.foundation import BaseTheme
 from onegov.core.utils import module_path

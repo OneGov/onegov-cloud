@@ -1,48 +1,48 @@
+from __future__ import annotations
+
+from contextlib import contextmanager
+from datetime import datetime
 from functools import cached_property
 from json import JSONDecodeError
 from logging import getLogger
 from logging import NullHandler
 from onegov.core.collection import _M
 from onegov.core.orm import Base
-from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.form.fields import HoneyPotField
 from onegov.form.utils import get_fields_from_class
 from onegov.user import User
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import Boolean
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
-from sqlalchemy import Text
-from sqlalchemy.orm import backref
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
-from uuid import uuid4
+from sqlalchemy.orm import Mapped
+from uuid import uuid4, UUID
+from webob.exc import HTTPException
 from webob.multidict import MultiDict
 from wtforms import HiddenField
 
 
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, NoReturn, overload
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterator
-    from datetime import datetime
     from onegov.core import Framework
     from onegov.core.collection import PKType
     from onegov.core.request import CoreRequest
     from onegov.form import Form
     from sqlalchemy.orm import Query, Session
-    from typing import Protocol, TypeVar
-    from typing_extensions import Self
+    from typing import Protocol, Self, TypeVar
     from webob.request import _FieldStorageWithFile
 
     _DefaultT = TypeVar('_DefaultT')
     _EmptyT = TypeVar('_EmptyT')
-    _IdT = TypeVar('_IdT', bound=uuid.UUID | str | int, contravariant=True)
+    _IdT = TypeVar('_IdT', bound=UUID | str | int, contravariant=True)
 
     class PaginationWithById(Protocol[_M, _IdT]):
         def by_id(self, id: _IdT) -> _M | None: ...
 
         # Pagination:
         batch_size: int
+
         def subset(self) -> Query[_M]: ...
         @property
         def cached_subset(self) -> Query[_M]: ...
@@ -50,7 +50,7 @@ if TYPE_CHECKING:
         def page(self) -> int | None: ...
         @property
         def page_index(self) -> int: ...
-        def page_by_index(self, index: int) -> 'Self': ...
+        def page_by_index(self, index: int) -> Self: ...
         @property
         def subset_count(self) -> int: ...
         @property
@@ -60,11 +60,11 @@ if TYPE_CHECKING:
         @property
         def pages_count(self) -> int: ...
         @property
-        def pages(self) -> 'Iterator[Self]': ...
+        def pages(self) -> Iterator[Self]: ...
         @property
-        def previous(self) -> 'Self | None': ...
+        def previous(self) -> Self | None: ...
         @property
-        def next(self) -> 'Self | None': ...
+        def next(self) -> Self | None: ...
 
 log = getLogger('onegov.api')
 log.addHandler(NullHandler())
@@ -81,23 +81,38 @@ class ApiException(Exception):
     def __init__(
         self,
         message: str = 'Internal Server Error',
-        exception: Exception | None = None,
         status_code: int = 500,
         headers: dict[str, str] | None = None,
     ):
-        self.message = (
-            exception.message
-            if exception and hasattr(exception, 'message') else message
-        )
-        self.status_code = (
-            exception.status_code
-            if exception and hasattr(exception, 'status_code') else status_code
-        )
-
+        super().__init__()
+        self.message = message
+        self.status_code = status_code
         self.headers = headers or {}
 
-        if exception:
-            log.exception(exception)
+    @classmethod
+    @contextmanager
+    def capture_exceptions(
+        cls,
+        default_message: str = 'Internal Server Error',
+        default_status_code: int = 500,
+        headers: dict[str, str] | None = None,
+        exception_type: type[Exception] = Exception,
+    ) -> Iterator[None]:
+        try:
+            yield
+        except exception_type as exc:
+            # NOTE: log unexpected exceptions
+            if (
+                exception_type is Exception
+                and not isinstance(exc, (HTTPException, ApiException))
+            ):
+                log.exception('Captured OneGov API Exception')
+
+            message = getattr(exc, 'message',
+                getattr(exc, 'title', default_message)
+            )
+            status_code = getattr(exc, 'status_code', default_status_code)
+            raise cls(message, status_code, headers) from exc
 
 
 class ApiInvalidParamException(ApiException):
@@ -116,16 +131,17 @@ class ApiEndpointItem(Generic[_M]):
 
     """
 
-    def __init__(self, app: 'Framework', endpoint: str, id: str):
-        self.app = app
+    def __init__(self, request: CoreRequest, endpoint: str, id: str):
+        self.request = request
+        self.app = request.app
         self.endpoint = endpoint
         self.id = id
 
     @cached_property
-    def api_endpoint(self) -> 'ApiEndpoint[_M] | None':
-        cls = ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
-        # type(cls(self.app)) == <class 'onegov.agency.api.AgencyApiEndpoint'>
-        return cls(self.app) if cls else None
+    def api_endpoint(self) -> ApiEndpoint[_M] | None:
+        endpoint = ApiEndpointCollection(
+            self.request).endpoints.get(self.endpoint)
+        return endpoint if endpoint else None
 
     @cached_property
     def item(self) -> _M | None:
@@ -145,7 +161,7 @@ class ApiEndpointItem(Generic[_M]):
             return self.api_endpoint.item_links(item)
         return None
 
-    def form(self, request: 'CoreRequest') -> 'Form | None':
+    def form(self, request: CoreRequest) -> Form | None:
         if self.api_endpoint and (item := self.item):
             return self.api_endpoint.form(item, request)
 
@@ -164,70 +180,91 @@ class ApiEndpoint(Generic[_M]):
 
     """
 
-    name: ClassVar[str] = ''  # FIXME: Do we ever use this?
-    endpoint: ClassVar[str] = ''
+    endpoint: str = ''
     filters: ClassVar[set[str]] = set()
-    form_class: ClassVar[type['Form'] | None] = None
+    form_class: ClassVar[type[Form] | None] = None
 
     def __init__(
         self,
-        app: 'Framework',
+        request: CoreRequest,
         extra_parameters: dict[str, str | None] | None = None,
         page: int | None = None,
     ):
-        self.app = app
+        self.request = request
+        self.app = request.app
         self.extra_parameters = extra_parameters or {}
         self.page = int(page) if page else page
         self.batch_size = 100
 
-    def for_page(self, page: int | None) -> 'Self | None':
+    @property
+    def title(self) -> str | None:
+        """ Return a human readable title for this endpoint """
+        return None
+
+    @property
+    def description(self) -> str | None:
+        """ Return a human readable description for this endpoint """
+        return None
+
+    def for_page(self, page: int | None) -> Self | None:
         """ Return a new endpoint instance with the given page while keeping
         the current filters.
 
         """
 
-        return self.__class__(self.app, self.extra_parameters, page)
+        return self.__class__(self.request, self.extra_parameters, page)
 
-    def for_filter(self, **filters: Any) -> 'Self':
+    def for_filter(self, **filters: Any) -> Self:
         """ Return a new endpoint instance with the given filters while
         discarding the current filters and page.
 
         """
 
-        return self.__class__(self.app, filters)
+        return self.__class__(self.request, filters)
 
     @overload
     def for_item(self, item: None) -> None: ...
     @overload
-    def for_item(self, item: _M) -> 'ApiEndpointItem[_M]': ...
+    def for_item(self, item: _M) -> ApiEndpointItem[_M]: ...
 
-    def for_item(self, item: _M | None) -> 'ApiEndpointItem[_M] | None':
+    def for_item(self, item: _M | None) -> ApiEndpointItem[_M] | None:
         """ Return a new endpoint item instance with the given item. """
 
         if not item:
             return None
 
-        target = str(item)
-        if hasattr(item, 'id'):
-            target = getattr(item.id, 'hex', str(item.id))
+        assert hasattr(item, 'id')
+        return self.for_item_id(item.id)
 
-        return ApiEndpointItem(self.app, self.endpoint, target)
+    @overload
+    def for_item_id(self, item_id: None) -> None: ...
+    @overload
+    def for_item_id(self, item_id: Any) -> ApiEndpointItem[Any]: ...
+
+    def for_item_id(self, item_id: Any | None) -> ApiEndpointItem[Any] | None:
+        """ Return a new endpoint item instance with the given item id. """
+
+        if not item_id:
+            return None
+
+        target = getattr(item_id, 'hex', str(item_id))
+        return ApiEndpointItem(self.request, self.endpoint, target)
 
     @overload
     def get_filter(
         self,
         name: str,
-        default: '_DefaultT',
-        empty: '_EmptyT'
-    ) -> 'str | _DefaultT | _EmptyT': ...
+        default: _DefaultT,
+        empty: _EmptyT
+    ) -> str | _DefaultT | _EmptyT: ...
 
     @overload
     def get_filter(
         self,
         name: str,
-        default: '_DefaultT',
+        default: _DefaultT,
         empty: None = None
-    ) -> 'str | _DefaultT | None': ...
+    ) -> str | _DefaultT | None: ...
 
     @overload
     def get_filter(
@@ -235,8 +272,8 @@ class ApiEndpoint(Generic[_M]):
         name: str,
         default: None = None,
         *,
-        empty: '_EmptyT'
-    ) -> 'str | _EmptyT | None': ...
+        empty: _EmptyT
+    ) -> str | _EmptyT | None: ...
 
     @overload
     def get_filter(
@@ -259,20 +296,20 @@ class ApiEndpoint(Generic[_M]):
             return default
         return self.extra_parameters[name] or empty
 
-    def by_id(self, id: 'PKType') -> _M | None:
+    def by_id(self, id: PKType) -> _M | None:
         """ Return the item with the given ID from the collection. """
 
         try:
-            return self.__class__(self.app).collection.by_id(id)
+            return self.__class__(self.request).collection.by_id(id)
         except SQLAlchemyError:
             return None
 
     @property
-    def session(self) -> 'Session':
+    def session(self) -> Session:
         return self.app.session()
 
     @property
-    def links(self) -> dict[str, 'Self | None']:
+    def links(self) -> dict[str, Self | None]:
         """ Returns a dictionary with pagination instances. """
 
         result: dict[str, Self | None] = {'prev': None, 'next': None}
@@ -286,7 +323,7 @@ class ApiEndpoint(Generic[_M]):
         return result
 
     @property
-    def batch(self) -> dict['ApiEndpointItem[_M]', _M]:
+    def batch(self) -> dict[ApiEndpointItem[_M], _M]:
         """ Returns a dictionary with endpoint item instances and their
         titles.
 
@@ -329,8 +366,8 @@ class ApiEndpoint(Generic[_M]):
     def form(
         self,
         item: _M | None,
-        request: 'CoreRequest'
-    ) -> 'Form | None':
+        request: CoreRequest
+    ) -> Form | None:
         """ Return a form for editing items of this collection. """
 
         if self.form_class is None:
@@ -355,11 +392,14 @@ class ApiEndpoint(Generic[_M]):
                     (HiddenField, HoneyPotField)
                 )
             }
+
             formdata = MultiDict()
-            try:
+            with ApiException.capture_exceptions(
+                exception_type=JSONDecodeError,
+                default_message='Malformed payload',
+                default_status_code=400,
+            ):
                 json_data = request.json
-            except JSONDecodeError as e:
-                raise ApiException('Malformed payload', status_code=400) from e
 
             if not isinstance(json_data, dict):
                 malformed_payload()
@@ -391,7 +431,9 @@ class ApiEndpoint(Generic[_M]):
                 elif isinstance(value, (str, int, float)):
                     formdata[name] = str(value)
                 else:
-                    raise ApiException(f'{name}: Unsupported value format')
+                    raise ApiException(
+                        f'{name}: Unsupported value format', status_code=400
+                    )
 
         else:
             formdata = None
@@ -409,7 +451,7 @@ class ApiEndpoint(Generic[_M]):
         raise NotImplementedError()
 
     @property
-    def collection(self) -> 'PaginationWithById[_M, Any]':
+    def collection(self) -> PaginationWithById[_M, Any]:
         """ Return an instance of the collection with filters and page set.
         """
 
@@ -418,27 +460,47 @@ class ApiEndpoint(Generic[_M]):
     def assert_valid_filter(self, param: str) -> None:
         if param not in self.filters:
             raise ApiInvalidParamException(
-                f'Invalid url parameter \'{param}\'. Valid params are: '
+                f"Invalid url parameter '{param}'. Valid params are: "
                 f'{", ".join(sorted(self.filters))}')
 
 
 class ApiEndpointCollection:
     """ A collection of all available API endpoints. """
 
-    def __init__(self, app: 'Framework'):
-        self.app = app
+    def __init__(self, request: CoreRequest):
+        self.request = request
+        self.app = request.app
 
     @cached_property
-    def endpoints(self) -> dict[str, type[ApiEndpoint[Any]]]:
+    def endpoints(self) -> dict[str, ApiEndpoint[Any]]:
         return {
             endpoint.endpoint: endpoint
-            for endpoint in self.app.config.setting_registry.api.endpoints
+            for endpoint in self.app.config.setting_registry.api.endpoints(
+                request=self.request
+            )
         }
+
+    def get_endpoint(
+            self,
+            name: str,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
+    ) -> ApiEndpoint[Any] | None:
+        endpoints = self.app.config.setting_registry.api.endpoints(
+            request=self.request,
+            extra_parameters=extra_parameters,
+            page=page
+        )
+        return next((
+            endpoint for endpoint in endpoints
+            if endpoint.endpoint == name
+        ), None)
 
 
 class AuthEndpoint:
+    """ This is a Dummy, because morepath requires a model for linking. """
 
-    def __init__(self, app: 'Framework'):
+    def __init__(self, app: Framework):
         self.app = app
 
 
@@ -446,40 +508,25 @@ class ApiKey(Base):
 
     __tablename__ = 'api_keys'
 
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type: ignore[arg-type]
-        nullable=False,
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the id of the user that created the api key
-    user_id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type: ignore[arg-type]
-        ForeignKey('users.id'),
-        nullable=False
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
 
     #: the user that created the api key
-    user: 'relationship[User]' = relationship(
-        User,
-        backref=backref(
-            'api_keys', cascade='all,delete-orphan', lazy='dynamic'
-        )
-    )
+    user: Mapped[User] = relationship(back_populates='api_keys')
 
     #: the name of the api key, may be any string
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Mapped[str]
 
     #: whether or not the api key can submit changes
-    read_only: 'Column[bool]' = Column(Boolean, default=True, nullable=False)
+    read_only: Mapped[bool] = mapped_column(default=True)
 
     #: the last time a token was generated based on this api key
-    last_used: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+    last_used: Mapped[datetime | None]
 
     #: the key itself
-    key: 'Column[uuid.UUID]' = Column(
-        UUID,  # type: ignore[arg-type]
-        nullable=False,
-        default=uuid4
-    )
+    key: Mapped[UUID] = mapped_column(default=uuid4)

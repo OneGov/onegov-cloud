@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from json import dumps
 from onegov.gis.utils import MapboxRequests
 from onegov.translator_directory import _, log
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
 
 class DrivingDistanceMixin:
 
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 
     if TYPE_CHECKING:
         # forward declare required fields
@@ -41,14 +43,14 @@ class DrivingDistanceMixin:
         ):
             return True
 
-        def to_tuple(coordinate: 'RealCoordinates') -> tuple[float, float]:
+        def to_tuple(coordinate: RealCoordinates) -> tuple[float, float]:
             return coordinate.lat, coordinate.lon
 
         if not self.request.app.coordinates:
             assert isinstance(self.coordinates.errors, list)
             self.coordinates.errors.append(
-                _("Home location is not configured. "
-                  "Please complete location settings first")
+                _('Home location is not configured. '
+                  'Please complete location settings first')
             )
             return False
 

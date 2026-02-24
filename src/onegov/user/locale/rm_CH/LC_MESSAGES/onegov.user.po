@@ -65,6 +65,14 @@ msgid ""
 "administrator"
 msgstr ""
 
+msgid "OpenID Connect"
+msgstr ""
+
+msgid ""
+"Can't login because your user has no group. Contact your OpenID system "
+"administrator"
+msgstr ""
+
 #, python-format
 msgid "${mtan} - mTAN for ${organisation}."
 msgstr ""
@@ -95,8 +103,8 @@ msgstr "mTAN"
 msgid "Phone number"
 msgstr ""
 
-msgid "The password must be at least eight characters long"
-msgstr "Il pled-clav sto avair almain 8 segns"
+msgid "The password must be at least ten characters long"
+msgstr "Il pled-clav sto avair almain 10 segns"
 
 msgid "Password Confirmation"
 msgstr "Confermar il pled-clav"
@@ -138,4 +146,10 @@ msgid "30 days"
 msgstr ""
 
 msgid "Number of Signups"
+msgstr ""
+
+msgid "Code"
+msgstr ""
+
+msgid "Users"
 msgstr ""

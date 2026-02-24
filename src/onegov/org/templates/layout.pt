@@ -37,14 +37,11 @@
 
     <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/7.54.0/bundle.min.js" integrity="sha384-EmlJLN9Q0yu0/2UUCIYnEM88jpQ7xUhtNI2ZeXb/ci3cwoAoIQl350N4PQPlMbP5" crossorigin="anonymous"></script>
     <script tal:condition="layout.app.sentry_dsn" src="${layout.sentry_init_path}"></script>
+    <tal:b tal:content="request.analytics_code|nothing" />
+
 </head>
 
 <body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)}" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}" tal:attributes="layout.custom_body_attributes">
-    <!--! Adds a 'framed' class to the body if this document is shown inside an iframe -->
-    <script>
-        let params = new URLSearchParams(window.location.search);
-        if (window !== window.parent || params.get('framed') === 'true') { document.querySelector('body').className += " framed"; }
-    </script>
     <!--! Skip navigation link for screenreaders -->
     <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
 
@@ -198,8 +195,6 @@
 
       </main>
     </div>
-
-    <tal:b tal:content="layout.org.analytics_code" />
 </body>
 
 </html>

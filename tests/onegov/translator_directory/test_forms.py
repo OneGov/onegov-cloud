@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 from cgi import FieldStorage
 from datetime import date
 from io import BytesIO
 from onegov.core.utils import Bunch
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
-from onegov.translator_directory.forms.accreditation import \
-    RequestAccreditationForm
+from onegov.translator_directory.forms.accreditation import (
+    RequestAccreditationForm)
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
 from onegov.translator_directory.models.translator import Translator
 from tests.onegov.translator_directory.shared import create_certificates
@@ -14,15 +16,25 @@ from tests.onegov.translator_directory.shared import create_translator
 from tests.shared.utils import encode_map_value
 
 
-class DummyPostData(dict):
-    def getlist(self, key):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from webob.multidict import MultiDict
+    from .conftest import TestApp
+
+    DummyPostDataBase = MultiDict[str, Any]
+else:
+    DummyPostDataBase = dict
+
+
+class DummyPostData(DummyPostDataBase):
+    def getlist(self, key: str) -> list[Any]:
         v = self[key]
         if not isinstance(v, (list, tuple)):
             v = [v]
         return v
 
 
-def create_file(filename):
+def create_file(filename: str) -> FieldStorage:
     file = BytesIO()
     pdf = Pdf(file)
     pdf.init_report()
@@ -37,7 +49,7 @@ def create_file(filename):
     return result
 
 
-def test_translator_mutation_form(translator_app):
+def test_translator_mutation_form(translator_app: TestApp) -> None:
     session = translator_app.session()
     certificates = create_certificates(session)
     languages = create_languages(session)
@@ -58,8 +70,9 @@ def test_translator_mutation_form(translator_app):
         iban='CH9300762011623852957',
         operation_comments='Some comment',
         tel_private='041 444 44 45',
+        nationalities=['CH'],
         tel_mobile='079 123 45 67',
-        social_sec_number='756.1234.4568.95',
+        social_sec_number='756.1234.4568.94',
     )
     translator.certificates = certificates[0:2]
     translator.mother_tongues = languages[0:2]
@@ -68,7 +81,7 @@ def test_translator_mutation_form(translator_app):
     translator.monitoring_languages = languages[3:4]
     translator.coordinates = Coordinates(1, 2, 12)
 
-    request = Bunch(
+    request: Any = Bunch(
         app=translator_app,
         session=session,
         locale='de_CH',
@@ -88,82 +101,111 @@ def test_translator_mutation_form(translator_app):
     form.on_request()
 
     # Test long descriptions
-    assert form.first_name.long_description == 'Hugo'
-    assert form.last_name.long_description == 'Benito'
-    assert form.pers_id.long_description == '1234'
-    assert form.admission.long_description == '_uncertified'
-    assert form.withholding_tax.long_description == '_No'
-    assert form.self_employed.long_description == '_No'
-    assert form.gender.long_description == '_masculin'
-    assert form.date_of_birth.long_description == '01.01.1970'
-    assert form.nationality.long_description == 'CH'
-    assert form.address.long_description == 'Downing Street 5'
-    assert form.zip_code.long_description == '4000'
-    assert form.city.long_description == 'Luzern'
-    assert form.drive_distance.long_description == '1.1'
-    assert form.social_sec_number.long_description == '756.1234.4568.95'
-    assert form.bank_name.long_description == 'R-BS'
-    assert form.bank_address.long_description == 'Bullstreet 5'
-    assert form.account_owner.long_description == 'Hugo Benito'
-    assert form.iban.long_description == 'CH9300762011623852957'
-    assert form.email.long_description == 'hugo@benito.com'
-    assert form.tel_mobile.long_description == '079 123 45 67'
-    assert form.tel_private.long_description == '041 444 44 45'
-    assert form.tel_office.long_description == '041 444 44 44'
-    assert form.availability.long_description == 'always'
-    assert form.operation_comments.long_description == 'Some comment'
-    assert form.confirm_name_reveal.long_description == '_Yes'
-    assert form.date_of_application.long_description == '01.01.2000'
-    assert form.date_of_decision.long_description == '01.01.2001'
-    assert form.mother_tongues.long_description == '_German, _French'
-    assert form.spoken_languages.long_description == '_French, _Italian'
-    assert form.written_languages.long_description == '_Italian, _Arabic'
-    assert form.monitoring_languages.long_description == '_Arabic'
-    assert form.profession.long_description == 'craftsman'
-    assert form.occupation.long_description == 'baker'
-    assert form.expertise_professional_guilds.long_description == \
-        '_Economy, _Military'
-    assert form.expertise_professional_guilds_other.long_description == \
-        'Psychology'
-    assert form.expertise_interpreting_types.long_description == \
-        '_Whisper interpreting, _Negotiation interpreting'
-    assert form.proof_of_preconditions.long_description == 'all okay'
-    assert form.agency_references.long_description == 'Some ref'
-    assert form.education_as_interpreter.long_description == '_No'
-    assert form.certificates.long_description == '_AAAA, _BBBB'
-    assert form.comments.long_description == 'Some other comment'
+    assert getattr(form.first_name, 'long_description', '') == 'Hugo'
+    assert getattr(form.last_name, 'long_description', '') == 'Benito'
+    assert getattr(form.pers_id, 'long_description', '') == '1234'
+    assert getattr(form.admission, 'long_description', '') == '_uncertified'
+    assert getattr(form.withholding_tax, 'long_description', '') == '_No'
+    assert getattr(form.self_employed, 'long_description', '') == '_No'
+    assert getattr(form.gender, 'long_description', '') == '_masculin'
+    assert getattr(form.date_of_birth, 'long_description', '') == '01.01.1970'
+    assert getattr(form.nationalities, 'long_description', '') == '_Schweiz'
+    assert getattr(form.address, 'long_description', '') == 'Downing Street 5'
+    assert getattr(form.zip_code, 'long_description', '') == '4000'
+    assert getattr(form.city, 'long_description', '') == 'Luzern'
+    assert getattr(form.drive_distance, 'long_description', '') == '1.1'
+    assert getattr(
+        form.social_sec_number, 'long_description', ''
+    ) == '756.1234.4568.94'
+    assert getattr(form.bank_name, 'long_description', '') == 'R-BS'
+    assert getattr(form.bank_address, 'long_description', '') == 'Bullstreet 5'
+    assert getattr(form.account_owner, 'long_description', '') == 'Hugo Benito'
+    assert getattr(
+        form.iban, 'long_description', ''
+    ) == 'CH9300762011623852957'
+    assert getattr(form.email, 'long_description', '') == 'hugo@benito.com'
+    assert getattr(form.tel_mobile, 'long_description', '') == '079 123 45 67'
+    assert getattr(form.tel_private, 'long_description', '') == '041 444 44 45'
+    assert getattr(form.tel_office, 'long_description', '') == '041 444 44 44'
+    assert getattr(form.availability, 'long_description', '') == 'always'
+    assert getattr(
+        form.operation_comments, 'long_description', ''
+    ) == 'Some comment'
+    assert getattr(form.confirm_name_reveal, 'long_description', '') == '_Yes'
+    assert getattr(
+        form.date_of_application, 'long_description', ''
+    ) == '01.01.2000'
+    assert getattr(
+        form.date_of_decision, 'long_description', ''
+    ) == '01.01.2001'
+    assert getattr(
+        form.mother_tongues, 'long_description', ''
+    ) == '_German, _French'
+    assert getattr(
+        form.spoken_languages, 'long_description', ''
+    ) == '_French, _Italian'
+    assert getattr(
+        form.written_languages, 'long_description', ''
+    ) == '_Italian, _Arabic'
+    assert getattr(
+        form.monitoring_languages, 'long_description', ''
+    ) == '_Arabic'
+    assert getattr(form.profession, 'long_description', '') == 'craftsman'
+    assert getattr(form.occupation, 'long_description', '') == 'baker'
+    assert getattr(
+        form.expertise_professional_guilds, 'long_description', ''
+    ) == '_Economy, _Military'
+    assert getattr(
+        form.expertise_professional_guilds_other, 'long_description', ''
+    ) == 'Psychology'
+    assert getattr(
+        form.expertise_interpreting_types, 'long_description', ''
+    ) == '_Whisper interpreting, _Negotiation interpreting'
+    assert getattr(
+        form.proof_of_preconditions, 'long_description', ''
+    ) == 'all okay'
+    assert getattr(
+        form.agency_references, 'long_description', ''
+    ) == 'Some ref'
+    assert getattr(
+        form.education_as_interpreter, 'long_description', ''
+    ) == '_No'
+    assert getattr(form.certificates, 'long_description', '') == '_AAAA, _BBBB'
+    assert getattr(
+        form.comments, 'long_description', ''
+    ) == 'Some other comment'
 
     # Test inserting of no choice
-    assert form.admission.choices[0] == ('', '_')
-    assert form.withholding_tax.choices[0] == ('', '_')
-    assert form.self_employed.choices[0] == ('', '_')
-    assert form.gender.choices[0] == ('', '_')
-    assert form.confirm_name_reveal.choices[0] == ('', '_')
-    assert form.mother_tongues.choices[0] == ('', '_')
-    assert form.spoken_languages.choices[0] == ('', '_')
-    assert form.written_languages.choices[0] == ('', '_')
-    assert form.monitoring_languages.choices[0] == ('', '_')
-    assert form.expertise_professional_guilds.choices[0] == ('', '_')
-    assert form.expertise_interpreting_types.choices[0] == ('', '_')
-    assert form.education_as_interpreter.choices[0] == ('', '_')
-    assert form.certificates.choices[0] == ('', '_')
+    assert form.admission.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.withholding_tax.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.self_employed.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.gender.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.confirm_name_reveal.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.mother_tongues.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.spoken_languages.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.written_languages.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.monitoring_languages.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.expertise_professional_guilds.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.expertise_interpreting_types.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.education_as_interpreter.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.certificates.choices[0] == ('', '_')  # type: ignore[index]
 
     # Test translating choices
-    assert form.admission.choices[1][1] == '_uncertified'
-    assert form.withholding_tax.choices[1][1] == '_Yes'
-    assert form.self_employed.choices[1][1] == '_Yes'
-    assert form.gender.choices[1][1] == '_masculin'
-    assert form.confirm_name_reveal.choices[1][1] == '_Yes'
-    assert form.mother_tongues.choices[1][1] == '_Arabic'
-    assert form.spoken_languages.choices[1][1] == '_Arabic'
-    assert form.written_languages.choices[1][1] == '_Arabic'
-    assert form.monitoring_languages.choices[1][1] == '_Arabic'
-    assert form.expertise_professional_guilds.choices[1][1] == \
-        '_Nutrition and agriculture'
-    assert form.expertise_interpreting_types.choices[1][1] == \
-        '_Simultaneous interpreting'
-    assert form.education_as_interpreter.choices[1][1] == '_Yes'
-    assert form.certificates.choices[1][1] == '_AAAA'
+    assert form.admission.choices[1][1] == '_uncertified'  # type: ignore[index]
+    assert form.withholding_tax.choices[1][1] == '_Yes'  # type: ignore[index]
+    assert form.self_employed.choices[1][1] == '_Yes'  # type: ignore[index]
+    assert form.gender.choices[1][1] == '_masculin'  # type: ignore[index]
+    assert form.confirm_name_reveal.choices[1][1] == '_Yes'  # type: ignore[index]
+    assert form.mother_tongues.choices[1][1] == '_Arabic'  # type: ignore[index]
+    assert form.spoken_languages.choices[1][1] == '_Arabic'  # type: ignore[index]
+    assert form.written_languages.choices[1][1] == '_Arabic'  # type: ignore[index]
+    assert form.monitoring_languages.choices[1][1] == '_Arabic'  # type: ignore[index]
+    assert form.expertise_professional_guilds.choices[1][1] == (  # type: ignore[index]
+        '_Nutrition and agriculture')
+    assert form.expertise_interpreting_types.choices[1][1] == (  # type: ignore[index]
+        '_Simultaneous interpreting')
+    assert form.education_as_interpreter.choices[1][1] == '_Yes'  # type: ignore[index]
+    assert form.certificates.choices[1][1] == '_AAAA'  # type: ignore[index]
 
     # Test removing fields by role
     form = TranslatorMutationForm()
@@ -172,7 +214,7 @@ def test_translator_mutation_form(translator_app):
     form.request.is_admin = False
     form.request.is_translator = True
     form.on_request()
-    assert len(form._fields) == 44
+    assert len(form._fields) == 55
     assert len(form.proposal_fields) == 43
 
     form = TranslatorMutationForm()
@@ -181,17 +223,17 @@ def test_translator_mutation_form(translator_app):
     form.request.is_translator = False
     form.request.is_editor = True
     form.on_request()
-    assert len(form._fields) == 33
+    assert len(form._fields) == 44
     assert len(form.proposal_fields) == 32
-    assert form.operation_comments is None
-    assert form.confirm_name_reveal is None
-    assert form.date_of_application is None
-    assert form.date_of_decision is None
-    assert form.proof_of_preconditions is None
-    assert form.agency_references is None
-    assert form.education_as_interpreter is None
-    assert form.certificates is None
-    assert form.comments is None
+    assert 'operation_comments' not in form
+    assert 'confirm_name_reveal' not in form
+    assert 'date_of_application' not in form
+    assert 'date_of_decision' not in form
+    assert 'proof_of_preconditions' not in form
+    assert 'agency_references' not in form
+    assert 'education_as_interpreter' not in form
+    assert 'certificates' not in form
+    assert 'comments' not in form
 
     form = TranslatorMutationForm()
     form.model = translator
@@ -199,30 +241,29 @@ def test_translator_mutation_form(translator_app):
     form.request.is_editor = False
     form.request.is_member = True
     form.on_request()
-    assert len(form._fields) == 28
+    assert len(form._fields) == 39
     assert len(form.proposal_fields) == 27
-    assert form.operation_comments is None
-    assert form.confirm_name_reveal is None
-    assert form.date_of_application is None
-    assert form.date_of_decision is None
-    assert form.proof_of_preconditions is None
-    assert form.agency_references is None
-    assert form.education_as_interpreter is None
-    assert form.certificates is None
-    assert form.comments is None
-    assert form.social_sec_number is None
-    assert form.bank_name is None
-    assert form.bank_address is None
-    assert form.account_owner is None
-    assert form.iban is None
+    assert 'operation_comments' not in form
+    assert 'confirm_name_reveal' not in form
+    assert 'date_of_application' not in form
+    assert 'date_of_decision' not in form
+    assert 'proof_of_preconditions' not in form
+    assert 'agency_references' not in form
+    assert 'education_as_interpreter' not in form
+    assert 'certificates' not in form
+    assert 'comments' not in form
+    assert 'social_sec_number' not in form
+    assert 'bank_name' not in form
+    assert 'bank_address' not in form
+    assert 'account_owner' not in form
+    assert 'iban' not in form
 
     # Test proposed changes
     form = TranslatorMutationForm(DummyPostData({}))
     assert not form.validate()
     assert form.errors == {
         'submitter_message': [
-            'Please enter a message or suggest some changes using the '
-            'fields below.'
+            'Please enter a message, suggest changes, or upload ' 'documents.'
         ]
     }
     assert form.proposed_changes == {}
@@ -242,13 +283,13 @@ def test_translator_mutation_form(translator_app):
         'self_employed': False,
         'gender': 'M',
         'date_of_birth': '1970-01-01',
-        'nationality': 'CH',
+        'nationalities': ['CH'],
         'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
         'address': 'Downing Street 5',
         'zip_code': '4000',
         'city': 'Luzern',
         'drive_distance': 1.1,
-        'social_sec_number': '756.1234.4568.95',
+        'social_sec_number': '756.1234.4568.94',
         'bank_name': 'R-BS',
         'bank_address': 'Bullstreet 5',
         'account_owner': 'Hugo Benito',
@@ -284,8 +325,7 @@ def test_translator_mutation_form(translator_app):
     assert not form.validate()
     assert form.errors == {
         'submitter_message': [
-            'Please enter a message or suggest some changes using the '
-            'fields below.'
+            'Please enter a message, suggest changes, or upload ' 'documents.'
         ]
     }
     assert form.proposed_changes == {}
@@ -309,13 +349,13 @@ def test_translator_mutation_form(translator_app):
         'self_employed': False,
         'gender': 'M',
         'date_of_birth': date(1970, 1, 1),
-        'nationality': 'CH',
+        'nationalities': ['CH'],
         'coordinates': Coordinates(1, 2, 12),
         'address': 'Downing Street 5',
         'zip_code': '4000',
         'city': 'Luzern',
         'drive_distance': 1.1,
-        'social_sec_number': '756.1234.4568.95',
+        'social_sec_number': '756.1234.4568.94',
         'bank_name': 'R-BS',
         'bank_address': 'Bullstreet 5',
         'account_owner': 'Hugo Benito',
@@ -344,13 +384,45 @@ def test_translator_mutation_form(translator_app):
         'comments': 'Some other comment',
     }
 
+    # Test document uploads
+    form = TranslatorMutationForm(
+        DummyPostData(
+            {
+                'uploaded_certificates': create_file('certificate.pdf'),
+                'passport': create_file('passport.pdf'),
+            }
+        )
+    )
+    form.request = request
+    assert form.validate()
+    files = form.get_files()
+    assert len(files) == 2
+    assert files[0].note == 'Mutationsmeldung'
+    assert files[1].note == 'Mutationsmeldung'
 
-def test_accreditation_form(translator_app):
+    # Test document upload with empty data
+    form = TranslatorMutationForm(DummyPostData({}))
+    form.request = request
+    files = form.get_files()
+    assert files == []
+
+    # Test valid submission with only documents (no message or changes)
+    form = TranslatorMutationForm(
+        DummyPostData({'resume': create_file('resume.pdf')})
+    )
+    form.request = request
+    assert form.validate()
+    assert form.proposed_changes == {}
+    files = form.get_files()
+    assert len(files) == 1
+
+
+def test_accreditation_form(translator_app: TestApp) -> None:
     session = translator_app.session()
     languages = create_languages(session)
     create_translator(translator_app)
 
-    request = Bunch(
+    request: Any = Bunch(
         app=translator_app,
         session=session,
         include=lambda x: x,
@@ -363,15 +435,15 @@ def test_accreditation_form(translator_app):
     form.request = request
     form.on_request()
 
-    assert '_neutral' in dict(form.gender.choices).values()
-    assert 'German' in dict(form.mother_tongues_ids.choices).values()
-    assert 'German' in dict(form.spoken_languages_ids.choices).values()
-    assert 'German' in dict(form.written_languages_ids.choices).values()
-    assert 'German' in dict(form.monitoring_languages_ids.choices).values()
-    assert '_Military' in \
-        dict(form.expertise_professional_guilds.choices).values()
-    assert '_Negotiation interpreting' in \
-        dict(form.expertise_interpreting_types.choices).values()
+    assert '_neutral' in dict(form.gender.choices).values()  # type: ignore[arg-type]
+    assert 'German' in dict(form.mother_tongues_ids.choices).values()  # type: ignore[arg-type]
+    assert 'German' in dict(form.spoken_languages_ids.choices).values()  # type: ignore[arg-type]
+    assert 'German' in dict(form.written_languages_ids.choices).values()  # type: ignore[arg-type]
+    assert 'German' in dict(form.monitoring_languages_ids.choices).values()  # type: ignore[arg-type]
+    assert '_Military' in dict(
+        form.expertise_professional_guilds.choices).values()  # type: ignore[arg-type]
+    assert '_Negotiation interpreting' in dict(
+        form.expertise_interpreting_types.choices).values()  # type: ignore[arg-type]
 
     # Test validation
     form = RequestAccreditationForm(DummyPostData({
@@ -412,7 +484,7 @@ def test_accreditation_form(translator_app):
         'gender': 'M',
         'date_of_birth': '1970-01-01',
         'hometown': 'Zug',
-        'nationality': 'CH',
+        'nationalities': ['CH'],
         'marital_status': 'verheiratet',
         'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
         'address': 'Downing Street 5',
@@ -421,7 +493,7 @@ def test_accreditation_form(translator_app):
         'drive_distance': 1.1,
         'withholding_tax': False,
         'self_employed': False,
-        'social_sec_number': '756.1234.4568.90',
+        'social_sec_number': '756.1234.4568.94',
         'bank_name': 'R-BS',
         'bank_address': 'Bullstreet 5',
         'account_owner': 'Hugo Benito',
@@ -475,7 +547,7 @@ def test_accreditation_form(translator_app):
         'first_name': 'Hugo',
         'gender': 'M',
         'date_of_birth': date(1970, 1, 1),
-        'nationality': 'CH',
+        'nationalities': ['CH'],
         'coordinates': Coordinates(1, 2, 12),
         'address': 'Downing Street 5',
         'zip_code': '4000',
@@ -484,7 +556,7 @@ def test_accreditation_form(translator_app):
         'drive_distance': 1.1,
         'withholding_tax': False,
         'self_employed': False,
-        'social_sec_number': '756.1234.4568.90',
+        'social_sec_number': '756.1234.4568.94',
         'bank_name': 'R-BS',
         'bank_address': 'Bullstreet 5',
         'account_owner': 'Hugo Benito',
@@ -509,8 +581,10 @@ def test_accreditation_form(translator_app):
         'admission': 'uncertified',
         'date_of_application': date.today()
     }
-    files = form.get_files()
-    files = {(file.note, file.name, file.reference.filename) for file in files}
+    files = {
+        (file.note, file.name, file.reference.filename)
+        for file in form.get_files()
+    }
     assert files == {
         ('Antrag', '_Signed declaration of authorization.pdf', '1.pdf'),
         ('Antrag', '_Short letter of motivation.pdf', '2.pdf'),
@@ -556,8 +630,10 @@ def test_accreditation_form(translator_app):
         ]
     }
 
-    files = form.get_files()
-    files = {(file.note, file.name, file.reference.filename) for file in files}
+    files = {
+        (file.note, file.name, file.reference.filename)
+        for file in form.get_files()
+    }
     assert files == {
         ('Antrag', '_Signed declaration of authorization.pdf', '1.pdf'),
         ('Antrag', '_Short letter of motivation.pdf', '2.pdf'),

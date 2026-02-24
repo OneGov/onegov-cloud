@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import click
 import os
 import platform
+import shlex
 import shutil
 import smtplib
 import ssl
@@ -11,8 +14,8 @@ import readline
 import rlcompleter
 from collections import defaultdict
 from fnmatch import fnmatch
+from functools import cache
 from onegov.core import log
-from onegov.core.cache import lru_cache
 from onegov.core.cli.core import (
     abort, command_group, pass_group_context, run_processors)
 from onegov.core.crypto import hash_password
@@ -26,7 +29,8 @@ from onegov.core.upgrade import get_upgrade_modules
 from onegov.core.upgrade import RawUpgradeRunner
 from onegov.core.upgrade import UpgradeRunner
 from onegov.server.config import Config
-from sqlalchemy import create_engine
+from pydantic import PostgresDsn
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm.session import close_all_sessions
 from time import sleep
 from transaction import commit
@@ -55,23 +59,23 @@ cli = command_group()
 @cli.command()
 @pass_group_context
 def delete(
-    group_context: 'GroupContext'
-) -> 'Callable[[CoreRequest, Framework], None]':
+    group_context: GroupContext
+) -> Callable[[CoreRequest, Framework], None]:
     """ Deletes a single instance matching the selector.
 
     Selectors matching multiple organisations are disabled for saftey reasons.
 
     """
 
-    def delete_instance(request: 'CoreRequest', app: 'Framework') -> None:
+    def delete_instance(request: CoreRequest, app: Framework) -> None:
 
-        confirmation = "Do you really want to DELETE this instance?"
+        confirmation = 'Do you really want to DELETE this instance?'
 
         if not click.confirm(confirmation):
-            abort("Deletion process aborted")
+            abort('Deletion process aborted')
 
         if app.has_filestorage:
-            click.echo("Removing File Storage")
+            click.echo('Removing File Storage')
             assert app.filestorage is not None
             for item in app.filestorage.listdir('.'):
                 if app.filestorage.isdir(item):
@@ -82,11 +86,11 @@ def delete(
         if getattr(app, 'depot_storage_path', ''):
             assert hasattr(app, 'bound_storage_path')
             if app.bound_storage_path:
-                click.echo("Removing Depot Storage")
+                click.echo('Removing Depot Storage')
                 shutil.rmtree(str(app.bound_storage_path.absolute()))
 
         if app.has_database_connection:
-            click.echo("Dropping Database Schema")
+            click.echo('Dropping Database Schema')
 
             assert app.session_manager.is_valid_schema(app.schema)
 
@@ -94,15 +98,16 @@ def delete(
             dsn = app.session_manager.dsn
             app.session_manager.dispose()
 
-            engine = create_engine(dsn)
-            engine.execute('DROP SCHEMA "{}" CASCADE'.format(app.schema))
+            engine = create_engine(dsn, future=True)
+            with engine.begin() as conn:
+                conn.execute(text(f'DROP SCHEMA "{app.schema}" CASCADE'))
             engine.raw_connection().invalidate()
             engine.dispose()
 
         click.echo(
-            "Instance was deleted successfully. Please flush redis and "
-            "restart the service(s) to make sure that there are no stale "
-            "database definitions used in running instances."
+            'Instance was deleted successfully. Please flush redis and '
+            'restart the service(s) to make sure that there are no stale '
+            'database definitions used in running instances.'
         )
 
     return delete_instance
@@ -113,11 +118,11 @@ def delete(
     'default_selector': '*'
 })
 @click.option('--queue', default='postmark',
-              help="The name of the queue to process")
+              help='The name of the queue to process')
 @click.option('--limit', default=25,
-              help="Max number of mails to send before exiting")
+              help='Max number of mails to send before exiting')
 @pass_group_context
-def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
+def sendmail(group_context: GroupContext, queue: str, limit: int) -> None:
     """ Sends mail from a specific mail queue. """
 
     queues = group_context.config.mail_queues
@@ -156,12 +161,13 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
 
 @cli.group(context_settings={
     'matches_required': False,
+    'skip_search_indexing': True,
     'default_selector': '*'
 })
 @pass_group_context
 def sendsms(
-    group_context: 'GroupContext'
-) -> 'Callable[[CoreRequest, Framework], None]':
+    group_context: GroupContext
+) -> Callable[[CoreRequest, Framework], None]:
     """ Sends the SMS in the smsdir for a given instance.
 
     For example::
@@ -170,7 +176,7 @@ def sendsms(
 
     """
 
-    def send(request: 'CoreRequest', app: 'Framework') -> None:
+    def send(request: CoreRequest, app: Framework) -> None:
         qp = get_sms_queue_processor(app)
         if qp is None:
             return
@@ -189,8 +195,9 @@ class SmsEventHandler(PatternMatchingEventHandler):
             ignore_directories=True
         )
 
-    def on_moved(self, event: 'FileSystemEvent') -> None:
-        dest_path = os.path.abspath(event.dest_path)
+    def on_moved(self, event: FileSystemEvent) -> None:
+        dest_path = os.path.abspath(str(event.dest_path))
+        assert isinstance(dest_path, str)
         for qp in self.queue_processors:
             # only one queue processor should match
             if dest_path.startswith(qp.path):
@@ -206,8 +213,9 @@ class SmsEventHandler(PatternMatchingEventHandler):
     #       move since our DataManager creates a temporary file that then is
     #       moved. But we should also trigger when new files are created just
     #       in case this ever changes.
-    def on_created(self, event: 'FileSystemEvent') -> None:
-        src_path = os.path.abspath(event.src_path)
+    def on_created(self, event: FileSystemEvent) -> None:
+        src_path = os.path.abspath(str(event.src_path))
+        assert isinstance(src_path, str)
         for qp in self.queue_processors:
             # only one queue processor should match
             if src_path.startswith(qp.path):
@@ -225,7 +233,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
     'default_selector': '*'
 })
 @pass_group_context
-def sms_spooler(group_context: 'GroupContext') -> None:
+def sms_spooler(group_context: GroupContext) -> None:
     """ Continuously spools the SMS in the smsdir for all instances using
     a watchdog that monitors the smsdir for newly created files.
 
@@ -237,8 +245,8 @@ def sms_spooler(group_context: 'GroupContext') -> None:
     queue_processors: dict[str, list[SmsQueueProcessor]] = defaultdict(list)
 
     def create_sms_queue_processor(
-        request: 'CoreRequest',
-        app: 'Framework'
+        request: CoreRequest,
+        app: Framework
     ) -> None:
 
         # we're fine if the path doesn't exist yet, we only call
@@ -291,21 +299,21 @@ def sms_spooler(group_context: 'GroupContext') -> None:
 @click.option('--remote-config', default='/var/lib/onegov-cloud/onegov.yml',
               help='Location of the remote config file')
 @click.option('--confirm/--no-confirm', default=True,
-              help="Ask for confirmation (disabling this is dangerous!)")
+              help='Ask for confirmation (disabling this is dangerous!)')
 @click.option('--no-filestorage', default=False, is_flag=True,
-              help="Do not transfer the files")
+              help='Do not transfer the files')
 @click.option('--no-database', default=False, is_flag=True,
-              help="Do not transfer the database")
+              help='Do not transfer the database')
 @click.option('--transfer-schema',
-              help="Only transfer this schema, e.g. /town6/govikon")
+              help='Only transfer this schema, e.g. /town6/govikon')
 @click.option('--add-admins', default=False, is_flag=True,
-              help="Add local admins (admin@example.org:test)")
+              help='Add local admins (admin@example.org:test)')
 @click.option('--delta', default=False, is_flag=True,
-              help="Only transfer files where size or modification time "
-                   "changed")
+              help='Only transfer files where size or modification time '
+                   'changed')
 @pass_group_context
 def transfer(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     server: str,
     remote_config: str,
     confirm: bool,
@@ -339,43 +347,46 @@ def transfer(
         transfer_schema = transfer_schema.strip('/').replace('/', '-')
 
     if delta and not shutil.which('rsync'):
-        click.echo("")
+        click.echo('')
         click.echo("Core delta transfer requires 'rsync', please install as "
                    "follows:")
-        click.echo("* brew install rsync")
-        click.echo("* apt-get install rsync")
-        click.echo("")
+        click.echo('* brew install rsync')
+        click.echo('* apt-get install rsync')
+        click.echo('')
         sys.exit(1)
 
     if not shutil.which('pv'):
-        click.echo("")
+        click.echo('')
         click.echo("Core transfer requires 'pv', please install as follows:")
-        click.echo("* brew install pv")
-        click.echo("* apt-get install pv")
-        click.echo("")
+        click.echo('* brew install pv')
+        click.echo('* apt-get install pv')
+        click.echo('')
         sys.exit(1)
 
     if no_filestorage and delta:
         raise click.UsageError(
-            "You cannot use --no-filestorage and --delta together because "
-            "--no-filestorage skips all file storage transfers, while "
-            "--delta requires transferring only modified files."
+            'You cannot use --no-filestorage and --delta together because '
+            '--no-filestorage skips all file storage transfers, while '
+            '--delta requires transferring only modified files.'
         )
 
     if confirm:
         click.confirm(
-            "Do you really want override all your local data?",
+            'Do you really want override all your local data?',
             default=False, abort=True
         )
 
-    click.echo("Parsing the remote application configuration")
+    click.echo('Parsing the remote application configuration')
 
     remote_dir = os.path.dirname(remote_config)
 
     try:
         remote_cfg = Config.from_yaml_string(
-            subprocess.check_output([
-                "ssh", server, "-C", "sudo cat '{}'".format(remote_config)
+            # NOTE: Using an absolute path is more trouble than it's worth
+            subprocess.check_output([  # nosec
+                'ssh', server, '-C', 'sudo cat {}'.format(
+                    shlex.quote(remote_config)
+                )
             ])
         )
     except subprocess.CalledProcessError:
@@ -385,7 +396,7 @@ def transfer(
 
     # some calls to the storage transfer may be repeated as applications
     # share folders in certain configurations
-    @lru_cache(maxsize=None)
+    @cache
     def transfer_storage(remote: str, local: str, glob: str = '*') -> None:
 
         # GNUtar differs from MacOS's version somewhat and the combination
@@ -395,17 +406,47 @@ def transfer(
         count = remote.count('/')
         count += platform.system() == 'Darwin' and 1 or 0
 
-        send = f"ssh {server} -C 'sudo nice -n 10 tar cz {remote}/{glob}'"
-        send = f"{send} --absolute-names"
-        recv = f"tar xz  --strip-components {count} -C {local}"
+        send = shlex.join([
+            'ssh',
+            server,
+            '-C',
+            shlex.join([
+                'sudo',
+                'nice',
+                '-n',
+                '10',
+                'tar',
+                'cz',
+                f'{remote}/{glob}',
+                '--absolute-names',
+            ]),
+        ])
+        recv = shlex.join([
+            'tar',
+            'xz',
+            '--strip-components',
+            str(count),
+            '-C',
+            local,
+        ])
 
         if shutil.which('pv'):
-            recv = f'pv -L 5m --name "{remote}/{glob}" -r -b | {recv}'
+            track_progress = shlex.join([
+                'pv',
+                '-L',
+                '5m',
+                '--name',
+                f'{remote}/{glob}',
+                '-r',
+                '-b',
+            ])
+            recv = f'{track_progress} | {recv}'
 
-        click.echo(f"Copying {remote}/{glob}")
-        subprocess.check_output(f'{send} | {recv}', shell=True)
+        click.echo(f'Copying {remote}/{glob}')
+        # NOTE: We took extra care that this is safe with shlex.join
+        subprocess.check_output(f'{send} | {recv}', shell=True)  # nosec:B602
 
-    @lru_cache(maxsize=None)
+    @cache
     def transfer_delta_storage(
         remote: str, local: str, glob: str = '*'
     ) -> None:
@@ -417,80 +458,170 @@ def transfer(
         # not it's contents.
         glob += '/***'
 
-        dry_run = (
-            f"rsync -a --include='*/' --include='{glob}' --exclude='*' "
-            f"--dry-run --itemize-changes "
-            f"{server}:{remote}/ {local}/"
-        )
-        subprocess.run(dry_run, shell=True, capture_output=False)
+        dry_run = shlex.join([
+            'rsync',
+            '-a',
+            "--include='*/'",
+            '--include={}'.format(shlex.quote(glob)),
+            "--exclude='*'",
+            '--dry-run',
+            '--itemize-changes',
+            f'{server}:{remote}/',
+            f'{local}/',
+        ])
+        # NOTE: We took extra care that this is safe with shlex.join
+        subprocess.run(dry_run, shell=True, capture_output=False)  # nosec:B602
 
-        send = (
-            f"rsync -av --include='*/' --include='{glob}' --exclude='*' "
-            f"{server}:{remote}/ {local}/"
-        )
+        send = shlex.join([
+            'rsync',
+            '-av',
+            "--include='*/'",
+            '--include={}'.format(shlex.quote(glob)),
+            "--exclude='*'",
+            f'{server}:{remote}/',
+            f'{local}/',
+        ])
 
         if shutil.which('pv'):
-            send = f"{send} | pv -L 5m --name '{remote}/{glob}' -r -b"
-        click.echo(f"Copying {remote}/{glob}")
-        subprocess.check_output(send, shell=True)
+            track_progress = shlex.join([
+                'pv',
+                '-L',
+                '5m',
+                '--name',
+                f'{remote}/{glob}',
+                '-r',
+                '-b',
+            ])
+            send = f'{send} | {track_progress}'
+        click.echo(f'Copying {remote}/{glob}')
+        # NOTE: We took extra care that this is safe with shlex.join
+        subprocess.check_output(send, shell=True)  # nosec:B602
 
     def transfer_database(
-        remote_db: str,
-        local_db: str,
-        schema_glob: str = '*'
+        remote_db: str, local_dsn: PostgresDsn, schema_glob: str = '*'
     ) -> tuple[str, ...]:
+
+        # Extract connection parameters from PostgresDsn
+        host_info = local_dsn.hosts()[0]
+        local_host = host_info.get('host') or 'localhost'
+        local_port = str(host_info.get('port') or 5432)
+        local_user = host_info.get('username') or 'postgres'
+        local_password = host_info.get('password') or ''
+        local_db = (local_dsn.path or '/').lstrip('/')
 
         # Get available schemas
         query = 'SELECT schema_name FROM information_schema.schemata'
 
-        lst = f'sudo -u postgres psql {remote_db} -t -c "{query}"'
-        lst = f"ssh {server} '{lst}'"
+        lst = shlex.join([
+            'sudo',
+            '-u',
+            'postgres',
+            'psql',
+            remote_db,
+            '-t',
+            '-c',
+            query,
+        ])
+        lst = shlex.join([
+            'ssh',
+            server,
+            lst,
+        ])
 
-        schemas_str = subprocess.check_output(lst, shell=True).decode('utf-8')
+        # NOTE: We took extra care that this is safe with shlex.join
+        schemas_str = subprocess.check_output(
+            lst, shell=True  # nosec:B602
+        ).decode('utf-8')
         schemas_iter = (s.strip() for s in schemas_str.splitlines())
         schemas_iter = (s for s in schemas_iter if s)
         schemas_iter = (s for s in schemas_iter if fnmatch(s, schema_glob))
         schemas = tuple(schemas_iter)
 
         if not schemas:
-            click.echo("No matching schema(s) found!")
+            click.echo('No matching schema(s) found!')
             return schemas
 
         # Prepare send command
-        send = f"ssh {server} sudo -u postgres nice -n 10 pg_dump {remote_db}"
-        send = f"{send} --no-owner --no-privileges"
-        send = f"{send} --quote-all-identifiers --no-sync"
-        send = f'{send} --schema {" --schema ".join(schemas)}'
+        send_parts = [
+            'sudo',
+            '-u',
+            'postgres',
+            'nice',
+            '-n',
+            '10',
+            'pg_dump',
+            remote_db,
+            '--no-owner',
+            '--no-privileges',
+            '--quote-all-identifiers',
+            '--no-sync',
+        ]
+        for schema in schemas:
+            send_parts.extend(('--schema', schema))
+
+        send = shlex.join(send_parts)
+        send = shlex.join([
+            'ssh',
+            server,
+            send,
+        ])
 
         # Prepare receive command
-        recv = f"psql -d {local_db} -v ON_ERROR_STOP=1"
-        if platform.system() == 'Linux':
-            recv = f"sudo -u postgres {recv}"
+        recv_parts = [
+            'psql',
+            '-h',
+            local_host,
+            '-p',
+            local_port,
+            '-U',
+            local_user,
+            '-d',
+            local_db,
+            '-v',
+            'ON_ERROR_STOP=1',
+        ]
+
+        recv = shlex.join(recv_parts)
 
         # Drop existing schemas
         for schema in schemas:
-            click.echo(f"Drop local database schema {schema}")
+            click.echo(f'Drop local database schema {schema}')
+            assert "'" not in schema and '"' not in schema
             drop = f'DROP SCHEMA IF EXISTS "{schema}" CASCADE'
             drop = f"echo '{drop}' | {recv}"
 
-            subprocess.check_call(
-                drop, shell=True,
+            subprocess.check_call(  # nosec:B602
+                drop,
+                shell=True,
                 stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
+                stderr=subprocess.DEVNULL,
+                env={**os.environ, 'PGPASSWORD': local_password}
             )
 
         # Transfer
-        click.echo("Transfering database")
+        click.echo('Transfering database')
         if shutil.which('pv'):
-            recv = f'pv --name "{remote_db}@postgres" -r -b | {recv}'
-        subprocess.check_output(f'{send} | {recv}', shell=True)
+            track_progress = shlex.join([
+                'pv',
+                '--name',
+                f'{remote_db}@postgres',
+                '-r',
+                '-b',
+            ])
+            recv = f'{track_progress} | {recv}'
+        # NOTE: We took extra care that this is safe with shlex.join
+        subprocess.check_output(
+            f'{send} | {recv}',
+            shell=True,  # nosec:B602
+            env={**os.environ, 'PGPASSWORD': local_password}
+        )
 
         return schemas
 
     def transfer_storage_of_app(
-        local_cfg: 'ApplicationConfig',
-        remote_cfg: 'ApplicationConfig',
-        transfer_function: 'Callable[..., None]'
+        local_cfg: ApplicationConfig,
+        remote_cfg: ApplicationConfig,
+        transfer_function: Callable[..., None]
     ) -> None:
 
         remote_storage = remote_cfg.configuration.get('filestorage', '')
@@ -509,9 +640,9 @@ def transfer(
             transfer_function(remote_storage, local_storage, glob=glob)
 
     def transfer_depot_storage_of_app(
-        local_cfg: 'ApplicationConfig',
-        remote_cfg: 'ApplicationConfig',
-        transfer_function: 'Callable[..., None]'
+        local_cfg: ApplicationConfig,
+        remote_cfg: ApplicationConfig,
+        transfer_function: Callable[..., None]
     ) -> None:
 
         depot_local_storage = 'depot.io.local.LocalFileStorage'
@@ -529,8 +660,8 @@ def transfer(
             transfer_function(remote_storage, local_storage, glob=glob)
 
     def transfer_database_of_app(
-        local_cfg: 'ApplicationConfig',
-        remote_cfg: 'ApplicationConfig'
+        local_cfg: ApplicationConfig,
+        remote_cfg: ApplicationConfig
     ) -> tuple[str, ...]:
 
         if 'dsn' not in remote_cfg.configuration:
@@ -543,27 +674,53 @@ def transfer(
         mgr = SessionManager(local_cfg.configuration['dsn'], Base)
         mgr.create_required_extensions()
 
-        local_db = local_cfg.configuration['dsn'].split('/')[-1]
+        local_dsn = PostgresDsn(local_cfg.configuration['dsn'])
         remote_db = remote_cfg.configuration['dsn'].split('/')[-1]
 
         schema_glob = transfer_schema or f'{local_cfg.namespace}*'
-        return transfer_database(remote_db, local_db, schema_glob=schema_glob)
+        return transfer_database(remote_db, local_dsn, schema_glob=schema_glob)
 
-    def do_add_admins(local_cfg: 'ApplicationConfig', schema: str) -> None:
+    def do_add_admins(local_dsn: PostgresDsn, schema: str) -> None:
         id_ = str(uuid4())
-        password_hash = hash_password('test').replace('$', '\\$')
+        password_hash = hash_password('test')
+        assert '"' not in schema and "'" not in schema
         query = (
-            f'INSERT INTO \\"{schema}\\".users '  # nosec: B608
+            f'INSERT INTO "{schema}".users '  # nosec: B608
             f"(type, id, username, password_hash, role, active, realname) "
             f"VALUES ('generic', '{id_}', 'admin@example.org', "
             f"'{password_hash}', 'admin', true, 'John Doe');"
         )
-        local_db = local_cfg.configuration['dsn'].split('/')[-1]
-        command = f'sudo -u postgres psql {local_db} -c "{query}"'
-        subprocess.check_call(
-            command, shell=True,
+
+        # Extract connection parameters from PostgresDsn
+        host_info = local_dsn.hosts()[0]
+        local_host = host_info.get('host') or 'localhost'
+        local_port = str(host_info.get('port') or 5432)
+        local_user = host_info.get('username') or 'postgres'
+        local_password = host_info.get('password') or ''
+        local_db = (local_dsn.path or '/').lstrip('/')
+
+        command = shlex.join(
+            [
+                'psql',
+                '-h',
+                local_host,
+                '-p',
+                local_port,
+                '-U',
+                local_user,
+                '-d',
+                local_db,
+                '-c',
+                query,
+            ]
+        )
+        # NOTE: We took extra care that this is safe with shlex.join
+        subprocess.check_call(  # nosec:B602
+            command,
+            shell=True,
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+            stderr=subprocess.DEVNULL,
+            env={**os.environ, 'PGPASSWORD': local_password}
         )
 
     # transfer the data
@@ -577,12 +734,12 @@ def transfer(
             continue
 
         if local_appcfg.configuration.get('disable_transfer'):
-            click.echo(f"Skipping {local_appcfg.namespace}, transfer disabled")
+            click.echo(f'Skipping {local_appcfg.namespace}, transfer disabled')
             continue
 
         remote_appcfg = remote_applications[local_appcfg.namespace]
 
-        click.echo(f"Fetching {remote_appcfg.namespace}")
+        click.echo(f'Fetching {remote_appcfg.namespace}')
 
         if not no_database:
             schemas.update(
@@ -599,24 +756,25 @@ def transfer(
             )
 
     if add_admins:
+        local_dsn = PostgresDsn(local_appcfg.configuration['dsn'])
         for schema in schemas:
-            click.echo(f"Adding admin@example:test to {schema}")
+            click.echo(f'Adding admin@example:test to {schema}')
             # FIXME: This is a bit sus, it works because we only access
             #        the DSN of the app config and it's the same for all
             #        the app configs, we should be a bit more explicit that
             #        we are passing a shared configuration value, rather
             #        than an application specific one
-            do_add_admins(local_appcfg, schema)
+            do_add_admins(local_dsn, schema)
 
 
 @cli.command(context_settings={'default_selector': '*'})
 @click.option('--dry-run', default=False, is_flag=True,
-              help="Do not write any changes into the database.")
+              help='Do not write any changes into the database.')
 @pass_group_context
 def upgrade(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     dry_run: bool
-) -> tuple['Callable[..., Any]', ...]:
+) -> tuple[Callable[..., Any], ...]:
     """ Upgrades all application instances of the given namespace(s). """
 
     modules = list(get_upgrade_modules())
@@ -627,11 +785,11 @@ def upgrade(
     basic_tasks = tuple((id, task) for id, task in tasks if not task.raw)
     raw_tasks = tuple((id, task) for id, task in tasks if task.raw)
 
-    def on_success(task: '_Task[..., Any]') -> None:
-        print(click.style("* " + str(task.task_name), fg='green'))
+    def on_success(task: _Task[..., Any]) -> None:
+        click.secho(f'* {task.task_name}', fg='green')
 
-    def on_fail(task: '_Task[..., Any]') -> None:
-        print(click.style("* " + str(task.task_name), fg='red'))
+    def on_fail(task: _Task[..., Any]) -> None:
+        click.secho(f'* {task.task_name}', fg='red')
 
     def run_upgrade_runner(
         runner: UpgradeRunner | RawUpgradeRunner,
@@ -640,13 +798,13 @@ def upgrade(
         executed_tasks = runner.run_upgrade(*args)
 
         if executed_tasks:
-            print("executed {} upgrade tasks".format(executed_tasks))
+            click.echo('executed {} upgrade tasks'.format(executed_tasks))
         else:
-            print("no pending upgrade tasks found")
+            click.echo('no pending upgrade tasks found')
 
     def run_raw_upgrade(
-        group_context: 'GroupContext',
-        appcfg: 'ApplicationConfig'
+        group_context: GroupContext,
+        appcfg: ApplicationConfig
     ) -> None:
 
         if appcfg in executed_raw_upgrades:
@@ -654,8 +812,8 @@ def upgrade(
 
         executed_raw_upgrades.add(appcfg)
 
-        title = "Running raw upgrade for {}".format(appcfg.path.lstrip('/'))
-        print(click.style(title, underline=True))
+        title = 'Running raw upgrade for {}'.format(appcfg.path.lstrip('/'))
+        click.secho(title, underline=True)
 
         upgrade_runner = RawUpgradeRunner(
             tasks=raw_tasks,
@@ -670,9 +828,9 @@ def upgrade(
             group_context.available_schemas(appcfg),
         )
 
-    def run_upgrade(request: 'CoreRequest', app: 'Framework') -> None:
-        title = "Running upgrade for {}".format(request.app.application_id)
-        print(click.style(title, underline=True))
+    def run_upgrade(request: CoreRequest, app: Framework) -> None:
+        title = 'Running upgrade for {}'.format(request.app.application_id)
+        click.secho(title, underline=True)
 
         upgrade_runner = UpgradeRunner(
             modules=modules,
@@ -683,7 +841,7 @@ def upgrade(
         )
         run_upgrade_runner(upgrade_runner, request)
 
-    def upgrade_steps() -> 'Iterator[Callable[..., Any]]':
+    def upgrade_steps() -> Iterator[Callable[..., Any]]:
         if next((t for n, t in tasks if t.raw), False):
             yield run_raw_upgrade
 
@@ -698,7 +856,7 @@ class EnhancedInteractiveConsole(InteractiveConsole):
     - horizontal movement (e.g. arrow keys)
     - history (e.g. up and down keys)
     - very basic tab completion
-"""
+    """
 
     def __init__(self, locals: dict[str, Any] | None = None):
         super().__init__(locals)
@@ -711,14 +869,14 @@ class EnhancedInteractiveConsole(InteractiveConsole):
             ).complete
         )
         readline.set_history_length(100)
-        readline.parse_and_bind("tab: complete")
+        readline.parse_and_bind('tab: complete')
 
 
 @cli.command()
-def shell() -> 'Callable[[CoreRequest, Framework], None]':
+def shell() -> Callable[[CoreRequest, Framework], None]:
     """ Enters an interactive shell. """
 
-    def _shell(request: 'CoreRequest', app: 'Framework') -> None:
+    def _shell(request: CoreRequest, app: Framework) -> None:
 
         shell = EnhancedInteractiveConsole({
             'app': app,

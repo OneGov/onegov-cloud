@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 
 
@@ -11,8 +13,8 @@ if TYPE_CHECKING:
 
 
 def export_parties_internal(
-    item: 'ElectionCompound | ProporzElection',
-    locales: 'Collection[str]',
+    item: ElectionCompound | ProporzElection,
+    locales: Collection[str],
     default_locale: str,
     json_serializable: bool = False
 ) -> list[dict[str, Any]]:
@@ -45,8 +47,8 @@ def export_parties_internal(
 
 
 def _export_parties(
-    item: 'ElectionCompound | ProporzElection',
-    locales: 'Collection[str]',
+    item: ElectionCompound | ProporzElection,
+    locales: Collection[str],
     default_locale: str,
     json_serializable: bool = False,
     domain: str | None = None,
@@ -66,7 +68,7 @@ def _export_parties(
 
     """
 
-    def convert_decimal(value: 'Decimal | None') -> float | str | None:
+    def convert_decimal(value: Decimal | None) -> float | str | None:
         if value is None:
             return value
         if json_serializable:

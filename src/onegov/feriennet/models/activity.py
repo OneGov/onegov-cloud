@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.activity import PublicationRequestCollection
@@ -23,88 +25,106 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
     __mapper_args__ = {'polymorphic_identity': 'vacation'}
 
-    es_type_name = 'vacation'
-
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'text': {'type': 'localized_html'},
-        'organiser': {'type': 'text'}
+    fts_type_title = _('Activities')
+    fts_title_property = 'title'
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        'text': {'type': 'localized', 'weight': 'C'},
+        'organizer_name': {'type': 'text', 'weight': 'B'},
+        'organization_text': {'type': 'text', 'weight': 'B'},
+        'organizer_details_text': {'type': 'text', 'weight': 'D'}
     }
 
     @property
-    def es_public(self) -> bool:
+    def fts_public(self) -> bool:
         return self.state == 'accepted'
 
     @property
-    def es_skip(self) -> bool:
+    def fts_skip(self) -> bool:
         return self.state == 'preview'
 
     @property
-    def organiser(self) -> list[str]:
-        organiser: list[str] = [
-            self.user.username,
-            # FIXME: For now we assume this is always set, if it
-            #        is sometimes not set, then perhaps we should
-            #        only append it when it is set.
-            self.user.realname  # type:ignore[list-item]
-        ]
+    def organizer_name(self) -> str:
+        if self.user.realname:
+            return self.user.realname
 
-        userprofile_keys = (
+        return self.user.username
+
+    @property
+    def organization_text(self) -> str:
+
+        organization_keys = (
             'organisation',
             'address',
             'zip_code',
             'place',
             'email',
             'phone',
-            'emergency',
             'website',
+        )
+
+        if not self.user.data:
+            return ''
+
+        return ' '.join(
+            value
+            for key in organization_keys
+            if (value := self.user.data.get(key))
+        )
+
+    @property
+    def organizer_details_text(self) -> str:
+
+        details_keys = (
+            'emergency',
             'bank_account',
             'bank_beneficiary',
         )
 
-        for key in userprofile_keys:
-            if not self.user.data:
-                continue
-            if value := self.user.data.get(key):
-                organiser.append(value)
+        if not self.user.data:
+            return ''
 
-        return organiser
+        return ' '.join(
+            value
+            for key in details_keys
+            if (value := self.user.data.get(key))
+        )
 
     def ordered_tags(
         self,
-        request: 'FeriennetRequest',
+        request: FeriennetRequest,
         durations: int | None = None
     ) -> list[str]:
 
         tags = [request.translate(_(tag)) for tag in self.tags]
 
         if durations is None:
+            period = request.app.active_period
             durations = sum(o.duration for o in (
                 request.session.query(Occasion)
                 .with_entities(Occasion.duration)
                 .distinct()
                 .filter_by(activity_id=self.id)
-                .filter_by(period=request.app.active_period)
+                .filter_by(period_id=period.id if period else None)
             ))
 
         if DAYS.has(durations, DAYS.half):
-            tags.append(request.translate(_("Half day")))
+            tags.append(request.translate(_('Half day')))
         if DAYS.has(durations, DAYS.full):
-            tags.append(request.translate(_("Full day")))
+            tags.append(request.translate(_('Full day')))
         if DAYS.has(durations, DAYS.many):
-            tags.append(request.translate(_("Multiple days")))
+            tags.append(request.translate(_('Multiple days')))
 
         return sorted(tags)
 
 
 class ActivityTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FER'}  # type:ignore
-    es_type_name = 'activity_tickets'
+    __mapper_args__ = {'polymorphic_identity': 'FER'}
 
     def reference_group(
         self,
-        request: 'FeriennetRequest'  # type:ignore[override]
+        request: FeriennetRequest  # type:ignore[override]
     ) -> str:
         return self.handler.title
 
@@ -112,8 +132,8 @@ class ActivityTicket(OrgTicketMixin, Ticket):
 @handlers.registered_handler('FER')
 class VacationActivityHandler(Handler):
 
-    handler_title = _("Activities")
-    code_title = _("Activities")
+    handler_title = _('Activities')
+    code_title = _('Activities')
 
     @cached_property
     def collection(self) -> PublicationRequestCollection:
@@ -126,7 +146,7 @@ class VacationActivityHandler(Handler):
         return self.publication_request.activity
 
     @cached_property
-    def publication_request(self) -> 'PublicationRequest | None':
+    def publication_request(self) -> PublicationRequest | None:
         return self.collection.by_id(self.id)
 
     @property
@@ -149,10 +169,10 @@ class VacationActivityHandler(Handler):
 
     @property
     def group(self) -> str:
-        return _("Activity")
+        return _('Activity')
 
     @property
-    def extra_data(self) -> 'Sequence[str]':
+    def extra_data(self) -> Sequence[str]:
         return ()
 
     @property
@@ -173,8 +193,8 @@ class VacationActivityHandler(Handler):
 
     def get_summary(
         self,
-        request: 'FeriennetRequest'  # type:ignore[override]
-    ) -> 'Markup':
+        request: FeriennetRequest  # type:ignore[override]
+    ) -> Markup:
 
         assert self.publication_request is not None
         assert self.activity is not None
@@ -197,23 +217,23 @@ class VacationActivityHandler(Handler):
 
     def get_period_bound_links(
         self,
-        request: 'FeriennetRequest'
-    ) -> 'Iterator[Link]':
+        request: FeriennetRequest
+    ) -> Iterator[Link]:
 
         if self.activity is None:
             return
 
         if self.activity.state in ('proposed', 'archived'):
             yield Link(
-                text=_("Publish"),
+                text=_('Publish'),
                 url=request.link(self.activity, name='accept'),
                 attrs={'class': 'accept-activity'},
                 traits=(
                     Confirm(
-                        _("Do you really want to publish this activity?"),
-                        _("This cannot be undone."),
-                        _("Publish Activity"),
-                        _("Cancel")
+                        _('Do you really want to publish this activity?'),
+                        _('This cannot be undone.'),
+                        _('Publish Activity'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='POST',
@@ -224,18 +244,17 @@ class VacationActivityHandler(Handler):
 
         if self.activity.state == 'accepted':
             yield Link(
-                text=_("Archive"),
+                text=_('Archive'),
                 url=request.link(self.activity, name='archive'),
                 attrs={'class': 'archive-activity'},
                 traits=(
                     Confirm(
-                        _("Do you really want to archive this activity?"),
+                        _('Do you really want to archive this activity?'),
                         _(
-                            "This cannot be undone. "
-                            "The activity will be made private as a result."
+                            'The activity will be made private as a result.'
                         ),
-                        _("Archive Activity"),
-                        _("Cancel")
+                        _('Archive Activity'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='POST',
@@ -246,12 +265,12 @@ class VacationActivityHandler(Handler):
 
     def get_links(  # type:ignore[override]
         self,
-        request: 'FeriennetRequest'  # type:ignore[override]
+        request: FeriennetRequest  # type:ignore[override]
     ) -> list[Link]:
 
         links = list(self.get_period_bound_links(request))
         links.append(Link(
-            text=_("Show activity"),
+            text=_('Show activity'),
             url=request.return_here(request.link(self.activity)),
             attrs={'class': 'show-activity'}
         ))

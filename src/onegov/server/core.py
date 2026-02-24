@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging.config
 
 from onegov.server.collection import ApplicationCollection
@@ -44,7 +46,7 @@ class Request(BaseRequest):
     hostname_keys = ('HTTP_HOST', 'HTTP_X_VHM_HOST')
 
     @property
-    def hostnames(self) -> 'Iterator[str]':
+    def hostnames(self) -> Iterator[str]:
         """ Iterates through the hostnames of the request. """
         for key in self.hostname_keys:
             if key in self.environ:
@@ -91,12 +93,12 @@ class Server:
 
     def __init__(
         self,
-        config: 'Config',
+        config: Config,
         configure_morepath: bool = True,
         configure_logging: bool = True,
         post_mortem: bool = False,
         environ_overrides: dict[str, Any] | None = None,
-        exception_hook: 'Callable[[WSGIEnvironment], Any] | None' = None
+        exception_hook: Callable[[WSGIEnvironment], Any] | None = None
     ):
 
         self.applications = ApplicationCollection(config.applications)
@@ -118,7 +120,7 @@ class Server:
 
     def configure_logging(
         self,
-        config: '_OptionalDictConfigArgs | _DictConfigArgs'
+        config: _OptionalDictConfigArgs | _DictConfigArgs
     ) -> None:
         """ Configures the python logging.
 
@@ -137,13 +139,15 @@ class Server:
         # morepath is only loaded if there's at lest one app depending on it
         if next(self.applications.morepath_applications(), None):
             import morepath
+            from onegov.server.utils import patch_morepath
+            patch_morepath()
             morepath.autoscan()
 
     def handle_request(
         self,
-        environ: 'WSGIEnvironment',
-        start_response: 'StartResponse'
-    ) -> 'Iterable[bytes]':
+        environ: WSGIEnvironment,
+        start_response: StartResponse
+    ) -> Iterable[bytes]:
 
         if self.environ_overrides:
             environ.update(self.environ_overrides)
@@ -206,9 +210,9 @@ class Server:
 
     def __call__(
         self,
-        environ: 'WSGIEnvironment',
-        start_response: 'StartResponse'
-    ) -> 'Iterable[bytes]':
+        environ: WSGIEnvironment,
+        start_response: StartResponse
+    ) -> Iterable[bytes]:
         try:
             return self.handle_request(environ, start_response)
         except Exception:
@@ -216,6 +220,6 @@ class Server:
                 self.exception_hook(environ)
 
             if self.post_mortem:
-                import pdb; pdb.post_mortem()  # noqa: E702
+                import pdb; pdb.post_mortem()  # noqa: E702, T100
 
             raise

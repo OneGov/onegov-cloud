@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 import yaml
+
 from datetime import timedelta
 from freezegun import freeze_time
-from sedate import utcnow
-
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.org.models import Topic
 from onegov.page import Page, PageCollection
+from sedate import utcnow
 from tests.onegov.org.common import edit_bar_links
 from tests.onegov.town6.test_views_topics import get_select_option_id_by_text
 from tests.shared.utils import (get_meta, create_image,
@@ -14,7 +16,13 @@ from tests.shared.utils import (get_meta, create_image,
 from webtest import Upload
 
 
-def check_breadcrumbs(page, excluded):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import ExtendedResponse
+    from .conftest import Client
+
+
+def check_breadcrumbs(page: ExtendedResponse, excluded: str) -> None:
     # check the breadcrumbs
     breadcrumbs = page.pyquery('ul.breadcrumbs a')
     for b in breadcrumbs:
@@ -22,7 +30,7 @@ def check_breadcrumbs(page, excluded):
         assert excluded not in url, f'{excluded} still in {url}'
 
 
-def check_navlinks(page, excluded):
+def check_navlinks(page: ExtendedResponse, excluded: str) -> None:
     # check the nav links
     nav_links = page.pyquery('ul.side-nav a')
     for link in nav_links:
@@ -30,7 +38,7 @@ def check_navlinks(page, excluded):
         assert excluded not in url, f'{excluded} still in {url}'
 
 
-def test_pages_cache(client):
+def test_pages_cache(client: Client) -> None:
     client.login_admin()
     editor = client.spawn()
     editor.login_editor()
@@ -49,8 +57,8 @@ def test_pages_cache(client):
 
     url_page.form['name'] = 'my govikoN'
     url_page = url_page.form.submit()
-    assert 'Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon' in \
-           url_page
+    assert ('Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon'
+        ) in url_page
     url_page.form['name'] = new_name
     url_page.form['test'] = True
     url_page = url_page.form.submit()
@@ -71,7 +79,7 @@ def test_pages_cache(client):
     assert editor.get(url_page.request.url, status=403)
 
 
-def test_pages(client):
+def test_pages(client: Client) -> None:
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     assert len(client.get(root_url).pyquery('.edit-bar')) == 0
 
@@ -79,13 +87,15 @@ def test_pages(client):
     admin.login_admin()
 
     images = admin.get('/images')
-    images.form['file'] = Upload('Test.jpg', create_image().read())
+    images.form['file'] = [Upload('Test.jpg', create_image().read())]
     images.form.submit()
     img_url = admin.get('/images').pyquery('.image-box a').attr('href')
 
-    embedded_img = f'<p class="has-img">' \
-                   f'<img src="${img_url}" class="lazyload-alt" ' \
-                   f'width="1167px" height="574px"></p>'
+    embedded_img = (
+        f'<p class="has-img">'
+        f'<img src="${img_url}" class="lazyload-alt" '
+        f'width="1167px" height="574px"></p>'
+    )
 
     client.login_admin()
     editor = client.spawn()
@@ -103,10 +113,10 @@ def test_pages(client):
     page = new_page.form.submit().follow()
 
     assert page.pyquery('.main-title').text() == "Living in Govikon is Swell"
-    assert page.pyquery('h2:first').text() \
-           == "Living in Govikon is Really Great"
-    assert page.pyquery('.page-text i').text() \
-        .startswith("Experts say it's the fact")
+    assert page.pyquery('h2:first').text() == (
+        "Living in Govikon is Really Great")
+    assert page.pyquery('.page-text i').text().startswith(
+        "Experts say it's the fact")
 
     # Test OpenGraph Meta
     assert get_meta(page, 'og:title') == 'Living in Govikon is Swell'
@@ -138,7 +148,7 @@ def test_pages(client):
     assert page.pyquery('.page-text i').text().startswith("Experts say hiring")
 
 
-def test_pages_explicitly_link_referenced_files(client):
+def test_pages_explicitly_link_referenced_files(client: Client) -> None:
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
 
     admin = client.spawn()
@@ -146,13 +156,17 @@ def test_pages_explicitly_link_referenced_files(client):
 
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with open(path, 'rb') as f:
-        page = admin.get('/files')
-        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
-        page.form.submit()
+        files = admin.get('/files')
+        files.form['file'] = [
+            Upload('Sample.pdf', f.read(), 'application/pdf')
+        ]
+        files.form.submit()
 
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
     pdf_url = (
         admin.get('/files')
-        .pyquery('[ic-trigger-from="#button-1"]')
+        .pyquery(f'[ic-trigger-from="#button-{pdf.id}"]')
         .attr('ic-get-from')
         .removesuffix('/details')
     )
@@ -166,9 +180,8 @@ def test_pages_explicitly_link_referenced_files(client):
     new_page.form['title'] = "Linking files"
     new_page.form['lead'] = "..."
     new_page.form['text'] = pdf_link
-    page = new_page.form.submit().follow()
+    new_page.form.submit().follow()
 
-    session = client.app.session()
     pdf = FileCollection(session).query().one()
     page = (
         PageCollection(session).query()
@@ -177,7 +190,7 @@ def test_pages_explicitly_link_referenced_files(client):
     assert page.files == [pdf]
     assert pdf.access == 'public'
 
-    page.access = 'mtan'
+    page.access = 'mtan'  # type: ignore[attr-defined]
     session.flush()
     assert pdf.access == 'mtan'
 
@@ -192,7 +205,7 @@ def test_pages_explicitly_link_referenced_files(client):
     assert pdf.access == 'secret'
 
 
-def test_pages_person_link_extension(client):
+def test_pages_person_link_extension(client: Client) -> None:
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     assert len(client.get(root_url).pyquery('.edit-bar')) == 0
 
@@ -200,13 +213,15 @@ def test_pages_person_link_extension(client):
     admin.login_admin()
 
     images = admin.get('/images')
-    images.form['file'] = Upload('Test.jpg', create_image().read())
+    images.form['file'] = [Upload('Test.jpg', create_image().read())]
     images.form.submit()
     img_url = admin.get('/images').pyquery('.image-box a').attr('href')
 
-    embedded_img = f'<p class="has-img">' \
-                   f'<img src="${img_url}" class="lazyload-alt" ' \
-                   f'width="1167px" height="574px"></p>'
+    embedded_img = (
+        f'<p class="has-img">'
+        f'<img src="${img_url}" class="lazyload-alt" '
+        f'width="1167px" height="574px"></p>'
+    )
 
     client.login_admin()
     editor = client.spawn()
@@ -222,6 +237,7 @@ def test_pages_person_link_extension(client):
     new_person_page.form['function'] = 'Gemeindeschreiber'
 
     page = new_person_page.form.submit()
+    assert page.location is not None
     person_uuid = page.location.split('/')[-1]
     page = page.follow()
     assert 'Müller Franz' in page
@@ -236,20 +252,19 @@ def test_pages_person_link_extension(client):
     new_page.form['text'] = ("<h2>Living in Govikon is Really "
                              "Great</h2><i>Experts say it's the fact that "
                              "Govikon does not really exist.</i>"
-                             + embedded_img
                              )
-    new_page.form['western_ordered'] = False
-    new_page.form['_'.join(['people', person_uuid])] = True
+    new_page.form['western_name_order'] = False
+    new_page.form['people-0-person'] = person_uuid
     page = new_page.form.submit().follow()
     assert 'Müller Franz' in page
 
     edit_page = page.click("Bearbeiten")
-    edit_page.form['western_ordered'] = True
+    edit_page.form['western_name_order'] = True
     page = edit_page.form.submit().follow()
     assert 'Franz Müller' in page
 
 
-def test_delete_pages(client):
+def test_delete_pages(client: Client) -> None:
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
 
     client.login_admin()
@@ -263,7 +278,9 @@ def test_delete_pages(client):
     )
     # we add a file attachment to ensure we can delete a page, even if
     # it contains file attachments
-    new_page.form.fields['files'][-1] = Upload('test.txt')
+    new_page.form.set('files', [
+        Upload('test.txt', b'foo', 'text/plain')
+    ], -1)
     page = new_page.form.submit().follow()
     delete_link = page.pyquery('a[ic-delete-from]')[0].attrib['ic-delete-from']
 
@@ -274,7 +291,7 @@ def test_delete_pages(client):
     assert client.delete(delete_link, expect_errors=True).status_code == 404
 
 
-def test_delete_root_page_with_nested_pages(client):
+def test_delete_root_page_with_nested_pages(client: Client) -> None:
 
     root_page_organisation = (
         client.get('/').pyquery('.top-bar-section a').attr('href')
@@ -319,7 +336,7 @@ def test_delete_root_page_with_nested_pages(client):
     assert query.filter_by(name='child-page').count() == 0
 
 
-def test_hide_page(client):
+def test_hide_page(client: Client) -> None:
     client.login_editor()
 
     new_page = client.get('/topics/organisation').click('Thema')
@@ -351,7 +368,7 @@ def test_hide_page(client):
     assert 'Test' not in page
 
 
-def setup_main_and_subpage(client):
+def setup_main_and_subpage(client: Client) -> None:
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     client.login_admin()
     root_page = client.get(root_url)
@@ -376,7 +393,7 @@ def setup_main_and_subpage(client):
     assert client.get('/topics/organisation/mainpage/subpage')
 
 
-def test_move_page_to_root(client):
+def test_move_page_to_root(client: Client) -> None:
     setup_main_and_subpage(client)
 
     # move subpage to top level (as mainpage)
@@ -400,7 +417,7 @@ def test_move_page_to_root(client):
     assert subpage.pyquery('.main-title').text() == 'Subpage'
 
 
-def test_move_page_with_child_to_root(client):
+def test_move_page_with_child_to_root(client: Client) -> None:
     setup_main_and_subpage(client)
 
     # move main page to top level
@@ -422,7 +439,7 @@ def test_move_page_with_child_to_root(client):
     assert subpage.pyquery('.main-title').text() == 'Subpage'
 
 
-def test_move_page_assign_yourself_as_parent(client):
+def test_move_page_assign_yourself_as_parent(client: Client) -> None:
     setup_main_and_subpage(client)
 
     mainpage = client.get('/topics/organisation/mainpage')
@@ -437,7 +454,7 @@ def test_move_page_assign_yourself_as_parent(client):
     assert 'Ungültiger Zielort gewählt' in move_page
 
 
-def test_move_page_assigning_a_child_as_parent(client):
+def test_move_page_assigning_a_child_as_parent(client: Client) -> None:
     setup_main_and_subpage(client)
     mainpage = client.get('/topics/organisation/mainpage')
     move_page = mainpage.click('Verschieben')
@@ -451,7 +468,7 @@ def test_move_page_assigning_a_child_as_parent(client):
     assert 'Ungültiger Zielort gewählt' in move_page
 
 
-def test_links(client):
+def test_links(client: Client) -> None:
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     client.login_admin()
     root_page = client.get(root_url)
@@ -498,7 +515,74 @@ def test_links(client):
     assert google.location == 'https://www.google.ch'
 
 
-def test_copy_pages_to_news(client):
+def test_copy_paste_with_same_trait_only(client: Client) -> None:
+    client.login_admin()
+
+    # test copy and paste topic (to different location in tree)
+    page = client.get('/topics/organisation')
+    edit = page.click('Thema')
+
+    edit.form['title'] = 'Dance Party'
+    edit.form['lead'] = '0xcafebabe'
+    party = edit.form.submit().follow()
+
+    assert '/topics/organisation/dance-party' in party.request.url
+
+    party.click('Kopieren')
+
+    edit = client.get('/topics/themen').click('Einf')
+
+    assert '0xcafebabe' in edit
+    page = edit.form.submit().follow()
+
+    assert 'Dance Party' in page
+    assert '/topics/themen/dance-party' in page.request.url
+
+    # test copy topic paste in news, fails
+    page.click('Kopieren')
+
+    news = client.get('/news')
+    assert 'Kopieren' in news
+    # paste button exists but disabled
+    assert 'Einf' in news
+    paste_link = news.pyquery('.paste-link.disabled-link')[0]
+    assert 'Einf' in paste_link.text
+    assert 'editor/paste/news' in paste_link.attrib['href']
+
+    # test copy and paste news
+    news = client.get('/news')
+    edit = news.click('Nachricht')
+
+    edit.form['title'] = 'Sink Hole'
+    edit.form['lead'] = '0xdeadbeef'
+
+    sinkhole = edit.form.submit().follow()
+
+    assert 'Sink Hole' in sinkhole
+    assert '0xdeadbeef' in sinkhole
+
+    sinkhole.click('Kopieren')
+
+    assert 'Einf' in sinkhole
+    edit = sinkhole.click('Einf')
+    edit.form['title'] = 'Sink Hole COPIED'
+
+    sinkhole_2 = edit.form.submit().follow()
+    assert 'Sink Hole COPIED' in sinkhole_2
+
+    # test copy news paste in topic, fails
+    sinkhole_2.click('Kopieren')
+    topics = client.get('/topics/themen')
+
+    assert 'Kopieren' in topics
+    # paste button exists but disabled
+    assert 'Einf' in topics
+    paste_link = topics.pyquery('.paste-link.disabled-link')[0]
+    assert 'Einf' in paste_link.text
+    assert 'editor/paste/page' in paste_link.attrib['href']
+
+
+def test_copy_pages_to_news(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/topics/organisation')
@@ -517,7 +601,7 @@ def test_copy_pages_to_news(client):
     assert '/news/organisation' in page.request.url
 
 
-def test_clipboard(client):
+def test_clipboard(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/topics/organisation')
@@ -534,7 +618,7 @@ def test_clipboard(client):
     assert '/organisation/organisation' in page.request.url
 
 
-def test_clipboard_separation(client):
+def test_clipboard_separation(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/topics/organisation')
@@ -549,7 +633,7 @@ def test_clipboard_separation(client):
     assert 'paste-link' not in client.get('/topics/organisation')
 
 
-def test_view_page_as_member(client):
+def test_view_page_as_member(client: Client) -> None:
     admin = client
     client.login_admin()
 
@@ -578,11 +662,11 @@ def test_view_page_as_member(client):
     assert 'Test' not in page
 
 
-def test_add_iframe(client):
-
+def test_add_iframe(client: Client) -> None:
     fs = client.app.filestorage
-    data = {
-        'allowed_domains': ['https://www.seantis.ch/']
+    assert fs is not None
+    data = {  # with and without trailing slash
+        'allowed_domains': ['https://www.seantis.ch/', 'https://www.myorg.org']
     }
     with fs.open('allowed_iframe_domains.yml', 'w') as f:
         yaml.dump(data, f)
@@ -591,13 +675,21 @@ def test_add_iframe(client):
     page = client.get('/topics/organisation').click('iFrame')
     page.form['title'] = "Success"
     page.form['url'] = "https://www.seantis.ch/success-stories/"
-    page = page.form.submit()
-    assert 'iframe' in page
-    assert 'https://www.seantis.ch/success-stories/' in page
+    page = page.form.submit().follow()
+    assert 'Die Domäne der URL ist für iFrames nicht zulässig.' not in page
+    assert 'iFrame wurde hinzugefügt' in page
 
-    csp = page.headers['Content-Security-Policy']
-    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
+    csp_str = page.headers['Content-Security-Policy']
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp_str.split(';')}
     assert "https://www.seantis.ch/" in csp['child-src']
+    assert "https://www.myorg.org" in csp['child-src']
+
+    page = client.get('/topics/organisation').click('iFrame')
+    page.form['title'] = "Fine"
+    page.form['url'] = "https://www.myorg.org/success-stories/"
+    page = page.form.submit().follow()
+    assert 'Die Domäne der URL ist für iFrames nicht zulässig.' not in page
+    assert 'iFrame wurde hinzugefügt' in page
 
     page = client.get('/topics/organisation').click('iFrame')
     page.form['title'] = "Failure"

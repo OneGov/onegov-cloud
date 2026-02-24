@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from onegov.core.security import Private
 from onegov.core.utils import normalize_for_url
@@ -21,16 +23,16 @@ if TYPE_CHECKING:
     template='exports.pt')
 def view_export_collection(
     self: ExportCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: ExportCollectionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     exports = list(self.exports_for_current_user(request))
     exports.sort(key=lambda e: normalize_for_url(request.translate(e.title)))
 
     return {
         'layout': layout or ExportCollectionLayout(self, request),
-        'title': _("Exports"),
+        'title': _('Exports'),
         'exports': exports
     }
 
@@ -42,10 +44,10 @@ def view_export_collection(
     form=lambda model, request: model.form_class)
 def view_export(
     self: Export,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     layout: ExportCollectionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = layout or ExportCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(self.title, request.link(self)))

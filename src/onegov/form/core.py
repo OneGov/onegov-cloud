@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import weakref
 
 from collections import OrderedDict
+from contextlib import nullcontext
 from decimal import Decimal
 from itertools import chain, groupby
 from markupsafe import Markup
@@ -11,7 +14,7 @@ from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
 from onegov.form.fields import HoneyPotField
 from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import If, StrictOptional
-from onegov.pay import Price
+from onegov.pay import InvoiceDiscountMeta, InvoiceItemMeta, Price
 from operator import itemgetter
 from wtforms import Form as BaseForm
 from wtforms.fields import EmailField
@@ -24,9 +27,10 @@ from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
+    from contextlib import AbstractContextManager as ContextManager
     from onegov.core.request import CoreRequest
     from onegov.form.types import PricingRules
-    from typing_extensions import Self, TypedDict
+    from typing import TypedDict, Self
     from weakref import CallableProxyType
     from webob.multidict import MultiDict
     from wtforms import Field
@@ -123,7 +127,7 @@ class Form(BaseForm):
             stamps = IntegerRangeField(
             'No. Stamps',
             range=range(0, 30),
-            pricing={range(0, 30): (0.85, 'CHF')}
+            pricing={range(0, 30): (1.00, 'CHF')}
         )
 
             delivery = RadioField('Delivery', choices=[
@@ -146,7 +150,7 @@ class Form(BaseForm):
 
     """
 
-    fieldsets: list['Fieldset']
+    fieldsets: list[Fieldset]
     hidden_fields: set[str]
 
     if TYPE_CHECKING:
@@ -154,7 +158,7 @@ class Form(BaseForm):
         #        meta, since that is where data like that is supposed to live
         #        but it'll be a pain to find everywhere we access request
         #        through anything other than meta.
-        request: 'CoreRequest'
+        request: CoreRequest
         model: Any
 
         # NOTE: While action isn't guaranteed to be set, it almost always will
@@ -164,13 +168,13 @@ class Form(BaseForm):
 
     def __init__(
         self,
-        formdata: 'MultiDict[str, Any] | None' = None,
+        formdata: MultiDict[str, Any] | None = None,
         obj: object | None = None,
         prefix: str = '',
         data: dict[str, Any] | None = None,
         meta: dict[str, Any] | None = None,
         *,
-        extra_filters: 'Mapping[str, Sequence[Any]] | None' = None,
+        extra_filters: Mapping[str, Sequence[Any]] | None = None,
         **kwargs: Any
     ):
 
@@ -181,7 +185,8 @@ class Form(BaseForm):
         preprocessors = [
             self.process_fieldset(),
             self.process_depends_on(),
-            self.process_pricing()
+            self.process_pricing(),
+            self.process_discount(),
         ]
 
         for processor in preprocessors:
@@ -203,7 +208,7 @@ class Form(BaseForm):
         self.hidden_fields = set()
 
     @classmethod
-    def clone(cls) -> type['Self']:
+    def clone(cls) -> type[Self]:
         """ Creates an independent copy of the form class.
 
         The fields of the so called class may be manipulated without affecting
@@ -222,7 +227,7 @@ class Form(BaseForm):
 
         return ClonedForm
 
-    def process_fieldset(self) -> 'Iterator[None]':
+    def process_fieldset(self) -> Iterator[None]:
         """ Processes the fieldset parameter on the fields, which puts
         fields into fieldsets.
 
@@ -267,7 +272,7 @@ class Form(BaseForm):
                 fields=(self._fields[field_id] for _, field_id in fields)
             ))
 
-    def process_depends_on(self) -> 'Iterator[None]':
+    def process_depends_on(self) -> Iterator[None]:
         """ Processes the depends_on parameter on the fields, which adds the
         ability to have fields depend on values of other fields.
 
@@ -314,12 +319,33 @@ class Form(BaseForm):
                 if field_flags:
                     field.kwargs['validators'][0].field_flags = field_flags
 
-            field.kwargs['render_kw'] = field.kwargs.get('render_kw', {})
-            field.kwargs['render_kw'].update(field.depends_on.html_data)
+            field.kwargs.setdefault('render_kw', {}).update(
+                # NOTE: self._prefix does not exist yet, for the shared
+                #       default we assume that there is no prefix
+                field.depends_on.html_data('')
+            )
 
         yield
 
-    def process_pricing(self) -> 'Iterator[None]':
+        # NOTE: We currently assume that the only time we have different
+        #       prefixes for the same form is in a FieldList, technically
+        #       we would need to always do this step below to be fully
+        #       robust
+        if not self._prefix:
+            return
+
+        for field_id, field in self._unbound_fields:
+            if not hasattr(field, 'depends_on'):
+                continue
+
+            f = self[field_id]
+            assert f.render_kw is not None
+            f.render_kw = f.render_kw.copy()
+            f.render_kw.update(
+                field.depends_on.html_data(self._prefix)
+            )
+
+    def process_pricing(self) -> Iterator[None]:
         """ Processes the pricing parameter on the fields, which adds the
         ability to have fields associated with a price.
 
@@ -345,13 +371,52 @@ class Form(BaseForm):
         for field_id, pricing in pricings.items():
             self._fields[field_id].pricing = pricing
 
-    def render_display(self, field: 'Field') -> Markup | None:
+    def process_discount(self) -> Iterator[None]:
+        """ Processes the discount parameter on the fields, which adds the
+        ability to have fields associated with a proportional discount.
+
+        See :class:`Form` for more information.
+
+        """
+
+        discounts: dict[str, dict[str, Decimal]] = {}
+
+        # move the pricing rule to the field class (happens once per class)
+        for field_id, field in self._unbound_fields:
+            if not hasattr(field, 'discount'):
+                field.discount = field.kwargs.pop('discount', None)
+
+        # prepare the pricing rules
+        for field_id, field in self._unbound_fields:
+            if field.discount:
+                discounts[field_id] = {
+                    key: Decimal(value)
+                    for key, value in field.discount.items()
+                }
+
+        yield
+
+        # attach the pricing rules to the field instances
+        for field_id, discount in discounts.items():
+            self._fields[field_id].discount = discount
+
+    def render_display(self, field: Field) -> Markup | None:
         """ Renders the given field for display (no input). May be overwritten
         by descendants to return different html, or to return None.
 
         If None is returned, the field is not rendered.
 
         """
+        if self.is_hidden(field):
+            return None
+        if (
+            # NOTE: It's a little sus to render fields that are not part
+            #       of our form at all, but for now we'll allow it.
+            field.id in self
+            and hasattr(self.__class__, field.id)
+            and not self.is_visible_through_dependencies(field.id)
+        ):
+            return None
         return render_field(field)
 
     def is_visible_through_dependencies(self, field_id: str) -> bool:
@@ -377,7 +442,7 @@ class Form(BaseForm):
             for d in depends_on.dependencies
         )
 
-    def is_hidden(self, field: 'Field') -> bool:
+    def is_hidden(self, field: Field) -> bool:
         """ True if the given field should be hidden. The effect of this is
         left to the application (it might not render the field, or add a
         class which hides the field).
@@ -385,11 +450,11 @@ class Form(BaseForm):
         """
         return field.id in self.hidden_fields
 
-    def hide(self, field: 'Field') -> None:
+    def hide(self, field: Field) -> None:
         """ Marks the given field as hidden. """
         self.hidden_fields.add(field.id)
 
-    def show(self, field: 'Field') -> None:
+    def show(self, field: Field) -> None:
         """ Marks the given field as visibile. """
         self.hidden_fields.discard(field.id)
 
@@ -412,9 +477,35 @@ class Form(BaseForm):
                 prices.append((field_id, price))
 
         currencies = {price.currency for _, price in prices}
-        assert len(currencies) <= 1, "Mixed currencies are not supported"
+        assert len(currencies) <= 1, 'Mixed currencies are not supported'
 
         return prices
+
+    def invoice_items(
+        self,
+        group: str = 'form',
+        cost_object: str | None = None,
+        vat_rate: Decimal | None = None,
+        extra: dict[str, Any] | None = None,
+    ) -> list[InvoiceItemMeta]:
+        """ Returns the invoice items for all selected items depending
+        on the formdata. """
+        return [
+            InvoiceItemMeta(
+                # NOTE: In some rare cases we may get a static field that has
+                #       a label with a translation string instead of a static
+                #       string defined through form code.
+                text=label if type(label := self[field_id].label.text) is str
+                           else self.request.translate(label),
+                group=group,
+                family=f'price-{field_id}',
+                cost_object=cost_object,
+                unit=price.amount,
+                extra=extra,
+                vat_rate=vat_rate,
+            )
+            for field_id, price in self.prices()
+        ]
 
     def total(self) -> Price | None:
         """ Returns the total amount of all prices. """
@@ -432,7 +523,84 @@ class Form(BaseForm):
             )
         )
 
-    def submitted(self, request: 'CoreRequest') -> bool:
+    def discounts(self) -> list[tuple[str, Decimal]]:
+        """ Returns the discounts of all selected items depending on the
+        formdata. """
+
+        discounts = []
+
+        for field_id, field in self._fields.items():
+            if not hasattr(field, 'discount') or not field.discount:
+                continue
+
+            if not self.is_visible_through_dependencies(field_id):
+                continue
+
+            values = field.data
+            if not isinstance(values, list):
+                values = [values]
+
+            field_discounts = [
+                discount
+                for value in values
+                if (discount := field.discount.get(value))
+            ]
+            if field_discounts:
+                discount = sum(field_discounts, start=Decimal('0'))
+                discounts.append((field_id, discount))
+
+        return discounts
+
+    def discount_items(
+        self,
+        group: str = 'form',
+        cost_object: str | None = None,
+        vat_rate: Decimal | None = None,
+        extra: dict[str, Any] | None = None,
+    ) -> list[InvoiceDiscountMeta]:
+        """ Returns the discount items for all selected items depending
+        on the formdata. """
+        return [
+            InvoiceDiscountMeta(
+                # NOTE: In some rare cases we may get a static field that has
+                #       a label with a translation string instead of a static
+                #       string defined through form code.
+                text=label if type(label := self[field_id].label.text) is str
+                           else self.request.translate(label),
+                group=group,
+                family=f'discount-{field_id}',
+                cost_object=cost_object,
+                discount=discount,
+                vat_rate=vat_rate,
+                extra=extra
+            )
+            for field_id, discount in self.discounts()
+        ]
+
+    def total_discount(self) -> Decimal | None:
+        """ Returns the total amount of all discounts.
+
+        The discount is returned as a multiplier between `-Inf` and `1`.
+        Discounts above `1` are clamped to `1`, since we can't discount
+        more than 100% of the price.
+
+        Negative discounts are allowed, but are generally discouraged.
+
+        This discount will not be automatically be applied to the price
+        of this form, since there may be external factors increasing the
+        price of your submission. Also the discount may not apply to
+        the options selected in the form.
+        """
+
+        discounts = self.discounts()
+
+        total = sum(discount for field_id, discount in discounts)
+        if not total:
+            return None
+
+        return min(total, Decimal('1'))
+
+    def submitted(self, request: CoreRequest) -> bool:
         """ Returns true if the given request is a successful post request. """
         return request.POST and self.validate() or False
 
@@ -470,8 +638,8 @@ class Form(BaseForm):
 
     def match_fields(
         self,
-        include_classes: 'Iterable[type[Field]] | None' = None,
-        exclude_classes: 'Iterable[type[Field]] | None' = None,
+        include_classes: Iterable[type[Field]] | None = None,
+        exclude_classes: Iterable[type[Field]] | None = None,
         required: bool | None = None,
         limit: int | None = None
     ) -> list[str]:
@@ -535,7 +703,7 @@ class Form(BaseForm):
 
     def get_useful_data(
         self,
-        exclude: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None
     ) -> dict[str, Any]:
         """ Returns the form data in a dictionary, by default excluding data
         that should not be stored in the db backend.
@@ -548,11 +716,21 @@ class Form(BaseForm):
 
         return {k: v for k, v in self.data.items() if k not in exclude}
 
+    @property
+    def no_autoflush(self) -> ContextManager[object]:
+        """ A convenience attribute for handling a no_autoflush when there
+        may not yet be a request bound to the form.
+
+        """
+        if hasattr(self, 'request'):
+            return self.request.session.no_autoflush
+        return nullcontext(None)
+
     def populate_obj(
         self,
         obj: object,
-        exclude: 'Collection[str] | None' = None,
-        include: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None
     ) -> None:
         """ A reimplementation of wtforms populate_obj function with the addage
         of optional include/exclude filters.
@@ -566,16 +744,22 @@ class Form(BaseForm):
         include = include or set(self._fields.keys())
         exclude = exclude or set()
 
-        for name, field in self._fields.items():
-            if name in include and name not in exclude:
-                field.populate_obj(obj, name)
+        # NOTE: We've observed some issues starting with SQLAlchemy 1.4 where
+        #       a flush could occur mid-object-population, this is not only
+        #       inefficient, but also error-prone for fields that rely on
+        #       the original object state being correct (observers and other
+        #       subscribers could mutate that state during the flush).
+        with self.no_autoflush:
+            for name, field in self._fields.items():
+                if name in include and name not in exclude:
+                    field.populate_obj(obj, name)
 
     def process(
         self,
-        formdata: '_MultiDictLike | None' = None,
+        formdata: _MultiDictLike | None = None,
         obj: object | None = None,
-        data: 'Mapping[str, Any] | None' = None,
-        extra_filters: 'Mapping[str, Sequence[Any]] | None' = None,
+        data: Mapping[str, Any] | None = None,
+        extra_filters: Mapping[str, Sequence[Any]] | None = None,
         **kwargs: Any
     ) -> None:
         """ Calls :meth:`process_obj` if ``process()`` was called with
@@ -603,12 +787,11 @@ class Form(BaseForm):
         call ``form.process(obj=obj)`` instead.
 
         """
-        pass
 
     def delete_field(self, fieldname: str) -> None:
         """ Removes the given field from the form and all the fieldsets. """
 
-        def fieldsets_without_field() -> 'Iterator[Fieldset]':
+        def fieldsets_without_field() -> Iterator[Fieldset]:
             for fieldset in self.fieldsets:
                 if fieldname in fieldset.fields:
                     del fieldset.fields[fieldname]
@@ -622,7 +805,7 @@ class Form(BaseForm):
 
     def validate(
         self,
-        extra_validators: 'Mapping[str, Sequence[Any]] | None' = None
+        extra_validators: Mapping[str, Sequence[Any]] | None = None
     ) -> bool:
         """ Adds support for 'ensurances' to the form. An ensurance is a
         method which is called during validation when all the fields have
@@ -650,7 +833,7 @@ class Form(BaseForm):
         return result
 
     @property
-    def ensurances(self) -> 'Iterator[Callable[[], bool]]':
+    def ensurances(self) -> Iterator[Callable[[], bool]]:
         """ Returns the ensurances that need to be checked when validating.
 
         This property may be overridden if only a subset of all ensurances
@@ -682,12 +865,12 @@ class Form(BaseForm):
 
     def additional_field_help(
         self,
-        field: 'Field',
+        field: Field,
         length_limit: int = 54
     ) -> str | None:
         """ Returns the field description in modified form if
-         the description should be rendered separately in the field macro.
-         """
+        the description should be rendered separately in the field macro.
+        """
         if hasattr(field, 'long_description'):
             return field.long_description
         if 'long_description' in (getattr(field, 'render_kw', {}) or {}):
@@ -707,9 +890,9 @@ class Form(BaseForm):
 class Fieldset:
     """ Defines a fieldset with a list of fields. """
 
-    fields: dict[str, 'CallableProxyType[Field]']
+    fields: dict[str, CallableProxyType[Field]]
 
-    def __init__(self, label: str | None, fields: 'Iterable[Field]'):
+    def __init__(self, label: str | None, fields: Iterable[Field]):
         """ Initializes the Fieldset.
 
         :label: Label of the fieldset (None if it's an invisible fieldset)
@@ -724,7 +907,7 @@ class Fieldset:
     def __len__(self) -> int:
         return len(self.fields)
 
-    def __getitem__(self, key: str) -> 'CallableProxyType[Field]':
+    def __getitem__(self, key: str) -> CallableProxyType[Field]:
         return self.fields[key]
 
     @property
@@ -732,7 +915,7 @@ class Fieldset:
         return self.label is not None
 
     @property
-    def non_empty_fields(self) -> dict[str, 'CallableProxyType[Field]']:
+    def non_empty_fields(self) -> dict[str, CallableProxyType[Field]]:
         """ Returns only the fields which are not empty. """
         return OrderedDict(
             (id, field) for id, field in self.fields.items() if field.data)
@@ -754,7 +937,7 @@ class FieldDependency:
 
     """
 
-    dependencies: list['DependencyDict']
+    dependencies: list[DependencyDict]
 
     def __init__(self, *kwargs: object):
         assert len(kwargs) and not len(kwargs) % 2
@@ -770,6 +953,13 @@ class FieldDependency:
             else:
                 invert = False
 
+            # NOTE: Fields in WTForms can't store an empty string, they
+            #       will instead be normalized to None, the raw_choice
+            #       should stay the same however, since the input in the
+            #       form will have an empty string as its value
+            if raw_choice == '':
+                choice = None
+
             self.dependencies.append({
                 'field_id': field_id,
                 'raw_choice': raw_choice,
@@ -777,7 +967,7 @@ class FieldDependency:
                 'choice': choice,
             })
 
-    def fulfilled(self, form: Form, field: 'Field') -> bool:
+    def fulfilled(self, form: Form, field: Field) -> bool:
         result = True
         for dependency in self.dependencies:
             data = getattr(form, dependency['field_id']).data
@@ -790,17 +980,18 @@ class FieldDependency:
             result = result and ((data == choice) ^ invert)
         return result
 
-    def unfulfilled(self, form: Form, field: 'Field') -> bool:
+    def unfulfilled(self, form: Form, field: Field) -> bool:
         return not self.fulfilled(form, field)
 
     @property
     def field_id(self) -> str:
         return self.dependencies[0]['field_id']
 
-    @property
-    def html_data(self) -> dict[str, str]:
+    def html_data(self, prefix: str) -> dict[str, str]:
         value = ';'.join(
-            f"{d['field_id']}/{d['raw_choice']}" for d in self.dependencies)
+            f"{prefix}{d['field_id']}/{d['raw_choice']}"
+            for d in self.dependencies
+        )
 
         return {'data-depends-on': value}
 
@@ -811,7 +1002,7 @@ class Pricing:
 
     """
 
-    def __init__(self, rules: 'PricingRules'):
+    def __init__(self, rules: PricingRules):
         self.rules = {
             rule: Price(
                 amount,
@@ -827,7 +1018,7 @@ class Pricing:
             price.credit_card_payment for price in self.rules.values()
         )
 
-    def price(self, field: 'Field') -> Price | None:
+    def price(self, field: Field) -> Price | None:
         values = field.data
         if not isinstance(field.data, list):
             values = [values]
@@ -911,7 +1102,7 @@ def merge_forms(form: type[_FormT], /, *forms: type[Form]) -> type[_FormT]:
 
 def enforce_order(
     form_class: type[_FormT],
-    fields_in_order: 'Iterable[str]'
+    fields_in_order: Iterable[str]
 ) -> type[_FormT]:
     """ Takes a list of fields used in a form_class and enforces the
     order of those fields.
@@ -942,28 +1133,32 @@ def enforce_order(
 
 def move_fields(
     form_class: type[_FormT],
-    fields: 'Collection[str]',
-    after: str | None
+    fields: Collection[str],
+    after: str | None = None,
+    before: str | None = None,
 ) -> type[_FormT]:
     """ Reorders the given fields (given by name) by inserting them directly
     after the given field.
 
-    If ``after`` is None, the fields are moved to the end.
+    If ``after`` and ``before`` are ``None``, the fields are moved to the end.
 
     """
 
-    fields_in_order = []
+    fields_in_order: list[str] = []
 
     for name, _ in utils.get_fields_from_class(form_class):
         if name in fields:
             continue
+
+        if name == before:
+            fields_in_order.extend(fields)
 
         fields_in_order.append(name)
 
         if name == after:
             fields_in_order.extend(fields)
 
-    if after is None:
+    if after is None and before is None:
         fields_in_order.extend(fields)
 
     return enforce_order(form_class, fields_in_order)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.hidden_by_principal import hide_candidates_chart
@@ -9,7 +11,6 @@ from onegov.election_day.utils import get_entity_filter
 from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
-from sqlalchemy.orm import object_session
 
 
 from typing import TYPE_CHECKING
@@ -33,8 +34,8 @@ election_incomplete_text = _(
 )
 def view_election_candidates_data(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" View the candidates as JSON.
 
     Used to for the candidates bar chart.
@@ -66,12 +67,12 @@ def view_election_candidates_data(
 )
 def view_election_candidates_chart(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the candidates as bar chart. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     entity = request.params.get('entity', '')
@@ -94,8 +95,8 @@ def view_election_candidates_chart(
 )
 def view_election_candidates(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
     entity = request.params.get('entity', '')
@@ -103,7 +104,7 @@ def view_election_candidates(
     entities = get_entity_filter(request, self, 'candidates', entity)
     candidates = get_candidates_results(
         self,
-        object_session(self),
+        request.session,
         entities=[entity] if entity else None
     ).all()
     any_elected = any(candidate.elected for candidate in candidates)
@@ -128,19 +129,19 @@ def view_election_candidates(
 )
 def view_election_lists_table(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the lists as table. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     entity = request.params.get('entity', '')
     assert isinstance(entity, str)
     candidates = get_candidates_results(
         self,
-        object_session(self),
+        request.session,
         entities=[entity] if entity else None
     ).all()
 
@@ -160,8 +161,8 @@ def view_election_lists_table(
 )
 def view_election_candidates_svg(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the candidates as SVG. """
 
     layout = ElectionLayout(self, request, 'candidates')

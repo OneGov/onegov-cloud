@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import msal  # type:ignore[import-untyped]
 from attr import attrs, attrib
 from functools import cached_property
@@ -8,7 +10,7 @@ from onegov.user import log
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.user.auth.provider import HasApplicationIdAndNamespace
-    from typing_extensions import Self
+    from typing import Self
 
 
 @attrs(auto_attribs=True)
@@ -36,7 +38,7 @@ class AzureADAttributes:
     preferred_username: str
 
     @classmethod
-    def from_cfg(cls, cfg: dict[str, Any]) -> 'Self':
+    def from_cfg(cls, cfg: dict[str, Any]) -> Self:
         return cls(
             source_id=cfg.get('source_id', 'sub'),
             username=cfg.get('username', 'email'),
@@ -48,7 +50,7 @@ class AzureADAttributes:
 
 
 @attrs()
-class MSALClient():
+class MSALClient:
 
     AUTHORITY_BASE = 'https://login.microsoftonline.com'
     SIGN_OUT_ENDPOINT = '/oauth2/v2.0/logout'
@@ -99,12 +101,12 @@ class MSALClient():
 
 
 @attrs
-class MSALConnections():
+class MSALConnections:
 
     # instantiated connections for every tenant
     connections: dict[str, MSALClient] = attrib()
 
-    def client(self, app: 'HasApplicationIdAndNamespace') -> MSALClient | None:
+    def client(self, app: HasApplicationIdAndNamespace) -> MSALClient | None:
         if app.application_id in self.connections:
             return self.connections[app.application_id]
 
@@ -113,7 +115,7 @@ class MSALConnections():
         return None
 
     @classmethod
-    def from_cfg(cls, config: dict[str, Any]) -> 'Self':
+    def from_cfg(cls, config: dict[str, Any]) -> Self:
         clients = {
             app_id: MSALClient(
                 client_id=cfg['client_id'],

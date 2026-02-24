@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from functools import cached_property
-from chameleon.utils import Markup
 from onegov.activity import Attendee, AttendeeCollection
-from onegov.activity import Booking, BookingCollection, Occasion
-from onegov.activity import InvoiceCollection
+from onegov.activity import Booking, BookingCollection
+from onegov.activity import BookingPeriodInvoiceCollection
+from onegov.activity import Occasion
 from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.feriennet.layout import DefaultLayout
@@ -30,7 +32,7 @@ if TYPE_CHECKING:
 
 class AttendeeBase(Form):
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     if TYPE_CHECKING:
         first_name: StringField
@@ -51,16 +53,16 @@ class AttendeeBase(Form):
         model.name = self.name
 
         # Update name changes on invoice items of current period
-        assert self.request.app.active_period is not None
-        invoice_collection = InvoiceCollection(
-            session=self.request.session,
-            period_id=self.request.app.active_period.id)
+        if self.request.app.active_period is not None:
+            invoice_collection = BookingPeriodInvoiceCollection(
+                session=self.request.session,
+                period_id=self.request.app.active_period.id)
 
-        invoice_items = invoice_collection.query_items()
+            invoice_items = invoice_collection.query_items()
 
-        for item in invoice_items:
-            if item.attendee_id == self.model.id:
-                item.group = self.name
+            for item in invoice_items:
+                if item.attendee_id == self.model.id:
+                    item.group = self.name
 
     def process_obj(self, model: Attendee) -> None:  # type:ignore[override]
         super().process_obj(model)
@@ -91,7 +93,7 @@ class AttendeeBase(Form):
         if self.request.session.query(query.exists()).scalar():
             assert isinstance(self.last_name.errors, list)
             self.last_name.errors.append(
-                _("You already entered a child with this name"))
+                _('You already entered a child with this name'))
 
             return False
         return None
@@ -100,57 +102,65 @@ class AttendeeBase(Form):
 class AttendeeForm(AttendeeBase):
 
     first_name = StringField(
-        label=_("First Name"),
+        label=_('First Name'),
         validators=[InputRequired()])
 
     last_name = StringField(
-        label=_("Last Name"),
+        label=_('Last Name'),
         validators=[InputRequired()])
 
     birth_date = DateField(
-        label=_("Birthdate"),
+        label=_('Birthdate'),
         validators=[InputRequired()])
 
     gender = RadioField(
-        label=_("Gender"),
+        label=_('Gender'),
         choices=[
-            ('female', _("Girl")),
-            ('male', _("Boy")),
+            ('female', _('Girl')),
+            ('male', _('Boy')),
         ],
         validators=[InputRequired()]
     )
 
     notes = TextAreaField(
-        label=_("Health Information"),
-        description=_("Allergies, Disabilities, Particulars"),
+        label=_('Is there anything the course instructor should know?'),
+        description=_('Allergies, Disabilities, Particulars'),
+    )
+
+    swisspass = StringField(
+        label=_('Swisspass ID'),
+        description='XXX-XXX-XXX-X',
+        render_kw={
+            'data-max-length': 13,
+        }
     )
 
     differing_address = BooleanField(
-        label=_("The address of the attendee differs from the users address"),
+        label=_('The address of the attendee differs from the users address'),
         description=_("Check this box if the attendee doesn't live with you")
     )
 
     address = TextAreaField(
-        label=_("Address"),
+        label=_('Address'),
         render_kw={'rows': 4},
         validators=[InputRequired()],
         depends_on=('differing_address', 'y')
     )
 
     zip_code = StringField(
-        label=_("Zip Code"),
+        label=_('Zip Code'),
         validators=[InputRequired()],
         depends_on=('differing_address', 'y')
     )
 
     place = StringField(
-        label=_("Place"),
+        label=_('Place'),
         validators=[InputRequired()],
         depends_on=('differing_address', 'y')
     )
 
     political_municipality = StringField(
-        label=_("Political municipality"),
+        label=_('Political municipality'),
         validators=[InputRequired()],
         depends_on=('differing_address', 'y')
     )
@@ -163,93 +173,125 @@ class AttendeeForm(AttendeeBase):
         if not self.show_political_municipality:
             self.delete_field('political_municipality')
 
+    def toggle_swisspass(self) -> None:
+        if not self.request.app.org.meta.get('require_swisspass'):
+            self.delete_field('swisspass')
+
     def on_request(self) -> None:
         self.toggle_political_municipality()
+        self.toggle_swisspass()
+
+    def ensure_valid_swisspass_id(self) -> bool:
+        if self.swisspass and self.swisspass.data:
+            if len(self.swisspass.data) != 13:
+                assert isinstance(self.swisspass.errors, list)
+                self.swisspass.errors.append(_(
+                    'The Swisspass ID must be 13 characters long '
+                    '(including dashes).'
+                ))
+                return False
+
+            if not all(c.isdigit() or c == '-' for c in self.swisspass.data):
+                assert isinstance(self.swisspass.errors, list)
+                self.swisspass.errors.append(_(
+                    'The Swisspass ID must only contain digits and dashes.'
+                ))
+                return False
+        return True
 
 
 class AttendeeSignupForm(AttendeeBase):
 
     attendee = RadioField(
-        label=_("Attendee"),
+        label=_('Attendee'),
         validators=[InputRequired()],
         default='0xdeadbeef')
 
     first_name = StringField(
-        label=_("First Name"),
+        label=_('First Name'),
         validators=[InputRequired()],
         depends_on=('attendee', 'other'))
 
     last_name = StringField(
-        label=_("Last Name"),
+        label=_('Last Name'),
         validators=[InputRequired()],
         depends_on=('attendee', 'other'))
 
     birth_date = DateField(
-        label=_("Birthdate"),
+        label=_('Birthdate'),
         validators=[InputRequired()],
         depends_on=('attendee', 'other'))
 
     gender = RadioField(
-        label=_("Gender"),
+        label=_('Gender'),
         choices=[
-            ('female', _("Girl")),
-            ('male', _("Boy")),
+            ('female', _('Girl')),
+            ('male', _('Boy')),
         ],
         validators=[InputRequired()],
         depends_on=('attendee', 'other')
     )
 
     notes = TextAreaField(
-        label=_("Note"),
-        description=_("Allergies, Disabilities, Particulars"),
+        label=_('Note'),
+        description=_('Allergies, Disabilities, Particulars'),
         depends_on=('attendee', 'other')
     )
 
+    swisspass = StringField(
+        label=_('Swisspass ID'),
+        description='XXX-XXX-XXX-X',
+        depends_on=('attendee', 'other'),
+        render_kw={
+            'data-max-length': 13,
+        }
+    )
+
     differing_address = BooleanField(
-        label=_("The address of the attendee differs from the users address"),
+        label=_('The address of the attendee differs from the users address'),
         description=_("Check this box if the attendee doesn't live with you"),
         depends_on=('attendee', 'other')
     )
 
     address = TextAreaField(
-        label=_("Address"),
+        label=_('Address'),
         render_kw={'rows': 4},
         validators=[InputRequired()],
         depends_on=('differing_address', 'y')
     )
 
     zip_code = StringField(
-        label=_("Zip Code"),
+        label=_('Zip Code'),
         validators=[InputRequired()],
         depends_on=('differing_address', 'y')
     )
 
     place = StringField(
-        label=_("Place"),
+        label=_('Place'),
         validators=[InputRequired()],
         depends_on=('differing_address', 'y')
     )
 
     political_municipality = StringField(
-        label=_("Political Municipality"),
+        label=_('Political Municipality'),
         validators=[InputRequired()],
         depends_on=('differing_address', 'y')
     )
 
     ignore_age = BooleanField(
-        label=_("Ignore Age Restriction"),
-        fieldset=_("Administration"),
+        label=_('Ignore Age Restriction'),
+        fieldset=_('Administration'),
         default=False
     )
 
     accept_tos = BooleanField(
-        label=_("Accept TOS"),
-        fieldset=_("TOS"),
+        label=_('Accept TOS'),
+        fieldset=_('TOS'),
         default=False,
     )
 
     group_code = HiddenField(
-        label=_("Group Code"),
+        label=_('Group Code'),
         fieldset=None,
         default=None
     )
@@ -268,7 +310,7 @@ class AttendeeSignupForm(AttendeeBase):
         return self.request.app.org.meta.get('show_political_municipality')
 
     @cached_property
-    def user(self) -> 'User | None':
+    def user(self) -> User | None:
         if not self.username:
             return None
         users = UserCollection(self.request.session)
@@ -283,6 +325,10 @@ class AttendeeSignupForm(AttendeeBase):
     def toggle_political_municipality(self) -> None:
         if not self.show_political_municipality:
             self.delete_field('political_municipality')
+
+    def toggle_swisspass(self) -> None:
+        if not self.request.app.org.meta.get('require_swisspass'):
+            self.delete_field('swisspass')
 
     def for_username(self, username: str) -> str:
         url = URL(self.action)
@@ -302,7 +348,7 @@ class AttendeeSignupForm(AttendeeBase):
         )
 
         self.attendee.choices = [(a.id.hex, a.name) for a in attendees]
-        self.attendee.choices.append(('other', _("Add a new attendee")))
+        self.attendee.choices.append(('other', _('Add a new attendee')))
 
         # override the default
         if self.attendee.data == '0xdeadbeef':
@@ -318,13 +364,14 @@ class AttendeeSignupForm(AttendeeBase):
 
         layout = DefaultLayout(self.model, self.request)
 
-        self.accept_tos.description = Markup(render_macro(  # noqa: MS001
-            layout.macros['accept_tos'], self.request, {'url': url}))
+        self.accept_tos.description = render_macro(
+            layout.macros['accept_tos'], self.request, {'url': url})
 
     def on_request(self) -> None:
         self.populate_attendees()
         self.populate_tos()
         self.toggle_political_municipality()
+        self.toggle_swisspass()
 
         if not self.request.is_admin:
             self.delete_field('ignore_age')
@@ -334,7 +381,7 @@ class AttendeeSignupForm(AttendeeBase):
             if not self.accept_tos.data:
                 assert isinstance(self.accept_tos.errors, list)
                 self.accept_tos.errors.append(
-                    _("The TOS must be accepted to create a booking."))
+                    _('The TOS must be accepted to create a booking.'))
                 return False
         return None
 
@@ -344,8 +391,8 @@ class AttendeeSignupForm(AttendeeBase):
             assert self.user is not None
             if self.user.username == self.request.current_username:
                 self.attendee.errors.append(_(
-                    "Your userprofile is not complete. It needs to be "
-                    "complete before signing up any attendees."
+                    'Your userprofile is not complete. It needs to be '
+                    'complete before signing up any attendees.'
                 ))
             else:
                 self.attendee.errors.append(_(
@@ -375,7 +422,7 @@ class AttendeeSignupForm(AttendeeBase):
             if booking:
                 assert isinstance(self.attendee.errors, list)
                 self.attendee.errors.append(_(
-                    "This occasion has already been booked by ${name}",
+                    'This occasion has already been booked by ${name}',
                     mapping={'name': booking.attendee.name}
                 ))
 
@@ -386,7 +433,7 @@ class AttendeeSignupForm(AttendeeBase):
         if not self.model.period.active:
             assert isinstance(self.attendee.errors, list)
             self.attendee.errors.append(_(
-                "This occasion is outside the currently active period"
+                'This occasion is outside the currently active period'
             ))
             return False
         return None
@@ -403,7 +450,7 @@ class AttendeeSignupForm(AttendeeBase):
 
         assert isinstance(self.attendee.errors, list)
         self.attendee.errors.append(
-            _("This period has already been finalized."))
+            _('This period has already been finalized.'))
 
         return False
 
@@ -414,7 +461,7 @@ class AttendeeSignupForm(AttendeeBase):
         if not self.model.period.is_currently_prebooking:
             assert isinstance(self.attendee.errors, list)
             self.attendee.errors.append(_(
-                "Cannot create a booking outside the prebooking period"
+                'Cannot create a booking outside the prebooking period'
             ))
             return False
         return None
@@ -429,7 +476,7 @@ class AttendeeSignupForm(AttendeeBase):
         if not self.model.period.is_currently_booking:
             assert isinstance(self.attendee.errors, list)
             self.attendee.errors.append(_(
-                "Cannot create a booking outside the booking period"
+                'Cannot create a booking outside the booking period'
             ))
             return False
         return None
@@ -438,16 +485,16 @@ class AttendeeSignupForm(AttendeeBase):
         if self.model.full and not self.model.period.wishlist_phase:
             assert isinstance(self.attendee.errors, list)
             self.attendee.errors.append(_(
-                "This occasion is already fully booked"
+                'This occasion is already fully booked'
             ))
             return False
         return None
 
     def ensure_correct_activity_state(self) -> bool | None:
-        if not self.model.activity.state != 'approved':
+        if self.model.activity.state == 'approved':
             assert isinstance(self.attendee.errors, list)
             self.attendee.errors.append(_(
-                "This is an unapproved activity"
+                'This is an unapproved activity'
             ))
             return False
         return None
@@ -482,8 +529,8 @@ class AttendeeSignupForm(AttendeeBase):
             if count >= limit:
                 assert isinstance(self.attendee.errors, list)
                 self.attendee.errors.append(_((
-                    "The attendee already has already reached the maximum "
-                    "number of ${count} bookings"
+                    'The attendee already has already reached the maximum '
+                    'number of ${count} bookings'
                 ), mapping={
                     'count': limit
                 }))
@@ -506,7 +553,7 @@ class AttendeeSignupForm(AttendeeBase):
                 if booking.overlaps(self.model):
                     assert isinstance(self.attendee.errors, list)
                     self.attendee.errors.append(_(
-                        "This occasion overlaps with another booking"
+                        'This occasion overlaps with another booking'
                     ))
                     return False
         return None
@@ -530,12 +577,12 @@ class AttendeeSignupForm(AttendeeBase):
 
         if self.model.is_too_old(birth_date):
             assert isinstance(self.attendee.errors, list)
-            self.attendee.errors.append(_("The attendee is too old"))
+            self.attendee.errors.append(_('The attendee is too old'))
             return False
 
         if self.model.is_too_young(birth_date):
             assert isinstance(self.attendee.errors, list)
-            self.attendee.errors.append(_("The attendee is too young"))
+            self.attendee.errors.append(_('The attendee is too young'))
             return False
         return True
 
@@ -545,16 +592,34 @@ class AttendeeSignupForm(AttendeeBase):
 
         if self.model.is_past_deadline(utcnow()):
             assert isinstance(self.attendee.errors, list)
-            self.attendee.errors.append(_("The deadline has passed."))
+            self.attendee.errors.append(_('The deadline has passed.'))
             return False
 
         return None
+
+    def ensure_valid_swisspass_id(self) -> bool:
+        if self.swisspass and self.swisspass.data:
+            if len(self.swisspass.data) != 13:
+                assert isinstance(self.swisspass.errors, list)
+                self.swisspass.errors.append(_(
+                    'The Swisspass ID must be 13 characters long '
+                    '(including dashes).'
+                ))
+                return False
+
+            if not all(c.isdigit() or c == '-' for c in self.swisspass.data):
+                assert isinstance(self.swisspass.errors, list)
+                self.swisspass.errors.append(_(
+                    'The Swisspass ID must only contain digits and dashes.'
+                ))
+                return False
+        return True
 
 
 class AttendeeLimitForm(Form):
 
     limit = IntegerField(
-        label=_("Maximum number of bookings per period"),
+        label=_('Maximum number of bookings per period'),
         validators=[
             NumberRange(0, 1000)
         ])

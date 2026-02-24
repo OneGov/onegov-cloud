@@ -1,43 +1,40 @@
+from __future__ import annotations
+
+from decimal import Decimal
 from onegov.activity.models.occasion import Occasion
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
-from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Index
-from sqlalchemy import Integer
 from sqlalchemy import Numeric
-from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import object_session, relationship
+from sqlalchemy.orm import mapped_column, object_session, relationship, Mapped
 from sqlalchemy_utils import aggregated
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 
-from typing import Literal, TYPE_CHECKING
+from typing import Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Collection
-    from decimal import Decimal
-    from onegov.activity.models import Attendee, OccasionDate, Period
+    from onegov.activity.models import Attendee, OccasionDate, BookingPeriod
     from onegov.user import User
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
-    BookingState: TypeAlias = Literal[
-        'open',
-        'blocked',
-        'accepted',
-        'denied',
-        'cancelled',
-    ]
+BookingState: TypeAlias = Literal[
+    'open',
+    'blocked',
+    'accepted',
+    'denied',
+    'cancelled',
+]
 
-    # NOTE: Workaround to help with inference in case of tuple arguments
-    BookingStates: TypeAlias = (
-        tuple[BookingState, ...] | Collection[BookingState]
-    )
+# NOTE: Workaround to help with inference in case of tuple arguments
+BookingStates: TypeAlias = (
+    'tuple[BookingState, ...] | Collection[BookingState]'
+)
 
 
 class Booking(Base, TimestampMixin):
@@ -63,66 +60,48 @@ class Booking(Base, TimestampMixin):
         return isinstance(other, self.__class__) and self.id == other.id
 
     #: the public id of the booking
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the user owning the booking
-    username: 'Column[str]' = Column(
-        Text,
-        ForeignKey('users.username'),
-        nullable=False
+    username: Mapped[str] = mapped_column(
+        ForeignKey('users.username', onupdate='CASCADE')
     )
 
     #: the priority of the booking, a higher number = a higher priority
-    priority: 'Column[int]' = Column(Integer, nullable=False, default=0)
+    priority: Mapped[int] = mapped_column(default=0)
 
     #: the group code of the booking, if missing the booking is not in a group
-    group_code: 'Column[str | None]' = Column(Text, nullable=True)
+    group_code: Mapped[str | None]
 
     #: the attendee behind this booking
-    attendee_id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey("attendees.id"),
-        nullable=False
-    )
+    attendee_id: Mapped[UUID] = mapped_column(ForeignKey('attendees.id'))
 
     #: the occasion this booking belongs to
-    occasion_id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey("occasions.id"),
-        nullable=False
-    )
+    occasion_id: Mapped[UUID] = mapped_column(ForeignKey('occasions.id'))
 
     #: the cost of the booking
-    cost: 'Column[Decimal | None]' = Column(
-        Numeric(precision=8, scale=2),
-        nullable=True
-    )
+    cost: Mapped[Decimal | None] = mapped_column(Numeric(precision=8, scale=2))
 
     #: the calculated score of the booking
-    score: 'Column[Decimal]' = Column(
+    score: Mapped[Decimal] = mapped_column(
         Numeric(precision=14, scale=9),
-        nullable=False,
-        default=0
+        default=lambda: Decimal('0')
     )
-
-    if TYPE_CHECKING:
-        # FIXME: We should be able to get rid of this workaround in the future
-        period_id: 'Column[uuid.UUID]'
 
     #: the period this booking belongs to
-    @aggregated('occasion', Column(  # type:ignore[no-redef]
-        UUID, ForeignKey("periods.id"), nullable=False)
-    )
-    def period_id(self) -> 'ColumnElement[uuid.UUID]':
+    @aggregated('occasion', mapped_column(
+        ForeignKey('periods.id'),
+        nullable=False
+    ))
+    def period_id(self) -> ColumnElement[UUID]:
         return func.coalesce(Occasion.period_id, None)
 
     #: the state of the booking
-    state: 'Column[BookingState]' = Column(
-        Enum(  # type:ignore[arg-type]
+    state: Mapped[BookingState] = mapped_column(
+        Enum(
             'open',
             'blocked',
             'accepted',
@@ -130,7 +109,6 @@ class Booking(Base, TimestampMixin):
             'cancelled',
             name='booking_state'
         ),
-        nullable=False,
         default='open'
     )
 
@@ -143,32 +121,25 @@ class Booking(Base, TimestampMixin):
     )
 
     #: access the user linked to this booking
-    user: 'relationship[User]' = relationship('User')
+    user: Mapped[User] = relationship()
 
     #: access the attendee linked to this booking
-    attendee: 'relationship[Attendee]' = relationship(
-        'Attendee',
-        back_populates='bookings'
-    )
+    attendee: Mapped[Attendee] = relationship(back_populates='bookings')
 
     #: access the occasion linked to this booking
-    occasion: 'relationship[Occasion]' = relationship(
-        Occasion,
-        back_populates='bookings'
-    )
+    occasion: Mapped[Occasion] = relationship(back_populates='bookings')
 
     #: access the period linked to this booking
-    period: 'relationship[Period]' = relationship(
-        'Period',
-        back_populates='bookings'
-    )
+    period: Mapped[BookingPeriod] = relationship(back_populates='bookings')
 
     def group_code_count(
         self,
-        states: 'BookingStates | Literal["*"]' = ('open', 'accepted')
+        states: BookingStates | Literal['*'] = ('open', 'accepted')
     ) -> int:
         """ Returns the number of bookings with the same group code. """
-        query = object_session(self).query(Booking).with_entities(
+        session = object_session(self)
+        assert session is not None
+        query = session.query(Booking).with_entities(
             func.count(Booking.id)
         ).filter(Booking.group_code == self.group_code)
 
@@ -177,7 +148,10 @@ class Booking(Base, TimestampMixin):
 
         return query.scalar()
 
-    def period_bound_booking_state(self, period: 'Period') -> 'BookingState':
+    def period_bound_booking_state(
+        self,
+        period: BookingPeriod
+    ) -> BookingState:
         """ During pre-booking we don't show the actual state of the booking,
         unless the occasion was cancelled, otherwise the user might see
         accepted bookings at a point where those states are not confirmed yet.
@@ -228,6 +202,7 @@ class Booking(Base, TimestampMixin):
             return True
 
         session = object_session(self)
+        assert session is not None
 
         q = session.query(Booking.id)
         q = q.filter(Booking.attendee_id == self.attendee_id)
@@ -252,28 +227,26 @@ class Booking(Base, TimestampMixin):
     def unnobble(self) -> None:
         self.set_priority_bit(1, 0)
 
-    if TYPE_CHECKING:
-        starred: Column[bool]
-        nobbled: Column[bool]
-
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def starred(self) -> bool:
         return self.priority & 1 << 0 != 0
 
-    @starred.expression  # type:ignore[no-redef]
-    def starred(self) -> 'ColumnElement[bool]':
-        return self.priority.op('&')(1 << 0) != 0
+    @starred.inplace.expression
+    @classmethod
+    def _starred_expression(cls) -> ColumnElement[bool]:
+        return cls.priority.op('&')(1 << 0) != 0
 
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def nobbled(self) -> bool:
         return self.priority & 1 << 1 != 0
 
-    @nobbled.expression  # type:ignore[no-redef]
-    def nobbled(self) -> 'ColumnElement[bool]':
-        return self.priority.op('&')(1 << 1) != 0
+    @nobbled.inplace.expression
+    @classmethod
+    def _nobbled_expression(cls) -> ColumnElement[bool]:
+        return cls.priority.op('&')(1 << 1) != 0
 
     @property
-    def dates(self) -> list['OccasionDate']:
+    def dates(self) -> list[OccasionDate]:
         return self.occasion.dates
 
     @property
@@ -282,7 +255,7 @@ class Booking(Base, TimestampMixin):
 
     def overlaps(
         self,
-        other: 'Booking',
+        other: Self,
         with_anti_affinity_check: bool = False
     ) -> bool:
         # XXX circular import
@@ -291,6 +264,6 @@ class Booking(Base, TimestampMixin):
         return utils.overlaps(
             self, other,
             minutes_between=self.period.minutes_between or 0,
-            alignment=self.period.alignment,  # type:ignore[arg-type]
+            alignment=self.period.alignment,  # type: ignore[arg-type]
             with_anti_affinity_check=with_anti_affinity_check,
         )

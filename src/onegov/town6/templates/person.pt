@@ -5,14 +5,14 @@
     <tal:b metal:fill-slot="content">
 
         <div class="grid-x wrapper">
-            <div class="medium-7 cell content">
+            <div class="large-7 medium-8 cell content">
                 <div metal:use-macro="layout.macros['person_card']" />
             </div>
 
-            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+            <div class="large-4 medium-4 cell large-offset-1 sidebar">
                 <div class="sidebar-wrapper">
                     <div class="side-panel">
-                        <h2 i18n:translate="">Exports</h2>
+                        <h3 i18n:translate="">Exports</h3>
                         <ul class="more-list">
                             <li>
                                 <a class="list-link" href="${request.link(person, name='vcard')}">

@@ -1,13 +1,16 @@
 """ The authentication views. """
+from __future__ import annotations
 
 from onegov.core.security import Public
 from onegov.org.auth import MTANAuth
+from onegov.org.forms import CitizenLoginForm, ConfirmCitizenLoginForm
 from onegov.org.forms import PublicMTANForm, PublicRequestMTANForm
 from onegov.org.views.auth import (
     handle_login, handle_registration, handle_password_reset,
     handle_password_reset_request, handle_mtan_second_factor,
     handle_mtan_second_factor_setup, handle_request_mtan,
-    handle_authenticate_mtan, handle_totp_second_factor
+    handle_authenticate_mtan, handle_totp_second_factor,
+    handle_citizen_login, handle_confirm_citizen_login
 )
 from onegov.town6 import TownApp
 from onegov.town6.layout import DefaultLayout
@@ -37,9 +40,9 @@ if TYPE_CHECKING:
 )
 def town_handle_login(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: LoginForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles the login requests. """
 
     return handle_login(self, request, form, DefaultLayout(self, request))
@@ -54,9 +57,9 @@ def town_handle_login(
 )
 def town_handle_registration(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: RegistrationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_registration(
         self, request, form, DefaultLayout(self, request))
 
@@ -70,9 +73,9 @@ def town_handle_registration(
 )
 def town_handle_password_reset_request(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: RequestPasswordResetForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_password_reset_request(
         self, request, form, DefaultLayout(self, request))
 
@@ -86,9 +89,9 @@ def town_handle_password_reset_request(
 )
 def town_handle_password_reset(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: PasswordResetForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_password_reset(
         self, request, form, DefaultLayout(self, request))
 
@@ -102,10 +105,10 @@ def town_handle_password_reset(
 )
 def town_handle_mtan_second_factor(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: MTANForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_mtan_second_factor(
         self,
         request,
@@ -123,10 +126,10 @@ def town_handle_mtan_second_factor(
 )
 def town_handle_mtan_second_factor_setup(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: RequestMTANForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_mtan_second_factor_setup(
         self,
         request,
@@ -144,10 +147,10 @@ def town_handle_mtan_second_factor_setup(
 )
 def town_handle_totp_second_factor(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: TOTPForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_totp_second_factor(
         self,
         request,
@@ -165,9 +168,9 @@ def town_handle_totp_second_factor(
 )
 def town_handle_request_mtan(
     self: MTANAuth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: PublicRequestMTANForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_request_mtan(
         self,
         request,
@@ -185,10 +188,50 @@ def town_handle_request_mtan(
 )
 def town_handle_authenticate_mtan(
     self: MTANAuth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: PublicMTANForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_authenticate_mtan(
+        self,
+        request,
+        form,
+        DefaultLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=Auth,
+    name='citizen-login',
+    template='form.pt',
+    permission=Public,
+    form=CitizenLoginForm
+)
+def town_handle_citizen_login(
+    self: Auth,
+    request: TownRequest,
+    form: CitizenLoginForm
+) -> RenderData | Response:
+    return handle_citizen_login(
+        self,
+        request,
+        form,
+        DefaultLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=Auth,
+    name='confirm-citizen-login',
+    template='form.pt',
+    permission=Public,
+    form=ConfirmCitizenLoginForm
+)
+def town_handle_confirm_citizen_login(
+    self: Auth,
+    request: TownRequest,
+    form: ConfirmCitizenLoginForm
+) -> RenderData | Response:
+    return handle_confirm_citizen_login(
         self,
         request,
         form,

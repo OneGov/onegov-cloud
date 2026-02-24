@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.election_day import _
 from onegov.election_day.collections import DataSourceCollection
@@ -38,12 +40,12 @@ if TYPE_CHECKING:
 
 class ManageLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'ElectionDayRequest'):
+    def __init__(self, model: Any, request: ElectionDayRequest):
         super().__init__(model, request)
         self.request.include('backend_common')
         self.request.include('chosen')
         self.breadcrumbs = [
-            (_("Manage"), super().manage_link, 'unavailable'),
+            (_('Manage'), super().manage_link, 'unavailable'),
         ]
 
     @cached_property
@@ -51,13 +53,13 @@ class ManageLayout(DefaultLayout):
         return self.request.link(self.model)
 
     @cached_property
-    def menu(self) -> 'NestedMenu':
+    def menu(self) -> NestedMenu:
         session = self.request.session
         principal = self.principal
 
         result: NestedMenu = []
         result.append((
-            _("Votes"),
+            _('Votes'),
             self.request.link(VoteCollection(session)),
             isinstance(self.model, VoteCollection),
             []
@@ -65,7 +67,7 @@ class ManageLayout(DefaultLayout):
 
         if principal.domain == 'municipality':
             result.append((
-                _("Elections"),
+                _('Elections'),
                 self.request.link(ElectionCollection(session)),
                 isinstance(self.model, ElectionCollection),
                 []
@@ -73,73 +75,73 @@ class ManageLayout(DefaultLayout):
         else:
             submenu: NestedMenu = []
             submenu.append((
-                _("Elections"),
+                _('Elections'),
                 self.request.link(ElectionCollection(session)),
                 isinstance(self.model, ElectionCollection),
                 []
             ))
 
             submenu.append((
-                _("Compounds of elections"),
+                _('Compounds of elections'),
                 self.request.link(ElectionCompoundCollection(session)),
                 isinstance(self.model, ElectionCompoundCollection),
                 []
             ))
             result.append((
-                _("Elections"),
+                _('Elections'),
                 '',
-                (
-                    isinstance(self.model, ElectionCollection)
-                    or isinstance(self.model, ElectionCompoundCollection)
-                ),
+                isinstance(self.model, (
+                    ElectionCollection,
+                    ElectionCompoundCollection
+                )),
                 submenu
             ))
 
         submenu = []
         submenu.append((
-            _("Upload tokens"),
+            _('Upload tokens'),
             self.request.link(UploadTokenCollection(session)),
             isinstance(self.model, UploadTokenCollection),
             []
         ))
         if principal.wabsti_import:
             submenu.append((
-                _("Wabsti data sources"),
+                _('Wabsti data sources'),
                 self.request.link(DataSourceCollection(session)),
-                (
-                    isinstance(self.model, DataSourceCollection)
-                    or isinstance(self.model, DataSourceItemCollection)
-                ),
+                isinstance(self.model, (
+                    DataSourceCollection,
+                    DataSourceItemCollection
+                )),
                 []
             ))
         result.append((
-            _("Import configuration"),
+            _('Import configuration'),
             '',
-            (
-                isinstance(self.model, UploadTokenCollection)
-                or isinstance(self.model, DataSourceCollection)
-                or isinstance(self.model, DataSourceItemCollection)
-            ),
+            isinstance(self.model, (
+                UploadTokenCollection,
+                DataSourceCollection,
+                DataSourceItemCollection
+            )),
             submenu
         ))
 
         submenu = []
         if principal.sms_notification:
             submenu.append((
-                _("SMS subscribers"),
+                _('SMS subscribers'),
                 self.request.link(SmsSubscriberCollection(session)),
                 isinstance(self.model, SmsSubscriberCollection),
                 []
             ))
         if self.principal.email_notification:
             submenu.append((
-                _("Email subscribers"),
+                _('Email subscribers'),
                 self.request.link(EmailSubscriberCollection(session)),
                 isinstance(self.model, EmailSubscriberCollection),
                 []
             ))
         submenu.append((
-            _("Trigger notifications"),
+            _('Trigger notifications'),
             self.request.link(
                 self.principal, name='trigger-notifications'
             ),
@@ -147,17 +149,17 @@ class ManageLayout(DefaultLayout):
             []
         ))
         result.append((
-            _("Notifications"),
+            _('Notifications'),
             '',
-            (
-                isinstance(self.model, SmsSubscriberCollection)
-                or isinstance(self.model, EmailSubscriberCollection)
-            ),
+            isinstance(self.model, (
+                SmsSubscriberCollection,
+                EmailSubscriberCollection
+            )),
             submenu
         ))
 
         result.append((
-            _("Screens"),
+            _('Screens'),
             self.request.link(ScreenCollection(session)),
             isinstance(self.model, ScreenCollection),
             []
@@ -166,13 +168,13 @@ class ManageLayout(DefaultLayout):
         if self.request.is_secret(self.model):
             submenu = [
                 (
-                    _("Update archived results"),
+                    _('Update archived results'),
                     self.request.link(self.principal, 'update-results'),
                     'update-results' in self.request.url,
                     []
                 ),
                 (
-                    _("Clear cache"),
+                    _('Clear cache'),
                     self.request.link(self.principal, 'clear-cache'),
                     'clear-cache' in self.request.url,
                     []
@@ -180,7 +182,7 @@ class ManageLayout(DefaultLayout):
             ]
 
             result.append((
-                _("Administration"),
+                _('Administration'),
                 '',
                 False,
                 submenu
@@ -196,7 +198,7 @@ class ManageLayout(DefaultLayout):
 
     def clear_media(
         self,
-        tabs: 'Collection[str] | None' = None,
+        tabs: Collection[str] | None = None,
         additional: list[str] | None = None
     ) -> int:
 
@@ -230,12 +232,12 @@ class ManageElectionsLayout(ManageLayout):
     def __init__(
         self,
         model: Election | ElectionCollection,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
 
         super().__init__(model, request)
         self.breadcrumbs.append(
-            (_("Elections"), request.link(self.model), '')
+            (_('Elections'), request.link(self.model), '')
         )
 
     @cached_property
@@ -258,12 +260,12 @@ class ManageElectionCompoundsLayout(ManageLayout):
     def __init__(
         self,
         model: ElectionCompound | ElectionCompoundCollection,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
 
         super().__init__(model, request)
         self.breadcrumbs.append(
-            (_("Compounds of elections"), request.link(self.model), '')
+            (_('Compounds of elections'), request.link(self.model), '')
         )
 
     @cached_property
@@ -286,12 +288,12 @@ class ManageVotesLayout(ManageLayout):
     def __init__(
         self,
         model: Vote | VoteCollection,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
 
         super().__init__(model, request)
         self.breadcrumbs.append(
-            (_("Votes"), request.link(self.model), ''),
+            (_('Votes'), request.link(self.model), ''),
         )
 
     @cached_property
@@ -318,26 +320,26 @@ class ManageVotesLayout(ManageLayout):
 
 class ManageSubscribersLayout(ManageLayout):
 
-    model: 'SubscriberCollection[Any] | Subscriber'
+    model: SubscriberCollection[Any] | Subscriber
 
     def __init__(
         self,
-        model: 'SubscriberCollection[Any] | Subscriber',
-        request: 'ElectionDayRequest'
+        model: SubscriberCollection[Any] | Subscriber,
+        request: ElectionDayRequest
     ) -> None:
 
         super().__init__(model, request)
         if isinstance(self.model, EmailSubscriberCollection):
             self.breadcrumbs.append(
-                (_("Email subscribers"), request.link(self.model), ''),
+                (_('Email subscribers'), request.link(self.model), ''),
             )
         elif isinstance(self.model, SmsSubscriberCollection):
             self.breadcrumbs.append(
-                (_("SMS subscribers"), request.link(self.model), ''),
+                (_('SMS subscribers'), request.link(self.model), ''),
             )
         else:
             self.breadcrumbs.append(
-                (_("Subscribers"), request.link(self.model), ''),
+                (_('Subscribers'), request.link(self.model), ''),
             )
 
     @cached_property
@@ -359,17 +361,17 @@ class ManageSubscribersLayout(ManageLayout):
 
 class ManageUploadTokensLayout(ManageLayout):
 
-    model: 'UploadToken | UploadTokenCollection'
+    model: UploadToken | UploadTokenCollection
 
     def __init__(
         self,
-        model: 'UploadToken | UploadTokenCollection',
-        request: 'ElectionDayRequest'
+        model: UploadToken | UploadTokenCollection,
+        request: ElectionDayRequest
     ) -> None:
 
         super().__init__(model, request)
         self.breadcrumbs.append(
-            (_("Upload tokens"), request.link(self.model), ''),
+            (_('Upload tokens'), request.link(self.model), ''),
         )
 
     @cached_property
@@ -381,11 +383,11 @@ class ManageUploadTokensLayout(ManageLayout):
 
 class ManageDataSourcesLayout(ManageLayout):
 
-    def __init__(self, model: Any, request: 'ElectionDayRequest') -> None:
+    def __init__(self, model: Any, request: ElectionDayRequest) -> None:
 
         super().__init__(model, request)
         self.breadcrumbs.append(
-            (_("Wabsti data sources"), request.link(self.model), ''),
+            (_('Wabsti data sources'), request.link(self.model), ''),
         )
 
     @cached_property
@@ -397,18 +399,18 @@ class ManageDataSourcesLayout(ManageLayout):
 
 class ManageDataSourceItemsLayout(ManageLayout):
 
-    model: 'DataSource | DataSourceItemCollection'
+    model: DataSource | DataSourceItemCollection
 
     def __init__(
         self,
-        model: 'DataSource | DataSourceItemCollection',
-        request: 'ElectionDayRequest'
+        model: DataSource | DataSourceItemCollection,
+        request: ElectionDayRequest
     ) -> None:
 
         super().__init__(model, request)
         self.breadcrumbs.append(
             (
-                _("Wabsti data sources"),
+                _('Wabsti data sources'),
                 self.request.link(
                     DataSourceCollection(self.request.session)
                 ),
@@ -416,7 +418,7 @@ class ManageDataSourceItemsLayout(ManageLayout):
             ),
         )
         self.breadcrumbs.append(
-            (_("Mappings"), request.link(self.model), ''),
+            (_('Mappings'), request.link(self.model), ''),
         )
 
     @cached_property
@@ -431,10 +433,10 @@ class ManageDataSourceItemsLayout(ManageLayout):
 
 class ManageScreensLayout(ManageLayout):
 
-    def __init__(self, model: Any, request: 'ElectionDayRequest') -> None:
+    def __init__(self, model: Any, request: ElectionDayRequest) -> None:
         super().__init__(model, request)
         self.breadcrumbs.append(
-            (_("Screens"), request.link(self.model), ''),
+            (_('Screens'), request.link(self.model), ''),
         )
 
     @cached_property

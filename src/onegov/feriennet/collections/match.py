@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import Booking, Attendee, Occasion
 from onegov.core.utils import toggle
 from onegov.core.orm import as_selectable_from_path
@@ -9,17 +11,18 @@ from statistics import mean
 
 from typing import Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Collection
+    from collections.abc import Collection, Iterable
     from datetime import datetime
-    from onegov.activity.models import Period
-    from sqlalchemy.orm import Query, Session
-    from sqlalchemy.sql.selectable import Alias
-    from typing_extensions import Self, TypeAlias
+    from onegov.activity.models import BookingPeriod, BookingPeriodMeta
+    from sqlalchemy.orm import Session
+    from sqlalchemy.sql import Subquery
+    from typing import Self, TypeAlias
     from uuid import UUID
 
     class OccasionByStateRow(NamedTuple):
-        state: 'OccasionState | None'
+        state: OccasionState | None
         occasion_id: UUID
+        activity_id: UUID
         title: str
         start: datetime
         end: datetime
@@ -32,7 +35,7 @@ if TYPE_CHECKING:
         total_bookings: int
         period_id: UUID
 
-OccasionState: 'TypeAlias' = Literal[
+OccasionState: TypeAlias = Literal[
     'cancelled',
     'overfull',
     'empty',
@@ -46,22 +49,22 @@ class MatchCollection:
 
     def __init__(
         self,
-        session: 'Session',
-        period: 'Period',
-        states: 'Collection[OccasionState] | None' = None
+        session: Session,
+        period: BookingPeriod | BookingPeriodMeta,
+        states: Collection[OccasionState] | None = None
     ) -> None:
         self.session = session
         self.period = period
         self.states = set(states) if states else set()
 
     @property
-    def period_id(self) -> 'UUID':
+    def period_id(self) -> UUID:
         return self.period.id
 
-    def for_period(self, period: 'Period') -> 'Self':
+    def for_period(self, period: BookingPeriod | BookingPeriodMeta) -> Self:
         return self.__class__(self.session, period)
 
-    def for_filter(self, state: OccasionState | None = None) -> 'Self':
+    def for_filter(self, state: OccasionState | None = None) -> Self:
         toggled = toggle(self.states, state)
         return self.__class__(self.session, self.period, toggled)
 
@@ -80,7 +83,7 @@ class MatchCollection:
             return 0
 
     @property
-    def occasions_by_state(self) -> 'Alias':
+    def occasions_by_state(self) -> Subquery:
         return as_selectable_from_path(
             module_path('onegov.feriennet', 'queries/occasions_by_state.sql'))
 
@@ -107,16 +110,16 @@ class MatchCollection:
 
         return sum(bits) / len(bits)
 
-    def include_in_output(self, occasion: 'OccasionByStateRow') -> bool:
+    def include_in_output(self, occasion: OccasionByStateRow) -> bool:
         if not self.states:
             return True
 
         return occasion.state in self.states
 
     @property
-    def occasions(self) -> 'Query[OccasionByStateRow]':
+    def occasions(self) -> Iterable[OccasionByStateRow]:
         columns = self.occasions_by_state.c
-        query = select(columns)
+        query = select(*columns)
 
         if not self.states:
             query = query.where(columns.period_id == self.period_id)
@@ -128,4 +131,4 @@ class MatchCollection:
 
         query = query.order_by(columns.title, columns.start)
 
-        return self.session.execute(query)
+        return self.session.execute(query).tuples()

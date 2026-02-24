@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.chat import Message, MessageCollection
 from onegov.core.security import Private
 
@@ -19,6 +21,6 @@ if TYPE_CHECKING:
 )
 def town_view_messages(
     self: MessageCollection[Message],
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_messages(self, request, MessageCollectionLayout(self, request))

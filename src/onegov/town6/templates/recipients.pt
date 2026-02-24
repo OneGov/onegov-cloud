@@ -7,6 +7,10 @@
             <p i18n:translate="">No subscribers yet</p>
         </tal:b>
 
+        <tal:b condition="count">
+            <p i18n:translate>There are currently <tal:b i18n:name="count">${count}</tal:b> recipients registered.</p>
+        </tal:b>
+
         <tal:b tal:repeat="letter by_letter">
             <h2>${letter}</h2>
 
@@ -14,6 +18,9 @@
                 <li tal:repeat="recipient by_letter[letter]" id="${recipient.id}">
                     <span>
                         ${recipient.address}
+                    </span>
+                    <span class="info">
+                        (<tal:b i18n:translate="">Subscribed on</tal:b> ${layout.format_date(recipient.created, 'date')})
                     </span>
                     -
                     <a class="confirm"
@@ -23,13 +30,15 @@
                        data-confirm-no="Cancel"
                        ic-get-from="${request.link(recipient.subscription, 'unsubscribe')}"
                        ic-select-from-response="#ignore-this"
-                       ic-target="#ignore-this"
-                       ic-replace-target="true"
-                       ic-on-success="$('#${recipient.id}').remove();"
+                       ic-target="#${recipient.id}"
+                       ic-success-action="remove"
                        i18n:translate
                        i18n:attributes="data-confirm-extra;data-confirm-yes;data-confirm-no">
                         unsubscribe
                     </a>
+                    <span tal:condition="recipient.is_inactive" class="small-text info-text" title="This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list." i18n:attributes="title">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </span>
                 </li>
             </ul>
         </tal:b>

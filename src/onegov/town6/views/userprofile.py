@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Personal, Public
 
 from onegov.org.views.userprofile import (
@@ -24,11 +26,12 @@ if TYPE_CHECKING:
 )
 def town_handle_user_profile(
     self: Organisation,
-    request: 'TownRequest',
-    form: UserProfileForm
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: UserProfileForm,
+    layout: DefaultLayout | None = None
+) -> RenderData | Response:
     return handle_user_profile(
-        self, request, form, DefaultLayout(self, request)
+        self, request, form, layout or DefaultLayout(self, request)
     )
 
 
@@ -41,6 +44,6 @@ def town_handle_user_profile(
 )
 def town_handle_unsubscribe(
     self: Organisation,
-    request: 'TownRequest'
-) -> 'RenderData | Response':
+    request: TownRequest
+) -> RenderData | Response:
     return handle_unsubscribe(self, request, DefaultLayout(self, request))

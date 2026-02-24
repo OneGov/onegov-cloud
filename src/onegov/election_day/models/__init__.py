@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.models.archived_result import ArchivedResult
 from onegov.election_day.models.data_source import DataSource
 from onegov.election_day.models.data_source import DataSourceItem

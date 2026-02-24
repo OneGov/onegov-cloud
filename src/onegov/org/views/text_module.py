@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
@@ -23,14 +25,14 @@ if TYPE_CHECKING:
 )
 def view_text_modules(
     self: TextModuleCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: TextModulesLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or TextModulesLayout(self, request)
 
     return {
-        'title': _("Text modules"),
+        'title': _('Text modules'),
         'layout': layout,
         'text_modules': self.query().all(),
     }
@@ -45,10 +47,10 @@ def view_text_modules(
 )
 def add_text_module(
     self: TextModuleCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: TextModuleForm,
     layout: TextModulesLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         text_module = self.add(
@@ -77,9 +79,9 @@ def add_text_module(
 )
 def view_text_module(
     self: TextModule,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: TextModuleLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or TextModuleLayout(self, request)
 
@@ -98,10 +100,10 @@ def view_text_module(
 )
 def edit_text_module(
     self: TextModule,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: TextModuleForm,
     layout: TextModuleLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -127,8 +129,8 @@ def edit_text_module(
     permission=Private,
     request_method='DELETE'
 )
-def delete_text_module(self: TextModule, request: 'OrgRequest') -> None:
+def delete_text_module(self: TextModule, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
 
     request.session.delete(self)
-    request.success(_("The text module was deleted"))
+    request.success(_('The text module was deleted'))

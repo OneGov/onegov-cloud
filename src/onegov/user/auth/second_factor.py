@@ -1,20 +1,24 @@
+from __future__ import annotations
+
 import morepath
 import pyotp
 
 from abc import ABCMeta, abstractmethod
+from datetime import timedelta
 from onegov.core.utils import is_valid_yubikey
 from onegov.user.collections import TANCollection
 from onegov.user.i18n import _
+from onegov.user.models import TAN
 
 
-from typing import Any, ClassVar, Literal, TYPE_CHECKING
+from typing import Any, ClassVar, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from morepath import App
     from onegov.core.request import CoreRequest
     from onegov.user import User
     from onegov.user.auth import Auth
-    from typing_extensions import Self, TypeAlias, TypedDict
+    from typing import TypeAlias, TypedDict
     from webob import Response
 
     class YubikeyConfig(TypedDict):
@@ -31,7 +35,7 @@ if TYPE_CHECKING:
     AnySecondFactor: TypeAlias = 'SingleStepSecondFactor | TwoStepSecondFactor'
 
 
-SECOND_FACTORS: dict[str, type['AnySecondFactor']] = {}
+SECOND_FACTORS: dict[str, type[AnySecondFactor]] = {}
 
 
 class SecondFactor(metaclass=ABCMeta):
@@ -65,7 +69,7 @@ class SecondFactor(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def configure(self, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
         """ Initialises the auth factor using a dictionary that may or may
         not contain the configuration values necessary for the auth factor.
 
@@ -78,7 +82,7 @@ class SecondFactor(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def args_from_app(cls, app: 'App') -> 'Mapping[str, Any]':
+    def args_from_app(cls, app: App) -> Mapping[str, Any]:
         """ Copies the required configuration values from the app, returning
         a dictionary with all keys present. The values should be either the
         ones from the application or None.
@@ -87,13 +91,13 @@ class SecondFactor(metaclass=ABCMeta):
 
     def start_activation(
         self,
-        request: 'CoreRequest',
-        auth: 'Auth'
-    ) -> 'Response | None':
+        request: CoreRequest,
+        auth: Auth
+    ) -> Response | None:
         """ Initiates the activation of the second factor. """
         return None
 
-    def complete_activation(self, user: 'User', factor: Any) -> None:
+    def complete_activation(self, user: User, factor: Any) -> None:
         """ Completes the activation of the second factor. """
         assert factor
         user.second_factor = {'type': self.type, 'data': factor}
@@ -111,8 +115,8 @@ class SingleStepSecondFactor(SecondFactor):
     @abstractmethod
     def is_valid(
         self,
-        request: 'CoreRequest',
-        user: 'User',
+        request: CoreRequest,
+        user: User,
         factor: str
     ) -> bool:
         """ Returns true if the given factor is valid for the given
@@ -134,10 +138,10 @@ class TwoStepSecondFactor(SecondFactor):
     @abstractmethod
     def send_challenge(
         self,
-        request: 'CoreRequest',
-        user: 'User',
-        auth: 'Auth'
-    ) -> 'Response':
+        request: CoreRequest,
+        user: User,
+        auth: Auth
+    ) -> Response:
         """ Sends the authentication challenge.
 
         The response will be checked in a second step using :meth:`is_valid`
@@ -158,7 +162,7 @@ class YubikeyFactor(SingleStepSecondFactor, type='yubikey'):
         self.yubikey_secret_key = yubikey_secret_key
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
         yubikey_client_id = cfg.pop('yubikey_client_id', None)
         yubikey_secret_key = cfg.pop('yubikey_secret_key', None)
         if not yubikey_client_id or not yubikey_secret_key:
@@ -167,7 +171,7 @@ class YubikeyFactor(SingleStepSecondFactor, type='yubikey'):
         return cls(yubikey_client_id, yubikey_secret_key)
 
     @classmethod
-    def args_from_app(cls, app: 'App') -> 'YubikeyConfig':
+    def args_from_app(cls, app: App) -> YubikeyConfig:
         return {
             'yubikey_client_id': getattr(app, 'yubikey_client_id', None),
             'yubikey_secret_key': getattr(app, 'yubikey_secret_key', None)
@@ -175,8 +179,8 @@ class YubikeyFactor(SingleStepSecondFactor, type='yubikey'):
 
     def is_valid(
         self,
-        request: 'CoreRequest',
-        user: 'User',
+        request: CoreRequest,
+        user: User,
         factor: str
     ) -> bool:
 
@@ -194,20 +198,25 @@ class YubikeyFactor(SingleStepSecondFactor, type='yubikey'):
 class MTANFactor(TwoStepSecondFactor, type='mtan'):
     """ Implements a mTAN factor for the :class:`Auth` class. """
 
-    __slots__ = ('self_activation',)
+    __slots__ = ('self_activation', 'expires_after')
 
     def __init__(self, mtan_automatic_setup: bool) -> None:
         self.self_activation = mtan_automatic_setup
+        # TODO: Do we want to make this configurable? For now we want
+        #       this to be slightly shorter than the default validity
+        #       period of one hour, since the second factor is a little
+        #       bit more sensitive.
+        self.mtan_expires_after = timedelta(minutes=15)
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
         if not cfg.pop('mtan_second_factor_enabled', False):
             return None
 
         return cls(cfg.pop('mtan_automatic_setup', False))
 
     @classmethod
-    def args_from_app(cls, app: 'App') -> 'MTANConfig':
+    def args_from_app(cls, app: App) -> MTANConfig:
         # if we can't deliver SMS we can't do mTAN authentication
         if not getattr(app, 'can_deliver_sms', False):
             enabled = False
@@ -219,11 +228,18 @@ class MTANFactor(TwoStepSecondFactor, type='mtan'):
             'mtan_automatic_setup': getattr(app, 'mtan_automatic_setup', False)
         }
 
+    def tans(self, request: CoreRequest) -> TANCollection:
+        return TANCollection(
+            request.session,
+            scope='mtan_second_factor',
+            expires_after=self.mtan_expires_after
+        )
+
     def start_activation(
         self,
-        request: 'CoreRequest',
-        auth: 'Auth'
-    ) -> 'Response | None':
+        request: CoreRequest,
+        auth: Auth
+    ) -> Response | None:
         if not self.self_activation:
             return None
 
@@ -232,18 +248,18 @@ class MTANFactor(TwoStepSecondFactor, type='mtan'):
 
     def send_challenge(
         self,
-        request: 'CoreRequest',
-        user: 'User',
-        auth: 'Auth',
+        request: CoreRequest,
+        user: User,
+        auth: Auth,
         mobile_number: str | None = None
-    ) -> 'Response':
+    ) -> Response:
 
         if mobile_number is None:
             assert user.second_factor
             mobile_number = user.second_factor['data']
             assert mobile_number is not None
 
-        tans = TANCollection(request.session, scope='mtan_second_factor')
+        tans = self.tans(request)
         obj = tans.add(
             client=request.client_addr or 'unknown',
             username=user.username,
@@ -270,21 +286,24 @@ class MTANFactor(TwoStepSecondFactor, type='mtan'):
 
     def is_valid(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         username: str,
         mobile_number: str,
         factor: str
     ) -> bool:
 
-        tans = TANCollection(request.session, scope='mtan_second_factor')
+        tans = self.tans(request)
         tan = tans.by_tan(factor)
         if (
             tan is not None
             and tan.meta.get('mobile_number') == mobile_number
             and tan.meta.get('username') == username
         ):
-            # expire the tan we just used
+            # expire the TAN we just used
             tan.expire()
+            # expire any other TANs issued to the same user
+            for tan in tans.query().filter(TAN.meta['username'] == username):
+                tan.expire()
             return True
         return False
 
@@ -293,32 +312,32 @@ class TOTPFactor(TwoStepSecondFactor, type='totp'):
     """ Implements a TOTP factor for the :class:`Auth` class. """
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
         if not cfg.pop('totp_enabled', False):
             return None
 
         return cls()
 
     @classmethod
-    def args_from_app(cls, app: 'App') -> 'TOTPConfig':
+    def args_from_app(cls, app: App) -> TOTPConfig:
         return {
             'totp_enabled': getattr(app, 'totp_enabled', False)
         }
 
     def send_challenge(
         self,
-        request: 'CoreRequest',
-        user: 'User',
-        auth: 'Auth',
+        request: CoreRequest,
+        user: User,
+        auth: Auth,
         mobile_number: str | None = None
-    ) -> 'Response':
+    ) -> Response:
 
         return morepath.redirect(request.link(auth, name='totp'))
 
     def is_valid(
         self,
-        request: 'CoreRequest',
-        user: 'User',
+        request: CoreRequest,
+        user: User,
         factor: str
     ) -> bool:
 

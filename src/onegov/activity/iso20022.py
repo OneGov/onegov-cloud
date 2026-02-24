@@ -1,16 +1,18 @@
+from __future__ import annotations
+
 import re
-import stdnum.ch.esr as esr  # type: ignore[import-untyped]
+import stdnum.ch.esr as esr
 
 from collections import defaultdict
 from functools import cached_property
 from datetime import date
 from decimal import Decimal
 from lxml import etree
-from onegov.activity.collections import InvoiceCollection
-from onegov.activity.models import Invoice
-from onegov.activity.models import InvoiceItem
-from onegov.activity.models import InvoiceReference
-from onegov.activity.models.invoice_reference import FeriennetSchema
+from onegov.activity.collections import BookingPeriodInvoiceCollection
+from onegov.activity.models import BookingPeriodInvoice
+from onegov.activity.models import ActivityInvoiceItem
+from onegov.pay.models import InvoiceReference
+from onegov.pay.models.invoice_reference import FeriennetSchema
 from onegov.user import User
 from sqlalchemy import func
 
@@ -57,7 +59,7 @@ class Transaction:
         # if possible, don't rely on manual extraction of the reference number.
         return {self.reference}
 
-    def extract_references(self) -> 'Iterator[str]':
+    def extract_references(self) -> Iterator[str]:
         if self.reference:
             yield self.reference
 
@@ -107,13 +109,14 @@ class Transaction:
         if self.confidence == 1:
             return 'success'
 
-        if self.confidence == 0.5:
+        # NOTE: This value is never calculated we set it exactly
+        if self.confidence == 0.5:  # noqa: RUF069
             return 'warning'
 
         return 'unknown'
 
 
-def transaction_entries(root: 'etree._Element') -> 'Iterator[etree._Element]':
+def transaction_entries(root: etree._Element) -> Iterator[etree._Element]:
     """ Yields the transaction entries from the given Camt.053 or Camt.054
     xml. This works because for our purposes the entries of those two formats
     are identical.
@@ -180,14 +183,14 @@ def get_esr(booking_text: str) -> str | None:
 def extract_transactions(
     xml: str,
     invoice_schema: str
-) -> 'Iterator[Transaction]':
+) -> Iterator[Transaction]:
     root = etree.fromstring(normalize_xml(xml).encode('utf-8'))
 
-    def first(element: 'etree._Element', xpath: str) -> Any | None:
+    def first(element: etree._Element, xpath: str) -> Any | None:
         elements = element.xpath(xpath)
         return elements[0] if elements else None
 
-    def joined(element: 'etree._Element', xpath: str) -> str:
+    def joined(element: etree._Element, xpath: str) -> str:
         return '\n'.join(element.xpath(xpath))
 
     def as_decimal(text: str | None) -> Decimal | None:
@@ -242,11 +245,11 @@ def extract_transactions(
 
 def match_iso_20022_to_usernames(
     xml: str,
-    session: 'Session',
-    period_id: 'UUID',
+    session: Session,
+    period_id: UUID,
     schema: str,
     currency: str = 'CHF'
-) -> 'Iterator[Transaction]':
+) -> Iterator[Transaction]:
     """ Takes an ISO20022 camt.053 file and matches it with the invoice
     items in the database.
 
@@ -259,35 +262,37 @@ def match_iso_20022_to_usernames(
 
     """
 
-    def items(period_id: 'UUID | None' = None) -> 'Query[InvoiceItem]':
-        invoices = InvoiceCollection(session, period_id=period_id)
-        return invoices.query_items().outerjoin(Invoice).outerjoin(User)
+    def items(period_id: UUID | None = None) -> Query[ActivityInvoiceItem]:
+        invoices = BookingPeriodInvoiceCollection(session, period_id=period_id)
+        return invoices.query_items().outerjoin(
+            BookingPeriodInvoice).outerjoin(User)
 
     # Get all known transaction ids to check what was already paid
-    q1 = items().with_entities(InvoiceItem.tid, User.username)
-    q1 = q1.group_by(InvoiceItem.tid, User.username)
+    q1 = items().with_entities(ActivityInvoiceItem.tid, User.username)
+    q1 = q1.group_by(ActivityInvoiceItem.tid, User.username)
     q1 = q1.filter(
-        InvoiceItem.paid == True,
-        InvoiceItem.source == 'xml'
+        ActivityInvoiceItem.paid == True,
+        ActivityInvoiceItem.source == 'xml'
     )
 
     paid_transaction_ids = {i.tid: i.username for i in q1}
 
     # Get a list of reference/username pairs as fallback
-    q2 = session.query(InvoiceReference).outerjoin(Invoice).outerjoin(User)
+    q2 = session.query(InvoiceReference).outerjoin(
+        BookingPeriodInvoice).outerjoin(User)
     username_by_ref = dict(q2.with_entities(
         InvoiceReference.reference,
         User.username
-    ))
+    ).tuples())
 
     # Get the items matching the given period
     q3 = items(period_id=period_id).outerjoin(InvoiceReference).with_entities(
         User.username,
-        func.sum(InvoiceItem.amount).label('amount'),
+        func.sum(ActivityInvoiceItem.amount).label('amount'),
         InvoiceReference.reference,
     )
     q3 = q3.group_by(User.username, InvoiceReference.reference)
-    q3 = q3.filter(InvoiceItem.paid == False)
+    q3 = q3.filter(ActivityInvoiceItem.paid == False)
     q3 = q3.order_by(User.username)
 
     # Hash the invoices by reference (duplicates possible)

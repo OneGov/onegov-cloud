@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.i18n import SiteLocale
 from onegov.election_day import _
@@ -16,7 +18,7 @@ class MailLayout(DefaultLayout):
     """ A special layout for creating HTML E-Mails. """
 
     @cached_property
-    def base(self) -> 'PageTemplateFile':
+    def base(self) -> PageTemplateFile:
         return self.template_loader['mail_layout.pt']
 
     @cached_property
@@ -25,7 +27,7 @@ class MailLayout(DefaultLayout):
 
     def model_title(
         self,
-        model: 'Election | ElectionCompound | Vote'
+        model: Election | ElectionCompound | Vote
     ) -> str | None:
         """ Returns the translated title of the given election or vote. Falls
         back to the title of the default fallback, if no translated title is
@@ -45,22 +47,22 @@ class MailLayout(DefaultLayout):
             self.request, self.request.link(model)
         )
 
-    def subject(self, model: 'Election | ElectionCompound | Vote') -> str:
+    def subject(self, model: Election | ElectionCompound | Vote) -> str:
         """ Returns a nice subject for the given model. """
 
-        result = _("New intermediate results")
+        result = _('New intermediate results')
         if model.completed:
-            result = _("Final results")
+            result = _('Final results')
             if isinstance(model, Vote):
                 if model.answer == 'accepted' or model.answer == 'proposal':
-                    result = _("Accepted")
+                    result = _('Accepted')
                 if model.answer == 'rejected':
-                    result = _("Rejected")
+                    result = _('Rejected')
                 if model.answer == 'counter-proposal':
                     if model.direct:
-                        result = _("Direct counter proposal accepted")
+                        result = _('Direct counter proposal accepted')
                     else:
-                        result = _("Indirect counter proposal accepted")
+                        result = _('Indirect counter proposal accepted')
 
         parts = (self.model_title(model), self.request.translate(result))
         return ' - '.join(part for part in parts if part)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.swissvotes import _
@@ -23,87 +25,87 @@ if TYPE_CHECKING:
 
 class SearchForm(Form):
 
-    request: 'SwissvotesRequest'
+    request: SwissvotesRequest
 
     term = StringField(
-        label=_("Text Search"),
+        label=_('Text Search'),
         render_kw={'size': 6, 'clear': False},
     )
 
     full_text = RadioField(
-        label=_("Full-text"),
+        label=_('Full-text'),
         choices=(
-            (1, _("Yes")),
-            (0, _("No")),
+            (1, _('Yes')),
+            (0, _('No')),
         ),
         default=1,
         coerce=bool,
         render_kw={'size': 6},
         description=_(
-            "Select «No» if you want to limit the search to title, keyword, "
-            "vote number, and procedure number only. If you select «Yes», the "
-            "full-text search also includes the following documents, in their "
-            "available language versions: brief description by Swissvotes, "
-            "text subject to vote, preliminary examination, decree on "
-            "success, Federal Council dispatch, parliamentary debate, "
-            "documents from the voting campaign. In contrast to the "
-            "abovementioned documents, the following documents are not "
-            "included in the search because they invariably contain "
-            "information on all the subjects that were put to the vote on "
-            "that day : explanatory brochure, analysis of the advertising "
-            "campaign, analysis of the media coverage, decree on voting "
-            "result, reports on the post-vote poll."
+            'Select «No» if you want to limit the search to title, keyword, '
+            'vote number, and procedure number only. If you select «Yes», the '
+            'full-text search also includes the following documents, in their '
+            'available language versions: brief description by Swissvotes, '
+            'text subject to vote, preliminary examination, decree on '
+            'success, Federal Council dispatch, parliamentary debate, '
+            'documents from the voting campaign. In contrast to the '
+            'abovementioned documents, the following documents are not '
+            'included in the search because they invariably contain '
+            'information on all the subjects that were put to the vote on '
+            'that day : explanatory brochure, analysis of the advertising '
+            'campaign, analysis of the media coverage, decree on voting '
+            'result, reports on the post-vote poll.'
         ),
     )
 
     policy_area = PolicyAreaField(
-        label=_("Policy area"),
+        label=_('Policy area'),
         render_kw={'size': 6, 'clear': True}
     )
 
     legal_form = MultiCheckboxField(
-        label=_("Legal form"),
+        label=_('Legal form'),
         coerce=int,
         choices=[],
         render_kw={'size': 6, 'clear': False}
     )
 
     result = MultiCheckboxField(
-        label=_("Voting result"),
+        label=_('Voting result'),
         coerce=int,
         choices=[],
         render_kw={'size': 6}
     )
 
     from_date = DateField(
-        label=_("From date"),
+        label=_('From date'),
         render_kw={'size': 6, 'clear': False}
     )
 
     to_date = DateField(
-        label=_("To date"),
+        label=_('To date'),
         render_kw={'size': 6}
     )
 
     position_federal_council = MultiCheckboxField(
-        label=_("Position of the Federal Council"),
-        fieldset=_("Other Filters"),
+        label=_('Position of the Federal Council'),
+        fieldset=_('Other Filters'),
         choices=[],
         coerce=int,
         render_kw={'size': 3, 'clear': False}
     )
 
     position_national_council = MultiCheckboxField(
-        label=_("Position of the National Council"),
-        fieldset=_("Other Filters"),
+        label=_('Position of the National Council'),
+        fieldset=_('Other Filters'),
         choices=[],
         coerce=int,
         render_kw={'size': 3, 'clear': False}
     )
 
     position_council_of_states = MultiCheckboxField(
-        label=_("Position of the Council of States"),
-        fieldset=_("Other Filters"),
+        label=_('Position of the Council of States'),
+        fieldset=_('Other Filters'),
         choices=[],
         coerce=int,
         render_kw={'size': 3}
@@ -118,7 +120,7 @@ class SearchForm(Form):
 
         def serialize(
             item: PolicyAreaDefinition
-        ) -> 'list[PolicyAreaTreeNode] | PolicyAreaTreeNode | None':
+        ) -> list[PolicyAreaTreeNode] | PolicyAreaTreeNode | None:
 
             children = [
                 serialized
@@ -133,9 +135,9 @@ class SearchForm(Form):
                 return None
 
             return {
-                "label": self.request.translate(item.label or ''),
-                "value": '.'.join(str(x) for x in item.path),
-                "children": children
+                'label': self.request.translate(item.label or ''),
+                'value': '.'.join(str(x) for x in item.path),
+                'children': children
             }
 
         tree = serialize(PolicyAreaDefinition.all())
@@ -144,8 +146,8 @@ class SearchForm(Form):
 
     def populate_choice(
         self,
-        field: 'SelectField',
-        remove: 'Collection[int] | None' = None,
+        field: SelectField,
+        remove: Collection[int] | None = None,
         add_none: bool = False
     ) -> None:
 
@@ -157,7 +159,7 @@ class SearchForm(Form):
             if code not in remove
         ]
         if add_none:
-            field.choices.append((-1, _("Missing")))
+            field.choices.append((-1, _('Missing')))
 
     def on_request(self) -> None:
         if 'csrf_token' in self:
@@ -169,7 +171,7 @@ class SearchForm(Form):
         self.populate_choice(self.position_council_of_states, [8, 9])
         self.populate_policy_area()
 
-    def select_all(self, field: 'SelectMultipleField') -> None:
+    def select_all(self, field: SelectMultipleField) -> None:
         if not field.data:
             field.data = [choice[0] for choice in field.choices]
 
@@ -198,7 +200,7 @@ class SearchForm(Form):
 class AttachmentsSearchForm(Form):
 
     term = StringField(
-        label=_("Text Search"),
+        label=_('Text Search'),
         render_kw={'size': 12, 'clear': True},
     )
 

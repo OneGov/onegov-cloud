@@ -5,7 +5,9 @@
 # version is to create release-dependent urls, artifacts and caches. During
 # development these dependencies do not need to be updated in lock-step.
 #
-__version__ = '2024.43'
+from __future__ import annotations
+
+__version__ = '2026.10'
 
 # The module levels used for dependency tests and to have a well defined
 # onegov core upgrade order.
@@ -34,11 +36,12 @@ LEVELS = (
         'onegov.gis',
         'onegov.gever',
         'onegov.newsletter',
-        'onegov.notice',
         'onegov.page',
+        'onegov.parliament',
         'onegov.pay',
         'onegov.pdf',
         'onegov.people',
+        'onegov.plausible',
         'onegov.quill',
         'onegov.qrcode',
         'onegov.recipient',
@@ -58,7 +61,6 @@ LEVELS = (
         'onegov.feriennet',
         'onegov.foundation6',
         'onegov.fsi',
-        'onegov.gazette',
         'onegov.intranet',
         'onegov.landsgemeinde',
         'onegov.onboarding',
@@ -68,10 +70,10 @@ LEVELS = (
         'onegov.town6',
         'onegov.translator_directory',
         'onegov.winterthur',
-        'onegov.wtfs',
     ),
 )
 
+import email_validator
 import logging
 import warnings
 
@@ -80,14 +82,17 @@ log.addHandler(logging.NullHandler())
 
 ignored_warnings = (
     # we will keep using psycopg2 instead of psycogp2-binary
-    "The psycopg2 wheel package will be renamed from release 2.8",
+    'The psycopg2 wheel package will be renamed from release 2.8',
 
     # SQLAlchemy-Utils installs its own array_agg function, which seems fine
     "The GenericFunction 'array_agg' is already registered"
 )
 
 for message in ignored_warnings:
-    warnings.filterwarnings("ignore", message=message)
+    warnings.filterwarnings('ignore', message=message)
+
+# we don't want to spend the extra I/O overhead on checking deliverability
+email_validator.CHECK_DELIVERABILITY = False
 
 from onegov.core.framework import Framework
 from onegov.core.filestorage import get_filestorage_file  # noqa: F401

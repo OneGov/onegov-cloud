@@ -1,13 +1,13 @@
 """ Renders and handles defined forms, turning them into submissions. """
+from __future__ import annotations
 
 import morepath
-
+from datetime import date
+from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.form.collection import SurveyCollection
-from onegov.form.models.submission import (CompleteSurveySubmission,
-                                           PendingSurveySubmission)
+from onegov.form.models.submission import SurveySubmission
 from onegov.org.cli import close_ticket
-from onegov.org.models.organisation import Organisation
 from onegov.ticket import TicketCollection
 from onegov.form import (
     FormCollection,
@@ -15,28 +15,45 @@ from onegov.form import (
     CompleteFormSubmission
 )
 from onegov.org import _, OrgApp
-from onegov.org.layout import FormSubmissionLayout, SurveySubmissionLayout
+from onegov.org.layout import (
+    FormSubmissionLayout,
+    SurveySubmissionLayout,
+    TicketLayout,
+)
 from onegov.org.mail import send_ticket_mail
-from onegov.org.utils import user_group_emails_for_new_ticket
 from onegov.org.models import TicketMessage, SubmissionMessage
-from onegov.pay import PaymentError, Price
+from onegov.org.models.ticket import (
+    DirectoryEntryTicket,
+    FormSubmissionTicket,
+    ReservationTicket,
+)
+from onegov.org.utils import (
+    currency_for_submission,
+    emails_for_new_ticket,
+    group_invoice_items,
+    invoice_items_for_submission,
+)
+from onegov.pay import InvoiceItemMeta, PaymentError, Price
+from onegov.ticket import TicketInvoice
 from purl import URL
-from webob.exc import HTTPNotFound
+from uuid import uuid4
+from webob.exc import HTTPMethodNotAllowed, HTTPNotFound
 
 
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.core.types import RenderData
-    from onegov.form import Form, FormSubmission
+    from onegov.form import FormSubmission
     from onegov.org.request import OrgRequest
+    from onegov.ticket import Ticket
     from webob import Response
 
 
 def copy_query(
-    request: 'OrgRequest',
+    request: OrgRequest,
     url: str,
-    fields: 'Iterable[str]'
+    fields: Iterable[str]
 ) -> str:
 
     url_obj = URL(url)
@@ -54,23 +71,6 @@ def copy_query(
     return url_obj.as_string()
 
 
-def get_price(
-    request: 'OrgRequest',
-    form: 'Form',
-    submission: 'FormSubmission'
-) -> Price | None:
-
-    total = form.total()
-
-    if 'price' in submission.meta:
-        if total is not None:
-            total += Price(**submission.meta['price'])
-        else:
-            total = Price(**submission.meta['price'])
-
-    return request.app.adjust_price(total)
-
-
 @OrgApp.html(model=PendingFormSubmission, template='submission.pt',
              permission=Public, request_method='GET')
 @OrgApp.html(model=PendingFormSubmission, template='submission.pt',
@@ -80,10 +80,11 @@ def get_price(
 @OrgApp.html(model=CompleteFormSubmission, template='submission.pt',
              permission=Private, request_method='POST')
 def handle_pending_submission(
-    self: PendingFormSubmission | CompleteFormSubmission,
-    request: 'OrgRequest',
-    layout: FormSubmissionLayout | None = None
-) -> 'RenderData | Response':
+    self: FormSubmission,
+    request: OrgRequest,
+    layout: FormSubmissionLayout | TicketLayout | None = None,
+    ticket: Ticket | None = None,
+) -> RenderData | Response:
     """ Renders a pending submission, takes it's input and allows the
     user to turn the submission into a complete submission, once all data
     is valid.
@@ -102,8 +103,13 @@ def handle_pending_submission(
     """
     collection = FormCollection(request.session)
 
+    if ticket is None:
+        self_url = request.link(self)
+    else:
+        self_url = request.link(ticket, 'submission')
+
     form = request.get_form(self.form_class, data=self.data)
-    form.action = request.link(self)
+    form.action = self_url
     form.model = self
 
     if 'edit' not in request.GET:
@@ -115,50 +121,53 @@ def handle_pending_submission(
         collection.submissions.update(self, form)
 
     completable = not form.errors and 'edit' not in request.GET
-    price = get_price(request, form, self)
+    invoice_items = invoice_items_for_submission(request, form, self)
+    current_total_amount = InvoiceItemMeta.total(invoice_items)
 
     # check minimum price total if set
-    current_total_amount = price and price.amount or 0.0
     minimum_total_amount = self.minimum_price_total or 0.0
-    if current_total_amount < minimum_total_amount:
-        if price is not None:
-            currency = price.currency
-        else:
-            # We just pick the first currency from any pricing rule we can find
-            # if we can't find any, then we fall back to 'CHF'. Although that
-            # should be an invalid form definition.
-            currency = 'CHF'
-            for field in form._fields.values():
-                if not hasattr(field, 'pricing'):
-                    continue
-
-                rules = field.pricing.rules
-                if not rules:
-                    continue
-
-                currency = next(iter(rules.values())).currency
-                break
-
+    if minimum_total_amount and current_total_amount < minimum_total_amount:
+        _currency = currency_for_submission(form, self)
         completable = False
         request.alert(
             _(
-                "The total amount for the currently entered data "
-                "is ${total} but has to be at least ${minimum}. "
-                "Please adjust your inputs.",
+                'The total amount for the currently entered data '
+                'is ${total} but has to be at least ${minimum}. '
+                'Please adjust your inputs.',
                 mapping={
-                    'total': Price(current_total_amount, currency),
-                    'minimum': Price(minimum_total_amount, currency)
+                    'total': Price(current_total_amount, _currency),
+                    'minimum': Price(minimum_total_amount, _currency)
                 }
             )
         )
 
-    if completable and 'return-to' in request.GET:
+    # Avoid allowing people to pay for registrations, they no longer
+    # will be able to complete. There's still a small time window
+    # where this can happen, if they're unlucky. But it should be
+    # less likely this way.
+    window = self.registration_window
+    if window and not window.accepts_submissions(self.spots):
+        request.alert(_('Registrations are no longer possible'))
+        completable = False
+
+    if completable and ticket is not None:
+        # refresh invoice items if allowed, otherwise show an error
+        if ticket.handler.refreshing_invoice_is_safe(request):
+            ticket.handler.refresh_invoice_items(request)
+        else:
+            completable = False
+            request.alert(_(
+                'Your changes would alter the price total '
+                'but the payment is no longer open.'
+            ))
+
+    if completable and (ticket is not None or 'return-to' in request.GET):
 
         if 'quiet' not in request.GET:
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
 
-        # the default url should actually never be called
-        return request.redirect(request.url)
+        url = request.url if ticket is None else request.link(ticket)
+        return request.redirect(url)
 
     if 'title' in request.GET:
         title = request.GET['title']
@@ -171,47 +180,112 @@ def handle_pending_submission(
         request, form.action, ('return-to', 'title', 'quiet'))
 
     edit_url_obj = URL(copy_query(
-        request, request.link(self), ('title', )))
+        request, self_url, ('title', )))
 
     # the edit url always points to the editable state
     edit_url_obj = edit_url_obj.query_param('edit', '')
     edit_url = edit_url_obj.as_string()
 
+    complete_url = request.link(self, 'complete')
+
+    if 'return-to' in request.GET:
+        complete_url = copy_query(request, complete_url, ('return-to', ))
+
+    price = request.app.adjust_price(Price(
+        amount=current_total_amount,
+        currency=currency_for_submission(form, self),
+        credit_card_payment=any(
+            price.credit_card_payment
+            for __, price in form.prices()
+        )
+    )) if self.state == 'pending' and current_total_amount > 0.0 else None
     email = self.email or self.get_email_field_data(form)
     if price:
         assert email is not None
-        assert request.locale is not None
         checkout_button = request.app.checkout_button(
-            button_label=request.translate(_("Pay Online and Complete")),
+            button_label=request.translate(_('Pay Online and Complete')),
             title=title,
             price=price,
             email=email,
-            locale=request.locale
+            complete_url=complete_url,
+            request=request
         )
     else:
         checkout_button = None
 
+    show_vat = getattr(self.form, 'show_vat', False)
     return {
         'layout': layout or FormSubmissionLayout(self, request, title),
         'title': title,
         'form': form,
         'completable': completable,
         'edit_link': edit_url,
-        'complete_link': request.link(self, 'complete'),
+        'complete_link': complete_url,
         'model': self,
         'price': price,
+        'show_vat': show_vat,
+        # NOTE: The VAT amount can be wrong if the fee is charged to
+        #       the customer. So it's better to not show it yet.
+        'hide_vat_amount': True,
+        'invoice_items': group_invoice_items(invoice_items),
+        'total_amount': current_total_amount,
+        'total_vat': show_vat and InvoiceItemMeta.total_vat(invoice_items),
         'checkout_button': checkout_button
     }
 
 
+@OrgApp.html(model=DirectoryEntryTicket, template='submission.pt',
+             permission=Private, request_method='GET', name='submission')
+@OrgApp.html(model=DirectoryEntryTicket, template='submission.pt',
+             permission=Private, request_method='POST', name='submission')
+@OrgApp.html(model=FormSubmissionTicket, template='submission.pt',
+             permission=Private, request_method='GET', name='submission')
+@OrgApp.html(model=FormSubmissionTicket, template='submission.pt',
+             permission=Private, request_method='POST', name='submission')
+@OrgApp.html(model=ReservationTicket, template='submission.pt',
+             permission=Private, request_method='GET', name='submission')
+@OrgApp.html(model=ReservationTicket, template='submission.pt',
+             permission=Private, request_method='POST', name='submission')
+def handle_edit_submission_from_ticket(
+    self: DirectoryEntryTicket | FormSubmissionTicket | ReservationTicket,
+    request: OrgRequest,
+    layout: TicketLayout | None = None
+) -> RenderData | Response:
+
+    submission = self.handler.submission
+    if not isinstance(submission, CompleteFormSubmission):
+        raise HTTPNotFound()
+
+    if layout is None:
+        layout = TicketLayout(self, request)
+
+    layout.breadcrumbs = [
+        *layout.breadcrumbs[:-1],
+        Link(self.number, request.link(self)),
+        Link(_('Edit submission'), '#')
+    ]
+    layout.editbar_links = []
+
+    return handle_pending_submission(
+        submission,
+        request,
+        layout,
+        ticket=self,
+    )
+
+
+@OrgApp.view(model=PendingFormSubmission, name='complete',
+             permission=Public, request_method='GET')
 @OrgApp.view(model=PendingFormSubmission, name='complete',
              permission=Public, request_method='POST')
 @OrgApp.view(model=CompleteFormSubmission, name='complete',
+             permission=Public, request_method='GET')
+@OrgApp.view(model=CompleteFormSubmission, name='complete',
              permission=Private, request_method='POST')
 def handle_complete_submission(
-    self: PendingFormSubmission | CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response':
+    self: FormSubmission,
+    request: OrgRequest
+) -> Response:
 
     form = request.get_form(self.form_class)
     form.process(data=self.data)
@@ -222,12 +296,23 @@ def handle_complete_submission(
     form.validate()
     form.ignore_csrf_error()
 
+    # NOTE: we only allow GET requests for some specific payment providers
+    if request.method == 'GET' and (
+        form.errors
+        or self.state == 'complete'
+        or (provider := request.app.default_payment_provider) is None
+        or not provider.payment_via_get
+    ):
+        # TODO: A redirect back to the previous step with an error might
+        #       be better UX, if this error can occur too easily...
+        raise HTTPMethodNotAllowed()
+
     if form.errors:
         return morepath.redirect(request.link(self))
     else:
         if self.state == 'complete':
             self.data.changed()  # type:ignore[attr-defined]  # trigger updates
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
 
             assert self.name is not None
             return morepath.redirect(request.link(
@@ -236,23 +321,33 @@ def handle_complete_submission(
             ))
         else:
             provider = request.app.default_payment_provider
-            token = request.params.get('payment_token')
-            if not isinstance(token, str):
-                token = None
-
-            price = get_price(request, form, self)
+            token = provider.get_token(request) if provider else None
+            invoice_items = invoice_items_for_submission(request, form, self)
+            amount = InvoiceItemMeta.total(invoice_items)
+            price = request.app.adjust_price(Price(
+                amount=amount,
+                currency=currency_for_submission(form, self),
+                credit_card_payment=any(
+                    price.credit_card_payment
+                    for __, price in form.prices()
+                )
+            )) if amount > 0.0 else None
             payment = self.process_payment(price, provider, token)
 
             # FIXME: Custom error message for PaymentError?
             if not payment or isinstance(payment, PaymentError):
-                request.alert(_("Your payment could not be processed"))
+                request.alert(_('Your payment could not be processed'))
                 return morepath.redirect(request.link(self))
-            elif payment is not True:
+
+            if payment is not True:
+                request.session.add(payment)
+                request.session.flush()
+                request.session.refresh(payment)
                 self.payment = payment
 
             window = self.registration_window
             if window and not window.accepts_submissions(self.spots):
-                request.alert(_("Registrations are no longer possible"))
+                request.alert(_('Registrations are no longer possible'))
                 return morepath.redirect(request.link(self))
 
             show_submission = request.params.get('send_by_email') == 'yes'
@@ -274,34 +369,48 @@ def handle_complete_submission(
                     handler_code=self.meta.get('handler_code', 'FRM'),
                     handler_id=self.id.hex
                 )
-                TicketMessage.create(ticket, request, 'opened')
+                TicketMessage.create(ticket, request, 'opened', 'external')
+
+                if invoice_items:
+                    invoice = TicketInvoice(id=uuid4())
+                    request.session.add(invoice)
+
+                    for item_meta in invoice_items:
+                        item = item_meta.add_to_invoice(invoice)
+                        if payment is not True:
+                            if provider and payment.source == provider.type:
+                                item.payment_date = date.today()
+                            item.payments.append(payment)
+                            item.paid = payment.state == 'paid'
+
+                    ticket.invoice = invoice
 
             assert self.email is not None
+            submission = collection.submissions.by_id(
+                submission_id, current_only=True
+            )
+            custom_above_footer = (
+                self.form.custom_above_footer if self.form else None)
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened.pt',
-                subject=_("Your request has been registered"),
+                subject=_('Your request has been registered'),
                 ticket=ticket,
                 receivers=(self.email, ),
                 content={
                     'model': ticket,
                     'form': form,
-                    'show_submission': self.meta['show_submission']
+                    'show_submission': self.meta['show_submission'],
+                    'custom_above_footer': custom_above_footer
                 }
             )
-            directory_user_group_recipients = user_group_emails_for_new_ticket(
-                request, ticket
-            )
-            if request.email_for_new_tickets:
+            for email in emails_for_new_ticket(request, ticket):
                 send_ticket_mail(
                     request=request,
                     template='mail_ticket_opened_info.pt',
-                    subject=_("New ticket"),
+                    subject=_('New ticket'),
                     ticket=ticket,
-                    receivers=(
-                        request.email_for_new_tickets,
-                        *directory_user_group_recipients,
-                    ),
+                    receivers=(email, ),
                     content={'model': ticket},
                 )
 
@@ -311,7 +420,8 @@ def handle_complete_submission(
                     'event': 'browser-notification',
                     'title': request.translate(_('New ticket')),
                     'created': ticket.created.isoformat()
-                }
+                },
+                groupids=request.app.groupids_for_ticket(ticket),
             )
 
             if request.auto_accept(ticket):
@@ -335,14 +445,14 @@ def handle_complete_submission(
 
                 except ValueError:
                     if request.is_manager:
-                        request.warning(_("Your request could not be "
-                                          "accepted automatically!"))
+                        request.warning(_('Your request could not be '
+                                          'accepted automatically!'))
                 else:
                     close_ticket(
                         ticket, request.auto_accept_user, request
                     )
 
-            request.success(_("Thank you for your submission!"))
+            request.success(_('Thank you for your submission!'))
 
             return morepath.redirect(request.link(ticket, 'status'))
 
@@ -350,8 +460,8 @@ def handle_complete_submission(
 @OrgApp.view(model=CompleteFormSubmission, name='ticket', permission=Private)
 def view_submission_ticket(
     self: CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response':
+    request: OrgRequest
+) -> Response:
     ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
     if not ticket:
         raise HTTPNotFound()
@@ -362,47 +472,87 @@ def view_submission_ticket(
              permission=Private, request_method='POST')
 def handle_accept_registration(
     self: CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response | None':
+    request: OrgRequest
+) -> Response | None:
     return handle_submission_action(self, request, 'confirmed')
+
+
+@OrgApp.view(model=FormSubmissionTicket, name='confirm-registration',
+             permission=Private, request_method='POST')
+def handle_accept_registration_from_ticket(
+    self: FormSubmissionTicket,
+    request: OrgRequest
+) -> Response | None:
+    submission = self.handler.submission
+    if not isinstance(submission, CompleteFormSubmission):
+        raise HTTPNotFound()
+    return handle_submission_action(
+        submission, request, 'confirmed', return_url=request.link(self))
 
 
 @OrgApp.view(model=CompleteFormSubmission, name='deny-registration',
              permission=Private, request_method='POST')
 def handle_deny_registration(
     self: CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response | None':
+    request: OrgRequest
+) -> Response | None:
     return handle_submission_action(self, request, 'denied')
+
+
+@OrgApp.view(model=FormSubmissionTicket, name='deny-registration',
+             permission=Private, request_method='POST')
+def handle_deny_registration_from_ticket(
+    self: FormSubmissionTicket,
+    request: OrgRequest
+) -> Response | None:
+    submission = self.handler.submission
+    if not isinstance(submission, CompleteFormSubmission):
+        raise HTTPNotFound()
+    return handle_submission_action(
+        submission, request, 'denied', return_url=request.link(self))
 
 
 @OrgApp.view(model=CompleteFormSubmission, name='cancel-registration',
              permission=Private, request_method='POST')
 def handle_cancel_registration(
     self: CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response | None':
+    request: OrgRequest
+) -> Response | None:
     return handle_submission_action(self, request, 'cancelled')
+
+
+@OrgApp.view(model=FormSubmissionTicket, name='cancel-registration',
+             permission=Private, request_method='POST')
+def handle_cancel_registration_from_ticket(
+    self: FormSubmissionTicket,
+    request: OrgRequest
+) -> Response | None:
+    submission = self.handler.submission
+    if not isinstance(submission, CompleteFormSubmission):
+        raise HTTPNotFound()
+    return handle_submission_action(
+        submission, request, 'cancelled', return_url=request.link(self))
 
 
 def handle_submission_action(
     self: CompleteFormSubmission,
-    request: 'OrgRequest',
+    request: OrgRequest,
     action: Literal['confirmed', 'denied', 'cancelled'],
     ignore_csrf: bool = False,
     raises: bool = False,
     no_messages: bool = False,
-    force_email: bool = False
-) -> 'Response | None':
+    force_email: bool = False,
+    return_url: str | None = None,
+) -> Response | None:
 
     if not ignore_csrf:
         request.assert_valid_csrf_token()
 
     if action == 'confirmed':
-        subject = _("Your registration has been confirmed")
-        success = _("The registration has been confirmed")
-        failure = _("The registration could not be confirmed because the "
-                    "maximum number of participants has been reached")
+        subject = _('Your registration has been confirmed')
+        success = _('The registration has been confirmed')
+        failure = _('The registration could not be confirmed because the '
+                    'maximum number of participants has been reached')
 
         def execute() -> bool:
             if self.registration_window and self.claimed is None:
@@ -410,9 +560,9 @@ def handle_submission_action(
             return False
 
     elif action == 'denied':
-        subject = _("Your registration has been denied")
-        success = _("The registration has been denied")
-        failure = _("The registration could not be denied")
+        subject = _('Your registration has been denied')
+        success = _('The registration has been denied')
+        failure = _('The registration could not be denied')
 
         def execute() -> bool:
             if self.registration_window and self.claimed is None:
@@ -421,9 +571,9 @@ def handle_submission_action(
             return False
 
     elif action == 'cancelled':
-        subject = _("Your registration has been cancelled")
-        success = _("The registration has been cancelled")
-        failure = _("The registration could not be cancelled")
+        subject = _('Your registration has been cancelled')
+        success = _('The registration has been cancelled')
+        failure = _('The registration could not be cancelled')
 
         def execute() -> bool:
             if self.registration_window and self.claimed:
@@ -465,26 +615,23 @@ def handle_submission_action(
             request.alert(failure)
             return None
 
-    return request.redirect(request.link(self))
+    if return_url is None:
+        return_url = request.link(self)
+
+    return request.redirect(return_url)
 
 
-@OrgApp.html(model=PendingSurveySubmission,
+@OrgApp.html(model=SurveySubmission,
              template='survey_submission.pt',
              permission=Public, request_method='GET')
-@OrgApp.html(model=PendingSurveySubmission,
+@OrgApp.html(model=SurveySubmission,
              template='survey_submission.pt',
              permission=Public, request_method='POST')
-@OrgApp.html(model=CompleteSurveySubmission,
-             template='survey_submission.pt',
-             permission=Private, request_method='GET')
-@OrgApp.html(model=CompleteSurveySubmission,
-             template='survey_submission.pt',
-             permission=Private, request_method='POST')
-def handle_pending_survey_submission(
-    self: PendingSurveySubmission | CompleteSurveySubmission,
-    request: 'OrgRequest',
+def handle_survey_submission(
+    self: SurveySubmission,
+    request: OrgRequest,
     layout: SurveySubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Renders a pending submission, takes it's input and allows the
     user to turn the submission into a complete submission, once all data
     is valid.
@@ -508,7 +655,7 @@ def handle_pending_survey_submission(
     if completable and 'return-to' in request.GET:
 
         if 'quiet' not in request.GET:
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
 
         # the default url should actually never be called
         return request.redirect(request.url)
@@ -530,7 +677,8 @@ def handle_pending_survey_submission(
     edit_url_obj = edit_url_obj.query_param('edit', '')
     edit_url = edit_url_obj.as_string()
 
-    checkout_button = None
+    layout = layout or SurveySubmissionLayout(self, request, title)
+    layout.editbar_links = []
 
     return {
         'layout': layout or SurveySubmissionLayout(self, request, title),
@@ -541,46 +689,4 @@ def handle_pending_survey_submission(
         'complete_link': request.link(self, 'complete'),
         'model': self,
         'price': None,
-        'checkout_button': checkout_button
     }
-
-
-@OrgApp.view(model=PendingSurveySubmission, name='complete',
-             permission=Public, request_method='POST')
-@OrgApp.view(model=CompleteSurveySubmission, name='complete',
-             permission=Private, request_method='POST')
-def handle_complete_survey_submission(
-    self: PendingSurveySubmission | CompleteSurveySubmission,
-    request: 'OrgRequest'
-) -> 'Response':
-
-    form = request.get_form(self.form_class)
-    form.process(data=self.data)
-    form.model = self
-
-    # we're not really using a csrf protected form here (the complete form
-    # button is basically just there so we can use a POST instead of a GET)
-    form.validate()
-    form.ignore_csrf_error()
-
-    if form.errors:
-        return morepath.redirect(request.link(self))
-    else:
-        if self.state == 'complete':
-            self.data.changed()  # type:ignore[attr-defined]  # trigger updates
-            request.success(_("Your changes were saved"))
-
-            assert self.name is not None
-            return morepath.redirect(request.link(
-                SurveyCollection(request.session).scoped_submissions(
-                    self.name, ensure_existance=False)
-            ))
-        else:
-            collection = SurveyCollection(request.session)
-
-            # Expunges the submission from the session
-            collection.submissions.complete_submission(self)
-
-            request.success(_("Thank you for your submission!"))
-
-            return morepath.redirect(request.class_link(Organisation))

@@ -24,7 +24,7 @@
                         <h3 class="filter-title" i18n:translate>Hashtags</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags tag_links" />
                     </div>
-                    <div class="side-panel">
+                    <div class="side-panel subscribe-panel">
                         <h3 i18n:translate="">Subscribe</h3>
                         <ul class="more-list">
                             <li tal:condition="rss_link">
@@ -55,7 +55,11 @@
         </div>
 
         <tal:b metal:use-macro="layout.macros.page_content" tal:condition="page.parent"
-            tal:define="lead page.content.get('lead');text page.text|None; people page.people; contact None if children else layout.contact_html; coordinates page.coordinates; files page.files; sidepanel_links page.sidepanel_links|False;" />
+            tal:define="lead page.content.get('lead');text page.text|None; people page.people; contact None if children else layout.contact_html; coordinates page.coordinates; files page.files; sidepanel_links page.sidepanel_links|False; imageset page.photo_album|False; sidepanel_contact page.sidepanel_contact|None; " />
+
+
+        <div metal:use-macro="layout.macros['pagination']" tal:condition="pagination" tal:define="
+            collection pagination; current_page pagination; pagination_centered True" />
 
     </tal:b>
 

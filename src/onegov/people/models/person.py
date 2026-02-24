@@ -1,15 +1,21 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
-from onegov.core.orm.types import UUID
+from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_property
+from onegov.core.utils import generate_fts_phonenumbers
 from onegov.people.models import AgencyMembership
 from onegov.search import ORMSearchable
-from sqlalchemy import Column
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import relationship
-from uuid import uuid4
+from sqlalchemy.orm import DynamicMapped
+from sqlalchemy.orm import Mapped
+from translationstring import TranslationString
+from uuid import uuid4, UUID
 from vobject import vCard
 from vobject.vcard import Address
 from vobject.vcard import Name
@@ -17,9 +23,7 @@ from vobject.vcard import Name
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Collection
-    from onegov.core.types import AppenderQuery
     from vobject.base import Component
 
 
@@ -33,33 +37,45 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'generic',
     }
 
-    es_public = True
-    es_properties = {
-        'title': {'type': 'text'},
-        'function': {'type': 'localized'},
-        'email': {'type': 'text'},
+    # HACK: We don't want to set up translations in this module for this single
+    #       string, we know we already have a translation in a different domain
+    #       so we just manually specify it for now.
+    fts_type_title = TranslationString('People', domain='onegov.org')
+    fts_public = True
+    fts_title_property = 'title'
+    fts_properties = {
+        'title': {'type': 'text', 'weight': 'A'},
+        'function': {'type': 'localized', 'weight': 'B'},
+        'email': {'type': 'text', 'weight': 'A'},
+        'phone_fts': {'type': 'text', 'weight': 'A'},
     }
 
     @property
-    def es_suggestion(self) -> tuple[str, ...]:
+    def fts_suggestion(self) -> tuple[str, ...]:
         return (self.title, f'{self.first_name} {self.last_name}')
+
+    # NOTE: When a person was last changed should not influence how
+    #       relevant they are in the search results
+    @property
+    def fts_last_change(self) -> None:
+        return None
+
+    @property
+    def phone_fts(self) -> list[str]:
+        numbers = (self.phone, self.phone_direct)
+        return generate_fts_phonenumbers(numbers)
 
     @property
     def title(self) -> str:
         """ Returns the Eastern-ordered name. """
-
-        return self.last_name + ' ' + self.first_name
+        return f'{self.last_name} {self.first_name}'
 
     @property
     def spoken_title(self) -> str:
@@ -76,97 +92,97 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         return ' '.join(parts)
 
     #: the unique id, part of the url
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the salutation used for the person
-    salutation: 'Column[str | None]' = Column(Text, nullable=True)
+    salutation: Mapped[str | None]
 
     #: the academic title of the person
-    academic_title: 'Column[str | None]' = Column(Text, nullable=True)
+    academic_title: Mapped[str | None]
 
     #: the first name of the person
-    first_name: 'Column[str]' = Column(Text, nullable=False)
+    first_name: Mapped[str]
 
     #: the last name of the person
-    last_name: 'Column[str]' = Column(Text, nullable=False)
+    last_name: Mapped[str]
 
     #: when the person was born
-    born: 'Column[str | None]' = Column(Text, nullable=True)
+    born: Mapped[str | None]
 
     #: the profession of the person
-    profession: 'Column[str | None]' = Column(Text, nullable=True)
+    profession: Mapped[str | None]
 
     #: the function of the person
-    function: 'Column[str | None]' = Column(Text, nullable=True)
+    function: Mapped[str | None]
 
     #: an organisation the person belongs to
-    organisation: 'Column[str | None]' = Column(Text, nullable=True)
+    organisation: Mapped[str | None]
+
+    #: multiple organisations the person belongs to
+    organisations_multiple: dict_property[list[str] | None] = content_property(
+    )
 
     # a sub organisation the person belongs to
-    sub_organisation: 'Column[str | None]' = Column(Text, nullable=True)
+    sub_organisation: Mapped[str | None]
 
     #: the political party the person belongs to
-    political_party: 'Column[str | None]' = Column(Text, nullable=True)
+    political_party: Mapped[str | None]
 
     #: the parliamentary group the person belongs to
-    parliamentary_group: 'Column[str | None]' = Column(Text, nullable=True)
+    parliamentary_group: Mapped[str | None]
 
     #: an URL leading to a picture of the person
-    picture_url: 'Column[str | None]' = Column(Text, nullable=True)
+    picture_url: Mapped[str | None]
 
     #: the email of the person
-    email: 'Column[str | None]' = Column(Text, nullable=True)
+    email: Mapped[str | None]
 
     #: the phone number of the person
-    phone: 'Column[str | None]' = Column(Text, nullable=True)
+    phone: Mapped[str | None]
 
     #: the direct phone number of the person
-    phone_direct: 'Column[str | None]' = Column(Text, nullable=True)
+    phone_direct: Mapped[str | None]
 
     #: the website related to the person
-    website: 'Column[str | None]' = Column(Text, nullable=True)
+    website: Mapped[str | None]
 
     #: a second website related to the person
-    website_2: 'Column[str | None]' = Column(Text, nullable=True)
+    website_2: Mapped[str | None]
 
     # agency does not use 'address' anymore. Instead, the 4 following items
     # are being used. The 'address' field is still used in org, town6,
     # volunteers and others
     #: the address of the person
-    address: 'Column[str | None]' = Column(Text, nullable=True)
+    address: Mapped[str | None]
 
     #: the location address (street name and number) of the person
-    location_address: 'Column[str | None]' = Column(Text, nullable=True)
+    location_address: Mapped[str | None]
 
     #: postal code of location and city of the person
-    location_code_city: 'Column[str | None]' = Column(Text, nullable=True)
+    location_code_city: Mapped[str | None]
 
     #: the postal address (street name and number) of the person
-    postal_address: 'Column[str | None]' = Column(Text, nullable=True)
+    postal_address: Mapped[str | None]
 
     #: postal code and city of the person
-    postal_code_city: 'Column[str | None]' = Column(Text, nullable=True)
+    postal_code_city: Mapped[str | None]
 
     #: some remarks about the person
-    notes: 'Column[str | None]' = Column(Text, nullable=True)
+    notes: Mapped[str | None]
 
-    memberships: 'relationship[AppenderQuery[AgencyMembership]]'
-    memberships = relationship(
-        AgencyMembership,
+    memberships: DynamicMapped[AgencyMembership] = relationship(
         back_populates='person',
         cascade='all, delete-orphan',
-        lazy='dynamic',
     )
 
     def vcard_object(
         self,
-        exclude: 'Collection[str] | None' = None,
+        exclude: Collection[str] | None = None,
         include_memberships: bool = True
-    ) -> 'Component':
+    ) -> Component:
         """ Returns the person as vCard (3.0) object.
 
         Allows to specify the included attributes, provides a reasonable
@@ -174,6 +190,23 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         name.
 
         """
+
+        def split_code_from_city(code_city: str) -> tuple[str, str]:
+            """
+            Splits a postal code and city into two parts. Supported are
+            formats like '1234 City Name' and '12345 City Name'.
+
+            """
+            import re
+
+            match = re.match(r'(\d{4,5})\s+(.*)', code_city)
+            if match:
+                code, city = match.groups()
+            else:
+                # assume no code is present
+                code, city = '', code_city
+            return code, city
+
         exclude = exclude or ['notes']
         result = vCard()
 
@@ -191,9 +224,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         line.charset_param = 'utf-8'
 
         line = result.add('fn')
-        line.value = " ".join((
-            prefix, self.first_name, self.last_name
-        )).strip()
+        line.value = f'{prefix} {self.first_name} {self.last_name}'.strip()
         line.charset_param = 'utf-8'
 
         # optional fields
@@ -236,7 +267,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             and 'postal_code_city' not in exclude and self.postal_code_city
         ):
             line = result.add('adr')
-            code, city = self.postal_code_city.split(' ', 1)
+            code, city = split_code_from_city(self.postal_code_city)
             line.value = Address(street=self.postal_address,
                                  code=code, city=city)
             line.charset_param = 'utf-8'
@@ -246,7 +277,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             and 'location_code_city' not in exclude and self.location_code_city
         ):
             line = result.add('adr')
-            code, city = self.location_code_city.split(' ', 1)
+            code, city = split_code_from_city(self.location_code_city)
             line.value = Address(street=self.location_address,
                                  code=code, city=city)
             line.charset_param = 'utf-8'
@@ -268,7 +299,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
         return result
 
-    def vcard(self, exclude: 'Collection[str] | None' = None) -> str:
+    def vcard(self, exclude: Collection[str] | None = None) -> str:
         """ Returns the person as vCard (3.0).
 
         Allows to specify the included attributes, provides a reasonable

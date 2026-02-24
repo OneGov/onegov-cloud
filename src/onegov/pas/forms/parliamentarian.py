@@ -1,11 +1,19 @@
+from __future__ import annotations
+
 from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
-from onegov.form.validators import ValidPhoneNumber
+from onegov.form.validators import (
+    ValidPhoneNumber,
+    MIME_TYPES_IMAGE
+)
+from onegov.parliament.models.parliamentarian import GENDERS
+from onegov.parliament.models.parliamentarian import SHIPPING_METHODS
+from onegov.pas.collections.parliamentarian import (
+    PASParliamentarianCollection
+)
 from onegov.pas import _
-from onegov.pas.models.parliamentarian import GENDERS
-from onegov.pas.models.parliamentarian import SHIPPING_METHODS
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
@@ -17,7 +25,15 @@ from wtforms.validators import Optional
 from wtforms.validators import URL
 
 
-class ParliamentarianForm(NamedFileForm):
+from typing import TYPE_CHECKING, cast
+if TYPE_CHECKING:
+    from typing import Any
+    from collections.abc import Collection
+    from onegov.pas.models.parliamentarian import PASParliamentarian
+    from onegov.pas.app import PasApp
+
+
+class PASParliamentarianForm(NamedFileForm):
 
     personnel_number = StringField(
         label=_('Personnel number'),
@@ -52,6 +68,7 @@ class ParliamentarianForm(NamedFileForm):
     picture = UploadField(
         label=_('Picture'),
         fieldset=_('Basic properties'),
+        allowed_mimetypes=MIME_TYPES_IMAGE,
     )
 
     shipping_method = TranslatedSelectField(
@@ -195,3 +212,29 @@ class ParliamentarianForm(NamedFileForm):
         label=_('Remarks'),
         fieldset=_('Additional information'),
     )
+
+    def get_useful_data(
+        self,
+        exclude: Collection[str] | None = None
+    ) -> dict[str, Any]:
+        """Do not use to update and instance of a parliamentarian."""
+        exclude_set = set(exclude or ())
+        exclude_set.add('csrf_token')
+        data = super().get_useful_data(
+            exclude=exclude_set
+        )
+
+        data['email_primary'] = data['email_primary'] or None
+        return data
+
+    def update_model(self, model: PASParliamentarian) -> None:
+        app = cast('PasApp', self.request.app)
+        parliamentarians = PASParliamentarianCollection(app)
+        parliamentarians.update_user(model, self.email_primary.data)
+
+        for field_name, field in self._fields.items():
+            if field_name in ('csrf_token', 'picture'):
+                continue
+
+            if hasattr(model, field_name):
+                setattr(model, field_name, field.data)

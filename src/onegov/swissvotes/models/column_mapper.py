@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from collections import OrderedDict
 from onegov.swissvotes.models.vote import SwissVote
@@ -7,7 +9,7 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     ColumnItem: TypeAlias = tuple[
         str,         # attribute
@@ -606,6 +608,8 @@ class ColumnMapperDataset:
             ('national_council_share_unknown', 'unbekannt-summe'),
             ('posters_mfg_yea', 'poster_ja_mfg'),
             ('posters_mfg_nay', 'poster_nein_mfg'),
+            ('posters_bs_yea', 'poster_ja_bs'),
+            ('posters_bs_nay', 'poster_nein_bs'),
             ('posters_sa_yea', 'poster_ja_sa'),
             ('posters_sa_nay', 'poster_nein_sa'),
             ('_result_people_accepted', 'volk'),
@@ -697,7 +701,7 @@ class ColumnMapperDataset:
         """ Set the given value of a vote. """
 
         if attribute.startswith('!'):
-            unused, type_, attribute, key = attribute.split('!')
+            _, _type, attribute, key = attribute.split('!')
             if getattr(vote, attribute) is None:
                 setattr(vote, attribute, {})
             getattr(vote, attribute)[key] = value
@@ -708,23 +712,23 @@ class ColumnMapperDataset:
         """ Get the given value of a vote. """
 
         if attribute.startswith('!'):
-            unused, type_, attribute, key = attribute.split('!')
+            _, _type, attribute, key = attribute.split('!')
             return (getattr(vote, attribute) or {}).get(key)
         return getattr(vote, attribute)
 
-    def get_values(self, vote: SwissVote) -> 'Iterator[Any]':
+    def get_values(self, vote: SwissVote) -> Iterator[Any]:
         """ Get all values of a vote in order. """
 
         for attribute in self.columns.keys():
             yield self.get_value(vote, attribute)
 
-    def get_items(self, vote: SwissVote) -> 'Iterator[tuple[str, Any]]':
+    def get_items(self, vote: SwissVote) -> Iterator[tuple[str, Any]]:
         """ Get all names and values of a vote in order. """
 
         for attribute in self.columns.keys():
             yield attribute, self.get_value(vote, attribute)
 
-    def items(self) -> 'Iterator[ColumnItem]':
+    def items(self) -> Iterator[ColumnItem]:
         """ Returns the attributes and column names together with additional
         information (type, nullable, precision, scale).
 
@@ -773,8 +777,8 @@ class ColumnMapperMetadata:
             ('t:t:title', 'Titel des Dokuments'),
             ('t:t:position', 'Position zur Vorlage'),
             ('t:t:author', 'AutorIn (Nachname Vorname) des Dokuments'),
-            ('t:t:editor', 'AuftraggeberIn/HerausgeberIn des Dokuments '
-                           '(typischerweise Komitee/Verband/Partei)'),
+            ('t:t:editor', ('AuftraggeberIn/HerausgeberIn des Dokuments '
+                           '(typischerweise Komitee/Verband/Partei)')),
             ('i:t:date_year', 'Datum Jahr'),
             ('i:t:date_month', 'Datum Monat'),
             ('i:t:date_day', 'Datum Tag'),
@@ -825,17 +829,25 @@ class ColumnMapperMetadata:
         else:
             data[attribute] = value
 
-    def items(self) -> 'Iterator[ColumnItem]':
+    def items(self) -> Iterator[ColumnItem]:
         """ Returns the attributes and column names together with additional
         information (type, nullable, precision, scale).
 
         """
 
         for attribute, column in self.columns.items():
-            _type, _nullable, name = attribute.split(':')
-            nullable = {'t': True, 'f': False}.get(_nullable, True)
-            precision = {'n': 8}.get(_type, None)
-            scale = {'n': 2}.get(_type, None)
-            type_ = {'n': 'NUMERIC', 'i': 'INTEGER', 't': 'TEXT'}.get(_type)
+            type_hint, nullable_hint, _name = attribute.split(':')
+            nullable = nullable_hint != 'f'
+            precision = 8 if type_hint == 'n' else None
+            scale = 2 if type_hint == 'n' else None
+            match type_hint:
+                case 'n':
+                    type_ = 'NUMERIC'
+                case 'i':
+                    type_ = 'INTEGER'
+                case 't':
+                    type_ = 'TEXT'
+                case _:
+                    raise AssertionError('unreachable')
 
             yield attribute, column, type_, nullable, precision, scale

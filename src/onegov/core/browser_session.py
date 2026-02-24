@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from contextlib import suppress
 from dogpile.cache.api import NO_VALUE
 from hashlib import blake2b
@@ -7,7 +9,7 @@ from typing import overload, Any, TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from typing_extensions import Never
+    from typing import Never
 
     from .cache import RedisCacheRegion
 
@@ -18,7 +20,7 @@ _T = TypeVar('_T')
 
 class Prefixed:
 
-    def __init__(self, prefix: str, cache: 'RedisCacheRegion'):
+    def __init__(self, prefix: str, cache: RedisCacheRegion):
         assert len(prefix) >= 24
 
         self.prefix = prefix
@@ -78,9 +80,9 @@ class BrowserSession:
 
     def __init__(
         self,
-        cache: 'RedisCacheRegion',
+        cache: RedisCacheRegion,
         token: str,
-        on_dirty: 'OnDirtyCallback' = lambda session, token: None
+        on_dirty: OnDirtyCallback = lambda session, token: None
     ):
 
         # make it impossible to get the session token through key listing
@@ -141,7 +143,7 @@ class BrowserSession:
     # FIXME: What is *args for, why do we allow this? For now we set
     #        it to Never, so we get a mypy error, if there is any code
     #        that uses this, if no code uses it then get rid of it!
-    def __getitem__(self, name: str, *args: 'Never') -> Any:
+    def __getitem__(self, name: str, *args: Never) -> Any:
         result = self._cache.get(name)
 
         if result is NO_VALUE:

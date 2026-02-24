@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.elements import Link
 from onegov.landsgemeinde import _
@@ -15,10 +17,11 @@ class VotumCollectionLayout(DefaultLayout):
     @cached_property
     def title(self) -> str:
         return _(
-            'Vota of agenda items ${number} of assembly from ${date}',
+            'Vota of agenda items ${number} of ${assembly_type} from ${date}',
             mapping={
                 'number': self.model.agenda_item_number,
-                'date': self.format_date(self.model.date, 'date_long')
+                'date': self.format_date(self.model.date, 'date_long'),
+                'assembly_type': self.assembly_type
             }
         )
 

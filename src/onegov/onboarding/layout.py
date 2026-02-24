@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
 
 class Layout(ChameleonLayout):
 
-    def __init__(self, model: Any, request: 'CoreRequest'):
+    def __init__(self, model: Any, request: CoreRequest):
         super().__init__(model=model, request=request)
         self.request.include('common')
 
@@ -42,9 +44,9 @@ class DefaultLayout(Layout):
 class MailLayout(Layout):
 
     @cached_property
-    def base(self) -> 'PageTemplateFile':
+    def base(self) -> PageTemplateFile:
         return self.template_loader['mail_layout.pt']
 
     @cached_property
-    def macros(self) -> 'MacrosLookup':
+    def macros(self) -> MacrosLookup:
         raise NotImplementedError

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.collection import GenericCollection
 from onegov.translator_directory.models.certificate import LanguageCertificate
 

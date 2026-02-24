@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from functools import cached_property
 from onegov.translator_directory.models.translator import Translator
@@ -14,9 +16,9 @@ class Accreditation:
 
     def __init__(
         self,
-        session: 'Session',
-        target_id: 'UUID',
-        ticket_id: 'UUID'
+        session: Session,
+        target_id: UUID,
+        ticket_id: UUID
     ) -> None:
         self.session = session
         self.target_id = target_id
@@ -31,7 +33,7 @@ class Accreditation:
         ).first()
 
     @cached_property
-    def ticket(self) -> 'Ticket | None':
+    def ticket(self) -> Ticket | None:
         from onegov.ticket import TicketCollection
         return TicketCollection(self.session).by_id(self.ticket_id)
 

@@ -1,4 +1,6 @@
 """ The upload view. """
+from __future__ import annotations
+
 import morepath
 import transaction
 
@@ -30,8 +32,8 @@ if TYPE_CHECKING:
 )
 def view_upload_election(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
     """ Upload results of an election.
 
     Redirects to the majorz or proporz upload view.
@@ -51,9 +53,9 @@ def view_upload_election(
 )
 def view_upload_majorz_election(
     self: Election,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: UploadMajorzElectionForm
-) -> 'RenderData':
+) -> RenderData:
     """ Upload results of a majorz election. """
 
     assert self.type == 'majorz'
@@ -112,7 +114,7 @@ def view_upload_majorz_election(
                         )
                     )
             else:
-                raise NotImplementedError("Unsupported import format")
+                raise NotImplementedError('Unsupported import format')
 
             archive = ArchivedResultCollection(request.session)
             archive.update(self, request)
@@ -153,9 +155,9 @@ def view_upload_majorz_election(
 )
 def view_upload_proporz_election(
     self: ProporzElection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: UploadProporzElectionForm
-) -> 'RenderData':
+) -> RenderData:
     """ Upload results of a proproz election. """
 
     assert self.type == 'proporz'
@@ -225,7 +227,7 @@ def view_upload_proporz_election(
                         )
                     )
             else:
-                raise NotImplementedError("Unsupported import format")
+                raise NotImplementedError('Unsupported import format')
 
             archive = ArchivedResultCollection(request.session)
             archive.update(self, request)

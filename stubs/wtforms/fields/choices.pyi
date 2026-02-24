@@ -8,8 +8,9 @@ from wtforms.meta import DefaultMeta, _SupportsGettextAndNgettext
 
 from onegov.form.types import PricingRules
 
-# technically this allows a list, but we're more strict for type safety
+__all__ = ("SelectField", "SelectMultipleField", "RadioField")
 
+# technically this allows a list, but we're more strict for type safety
 _Choice: TypeAlias = str | tuple[Any, str] | tuple[Any, str, dict[str, Any]]
 # it's too difficult to get type safety here due to to nested partially invariant collections
 _GroupedChoices: TypeAlias = dict[str, Any]  # Any should be Collection[_Choice]
@@ -40,6 +41,7 @@ class SelectFieldBase(Field):
         fieldset: str | None = None,
         depends_on: Sequence[Any] | None = None,
         pricing: PricingRules | None = None,
+        discount: dict[str, float] | None = None,
     ) -> None: ...
     def iter_choices(self) -> Iterator[_FullChoice]: ...
     def has_groups(self) -> bool: ...
@@ -77,6 +79,7 @@ class SelectField(SelectFieldBase):
         fieldset: str | None = None,
         depends_on: Sequence[Any] | None = None,
         pricing: PricingRules | None = None,
+        discount: dict[str, float] | None = None,
     ) -> None: ...
     def iter_choices(self) -> Iterator[_FullChoice]: ...
     def has_groups(self) -> bool: ...

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.org.views.homepage import view_org
 from onegov.org.models import Organisation
@@ -19,6 +21,6 @@ if TYPE_CHECKING:
 )
 def feriennet_view_org(
     self: Organisation,
-    request: 'FeriennetRequest'
-) -> 'RenderData | Response':
+    request: FeriennetRequest
+) -> RenderData | Response:
     return view_org(self, request, HomepageLayout(self, request))

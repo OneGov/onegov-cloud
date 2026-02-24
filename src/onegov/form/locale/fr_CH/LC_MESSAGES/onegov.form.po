@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-07-02 14:42+0200\n"
+"POT-Creation-Date: 2026-01-27 10:29+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -17,6 +17,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.11\n"
 "X-Generator: Poedit 2.2.1\n"
+
+msgid "Invalid number of hours"
+msgstr "Nombre d'heures non valide"
+
+msgid "Invalid number of minutes"
+msgstr "Nombre de minutes non valide"
 
 msgid "Not a valid email"
 msgstr "L'adresse électronique n'est pas valide"
@@ -43,12 +49,6 @@ msgstr "Général"
 msgid "Title"
 msgstr "Titre"
 
-msgid "Text"
-msgstr "Texte"
-
-msgid "Multiline"
-msgstr "Multi-lignes"
-
 msgid "E-Mail"
 msgstr "E-mail"
 
@@ -56,7 +56,22 @@ msgid "Website"
 msgstr "Site internet"
 
 msgid "Video Link"
-msgstr ""
+msgstr "Lien vidéo"
+
+msgid "Text fields"
+msgstr "Champs de texte"
+
+msgid "Text"
+msgstr "Texte"
+
+msgid "Limited text"
+msgstr "Texte limité"
+
+msgid "Multiline with optional number of rows"
+msgstr "Multiligne avec nombre de lignes optionnel"
+
+msgid "Numbers-only textfield (regex)"
+msgstr "Champ de texte numérique uniquement (regex)"
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -94,6 +109,9 @@ msgstr "Image"
 msgid "Document"
 msgstr "Document"
 
+msgid "Documents (Multiple upload)"
+msgstr "Documents (Téléchargement multiple)"
+
 msgid "Numbers"
 msgstr "Numéros"
 
@@ -102,6 +120,9 @@ msgstr "Âge"
 
 msgid "Percentage"
 msgstr "Pourcentage"
+
+msgid "Amount with Price"
+msgstr "Montant avec prix"
 
 msgid "Extended"
 msgstr "Étendu"
@@ -118,6 +139,12 @@ msgstr "Identificateur suisse d'entreprise"
 msgid "Swiss vat number"
 msgstr "Numéro de TVA suisse"
 
+msgid "Animal identification number (Microchip-Nr.)"
+msgstr "Numéro d'identification de l'animal (Microchip-Nr.)"
+
+msgid "Password"
+msgstr "Mot de passe"
+
 msgid "Markdown"
 msgstr "Markdown"
 
@@ -128,6 +155,13 @@ msgstr ""
 
 msgid "Files of this type are not supported."
 msgstr "Les fichiers de ce type ne sont pas pris en charge."
+
+msgid ""
+"The password you wanted to use was found on list of commonly used passwords, "
+"please use a more secure password."
+msgstr ""
+"Le mot de passe que vous avez choisi figure dans la liste des mots de passe "
+"couramment utilisés. Veuillez utiliser un mot de passe plus sécurisé."
 
 msgid "The form could not be parsed."
 msgstr "Le formulaire ne peut pas être analysé."
@@ -146,6 +180,22 @@ msgid ""
 msgstr ""
 "L'indentation de la ligne {ligne} n'est pas valide. Veuillez utiliser un "
 "multiple de 4 espaces"
+
+#, python-format
+msgid ""
+"The indentation on line {line} is not valid. Comments must be indented to "
+"the same level as the field definition (`=`) they belong to."
+msgstr ""
+"L'indentation de la ligne {line} n'est pas valide. Les commentaires doivent "
+"être indentés au même niveau que la définition du champ (`=`) auquel ils "
+"appartiennent."
+
+#, python-format
+msgid ""
+"Incorrect placement of the field description on line {line}. The field "
+"description must be placed below the field definition (`=`) and with the "
+"same indentation."
+msgstr ""
 
 #, python-format
 msgid "The field '{label}' exists more than once."
@@ -175,10 +225,20 @@ msgstr ""
 "payant est défini."
 
 #, python-format
-msgid "The '{label}' group is empty and will not be visible. Either "
-"remove the empty group or add fields to it."
-msgstr "Le groupe '{label}' est vide et ne sera pas visible. Supprimez le "
-"groupe vide ou ajoutez des champs."
+msgid ""
+"The '{label}' group is empty and will not be visible. Either remove the "
+"empty group or add fields to it."
+msgstr ""
+"Le groupe '{label}' est vide et ne sera pas visible. Supprimez le groupe "
+"vide ou ajoutez des champs."
+
+#, python-format
+msgid ""
+"${fields}: New fields cannot be required initially. Require them in a "
+"separate migration step."
+msgstr ""
+"${fields}: Les nouveaux champs ne peuvent pas être requis au départ. Exigez-"
+"les dans une étape de migration séparée."
 
 #, python-format
 msgid ""
@@ -190,7 +250,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Invalid field type for field '{label}'. Please use the plus-icon to add "
+"Invalid field type for field '${label}'. Please use the plus-icon to add "
 "allowed field types."
 msgstr ""
 
@@ -214,6 +274,9 @@ msgstr "Doit avoir lieu le {date} ou après."
 #, python-format
 msgid "Needs to be on or before {date}."
 msgstr "Doit avoir lieu le {date} ou avant."
+
+msgid "Not a valid domain."
+msgstr "Domaine non valide."
 
 msgid "Uploaded file"
 msgstr "Fichier téléchargé"
@@ -241,3 +304,12 @@ msgstr "Aucun résultat ne correspond"
 
 msgid "Select Some Options"
 msgstr "Sélectionner quelques options"
+
+msgid "hours"
+msgstr "heures"
+
+msgid "minutes"
+msgstr "minutes"
+
+#~ msgid "Multiline"
+#~ msgstr "Multi-lignes"

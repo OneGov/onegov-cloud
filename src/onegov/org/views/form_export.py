@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 from collections import OrderedDict
-from onegov.core.orm.types import UUID
 from onegov.core.security import Private
 from onegov.form import FormDefinition
 from onegov.form import FormRegistrationWindow
@@ -13,7 +14,7 @@ from onegov.core.elements import Link
 from onegov.org.utils import keywords_first
 from onegov.ticket import Ticket
 from sedate import align_range_to_day, as_datetime, standardize_date
-from sqlalchemy import and_
+from sqlalchemy import and_, UUID as UUIDType
 
 
 from typing import Any, NamedTuple, TYPE_CHECKING
@@ -26,6 +27,7 @@ if TYPE_CHECKING:
     from onegov.pay.types import PaymentMethod
     from sedate.types import DateLike, TzInfoOrName
     from sqlalchemy.orm import Query
+    from uuid import UUID
     from webob import Response
 
     class FormSubmissionRow(NamedTuple):
@@ -49,13 +51,13 @@ if TYPE_CHECKING:
 )
 def handle_form_submissions_export(
     self: FormDefinition,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormSubmissionsExport,
     layout: FormSubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = layout or FormSubmissionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Export"), '#'))
+    layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None
 
     if form.submitted(request):
@@ -85,19 +87,19 @@ def handle_form_submissions_export(
         return form.as_export_response(results, self.title, key=field_order)
 
     return {
-        'title': _("Export"),
+        'title': _('Export'),
         'layout': layout,
         'form': form,
-        'explanation': _("Exports the submissions of the given date range.")
+        'explanation': _('Exports the submissions of the given date range.')
     }
 
 
 def subset_by_date(
     submissions: FormSubmissionCollection,
-    start: 'DateLike',
-    end: 'DateLike',
-    timezone: 'TzInfoOrName'
-) -> 'Query[FormSubmission]':
+    start: DateLike,
+    end: DateLike,
+    timezone: TzInfoOrName
+) -> Query[FormSubmission]:
 
     start, end = align_range_to_day(
         standardize_date(as_datetime(start), timezone),
@@ -116,8 +118,8 @@ def subset_by_date(
 
 def subset_by_window(
     submissions: FormSubmissionCollection,
-    window_ids: 'Collection[UUID]'
-) -> 'Query[FormSubmission]':
+    window_ids: Collection[UUID]
+) -> Query[FormSubmission]:
     return (
         submissions.query()
         .filter_by(state='complete')
@@ -126,11 +128,11 @@ def subset_by_window(
 
 
 def configure_subset(
-    subset: 'Query[FormSubmission]'
-) -> 'Query[FormSubmissionRow]':
+    subset: Query[FormSubmission]
+) -> Query[FormSubmissionRow]:
     subset = subset.join(
         Ticket,
-        FormSubmission.id == Ticket.handler_id.cast(UUID)
+        FormSubmission.id == Ticket.handler_id.cast(UUIDType)
     )
 
     subset = subset.join(
@@ -153,10 +155,10 @@ def configure_subset(
 
 
 def run_export(
-    subset: 'Query[FormSubmissionRow]',
+    subset: Query[FormSubmissionRow],
     nested: bool,
-    formatter: 'Callable[[object], Any]'
-) -> tuple['Callable[[str], tuple[int, str]]', 'Sequence[dict[str, Any]]']:
+    formatter: Callable[[object], Any]
+) -> tuple[Callable[[str], tuple[int, str]], Sequence[dict[str, Any]]]:
 
     keywords = (
         'ticket_number',
@@ -169,7 +171,7 @@ def run_export(
         'registration_window_end'
     )
 
-    def transform(submission: 'FormSubmissionRow') -> dict[str, Any]:
+    def transform(submission: FormSubmissionRow) -> dict[str, Any]:
         r = OrderedDict()
 
         for keyword in keywords:

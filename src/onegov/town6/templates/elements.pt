@@ -7,7 +7,7 @@
             tal:define="item e.model"
             use-macro="layout.macros['access_hint']"
         />
-    </tal:b></a>
+    </tal:b><span tal:condition="not e.text and e.sr_text|nothing" class="show-for-sr">${e.sr_text}</span></a>
 </metal:b>
 
 <!--! An img element -->
@@ -55,6 +55,9 @@
             <div class="panel">
                 <p>${e.attrs['new-iframe-link']}</p>
             </div>
+            <p i18n:translate>
+                To display the breadcrumbs you can add <code i18n:name="bc_level">?bc-level=1</code> as a parameter to the URL. The number defines where the breadcrumbs start. 1 in this case means that the first level is hidden. You can use any number as long as it is less than the number of levels in the breadcrumbs.
+            </p>
         </tal:block>
     </tal:block>
 </metal:b>

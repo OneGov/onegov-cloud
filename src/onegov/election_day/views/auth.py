@@ -1,4 +1,6 @@
 """ The authentication views. """
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Private
 from onegov.core.security import Public
@@ -36,20 +38,20 @@ if TYPE_CHECKING:
 )
 def handle_login(
     self: Auth,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: LoginForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles the login requests. """
 
     if form.submitted(request):
         response = self.login_to(request=request, **form.login_data)
-        form.error_message = _("Wrong username or password")  # type:ignore
+        form.error_message = _('Wrong username or password')  # type:ignore
     else:
         response = None
 
     return response or {
         'layout': DefaultLayout(self, request),
-        'title': _("Login"),
+        'title': _('Login'),
         'form': form,
         'password_reset_link': request.link(
             request.app.principal, name='request-password'
@@ -62,7 +64,7 @@ def handle_login(
     name='logout',
     permission=Private
 )
-def view_logout(self: Auth, request: 'ElectionDayRequest') -> 'Response':
+def view_logout(self: Auth, request: ElectionDayRequest) -> Response:
 
     """ Handles the logout requests. """
 
@@ -78,9 +80,9 @@ def view_logout(self: Auth, request: 'ElectionDayRequest') -> 'Response':
 )
 def handle_password_reset_request(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: PasswordResetForm
-) -> 'RenderData':
+) -> RenderData:
     """ Handles the password reset requests. """
 
     show_form = True
@@ -99,7 +101,7 @@ def handle_password_reset_request(
 
             assert request.app.mail is not None
             request.app.send_transactional_email(
-                subject=request.translate(_("Password reset")),
+                subject=request.translate(_('Password reset')),
                 receivers=(user.username, ),
                 reply_to=(
                     request.app.principal.reply_to
@@ -109,7 +111,7 @@ def handle_password_reset_request(
                     'mail_password_reset.pt',
                     request,
                     {
-                        'title': request.translate(_("Password reset")),
+                        'title': request.translate(_('Password reset')),
                         'model': None,
                         'url': url,
                         'layout': MailLayout(self, request)
@@ -118,7 +120,7 @@ def handle_password_reset_request(
             )
         else:
             log.info(
-                "Failed password reset attempt by {}".format(
+                'Failed password reset attempt by {}'.format(
                     request.client_addr
                 )
             )
@@ -150,9 +152,9 @@ def handle_password_reset_request(
 )
 def handle_password_reset(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: PasswordResetForm
-) -> 'RenderData':
+) -> RenderData:
     """ Handles password reset requests. """
 
     callout = None
@@ -160,13 +162,13 @@ def handle_password_reset(
     if form.submitted(request):
         if form.update_password(request):
             show_form = False
-            callout = _("Password changed.")
+            callout = _('Password changed.')
         else:
             form.error_message = _(  # type:ignore[attr-defined]
-                "Wrong username or password reset link not valid any more."
+                'Wrong username or password reset link not valid any more.'
             )
             log.info(
-                "Failed password reset attempt by {}".format(
+                'Failed password reset attempt by {}'.format(
                     request.client_addr
                 )
             )
@@ -193,15 +195,15 @@ def handle_password_reset(
 )
 def handle_totp_second_factor(
     self: Auth,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: TOTPForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not request.app.totp_enabled:
         raise exc.HTTPNotFound()
 
     @request.after
-    def respond_with_no_index(response: 'Response') -> None:
+    def respond_with_no_index(response: Response) -> None:
         response.headers['X-Robots-Tag'] = 'noindex'
 
     users = UserCollection(request.session)
@@ -213,7 +215,7 @@ def handle_totp_second_factor(
             return self.redirect(request, self.to)
 
         request.alert(
-            _("Failed to continue login, please ensure cookies are allowed.")
+            _('Failed to continue login, please ensure cookies are allowed.')
         )
         return redirect(request.link(self, name='login'))
 

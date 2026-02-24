@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 import re
 
@@ -30,9 +32,9 @@ class TownAssistant(Assistant):
     @Assistant.step(form=TownForm)
     def first_step(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         form: TownForm
-    ) -> 'RenderData | Response':
+    ) -> RenderData | Response:
 
         if form.submitted(request):
             request.browser_session['name'] = form.name.data
@@ -47,28 +49,28 @@ class TownAssistant(Assistant):
         form.user.data = request.browser_session.get('user', form.user.data)
         form.color.data = request.browser_session.get('color', form.color.data)
         form.user_name.data = request.browser_session.get(
-            "user_name", form.user_name.data
+            'user_name', form.user_name.data
         )
         form.phone_number.data = request.browser_session.get(
-            "phone_number", form.phone_number.data
+            'phone_number', form.phone_number.data
         )
 
         return {
             'name': 'town-start',
-            'title': _("Online Counter for Towns Demo"),
+            'title': _('Online Counter for Towns Demo'),
             'bullets': (
-                _("Start using the online counter for your town immediately."),
-                _("Setup takes less than one minute."),
-                _("Free with no commitment.")
+                _('Start using the online counter for your town immediately.'),
+                _('Setup takes less than one minute.'),
+                _('Free with no commitment.')
             ),
         }
 
     @Assistant.step(form=FinishForm)
     def last_step(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         form: FinishForm
-    ) -> 'RenderData | Response':
+    ) -> RenderData | Response:
 
         for key in ('name', 'user', 'color'):
             if not request.browser_session.has(key):
@@ -88,11 +90,11 @@ class TownAssistant(Assistant):
                 self.app.send_zulip(
                     subject='OneGov Onboarding',
                     content='\n'.join((
-                        f"A new OneGov Cloud instance was started by "
-                        f"{user_name}:",
+                        (f'A new OneGov Cloud instance was started by '
+                        f'{user_name}:'),
                         f"[{name}]({product['url']})",
-                        f"Email: {user}",
-                        f"Phone: {phone_number}"
+                        f'Email: {user}',
+                        f'Phone: {phone_number}'
                     ))
                 )
             except AlreadyExistsError:
@@ -111,26 +113,26 @@ class TownAssistant(Assistant):
             if error:
                 return {
                     'name': 'town-error',
-                    'title': _("Online Counter for Towns Demo"),
+                    'title': _('Online Counter for Towns Demo'),
                     'error': error,
                     'form': None
                 }
             else:
                 return {
                     'name': 'town-success',
-                    'title': _("Online Counter for Towns Demo"),
+                    'title': _('Online Counter for Towns Demo'),
                     'product': product,
-                    'message': _("Success! Have a look at your new website!"),
+                    'message': _('Success! Have a look at your new website!'),
                     'warning': _(
-                        "Please write down your username and password "
-                        "before you continue. "
+                        'Please write down your username and password '
+                        'before you continue. '
                     ),
                     'form': None
                 }
 
         return {
             'name': 'town-ready',
-            'title': _("Online Counter for Towns Demo"),
+            'title': _('Online Counter for Towns Demo'),
             'message': _(
                 "We are ready to launch! Click continue once you're ready."
             ),
@@ -164,8 +166,8 @@ class TownAssistant(Assistant):
         name: str,
         user: str,
         color: str,
-        request: 'CoreRequest'
-    ) -> 'RenderData':
+        request: CoreRequest
+    ) -> RenderData:
 
         current_schema = self.app.session_manager.current_schema
         assert current_schema is not None
@@ -193,7 +195,7 @@ class TownAssistant(Assistant):
 
             users.add(user, password, 'admin')
 
-            title = request.translate(_("Welcome to OneGov Cloud"))
+            title = request.translate(_('Welcome to OneGov Cloud'))
             welcome_mail = render_template('mail_welcome.pt', request, {
                 'url': 'https://{}'.format(self.get_domain(name)),
                 'mail': user,
@@ -202,7 +204,7 @@ class TownAssistant(Assistant):
                 'org': name
             })
 
-            self.app.es_perform_reindex()
+            self.app.perform_reindex()
             self.app.send_transactional_email(
                 subject=title,
                 receivers=(user, ),
@@ -215,8 +217,8 @@ class TownAssistant(Assistant):
 
         return {
             'info': [
-                (_("Username"), user),
-                (_("Password"), password),
+                (_('Username'), user),
+                (_('Password'), password),
             ],
             'url': 'https://{}'.format(self.get_domain(name))
         }

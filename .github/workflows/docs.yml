@@ -53,12 +53,12 @@ jobs:
           git-core \
           postgresql \
           redis \
-          openjdk-8-jre-headless \
           gcc \
           libc-dev \
           fonts-liberation \
           libappindicator3-1 \
           libasound2t64  \
+          libcairo2-dev \
           libdrm2 \
           libgbm1 \
           libnspr4 \
@@ -69,6 +69,7 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
+          libxt-dev \
           xdg-utils \
           make \
           --fix-missing

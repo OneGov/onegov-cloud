@@ -19,41 +19,16 @@
 </metal:agenda-item-title>
 
 <metal:agenda-item-title-in-list define-macro="agenda-item-title-in-list">
-    <h5 class="list-title"><tal:block i18n:translate="">Agenda item</tal:block> ${agenda_item.number}<br></h5>
-    <span class="agenda-item-title"><tal:block tal:repeat="part agenda_item.title_parts">${part}<br tal:condition="not:repeat.part.end"></tal:block></span>
+    <h5 class="list-title"><span class="agenda-item-title"><tal:block tal:repeat="part agenda_item.title_parts">${part}<br tal:condition="not:repeat.part.end"></tal:block></span></h5>
 </metal:agenda-item-title-in-list>
 
 <metal:agenda-item-list define-macro="agenda_item_list">
     <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
-        <h2 i18n:translate="">Agenda items</h2>
+        <h3 i18n:translate="">Agenda items</h3>
         <ul class="more-list agenda-item-list ${'with-current' if agenda_item else ''}">
-            <li tal:repeat="current_agenda_item agenda_items">
-                <a class="list-link" id="${'current' if current else ''}" tal:attributes="href request.link(current_agenda_item)" tal:define="current agenda_item == current_agenda_item">
-                    <div class="timeline">
-                        <div class="line"></div>
-                        <div class="circle">
-                            <span class="number">${current_agenda_item.number}</span>
-                        </div>
-                        <div class="line"></div>
-                    </div>
-                    <div class="title">
-                        <tal:block metal:use-macro="layout.macros['agenda-item-title-in-list']" tal:define="agenda_item current_agenda_item"/>
-                    </div>
-                </a>
-            </li>
-        </ul>
-    </div>
-</metal:agenda-item-list>
-
-<metal:ticker-agenda-item-list define-macro="ticker_agenda_item_list">
-    <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
-        <h2 i18n:translate="">Agenda items</h2>
-        <ul class="more-list agenda-item-list with-current">
             <tal:b tal:repeat="current_agenda_item agenda_items">
-                <li id="list-agenda-item-${current_agenda_item.number}">
-                    <a class="list-link ${current_agenda_item.state}"
-                    id="${'current' if current else ''}" tal:define="current current_agenda_item.state == 'ongoing'"
-                    href="${f'#agenda-item-{current_agenda_item.number}' if current_agenda_item.state != 'scheduled' else request.link(current_agenda_item)}">
+                <li tal:condition="current_agenda_item.state != 'draft' or request.is_logged_in">
+                    <a class="list-link" id="${'current' if current else ''}" tal:attributes="href request.link(current_agenda_item)" tal:define="current agenda_item == current_agenda_item">
                         <div class="timeline">
                             <div class="line"></div>
                             <div class="circle">
@@ -62,7 +37,33 @@
                             <div class="line"></div>
                         </div>
                         <div class="title">
-                            <h5 class="list-title"><tal:block metal:use-macro="layout.macros['agenda-item-title-in-list']" tal:define="agenda_item current_agenda_item"/></h5>
+                            <tal:block metal:use-macro="layout.macros['agenda-item-title-in-list']" tal:define="agenda_item current_agenda_item"/>
+                        </div>
+                    </a>
+                </li>
+            </tal:b>
+        </ul>
+    </div>
+</metal:agenda-item-list>
+
+<metal:ticker-agenda-item-list define-macro="ticker_agenda_item_list">
+    <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
+        <h3 i18n:translate="">Agenda items</h3>
+        <ul class="more-list agenda-item-list with-current">
+            <tal:b tal:repeat="current_agenda_item agenda_items">
+                <li id="list-agenda-item-${current_agenda_item.number}">
+                    <a class="list-link ${current_agenda_item.state}"
+                    id="${'current' if current else ''}" tal:define="current current_agenda_item.state == 'ongoing'"
+                    href="${f'#agenda-item-{current_agenda_item.number}' if current_agenda_item.state not in ['scheduled', 'draft'] else request.link(current_agenda_item)}">
+                        <div class="timeline">
+                            <div class="line"></div>
+                            <div class="circle">
+                                <span class="number">${current_agenda_item.number}</span>
+                            </div>
+                            <div class="line"></div>
+                        </div>
+                        <div class="title">
+                            <tal:block metal:use-macro="layout.macros['agenda-item-title-in-list']" tal:define="agenda_item current_agenda_item"/>
                         </div>
                     </a>
                 </li>
@@ -73,12 +74,68 @@
 
 <metal:state define-macro="state">
     <tal:block tal:switch="state">
+        <span class="label draft" tal:case="'draft'" i18n:translate="">${state}</span>
         <span class="label secondary" tal:case="'scheduled'" i18n:translate="">${state}</span>
         <span class="label warning" tal:case="'ongoing'" i18n:translate="">${state}</span>
         <span class="label success" tal:case="'completed'" i18n:translate="">${state}</span>
         <span tal:case="default">${state}</span>
     </tal:block>
 </metal:state>
+
+
+<metal:states-list define-macro="states-list" i18n:domain="onegov.landsgemeinde">
+    <div id="states-list-container">
+        <ul id="states-list">
+            <li class="assembly">
+                <a href="${request.return_to(request.link(assembly, 'edit'), request.link(assembly, 'states'))}">
+                    <tal:b i18n:translate="">Assembly</tal:b>
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a ic-post-to="${layout.csrf_protected_url(request.link(assembly, 'change-state'))}"
+                    ic-target="#states-list"
+                    ic-select-from-response="#states-list"
+                    >
+                    <tal:b>
+                        <tal:block metal:use-macro="layout.macros['state']" tal:define="state assembly.state"/>
+                    </tal:b>
+                </a>
+            </li>
+            <tal:block tal:repeat="agenda_item reversed(agenda_items)">
+                <li class="agenda-item">
+                    <a href="${request.return_to(request.link(agenda_item, 'edit'), request.link(assembly, 'states'))}">
+                        <span>
+                            <i class="fas fa-file-alt"></i>
+                            ${layout.agenda_item_title(agenda_item, short=True)}
+                            <span class="start" tal:condition="agenda_item.start_time">
+                                <i class="far fa-clock"></i> ${layout.format_date(agenda_item.start_time, 'time')}
+                            </span>
+                        </span>
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a ic-post-to="${layout.csrf_protected_url(request.link(agenda_item, 'change-state'))}"
+                        ic-target="#states-list"
+                        ic-select-from-response="#states-list"
+                        >
+                        <tal:block metal:use-macro="layout.macros['state']" tal:define="state agenda_item.state"/>
+                    </a>
+                </li>
+                <li tal:repeat="votum agenda_item.vota" class="votum">
+                    <a href="${request.return_to(request.link(votum, 'edit'), request.link(assembly, 'states'))}">
+                        <span><i class="fa fa-user"></i>
+                        ${layout.votum_title(votum)}</span>
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a ic-post-to="${layout.csrf_protected_url(request.link(votum, 'change-state'))}"
+                        ic-target="#states-list"
+                        ic-select-from-response="#states-list"
+                        >
+                        <tal:block metal:use-macro="layout.macros['state']" tal:define="state votum.state"/>
+                    </a>
+                </li>
+            </tal:block>
+        </ul>
+    </div>
+</metal:states-list>
 
 <metal:votum define-macro="votum" i18n:domain="onegov.landsgemeinde">
     <div tal:condition="request.is_logged_in or votum.state != 'scheduled'" id="votum-${votum.number}" class="votum ${votum.state}" tal:define="thumbnail votum.person_picture|None; modal f'modal-{votum.agenda_item.number}-{votum.number}'">
@@ -101,7 +158,7 @@
                 </ul>
             </div>
             <div class="video-link" tal:define="votum_timestamp (votum.video_timestamp or votum.calculated_timestamp)">
-                <a tal:condition="votum_timestamp" href="${append_query_param(request.url, 'start', timestamp_to_seconds(votum_timestamp))}">
+                <a tal:condition="votum_timestamp" data-timestamp="${timestamp_to_seconds(votum_timestamp)}" href="#content">
                     <i class="far fa-play-circle"></i>
                     <tal:b i18n:translate="">${votum_timestamp}</tal:b>
                 </a>
@@ -111,7 +168,6 @@
             <tal:b tal:content="votum.text"/>
         </blockquote>
         <blockquote class="votum-motion" tal:condition="votum.motion">
-            <span i18n:translate="">Motion</span><br/>
             <tal:b tal:content="votum.motion"></tal:b>
         </blockquote>
         <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons">
@@ -125,7 +181,7 @@
     <div class="ticker-item ticker-item-agenda-item ${agenda_item.state}" id="agenda-item-${agenda_item.number}">
         <div class="ticker-info">
             <h2><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h2>
-            <p tal:condition="agenda_item.start_time" class="subheader agenda-item-timestamp"><span><i class="far fa-clock"></i> ${layout.format_date(agenda_item.start_time, 'time')}</span></p>
+            <p tal:condition="agenda_item.start_time" class="subheader agenda-item-timestamp"><i class="far fa-clock"></i><span>${layout.format_date(agenda_item.start_time, 'time')}</span></p>
         </div>
 
         <div class="callout secondary agenda-item-resolution" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
@@ -244,6 +300,32 @@
         </p>
     </a>
 </metal:search_result_files>
+
+<metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.landsgemeinde">
+    <div tal:content="layout.org.contact_html" />
+    <a tal:condition="contact_url" tal:attributes="href contact_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
+</metal:footer_contact>
+
+<metal:file_icons define-macro="file_icons">
+    <i tal:condition="file.claimed_extension not in ['pdf', 'zip', 'png', 'jpg', 'gif']" class="fa fa-download" aria-hidden="true"></i>
+    <tal:b tal:switch="file.claimed_extension">
+        <tal:b tal:case="'pdf'">
+            <i class="fa fa-file-pdf" aria-hidden="true"></i>
+        </tal:b>
+        <tal:b tal:case="'png'">
+            <i class="fas fa-image" aria-hidden="true"></i>
+        </tal:b>
+        <tal:b tal:case="'jpg'">
+            <i class="fas fa-image" aria-hidden="true"></i>
+        </tal:b>
+        <tal:b tal:case="'gif'">
+            <i class="fas fa-image" aria-hidden="true"></i>
+        </tal:b>
+        <tal:b tal:case="'zip'">
+            <i class="fa fa-file-archive" aria-hidden="true"></i>
+        </tal:b>
+    </tal:b>
+</metal:file_icons>
 
 </body>
 <html>

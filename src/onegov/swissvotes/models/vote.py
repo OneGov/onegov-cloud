@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 from collections import OrderedDict
+from datetime import date as date_t
+from decimal import Decimal
 from functools import cached_property
 from onegov.core.orm import observes
 from onegov.core.orm import Base
@@ -19,27 +23,22 @@ from onegov.swissvotes.models.file import SwissVoteFile
 from onegov.swissvotes.models.policy_area import PolicyArea
 from onegov.swissvotes.models.region import Region
 from operator import itemgetter
-from sqlalchemy import Column
-from sqlalchemy import Date
 from sqlalchemy import func
-from sqlalchemy import Integer
 from sqlalchemy import Numeric
-from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import TSVECTOR
-from sqlalchemy.orm import deferred
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
-
 
 from typing import Any
 from typing import Generic
 from typing import NamedTuple
 from typing import TYPE_CHECKING
 from typing_extensions import TypeVar
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from datetime import date as date_t
-    from decimal import Decimal
     from onegov.core.orm import SessionManager
     from onegov.swissvotes.request import SwissvotesRequest
     from typing import Protocol
@@ -63,7 +62,7 @@ class Poster(NamedTuple):
     label: str
 
 
-class encoded_property:
+class encoded_property:  # noqa: N801
     """ A shorthand property to return the label of an encoded value. Requires
     the instance the have a `codes`-lookup function. Creates the SqlAlchemy
     Column (with a prefixed underline).
@@ -71,6 +70,7 @@ class encoded_property:
     Example:
 
         class MyClass:
+            _value: Mapped[int | None]
             value = encoded_property()
 
             def codes(self, attributes):
@@ -78,49 +78,45 @@ class encoded_property:
 
     """
 
-    def __init__(self, nullable: bool = True):
-        self.nullable = nullable
-
-    def __set_name__(self, owner: type['HasCodes[T]'], name: str) -> None:
+    def __set_name__(self, owner: type[HasCodes[T]], name: str) -> None:
         self.name = name
-        assert not hasattr(owner, f'_{name}')
-        setattr(
-            owner, f'_{name}', Column(name, Integer, nullable=self.nullable)
-        )
+        assert not hasattr(owner, f'_{name}'), (
+            f'Attribute "_{name}" already defined')
+        setattr(owner, f'_{name}', mapped_column(name=name))
 
     def __get__(
-        self,
-        instance: 'HasCodes[T]',
-        owner: type[object]
-    ) -> 'T | None':
+            self,
+            instance: HasCodes[T],
+            owner: type[object]
+    ) -> T | None:
         value = getattr(instance, f'_{self.name}')
         return instance.codes(self.name).get(value)
 
 
-class localized_property(Generic[StrT]):
+class localized_property(Generic[StrT]):  # noqa: N801
     """ A shorthand property to return a localized attribute. Requires at least
     a `xxx_de` attribute and falls back to this.
 
     Example:
 
         class MyClass:
-            value_de = Column(Text)
-            value_fr = Column(Text)
+            value_de = mapped_column(Text)
+            value_fr = mapped_column(Text)
             value = localized_property()
     """
+
     def __set_name__(
-        self,
-        owner: type['HasSessionManager'],
-        name: str
+            self,
+            owner: type[HasSessionManager],
+            name: str
     ) -> None:
         self.name = name
 
     def __get__(
-        self,
-        instance: 'HasSessionManager',
-        owner: type['HasSessionManager']
+            self,
+            instance: HasSessionManager,
+            owner: type[HasSessionManager]
     ) -> StrT:
-
         default: StrT = getattr(instance, f'{self.name}_de')
         assert instance.session_manager is not None
         assert instance.session_manager.current_locale is not None
@@ -130,7 +126,6 @@ class localized_property(Generic[StrT]):
 
 
 class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
-
     """ A single vote as defined by the code book.
 
     There are a lot of columns:
@@ -160,47 +155,12 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     ORGANIZATION_NO_LONGER_EXISTS = 9999
 
-    term: str | None = None
-
     if TYPE_CHECKING:
-        # we declare the internal numeric coded attributes
-        # so mypy knows about them
-        _legal_form: Column[int]
-        _parliamentary_initiated: Column[int | None]
-        _result: Column[int]
-        _result_people_accepted: Column[int]
-        _result_cantons_accepted: Column[int]
-        _result_ag_accepted: Column[int]
-        _result_ai_accepted: Column[int]
-        _result_ar_accepted: Column[int]
-        _result_be_accepted: Column[int]
-        _result_bl_accepted: Column[int]
-        _result_bs_accepted: Column[int]
-        _result_fr_accepted: Column[int]
-        _result_ge_accepted: Column[int]
-        _result_gl_accepted: Column[int]
-        _result_gr_accepted: Column[int]
-        _result_ju_accepted: Column[int]
-        _result_lu_accepted: Column[int]
-        _result_ne_accepted: Column[int]
-        _result_nw_accepted: Column[int]
-        _result_ow_accepted: Column[int]
-        _result_sg_accepted: Column[int]
-        _result_sh_accepted: Column[int]
-        _result_so_accepted: Column[int]
-        _result_sz_accepted: Column[int]
-        _result_tg_accepted: Column[int]
-        _result_ti_accepted: Column[int]
-        _result_ur_accepted: Column[int]
-        _result_vd_accepted: Column[int]
-        _result_vs_accepted: Column[int]
-        _result_zg_accepted: Column[int]
-        _result_zh_accepted: Column[int]
-        _position_council_of_states: Column[int]
-        _position_federal_council: Column[int]
-        _position_national_council: Column[int]
-        _position_parliament: Column[int]
-        _recommendation: Column[int | None]
+        # NOTE: We don't want this to end up in __annotations__
+        #       since it should not be mapped by SQLAlchemy
+        term: str | None
+
+    term = None
 
     @staticmethod
     def codes(attribute: str) -> dict[int | None, str]:
@@ -211,56 +171,56 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
         if attribute == 'legal_form':
             return OrderedDict((
-                (1, _("Mandatory referendum")),
-                (2, _("Optional referendum")),
-                (3, _("Popular initiative")),
-                (4, _("Direct counter-proposal")),
-                (5, _("Tie-breaker")),
+                (1, _('Mandatory referendum')),
+                (2, _('Optional referendum')),
+                (3, _('Popular initiative')),
+                (4, _('Direct counter-proposal')),
+                (5, _('Tie-breaker')),
             ))
 
         if attribute == 'parliamentary_initiated':
             return OrderedDict((
-                (0, _("No")),
-                (1, _("Yes")),
-                (None, _("No")),
+                (0, _('No')),
+                (1, _('Yes')),
+                (None, _('No')),
             ))
 
         if attribute == 'result' or attribute.endswith('_accepted'):
             return OrderedDict((
-                (0, _("Rejected")),
-                (1, _("Accepted")),
-                (3, _("Majority of the cantons not necessary")),
-                (8, _("Counter-proposal preferred")),
-                (9, _("Popular initiative preferred")),
+                (0, _('Rejected')),
+                (1, _('Accepted')),
+                (3, _('Majority of the cantons not necessary')),
+                (8, _('Counter-proposal preferred')),
+                (9, _('Popular initiative preferred')),
             ))
 
         if attribute in (
-            'position_council_of_states',
-            'position_federal_council',
-            'position_national_council',
-            'position_parliament',
+                'position_council_of_states',
+                'position_federal_council',
+                'position_national_council',
+                'position_parliament',
         ):
             return OrderedDict((
-                (1, _("Accepting")),
-                (2, _("Rejecting")),
-                (3, _("None")),
-                (8, _("Preference for the counter-proposal")),
-                (9, _("Preference for the popular initiative")),
+                (1, _('Accepting')),
+                (2, _('Rejecting')),
+                (3, _('None')),
+                (8, _('Preference for the counter-proposal')),
+                (9, _('Preference for the popular initiative')),
             ))
 
         if attribute == 'recommendation':
             # Sorted by how it should be displayed in strengths table
             return OrderedDict((
-                (1, _("Yea")),
-                (9, _("Preference for the popular initiative")),
-                (2, _("Nay")),
-                (8, _("Preference for the counter-proposal")),
-                (4, _("Empty")),
-                (5, _("Free vote")),
-                (3, _("None")),
-                (66, _("Neutral")),
-                (9999, _("Organization no longer exists")),
-                (None, _("unknown"))
+                (1, _('Yea')),
+                (9, _('Preference for the popular initiative')),
+                (2, _('Nay')),
+                (8, _('Preference for the counter-proposal')),
+                (4, _('Empty')),
+                (5, _('Free vote')),
+                (3, _('None')),
+                (66, _('Neutral')),
+                (9999, _('Organization no longer exists')),
+                (None, _('unknown'))
             ))
 
         raise RuntimeError(f"No codes available for '{attribute}'")
@@ -269,10 +229,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     def metadata_codes(attribute: str) -> dict[str, str]:
         if attribute == 'position':
             return OrderedDict((
-                ('yes', _("Yes")),
-                ('mixed', _("Mixed")),
-                ('no', _("No")),
-                ('neutral', _("Neutral")),
+                ('yes', _('Yes')),
+                ('mixed', _('Mixed')),
+                ('no', _('No')),
+                ('neutral', _('Neutral')),
             ))
 
         if attribute == 'language':
@@ -281,6 +241,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 ('fr', _('French')),
                 ('it', _('Italian')),
                 ('rm', _('Rhaeto-Romanic')),
+                ('en', _('English')),
                 ('mixed', _('Mixed')),
                 ('other', _('Other')),
             ))
@@ -303,33 +264,35 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
         raise RuntimeError(f"No codes available for '{attribute}'")
 
-    id: 'Column[int]' = Column(Integer, nullable=False, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
     # Formal description
-    bfs_number: 'Column[Decimal]' = Column(Numeric(8, 2), nullable=False)
-    date: 'Column[date_t]' = Column(Date, nullable=False)
-    title_de: 'Column[str]' = Column(Text, nullable=False)
-    title_fr: 'Column[str]' = Column(Text, nullable=False)
+    bfs_number: Mapped[Decimal] = mapped_column(Numeric(8, 2))
+    date: Mapped[date_t]
+    title_de: Mapped[str]
+    title_fr: Mapped[str]
     title: localized_property[str] = localized_property()
-    short_title_de: 'Column[str]' = Column(Text, nullable=False)
-    short_title_fr: 'Column[str]' = Column(Text, nullable=False)
-    short_title_en: 'Column[str | None]' = Column(Text, nullable=True)
+    short_title_de: Mapped[str]
+    short_title_fr: Mapped[str]
+    short_title_en: Mapped[str | None]
     short_title: localized_property[str] = localized_property()
-    brief_description_title: 'Column[str | None]' = Column(Text)
-    keyword: 'Column[str | None]' = Column(Text)
-    legal_form = encoded_property(nullable=False)
+    brief_description_title: Mapped[str | None]
+    keyword: Mapped[str | None]
+    _legal_form: Mapped[int]
+    legal_form = encoded_property()
+    _parliamentary_initiated: Mapped[int | None]
     parliamentary_initiated = encoded_property()
-    initiator_de: 'Column[str | None]' = Column(Text)
-    initiator_fr: 'Column[str | None]' = Column(Text)
+    initiator_de: Mapped[str | None]
+    initiator_fr: Mapped[str | None]
     initiator = localized_property()
-    anneepolitique: 'Column[str | None]' = Column(Text)
-    bfs_map_de: 'Column[str | None]' = Column(Text)
-    bfs_map_fr: 'Column[str | None]' = Column(Text)
-    bfs_map_en: 'Column[str | None]' = Column(Text)
+    anneepolitique: Mapped[str | None]
+    bfs_map_de: Mapped[str | None]
+    bfs_map_fr: Mapped[str | None]
+    bfs_map_en: Mapped[str | None]
     bfs_map = localized_property()
-    bfs_dashboard_de: 'Column[str | None]' = Column(Text)
-    bfs_dashboard_fr: 'Column[str | None]' = Column(Text)
-    bfs_dashboard_en: 'Column[str | None]' = Column(Text)
+    bfs_dashboard_de: Mapped[str | None]
+    bfs_dashboard_fr: Mapped[str | None]
+    bfs_dashboard_en: Mapped[str | None]
     bfs_dashboard = localized_property()
 
     @property
@@ -396,8 +359,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     def campaign_links(self) -> dict[str, list[str]]:
         result: dict[str, list[str]] = {}
         for position, label in (
-            ('yes', _('Campaign for a Yes')),
-            ('no', _('Campaign for a No'))
+                ('yes', _('Campaign for a Yes')),
+                ('no', _('Campaign for a No'))
         ):
             for number in (1, 2, 3):
                 link = getattr(self, f'link_campaign_{position}_{number}', '')
@@ -406,33 +369,47 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         return result
 
     # Campaign finances
-    campaign_finances_yea_total: 'Column[int | None]' = Column(Integer())
-    campaign_finances_nay_total: 'Column[int | None]' = Column(Integer())
-    campaign_finances_yea_donors_de: dict_property[str | None]
-    campaign_finances_yea_donors_de = content_property()
-    campaign_finances_yea_donors_fr: dict_property[str | None]
-    campaign_finances_yea_donors_fr = content_property()
+    campaign_finances_yea_total: Mapped[int | None]
+    campaign_finances_nay_total: Mapped[int | None]
+    campaign_finances_yea_donors_de: dict_property[str | None] = (
+        content_property()
+    )
+    campaign_finances_yea_donors_fr: dict_property[str | None] = (
+        content_property()
+    )
     campaign_finances_yea_donors = localized_property()
-    campaign_finances_nay_donors_de: dict_property[str | None]
-    campaign_finances_nay_donors_de = content_property()
-    campaign_finances_nay_donors_fr: dict_property[str | None]
-    campaign_finances_nay_donors_fr = content_property()
+    campaign_finances_nay_donors_de: dict_property[str | None] = (
+        content_property()
+    )
+    campaign_finances_nay_donors_fr: dict_property[str | None] = (
+        content_property()
+    )
     campaign_finances_nay_donors = localized_property()
     campaign_finances_link_de: dict_property[str | None] = content_property()
     campaign_finances_link_fr: dict_property[str | None] = content_property()
     campaign_finances_link = localized_property()
 
     # space-separated poster URLs coming from the dataset
-    posters_mfg_yea: 'Column[str | None]' = Column(Text)
-    posters_mfg_nay: 'Column[str | None]' = Column(Text)
-    posters_sa_yea: 'Column[str | None]' = Column(Text)
-    posters_sa_nay: 'Column[str | None]' = Column(Text)
+    posters_mfg_yea: Mapped[str | None]
+    posters_mfg_nay: Mapped[str | None]
+    posters_bs_yea: Mapped[str | None]
+    posters_bs_nay: Mapped[str | None]
+    posters_sa_yea: Mapped[str | None]
+    posters_sa_nay: Mapped[str | None]
 
     # Fetched list of image urls using MfG API
     posters_mfg_yea_imgs: dict_property[dict[str, Any]] = content_property(
         default=dict
     )
     posters_mfg_nay_imgs: dict_property[dict[str, Any]] = content_property(
+        default=dict
+    )
+
+    # Fetched list of image urls using bs API
+    posters_bs_yea_imgs: dict_property[dict[str, Any]] = content_property(
+        default=dict
+    )
+    posters_bs_nay_imgs: dict_property[dict[str, Any]] = content_property(
         default=dict
     )
 
@@ -444,14 +421,17 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         default=dict
     )
 
-    def posters(self, request: 'SwissvotesRequest') -> dict[str, list[Poster]]:
+    def posters(self, request: SwissvotesRequest) -> dict[str, list[Poster]]:
         result: dict[str, list[Poster]] = {'yea': [], 'nay': []}
 
+        # order: MfG, SA, BS
         for key, attribute, label in (
-            ('yea', 'posters_mfg_yea', _('Link eMuseum.ch')),
-            ('nay', 'posters_mfg_nay', _('Link eMuseum.ch')),
-            ('yea', 'posters_sa_yea', _('Link Social Archives')),
-            ('nay', 'posters_sa_nay', _('Link Social Archives')),
+                ('yea', 'posters_mfg_yea', _('Link eMuseum.ch')),
+                ('nay', 'posters_mfg_nay', _('Link eMuseum.ch')),
+                ('yea', 'posters_sa_yea', _('Link Social Archives')),
+                ('nay', 'posters_sa_nay', _('Link Social Archives')),
+                ('yea', 'posters_bs_yea', _('Link Basel Poster Collection')),
+                ('nay', 'posters_bs_nay', _('Link Basel Poster Collection')),
         ):
             images = getattr(self, f'{attribute}_imgs')
             urls = (getattr(self, attribute) or '').strip().split(' ')
@@ -468,8 +448,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                     )
 
         for key, attribute, label in (
-            ('yea', 'campaign_material_yea', _('Swissvotes database')),
-            ('nay', 'campaign_material_nay', _('Swissvotes database')),
+                ('yea', 'campaign_material_yea', _('Swissvotes database')),
+                ('nay', 'campaign_material_nay', _('Swissvotes database')),
         ):
             for image in getattr(self, attribute):
                 result[key].append(
@@ -484,23 +464,23 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         return result
 
     # Media
-    media_ads_total: 'Column[int | None]' = Column(Integer)
-    media_ads_yea_p: 'Column[Decimal | None]' = Column(Numeric(13, 10))
-    media_coverage_articles_total: 'Column[int | None]' = Column(Integer)
-    media_coverage_tonality_total: 'Column[Decimal | None]' = Column(
+    media_ads_total: Mapped[int | None]
+    media_ads_yea_p: Mapped[Decimal | None] = mapped_column(Numeric(13, 10))
+    media_coverage_articles_total: Mapped[int | None]
+    media_coverage_tonality_total: Mapped[Decimal | None] = mapped_column(
         Numeric(13, 10)
     )
 
     # Descriptor
-    descriptor_1_level_1: 'Column[Decimal | None]' = Column(Numeric(8, 4))
-    descriptor_1_level_2: 'Column[Decimal | None]' = Column(Numeric(8, 4))
-    descriptor_1_level_3: 'Column[Decimal | None]' = Column(Numeric(8, 4))
-    descriptor_2_level_1: 'Column[Decimal | None]' = Column(Numeric(8, 4))
-    descriptor_2_level_2: 'Column[Decimal | None]' = Column(Numeric(8, 4))
-    descriptor_2_level_3: 'Column[Decimal | None]' = Column(Numeric(8, 4))
-    descriptor_3_level_1: 'Column[Decimal | None]' = Column(Numeric(8, 4))
-    descriptor_3_level_2: 'Column[Decimal | None]' = Column(Numeric(8, 4))
-    descriptor_3_level_3: 'Column[Decimal | None]' = Column(Numeric(8, 4))
+    descriptor_1_level_1: Mapped[Decimal | None] = mapped_column(Numeric(8, 4))
+    descriptor_1_level_2: Mapped[Decimal | None] = mapped_column(Numeric(8, 4))
+    descriptor_1_level_3: Mapped[Decimal | None] = mapped_column(Numeric(8, 4))
+    descriptor_2_level_1: Mapped[Decimal | None] = mapped_column(Numeric(8, 4))
+    descriptor_2_level_2: Mapped[Decimal | None] = mapped_column(Numeric(8, 4))
+    descriptor_2_level_3: Mapped[Decimal | None] = mapped_column(Numeric(8, 4))
+    descriptor_3_level_1: Mapped[Decimal | None] = mapped_column(Numeric(8, 4))
+    descriptor_3_level_2: Mapped[Decimal | None] = mapped_column(Numeric(8, 4))
+    descriptor_3_level_3: Mapped[Decimal | None] = mapped_column(Numeric(8, 4))
 
     @cached_property
     def policy_areas(self) -> list[PolicyArea]:
@@ -522,38 +502,69 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         return result
 
     # Result
+    _result: Mapped[int | None]
     result = encoded_property()
-    result_turnout: 'Column[Decimal | None]' = Column(Numeric(13, 10))
+    result_turnout: Mapped[Decimal | None] = mapped_column(Numeric(13, 10))
+    _result_people_accepted: Mapped[int | None]
     result_people_accepted = encoded_property()
-    result_people_yeas_p: 'Column[Decimal | None]' = Column(Numeric(13, 10))
+    result_people_yeas_p: Mapped[Decimal | None] = mapped_column(
+        Numeric(13, 10)
+    )
+    _result_cantons_accepted: Mapped[int | None]
     result_cantons_accepted = encoded_property()
-    result_cantons_yeas: 'Column[Decimal | None]' = Column(Numeric(3, 1))
-    result_cantons_nays: 'Column[Decimal | None]' = Column(Numeric(3, 1))
+    result_cantons_yeas: Mapped[Decimal | None] = mapped_column(Numeric(3, 1))
+    result_cantons_nays: Mapped[Decimal | None] = mapped_column(Numeric(3, 1))
+    _result_ag_accepted: Mapped[int | None]
     result_ag_accepted = encoded_property()
+    _result_ai_accepted: Mapped[int | None]
     result_ai_accepted = encoded_property()
+    _result_ar_accepted: Mapped[int | None]
     result_ar_accepted = encoded_property()
+    _result_be_accepted: Mapped[int | None]
     result_be_accepted = encoded_property()
+    _result_bl_accepted: Mapped[int | None]
     result_bl_accepted = encoded_property()
+    _result_bs_accepted: Mapped[int | None]
     result_bs_accepted = encoded_property()
+    _result_fr_accepted: Mapped[int | None]
     result_fr_accepted = encoded_property()
+    _result_ge_accepted: Mapped[int | None]
     result_ge_accepted = encoded_property()
+    _result_gl_accepted: Mapped[int | None]
     result_gl_accepted = encoded_property()
+    _result_gr_accepted: Mapped[int | None]
     result_gr_accepted = encoded_property()
+    _result_ju_accepted: Mapped[int | None]
     result_ju_accepted = encoded_property()
+    _result_lu_accepted: Mapped[int | None]
     result_lu_accepted = encoded_property()
+    _result_ne_accepted: Mapped[int | None]
     result_ne_accepted = encoded_property()
+    _result_nw_accepted: Mapped[int | None]
     result_nw_accepted = encoded_property()
+    _result_ow_accepted: Mapped[int | None]
     result_ow_accepted = encoded_property()
+    _result_sg_accepted: Mapped[int | None]
     result_sg_accepted = encoded_property()
+    _result_sh_accepted: Mapped[int | None]
     result_sh_accepted = encoded_property()
+    _result_so_accepted: Mapped[int | None]
     result_so_accepted = encoded_property()
+    _result_sz_accepted: Mapped[int | None]
     result_sz_accepted = encoded_property()
+    _result_tg_accepted: Mapped[int | None]
     result_tg_accepted = encoded_property()
+    _result_ti_accepted: Mapped[int | None]
     result_ti_accepted = encoded_property()
+    _result_ur_accepted: Mapped[int | None]
     result_ur_accepted = encoded_property()
+    _result_vd_accepted: Mapped[int | None]
     result_vd_accepted = encoded_property()
+    _result_vs_accepted: Mapped[int | None]
     result_vs_accepted = encoded_property()
+    _result_zg_accepted: Mapped[int | None]
     result_zg_accepted = encoded_property()
+    _result_zh_accepted: Mapped[int | None]
     result_zh_accepted = encoded_property()
 
     @cached_property
@@ -580,50 +591,47 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         )
 
     # Authorities
-    procedure_number: 'Column[str | None]' = Column(Text)
+    procedure_number: Mapped[str | None]
+    _position_federal_council: Mapped[int | None]
     position_federal_council = encoded_property()
+    _position_parliament: Mapped[int | None]
     position_parliament = encoded_property()
+    _position_national_council: Mapped[int | None]
     position_national_council = encoded_property()
-    position_national_council_yeas: 'Column[int | None]' = Column(Integer)
-    position_national_council_nays: 'Column[int | None]' = Column(Integer)
+    position_national_council_yeas: Mapped[int | None]
+    position_national_council_nays: Mapped[int | None]
+    _position_council_of_states: Mapped[int | None]
     position_council_of_states = encoded_property()
-    position_council_of_states_yeas: 'Column[int | None]' = Column(Integer)
-    position_council_of_states_nays: 'Column[int | None]' = Column(Integer)
+    position_council_of_states_yeas: Mapped[int | None]
+    position_council_of_states_nays: Mapped[int | None]
 
     # Duration
-    duration_federal_assembly: 'Column[int | None]' = Column(Integer)
-    duration_initative_collection: 'Column[int | None]' = Column(Integer)
-    duration_referendum_collection: 'Column[int | None]' = Column(Integer)
-    signatures_valid: 'Column[int | None]' = Column(Integer)
+    duration_federal_assembly: Mapped[int | None]
+    duration_initative_collection: Mapped[int | None]
+    duration_referendum_collection: Mapped[int | None]
+    signatures_valid: Mapped[int | None]
 
     # Voting recommendations
-    recommendations: 'Column[dict[str, int]]' = Column(
+    recommendations: Mapped[dict[str, int | None]] = mapped_column(
         JSON,
-        nullable=False,
         default=dict
     )
-    recommendations_other_yes_de: 'Column[str | None]' = Column(Text)
-    recommendations_other_yes_fr: 'Column[str | None]' = Column(Text)
+    recommendations_other_yes_de: Mapped[str | None]
+    recommendations_other_yes_fr: Mapped[str | None]
     recommendations_other_yes = localized_property()
-    recommendations_other_no_de: 'Column[str | None]' = Column(Text)
-    recommendations_other_no_fr: 'Column[str | None]' = Column(Text)
+    recommendations_other_no_de: Mapped[str | None]
+    recommendations_other_no_fr: Mapped[str | None]
     recommendations_other_no = localized_property()
-    recommendations_other_counter_proposal_de: 'Column[str | None]'
-    recommendations_other_counter_proposal_de = Column(Text)
-    recommendations_other_counter_proposal_fr: 'Column[str | None]'
-    recommendations_other_counter_proposal_fr = Column(Text)
+    recommendations_other_counter_proposal_de: Mapped[str | None]
+    recommendations_other_counter_proposal_fr: Mapped[str | None]
     recommendations_other_counter_proposal = localized_property()
-    recommendations_other_popular_initiative_de: 'Column[str | None]'
-    recommendations_other_popular_initiative_de = Column(Text)
-    recommendations_other_popular_initiative_fr: 'Column[str | None]'
-    recommendations_other_popular_initiative_fr = Column(Text)
+    recommendations_other_popular_initiative_de: Mapped[str | None]
+    recommendations_other_popular_initiative_fr: Mapped[str | None]
     recommendations_other_popular_initiative = localized_property()
-    recommendations_other_free_de: 'Column[str | None]' = Column(Text)
-    recommendations_other_free_fr: 'Column[str | None]' = Column(Text)
+    recommendations_other_free_de: Mapped[str | None]
+    recommendations_other_free_fr: Mapped[str | None]
     recommendations_other_free = localized_property()
-    recommendations_divergent: 'Column[dict[str, Any]]' = Column(
-        JSON,
-        nullable=False,
+    recommendations_divergent: Mapped[dict[str, Any]] = mapped_column(
         default=dict
     )
 
@@ -633,7 +641,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             self.recommendations.get(name)
         )
 
-    def get_recommendation_of_existing_parties(self) -> dict[str, int]:
+    def get_recommendation_of_existing_parties(self) -> dict[str, int | None]:
         """ Get only the existing parties as when this vote was conducted """
         if not self.recommendations:
             return {}
@@ -643,16 +651,16 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
 
     def group_recommendations(
-        self,
-        recommendations: 'Iterable[tuple[T, int | None]]',
-        ignore_unknown: bool = False
-    ) -> dict[str, list['T']]:
+            self,
+            recommendations: Iterable[tuple[T, int | None]],
+            ignore_unknown: bool = False
+    ) -> dict[str, list[T]]:
         """ Group the given recommendations by slogan. """
 
         codes = self.codes('recommendation')
         recommendation_codes = list(codes.keys())
 
-        def by_recommendation(reco: tuple[int | None, list['T']]) -> int:
+        def by_recommendation(reco: tuple[int | None, list[T]]) -> int:
             return recommendation_codes.index(reco[0])
 
         result: dict[int | None, list[T]] = {}
@@ -686,10 +694,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
         """
         result = []
-        for slogan, actor_list in self.recommendations_parties.items():
+        for actor_list in self.recommendations_parties.values():
             actors = (d.name for d in actor_list)
-            # Filter out those who have None as share
-
             result.extend(
                 sorted(actors, key=self.get_actors_share, reverse=True)
             )
@@ -707,7 +713,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @cached_property
     def recommendations_divergent_parties(
-        self
+            self
     ) -> dict[str, list[tuple[Actor, Region]]]:
         """ The divergent recommendations of the parties grouped by slogans.
 
@@ -730,80 +736,111 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             (Actor(name), recommendations_lookup.get(name))
             for name in Actor.associations()
         ]
-        for attribute, code in (
-            ('yes', 1),
-            ('no', 2),
-            ('free', 5),
-            ('counter_proposal', 8),
-            ('popular_initiative', 9),
-        ):
-            value = getattr(self, f'recommendations_other_{attribute}')
-            for name in (value or '').split(','):
-                if stripped := name.strip():
-                    recommendations.append((Actor(stripped), code))
+        recommendations.extend(
+            (Actor(stripped), code)
+            for attribute, code in (
+                ('yes', 1),
+                ('no', 2),
+                ('free', 5),
+                ('counter_proposal', 8),
+                ('popular_initiative', 9),
+            )
+            if (value := getattr(self, f'recommendations_other_{attribute}'))
+            for name in value.split(',')
+            if (stripped := name.strip())
+        )
 
         return self.group_recommendations(recommendations, ignore_unknown=True)
 
     # Electoral strength
-    national_council_election_year: 'Column[int | None]' = Column(Integer)
-    national_council_share_fdp: 'Column[Decimal | None]'
-    national_council_share_fdp = Column(Numeric(13, 10))
-    national_council_share_cvp: 'Column[Decimal | None]'
-    national_council_share_cvp = Column(Numeric(13, 10))
-    national_council_share_sps: 'Column[Decimal | None]'
-    national_council_share_sps = Column(Numeric(13, 10))
-    national_council_share_svp: 'Column[Decimal | None]'
-    national_council_share_svp = Column(Numeric(13, 10))
-    national_council_share_lps: 'Column[Decimal | None]'
-    national_council_share_lps = Column(Numeric(13, 10))
-    national_council_share_ldu: 'Column[Decimal | None]'
-    national_council_share_ldu = Column(Numeric(13, 10))
-    national_council_share_evp: 'Column[Decimal | None]'
-    national_council_share_evp = Column(Numeric(13, 10))
-    national_council_share_csp: 'Column[Decimal | None]'
-    national_council_share_csp = Column(Numeric(13, 10))
-    national_council_share_pda: 'Column[Decimal | None]'
-    national_council_share_pda = Column(Numeric(13, 10))
-    national_council_share_poch: 'Column[Decimal | None]'
-    national_council_share_poch = Column(Numeric(13, 10))
-    national_council_share_gps: 'Column[Decimal | None]'
-    national_council_share_gps = Column(Numeric(13, 10))
-    national_council_share_sd: 'Column[Decimal | None]'
-    national_council_share_sd = Column(Numeric(13, 10))
-    national_council_share_rep: 'Column[Decimal | None]'
-    national_council_share_rep = Column(Numeric(13, 10))
-    national_council_share_edu: 'Column[Decimal | None]'
-    national_council_share_edu = Column(Numeric(13, 10))
-    national_council_share_fps: 'Column[Decimal | None]'
-    national_council_share_fps = Column(Numeric(13, 10))
-    national_council_share_lega: 'Column[Decimal | None]'
-    national_council_share_lega = Column(Numeric(13, 10))
-    national_council_share_kvp: 'Column[Decimal | None]'
-    national_council_share_kvp = Column(Numeric(13, 10))
-    national_council_share_glp: 'Column[Decimal | None]'
-    national_council_share_glp = Column(Numeric(13, 10))
-    national_council_share_bdp: 'Column[Decimal | None]'
-    national_council_share_bdp = Column(Numeric(13, 10))
-    national_council_share_mcg: 'Column[Decimal | None]'
-    national_council_share_mcg = Column(Numeric(13, 10))
-    national_council_share_mitte: 'Column[Decimal | None]'
-    national_council_share_mitte = Column(Numeric(13, 10))
-    national_council_share_ubrige: 'Column[Decimal | None]'
-    national_council_share_ubrige = Column(Numeric(13, 10))
-    national_council_share_yeas: 'Column[Decimal | None]'
-    national_council_share_yeas = Column(Numeric(13, 10))
-    national_council_share_nays: 'Column[Decimal | None]'
-    national_council_share_nays = Column(Numeric(13, 10))
-    national_council_share_none: 'Column[Decimal | None]'
-    national_council_share_none = Column(Numeric(13, 10))
-    national_council_share_empty: 'Column[Decimal | None]'
-    national_council_share_empty = Column(Numeric(13, 10))
-    national_council_share_free_vote: 'Column[Decimal | None]'
-    national_council_share_free_vote = Column(Numeric(13, 10))
-    national_council_share_neutral: 'Column[Decimal | None]'
-    national_council_share_neutral = Column(Numeric(13, 10))
-    national_council_share_unknown: 'Column[Decimal | None]'
-    national_council_share_unknown = Column(Numeric(13, 10))
+    national_council_election_year: Mapped[int | None]
+    national_council_share_fdp: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_cvp: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_sps: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_svp: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_lps: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_ldu: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_evp: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_csp: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_pda: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_poch: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_gps: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_sd: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_rep: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_edu: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_fps: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_lega: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_kvp: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_glp: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_bdp: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_mcg: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_mitte: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_ubrige: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_yeas: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_nays: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_none: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_empty: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_free_vote: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_neutral: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
+    national_council_share_unknown: Mapped[Decimal | None] = (
+        mapped_column(Numeric(13, 10))
+    )
 
     @cached_property
     def has_national_council_share_data(self) -> bool:
@@ -817,7 +854,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             share and a recommendation regarding this vote is present
         """
         if (
-            self.national_council_election_year and (
+                self.national_council_election_year and (
                 self.national_council_share_yeas
                 or self.national_council_share_nays
                 or self.national_council_share_none
@@ -826,7 +863,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 or self.national_council_share_neutral
                 or self.national_council_share_unknown
                 or self.sorted_actors_list
-            )
+        )
         ):
             return True
 
@@ -944,7 +981,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
     )
     post_vote_poll = LocalizedFile(
-        label=_('Full analysis of post-vote poll results'),
+        label=_('Full analysis of VOX post-vote poll results'),
         extension='pdf',
         static_views={
             'de_CH': 'nachbefragung-de.pdf',
@@ -952,7 +989,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
     )
     post_vote_poll_methodology = LocalizedFile(
-        label=_('Questionnaire of the poll'),
+        label=_('Questionnaire of the VOX poll'),
         extension='pdf',
         static_views={
             'de_CH': 'nachbefragung-methode-de.pdf',
@@ -960,28 +997,28 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
     )
     post_vote_poll_dataset = LocalizedFile(
-        label=_('Dataset of the post-vote poll'),
+        label=_('Dataset of the VOX poll'),
         extension='csv',
         static_views={
             'de_CH': 'nachbefragung.csv',
         }
     )
     post_vote_poll_dataset_sav = LocalizedFile(
-        label=_('Dataset of the post-vote poll'),
+        label=_('Dataset of the VOX poll'),
         extension='sav',
         static_views={
             'de_CH': 'nachbefragung.sav',
         }
     )
     post_vote_poll_dataset_dta = LocalizedFile(
-        label=_('Dataset of the post-vote poll'),
+        label=_('Dataset of the VOX poll'),
         extension='dta',
         static_views={
             'de_CH': 'nachbefragung.dta',
         }
     )
     post_vote_poll_codebook = LocalizedFile(
-        label=_('Codebook for the post-vote poll'),
+        label=_('Codebook for the VOX poll'),
         extension='pdf',
         static_views={
             'de_CH': 'nachbefragung-codebuch-de.pdf',
@@ -989,7 +1026,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
     )
     post_vote_poll_codebook_xlsx = LocalizedFile(
-        label=_('Codebook for the post-vote poll'),
+        label=_('Codebook for the VOX poll'),
         extension='xlsx',
         static_views={
             'de_CH': 'nachbefragung-codebuch-de.xlsx',
@@ -997,10 +1034,17 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
     )
     post_vote_poll_report = LocalizedFile(
-        label=_('Technical report of the post-vote poll'),
+        label=_('Technical report on the VOX poll'),
         extension='pdf',
         static_views={
             'de_CH': 'nachbefragung-technischer-bericht.pdf',
+        }
+    )
+    leewas_post_vote_poll_results = LocalizedFile(
+        label=_('Results of the LeeWas post-vote poll'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'ergebnisse-der-leewas-nachbefragung.pdf',
         }
     )
     preliminary_examination = LocalizedFile(
@@ -1023,17 +1067,27 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     campaign_material_yea = FileSubCollection()
     campaign_material_nay = FileSubCollection()
     campaign_material_other = FileSubCollection()
-    campaign_material_metadata: 'Column[dict[str, Any]]' = Column(
-        JSON,
-        nullable=False,
+    campaign_material_metadata: Mapped[dict[str, Any]] = mapped_column(
         default=dict
     )
 
     # searchable attachment texts
-    searchable_text_de_CH = deferred(Column(TSVECTOR))
-    searchable_text_fr_CH = deferred(Column(TSVECTOR))
-    searchable_text_it_CH = deferred(Column(TSVECTOR))
-    searchable_text_en_US = deferred(Column(TSVECTOR))
+    searchable_text_de_CH: Mapped[str | None] = mapped_column(  # noqa: N815
+        TSVECTOR,
+        deferred=True
+    )
+    searchable_text_fr_CH: Mapped[str | None] = mapped_column(  # noqa: N815
+        TSVECTOR,
+        deferred=True
+    )
+    searchable_text_it_CH: Mapped[str | None] = mapped_column(  # noqa: N815
+        TSVECTOR,
+        deferred=True
+    )
+    searchable_text_en_US: Mapped[str | None] = mapped_column(  # noqa: N815
+        TSVECTOR,
+        deferred=True
+    )
 
     indexed_files = {
         'voting_text',
@@ -1124,10 +1178,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         self.reindex_files()
 
     def get_file(
-        self,
-        name: str,
-        locale: str | None = None,
-        fallback: bool = True
+            self,
+            name: str,
+            locale: str | None = None,
+            fallback: bool = True
     ) -> SwissVoteFile | None:
         """ Returns the requested localized file.
 
@@ -1183,7 +1237,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         from sqlalchemy.orm import object_session
         from sqlalchemy import func, and_, or_
 
-        query = object_session(self).query(SwissVoteFile)
+        session = object_session(self)
+        assert session is not None
+        query = session.query(SwissVoteFile)
         query = query.filter(
             or_(*(
                 and_(

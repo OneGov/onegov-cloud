@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from onegov.core.collection import GenericCollection
@@ -13,6 +15,7 @@ from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
     from onegov.core.csv import DefaultRow
+    from sqlalchemy.engine import Result
     from sqlalchemy.orm import Query, Session
     from typing import NamedTuple
 
@@ -32,7 +35,7 @@ class AddressCollection(GenericCollection[WinterthurAddress]):
     def model_class(self) -> type[WinterthurAddress]:
         return WinterthurAddress
 
-    def streets(self) -> 'Query[StreetRow]':
+    def streets(self) -> Result[StreetRow]:
         query = as_selectable("""
             SELECT
                 UPPER(UNACCENT(LEFT(street, 1))) AS letter, -- Text
@@ -45,9 +48,9 @@ class AddressCollection(GenericCollection[WinterthurAddress]):
                 unaccent(street)
         """)
 
-        return self.session.execute(select(query.c))
+        return self.session.execute(select(*query.c))
 
-    def last_updated(self) -> 'datetime | None':
+    def last_updated(self) -> datetime | None:
         result = self.query().first()
         return result.modified if result else None
 
@@ -77,8 +80,8 @@ class AddressCollection(GenericCollection[WinterthurAddress]):
 
     def import_from_csv(
         self,
-        streets: 'CSVFile[DefaultRow]',
-        addresses: 'CSVFile[DefaultRow]'
+        streets: CSVFile[DefaultRow],
+        addresses: CSVFile[DefaultRow]
     ) -> None:
 
         streets_d = {s.strc: s.bez for s in streets.lines}
@@ -118,12 +121,12 @@ class AddressCollection(GenericCollection[WinterthurAddress]):
 
         self.session.flush()
 
-    def load_urls(self, *urls: str) -> tuple['CSVFile[DefaultRow]', ...]:
+    def load_urls(self, *urls: str) -> tuple[CSVFile[DefaultRow], ...]:
         with ThreadPoolExecutor(max_workers=2) as executor:
             futures = (executor.submit(self.load_url, url) for url in urls)
             return tuple(f.result() for f in futures)
 
-    def load_url(self, url: str) -> 'CSVFile[DefaultRow]':
+    def load_url(self, url: str) -> CSVFile[DefaultRow]:
         buffer = BytesIO()
 
         c = Curl()
@@ -137,7 +140,7 @@ class AddressCollection(GenericCollection[WinterthurAddress]):
 
 class AddressSubsetCollection(GenericCollection[WinterthurAddress]):
 
-    def __init__(self, session: 'Session', street: str) -> None:
+    def __init__(self, session: Session, street: str) -> None:
         super().__init__(session)
         self.street = street
 
@@ -145,7 +148,7 @@ class AddressSubsetCollection(GenericCollection[WinterthurAddress]):
     def model_class(self) -> type[WinterthurAddress]:
         return WinterthurAddress
 
-    def subset(self) -> 'Query[WinterthurAddress]':
+    def subset(self) -> Query[WinterthurAddress]:
         subset = self.query().filter_by(street=self.street)
 
         return subset.order_by(

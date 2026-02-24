@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pdfrw import PdfReader  # type:ignore[import-untyped]
 from pdfrw.buildxobj import pagexobj  # type:ignore[import-untyped]
 from pdfrw.toreportlab import makerl  # type:ignore[import-untyped]
@@ -14,7 +16,7 @@ class InlinePDF(Flowable):
 
     def __init__(
         self,
-        pdf_file: 'StrOrBytesPath | SupportsRead[bytes]',
+        pdf_file: StrOrBytesPath | SupportsRead[bytes],
         width: float
     ):
         Flowable.__init__(self)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from itertools import chain
 from onegov.election_day.models.subscriber import Subscriber
 from sqlalchemy import and_
@@ -18,18 +20,18 @@ if TYPE_CHECKING:
 
 
 class ModelGroup(NamedTuple):
-    domain: 'DomainSubset'
+    domain: DomainSubset
     domain_segment: str | None
-    elections: 'Sequence[Election]'
-    election_compounds: 'Sequence[ElectionCompound]'
-    votes: 'Sequence[Vote]'
-    filter: 'ColumnElement[bool]'
+    elections: Sequence[Election]
+    election_compounds: Sequence[ElectionCompound]
+    votes: Sequence[Vote]
+    filter: ColumnElement[bool]
 
 
 def segment_models(
-    elections: 'Sequence[Election]',
-    election_compounds: 'Sequence[ElectionCompound]',
-    votes: 'Sequence[Vote]'
+    elections: Sequence[Election],
+    election_compounds: Sequence[ElectionCompound],
+    votes: Sequence[Vote]
 ) -> list[ModelGroup]:
     """ Group elections, compounds and votes by subscribable notification
     segmenation.
@@ -52,8 +54,8 @@ def segment_models(
     }
 
     def match_(
-        model: 'Election | ElectionCompound | Vote',
-        domain: 'DomainSubset',
+        model: Election | ElectionCompound | Vote,
+        domain: DomainSubset,
         domain_segment: str | None
     ) -> bool:
         if domain != 'municipality':

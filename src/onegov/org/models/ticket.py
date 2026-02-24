@@ -1,35 +1,53 @@
+from __future__ import annotations
+
 from functools import cached_property
 from markupsafe import Markup
+from onegov.chat import Message, MessageCollection
 from onegov.chat.collections import ChatCollection
+from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Trait
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
 from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
 from onegov.org import _
 from onegov.org.layout import DefaultLayout, EventLayout
-from onegov.chat import Message
-from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Trait
 from onegov.org.views.utils import show_tags, show_filters
+from onegov.org.utils import (
+    currency_for_submission,
+    invoice_items_for_submission
+)
+from onegov.pay import ManualPayment
 from onegov.reservation import Allocation, Resource, Reservation
-from onegov.ticket import Ticket, Handler, handlers
+from onegov.search import SearchIndex
+from onegov.search.utils import language_from_locale
+from onegov.ticket import handlers, Handler, Ticket, TicketInvoice
+from onegov.ticket.collection import TicketCollection, ArchivedTicketCollection
 from onegov.search.utils import extract_hashtags
+from operator import attrgetter
 from purl import URL
-from sqlalchemy import desc
-from sqlalchemy import func
-from sqlalchemy.orm import object_session
+from sedate import utcnow
+from sqlalchemy import and_, desc, func, or_, text
+from sqlalchemy.orm import object_session, undefer
+from uuid import uuid4
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from datetime import datetime
     from onegov.chat.models import Chat
+    from onegov.core.request import CoreRequest
     from onegov.event import Event
     from onegov.form import Form, FormSubmission
     from onegov.org.request import OrgRequest
-    from onegov.pay import Payment
+    from onegov.pay import InvoiceItem, InvoiceItemMeta, Payment
     from onegov.ticket.handler import _Q
-    from sqlalchemy import Column
-    from sqlalchemy.orm import Query, Session
+    from onegov.ticket.collection import ExtendedTicketState
+    from sqlalchemy.orm import Mapped, Query, Session
+    from typing import TypeAlias
     from uuid import UUID
+
+    DateRange: TypeAlias = tuple[datetime, datetime]
 
 
 def ticket_submitter(ticket: Ticket) -> str | None:
@@ -41,6 +59,153 @@ def ticket_submitter(ticket: Ticket) -> str | None:
     return mail
 
 
+def submission_invoice_items(
+    self: FormSubmissionHandler | DirectoryEntryHandler,
+    request: CoreRequest
+) -> list[InvoiceItemMeta]:
+    return invoice_items_for_submission(
+        request,
+        self.form,  # type: ignore[arg-type]
+        self.submission
+    ) if self.submission else []
+
+
+def refresh_submission_invoice_items(
+    self: FormSubmissionHandler | DirectoryEntryHandler,
+    request: CoreRequest
+) -> None:
+    payment = self.payment
+    invoice = self.ticket.invoice
+    new_item_metas = self.invoice_items(request)
+    if not new_item_metas:
+        # delete the invoice and payment (if it exists)
+        if invoice is not None:
+            for item in invoice.items:
+                item.payments = []
+                request.session.delete(item)
+            self.ticket.invoice = None
+            request.session.delete(invoice)
+
+        if payment is not None:
+            if self.submission is not None:
+                self.submission.payment = None
+            request.session.delete(payment)
+
+        return
+
+    if invoice is None:
+        # create a new invoice
+        invoice = TicketInvoice(id=uuid4())
+        request.session.add(invoice)
+        self.ticket.invoice = invoice
+
+    old_items = sorted(invoice.items, key=attrgetter('group'))
+    new_items: list[InvoiceItem] = []
+    unused: set[InvoiceItem] = set(old_items)
+    for meta in new_item_metas:
+        existing: InvoiceItem | None = None
+        for item in old_items:
+            if item.group != meta.group:
+                continue
+
+            if meta.group == 'form':
+                assert meta.extra is not None
+                assert meta.extra['submission_id'] == item.submission_id
+                if meta.family == item.family:
+                    existing = item
+                    break
+            elif meta.group == 'submission':
+                if item.group == 'submission':
+                    existing = item
+                    break
+            else:
+                raise AssertionError('unreachable')
+
+        if existing is None:
+            new_item = meta.add_to_invoice(invoice)
+            if payment is not None:
+                new_item.payments.append(payment)
+                # FIXME: If we allow paid payments we need to do
+                #        more here
+            new_items.append(new_item)
+            continue
+
+        # update the existing item if necessary
+        meta.refresh_item(existing)
+
+        unused.discard(existing)
+        new_items.append(existing)
+
+    for existing in unused:
+        # keep manually added items
+        if existing.group == 'manual':
+            new_items.append(existing)
+            continue
+
+        # clear out any links to payments before deleting
+        existing.payments = []
+        request.session.delete(existing)
+
+    invoice.items = new_items  # type: ignore[assignment]
+    request.session.flush()
+
+    # FIXME: If we allow paid or online payments, then we need to do
+    #        something different here
+    total = invoice.total_amount
+    if payment is None:
+        if total > 0:
+            # we need to create a new manual payment
+            # and link it to the submission and invoice items
+            assert self.submission
+            payment = ManualPayment(
+                amount=invoice.total_amount,
+                currency=currency_for_submission(
+                    self.form,  # type: ignore[arg-type]
+                    self.submission
+                )
+            )
+            self.submission.payment = payment
+            for item in invoice.items:
+                item.payments.append(payment)
+            invoice.sync(capture=False)
+            self.ticket.payment = payment
+    elif total <= 0:
+        # we need to delete the payment
+        # TODO: We may allow deleting non-manual payments in the future
+        #       but for now we assert we didn't delete a non-open
+        #       non-manual payment
+        assert payment.source == 'manual' and payment.state == 'open'
+        if self.submission:
+            self.submission.payment = None
+        for item in invoice.items:
+            item.payments.remove(payment)
+        self.ticket.payment = None
+        self.ticket.payment_id = None
+        request.session.delete(payment)
+    elif total != payment.amount:
+        # we need to update the payment
+        # TODO: We may allow changing non-manual payments in the future
+        #       but for now we assert we didn't change a non-open
+        #       non-manual payment
+        assert payment.source == 'manual' and payment.state == 'open'
+        payment.amount = total
+    request.session.flush()
+
+
+def change_submission_email(
+    submission: FormSubmission | None,
+    email: str
+) -> None:
+
+    if submission is None:
+        return
+
+    submission.email = email
+    name = submission.get_email_field_name()
+    if name is not None:
+        submission.data[name] = email
+
+
 class OrgTicketMixin:
     """ Adds additional methods to the ticket, needed by the organisations
     implementation of it. Strictly limited to things that
@@ -49,10 +214,10 @@ class OrgTicketMixin:
     """
 
     if TYPE_CHECKING:
-        number: Column[str]
-        group: Column[str]
+        number: Mapped[str]
+        group: Mapped[str]
 
-    def reference(self, request: 'OrgRequest') -> str:
+    def reference(self, request: OrgRequest) -> str:
         """ Returns the reference which should be used wherever we talk about
         a ticket, but do not show it (say in an e-mail subject).
 
@@ -64,7 +229,7 @@ class OrgTicketMixin:
         """
         return f'{self.number} / {self.reference_group(request)}'
 
-    def reference_group(self, request: 'OrgRequest') -> str:
+    def reference_group(self, request: OrgRequest) -> str:
         return request.translate(self.group)
 
     @cached_property
@@ -83,7 +248,9 @@ class OrgTicketMixin:
         # we should advise them to enter a meaningful note with the file
         # instead.
         #
-        q = object_session(self).query(Message)
+        session = object_session(self)
+        assert session is not None
+        q = session.query(Message)
         q = q.filter_by(channel_id=self.number)
         q = q.filter(Message.type.in_(('ticket_note', 'ticket_chat')))
         q = q.with_entities(Message.text)
@@ -91,37 +258,40 @@ class OrgTicketMixin:
         return ' '.join(n.text for n in q if n.text)
 
     @property
-    def es_tags(self) -> list[str] | None:
+    def fts_tags(self) -> list[str]:
+        tags: list[str] = super().fts_tags  # type: ignore[misc]
         if self.extra_localized_text:
-            return [
-                tag.lstrip('#') for tag in extract_hashtags(
-                    self.extra_localized_text
-                )
-            ]
-        return None
+            tags.extend(
+                tag.lstrip('#')
+                for tag in extract_hashtags(self.extra_localized_text)
+            )
+        return tags
 
 
 class FormSubmissionTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FRM'}  # type:ignore
-    es_type_name = 'submission_tickets'
+    __mapper_args__ = {'polymorphic_identity': 'FRM'}
+
+    if TYPE_CHECKING:
+        handler: FormSubmissionHandler
 
 
 class ReservationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'RSV'}  # type:ignore
-    es_type_name = 'reservation_tickets'
+    __mapper_args__ = {'polymorphic_identity': 'RSV'}
+
+    if TYPE_CHECKING:
+        handler: ReservationHandler
 
 
 class EventSubmissionTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'EVN'}  # type:ignore
-    es_type_name = 'event_tickets'
+    __mapper_args__ = {'polymorphic_identity': 'EVN'}
 
     if TYPE_CHECKING:
-        handler: 'EventSubmissionHandler'
+        handler: EventSubmissionHandler
 
-    def reference_group(self, request: 'OrgRequest') -> str:
+    def reference_group(self, request: OrgRequest) -> str:
         return self.title
 
-    def unguessable_edit_link(self, request: 'OrgRequest') -> str | None:
+    def unguessable_edit_link(self, request: OrgRequest) -> str | None:
         if (
             self.handler
             and self.handler.ticket
@@ -140,28 +310,32 @@ class EventSubmissionTicket(OrgTicketMixin, Ticket):
 
 
 class DirectoryEntryTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'DIR'}  # type:ignore
-    es_type_name = 'directory_tickets'
+    __mapper_args__ = {'polymorphic_identity': 'DIR'}
+
+    if TYPE_CHECKING:
+        handler: DirectoryEntryHandler
 
 
 @handlers.registered_handler('FRM')
 class FormSubmissionHandler(Handler):
 
-    id: 'UUID'
+    id: UUID
 
-    handler_title = _("Form Submissions")
-    code_title = _("Forms")
+    handler_title = _('Form Submissions')
+    code_title = _('Forms')
+    invoice_items = submission_invoice_items
+    refresh_invoice_items = refresh_submission_invoice_items
 
     @cached_property
     def collection(self) -> FormSubmissionCollection:
         return FormSubmissionCollection(self.session)
 
     @cached_property
-    def submission(self) -> 'FormSubmission | None':
+    def submission(self) -> FormSubmission | None:
         return self.collection.by_id(self.id)
 
     @cached_property
-    def form(self) -> 'Form':
+    def form(self) -> Form:
         assert self.submission is not None
         return self.submission.form_class(data=self.submission.data)
 
@@ -175,8 +349,20 @@ class FormSubmissionHandler(Handler):
     def email(self) -> str:
         return (
             self.submission.email or ''
-            if self.submission is not None else ''
+            if self.submission is not None
+            else self.ticket.snapshot.get('email', '')
         )
+
+    @property
+    def email_changeable(self) -> bool:
+        return True
+
+    def change_email(self, email: str) -> None:
+        if self.deleted:
+            self.ticket.snapshot['email'] = email
+        else:
+            change_submission_email(self.submission, email)
+        self.ticket.ticket_email = email
 
     @property
     def title(self) -> str:
@@ -197,8 +383,19 @@ class FormSubmissionHandler(Handler):
         )
 
     @property
-    def payment(self) -> 'Payment | None':
+    def payment(self) -> Payment | None:
         return self.submission.payment if self.submission is not None else None
+
+    # FIXME: This should probably be cached on the ticket/submission
+    #        so it can't change throughout the ticket's lifespan
+    #        however this VAT stuff will probably still change quite
+    #        a bit, so for now this simple solution should be fine.
+    @property
+    def show_vat(self) -> bool:
+        return (
+            getattr(self.submission.form, 'show_vat', False)
+            if self.submission is not None else False
+        )
 
     @property
     def extra_data(self) -> list[str]:
@@ -223,25 +420,31 @@ class FormSubmissionHandler(Handler):
 
         return False
 
+    @property
+    def reply_to(self) -> str | None:
+        if self.submission and self.submission.form:
+            return self.submission.form.reply_to
+        return self.ticket.snapshot.get('reply_to')
+
     def get_summary(
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> Markup:
 
         layout = DefaultLayout(self.submission, request)
         if self.submission is not None:
             return render_macro(layout.macros['display_form'], request, {
                 'form': self.form,
-                'layout': layout
+                'layout': layout,
+                'price': self.submission.payment,
+                'show_vat': self.show_vat,
             })
         return Markup('')
 
     def get_links(  # type:ignore[override]
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> list[Link | LinkGroup]:
-
-        layout = DefaultLayout(self.submission, request)
 
         links: list[Link | LinkGroup] = []
         extra: list[Link] = []
@@ -265,30 +468,27 @@ class FormSubmissionHandler(Handler):
                 if next_in_queue and next_in_queue is not self.submission:
                     confirmation_traits.append(Confirm(
                         _(
-                            "This is not the oldest undecided submission of "
-                            "this registration window. Do you really want to "
-                            "confirm this submission?"
+                            'This is not the oldest undecided submission of '
+                            'this registration window. Do you really want to '
+                            'confirm this submission?'
                         ),
                         _(
-                            "By confirming this submission, you will prefer "
-                            "this over a submission that came in earlier."
+                            'By confirming this submission, you will prefer '
+                            'this over a submission that came in earlier.'
                         ),
                         _(
-                            "Confirm registration"
+                            'Confirm registration'
                         ),
                         _(
-                            "Cancel"
+                            'Cancel'
                         )
                     ))
 
                 links.append(
                     Link(
-                        text=_("Confirm registration"),
-                        url=request.return_here(
-                            layout.csrf_protected_url(
-                                request.link(
-                                    self.submission, 'confirm-registration')
-                            )
+                        text=_('Confirm registration'),
+                        url=request.csrf_protected_url(
+                            request.link(self.ticket, 'confirm-registration')
                         ),
                         attrs={'class': 'accept-link'},
                         traits=confirmation_traits
@@ -296,12 +496,9 @@ class FormSubmissionHandler(Handler):
                 )
                 extra.append(
                     Link(
-                        text=_("Deny registration"),
-                        url=request.return_here(
-                            layout.csrf_protected_url(
-                                request.link(
-                                    self.submission, 'deny-registration')
-                            )
+                        text=_('Deny registration'),
+                        url=request.csrf_protected_url(
+                            request.link(self.ticket, 'deny-registration')
                         ),
                         attrs={'class': 'delete-link'},
                         traits=(
@@ -317,12 +514,9 @@ class FormSubmissionHandler(Handler):
             if self.submission.spots and self.submission.claimed:
                 links.append(
                     Link(
-                        text=_("Cancel registration"),
-                        url=request.return_here(
-                            layout.csrf_protected_url(
-                                request.link(
-                                    self.submission, 'cancel-registration')
-                            )
+                        text=_('Cancel registration'),
+                        url=request.csrf_protected_url(
+                            request.link(self.ticket, 'cancel-registration')
                         ),
                         attrs={'class': 'delete-link'},
                         traits=(
@@ -335,27 +529,27 @@ class FormSubmissionHandler(Handler):
                 )
             extra.append(
                 Link(
-                    text=_("Registration Window"),
-                    url=request.link(window),
+                    text=_('Registration Window'),
+                    url=request.link(self.ticket, 'window'),
                     attrs={'class': 'edit-link'}
                 )
             )
 
         if self.submission is not None:
-            url_obj = URL(request.link(self.submission))
+            url_obj = URL(request.link(self.ticket, 'submission'))
             edit_url = url_obj.query_param('edit', '').as_string()
 
-            (links if not links else extra).append(  # type:ignore
+            (links if not links else extra).append(
                 Link(
                     text=_('Edit submission'),
-                    url=request.return_here(edit_url),
+                    url=edit_url,
                     attrs={'class': 'edit-link'}
                 )
             )
 
         if extra:
             links.append(LinkGroup(
-                _("Advanced"),
+                _('Advanced'),
                 links=extra,
                 right_side=False
             ))
@@ -366,10 +560,10 @@ class FormSubmissionHandler(Handler):
 @handlers.registered_handler('RSV')
 class ReservationHandler(Handler):
 
-    id: 'UUID'
+    id: UUID
 
-    handler_title = _("Reservations")
-    code_title = _("Reservations")
+    handler_title = _('Reservations')
+    code_title = _('Reservations')
 
     @cached_property
     def resource(self) -> Resource | None:
@@ -380,7 +574,7 @@ class ReservationHandler(Handler):
 
         return query.one()
 
-    def reservations_query(self) -> 'Query[Reservation]':
+    def reservations_query(self) -> Query[Reservation]:
         # libres allows for multiple reservations with a single request (token)
         # for now we don't really have that case in onegov.org, but we
         # try to be aware of it as much as possible
@@ -391,7 +585,10 @@ class ReservationHandler(Handler):
 
     @cached_property
     def reservations(self) -> tuple[Reservation, ...]:
-        return tuple(self.reservations_query())
+        return tuple(
+            self.reservations_query()
+            .options(undefer(Reservation.data))
+        )
 
     @cached_property
     def has_future_reservation(self) -> bool:
@@ -410,16 +607,168 @@ class ReservationHandler(Handler):
         )
 
     @cached_property
-    def submission(self) -> 'FormSubmission | None':
+    def submission(self) -> FormSubmission | None:
         return FormSubmissionCollection(self.session).by_id(self.id)
 
     @property
-    def payment(self) -> 'Payment | None':
+    def payment(self) -> Payment | None:
         return self.reservations and self.reservations[0].payment or None
 
     @property
     def deleted(self) -> bool:
-        return False if self.reservations else True
+        return not self.reservations
+
+    def invoice_items(self, request: CoreRequest) -> list[InvoiceItemMeta]:
+        if self.submission:
+            form = request.get_form(
+                self.submission.form_class,
+                data=self.submission.data
+            )
+            cost_object = self.resource.cost_object if self.resource else None
+            item_extra = {'submission_id': self.submission.id}
+            extras = form.invoice_items(
+                cost_object=cost_object,
+                extra=item_extra
+            )
+            discounts = form.discount_items(
+                cost_object=cost_object,
+                extra=item_extra
+            )
+        else:
+            extras = []
+            discounts = []
+
+        return self.resource.invoice_items_for_reservation(
+            self.reservations,
+            extras,
+            discounts,
+            reduced_amount_label=request.translate(_('Discount'))
+        ) if self.resource else []
+
+    def refresh_invoice_items(self, request: CoreRequest) -> None:
+        payment = self.payment
+        invoice = self.ticket.invoice
+        new_item_metas = self.invoice_items(request)
+        if not new_item_metas:
+            # delete the invoice and payment (if it exists)
+            if invoice is not None:
+                for item in invoice.items:
+                    item.payments = []
+                    request.session.delete(item)
+                self.ticket.invoice = None
+                request.session.delete(invoice)
+
+            if payment is not None:
+                for reservation in self.reservations:
+                    reservation.payment = None
+                request.session.delete(payment)
+
+            return
+
+        if invoice is None:
+            # create a new invoice
+            invoice = TicketInvoice(id=uuid4())
+            request.session.add(invoice)
+            self.ticket.invoice = invoice
+
+        # update the invoicing party
+        if self.resource:
+            invoice.invoicing_party = self.resource.invoicing_party
+
+        old_items = sorted(invoice.items, key=attrgetter('group'))
+        new_items: list[InvoiceItem] = []
+        unused: set[InvoiceItem] = set(old_items)
+        for meta in new_item_metas:
+            existing: InvoiceItem | None = None
+            for item in old_items:
+                if item.group != meta.group:
+                    continue
+
+                if meta.group == 'reservation':
+                    assert meta.extra is not None
+                    if meta.extra['reservation_id'] == item.reservation_id:
+                        existing = item
+                        break
+                elif meta.group == 'form':
+                    assert meta.extra is not None
+                    assert item.submission_id is not None
+                    assert meta.extra['submission_id'] == item.submission_id
+                    if meta.family == item.family:
+                        existing = item
+                        break
+                elif meta.group == 'reduced_amount':
+                    existing = item
+                    break
+                else:
+                    raise AssertionError('unreachable')
+
+            if existing is None:
+                new_item = meta.add_to_invoice(invoice)
+                if payment is not None:
+                    new_item.payments.append(payment)
+                    # FIXME: If we allow paid payments we need to do
+                    #        more here
+                new_items.append(new_item)
+                continue
+
+            # update the existing item if necessary
+            meta.refresh_item(existing)
+
+            unused.discard(existing)
+            new_items.append(existing)
+
+        for existing in unused:
+            # keep manually added items
+            if existing.group == 'manual':
+                new_items.append(existing)
+                continue
+
+            # clear out any links to payments before deleting
+            existing.payments = []
+            request.session.delete(existing)
+
+        invoice.items = new_items  # type: ignore[assignment]
+        request.session.flush()
+
+        # FIXME: If we allow paid or online payments, then we need to do
+        #        something different here
+        total = invoice.total_amount
+        if payment is None:
+            if total > 0:
+                # we need to create a new manual payment
+                # and link it to the reservations and invoice items
+                assert self.resource is not None
+                payment = ManualPayment(
+                    amount=invoice.total_amount,
+                    currency=self.resource.currency or 'CHF'
+                )
+                for reservation in self.reservations:
+                    reservation.payment = payment
+                for item in invoice.items:
+                    item.payments.append(payment)
+                invoice.sync(capture=False)
+                self.ticket.payment = payment
+        elif total <= 0:
+            # we need to delete the payment
+            # TODO: We may allow deleting non-manual payments in the future
+            #       but for now we assert we didn't delete a non-open
+            #       non-manual payment
+            assert payment.source == 'manual' and payment.state == 'open'
+            for reservation in self.reservations:
+                reservation.payment = None
+            for item in invoice.items:
+                item.payments.remove(payment)
+            self.ticket.payment = None
+            self.ticket.payment_id = None
+            request.session.delete(payment)
+        elif total != payment.amount:
+            # we need to update the payment
+            # TODO: We may allow changing non-manual payments in the future
+            #       but for now we assert we didn't change a non-open
+            #       non-manual payment
+            assert payment.source == 'manual' and payment.state == 'open'
+            payment.amount = total
+        request.session.flush()
 
     @property
     def extra_data(self) -> list[str]:
@@ -432,8 +781,21 @@ class ReservationHandler(Handler):
     def email(self) -> str:
         # the e-mail is the same over all reservations
         if self.deleted:
-            return self.ticket.snapshot.get('email')  # type:ignore
+            return self.ticket.snapshot.get('email', '')
         return self.reservations[0].email
+
+    @property
+    def email_changeable(self) -> bool:
+        return True
+
+    def change_email(self, email: str) -> None:
+        if self.deleted:
+            self.ticket.snapshot['email'] = email
+        else:
+            for reservation in self.reservations:
+                reservation.email = email
+            change_submission_email(self.submission, email)
+        self.ticket.ticket_email = email
 
     @property
     def undecided(self) -> bool:
@@ -447,6 +809,14 @@ class ReservationHandler(Handler):
                 return False
 
         return True
+
+    @property
+    def reply_to(self) -> str | None:
+        if self.deleted:
+            return self.ticket.snapshot.get('reply_to')
+
+        assert self.resource is not None
+        return self.resource.reply_to
 
     def prepare_delete_ticket(self) -> None:
         for reservation in self.reservations or ():
@@ -490,10 +860,10 @@ class ReservationHandler(Handler):
     @classmethod
     def handle_extra_parameters(
         cls,
-        session: 'Session',
-        query: '_Q',
+        session: Session,
+        query: _Q,
         extra_parameters: dict[str, Any]
-    ) -> '_Q':
+    ) -> _Q:
 
         if 'allocation_id' in extra_parameters:
             allocations = session.query(Allocation.group)
@@ -502,31 +872,59 @@ class ReservationHandler(Handler):
 
             tokens = session.query(Reservation.token)
             tokens = tokens.filter(
-                Reservation.target.in_(allocations.subquery()))
+                Reservation.target.in_(allocations.scalar_subquery()))
 
             handler_ids = tuple(t[0].hex for t in tokens)
 
             if handler_ids:
                 query = query.filter(Ticket.handler_id.in_(handler_ids))
             else:
-                query = query.filter(False)
+                query = query.filter(text('1 = 0'))
 
         return query
 
     def get_summary(
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> Markup:
 
         layout = DefaultLayout(self.resource, request)
 
+        is_manager = request.is_manager_for_model(self.ticket)
         parts = []
         parts.append(
             render_macro(layout.macros['reservations'], request, {
                 'reservations': self.reservations,
+                'get_links': self.get_reservation_links
+                if is_manager and self.ticket.state == 'pending' else None,
+                'get_occupancy_url': self.get_occupancy_url,
                 'layout': layout
             })
         )
+
+        # render key code
+        if key_code := self.data.get('key_code'):
+            parts.append(Markup(
+                '<dl class="field-display">'
+                '<dt>{}</dt><dd>{}</dd>'
+                '</dl>'
+            ).format(
+                request.translate(_('Key Code')),
+                key_code
+            ))
+
+        # render internal tag meta data
+        if is_manager and self.ticket.tag_meta:
+            parts.append(
+                Markup('').join(
+                    Markup(
+                        '<dl class="field-display">'
+                        '<dt>{}</dt><dd>{}</dd>'
+                        '</dl>'
+                    ).format(key, value)
+                    for key, value in self.ticket.tag_meta.items()
+                )
+            )
 
         if self.submission:
             form = self.submission.form_class(data=self.submission.data)
@@ -540,9 +938,134 @@ class ReservationHandler(Handler):
 
         return Markup('').join(parts)
 
+    def get_changes(
+        self,
+        request: OrgRequest
+    ) -> dict[DateRange, DateRange | None]:
+        """ Returns a compressed set of changes of reservations.
+
+        If a reservation is moved multiple times and then rejected, then
+        this will only contain the rejection (orginal start/end -> None).
+
+        If there is a chain of time adjustments, only the orginal and
+        current start/end will be included.
+        """
+
+        messages = MessageCollection(
+            request.session,
+            type=('reservation', 'reservation_adjusted'),
+            channel_id=self.ticket.number
+        )
+        changes: dict[DateRange, DateRange | None] = {}
+        # maps current start/end to its original start/end
+        origin: dict[DateRange, DateRange] = {}
+        for message in messages.query():
+            if message.type == 'reservation':
+                if message.meta['change'] != 'rejected':
+                    continue
+
+                for reservation in message.meta['reservations']:
+                    # for old messages we can't reconstruct the change
+                    # so we just return an empty changelog
+                    if not isinstance(reservation, dict):
+                        return {}
+
+                    key = reservation['start'], reservation['end']
+                    key = origin.pop(key, key)
+                    changes[key] = None
+            else:
+                assert message.type == 'reservation_adjusted'
+                key = message.meta['old_start'], message.meta['old_end']
+                current = message.meta['new_start'], message.meta['new_end']
+                # if we have been moved previously map back to the origin
+                key = origin.pop(key, key)
+                origin[current] = key
+                if key == current:
+                    # if we changed a reservation back to its original
+                    # state, then we remove it from the changes,
+                    changes.pop(key, None)
+                else:
+                    changes[key] = current
+
+        return changes
+
+    def get_reservation_links(
+        self,
+        reservation: Reservation,
+        request: OrgRequest
+    ) -> list[Link]:
+
+        links: list[Link] = []
+
+        url_obj = URL(request.link(self.ticket, 'reject-reservation'))
+        url_obj = url_obj.query_param(
+            'reservation-id', str(reservation.id))
+        url = url_obj.as_string()
+
+        title = self.get_reservation_title(reservation)
+        links.append(Link(
+            text=_('Reject'),
+            url=url,
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _('Do you really want to reject this reservation?'),
+                    _("Rejecting ${title} can't be undone.", mapping={
+                        'title': title
+                    }),
+                    _('Reject reservation'),
+                    _('Cancel')
+                ),
+                Intercooler(
+                    request_method='GET',
+                    redirect_after=request.url
+                )
+            )
+        ))
+
+        if reservation.is_adjustable and (
+            # NOTE: Only managers may adjust accepted reservations
+            request.is_manager
+            or not (reservation.data and reservation.data.get('accepted'))
+        ):
+            url_obj = URL(request.link(self.ticket, 'adjust-reservation'))
+            url_obj = url_obj.query_param(
+                'reservation-id', str(reservation.id))
+            url = url_obj.as_string()
+            links.append(Link(
+                text=_('Adjust'),
+                url=url,
+                attrs={'class': 'edit-link'}
+            ))
+
+        return links
+
+    def get_occupancy_url(
+        self,
+        reservation: Reservation,
+        request: OrgRequest
+    ) -> str | None:
+
+        if self.deleted:
+            return None
+
+        if not request.is_manager_for_model(self.ticket):
+            return None
+
+        assert self.resource is not None
+        return request.class_link(
+            Resource,
+            {
+                'name': self.resource.name,
+                'date': reservation.display_start(),
+                'view': 'timeGridDay'
+            },
+            name='occupancy'
+        )
+
     def get_links(  # type:ignore[override]
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> list[Link | LinkGroup]:
 
         if self.deleted:
@@ -558,22 +1081,45 @@ class ReservationHandler(Handler):
         if not all(accepted):
             links.append(
                 Link(
-                    text=_("Accept all reservations"),
-                    url=request.return_here(
-                        request.link(self.reservations[0], 'accept')
-                    ),
+                    text=_('Accept all reservations'),
+                    url=request.link(self.ticket, 'accept-reservation'),
                     attrs={'class': 'accept-link'}
                 )
             )
 
         advanced_links = []
 
+        if self.reservations:
+            advanced_links.append(Link(
+                text=_('Send reservation summary'),
+                url=request.link(self.ticket, 'send-reservation-summary'),
+                attrs={'class': ('envelope', 'border')},
+                traits=(
+                    Confirm(
+                        _('Do you really want to send a reservation summary?'),
+                        _(
+                            'This will always be sent via e-mail, even when '
+                            'ticket updates have been disabled. Make sure to '
+                            'only use this to inform customers, when '
+                            'significant changes have been made to the '
+                            'reservations, they need to be aware of.'
+                        ),
+                        _('Send'),
+                        _('Cancel')
+                    ),
+                    Intercooler(
+                        request_method='GET',
+                        redirect_after=request.url
+                    )
+                )
+            ))
+
         if self.submission:
-            url_obj = URL(request.link(self.submission))
+            url_obj = URL(request.link(self.ticket, 'submission'))
             url_obj = url_obj.query_param('edit', '')
             url_obj = url_obj.query_param('title', request.translate(
-                _("Details about the reservation")))
-            url = request.return_here(url_obj.as_string())
+                _('Details about the reservation')))
+            url = url_obj.as_string()
 
             advanced_links.append(
                 Link(
@@ -583,30 +1129,40 @@ class ReservationHandler(Handler):
                 )
             )
 
+        now = utcnow()
+        if getattr(self.resource, 'kaba_components', None) and any(
+            True
+            for reservation in self.reservations
+            if reservation.display_start() > now
+        ):
+            advanced_links.append(
+                Link(
+                    text=_('Edit key code'),
+                    url=request.link(self.ticket, 'edit-kaba'),
+                    attrs={'class': ('edit-link', 'border')}
+                )
+            )
+
         if not all(accepted):
             advanced_links.append(
                 Link(
-                    text=_("Accept all with message"),
-                    url=request.return_here(
-                        request.link(self.reservations[0],
-                                     'accept-with-message')
-                    ),
+                    text=_('Accept all with message'),
+                    url=request.link(
+                        self.ticket, 'accept-reservation-with-message'),
                     attrs={'class': 'accept-link'}
                 )
             )
 
         advanced_links.append(Link(
-            text=_("Reject all"),
-            url=request.return_here(
-                request.link(self.reservations[0], 'reject')
-            ),
+            text=_('Reject all'),
+            url=request.link(self.ticket, 'reject-reservation'),
             attrs={'class': 'delete-link'},
             traits=(
                 Confirm(
-                    _("Do you really want to reject all reservations?"),
+                    _('Do you really want to reject all reservations?'),
                     _("Rejecting these reservations can't be undone."),
-                    _("Reject reservations"),
-                    _("Cancel")
+                    _('Reject reservations'),
+                    _('Cancel')
                 ),
                 Intercooler(
                     request_method='GET',
@@ -616,42 +1172,19 @@ class ReservationHandler(Handler):
         ))
 
         advanced_links.append(Link(
-            text=_("Reject all with message"),
-            url=request.return_here(
-                request.link(self.reservations[0], 'reject-with-message')
-            ),
-            attrs={'class': 'delete-link'},
+            text=_('Reject all with message'),
+            url=request.link(self.ticket, 'reject-reservation-with-message'),
+            attrs={'class': ('delete-link', 'border')},
         ))
 
-        for reservation in self.reservations:
-            url_obj = URL(request.link(reservation, 'reject'))
-            url_obj = url_obj.query_param(
-                'reservation-id', str(reservation.id))
-            url = request.return_here(url_obj.as_string())
-
-            title = self.get_reservation_title(reservation)
-            advanced_links.append(Link(
-                text=_("Reject ${title}", mapping={'title': title}),
-                url=url,
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Confirm(
-                        _("Do you really want to reject this reservation?"),
-                        _("Rejecting ${title} can't be undone.", mapping={
-                            'title': title
-                        }),
-                        _("Reject reservation"),
-                        _("Cancel")
-                    ),
-                    Intercooler(
-                        request_method='GET',
-                        redirect_after=request.url
-                    )
-                )
-            ))
+        advanced_links.append(Link(
+            text=_('Add reservation'),
+            url=request.link(self.ticket, 'add-reservation'),
+            attrs={'class': 'new-reservation'}
+        ))
 
         links.append(LinkGroup(
-            _("Advanced"),
+            _('Advanced'),
             links=advanced_links,
             right_side=False
         ))
@@ -662,16 +1195,16 @@ class ReservationHandler(Handler):
 @handlers.registered_handler('EVN')
 class EventSubmissionHandler(Handler):
 
-    id: 'UUID'
-    handler_title = _("Events")
-    code_title = _("Events")
+    id: UUID
+    handler_title = _('Events')
+    code_title = _('Events')
 
     @cached_property
     def collection(self) -> EventCollection:
         return EventCollection(self.session)
 
     @cached_property
-    def event(self) -> 'Event | None':
+    def event(self) -> Event | None:
         return self.collection.by_id(self.id)
 
     @property
@@ -690,7 +1223,20 @@ class EventSubmissionHandler(Handler):
 
     @cached_property
     def email(self) -> str | None:
-        return self.event.meta.get('submitter_email') if self.event else None
+        if self.event is None:
+            return self.ticket.snapshot.get('email')
+        return self.event.meta.get('submitter_email')
+
+    @property
+    def email_changeable(self) -> bool:
+        return True
+
+    def change_email(self, email: str) -> None:
+        if self.event is None:
+            self.ticket.snapshot['email'] = email
+        else:
+            self.event.meta['submitter_email'] = email
+        self.ticket.ticket_email = email
 
     @property
     def title(self) -> str:
@@ -730,11 +1276,11 @@ class EventSubmissionHandler(Handler):
 
     @cached_property
     def group(self) -> str:
-        return _("Event")
+        return _('Event')
 
     def get_summary(
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> Markup:
         assert self.event is not None
         layout = EventLayout(self.event, request)
@@ -747,43 +1293,41 @@ class EventSubmissionHandler(Handler):
 
     def get_links(  # type:ignore[override]
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> list[Link | LinkGroup]:
 
-        links: list[Link | LinkGroup] = []
-        # FIXME: We only use EventLayout to generate a csrf_protected_url
-        #        This should probably be moved to an utils function
-        layout = EventLayout(self.event, request)  # type:ignore[arg-type]
+        if not self.event:
+            return []
 
-        if self.event and self.event.state == 'submitted':
+        links: list[Link | LinkGroup] = []
+
+        if self.event.state == 'submitted':
             links.append(Link(
-                text=_("Accept event"),
-                url=request.return_here(request.link(self.event, 'publish')),
+                text=_('Accept event'),
+                url=request.link(self.ticket, 'publish-event'),
                 attrs={'class': 'accept-link'},
             ))
-        if not self.event:
-            return links
 
         advanced_links = [
             Link(
                 text=_('Edit event'),
-                url=request.return_here(request.link(self.event, 'edit')),
+                url=request.link(self.ticket, 'edit-event'),
                 attrs={'class': ('edit-link', 'border')}
             )]
 
         if not self.event.source:
             advanced_links.append(
                 Link(
-                    text=_("Reject event"),
-                    url=layout.csrf_protected_url(
-                        request.link(self.event)),
+                    text=_('Reject event'),
+                    url=request.csrf_protected_url(
+                        request.link(self.ticket, 'delete-event')),
                     attrs={'class': ('delete-link')},
                     traits=(
                         Confirm(
-                            _("Do you really want to reject this event?"),
+                            _('Do you really want to reject this event?'),
                             _("Rejecting this event can't be undone."),
-                            _("Reject event"),
-                            _("Cancel")
+                            _('Reject event'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -796,16 +1340,16 @@ class EventSubmissionHandler(Handler):
         elif self.event.state in ('published', 'submitted'):
             advanced_links.append(
                 Link(
-                    text=_("Withdraw event"),
-                    url=layout.csrf_protected_url(request.link(
-                        self.event, name='withdraw')),
+                    text=_('Withdraw event'),
+                    url=request.csrf_protected_url(
+                        request.link(self.ticket, name='withdraw-event')),
                     attrs={'class': ('delete-link')},
                     traits=(
                         Confirm(
-                            _("Do you really want to withdraw this event?"),
-                            _("You can re-publish an imported event later."),
-                            _("Withdraw event"),
-                            _("Cancel")
+                            _('Do you really want to withdraw this event?'),
+                            _('You can re-publish an imported event later.'),
+                            _('Withdraw event'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='POST',
@@ -818,14 +1362,13 @@ class EventSubmissionHandler(Handler):
         elif self.event.state == 'withdrawn':
             advanced_links.append(
                 Link(
-                    text=_("Re-publish event"),
-                    url=request.return_here(
-                        request.link(self.event, 'publish')),
+                    text=_('Re-publish event'),
+                    url=request.link(self.ticket, 'publish-event'),
                     attrs={'class': 'accept-link'}
                 )
             )
 
-        links.append(LinkGroup(_("Advanced"), links=advanced_links,
+        links.append(LinkGroup(_('Advanced'), links=advanced_links,
                                right_side=False))
 
         return links
@@ -834,21 +1377,23 @@ class EventSubmissionHandler(Handler):
 @handlers.registered_handler('DIR')
 class DirectoryEntryHandler(Handler):
 
-    id: 'UUID'
+    id: UUID
 
-    handler_title = _("Directory Entry Submissions")
-    code_title = _("Directory Entry Submissions")
+    handler_title = _('Directory Entry Submissions')
+    code_title = _('Directory Entry Submissions')
+    invoice_items = submission_invoice_items
+    refresh_invoice_items = refresh_submission_invoice_items
 
     @cached_property
     def collection(self) -> FormSubmissionCollection:
         return FormSubmissionCollection(self.session)
 
     @cached_property
-    def submission(self) -> 'FormSubmission | None':
+    def submission(self) -> FormSubmission | None:
         return self.collection.by_id(self.id)
 
     @cached_property
-    def form(self) -> 'Form | None':
+    def form(self) -> Form | None:
         return (
             self.submission.form_class(data=self.submission.data)
             if self.submission is not None else None
@@ -907,8 +1452,20 @@ class DirectoryEntryHandler(Handler):
         return (
             # we don't allow directory entry submissions without an email
             self.submission.email  # type:ignore[return-value]
-            if self.submission is not None else ''
+            if self.submission is not None
+            else self.ticket.snapshot.get('email')
         )
+
+    @property
+    def email_changeable(self) -> bool:
+        return True
+
+    def change_email(self, email: str) -> None:
+        if self.submission is None:
+            self.ticket.snapshot['email'] = email
+        else:
+            change_submission_email(self.submission, email)
+        self.ticket.ticket_email = email
 
     @property
     def submitter_name(self) -> str | None:
@@ -960,7 +1517,7 @@ class DirectoryEntryHandler(Handler):
         return '-'
 
     @property
-    def payment(self) -> 'Payment | None':
+    def payment(self) -> Payment | None:
         return self.submission.payment if self.submission else None
 
     @property
@@ -995,7 +1552,7 @@ class DirectoryEntryHandler(Handler):
 
     def get_summary(
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> Markup:
 
         assert self.form is not None
@@ -1015,7 +1572,7 @@ class DirectoryEntryHandler(Handler):
 
     def get_links(  # type:ignore[override]
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> list[Link | LinkGroup]:
 
         links: list[Link | LinkGroup] = []
@@ -1028,7 +1585,7 @@ class DirectoryEntryHandler(Handler):
             assert hasattr(self.directory, 'submission_action')
             links.append(
                 Link(
-                    text=_("Adopt"),
+                    text=_('Adopt'),
                     url=request.link(
                         self.directory.submission_action(
                             'adopt', self.submission.id
@@ -1045,9 +1602,10 @@ class DirectoryEntryHandler(Handler):
             )
 
         if self.state == 'adopted':
+            # FIXME: A supporter may not have permission to view the entry
             links.append(
                 Link(
-                    text=_("View directory entry"),
+                    text=_('View directory entry'),
                     url=request.class_link(DirectoryEntry, {
                         'directory_name': self.directory.name,
                         'name': self.ticket.handler_data['entry_name']
@@ -1058,12 +1616,42 @@ class DirectoryEntryHandler(Handler):
 
         advanced_links = []
 
+        if self.state == 'rejected':
+            assert self.submission is not None
+            assert hasattr(self.directory, 'submission_action')
+            type = 'change' if (
+                   'change-request' in self.submission.extensions) else 'entry'
+            text = _('Withdraw rejection')
+            if type == 'entry':
+                tooltip = _('This directory entry has been rejected. Do you '
+                            'want to withdraw the rejection?')
+            else:
+                tooltip = _('This directory change has been rejected. Do you '
+                            'want to withdraw the rejection?')
+            advanced_links.append(
+                Link(
+                    text=text,
+                    url=request.link(
+                        self.directory.submission_action(
+                            'withdraw_rejection', self.submission.id,
+                        )
+                    ),
+                    attrs={'class': 'undo-link', 'title': tooltip},
+                    traits=(
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=request.url
+                        ),
+                    ),
+                )
+            )
+
         if self.state is None:
-            url_obj = URL(request.link(self.submission))
+            url_obj = URL(request.link(self.ticket, 'submission'))
             url_obj = url_obj.query_param('edit', '')
             url_obj = url_obj.query_param('title', request.translate(
-                _("Edit details")))
-            url = request.return_here(url_obj.as_string())
+                _('Edit details')))
+            url = url_obj.as_string()
 
             advanced_links.append(
                 Link(
@@ -1075,21 +1663,37 @@ class DirectoryEntryHandler(Handler):
 
             assert self.submission is not None
             assert hasattr(self.directory, 'submission_action')
-            advanced_links.append(Link(
-                text=_("Reject"),
-                url=request.link(
+            if 'change-request' in self.submission.extensions:
+                text = _('Reject change request')
+                url = request.link(
                     self.directory.submission_action(
                         'reject', self.submission.id
                     )
-                ),
+                )
+                traits = Confirm(
+                    _('Do you really want to reject this change?'), None,
+                    _('Reject change'),
+                    _('Cancel')
+                )
+            else:
+                text = _('Reject entry')
+                url = request.link(
+                    self.directory.submission_action(
+                        'reject', self.submission.id
+                    )
+                )
+                traits = Confirm(
+                    _('Do you really want to reject this entry?'),
+                    None,
+                    _('Reject entry'),
+                    _('Cancel')
+                )
+            advanced_links.append(Link(
+                text=text,
+                url=url,
                 attrs={'class': 'delete-link'},
                 traits=(
-                    Confirm(
-                        _("Do you really want to reject this entry?"),
-                        _("This cannot be undone."),
-                        _("Reject entry"),
-                        _("Cancel")
-                    ),
+                    traits,
                     Intercooler(
                         request_method='POST',
                         redirect_after=request.url
@@ -1098,7 +1702,7 @@ class DirectoryEntryHandler(Handler):
             ))
 
         links.append(LinkGroup(
-            _("Advanced"),
+            _('Advanced'),
             links=advanced_links,
             right_side=False
         ))
@@ -1107,25 +1711,24 @@ class DirectoryEntryHandler(Handler):
 
 
 class ChatTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'CHT'}  # type:ignore
-    es_type_name = 'chat_tickets'
+    __mapper_args__ = {'polymorphic_identity': 'CHT'}
 
-    def reference_group(self, request: 'OrgRequest') -> str:
+    def reference_group(self, request: OrgRequest) -> str:
         return self.handler.title
 
 
 @handlers.registered_handler('CHT')
 class ChatHandler(Handler):
 
-    handler_title = _("Chats")
-    code_title = _("Chats")
+    handler_title = _('Chats')
+    code_title = _('Chats')
 
     @cached_property
     def collection(self) -> ChatCollection:
         return ChatCollection(self.session)
 
     @cached_property
-    def chat(self) -> 'Chat | None':
+    def chat(self) -> Chat | None:
         return self.collection.by_id(self.id)
 
     @property
@@ -1153,7 +1756,7 @@ class ChatHandler(Handler):
 
     def get_summary(
         self,
-        request: 'OrgRequest'  # type: ignore[override]
+        request: OrgRequest  # type: ignore[override]
     ) -> Markup:
 
         layout = DefaultLayout(self.collection, request)
@@ -1166,6 +1769,211 @@ class ChatHandler(Handler):
 
     def get_links(  # type: ignore[override]
         self,
-        request: 'OrgRequest'  # type: ignore[override]
+        request: OrgRequest  # type: ignore[override]
     ) -> list[Link | LinkGroup]:
         return []
+
+
+def apply_ticket_permissions(
+    query: _Q,
+    filtered_handler: str,
+    request: OrgRequest | None,
+) -> _Q:
+    if request is None or request.is_manager:
+        return query
+
+    permissions = request.app.ticket_permissions
+    if not permissions:
+        # no permission downgrades occur
+        return query
+
+    groupids: frozenset[str]
+    groupids = getattr(request.identity, 'groupids', frozenset())
+    inclusions: dict[str, set[str]] = {}
+    exclusions: dict[str, set[str]] = {}
+    for handler, groups in permissions.items():
+        if None in groups and groupids.isdisjoint(groups[None]):
+            # we only have access to the specific groups we were added to
+            # any other ticket in this handler is excluded, if we end up
+            # with an empty set here that means that we don't have access
+            # to this handler at all
+            inclusions[handler] = {
+                group
+                for group, allowed_ids in groups.items()
+                if group is not None
+                if not groupids.isdisjoint(allowed_ids)
+            }
+        else:
+            # in every other case we have access to all groups, except for
+            # the ones that were exclusively assigned to someone else
+            excluded = {
+                group
+                for group, allowed_ids in groups.items()
+                if group is not None
+                if groupids.isdisjoint(allowed_ids)
+            }
+            if excluded:
+                exclusions[handler] = excluded
+
+    if not inclusions and not exclusions:
+        return query
+
+    if filtered_handler != 'ALL':
+        # we only need to emit a simple condition, so let's special case
+        # so we produce less work for the query compiler/optimizer
+        included_groups = inclusions.get(filtered_handler)
+        excluded_groups = exclusions.get(filtered_handler)
+        if included_groups is None:
+            if excluded_groups is None:
+                # no filter necessary
+                return query
+            return query.filter(Ticket.group.notin_(excluded_groups))
+        elif not included_groups:
+            # we don't have access to anything for this handler
+            return query.filter(text('1=0'))
+        return query.filter(Ticket.group.in_(included_groups))
+
+    filtered_handlers = inclusions.keys() | exclusions.keys()
+    assert filtered_handlers
+    conditions = []
+    for handler in filtered_handlers:
+        included_groups = inclusions.get(handler)
+        excluded_groups = exclusions.get(handler)
+        if included_groups is None:
+            assert excluded_groups is not None
+            conditions.append(and_(
+                Ticket.handler_code == handler,
+                Ticket.group.notin_(excluded_groups)
+            ))
+        elif included_groups:
+            conditions.append(and_(
+                Ticket.handler_code == handler,
+                Ticket.group.in_(included_groups)
+            ))
+        # NOTE: The case of an empty included_groups is handled
+        #       by the final filter in the or_, since it excludes
+        #       any handler codes we have filters for.
+
+    return query.filter(or_(
+        *conditions,
+        Ticket.handler_code.notin_(filtered_handlers)
+    ))
+
+
+def apply_search_term(
+    query: _Q,
+    term: str | None,
+    request: OrgRequest | None,
+) -> _Q:
+    if request is None or not term:
+        return query
+
+    language = request.locale
+    if language_from_locale(language) == 'simple':
+        language = 'simple'
+
+    query = query.join(SearchIndex, SearchIndex.owner_id_uuid == Ticket.id)
+    query = query.filter(SearchIndex.data_vector.op('@@')(
+        func.websearch_to_tsquery(language, term)
+    ))
+    return query
+
+
+class FilteredTicketCollection(TicketCollection):
+
+    search_term_supported = True
+
+    def __init__(
+        self,
+        session: Session,
+        page: int = 0,
+        state: ExtendedTicketState = 'open',
+        handler: str = 'ALL',
+        group: str | None = None,
+        owner: str = '*',
+        submitter: str = '*',
+        term: str | None = None,
+        extra_parameters: dict[str, Any] | None = None,
+        # NOTE: This is pretty fragile since the `for_X` methods will
+        #       not preserve the request, so if we rely on that being
+        #       the case anywhere we manually need to set the request
+        #       afterwards, but the alternative seems even worse, so
+        #       we'll allow it for now...
+        request: OrgRequest | None = None,
+    ) -> None:
+        super().__init__(
+            session,
+            page=page,
+            state=state,
+            handler=handler,
+            group=group,
+            owner=owner,
+            submitter=submitter,
+            term=term,
+            extra_parameters=extra_parameters,
+        )
+        self.request = request
+
+    def subset(self) -> Query[Ticket]:
+        return apply_search_term(apply_ticket_permissions(
+            super().subset(),
+            self.handler,
+            self.request
+        ), self.term, self.request)
+
+    def groups_by_handler_code(self) -> Query[tuple[str, Sequence[str]]]:
+        return apply_ticket_permissions(
+            super().groups_by_handler_code(),
+            'ALL',
+            self.request
+        )
+
+
+class FilteredArchivedTicketCollection(ArchivedTicketCollection):
+
+    search_term_supported = True
+
+    def __init__(
+        self,
+        session: Session,
+        page: int = 0,
+        state: Literal['archived'] = 'archived',
+        handler: str = 'ALL',
+        group: str | None = None,
+        owner: str = '*',
+        submitter: str = '*',
+        term: str | None = None,
+        extra_parameters: dict[str, Any] | None = None,
+        # NOTE: This is pretty fragile since the `for_X` methods will
+        #       not preserve the request, so if we rely on that being
+        #       the case anywhere we manually need to set the request
+        #       afterwards, but the alternative seems even worse, so
+        #       we'll allow it for now...
+        request: OrgRequest | None = None,
+    ) -> None:
+        super().__init__(
+            session,
+            page=page,
+            state='archived',
+            handler=handler,
+            group=group,
+            owner=owner,
+            submitter=submitter,
+            term=term,
+            extra_parameters=extra_parameters,
+        )
+        self.request = request
+
+    def subset(self) -> Query[Ticket]:
+        return apply_search_term(apply_ticket_permissions(
+            super().subset(),
+            self.handler,
+            self.request
+        ), self.term, self.request)
+
+    def groups_by_handler_code(self) -> Query[tuple[str, Sequence[str]]]:
+        return apply_ticket_permissions(
+            super().groups_by_handler_code(),
+            'ALL',
+            self.request
+        )

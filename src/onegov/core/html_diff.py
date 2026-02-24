@@ -1,24 +1,29 @@
 """
-    htmldiff
-    ~~~~~~~~
+htmldiff
+========
 
-    Diffs HTML fragments.  Nice to show what changed between two revisions
-    of a document for an arbitrary user.  Examples:
+Diffs HTML fragments.  Nice to show what changed between two revisions
+of a document for an arbitrary user.
+
+Examples:
+.. code-block:: pycon
 
     >>> from htmldiff import render_html_diff
 
     >>> render_html_diff('Foo <b>bar</b> baz', 'Foo <i>bar</i> baz')
-    u'<div class="diff">Foo <i class="tagdiff_replaced">bar</i> baz</div>'
+    '<div class="diff">Foo <i class="tagdiff_replaced">bar</i> baz</div>'
 
     >>> render_html_diff('Foo bar baz', 'Foo baz')
-    u'<div class="diff">Foo <del>bar</del> baz</div>'
+    '<div class="diff">Foo <del>bar</del> baz</div>'
 
     >>> render_html_diff('Foo baz', 'Foo blah baz')
-    u'<div class="diff">Foo <ins>blah</ins> baz</div>'
+    '<div class="diff">Foo <ins>blah</ins> baz</div>'
 
-    :copyright: (c) 2011 by Armin Ronacher, see AUTHORS for more details.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2011 by Armin Ronacher
+:license: BSD
 """
+from __future__ import annotations
+
 import re
 from contextlib import contextmanager
 from difflib import SequenceMatcher
@@ -34,7 +39,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from genshi.core import StreamEventKind
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Position: TypeAlias = tuple[str | None, int, int]
     StreamEvent: TypeAlias = tuple[StreamEventKind, Any, Position]
@@ -60,7 +65,7 @@ def render_html_diff(
     old_stream = parse_html(old, wrapper_element, wrapper_class)
     new_stream = parse_html(new, wrapper_element, wrapper_class)
     rv = diff_genshi_stream(old_stream, new_stream)
-    return Markup(rv.render('html', encoding=None))  # noqa: MS001
+    return Markup(rv.render('html', encoding=None))  # nosec: B704
 
 
 def parse_html(
@@ -80,16 +85,16 @@ def parse_html(
 
 class StreamDiffer:
     """A class that can diff a stream of Genshi events. It will inject
-``<ins>`` and ``<del>`` tags into the stream. It probably breaks
-in very ugly ways if you pass a random Genshi stream to it. I'm
-not exactly sure if it's correct what creoleparser is doing here,
-but it appears that it's not using a namespace. That's fine with me
-so the tags the `StreamDiffer` adds are also unnamespaced.
-"""
+    ``<ins>`` and ``<del>`` tags into the stream. It probably breaks
+    in very ugly ways if you pass a random Genshi stream to it. I'm
+    not exactly sure if it's correct what creoleparser is doing here,
+    but it appears that it's not using a namespace. That's fine with me
+    so the tags the `StreamDiffer` adds are also unnamespaced.
+    """
 
-    _old: list['StreamEvent']
-    _new: list['StreamEvent']
-    _result: list['StreamEvent']
+    _old: list[StreamEvent]
+    _new: list[StreamEvent]
+    _result: list[StreamEvent]
     _stack: list[str]
     _context: str | None
 
@@ -102,7 +107,7 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
         self._context = None
 
     @contextmanager
-    def context(self, kind: str | None) -> 'Iterator[None]':
+    def context(self, kind: str | None) -> Iterator[None]:
         old_context = self._context
         self._context = kind
         try:
@@ -117,9 +122,9 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
 
     def append(
         self,
-        type: 'StreamEventKind',
+        type: StreamEventKind,
         data: Any,
-        pos: 'Position'
+        pos: Position
     ) -> None:
         self._result.append((type, data, pos))
 
@@ -133,7 +138,7 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
             return '', s
         return match.group(), s[match.end():]
 
-    def mark_text(self, pos: 'Position', text: str, tag: str) -> None:
+    def mark_text(self, pos: Position, text: str, tag: str) -> None:
         ws, text = self.cut_leading_space(text)
         tag = QName(tag)
         if ws:
@@ -142,7 +147,7 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
         self.append(TEXT, text, pos)
         self.append(END, tag, pos)
 
-    def diff_text(self, pos: 'Position', old_text: str, new_text: str) -> None:
+    def diff_text(self, pos: Position, old_text: str, new_text: str) -> None:
         old = self.text_split(old_text)
         new = self.text_split(new_text)
         matcher = SequenceMatcher(None, old, new)
@@ -160,7 +165,7 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
             elif tag == 'insert':
                 wrap('ins', new[j1:j2])
             else:
-                self.append(TEXT, u''.join(old[i1:i2]), pos)
+                self.append(TEXT, ''.join(old[i1:i2]), pos)
 
     def replace(
         self,
@@ -250,7 +255,7 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
 
     def enter_mark_replaced(
         self,
-        pos: 'Position',
+        pos: Position,
         tag: str,
         attrs: Attrs
     ) -> None:
@@ -258,7 +263,7 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
         self._stack.append(tag)
         self.append(START, (tag, attrs), pos)
 
-    def leave(self, pos: 'Position', tag: str) -> bool:
+    def leave(self, pos: Position, tag: str) -> bool:
         if not self._stack:
             return False
         if tag == self._stack[-1]:
@@ -274,7 +279,7 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
                 self.append(END, tag, last_pos)
         del self._stack[:]
 
-    def block_process(self, events: list['StreamEvent']) -> None:
+    def block_process(self, events: list[StreamEvent]) -> None:
         for event in events:
             type, data, pos = event
             if type == START:

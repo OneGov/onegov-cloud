@@ -20,6 +20,13 @@
             <hr class="large">
             <metal:b use-macro="layout.macros['display_form']" />
         </tal:b>
-
+        <tal:b tal:condition="ticket.handler.payment">
+            <hr class="large">
+            <metal:b tal:define="payment ticket.handler.payment; show_vat ticket.handler.show_vat" use-macro="layout.macros['payment']" />
+        </tal:b>
+        <tal:b tal:condition="custom_above_footer|nothing">
+            <hr class="large">
+            <p>custom_above_footer</p>
+        </tal:b>
     </tal:b>
 </div>

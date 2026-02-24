@@ -1,12 +1,10 @@
 """ Contains the base application used by other applications. """
+from __future__ import annotations
 
 import re
 import yaml
 
-import base64
-import hashlib
 import morepath
-from collections import defaultdict
 from dectate import directive
 from email.headerregistry import Address
 from functools import wraps
@@ -16,33 +14,31 @@ from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
-from onegov.core.orm import orm_cached
-from onegov.core.templates import PageTemplate
+from onegov.core.orm.cache import orm_cached, request_cached
+from onegov.core.templates import PageTemplate, render_template
 from onegov.core.widgets import transform_structure
 from onegov.editor import EditorApp
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp
-from onegov.org import directives
+from onegov.org import _, directives
 from onegov.org.auth import MTANAuth
+from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.initial_content import create_new_organisation
-from onegov.org.models import Dashboard
-from onegov.org.models import Topic, Organisation, PublicationCollection
+from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
-from onegov.page import Page, PageCollection
-from onegov.pay import PayApp
+from onegov.pay import PayApp, log as pay_log
 from onegov.reservation import LibresIntegration
-from onegov.search import ElasticsearchApp
+from onegov.search import SearchApp
 from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
 from onegov.websockets import WebsocketsApp
 from purl import URL
-from sqlalchemy.orm import noload, undefer
-from sqlalchemy.orm.attributes import set_committed_value
 from types import MethodType
-from webob.exc import WSGIHTTPException, HTTPTooManyRequests
+from webob import Response
+from webob.exc import WSGIHTTPException
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -55,12 +51,12 @@ if TYPE_CHECKING:
     from onegov.core.mail import Attachment
     from onegov.core.types import EmailJsonDict, SequenceOrScalar
     from onegov.pay import Price
+    from onegov.ticket import Ticket
     from onegov.ticket.collection import TicketCount
     from reg.dispatch import _KeyLookup
-    from webob import Response
 
 
-class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
+class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
              DepotApp, PayApp, FormApp, EditorApp, UserApp, WebsocketsApp):
 
     serve_static_files = True
@@ -131,6 +127,24 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         self.enable_yubikey = enable_yubikey
         self.disable_password_reset = disable_password_reset
 
+    def configure_plausible_api_token(
+        self,
+        *,
+        plausible_api_token: str = '',
+        ** cfg: Any
+    ) -> None:
+
+        self.plausible_api_token = plausible_api_token
+
+    def configure_stadt_wil_azizi_api_token(
+            self,
+            *,
+            azizi_api_token: str = '',
+            ** cfg: Any
+    ) -> None:
+
+        self.azizi_api_token = azizi_api_token
+
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
         This inserts an mtan hook by wrapping the callable we receive
@@ -178,7 +192,11 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
                 dispatch.key_lookup = get_view.key_lookup
                 dispatch._mtan_hook_configured = True
 
-    @orm_cached(policy='on-table-change:organisations')
+    # NOTE: Organisation is probably the one model we could get away with
+    #       caching long-term without causing too many issues, but we
+    #       would first have to prove that we actually save a significant
+    #       amount of resources by skipping this query
+    @request_cached
     def org(self) -> Organisation:
         # even though this could return no Organisation, this can only
         # occur during setup, until after we added an Organisation, so
@@ -186,114 +204,73 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         # an organisation, so we pretend that it always does
         return self.session().query(Organisation).first()  # type:ignore
 
-    @orm_cached(policy='on-table-change:pages')
-    def root_pages(self) -> tuple[Page, ...]:
-
-        def include(page: Page) -> bool:
-            if page.type != 'news':
-                return True
-
-            return True if page.children else False
-
-        return tuple(p for p in self.pages_tree if include(p))
-
-    @orm_cached(policy='on-table-change:pages')
-    def pages_tree(self) -> tuple[Page, ...]:
-        """
-        This is the entire pages tree preloaded into the individual
-        parent/children attributes. We optimize this as much as possible
-        by performing the recursive join in Python, rather than SQL.
-
-        """
-        query = PageCollection(self.session()).query(ordered=False)
-        query = query.options(
-            # we populate these relationship ourselves
-            noload(Page.parent),
-            noload(Page.children),
-            # since we cache this result we should undefer loading the
-            # page meta, so we don't need to deserialize it every time
-            # this causes a fairly substantial overhead on uncached
-            # loads of pages_tree, but it's also a fairly big win
-            # once it is cached. There may be call-sites other than
-            # homepage_pages that benefit from this. If there aren't
-            # we can always go back on this decision
-            undefer(Page.meta)
-        )
-        query = query.order_by(Page.order)
-
-        # first we build a map from parent_ids to their children
-        parent_to_child = defaultdict(list)
-        for page in query:
-            parent_to_child[page.parent_id].append(page)
-
-        # then we populate the children and parent based on this information
-        # this should result in no pending modifications, because we use
-        # set_committed_value to set them
-        for page in (
-            page
-            for pages in parent_to_child.values()
-            for page in pages
-        ):
-            # even though this is a defaultdict, we need to use get()
-            # since otherwise we modifiy the dictionary
-            children = parent_to_child.get(page.id, [])
-            for child in children:
-                set_committed_value(child, 'parent', page)
-            set_committed_value(page, 'children', children)
-
-        # we return the root pages which should contain references to all
-        # the child pages
-        return tuple(p for p in parent_to_child.get(None, []))
-
     @orm_cached(policy='on-table-change:organisations')
-    def homepage_template(self) -> PageTemplate:
+    def _homepage_template_str(self) -> str:
         structure = self.org.meta.get('homepage_structure')
         if structure:
             widgets = self.config.homepage_widget_registry.values()
-            return PageTemplate(transform_structure(widgets, structure))
+            return transform_structure(widgets, structure)
         else:
-            return PageTemplate('')
+            return ''
+
+    @property
+    def homepage_template(self) -> PageTemplate:
+        return PageTemplate(self._homepage_template_str)
 
     @orm_cached(policy='on-table-change:tickets')
-    def ticket_count(self) -> 'TicketCount':
+    def ticket_count(self) -> TicketCount:
         return TicketCollection(self.session()).get_count()
 
     @orm_cached(policy='on-table-change:ticket_permissions')
     def ticket_permissions(self) -> dict[str, dict[str | None, list[str]]]:
-        result: dict[str, dict[str | None, list[str]]] = {}
-        for permission in self.session().query(TicketPermission):
-            handler = result.setdefault(permission.handler_code, {})
-            group = handler.setdefault(permission.group, [])
-            group.append(permission.user_group_id.hex)
-        return result
-
-    @orm_cached(policy='on-table-change:pages')
-    def homepage_pages(self) -> dict[int, list[Topic]]:
-
-        def visit_topics(
-            pages: 'Iterable[Page]',
-            root_id: int | None = None
-        ) -> 'Iterator[tuple[int, Topic]]':
-            for page in pages:
-                if isinstance(page, Topic):
-                    yield root_id or page.id, page
-
-                yield from visit_topics(
-                    page.children,
-                    root_id=root_id or page.id
-                )
-
-        result = defaultdict(list)
-        for root_id, topic in visit_topics(self.root_pages):
-            if topic.is_visible_on_homepage:
-                result[root_id].append(topic)
-
-        for topics in result.values():
-            topics.sort(
-                key=lambda p: utils.normalize_for_url(p.title)
+        """ Exclusive ticket permissions for authorization. """
+        permissions: dict[str, dict[str | None, tuple[bool, list[str]]]] = {}
+        for permission in self.session().query(TicketPermission).with_entities(
+            TicketPermission.handler_code,
+            TicketPermission.group,
+            TicketPermission.user_group_id,
+            TicketPermission.exclusive,
+        ):
+            handler = permissions.setdefault(permission.handler_code, {})
+            has_exclusive, group = handler.setdefault(
+                permission.group,
+                (permission.exclusive, [])
             )
+            group.append(permission.user_group_id.hex)
+            if permission.exclusive and not has_exclusive:
+                handler[permission.group] = (True, group)
 
-        return result
+        return {
+            handler_code: {
+                group: group_perms if exclusive else
+                # if we treated a non-exclusive group as exclusive it also
+                # needs to include all of the members of the exclusive handler
+                # scoped group, otherwise we'll incorrectly restrict their
+                # access to these groups.
+                list({*group_perms, *handler_perms[None][1]})
+                for group, (exclusive, group_perms) in handler_perms.items()
+                # the permission is only exclusive, if at least one user group
+                # has exclusive permissions. But user groups with non-exclusive
+                # permissions still have permission to access the ticket.
+                if exclusive or (
+                    # if there is exclusive access to the whole handler code
+                    # we need to treat non-exclusive access to a group as
+                    # exclusive, so the users with non-exclusive access
+                    # to this group keep their access rights.
+                    group is not None
+                    and handler_perms.get(None, (False, ))[0]
+                )
+            }
+            for handler_code, handler_perms in permissions.items()
+        }
+
+    def groupids_for_ticket(self, ticket: Ticket) -> list[str] | None:
+        handler_perms = self.ticket_permissions.get(ticket.handler_code)
+        if handler_perms is None:
+            return None
+
+        group_perms = handler_perms.get(ticket.group)
+        return handler_perms.get(None) if group_perms is None else group_perms
 
     @orm_cached(policy='on-table-change:files')
     def publications_count(self) -> int:
@@ -303,15 +280,15 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         self,
         reply_to: Address | str | None = None,
         category: Literal['marketing', 'transactional'] = 'marketing',
-        receivers: 'SequenceOrScalar[Address | str]' = (),
-        cc: 'SequenceOrScalar[Address | str]' = (),
-        bcc: 'SequenceOrScalar[Address | str]' = (),
+        receivers: SequenceOrScalar[Address | str] = (),
+        cc: SequenceOrScalar[Address | str] = (),
+        bcc: SequenceOrScalar[Address | str] = (),
         subject: str | None = None,
         content: str | None = None,
-        attachments: 'Iterable[Attachment | StrPath]' = (),
+        attachments: Iterable[Attachment | StrPath] = (),
         headers: dict[str, str] | None = None,
         plaintext: str | None = None
-    ) -> 'EmailJsonDict':
+    ) -> EmailJsonDict:
         """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`,
         setting  the reply_to address by using the reply address from
         the organisation settings.
@@ -366,6 +343,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     def custom_texts(self) -> dict[str, str] | None:
         return self.cache.get_or_create(
             'custom_texts', self.load_custom_texts,
+            expiration_time=3600
         )
 
     def load_custom_texts(self) -> dict[str, str] | None:
@@ -379,9 +357,8 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         Example customtexts.yml:
         ```yaml
         custom texts:
-          Custom admission course agreement: Ich erkläre mich bereit, den
-          Zulassungskurs des Obergerichts des Kantons Zürich zu absolvieren
-          (Kostenbeteiligung Dolmetscher:in CHF 300).
+          (en) Custom admission course agreement: I agree to attend the ..
+          (de) Custom admission course agreement: Ich erkläre mich bereit, ..
         ```
 
         """
@@ -409,15 +386,6 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             return yaml.safe_load(f).get('allowed_domains', [])
 
     @property
-    def hashed_identity_key(self) -> bytes:
-        """ Take the sha-256 because we want a key that is 32 bytes long. """
-        hash_object = hashlib.sha256()
-        hash_object.update(self.identity_secret.encode('utf-8'))
-        short_key = hash_object.digest()
-        key_base64 = base64.b64encode(short_key)
-        return key_base64
-
-    @property
     def custom_event_form_lead(self) -> str | None:
         return self.cache.get_or_create(
             'custom_event_lead', self.load_custom_event_form_lead
@@ -436,9 +404,10 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         self,
         button_label: str,
         title: str,
-        price: 'Price | None',
+        price: Price | None,
         email: str,
-        locale: str
+        complete_url: str,
+        request: OrgRequest
     ) -> str | None:
         provider = self.default_payment_provider
 
@@ -450,27 +419,49 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         if self.org.square_logo_url:
             extra['image'] = self.org.square_logo_url
 
-        return provider.checkout_button(
-            label=button_label,
-            # FIXME: This is a little suspect, since StripePaymentProvider
-            #        would previously have raised an exception for a
-            #        missing price, should it really be legal to generate
-            #        a checkout button when there is no price?
-            amount=price and price.amount or None,
-            currency=price and price.currency or None,
-            email=email,
-            name=self.org.name,
-            description=title,
-            locale=locale.split('_')[0],
-            # FIXME: This seems Stripe specific, so it should probably be
-            #        built into that payment provider
-            allowRememberMe='false',
-            **extra
-        )
+        if provider.type == 'worldline_saferpay':
+            # add confirm dialog
+            extra['confirm'] = request.translate(
+                _('Important information regarding online payments')
+            )
+            extra['confirm_extra'] = request.translate(_(
+                'The payment process is only complete once you are '
+                'redirected back to our site and receive a request number. '
+                'Any success messages the payment provider generates '
+                'before then, do not indicate completion. Transactions '
+                'in this semi-successful state will usually be refunded '
+                'within one hour, although it might take longer depending '
+                'on the chosen payment method.'
+            ))
+            extra['confirm_yes'] = request.translate(_('Ok'))
+            extra['confirm_no'] = request.translate(_('Cancel'))
+
+        try:
+            return provider.checkout_button(
+                label=button_label,
+                # FIXME: This is a little suspect, since StripePaymentProvider
+                #        would previously have raised an exception for a
+                #        missing price, should it really be legal to generate
+                #        a checkout button when there is no price?
+                amount=price and price.amount or None,
+                currency=price and price.currency or None,
+                email=email,
+                name=self.org.name,
+                description=title,
+                complete_url=complete_url,
+                request=request,
+                **extra
+            )
+        except Exception:
+            pay_log.info(
+                f'Failed to generate checkout button for {provider.title}:',
+                exc_info=True
+            )
+            return None
 
     def redirect_after_login(
         self,
-        identity: 'Identity | NoIdentity',
+        identity: Identity | NoIdentity,
         request: OrgRequest,  # type:ignore[override]
         default: str
     ) -> str | None:
@@ -508,7 +499,7 @@ def get_shared_assets_path() -> str:
 
 @OrgApp.setting(section='i18n', name='locales')
 def get_i18n_used_locales() -> set[str]:
-    return {'de_CH', 'fr_CH'}
+    return {'de_CH', 'fr_CH', 'it_CH'}
 
 
 @OrgApp.setting(section='i18n', name='localedirs')
@@ -516,6 +507,7 @@ def get_i18n_localedirs() -> list[str]:
     return [
         utils.module_path('onegov.org', 'locale'),
         utils.module_path('onegov.form', 'locale'),
+        utils.module_path('onegov.parliament', 'locale'),
         utils.module_path('onegov.user', 'locale')
     ]
 
@@ -527,9 +519,9 @@ def get_i18n_default_locale() -> str:
 
 @OrgApp.setting(section='i18n', name='locale_negotiator')
 def get_locale_negotiator(
-) -> 'Callable[[Sequence[str], OrgRequest], str | None]':
+) -> Callable[[Sequence[str], OrgRequest], str | None]:
     def locale_negotiator(
-        locales: 'Sequence[str]',
+        locales: Sequence[str],
         request: OrgRequest
     ) -> str | None:
 
@@ -561,50 +553,50 @@ def get_theme() -> OrgTheme:
 
 
 @OrgApp.setting(section='content_security_policy', name='default')
-def org_content_security_policy() -> 'ContentSecurityPolicy':
+def org_content_security_policy() -> ContentSecurityPolicy:
     policy = default_content_security_policy()
+
+    policy.script_src.add('https://checkout.stripe.com')
+    policy.script_src.add('https://pay.datatrans.com')
+    policy.script_src.add('https://pay.sandbox.datatrans.com')
 
     policy.child_src.add(SELF)
     policy.child_src.add('https://*.youtube.com')
     policy.child_src.add('https://*.vimeo.com')
     policy.child_src.add('https://*.infomaniak.com')
     policy.child_src.add('https://checkout.stripe.com')
+    policy.child_src.add('https://pay.datatrans.com')
+    policy.child_src.add('https://pay.sandbox.datatrans.com')
 
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://checkout.stripe.com')
-    policy.connect_src.add('https://*.google-analytics.com')
-    policy.connect_src.add('https://stats.g.doubleclick.net')
     policy.connect_src.add('https://map.geo.bs.ch')
     policy.connect_src.add('https://wmts.geo.bs.ch')
     policy.connect_src.add('https://maps.zg.ch')
     policy.connect_src.add('https://api.mapbox.com')
-    policy.connect_src.add('https://stats.seantis.ch')
     policy.connect_src.add('https://geodesy.geo.admin.ch')
     policy.connect_src.add('https://wms.geo.admin.ch/')
 
-    policy.connect_src.add('https://*.projuventute.ch')
+    # FIXME: which one do we need this for?
     policy.connect_src.add('https://cdn.jsdelivr.net')
-    policy.connect_src.add('https://*.usercentrics.eu')
-
-    policy.script_src.add('https:')
 
     return policy
 
 
 @OrgApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[OrgApp, str], Organisation]':
+) -> Callable[[OrgApp, str], Organisation]:
     return create_new_organisation
 
 
 @OrgApp.setting(section='org', name='status_mail_roles')
-def get_status_mail_roles() -> 'Collection[str]':
+def get_status_mail_roles() -> Collection[str]:
     return ('admin', 'editor')
 
 
 @OrgApp.setting(section='org', name='ticket_manager_roles')
-def get_ticket_manager_roles() -> 'Collection[str]':
-    return ('admin', 'editor')
+def get_ticket_manager_roles() -> Collection[str]:
+    return ('admin', 'editor', 'supporter')
 
 
 @OrgApp.setting(section='org', name='require_complete_userprofile')
@@ -614,7 +606,7 @@ def get_require_complete_userprofile() -> bool:
 
 @OrgApp.setting(section='org', name='is_complete_userprofile')
 def get_is_complete_userprofile_handler(
-) -> 'Callable[[OrgRequest, str], bool]':
+) -> Callable[[OrgRequest, str], bool]:
 
     def is_complete_userprofile(request: OrgRequest, username: str) -> bool:
         return True
@@ -633,7 +625,7 @@ def get_default_event_search_widget() -> None:
 
 
 @OrgApp.setting(section='org', name='public_ticket_messages')
-def get_public_ticket_messages() -> 'Collection[str]':
+def get_public_ticket_messages() -> Collection[str]:
     """ Returns a list of message types which are availble on the ticket
     status page, visible to anyone that knows the unguessable url.
 
@@ -645,6 +637,7 @@ def get_public_ticket_messages() -> 'Collection[str]':
         'event',
         'payment',
         'reservation',
+        'reservation_adjusted',
         'submission',
         'ticket',
         'ticket_chat',
@@ -653,15 +646,42 @@ def get_public_ticket_messages() -> 'Collection[str]':
 
 
 @OrgApp.setting(section='org', name='disabled_extensions')
-def get_disabled_extensions() -> 'Collection[str]':
+def get_disabled_extensions() -> Collection[str]:
     return ()
 
 
+@OrgApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return True
+
+
+@OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')
+def get_render_mtan_access_limit_exceeded(
+) -> Callable[[MTANAccessLimitExceeded, OrgRequest], Response]:
+
+    # circular import
+    from onegov.org.layout import DefaultLayout
+
+    def render_mtan_access_limit_exceeded(
+        self: MTANAccessLimitExceeded,
+        request: OrgRequest
+    ) -> Response:
+        return Response(
+            render_template('mtan_access_limit_exceeded.pt', request, {
+                'layout': DefaultLayout(self, request),
+                'title': self.title,
+            }),
+            status=423
+        )
+    return render_mtan_access_limit_exceeded
+
+
+# FIXME: It might be a little more robust to override apply_policy instead
 @OrgApp.tween_factory(under=content_security_policy_tween_factory)
 def enable_iframes_tween_factory(
     app: OrgApp,
-    handler: 'Callable[[OrgRequest], Response]'
-) -> 'Callable[[OrgRequest], Response]':
+    handler: Callable[[OrgRequest], Response]
+) -> Callable[[OrgRequest], Response]:
 
     no_iframe_paths = (
         r'/auth/.*',
@@ -682,7 +702,7 @@ def enable_iframes_tween_factory(
 
     def enable_iframes_tween(
         request: OrgRequest
-    ) -> 'Response':
+    ) -> Response:
         """ Enables iframes. """
 
         result = handler(request)
@@ -719,14 +739,13 @@ def get_webasset_output() -> str:
 
 
 @OrgApp.webasset('sortable')
-def get_sortable_asset() -> 'Iterator[str]':
+def get_sortable_asset() -> Iterator[str]:
     yield 'sortable.js'
     yield 'sortable_custom.js'
 
 
 @OrgApp.webasset('fullcalendar')
-def get_fullcalendar_asset() -> 'Iterator[str]':
-    yield 'fullcalendar.css'
+def get_fullcalendar_asset() -> Iterator[str]:
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
     yield 'fullcalendar.fr.js'
@@ -734,26 +753,34 @@ def get_fullcalendar_asset() -> 'Iterator[str]':
     yield 'reservationcalendar_custom.js'
 
 
+@OrgApp.webasset('occupancycalendar')
+def get_occupancycalendar_asset() -> Iterator[str]:
+    yield 'occupancycalendar.jsx'
+    yield 'occupancycalendar_custom.js'
+
+
 @OrgApp.webasset('reservationlist')
-def get_reservation_list_asset() -> 'Iterator[str]':
+def get_reservation_list_asset() -> Iterator[str]:
     yield 'reservationlist.jsx'
     yield 'reservationlist_custom.js'
 
 
 @OrgApp.webasset('code_editor')
-def get_code_editor_asset() -> 'Iterator[str]':
+def get_code_editor_asset() -> Iterator[str]:
     yield 'ace.js'
     yield 'ace-mode-form.js'
     yield 'ace-mode-markdown.js'
     yield 'ace-mode-xml.js'
     yield 'ace-mode-yaml.js'
+    yield 'ace-mode-json.js'
     yield 'ace-theme-tomorrow.js'
+    yield 'ace-theme-katzenmilch.js'
     yield 'formcode'
     yield 'code_editor.js'
 
 
 @OrgApp.webasset('editor')
-def get_editor_asset() -> 'Iterator[str]':
+def get_editor_asset() -> Iterator[str]:
     yield 'bufferbuttons.js'
     yield 'definedlinks.js'
     yield 'filemanager.js'
@@ -767,35 +794,35 @@ def get_editor_asset() -> 'Iterator[str]':
 
 
 @OrgApp.webasset('timeline')
-def get_timeline_asset() -> 'Iterator[str]':
+def get_timeline_asset() -> Iterator[str]:
     yield 'timeline.jsx'
 
 
 # do NOT minify the redactor, or the copyright notice goes away, which
 # is something we are not allowed to do per our license
 @OrgApp.webasset('redactor', filters={'js': None})
-def get_redactor_asset() -> 'Iterator[str]':
+def get_redactor_asset() -> Iterator[str]:
     yield 'redactor.js'
     yield 'redactor.css'
 
 
 @OrgApp.webasset('upload')
-def get_upload_asset() -> 'Iterator[str]':
+def get_upload_asset() -> Iterator[str]:
     yield 'upload.js'
 
 
 @OrgApp.webasset('editalttext')
-def get_editalttext_asset() -> 'Iterator[str]':
+def get_editalttext_asset() -> Iterator[str]:
     yield 'editalttext.js'
 
 
 @OrgApp.webasset('prompt')
-def get_prompt() -> 'Iterator[str]':
+def get_prompt() -> Iterator[str]:
     yield 'prompt.jsx'
 
 
 @OrgApp.webasset('photoswipe')
-def get_photoswipe_asset() -> 'Iterator[str]':
+def get_photoswipe_asset() -> Iterator[str]:
     yield 'photoswipe.css'
     yield 'photoswipe-skin.css'
     yield 'photoswipe.js'
@@ -804,25 +831,25 @@ def get_photoswipe_asset() -> 'Iterator[str]':
 
 
 @OrgApp.webasset('tags-input')
-def get_tags_input() -> 'Iterator[str]':
+def get_tags_input() -> Iterator[str]:
     yield 'tags-input.js'
     yield 'tags-input-setup.js'
 
 
 @OrgApp.webasset('filedigest')
-def get_filehash() -> 'Iterator[str]':
+def get_filehash() -> Iterator[str]:
     yield 'asmcrypto-lite.js'
     yield 'filedigest.js'
 
 
 @OrgApp.webasset('monthly-view')
-def get_monthly_view() -> 'Iterator[str]':
+def get_monthly_view() -> Iterator[str]:
     yield 'daypicker.js'
     yield 'monthly-view.jsx'
 
 
 @OrgApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield 'global.js'
     yield 'polyfills.js'
     yield 'jquery.datetimepicker.css'
@@ -867,26 +894,53 @@ def get_common_asset() -> 'Iterator[str]':
     yield 'items_selectable.js'
     yield 'notifications.js'
     yield 'foundation.accordion.js'
+    yield 'chosen_select_hierarchy.js'
 
 
 @OrgApp.webasset('fontpreview')
-def get_fontpreview_asset() -> 'Iterator[str]':
+def get_fontpreview_asset() -> Iterator[str]:
     yield 'fontpreview.js'
 
 
 @OrgApp.webasset('scroll-to-username')
-def get_scroll_to_username_asset() -> 'Iterator[str]':
+def get_scroll_to_username_asset() -> Iterator[str]:
     yield 'scroll_to_username.js'
 
 
 @OrgApp.webasset('all_blank')
-def get_all_blank_asset() -> 'Iterator[str]':
+def get_all_blank_asset() -> Iterator[str]:
     yield 'all_blank.js'
 
 
+@OrgApp.webasset('people-select')
+def people_select_asset() -> Iterator[str]:
+    yield 'people-select.js'
+
+
+@OrgApp.webasset('participant-select')
+def particpant_select_asset() -> Iterator[str]:
+    yield 'participant-select.js'
+
+
+@OrgApp.webasset('kaba-configurations')
+def kaba_configurations_asset() -> Iterator[str]:
+    yield 'kaba-configurations.js'
+
+
+@OrgApp.webasset('mapbox_address_autofill')
+def mapbox_address_autofill() -> Iterator[str]:
+    yield 'mapbox-search-web.js'  # implicit dependency
+    yield 'mapbox_address_autofill.js'
+
+
+@OrgApp.webasset('invoicing')
+def get_invoicing() -> Iterator[str]:
+    yield 'invoicing.js'
+
+
 def wrap_with_mtan_hook(
-    func: 'Callable[[OrgApp, Any, OrgRequest], Any]'
-) -> 'Callable[[OrgApp, Any, OrgRequest], Any]':
+    func: Callable[[OrgApp, Any, OrgRequest], Any]
+) -> Callable[[OrgApp, Any, OrgRequest], Any]:
 
     @wraps(func)
     def wrapped(self: OrgApp, obj: Any, request: OrgRequest) -> Any:
@@ -910,7 +964,13 @@ def wrap_with_mtan_hook(
 
             # access limit exceeded
             if request.mtan_access_limit_exceeded:
-                return HTTPTooManyRequests()
+                # NOTE: Ideally we would just be able to return the exception
+                #       as a response here, but unfortunately we would bypass
+                #       the tweens that way, so we have to manually render this
+                return self.settings.org.render_mtan_access_limit_exceeded(
+                    MTANAccessLimitExceeded(),
+                    request
+                )
 
             # record access
             request.mtan_accesses.add(url=request.path_url)
@@ -921,13 +981,13 @@ def wrap_with_mtan_hook(
 
 
 class KeyLookupWithMTANHook:
-    def __init__(self, key_lookup: '_KeyLookup'):
+    def __init__(self, key_lookup: _KeyLookup):
         self.key_lookup = key_lookup
 
     def component(
         self,
-        key: 'Sequence[Any]'
-    ) -> 'Callable[..., Any] | None':
+        key: Sequence[Any]
+    ) -> Callable[..., Any] | None:
 
         result = self.key_lookup.component(key)
         if result is None:
@@ -936,8 +996,8 @@ class KeyLookupWithMTANHook:
 
     def fallback(
         self,
-        key: 'Sequence[Any]'
-    ) -> 'Callable[..., Any] | None':
+        key: Sequence[Any]
+    ) -> Callable[..., Any] | None:
 
         result = self.key_lookup.fallback(key)
         if result is None:
@@ -946,6 +1006,6 @@ class KeyLookupWithMTANHook:
 
     def all(
         self,
-        key: 'Sequence[Any]'
-    ) -> 'Iterator[Callable[..., Any]]':
+        key: Sequence[Any]
+    ) -> Iterator[Callable[..., Any]]:
         return self.key_lookup.all(key)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import desc
 
 from onegov.core.collection import Pagination
@@ -9,7 +11,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
@@ -17,28 +19,28 @@ class DataSourceCollection(Pagination[DataSource]):
 
     page: int
 
-    def __init__(self, session: 'Session', page: int = 0):
+    def __init__(self, session: Session, page: int = 0):
         super().__init__(page)
         self.session = session
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and self.page == other.page
 
-    def subset(self) -> 'Query[DataSource]':
+    def subset(self) -> Query[DataSource]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(self.session, index)
 
-    def query(self) -> 'Query[DataSource]':
+    def query(self) -> Query[DataSource]:
         return self.session.query(DataSource).order_by(
             desc(DataSource.created))
 
-    def by_id(self, id: 'UUID') -> DataSource | None:
+    def by_id(self, id: UUID) -> DataSource | None:
         return self.query().filter(DataSource.id == id).first()
 
     def add(self, source: DataSource) -> None:
@@ -56,8 +58,8 @@ class DataSourceItemCollection(Pagination[DataSourceItem]):
 
     def __init__(
         self,
-        session: 'Session',
-        id: 'UUID | None' = None,
+        session: Session,
+        id: UUID | None = None,
         page: int = 0
     ):
         super().__init__(page)
@@ -67,23 +69,23 @@ class DataSourceItemCollection(Pagination[DataSourceItem]):
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and self.page == other.page
 
-    def subset(self) -> 'Query[DataSourceItem]':
+    def subset(self) -> Query[DataSourceItem]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(self.session, self.id, index)
 
-    def query(self) -> 'Query[DataSourceItem]':
+    def query(self) -> Query[DataSourceItem]:
         query = self.session.query(DataSourceItem)
         query = query.filter(DataSourceItem.source_id == self.id)
         query = query.order_by(DataSourceItem.district, DataSourceItem.number)
         return query
 
-    def by_id(self, id: 'UUID') -> DataSourceItem | None:
+    def by_id(self, id: UUID) -> DataSourceItem | None:
         query = self.session.query(DataSourceItem)
         query = query.filter(DataSourceItem.id == id)
         return query.first()

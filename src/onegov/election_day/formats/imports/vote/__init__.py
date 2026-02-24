@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.formats.imports.vote.ech import (
     import_votes_ech)
 from onegov.election_day.formats.imports.vote.internal import (

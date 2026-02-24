@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pdftotext import PDF  # type:ignore
 from onegov.pdf import log
 
@@ -8,7 +10,7 @@ if TYPE_CHECKING:
 
 
 def extract_pdf_info(
-    content: 'SupportsRead[bytes]',
+    content: SupportsRead[bytes],
     remove: str = '\0'
 ) -> tuple[int, str]:
     """ Extracts the number of pages and text from a PDF.

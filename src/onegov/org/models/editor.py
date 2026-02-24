@@ -1,9 +1,10 @@
 """ Contains the model describing the page editor. """
+from __future__ import annotations
 
 
 from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing_extensions import TypeAlias, TypeGuard
+    from typing import TypeAlias, TypeGuard
 
     from .traitinfo import TraitInfo
 
@@ -23,7 +24,7 @@ class Editor:
     @overload
     def __init__(
         self,
-        action: 'PageActionWithoutPage',
+        action: PageActionWithoutPage,
         page: None,
         trait: str
     ) -> None: ...
@@ -31,8 +32,8 @@ class Editor:
     @overload
     def __init__(
         self,
-        action: 'PageAction',
-        page: 'TraitInfo',
+        action: PageAction,
+        page: TraitInfo,
         trait: str | None = None
     ) -> None: ...
 
@@ -46,9 +47,9 @@ class Editor:
 
     def __init__(
         self,
-        action: 'PageAction',
+        action: PageAction,
         # NOTE: We would like this to be (Page & TraitInfo) | None
-        page: 'TraitInfo | None',
+        page: TraitInfo | None,
         trait: str | None = None
     ) -> None:
         """ The editor is defined by an action and a page/context.
@@ -83,7 +84,7 @@ class Editor:
         self.trait = trait
 
     @staticmethod
-    def is_supported_action(action: str) -> 'TypeGuard[PageAction]':
+    def is_supported_action(action: str) -> TypeGuard[PageAction]:
         """ Returns True if the given action is supported. """
         return action in {
             'new', 'new-root', 'paste', 'edit', 'delete', 'change-url',

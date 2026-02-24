@@ -4,7 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="content" tal:define="bills model.bills">
 
-        <div class="callout panel" tal:condition="not:model.expand">
+        <div class="panel period-hint-panel" tal:condition="not:model.expand">
             <div class="hints">
                 <tal:b metal:use-macro="layout.macros.period_hints" />
 
@@ -18,38 +18,49 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="columns small-12 medium-8">
+        <div class="grid-x grid-padding-x wrapper">
+            <div class="medium-8 cell content">
                 <tal:b condition="not: bills" i18n:translate>No bills found.</tal:b>
 
                 <div class="bills billing">
-                    <div class="bill ${details.outstanding == 0 and 'paid'} ${details.outstanding > 0 and 'unpaid'} ${details.outstanding < 0 and 'overpaid'}" id="${details.invoice_id}" tal:repeat="(username, details) bills.items()" data-reload-from="${request.link(model.for_username(username).for_expand(True))}" data-reload-from-selector=".bill">
-                        <h3>${details.title}</h3>
+                    <div
+                        class="bill item-wrapper ${details.outstanding == 0 and 'item-green'} ${details.outstanding > 0 and 'item-red'} ${details.outstanding < 0 and 'item-yellow'}"
+                        id="${details.invoice_id}"
+                        tal:repeat="(username, details) bills.items()"
+                        ic-select-from-response="#${details.invoice_id}"
+                        ic-get-from="${request.link(model.for_username(username).for_expand(True))}"
+                        ic-trigger-on="reload-from"
+                    >
+                        <div class="item-header">
+                            <div class="item-header-bar">
+                                <h3>${details.title}</h3>
 
-                        <strong class="outstanding">
-                            <tal:b condition="details.outstanding == 0" i18n:translate>Paid</tal:b>
-                            <tal:b condition="details.outstanding > 0" i18n:translate>
-                                <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding)" /> unpaid
-                            </tal:b>
-                            <tal:b condition="details.outstanding < 0" i18n:translate>
-                                <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding * -1)" /> overpaid
-                            </tal:b>
+                                <span class="outstanding">
+                                    <tal:b condition="details.outstanding == 0" i18n:translate>Paid</tal:b>
+                                    <tal:b condition="details.outstanding > 0" i18n:translate>
+                                        <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding)" /> unpaid
+                                    </tal:b>
+                                    <tal:b condition="details.outstanding < 0" i18n:translate>
+                                        <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding * -1)" /> overpaid
+                                    </tal:b>
 
-                            <tal:b tal:define="actions tuple(invoice_links(details))" tal:condition="actions">
-                                <tal:b
-                                    define="
-                                        action_id 'item-dropdown-{}'.format(details.id);
-                                        links actions
-                                    "
-                                    metal:use-macro="layout.macros.actions_button"
-                                />
-                            </tal:b>
-                        </strong>
+                                    <tal:b tal:define="actions tuple(invoice_links(details))" tal:condition="actions">
+                                        <tal:b
+                                            define="
+                                                action_id 'item-dropdown-{}'.format(details.id);
+                                                links actions
+                                            "
+                                            metal:use-macro="layout.macros.actions_button"
+                                        />
+                                    </tal:b>
+                                </span>
+                            </div>
 
-                        <button id="button-${details.id}" data-toggle="#details-${details.id}" class="${model.expand and 'toggled' or 'untoggled'} ic-use-transition">
-                            <span i18n:translate class="show-for-sr">Show Details</span>
-                            <i class="fa fa-angle-double-down" aria-hidden="true"></i>
-                        </button>
+                            <a href="#" id="button-${details.id}" data-ogc-toggle="#details-${details.id}" class="details-button ${model.expand and 'toggled' or 'untoggled'} ic-use-transition">
+                                <span i18n:translate class="show-for-sr">Show Details</span>
+                                <i class="fa fa-chevron-down rotate ${model.expand and 'down' or ''} " aria-hidden="true"></i>
+                            </a>
+                        </div>
 
                         <!--! loads the table when the button is clicked and replaces itself with the result -->
                         <div
@@ -58,18 +69,21 @@
                             ic-trigger-from="#button-${details.id}"
                             ic-trigger-on="click once"
                             ic-get-from="${request.link(model.for_username(username).for_expand(True))}"
-                            ic-indicator="#button-${details.id}"
-                            ic-select-from-response=".bill-details"
+                            ic-indicator="#indicator-${details.id}"
+                            ic-select-from-response="#details-${details.id}"
+                            ic-target="#details-${details.id}"
                             >
                         </div>
-                        <div class="bill-details">
-                            <div id="details-${details.id}" style="${not model.expand and 'display: none;'}">
+                        <div class="bill-details ${not model.expand and 'hidden'}" id="details-${details.id}">
+                            <div class="indicator">
+                                <i id="indicator-${details.id}" class="fa fa-spinner fa-spin" style="display:none"></i>
+                            </div>
+                            <div class="bill-details-table">
                                 <table class="invoice-items" tal:condition="model.expand">
                                     <thead class="show-for-sr">
                                         <tr>
                                             <th i18n:translate>Booking Text</th>
                                             <th i18n:translate>Amount</th>
-                                            <th i18n:translate>Paid</th>
                                             <th i18n:translate>Actions</th>
                                         </tr>
                                     </thead>
@@ -77,23 +91,23 @@
                                         <tal:b repeat="item details.items">
                                             <tr class="group" tal:condition="repeat.item.start or details.items[repeat.item.index - 1].group != item.group">
                                                 <!--! show the group text if this is not a manual or donation booking -->
-                                                <td colspan="4" tal:condition="item.family is None and item.group != 'donation'">
+                                                <td colspan="3" tal:condition="item.family is None and item.group != 'donation'">
                                                     ${item.group}
                                                 </td>
 
                                                 <!-- show the discounts/surcharges text if the previous booking was a normal booking and the current is a donation, ensuring that both the normal discounts/surcharges and the donation show up under this label -->
-                                                <td colspan="4" tal:condition="item.family or details.items[repeat.item.index - 1].family is None and item.group == 'donation'" i18n:translate>Discounts / Surcharges</td>
+                                                <td colspan="3" tal:condition="item.family or details.items[repeat.item.index - 1].family is None and item.group == 'donation'" i18n:translate>Discounts / Surcharges</td>
                                             </tr>
-                                            <tr class="${item.paid and 'paid' or 'unpaid'}" tal:define="groupid hash(str(item.group) + str(repeat.item.index))">
+                                            <tr class="invoice-item ${item.paid and 'item-green' or 'item-red'}" tal:define="groupid hash(str(item.group) + str(repeat.item.index))">
                                                 <td>
                                                     <tal:b condition="item.group == 'donation'">
                                                         <tal:b i18n:translate>Donation</tal:b> ❤
                                                     </tal:b>
                                                     <tal:b condition="item.group != 'donation'">
                                                         ${item.text}<br>
-                                                        <span class="item-organizer" tal:condition="item.organizer">
+                                                        <i class="item-organizer" tal:condition="item.organizer">
                                                             <tal:b i18n:translate>Organizer:</tal:b> ${item.organizer}
-                                                        </span>
+                                                        </i>
                                                     </tal:b>
                                                 </td>
                                                 <td class="amount">${'{:.2f}'.format(item.amount)}</td>
@@ -103,7 +117,7 @@
                                                 </td>
                                                 <td class="payment-status" tal:condition="item.paid">
                                                     <span i18n:translate class="show-for-sr">Paid</span>
-                                                    <i class="fa ${item.source == 'stripe_connect' and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true"></i>
+                                                    <i class="fa ${item.source in ('datatrans', 'stripe_connect', 'worldline_saferpay') and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true"></i>
                                                 </td>
                                                 <td class="actions">
                                                     <tal:b tal:define="actions tuple(item_links(item))" tal:condition="actions">
@@ -121,15 +135,9 @@
                                         <tr class="total">
                                             <td i18n:translate>Total</td>
                                             <td class="amount">
+                                                <tal:b tal:condition="not details.paid" i18n:translate >amount unpaid</tal:b>
+                                                <tal:b tal:condition="details.paid" i18n:translate >paid</tal:b>
                                                 ${'{:.2f}'.format(details.total)}
-                                            </td>
-                                            <td class="payment-status" tal:condition="not details.paid">
-                                                <span i18n:translate class="show-for-sr">Unpaid</span>
-                                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                            </td>
-                                            <td class="payment-status" tal:condition="details.paid">
-                                                <span i18n:translate class="show-for-sr">Paid</span>
-                                                <i class="fa fa-check-circle" aria-hidden="true"></i>
                                             </td>
                                             <td></td>
                                         </tr>
@@ -140,65 +148,67 @@
                     </div>
                 </div>
             </div>
-            <div class="columns small-12 medium-4">
-                <div class="side-panel form-panel">
-                    <h4 i18n:translate>Billing</h4>
+            <div class="medium-4 cell sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel form-panel">
+                        <h3 i18n:translate>Billing</h3>
 
-                    <div class="form-panel-block">
-                        <tal:b condition="period.active and period.confirmed and period.finalizable and not period.finalized">
-                            <div metal:use-macro="layout.macros['form']" />
+                        <div class="form-panel-block">
+                            <tal:b condition="period.active and period.confirmed and period.finalizable and not period.finalized">
+                                <div metal:use-macro="layout.macros['form']" />
 
-                            <a ic-post-to="${request.link(model, 'reset')}" redirect-after="${request.link(model)}" i18n:translate class="reset-billing" tal:condition="bills">
-                                Reset Billing
-                            </a>
-                        </tal:b>
+                                <a ic-post-to="${request.link(model, 'reset')}" redirect-after="${request.link(model)}" i18n:translate class="reset-billing" tal:condition="bills">
+                                    Reset Billing
+                                </a>
+                            </tal:b>
 
-                        <tal:b condition="not period.finalizable">
-                            <p>
-                                <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
-                                <span i18n:translate>
-                                    Billing is disabled for this period.
-                                </span>
-                            </p>
-                        </tal:b>
+                            <tal:b condition="not period.finalizable">
+                                <p>
+                                    <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                                    <span i18n:translate>
+                                        Billing is disabled for this period.
+                                    </span>
+                                </p>
+                            </tal:b>
 
-                        <tal:b condition="period.active and not period.confirmed">
-                            <p>
-                                <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
-                                <span i18n:translate>
-                                    The matching of this period has not been confirmed yet.
-                                </span>
-                            </p>
-                        </tal:b>
+                            <tal:b condition="period.active and not period.confirmed">
+                                <p>
+                                    <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                                    <span i18n:translate>
+                                        The matching of this period has not been confirmed yet.
+                                    </span>
+                                </p>
+                            </tal:b>
 
-                        <tal:b condition="not period.active and not period.finalized">
-                            <p>
-                                <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
-                                <span i18n:translate>
-                                    This period is not active. Bills may only be created for the active period.
-                                </span>
-                            </p>
-                        </tal:b>
+                            <tal:b condition="not period.active and not period.finalized">
+                                <p>
+                                    <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                                    <span i18n:translate>
+                                        This period is not active. Bills may only be created for the active period.
+                                    </span>
+                                </p>
+                            </tal:b>
 
-                        <tal:b condition="period.finalized">
-                            <p>
-                                <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
-                                <span i18n:translate>
-                                    The billing for this period has been confirmed. You can still change the invoices manually but you can no longer generate them automatically.
-                                </span>
-                            </p>
-                        </tal:b>
+                            <tal:b condition="period.finalized">
+                                <p>
+                                    <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                                    <span i18n:translate>
+                                        The billing for this period has been confirmed. You can still change the invoices manually but you can no longer generate them automatically.
+                                    </span>
+                                </p>
+                            </tal:b>
+                        </div>
                     </div>
-                </div>
 
-                <div class="filter-panel">
-                    <div class="filter-state">
-                        <h2 class="filter-title" i18n:translate>Payment State</h2>
-                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['state']" />
+                    <div class="side-panel filter-panel">
+                        <div class="filter-state">
+                            <h3 class="filter-title" i18n:translate>Payment State</h3>
+                            <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['state']" />
+                        </div>
                     </div>
-                </div>
 
-                <tal:b metal:use-macro="layout.macros.periods" />
+                    <tal:b metal:use-macro="layout.macros.periods" />
+                </div>
             </div>
         </div>
     </tal:b>

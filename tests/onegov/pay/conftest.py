@@ -1,11 +1,18 @@
+from __future__ import annotations
+
 import pytest
 import transaction
 
 from onegov.pay.models import Payment
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+
 @pytest.fixture(scope='function', autouse=True)
-def reset_payment():
+def reset_payment() -> Iterator[None]:
     yield
 
     # during testing we need to reset the links created on the payment
@@ -16,8 +23,11 @@ def reset_payment():
     while classes:
         cls = classes.pop()
 
-        for key in (Payment.registered_links or tuple()):
-            del cls.__mapper__._props[key]
+        for key in (Payment.registered_links or ()):
+            try:
+                del cls.__mapper__._props[key]
+            except KeyError:
+                pass
 
         classes.extend(cls.__subclasses__())
 

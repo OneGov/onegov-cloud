@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import VoteLayout
@@ -25,8 +27,8 @@ if TYPE_CHECKING:
 )
 def view_vote_entities(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view (proposal). """
 
     layout = VoteLayout(self, request, 'entities')
@@ -45,8 +47,8 @@ def view_vote_entities(
 )
 def view_vote_entities_proposal(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view (proposal). """
 
     layout = VoteLayout(self, request, 'proposal-entities')
@@ -65,8 +67,8 @@ def view_vote_entities_proposal(
 )
 def view_vote_entities_counter_proposal(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view (counter-proposal). """
 
     layout = VoteLayout(self, request, 'counter-proposal-entities')
@@ -85,8 +87,8 @@ def view_vote_entities_counter_proposal(
 )
 def view_vote_entities_tie_breaker(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view (tie-breaker). """
 
     layout = VoteLayout(self, request, 'tie-breaker-entities')
@@ -104,8 +106,8 @@ def view_vote_entities_tie_breaker(
 )
 def view_vote_entities_map_proposal(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
     """ A static link to the map of the proposal. """
 
     ballot = getattr(self, 'proposal', None)
@@ -128,8 +130,8 @@ def view_vote_entities_map_proposal(
 )
 def view_vote_entities_map_counter_proposal(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
     """ A static link to the map of the counter proposal. """
 
     ballot = getattr(self, 'counter_proposal', None)
@@ -152,8 +154,8 @@ def view_vote_entities_map_counter_proposal(
 )
 def view_vote_entities_map_tie_breaker(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
     """ A static link to the map of the tie breaker. """
 
     ballot = getattr(self, 'tie_breaker', None)
@@ -176,8 +178,8 @@ def view_vote_entities_map_tie_breaker(
 )
 def view_ballot_by_entity(
     self: Ballot,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ Returns the data for the ballot map. """
 
     return get_ballot_data_by_entity(self)  # type:ignore[return-value]
@@ -191,12 +193,12 @@ def view_ballot_by_entity(
 )
 def view_ballot_entities_as_map(
     self: Ballot,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the results of the entities of ballot as map. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.vote.last_modified)
 
     layout = VoteLayout(self.vote, request, f'{self.type}-entities')
@@ -223,12 +225,12 @@ def view_ballot_entities_as_map(
 )
 def view_ballot_as_table(
     self: Ballot,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the results of the entities of ballot as table. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.vote.last_modified)
 
     return {
@@ -247,8 +249,8 @@ def view_ballot_as_table(
 )
 def view_vote_entities_table_proposal(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
     """ A static link to the table by entities of the proposal. """
 
     ballot = getattr(self, 'proposal', None)
@@ -271,8 +273,8 @@ def view_vote_entities_table_proposal(
 )
 def view_vote_entities_table_counter_proposal(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
     """ A static link to the table by entities of the counter proposal. """
 
     ballot = getattr(self, 'counter_proposal', None)
@@ -295,8 +297,8 @@ def view_vote_entities_table_counter_proposal(
 )
 def view_vote_entities_table_tie_breaker(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
     """ A static link to the table of the tie breaker. """
 
     ballot = getattr(self, 'tie_breaker', None)
@@ -319,8 +321,8 @@ def view_vote_entities_table_tie_breaker(
 )
 def view_ballot_entities_svg(
     self: Ballot,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ Download the results of the entities of ballot as a SVG. """
 
     layout = VoteLayout(

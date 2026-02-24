@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Secret
 from onegov.election_day import _
@@ -23,27 +25,27 @@ if TYPE_CHECKING:
 )
 def view_clear_pages_cache(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmptyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Clears the pages cache. """
 
     layout = DefaultLayout(self, request)
 
     if form.submitted(request):
         request.app.pages_cache.flush()
-        request.message(_("Cache cleared."), 'success')
+        request.message(_('Cache cleared.'), 'success')
         return redirect(layout.manage_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("Clear cache"),
+        'title': _('Clear cache'),
         'callout': _(
-            "Elections and votes are cached for ${expiration} seconds. The "
-            "cache is automatically cleared for new results and other "
-            "updates. It is not normally necessary to clear the cache "
-            "yourself.",
+            'Elections and votes are cached for ${expiration} seconds. The '
+            'cache is automatically cleared for new results and other '
+            'updates. It is not normally necessary to clear the cache '
+            'yourself.',
             mapping={'expiration': self.cache_expiration_time}
         ),
         'cancel': layout.manage_link

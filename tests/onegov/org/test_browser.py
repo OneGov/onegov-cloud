@@ -1,25 +1,32 @@
-import time
+from __future__ import annotations
 
+import os
 import pytest
 import requests
+import time
 import transaction
+
 from datetime import datetime, timedelta
 from onegov.core.utils import module_path
 from onegov.directory import DirectoryCollection
 from onegov.file import FileCollection
+from onegov.org.models import ResourceRecipientCollection
 from onegov.people import Person
-from tests.shared.utils import create_image
+from onegov.reservation import ResourceCollection
+from onegov.ticket import TicketCollection
+from pathlib import Path
 from pytz import UTC
 from sedate import utcnow
 from tempfile import NamedTemporaryFile
-from time import sleep
-from tests.shared.utils import encode_map_value
-from onegov.org.models import ResourceRecipientCollection
-import os
-from pathlib import Path
-from onegov.reservation import ResourceCollection
-from onegov.ticket import TicketCollection
 from tests.onegov.org.test_views_resources import add_reservation
+from tests.shared.utils import create_image, encode_map_value
+from time import sleep
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.browser import ExtendedBrowser
+    from .conftest import Client, TestOrgApp
 
 
 # FIXME: For some reason all the browser tests need to run on the same process
@@ -27,7 +34,7 @@ from tests.onegov.org.test_views_resources import add_reservation
 #        wires are probably being crossed, but it's nothing too obvious, we
 #        already use separate application ports for every test.
 @pytest.mark.xdist_group(name="browser")
-def test_browse_activities(browser):
+def test_browse_activities(browser: ExtendedBrowser) -> None:
     # admins
     browser.login_admin()
     browser.visit('/timeline')
@@ -48,7 +55,12 @@ def test_browse_activities(browser):
     'Photo *= *.png|*.jpg',
 ))
 @pytest.mark.xdist_group(name="browser")
-def test_browse_directory_uploads(browser, org_app, field):
+def test_browse_directory_uploads(
+    browser: ExtendedBrowser,
+    org_app: TestOrgApp,
+    field: str
+) -> None:
+
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Crime Scenes",
         structure="""
@@ -80,7 +92,7 @@ def test_browse_directory_uploads(browser, org_app, field):
     browser.fill('name', "Seven Seas Motel")
     browser.fill('description', "First victim of Ice Truck Killer")
     browser.fill('photo', photo.name)
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     assert browser.is_text_present("Seven Seas Motel")
     assert browser.is_element_present_by_css('.field-display img')
@@ -90,7 +102,7 @@ def test_browse_directory_uploads(browser, org_app, field):
     # elect to keep the picture (default)
     browser.find_by_css('.edit-link').click()
     browser.fill('name', "Seven Seas Motel, Miami")
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     assert browser.is_text_present("Seven Seas Motel, Miami")
     assert browser.is_element_present_by_css('.field-display img')
@@ -102,7 +114,7 @@ def test_browse_directory_uploads(browser, org_app, field):
     browser.find_by_css('.edit-link').click()
     browser.choose('photo', 'replace')
     browser.find_by_name('photo')[3].value = photo.name
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     assert browser.is_element_present_by_css('.field-display img')
     assert browser.find_by_css('.field-display img')['src'] != src
@@ -110,7 +122,7 @@ def test_browse_directory_uploads(browser, org_app, field):
     # elect to delete the picture
     browser.find_by_css('.edit-link').click()
     browser.choose('photo', 'delete')
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     if field.startswith('Photo ='):
         assert not browser.is_element_present_by_css('.field-display img')
@@ -119,7 +131,11 @@ def test_browse_directory_uploads(browser, org_app, field):
 
 
 @pytest.mark.xdist_group(name="browser")
-def test_upload_image_with_error(browser, org_app):
+def test_upload_image_with_error(
+    browser: ExtendedBrowser,
+    org_app: TestOrgApp
+) -> None:
+
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Crime Scenes",
         structure="""
@@ -150,13 +166,13 @@ def test_upload_image_with_error(browser, org_app):
     browser.visit('/directories/crime-scenes/+new')
     browser.fill('name', "Seven Seas Motel")
     browser.fill('photo', photo.name)
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     assert browser.is_text_present("Dieses Feld wird benötigt")
 
     # try again with the missing field present
     browser.fill('description', "First victim of Ice Truck Killer")
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     assert browser.is_text_present("Seven Seas Motel")
 
@@ -166,7 +182,10 @@ def test_upload_image_with_error(browser, org_app):
 
 @pytest.mark.skip('Picture upload is needed to check scaling')
 @pytest.mark.xdist_group(name="browser")
-def test_directory_thumbnail_views(browser, org_app):
+def test_directory_thumbnail_views(
+    browser: ExtendedBrowser,
+    org_app: TestOrgApp
+) -> None:
 
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Jam Session",
@@ -204,7 +223,10 @@ def test_directory_thumbnail_views(browser, org_app):
 
 @pytest.mark.skip("Passes locally, but not in CI, skip for now")
 @pytest.mark.xdist_group(name="browser")
-def test_browse_directory_editor(browser, org_app):
+def test_browse_directory_editor(
+    browser: ExtendedBrowser,
+    org_app: TestOrgApp
+) -> None:
     browser.login_admin()
     browser.visit('/directories/+new')
 
@@ -270,7 +292,11 @@ def test_browse_directory_editor(browser, org_app):
 
 
 @pytest.mark.xdist_group(name="browser")
-def test_browse_directory_coordinates(browser, org_app):
+def test_browse_directory_coordinates(
+    browser: ExtendedBrowser,
+    org_app: TestOrgApp
+) -> None:
+
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Restaurants",
         structure="""
@@ -302,7 +328,7 @@ def test_browse_directory_coordinates(browser, org_app):
     assert browser.is_element_present_by_css('.add-point-active', wait_time=5)
     browser.execute_script('document.leafletmaps[0].panBy([-100, 100]);')
     browser.find_by_css('.add-point-active').click()
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     browser.visit('/directories/restaurants/+new')
     browser.fill('name', "City Sushi")
@@ -310,7 +336,7 @@ def test_browse_directory_coordinates(browser, org_app):
     assert browser.is_element_present_by_css('.add-point-active', wait_time=5)
     browser.execute_script('document.leafletmaps[0].panBy([100, -100]);')
     browser.find_by_css('.add-point-active').click()
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     # make sure the restaurants are visible in the overview
     browser.visit('/directories/restaurants')
@@ -332,11 +358,17 @@ def test_browse_directory_coordinates(browser, org_app):
 
 
 @pytest.mark.xdist_group(name="browser")
-def test_publication_workflow(browser, temporary_path, org_app):
+@pytest.mark.skip_night_hours
+def test_publication_workflow(
+    browser: ExtendedBrowser,
+    temporary_path: Path,
+    org_app: TestOrgApp
+) -> None:
+
     path = temporary_path / 'foo.txt'
 
-    with path.open('w') as f:
-        f.write('bar')
+    with path.open('w') as fp:
+        fp.write('bar')
 
     browser.login_admin()
     browser.visit('/files')
@@ -398,7 +430,12 @@ def test_publication_workflow(browser, temporary_path, org_app):
 
 
 @pytest.mark.xdist_group(name="browser")
-def test_signature_workflow(browser, temporary_path, org_app):
+def test_signature_workflow(
+    browser: ExtendedBrowser,
+    temporary_path: Path,
+    org_app: TestOrgApp
+) -> None:
+
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     org_app.enable_yubikey = True
 
@@ -428,7 +465,7 @@ def test_signature_workflow(browser, temporary_path, org_app):
     # change the database and show the information in the browser
     f = FileCollection(org_app.session()).query().one()
     f.signed = True
-    f.signature_metadata = {
+    f.signature_metadata = {  # type: ignore[assignment]
         'signee': 'foo@example.org',
         'timestamp': utcnow().isoformat()
     }
@@ -443,7 +480,11 @@ def test_signature_workflow(browser, temporary_path, org_app):
 
 
 @pytest.mark.xdist_group(name="browser")
-def test_external_map_link(browser, client):
+def test_external_map_link(
+    browser: ExtendedBrowser,
+    client: Client[TestOrgApp]
+) -> None:
+
     client.login_admin()
     settings = client.get('/map-settings')
     settings.form['geo_provider'] = 'geo-bs'
@@ -453,7 +494,7 @@ def test_external_map_link(browser, client):
     topic = topic.click('Bearbeiten')
 
     topic.form['coordinates'] = encode_map_value({
-        'lat': 47, 'lon': 8, 'zoom': 12
+        'lat': 47.5, 'lon': 7.58, 'zoom': 6
     })
     topic.form.submit()
 
@@ -462,10 +503,12 @@ def test_external_map_link(browser, client):
     assert browser.is_text_present("Karte Geo-BS")
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky(reruns=3, only_rerun=None)
 @pytest.mark.xdist_group(name="browser")
-def test_context_specific_function_are_displayed_in_person_directory(browser,
-                                                                     client):
+def test_context_specific_function_are_displayed_in_person_directory(
+    browser: ExtendedBrowser,
+    client: Client[TestOrgApp]
+) -> None:
 
     browser.login_admin()
     client.login_admin()
@@ -475,27 +518,36 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
         'last_name': 'Boolean'
     })
 
-    browser.find_by_value("Absenden").click()
-    person = client.app.session().query(Person)\
-        .filter(Person.last_name == 'Boolean')\
+    browser.find_by_value("Speichern").click()
+    person = (
+        client.app.session().query(Person)
+        .filter(Person.last_name == 'Boolean')
         .one()
+    )
 
     browser.visit('/editor/new/page/1')
+    chosen_input = browser.find_by_id('people_0_person_chosen')
+    chosen_input.click()
+    search_input = chosen_input.find_by_xpath('.//input').first
+    search_input.fill('Boolean Berry\t')
     browser.fill_form({
         'title': 'All About Berry',
-        'people_' + person.id.hex: True,
-        'people_' + person.id.hex + '_function': 'Logician'
+        'people-0-context_specific_function': 'Logician',
+        'people-0-display_function_in_person_directory': True,
     })
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     browser.visit(f"/person/{person.id.hex}")
     browser.find_by_text('All About Berry: Logician')
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky(reruns=3, only_rerun=None)
 @pytest.mark.xdist_group(name="browser")
-def test_rejected_reservation_sends_email_to_configured_recipients(browser,
-                                                                   client):
+def test_rejected_reservation_sends_email_to_configured_recipients(
+    browser: ExtendedBrowser,
+    client: Client[TestOrgApp]
+) -> None:
+
     resources = ResourceCollection(client.app.libres_context)
     dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
 
@@ -525,12 +577,12 @@ def test_rejected_reservation_sends_email_to_configured_recipients(browser,
     browser.visit('/tickets/ALL/open')
     browser.find_by_value("Annehmen").click()
 
-    def is_advanced_dropdown_present():
+    def is_advanced_dropdown_present() -> bool:
         e = [e for e in browser.find_by_tag("button") if 'Erweitert' in e.text]
         return len(e) == 1
 
     browser.wait_for(
-        lambda: is_advanced_dropdown_present(),
+        is_advanced_dropdown_present,
         timeout=5,
     )
     advanced_menu_options = browser.find_by_tag("button")
@@ -564,7 +616,10 @@ def test_rejected_reservation_sends_email_to_configured_recipients(browser,
 
 
 @pytest.mark.xdist_group(name="browser")
-def test_script_escaped_in_user_submitted_html(browser, org_app):
+def test_script_escaped_in_user_submitted_html(
+    browser: ExtendedBrowser,
+    org_app: TestOrgApp
+) -> None:
 
     # This test attempts to inject JS (should not succeed of course)
     payload = """<script>document.addEventListener('DOMContentLoaded', () =>
@@ -598,13 +653,13 @@ def test_script_escaped_in_user_submitted_html(browser, org_app):
     new_directory_button = 'a.new-directory-entry'  # Verzeichnis
     browser.find_by_css(add_button).click()
     assert browser.wait_for(
-        lambda: browser.find_by_css(new_directory_button),
+        lambda: bool(browser.find_by_css(new_directory_button)),
         timeout=3,
     )
     browser.find_by_css(new_directory_button).click()
 
     browser.fill('name', "Seven Seas Motel")
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     browser.visit('/directories/clubs')
     browser.find_by_value("Konfigurieren").click()
@@ -615,3 +670,88 @@ def test_script_escaped_in_user_submitted_html(browser, org_app):
     payload_h1_selector = 'h1#foo'  # CSS selector for the injected element
     time.sleep(1)
     assert not browser.find_by_css(payload_h1_selector)
+
+
+@pytest.mark.xdist_group(name="browser")
+def test_link_hashtags(
+    browser: ExtendedBrowser,
+    org_app: TestOrgApp
+) -> None:
+
+    browser.login_admin()
+
+    DirectoryCollection(org_app.session(), type='extended').add(
+        title="Crime Scenes",
+        structure="""
+            Name *= ___
+            Description *= ...
+        """,
+        configuration="""
+            title:
+                - name
+            order:
+                - name
+            display:
+                content:
+                    - name
+                    - description
+        """,
+        type='extended'
+    )
+
+    transaction.commit()
+
+    browser.login_admin()
+    browser.visit('/directories/crime-scenes/+new')
+    browser.fill('name', "Seven Seas Motel")
+    browser.fill('description',
+                 """
+                 #hotel Our rooms are #amazing! Check them out here:
+                 https://www.seven-seas-motel.com/#rooms
+                 https://www.seven-seas-motel.com/rooms#luxury-suite
+                 #fantastic
+                 """)
+    browser.find_by_value("Speichern").click()
+    assert browser.is_text_present("Seven Seas Motel")
+
+    # Only hashtags should be links, URL anchors should not be seen as hashtags
+    assert ('<a class="hashtag" href="/search?q=%23amazing">#amazing</a>'
+            ) in browser.html
+    assert ('<a class="hashtag" href="/search?q=%23fantastic">#fantastic</a>'
+            ) in browser.html
+    assert ('<a class="hashtag" href="/search?q=%23hotel">#hotel</a>'
+            ) in browser.html
+    assert ('<a class="hashtag" href="/search?q=%23rooms">#rooms</a>'
+            ) not in browser.html
+    assert ('<a class="hashtag" href="/search?q=%23luxury-suite">'
+            '#luxury-suite</a>') not in browser.html
+
+
+@pytest.mark.flaky(reruns=3)
+@pytest.mark.xdist_group(name="browser")
+def test_people_multiple_select(
+    browser: ExtendedBrowser,
+    org_app: TestOrgApp
+) -> None:
+
+    browser.login_admin()
+
+    browser.visit('/people-settings')
+    browser.fill('organisation_hierarchy', """
+    - Organisation 1
+    - Organisation 2:
+      - Sub-Organisation 2.1
+      - Sub-Organisation 2.2
+    """)
+    browser.find_by_value("Speichern").click()
+    browser.visit('/people/new')
+    browser.fill('first_name', 'John')
+    browser.fill('last_name', 'Doe')
+    browser.find_by_css("#organisations_multiple_chosen").click()
+    # Only select the sub-organisation this should select the top organisation
+    # "Organisation 2" automatically
+    browser.find_by_css(".chosen-results .active-result:nth-child(3)").click()
+    browser.find_by_value("Speichern").click()
+
+    assert browser.is_text_present("Organisation 2 - Sub-Organisation 2.1")
+    assert not browser.is_text_present("Organisation 1")

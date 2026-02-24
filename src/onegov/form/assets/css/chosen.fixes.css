@@ -2,3 +2,10 @@
 .field-type-chosenselectmultiplefield select {
     display: none !important;
 }
+
+/* Fixes nonsensical cursor due to use of abbr element */
+.search-choice-close {
+    cursor: pointer;
+    border: 0 !important;
+    text-decoration: none;
+}

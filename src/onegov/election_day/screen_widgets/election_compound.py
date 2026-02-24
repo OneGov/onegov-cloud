@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.screen_widgets.generic import ChartWidget
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget
@@ -35,7 +37,7 @@ class ElectionCompoundSeatAllocationTableWidget(ElectionCompoundWidget):
     """
     usage = '<election-compound-seat-allocation-table class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         party_years, parties = get_party_results(model)
         seat_allocations = get_party_results_seat_allocation(
@@ -65,7 +67,7 @@ class ElectionCompoundCandidatesTableWidget(ElectionCompoundWidget):
     """
     usage = '<election-compound-candidates-table class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         request = layout.request
         session = request.session
@@ -102,7 +104,7 @@ class ElectionCompoundListGroupsTableWidget(ElectionCompoundWidget):
     """
     usage = '<election-compound-list-groups-table class="" />'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         groups = get_list_groups(model)
         return {
@@ -128,7 +130,7 @@ class ElectionCompoundPartyStrengthsTableWidget(ElectionCompoundWidget):
     """
     usage = '<election-compound-party-strengths-table year="" class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         party_years, parties = get_party_results(model)
         party_deltas, party_results = get_party_results_deltas(
@@ -159,7 +161,7 @@ class ElectionCompoundDistrictsTableWidget(ElectionCompoundWidget):
     """
     usage = '<election-compound-districts-table class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'election_compound': model,
@@ -183,7 +185,7 @@ class ElectionCompoundDistrictsMapWidget(ElectionCompoundWidget):
     """
     usage = '<election-compound-districts-map class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -208,7 +210,7 @@ class ElectionCompoundSuperregionsTableWidget(ElectionCompoundWidget):
     """
     usage = '<election-compound-superregions-table class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         superregions = get_superregions(model, layout.app.principal)
         return {
@@ -234,7 +236,7 @@ class ElectionCompoundSuperregionsMapWidget(ElectionCompoundWidget):
     """
     usage = '<election-compound-superregions-map class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,

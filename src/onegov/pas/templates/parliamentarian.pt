@@ -85,15 +85,15 @@
             </div>
             <div tal:condition="parliamentarian.phone_private">
                 <dt i18n:translate>Private phone number</dt>
-                <dd>${parliamentarian.phone_private}</dd>
+                <dd>${layout.format_phone_number(parliamentarian.phone_private)}</dd>
             </div>
             <div tal:condition="parliamentarian.phone_mobile">
                 <dt i18n:translate>Mobile phone number</dt>
-                <dd>${parliamentarian.phone_mobile}</dd>
+                <dd>${layout.format_phone_number(parliamentarian.phone_mobile)}</dd>
             </div>
             <div tal:condition="parliamentarian.phone_business">
                 <dt i18n:translate>Business phone number</dt>
-                <dd>${parliamentarian.phone_business}</dd>
+                <dd>${layout.format_phone_number(parliamentarian.phone_business)}</dd>
             </div>
             <div tal:condition="parliamentarian.email_primary">
                 <dt i18n:translate>Primary email address</dt>

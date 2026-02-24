@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from morepath import redirect
 from onegov.core.utils import normalize_for_url
@@ -28,11 +30,11 @@ if TYPE_CHECKING:
 )
 def view_vote_head(
     self: Vote,
-    request: 'ElectionDayRequest'
+    request: ElectionDayRequest
 ) -> None:
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
@@ -43,8 +45,8 @@ def view_vote_head(
 )
 def view_vote(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
     """" The main view. """
 
     return redirect(VoteLayout(self, request).main_view)
@@ -57,15 +59,15 @@ def view_vote(
 )
 def view_vote_json(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'VoteJson':
+    request: ElectionDayRequest
+) -> VoteJson:
     """" The main view as JSON. """
 
     last_modified = self.last_modified
     assert last_modified is not None
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
@@ -187,12 +189,12 @@ def view_vote_json(
 )
 def view_vote_summary(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ View the summary of the vote as JSON. """
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
@@ -206,8 +208,8 @@ def view_vote_summary(
 )
 def view_vote_pdf(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the generated PDF. """
 
     layout = VoteLayout(self, request)
@@ -225,12 +227,12 @@ def view_vote_pdf(
 )
 def view_vote_header_as_widget(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ A static link to the top bar showing the vote result as widget. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {

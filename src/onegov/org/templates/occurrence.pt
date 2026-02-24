@@ -7,9 +7,10 @@
         <div class="row">
             <div class="large-8 medium-8 columns">
                 <div class="page-lead">
-                    <div>
+                    <div tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">
                         ${layout.format_date(occurrence.localized_start, 'event')},
-                        ${layout.format_time_range(occurrence.localized_start, occurrence.localized_end)}
+                        <span tal:condition="python: '00:00' not in time">${time} ${time_suffix}</span>
+                        <span tal:condition="python: '00:00' in time">${time}</span>
                     </div>
                     <div tal:condition="occurrence.event.location">${occurrence.event.location}</div>
                 </div>
@@ -27,11 +28,11 @@
                 </div>
 
                 <div class="occurence-link" tal:define="event_link occurrence.event.content.get('external_event_url')">
-                    <a tal:condition="event_link" class="button" href="${event_link}" i18n:translate="">Link to organizers page</a>
+                    <a tal:condition="event_link and event_link != 'https://' and 'keine' not in event_link.lower()" class="button" href="${event_link}" i18n:translate="">Link to organizers page</a>
                 </div>
 
                 <div class="occurence-link" tal:define="registration_link occurrence.event.content.get('event_registration_url')">
-                    <a tal:condition="registration_link" class="button" href="${registration_link}" i18n:translate="">Link to registration</a>
+                    <a tal:condition="registration_link and registration_link != 'https://' and 'keine' not in registration_link.lower()" class="button" href="${registration_link}" i18n:translate="">Link to registration</a>
                 </div>
 
                 <div class="occurrence-description">
@@ -70,7 +71,7 @@
                         </div>
                         <div tal:condition="organizer_phone">
                             <dt i18n:translate>Organizer phone number</dt>
-                            <dd><a href="tel:${organizer_phone}" tal:content="organizer_phone" /></dd>
+                            <dd><a href="tel:${layout.format_phone_number(organizer_phone)}" tal:content="layout.format_phone_number(organizer_phone)" /></dd>
                         </div>
                     </dl>
                 </div>

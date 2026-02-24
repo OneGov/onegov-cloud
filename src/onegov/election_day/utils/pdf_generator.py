@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 
 from onegov.election_day import _
@@ -48,8 +50,8 @@ class PdfGenerator:
 
     def __init__(
         self,
-        app: 'ElectionDayApp',
-        request: 'ElectionDayRequest',
+        app: ElectionDayApp,
+        request: ElectionDayRequest,
         renderer: D3Renderer | None = None
     ):
         self.app = app
@@ -58,7 +60,7 @@ class PdfGenerator:
         self.session = self.app.session()
         self.renderer = renderer or D3Renderer(app)
 
-    def remove(self, directory: str, files: 'Collection[str]') -> None:
+    def remove(self, directory: str, files: Collection[str]) -> None:
         """ Safely removes the given files from the directory. """
         if not files:
             return
@@ -136,7 +138,7 @@ class PdfGenerator:
 
     def add_tacit_election(
         self,
-        principal: 'Canton | Municipality',
+        principal: Canton | Municipality,
         election: Election,
         pdf: Pdf
     ) -> None:
@@ -173,13 +175,13 @@ class PdfGenerator:
 
     def add_election(
         self,
-        principal: 'Canton | Municipality',
+        principal: Canton | Municipality,
         election: Election,
         pdf: Pdf
     ) -> None:
 
-        def format_name(item: 'ElectionResult') -> str:
-            return item.name if item.entity_id else pdf.translate(_("Expats"))
+        def format_name(item: ElectionResult) -> str:
+            return item.name if item.entity_id else pdf.translate(_('Expats'))
 
         majorz = election.type == 'majorz'
         show_majority = majorz and election.majority_type == 'absolute'
@@ -314,10 +316,10 @@ class PdfGenerator:
             pdf.table(
                 table,
                 [None, 2 * cm, 2 * cm],
-                style=pdf.style.table_results + tuple([
+                style=pdf.style.table_results + tuple(
                     ('TOPPADDING', (0, row), (-1, row), 15)
                     for row in spacers[:-1]
-                ])
+                )
             )
             pdf.pagebreak()
 
@@ -335,7 +337,7 @@ class PdfGenerator:
             deltas, results_dict = get_party_results_deltas(
                 election, years, parties
             )
-            results = results_dict[sorted(results_dict.keys())[-1]]
+            results = results_dict[max(results_dict.keys())]
             pdf.results(
                 head=[
                     _('Party'),
@@ -469,7 +471,7 @@ class PdfGenerator:
 
     def add_election_compound(
         self,
-        principal: 'Canton | Municipality',
+        principal: Canton | Municipality,
         compound: ElectionCompound,
         pdf: Pdf
     ) -> None:
@@ -479,12 +481,12 @@ class PdfGenerator:
                 if compound.domain_elections == 'region':
                     return principal.label('region')
                 if compound.domain_elections == 'municipality':
-                    return _("Municipality")
+                    return _('Municipality')
             if value == 'districts':
                 if compound.domain_elections == 'region':
                     return principal.label('regions')
                 if compound.domain_elections == 'municipality':
-                    return _("Municipalities")
+                    return _('Municipalities')
             return principal.label(value)
 
         def format_gender(value: str) -> str:
@@ -647,7 +649,7 @@ class PdfGenerator:
                 compound, years, parties
             )
             if dict_results:
-                results = dict_results[sorted(dict_results.keys())[-1]]
+                results = dict_results[max(dict_results.keys())]
                 pdf.results(
                     head=[
                         _('Party'),
@@ -703,7 +705,7 @@ class PdfGenerator:
                     result.domain_supersegment,
                     result.eligible_voters,
                     result.expats,
-                    '{0:.2f} %'.format(result.turnout),
+                    '{:.2f} %'.format(result.turnout),
                     result.accounted_votes,
                 ]
                 for result in compound_results
@@ -777,7 +779,7 @@ class PdfGenerator:
 
     def add_vote(
         self,
-        principal: 'Canton | Municipality',
+        principal: Canton | Municipality,
         vote: Vote,
         pdf: Pdf,
         locale: str
@@ -788,7 +790,7 @@ class PdfGenerator:
         layout = VoteLayout(vote, self.request)
         direct = vote.direct
 
-        def format_name(item: 'BallotResult | ResultsByDistrictRow') -> str:
+        def format_name(item: BallotResult | ResultsByDistrictRow) -> str:
             if getattr(item, 'entity_id', None):
                 # FIXME: Why are we even doing this check, when we still
                 #        return the name rather than the entity_id? Is
@@ -796,11 +798,11 @@ class PdfGenerator:
                 return item.name
             if item.name:
                 return item.name
-            return pdf.translate(_("Expats"))
+            return pdf.translate(_('Expats'))
 
         def format_accepted(
-            result: 'BallotResult | Ballot | ResultsByDistrictRow',
-            ballot: 'Ballot'
+            result: BallotResult | Ballot | ResultsByDistrictRow,
+            ballot: Ballot
         ) -> str:
             tie_breaker = (
                 ballot.type == 'tie-breaker'
@@ -809,7 +811,7 @@ class PdfGenerator:
             accepted = result.accepted
             direct = ballot.vote.direct
             if accepted is None:
-                return _('Intermediate results abbrev')  # type:ignore
+                return _('Intermediate results abbrev')
             if tie_breaker:
                 if accepted:
                     return _('Proposal')
@@ -824,13 +826,13 @@ class PdfGenerator:
             return f'{number:.2f}%'
 
         def format_value(
-            result: 'Ballot | BallotResult | ResultsByDistrictRow',
+            result: Ballot | BallotResult | ResultsByDistrictRow,
             attr: str,
-            fmt: 'Callable[[Any], str]' = format_percentage
+            fmt: Callable[[Any], str] = format_percentage
         ) -> str:
 
             if result.accepted is None:
-                return nan  # type:ignore[unreachable]
+                return nan
             return fmt(getattr(result, attr))
 
         # Answer
@@ -875,9 +877,9 @@ class PdfGenerator:
                     answer = _('Proposal accepted')
                 if not proposal and counter_proposal:
                     if direct:
-                        answer = _("Direct counter proposal accepted")
+                        answer = _('Direct counter proposal accepted')
                     else:
-                        answer = _("Indirect counter proposal accepted")
+                        answer = _('Indirect counter proposal accepted')
                 if proposal and counter_proposal:
                     if vote.tie_breaker.accepted:  # type:ignore[attr-defined]
                         answer = _('Tie breaker in favor of the proposal')
@@ -1039,7 +1041,7 @@ class PdfGenerator:
                         result.eligible_voters or '0',
                         result.expats,
                         result.cast_ballots or '0',
-                        '{0:.2f} %'.format(result.turnout),
+                        '{:.2f} %'.format(result.turnout),
                     ]
                     for result in ballot.results
                 ],
@@ -1049,7 +1051,7 @@ class PdfGenerator:
                     ballot.eligible_voters or '0',
                     ballot.expats,
                     ballot.cast_ballots or '0',
-                    '{0:.2f} %'.format(ballot.turnout),
+                    '{:.2f} %'.format(ballot.turnout),
                 ] if layout.summarize else None,
                 hide=[
                     False,
@@ -1116,7 +1118,7 @@ class PdfGenerator:
         def render_item(item: Election | ElectionCompound | Vote) -> bool:
             if item.completed:
                 return True
-            counted, total = item.progress
+            counted, _total = item.progress
             if counted == 0:
                 return False
             if not publish:
@@ -1152,10 +1154,10 @@ class PdfGenerator:
                         fs.remove(path)
                     try:
                         self.generate_pdf(item, path, locale)
-                        log.info(f"{filename} created")
+                        log.info(f'{filename} created')
                     except Exception:
                         log.exception(
-                            f"Could not create {filename} ({item.title})"
+                            f'Could not create {filename} ({item.title})'
                         )
                         # Don't leave probably broken PDFs laying around
                         if fs.exists(path):

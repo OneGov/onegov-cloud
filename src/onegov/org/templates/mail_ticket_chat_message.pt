@@ -9,7 +9,7 @@
         <tal:b repeat="previous thread">
             <table class="inline-message previous-message" bgcolor="#f5f5f5"><tr><td>
                 <span class="message-owner" i18n:translate tal:condition="repeat.previous.index in (0, 1)">
-                    <a href="mailto:${previous.owner}" i18n:name="author">${previous.owner}</a> wrote
+                    <a href="mailto:${previous.owner if not layout.org.hide_personal_email or message.meta.origin == 'external' else (model.handler.reply_to or layout.org.general_email)}" i18n:name="author">${previous.owner if not layout.org.hide_personal_email or message.meta.origin == 'external' else (model.handler.reply_to or layout.org.general_email)}</a> wrote
                 </span>
 
                 <tal:b content="previous.formatted_text(layout)" />
@@ -19,7 +19,7 @@
 
         <table class="inline-message current-message" bgcolor="#f5f5f5"><tr><td>
             <span class="message-owner" i18n:translate tal:condition="len(thread) <= 1">
-                <a href="mailto:${message.owner}" i18n:name="author">${message.owner}</a> wrote
+                <a href="mailto:${message.owner if not layout.org.hide_personal_email or message.meta.origin == 'external' else (model.handler.reply_to or layout.org.general_email)}" i18n:name="author">${message.owner if not layout.org.hide_personal_email or message.meta.origin == 'external' else (model.handler.reply_to or layout.org.general_email)}</a> wrote
             </span>
 
             <tal:b content="message.formatted_text(layout)" />

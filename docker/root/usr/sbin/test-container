@@ -12,6 +12,7 @@ echo "--- Installing packages"
 apt-get install -y \
     wget \
     apparmor \
+    chromium-browser \
     curl \
     git-core \
     postgresql \
@@ -34,8 +35,6 @@ apt-get install -y \
     libxss1 \
     xdg-utils \
     unzip
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-dpkg -i google-chrome-stable_current_amd64.deb
 export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 redis-server --daemonize yes
 

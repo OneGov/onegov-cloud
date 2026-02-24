@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from datetime import date
 from onegov.election_day.formats import export_election_compound_internal
@@ -14,7 +16,12 @@ from onegov.election_day.models import ProporzElection
 from uuid import uuid4
 
 
-def majorz_election():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def majorz_election() -> Election:
     # election
     election = Election(
         title='Majorz',
@@ -26,8 +33,8 @@ def majorz_election():
         number_of_mandates=1,
         absolute_majority=144
     )
-    election.title_translations['it_CH'] = 'Elezione'
-    election.short_title_translations['it_CH'] = 'X'
+    election.title_translations['it_CH'] = 'Elezione'  # type: ignore[index]
+    election.short_title_translations['it_CH'] = 'X'  # type: ignore[index]
 
     # candidates
     candidate_id_1 = uuid4()
@@ -78,7 +85,7 @@ def majorz_election():
     return election
 
 
-def proporz_election():
+def proporz_election() -> ProporzElection:
     # election
     election = ProporzElection(
         title='Proporz',
@@ -92,8 +99,8 @@ def proporz_election():
         status=None,
         domain_supersegment=''
     )
-    election.title_translations['it_CH'] = 'Elezione'
-    election.short_title_translations['it_CH'] = 'Y'
+    election.title_translations['it_CH'] = 'Elezione'  # type: ignore[index]
+    election.short_title_translations['it_CH'] = 'Y'  # type: ignore[index]
 
     # lists
     list_id_1 = uuid4()
@@ -185,7 +192,7 @@ def proporz_election():
     return election
 
 
-def test_election_compound_export(session):
+def test_election_compound_export(session: Session) -> None:
     session.add(
         ElectionCompound(
             title='Elections',
@@ -205,8 +212,8 @@ def test_election_compound_export(session):
     session.add(election)
     session.flush()
     election_compound = session.query(ElectionCompound).one()
-    election_compound.title_translations['it_CH'] = 'Elezioni'
-    election_compound.short_title_translations['it_CH'] = 'E'
+    election_compound.title_translations['it_CH'] = 'Elezioni'  # type: ignore[index]
+    election_compound.short_title_translations['it_CH'] = 'E'  # type: ignore[index]
 
     assert export_election_compound_internal(
         election_compound, ['de_CH']

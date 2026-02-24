@@ -1,34 +1,38 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.pas import _
-from sqlalchemy import Column
+from onegov.pas.models.attendence import Attendence
+from onegov.pas.models.commission import PASCommission
+from onegov.pas.models.parliamentarian import PASParliamentarian
 from sqlalchemy import Enum
 from sqlalchemy import String
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
+from uuid import UUID
 
+
+from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from onegov.core.orm.mixins import dict_property
-    from onegov.pas.models import Attendence
-    from onegov.pas.models import Commission
-    from onegov.pas.models import Parliamentarian
+    from typing import TypeAlias
+
     from onegov.town6.request import TownRequest
-    from typing import Literal
-    from typing_extensions import TypeAlias
 
-    Action: TypeAlias = Literal[
-        'add',
-        'edit',
-        'delete'
-    ]
+Action: TypeAlias = Literal[
+    'add',
+    'edit',
+    'delete'
+]
 
-ACTIONS: list['Action'] = [
+ACTIONS: list[Action] = [
     'add',
     'edit',
     'delete',
@@ -37,26 +41,19 @@ ACTIONS: list['Action'] = [
 
 class Change(Base, ContentMixin, TimestampMixin):
 
-    __tablename__ = 'pas_changes'
+    __tablename__ = 'par_changes'
 
     #: Internal ID
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The user id responsible for the change
-    user_id: 'Column[str | None]' = Column(
-        String,
-        nullable=True
-    )
+    user_id: Mapped[str | None] = mapped_column(String)
 
-    #: The user name responsible for the change
-    user_name: 'Column[str | None]' = Column(
-        String,
-        nullable=True
-    )
+    #: The username responsible for the change
+    user_name: Mapped[str | None] = mapped_column(String)
 
     @property
     def user(self) -> str | None:
@@ -69,12 +66,11 @@ class Change(Base, ContentMixin, TimestampMixin):
         return self.user_name or self.user_id
 
     #: The type of change
-    action: 'Column[Action]' = Column(
+    action: Mapped[Action] = mapped_column(
         Enum(
-            *ACTIONS,  # type:ignore[arg-type]
-            name='pas_actions'
-        ),
-        nullable=False
+            *ACTIONS,
+            name='par_actions'
+        )
     )
 
     @property
@@ -88,24 +84,30 @@ class Change(Base, ContentMixin, TimestampMixin):
         raise NotImplementedError()
 
     #: The model behind this change
-    model: 'Column[str]' = Column(
-        String,
-        nullable=False
-    )
+    model: Mapped[str] = mapped_column(String)
+
+    #: The polymorphic type of change
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'pas_change',
+    }
 
     @property
-    def attendence(self) -> 'Attendence | None':
-        from onegov.pas.models import Attendence
+    def attendence(self) -> Attendence | None:
         attendence_id = (self.changes or {}).get('id')
         if self.model == 'attendence' and attendence_id:
             session = object_session(self)
+            assert session is not None
             query = session.query(Attendence).filter_by(id=attendence_id)
             return query.first()
         return None
 
     #: The changes
-    changes: 'dict_property[dict[str, str | int | None] | None]'
-    changes = content_property()
+    changes: dict_property[dict[str, str | int | None] | None] = (
+        content_property()
+    )
 
     @property
     def date(self) -> date | None:
@@ -116,34 +118,34 @@ class Change(Base, ContentMixin, TimestampMixin):
         return None
 
     @property
-    def parliamentarian(self) -> 'Parliamentarian | None':
-        from onegov.pas.models import Parliamentarian
+    def parliamentarian(self) -> PASParliamentarian | None:
         parliamentarian_id = (self.changes or {}).get('parliamentarian_id')
         if self.model == 'attendence' and parliamentarian_id:
             session = object_session(self)
-            query = session.query(Parliamentarian).filter_by(
+            assert session is not None
+            query = session.query(PASParliamentarian).filter_by(
                 id=parliamentarian_id
             )
             return query.first()
         return None
 
     @property
-    def commission(self) -> 'Commission | None':
-        from onegov.pas.models import Commission
+    def commission(self) -> PASCommission | None:
         commission_id = (self.changes or {}).get('commission_id')
         if self.model == 'attendence' and commission_id:
             session = object_session(self)
-            query = session.query(Commission).filter_by(id=commission_id)
+            assert session is not None
+            query = session.query(PASCommission).filter_by(id=commission_id)
             return query.first()
         return None
 
     @classmethod
     def add(
         cls,
-        request: 'TownRequest',
-        action: 'Action',
-        attendence: 'Attendence'
-    ) -> 'Change':
+        request: TownRequest,
+        action: Action,
+        attendence: Attendence
+    ) -> Change:
         """ Create a new change and add it to the session. """
 
         change = cls()

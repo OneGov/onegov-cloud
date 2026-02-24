@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from datetime import date
 from onegov.core.elements import Link
@@ -36,14 +38,14 @@ class VoteLayout(DefaultLayout):
         if self.request.has_role('admin', 'editor'):
             result.append(
                 Link(
-                    text=_("Manage attachments"),
+                    text=_('Manage attachments'),
                     url=self.request.link(self.model, name='upload'),
                     attrs={'class': 'upload-icon'}
                 )
             )
             result.append(
                 Link(
-                    text=_("Campaign material"),
+                    text=_('Campaign material'),
                     url=self.request.link(
                         self.model, name='manage-campaign-material'
                     ),
@@ -52,7 +54,7 @@ class VoteLayout(DefaultLayout):
             )
             result.append(
                 Link(
-                    text=_("Graphical campaign material for a Yes"),
+                    text=_('Graphical campaign material for a Yes'),
                     url=self.request.link(
                         self.model, name='manage-campaign-material-yea'
                     ),
@@ -61,7 +63,7 @@ class VoteLayout(DefaultLayout):
             )
             result.append(
                 Link(
-                    text=_("Graphical campaign material for a No"),
+                    text=_('Graphical campaign material for a No'),
                     url=self.request.link(
                         self.model, name='manage-campaign-material-nay'
                     ),
@@ -70,7 +72,7 @@ class VoteLayout(DefaultLayout):
             )
             result.append(
                 Link(
-                    text=_("Delete vote"),
+                    text=_('Delete vote'),
                     url=self.request.link(self.model, name='delete'),
                     attrs={'class': 'delete-icon'}
                 )
@@ -80,13 +82,13 @@ class VoteLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Votes"), self.votes_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Votes'), self.votes_url),
             Link(self.title, '#'),
         ]
 
     @cached_property
-    def attachments(self) -> 'RenderData':
+    def attachments(self) -> RenderData:
         """ Returns a dictionary with static URLS and locale for attachments.
 
         Note that only file / locale combinations with a file_name
@@ -112,7 +114,7 @@ class VoteLayout(DefaultLayout):
     @cached_property
     def search_results(
         self
-    ) -> list[tuple[int, str, str, bool, 'SwissVoteFile']]:
+    ) -> list[tuple[int, str, str, bool, SwissVoteFile]]:
 
         result = []
         metadata = self.model.campaign_material_metadata or {}
@@ -137,6 +139,7 @@ class VoteLayout(DefaultLayout):
                 language = ', '.join([
                     self.request.translate(codes[lang])
                     for lang in data.get('language', [])
+                    if lang in codes
                 ])
                 protected = 'article' in data.get('doctype', ['article'])
             else:
@@ -162,8 +165,8 @@ class VoteDetailLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Votes"), self.votes_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Votes'), self.votes_url),
             Link(self.model.short_title, self.request.link(self.model)),
             Link(self.title, '#'),
         ]
@@ -173,7 +176,7 @@ class VoteStrengthsLayout(VoteDetailLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Voter strengths")
+        return _('Voter strengths')
 
 
 class VoteCampaignMaterialLayout(VoteDetailLayout):
@@ -183,7 +186,7 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Documents from the campaign")
+        return _('Documents from the campaign')
 
     @cached_property
     def codes(self) -> dict[str, dict[str, str]]:
@@ -253,35 +256,35 @@ class UploadVoteAttachemtsLayout(VoteDetailLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Manage attachments")
+        return _('Manage attachments')
 
 
 class ManageCampaingMaterialLayout(VoteDetailLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Campaign material")
+        return _('Campaign material')
 
 
 class ManageCampaingMaterialYeaLayout(VoteDetailLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Graphical campaign material for a Yes")
+        return _('Graphical campaign material for a Yes')
 
 
 class ManageCampaingMaterialNayLayout(VoteDetailLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Graphical campaign material for a No")
+        return _('Graphical campaign material for a No')
 
 
 class DeleteVoteLayout(VoteDetailLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Delete vote")
+        return _('Delete vote')
 
 
 class DeleteVoteAttachmentLayout(DefaultLayout):
@@ -296,18 +299,18 @@ class DeleteVoteAttachmentLayout(DefaultLayout):
         ) -> None: ...
 
     @cached_property
-    def parent(self) -> 'SwissVote':
+    def parent(self) -> SwissVote:
         return self.model.linked_swissvotes[0]
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Votes"), self.votes_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Votes'), self.votes_url),
             Link(self.parent.short_title, self.request.link(self.parent)),
             Link(self.title, '#'),
         ]
 
     @cached_property
     def title(self) -> str:
-        return _("Delete attachment")
+        return _('Delete attachment')

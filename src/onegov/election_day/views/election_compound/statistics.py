@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.models import ElectionCompound
@@ -23,8 +25,8 @@ if TYPE_CHECKING:
 )
 def view_election_statistics(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
     elected_candidates = get_elected_candidates(self, request.session).all()
@@ -45,12 +47,12 @@ def view_election_statistics(
 )
 def view_election_statistics_table(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View for the standalone statistics table.  """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {

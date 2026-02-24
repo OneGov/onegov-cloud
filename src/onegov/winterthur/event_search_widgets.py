@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from sqlalchemy import func, or_, cast, String
 
@@ -23,7 +25,7 @@ class InlineEventSearch:
 
     def __init__(
         self,
-        request: 'WinterthurRequest',
+        request: WinterthurRequest,
         search_query: dict[str, str]
     ) -> None:
         self.app = request.app
@@ -34,7 +36,7 @@ class InlineEventSearch:
     def term(self) -> str | None:
         return (self.search_query or {}).get('term', None)
 
-    def html(self, layout: 'DefaultLayout') -> str:
+    def html(self, layout: DefaultLayout) -> str:
         return render_macro(layout.macros['inline_search'],
                             self.request, {
             'term': self.term,
@@ -47,7 +49,7 @@ class InlineEventSearch:
             )
         })
 
-    def adapt(self, query: 'Query[T]') -> 'Query[T]':
+    def adapt(self, query: Query[T]) -> Query[T]:
         """
         Adapt the query to search for words in the search term `self.term` in
         event search properties.
@@ -56,14 +58,12 @@ class InlineEventSearch:
         if not self.term:
             return query
 
-        search_properties = [p for p in Event.es_properties.keys() if not
-                             p.startswith('es_')]
         for word in self.term.split():
-            conditions = []
-            for p in search_properties:
-                conditions.append(
-                    func.lower(cast(getattr(Event, p), String)).contains(
-                        word.lower()))
-            query = query.filter(or_(*conditions))
+            query = query.filter(or_(*(
+                func.lower(
+                    cast(getattr(Event, prop), String)
+                ).contains(word.lower())
+                for prop in Event.fts_properties.keys()
+            )))
 
         return query

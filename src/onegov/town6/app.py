@@ -1,28 +1,39 @@
+from __future__ import annotations
+
 from datetime import datetime
 
 import pytz
 from sedate import replace_timezone
 
+from onegov.api import ApiApp
 from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
+from onegov.core.templates import render_template
 from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
 from onegov.org.app import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.models.directory import ExtendedDirectory
+from onegov.town6.api import (
+    EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint,
+    DirectoryEntryApiEndpoint)
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
 from onegov.town6.theme import TownTheme
+from webob import Response
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
+    from onegov.api import ApiEndpoint
     from onegov.core.types import RenderData
+    from onegov.org.exceptions import MTANAccessLimitExceeded
     from onegov.org.models import Organisation
     from onegov.town6.request import TownRequest
 
 
-class TownApp(OrgApp, FoundationApp):
+class TownApp(OrgApp, FoundationApp, ApiApp):
 
     def configure_organisation(
         self,
@@ -43,7 +54,7 @@ class TownApp(OrgApp, FoundationApp):
     def font_family(self) -> str | None:
         return self.theme_options.get('body-font-family-ui')
 
-    def chat_open(self, request: 'TownRequest') -> bool:
+    def chat_open(self, request: TownRequest) -> bool:
         if not request.app.org.specific_opening_hours:
             return True
         opening_hours = request.app.org.opening_hours_chat
@@ -81,7 +92,7 @@ def get_template_directory() -> str:
 
 
 @TownApp.template_variables()
-def get_template_variables(request: 'TownRequest') -> 'RenderData':
+def get_template_variables(request: TownRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request))
     }
@@ -94,7 +105,7 @@ def get_theme() -> TownTheme:
 
 @TownApp.setting(section='i18n', name='locales')
 def get_i18n_used_locales() -> set[str]:
-    return {'de_CH', 'fr_CH'}
+    return {'de_CH', 'fr_CH', 'it_CH'}
 
 
 @TownApp.setting(section='i18n', name='localedirs')
@@ -112,10 +123,10 @@ def get_i18n_default_locale() -> str:
 
 @TownApp.setting(section='i18n', name='locale_negotiator')
 def get_locale_negotiator(
-) -> 'Callable[[Sequence[str], TownRequest], str | None]':
+) -> Callable[[Sequence[str], TownRequest], str | None]:
     def locale_negotiator(
-        locales: 'Sequence[str]',
-        request: 'TownRequest'
+        locales: Sequence[str],
+        request: TownRequest
     ) -> str | None:
         if request.app.org:
             locales = request.app.org.locales or get_i18n_default_locale()
@@ -131,7 +142,7 @@ def get_locale_negotiator(
 
 @TownApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[TownApp, str], Organisation]':
+) -> Callable[[TownApp, str], Organisation]:
     return create_new_organisation
 
 
@@ -142,7 +153,7 @@ def get_status_mail_roles() -> tuple[str, ...]:
 
 @TownApp.setting(section='org', name='ticket_manager_roles')
 def get_ticket_manager_roles() -> tuple[str, ...]:
-    return ('admin', 'editor')
+    return ('admin', 'editor', 'supporter')
 
 
 @TownApp.setting(section='org', name='require_complete_userprofile')
@@ -152,8 +163,8 @@ def get_require_complete_userprofile() -> bool:
 
 @TownApp.setting(section='org', name='is_complete_userprofile')
 def get_is_complete_userprofile_handler(
-) -> 'Callable[[TownRequest, str], bool]':
-    def is_complete_userprofile(request: 'TownRequest', username: str) -> bool:
+) -> Callable[[TownRequest, str], bool]:
+    def is_complete_userprofile(request: TownRequest, username: str) -> bool:
         return True
 
     return is_complete_userprofile
@@ -188,6 +199,56 @@ def get_public_ticket_messages() -> tuple[str, ...]:
     )
 
 
+@TownApp.setting(section='org', name='disabled_extensions')
+def get_disabled_extensions() -> tuple[str, ...]:
+    return ()
+
+
+@TownApp.setting(section='org', name='render_mtan_access_limit_exceeded')
+def get_render_mtan_access_limit_exceeded(
+) -> Callable[[MTANAccessLimitExceeded, TownRequest], Response]:
+
+    # circular import
+    from onegov.town6.layout import DefaultLayout
+
+    def render_mtan_access_limit_exceeded(
+        self: MTANAccessLimitExceeded,
+        request: TownRequest
+    ) -> Response:
+        return Response(
+            render_template('mtan_access_limit_exceeded.pt', request, {
+                'layout': DefaultLayout(self, request),
+                'title': self.title,
+            }),
+            status=423
+        )
+    return render_mtan_access_limit_exceeded
+
+
+@TownApp.setting(section='api', name='endpoints')
+def get_api_endpoints_handler(
+) -> Callable[[TownRequest], Iterator[ApiEndpoint[Any]]]:
+
+    def get_api_endpoints(
+            request: TownRequest,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
+    ) -> Iterator[ApiEndpoint[Any]]:
+        yield EventApiEndpoint(request, extra_parameters, page)
+        yield NewsApiEndpoint(request, extra_parameters, page)
+        yield TopicApiEndpoint(request, extra_parameters, page)
+        directories = request.exclude_invisible(
+            request.session.query(ExtendedDirectory).all())
+        for directory in directories:
+            yield DirectoryEntryApiEndpoint(
+                request=request,
+                page=page,
+                name=directory.name,
+                extra_parameters=extra_parameters)
+
+    return get_api_endpoints
+
+
 @TownApp.webasset_path()
 def get_js_path() -> str:
     return 'assets/js'
@@ -204,7 +265,7 @@ def get_webasset_output() -> str:
 
 
 @TownApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield 'global.js'
     yield 'polyfills.js'
     yield 'jquery.datetimepicker.css'
@@ -218,7 +279,6 @@ def get_common_asset() -> 'Iterator[str]':
     yield 'form_dependencies.js'
     yield 'confirm.jsx'
     yield 'typeahead.jsx'
-    yield 'many.jsx'
     yield 'pay'
     yield 'moment.js'
     yield 'moment.de-ch.js'
@@ -229,10 +289,12 @@ def get_common_asset() -> 'Iterator[str]':
     yield 'jquery.load.js'
     yield 'videoframe.js'
     yield 'datetimepicker.js'
+    yield 'many.jsx'
     yield 'url.js'
     yield 'date-range-selector.js'
     yield 'lazyalttext.js'
     yield 'lazysizes.js'
+    yield 'button-toggler.js'
     yield 'common.js'
     yield '_blank.js'
     yield 'homepage_video_or_slider.js'
@@ -249,10 +311,14 @@ def get_common_asset() -> 'Iterator[str]':
     yield 'sidebar_fixed.js'
     yield 'ResizeSensor.js'
     yield 'theia-sticky-sidebar.js'
+    yield 'apply-filters.js'
+    yield 'foundation-intercooler.js'
+    yield 'chosen_select_hierarchy.js'
+    yield 'iframe_request_parameters.js'
 
 
 @TownApp.webasset('editor')
-def get_editor_asset() -> 'Iterator[str]':
+def get_editor_asset() -> Iterator[str]:
     yield 'bufferbuttons.js'
     yield 'definedlinks.js'
     yield 'filemanager.js'
@@ -266,21 +332,27 @@ def get_editor_asset() -> 'Iterator[str]':
 
 
 @TownApp.webasset('fullcalendar')
-def get_fullcalendar_asset() -> 'Iterator[str]':
-    yield 'fullcalendar.css'
+def get_fullcalendar_asset() -> Iterator[str]:
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
+    yield 'fullcalendar.fr.js'
     yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
 
 
+@TownApp.webasset('occupancycalendar')
+def get_occupancycalendar_asset() -> Iterator[str]:
+    yield 'occupancycalendar.jsx'
+    yield 'occupancycalendar_custom.js'
+
+
 @TownApp.webasset('staff-chat')
-def get_staff_chat_asset() -> 'Iterator[str]':
+def get_staff_chat_asset() -> Iterator[str]:
     yield 'chat-shared.js'
     yield 'chat-staff.js'
 
 
 @TownApp.webasset('client-chat')
-def get_staff_client_asset() -> 'Iterator[str]':
+def get_staff_client_asset() -> Iterator[str]:
     yield 'chat-shared.js'
     yield 'chat-client.js'

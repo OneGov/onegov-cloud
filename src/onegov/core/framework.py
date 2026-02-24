@@ -15,6 +15,7 @@ Using the framework does not really differ from using Morepath::
         pass
 
 """
+from __future__ import annotations
 
 import dectate
 import hashlib
@@ -28,6 +29,7 @@ import sys
 import traceback
 
 from base64 import b64encode
+from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from datetime import datetime
@@ -38,7 +40,7 @@ from libres.db.models import ORMBase
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
-from more.content_security import NONE, SELF, UNSAFE_INLINE, UNSAFE_EVAL
+from more.content_security import NONE, SELF, UNSAFE_INLINE
 from more.transaction import TransactionApp
 from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
@@ -57,6 +59,7 @@ from onegov.core.request import CoreRequest
 from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class
+from operator import itemgetter
 from psycopg2.extensions import TransactionRollbackError
 from purl import URL
 from sqlalchemy.exc import OperationalError
@@ -79,6 +82,7 @@ if TYPE_CHECKING:
     from typing_extensions import ParamSpec
     from webob import Response
 
+    from .analytics import AnalyticsProvider
     from .mail import Attachment
     from .metadata import Metadata
     from .security.permissions import Intent
@@ -106,7 +110,7 @@ class Framework(
 ):
     """ Baseclass for Morepath OneGov applications. """
 
-    request_class: type['Request'] = CoreRequest
+    request_class: type[Request] = CoreRequest
 
     #: holds the database connection string, *if* there is a database connected
     dsn: str | None = None
@@ -120,14 +124,27 @@ class Framework(
     #: framework directives
     form = directive(directives.HtmlHandleFormAction)
     cronjob = directive(directives.CronjobAction)
+    analytics_provider = directive(directives.AnalyticsProviderAction)
     static_directory = directive(directives.StaticDirectoryAction)
     template_variables = directive(directives.TemplateVariablesAction)
+    replace_setting = directive(directives.ReplaceSettingAction)
+    replace_setting_section = directive(directives.ReplaceSettingSectionAction)
 
     #: sets the same-site cookie directive, (may need removal inside iframes)
     same_site_cookie_policy: str | None = 'Lax'
 
     #: the request cache is initialised/emptied before each request
     request_cache: dict[str, Any]
+
+    #: the schema cache stays around for the entire runtime of the
+    #: application, but is switched, each time the schema changes
+    # NOTE: This cache should never be used to store ORM objects
+    #       In addition this should generally be backed by a Redis
+    #       cache to make sure the cache is synchronized between
+    #       all processes. Although there may be some cases where
+    #       it makes sense to use this cache on its own
+    schema_cache: dict[str, Any]
+    _all_schema_caches: dict[str, Any]
 
     @property
     def version(self) -> str:
@@ -143,7 +160,7 @@ class Framework(
         ) -> Iterable[bytes]: ...
 
     @morepath.reify  # type:ignore[no-redef]
-    def __call__(self) -> 'WSGIApplication':  # noqa:F811
+    def __call__(self) -> WSGIApplication:
         """ Intercept all wsgi calls so we can attach debug tools. """
 
         fn: WSGIApplication = super().__call__
@@ -162,12 +179,12 @@ class Framework(
 
         return fn
 
-    def with_query_report(self, fn: 'Callable[_P, _T]') -> 'Callable[_P, _T]':
+    def with_query_report(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
 
         @wraps(fn)
         def with_query_report_wrapper(
-            *args: '_P.args',
-            **kwargs: '_P.kwargs'
+            *args: _P.args,
+            **kwargs: _P.kwargs
         ) -> _T:
 
             assert isinstance(self.sql_query_report, str)
@@ -176,12 +193,12 @@ class Framework(
 
         return with_query_report_wrapper
 
-    def with_profiler(self, fn: 'Callable[_P, _T]') -> 'Callable[_P, _T]':
+    def with_profiler(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
 
         @wraps(fn)
         def with_profiler_wrapper(
-            *args: '_P.args',
-            **kwargs: '_P.kwargs'
+            *args: _P.args,
+            **kwargs: _P.kwargs
         ) -> _T:
             filename = '{:%Y-%m-%d %H:%M:%S}.profile'.format(datetime.now())
 
@@ -190,12 +207,12 @@ class Framework(
 
         return with_profiler_wrapper
 
-    def with_request_cache(self, fn: 'Callable[_P, _T]') -> 'Callable[_P, _T]':
+    def with_request_cache(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
 
         @wraps(fn)
         def with_request_cache_wrapper(
-            *args: '_P.args',
-            **kwargs: '_P.kwargs'
+            *args: _P.args,
+            **kwargs: _P.kwargs
         ) -> _T:
             self.clear_request_cache()
             return fn(*args, **kwargs)
@@ -204,19 +221,19 @@ class Framework(
 
     def with_print_exceptions(
         self,
-        fn: 'Callable[_P, _T]'
-    ) -> 'Callable[_P, _T]':
+        fn: Callable[_P, _T]
+    ) -> Callable[_P, _T]:
 
         @wraps(fn)
         def with_print_exceptions_wrapper(
-            *args: '_P.args',
-            **kwargs: '_P.kwargs'
+            *args: _P.args,
+            **kwargs: _P.kwargs
         ) -> _T:
             try:
                 return fn(*args, **kwargs)
             except Exception:
                 if getattr(self, 'print_exceptions', False):
-                    print("=" * 80, file=sys.stderr)
+                    print('=' * 80, file=sys.stderr)  # noqa: T201
                     traceback.print_exc()
                 raise
 
@@ -259,7 +276,7 @@ class Framework(
         )
 
     @property
-    def metadata(self) -> 'Metadata':
+    def metadata(self) -> Metadata:
         return self.modules.metadata.Metadata(self)
 
     @property
@@ -281,9 +298,9 @@ class Framework(
     def handle_exception(
         self,
         exception: BaseException,
-        environ: 'WSGIEnvironment',
-        start_response: 'StartResponse'
-    ) -> 'Iterable[bytes]':
+        environ: WSGIEnvironment,
+        start_response: StartResponse
+    ) -> Iterable[bytes]:
         """ Stops database connection errors from bubbling all the way up
         to our exception handling services (sentry.io).
 
@@ -418,7 +435,7 @@ class Framework(
 
         members = sorted(
             inspect.getmembers(self.__class__, callable),
-            key=lambda item: item[0]
+            key=itemgetter(0)
         )
 
         for n, method in members:
@@ -435,7 +452,7 @@ class Framework(
     ) -> None:
 
         # certain namespaces are reserved for internal use:
-        assert self.namespace not in {'global'}
+        assert self.namespace != 'global'
 
         self.dsn = dsn
 
@@ -628,6 +645,7 @@ class Framework(
         content_security_policy_report_uri: str | None = None,
         content_security_policy_report_only: bool = False,
         content_security_policy_report_sample_rate: float = 0.0,
+        content_security_policy_extra_script_src: list[str] | None = None,
         **cfg: Any
     ) -> None:
 
@@ -638,6 +656,9 @@ class Framework(
             content_security_policy_report_only)
         self.content_security_policy_report_sample_rate = (
             content_security_policy_report_sample_rate)
+        self.content_security_policy_extra_script_src = (
+            content_security_policy_extra_script_src or []
+        )
 
     def configure_sentry(
         self,
@@ -651,6 +672,22 @@ class Framework(
     @property
     def is_sentry_supported(self) -> bool:
         return getattr(self, 'sentry_dsn', None) and True or False
+
+    def configure_analytics_providers(self, **cfg: Any) -> None:
+        self.analytics_providers_configs = cfg.get('analytics_providers', {})
+
+    @cached_property
+    def available_analytics_providers(self) -> dict[str, AnalyticsProvider]:
+        return {
+            name: provider
+            for name, _provider_cfg in self.analytics_providers_configs.items()
+            if (cls := self.config.analytics_provider_registry.get(
+                (provider_cfg := _provider_cfg or {}).get('provider', name)
+            )) is not None
+            if (
+                provider := cls.configure(name=name, **provider_cfg)
+            ) is not None
+        }
 
     def set_application_id(self, application_id: str) -> None:
         """ Set before the request is handled. Gets the schema from the
@@ -666,6 +703,10 @@ class Framework(
         # then, replace the '/' with a '-' so the only dash left will be
         # the dash between namespace and id
         self.schema = application_id.replace('-', '_').replace('/', '-')
+        if not hasattr(self, '_all_schema_caches'):
+            self._all_schema_caches = {}
+
+        self.schema_cache = self._all_schema_caches.setdefault(self.schema, {})
 
         if self.has_database_connection:
             ScopedPropertyObserver.enter_scope(self)
@@ -699,7 +740,7 @@ class Framework(
         return self.get_cache('short-term', expiration_time=3600)
 
     @property
-    def settings(self) -> 'SettingRegistry':
+    def settings(self) -> SettingRegistry:
         return self.config.setting_registry
 
     @property
@@ -735,7 +776,7 @@ class Framework(
         self,
         path: str,
         with_view_name: bool = False
-    ) -> object | None | tuple[object | None, str | None]:
+    ) -> object | tuple[object | None, str | None] | None:
         """ Takes a path and returns the object associated with it. If a
         scheme or a host is passed it is ignored.
 
@@ -773,7 +814,7 @@ class Framework(
         self,
         model: type[object] | object,
         view_name: str | None = None
-    ) -> type['Intent']:
+    ) -> type[Intent]:
         """ Returns the permission required for the given model and view_name.
 
         The model may be an instance or a class.
@@ -792,33 +833,34 @@ class Framework(
         )
 
         try:
-            action, handler = next(query(self.__class__))
+            action, _handler = next(query(self.__class__))
         except (StopIteration, RuntimeError) as exception:
             raise KeyError(
-                "{!r} has no view named {}".format(model, view_name)
+                '{!r} has no view named {}'.format(model, view_name)
             ) from exception
 
         return action.permission
 
     @cached_property
-    def session(self) -> 'Callable[[], Session]':
+    def session(self) -> Callable[[], Session]:
         """ Alias for self.session_manager.session. """
         return self.session_manager.session
 
     def send_marketing_email(
         self,
-        reply_to: 'Address | str | None' = None,
-        receivers: 'SequenceOrScalar[Address | str]' = (),
-        cc: 'SequenceOrScalar[Address | str]' = (),
-        bcc: 'SequenceOrScalar[Address | str]' = (),
+        reply_to: Address | str | None = None,
+        receivers: SequenceOrScalar[Address | str] = (),
+        cc: SequenceOrScalar[Address | str] = (),
+        bcc: SequenceOrScalar[Address | str] = (),
         subject: str | None = None,
         content: str | None = None,
-        attachments: 'Iterable[Attachment | StrPath]' = (),
+        attachments: Iterable[Attachment | StrPath] = (),
         headers: dict[str, str] | None = None,
         plaintext: str | None = None
     ) -> None:
-        """ Sends an e-mail categorised as marketing. This includes but is not
-        limited to:
+        """ Sends an e-mail categorised as marketing.
+
+        This includes but is not limited to:
 
             * Announcements
             * Newsletters
@@ -847,10 +889,11 @@ class Framework(
 
     def send_marketing_email_batch(
         self,
-        prepared_emails: 'Iterable[EmailJsonDict]'
+        prepared_emails: Iterable[EmailJsonDict]
     ) -> None:
-        """ Sends an e-mail batch categorised as marketing. This includes but
-        is not limited to:
+        """ Sends an e-mail batch categorised as marketing.
+
+        This includes but is not limited to:
 
             * Announcements
             * Newsletters
@@ -876,17 +919,19 @@ class Framework(
 
     def send_transactional_email(
         self,
-        reply_to: 'Address | str | None' = None,
-        receivers: 'SequenceOrScalar[Address | str]' = (),
-        cc: 'SequenceOrScalar[Address | str]' = (),
-        bcc: 'SequenceOrScalar[Address | str]' = (),
+        reply_to: Address | str | None = None,
+        receivers: SequenceOrScalar[Address | str] = (),
+        cc: SequenceOrScalar[Address | str] = (),
+        bcc: SequenceOrScalar[Address | str] = (),
         subject: str | None = None,
         content: str | None = None,
-        attachments: 'Iterable[Attachment | StrPath]' = (),
+        attachments: Iterable[Attachment | StrPath] = (),
         headers: dict[str, str] | None = None,
         plaintext: str | None = None
     ) -> None:
-        """ Sends an e-mail categorised as transactional. This is limited to:
+        """ Sends an e-mail categorised as transactional.
+
+        This is limited to:
 
             * Welcome emails
             * Reset passwords emails
@@ -910,9 +955,11 @@ class Framework(
 
     def send_transactional_email_batch(
         self,
-        prepared_emails: 'Iterable[EmailJsonDict]'
+        prepared_emails: Iterable[EmailJsonDict]
     ) -> None:
-        """  Sends an e-mail categorised as transactional. This is limited to:
+        """  Sends an e-mail categorised as transactional.
+
+        This is limited to:
 
             * Welcome emails
             * Reset passwords emails
@@ -933,20 +980,20 @@ class Framework(
 
     def prepare_email(
         self,
-        reply_to: 'Address | str | None' = None,
+        reply_to: Address | str | None = None,
         category: Literal['marketing', 'transactional'] = 'marketing',
-        receivers: 'SequenceOrScalar[Address | str]' = (),
-        cc: 'SequenceOrScalar[Address | str]' = (),
-        bcc: 'SequenceOrScalar[Address | str]' = (),
+        receivers: SequenceOrScalar[Address | str] = (),
+        cc: SequenceOrScalar[Address | str] = (),
+        bcc: SequenceOrScalar[Address | str] = (),
         subject: str | None = None,
         content: str | None = None,
-        attachments: 'Iterable[Attachment | StrPath]' = (),
+        attachments: Iterable[Attachment | StrPath] = (),
         headers: dict[str, str] | None = None,
         plaintext: str | None = None
-    ) -> 'EmailJsonDict':
+    ) -> EmailJsonDict:
         """ Common path for batch and single mail sending. Use this the same
-         way you would use send_email then pass the prepared emails in a list
-         or another iterable to the batch send method.
+        way you would use send_email then pass the prepared emails in a list
+        or another iterable to the batch send method.
         """
 
         headers = headers or {}
@@ -987,14 +1034,14 @@ class Framework(
 
     def send_email(
         self,
-        reply_to: 'Address | str | None' = None,
+        reply_to: Address | str | None = None,
         category: Literal['marketing', 'transactional'] = 'marketing',
-        receivers: 'SequenceOrScalar[Address | str]' = (),
-        cc: 'SequenceOrScalar[Address | str]' = (),
-        bcc: 'SequenceOrScalar[Address | str]' = (),
+        receivers: SequenceOrScalar[Address | str] = (),
+        cc: SequenceOrScalar[Address | str] = (),
+        bcc: SequenceOrScalar[Address | str] = (),
         subject: str | None = None,
         content: str | None = None,
-        attachments: 'Iterable[Attachment | StrPath]' = (),
+        attachments: Iterable[Attachment | StrPath] = (),
         headers: dict[str, str] | None = None,
         plaintext: str | None = None
     ) -> None:
@@ -1050,7 +1097,7 @@ class Framework(
 
     def send_email_batch(
         self,
-        prepared_emails: 'Iterable[EmailJsonDict]',
+        prepared_emails: Iterable[EmailJsonDict],
         category: Literal['marketing', 'transactional'] = 'marketing'
     ) -> None:
         """ Sends an e-mail batch.
@@ -1069,11 +1116,11 @@ class Framework(
         # transactional stream in Postmark is called outbound
         stream = 'marketing' if category == 'marketing' else 'outbound'
 
-        BATCH_LIMIT = 500
+        BATCH_LIMIT = 500  # noqa: N806
         # NOTE: The API specifies MB, so let's not chance it
         #       by assuming they meant MiB and just go with
         #       lower size limit.
-        SIZE_LIMIT = 50_000_000  # 50MB
+        SIZE_LIMIT = 50_000_000  # 50MB  # noqa: N806
         # NOTE: We use a buffer to be a bit more memory efficient
         #       we don't initialize the buffer, so tell gives us
         #       the exact size of the buffer.
@@ -1084,9 +1131,7 @@ class Framework(
         timestamp = datetime.now().timestamp()
 
         def finish_batch() -> None:
-            nonlocal buffer
-            nonlocal num_included
-            nonlocal batch_num
+            nonlocal buffer, num_included, batch_num
 
             buffer.write(b']')
 
@@ -1155,7 +1200,7 @@ class Framework(
 
     def send_sms(
         self,
-        receivers: 'SequenceOrScalar[str]',
+        receivers: SequenceOrScalar[str],
         content: str | bytes
     ) -> None:
         """ Sends an SMS by writing a file to the `sms_directory` of the
@@ -1174,7 +1219,7 @@ class Framework(
         are automatically commited at the end.
 
         """
-        assert self.sms_directory, "No SMS directory configured"
+        assert self.sms_directory, 'No SMS directory configured'
 
         path = os.path.join(self.sms_directory, self.schema)
         if not os.path.exists(path):
@@ -1249,7 +1294,7 @@ class Framework(
             '{}:{}'.format(self.zulip_user, self.zulip_key).encode('ascii')
         )
         headers = (
-            ('Authorization', 'Basic {}'.format(auth.decode("ascii"))),
+            ('Authorization', 'Basic {}'.format(auth.decode('ascii'))),
             ('Content-Type', 'application/x-www-form-urlencoded'),
             ('Content-Length', str(len(data))),
         )
@@ -1297,7 +1342,7 @@ class Framework(
         self,
         userid: str,
         uid: str,
-        groupid: str | None,
+        groupids: frozenset[str],
         role: str
     ) -> morepath.authentication.Identity:
         """ Returns a new morepath identity for the given userid, group and
@@ -1305,12 +1350,12 @@ class Framework(
 
         """
         return morepath.authentication.Identity(
-            userid, uid=uid, groupid=groupid, role=role,
+            userid, uid=uid, groupids=groupids, role=role,
             application_id=self.application_id_hash
         )
 
     @property
-    def filestorage(self) -> 'SubFS[FS] | None':
+    def filestorage(self) -> SubFS[FS] | None:
         """ Returns a filestorage object bound to the current application.
         Based on this nifty module:
 
@@ -1364,7 +1409,7 @@ class Framework(
         return utils.makeopendir(self._global_file_storage, self.schema)
 
     @property
-    def themestorage(self) -> 'SubFS[FS] | None':
+    def themestorage(self) -> SubFS[FS] | None:
         """ Returns a storage object meant for themes, shared by all
         applications.
 
@@ -1383,7 +1428,7 @@ class Framework(
         return {}
 
     @cached_property
-    def translations(self) -> dict[str, 'GNUTranslations']:
+    def translations(self) -> dict[str, GNUTranslations]:
         """ Returns all available translations keyed by language. """
 
         try:
@@ -1397,7 +1442,7 @@ class Framework(
             return {}
 
     @cached_property
-    def chameleon_translations(self) -> dict[str, '_ChameleonTranslate']:
+    def chameleon_translations(self) -> dict[str, _ChameleonTranslate]:
         """ Returns all available translations for chameleon. """
         return self.modules.i18n.wrap_translations_for_chameleon(
             self.translations
@@ -1478,11 +1523,40 @@ class Framework(
         except BadSignature:
             return None
 
+    @property
+    def hashed_identity_key(self) -> bytes:
+        """ Take the sha-256 because we want a key that is 32 bytes long. """
+        hash_object = hashlib.sha256()
+        hash_object.update(self.identity_secret.encode('utf-8'))
+        return b64encode(hash_object.digest())
+
+    def encrypt(self, plaintext: str) -> bytes:
+        """ Encrypts the given text using Fernet (symmetric encryption).
+
+        plaintext (str): The data to encrypt.
+
+        Returns: the encrypted data in bytes.
+        """
+        return Fernet(
+            self.hashed_identity_key
+        ).encrypt(plaintext.encode('utf-8'))
+
+    def decrypt(self, cyphertext: bytes) -> str:
+        """ Decrypts the given text using Fernet (symmetric encryption).
+
+        cyphertext (str): The data to encrypt.
+
+        Returns: the decrypted text.
+        """
+        return Fernet(
+            self.hashed_identity_key
+        ).decrypt(cyphertext).decode('utf-8')
+
 
 @Framework.webasset_url()
 def get_webasset_url() -> str:
     """ The webassets url needs to be unique so we can fix it before
-        returning the generated html. See :func:`fix_webassets_url_factory`.
+    returning the generated html. See :func:`fix_webassets_url_factory`.
 
     """
     return '7da9c72a3b5f9e060b898ef7cd714b8a'  # do *not* change this hash!
@@ -1506,9 +1580,9 @@ def get_jsx_filter() -> str:
 @Framework.tween_factory(over=webassets_injector_tween)
 def fix_webassets_url_factory(
     app: Framework,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
-    def fix_webassets_url(request: CoreRequest) -> 'Response':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
+    def fix_webassets_url(request: CoreRequest) -> Response:
         """ more.webassets is not aware of our virtual hosting situation
         introduced by onegov.server - therefore it doesn't produce the right
         urls. This is something Morepath would have to fix.
@@ -1573,25 +1647,29 @@ def default_content_security_policy() -> ContentSecurityPolicy:
         default_src={SELF},
 
         # allow fonts from practically anywhere (no mixed content though)
-        font_src={SELF, "http:", "https:", "data:"},
+        font_src={SELF, 'http:', 'https:', 'data:'},
 
         # allow images from practically anywhere (no mixed content though)
-        img_src={SELF, "http:", "https:", "data:"},
+        img_src={SELF, 'http:', 'https:', 'data:'},
 
         # enable inline styles and external stylesheets
-        style_src={SELF, "https:", UNSAFE_INLINE},
+        style_src={SELF, 'https:', UNSAFE_INLINE},
 
-        # enable inline scripts, eval and external scripts
+        # enable inline scripts and external scripts for sentry
         script_src={
             SELF,
-            "https://browser.sentry-cdn.com",
-            "https://js.sentry-cdn.com",
-            UNSAFE_INLINE,
-            UNSAFE_EVAL
+            'https://browser.sentry-cdn.com',
+            'https://js.sentry-cdn.com',
         },
 
         # by default limit to self (allow pdf viewer etc)
         object_src={NONE},
+
+        # only allow setting <base> to self
+        base_uri={SELF},
+
+        # only allow submitting forms to self
+        form_action={SELF},
 
         # disable all mixed content (https -> http)
         block_all_mixed_content=True,
@@ -1602,13 +1680,13 @@ def default_content_security_policy() -> ContentSecurityPolicy:
 
 @Framework.setting(section='content_security_policy', name='apply_policy')
 def default_policy_apply_factory(
-) -> 'Callable[[ContentSecurityPolicy, CoreRequest, Response], None]':
+) -> Callable[[ContentSecurityPolicy, CoreRequest, Response], None]:
     """ Adds the content security policy report settings from the yaml. """
 
     def apply_policy(
         policy: ContentSecurityPolicy,
         request: CoreRequest,
-        response: 'Response'
+        response: Response
     ) -> None:
 
         if not request.app.content_security_policy_enabled:
@@ -1625,6 +1703,16 @@ def default_policy_apply_factory(
         policy.report_uri = report_uri or ''
         policy.report_only = report_only
 
+        if script_srcs := request.app.content_security_policy_extra_script_src:
+            # NOTE: We don't want to modify the original CSP
+            #       we don't care with report_uri and report_only
+            #       since we set it for every request, but if this
+            #       setting changes we would no longer produce the
+            #       correct CSP, if we modified it previously.
+            policy = policy.copy()
+            for script_src in script_srcs:
+                policy.script_src.add(script_src)
+
         policy.apply(response)
 
     return apply_policy
@@ -1633,10 +1721,10 @@ def default_policy_apply_factory(
 @Framework.tween_factory(over=transaction_tween_factory)
 def http_conflict_tween_factory(
     app: Framework,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
 
-    def http_conflict_tween(request: CoreRequest) -> 'Response':
+    def http_conflict_tween(request: CoreRequest) -> Response:
         """ When two transactions conflict, postgres raises an error which
         more.transaction handles by retrying the transaction for the configured
         amount of time. See :func:`get_retry_attempts`.
@@ -1656,7 +1744,7 @@ def http_conflict_tween_factory(
             if not isinstance(e.orig, TransactionRollbackError):
                 raise
 
-            log.warning("A transaction failed because there was a conflict")
+            log.warning('A transaction failed because there was a conflict')
 
             return HTTPConflict()
 
@@ -1666,10 +1754,10 @@ def http_conflict_tween_factory(
 @Framework.tween_factory(over=transaction_tween_factory)
 def activate_session_manager_factory(
     app: Framework,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
     """ Activate the session manager before each transaction. """
-    def activate_session_manager(request: CoreRequest) -> 'Response':
+    def activate_session_manager(request: CoreRequest) -> Response:
         if app.has_database_connection:
             request.app.session_manager.activate()
 
@@ -1681,15 +1769,15 @@ def activate_session_manager_factory(
 @Framework.tween_factory(over=transaction_tween_factory)
 def close_session_after_request_factory(
     app: Framework,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
     """ Closes the session after each request.
 
     This frees up connections that are unused, without costing us any
     request performance from what I can measure.
 
     """
-    def close_session_after_request(request: CoreRequest) -> 'Response':
+    def close_session_after_request(request: CoreRequest) -> Response:
         try:
             return handler(request)
         finally:
@@ -1702,9 +1790,9 @@ def close_session_after_request_factory(
 @Framework.tween_factory(under=http_conflict_tween_factory)
 def current_language_tween_factory(
     app: Framework,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
-    def current_language_tween(request: CoreRequest) -> 'Response':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
+    def current_language_tween(request: CoreRequest) -> Response:
         """ Set the current language on the session manager for each request,
         for translatable database columns.
 
@@ -1724,8 +1812,8 @@ def current_language_tween_factory(
 @Framework.tween_factory(under=current_language_tween_factory)
 def spawn_cronjob_thread_tween_factory(
     app: Framework,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
 
     from onegov.core.cronjobs import ApplicationBoundCronjobs
     registry = app.config.cronjob_registry
@@ -1736,7 +1824,7 @@ def spawn_cronjob_thread_tween_factory(
     if not app.settings.cronjobs.enabled:
         return handler
 
-    def spawn_cronjob_thread_tween(request: CoreRequest) -> 'Response':
+    def spawn_cronjob_thread_tween(request: CoreRequest) -> Response:
         if app.application_id not in registry.cronjob_threads:
             thread = ApplicationBoundCronjobs(
                 request, registry.cronjobs.values()
@@ -1749,3 +1837,29 @@ def spawn_cronjob_thread_tween_factory(
         return handler(request)
 
     return spawn_cronjob_thread_tween
+
+
+@Framework.tween_factory(under=webassets_injector_tween)
+def cache_control_tween_factory(
+    app: Framework,
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
+
+    def set_cache_control_header_tween(request: CoreRequest) -> Response:
+        response = handler(request)
+        if (
+            (
+                # logged in as a user
+                request.is_logged_in
+                # logged in as a citizen
+                or getattr(request, 'authenticated_email', None)
+            )
+            # original headers take precedence
+            and 'Cache-Control' not in response.headers
+            # files have their own cache control handling
+            and '/storage/' not in request.path
+        ):
+            response.headers['Cache-Control'] = 'no-store'
+        return response
+
+    return set_cache_control_header_tween

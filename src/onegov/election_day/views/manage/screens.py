@@ -1,4 +1,5 @@
 """ The manage screen views. """
+from __future__ import annotations
 
 from morepath import redirect
 from onegov.core.security import Private
@@ -24,8 +25,8 @@ if TYPE_CHECKING:
 )
 def view_screens(
     self: ScreenCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View all screens as a list. """
 
     return {
@@ -44,8 +45,8 @@ def view_screens(
 )
 def export_screens(
     self: ScreenCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ Export all screens as a CSV file. """
 
     return {
@@ -61,9 +62,9 @@ def export_screens(
 )
 def create_screen(
     self: ScreenCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ScreenForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Create a new screen. """
 
     layout = ManageScreensLayout(self, request)
@@ -91,9 +92,9 @@ def create_screen(
 )
 def edit_screen_item(
     self: Screen,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ScreenForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Edit a screen. """
 
     layout = ManageScreensLayout(self, request)
@@ -111,7 +112,7 @@ def edit_screen_item(
         'layout': layout,
         'form': form,
         'title': _(
-            "Screen ${number}",
+            'Screen ${number}',
             mapping={'number': self.number}
         ),
         'subtitle': _('Edit screen'),
@@ -125,9 +126,9 @@ def edit_screen_item(
 )
 def delete_screen(
     self: Screen,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Delete a screen. """
 
     layout = ManageScreensLayout(self, request)
@@ -148,7 +149,7 @@ def delete_screen(
         'layout': layout,
         'form': form,
         'title': _(
-            "Screen ${number}",
+            'Screen ${number}',
             mapping={'number': self.number}
         ),
         'subtitle': _('Delete screen'),

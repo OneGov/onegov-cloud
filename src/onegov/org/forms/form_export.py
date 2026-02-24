@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import merge_forms
 from onegov.form.fields import MultiCheckboxField
 from onegov.org import _
@@ -24,28 +26,28 @@ class FormSubmissionsExport(FormSubmissionsExportBase):
         request: OrgRequest
 
     selection = RadioField(
-        label=_("Selection"),
+        label=_('Selection'),
         default='date',
         choices=[
-            ('date', _("By date")),
-            ('window', _("By registration window"))
+            ('date', _('By date')),
+            ('window', _('By registration window'))
         ]
     )
 
     registration_window = MultiCheckboxField(
-        label=_("Registration Window"),
+        label=_('Registration Window'),
         choices=None,
         depends_on=('selection', 'window')
     )
 
     start = DateField(
-        label=_("Start"),
+        label=_('Start'),
         validators=[InputRequired()],
         depends_on=('selection', 'date')
     )
 
     end = DateField(
-        label=_("End"),
+        label=_('End'),
         validators=[InputRequired()],
         depends_on=('selection', 'date')
     )

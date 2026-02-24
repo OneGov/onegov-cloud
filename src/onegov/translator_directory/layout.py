@@ -1,27 +1,38 @@
+from __future__ import annotations
+
 from functools import cached_property
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from purl import URL
+from urllib.parse import urlencode
 import pytz
 
 from onegov.translator_directory import _
 from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
-from onegov.org.layout import DefaultLayout as BaseLayout
+from onegov.town6.layout import DefaultLayout as BaseLayout
+from onegov.town6.layout import TicketLayout as TownTicketLayout
 from onegov.org.models import Organisation
-from onegov.translator_directory.collections.documents import (
-    TranslatorDocumentCollection)
+from onegov.org.utils import get_current_tickets_url
+from onegov.translator_directory.collections.documents import \
+    TranslatorDocumentCollection
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import (
-    TranslatorCollection)
+    TranslatorCollection,
+)
 from onegov.translator_directory.constants import (
     member_can_see, editor_can_see, translator_can_see,
-    GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, INTERPRETING_TYPES)
+    GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS,
+    INTERPRETING_TYPES, TIME_REPORT_INTERPRETING_TYPES)
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from decimal import Decimal
+    from onegov.translator_directory.collections.time_report import (
+        TimeReportCollection,
+    )
     from onegov.translator_directory.models.language import Language
     from markupsafe import Markup
     from onegov.translator_directory.models.translator import (
@@ -31,17 +42,17 @@ if TYPE_CHECKING:
 
 class DefaultLayout(BaseLayout):
 
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 
     @staticmethod
-    def linkify(text: str | None) -> 'Markup':  # type:ignore[override]
+    def linkify(text: str | None) -> Markup:  # type:ignore[override]
         return linkify(text)
 
     @staticmethod
-    def format_languages(languages: 'Iterable[Language] | None') -> str:
+    def format_languages(languages: Iterable[Language] | None) -> str:
         return ', '.join(sorted(lang.name for lang in languages or ()))
 
-    def format_gender(self, gender: 'Gender') -> str:
+    def format_gender(self, gender: Gender) -> str:
         return self.request.translate(GENDERS[gender])
 
     @staticmethod
@@ -52,9 +63,9 @@ class DefaultLayout(BaseLayout):
 
     def format_boolean(self, val: bool | None) -> str:
         assert isinstance(val, bool) or val is None
-        return self.request.translate((_('Yes') if val else _('No')))
+        return self.request.translate(_('Yes') if val else _('No'))
 
-    def format_admission(self, val: 'AdmissionState') -> str:
+    def format_admission(self, val: AdmissionState) -> str:
         return self.request.translate(ADMISSIONS[val])
 
     def show(self, attribute_name: str) -> bool:
@@ -86,13 +97,22 @@ class DefaultLayout(BaseLayout):
     def format_interpreting_type(self, key: str) -> str:
         if key in INTERPRETING_TYPES:
             return self.request.translate(INTERPRETING_TYPES[key])
+        if key in TIME_REPORT_INTERPRETING_TYPES:
+            return self.request.translate(TIME_REPORT_INTERPRETING_TYPES[key])
         return key
+
+    @staticmethod
+    def format_currency(amount: Decimal | float | None) -> str:
+        """Format amount as Swiss Francs."""
+        if amount is None:
+            return 'CHF 0.00'
+        return f'CHF {amount:.2f}'
 
 
 class TranslatorLayout(DefaultLayout):
 
     if TYPE_CHECKING:
-        model: 'Translator'
+        model: Translator
 
         def __init__(
             self,
@@ -127,7 +147,7 @@ class TranslatorLayout(DefaultLayout):
                     title=_('Add'),
                     links=(
                         Link(
-                            text=_("Add translator"),
+                            text=_('Add translator'),
                             url=self.request.class_link(
                                 TranslatorCollection, name='new'
                             ),
@@ -136,7 +156,7 @@ class TranslatorLayout(DefaultLayout):
                     )
                 ),
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(
                         self.model, name='edit'
                     ),
@@ -150,11 +170,11 @@ class TranslatorLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to delete "
-                              "this translator?"),
-                            _("This cannot be undone."),
-                            _("Delete translator"),
-                            _("Cancel")
+                            _('Do you really want to delete '
+                              'this translator?'),
+                            _('This cannot be undone.'),
+                            _('Delete translator'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -176,11 +196,16 @@ class TranslatorLayout(DefaultLayout):
                     ),
                     attrs={'class': 'envelope'}
                 ),
+                Link(
+                    _('Add Time Report'),
+                    url=self.request.link(self.model, name='add-time-report'),
+                    attrs={'class': 'plus'},
+                ),
             ]
         elif self.request.is_editor:
             return [
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(
                         self.model, name='edit-restricted'
                     ),
@@ -190,15 +215,20 @@ class TranslatorLayout(DefaultLayout):
                     _('Report change'),
                     self.request.link(self.model, name='report-change'),
                     attrs={'class': 'report-change'}
-                )
+                ),
+                Link(
+                    _('Add Time Report'),
+                    url=self.request.link(self.model, name='add-time-report'),
+                    attrs={'class': 'plus'},
+                ),
             ]
         elif self.request.is_member:
             return [
                 Link(
-                    _('Report change'),
-                    self.request.link(self.model, name='report-change'),
-                    attrs={'class': 'report-change'}
-                )
+                    _('Add Time Report'),
+                    url=self.request.link(self.model, name='add-time-report'),
+                    attrs={'class': 'plus'},
+                ),
             ]
         elif self.translator_data_outdated():
             return [
@@ -303,7 +333,8 @@ class MailTemplatesLayout(TranslatorLayout):
 
     @property
     def breadcrumbs(self) -> list[Link]:
-        return super().breadcrumbs + [
+        return [
+            *super().breadcrumbs,
             Link(
                 text=_('Mail templates'),
                 url=self.request.link(
@@ -315,18 +346,54 @@ class MailTemplatesLayout(TranslatorLayout):
 
 class TranslatorCollectionLayout(DefaultLayout):
 
+    model: TranslatorCollection
+
     @cached_property
     def title(self) -> str:
         return _('Search for translators')
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
-        return super().breadcrumbs + [  # type:ignore[operator]
+        return [  # type:ignore[misc]
+            *super().breadcrumbs,
             Link(
                 text=_('Translators'),
                 url=self.request.class_link(TranslatorCollection)
             )
         ]
+
+    @cached_property
+    def export_link(self) -> str | None:
+        """ Returns the export link with current filters included, or None """
+        if not self.request.is_admin:
+            return None
+
+        params = self.request.GET.copy()
+
+        # Remove pagination parameter, not needed for export
+        params.pop('page', None)
+
+        # Ensure sorting parameters in the link match the actual state of the
+        # collection model, handling defaults correctly.
+        if self.model.order_by != 'last_name':
+            params['order_by'] = self.model.order_by
+        else:
+            # Remove order_by from params if it's the default
+            params.pop('order_by', None)
+
+        if self.model.order_desc:
+            params['order_desc'] = 'true'
+        else:
+            # Remove order_desc from params if it's the default (False)
+            params.pop('order_desc', None)
+
+        base_export_link = self.request.class_link(
+            TranslatorCollection, name='export'
+        )
+        return (
+            f'{base_export_link}?{urlencode(params, doseq=True)}'
+            if params else base_export_link
+        )
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
@@ -336,7 +403,7 @@ class TranslatorCollectionLayout(DefaultLayout):
                     _('Add'),
                     links=(
                         Link(
-                            text=_("Add translator"),
+                            text=_('Add translator'),
                             url=self.request.class_link(
                                 TranslatorCollection, name='new'
                             ),
@@ -345,14 +412,7 @@ class TranslatorCollectionLayout(DefaultLayout):
                     )
                 ),
                 Link(
-                    _('Export Excel'),
-                    url=self.request.class_link(
-                        TranslatorCollection, name='export'
-                    ),
-                    attrs={'class': 'export-link'},
-                ),
-                Link(
-                    _("Mail to all translators"),
+                    _('Mail to all translators'),
                     url=self.request.app.mailto_link,
                     attrs={'class': 'envelope'},
                 )
@@ -381,9 +441,15 @@ class AddTranslatorLayout(TranslatorCollectionLayout):
 
 class TranslatorDocumentsLayout(DefaultLayout):
 
+    def __init__(self, model: Any, request: TranslatorAppRequest) -> None:
+        super().__init__(model, request)
+        request.include('upload')
+        request.include('prompt')
+
     @cached_property
     def breadcrumbs(self) -> list[Link]:
-        return super().breadcrumbs + [  # type:ignore[operator]
+        return [  # type:ignore[misc]
+            *super().breadcrumbs,
             Link(
                 text=_('Translators'),
                 url=self.request.class_link(TranslatorCollection)
@@ -423,7 +489,7 @@ class LanguageCollectionLayout(DefaultLayout):
             _('Add'),
             links=(
                 Link(
-                    text=_("Add language"),
+                    text=_('Add language'),
                     url=self.request.class_link(
                         LanguageCollection, name='new'
                     ),
@@ -470,7 +536,7 @@ class EditLanguageLayout(LanguageLayout):
                             Block(
                                 _("This language is used and can't be "
                                   "deleted."),
-                                no=_("Cancel")
+                                no=_('Cancel')
                             ),
                         )
                     ),
@@ -484,11 +550,11 @@ class EditLanguageLayout(LanguageLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to delete "
-                              "this language?"),
-                            _("This cannot be undone."),
-                            _("Delete language"),
-                            _("Cancel")
+                            _('Do you really want to delete '
+                              'this language?'),
+                            _('This cannot be undone.'),
+                            _('Delete language'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -576,4 +642,78 @@ class RefuseAccreditationLayout(DefaultLayout):
             )
         )
         links.append(Link(_('Refuse admission')))
+        return links
+
+
+class TimeReportCollectionLayout(DefaultLayout):
+
+    if TYPE_CHECKING:
+        model: TimeReportCollection
+
+    @cached_property
+    def title(self) -> str:
+        return _('Time Reports')
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        links = super().breadcrumbs
+        assert isinstance(links, list)
+        links.append(Link(_('Time Reports')))
+        return links
+
+
+class TicketLayout(TownTicketLayout):
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        from onegov.translator_directory.models.ticket import (
+            TimeReportHandler,
+        )
+
+        links = super().editbar_links
+        if links is None:
+            return None
+
+        if not self.request.is_manager:
+            return links
+
+        if self.model.handler_code != 'TRP':
+            return links
+
+        if self.model.state != 'open':
+            return links
+
+        handler = self.model.handler
+        if not isinstance(handler, TimeReportHandler):
+            return links
+
+        if not handler.can_delete_time_report(
+            self.request  # type: ignore[arg-type]
+        ):
+            return links
+
+        if handler.time_report is None:
+            return links
+
+        delete_link = Link(
+            text=_('Delete Time Report'),
+            url=self.csrf_protected_url(
+                self.request.link(handler.time_report)
+            ),
+            attrs={'class': ('ticket-button', 'ticket-delete')},
+            traits=(
+                Confirm(
+                    _('Do you really want to delete this time report?'),
+                    _('This cannot be undone.'),
+                    _('Delete time report'),
+                    _('Cancel'),
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=get_current_tickets_url(self.request),
+                ),
+            ),
+        )
+
+        links.append(delete_link)
         return links

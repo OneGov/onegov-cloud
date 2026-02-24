@@ -1,24 +1,26 @@
+from __future__ import annotations
+
+import datetime
+import pytz
 from onegov.core.orm import Base
-from onegov.core.orm.types import UUID, JSON
-from sqlalchemy import Boolean
+from onegov.fsi.i18n import _
 from onegov.search import ORMSearchable
 from sedate import utcnow
-from sqlalchemy import Column, Text, ForeignKey, ARRAY, desc
-from sqlalchemy.orm import relationship, object_session, backref
-from uuid import uuid4
+from sqlalchemy import Text, ForeignKey, ARRAY, desc
+from sqlalchemy.orm import backref, mapped_column, object_session, relationship
+from sqlalchemy.orm import DynamicMapped, Mapped
+from uuid import uuid4, UUID
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from onegov.core.types import AppenderQuery
     from onegov.user import User
     from sqlalchemy.orm import Query
     from .course_event import CourseEvent
     from .course_subscription import CourseSubscription
 
 
-external_attendee_org = "Externe Kursteilnehmer"
+external_attendee_org = 'Externe Kursteilnehmer'
 
 
 class CourseAttendee(Base, ORMSearchable):
@@ -41,42 +43,40 @@ class CourseAttendee(Base, ORMSearchable):
 
     __tablename__ = 'fsi_attendees'
 
-    es_properties = {
-        'first_name': {'type': 'text'},
-        'last_name': {'type': 'text'},
-        'organisation': {'type': 'text'},
-        'email': {'type': 'text'},
-        'title': {'type': 'text'},
+    fts_type_title = _('Attendees')
+    fts_public = False
+    fts_title_property = 'title'
+    fts_properties = {
+        # NOTE: We use both individual properties and title, it's
+        #       probably better to only use the title
+        'first_name': {'type': 'text', 'weight': 'A'},
+        'last_name': {'type': 'text', 'weight': 'A'},
+        'email': {'type': 'text', 'weight': 'A'},
+        'title': {'type': 'text', 'weight': 'A'},
+        'organisation': {'type': 'text', 'weight': 'B'},
     }
 
-    es_public = False
-
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     # is null if its an external attendee
-    user_id: 'Column[uuid.UUID | None]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('users.id'),
-        nullable=True
-    )
+    user_id: Mapped[UUID | None] = mapped_column(ForeignKey('users.id'))
     # FIXME: It's not great that we insert a backref on User across
     #        module boundaries here. This technically violates the
     #        separation of modules. Do we need this?
-    user: 'relationship[User | None]' = relationship(
-        "User", backref=backref("attendee", uselist=False))
+    user: Mapped[User | None] = relationship(
+        backref=backref('attendee', uselist=False))
 
     # mirrors user active property
-    active: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
+    active: Mapped[bool] = mapped_column(default=True)
 
     # mirrors the source_id field from user due to performance reasons
-    source_id: 'Column[str | None]' = Column(Text, nullable=True)
+    source_id: Mapped[str | None]
 
-    first_name: 'Column[str | None]' = Column(Text, nullable=True)
-    last_name: 'Column[str | None]' = Column(Text, nullable=True)
+    first_name: Mapped[str | None]
+    last_name: Mapped[str | None]
 
     # The organization this user belongs to, which may be a path like this:
     #
@@ -96,11 +96,14 @@ class CourseAttendee(Base, ORMSearchable):
     # BD / HBA / Planungsbaukommission" and "BD / HBA" to access all of
     # "BD / HBA / *"
     #
-    organisation: 'Column[str | None]' = Column(Text, nullable=True)
+    organisation: Mapped[str | None]
 
-    permissions: 'Column[list[str] | None]' = Column(ARRAY(Text), default=list)
+    permissions: Mapped[list[str] | None] = mapped_column(
+        ARRAY(Text),
+        default=list
+    )
 
-    _email: 'Column[str | None]' = Column(Text, unique=True)
+    _email: Mapped[str | None] = mapped_column(Text, unique=True)
 
     def __str__(self) -> str:
         if self.first_name and self.last_name:
@@ -113,18 +116,10 @@ class CourseAttendee(Base, ORMSearchable):
             return mail
         return 'NO NAME NO EMAIL'
 
-    meta: 'Column[dict[str, Any] | None]' = Column(
-        JSON,
-        # FIXME: Why is this nullable=True if we set a default?
-        nullable=True,
-        default=dict
-    )
+    meta: Mapped[dict[str, Any] | None] = mapped_column(default=dict)
 
-    subscriptions: 'relationship[AppenderQuery[CourseSubscription]]'
-    subscriptions = relationship(
-        'CourseSubscription',
+    subscriptions: DynamicMapped[CourseSubscription] = relationship(
         back_populates='attendee',
-        lazy='dynamic',
         cascade='all, delete-orphan'
     )
 
@@ -170,7 +165,7 @@ class CourseAttendee(Base, ORMSearchable):
         self._email = value
 
     @property
-    def course_events(self) -> 'Query[CourseEvent]':
+    def course_events(self) -> Query[CourseEvent]:
         """
         Will return the query for not completed (future) courses events
          the attendee has a subscription record.
@@ -179,6 +174,7 @@ class CourseAttendee(Base, ORMSearchable):
         from onegov.fsi.models import CourseSubscription  # circular
 
         session = object_session(self)
+        assert session is not None
         result = session.query(CourseEvent).join(CourseSubscription)
         result = result.filter(CourseSubscription.attendee_id == self.id)
         result = result.filter(CourseSubscription.event_completed == False)
@@ -187,19 +183,19 @@ class CourseAttendee(Base, ORMSearchable):
         return result
 
     @property
-    def confirmed_course_events(self) -> 'Query[CourseEvent]':
+    def confirmed_course_events(self) -> Query[CourseEvent]:
         """ Registered future course events which have been confirmed """
         from onegov.fsi.models import CourseEvent
         return self.course_events.filter(CourseEvent.status == 'confirmed')
 
     @property
-    def total_done_course_events(self) -> 'Query[CourseSubscription]':
+    def total_done_course_events(self) -> Query[CourseSubscription]:
         from onegov.fsi.models import CourseSubscription  # circular
         return self.subscriptions.filter(
             CourseSubscription.event_completed == True)
 
     @property
-    def repeating_courses(self) -> 'Query[CourseEvent]':
+    def repeating_courses(self) -> Query[CourseEvent]:
         """
         Will return query to filter for all upcoming courses the attendee
         has to refresh.
@@ -217,6 +213,7 @@ class CourseAttendee(Base, ORMSearchable):
         from onegov.fsi.models import CourseSubscription
 
         session = object_session(self)
+        assert session is not None
 
         return (
             session.query(CourseEvent)
@@ -229,11 +226,12 @@ class CourseAttendee(Base, ORMSearchable):
         )
 
     @property
-    def undone_registered_courses(self) -> 'Query[CourseEvent]':
+    def undone_registered_courses(self) -> Query[CourseEvent]:
         from onegov.fsi.models import CourseEvent
         from onegov.fsi.models import CourseSubscription
 
         session = object_session(self)
+        assert session is not None
         result = session.query(CourseEvent).join(CourseSubscription)
         result = result.filter(CourseEvent.status == 'confirmed')
         result = result.filter(CourseEvent.start < utcnow())
@@ -245,18 +243,33 @@ class CourseAttendee(Base, ORMSearchable):
         self,
         show_hidden: bool = True,
         show_locked: bool = False
-    ) -> 'Query[CourseEvent]':
+    ) -> Query[CourseEvent]:
         """Used for the subscription form. Should exclude past courses
         and courses already registered"""
         from onegov.fsi.models import CourseEvent
         from onegov.fsi.models import CourseSubscription
 
         session = object_session(self)
-        excl = session.query(CourseEvent.id).join(CourseSubscription)
-        excl = excl.filter(CourseSubscription.attendee_id == self.id)
-        excl = excl.subquery('excl')
+        assert session is not None
+        excl_q = session.query(CourseEvent.id).join(CourseSubscription)
+        excl_q = excl_q.filter(CourseSubscription.attendee_id == self.id)
+        excl = excl_q.scalar_subquery()
+
+        last_subscribed_event = session.query(
+            CourseEvent).join(CourseSubscription).filter(
+            CourseSubscription.attendee_id == self.id).order_by(
+            desc(CourseEvent.start)).first()
+
         result = session.query(CourseEvent).filter(CourseEvent.id.notin_(excl))
         result = result.filter(CourseEvent.start > utcnow())
+        if last_subscribed_event:
+            # Suggested events need to start at least 6 years after the last
+            # subscribed event
+            result = result.filter(
+                CourseEvent.start > datetime.datetime(
+                    last_subscribed_event.start.year + 6, 1, 1,
+                    tzinfo=pytz.utc))
+
         if not show_hidden:
             result = result.filter(CourseEvent.hidden_from_public == False)
         if not show_locked:

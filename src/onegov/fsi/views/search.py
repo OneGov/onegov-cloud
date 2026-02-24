@@ -1,29 +1,33 @@
+from __future__ import annotations
+
 from onegov.core.security import Personal
 from onegov.fsi import FsiApp
 from onegov.org.models import Search
-from onegov.org.views.search import search as search_view
-from onegov.org.views.search import suggestions as suggestions_view
-
+from onegov.org.views.search import suggestions
+from onegov.town6.views.search import town_search
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.orm import Base
     from onegov.core.types import JSON_ro, RenderData
     from onegov.fsi.request import FsiRequest
     from webob import Response
 
 
-@FsiApp.html(model=Search, template='search.pt', permission=Personal)
-def search(
-    self: Search['Base'],
-    request: 'FsiRequest'
-) -> 'RenderData | Response':
-    return search_view(self, request)
+@FsiApp.html(
+    model=Search,
+    template='search.pt',
+    permission=Personal
+)
+def fsi_search(
+    self: Search,
+    request: FsiRequest
+) -> RenderData | Response:
+    return town_search(self, request)
 
 
 @FsiApp.json(model=Search, name='suggest', permission=Personal)
-def suggestions(
-    self: Search['Base'],
-    request: 'FsiRequest'
-) -> 'JSON_ro':
-    return suggestions_view(self, request)
+def fsi_suggestions(
+    self: Search,
+    request: FsiRequest
+) -> JSON_ro:
+    return suggestions(self, request)

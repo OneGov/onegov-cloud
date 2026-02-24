@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import module_path
 from onegov.org.initial_content import load_content, add_pages
 from onegov.org.models import Organisation
@@ -9,7 +11,7 @@ if TYPE_CHECKING:
 
 
 def create_new_organisation(
-    app: 'WinterthurApp',
+    app: WinterthurApp,
     name: str,
     locale: str = 'de_CH'
 ) -> Organisation:

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from sedate import utcnow
 from sqlalchemy import desc
@@ -13,7 +15,7 @@ from onegov.fsi.models.course_event import CourseEvent
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
@@ -26,7 +28,7 @@ class CourseEventCollection(
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
         from_date: datetime | None = None,
         upcoming_only: bool = False,
@@ -34,7 +36,7 @@ class CourseEventCollection(
         limit: int | None = None,
         show_hidden: bool = False,
         show_locked: bool = True,
-        course_id: 'UUID | None' = None,
+        course_id: UUID | None = None,
         sort_desc: bool = False
     ) -> None:
 
@@ -76,7 +78,7 @@ class CourseEventCollection(
             return None
         return CourseCollection(self.session).by_id(self.course_id)
 
-    def query(self) -> 'Query[CourseEvent]':
+    def query(self) -> Query[CourseEvent]:
         query = super().query()
         if not self.show_hidden:
             query = query.filter(CourseEvent.hidden_from_public == False)
@@ -101,14 +103,14 @@ class CourseEventCollection(
 
         return query
 
-    def subset(self) -> 'Query[CourseEvent]':
+    def subset(self) -> Query[CourseEvent]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -123,15 +125,15 @@ class CourseEventCollection(
         )
 
     @classmethod
-    def latest(cls, session: 'Session', limit: int = 5) -> 'Self':
+    def latest(cls, session: Session, limit: int = 5) -> Self:
         return cls(session, upcoming_only=True, limit=limit)
 
-    def next_event(self) -> 'Query[CourseEvent]':
+    def next_event(self) -> Query[CourseEvent]:
         return self.query().filter(
             self.model_class.start > utcnow()).order_by(None).order_by(
             self.model_class.start)
 
-    def get_past_reminder_date(self) -> 'Query[CourseEvent]':
+    def get_past_reminder_date(self) -> Query[CourseEvent]:
         return super().query().filter(
             self.model_class.scheduled_reminder > utcnow())
 
@@ -153,11 +155,11 @@ class PastCourseEventCollection(CourseEventCollection):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
         show_hidden: bool = False,
         show_locked: bool = True,
-        course_id: 'UUID | None' = None
+        course_id: UUID | None = None
     ) -> None:
         super().__init__(
             session,
@@ -169,7 +171,7 @@ class PastCourseEventCollection(CourseEventCollection):
             sort_desc=True
         )
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -178,5 +180,5 @@ class PastCourseEventCollection(CourseEventCollection):
             course_id=self.course_id,
         )
 
-    def query(self) -> 'Query[CourseEvent]':
+    def query(self) -> Query[CourseEvent]:
         return super().query().filter(self.model_class.status == 'confirmed')

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import operator
 from email.headerregistry import Address
 from markupsafe import Markup
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.agency.request import AgencyRequest
     from onegov.core.orm.mixins import TimestampMixin
-    from onegov.user import RoleMapping
+    from onegov.user import UserGroup
     from sqlalchemy.orm import Query
     from typing import TypeVar
 
@@ -28,8 +30,8 @@ def handle_empty_p_tags(html: Markup) -> Markup:
 
 def emails_for_new_ticket(
     model: Agency | Person,
-    request: 'AgencyRequest'
-) -> 'Iterator[Address]':
+    request: AgencyRequest
+) -> Iterator[Address]:
     """
     Returns an iterator with all the unique email addresses
     that need to be notified for a new ticket of this type
@@ -65,27 +67,23 @@ def emails_for_new_ticket(
 
     # we try to minimize the amount of e-mail address parsing we
     # perform by de-duplicating the raw usernames as we get them
-    role_mapping: RoleMapping
+    agency: Agency | None
     for agency in agencies:
-        for role_mapping in getattr(agency, 'role_mappings', ()):
-            if role_mapping.role != 'editor':
-                continue
+        # if there are no user groups which can handle our ticket
+        # then look if there are groups in one of the parent agencies
+        while not (
+            agency is None
+            or (groups := ticket_groups(agency, groupids))
+        ):
+            agency = agency.parent
 
-            # we only care about group role mappings
-            group = role_mapping.group
-            if group is None:
-                continue
+        if agency is None or not groups:
+            continue
 
-            # if the group does not have permission to manage this
-            # type of ticket then we need to skip it
-            if groupids is not None and group.id.hex not in groupids:
-                continue
-
+        for group in groups:
             # if the group does not have immediate notification
             # turned on, then skip it
-            if not group.meta:
-                continue
-            if group.meta.get('immediate_notification') != 'yes':
+            if (group.meta or {}).get('immediate_notification') != 'yes':
                 continue
 
             for user in group.users:
@@ -104,7 +102,20 @@ def emails_for_new_ticket(
                     pass
 
 
-def get_html_paragraph_with_line_breaks(text: str | None) -> Markup:
+def ticket_groups(
+    agency: Agency,
+    groupids: list[str] | None
+) -> list[UserGroup]:
+    return [
+        group
+        for role_mapping in getattr(agency, 'role_mappings', ())
+        if role_mapping.role == 'editor'
+        if (group := role_mapping.group)
+        if groupids is None or group.id.hex in groupids
+    ]
+
+
+def get_html_paragraph_with_line_breaks(text: object) -> Markup:
     if not text:
         return Markup('')
     return Markup('<p>{}</p>').format(
@@ -113,13 +124,13 @@ def get_html_paragraph_with_line_breaks(text: str | None) -> Markup:
 
 
 def filter_modified_or_created(
-    query: 'Query[_T]',
+    query: Query[_T],
     relate: Literal['>', '<', '>=', '<=', '=='],
     # FIXME: This is a bit lax about types, SQLAlchemy is doing the heavy
     #        lifting here, auto casting ISO formatted date strings
-    comparison_property: 'datetime | str',
-    collection_class: type['TimestampMixin']
-) -> 'Query[_T]':
+    comparison_property: datetime | str,
+    collection_class: type[TimestampMixin]
+) -> Query[_T]:
 
     ops = {
         '>': operator.gt,

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.core.utils import ensure_scheme
 from onegov.form import Form
@@ -20,28 +22,28 @@ if TYPE_CHECKING:
 class MutationForm(Form):
 
     callout = _(
-        "This form can be used to report mutations to the data. "
-        "You can either leave us a message or directly suggest changes to "
-        "the corresponding fields."
+        'This form can be used to report mutations to the data. '
+        'You can either leave us a message or directly suggest changes to '
+        'the corresponding fields.'
     )
 
     delay = HoneyPotField()
 
     submitter_email = EmailField(
-        fieldset=_("Your contact details"),
-        label=_("E-Mail"),
-        description="max.muster@example.org",
+        fieldset=_('Your contact details'),
+        label=_('E-Mail'),
+        description='max.muster@example.org',
         validators=[InputRequired(), Email()],
     )
 
     submitter_message = TextAreaField(
-        fieldset=_("Your message"),
-        label=_("Message"),
+        fieldset=_('Your message'),
+        label=_('Message'),
         render_kw={'rows': 8}
     )
 
     @property
-    def proposal_fields(self) -> dict[str, 'CallableProxyType[Field]']:
+    def proposal_fields(self) -> dict[str, CallableProxyType[Field]]:
         for fieldset in self.fieldsets:
             if fieldset.label == 'Proposed changes':
                 return fieldset.fields
@@ -63,8 +65,8 @@ class MutationForm(Form):
             assert isinstance(self.submitter_message.errors, list)
             self.submitter_message.errors.append(
                 _(
-                    "Please enter a message or suggest some changes "
-                    "using the fields below."
+                    'Please enter a message or suggest some changes '
+                    'using the fields below.'
                 )
             )
             return False
@@ -82,56 +84,56 @@ class AgencyMutationForm(MutationForm):
     """ Form to report a mutation of an organization. """
 
     title = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Title"),
+        fieldset=_('Proposed changes'),
+        label=_('Title'),
     )
 
     location_address = TextAreaField(
-        fieldset=_("Proposed changes"),
-        label=_("Location address"),
+        fieldset=_('Proposed changes'),
+        label=_('Location address'),
         render_kw={'rows': 2}
     )
 
     location_code_city = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Location Code and City"),
+        fieldset=_('Proposed changes'),
+        label=_('Location Code and City'),
     )
 
     postal_address = TextAreaField(
-        fieldset=_("Proposed changes"),
-        label=_("Postal address"),
+        fieldset=_('Proposed changes'),
+        label=_('Postal address'),
         render_kw={'rows': 2}
     )
 
     postal_code_city = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Postal Code and City"),
+        fieldset=_('Proposed changes'),
+        label=_('Postal Code and City'),
     )
 
     phone = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Phone")
+        fieldset=_('Proposed changes'),
+        label=_('Phone')
     )
 
     phone_direct = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Direct Phone Number or Mobile")
+        fieldset=_('Proposed changes'),
+        label=_('Direct Phone Number or Mobile')
     )
 
     email = EmailField(
-        fieldset=_("Proposed changes"),
-        label=_("E-Mail")
+        fieldset=_('Proposed changes'),
+        label=_('E-Mail')
     )
 
     website = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Website"),
+        fieldset=_('Proposed changes'),
+        label=_('Website'),
         filters=(ensure_scheme, )
     )
 
     opening_hours = TextAreaField(
-        fieldset=_("Proposed changes"),
-        label=_("Opening hours"),
+        fieldset=_('Proposed changes'),
+        label=_('Opening hours'),
         render_kw={'rows': 3}
     )
 
@@ -140,102 +142,102 @@ class PersonMutationForm(MutationForm):
     """ Form to report a mutation of a person. """
 
     salutation = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Salutation")
+        fieldset=_('Proposed changes'),
+        label=_('Salutation')
     )
 
     academic_title = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Academic Title")
+        fieldset=_('Proposed changes'),
+        label=_('Academic Title')
     )
 
     first_name = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("First name")
+        fieldset=_('Proposed changes'),
+        label=_('First name')
     )
 
     last_name = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Last name")
+        fieldset=_('Proposed changes'),
+        label=_('Last name')
     )
 
     function = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Function")
+        fieldset=_('Proposed changes'),
+        label=_('Function')
     )
 
     email = EmailField(
-        fieldset=_("Proposed changes"),
-        label=_("E-Mail")
+        fieldset=_('Proposed changes'),
+        label=_('E-Mail')
     )
 
     phone = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Phone")
+        fieldset=_('Proposed changes'),
+        label=_('Phone')
     )
 
     phone_direct = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Direct Phone Number or Mobile")
+        fieldset=_('Proposed changes'),
+        label=_('Direct Phone Number or Mobile')
     )
 
     born = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Born")
+        fieldset=_('Proposed changes'),
+        label=_('Born')
     )
 
     profession = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Profession")
+        fieldset=_('Proposed changes'),
+        label=_('Profession')
     )
 
     political_party = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Political Party")
+        fieldset=_('Proposed changes'),
+        label=_('Political Party')
     )
 
     parliamentary_group = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Parliamentary Group")
+        fieldset=_('Proposed changes'),
+        label=_('Parliamentary Group')
     )
 
     website = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Website"),
+        fieldset=_('Proposed changes'),
+        label=_('Website'),
         filters=(ensure_scheme, )
     )
 
     website_2 = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Website 2"),
+        fieldset=_('Proposed changes'),
+        label=_('Website 2'),
         filters=(ensure_scheme, )
     )
 
     location_address = TextAreaField(
-        fieldset=_("Proposed changes"),
-        label=_("Location address"),
+        fieldset=_('Proposed changes'),
+        label=_('Location address'),
         render_kw={'rows': 2}
     )
 
     location_code_city = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Location Code and City"),
+        fieldset=_('Proposed changes'),
+        label=_('Location Code and City'),
     )
 
     postal_address = TextAreaField(
-        fieldset=_("Proposed changes"),
-        label=_("Postal address"),
+        fieldset=_('Proposed changes'),
+        label=_('Postal address'),
         render_kw={'rows': 2}
     )
 
     postal_code_city = StringField(
-        fieldset=_("Proposed changes"),
-        label=_("Postal Code and City"),
+        fieldset=_('Proposed changes'),
+        label=_('Postal Code and City'),
     )
 
     notes = TextAreaField(
-        fieldset=_("Proposed changes"),
-        label=_("Notes"),
+        fieldset=_('Proposed changes'),
+        label=_('Notes'),
         render_kw={'rows': 5}
     )
 
@@ -243,7 +245,7 @@ class PersonMutationForm(MutationForm):
 class ApplyMutationForm(Form):
 
     changes = MultiCheckboxField(
-        label=_("Proposed changes"),
+        label=_('Proposed changes'),
         choices=[]
     )
 

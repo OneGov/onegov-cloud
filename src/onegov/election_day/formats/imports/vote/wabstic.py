@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -62,7 +64,7 @@ def parse_domain(domain: str) -> str | None:
 
 
 def line_is_relevant(
-    line: 'DefaultRow',
+    line: DefaultRow,
     domain: str,
     district: str,
     number: str
@@ -75,8 +77,8 @@ def line_is_relevant(
 
 
 def import_vote_wabstic(
-    vote: 'Vote',
-    principal: 'Canton | Municipality',
+    vote: Vote,
+    principal: Canton | Municipality,
     number: str,
     district: str,
     file_sg_geschaefte: IO[bytes],
@@ -142,7 +144,7 @@ def import_vote_wabstic(
                 )
         except Exception as e:
             line_errors.append(
-                _("Error in anzpendentgde/anzgdependent: ${msg}",
+                _('Error in anzpendentgde/anzgdependent: ${msg}',
                   mapping={'msg': e.args[0]}))
 
         if line_errors:
@@ -178,15 +180,15 @@ def import_vote_wabstic(
 
             if entity_id in added_entities:
                 line_errors.append(
-                    _("${name} was found twice", mapping={'name': entity_id}))
+                    _('${name} was found twice', mapping={'name': entity_id}))
             else:
                 added_entities.append(entity_id)
 
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
             else:
-                entity_name, entity_district, superregion = (
+                entity_name, entity_district, _superregion = (
                     get_entity_and_district(
                         entity_id, entities, vote, principal, line_errors
                     )
@@ -199,9 +201,9 @@ def import_vote_wabstic(
         # Check if the entity is counted
         try:
             counted_num = validate_integer(line, 'sperrung')
-            counted = False if counted_num == 0 else True
+            counted = counted_num != 0
         except ValueError:
-            line_errors.append(_("Invalid values"))
+            line_errors.append(_('Invalid values'))
         else:
             if not counted:
                 continue
@@ -246,7 +248,7 @@ def import_vote_wabstic(
             empty['counter-proposal'] = validate_integer(line, 'stmn1ohneaw')
             empty['tie-breaker'] = validate_integer(line, 'stmn2ohneaw')
         except ValueError:
-            line_errors.append(_("Could not read the empty votes"))
+            line_errors.append(_('Could not read the empty votes'))
 
         # Pass the line errors
         if line_errors:
@@ -285,7 +287,7 @@ def import_vote_wabstic(
             remaining.add(0)
         remaining -= {r['entity_id'] for r in ballot_results[ballot_type]}
         for entity_id in remaining:
-            entity_name, entity_district, superregion = (
+            entity_name, entity_district, _superregion = (
                 get_entity_and_district(
                     entity_id, entities, vote, principal
                 )
@@ -315,9 +317,11 @@ def import_vote_wabstic(
     ballot_ids = {b: vote.ballot(b).id for b in used_ballot_types}
 
     session = object_session(vote)
+    assert session is not None
     session.flush()
+    # FIXME: Switch to regular `session.execute` with insert statements
     session.bulk_insert_mappings(
-        BallotResult,
+        BallotResult,  # type: ignore[arg-type]
         (
             dict(**result, ballot_id=ballot_ids[ballot_type])
             for ballot_type in used_ballot_types

@@ -30,6 +30,7 @@ If you need to serve something on another path you can::
         return StaticFile.from_application(app, 'favicon.ico')
 
 """
+from __future__ import annotations
 
 import os.path
 
@@ -44,7 +45,7 @@ from more.webassets.tweens import (
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from morepath import Response
-    from typing_extensions import Self
+    from typing import Self
 
     from .request import CoreRequest
 
@@ -64,7 +65,7 @@ class StaticFile:
         return self.path
 
     @classmethod
-    def from_application(cls, app: Framework, absorb: str) -> 'Self | None':
+    def from_application(cls, app: Framework, absorb: str) -> Self | None:
         """ Absorbs all /static/* paths and returns :class:`StaticFile`
         instances with the path set to a subpath of
         :meth:`onegov.core.Framework.static_files`.
@@ -107,13 +108,13 @@ def get_static_file(app: Framework, absorb: str) -> StaticFile | None:
 
 
 @Framework.view(model=StaticFile, render=render_file, permission=Public)
-def view_static_file(self: StaticFile, request: 'CoreRequest') -> str | None:
+def view_static_file(self: StaticFile, request: CoreRequest) -> str | None:
     """ Renders the given static file in the browser. """
 
     if self.version:
 
         @request.after
-        def cache_forever(response: 'Response') -> None:
+        def cache_forever(response: Response) -> None:
             response.headers['Cache-Control'] = 'max-age=31536000'
 
     for directory in request.app.static_files:

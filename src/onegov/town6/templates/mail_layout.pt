@@ -35,7 +35,7 @@
 
     img {
         height: auto;
-        margin-bottom: 10px;
+        Margin-bottom: 10px;
         max-width: 100%;
         width: auto;
     }
@@ -60,8 +60,8 @@
     .btn-primary {
         text-decoration: none;
         color: #FFF;
-        background-color: ${primary_color};
-        border: solid ${primary_color};
+        background-color: <tal:b replace="primary_color" />;
+        border: solid <tal:b replace="primary_color" />;
         border-width: 10px 20px;
         line-height: 2;
         font-weight: bold;
@@ -108,6 +108,21 @@
     table {
         width: 100% !important;
     }
+
+    table.fit-content {
+        width: auto !important;
+    }
+
+    table.fit-content td {
+        vertical-align: middle;
+    }
+
+    .arrow {
+        font-size: 22px;
+        font-weight: bold;
+        padding: 20px 40px;
+    }
+
 
     table.body-wrap {
         width: 100%;
@@ -184,7 +199,7 @@
     ul.flat,
     ul.flat li {
         list-style: none;
-        margin: 0;
+        Margin: 0;
         padding: 0;
     }
 
@@ -193,10 +208,14 @@
     }
 
     hr {
-        border: 2px solid ${primary_color};
+        border: 2px solid <tal:b replace="primary_color" />;
         border-width: 2px 0 0 0;
         Margin-bottom: 20px;
-        margin-top: 20px;
+        Margin-top: 20px;
+    }
+
+    hr.gray {
+        border: 1px solid #ddd;
     }
 
     hr.large {
@@ -208,6 +227,13 @@
         color: #222;
         Margin-bottom: 10px;
         padding: 0;
+    }
+
+    .token {
+        background-color: #f5f5f5;
+        Margin-bottom: 10px;
+        padding: 0;
+        font-size: 22px;
     }
 
     .header {
@@ -248,7 +274,7 @@
 
     .current-message {
         Margin-bottom: 10px;
-        border-left: 4px solid ${primary_color};
+        border-left: 4px solid <tal:b replace="primary_color" />;
     }
 
     .inline-message p:last-child {
@@ -284,13 +310,14 @@
     .logo svg {
         display: block;
         height: 6em;
-        margin: 0 auto;
+        Margin: 0 auto;
+        padding-bottom: 20px;
     }
 
     #message-area .card {
         border: 0;
         max-width: 80%;
-        margin-bottom: 1rem;
+        Margin-bottom: 1rem;
     }
     #message-area .card .card-section {
         border-radius: 0.7rem;
@@ -298,14 +325,14 @@
     }
     #message-area .card .card-section p {
         white-space: pre-wrap;
-        margin-bottom: 0;
+        Margin-bottom: 0;
     }
     #message-area .card .info {
         color: #DDDDDD;
-        margin-bottom: 0;
-        margin-left: 0.7rem;
-        margin-right: 0.7rem;
-        }
+        Margin-bottom: 0;
+        Margin-left: 0.7rem;
+        Margin-right: 0.7rem;
+    }
     #message-area .card .card-section + .info {
         text-align: right;
     }
@@ -313,7 +340,7 @@
         place-self: end;
     }
     #message-area .card.right .card-section {
-        background: ${primary_color};
+        background: <tal:b replace="primary_color" />;
         color: #FFF;
     }
     #message-area .card.left {
@@ -330,7 +357,7 @@
     .ticket-chat #message-area {
         border: 1px solid #DDDDDD;
         padding: 1rem;
-        margin: 1rem 0;
+        Margin: 1rem 0;
     }
 
     </style>
@@ -346,20 +373,20 @@
                 <!-- content -->
                 <div class="content">
                     <div class="logo">
-                        <tal:b metal:define-slot="logo" />
+                        <img tal:condition="layout.org.logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
                     </div>
-                <table>
-                    <tr>
-                        <td>
-                            <div metal:define-slot="body"></div>
-                        </td>
-                    </tr>
-                    <tr tal:define="signature layout.macros['email_signature']|nothing" tal:condition="signature">
-                        <td>
-                            <metal:b use-macro="signature" />
-                        </td>
-                    </tr>
-                </table>
+                    <table>
+                        <tr>
+                            <td>
+                                <div metal:define-slot="body"></div>
+                            </td>
+                        </tr>
+                        <tr tal:define="signature layout.macros['email_signature']|nothing" tal:condition="signature">
+                            <td>
+                                <metal:b use-macro="signature" />
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </td>
             <td></td>

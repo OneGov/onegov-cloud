@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import jwt
 
 from datetime import timedelta
+from functools import lru_cache
 from onegov.api import ApiApp
 from onegov.api.models import ApiException, ApiKey
 from onegov.api.token import try_get_encoded_token, jwt_decode
@@ -14,25 +17,41 @@ if TYPE_CHECKING:
     from morepath.request import Response
 
 
-def authenticate(request: 'CoreRequest') -> ApiKey:
+# TODO: Do we allow this to update request.identity, so we can elevate
+#       privileges for what a given API token is allowed to see?
+def authenticate(request: CoreRequest) -> ApiKey:
     if request.authorization is None:
         raise HTTPUnauthorized()
 
-    try:
-        auth = try_get_encoded_token(request)
-        data = jwt_decode(request, auth)
-    except jwt.ExpiredSignatureError as exception:
-        raise HTTPUnauthorized() from exception
-    except Exception as e:
-        raise ApiException(exception=e) from e
+    with ApiException.capture_exceptions():
+        try:
+            auth = try_get_encoded_token(request)
+            data = jwt_decode(request, auth)
+        except jwt.ExpiredSignatureError as exception:
+            raise HTTPUnauthorized() from exception
 
-    api_key = request.session.query(ApiKey).get(data['id'])
+    api_key = request.session.get(ApiKey, data['id'])
     if api_key is None:
         raise HTTPClientError()
+
     return api_key
 
 
-def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
+# NOTE: This is a workaround for the problem above, when we only care
+#       about whether or not we're authorized and not what kind of
+#       permissions are attached to our ApiKey, then we can use this
+#       function.
+@lru_cache(16)
+def is_authorized(request: CoreRequest) -> bool:
+    try:
+        authenticate(request)
+    except Exception:
+        return False
+    else:
+        return True
+
+
+def check_rate_limit(request: CoreRequest) -> dict[str, str]:
     """ Checks if the rate limit for the current client.
 
     Raises an exception if the rate limit is reached. Returns response headers
@@ -70,11 +89,11 @@ def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
     headers = {
         'X-RateLimit-Limit': str(limit),
         'X-RateLimit-Remaining': str(max(limit - requests, 0)),
-        'X-RateLimit-Reset': reset.strftime("%a, %d %b %Y %H:%M:%S GMT")
+        'X-RateLimit-Reset': reset.strftime('%a, %d %b %Y %H:%M:%S GMT')
     }
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         for header in headers.items():
             response.headers.add(*header)
 

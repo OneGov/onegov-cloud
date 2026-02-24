@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.chat import TextModuleCollection
 from onegov.core.elements import Link
 from onegov.core.utils import Bunch
@@ -21,8 +23,8 @@ if TYPE_CHECKING:
 
 
 def get_global_tools(
-    request: 'LandsgemeindeRequest'
-) -> 'Iterator[Link | LinkGroup]':
+    request: LandsgemeindeRequest
+) -> Iterator[Link | LinkGroup]:
 
     if request.is_logged_in:
         assert request.current_username is not None
@@ -32,7 +34,7 @@ def get_global_tools(
             request.current_username, classes=('user',),
             links=(
                 Link(
-                    _("Logout"), request.link(
+                    _('Logout'), request.link(
                         Auth.from_request(
                             request, to=logout_path(request)), name='logout'
                     ),
@@ -44,34 +46,34 @@ def get_global_tools(
         # Management Dropdown
         if request.is_admin:
             yield LinkGroup(
-                _("Management"), classes=('management',),
+                _('Management'), classes=('management',),
                 links=(
                     Link(
-                        _("Files"),
+                        _('Files'),
                         request.class_link(GeneralFileCollection),
                         attrs={'class': 'files'}
                     ),
                     Link(
-                        _("Images"),
+                        _('Images'),
                         request.class_link(ImageFileCollection),
                         attrs={'class': 'images'}
                     ),
                     Link(
-                        _("Text modules"),
+                        _('Text modules'),
                         request.class_link(TextModuleCollection),
                         attrs={'class': 'text-modules'}
                     ),
                     Link(
-                        _("Users"), request.class_link(UserCollection),
+                        _('Users'), request.class_link(UserCollection),
                         attrs={'class': 'user'}
                     ),
                     Link(
-                        _("Settings"),
+                        _('Settings'),
                         request.link(request.app.org, 'settings'),
                         attrs={'class': 'settings'}
                     ),
                     Link(
-                        _("People"), request.class_link(PersonCollection),
+                        _('People'), request.class_link(PersonCollection),
                         attrs={'class': 'people'}
                     ),
                 )
@@ -79,13 +81,13 @@ def get_global_tools(
 
 
 def get_top_navigation(
-    request: 'LandsgemeindeRequest'
-) -> 'Iterator[NavigationEntry]':
+    request: LandsgemeindeRequest
+) -> Iterator[NavigationEntry]:
 
     yield (  # type:ignore[misc]
         Bunch(id=-1, access='public', published=True),
         Link(
-            text=_("Assemblies"),
+            text=_('Archive'),
             url=request.class_link(AssemblyCollection)
         ),
         ()

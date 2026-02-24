@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.form import FormDefinition
 
@@ -23,8 +25,8 @@ if TYPE_CHECKING:
 )
 def town_handle_form_submissions_export(
     self: FormDefinition,
-    request: 'TownRequest',
+    request: TownRequest,
     form: FormSubmissionsExport
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_form_submissions_export(
         self, request, form, FormSubmissionLayout(self, request))

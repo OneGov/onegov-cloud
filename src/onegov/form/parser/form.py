@@ -1,10 +1,11 @@
-import re
+from __future__ import annotations
+
 from html import escape
 from onegov.form import errors
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
 from onegov.form.fields import (
-    MultiCheckboxField, DateTimeLocalField, VideoURLField)
+    MultiCheckboxField, DateTimeLocalField, URLField, VideoURLField)
 from onegov.form.fields import TimeField, UploadField, UploadMultipleField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
@@ -25,7 +26,6 @@ from wtforms.fields import PasswordField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.fields import URLField
 from wtforms.validators import Email
 from wtforms.validators import Length
 from wtforms.validators import NumberRange
@@ -41,14 +41,9 @@ if TYPE_CHECKING:
 
 _FormT = TypeVar('_FormT', bound=Form)
 
-# increasing the default filesize is *strongly discouarged*, as we are not
-# storing those files in the database, so they need to fit in memory
-#
-# if this value must be higher, we need to store the files outside the
-# database
-#
+
 MEGABYTE = 1000 ** 2
-DEFAULT_UPLOAD_LIMIT = 50 * MEGABYTE
+DEFAULT_UPLOAD_LIMIT = 100 * MEGABYTE
 
 
 @overload
@@ -104,18 +99,9 @@ def parse_form(
     return form_class
 
 
-def normalize_label_for_dependency(label: str) -> str:
-    """ Removes all between '(' and ')' Parentheses (inclusive) """
-    if '(' in label and ')' in label:
-        label = re.sub("([(]).*?([)])", "", label)
-        return label[:-1] if label[-1] == " " else label
-    else:
-        return label
-
-
 def handle_field(
-    builder: 'WTFormsClassBuilder[Any]',
-    field: 'ParsedField',
+    builder: WTFormsClassBuilder[Any],
+    field: ParsedField,
     dependency: FieldDependency | None = None
 ) -> None:
     """ Takes the given parsed field and adds it to the form. """
@@ -270,9 +256,9 @@ def handle_field(
             dependency=dependency,
             required=field.required,
             validators=[
-                expected_extensions,
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ],
+            allowed_mimetypes=expected_extensions.whitelist,
             render_kw={'accept': accept},
             description=field.field_help
         )
@@ -288,9 +274,9 @@ def handle_field(
             dependency=dependency,
             required=field.required,
             validators=[
-                expected_extensions,
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ],
+            allowed_mimetypes=expected_extensions.whitelist,
             render_kw={'accept': accept},
             description=field.field_help
         )
@@ -305,6 +291,7 @@ def handle_field(
             choices=[(c.key, c.label) for c in field.choices],
             default=next((c.key for c in field.choices if c.selected), None),
             pricing=field.pricing,
+            discount=field.discount,
             # do not coerce None into 'None'
             coerce=lambda v: str(v) if v is not None else v,
             description=field.field_help
@@ -320,6 +307,7 @@ def handle_field(
             choices=[(c.key, c.label) for c in field.choices],
             default=[c.key for c in field.choices if c.selected],
             pricing=field.pricing,
+            discount=field.discount,
             # do not coerce None into 'None'
             coerce=lambda v: str(v) if v is not None else v,
             description=field.field_help
@@ -358,6 +346,17 @@ def handle_field(
             description=field.field_help
         )
 
+    elif field.type == 'chip_nr':
+        builder.add_field(
+            field_class=StringField,
+            field_id=field.id,
+            label=field.label,
+            dependency=dependency,
+            required=field.required,
+            validators=[Regexp(r'^[0-9]{15}$')],
+            description=field.field_help
+        )
+
     elif field.type == 'code':
         builder.add_field(
             field_class=TextAreaField,
@@ -376,8 +375,7 @@ def handle_field(
         for choice in field.choices:
             if not choice.fields:
                 continue
-            normalized_label = normalize_label_for_dependency(choice.label)
-            dependency = FieldDependency(field.id, normalized_label)
+            dependency = FieldDependency(field.id, choice.key)
             for choice_field in choice.fields:
                 handle_field(builder, choice_field, dependency)
 
@@ -409,7 +407,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
 
     def validators_extend(
         self,
-        validators: list['Validator[Any, Any]'],
+        validators: list[Validator[Any, Any]],
         required: bool,
         dependency: FieldDependency | None
     ) -> None:
@@ -423,7 +421,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
 
     def validators_add_required(
         self,
-        validators: list['Validator[Any, Any]']
+        validators: list[Validator[Any, Any]]
     ) -> None:
         # we use the DataRequired check instead of InputRequired, since
         # InputRequired only works if the data comes over the wire. We
@@ -435,7 +433,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
 
     def validators_add_dependency(
         self,
-        validators: list['Validator[Any, Any]'],
+        validators: list[Validator[Any, Any]],
         dependency: FieldDependency
     ) -> None:
         # if the dependency is not fulfilled, the field may be empty
@@ -451,7 +449,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
 
     def validators_add_optional(
         self,
-        validators: list['Validator[Any, Any]']
+        validators: list[Validator[Any, Any]]
     ) -> None:
         validators.insert(0, StrictOptional())
 
@@ -464,7 +462,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
         field = getattr(self.form_class, field_id)
         if not field.kwargs.get('render_kw'):
             field.kwargs['render_kw'] = {}
-        field.kwargs['render_kw'].update(dependency.html_data)
+        field.kwargs['render_kw'].update(dependency.html_data(''))
 
     def get_unique_field_id(
         self,
@@ -488,19 +486,19 @@ class WTFormsClassBuilder(Generic[_FormT]):
 
     def add_field(
         self,
-        field_class: type['WTField'],
+        field_class: type[WTField],
         field_id: str,
         label: str,
         required: bool,
         dependency: FieldDependency | None = None,
-        pricing: 'PricingRules | None' = None,
-        validators: list['Validator[Any, Any]'] | None = None,
+        pricing: PricingRules | None = None,
+        validators: list[Validator[Any, Any]] | None = None,
         description: str | None = None,
-        widget: 'Widget[Any] | None' = None,
+        widget: Widget[Any] | None = None,
         render_kw: dict[str, Any] | None = None,
         # for field classes that have more than just the base arguments
         **extra_field_kwargs: Any
-    ) -> 'WTField':
+    ) -> WTField:
         validators = validators or []
 
         if hasattr(self.form_class, field_id):

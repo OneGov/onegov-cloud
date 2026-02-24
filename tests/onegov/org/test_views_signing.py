@@ -1,23 +1,30 @@
-import re
-from unittest.mock import patch
+from __future__ import annotations
 
+import re
 import transaction
-import vcr
-from webtest import Upload
-from yubico_client import Yubico
+import vcr  # type: ignore[import-untyped]
 
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.user import UserCollection
+from unittest.mock import patch
+from webtest import Upload
+from yubico_client import Yubico  # type: ignore[import-untyped]
 
 
-def test_sign_document(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import ExtendedResponse
+    from .conftest import Client
+
+
+def test_sign_document(client: Client) -> None:
     client.login_admin()
 
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with open(path, 'rb') as f:
         page = client.get('/files')
-        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
     pdf = FileCollection(client.app.session()).query().one()
@@ -32,9 +39,13 @@ def test_sign_document(client):
     assert 'Siegel' in page
 
     # applying a seal only works if the given user has a yubikey setup
-    def sign(client, page, token):
-        rex = r"'(http://\w+/\w+/\w+/sign?[^']+)'"
-        url = re.search(rex, str(page)).group(1)
+    def sign(
+        client: Client,
+        page: ExtendedResponse,
+        token: str
+    ) -> ExtendedResponse:
+        rex = r'"(http://\w+/\w+/\w+/sign?[^"]+)"'
+        url = re.search(rex, page.text).group(1)  # type: ignore[union-attr]
         return client.post(url, {'token': token})
 
     assert "Bitte geben Sie Ihren Yubikey ein" in sign(client, page, '')
@@ -43,9 +54,10 @@ def test_sign_document(client):
     # not just any yubikey either, it has to be the one linked to the account
     transaction.begin()
 
-    user = UserCollection(client.app.session())\
-        .by_username('admin@example.org')
+    user = (UserCollection(client.app.session())
+        .by_username('admin@example.org'))
 
+    assert user is not None
     user.second_factor = {
         'type': 'yubikey',
         'data': 'ccccccbcgujh'
@@ -81,9 +93,10 @@ def test_sign_document(client):
                 client, page, 'ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded')
 
     # we should at this point see some useful metadata on the file
-    metadata = FileCollection(client.app.session())\
-        .query().one().signature_metadata
+    metadata = (FileCollection(client.app.session())
+        .query().one().signature_metadata)
 
+    assert metadata is not None
     assert metadata['token'] == 'ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
     assert metadata['signee'] == 'admin@example.org'
 
@@ -94,5 +107,5 @@ def test_sign_document(client):
     # at this point should yield another message
     pdf = FileCollection(client.app.session()).query().one()
     client.get(f'/storage/{pdf.id}/details').click("Löschen")
-    assert 'Datei mit digitalem Siegel gel\\u00f6scht' in client.get(
+    assert 'Datei mit digitalem Siegel gelöscht' in client.get(
         '/timeline').text

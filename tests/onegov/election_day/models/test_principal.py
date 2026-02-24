@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from freezegun import freeze_time
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
@@ -5,18 +7,23 @@ from onegov.election_day.models import Principal
 from textwrap import dedent
 
 
-SUPPORTED_YEARS = list(range(2002, 2024 + 1))
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
 
-SUPPORTED_YEARS_MAP = list(range(2013, 2024 + 1))
+
+SUPPORTED_YEARS = list(range(2002, 2026 + 1))
+
+SUPPORTED_YEARS_MAP = list(range(2013, 2026 + 1))
 SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
 
-SUPPORTED_YEARS_MAP_ADDITIONAL = list(range(2004, 2024 + 1))
+SUPPORTED_YEARS_MAP_ADDITIONAL = list(range(2004, 2026 + 1))
 SUPPORTED_YEARS_NO_MAP_ADDITIONAL = list(
     set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP_ADDITIONAL)
 )
 
 
-def test_principal_load():
+def test_principal_load() -> None:
     # Canton with minimal options
     principal = Principal.from_yaml(dedent("""
         name: Kanton Zug
@@ -197,10 +204,10 @@ def test_principal_load():
     assert principal.wabsti_import is False
 
 
-def test_canton():
+def test_canton() -> None:
     # All cantons
-    for canton in Canton.CANTONS:
-        principal = Canton(name=canton, canton=canton)
+    for canton_name in Canton.CANTONS:
+        principal = Canton(name=canton_name, canton=canton_name)
         for year in SUPPORTED_YEARS:
             assert principal.entities[year]
 
@@ -274,9 +281,9 @@ def test_canton():
     assert not canton.get_superregions(2022)
 
 
-def test_municipality_entities():
+def test_municipality_entities() -> None:
     # Municipality without quarters
-    with freeze_time("{}-01-01".format(SUPPORTED_YEARS[-1])):
+    with freeze_time(f"{SUPPORTED_YEARS[-1]}-01-01"):
         principal = Municipality(
             name='Kriens', municipality='1059', canton='lu',
             canton_name='Kanton Luzern'
@@ -300,9 +307,10 @@ def test_municipality_entities():
     assert principal.entities == {year: entities for year in SUPPORTED_YEARS}
 
 
-def test_principal_years_available():
+def test_principal_years_available() -> None:
+    principal: Canton | Municipality
     # Municipality without quarters/map
-    with freeze_time("{}-01-01".format(SUPPORTED_YEARS[-1])):
+    with freeze_time(f"{SUPPORTED_YEARS[-1]}-01-01"):
         principal = Municipality(
             name='Kriens', municipality='1059', canton='lu',
             canton_name='Kanton Luzern'
@@ -348,10 +356,12 @@ def test_principal_years_available():
                 assert principal.is_year_available(year, map_required=False)
 
 
-def test_principal_label(election_day_app_zg):
+def test_principal_label(election_day_app_zg: TestApp) -> None:
+    principal: Canton | Municipality
 
-    def translate(text, locale):
+    def translate(text: Any, locale: str) -> str:
         translator = election_day_app_zg.translations.get(locale)
+        assert translator is not None
         return text.interpolate(translator.gettext(text))
 
     # Default (Canton)

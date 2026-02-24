@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.landsgemeinde import _
 from onegov.core.security import Private
 from onegov.landsgemeinde.app import LandsgemeindeApp
@@ -23,9 +25,9 @@ if TYPE_CHECKING:
 )
 def landsgemeinde_handle_new_person(
     self: PersonCollection,
-    request: 'LandsgemeindeRequest',
+    request: LandsgemeindeRequest,
     form: PersonForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     form.location_code_city.label.text = _('Location')
     layout = PersonCollectionLayout(self, request)
@@ -41,9 +43,9 @@ def landsgemeinde_handle_new_person(
 )
 def landsgemeinde_handle_edit_person(
     self: Person,
-    request: 'LandsgemeindeRequest',
+    request: LandsgemeindeRequest,
     form: PersonForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     form.location_code_city.label.text = _('Location')
     layout = PersonLayout(self, request)

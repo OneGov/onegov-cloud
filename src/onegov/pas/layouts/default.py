@@ -1,9 +1,17 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.pas import _
 from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
 
+from typing import TYPE_CHECKING
+
 
 class DefaultLayout(BaseDefaultLayout):
+
+    if TYPE_CHECKING:
+        from onegov.pas.request import PasRequest
+        request: PasRequest
 
     @cached_property
     def pas_settings_url(self) -> str:

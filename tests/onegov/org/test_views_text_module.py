@@ -1,4 +1,12 @@
-def test_view_text_modules(client):
+from __future__ import annotations
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_view_text_modules(client: Client) -> None:
     client.login_editor()
 
     # create

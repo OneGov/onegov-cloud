@@ -7,31 +7,35 @@
             No bank account defined. Please define a bank account in the <a href="${request.return_here('/settings')}" i18n:name="link" i18n:translate>settings</a> first.
         </div>
 
-        <div class="row" tal:condition="layout.app.org.meta.get('bank_account', None) and not uploaded">
-            <div class="columns small-12 medium-8">
+        <div class="grid-x grid-padding-x" tal:condition="layout.app.org.meta.get('bank_account', None) and not uploaded">
+            <div class="medium-8 large-7 cell content">
                 <div metal:use-macro="layout.macros['form']"/>
             </div>
-            <div class="columns small-12 medium-4">
-                <div class="panel">
-                    <p i18n:translate>
-                        Your statement is required to be in "ISO-20022 format (without picture)". Banks may also refer to it as "camt.054" or "camt.053". Be sure to ask your bank to switch your account to this format or to select this format in your online banking profile.
-                    </p>
+            <div class="cell small-12 medium-4 large-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel">
+                        <div class="panel">
+                            <p i18n:translate>
+                                Your statement is required to be in "ISO-20022 format (without picture)". Banks may also refer to it as "camt.054" or "camt.053". Be sure to ask your bank to switch your account to this format or to select this format in your online banking profile.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="row" tal:condition="uploaded">
-            <div class="columns small-12 medium-8">
+        <div class="grid-x grid-padding-x" tal:condition="uploaded">
+            <div class="medium-8 large-7 cell content">
                 <ul class="transactions">
                     <li tal:repeat="transaction transactions" class="transaction-${transaction.state}">
-                        <div class="transaction-header row collapse">
-                            <div class="columns small-4">
+                        <div class="transaction-header grid-x collapse">
+                            <div class="cell small-4">
                                 <div class="show-for-sr" i18n:translate>
                                     Amount
                                 </div>
                                 ${transaction.amount} ${transaction.currency}
                             </div>
-                            <div class="columns small-8">
+                            <div class="cell small-8">
                                 <tal:b condition="transaction.username">
                                     <div class="show-for-sr" i18n:translate>
                                         Username
@@ -46,8 +50,8 @@
                                 </tal:b>
                             </div>
                         </div>
-                        <div class="transaction-details row collapse">
-                            <div class="columns small-12 medium-6">
+                        <div class="transaction-details grid-x collapse">
+                            <div class="cell small-12 medium-6">
                                 <dl>
                                     <tal:b condition="transaction.valuta_date">
                                         <dt i18n:translate>Valuta Date</dt>
@@ -71,7 +75,7 @@
                                 </dl>
                             </div>
 
-                            <div class="columns small-12 medium-6">
+                            <div class="cell small-12 medium-6">
                                 <dl>
                                     <tal:b condition="transaction.note">
                                         <dt i18n:translate>Note</dt>
@@ -95,34 +99,36 @@
                     </li>
                 </ul>
             </div>
-            <div class="columns small-12 medium-4">
-                <div>
-                    <a ic-post-to="${post_url}" redirect-after="${request.link(model)}" class="button expand" i18n:translate>Import <tal:b i18n:name="count">${success_count}</tal:b> payments</a>
-                </div>
-                <div class="side-panel">
-                    <h2 i18n:translate>Legend</h2>
-                    <ul class="legend fa-ul">
-                        <li>
-                            <i class="fa-li fa fa-check-circle fa-fw green" aria-hidden="true"></i>
-                            <span i18n:translate>Payment detected.</span>
-                        </li>
-                        <li>
-                            <i class="fa-li fa fa-exclamation-triangle fa-fw orange" aria-hidden="true"></i>
-                            <span i18n:translate>The amount, note or reference is wrong.</span>
-                        </li>
-                        <li>
-                            <i class="fa-li fa fa-clone fa-fw blue" aria-hidden="true"></i>
-                            <span i18n:translate>The payment was found twice.</span>
-                        </li>
-                        <li>
-                            <i class="fa-li fa fa-check-circle-o gray-dark" aria-hidden="true"></i>
-                            <span i18n:translate>The payment has already been imported.</span>
-                        </li>
-                        <li>
-                            <i class="fa-li fa fa-question-circle fa-fw red" aria-hidden="true"></i>
-                            <span i18n:translate>Could not match the payment to a bill.</span>
-                        </li>
-                    </ul>
+            <div class="cell small-12 medium-4 large-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel">
+                        <a ic-post-to="${post_url}" redirect-after="${request.link(model)}" class="button expand" i18n:translate>Import <tal:b i18n:name="count">${success_count}</tal:b> payments</a>
+                    </div>
+                    <div class="side-panel legend-panel">
+                        <h3 i18n:translate>Legend</h3>
+                        <ul class="legend fa-ul">
+                            <li>
+                                <i class="fa-li fa fa-check-circle fa-fw green" aria-hidden="true"></i>
+                                <span i18n:translate>Payment detected.</span>
+                            </li>
+                            <li>
+                                <i class="fa-li fa fa-exclamation-triangle fa-fw orange" aria-hidden="true"></i>
+                                <span i18n:translate>The amount, note or reference is wrong.</span>
+                            </li>
+                            <li>
+                                <i class="fa-li fa fa-clone fa-fw blue" aria-hidden="true"></i>
+                                <span i18n:translate>The payment was found twice.</span>
+                            </li>
+                            <li>
+                                <i class="fa-li fa fa-check-circle-o gray-dark" aria-hidden="true"></i>
+                                <span i18n:translate>The payment has already been imported.</span>
+                            </li>
+                            <li>
+                                <i class="fa-li fa fa-question-circle fa-fw red" aria-hidden="true"></i>
+                                <span i18n:translate>Could not match the payment to a bill.</span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>

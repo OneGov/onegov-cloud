@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.swissvotes import _
 from onegov.swissvotes import SwissvotesApp
@@ -20,19 +22,19 @@ if TYPE_CHECKING:
 )
 def handle_forbidden(
     self: HTTPForbidden,
-    request: 'SwissvotesRequest'
-) -> 'RenderData':
+    request: SwissvotesRequest
+) -> RenderData:
     """ Displays a nice HTTP 403 error. """
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = self.code
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _("Access Denied"),
+        'title': _('Access Denied'),
         'message': _(
-            "You are trying to open a page for which you are not authorized."
+            'You are trying to open a page for which you are not authorized.'
         )
     }
 
@@ -44,16 +46,16 @@ def handle_forbidden(
 )
 def handle_notfound(
     self: HTTPNotFound,
-    request: 'SwissvotesRequest'
-) -> 'RenderData':
+    request: SwissvotesRequest
+) -> RenderData:
     """ Displays a nice HTTP 404 error. """
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = self.code
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _("Page not Found"),
-        'message': _("The page you are looking for could not be found."),
+        'title': _('Page not Found'),
+        'message': _('The page you are looking for could not be found.'),
     }

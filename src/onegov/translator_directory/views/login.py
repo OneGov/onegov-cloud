@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
-from onegov.org.views.auth import handle_login as handle_login_base
+from onegov.town6.views.auth import town_handle_login as handle_login_base
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.forms.login import LoginForm
@@ -22,13 +24,13 @@ if TYPE_CHECKING:
 )
 def handle_login(
     self: Auth,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: LoginForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     # custom username handle
     form.username.label.text = request.translate(
-        _("E-Mail Address / Username / Shortcut")
+        _('E-Mail Address / Username / Shortcut')
     )
 
     return handle_login_base(self, request, form)

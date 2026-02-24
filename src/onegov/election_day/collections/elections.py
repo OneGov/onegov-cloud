@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.collection import Pagination
 from onegov.election_day.models import Election
 from sqlalchemy import cast
@@ -11,7 +13,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
 
 
 class ElectionCollection(Pagination[Election]):
@@ -20,7 +22,7 @@ class ElectionCollection(Pagination[Election]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
         year: int | None = None
     ):
@@ -33,7 +35,7 @@ class ElectionCollection(Pagination[Election]):
             return False
         return self.year == other.year and self.page == other.page
 
-    def subset(self) -> 'Query[Election]':
+    def subset(self) -> Query[Election]:
         query = self.query()
         query = query.order_by(
             desc(Election.date), Election.shortcode, Election.title
@@ -47,13 +49,13 @@ class ElectionCollection(Pagination[Election]):
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(self.session, index, self.year)
 
-    def for_year(self, year: int | None) -> 'Self':
+    def for_year(self, year: int | None) -> Self:
         return self.__class__(self.session, 0, year)
 
-    def query(self) -> 'Query[Election]':
+    def query(self) -> Query[Election]:
         return self.session.query(Election)
 
     def get_latest(self) -> list[Election] | None:
@@ -75,7 +77,7 @@ class ElectionCollection(Pagination[Election]):
 
         return [year for year, in query]
 
-    def by_date(self, date: 'date') -> list[Election]:
+    def by_date(self, date: date) -> list[Election]:
         """ Returns the elections on the given date. """
 
         query = self.query()

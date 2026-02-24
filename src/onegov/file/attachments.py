@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pdftotext  # type:ignore
 
 from depot.fields.upload import UploadedFile
@@ -11,7 +13,7 @@ from onegov.file.utils import get_image_size
 from onegov.file.utils import get_svg_size
 from onegov.file.utils import IMAGE_MIME_TYPES
 from onegov.file.utils import word_count
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 from tempfile import SpooledTemporaryFile
 from onegov.pdf.utils import extract_pdf_info
 
@@ -19,7 +21,7 @@ from onegov.pdf.utils import extract_pdf_info
 from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from depot.io.interfaces import _FileContent
-    from typing_extensions import NotRequired, TypedDict
+    from typing import NotRequired, TypedDict
 
     class _ImageSaveOptionalParams(TypedDict):
         exif: NotRequired[Image.Exif]
@@ -40,7 +42,7 @@ def get_svg_size_or_default(content: IO[bytes]) -> tuple[str, str]:
 
 
 def strip_exif_and_limit_and_store_image_size(
-    file: 'ProcessedUploadedFile',
+    file: ProcessedUploadedFile,
     content: IO[bytes],
     content_type: str | None
 ) -> IO[bytes] | None:
@@ -74,6 +76,9 @@ def strip_exif_and_limit_and_store_image_size(
         params: _ImageSaveOptionalParams = {}
 
         if has_exif:
+            # bake EXIF orientation into the image
+            ImageOps.exif_transpose(image, in_place=True)
+
             # replace EXIF section with an empty one
             params['exif'] = Image.Exif()
 
@@ -82,7 +87,7 @@ def strip_exif_and_limit_and_store_image_size(
                 (IMAGE_MAX_SIZE, IMAGE_MAX_SIZE), Image.Resampling.LANCZOS
             )
 
-        content = SpooledTemporaryFile(INMEMORY_FILESIZE)
+        content = SpooledTemporaryFile(INMEMORY_FILESIZE)  # noqa: SIM115
         try:
             # Quality is only supported by jpeg
             image.save(content, image.format, quality=IMAGE_QUALITY, **params)
@@ -96,7 +101,7 @@ def strip_exif_and_limit_and_store_image_size(
 
 
 def store_checksum(
-    file: 'ProcessedUploadedFile',
+    file: ProcessedUploadedFile,
     content: IO[bytes],
     content_type: str | None
 ) -> None:
@@ -105,7 +110,7 @@ def store_checksum(
 
 
 def sanitize_svg_images(
-    file: 'ProcessedUploadedFile',
+    file: ProcessedUploadedFile,
     content: IO[bytes],
     content_type: str | None
 ) -> IO[bytes]:
@@ -118,7 +123,7 @@ def sanitize_svg_images(
 
 
 def store_extract_and_pages(
-    file: 'ProcessedUploadedFile',
+    file: ProcessedUploadedFile,
     content: IO[bytes],
     content_type: str | None
 ) -> None:
@@ -143,7 +148,7 @@ class ProcessedUploadedFile(UploadedFile):
 
     def process_content(
         self,
-        content: '_FileContent',
+        content: _FileContent,
         filename: str | None = None,
         content_type: str | None = None
     ) -> None:

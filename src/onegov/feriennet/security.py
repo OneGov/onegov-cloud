@@ -1,5 +1,9 @@
+from __future__ import annotations
+
 from onegov.activity import Activity, ActivityCollection, Booking, Occasion
 from onegov.core.security import Public, Private, Personal
+from onegov.core.security.roles import (
+    get_roles_setting as get_roles_setting_base)
 from onegov.core.security.rules import has_permission_logged_in
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import NotificationTemplateCollection
@@ -7,12 +11,20 @@ from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.const import VISIBLE_ACTIVITY_STATES
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.feriennet.models import NotificationTemplate
-from onegov.org.models import ImageFileCollection, SiteCollection
+from onegov.org.models import ImageFileCollection, SiteCollection, TicketNote
+from onegov.ticket import Ticket
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from morepath.authentication import Identity, NoIdentity
+    from onegov.core.security.roles import Intent
+
+
+@FeriennetApp.replace_setting_section(section='roles')
+def get_roles_setting() -> dict[str, set[type[Intent]]]:
+    # NOTE: Without a supporter role for now
+    return get_roles_setting_base()
 
 
 def is_owner(username: str, activity: Activity) -> bool:
@@ -29,7 +41,7 @@ def is_owner(username: str, activity: Activity) -> bool:
 @FeriennetApp.permission_rule(model=object, permission=object)
 def local_has_permission_logged_in(
     app: FeriennetApp,
-    identity: 'Identity',
+    identity: Identity,
     model: object,
     permission: object
 ) -> bool:
@@ -45,7 +57,7 @@ def local_has_permission_logged_in(
 @FeriennetApp.permission_rule(model=object, permission=Private)
 def has_private_permission_logged_in(
     app: FeriennetApp,
-    identity: 'Identity',
+    identity: Identity,
     model: object,
     permission: type[Private]
 ) -> bool:
@@ -63,7 +75,7 @@ def has_private_permission_logged_in(
 @FeriennetApp.permission_rule(model=SiteCollection, permission=Private)
 def has_private_permission_site_collection(
     app: FeriennetApp,
-    identity: 'Identity',
+    identity: Identity,
     model: SiteCollection,
     permission: type[Private]
 ) -> bool:
@@ -78,7 +90,7 @@ def has_private_permission_site_collection(
 @FeriennetApp.permission_rule(model=ImageFileCollection, permission=Private)
 def has_private_permission_image_collection(
     app: FeriennetApp,
-    identity: 'Identity',
+    identity: Identity,
     model: ImageFileCollection,
     permission: type[Private]
 ) -> bool:
@@ -96,7 +108,7 @@ def has_private_permission_image_collection(
 @FeriennetApp.permission_rule(model=ActivityCollection, permission=Private)
 def has_private_permission_activity_collections(
     app: FeriennetApp,
-    identity: 'Identity',
+    identity: Identity,
     model: ActivityCollection[Any],
     permission: type[Private]
 ) -> bool:
@@ -114,7 +126,7 @@ def has_private_permission_activity_collections(
 @FeriennetApp.permission_rule(model=Activity, permission=Private)
 def has_private_permission_activities(
     app: FeriennetApp,
-    identity: 'Identity',
+    identity: Identity,
     model: Activity,
     permission: type[Private]
 ) -> bool:
@@ -132,7 +144,7 @@ def has_private_permission_activities(
 @FeriennetApp.permission_rule(model=Occasion, permission=Private)
 def has_private_permission_occasions(
     app: FeriennetApp,
-    identity: 'Identity',
+    identity: Identity,
     model: Occasion,
     permission: type[Private]
 ) -> bool:
@@ -153,7 +165,7 @@ def has_private_permission_occasions(
 )
 def has_private_permission_notifications(
     app: FeriennetApp,
-    identity: 'Identity',
+    identity: Identity,
     model: NotificationTemplateCollection,
     permission: type[Private]
 ) -> bool:
@@ -168,7 +180,7 @@ def has_private_permission_notifications(
 @FeriennetApp.permission_rule(model=NotificationTemplate, permission=Private)
 def has_private_permission_notification(
     app: FeriennetApp,
-    identity: 'Identity',
+    identity: Identity,
     model: NotificationTemplate,
     permission: type[Private]
 ) -> bool:
@@ -183,7 +195,7 @@ def has_private_permission_notification(
 @FeriennetApp.permission_rule(model=Activity, permission=Public, identity=None)
 def has_public_permission_not_logged_in(
     app: FeriennetApp,
-    identity: 'NoIdentity | None',
+    identity: NoIdentity | None,
     model: Activity,
     permission: type[Public]
 ) -> bool:
@@ -195,7 +207,7 @@ def has_public_permission_not_logged_in(
 @FeriennetApp.permission_rule(model=Activity, permission=Public)
 def has_public_permission_logged_in(
     app: FeriennetApp,
-    identity: 'Identity',
+    identity: Identity,
     model: Activity,
     permission: type[Public]
 ) -> bool:
@@ -216,7 +228,7 @@ def has_public_permission_logged_in(
 @FeriennetApp.permission_rule(model=Booking, permission=Personal)
 def has_personal_permission_booking(
     app: FeriennetApp,
-    identity: 'Identity',
+    identity: Identity,
     model: Booking,
     permission: type[Personal]
 ) -> bool:
@@ -234,7 +246,7 @@ def has_personal_permission_booking(
 )
 def has_private_permission_occasion_attendee_collection(
     app: FeriennetApp,
-    identity: 'Identity',
+    identity: Identity,
     model: OccasionAttendeeCollection,
     permission: type[Private]
 ) -> bool:
@@ -244,3 +256,21 @@ def has_private_permission_occasion_attendee_collection(
         return True
 
     return local_has_permission_logged_in(app, identity, model, permission)
+
+
+@FeriennetApp.permission_rule(model=Ticket, permission=Personal)
+@FeriennetApp.permission_rule(model=TicketNote, permission=Personal)
+def restrict_personal_ticket_views(
+    app: FeriennetApp,
+    identity: Identity,
+    model: Ticket | TicketNote,
+    permission: type[Personal]
+) -> bool:
+    """
+    Ensure that only managers may view ticket details.
+
+    Since members in feriennet are customers which shouldn't be able to
+    view other customer's private information.
+    """
+
+    return identity.role in ('admin', 'editor')

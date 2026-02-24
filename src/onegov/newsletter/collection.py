@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import normalize_for_url, is_uuid
 from onegov.newsletter import Newsletter, Recipient
 from onegov.newsletter.errors import AlreadyExistsError
@@ -13,10 +15,10 @@ if TYPE_CHECKING:
 
 class NewsletterCollection:
 
-    def __init__(self, session: 'Session'):
+    def __init__(self, session: Session):
         self.session = session
 
-    def query(self) -> 'Query[Newsletter]':
+    def query(self) -> Query[Newsletter]:
         return self.session.query(Newsletter)
 
     def by_name(self, name: str) -> Newsletter | None:
@@ -25,11 +27,12 @@ class NewsletterCollection:
     def add(
         self,
         title: str,
-        html: 'Markup',
+        html: Markup,
         lead: str | None = None,
         meta: dict[str, Any] | None = None,
         content: dict[str, Any] | None = None,
-        scheduled: 'datetime | None' = None
+        scheduled: datetime | None = None,
+        show_only_previews: bool = False
     ) -> Newsletter:
 
         name = normalize_for_url(title)
@@ -44,7 +47,8 @@ class NewsletterCollection:
             lead=lead,
             meta=meta or {},
             content=content or {},
-            scheduled=scheduled
+            scheduled=scheduled,
+            show_only_previews=show_only_previews
         )
 
         self.session.add(newsletter)
@@ -59,16 +63,20 @@ class NewsletterCollection:
 
 class RecipientCollection:
 
-    def __init__(self, session: 'Session'):
+    def __init__(self, session: Session):
         self.session = session
 
-    def query(self) -> 'Query[Recipient]':
+    def query(self) -> Query[Recipient]:
         return self.session.query(Recipient)
 
-    def by_id(self, id: 'str | UUID') -> Recipient | None:
+    def by_id(self, id: str | UUID) -> Recipient | None:
         if is_uuid(id):
             return self.query().filter(Recipient.id == id).first()
         return None
+
+    def by_inactive(self) -> Query[Recipient]:
+        return self.query().filter(
+            Recipient.meta['inactive'].as_boolean() == True)
 
     def by_address(
         self,
@@ -82,7 +90,7 @@ class RecipientCollection:
 
         return query.first()
 
-    def ordered_by_status_address(self) -> 'Query[Recipient]':
+    def ordered_by_status_address(self) -> Query[Recipient]:
         """ Orders the recipients by status and address. """
         return self.query().order_by(Recipient.confirmed, Recipient.address)
 
@@ -90,13 +98,15 @@ class RecipientCollection:
         self,
         address: str,
         group: str | None = None,
-        confirmed: bool = False
+        confirmed: bool = False,
+        subscribed_categories: list[str] | None = None,
     ) -> Recipient:
 
         recipient = Recipient(
             address=address,
             group=group,
-            confirmed=confirmed
+            confirmed=confirmed,
+            subscribed_categories=subscribed_categories,
         )
         self.session.add(recipient)
         self.session.flush()

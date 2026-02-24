@@ -13,10 +13,11 @@ header.addEventListener('onegov.header-resized', function (event) {
     var new_height = 'calc(' + current_height + ' - ' + header_height + 'px)';
 
     video_wrapper.css('max-height', new_height)
+}, {once: true})
 
     // Slider
     if ($('.orbit.slider').length) {
-        var orbit_slider = $('.orbit-container');
+        var orbit_slider = $('.homepage-image-slider .orbit-container');
         var current_mobile_height = orbit_slider.data('height-m');
         var current_desktop_height = orbit_slider.data('height-d');
 
@@ -40,7 +41,7 @@ header.addEventListener('onegov.header-resized', function (event) {
         }
 
     }
-}, {once: true})
+
 
 // Find out if we're on desktop or mobile
 var w = window.matchMedia("(max-width: 700px)");

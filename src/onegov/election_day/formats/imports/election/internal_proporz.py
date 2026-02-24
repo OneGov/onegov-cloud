@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -60,23 +62,23 @@ INTERNAL_PROPORZ_HEADERS = (
 )
 
 
-def parse_election(line: 'DefaultRow', errors: list[str]) -> 'Status | None':
+def parse_election(line: DefaultRow, errors: list[str]) -> Status | None:
     status = None
     try:
         status = line.election_status or 'unknown'
     except ValueError:
-        errors.append(_("Invalid election values"))
+        errors.append(_('Invalid election values'))
     if status not in STATI:
-        errors.append(_("Invalid status"))
+        errors.append(_('Invalid status'))
     return status  # type:ignore[return-value]
 
 
 def parse_election_result(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     entities: dict[int, dict[str, str]],
-    election: 'Election',
-    principal: 'Canton | Municipality',
+    election: Election,
+    principal: Canton | Municipality,
     ignore_extra: bool
 ) -> dict[str, Any] | bool:
 
@@ -102,7 +104,7 @@ def parse_election_result(
 
         if entity_id and entity_id not in entities:
             errors.append(_(
-                "${name} is unknown",
+                '${name} is unknown',
                 mapping={'name': entity_id}
             ))
 
@@ -137,7 +139,7 @@ def parse_election_result(
 
 
 def parse_list(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     election_id: str,
     colors: dict[str, str]
@@ -164,7 +166,7 @@ def parse_list(
 
 
 def parse_list_result(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     counted: bool
 ) -> dict[str, Any] | None:
@@ -181,7 +183,7 @@ def parse_list_result(
     return None
 
 
-def parse_list_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
+def parse_list_panachage_headers(csv: DefaultCSVFile) -> dict[str, str]:
     headers = {}
     prefix = 'list_panachage_votes_from_list_'
     for header in csv.headers:
@@ -200,7 +202,7 @@ def parse_list_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
 
 
 def parse_list_panachage_results(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     values: dict[str, dict[str, int]],
     headers: dict[str, str]
@@ -221,11 +223,11 @@ def parse_list_panachage_results(
     except ValueError as e:
         errors.append(e.args[0])
     except Exception:
-        errors.append(_("Invalid list results"))
+        errors.append(_('Invalid list results'))
 
 
 def parse_candidate(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     election_id: str,
     colors: dict[str, str]
@@ -246,7 +248,7 @@ def parse_candidate(
     except ValueError as e:
         errors.append(e.args[0])
     except Exception:
-        errors.append(_("Invalid candidate values"))
+        errors.append(_('Invalid candidate values'))
     else:
         if party and color:
             colors[party] = color
@@ -265,7 +267,7 @@ def parse_candidate(
 
 
 def parse_candidate_result(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     counted: bool
 ) -> dict[str, Any] | None:
@@ -282,7 +284,7 @@ def parse_candidate_result(
     return None
 
 
-def parse_candidate_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
+def parse_candidate_panachage_headers(csv: DefaultCSVFile) -> dict[str, str]:
     headers = {}
     prefix = 'candidate_panachage_votes_from_list_'
     for header in csv.headers:
@@ -299,7 +301,7 @@ def parse_candidate_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
 
 
 def parse_candidate_panachage_results(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     values: list[dict[str, Any]],
     headers: dict[str, str]
@@ -320,7 +322,7 @@ def parse_candidate_panachage_results(
     except ValueError as e:
         errors.append(e.args[0])
     except Exception:
-        errors.append(_("Invalid candidate results"))
+        errors.append(_('Invalid candidate results'))
 
 
 def prefix_connection_id(connection_id: str, parent_connection_id: str) -> str:
@@ -332,7 +334,7 @@ def prefix_connection_id(connection_id: str, parent_connection_id: str) -> str:
 
 
 def parse_connection(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     election_id: str
 ) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
@@ -347,7 +349,7 @@ def parse_connection(
             )
             connection_id = parent_connection_id
     except ValueError:
-        errors.append(_("Invalid list connection values"))
+        errors.append(_('Invalid list connection values'))
     else:
         connection = {
             'id': uuid4(),
@@ -364,8 +366,8 @@ def parse_connection(
 
 
 def import_election_internal_proporz(
-    election: 'Election',
-    principal: 'Canton | Municipality',
+    election: Election,
+    principal: Canton | Municipality,
     file: IO[bytes],
     mimetype: str,
     ignore_extra: bool = False
@@ -381,7 +383,7 @@ def import_election_internal_proporz(
         A list containing errors.
 
     """
-    filename = _("Results")
+    filename = _('Results')
     csv, error = load_csv(
         file, mimetype, expected_headers=INTERNAL_PROPORZ_HEADERS,
         filename=filename,
@@ -489,30 +491,30 @@ def import_election_internal_proporz(
 
     # Additional checks
     if not errors and not results:
-        errors.append(FileImportError(_("No data found")))
+        errors.append(FileImportError(_('No data found')))
 
-    for values in list_panachage.values():
-        for list_id in values:
-            if list_id != '999' and list_id not in lists:
-                errors.append(
-                    FileImportError(
-                        _(
-                            "Panachage results id ${id} not in list_id's",
-                            mapping={'id': list_id}
-                        )
-                    )
-                )
-
-    for values in candidate_panachage:
-        if values['list_id'] != '999' and values['list_id'] not in lists:
-            errors.append(
-                FileImportError(
-                    _(
-                        "Panachage results id ${id} not in list_id's",
-                        mapping={'id': values['list_id']}
-                    )
-                )
+    errors.extend(
+        FileImportError(
+            _(
+                "Panachage results id ${id} not in list_id's",
+                mapping={'id': list_id}
             )
+        )
+        for values in list_panachage.values()
+        for list_id in values
+        if list_id != '999' and list_id not in lists
+    )
+
+    errors.extend(
+        FileImportError(
+            _(
+                "Panachage results id ${id} not in list_id's",
+                mapping={'id': values['list_id']}
+            )
+        )
+        for values in candidate_panachage
+        if values['list_id'] != '999' and values['list_id'] not in lists
+    )
 
     if errors:
         return errors
@@ -571,10 +573,12 @@ def import_election_internal_proporz(
     list_uids = {r['list_id']: r['id'] for r in lists.values()}
     list_uids['999'] = None
     session = object_session(election)
-    session.bulk_insert_mappings(ListConnection, connections.values())
-    session.bulk_insert_mappings(ListConnection, subconnections.values())
-    session.bulk_insert_mappings(List, lists.values())
-    session.bulk_insert_mappings(ListPanachageResult, (
+    assert session is not None
+    # FIXME: Switch to regular `session.execute` with insert statements
+    session.bulk_insert_mappings(ListConnection, connections.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(ListConnection, subconnections.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(List, lists.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(ListPanachageResult, (  # type: ignore[arg-type]
         {
             'id': uuid4(),
             'source_id': list_uids[source],
@@ -584,15 +588,15 @@ def import_election_internal_proporz(
         for list_id in list_panachage
         for source, votes in list_panachage[list_id].items()
     ))
-    session.bulk_insert_mappings(Candidate, candidates.values())
-    session.bulk_insert_mappings(ElectionResult, results.values())
-    session.bulk_insert_mappings(ListResult, (
+    session.bulk_insert_mappings(Candidate, candidates.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(ElectionResult, results.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(ListResult, (  # type: ignore[arg-type]
         dict(**list_result, election_result_id=result_uids[entity_id])
         for entity_id, values in list_results.items()
         for list_result in values.values()
     ))
-    session.bulk_insert_mappings(CandidateResult, candidate_results)
-    session.bulk_insert_mappings(CandidatePanachageResult, (
+    session.bulk_insert_mappings(CandidateResult, candidate_results)  # type: ignore[arg-type]
+    session.bulk_insert_mappings(CandidatePanachageResult, (  # type: ignore[arg-type]
         {
             'id': uuid4(),
             'election_result_id': result_uids[panachage_result['entity_id']],

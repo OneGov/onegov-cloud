@@ -1,4 +1,5 @@
-from collections import namedtuple
+from __future__ import annotations
+
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
@@ -17,7 +18,7 @@ from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.form import Form
 from onegov.org.elements import Link
-from onegov.org.forms import PersonForm
+from onegov.agency.forms.person import AgencyPersonForm
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import AtoZ
 from onegov.org.models import TicketMessage
@@ -28,22 +29,30 @@ from unidecode import unidecode
 from uuid import uuid4
 
 
+from typing import NamedTuple
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.agency.request import AgencyRequest
     from onegov.core.types import RenderData
     from onegov.ticket import Ticket
     from webob import Response as BaseResponse
+    from onegov.agency.forms.person import AuthenticatedPersonMutationForm
+
+
+class FilterOption(NamedTuple):
+    title: str
+    value: str
+    selected: bool
 
 
 def get_person_form_class(
     model: object,
-    request: 'AgencyRequest'
-) -> type[PersonForm]:
+    request: AgencyRequest
+) -> type[AgencyPersonForm]:
 
     if isinstance(model, ExtendedPerson):
-        return model.with_content_extensions(PersonForm, request)
-    return ExtendedPerson().with_content_extensions(PersonForm, request)
+        return model.with_content_extensions(AgencyPersonForm, request)
+    return ExtendedPerson().with_content_extensions(AgencyPersonForm, request)
 
 
 @AgencyApp.html(
@@ -53,8 +62,8 @@ def get_person_form_class(
 )
 def view_people(
     self: ExtendedPersonCollection,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     request.include('common')
     request.include('chosen')
@@ -81,9 +90,8 @@ def view_people(
         ) for letter in self.used_letters
     ]
 
-    Option = namedtuple('Option', ['title', 'value', 'selected'])
     agencies = [
-        Option(
+        FilterOption(
             title=agency,
             value=request.link(self.for_filter(agency=agency)),
             selected=(agency == self.agency),
@@ -91,7 +99,7 @@ def view_people(
     ]
     agencies.insert(
         0,
-        Option(
+        FilterOption(
             title='',
             value=request.link(self.for_filter(agency=None)),
             selected=(self.agency is None),
@@ -117,7 +125,7 @@ def view_people(
     people_by_letter = AtoZPeople(request).get_items_by_letter()
 
     return {
-        'title': _("People"),
+        'title': _('People'),
         'layout': ExtendedPersonCollectionLayout(self, request),
         'letters': letters,
         'agencies': agencies,
@@ -135,29 +143,29 @@ def view_people(
 )
 def create_people_xlsx(
     self: ExtendedPersonCollection,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: Form
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         request.app.people_xlsx = export_person_xlsx(
             request.session
         ).getvalue()
         if request.app.people_xlsx_exists:
-            request.success(_("Excel file created"))
+            request.success(_('Excel file created'))
             return redirect(request.link(self))
         else:
-            request.success(_("Excel could not be created"))
+            request.success(_('Excel could not be created'))
             return redirect(request.link(self, name='create-people-xlsx'))
 
     layout = ExtendedPersonCollectionLayout(self, request)
 
     return {
         'layout': layout,
-        'title': _("Create Excel"),
+        'title': _('Create Excel'),
         'helptext': _(
-            "Create an Excel of persons and their memberships. "
-            "This may take a while."
+            'Create an Excel of persons and their memberships. '
+            'This may take a while.'
         ),
         'form': form
     }
@@ -170,14 +178,14 @@ def create_people_xlsx(
 )
 def get_people_xlsx(
     self: ExtendedPersonCollection,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> Response:
 
     if not request.app.people_xlsx_exists:
         return Response(status='503 Service Unavailable')
 
     @request.after
-    def cache_headers(response: 'BaseResponse') -> None:
+    def cache_headers(response: BaseResponse) -> None:
         last_modified = request.app.people_xlsx_modified
         if last_modified:
             max_age = 1 * 24 * 60 * 60
@@ -205,8 +213,8 @@ def get_people_xlsx(
 )
 def view_person(
     self: ExtendedPerson,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     return {
         'title': self.title,
@@ -223,13 +231,13 @@ def view_person(
 )
 def view_sort_person(
     self: ExtendedPerson,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     layout = ExtendedPersonLayout(self, request)
 
     return {
-        'title': _("Sort"),
+        'title': _('Sort'),
         'layout': layout,
         'items': (
             (
@@ -256,24 +264,24 @@ def view_sort_person(
 )
 def add_person(
     self: ExtendedPersonCollection,
-    request: 'AgencyRequest',
-    form: PersonForm
-) -> 'RenderData | BaseResponse':
+    request: AgencyRequest,
+    form: AgencyPersonForm
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         person = self.add(**form.get_useful_data())
-        request.success(_("Added a new person"))
+        request.success(_('Added a new person'))
 
         return redirect(request.link(person))
 
     layout = ExtendedPersonCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New person"),
+        'title': _('New person'),
         'form': form
     }
 
@@ -287,13 +295,13 @@ def add_person(
 )
 def edit_person(
     self: ExtendedPerson,
-    request: 'AgencyRequest',
-    form: PersonForm
-) -> 'RenderData | BaseResponse':
+    request: AgencyRequest,
+    form: AgencyPersonForm
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         if 'return-to' in request.GET:
             return request.redirect(request.url)
         return redirect(request.link(self))
@@ -301,7 +309,7 @@ def edit_person(
         form.process(obj=self)
 
     layout = ExtendedPersonLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.include_editor()
     layout.edit_mode = True
 
@@ -318,7 +326,7 @@ def edit_person(
     permission=Private)
 def handle_delete_person(
     self: ExtendedPerson,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> None:
 
     if not self.deletable(request):
@@ -329,9 +337,9 @@ def handle_delete_person(
 
 def do_report_person_change(
     self: ExtendedPerson,
-    request: 'AgencyRequest',
-    form: PersonMutationForm
-) -> 'Ticket':
+    request: AgencyRequest,
+    form: PersonMutationForm | AuthenticatedPersonMutationForm
+) -> Ticket:
 
     session = request.session
     with session.no_autoflush:
@@ -345,14 +353,14 @@ def do_report_person_change(
                 'proposed_changes': form.proposed_changes
             }
         )
-        TicketMessage.create(ticket, request, 'opened')
+        TicketMessage.create(ticket, request, 'opened', 'external')
         ticket.create_snapshot(request)
 
     assert form.submitter_email.data is not None
     send_ticket_mail(
         request=request,
         template='mail_ticket_opened.pt',
-        subject=_("Your ticket has been opened"),
+        subject=_('Your ticket has been opened'),
         receivers=(form.submitter_email.data, ),
         ticket=ticket
     )
@@ -361,7 +369,7 @@ def do_report_person_change(
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened_info.pt',
-            subject=_("New ticket"),
+            subject=_('New ticket'),
             ticket=ticket,
             receivers=(email, ),
             content={
@@ -376,6 +384,10 @@ def do_report_person_change(
             'title': request.translate(_('New ticket')),
             'created': ticket.created.isoformat()
         }
+        # FIXME: set groupids to all groups which are linked
+        #        to the agencies of this person or the first
+        #        parent agency for each agency with links to
+        #        one or more groups, to mirror email notifications
     )
 
     return ticket
@@ -390,21 +402,21 @@ def do_report_person_change(
 )
 def report_person_change(
     self: ExtendedPerson,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: PersonMutationForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         ticket = do_report_person_change(self, request, form)
-        request.success(_("Thank you for your submission!"))
+        request.success(_('Thank you for your submission!'))
         return redirect(request.link(ticket, 'status'))
 
     layout = ExtendedPersonLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Report change"), '#'))
+    layout.breadcrumbs.append(Link(_('Report change'), '#'))
 
     return {
         'layout': layout,
-        'title': _("Report change"),
+        'title': _('Report change'),
         'lead': self.title,
         'form': form
     }

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.framework import Framework
 from onegov.core.security import Public, Personal, Private, Secret
 
@@ -7,8 +9,8 @@ if TYPE_CHECKING:
     from .permissions import Intent
 
 
-@Framework.setting_section(section="roles")
-def get_roles_setting() -> dict[str, set[type['Intent']]]:
+@Framework.setting_section(section='roles')
+def get_roles_setting() -> dict[str, set[type[Intent]]]:
     """ Returns the default roles available to onegov.core applications.
 
     Applications building on onegov.core may add more roles and permissions,

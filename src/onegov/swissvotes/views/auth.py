@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Personal
 from onegov.core.security import Public
@@ -35,27 +37,27 @@ if TYPE_CHECKING:
 )
 def handle_login(
     self: Auth,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: LoginForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles the login requests. """
     layout = DefaultLayout(self, request)
 
     if form.submitted(request):
         self.to = relative_url(layout.homepage_url)
         response = self.login_to(request=request, **form.login_data)
-        form.error_message = _("Wrong username or password")  # type:ignore
+        form.error_message = _('Wrong username or password')  # type:ignore
     else:
         response = None
 
     return response or {
         'layout': layout,
-        'title': _("Login"),
+        'title': _('Login'),
         'form': form,
         'password_reset_link': request.link(
             Auth.from_request(request), name='request-password'
         ),
-        'button_text': _("Submit"),
+        'button_text': _('Submit'),
     }
 
 
@@ -64,7 +66,7 @@ def handle_login(
     name='logout',
     permission=Personal
 )
-def view_logout(self: Auth, request: 'SwissvotesRequest') -> 'Response':
+def view_logout(self: Auth, request: SwissvotesRequest) -> Response:
     """ Handles the logout requests. """
 
     return self.logout_to(request)
@@ -79,9 +81,9 @@ def view_logout(self: Auth, request: 'SwissvotesRequest') -> 'Response':
 )
 def handle_password_reset_request(
     self: Auth,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: RequestPasswordResetForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles the password reset requests. """
 
     layout = DefaultLayout(self, request)
@@ -99,14 +101,14 @@ def handle_password_reset_request(
 
             assert request.app.mail is not None
             request.app.send_transactional_email(
-                subject=request.translate(_("Password reset")),
+                subject=request.translate(_('Password reset')),
                 receivers=(user.username, ),
                 reply_to=request.app.mail['transactional']['sender'],
                 content=render_template(
                     'mail_password_reset.pt',
                     request,
                     {
-                        'title': request.translate(_("Password reset")),
+                        'title': request.translate(_('Password reset')),
                         'model': None,
                         'url': url,
                         'layout': MailLayout(self, request)
@@ -115,7 +117,7 @@ def handle_password_reset_request(
             )
         else:
             log.info(
-                "Failed password reset attempt by {}".format(
+                'Failed password reset attempt by {}'.format(
                     request.client_addr
                 )
             )
@@ -132,7 +134,7 @@ def handle_password_reset_request(
         'layout': layout,
         'title': _('Reset password'),
         'form': form,
-        'button_text': _("Submit"),
+        'button_text': _('Submit'),
     }
 
 
@@ -145,23 +147,23 @@ def handle_password_reset_request(
 )
 def handle_password_reset(
     self: Auth,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: PasswordResetForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles password reset requests. """
 
     layout = DefaultLayout(self, request)
 
     if form.submitted(request):
         if form.update_password(request):
-            request.message(_("Password changed."), 'success')
+            request.message(_('Password changed.'), 'success')
             return request.redirect(layout.login_url or layout.homepage_url)
         else:
             form.error_message = _(  # type:ignore[attr-defined]
-                "Wrong username or password reset link not valid any more."
+                'Wrong username or password reset link not valid any more.'
             )
             log.info(
-                "Failed password reset attempt by {}".format(
+                'Failed password reset attempt by {}'.format(
                     request.client_addr
                 )
             )
@@ -173,7 +175,7 @@ def handle_password_reset(
         'layout': layout,
         'title': _('Reset password'),
         'form': form,
-        'button_text': _("Submit"),
+        'button_text': _('Submit'),
     }
 
 
@@ -186,15 +188,15 @@ def handle_password_reset(
 )
 def handle_totp_second_factor(
     self: Auth,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: TOTPForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not request.app.totp_enabled:
         raise exc.HTTPNotFound()
 
     @request.after
-    def respond_with_no_index(response: 'Response') -> None:
+    def respond_with_no_index(response: Response) -> None:
         response.headers['X-Robots-Tag'] = 'noindex'
 
     users = UserCollection(request.session)
@@ -206,7 +208,7 @@ def handle_totp_second_factor(
             return self.redirect(request, self.to)
 
         request.alert(
-            _("Failed to continue login, please ensure cookies are allowed.")
+            _('Failed to continue login, please ensure cookies are allowed.')
         )
         return redirect(request.link(self, name='login'))
 

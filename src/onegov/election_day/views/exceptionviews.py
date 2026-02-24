@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
@@ -21,20 +23,20 @@ if TYPE_CHECKING:
 )
 def handle_forbidden(
     self: HTTPForbidden,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Displays a nice HTTP 403 error. """
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = self.code  # pass along 403
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _("Access Denied"),
+        'title': _('Access Denied'),
         'message': _(
-            "You are trying to open a page for which you are not authorized."
+            'You are trying to open a page for which you are not authorized.'
         )
     }
 
@@ -46,19 +48,19 @@ def handle_forbidden(
 )
 def handle_notfound(
     self: HTTPNotFound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Displays a nice HTTP 404 error. """
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = self.code  # pass along 404
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _("Page not Found"),
-        'message': _("The page you are looking for could not be found."),
+        'title': _('Page not Found'),
+        'message': _('The page you are looking for could not be found.'),
     }
 
 
@@ -69,20 +71,20 @@ def handle_notfound(
 )
 def handle_accepted(
     self: HTTPAccepted,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Displays a nice HTTP 202 exception. """
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = self.code
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _("File not yet ready"),
+        'title': _('File not yet ready'),
         'message': _(
-            "The file you are looking for is not ready yet. "
-            "Please try again later."
+            'The file you are looking for is not ready yet. '
+            'Please try again later.'
         ),
     }

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import onegov.feriennet
 import os
 import pytest
@@ -7,13 +9,15 @@ import transaction
 
 from datetime import datetime, timedelta, date, time
 from freezegun import freeze_time
-from onegov.activity import Booking, Invoice, InvoiceItem
+from onegov.activity import Booking, BookingPeriodInvoice, ActivityInvoiceItem
+from onegov.activity import Activity
 from onegov.activity.utils import generate_xml
 from onegov.core.custom import json
 from onegov.feriennet.utils import NAME_SEPARATOR
 from onegov.file import FileCollection
 from onegov.gis import Coordinates
 from onegov.pay import Payment
+from onegov.user import User
 from psycopg2.extras import NumericRange
 from sedate import utcnow
 from tests.shared import utils
@@ -21,7 +25,15 @@ from unittest.mock import patch
 from webtest import Upload
 
 
-def test_wwf_fixed_pass_system(client, scenario):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.activity.models.booking import BookingState
+    from tests.shared.client import ExtendedResponse
+    from unittest.mock import MagicMock
+    from .conftest import Client, Scenario
+
+
+def test_wwf_fixed_pass_system(client: Client, scenario: Scenario) -> None:
     scenario.add_period(
         title='WWF Period',
         phase='wishlist',
@@ -62,13 +74,14 @@ def test_wwf_fixed_pass_system(client, scenario):
 
     scenario.refresh()
     period = scenario.latest_period
+    assert period is not None
     booking_start = period.booking_start
     assert period.all_inclusive is False
     assert period.max_bookings_per_attendee == 1
     assert period.booking_cost == 11
     assert period.pay_organiser_directly is False
 
-    def login_member(client):
+    def login_member(client: Client) -> Client:
         login = client.get('/').click("Anmelden", index=1)
         login.form['username'] = 'member@example.org'
         login.form['password'] = 'hunter2'
@@ -79,7 +92,7 @@ def test_wwf_fixed_pass_system(client, scenario):
 
     activities = member.get('/activities')
 
-    def register_for_activity(name):
+    def register_for_activity(name: str) -> ExtendedResponse:
         # Register the first attendee available
         page = activities.click(name).click('Anmelden').form.submit().follow()
         assert 'Durchführung wurde zu Georges Wunschliste hinzugefügt' in page
@@ -111,12 +124,12 @@ def test_wwf_fixed_pass_system(client, scenario):
         assert 'Blockiert (1)' in page
 
 
-def test_view_permissions():
+def test_view_permissions() -> None:
     utils.assert_explicit_permissions(
         onegov.feriennet, onegov.feriennet.FeriennetApp)
 
 
-def test_view_hint_max_activities(client, scenario):
+def test_view_hint_max_activities(client: Client, scenario: Scenario) -> None:
     client.login_admin()
 
     scenario.add_period(
@@ -153,7 +166,7 @@ def test_view_hint_max_activities(client, scenario):
     assert "Teilnehmende werden in bis zu 4 Angebot(e) eingeteilt." not in page
 
 
-def test_activity_permissions(client, scenario):
+def test_activity_permissions(client: Client, scenario: Scenario) -> None:
     anon = client.spawn()
     admin = client.spawn()
     editor = client.spawn()
@@ -222,8 +235,14 @@ def test_activity_permissions(client, scenario):
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_activity_communication(broadcast, authenticate, connect, client,
-                                scenario):
+def test_activity_communication(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period()
     scenario.add_activity(
         title="Learn Python",
@@ -264,8 +283,19 @@ def test_activity_communication(broadcast, authenticate, connect, client,
     assert "Using a Raspberry Pi we will learn Python" in message
 
 
-def test_activity_search(client_with_es, scenario):
-    client = client_with_es
+def test_basic_search(client_with_fts: Client) -> None:
+    client = client_with_fts
+    anom = client.spawn()
+
+    # basic test
+    assert 'Resultate' in client.get('/search?q=test')
+    assert client.get('/search/suggest?q=test').json == []
+    assert 'Resultate' in anom.get('/search?q=test')
+    assert anom.get('/search/suggest?q=test').json == []
+
+
+def test_activity_search(client_with_fts: Client, scenario: Scenario) -> None:
+    client = client_with_fts
 
     scenario.add_period()
     scenario.add_activity(
@@ -283,40 +313,37 @@ def test_activity_search(client_with_es, scenario):
     editor.login_editor()
 
     # in preview, activities can't be found
-    client.app.es_client.indices.refresh(index='_all')
-    assert 'search-result-vacation' not in admin.get('/search?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' not in client.get('/search?q=Learn')
+    assert 'search-result-activities' not in admin.get('/search?q=Learn')
+    assert 'search-result-activities' not in editor.get('/search?q=Learn')
+    assert 'search-result-activities' not in client.get('/search?q=Learn')
 
     url = '/activity/learn-how-to-program'
     editor.get(url).click("Publikation beantragen")
 
     # once proposed, activities can be found by the admin only
-    client.app.es_client.indices.refresh(index='_all')
-    assert 'search-result-vacation' in admin.get('/search?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' not in client.get('/search?q=Learn')
+    assert 'search-result-activities' in admin.get('/search?q=Learn')
+    assert 'search-result-activities' not in editor.get('/search?q=Learn')
+    assert 'search-result-activities' not in client.get('/search?q=Learn')
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     ticket.click("Veröffentlichen")
 
     # once accepted, activities can be found by anyone
-    client.app.es_client.indices.refresh(index='_all')
-    assert 'search-result-vacation' in admin.get('/search?q=Learn')
-    assert 'search-result-vacation' in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' in client.get('/search?q=Learn')
+    assert 'search-result-activities' in admin.get('/search?q=Learn')
+    assert 'search-result-activities' in editor.get('/search?q=Learn')
+    assert 'search-result-activities' in client.get('/search?q=Learn')
 
     ticket = admin.get(ticket.request.url)
     ticket.click("Archivieren")
 
     # archived the search will fail again, except for admins
-    client.app.es_client.indices.refresh(index='_all')
-    assert 'search-result-vacation' in admin.get('/search?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' not in client.get('/search?q=Learn')
+    assert 'search-result-activities' in admin.get('/search?q=Learn')
+    assert 'search-result-activities' not in editor.get('/search?q=Learn')
+    assert 'search-result-activities' not in client.get('/search?q=Learn')
 
 
-def test_activity_filter_tags(client, scenario):
+@pytest.mark.skip('Activities work differently now, skip for now')
+def test_activity_filter_tags(client: Client, scenario: Scenario) -> None:
     scenario.add_period(
         prebooking_start=datetime(2015, 1, 1),
         prebooking_end=datetime(2015, 12, 31),
@@ -365,7 +392,7 @@ def test_activity_filter_tags(client, scenario):
     assert "Learn How to Cook" in page
     assert "Learn How to Program" in page
 
-    page = page.click('Computer')
+    page = client.get('/activities?filter=tags%3AComputer')
     assert "Learn How to Cook" not in page
     assert "Learn How to Program" in page
 
@@ -412,7 +439,7 @@ def test_activity_filter_tags(client, scenario):
     assert "Learn How to Cook" in page
 
 
-def test_activity_filter_duration(client, scenario):
+def test_activity_filter_duration(client: Client, scenario: Scenario) -> None:
     scenario.add_period()
 
     # the retreat lasts a weekend
@@ -431,8 +458,8 @@ def test_activity_filter_duration(client, scenario):
 
     scenario.commit()
 
-    half_day = client.get('/activities').click('Halbtägig')
-    many_day = client.get('/activities').click('Mehrtägig')
+    half_day = client.get('/activities?filter=durations%3A1')
+    many_day = client.get('/activities?filter=durations%3A4')
 
     assert "Meeting" in half_day
     assert "Retreat" not in half_day
@@ -444,14 +471,14 @@ def test_activity_filter_duration(client, scenario):
     with scenario.update():
         scenario.occasions[0].dates[0].end -= timedelta(days=1)
 
-    full_day = client.get('/activities').click('Ganztägig')
-    many_day = client.get('/activities').click('Mehrtägig')
+    full_day = client.get('/activities?filter=durations%3A2')
+    many_day = client.get('/activities?filter=durations%3A4')
 
     assert "Retreat" in full_day
     assert "Retreat" not in many_day
 
 
-def test_activity_filter_weeks(client, scenario):
+def test_activity_filter_weeks(client: Client, scenario: Scenario) -> None:
     scenario.add_period(
         prebooking_start=datetime(2022, 2, 1),
         prebooking_end=datetime(2022, 2, 28),
@@ -477,7 +504,11 @@ def test_activity_filter_weeks(client, scenario):
     assert "18.04.2022 - 24.04.2022" in page
 
 
-def test_activity_filter_age_ranges(client, scenario):
+def test_activity_filter_age_ranges(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period()
 
     # the retreat is for really young kids
@@ -490,10 +521,8 @@ def test_activity_filter_age_ranges(client, scenario):
 
     scenario.commit()
 
-    preschool = client.get('/activities').click(
-        '5', href='filter=age', index=0)
-    highschool = client.get('/activities').click(
-        '15', href='filter=age', index=0)
+    preschool = client.get('/activities?filter=age_ranges%3A5-5')
+    highschool = client.get('/activities?filter=age_ranges%3A15-15')
 
     assert "Retreat" in preschool
     assert "Meeting" in preschool
@@ -503,16 +532,15 @@ def test_activity_filter_age_ranges(client, scenario):
 
     # change the meeting age
     with scenario.update():
-        scenario.occasions[1].age = NumericRange(15, 20)
+        scenario.occasions[1].age = NumericRange(15, 20)  # type: ignore[assignment]
 
-    preschool = client.get('/activities').click(
-        '5', href='filter=age', index=0)
+    preschool = client.get('/activities?filter=age_ranges%3A5-5')
 
     assert "Retreat" in preschool
     assert "Meeting" not in preschool
 
 
-def test_organiser_info(client, scenario):
+def test_organiser_info(client: Client, scenario: Scenario) -> None:
 
     admin = client.spawn()
     admin.login_admin()
@@ -549,7 +577,7 @@ def test_organiser_info(client, scenario):
     contact.form['zip_code'] = '20001'
     contact.form['place'] = 'Washington'
     contact.form['email'] = 'editors-association@example.org'
-    contact.form['phone'] = '+41 23 456 789'
+    contact.form['phone'] = '+41234567890'
     contact.form['website'] = 'https://www.example.org'
     contact.form['emergency'] = '+01 234 56 78 (Peter)'
     contact.form.submit()
@@ -566,10 +594,12 @@ def test_organiser_info(client, scenario):
     assert "https://www.example.org" in activity
 
     # admin changes are reflected on the activity
-    contact = admin.get('/usermanagement')\
-        .click('Veranstalter')\
-        .click('Ansicht')\
+    contact = (
+        admin.get('/usermanagement')
+        .click('Veranstalter')
+        .click('Ansicht')
         .click('Bearbeiten')
+    )
 
     contact.form['organisation'] = 'Admins Association'
     contact.form.submit()
@@ -579,7 +609,7 @@ def test_organiser_info(client, scenario):
     assert "Admins Association" in activity
 
     # we can show/hide information individually
-    def with_public_organiser_data(values):
+    def with_public_organiser_data(values: list[str]) -> ExtendedResponse:
         page = admin.get('/feriennet-settings')
         page.form['public_organiser_data'] = values
         page.form.submit()
@@ -600,32 +630,32 @@ def test_organiser_info(client, scenario):
     assert "Admins Association" not in page
     assert "Washington" in page
     assert "editors-association@example.org" not in page
-    assert "+41 23 456 789" not in page
+    assert "+41 23 456 78 90" not in page
     assert "https://www.example.org" not in page
 
     page = with_public_organiser_data(['email'])
     assert "Admins Association" not in page
     assert "Washington" not in page
     assert "editors-association@example.org" in page
-    assert "+41 23 456 789" not in page
+    assert "+41 23 456 78 90" not in page
     assert "https://www.example.org" not in page
 
     page = with_public_organiser_data(['phone'])
     assert "Admins Association" not in page
     assert "Washington" not in page
     assert "editors-association@example.org" not in page
-    assert "+41 23 456 789" in page
+    assert "+41 23 456 78 90" in page
     assert "https://www.example.org" not in page
 
     page = with_public_organiser_data(['website'])
     assert "Admins Association" not in page
     assert "Washington" not in page
     assert "editors-association@example.org" not in page
-    assert "+41 23 456 789" not in page
+    assert "+41 23 456 78 90" not in page
     assert "https://www.example.org" in page
 
 
-def test_occasions_form(client, scenario):
+def test_occasions_form(client: Client, scenario: Scenario) -> None:
 
     editor = client.spawn()
     editor.login_editor()
@@ -700,7 +730,7 @@ def test_occasions_form(client, scenario):
     assert "keine Durchführungen" in editor.get('/activity/play-with-legos')
 
 
-def test_multiple_dates_occasion(client, scenario):
+def test_multiple_dates_occasion(client: Client, scenario: Scenario) -> None:
 
     editor = client.spawn()
     editor.login_editor()
@@ -764,7 +794,7 @@ def test_multiple_dates_occasion(client, scenario):
     assert "2. Oktober 10:00" in activity
 
 
-def test_execution_period(client, scenario):
+def test_execution_period(client: Client, scenario: Scenario) -> None:
 
     admin = client.spawn()
     admin.login_admin()
@@ -831,7 +861,8 @@ def test_execution_period(client, scenario):
     assert "gespeichert" in periods
 
 
-def test_enroll_child(client, scenario):
+@pytest.mark.skip_night_hours
+def test_enroll_child(client: Client, scenario: Scenario) -> None:
     scenario.add_period(
         prebooking_end=scenario.date_offset(0)
     )
@@ -875,8 +906,8 @@ def test_enroll_child(client, scenario):
 
     # prevent double-subscriptions
     enroll = activity.click("Anmelden")
-    assert "Tom\u00A0Sawyer hat sich bereits für diese Durchführung"\
-        in enroll.form.submit()
+    assert "Tom\u00A0Sawyer hat sich bereits für diese Durchführung" in (
+        enroll.form.submit())
 
     enroll.form['attendee'] = 'other'
     enroll.form['first_name'] = "Tom"
@@ -885,17 +916,18 @@ def test_enroll_child(client, scenario):
     enroll.form['gender'] = 'male'
 
     # prevent adding two kids with the same name
-    assert "Sie haben bereits eine Person mit diesem Namen erfasst"\
-        in enroll.form.submit()
+    assert "Sie haben bereits eine Person mit diesem Namen erfasst" in (
+        enroll.form.submit())
 
     # prevent enrollment for inactive periods
+    assert scenario.latest_period is not None
     with scenario.update():
         scenario.latest_period.active = False
 
     enroll.form['first_name'] = "Huckleberry"
     enroll.form['last_name'] = "Finn"
-    assert "Diese Durchführung liegt ausserhalb des aktiven Zeitraums"\
-        in enroll.form.submit()
+    assert "Diese Durchführung liegt ausserhalb des aktiven Zeitraums" in (
+        enroll.form.submit())
 
     # prevent enrollment outside of prebooking
     with scenario.update():
@@ -931,7 +963,7 @@ def test_enroll_child(client, scenario):
     assert "maximale Anzahl von 1 Buchungen" in enroll.form.submit()
 
 
-def test_enroll_age_mismatch(client, scenario):
+def test_enroll_age_mismatch(client: Client, scenario: Scenario) -> None:
     scenario.add_period()
     scenario.add_activity(title="Retreat", state='accepted')
     scenario.add_occasion(age=(5, 10))
@@ -956,7 +988,11 @@ def test_enroll_age_mismatch(client, scenario):
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
 
-def test_enroll_after_wishlist_phase(client, scenario):
+def test_enroll_after_wishlist_phase(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period()
     scenario.add_activity(title="Retreat", state='accepted')
     scenario.add_occasion()
@@ -977,7 +1013,7 @@ def test_enroll_after_wishlist_phase(client, scenario):
         assert "nur während der Wunschphase" in page.form.submit()
 
 
-def test_booking_view(client, scenario):
+def test_booking_view(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="2017", active=False)
     scenario.add_period(title="2016", active=True)
 
@@ -1025,7 +1061,7 @@ def test_booking_view(client, scenario):
     assert 'data-count="1"' in c2.get('/')
 
     # make sure the bookings show up under my view
-    def count(page):
+    def count(page: ExtendedResponse) -> int:
         return len(page.pyquery('.attendee-bookings .booking'))
 
     c1_bookings = c1.get('/').click('Wunschliste')
@@ -1035,7 +1071,7 @@ def test_booking_view(client, scenario):
     assert count(c2_bookings) == 1
 
     # make sure each user only has access to their own bookings
-    def star_url(page, index):
+    def star_url(page: ExtendedResponse, index: int) -> str:
         return page.pyquery(
             page.pyquery('a[ic-post-to]')[index]).attr['ic-post-to']
 
@@ -1054,7 +1090,7 @@ def test_booking_view(client, scenario):
 
     result = c1.post(star_url(c1_bookings, 3))
     assert result.headers.get('X-IC-Trigger') == 'show-alert'
-    assert "maximal drei Favoriten" in result.headers.get('X-IC-Trigger-Data')
+    assert "maximal drei Favoriten" in result.headers['X-IC-Trigger-Data']
 
     # users may switch between other periods
     url = c1_bookings.pyquery('select option:first').val()
@@ -1072,7 +1108,90 @@ def test_booking_view(client, scenario):
     assert count(m1_bookings) == 4
 
 
-def test_confirmed_booking_view(scenario, client):
+def test_booking_contact_view(client: Client, scenario: Scenario) -> None:
+    scenario.add_period()
+
+    for i in range(4):
+        scenario.add_activity(title=f"A {i}", state='accepted')
+        scenario.add_occasion()
+
+    scenario.add_user(username='m1@example.org', role='member', realname="Tom",
+    phone="000 000 00 11", email="tom@example.org")
+    scenario.add_attendee(
+        name="Dustin",
+        birth_date=date(2000, 1, 1)
+    )
+
+    scenario.add_user(username='m2@example.org', role='member', realname="Doc",
+        show_contact_data_to_others=True, phone="000 000 00 12",
+        email="doc@example.org")
+    scenario.add_attendee(
+        name="Mike",
+        birth_date=date(2000, 1, 1)
+    )
+
+    scenario.add_user(username='m3@example.org', role='member', realname="Zak",
+        show_contact_data_to_others=True, phone="000 000 00 13",
+        email="zak@example.org")
+    scenario.add_attendee(
+        name="Luca",
+        birth_date=date(2000, 1, 1)
+    )
+
+    # sign Dustin up for all courses
+    for occasion in scenario.occasions:
+        scenario.add_booking(
+            occasion=occasion,
+            user=scenario.users[0],
+            attendee=scenario.attendees[0]
+        )
+
+    # sign Mike up for one course only for the permission check
+    scenario.add_booking(
+        occasion=scenario.occasions[0],
+        user=scenario.users[1],
+        attendee=scenario.attendees[1]
+    )
+
+    # sign Luca up for one course to see if he shows up in the contact list
+    scenario.add_booking(
+        occasion=scenario.occasions[0],
+        user=scenario.users[2],
+        attendee=scenario.attendees[2]
+    )
+
+    scenario.commit()
+
+    with scenario.update():
+        assert scenario.latest_period is not None
+        scenario.latest_period.confirm_and_start_booking_phase()
+        for b in scenario.bookings:
+            b.state = 'accepted'
+
+    c1 = client.spawn()
+    c1.login('m1@example.org', 'hunter2')
+
+    c2 = client.spawn()
+    c2.login('m2@example.org', 'hunter2')
+
+    # Tom can see the contact data of Doc and Zak
+    c1_bookings = c1.get('/').click('Buchungen')
+    assert "doc@example.org" in c1_bookings
+    assert 'href="tel:+41 000000012"' in c1_bookings
+    assert "zak@example.org" in c1_bookings
+    assert 'href="tel:+41 000000013"' in c1_bookings
+
+    # Doc can see the contact data of Zak and himself but not Tom
+    c2_bookings = c2.get('/').click('Buchungen')
+    assert "doc@example.org" in c2_bookings
+    assert 'href="tel:+41 000000012"' in c2_bookings
+    assert "zak@example.org" in c2_bookings
+    assert 'href="tel:+41 000000013"' in c2_bookings
+    assert "tom@example.org" not in c2_bookings
+    assert 'href="tel:+41 000000011"' not in c2_bookings
+
+
+def test_confirmed_booking_view(client: Client, scenario: Scenario) -> None:
     scenario.add_period()
     scenario.add_activity()
     scenario.add_occasion()
@@ -1085,7 +1204,9 @@ def test_confirmed_booking_view(scenario, client):
     # When the period is unconfirmed, no storno is available, and the
     # state is always "open"
     with scenario.update():
+        assert scenario.latest_period is not None
         scenario.latest_period.confirmed = False
+        assert scenario.latest_booking is not None
         scenario.latest_booking.state = 'accepted'
 
     page = client.get('/my-bookings')
@@ -1093,11 +1214,6 @@ def test_confirmed_booking_view(scenario, client):
     assert "Buchung stornieren" not in page
     assert "Wunsch entfernen" in page
     assert "Gebucht" not in page
-
-    # Related contacts are hidden at this point
-    page = client.get('/feriennet-settings')
-    page.form['show_related_contacts'] = True
-    page.form.submit()
 
     page = client.get('/my-bookings')
     assert not page.pyquery('.attendees-toggle')
@@ -1114,21 +1230,8 @@ def test_confirmed_booking_view(scenario, client):
     assert "Buchung entfernen" not in page
     assert "nicht genügend Anmeldungen" not in page
 
-    # Related contacts are now visible
-    assert page.pyquery('.attendees-toggle').text() == '1 Teilnehmende'
-    assert "Elternteil" in page
-
-    # Unless that option was disabled
-    page = client.get('/feriennet-settings')
-    page.form['show_related_contacts'] = False
-    page.form.submit()
-
-    page = client.get('/my-bookings')
-    assert not page.pyquery('.attendees-toggle')
-    assert "Elternteil" not in page
-
     # Other states are shown too
-    states = [
+    states: list[tuple[BookingState, str]] = [
         ('cancelled', "Storniert"),
         ('denied', "Abgelehnt"),
         ('blocked', "Blockiert")
@@ -1144,13 +1247,48 @@ def test_confirmed_booking_view(scenario, client):
     with scenario.update():
         scenario.latest_period.confirmed = True
         scenario.latest_booking.state = 'accepted'
-        scenario.latest_occasion.spots = NumericRange(2, 5)
+        assert scenario.latest_occasion is not None
+        scenario.latest_occasion.spots = NumericRange(2, 5)  # type: ignore[assignment]
 
     page = client.get('/my-bookings')
     assert "nicht genügend Anmeldungen" in page
 
 
-def test_direct_booking_and_storno(client, scenario):
+def test_booking_mail(client: Client, scenario: Scenario) -> None:
+    scenario.add_period(
+        title="2019",
+        phase='booking',
+        confirmed=True,
+    )
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_occasion(spots=(0, 1))
+    scenario.add_user(username='member@example.org', role='member')
+    scenario.add_attendee(
+        name="Dustin",
+        birth_date=date(2008, 1, 1),
+        username='admin@example.org'
+    )
+    scenario.commit()
+
+    client = client.spawn()
+    client.login_admin()
+    client.fill_out_profile("Scrooge", "McDuck")
+
+    # Add cancellation conditions to the ferienpass
+    page = client.get('/feriennet-settings')
+    page.form['cancellation_conditions'] = "Do not cancel"
+    page.form.submit()
+
+    page = client.get('/activity/foobar').click('Anmelden')
+    page = page.form.submit().follow()
+
+    # Check mail
+    assert len(os.listdir(client.app.maildir)) == 1
+    message_1 = client.get_email(0, 0)
+    assert "Do not cancel" in message_1['TextBody']
+
+
+def test_direct_booking_and_storno(client: Client, scenario: Scenario) -> None:
     scenario.add_period(confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
     scenario.add_occasion(spots=(0, 1))
@@ -1218,7 +1356,7 @@ def test_direct_booking_and_storno(client, scenario):
     assert "Mike" in page
 
 
-def test_cancel_occasion(client, scenario):
+def test_cancel_occasion(client: Client, scenario: Scenario) -> None:
     scenario.add_period(confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
     scenario.add_occasion(age=(0, 100))
@@ -1266,7 +1404,11 @@ def test_cancel_occasion(client, scenario):
     page.click("Löschen")
 
 
-def test_reactivate_cancelled_booking(client, scenario):
+def test_reactivate_cancelled_booking(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period()
     scenario.add_activity(title="Foobar", state='accepted')
     scenario.add_occasion(
@@ -1293,21 +1435,21 @@ def test_reactivate_cancelled_booking(client, scenario):
     assert "bereits für diese Durchführung angemeldet" in page.form.submit()
 
     # unless they are cancelled
-    scenario.c.bookings.query().first().state = 'cancelled'
+    scenario.c.bookings.query().first().state = 'cancelled'  # type: ignore[union-attr]
     scenario.commit()  # can be done by cancelling the whole event in UI
 
     page = client.get('/activity/foobar').click('Anmelden')
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
     # this also works between multiple occasions of the same activity
-    scenario.c.bookings.query().first().state = 'cancelled'
+    scenario.c.bookings.query().first().state = 'cancelled'  # type: ignore[union-attr]
     scenario.commit()  # can be done by cancelling the whole event in UI
 
     page = client.get('/activity/foobar').click('Anmelden')
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
     # including denied bookings
-    scenario.c.bookings.query().first().state = 'denied'
+    scenario.c.bookings.query().first().state = 'denied'  # type: ignore[union-attr]
     scenario.commit()  # can be done by cancelling the whole event in UI
 
     page = client.get('/activity/foobar').click('Anmelden')
@@ -1320,6 +1462,7 @@ def test_reactivate_cancelled_booking(client, scenario):
     page.form.submit()
 
     with scenario.update():
+        assert scenario.latest_period is not None
         scenario.latest_period.confirm_and_start_booking_phase()
 
     client.get('/my-bookings').click("Buchung stornieren")
@@ -1327,7 +1470,11 @@ def test_reactivate_cancelled_booking(client, scenario):
     assert "war erfolgreich" in page.form.submit().follow()
 
 
-def test_occasion_attendance_collection(client, scenario):
+def test_occasion_attendance_collection(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period()
 
     scenario.add_activity(
@@ -1365,6 +1512,7 @@ def test_occasion_attendance_collection(client, scenario):
 
     # organisers only see their own occasions
     with scenario.update():
+        assert scenario.latest_period is not None
         scenario.latest_period.confirmed = True
 
     editor = client.spawn()
@@ -1398,7 +1546,7 @@ def test_occasion_attendance_collection(client, scenario):
     assert "123456789 Admin" in admin.get('/attendees/bar')
 
 
-def test_send_email(client, scenario):
+def test_send_email(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="Ferienpass 2015", active=False)
     scenario.add_period(title="Ferienpass 2016")
     scenario.commit()
@@ -1410,7 +1558,7 @@ def test_send_email(client, scenario):
     page.form['text'] = '[Zeitraum] body'
     page = page.form.submit().follow()
 
-    page = page.click('Versand')
+    page = page.click('Vorlage verwenden')
     page.form['no_spam'] = True
     assert 'selected="False"' not in page
     assert "Ferienpass 2016 subject" in page
@@ -1434,7 +1582,7 @@ def test_send_email(client, scenario):
     assert "admin@example.org" in recipients
 
 
-def test_create_duplicate_notification(client):
+def test_create_duplicate_notification(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/notifications').click('Neue Mitteilungs-Vorlage')
@@ -1445,7 +1593,7 @@ def test_create_duplicate_notification(client):
     assert "existiert bereits" in page.form.submit()
 
 
-def test_import_account_statement(client, scenario):
+def test_import_account_statement(client: Client, scenario: Scenario) -> None:
     scenario.add_user(username='member@example.org', role='member')
     scenario.add_period(confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
@@ -1487,10 +1635,10 @@ def test_import_account_statement(client, scenario):
     settings.form.submit()
 
     # Prepare two payments
-    bookings = scenario.session.query(InvoiceItem)
-    bookings = bookings.order_by(InvoiceItem.group).all()
-    assert not all([booking.payment_date for booking in bookings])
-    assert not all([booking.tid for booking in bookings])
+    bookings_query = scenario.session.query(ActivityInvoiceItem)
+    bookings = bookings_query.order_by(ActivityInvoiceItem.group).all()
+    assert not all(booking.payment_date for booking in bookings)
+    assert not all(booking.tid for booking in bookings)
 
     code_1 = 'Zahlungszweck {}'.format(
         bookings[3].invoice.references[0].readable)
@@ -1520,13 +1668,13 @@ def test_import_account_statement(client, scenario):
     assert "2 Zahlungen wurden importiert" in page
 
     # Check dates and transaction IDs
-    booking1 = scenario.session.query(InvoiceItem).filter(
-        InvoiceItem.payment_date == date(2020, 3, 22)
+    booking1 = scenario.session.query(ActivityInvoiceItem).filter(
+        ActivityInvoiceItem.payment_date == date(2020, 3, 22)
     ).one()
     assert booking1.tid == 'TX1'
 
-    booking2 = scenario.session.query(InvoiceItem).filter(
-        InvoiceItem.payment_date == date(2020, 3, 5)
+    booking2 = scenario.session.query(ActivityInvoiceItem).filter(
+        ActivityInvoiceItem.payment_date == date(2020, 3, 5)
     ).all()
     assert [b.tid for b in booking2] == ['TX2', 'TX2']
 
@@ -1542,7 +1690,7 @@ def test_import_account_statement(client, scenario):
     assert "0 Zahlungen importieren" in page
 
 
-def test_deadline(client, scenario):
+def test_deadline(client: Client, scenario: Scenario) -> None:
     scenario.add_period()
     scenario.add_activity(title="Foo", state='accepted')
     scenario.add_occasion()
@@ -1551,25 +1699,28 @@ def test_deadline(client, scenario):
 
     # Test visibility of booking button right after day change
     period = scenario.latest_period
+    assert period is not None
     prebook_midnight = period.as_local_datetime(period.prebooking_start)
 
     with freeze_time(prebook_midnight + timedelta(minutes=30)):
         assert period.wishlist_phase
         assert period.is_prebooking_in_past is False
         page = client.get('/activity/foo')
-        assert 'Anmelden' in page.pyquery('.call-to-action a')[0].text
+        assert 'Anmelden' in page.pyquery('.enroll a')[0].text
 
     with freeze_time(prebook_midnight - timedelta(minutes=30)):
+        period = period  # undo mypy narrowing
         assert not period.wishlist_phase
         assert period.is_prebooking_in_past is False
         page = client.get('/activity/foo')
-        assert not page.pyquery('.call-to-action')
+        assert not page.pyquery('.enroll')
 
-    with freeze_time(scenario.latest_period.booking_end + timedelta(days=1)):
+    with freeze_time(period.booking_end + timedelta(days=1)):
 
         # show no 'enroll' for ordinary users past the deadline
-        # (there is one login link, for the ordinary login)
-        assert str(client.get('/activity/foo')).count("Anmelden") == 1
+        # (there are two login links in the header and footer, for the
+        # ordinary login)
+        assert str(client.get('/activity/foo')).count("Anmelden") == 2
 
         # do show it for admins though and allow signups
         admin = client.spawn()
@@ -1590,7 +1741,7 @@ def test_deadline(client, scenario):
         assert "Der Anmeldeschluss wurde erreicht" in page.form.submit()
 
 
-def test_cancellation_deadline(client, scenario):
+def test_cancellation_deadline(client: Client, scenario: Scenario) -> None:
     scenario.add_period(confirmed=True)
     scenario.add_activity(title="Foo", state='accepted')
     scenario.add_occasion()
@@ -1609,19 +1760,20 @@ def test_cancellation_deadline(client, scenario):
 
     # before the deadline, cancellation
     with scenario.update():
-        scenario.latest_period.cancellation_date\
-            = utcnow().date() + timedelta(days=1)
+        assert scenario.latest_period is not None
+        scenario.latest_period.cancellation_date = (
+            utcnow().date() + timedelta(days=1))
 
     page = client.get('/my-bookings')
     assert "Buchung stornieren" in page
 
-    cancel = page.pyquery('a:contains("Buchung stornieren")')\
-        .attr('ic-post-to')
+    cancel = page.pyquery(
+        'a:contains("Buchung stornieren")').attr('ic-post-to')
 
     # after the deadline, no cancellation
     with scenario.update():
-        scenario.latest_period.cancellation_date\
-            = utcnow().date() - timedelta(days=1)
+        scenario.latest_period.cancellation_date = (
+            utcnow().date() - timedelta(days=1))
 
     assert "Buchung stornieren" not in client.get('/my-bookings')
 
@@ -1638,7 +1790,7 @@ def test_cancellation_deadline(client, scenario):
     assert "Buchung wurde erfolgreich abgesagt" in client.get('/my-bookings')
 
 
-def test_userprofile_login(client):
+def test_userprofile_login(client: Client) -> None:
     page = client.get('/auth/login?to=/settings')
     page.form['username'] = 'admin@example.org'
     page.form['password'] = 'hunter2'
@@ -1666,7 +1818,7 @@ def test_userprofile_login(client):
     assert 'settings' in page.request.url
 
 
-def test_provide_activity_again(client, scenario):
+def test_provide_activity_again(client: Client, scenario: Scenario) -> None:
     scenario.add_period()
     scenario.add_activity(title="Learn How to Program")
     scenario.add_occasion()
@@ -1678,6 +1830,7 @@ def test_provide_activity_again(client, scenario):
     assert "Erneut anbieten" not in admin.get('/activities')
 
     with scenario.update():
+        assert scenario.latest_activity is not None
         scenario.latest_activity.state = 'archived'
 
     assert "Erneut anbieten" in admin.get('/activities')
@@ -1691,10 +1844,12 @@ def test_provide_activity_again(client, scenario):
 
     admin.post('/activity/learn-how-to-program/offer-again')
     scenario.refresh()
+    scenario = scenario  # undo mypy narrowing
+    assert scenario.latest_activity is not None
     assert scenario.latest_activity.state == 'preview'
 
 
-def test_online_payment(client, scenario):
+def test_online_payment(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="Ferienpass 2017", confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
     scenario.add_occasion(cost=100)
@@ -1773,8 +1928,8 @@ def test_online_payment(client, scenario):
         assert ">Bezahlt<" in page
 
         page = client.get('/payments')
-        assert ">Offen<" not in page
-        assert ">Bezahlt<" in page
+        assert "Offen" not in page.pyquery('tbody tr').text()
+        assert "Bezahlt" in page.pyquery('tbody tr').text()
 
     page = client.get('/payments')
     assert "Ferienpass 2017" in page
@@ -1797,10 +1952,10 @@ def test_online_payment(client, scenario):
         # client.post(get_post_url(page, 'payment-refund'))
 
     page = client.get('/billing?expand=1&state=all')
-    assert ">Unbezahlt<" in page
+    assert "Unbezahlt" in page.pyquery('tbody tr').text()
 
     page = client.get('/payments')
-    assert ">Rückerstattet<" in page
+    assert "Rückerstattet" in page.pyquery('tbody tr').text()
 
     page = client.get('/my-bills')
     assert 'checkout-button' in page
@@ -1812,9 +1967,9 @@ def test_online_payment(client, scenario):
             "Rechnung als bezahlt markieren")
 
         # check if paid and payment date is set
-        assert scenario.session.query(
-            InvoiceItem
-        ).all()[0].payment_date == date(2018, 1, 1)
+        assert scenario.session.query(  # type: ignore[union-attr]
+            ActivityInvoiceItem
+        ).first().payment_date == date(2018, 1, 1)
 
     client.get('/billing?state=all').click("Rechnung als unbezahlt markieren")
 
@@ -1832,11 +1987,12 @@ def test_online_payment(client, scenario):
         page.form.submit().follow()
 
     page = client.get('/payments')
-    assert ">Offen<" in page
-    assert ">Rückerstattet<" in page
+
+    assert "Offen" in page.pyquery('tbody tr').text()
+    assert "Rückerstattet" in page.pyquery('tbody tr').text()
 
 
-def test_icalendar_subscription(client, scenario):
+def test_icalendar_subscription(client: Client, scenario: Scenario) -> None:
     scenario.add_period()
     scenario.add_activity(title="Fishing")
     scenario.add_occasion(
@@ -1852,7 +2008,9 @@ def test_icalendar_subscription(client, scenario):
 
     # When the period is unconfirmed, the events are not shown in the calendar
     with scenario.update():
+        assert scenario.latest_period is not None
         scenario.latest_period.confirmed = False
+        assert scenario.latest_booking is not None
         scenario.latest_booking.state = 'accepted'
 
     page = client.get('/my-bookings')
@@ -1885,7 +2043,7 @@ def test_icalendar_subscription(client, scenario):
     assert 'DTEND:20161125T150000Z' in calendar
 
 
-def test_fill_out_contact_form(client):
+def test_fill_out_contact_form(client: Client) -> None:
     page = client.get('/form/kontakt')
     page.form['vorname'] = 'Foo'
     page.form['nachname'] = 'Bar'
@@ -1902,7 +2060,7 @@ def test_fill_out_contact_form(client):
     assert len(os.listdir(client.app.maildir)) == 1
 
 
-def test_occasion_number(client, scenario):
+def test_occasion_number(client: Client, scenario: Scenario) -> None:
     period = scenario.add_period()
 
     scenario.add_activity(name='fishing', state='accepted')
@@ -1932,7 +2090,7 @@ def test_occasion_number(client, scenario):
     assert "2. Durchführung" in page.click('Anmelden', index=1)
 
 
-def test_main_views_without_period(client):
+def test_main_views_without_period(client: Client) -> None:
     client.login_admin()
 
     # 99.9% of the time, there's a period for the following views -
@@ -1947,7 +2105,10 @@ def test_main_views_without_period(client):
     assert client.get('/billing', expect_errors=True).status_code == 404
 
 
-def test_book_alternate_occasion_regression(client, scenario):
+def test_book_alternate_occasion_regression(
+    client: Client,
+    scenario: Scenario
+) -> None:
     scenario.add_period(title="Ferienpass", confirmed=True)
     scenario.add_attendee(birth_date=date.today() - timedelta(days=8 * 360))
 
@@ -1973,7 +2134,7 @@ def test_book_alternate_occasion_regression(client, scenario):
     assert 'bereits für diese Durchführung' not in page
 
 
-def test_view_archived_occasions(client, scenario):
+def test_view_archived_occasions(client: Client, scenario: Scenario) -> None:
     scenario.add_period(
         title="Yesteryear",
         confirmed=True,
@@ -1993,6 +2154,7 @@ def test_view_archived_occasions(client, scenario):
     client.get('/activity/fishing', status=404)
 
     scenario.refresh()
+    assert scenario.latest_activity is not None
     scenario.latest_activity.username = 'editor@example.org'
     scenario.commit()
 
@@ -2009,7 +2171,11 @@ def test_view_archived_occasions(client, scenario):
     assert 'Duplizieren' in client.get('/activity/fishing')
 
 
-def test_no_new_activites_without_active_period(client, scenario):
+def test_no_new_activites_without_active_period(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period(
         title="2017",
         confirmed=True,
@@ -2041,6 +2207,7 @@ def test_no_new_activites_without_active_period(client, scenario):
     assert "Erneut anbieten" in page
 
     scenario.refresh()
+    assert scenario.latest_period is not None
     scenario.latest_period.active = False
     scenario.commit()
 
@@ -2052,7 +2219,10 @@ def test_no_new_activites_without_active_period(client, scenario):
     assert "Erneut anbieten" not in page
 
 
-def test_no_state_before_wishlist_phase_starts(client, scenario):
+def test_no_state_before_wishlist_phase_starts(
+    client: Client,
+    scenario: Scenario
+) -> None:
 
     scenario.add_period(
         title="Ferienpass",
@@ -2070,7 +2240,7 @@ def test_no_state_before_wishlist_phase_starts(client, scenario):
     assert not page.pyquery('.state')
 
 
-def test_invoice_references(client, scenario):
+def test_invoice_references(client: Client, scenario: Scenario) -> None:
 
     scenario.add_period(title="2019", confirmed=True, finalized=False)
     scenario.add_activity(title="Fishing", state='accepted')
@@ -2091,9 +2261,9 @@ def test_invoice_references(client, scenario):
     page.form['sure'] = 'yes'
     page.form.submit()
 
-    def reference():
-        return client.get('/my-bills')\
-            .pyquery('.reference-number').text().strip()
+    def reference() -> str:
+        return client.get('/my-bills').pyquery(
+            '.reference-number').text().strip()
 
     default_reference = reference()
     assert re.match(r'Q-[0-9A-Z]{5}-[0-9A-Z]{5}', default_reference)
@@ -2150,7 +2320,7 @@ def test_invoice_references(client, scenario):
     assert reference() == default_reference
 
 
-def test_group_codes(client, scenario):
+def test_group_codes(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="2019", confirmed=False)
     scenario.add_activity(title="Fishing", state='accepted')
 
@@ -2198,14 +2368,14 @@ def test_group_codes(client, scenario):
     assert "Foo" in page.pyquery('#add-possible').text()
 
     # we can sign-up Foo
-    page = page.click("Foo").form.submit().follow()
+    page = page.click("zur Gruppe hinzufügen").form.submit().follow()
 
     # we end up at the group view again, where Foo is in the group now
     assert "Bar" in page.pyquery('.own-children').text()
     assert "Foo" in page.pyquery('.own-children').text()
 
     # we can remove Bar from the group
-    page = page.click("Gruppe verlassen", index=0)
+    page = page.click("aus Gruppe entfernen", index=0)
     page = usr1.get(group_url)
 
     assert "Bar" not in page.pyquery('.own-children').text()
@@ -2221,7 +2391,7 @@ def test_group_codes(client, scenario):
 
     assert "Sawyer" in page.pyquery('.own-children').text()
 
-    page = page.click("Gruppe verlassen", index=1)
+    page = page.click("aus Gruppe entfernen", index=1)
 
     # other users can see the group view, but cannot execute actions and
     # they only see the active attendees
@@ -2230,22 +2400,20 @@ def test_group_codes(client, scenario):
     page = usr2.get(group_url)
     assert "Foo" in page
     assert "Bar" not in page
-    assert "Gruppe verlassen" not in page.pyquery('a').text()
-    assert "Gruppe beitreten" not in page.pyquery('a').text()
+    assert "aus Gruppe entfernen" not in page.pyquery('a').text()
+    assert "zur Gruppe hinzufügen" not in page.pyquery('a').text()
 
     usr2.login('qux@example.org', 'hunter2')
 
     page = usr2.get(group_url)
     assert "Foo" in page
     assert "Bar" not in page
-    assert "Gruppe verlassen" not in page.pyquery('a').text()
-    assert "Gruppe beitreten" not in page.pyquery('a').text()
 
     # the second user's child should be listed now
     assert "Qux" in page.pyquery('#add-possible').text()
 
     # let's join the group
-    page = page.click("Qux").form.submit().follow()
+    page = page.click("zur Gruppe hinzufügen").form.submit().follow()
 
     # now we can do the matching, and we should have Foo and Qux in the group
     admin = client.spawn()
@@ -2274,7 +2442,7 @@ def test_group_codes(client, scenario):
     assert b4.state == 'denied'
 
 
-def test_needs(client, scenario):
+def test_needs(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="2019", confirmed=False)
     scenario.add_activity(title="Fishing", state='accepted')
     scenario.add_occasion(spots=(0, 2), age=(0, 99999))
@@ -2329,7 +2497,7 @@ def test_needs(client, scenario):
     assert data == []
 
 
-def test_needs_export_by_period(client, scenario):
+def test_needs_export_by_period(client: Client, scenario: Scenario) -> None:
     scenario.add_activity(title="Fishing", state='accepted')
 
     scenario.add_period(title="2018", confirmed=False, active=False)
@@ -2373,14 +2541,18 @@ def test_needs_export_by_period(client, scenario):
     assert two[0]['Bedarf Anzahl'] == '2 - 2'
 
 
-def test_send_email_with_link_and_attachment(client, scenario):
+def test_send_email_with_link_and_attachment(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period(title="Ferienpass 2016")
     scenario.commit()
 
     client.login_admin()
 
     page = client.get('/files')
-    page.form['file'] = Upload('Test.txt', b'File content.')
+    page.form['file'] = [Upload('Test.txt', b'File content.')]
     page.form.submit()
 
     file_id = FileCollection(scenario.session).query().one().id
@@ -2391,7 +2563,7 @@ def test_send_email_with_link_and_attachment(client, scenario):
                          f'<p><a href="www.google.ch">Google</a></p>')
     page = page.form.submit().follow()
 
-    page = page.click('Versand')
+    page = page.click('Vorlage verwenden')
     assert "File und Link" in page
     assert "Test.txt" not in page
     assert "Google" in page
@@ -2413,7 +2585,7 @@ def test_send_email_with_link_and_attachment(client, scenario):
     assert email_2['To'] == 'admin@example.org'
 
 
-def test_max_age_exact(client, scenario):
+def test_max_age_exact(client: Client, scenario: Scenario) -> None:
     scenario.add_period(
         title="2018",
         confirmed=False,
@@ -2475,7 +2647,7 @@ def test_max_age_exact(client, scenario):
         assert "zu alt" not in page.form.submit()
 
 
-def test_max_age_year(client, scenario):
+def test_max_age_year(client: Client, scenario: Scenario) -> None:
     scenario.add_period(
         title="2018",
         confirmed=False,
@@ -2551,7 +2723,7 @@ def test_max_age_year(client, scenario):
         assert "zu alt" not in page.form.submit()
 
 
-def test_accept_tos(client, scenario):
+def test_accept_tos(client: Client, scenario: Scenario) -> None:
     scenario.add_period(confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
     scenario.add_occasion(age=(0, 100))
@@ -2590,7 +2762,7 @@ def test_accept_tos(client, scenario):
     assert not data[1]['Benutzer AGB akzeptiert']
 
 
-def test_donations(client, scenario):
+def test_donations(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="2019", confirmed=True, finalized=False)
     scenario.add_activity(title="Fishing", state='accepted')
     scenario.add_occasion(cost=100)
@@ -2641,7 +2813,7 @@ def test_donations(client, scenario):
     assert "30" in page
 
     # mark it as paid to disable changes
-    for item in scenario.session.query(InvoiceItem):
+    for item in scenario.session.query(ActivityInvoiceItem):
         item.paid = True
 
     transaction.commit()
@@ -2651,7 +2823,7 @@ def test_donations(client, scenario):
     assert "Die Spende wurde bereits bezahlt" in client.get('/my-bills')
 
     # until we mark it as unpaid again
-    for item in scenario.session.query(InvoiceItem):
+    for item in scenario.session.query(ActivityInvoiceItem):
         item.paid = False
 
     transaction.commit()
@@ -2663,7 +2835,11 @@ def test_donations(client, scenario):
     assert "Entfernen" not in client.get('/my-bills')
 
 
-def test_booking_after_finalization_all_inclusive(client, scenario):
+def test_booking_after_finalization_all_inclusive(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period(
         title="2019",
         confirmed=True,
@@ -2753,10 +2929,14 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
     ]
 
     # none of this should have produced more than one invoice
-    assert client.app.session().query(Invoice).count() == 1
+    assert client.app.session().query(BookingPeriodInvoice).count() == 1
 
 
-def test_booking_after_finalization_itemized(client, scenario):
+def test_booking_after_finalization_itemized(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period(
         title="2019",
         confirmed=True,
@@ -2824,10 +3004,14 @@ def test_booking_after_finalization_itemized(client, scenario):
     ]
 
     # none of this should have produced more than one invoice
-    assert client.app.session().query(Invoice).count() == 1
+    assert client.app.session().query(BookingPeriodInvoice).count() == 1
 
 
-def test_booking_after_finalization_for_anonymous(client, scenario):
+def test_booking_after_finalization_for_anonymous(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period(
         title="2019",
         phase='booking',
@@ -2846,24 +3030,30 @@ def test_booking_after_finalization_for_anonymous(client, scenario):
 
     scenario.commit()
 
-    # this is now possible for anyone
-    assert client.get('/activity/fishing').body.count(b"Anmelden") == 2
-    assert client.get('/activity/fishing').body.count(b"Anmelden") == 2
+    # "Anmelden" is there three times, twice for ogc-login and once for the
+    # occasion
+    assert client.get('/activity/fishing').body.count(b"Anmelden") == 3
+    assert client.get('/activity/hunting').body.count(b"Anmelden") == 3
 
     client.login_editor()
     assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
-    assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
+    assert client.get('/activity/hunting').body.count(b"Anmelden") == 1
 
     client.login_admin()
     assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
-    assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
+    assert client.get('/activity/hunting').body.count(b"Anmelden") == 1
 
 
 @pytest.mark.parametrize('attendee_owner', [
     'anna.frisch@example.org',
     'admin@example.org'
 ])
-def test_attendee_view(scenario, client, attendee_owner):
+def test_attendee_view(
+    client: Client,
+    scenario: Scenario,
+    attendee_owner: str
+) -> None:
+
     # Edit an attendee as administrator
     if not attendee_owner.startswith('admin'):
         scenario.add_user(username='anna.frisch@example.org')
@@ -2881,6 +3071,7 @@ def test_attendee_view(scenario, client, attendee_owner):
     scenario.refresh()
     client.login_admin()
 
+    assert scenario.latest_attendee is not None
     page = client.get(f'/attendee/{scenario.latest_attendee.id}')
     # Unique Child is not in the row of first_name
     assert page.form['first_name'].value == 'Bruno'
@@ -2890,7 +3081,7 @@ def test_attendee_view(scenario, client, attendee_owner):
     assert "Sie haben bereits eine Person mit diesem Namen erfasst" in page
 
 
-def test_registration(client):
+def test_registration(client: Client) -> None:
     client.app.enable_user_registration = True
 
     register = client.get('/auth/register')
@@ -2905,8 +3096,8 @@ def test_registration(client):
     register = client.get('/auth/register')
     assert 'volljährige Person eröffnet werden' in register
     register.form['username'] = 'user@example.org'
-    register.form['password'] = 'p@ssw0rd'
-    register.form['confirm'] = 'p@ssw0rd'
+    register.form['password'] = 'known_very_secure_password'
+    register.form['confirm'] = 'known_very_secure_password'
 
     assert "Vielen Dank" in register.form.submit().follow()
 
@@ -2914,17 +3105,18 @@ def test_registration(client):
     assert "Anmeldung bestätigen" in message
 
     expr = r'href="[^"]+">Anmeldung bestätigen</a>'
-    url = re.search(expr, message).group()
+    url = re.search(expr, message).group()  # type: ignore[union-attr]
     url = client.extract_href(url)
 
     assert "Konto wurde aktiviert" in client.get(url).follow()
     assert "Konto wurde bereits aktiviert" in client.get(url).follow()
 
-    logged_in = client.login('user@example.org', 'p@ssw0rd').follow()
+    logged_in = client.login(
+        'user@example.org', 'known_very_secure_password').follow()
     assert "Ihr Benutzerprofil ist unvollständig" in logged_in
 
 
-def test_view_qrbill(client, scenario):
+def test_view_qrbill(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="Ferienpass 2017", confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
     scenario.add_occasion(cost=100)
@@ -2964,7 +3156,7 @@ def test_view_qrbill(client, scenario):
 
 
 @freeze_time("2022-05-01 18:00")
-def test_activities_json(client, scenario):
+def test_activities_json(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="Ferienpass 2022", confirmed=True)
     activity = scenario.add_activity(
         title='Backen',
@@ -3026,7 +3218,7 @@ def test_activities_json(client, scenario):
     }
 
 
-def test_billing_with_date(client, scenario):
+def test_billing_with_date(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="2019", confirmed=True, finalized=False)
     scenario.add_activity(title="Fishing", state='accepted')
     scenario.add_occasion(cost=100)
@@ -3065,7 +3257,11 @@ def test_billing_with_date(client, scenario):
     assert json_data[0]['Zahlungsdatum'] == date
 
 
-def test_mails_on_registration_and_cancellation(client, scenario):
+def test_mails_on_registration_and_cancellation(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period(title="2019", confirmed=True, finalized=False,
                         phase="booking")
     scenario.add_activity(title="Drawing", state='accepted')
@@ -3109,7 +3305,11 @@ def test_mails_on_registration_and_cancellation(client, scenario):
     assert text in cancelation['TextBody']
 
 
-def test_add_child_with_differing_address(client, scenario):
+def test_add_child_with_differing_address(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period(title="2019", confirmed=True, finalized=False,
                         phase="booking")
     scenario.add_activity(title="Drawing", state='accepted')
@@ -3155,7 +3355,11 @@ def test_add_child_with_differing_address(client, scenario):
     assert json_data[0]['Teilnehmer Politische Gemeinde'] == 'London'
 
 
-def test_add_child_without_political_municipality(client, scenario):
+def test_add_child_without_political_municipality(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period(title="2023", confirmed=True, finalized=False,
                         phase='booking')
     scenario.add_activity(title="Skating", state='accepted')
@@ -3194,7 +3398,51 @@ def test_add_child_without_political_municipality(client, scenario):
     assert 'war erfolgreich' in page
 
 
-def test_view_dashboard(client, scenario):
+def test_delete_child(client: Client, scenario: Scenario) -> None:
+    scenario.add_period(title="2019", confirmed=True, finalized=True,
+                        active=True)
+    scenario.add_activity(title="Drawing", state='accepted')
+    scenario.add_occasion(cost=100)
+
+    scenario.add_user(username='m1@example.org', role='member', realname="Tom")
+    scenario.add_attendee(name="Dustin", birth_date=date(2000, 1, 1))
+
+    scenario.add_user(username='m2@example.org', role='member', realname="Doc")
+    scenario.add_attendee(name="Mike", birth_date=date(2000, 1, 1))
+
+    # Sign Mike up for the activity
+    scenario.add_booking(
+        user=scenario.users[0],
+        attendee=scenario.attendees[0],
+        occasion=scenario.occasions[0]
+    )
+
+    scenario.commit()
+
+    c1 = client.spawn()
+    c1.login('m1@example.org', 'hunter2')
+
+    c2 = client.spawn()
+    c2.login('m2@example.org', 'hunter2')
+
+    # Dustin cannot be deleted because he has bookings in the current period
+    page = c1.get('/my-bookings')
+    delete_link = page.pyquery('a.delete-icon').attr('ic-delete-from')
+    assert 'Dustin' in page
+    c1.delete(delete_link)
+    page = c1.get('/my-bookings')
+    assert 'Der/die Teilnehmende kann nicht gelöscht werden' in page
+
+    # Mike can be deleted because he has no bookings in the current period
+    page = c2.get('/my-bookings')
+    assert 'Mike' in page
+    delete_link = page.pyquery('a.delete-icon').attr('ic-delete-from')
+    c2.delete(delete_link)
+    page = c2.get('/my-bookings')
+    assert 'Mike und die zugehörigen Buchungen wurden gelöscht.' in page
+
+
+def test_view_dashboard(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="2019", confirmed=True, finalized=False)
     scenario.add_activity(title="Pet Zoo", state='accepted')
     scenario.add_occasion(cost=100)
@@ -3212,7 +3460,374 @@ def test_view_dashboard(client, scenario):
     client.login_admin()
 
     page = client.get('/dashboard')
-    assert "1 Angebote" in page
-    assert "2 Durchführungen" in page
-    assert "1 unbelegt" in page
-    assert "1 durchführbar" in page
+    assert page.pyquery('.activities .facts tr:first-child').text(
+        ) == "1\nAngebote"
+    assert page.pyquery('.activities .facts tr:nth-child(2)').text(
+        ) == "2\nDurchführungen"
+    assert page.pyquery('.activities .facts tr:nth-child(5)').text(
+        ) == "1\ndurchführbar"
+    assert page.pyquery('.activities .facts tr:nth-child(7)').text(
+        ) == "1\nunbelegt"
+
+    # ensure only feriennet boardlets are shown
+    assert len(page.pyquery('.boardlet')) == 6
+
+
+def test_view_volunteer_activities(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
+    scenario.add_period(title="2019", confirmed=True, finalized=False)
+    scenario.add_activity(title="Pet Zoo", state='accepted')
+    scenario.add_occasion(cost=200)
+    scenario.add_need(
+        name="Begleiter", number=NumericRange(1, 2), accept_signups=True)
+
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/feriennet-settings')
+    page.form['volunteers'] = 'enabled'
+    page.form.submit()
+
+    page = client.get('/activities/volunteer')
+    assert "Pet Zoo" in page
+
+    scenario.add_volunteer(
+        first_name='V',
+        last_name='P',
+        address='street',
+        zip_code='12',
+        place='some place',
+        birth_date=date(2019, 1, 1),
+        email='test@test.com',
+        phone='041 322 22 22',
+        state='confirmed'
+    )
+
+    scenario.commit()
+
+    page = client.get('/activities/volunteer')
+    assert "Pet Zoo" not in page
+
+
+def test_analytics_settings(client: Client) -> None:
+    # plausible
+    client.login_admin()
+
+    settings = client.get('/analytics-settings')
+    settings.form['analytics_provider_name'] = 'plausible'
+    settings.form['plausible_domain'] = 'govikon.ch'
+    settings.form.submit()
+
+    settings = client.get('/analytics-settings')
+    assert 'src="https://dummy-plausible.test/script.js"' in settings
+    assert 'href="https://dummy-plausible.test/govikon.ch"' in settings
+
+    # matomo
+    settings = client.get('/analytics-settings')
+    settings.form['analytics_provider_name'] = 'matomo'
+    settings.form['matomo_site_id'] = '28'
+    settings.form.submit()
+
+    settings = client.get('/analytics-settings')
+    assert 'var u="https://dummy-matomo.test/";' in settings
+    assert 'href="https://dummy-matomo.test/"' in settings
+
+    # google analytics
+    settings = client.get('/analytics-settings')
+    settings.form['analytics_provider_name'] = 'google_analytics'
+    settings.form['google_tag_id'] = 'G-DEADBEEF'
+    settings.form.submit()
+
+    settings = client.get('/analytics-settings')
+    assert (
+        'src="https://www.googletagmanager.com/gtag/js?id=G-DEADBEEF"'
+    ) in settings
+
+
+def test_footer_settings_contact_url_label(client: Client) -> None:
+    client.login_admin()
+
+    url = 'https://www.happy.coding.ch'
+
+    # initial, no contact url set, no link
+    page = client.get('/')
+    assert 'mehr' not in page
+    assert url not in page
+
+    # footer settings custom contact link label
+    settings = client.get('/footer-settings')
+    settings.form['contact_url_label'] = 'Contact Form'
+    settings.form['contact_url'] = url
+    page = settings.form.submit().follow()
+    assert 'Contact Form' in page
+    assert url in page
+
+    # footer settings default contact link label
+    settings = client.get('/footer-settings')
+    settings.form['contact_url_label'] = ''
+    settings.form['contact_url'] = url
+    page = settings.form.submit().follow()
+    assert 'mehr' in page
+    assert url in page
+
+
+def test_footer_settings_opening_hours_url_label(client: Client) -> None:
+    client.login_admin()
+
+    url = 'https://www.abc.ch'
+
+    # initial, no opening hours url set, no link
+    page = client.get('/')
+    assert 'mehr' not in page
+    assert url not in page
+
+    # footer settings custom opening our link label
+    settings = client.get('/footer-settings')
+    settings.form['opening_hours_url_label'] = 'Special abc'
+    settings.form['opening_hours_url'] = url
+    page = settings.form.submit().follow()
+    assert 'Special abc' in page
+    assert url in page
+
+    # footer settings default opening hour link label
+    settings = client.get('/footer-settings')
+    settings.form['opening_hours_url_label'] = ''
+    settings.form['opening_hours_url'] = url
+    page = settings.form.submit().follow()
+    assert 'mehr' in page
+    assert url in page
+
+
+@pytest.mark.parametrize(
+        'scenario_name, period_config,user_config,activity_config,'
+        'booking_config,invoice_config,expected_deleted,expected_message', [
+    # Scenario 1: Delete user with past bookings and paid invoices
+    (
+        'past_paid',
+        {'title': '2020', 'active': False},
+        {'username': 'test_user@example.org', 'role': 'member',
+         'complete_profile': True},
+        {'title': 'Retreat', 'state': 'accepted'},
+        {'state': 'accepted', 'cost': 100},
+        {'paid': True},
+        True,
+        'wurde gelöscht, inklusive aller damit verbundenen Daten.'
+    ),
+    # Scenario 2: Try to delete user with unpaid invoices from finalized period
+    (
+        'unpaid_finalized',
+        {'title': '2021', 'active': True, 'confirmed': True},
+        {'username': 'unpaid_user@example.org', 'role': 'member',
+         'complete_profile': True},
+        {'title': 'Hiking', 'state': 'accepted'},
+        {'state': 'accepted', 'cost': 50},
+        {'paid': False},
+        False,
+        'Das Konto kann nicht gelöscht werden'
+    ),
+    # Scenario 3: Delete user with unpaid invoice from unfinalized period
+    (
+        'unpaid_unfinalized',
+        {'title': '2022', 'active': True, 'finalized': False},
+        {'username': 'unfinalized_user@example.org', 'role': 'member',
+         'complete_profile': True},
+         None,  # No activity needed
+         None,  # No booking needed
+        {'paid': False},
+        True,
+        'wurde gelöscht, inklusive aller damit verbundenen Daten.'
+    ),
+    # Scenario 4: Try to delete user with bookings in active period
+    (
+        'active_booking',
+        {'title': '2023', 'active': True},
+        {'username': 'active_user@example.org', 'role': 'member',
+         'complete_profile': True},
+        {'title': 'Swimming', 'state': 'accepted'},
+        {'state': 'open', 'cost': 100},
+        None,  # No invoice
+        False,
+        'Das Konto kann nicht gelöscht werden'
+    ),
+    # Scenario 5: Try to delete organizer with activities
+    (
+        'organizer_with_activities',
+        {'title': '2024', 'active': True},
+        {'username': 'organizer@example.org', 'role': 'editor',
+         'complete_profile': True},
+        {'title': 'Coding Class', 'state': 'accepted',
+         'username': 'organizer@example.org'},
+        None,  # No booking needed
+        None,  # No invoice
+        False,
+        'Der Benutzer kann nicht gelöscht werden'
+    ),
+])
+def test_delete_user_scenarios_parametrized(
+    client: Client,
+    scenario: Scenario,
+    scenario_name: str,
+    period_config: dict[str, str | bool],
+    user_config: dict[str, str],
+    activity_config: dict[str, str] | None,
+    booking_config: dict[str, str | int] | None,
+    invoice_config: dict[str, int] | None,
+    expected_deleted: bool,
+    expected_message: str
+) -> None:
+    """Test various user deletion scenarios using parametrize."""
+
+    session = scenario.session
+    admin = client.spawn()
+    admin.login_admin()
+
+    # Setup period
+    scenario.add_period(**period_config)  # type: ignore[arg-type]
+
+    # Setup activity if needed
+    if activity_config:
+        scenario.add_activity(**activity_config)
+        scenario.add_occasion()
+
+    # Setup user and attendee
+    username = user_config['username']
+    scenario.add_user(**user_config)  # type: ignore[arg-type]
+    scenario.add_attendee(name='Test Child', username=username)
+
+    # Setup booking if needed
+    if booking_config:
+        scenario.add_booking(
+            occasion=scenario.occasions[-1],
+            user=scenario.users[-1],
+            attendee=scenario.attendees[-1],
+            **booking_config
+        )
+
+    scenario.commit()
+    scenario.refresh()
+
+    # Create invoice if needed
+    if invoice_config is not None:
+        user = session.query(User).filter_by(username=username).one()
+        period = scenario.latest_period
+
+        invoice = BookingPeriodInvoice(
+            user_id=user.id,
+            period_id=period.id  # type: ignore[union-attr]
+        )
+        session.add(invoice)
+        session.flush()
+
+        # Mark invoice items as paid/unpaid if there are any
+        if invoice_config.get('paid') is not None and invoice.items:
+            for item in invoice.items:
+                item.paid = invoice_config['paid']  # type: ignore[assignment]
+            session.flush()
+
+        # Confirm period for unfinalized period
+        if period_config.get('finalized') is False and period_config.get(
+            'active'):
+            page = admin.get('/matching')
+            page.form['confirm'] = 'yes'
+            page.form['sure'] = 'yes'
+            page.form.submit()
+
+        # Finalize period if needed for invoice validation
+        if period_config.get('confirmed'):
+            page = admin.get('/billing')
+            page.form['confirm'] = 'yes'
+            page.form['sure'] = 'yes'
+            page.form.submit()
+
+    # Attempt to delete user
+    users = admin.get('/usermanagement')
+    view_user_links = users.pyquery('.text-links a')
+
+    page = admin.get(view_user_links[2].attrib['href'])
+    delete_link = page.pyquery('a.delete-link').attr('ic-delete-from')
+
+    if delete_link:
+        admin.delete(delete_link)
+        transaction.commit()
+
+    # Verify results
+    page = admin.get('/usermanagement')
+    assert expected_message in page
+
+    user_exists = session.query(User).filter_by(
+        username=username).first() is not None
+    assert user_exists != expected_deleted
+
+    # Additional check for organizer scenario
+    if scenario_name == 'organizer_with_activities' and not expected_deleted:
+        assert session.query(Activity).filter_by(
+            username=username
+        ).first() is not None
+
+
+def test_admin_user_no_delete_button(
+        client: Client, scenario: Scenario) -> None:
+    """Test that admin users don't have a delete button."""
+
+    scenario.add_user(
+        username='another_admin@example.org',
+        role='admin',
+        complete_profile=True
+    )
+    scenario.commit()
+
+    admin = client.spawn()
+    admin.login_admin()
+
+    users = admin.get('/usermanagement')
+    view_user_links = users.pyquery('.text-links a')
+    page = admin.get(view_user_links[0].attrib['href'])  # Administratoren
+
+    # Check that delete button is not present for admin users
+    assert page.pyquery('a.delete-link').length == 0
+
+
+def test_add_manual_booking(client: Client, scenario: Scenario) -> None:
+    scenario.add_period(title="2019", confirmed=True, finalized=False)
+    scenario.add_activity(title="Fishing", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_user(username='tom@example.org', role='member',
+                      realname="Tom",
+    phone="000 000 00 11", email="tom@example.org")
+    scenario.add_attendee(name="Dustin")
+    scenario.add_booking(state='accepted', cost=100)
+    scenario.commit()
+
+    client.login_admin()
+
+    settings = client.get('/feriennet-settings')
+    settings.form['bank_account'] = 'CH6309000000250097798'
+    settings.form['bank_beneficiary'] = 'Initech'
+    settings.form.submit()
+
+    page = client.get('/billing')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page.form.submit()
+
+    page = client.get('/billing')
+
+    form = page.click('Manuelle Buchung hinzufügen')
+    form.form['username'] = 'tom@example.org'
+    form.form['booking_text'] = 'Discount for being nice to the admin'
+    form.form['discount'] = '20'
+    form.form.submit()
+
+    page_url = (
+        client.get('/billing')
+        .pyquery('.item-header + div')
+        .attr('ic-get-from')
+    )
+
+    page = client.get(page_url)
+    assert 'Tom' in page
+    assert 'Discount for being nice to the admin' in page

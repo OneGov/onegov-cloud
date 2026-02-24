@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.translator_directory import _
 from onegov.translator_directory.collections.language import LanguageCollection
@@ -16,15 +18,17 @@ class LanguageForm(Form):
     )
 
     def validate_name(self, field: StringField) -> None:
-        query = self.request.session.query(Language)
-        lang = query.filter_by(name=field.data).first()
-        if isinstance(self.model, LanguageCollection) and lang:
+        query = self.request.session.query(Language.id)
+        row = query.filter_by(name=field.data).first()
+        if not row:
+            return
+
+        lang_id, = row
+        if (
+            isinstance(self.model, LanguageCollection)
+            or lang_id != self.model.id
+        ):
             raise ValidationError(
-                _("${language} already exists",
-                  mapping={'language': field.data})
-            )
-        elif lang and not lang.id == self.model.id:
-            raise ValidationError(
-                _("${language} already exists",
+                _('${language} already exists',
                   mapping={'language': field.data})
             )

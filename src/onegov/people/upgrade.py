@@ -2,6 +2,9 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
+from __future__ import annotations
+
 import itertools
 
 from onegov.core.orm.types import JSON
@@ -116,13 +119,11 @@ def add_order_within_person_column(context: UpgradeContext) -> None:
     def groupkey(result: Any) -> str:
         return result[0].person_id
 
-    agency_list = []
-    for result in session.query(
-            AgencyMembership.id,
-            AgencyMembership.agency_id,
-            AgencyMembership.person_id,
-    ):
-        agency_list.append(result)
+    agency_list = session.query(
+        AgencyMembership.id,
+        AgencyMembership.agency_id,
+        AgencyMembership.person_id,
+    ).all()
 
     title_list = []
     for result in agency_list:
@@ -202,59 +203,7 @@ def fix_agency_address_column(context: UpgradeContext) -> None:
         ))
 
 
-@upgrade_task(
-    'Remove address columns from agency',
-    requires='onegov.people:Fix agency address column'
-)
-def remove_address_columns_from_agency(context: UpgradeContext) -> None:
-    if context.has_column('agencies', 'zip_code'):
-        context.operations.drop_column('agencies', 'zip_code')
-    if context.has_column('agencies', 'city'):
-        context.operations.drop_column('agencies', 'city')
-    if context.has_column('agencies', 'address'):
-        context.operations.drop_column('agencies', 'address')
-
-
-@upgrade_task('ogc-966 extend agency and person tables with more fields')
-def extend_agency_and_person_with_more_fields(context: UpgradeContext) -> None:
-    # add columns to table 'agencies'
-    agencies_columns = ['email', 'phone', 'phone_direct', 'website',
-                        'location_address', 'location_code_city',
-                        'postal_address', 'postal_code_city',
-                        'opening_hours']
-    table = 'agencies'
-
-    for column in agencies_columns:
-        if not context.has_column(table, column):
-            context.add_column_with_defaults(
-                table,
-                Column(column, Text, nullable=True),
-                default=lambda x: ''
-            )
-
-    context.session.flush()
-
-    # add columns to table 'people'
-    people_columns = ['location_address', 'location_code_city',
-                      'postal_address', 'postal_code_city', 'website_2']
-    table = 'people'
-
-    for column in people_columns:
-        if not context.has_column(table, column):
-            context.add_column_with_defaults(
-                table,
-                Column(column, Text, nullable=True),
-                default=lambda x: ''
-            )
-
-
-@upgrade_task('Add organisation columns to people')
-def add_organisation_columns_to_people(context: UpgradeContext) -> None:
-    if not context.has_column('people', 'organisation'):
-        context.operations.add_column('people', Column(
-            'organisation', Text, nullable=True
-        ))
-    if not context.has_column('people', 'sub_organisation'):
-        context.operations.add_column('people', Column(
-            'sub_organisation', Text, nullable=True
-        ))
+@upgrade_task('Remove_lu_external_id fixed')
+def remove_external_id_for_agency_import(context: UpgradeContext) -> None:
+    if context.has_column('people', 'lu_external_id'):
+        context.operations.drop_column('people', 'lu_external_id')

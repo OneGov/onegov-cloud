@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-08-08 12:56+0200\n"
+"POT-Creation-Date: 2024-10-08 08:58+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -110,23 +110,23 @@ msgstr "Abstimmung"
 msgid "Result by canton, district and municipality"
 msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
 
-msgid "Full analysis of post-vote poll results"
-msgstr "Analysebericht Nachbefragung"
+msgid "Full analysis of VOX post-vote poll results"
+msgstr "Analysebericht VOX-Nachbefragung"
 
-msgid "Post-vote poll"
-msgstr "Nachbefragung"
+msgid "Post-vote polls"
+msgstr "Nachbefragungen"
 
-msgid "Questionnaire of the poll"
-msgstr "Fragebogen der Nachbefragung"
+msgid "Questionnaire of the VOX poll"
+msgstr "Fragebogen der VOX-Nachbefragung"
 
-msgid "Dataset of the post-vote poll (CSV)"
-msgstr "Datensatz der Nachbefragung (CSV)"
+msgid "Dataset of the VOX poll (CSV)"
+msgstr "Datensatz der VOX-Nachbefragung (CSV)"
 
-msgid "Dataset of the post-vote poll (SAV)"
-msgstr "Datensatz der Nachbefragung (SAV)"
+msgid "Dataset of the VOX poll (SAV)"
+msgstr "Datensatz der VOX-Nachbefragung (SAV)"
 
-msgid "Dataset of the post-vote poll (DTA)"
-msgstr "Datensatz der Nachbefragung (DTA)"
+msgid "Dataset of the VOX poll (DTA)"
+msgstr "Datensatz der VOX-Nachbefragung (DTA)"
 
 msgid "Codebook for the post-vote poll (PDF)"
 msgstr "Codebuch zur Nachbefragung (PDF)"
@@ -134,8 +134,11 @@ msgstr "Codebuch zur Nachbefragung (PDF)"
 msgid "Codebook for the post-vote poll (XLSX)"
 msgstr "Codebuch zur Nachbefragung (XLSX)"
 
-msgid "Technical report of the post-vote poll"
-msgstr "Technischer Bericht der Nachbefragung"
+msgid "Technical report on the VOX poll"
+msgstr "Technischer Bericht zur VOX-Nachbefragung"
+
+msgid "Results of the LeeWas post-vote poll"
+msgstr "Ergebnisse der LeeWas-Nachbefragung"
 
 msgid "Updating the external resources may take some time."
 msgstr ""
@@ -149,6 +152,9 @@ msgstr "eMuseum.ch"
 
 msgid "Social Archives"
 msgstr "Sozialarchiv"
+
+msgid "Basel Poster Collection"
+msgstr "Plakatsammlung Basel"
 
 msgid "No eMuseum API key available."
 msgstr "Kein eMuseum API Schlüssel verfügbar."
@@ -1193,7 +1199,7 @@ msgid "d-3-938"
 msgstr "Tierschutz"
 
 msgid "d-1-10"
-msgstr "Sozialpolitik"
+msgstr "Sozial- und Gesellschaftspolitik"
 
 msgid "d-2-101"
 msgstr "Gesundheit"
@@ -1241,31 +1247,31 @@ msgid "d-3-1028"
 msgstr "Fürsorge"
 
 msgid "d-2-103"
-msgstr "Soziale Gruppen"
+msgstr "Gesellschaftsfragen"
 
 msgid "d-3-1031"
-msgstr "Ausländer:innen"
+msgstr "Migrations- und Integrationspolitik"
 
 msgid "d-3-1032"
-msgstr "Flüchtlinge"
+msgstr "Asylpolitik"
 
 msgid "d-3-1033"
-msgstr "Stellung der Frau"
+msgstr "Frauen und Gleichstellungspolitik"
 
 msgid "d-3-1034"
 msgstr "Familienpolitik"
 
 msgid "d-3-1035"
-msgstr "Kinder und Jugendliche"
+msgstr "Kinder- und Jugendpolitik"
 
 msgid "d-3-1036"
-msgstr "Senior:innen"
+msgstr "Alterspolitik"
 
 msgid "d-3-1037"
-msgstr "Behinderte"
+msgstr "Menschen mit Behinderungen"
 
 msgid "d-3-1038"
-msgstr "Homosexuelle"
+msgstr "LGBTQIA+"
 
 msgid "d-1-11"
 msgstr "Bildung und Forschung"
@@ -1537,6 +1543,9 @@ msgstr "Link eMuseum.ch"
 msgid "Link Social Archives"
 msgstr "Link Sozialarchiv"
 
+msgid "Link Basel Poster Collection"
+msgstr "Link Plakatsammlung Basel"
+
 msgid "Swissvotes database"
 msgstr "Swissvotes-Datenbank"
 
@@ -1552,11 +1561,11 @@ msgstr "Inseratekampagne: Analyse von APS"
 msgid "Media coverage: fög analysis"
 msgstr "Medienberichterstattung: Analyse des fög"
 
-msgid "Dataset of the post-vote poll"
-msgstr "Datensatz der Nachbefragung"
+msgid "Dataset of the VOX poll"
+msgstr "Datensatz der VOX-Nachbefragung"
 
-msgid "Codebook for the post-vote poll"
-msgstr "Codebuch zur Nachbefragung"
+msgid "Codebook for the VOX poll"
+msgstr "Codebuch zur VOX-Nachbefragung"
 
 msgid "Attachment"
 msgstr "Anhang"
@@ -1951,11 +1960,20 @@ msgstr "Interaktive Karte des Bundesamts für Statistik"
 msgid "Display the map"
 msgstr "Karte anzeigen"
 
-msgid "Technical report"
-msgstr "Technischer Bericht"
+msgid "Full analysis of VOTO post-vote poll results"
+msgstr "Analysebericht VOTO-Nachbefragung"
 
-msgid "Cockpit with selected results"
-msgstr "Cockpit mit Analyseergebnissen"
+msgid "Cockpit with selected VOX results"
+msgstr "Cockpit mit VOX-Analyseergebnissen"
+
+msgid "Cockpit with selected VOTO results"
+msgstr "Cockpit mit VOTO-Analyseergebnissen"
+
+msgid "Questionnaire of the VOTO poll"
+msgstr "Fragebogen der VOTO-Nachbefragung"
+
+msgid "Dataset of the VOTO poll"
+msgstr "Datensatz der VOTO-Nachbefragung"
 
 msgid ""
 "Due to data protection requirements, Swissvotes publishes a slightly reduced "
@@ -1968,6 +1986,9 @@ msgstr ""
 "Umständen der Zugang zum vollständigen Datensatz möglich; Sie finden die "
 "näheren Angaben dazu im Swissvotes-Codebuch (www.swissvotes.ch/page/dataset/"
 "codebook-de.pdf)."
+
+msgid "Codebook for the VOTO poll"
+msgstr "Codebuch zur VOTO-Nachbefragung"
 
 msgid "Full-text search in all documents on this vote"
 msgstr "Volltextsuche in allen Dokumenten zu dieser Vorlage"
@@ -2194,3 +2215,6 @@ msgstr "Alle Abstimmungen gelöscht"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
+
+#~ msgid "Technical report"
+#~ msgstr "Technischer Bericht"

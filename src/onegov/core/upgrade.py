@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import inspect
 import importlib
 import pkg_resources
@@ -9,11 +11,9 @@ from itertools import chain
 from onegov.core import LEVELS
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import JSON
-from sqlalchemy import Column, Text
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.engine.reflection import Inspector
-from sqlalchemy.orm import load_only
+from sqlalchemy.orm import load_only, mapped_column, Mapped
 from sqlalchemy.pool import StaticPool
 from toposort import toposort
 
@@ -25,11 +25,11 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
     # FIXME: Switch to importlib.resources
     from pkg_resources import Distribution, EntryPoint
+    from sqlalchemy import Column
     from sqlalchemy.engine import Connection
     from sqlalchemy.orm import Query, Session
     from types import CodeType, ModuleType
-    from typing import Protocol
-    from typing_extensions import ParamSpec, TypeAlias, TypeGuard
+    from typing import ParamSpec, Protocol, TypeAlias, TypeGuard
 
     from .request import CoreRequest
 
@@ -44,6 +44,7 @@ if TYPE_CHECKING:
         always_run: bool
         requires: str | None
         raw: bool
+
         def __call__(self, *args: _P.args, **kwargs: _P.kwargs) -> _T_co: ...
 
     RawFunc: TypeAlias = Callable[[Connection, Sequence[str]], Any]
@@ -59,10 +60,10 @@ class UpgradeState(Base, TimestampMixin):
     __tablename__ = 'upgrades'
 
     # the name of the module (e.g. onegov.core)
-    module = Column(Text, primary_key=True)
+    module: Mapped[str] = mapped_column(primary_key=True)
 
     # a json holding the state of the upgrades
-    state = Column(JSON, nullable=False, default=dict)
+    state: Mapped[dict[str, Any]] = mapped_column(default=dict)
 
     @property
     def executed_tasks(self) -> set[str]:
@@ -71,10 +72,10 @@ class UpgradeState(Base, TimestampMixin):
         else:
             return set(self.state.get('executed_tasks', []))
 
-    def was_already_executed(self, task: '_Task[..., Any]') -> bool:
+    def was_already_executed(self, task: _Task[..., Any]) -> bool:
         return task.task_name in self.executed_tasks
 
-    def mark_as_executed(self, task: '_Task[..., Any]') -> None:
+    def mark_as_executed(self, task: _Task[..., Any]) -> None:
         if not self.state:
             self.state = {}
 
@@ -90,7 +91,7 @@ class UpgradeState(Base, TimestampMixin):
 
 def get_distributions_with_entry_map(
     key: str
-) -> 'Iterator[tuple[Distribution, dict[str, EntryPoint]]]':
+) -> Iterator[tuple[Distribution, dict[str, EntryPoint]]]:
     """ Iterates through all distributions with entry_maps and yields
     each distribution along side the entry map with the given key.
 
@@ -103,7 +104,7 @@ def get_distributions_with_entry_map(
                 yield distribution, entry_map
 
 
-def get_upgrade_modules() -> 'Iterator[tuple[str, ModuleType]]':
+def get_upgrade_modules() -> Iterator[tuple[str, ModuleType]]:
     """ Returns all modules that registered themselves for onegov.core
     upgrades like this::
 
@@ -144,7 +145,7 @@ def get_upgrade_modules() -> 'Iterator[tuple[str, ModuleType]]':
             yield entry.name, importlib.import_module(entry.module_name)
 
 
-class upgrade_task:
+class upgrade_task:  # noqa: N801
     """ Marks the decorated function as an upgrade task. Upgrade tasks should
     be defined outside classes (except for testing) - that is in the root of
     the module (directly in onegov/form/upgrades.py for example).
@@ -223,8 +224,8 @@ class upgrade_task:
         raw: bool = False
     ):
         if raw:
-            assert always_run, "raw tasks must always run"
-            assert not requires, "raw tasks may not require other tasks"
+            assert always_run, 'raw tasks must always run'
+            assert not requires, 'raw tasks may not require other tasks'
 
         self.name = name
         self.always_run = always_run
@@ -233,11 +234,11 @@ class upgrade_task:
 
     # NOTE: We only allow the two supported function signatures
     @overload
-    def __call__(self, fn: 'UpgradeFunc') -> 'UpgradeTask': ...
+    def __call__(self, fn: UpgradeFunc) -> UpgradeTask: ...
     @overload
-    def __call__(self, fn: 'RawFunc') -> 'RawTask': ...
+    def __call__(self, fn: RawFunc) -> RawTask: ...
 
-    def __call__(self, fn: 'Callable[_P, _T]') -> '_Task[_P, _T]':
+    def __call__(self, fn: Callable[_P, _T]) -> _Task[_P, _T]:
         fn = cast('_Task[_P, _T]', fn)
         fn.task_name = self.name
         fn.always_run = self.always_run
@@ -246,7 +247,7 @@ class upgrade_task:
         return fn
 
 
-def is_task(function: 'Callable[_P, _T]') -> 'TypeGuard[_Task[_P, _T]]':
+def is_task(function: Callable[_P, _T]) -> TypeGuard[_Task[_P, _T]]:
     """ Returns True if the given function is an uprade task. """
     if not (isfunction(function) or ismethod(function)):
         return False
@@ -254,15 +255,15 @@ def is_task(function: 'Callable[_P, _T]') -> 'TypeGuard[_Task[_P, _T]]':
     return hasattr(function, 'task_name')
 
 
-def get_module_tasks(module: 'ModuleType') -> 'Iterator[_Task[..., Any]]':
+def get_module_tasks(module: ModuleType) -> Iterator[_Task[..., Any]]:
     """ Goes through a module or class and returns all upgrade tasks. """
     for name, function in getmembers(module, is_task):
         yield function
 
 
 def get_tasks_by_id(
-    upgrade_modules: 'Iterable[tuple[str, ModuleType]]'
-) -> dict[str, '_Task[..., Any]']:
+    upgrade_modules: Iterable[tuple[str, ModuleType]]
+) -> dict[str, _Task[..., Any]]:
     """ Takes a list of upgrade modules or classes and returns the tasks
     keyed by id.
 
@@ -274,14 +275,14 @@ def get_tasks_by_id(
     for distribution, upgrade_module in upgrade_modules:
 
         for function in get_module_tasks(upgrade_module):
-            task_id = ':'.join((distribution, function.task_name))
+            task_id = f'{distribution}:{function.task_name}'
 
-            assert task_id not in tasks, "Duplicate task"
+            assert task_id not in tasks, 'Duplicate task'
             tasks[task_id] = function
 
             # make sure we don't have duplicate function names - it works, but
             # it makes debugging harder
-            msg = f"Duplicate function name: {function.__name__}"
+            msg = f'Duplicate function name: {function.__name__}'
             assert function.__name__ not in fn_names, msg
 
             fn_names.add(function.__name__)
@@ -290,8 +291,8 @@ def get_tasks_by_id(
 
 
 def get_module_order_key(
-    tasks: 'Mapping[str, _Task[..., Any]]'
-) -> 'Callable[[str], SupportsRichComparison]':
+    tasks: Mapping[str, _Task[..., Any]]
+) -> Callable[[str], SupportsRichComparison]:
     """ Returns a sort order key which orders task_ids in order of their
     module dependencies. That is a task from onegov.core is sorted before
     a task in onegov.user, because onegov.user depends on onegov.core.
@@ -300,13 +301,9 @@ def get_module_order_key(
 
     """
     sorted_modules = {module: ix for ix, module in enumerate(chain(*LEVELS))}
-    modules = set()
 
-    for task in tasks:
-        modules.add(task.split(':', 1)[0])
-
-    def sortkey(task: str) -> 'SupportsRichComparison':
-        module, name = task.split(':', 1)
+    def sortkey(task: str) -> SupportsRichComparison:
+        module = task.split(':', 1)[0]
         return (
             # sort by level (unknown models first)
             sorted_modules.get(module, float('-inf')),
@@ -322,8 +319,8 @@ def get_module_order_key(
 
 
 def get_tasks(
-    upgrade_modules: 'Iterable[tuple[str, ModuleType]] | None' = None
-) -> list[tuple[str, '_Task[..., Any]']]:
+    upgrade_modules: Iterable[tuple[str, ModuleType]] | None = None
+) -> list[tuple[str, _Task[..., Any]]]:
     """ Takes a list of upgrade modules or classes and returns the
     tasks that should be run in the order they should be run.
 
@@ -335,7 +332,8 @@ def get_tasks(
 
     for task_id, task in tasks.items():
         if task.requires:
-            assert not tasks[task.requires].raw, "Raw tasks cannot be required"
+            assert task.requires in tasks, f'Could not find "{task.requires}"'
+            assert not tasks[task.requires].raw, 'Raw tasks cannot be required'
 
     graph: dict[str, set[str]] = {}
 
@@ -356,9 +354,9 @@ def get_tasks(
 
 
 def register_modules(
-    session: 'Session',
-    modules: 'Iterable[tuple[str, ModuleType]]',
-    tasks: 'Collection[tuple[str, _Task[..., Any]]]'
+    session: Session,
+    modules: Iterable[tuple[str, ModuleType]],
+    tasks: Collection[tuple[str, _Task[..., Any]]]
 ) -> None:
     """ Sets up the state tracking for all modules. Initially, all tasks
     are marekd as executed, because we assume tasks to upgrade older
@@ -393,7 +391,7 @@ def register_modules(
     session.flush()
 
 
-def register_all_modules_and_tasks(session: 'Session') -> None:
+def register_all_modules_and_tasks(session: Session) -> None:
     """ Registers all the modules and all the tasks. """
     register_modules(session, get_upgrade_modules(), get_tasks())
 
@@ -407,8 +405,10 @@ class UpgradeTransaction:
 
     """
 
-    def __init__(self, context: 'UpgradeContext'):
-        self.operations_transaction = context.operations_connection.begin()
+    def __init__(self, context: UpgradeContext):
+        conn = context.operations_connection
+        tx = conn.begin_nested() if conn.in_transaction() else conn.begin()
+        self.operations_transaction = tx
         self.session = context.session
 
     def flush(self) -> None:
@@ -434,7 +434,7 @@ class UpgradeContext:
     #        to be auto-generated as well, so we get the available methods
     operations: Any
 
-    def __init__(self, request: 'CoreRequest'):
+    def __init__(self, request: CoreRequest):
 
         # alembic is a somewhat heavy import (thanks to the integrated mako)
         # -> since we really only ever need it during upgrades we lazy load
@@ -465,8 +465,8 @@ class UpgradeContext:
         #       http://docs.sqlalchemy.org/en/latest/core/pooling.html
         #       #sqlalchemy.pool.AssertionPool
         #
-        conn = session._connection_for_bind(  # type:ignore[attr-defined]
-            session.bind)
+        assert session.bind is not None
+        conn = session._connection_for_bind(session.bind)
         self.operations_connection: Connection = conn
         self.operations = Operations(
             MigrationContext.configure(self.operations_connection))
@@ -480,23 +480,94 @@ class UpgradeContext:
             table, schema=self.schema
         )}
 
-    def has_enum(self, enum: str) -> bool:
-        return self.session.execute(f"""
-            SELECT EXISTS (
-                SELECT 1 FROM pg_type
-                WHERE typname = '{enum}'
-                  and typnamespace = (
-                    SELECT oid FROM pg_namespace
-                    WHERE nspname = '{self.schema}'
-                  )
-            )
-        """).scalar()
+    def has_constraint(
+        self, table_name: str, constraint_name: str, constraint_type: str
+    ) -> bool:
+        """ Check if a specific constraint exists on a table.
+
+        When constraint names aren't known, they can be discovered:
+
+        SELECT constraint_name FROM information_schema.table_constraints
+        WHERE table_name = 'table_name'
+        AND constraint_name LIKE '%column_name%';
+        """
+        return self.session.execute(
+            text("""
+                SELECT EXISTS (
+                    SELECT 1 FROM information_schema.table_constraints
+                    WHERE table_schema = :schema
+                      AND table_name = :table_name
+                      AND constraint_type = :constraint_type
+                      AND constraint_name = :constraint_name
+                )
+            """),
+            {
+                'schema': self.schema,
+                'table_name': table_name,
+                'constraint_name': constraint_name,
+                'constraint_type': constraint_type,
+            }
+        ).scalar_one()
+
+    def has_enum(self, enum_name: str) -> bool:
+        return self.session.execute(
+            text("""
+                SELECT EXISTS (
+                    SELECT 1 FROM pg_type
+                    WHERE typname = :enum_name
+                      AND typnamespace = (
+                        SELECT oid FROM pg_namespace
+                        WHERE nspname = :schema
+                      )
+                )
+            """),
+            {
+                'schema': self.schema,
+                'enum_name': enum_name,
+            }
+        ).scalar_one()
 
     def has_table(self, table: str) -> bool:
         inspector = Inspector(self.operations_connection)
         return table in inspector.get_table_names(schema=self.schema)
 
-    def models(self, table: str) -> 'Iterator[Any]':
+    def get_enum_values(self, enum_name: str) -> set[str]:
+        result = self.operations_connection.execute(
+            text("""
+            SELECT pg_enum.enumlabel AS value
+              FROM pg_enum
+              JOIN pg_type
+                ON pg_type.oid = pg_enum.enumtypid
+             WHERE pg_type.typname = :enum_name
+             GROUP BY pg_enum.enumlabel
+            """),
+            {'enum_name': enum_name}
+        )
+        return {value for (value,) in result}
+
+    def update_enum_values(
+        self,
+        enum_name: str,
+        enum_values: Iterable[str]
+    ) -> bool:
+        existing = self.get_enum_values(enum_name)
+        missing = set(enum_values) - existing
+        if not missing:
+            return False
+
+        # HACK: ALTER TYPE has to be run outside transaction
+        self.operations.execute(text('COMMIT'))
+        for value in missing:
+            # NOTE: This should be safe just by virtue of naming
+            #       restrictions on classes and enum members
+            self.operations.execute(text(
+                f"ALTER TYPE {enum_name} ADD VALUE '{value}'"
+            ))
+        # start a new transaction
+        self.operations.execute(text('BEGIN'))
+        return True
+
+    def models(self, table: str) -> Iterator[Any]:
         def has_matching_tablename(model: Any) -> bool:
             if not hasattr(model, '__tablename__'):
                 return False  # abstract bases
@@ -506,44 +577,50 @@ class UpgradeContext:
         for base in self.request.app.session_manager.bases:
             yield from find_models(base, has_matching_tablename)
 
+    # FIXME: We can probably get rid of this once we get rid of
+    #        `add_column_with_defaults`
     def records_per_table(
         self,
         table: str,
-        columns: 'Iterable[Column[Any]] | None' = None
-    ) -> 'Iterator[Any]':
+        columns: Iterable[Column[Any]] | None = None
+    ) -> Iterator[Any]:
 
         if columns is None:
-            def filter_columns(q: 'Query[Any]') -> 'Query[Any]':
+            def filter_columns(model: type[_T], q: Query[_T]) -> Query[_T]:
                 return q
         else:
             column_names = tuple(c.name for c in columns)
 
-            def filter_columns(q: 'Query[Any]') -> 'Query[Any]':
-                return q.options(load_only(*column_names))
+            def filter_columns(model: type[_T], q: Query[_T]) -> Query[_T]:
+                return q.options(load_only(*(
+                    getattr(model, name)
+                    for name in column_names
+                )))
 
         for model in self.models(table):
-            yield from filter_columns(self.session.query(model))
+            yield from filter_columns(model, self.session.query(model))
 
     @contextmanager
-    def stop_search_updates(self) -> 'Iterator[None]':
+    def stop_search_updates(self) -> Iterator[None]:
         # XXX this would be better handled with a more general approach
         # that doesn't require knowledge of onegov.search
-        if hasattr(self.app, 'es_orm_events'):
-            self.app.es_orm_events.stopped = True
+        if hasattr(self.app, 'fts_orm_events'):
+            self.app.fts_orm_events.stopped = True
             yield
-            self.app.es_orm_events.stopped = False
+            self.app.fts_orm_events.stopped = False
         else:
             yield
 
     def is_empty_table(self, table: str) -> bool:
-        return self.operations_connection.execute(
-            f"SELECT * FROM {table} LIMIT 1").rowcount == 0
+        return self.operations_connection.execute(text(
+            f'SELECT * FROM {table} LIMIT 1')).rowcount == 0
 
+    # FIXME: Get rid of this and any tasks that use it
     def add_column_with_defaults(
         self,
         table: str,
-        column: 'Column[_T]',
-        default: '_T | Callable[[Any], _T]'
+        column: Column[_T],
+        default: _T | Callable[[Any], _T]
     ) -> None:
         # XXX while adding default values we shouldn't reindex the data
         # since this is what the default add_column code does and will be
@@ -583,10 +660,10 @@ class RawUpgradeRunner:
 
     def __init__(
         self,
-        tasks: 'Sequence[tuple[str, RawTask]]',
+        tasks: Sequence[tuple[str, RawTask]],
         commit: bool = True,
-        on_task_success: 'TaskCallback | None' = None,
-        on_task_fail: 'TaskCallback | None' = None
+        on_task_success: TaskCallback | None = None,
+        on_task_fail: TaskCallback | None = None
     ):
         self.tasks = tasks
         self.commit = commit
@@ -599,14 +676,14 @@ class RawUpgradeRunner:
         self._on_task_success = on_task_success
         self._on_task_fail = on_task_fail
 
-    def run_upgrade(self, dsn: str, schemas: 'Sequence[str]') -> int:
+    def run_upgrade(self, dsn: str, schemas: Sequence[str]) -> int:
 
         # it's possible for applications to exist without schemas, if the
         # application doesn't use multi-tennants and has not been run yet
         if not schemas:
             return 0
 
-        engine = create_engine(dsn, poolclass=StaticPool)
+        engine = create_engine(dsn, poolclass=StaticPool, future=True)
         connection = engine.connect()
         executions = 0
 
@@ -654,11 +731,11 @@ class UpgradeRunner:
 
     def __init__(
         self,
-        modules: 'Sequence[tuple[str, ModuleType]]',
-        tasks: 'Sequence[tuple[str, UpgradeTask]]',
+        modules: Sequence[tuple[str, ModuleType]],
+        tasks: Sequence[tuple[str, UpgradeTask]],
         commit: bool = True,
-        on_task_success: 'TaskCallback | None' = None,
-        on_task_fail: 'TaskCallback | None' = None
+        on_task_success: TaskCallback | None = None,
+        on_task_fail: TaskCallback | None = None
     ):
         self.modules = modules
         self.tasks = tasks
@@ -668,11 +745,11 @@ class UpgradeRunner:
         self._on_task_success = on_task_success
         self._on_task_fail = on_task_fail
 
-    def on_task_success(self, task: 'UpgradeTask') -> None:
+    def on_task_success(self, task: UpgradeTask) -> None:
         if self._on_task_success is not None:
             self._on_task_success(task)
 
-    def on_task_fail(self, task: 'UpgradeTask') -> None:
+    def on_task_fail(self, task: UpgradeTask) -> None:
         if self._on_task_fail is not None:
             self._on_task_fail(task)
 
@@ -686,7 +763,7 @@ class UpgradeRunner:
 
         return context.session.merge(self.states[module], load=True)
 
-    def register_modules(self, request: 'CoreRequest') -> None:
+    def register_modules(self, request: CoreRequest) -> None:
         register_modules(request.session, self.modules, self.tasks)
 
         if self.commit:
@@ -695,7 +772,7 @@ class UpgradeRunner:
     def get_module_from_task_id(self, task_id: str) -> str:
         return task_id.split(':', 1)[0]
 
-    def run_upgrade(self, request: 'CoreRequest') -> int:
+    def run_upgrade(self, request: CoreRequest) -> int:
         self.register_modules(request)
 
         tasks = ((self.get_module_from_task_id(i), t) for i, t in self.tasks)
@@ -737,6 +814,7 @@ class UpgradeRunner:
                     upgrade.abort()
             finally:
                 context.session.invalidate()
-                context.engine.dispose()
+                if context.engine and hasattr(context.engine, 'dispose'):
+                    context.engine.dispose()
 
         return executed

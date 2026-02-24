@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import kerberos  # type:ignore
 import os
 
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
 
 
 @attrs()
-class KerberosClient():
+class KerberosClient:
     """ Kerberos is a computer-network authentication protocol that works on
     the basis of tickets to allow nodes communicating over a non-secure network
     to prove their identity to one another in a secure manner.
@@ -36,7 +38,7 @@ class KerberosClient():
             kerberos.getServerPrincipalDetails(self.service, self.hostname)
 
     @contextmanager
-    def context(self) -> 'Iterator[None]':
+    def context(self) -> Iterator[None]:
         """ Runs the block inside the context manager with the keytab
         set to the provider's keytab.
 
@@ -50,15 +52,16 @@ class KerberosClient():
         previous = os.environ.pop('KRB5_KTNAME', None)
         os.environ['KRB5_KTNAME'] = self.keytab
 
-        yield
-
-        if previous is not None:
-            os.environ['KRB5_KTNAME'] = previous
+        try:
+            yield
+        finally:
+            if previous is not None:
+                os.environ['KRB5_KTNAME'] = previous
 
     def authenticated_username(
         self,
-        request: 'CoreRequest'
-    ) -> 'Response | str | None':
+        request: CoreRequest
+    ) -> Response | str | None:
         """ Authenticates the given request using Kerberos.
 
         The kerberos handshake is as follows:
@@ -82,9 +85,9 @@ class KerberosClient():
         token = token and ''.join(token.split()[1:]).strip()
 
         def with_header(
-            response: 'Response',
+            response: Response,
             include_token: bool = True
-        ) -> 'Response':
+        ) -> Response:
             if include_token and token:
                 negotiate = f'Negotiate {token}'
             else:
@@ -94,7 +97,7 @@ class KerberosClient():
 
             return response
 
-        def negotiate() -> 'Response':
+        def negotiate() -> Response:
             # only mirror the token back, if it is valid, which is never
             # the case in the negotiate step
             return with_header(HTTPUnauthorized(), include_token=False)

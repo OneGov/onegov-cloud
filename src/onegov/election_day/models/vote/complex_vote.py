@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.models.vote.vote import Vote
 
 
@@ -13,19 +15,23 @@ class ComplexVote(Vote):
     __mapper_args__ = {'polymorphic_identity': 'complex'}
 
     @property
-    def counter_proposal(self) -> 'Ballot':
+    def proposal(self) -> Ballot:
+        return self.ballot('proposal')
+
+    @property
+    def counter_proposal(self) -> Ballot:
         return self.ballot('counter-proposal')
 
     @property
-    def tie_breaker(self) -> 'Ballot':
+    def tie_breaker(self) -> Ballot:
         return self.ballot('tie-breaker')
 
     @staticmethod
     def get_answer(
         counted: bool,
-        proposal: 'Ballot | BallotResult | None',
-        counter_proposal: 'Ballot | BallotResult | None',
-        tie_breaker: 'Ballot | BallotResult | None'
+        proposal: Ballot | BallotResult | None,
+        counter_proposal: Ballot | BallotResult | None,
+        tie_breaker: Ballot | BallotResult | None
     ) -> str | None:
 
         if not (counted and proposal and counter_proposal and tie_breaker):

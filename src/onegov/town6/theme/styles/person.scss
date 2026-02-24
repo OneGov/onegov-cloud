@@ -1,3 +1,8 @@
+#people-filters {
+    margin-bottom: 2rem;
+}
+
+
 /*
     Person card
 */
@@ -22,10 +27,10 @@ $person-email-icon: '\f0e0';
         @include circle;
 
         background: $gainsboro;
-        height: 9rem;
+        height: 12rem;
         overflow: hidden;
         position: relative;
-        width: 9rem;
+        width: 12rem;
 
         // this would be nicer with object-position and object-fit, but IE
         // doesn't support it at all and Safari only somewhat.
@@ -56,16 +61,16 @@ $person-email-icon: '\f0e0';
         }
     }
 
+    .person-card-details {
+        flex-grow: 2;
+    }
+
     .person-card-function {
         margin-bottom: 1em;
     }
 
-    .person-card-organisation {
+    :nth-last-child(1 of .person-card-organisation) {
         margin-bottom: 1em;
-
-        span:not(:last-child)::after {
-            content: ' -';
-        }
     }
 
     .person-card-personal {
@@ -132,9 +137,9 @@ $person-email-icon: '\f0e0';
 @include breakpoint(small only) {
     .person-card {
         .person-card-portrait {
-            height: 8rem;
+            height: 12rem;
             margin-bottom: 1rem;
-            width: 8rem;
+            width: 12rem;
 
             .fa-user {
                 font-size: calc(100vw - 6rem);
@@ -164,12 +169,18 @@ Person card in lists
     width: 100%;
     border-top: 1px solid #f5f5f5;
 
+
     .person-card-portrait {
-        height: 5rem;
+        height: 8rem;
         margin-right: 1rem;
         position: relative;
         text-align: center;
-        width: 5rem;
+        width: 8rem;
+
+        @include breakpoint(small only) {
+                height: 6rem;
+                width: 6rem;
+        }
 
         .fa-user {
             font-size: 4rem;
@@ -199,15 +210,16 @@ Person card in lists
     .person-card-function {
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
+        overflow: hidden;
         display: -webkit-box;
         margin-bottom: 0;
-        overflow: hidden;
 
         span {
             cursor: help;
         }
     }
 }
+
 
 /*
     A-Z Blocks

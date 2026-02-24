@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import textwrap
 
 from markupsafe import Markup
@@ -48,75 +50,75 @@ DEFAULT_LEGEND = Markup("""
 class WinterthurDaycareSettingsForm(Form):
 
     max_income = DecimalField(
-        label=_("Maximum taxable income"),
-        fieldset=_("Variables"),
+        label=_('Maximum taxable income'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     max_wealth = DecimalField(
-        label=_("Maximum taxable wealth"),
-        fieldset=_("Variables"),
+        label=_('Maximum taxable wealth'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     min_income = DecimalField(
-        label=_("Minimum income"),
-        fieldset=_("Variables"),
+        label=_('Minimum income'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     min_rate = DecimalField(
-        label=_("Minimum day-rate"),
-        fieldset=_("Variables"),
+        label=_('Minimum day-rate'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     max_rate = DecimalField(
-        label=_("Maximum day-rate"),
-        fieldset=_("Variables"),
+        label=_('Maximum day-rate'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     max_subsidy = DecimalField(
-        label=_("Maximum subsidy"),
-        fieldset=_("Variables"),
+        label=_('Maximum subsidy'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     wealth_premium = DecimalField(
-        label=_("Wealth premium (%)"),
-        fieldset=_("Variables"),
+        label=_('Wealth premium (%)'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     rebate = DecimalField(
-        label=_("Rebate (%)"),
-        fieldset=_("Variables"),
+        label=_('Rebate (%)'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     services = TextAreaField(
-        label=_("Care"),
-        fieldset=_("Variables"),
+        label=_('Care'),
+        fieldset=_('Variables'),
         validators=[InputRequired()],
         render_kw={'rows': 32, 'data-editor': 'yaml'})
 
     directory = RadioField(
-        label=_("Directory"),
-        fieldset=_("Institutions"),
+        label=_('Directory'),
+        fieldset=_('Institutions'),
         validators=[InputRequired()],
         choices=None)
 
     explanation = HtmlField(
-        label=_("Explanation"),
-        fieldset=_("Details"),
+        label=_('Explanation'),
+        fieldset=_('Details'),
         render_kw={'rows': 32})
 
     def populate_obj(  # type:ignore[override]
         self,
         obj: Organisation,  # type:ignore[override]
-        exclude: 'Collection[str] | None' = None,
-        include: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None
     ) -> None:
 
         super().populate_obj(obj, exclude=exclude, include=include)
@@ -133,7 +135,7 @@ class WinterthurDaycareSettingsForm(Form):
                     #       but we should probably consider creating
                     #       something like a DaycareSettingsProxy class
                     #       which contains all the fields as dict_property
-                    v = Markup(v)  # noqa: MS001
+                    v = Markup(v)  # nosec: B704
                 self[k].data = v
 
         if not self.services.data or not self.services.data.strip():
@@ -150,14 +152,14 @@ class WinterthurDaycareSettingsForm(Form):
             tuple(Services.parse_definition(field.data or ''))
         except (YAMLError, TypeError, KeyError) as exception:
             raise ValidationError(
-                _("Invalid services configuration")
+                _('Invalid services configuration')
             ) from exception
 
-    def directory_choices(self) -> 'Iterator[tuple[str, str]]':
+    def directory_choices(self) -> Iterator[tuple[str, str]]:
         dirs: DirectoryCollection[ExtendedDirectory]
         dirs = DirectoryCollection(self.request.session, type='extended')
 
-        def choice(directory: 'ExtendedDirectory') -> tuple[str, str]:
+        def choice(directory: ExtendedDirectory) -> tuple[str, str]:
             return (
                 directory.id.hex,
                 directory.title
@@ -174,30 +176,30 @@ class WinterthurDaycareSettingsForm(Form):
     model=Organisation, name='daycare-settings',
     template='form.pt', permission=Secret,
     form=WinterthurDaycareSettingsForm,
-    setting=_("Daycare Calculator"),
+    setting=_('Daycare Calculator'),
     icon='fa-calculator'
 )
 def custom_handle_settings(
     self: Organisation,
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     form: WinterthurDaycareSettingsForm
-) -> 'RenderData | Response':
-    return handle_generic_settings(self, request, form, _("Daycare Settings"))
+) -> RenderData | Response:
+    return handle_generic_settings(self, request, form, _('Daycare Settings'))
 
 
 class WinterthurMissionReportSettingsForm(Form):
 
     legend = HtmlField(
-        label=_("Legend Text"))
+        label=_('Legend Text'))
 
     hide_civil_defence_field = BooleanField(
-        label=_("Hide Civil Defence Field"))
+        label=_('Hide Civil Defence Field'))
 
     def populate_obj(  # type:ignore[override]
         self,
         obj: Organisation,  # type:ignore[override]
-        exclude: 'Collection[str] | None' = None,
-        include: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None
     ) -> None:
 
         super().populate_obj(obj, exclude=exclude, include=include)
@@ -218,7 +220,7 @@ class WinterthurMissionReportSettingsForm(Form):
         #       but we should probably consider creating
         #       something like a MissionReportSettingsProxy class
         #       which contains all the fields as dict_property
-        self.legend.data = Markup(  # noqa: MS001
+        self.legend.data = Markup(  # nosec: B704
             d.get('legend', DEFAULT_LEGEND))
 
 
@@ -226,13 +228,13 @@ class WinterthurMissionReportSettingsForm(Form):
     model=Organisation, name='mission-report-settings',
     template='form.pt', permission=Secret,
     form=WinterthurMissionReportSettingsForm,
-    setting=_("Mission Reports"),
+    setting=_('Mission Reports'),
     icon='fa-ambulance'
 )
 def handle_mission_report_settings(
     self: Organisation,
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     form: WinterthurMissionReportSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(
-        self, request, form, _("Mission Reports"))
+        self, request, form, _('Mission Reports'))

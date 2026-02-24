@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 
 from bleach.sanitizer import Cleaner
@@ -54,7 +56,8 @@ SANE_HTML_ATTRS = {
     'a': ['href', 'title'],
     'abbr': ['title', ],
     'acronym': ['title', ],
-    'img': ['src', 'alt', 'title']
+    'img': ['src', 'alt', 'title'],
+    'p': ['class']
 }
 
 # lines without these plaintext characters are excluded in html_to_text
@@ -72,7 +75,7 @@ VALID_PLAINTEXT_CHARACTERS = re.compile(r"""
 """, re.VERBOSE)
 
 # match empty link expressions
-EMPTY_LINK = re.compile(r"\[\]\([^)]+\)")
+EMPTY_LINK = re.compile(r'\[\]\([^)]+\)')
 
 
 cleaner = Cleaner(
@@ -87,7 +90,7 @@ def sanitize_html(html: str | None) -> Markup:
 
     """
 
-    return Markup(cleaner.clean(html or ''))  # noqa: MS001
+    return Markup(cleaner.clean(html or ''))  # nosec: B704
 
 
 def sanitize_svg(svg: _StrT) -> _StrT:

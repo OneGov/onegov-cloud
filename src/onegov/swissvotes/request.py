@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.request import CoreRequest
 
 
@@ -9,4 +11,4 @@ if TYPE_CHECKING:
 # NOTE: Currently this is purely for type checking
 class SwissvotesRequest(CoreRequest):
     if TYPE_CHECKING:
-        app: 'SwissvotesApp'
+        app: SwissvotesApp

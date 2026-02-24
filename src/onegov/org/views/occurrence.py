@@ -1,4 +1,6 @@
 """ The onegov org collection of images uploaded to the site. """
+from __future__ import annotations
+
 from collections import defaultdict
 from datetime import date
 from markupsafe import Markup
@@ -18,6 +20,7 @@ from onegov.org.forms.event import EventConfigurationForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
+from operator import itemgetter
 from sedate import as_datetime, replace_timezone
 
 
@@ -36,9 +39,9 @@ class Filter(NamedTuple):
 
 
 def get_filters(
-    request: 'OrgRequest',
+    request: OrgRequest,
     self: OccurrenceCollection,
-    keyword_counts: 'Mapping[str, Mapping[str, int]]',
+    keyword_counts: Mapping[str, Mapping[str, int]],
     view_name: str = ''
 ) -> list[Filter]:
 
@@ -77,7 +80,7 @@ def get_filters(
 
 
 def keyword_count(
-    request: 'OrgRequest',
+    request: OrgRequest,
     collection: OccurrenceCollection
 ) -> dict[str, dict[str, int]]:
 
@@ -96,6 +99,13 @@ def keyword_count(
     }
 
     counts: dict[str, dict[str, int]] = {}
+
+    # NOTE: The counting can get incredibly expensive with many entries
+    #       so we should skip it when we know we can skip it
+    if not fields:
+        return counts
+
+    # FIXME: This is incredibly slow. We need to think of a better way.
     for model in self.without_keywords_and_tags().query():
         if not request.is_visible(model):
             continue
@@ -117,9 +127,9 @@ def keyword_count(
              permission=Public)
 def view_occurrences(
     self: OccurrenceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: OccurrencesLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
     """ View all occurrences of all events. """
 
     filters = None
@@ -129,10 +139,12 @@ def view_occurrences(
 
     layout = layout or OccurrencesLayout(self, request)
 
-    translated_tags = [
-        (tag, request.translate(_(tag))) for tag in self.used_tags
-    ]
-    translated_tags.sort(key=lambda i: i[1])
+    custom_tags = bool(request.app.custom_event_tags)
+
+    used_tags = sorted((
+        (tag, (tag if custom_tags else request.translate(_(tag))))
+        for tag in self.used_tags
+    ), key=itemgetter(1))
 
     if (
         filter_type in ('filters', 'tags_and_filters')
@@ -150,7 +162,7 @@ def view_occurrences(
                 text=translation + f' ({self.tag_counts[tag]})',
                 url=request.link(self.for_filter(tag=tag)),
                 active=tag in self.tags
-            ) for tag, translation in translated_tags if self.tag_counts[tag]
+            ) for tag, translation in used_tags if self.tag_counts[tag]
         ]
 
     locations = [
@@ -165,16 +177,16 @@ def view_occurrences(
     ]
 
     range_labels: tuple[tuple[DateRange, str], ...] = (
-        ('today', _("Today")),
-        ('tomorrow', _("Tomorrow")),
-        ('weekend', _("This weekend")),
-        ('week', _("This week")),
-        ('month', _("This month")),
-        ('past', _("Past events")),
+        ('today', _('Today')),
+        ('tomorrow', _('Tomorrow')),
+        ('weekend', _('This weekend')),
+        ('week', _('This week')),
+        ('month', _('This month')),
+        ('past', _('Past events')),
     )
     ranges = [
         Link(
-            text=_("All"),
+            text=_('All'),
             url=request.link(self.for_filter(start=None, end=None)),
             active=not (self.range or self.start or self.end)
         )
@@ -210,15 +222,18 @@ def view_occurrences(
         'no_event_link': request.link(
             self.for_filter(range='past', start=None, end=None)
         ),
+        'header_html': request.app.org.event_header_html,
+        'footer_html': request.app.org.event_footer_html,
+        'time_suffix': request.translate(_("o'clock")),
     }
 
 
 @OrgApp.html(model=Occurrence, template='occurrence.pt', permission=Public)
 def view_occurrence(
     self: Occurrence,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: OccurrenceLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
     """ View a single occurrence of an event. """
 
     layout = layout or OccurrenceLayout(self, request)
@@ -246,6 +261,7 @@ def view_occurrence(
         'title': self.title,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
+        'time_suffix': request.translate(_("o'clock")),
     }
 
 
@@ -254,10 +270,10 @@ def view_occurrence(
              form=EventConfigurationForm)
 def handle_edit_event_filters(
     self: OccurrenceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: EventConfigurationForm,
     layout: OccurrencesLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     try:
         if form.submitted(request):
@@ -268,7 +284,7 @@ def handle_edit_event_filters(
             }
             request.app.org.event_filter_definition = form.definition.data
 
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
             return request.redirect(request.link(self))
 
         elif not request.POST:
@@ -279,24 +295,24 @@ def handle_edit_event_filters(
 
     except InvalidFormSyntax as e:
         request.warning(
-            _("Syntax Error in line ${line}", mapping={'line': e.line})
+            _('Syntax Error in line ${line}', mapping={'line': e.line})
         )
     except AttributeError:
-        request.warning(_("Syntax error in form"))
+        request.warning(_('Syntax error in form'))
 
     except MixedTypeError as e:
         request.warning(
-            _("Syntax error in field ${field_name}",
+            _('Syntax error in field ${field_name}',
               mapping={'field_name': e.field_name})
         )
     except DuplicateLabelError as e:
         request.warning(
-            _("Error: Duplicate label ${label}", mapping={'label': e.label})
+            _('Error: Duplicate label ${label}', mapping={'label': e.label})
         )
 
     layout = layout or OccurrencesLayout(self, request)
     layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
 
     return {
@@ -311,7 +327,7 @@ def handle_edit_event_filters(
 
 
 @OrgApp.view(model=Occurrence, name='ical', permission=Public)
-def ical_export_occurence(self: Occurrence, request: 'OrgRequest') -> Response:
+def ical_export_occurence(self: Occurrence, request: OrgRequest) -> Response:
     """ Returns the occurrence as ics. """
 
     return Response(
@@ -324,7 +340,7 @@ def ical_export_occurence(self: Occurrence, request: 'OrgRequest') -> Response:
 @OrgApp.view(model=OccurrenceCollection, name='ical', permission=Public)
 def ical_export_occurences(
     self: OccurrenceCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> Response:
     """ Returns the occurrences as ics. """
 
@@ -339,14 +355,14 @@ def ical_export_occurences(
              form=ExportForm, template='export.pt')
 def export_occurrences(
     self: OccurrenceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ExportForm,
     layout: OccurrencesLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Export the occurrences in various formats. """
 
     layout = layout or OccurrencesLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Export"), '#'))
+    layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
@@ -355,22 +371,22 @@ def export_occurrences(
         results = import_form.run_export()
 
         return form.as_export_response(results, title=request.translate(_(
-            "Events"
+            'Events'
         )))
 
     return {
         'layout': layout,
-        'title': _("Event Export"),
+        'title': _('Event Export'),
         'form': form,
-        'explanation': _("Exports all future events.")
+        'explanation': _('Exports all future events.')
     }
 
 
 @OrgApp.json(model=OccurrenceCollection, name='json', permission=Public)
 def json_export_occurences(
     self: OccurrenceCollection,
-    request: 'OrgRequest'
-) -> 'JSON_ro':
+    request: OrgRequest
+) -> JSON_ro:
     """ Returns the occurrences as JSON.
 
     This is used for the senantis.dir.eventsportlet.
@@ -378,7 +394,7 @@ def json_export_occurences(
     """
 
     @request.after
-    def cors(response: 'BaseResponse') -> None:
+    def cors(response: BaseResponse) -> None:
         response.headers.add('Access-Control-Allow-Origin', '*')
 
     query = self.for_filter(
@@ -406,7 +422,7 @@ def json_export_occurences(
 )
 def xml_export_all_occurrences(
     self: OccurrenceCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> Response:
     """
     Returns events as xml.
@@ -430,10 +446,10 @@ def xml_export_all_occurrences(
 )
 def import_occurrences(
     self: OccurrenceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: EventImportForm,
     layout: OccurrencesLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         count, errors = form.run_import()

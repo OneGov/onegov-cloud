@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 
-from markupsafe import escape
+from markupsafe import Markup
 
-from onegov.activity import PeriodCollection
+
+from onegov.activity import BookingPeriodCollection
 from onegov.core.elements import BackLink
 from onegov.core.html import html_to_text, sanitize_html
 from onegov.core.security import Secret
@@ -28,8 +31,8 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-def get_variables(request: 'FeriennetRequest') -> dict[str, str]:
-    period = PeriodCollection(request.session).active()
+def get_variables(request: FeriennetRequest) -> dict[str, str]:
+    period = BookingPeriodCollection(request.session).active()
     variables = TemplateVariables(request, period).bound
 
     return OrderedDict(
@@ -43,37 +46,37 @@ def get_variables(request: 'FeriennetRequest') -> dict[str, str]:
     template='notification_templates.pt')
 def view_notification_templates(
     self: NotificationTemplateCollection,
-    request: 'FeriennetRequest'
-) -> 'RenderData':
+    request: FeriennetRequest
+) -> RenderData:
 
     layout = NotificationTemplateCollectionLayout(self, request)
 
-    def get_links(notification: NotificationTemplate) -> 'Iterator[Link]':
+    def get_links(notification: NotificationTemplate) -> Iterator[Link]:
         if not request.app.active_period:
             return
 
         yield Link(
-            text=_("Mailing"),
-            url=request.link(notification, 'send')
-        )
-
-        yield Link(
-            text=_("Edit"),
+            text=_('Edit'),
             url=request.link(notification, 'edit')
         )
 
         yield DeleteLink(
-            text=_("Delete"),
+            text=_('Delete'),
             url=layout.csrf_protected_url(request.link(notification)),
             confirm=_('Do you really want to delete "${title}"?', mapping={
                 'title': notification.subject,
             }),
             target=f'#{notification.id.hex}',
-            yes_button_text=_("Delete Notification Template")
+            yes_button_text=_('Delete Notification Template')
+        )
+
+        yield Link(
+            text=_('Use Template'),
+            url=request.link(notification, 'send')
         )
 
     return {
-        'title': _("Notification Templates"),
+        'title': _('Notification Templates'),
         'layout': layout,
         'notifications': self.query(),
         'get_links': get_links,
@@ -88,11 +91,11 @@ def view_notification_templates(
     form=NotificationTemplateForm)
 def view_notification_template_form(
     self: NotificationTemplateCollection,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: NotificationTemplateForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
-    title = _("New Notification Template")
+    title = _('New Notification Template')
 
     if form.submitted(request):
         self.add(
@@ -100,7 +103,7 @@ def view_notification_template_form(
             text=form.text.data
         )
 
-        request.success(_("Successfully added a new notification template"))
+        request.success(_('Successfully added a new notification template'))
         return request.redirect(request.link(self))
     layout = NotificationTemplateCollectionLayout(self, request, title)
     layout.edit_mode = True
@@ -121,13 +124,13 @@ def view_notification_template_form(
     form=NotificationTemplateForm)
 def edit_notification(
     self: NotificationTemplate,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: NotificationTemplateForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return request.redirect(
             request.class_link(NotificationTemplateCollection))
@@ -139,7 +142,7 @@ def edit_notification(
     layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
-        'title': _("Edit"),
+        'title': _('Edit'),
         'layout': layout,
         'form': form,
         'variables': get_variables(request)
@@ -152,7 +155,7 @@ def edit_notification(
     request_method='DELETE')
 def delete_notification(
     self: NotificationTemplate,
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -160,7 +163,7 @@ def delete_notification(
     NotificationTemplateCollection(request.session).delete(self)
 
     @request.after
-    def remove_target(response: 'Response') -> None:
+    def remove_target(response: Response) -> None:
         response.headers.add('X-IC-Remove', 'true')
 
 
@@ -173,22 +176,22 @@ def delete_notification(
 )
 def handle_send_notification(
     self: NotificationTemplate,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: NotificationTemplateSendForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
-    period = PeriodCollection(request.session).active()
+    period = BookingPeriodCollection(request.session).active()
     variables = TemplateVariables(request, period)
     layout = NotificationTemplateLayout(self, request)
 
-    subject = variables.render(escape(self.subject))
+    subject = variables.render(Markup(self.subject))  # nosec: B704
     message = variables.render(sanitize_html(self.text))
 
     if form.submitted(request):
         recipients = form.recipients
 
         if not recipients:
-            request.alert(_("There are no recipients matching the selection"))
+            request.alert(_('There are no recipients matching the selection'))
         else:
             content = render_template('mail_notification.pt', request, {
                 'layout': DefaultMailLayout(self, request),
@@ -197,7 +200,7 @@ def handle_send_notification(
             })
             plaintext = html_to_text(content)
 
-            def email_iter() -> 'Iterator[EmailJsonDict]':
+            def email_iter() -> Iterator[EmailJsonDict]:
                 for recipient in recipients:
                     yield request.app.prepare_email(
                         receivers=(recipient, ),
@@ -221,7 +224,7 @@ def handle_send_notification(
             self.last_sent = utcnow()
 
             request.success(_(
-                "Successfully sent the e-mail to ${count} recipients",
+                'Successfully sent the e-mail to ${count} recipients',
                 mapping={
                     'count': len(recipients)
                 }
@@ -231,13 +234,13 @@ def handle_send_notification(
                 request.class_link(NotificationTemplateCollection))
 
     return {
-        'title': _("Mailing"),
+        'title': _('Mailing'),
         'layout': layout,
         'form': form,
         'preview_subject': subject,
         'preview_body': message,
         'edit_link': request.return_here(request.link(self, 'edit')),
-        'button_text': _("Send E-Mail Now"),
+        'button_text': _('Send E-Mail Now'),
         'model': self,
         'period': form.period,
     }

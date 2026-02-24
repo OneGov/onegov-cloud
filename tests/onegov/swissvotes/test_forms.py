@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from cgi import FieldStorage
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
+from markupsafe import Markup
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.forms import AttachmentsForm
@@ -17,22 +20,47 @@ from tests.shared.utils import use_locale
 from xlsxwriter.workbook import Workbook
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.swissvotes.models import SwissVoteFile
+    from sqlalchemy.orm import Session
+    from webob.multidict import MultiDict
+    from .conftest import TestApp
+
+    DummyPostDataBase = MultiDict[str, Any]
+else:
+    DummyPostDataBase = dict
+
+
 class DummyPrincipal:
     pass
 
 
 class DummyApp:
-    def __init__(self, session, principal, mfg_api_token=None):
+    def __init__(
+        self,
+        session: Session,
+        principal: DummyPrincipal | None,
+        mfg_api_token: str | None = None,
+        bs_api_token: str | None = None
+    ) -> None:
         self._session = session
         self.principal = principal
         self.mfg_api_token = None
+        self.bs_api_token = None
 
-    def session(self):
+    def session(self) -> Session:
         return self._session
 
 
 class DummyRequest:
-    def __init__(self, session, principal=None, private=False, secret=False):
+    def __init__(
+        self,
+        session: Session,
+        principal: DummyPrincipal | None = None,
+        private: bool = False,
+        secret: bool = False
+    ) -> None:
         self.app = DummyApp(session, principal)
         self.session = session
         self.private = private
@@ -40,28 +68,31 @@ class DummyRequest:
         self.locale = 'de_CH'
         self.time_zone = 'Europe/Zurich'
 
-    def is_private(self, model):
+    def is_private(self, model: object) -> bool:
         return self.private
 
-    def is_secret(self, model):
+    def is_secret(self, model: object) -> bool:
         return self.secret
 
-    def include(self, resource):
+    def include(self, resource: object) -> None:
         pass
 
-    def translate(self, text):
+    def translate(self, text: Any) -> str:
         return text.interpolate()
 
 
-class DummyPostData(dict):
-    def getlist(self, key):
+class DummyPostData(DummyPostDataBase):
+    def getlist(self, key: str) -> list[Any]:
         v = self[key]
         if not isinstance(v, (list, tuple)):
             v = [v]
         return v
 
 
-def test_attachments_form(swissvotes_app, attachments):
+def test_attachments_form(
+    swissvotes_app: TestApp,
+    attachments: dict[str, SwissVoteFile]
+) -> None:
     session = swissvotes_app.session()
     names = list(attachments.keys())
 
@@ -79,16 +110,16 @@ def test_attachments_form(swissvotes_app, attachments):
     )
 
     form = AttachmentsForm()
-    form.request = DummyRequest(session, DummyPrincipal())
+    form.request = DummyRequest(session, DummyPrincipal())  # type: ignore[assignment]
 
     # ... empty
     form.apply_model(vote)
 
-    assert all([getattr(form, name).data is None for name in names])
+    assert all(getattr(form, name).data is None for name in names)
 
     form.update_model(vote)
 
-    assert all([getattr(vote, name) is None for name in names])
+    assert all(getattr(vote, name) is None for name in names)
 
     # ... add attachments (de_CH)
     for name, attachment in attachments.items():
@@ -98,7 +129,7 @@ def test_attachments_form(swissvotes_app, attachments):
     # ... not present with fr_CH
     with use_locale(vote, 'fr_CH'):
         form.apply_model(vote)
-        assert all([getattr(form, name).data is None for name in names])
+        assert all(getattr(form, name).data is None for name in names)
 
     # ... present with de_CH
     form.apply_model(vote)
@@ -188,7 +219,7 @@ def test_attachments_form(swissvotes_app, attachments):
     assert form.validate()
 
 
-def test_page_form(session):
+def test_page_form(session: Session) -> None:
     # Test apply / update
     pages = TranslatablePageCollection(session)
     page = pages.add(
@@ -207,7 +238,7 @@ def test_page_form(session):
     assert form.show_timeline.data is False
 
     form.title.data = 'A'
-    form.content.data = 'B'
+    form.content.data = Markup('B')
     form.show_timeline.data = True
 
     form.update_model(page)
@@ -224,7 +255,7 @@ def test_page_form(session):
         assert form.content.data == 'Content'
 
         form.title.data = 'C'
-        form.content.data = 'D'
+        form.content.data = Markup('D')
         form.update_model(page)
 
     assert page.title_translations == {'de_CH': 'A', 'en_US': 'C'}
@@ -238,7 +269,7 @@ def test_page_form(session):
         assert form.content.data == 'B'
 
         form.title.data = 'E'
-        form.content.data = 'F'
+        form.content.data = Markup('F')
         form.update_model(page)
 
     assert page.title_translations == {
@@ -251,7 +282,7 @@ def test_page_form(session):
 
     # Test ID generation
     form = PageForm()
-    form.request = DummyRequest(session, DummyPrincipal())
+    form.request = DummyRequest(session, DummyPrincipal())  # type: ignore[assignment]
 
     assert form.id == 'page-1'
 
@@ -273,10 +304,10 @@ def test_page_form(session):
     assert form.validate()
 
 
-def test_search_form(swissvotes_app):
+def test_search_form(swissvotes_app: TestApp) -> None:
     # Test on request / popluate
     form = SearchForm()
-    form.request = DummyRequest(swissvotes_app.session(), DummyPrincipal())
+    form.request = DummyRequest(swissvotes_app.session(), DummyPrincipal())  # type: ignore[assignment]
     form.on_request()
 
     assert form.legal_form.choices == [
@@ -422,8 +453,8 @@ def test_search_form(swissvotes_app):
     assert form.validate()
 
 
-def test_update_dataset_form(session):
-    request = DummyRequest(session, DummyPrincipal())
+def test_update_dataset_form(session: Session) -> None:
+    request: Any = DummyRequest(session, DummyPrincipal())
 
     # Validate
     form = UpdateDatasetForm()
@@ -471,8 +502,8 @@ def test_update_dataset_form(session):
     assert form.validate()
 
 
-def test_update_metadata_form(session):
-    request = DummyRequest(session, DummyPrincipal())
+def test_update_metadata_form(session: Session) -> None:
+    request: Any = DummyRequest(session, DummyPrincipal())
 
     # Validate
     form = UpdateMetadataForm()
@@ -522,12 +553,13 @@ def test_update_metadata_form(session):
     assert form.validate()
 
 
-def test_update_external_resources_form(session):
+def test_update_external_resources_form(session: Session) -> None:
     form = UpdateExternalResourcesForm()
-    form.request = DummyRequest(session, DummyPrincipal())
+    form.request = DummyRequest(session, DummyPrincipal())  # type: ignore[assignment]
 
     assert form.resources.choices == [
         ('mfg', 'eMuseum.ch'),
+        ('bs', 'Plakatsammlung Basel'),
         ('sa', 'Social Archives')
     ]
 
@@ -537,9 +569,13 @@ def test_update_external_resources_form(session):
     form.resources.process(DummyPostData({'resources': ['sa']}))
     assert form.validate()
 
-    form.resources.process(DummyPostData({'resources': ['mfg']}))
-    assert not form.validate()
+    form.resources.process(DummyPostData({'resources': ['bs']}))
+    assert not form.validate()  # missing API token
 
-    form.request.app.mfg_api_token = 'token'
-    form.resources.process(DummyPostData({'resources': ['sa', 'mfg']}))
+    form.resources.process(DummyPostData({'resources': ['mfg']}))
+    assert not form.validate()  # missing API token
+
+    form.request.app.mfg_api_token = 'token-mfg'
+    form.request.app.bs_api_token = 'token-bs'
+    form.resources.process(DummyPostData({'resources': ['sa', 'bs', 'mfg']}))
     assert form.validate()

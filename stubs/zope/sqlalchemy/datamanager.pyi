@@ -1,10 +1,10 @@
 from collections.abc import Callable
 from typing import Any, Final, Literal
-from typing_extensions import Self, TypeAlias
+from typing_extensions import TypeAlias
 
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import Session
-from transaction.interfaces import IDataManagerSavepoint, ISavepointDataManager, ITransaction, ITransactionManager
+from transaction.interfaces import ITransaction, ITransactionManager
 
 _Status: TypeAlias = Literal["active", "changed", "readonly"]
 # TODO: Replace these with the proper types after SQLAlchemy 2.0 upgrade

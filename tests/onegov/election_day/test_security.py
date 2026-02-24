@@ -1,10 +1,17 @@
+from __future__ import annotations
+
 from morepath import Identity
 from morepath.authentication import NoIdentity
 from onegov.election_day.security import MaybePublic
 from onegov.user.models import User
 
 
-def test_security_permissions(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import TestApp
+
+
+def test_security_permissions(election_day_app_zg: TestApp) -> None:
     session = election_day_app_zg.session()
 
     # Remove existing users
@@ -18,17 +25,18 @@ def test_security_permissions(election_day_app_zg):
             username=f'{role}@example.org',
             password_hash='hash',
             role=role,
-            group_id=None
+            groups=[]
         )
         session.add(user)
         users[role] = user
 
-    def permits(user, model, permission):
-        identity = NoIdentity()
+    def permits(user: User | None, model: object, permission: object) -> bool:
+        identity: Identity | NoIdentity = NoIdentity()
         if user:
             identity = Identity(
+                uid='',
                 userid=user.username,
-                groupid=user.group_id.hex if user.group_id else '',
+                groupids=frozenset(group.id.hex for group in user.groups),
                 role=user.role,
                 application_id=election_day_app_zg.application_id
             )

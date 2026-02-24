@@ -1,10 +1,9 @@
 from _typeshed import StrOrBytesPath
 from collections.abc import Callable, Collection, Iterator, Mapping, Sequence
-from typing import Any
 from typing_extensions import Self, TypeAlias
 
 from dectate import Action
-from webassets import Bundle, Environment  # type: ignore[import-untyped]
+from webassets import Bundle, Environment
 
 _Filter: TypeAlias = str | Collection[str] | None
 

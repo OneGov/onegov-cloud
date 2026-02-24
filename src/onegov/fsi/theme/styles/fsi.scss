@@ -59,30 +59,32 @@ dl.accordion + a {
     Edit-bar icons
 */
 .edit-bar {
-    .add-icon::before { @include icon('\f067'); }
+    .add-icon::before { @include icon-bold('\f067'); }
     .invite-attendees::before { @include icon('\f0a1'); }
     .new-event::before { @include icon('\f133'); }
-    .subscriptions::before { @include icon('\f1ae'); }
-    .add-external::before { @include icon('\f14c'); }
-    .email-link::before { @include icon('\f003'); }
+    .subscriptions::before { @include icon-bold('\f19d'); }
+    .add-external::before { @include icon-bold('\f234'); }
+    .email-link::before { @include icon-bold('\f0e0'); }
     .duplicate-link::before { @include icon('\f24d'); }
-    .add-placeholder::before { @include icon('\f2c0'); }
-    .print-icon::before { @include icon('\f02f'); }
-    .cancel-icon::before { @include icon('\f05e'); }
-    .audit-icon::before { @include icon('\f00b'); }
+    .add-placeholder::before { @include icon('\f007'); }
+    .print-icon::before { @include icon-bold('\f02f'); }
+    .cancel-icon::before { @include icon-bold('\f05e'); }
+    .audit-icon::before { @include icon-bold('\f00b'); }
 }
 
 .info-panel {
+    @include smooth-edges ;
     background-color: $topbar-bg-color;
-    padding: 1rem;
+    padding: 2rem;
+    padding-bottom: 1.5rem;
 }
 
 /*
     Global tool icons
 */
 .globals {
-    .attendees::before { @include icon('\f1ae'); }
-    .subscriptions::before { @include icon('\f19d'); }
+    .attendees::before { @include icon-bold('\f1ae'); }
+    .subscriptions::before { @include icon-bold('\f19d'); }
 }
 
 /*
@@ -108,12 +110,12 @@ dl.accordion + a {
 
 // Table icons
 
-.locked-icon::before { @include icon('\f023'); }
+.locked-icon::before { @include icon-bold('\f023'); }
 .locked-icon-after::after { @include icon('\f023'); }
 .unlocked-icon::before { @include icon('\f09c'); }
 .visible-icon::before { @include icon('\f06e'); }
 .hidden-icon::before { @include icon('\f070'); }
-.check-icon::before { @include icon('\f00c'); }
+.check-icon::before { @include icon-bold('\f00c'); }
 
 /*
     Links
@@ -192,8 +194,7 @@ a.grayed-out {
 }
 
 .filter-panel {
-    margin-bottom: 1rem;
-    padding: 1rem 0;
+    margin-bottom: 2rem;
 
     input.button:last-child {
         margin-bottom: 0;
@@ -227,17 +228,26 @@ a.grayed-out {
         }
     }
 
+    form {
+        .formfields {
+            margin-bottom: 0;
+        }
+
+        .button {
+            margin-top: 0;
+        }
+    }
+
     .filters ul + ul {
         margin-top: .5rem;
     }
 
     .label-text {
-        color: #575757;
-        display: block;
-        font-size: .875rem;
-        font-weight: normal;
+        font-weight: bold;
         line-height: 1.5;
         margin-bottom: .5rem;
+        color: $form-label-color;
+        font-size: $form-label-font-size;
     }
 
 }
@@ -249,4 +259,9 @@ a.grayed-out {
 /* Remove OGC-Login on FSI-Page */
 .ogc-login {
     display: none;
+}
+
+.main-title {
+    max-width: 100%;
+
 }

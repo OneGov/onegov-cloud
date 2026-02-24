@@ -85,7 +85,7 @@
                         <tal:block tal:content="message.text" />
                         <a href="#" class="close">&times;</a>
                     </div>
-                    <div i18n:translate tal:condition="request.agent['user_agent']['family'] == 'IE'" data-alert class="alert-box warning">
+                    <div i18n:translate tal:condition="request.agent.user_agent.family == 'IE'" data-alert class="alert-box warning">
                         This webpage is best viewed with a modern Browser. Consider to use Chrome, Firefox or Edge.
                         <a href="#" class="close">&times;</a>
                     </div>

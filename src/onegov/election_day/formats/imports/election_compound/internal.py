@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.formats.imports.election.internal_proporz import (
     import_election_internal_proporz)
 from onegov.election_day import _
@@ -13,8 +15,8 @@ if TYPE_CHECKING:
 
 
 def import_election_compound_internal(
-    compound: 'ElectionCompound',
-    principal: 'Canton | Municipality',
+    compound: ElectionCompound,
+    principal: Canton | Municipality,
     file: IO[bytes],
     mimetype: str
 ) -> list[FileImportError]:

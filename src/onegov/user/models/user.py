@@ -1,34 +1,50 @@
+from __future__ import annotations
+
+from datetime import datetime
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import data_property, dict_property, TimestampMixin
-from onegov.core.orm.types import JSON, UUID, LowercaseText
+from onegov.core.orm.types import LowercaseText
 from onegov.core.security import forget, remembered
 from onegov.core.utils import is_valid_yubikey_format
+from onegov.core.utils import remove_repeated_dots
 from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
+from onegov.user.i18n import _
 from onegov.user.models.group import UserGroup
 from sedate import utcnow
-from sqlalchemy import Boolean, Column, Index, Text, func, ForeignKey
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import func
+from sqlalchemy import Index, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import deferred, relationship
-from uuid import uuid4, UUID as UUIDType
+from sqlalchemy.orm import mapped_column, relationship, DynamicMapped, Mapped
+from uuid import uuid4, UUID
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from onegov.api.models import ApiKey
     from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
-    from onegov.core.types import AppenderQuery
+    from onegov.ticket import Ticket
     from onegov.user import RoleMapping
+    from sqlalchemy import ColumnElement, Table
     from typing_extensions import TypedDict
 
     class SessionDict(TypedDict):
         address: str | None
         timestamp: str
         agent: str | None
+
+    # HACK: We experienced flaky behavior with mypy when importing this
+    #       symbol normally, so for now we'll just declare what this
+    #       symbol is, so it doesn't have to retrieved from the other module
+    #       eventually we can hopefully get rid of this again and just
+    #       import normally.
+    group_association_table: Table
+else:
+    from onegov.user.models.group import group_association_table
 
 
 class User(Base, TimestampMixin, ORMSearchable):
@@ -40,23 +56,24 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
-        Text, nullable=False, default=lambda: 'generic')
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'generic',
     }
 
-    es_properties = {
-        'username': {'type': 'text'},
-        'realname': {'type': 'text'},
-        'userprofile': {'type': 'text'}
+    fts_type_title = _('Users')
+    fts_title_property = 'title'
+    fts_properties = {
+        'username': {'type': 'text', 'weight': 'A'},
+        'realname': {'type': 'text', 'weight': 'A'},
+        'userprofile': {'type': 'text', 'weight': 'B'}
     }
-    es_public = False
+    fts_public = False
 
     @property
-    def es_suggestion(self) -> tuple[str, str]:
+    def fts_suggestion(self) -> tuple[str, str]:
         return (self.realname or self.username, self.username)
 
     @property
@@ -71,42 +88,33 @@ class User(Base, TimestampMixin, ORMSearchable):
         ]
 
     #: the user id is a uuid because that's more secure (no id guessing)
-    id: 'Column[UUIDType]' = Column(
-        UUID,  # type:ignore[arg-type]
-        nullable=False,
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the username may be any string, but will usually be an email address
-    username: 'Column[str]' = Column(
+    username: Mapped[str] = mapped_column(
         LowercaseText,
-        unique=True,
-        nullable=False
+        unique=True
     )
 
     #: the password is stored with the hashing algorithm defined by onegov.core
-    password_hash: 'Column[str]' = Column(Text, nullable=False)
+    password_hash: Mapped[str]
 
     #: the role is relevant for security in onegov.core
-    role: 'Column[str]' = Column(Text, nullable=False)
-
-    #: the id of the group this user belongs to
-    group_id: 'Column[UUIDType | None]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey(UserGroup.id),
-        nullable=True
-    )
+    role: Mapped[str]
 
     #: the group this user belongs to
-    group: 'relationship[UserGroup | None]' = relationship(
-        UserGroup,
-        back_populates='users'
+    groups: Mapped[list[UserGroup]] = relationship(
+        secondary=group_association_table,
+        back_populates='users',
+        passive_deletes=True,
     )
 
     #: the real name of the user for display (use the :attr:`name` property
     #: to automatically get the name or the username)
-    realname: 'Column[str | None]' = Column(Text, nullable=True)
+    realname: Mapped[str | None]
 
     #: extra data that may be stored with this user, the format and content
     #: of this data is defined by the consumer of onegov.user
@@ -115,7 +123,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     #:
     #:     session.query(User).options(undefer("data"))
     #:
-    data: 'Column[dict[str, Any]]' = deferred(Column(JSON, nullable=True))
+    data: Mapped[dict[str, Any]] = mapped_column(deferred=True)
 
     #: two-factor authentication schemes are enabled with this property
     #: if no two-factor auth is used, the value is NULL, if one *is* used,
@@ -132,10 +140,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     #:
     #: Note that 'data' could also be a nested dictionary!
     #:
-    second_factor: 'Column[dict[str, Any] | None]' = Column(
-        JSON,
-        nullable=True
-    )
+    second_factor: Mapped[dict[str, Any] | None]
 
     #: A string describing where the user came from, None if internal.
     #
@@ -145,23 +150,22 @@ class User(Base, TimestampMixin, ORMSearchable):
     #
     #: A user can technically come from changing providers - the source refers
     #: to the last provider he used.
-    source: 'Column[str | None]' = Column(Text, nullable=True, default=None)
+    source: Mapped[str | None]
 
     #: A string describing the user id on the source, which is an id that is
     #: supposed never change (unlike the username, which may change).
     #:
     #: If set, the source_id is unique per source.
-    source_id: 'Column[str | None]' = Column(Text, nullable=True, default=None)
+    source_id: Mapped[str | None]
 
     #: true if the user is active
-    active: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
+    active: Mapped[bool] = mapped_column(default=True)
+
+    #: timestamp of the last successful login
+    last_login: Mapped[datetime | None]
 
     #: the signup token used by the user
-    signup_token: 'Column[str | None]' = Column(
-        Text,
-        nullable=True,
-        default=None
-    )
+    signup_token: Mapped[str | None]
 
     __table_args__ = (
         Index('lowercase_username', func.lower(username), unique=True),
@@ -169,50 +173,50 @@ class User(Base, TimestampMixin, ORMSearchable):
     )
 
     #: the role mappings associated with this user
-    role_mappings: 'relationship[AppenderQuery[RoleMapping]]' = relationship(
-        'RoleMapping',
-        back_populates='user',
-        lazy='dynamic'
+    role_mappings: DynamicMapped[RoleMapping] = relationship(
+        back_populates='user'
     )
 
-    if TYPE_CHECKING:
-        # HACK: This probably won't be necessary in SQLAlchemy 2.0, but
-        #       for the purposes of type checking these behave like a
-        #       Column[str]
-        title: Column[str]
-        password: Column[str]
-        api_keys: relationship[list[Any]]
-    else:
-        @hybrid_property
-        def title(self) -> str:
-            """ Returns the realname or the username of the user, depending on
-            what's available first. """
-            if self.realname is None:
-                return self.username
+    #: the api keys associated with this user
+    api_keys: DynamicMapped[ApiKey] = relationship(
+        cascade='all,delete-orphan',
+        back_populates='user'
+    )
 
-            if self.realname.strip():
-                return self.realname
+    #: the tickets assigned to this user
+    tickets: Mapped[list[Ticket]] = relationship(back_populates='user')
 
+    @hybrid_property
+    def title(self) -> str:
+        """ Returns the realname or the username of the user, depending on
+        what's available first. """
+        if self.realname is None:
             return self.username
 
-        @title.expression
-        def title(cls):
-            return func.coalesce(
-                func.nullif(func.trim(cls.realname), ''), cls.username
-            )
+        if self.realname.strip():
+            return self.realname
 
-        @hybrid_property
-        def password(self):
-            """ An alias for :attr:`password_hash`. """
-            return self.password_hash
+        return self.username
 
-        @password.setter
-        def password(self, value):
-            """ When set, the given password in cleartext is hashed using
-            onegov.core's default hashing algorithm.
+    @title.inplace.expression
+    @classmethod
+    def _title_expression(cls) -> ColumnElement[str]:
+        return func.coalesce(
+            func.nullif(func.trim(cls.realname), ''), cls.username
+        )
 
-            """
-            self.password_hash = hash_password(value)
+    @hybrid_property
+    def password(self) -> str:
+        """ An alias for :attr:`password_hash`. """
+        return self.password_hash
+
+    @password.inplace.setter
+    def _password_setter(self, value: str) -> None:
+        """ When set, the given password in cleartext is hashed using
+        onegov.core's default hashing algorithm.
+
+        """
+        self.password_hash = hash_password(value)
 
     def is_matching_password(self, password: str) -> bool:
         """ Returns True if the given password (cleartext) matches the
@@ -241,18 +245,18 @@ class User(Base, TimestampMixin, ORMSearchable):
         # name in the e-mail address)
         if realname is None or not realname.strip():
             username = username.split('@')[0]
-            parts = username.split('.')[:2]
+            parts = remove_repeated_dots(username.strip('.')).split('.')[:2]
 
         # for real names split by space and assume that with more than one
         # part that the first and last part are the most important to get rid
         # of middlenames
         else:
-            parts = remove_repeated_spaces(realname).split(' ')
+            parts = remove_repeated_spaces(realname.strip()).split(' ')
 
             if len(parts) > 2:
                 parts = (parts[0], parts[-1])
 
-        return ''.join(p[0] for p in parts).upper()
+        return ''.join(p[0] for p in parts if p).upper() or '?'
 
     @property
     def initials(self) -> str:
@@ -307,7 +311,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         return self.second_factor.get('data')
 
     #: sessions of this user
-    sessions: dict_property[dict[str, 'SessionDict'] | None] = data_property()
+    sessions: dict_property[dict[str, SessionDict] | None] = data_property()
 
     #: tags of this user
     tags: dict_property[list[str] | None] = data_property()
@@ -315,7 +319,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the phone number of this user
     phone_number: dict_property[str | None] = data_property()
 
-    def cleanup_sessions(self, app: 'Framework') -> None:
+    def cleanup_sessions(self, app: Framework) -> None:
         """ Removes stored sessions not valid anymore. """
 
         self.sessions = self.sessions or {}
@@ -323,7 +327,7 @@ class User(Base, TimestampMixin, ORMSearchable):
             if not remembered(app, session_id):
                 del self.sessions[session_id]
 
-    def save_current_session(self, request: 'CoreRequest') -> None:
+    def save_current_session(self, request: CoreRequest) -> None:
         """ Stores the current browser session. """
 
         self.sessions = self.sessions or {}
@@ -335,7 +339,7 @@ class User(Base, TimestampMixin, ORMSearchable):
 
         self.cleanup_sessions(request.app)
 
-    def remove_current_session(self, request: 'CoreRequest') -> None:
+    def remove_current_session(self, request: CoreRequest) -> None:
         """ Removes the current browser session. """
 
         token = request.browser_session._token
@@ -344,7 +348,7 @@ class User(Base, TimestampMixin, ORMSearchable):
 
         self.cleanup_sessions(request.app)
 
-    def logout_all_sessions(self, app: 'Framework') -> int:
+    def logout_all_sessions(self, app: Framework) -> int:
         """ Terminates all open browser sessions. """
 
         self.sessions = self.sessions or {}

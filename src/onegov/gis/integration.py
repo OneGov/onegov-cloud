@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from more.webassets import WebassetsApp
 
 
@@ -56,7 +58,7 @@ def get_css_path() -> str:
 
 
 @MapboxApp.webasset('leaflet', filters={'css': ['datauri', 'custom-rcssmin']})
-def get_leaflet_asset() -> 'Iterator[str]':
+def get_leaflet_asset() -> Iterator[str]:
     yield 'leaflet.css'
     yield 'leaflet-easybutton.css'
     yield 'leaflet-control-geocoder.css'
@@ -71,53 +73,53 @@ def get_leaflet_asset() -> 'Iterator[str]':
 
 
 @MapboxApp.webasset('proj4js')
-def get_proj4js_asset() -> 'Iterator[str]':
+def get_proj4js_asset() -> Iterator[str]:
     yield 'proj4js.js'
     yield 'proj4js-leaflet.js'
 
 
 @MapboxApp.webasset('geo-mapbox')
-def get_geo_mapbox() -> 'Iterator[str]':
+def get_geo_mapbox() -> Iterator[str]:
     yield 'leaflet'
 
 
 @MapboxApp.webasset('geo-vermessungsamt-winterthur')
-def get_geo_vermessungsamt_winterthur() -> 'Iterator[str]':
+def get_geo_vermessungsamt_winterthur() -> Iterator[str]:
     yield 'leaflet'
     yield 'proj4js'
     yield 'geo-vermessungsamt-winterthur.js'
 
 
 @MapboxApp.webasset('geo-zugmap-basisplan')
-def get_geo_zugmap_basisplan() -> 'Iterator[str]':
+def get_geo_zugmap_basisplan() -> Iterator[str]:
     yield 'leaflet'
     yield 'proj4js'
     yield 'geo-zugmap.js'
 
 
 @MapboxApp.webasset('geo-zugmap-orthofoto')
-def get_geo_zugmap_orthofoto() -> 'Iterator[str]':
+def get_geo_zugmap_orthofoto() -> Iterator[str]:
     yield 'leaflet'
     yield 'proj4js'
     yield 'geo-zugmap-orthofoto.js'
 
 
 @MapboxApp.webasset('geo-bs')
-def get_geo_bs() -> 'Iterator[str]':
+def get_geo_bs() -> Iterator[str]:
     yield 'leaflet'
     yield 'proj4js'
     yield 'geo-bs.js'
 
 
 @MapboxApp.webasset('geo-admin')
-def get_geo_admin() -> 'Iterator[str]':
+def get_geo_admin() -> Iterator[str]:
     yield 'leaflet'
     yield 'proj4js'
     yield 'geo-admin.js'
 
 
 @MapboxApp.webasset('geo-admin-aerial')
-def get_geo_admin_aerial() -> 'Iterator[str]':
+def get_geo_admin_aerial() -> Iterator[str]:
     yield 'leaflet'
     yield 'proj4js'
     yield 'geo-admin-aerial.js'
@@ -126,13 +128,13 @@ def get_geo_admin_aerial() -> 'Iterator[str]':
 @MapboxApp.tween_factory()
 def inject_mapbox_api_token_tween_factory(
     app: MapboxApp,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
 
     replacement = '<body data-mapbox-token="{}"'.format(app.mapbox_token)
     replacement_b = replacement.encode('utf-8')
 
-    def inject_mapbox_api_token_tween(request: 'CoreRequest') -> 'Response':
+    def inject_mapbox_api_token_tween(request: CoreRequest) -> Response:
 
         response = handler(request)
 

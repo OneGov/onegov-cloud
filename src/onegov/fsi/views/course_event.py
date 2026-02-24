@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Personal, Secret
 from onegov.core.templates import render_macro
 from onegov.fsi import FsiApp
@@ -26,8 +28,8 @@ if TYPE_CHECKING:
 )
 def view_course_event_collection(
     self: CourseEventCollection,
-    request: 'FsiRequest'
-) -> 'RenderData':
+    request: FsiRequest
+) -> RenderData:
 
     layout = CourseEventCollectionLayout(self, request)
     has_events = request.session.query(self.query().exists()).scalar()
@@ -45,7 +47,7 @@ def view_course_event_collection(
 )
 def view_course_event_collection_json(
     self: CourseEventCollection,
-    request: 'FsiRequest'
+    request: FsiRequest
 ) -> str:
 
     layout = CourseEventCollectionLayout(self, request)
@@ -67,8 +69,8 @@ def view_course_event_collection_json(
 )
 def view_past_course_event_collection(
     self: PastCourseEventCollection,
-    request: 'FsiRequest'
-) -> 'RenderData':
+    request: FsiRequest
+) -> RenderData:
     layout = CourseEventCollectionLayout(self, request)
     return {
         'layout': layout,
@@ -86,16 +88,17 @@ def view_past_course_event_collection(
 )
 def view_add_course_event(
     self: CourseEventCollection,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: CourseEventForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         course_event = self.add(**form.get_useful_data())
-        request.success(_("Added a new course event"))
+        request.success(_('Added a new course event'))
         return request.redirect(request.link(course_event))
 
     layout = AddCourseEventLayout(self, request)
+    layout.edit_mode = True
     return {
         'layout': layout,
         'model': self,
@@ -110,8 +113,8 @@ def view_add_course_event(
 )
 def view_course_event(
     self: CourseEvent,
-    request: 'FsiRequest'
-) -> 'RenderData':
+    request: FsiRequest
+) -> RenderData:
 
     layout = CourseEventLayout(self, request)
     return {
@@ -129,14 +132,14 @@ def view_course_event(
 )
 def view_edit_course_event(
     self: CourseEvent,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: CourseEventForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.update_model(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     if not form.errors:
@@ -160,15 +163,15 @@ def view_edit_course_event(
 )
 def view_duplicate_course_event(
     self: CourseEvent,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: CourseEventForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         duplicate = CourseEventCollection(
             request.session).add(**form.get_useful_data())
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(duplicate))
 
     form.apply_model(self.duplicate)
@@ -186,7 +189,7 @@ def view_duplicate_course_event(
     request_method='DELETE',
     permission=Secret
 )
-def delete_course_event(self: CourseEvent, request: 'FsiRequest') -> None:
+def delete_course_event(self: CourseEvent, request: FsiRequest) -> None:
     request.assert_valid_csrf_token()
     if not self.subscriptions.first():
         CourseEventCollection(request.session).delete(self)
@@ -201,7 +204,7 @@ def delete_course_event(self: CourseEvent, request: 'FsiRequest') -> None:
     permission=Secret,
     name='cancel'
 )
-def cancel_course_event(self: CourseEvent, request: 'FsiRequest') -> None:
+def cancel_course_event(self: CourseEvent, request: FsiRequest) -> None:
     request.assert_valid_csrf_token()
     self.status = 'canceled'
 

@@ -1,33 +1,64 @@
-from uuid import UUID
+from __future__ import annotations
+
 from markupsafe import Markup
-from onegov.core.request import CoreRequest
 from onegov.org.models import Topic
+from onegov.org.request import OrgRequest
 from onegov.org.views.people import person_functions_by_organization
 from onegov.people import Person
+from uuid import UUID
 
 
-def test_people_view(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from .conftest import Client, TestOrgApp
+
+
+def test_people_view(client: Client) -> None:
     client.login_admin()
-    settings = client.get('/module-settings')
+    settings = client.get('/people-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'profession']
+    settings.form['organisation_hierarchy'] = """
+    - Organisation 1:
+    """
+    assert 'Ungültiges Format.' in settings.form.submit()
+
+    settings.form['organisation_hierarchy'] = """
+    - Organisation 1:
+      - a
+      -
+    """
+    assert 'Ungültiges Format.' in settings.form.submit()
+
+    settings.form['organisation_hierarchy'] = """
+    - Organisation 1
+    - Organisation 2:
+      - Sub-Organisation 2.1
+      - Sub-Organisation 2.2
+    """
     settings.form.submit()
     client.logout()
 
     client.login_editor()
 
     people = client.get('/people')
-    assert 'noch keine Personen' in people
+    assert 'Keine Personen' in people
 
     new_person = people.click('Person')
     new_person.form['academic_title'] = 'Dr.'
     new_person.form['first_name'] = 'Flash'
     new_person.form['last_name'] = 'Gordon'
     new_person.form['profession'] = 'Hero'
+    new_person.form['organisations_multiple'].select_multiple(
+        texts=['Organisation 1', 'Organisation 2', '- Sub-Organisation 2.1',
+               '- Sub-Organisation 2.2'])
     person = new_person.form.submit().follow()
 
     assert 'Gordon Flash' in person
     assert 'Dr.' in person
     assert 'Hero' in person
+    assert 'Organisation 1' in person
+    assert 'Organisation 2 - Sub-Organisation 2.1, Sub' in person
 
     vcard = person.click('Elektronische Visitenkarte').text
     assert 'FN;CHARSET=utf-8:Dr. Flash Gordon' in vcard
@@ -60,10 +91,10 @@ def test_people_view(client):
     client.delete(delete_link)
 
     people = client.get('/people')
-    assert 'noch keine Personen' in people
+    assert 'Keine Personen' in people
 
 
-def test_with_people(client):
+def test_with_people(client: Client) -> None:
     client.login_editor()
 
     people = client.get('/people')
@@ -87,24 +118,21 @@ def test_with_people(client):
         .filter(Person.last_name == 'Gordon') \
         .one()
 
-    ming = client.app.session().query(Person) \
-        .filter(Person.last_name == 'Ming') \
-        .one()
-
     new_page.form['title'] = 'About Flash'
-    new_page.form['people_' + gordon.id.hex] = True
-    new_page.form['people_' + gordon.id.hex + '_function'] = 'Astronaut'
+    new_page.form['people-0-person'] = gordon.id.hex
+    new_page.form['people-0-context_specific_function'] = 'Astronaut'
+    new_page.form['people-0-display_function_in_person_directory'] = True
     edit_page = new_page.form.submit().follow().click('Bearbeiten')
 
-    assert edit_page.form['people_' + gordon.id.hex].value == 'y'
-    assert edit_page.form['people_' + gordon.id.hex + '_function'].value \
-           == 'Astronaut'
+    assert edit_page.form['people-0-person'].value == gordon.id.hex
+    assert edit_page.form['people-0-context_specific_function'].value == (
+           'Astronaut')
 
-    assert edit_page.form['people_' + ming.id.hex].value is None
-    assert edit_page.form['people_' + ming.id.hex + '_function'].value == ''
+    assert edit_page.form['people-1-person'].value == ''
+    assert edit_page.form['people-1-context_specific_function'].value == ''
 
 
-def test_people_view_organisation_fiter(client):
+def test_people_view_organisation_filter(client: Client) -> None:
     org_1 = 'The Nexus'
     sub_org_11 = 'Nexus Innovators'
     sub_org_12 = 'Nexus Guardians'
@@ -113,16 +141,37 @@ def test_people_view_organisation_fiter(client):
     sub_org_21 = 'Vanguard Tech'
     sub_org_22 = 'Vanguard Capital'
 
+    client.login_admin()
+    settings = client.get('/people-settings')
+    settings.form['organisation_hierarchy'] = f"""
+    - {org_1}:
+      - {sub_org_11}
+      - {sub_org_12}
+      - {sub_org_13}
+    - {org_2}:
+      - {sub_org_21}
+      - {sub_org_22}
+    """
+    settings.form.submit()
+    client.logout()
+
+
     client.login_editor()
 
-    def add_person(first_name, last_name, function, org, sub_org):
+    def add_person(
+        first_name: str,
+        last_name: str,
+        function: str,
+        org: str,
+        sub_org: str
+    ) -> None:
         people = client.get('/people')
         new_person = people.click('Person')
         new_person.form['first_name'] = first_name
         new_person.form['last_name'] = last_name
         new_person.form['function'] = function
-        new_person.form['organisation'] = org
-        new_person.form['sub_organisation'] = sub_org
+        new_person.form['organisations_multiple'].select_multiple(
+        texts=[org, f'- {sub_org}'] if sub_org else [org])
         new_person.form.submit()
 
     add_person('Aria', 'Chen',
@@ -273,7 +322,7 @@ def test_people_view_organisation_fiter(client):
     assert 'Vanguard Capital' in people
 
 
-def test_delete_linked_person_issue_149(client):
+def test_delete_linked_person_issue_149(client: Client) -> None:
     client.login_editor()
 
     people = client.get('/people')
@@ -283,14 +332,17 @@ def test_delete_linked_person_issue_149(client):
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
 
-    gordon = client.app.session().query(Person) \
-        .filter(Person.last_name == 'Gordon') \
+    gordon = (
+        client.app.session().query(Person)
+        .filter(Person.last_name == 'Gordon')
         .one()
+    )
 
     new_page = client.get('/topics/organisation').click('Thema')
     new_page.form['title'] = 'About Flash'
-    new_page.form['people_' + gordon.id.hex] = True
-    new_page.form['people_' + gordon.id.hex + '_function'] = 'Astronaut'
+    new_page.form['people-0-person'] = gordon.id.hex
+    new_page.form['people-0-context_specific_function'] = 'Astronaut'
+    new_page.form['people-0-display_function_in_person_directory'] = True
     edit_page = new_page.form.submit().follow().click('Bearbeiten')
 
     person = client.get('/people').click('Gordon Flash')
@@ -301,7 +353,11 @@ def test_delete_linked_person_issue_149(client):
     edit_page.form.submit().follow()
 
 
-def test_context_specific_function(session, org_app):
+def test_context_specific_function(
+    session: Session,
+    org_app: TestOrgApp
+) -> None:
+
     organizations = ["Forum der Ortsparteien und Quartiervereine", "Urnenbüro"]
     context_specific_functions = [
         "Präsidentin Urnenbüro",
@@ -328,7 +384,7 @@ def test_context_specific_function(session, org_app):
     session.add(topic1)
     session.add(topic2)
     topics = [topic1, topic2]
-    request = CoreRequest(
+    request = OrgRequest(
         environ={
             "wsgi.url_scheme": "https",
             "PATH_INFO": "/",

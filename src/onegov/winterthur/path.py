@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.winterthur.app import WinterthurApp
 from onegov.winterthur.collections import AddressCollection
@@ -59,7 +61,7 @@ def get_roadwork(app: WinterthurApp, id: int) -> Roadwork | None:
     path='/mission-reports',
     converters={'year': int, 'page': int})
 def get_mission_reports(
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     page: int = 0,
     year: int | None = None
 ) -> MissionReportCollection:
@@ -75,7 +77,7 @@ def get_mission_reports(
     model=MissionReportVehicleCollection,
     path='/mission-reports/vehicles')
 def get_mission_report_vehicles(
-    request: 'WinterthurRequest'
+    request: WinterthurRequest
 ) -> MissionReportVehicleCollection:
     return MissionReportVehicleCollection(request.session)
 
@@ -85,7 +87,7 @@ def get_mission_report_vehicles(
     path='/mission-reports/report/{id}',
     converters={'id': UUID})
 def get_mission_report(
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     id: UUID
 ) -> MissionReport | None:
     return get_mission_reports(request).by_id(id)
@@ -96,7 +98,7 @@ def get_mission_report(
     path='/mission-reports/report/{id}/images',
     converters={'id': UUID})
 def get_mission_report_files(
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     id: UUID
 ) -> MissionReportFileCollection | None:
 
@@ -110,7 +112,7 @@ def get_mission_report_files(
     path='/mission-reports/vehicle/{id}',
     converters={'id': UUID})
 def get_mission_report_vehicle(
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     id: UUID
 ) -> MissionReportVehicle | None:
     return get_mission_report_vehicles(request).by_id(id)
@@ -120,6 +122,6 @@ def get_mission_report_vehicle(
     model=DaycareSubsidyCalculator,
     path='/daycare-subsidy-calculator')
 def get_daycare_subsidy_calculator(
-    request: 'WinterthurRequest'
+    request: WinterthurRequest
 ) -> DaycareSubsidyCalculator:
     return DaycareSubsidyCalculator(request.session)

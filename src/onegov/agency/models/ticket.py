@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from markupsafe import Markup
 from onegov.agency.collections import ExtendedAgencyCollection
@@ -26,41 +28,39 @@ if TYPE_CHECKING:
 
 
 class AgencyMutationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'AGN'}  # type:ignore
-    es_type_name = 'agency_tickets'
+    __mapper_args__ = {'polymorphic_identity': 'AGN'}
 
     if TYPE_CHECKING:
         @property
-        def handler(self) -> 'AgencyMutationHandler': ...
+        def handler(self) -> AgencyMutationHandler: ...
 
-    def reference_group(self, request: 'OrgRequest') -> str:
+    def reference_group(self, request: OrgRequest) -> str:
         return self.title
 
 
 class PersonMutationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'PER'}  # type:ignore
-    es_type_name = 'person_tickets'
+    __mapper_args__ = {'polymorphic_identity': 'PER'}
 
     if TYPE_CHECKING:
         @property
-        def handler(self) -> 'PersonMutationHandler': ...
+        def handler(self) -> PersonMutationHandler: ...
 
-    def reference_group(self, request: 'OrgRequest') -> str:
+    def reference_group(self, request: OrgRequest) -> str:
         return self.title
 
 
 @handlers.registered_handler('AGN')
 class AgencyMutationHandler(Handler):
 
-    handler_title = _("Agency")
-    code_title = _("Agencies")
+    handler_title = _('Agency')
+    code_title = _('Agencies')
 
     @cached_property
     def collection(self) -> ExtendedAgencyCollection:
         return ExtendedAgencyCollection(self.session)
 
     @cached_property
-    def agency(self) -> 'ExtendedAgency | None':
+    def agency(self) -> ExtendedAgency | None:
         return self.collection.by_id(self.data['handler_data']['id'])
 
     @cached_property
@@ -101,15 +101,15 @@ class AgencyMutationHandler(Handler):
 
     @property
     def subtitle(self) -> str:
-        return _("Mutation")
+        return _('Mutation')
 
     @cached_property
     def group(self) -> str:
-        return _("Agency")
+        return _('Agency')
 
     def get_summary(
         self,
-        request: 'AgencyRequest'  # type:ignore[override]
+        request: AgencyRequest  # type:ignore[override]
     ) -> Markup:
 
         layout = AgencyLayout(self.agency, request)
@@ -125,14 +125,14 @@ class AgencyMutationHandler(Handler):
             }
         )
 
-    def get_links(self, request: 'AgencyRequest') -> list[Link]:  # type:ignore
+    def get_links(self, request: AgencyRequest) -> list[Link]:  # type:ignore
         if self.deleted:
             return []
 
         assert self.agency is not None
         links = [
             Link(
-                text=_("Edit agency"),
+                text=_('Edit agency'),
                 url=request.return_here(
                     request.link(self.agency.proxy(), 'edit')
                 ),
@@ -144,7 +144,7 @@ class AgencyMutationHandler(Handler):
             assert self.mutation is not None
             links.append(
                 Link(
-                    text=_("Apply proposed changes"),
+                    text=_('Apply proposed changes'),
                     url=request.return_here(
                         request.link(self.mutation, 'apply')
                     ),
@@ -158,15 +158,15 @@ class AgencyMutationHandler(Handler):
 @handlers.registered_handler('PER')
 class PersonMutationHandler(Handler):
 
-    handler_title = _("Person")
-    code_title = _("People")
+    handler_title = _('Person')
+    code_title = _('People')
 
     @cached_property
     def collection(self) -> ExtendedPersonCollection:
         return ExtendedPersonCollection(self.session)
 
     @cached_property
-    def person(self) -> 'ExtendedPerson | None':
+    def person(self) -> ExtendedPerson | None:
         return self.collection.by_id(self.data['handler_data']['id'])
 
     @cached_property
@@ -207,15 +207,15 @@ class PersonMutationHandler(Handler):
 
     @property
     def subtitle(self) -> str:
-        return _("Mutation")
+        return _('Mutation')
 
     @cached_property
     def group(self) -> str:
-        return _("Person")
+        return _('Person')
 
     def get_summary(
         self,
-        request: 'AgencyRequest'  # type:ignore[override]
+        request: AgencyRequest  # type:ignore[override]
     ) -> Markup:
 
         layout = ExtendedPersonLayout(self.person, request)
@@ -231,14 +231,14 @@ class PersonMutationHandler(Handler):
             }
         )
 
-    def get_links(self, request: 'AgencyRequest') -> list[Link]:  # type:ignore
+    def get_links(self, request: AgencyRequest) -> list[Link]:  # type:ignore
         if self.deleted:
             return []
 
         assert self.person is not None
         links = [
             Link(
-                text=_("Edit person"),
+                text=_('Edit person'),
                 url=request.return_here(
                     request.link(self.person, 'edit')
                 ),
@@ -250,7 +250,7 @@ class PersonMutationHandler(Handler):
             assert self.mutation is not None
             links.append(
                 Link(
-                    text=_("Apply proposed changes"),
+                    text=_('Apply proposed changes'),
                     url=request.return_here(
                         request.link(self.mutation, 'apply')
                     ),

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Vote
@@ -5,7 +7,12 @@ from onegov.election_day.utils import segment_models
 from onegov.core.utils import groupbylist
 
 
-def test_segment_models():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.utils.notification import ModelGroup
+
+
+def test_segment_models() -> None:
     assert segment_models([], [], []) == []
 
     elections = [
@@ -22,11 +29,14 @@ def test_segment_models():
         Vote(domain='municipality', domain_segment='A'),
         Vote(domain='municipality', domain_segment='B'),
     ]
-    groups = segment_models(elections, compounds, votes)
-    assert len(groups) == 4
-    groups = dict(groupbylist(groups, lambda x: (x.domain, x.domain_segment)))
+    segments = segment_models(elections, compounds, votes)
+    assert len(segments) == 4
+    groups = dict(groupbylist(
+        segments,
+        lambda x: (x.domain, x.domain_segment)
+    ))
 
-    def compile(group):
+    def compile(group: ModelGroup) -> str:
         return str(
             group.filter.compile(compile_kwargs={"literal_binds": True})
         )

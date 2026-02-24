@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.chat import Message
 from onegov.chat import MessageCollection
 from onegov.core.custom import json
@@ -25,9 +27,9 @@ if TYPE_CHECKING:
 # might have to be implemented in link_message below
 def render_message(
     message: Message,
-    request: 'OrgRequest',
-    owner: 'Owner',
-    layout: MessageCollectionLayout
+    request: OrgRequest,
+    owner: Owner,
+    layout: MessageCollectionLayout,
 ) -> str:
     return render_template(
         template=f'message_{message.type}',
@@ -36,13 +38,13 @@ def render_message(
             'layout': layout,
             'model': message,
             'owner': owner,
-            'link': link_message(message, request)
+            'link': link_message(message, request),
         },
         suppress_global_variables=True
     )
 
 
-def link_message(message: Message, request: 'OrgRequest') -> str:
+def link_message(message: Message, request: OrgRequest) -> str:
     if hasattr(message, 'link'):
         return message.link(request)
 
@@ -70,9 +72,9 @@ class Owner(NamedTuple):
 @OrgApp.json(model=MessageCollection, permission=Private, name='feed')
 def view_messages_feed(
     self: MessageCollection[Message],
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: MessageCollectionLayout | None = None
-) -> 'JSONObject_ro':
+) -> JSONObject_ro:
 
     mapper = inspect(Message).polymorphic_map
     layout = layout or MessageCollectionLayout(self, request)
@@ -85,17 +87,33 @@ def view_messages_feed(
     messages = tuple(cast(m) for m in self.query())
     usernames = {m.owner for m in messages if m.owner}
 
-    if usernames:
-        q = request.session.query(User)
-        q = q.with_entities(User.username, User.realname)
-        q = q.filter(User.username.in_(usernames))
+    hide_personal_email = (request.app.org.hide_personal_email
+                  and not request.is_manager)
+    hide_submitter_email = (request.app.org.hide_submitter_email
+                              and not request.is_manager)
+    general = request.app.org.general_email or ''
+    submitter_name = request.translate(_('Submitter'))
 
-        owners = {u.username: Owner(u.username, u.realname) for u in q}
+    if usernames:
+        query = request.session.query(User.username, User.realname)
+        query = query.filter(User.username.in_(usernames))
+
+        owners = {
+            username: Owner(
+                general if hide_personal_email else username,
+                realname
+            )
+            for username, realname in query.tuples()
+        }
         owners.update({
-            username: Owner(username, None)
+            username: Owner(
+                submitter_name if hide_submitter_email else username,
+                None
+            )
             for username in usernames
             if username not in owners
         })
+
     else:
         owners = {}
 
@@ -134,9 +152,9 @@ def view_messages_feed(
 )
 def view_messages(
     self: MessageCollection[Message],
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: MessageCollectionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     # The initial load contains only the 25 latest message (the feed will
     # return the 25 oldest messages by default)
@@ -148,7 +166,7 @@ def view_messages(
 
     return {
         'layout': layout or MessageCollectionLayout(self, request),
-        'title': _("Timeline"),
+        'title': _('Timeline'),
         'feed': request.link(self, 'feed'),
         'feed_data': json.dumps(
             view_messages_feed(self, request)

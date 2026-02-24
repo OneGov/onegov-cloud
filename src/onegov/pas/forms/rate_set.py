@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.form import Form
 from onegov.pas import _

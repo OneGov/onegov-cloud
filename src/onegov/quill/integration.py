@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from more.webassets import WebassetsApp
 
 
@@ -24,7 +26,7 @@ def get_css_path() -> str:
 
 
 @QuillApp.webasset('quill')
-def get_quill_asset() -> 'Iterator[str]':
+def get_quill_asset() -> Iterator[str]:
     yield 'quill.snow.css'
     yield 'custom.css'
     yield 'quill.js'

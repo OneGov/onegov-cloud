@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.election_day import _
 from onegov.election_day.collections import SearchableArchivedResultCollection
@@ -16,7 +18,7 @@ class ArchiveLayout(DefaultLayout):
     def __init__(
         self,
         model: SearchableArchivedResultCollection,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         super().__init__(model, request)
 

@@ -1,21 +1,23 @@
+from __future__ import annotations
+
 from itertools import groupby
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.utils import toggle
 from onegov.directory.models import DirectoryEntry
 from onegov.form import as_internal_id
-from sqlalchemy import and_, desc
+from sqlalchemy import and_
 from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import array
 
 
-from typing import Any, Protocol, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Mapping
     from markupsafe import Markup
     from onegov.directory.models import Directory
     from sqlalchemy.orm import Query
-    from typing_extensions import Self
+    from typing import Self
 
 
 T = TypeVar('T')
@@ -26,14 +28,14 @@ class DirectorySearchWidget(Protocol[DirectoryEntryT]):
     @property
     def name(self) -> str: ...
     @property
-    def search_query(self) -> 'Query[DirectoryEntryT]': ...
+    def search_query(self) -> Query[DirectoryEntryT]: ...
 
     def adapt(
         self,
-        query: 'Query[DirectoryEntryT]'
-    ) -> 'Query[DirectoryEntryT]': ...
+        query: Query[DirectoryEntryT]
+    ) -> Query[DirectoryEntryT]: ...
 
-    def html(self, layout: Any) -> 'Markup': ...
+    def html(self, layout: Any) -> Markup: ...
 
 
 class DirectoryEntryCollection(
@@ -48,16 +50,36 @@ class DirectoryEntryCollection(
 
     """
 
+    @overload
+    def __init__(
+        self: DirectoryEntryCollection[DirectoryEntry],
+        directory: Directory,
+        type: Literal['*', 'generic'] = '*',
+        keywords: Mapping[str, list[str]] | None = None,
+        page: int = 0,
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None,
+    ) -> None: ...
+
+    @overload
     def __init__(
         self,
-        directory: 'Directory',
-        type: str = '*',
-        keywords: 'Mapping[str, list[str]] | None' = None,
+        directory: Directory,
+        type: str,
+        keywords: Mapping[str, list[str]] | None = None,
         page: int = 0,
-        search_widget: 'DirectorySearchWidget[DirectoryEntryT] | None' = None
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None,
+    ) -> None: ...
+
+    def __init__(
+        self,
+        directory: Directory,
+        type: str = '*',
+        keywords: Mapping[str, list[str]] | None = None,
+        page: int = 0,
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None,
     ) -> None:
 
-        super().__init__(object_session(directory))
+        super().__init__(object_session(directory))  # type: ignore[arg-type]
         self.type = type
         self.directory = directory
         self.keywords = keywords or {}
@@ -71,7 +93,7 @@ class DirectoryEntryCollection(
             and self.page == other.page
         )
 
-    def subset(self) -> 'Query[DirectoryEntryT]':
+    def subset(self) -> Query[DirectoryEntryT]:
         return self.query()
 
     @property
@@ -82,7 +104,7 @@ class DirectoryEntryCollection(
         return self.search_widget.name
 
     @property
-    def search_query(self) -> 'Query[DirectoryEntryT] | None':
+    def search_query(self) -> Query[DirectoryEntryT] | None:
         if self.search_widget is None:
             return None
 
@@ -92,18 +114,18 @@ class DirectoryEntryCollection(
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.directory,
             self.type,
             self.keywords,
-            page=index
+            page=index,
         )
 
     def by_name(self, name: str) -> DirectoryEntryT | None:
         return self.query().filter_by(name=name).first()
 
-    def query(self) -> 'Query[DirectoryEntryT]':
+    def query(self) -> Query[DirectoryEntryT]:
         cls = self.model_class
 
         query = super().query().filter_by(directory_id=self.directory.id)
@@ -113,21 +135,21 @@ class DirectoryEntryCollection(
             return value.split(':')[0]
 
         values = [
-            ':'.join((keyword, value))
+            f'{keyword}:{value}'
             for keyword in keywords
             for value in keywords[keyword]
         ]
         values.sort(key=keyword_group)
 
-        values = [
-            cls._keywords.has_any(array(group_values))  # type:ignore
+        value_filters = [
+            cls._keywords.has_any(array(group_values))
             for group, group_values in groupby(values, key=keyword_group)
         ]
-        if values:
-            query = query.filter(and_(*values))
+        if value_filters:
+            query = query.filter(and_(*value_filters))
 
         if self.directory.configuration.direction == 'desc':
-            query = query.order_by(desc(cls.order))
+            query = query.order_by(cls.order.desc())
         else:
             query = query.order_by(cls.order)
 
@@ -138,7 +160,7 @@ class DirectoryEntryCollection(
 
     def valid_keywords(
         self,
-        parameters: 'Mapping[str, T]'
+        parameters: Mapping[str, T]
     ) -> dict[str, T]:
 
         valid_keywords = {
@@ -165,8 +187,8 @@ class DirectoryEntryCollection(
     def available_filters(
         self,
         sort_choices: bool = False,
-        sortfunc: 'Callable[[str], SupportsRichComparison] | None ' = None
-    ) -> 'Iterable[tuple[str, str, list[str]]]':
+        sortfunc: Callable[[str], SupportsRichComparison] | None = None
+    ) -> Iterable[tuple[str, str, list[str]]]:
         """ Retrieve the filters with their choices.
 
         By default the choices are returned in the same order as defined in the
@@ -186,7 +208,7 @@ class DirectoryEntryCollection(
             )
         }
 
-        def maybe_sorted(values: 'Iterable[str]') -> list[str]:
+        def maybe_sorted(values: Iterable[str]) -> list[str]:
             if not sort_choices:
                 return list(values)
             return sorted(values, key=sortfunc)
@@ -200,7 +222,7 @@ class DirectoryEntryCollection(
         self,
         singular: bool = False,
         **keywords: list[str]
-    ) -> 'Self':
+    ) -> Self:
 
         if not self.directory.configuration.keywords:
             return self
@@ -209,7 +231,7 @@ class DirectoryEntryCollection(
             directory=self.directory,
             type=self.type,
             search_widget=self.search_widget,
-            keywords=keywords
+            keywords=keywords,
         )
 
     def for_toggled_keyword_value(
@@ -217,7 +239,7 @@ class DirectoryEntryCollection(
         keyword: str,
         value: str,
         singular: bool = False,
-    ) -> 'Self':
+    ) -> Self:
 
         if not self.directory.configuration.keywords:
             return self
@@ -240,13 +262,13 @@ class DirectoryEntryCollection(
             directory=self.directory,
             type=self.type,
             search_widget=self.search_widget,
-            keywords=parameters
+            keywords=parameters,
         )
 
-    def without_keywords(self) -> 'Self':
+    def without_keywords(self) -> Self:
         return self.__class__(
             directory=self.directory,
             type=self.type,
             page=self.page,
-            search_widget=self.search_widget
+            search_widget=self.search_widget,
         )

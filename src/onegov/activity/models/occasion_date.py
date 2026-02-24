@@ -1,27 +1,25 @@
+from __future__ import annotations
+
 import sedate
 
 from datetime import datetime, time
 from enum import IntEnum
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID, UTCDateTime
 from sqlalchemy import event
 from sqlalchemy import CheckConstraint
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import mapped_column, relationship
+from sqlalchemy.orm import Mapped, Session
+from uuid import UUID
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterator, Sequence
     from onegov.activity.models import Occasion
-    from sqlalchemy.orm import UOWTransaction  # type:ignore[attr-defined]
+    from sqlalchemy.orm import UOWTransaction
 
 
 class DAYS(IntEnum):
@@ -38,7 +36,7 @@ class DAYS(IntEnum):
         localized_start: datetime,
         localized_end: datetime,
         total_seconds: float
-    ) -> 'DAYS':
+    ) -> DAYS:
         hours = total_seconds / 3600
 
         if hours <= 6:
@@ -70,27 +68,20 @@ class OccasionDate(Base, TimestampMixin):
         return hash(self.id)
 
     #: the internal id of this occasion date
-    id: 'Column[int]' = Column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
     #: Timezone of the occasion date
-    timezone: 'Column[str]' = Column(Text, nullable=False)
+    timezone: Mapped[str]
 
     #: The start of the range
-    start: 'Column[datetime]' = Column(UTCDateTime, nullable=False)
+    start: Mapped[datetime]
 
     #: The end of the range
-    end: 'Column[datetime]' = Column(UTCDateTime, nullable=False)
+    end: Mapped[datetime]
 
     #: The associated occasion
-    occasion_id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('occasions.id'),
-        nullable=False
-    )
-    occasion: 'relationship[Occasion]' = relationship(
-        'Occasion',
-        back_populates='dates'
-    )
+    occasion_id: Mapped[UUID] = mapped_column(ForeignKey('occasions.id'))
+    occasion: Mapped[Occasion] = relationship(back_populates='dates')
 
     __table_args__ = (
         CheckConstraint('"start" <= "end"', name='start_before_end'),
@@ -105,7 +96,7 @@ class OccasionDate(Base, TimestampMixin):
         return sedate.to_timezone(self.end, self.timezone)
 
     @property
-    def active_days(self) -> 'Iterator[int]':
+    def active_days(self) -> Iterator[int]:
         for dt in sedate.dtrange(self.localized_start, self.localized_end):
             yield dt.date().toordinal()
 
@@ -117,17 +108,11 @@ class OccasionDate(Base, TimestampMixin):
             )
         })
 
-    if TYPE_CHECKING:
-        duration_in_seconds: Column[float]
-        duration: Column[DAYS]
-
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def duration_in_seconds(self) -> float:
         return (self.end - self.start).total_seconds()
 
-    # FIXME: I don't think this works as a hybrid_property because
-    #        localized_start/localized_end aren't hybrid_property
-    @hybrid_property  # type:ignore[no-redef]
+    @property
     def duration(self) -> DAYS:
         return DAYS.compute(
             self.localized_start,
@@ -135,17 +120,17 @@ class OccasionDate(Base, TimestampMixin):
             self.duration_in_seconds
         )
 
-    def overlaps(self, other: 'OccasionDate') -> bool:
+    def overlaps(self, other: OccasionDate) -> bool:
         return sedate.overlaps(self.start, self.end, other.start, other.end)
 
 
 # # changes to the dates need to be propagated to the parent occasion
-# # so it can update its aggreagated values
+# # so it can update its aggregated values
 @event.listens_for(Session, 'before_flush')
 def before_flush(
     session: Session,
-    context: 'UOWTransaction',
-    instances: 'Sequence[Any]'
+    context: UOWTransaction,
+    instances: Sequence[Any]
 ) -> None:
     for obj in session.dirty:
         if isinstance(obj, OccasionDate):

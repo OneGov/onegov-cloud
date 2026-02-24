@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
 from onegov.election_day.models import Ballot
@@ -6,7 +8,15 @@ from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Vote
 
 
-def test_vote(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from io import BytesIO
+    from onegov.election_day.types import Status
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
+def test_vote(session: Session) -> None:
     vote = Vote(
         title="Universal Healthcare",
         domain='federation',
@@ -52,18 +62,18 @@ def test_vote(session):
     assert vote.proposal.results[0].entity_id == 1
 
 
-def test_complex_vote(session):
-    vote = ComplexVote(
+def test_complex_vote(session: Session) -> None:
+    vote_ = ComplexVote(
         title="Universal Healthcare",
         domain='federation',
         date=date(2015, 6, 14),
     )
     # todo: add results, title etc
-    session.add(vote)
+    session.add(vote_)
     session.flush()
 
     vote = session.query(Vote).one()
-
+    assert isinstance(vote, ComplexVote)
     assert vote.type == 'complex'
     assert vote.title == "Universal Healthcare"
     assert vote.domain == 'federation'
@@ -76,7 +86,7 @@ def test_complex_vote(session):
     assert vote.ballot('tie-breaker')
 
 
-def test_vote_id_generation(session):
+def test_vote_id_generation(session: Session) -> None:
     vote = Vote(
         title="Universal Healthcare",
         domain='federation',
@@ -115,7 +125,7 @@ def test_vote_id_generation(session):
     assert vote.id == 'uhc'
 
 
-def test_ballot_answer_simple(session):
+def test_ballot_answer_simple(session: Session) -> None:
     vote = Vote(
         title="Abstimmung",
         domain='federation',
@@ -162,7 +172,7 @@ def test_ballot_answer_simple(session):
     assert vote.answer == 'rejected'
 
 
-def test_ballot_nobody_voted_right(session):
+def test_ballot_nobody_voted_right(session: Session) -> None:
     vote = Vote(
         title="Should we go voting?",
         domain='federation',
@@ -199,7 +209,7 @@ def test_ballot_nobody_voted_right(session):
     assert vote.nays_percentage == 100.0
 
 
-def test_ballot_answer_proposal_wins(session):
+def test_ballot_answer_proposal_wins(session: Session) -> None:
     vote = ComplexVote(
         title="Abstimmung mit Gegenentwurf",
         domain='federation',
@@ -225,7 +235,7 @@ def test_ballot_answer_proposal_wins(session):
     assert vote.nays_percentage == 0
 
 
-def test_ballot_answer_counter_proposal_wins(session):
+def test_ballot_answer_counter_proposal_wins(session: Session) -> None:
     vote = ComplexVote(
         title="Abstimmung mit Gegenentwurf",
         domain='federation',
@@ -251,7 +261,7 @@ def test_ballot_answer_counter_proposal_wins(session):
     assert vote.nays_percentage == 0
 
 
-def test_ballot_answer_counter_tie_breaker_decides(session):
+def test_ballot_answer_counter_tie_breaker_decides(session: Session) -> None:
     vote = ComplexVote(
         title="Abstimmung mit Gegenentwurf",
         domain='federation',
@@ -287,7 +297,7 @@ def test_ballot_answer_counter_tie_breaker_decides(session):
     assert vote.nays_percentage == 20.0
 
 
-def test_ballot_answer_nobody_wins(session):
+def test_ballot_answer_nobody_wins(session: Session) -> None:
     vote = ComplexVote(
         title="Abstimmung mit Gegenentwurf",
         domain='federation',
@@ -311,9 +321,9 @@ def test_ballot_answer_nobody_wins(session):
     assert vote.answer == 'rejected'
 
 
-def test_vote_progress(session):
+def test_vote_progress(session: Session) -> None:
 
-    def result(name, counted):
+    def result(name: str, counted: bool) -> BallotResult:
         return BallotResult(name=name, counted=counted, entity_id=1)
 
     # Simple vote
@@ -365,7 +375,7 @@ def test_vote_progress(session):
     assert vote.counted_entities == ['A', 'B']
 
 
-def test_vote_results_by_district(session):
+def test_vote_results_by_district(session: Session) -> None:
     vote = Vote(
         title="Abstimmung",
         domain='federation',
@@ -435,7 +445,7 @@ def test_vote_results_by_district(session):
     ]
 
 
-def test_ballot_hybrid_properties(session):
+def test_ballot_hybrid_properties(session: Session) -> None:
     vote = Vote(
         title="Universal Healthcare",
         domain='federation',
@@ -515,6 +525,8 @@ def test_ballot_hybrid_properties(session):
         )
     ])
 
+    # undo mypy narrowing
+    vote = vote
     assert vote.proposal.yeas == 816
     assert vote.proposal.nays == 97
     assert vote.proposal.empty == 19
@@ -573,6 +585,8 @@ def test_ballot_hybrid_properties(session):
         ),
     )
 
+    # undo mypy narrowing
+    vote = vote
     assert vote.proposal.yeas == 816
     assert vote.proposal.nays == 97
     assert vote.proposal.empty == 19
@@ -623,6 +637,8 @@ def test_ballot_hybrid_properties(session):
     # mark as counted, but don't change any results from 0
     vote.proposal.results[2].counted = True
 
+    # undo mypy narrowing
+    vote = vote
     assert vote.proposal.yeas == 816
     assert vote.proposal.nays == 97
     assert vote.proposal.empty == 19
@@ -688,23 +704,23 @@ def test_ballot_hybrid_properties(session):
         .filter_by(entity_id=1).scalar(),
         2
     ) == 11.98
-    assert session.query(BallotResult.accepted).\
-        filter_by(entity_id=1).scalar() is True
+    assert session.query(BallotResult.accepted
+        ).filter_by(entity_id=1).scalar() is True
     assert round(
         session.query(BallotResult.turnout)
         .filter_by(entity_id=1).scalar(),
         2
     ) == 20.68
-    assert session.query(BallotResult.cast_ballots)\
-        .filter_by(entity_id=1).scalar() == 595
+    assert session.query(BallotResult.cast_ballots
+        ).filter_by(entity_id=1).scalar() == 595
 
     ballot_result.eligible_voters = 0
     assert ballot_result.turnout == 0
-    assert session.query(BallotResult.turnout).\
-        filter_by(entity_id=1).scalar() == 0
+    assert session.query(BallotResult.turnout
+        ).filter_by(entity_id=1).scalar() == 0
 
 
-def test_vote_last_modified(session):
+def test_vote_last_modified(session: Session) -> None:
     # Add vote
     with freeze_time("2001-01-01"):
         vote = Vote(
@@ -717,11 +733,14 @@ def test_vote_last_modified(session):
 
         session.add(vote)
         session.flush()
+        # undo mypy narrowing
+        vote = vote
         assert vote.last_ballot_change is None
         assert session.query(Vote.last_ballot_change).scalar() is None
+        assert vote.last_modified is not None
         assert vote.last_modified.isoformat().startswith('2001')
-        assert session.query(Vote.last_modified).scalar()\
-            .isoformat().startswith('2001')
+        assert session.query(Vote.last_modified
+            ).scalar().isoformat().startswith('2001')
 
     with freeze_time("2002-01-01"):
         vote.last_result_change = vote.timestamp()
@@ -729,8 +748,8 @@ def test_vote_last_modified(session):
         assert vote.last_ballot_change is None
         assert session.query(Vote.last_ballot_change).scalar() is None
         assert vote.last_modified.isoformat().startswith('2002')
-        assert session.query(Vote.last_modified).scalar()\
-            .isoformat().startswith('2002')
+        assert session.query(Vote.last_modified
+            ).scalar().isoformat().startswith('2002')
 
     with freeze_time("2003-01-01"):
         vote.domain = 'canton'
@@ -738,42 +757,46 @@ def test_vote_last_modified(session):
         assert vote.last_ballot_change is None
         assert session.query(Vote.last_ballot_change).scalar() is None
         assert vote.last_modified.isoformat().startswith('2003')
-        assert session.query(Vote.last_modified).scalar()\
-            .isoformat().startswith('2003')
+        assert session.query(Vote.last_modified
+            ).scalar().isoformat().startswith('2003')
 
     with freeze_time("2004-01-01"):
         vote.ballot('proposal')
         session.flush()
+        # undo mypy narrowing
+        vote = vote
+        assert vote.last_ballot_change is not None
         assert vote.last_ballot_change.isoformat().startswith('2004')
-        assert session.query(Vote.last_ballot_change).scalar()\
-            .isoformat().startswith('2004')
+        assert session.query(Vote.last_ballot_change
+            ).scalar().isoformat().startswith('2004')
+        assert vote.last_modified is not None
         assert vote.last_modified.isoformat().startswith('2004')
-        assert session.query(Vote.last_modified).scalar()\
-            .isoformat().startswith('2004')
+        assert session.query(Vote.last_modified
+            ).scalar().isoformat().startswith('2004')
 
     with freeze_time("2005-01-01"):
         vote.proposal.title = 'Proposal'
         session.flush()
         assert vote.last_ballot_change.isoformat().startswith('2005')
-        assert session.query(Vote.last_ballot_change).scalar()\
-            .isoformat().startswith('2005')
+        assert session.query(Vote.last_ballot_change
+            ).scalar().isoformat().startswith('2005')
         assert vote.last_modified.isoformat().startswith('2005')
-        assert session.query(Vote.last_modified).scalar()\
-            .isoformat().startswith('2005')
+        assert session.query(Vote.last_modified
+            ).scalar().isoformat().startswith('2005')
 
     with freeze_time("2006-01-01"):
         vote.ballot('counter-proposal')
         session.flush()
         assert vote.last_ballot_change.isoformat().startswith('2006')
-        assert session.query(Vote.last_ballot_change).scalar()\
-            .isoformat().startswith('2006')
+        assert session.query(Vote.last_ballot_change
+            ).scalar().isoformat().startswith('2006')
         assert vote.last_modified.isoformat().startswith('2006')
-        assert session.query(Vote.last_modified).scalar()\
-            .isoformat().startswith('2006')
+        assert session.query(Vote.last_modified
+            ).scalar().isoformat().startswith('2006')
     return
 
 
-def test_vote_meta_data(session):
+def test_vote_meta_data(session: Session) -> None:
     vote = Vote(
         title="Is this a test?",
         shortcode="FOO",
@@ -796,7 +819,7 @@ def test_vote_meta_data(session):
     assert vote.meta['b'] == 2
 
 
-def test_vote_status(session):
+def test_vote_status(session: Session) -> None:
     vote = Vote(
         title="Vote",
         domain='federation',
@@ -827,6 +850,7 @@ def test_vote_status(session):
 
     # Test completed calcuation
     # ... empty vote
+    status: Status | None
     for status, completed in (
         (None, False), ('unknown', False), ('interim', False), ('final', True)
     ):
@@ -873,7 +897,7 @@ def test_vote_status(session):
         assert vote.completed == completed
 
 
-def test_clear_ballot(session):
+def test_clear_ballot(session: Session) -> None:
     vote = Vote(
         title='Vote',
         domain='canton',
@@ -902,7 +926,7 @@ def test_clear_ballot(session):
     assert session.query(BallotResult).first() is None
 
 
-def test_clear_vote(session):
+def test_clear_vote(session: Session) -> None:
     vote = Vote(
         title='Vote',
         domain='canton',
@@ -928,13 +952,15 @@ def test_clear_vote(session):
     vote.clear_results()
     session.flush()
 
+    # undo mypy narrowing
+    vote = vote
     assert vote.last_result_change is None
     assert vote.status is None
     assert not vote.proposal.results
     assert session.query(BallotResult).first() is None
 
 
-def test_vote_has_results(session):
+def test_vote_has_results(session: Session) -> None:
     vote = Vote(
         title="Vote",
         domain='federation',
@@ -965,7 +991,11 @@ def test_vote_has_results(session):
     assert vote.has_results is True
 
 
-def test_vote_rename(election_day_app_zg, explanations_pdf):
+def test_vote_rename(
+    election_day_app_zg: TestApp,
+    explanations_pdf: BytesIO
+) -> None:
+
     session = election_day_app_zg.session()
 
     vote = Vote(
@@ -990,7 +1020,11 @@ def test_vote_rename(election_day_app_zg, explanations_pdf):
     assert len(vote.ballots) == 1
 
 
-def test_vote_attachments(election_day_app_zg, explanations_pdf):
+def test_vote_attachments(
+    election_day_app_zg: TestApp,
+    explanations_pdf: BytesIO
+) -> None:
+
     models = tuple(
         cls(
             title="Universal Healthcare",
@@ -1003,9 +1037,12 @@ def test_vote_attachments(election_day_app_zg, explanations_pdf):
         assert model.explanations_pdf is None
         del model.explanations_pdf
         model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+        # undo mypy narrowing
+        model = model
+        assert model.explanations_pdf is not None
         assert model.explanations_pdf.name == 'explanations_pdf'
         assert model.explanations_pdf.reference.filename == 'explanations.pdf'
-        assert model.explanations_pdf.reference.content_type == \
-            'application/pdf'
+        assert model.explanations_pdf.reference.content_type == (
+            'application/pdf')
         del model.explanations_pdf
         assert model.explanations_pdf is None

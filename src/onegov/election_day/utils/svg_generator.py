@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 from onegov.election_day import log
 from onegov.election_day.models import Ballot
@@ -19,7 +21,7 @@ class SvgGenerator:
 
     def __init__(
         self,
-        app: 'ElectionDayApp',
+        app: ElectionDayApp,
         renderer: D3Renderer | None = None
     ):
         self.app = app
@@ -27,7 +29,7 @@ class SvgGenerator:
         self.session = self.app.session()
         self.renderer = renderer or D3Renderer(app)
 
-    def remove(self, directory: str, files: 'Collection[str]') -> None:
+    def remove(self, directory: str, files: Collection[str]) -> None:
         """ Safely removes the given files from the directory. """
         if not files:
             return
@@ -87,7 +89,7 @@ class SvgGenerator:
             assert fs is not None
             with fs.open(path, 'w') as f:
                 copyfileobj(chart, f)
-            log.info(f"{filename} created")
+            log.info(f'{filename} created')
             return 1
 
         return 0

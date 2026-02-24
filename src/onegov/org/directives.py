@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from dectate import Action
 from itertools import count
 
 
-from typing import cast, Any, ClassVar, TYPE_CHECKING
+from typing import cast, Any, ClassVar, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.elements import LinkGroup
@@ -12,8 +14,7 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.user import User
     from sqlalchemy.orm import Query
-    from typing import Protocol, TypeVar, TypedDict
-    from typing_extensions import TypeAlias
+    from typing import Protocol, TypeAlias, TypeVar, TypedDict
 
     DirectoryEntryT = TypeVar('DirectoryEntryT', bound=DirectoryEntry)
     DirectorySearchWidgetRegistry: TypeAlias = dict[
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
         type['RegisteredEventSearchWidget']
     ]
     LinkGroupFactory: TypeAlias = Callable[[OrgRequest, User], LinkGroup]
+    BoardletKind: TypeAlias = Literal['user', 'citizen']
 
     class HomepageWidget(Protocol):
         @property
@@ -69,6 +71,7 @@ if TYPE_CHECKING:
     class BoardletConfig(TypedDict):
         cls: type[_Boardlet]
         order: tuple[int, int]
+        icon: str
 
 
 class HomepageWidgetAction(Action):
@@ -83,14 +86,14 @@ class HomepageWidgetAction(Action):
 
     def identifier(  # type:ignore[override]
         self,
-        homepage_widget_registry: dict[str, 'RegisteredHomepageWidget']
+        homepage_widget_registry: dict[str, RegisteredHomepageWidget]
     ) -> str:
         return self.tag
 
     def perform(  # type:ignore[override]
         self,
-        func: 'Callable[[], HomepageWidget]',
-        homepage_widget_registry: dict[str, 'RegisteredHomepageWidget']
+        func: Callable[[], HomepageWidget],
+        homepage_widget_registry: dict[str, RegisteredHomepageWidget]
     ) -> None:
         widget = cast('RegisteredHomepageWidget', func())
         widget.tag = self.tag  # keep redundantly for ease of access
@@ -118,7 +121,7 @@ class ExportAction(Action):
 
     def perform(  # type:ignore[override]
         self,
-        cls: 'Callable[..., Any]',
+        cls: Callable[..., Any],
         export_registry: dict[str, Any]
     ) -> None:
         export_registry[self.id] = cls(**self.kwargs)
@@ -138,14 +141,14 @@ class UserlinkAction(Action):
 
     def identifier(  # type:ignore[override]
         self,
-        linkgroup_registry: list['LinkGroupFactory']
+        linkgroup_registry: list[LinkGroupFactory]
     ) -> int:
         return self.name
 
     def perform(  # type:ignore[override]
         self,
-        func: 'LinkGroupFactory',
-        linkgroup_registry: list['LinkGroupFactory']
+        func: LinkGroupFactory,
+        linkgroup_registry: list[LinkGroupFactory]
     ) -> None:
         linkgroup_registry.append(func)
 
@@ -162,14 +165,14 @@ class DirectorySearchWidgetAction(Action):
 
     def identifier(  # type:ignore[override]
         self,
-        directory_search_widget_registry: 'DirectorySearchWidgetRegistry'
+        directory_search_widget_registry: DirectorySearchWidgetRegistry
     ) -> str:
         return self.name
 
     def perform(  # type:ignore[override]
         self,
-        cls: type['DirectorySearchWidget[Any]'],
-        directory_search_widget_registry: 'DirectorySearchWidgetRegistry'
+        cls: type[DirectorySearchWidget[Any]],
+        directory_search_widget_registry: DirectorySearchWidgetRegistry
     ) -> None:
 
         cls = cast('type[RegisteredDirectorySearchWidget[Any]]', cls)
@@ -193,14 +196,14 @@ class EventSearchWidgetAction(Action):
 
     def identifier(  # type:ignore[override]
         self,
-        event_search_widget_registry: 'EventSearchWidgetRegistry'
+        event_search_widget_registry: EventSearchWidgetRegistry
     ) -> str:
         return self.name
 
     def perform(  # type:ignore[override]
         self,
-        cls: type['EventSearchWidget'],
-        event_search_widget_registry: 'EventSearchWidgetRegistry'
+        cls: type[EventSearchWidget],
+        event_search_widget_registry: EventSearchWidgetRegistry
     ) -> None:
 
         cls = cast('type[RegisteredEventSearchWidget]', cls)
@@ -224,8 +227,7 @@ class SettingsView(Action):
         name: str,
         title: str,
         order: int = 0,
-        icon: str =
-        'fa-cogs'
+        icon: str = 'fa-cogs'
     ) -> None:
 
         self.name = name
@@ -238,14 +240,14 @@ class SettingsView(Action):
 
     def identifier(  # type:ignore[override]
         self,
-        settings_view_registry: dict[str, 'SettingsDict']
+        settings_view_registry: dict[str, SettingsDict]
     ) -> str:
         return self.name
 
     def perform(  # type:ignore[override]
         self,
         func: Any,
-        settings_view_registry: dict[str, 'SettingsDict']
+        settings_view_registry: dict[str, SettingsDict]
     ) -> None:
         settings_view_registry[self.name] = self.setting
 
@@ -254,10 +256,17 @@ class Boardlet(Action):
     """ Registers a boardlet on the Dashboard. """
 
     config = {
-        'boardlets_registry': dict
+        'boardlets_registry': lambda: {'user': {}, 'citizen': {}}
     }
 
-    def __init__(self, name: str, order: tuple[int, int]):
+    def __init__(
+        self,
+        name: str,
+        order: tuple[int, int],
+        icon: str = '',
+        kind: Literal['user', 'citizen'] = 'user'
+    ) -> None:
+
         assert isinstance(order, tuple) and len(order) == 2, """
             The order should consist of two values, a group and an order
             within the group.
@@ -265,19 +274,22 @@ class Boardlet(Action):
 
         self.name = name
         self.order = order
+        self.icon = icon
+        self.kind = kind
 
     def identifier(  # type:ignore[override]
         self,
-        boardlets_registry: dict[str, 'BoardletConfig']
+        boardlets_registry: dict[BoardletKind, dict[str, BoardletConfig]]
     ) -> str:
-        return self.name
+        return f'{self.kind}-{self.name}'
 
     def perform(  # type:ignore[override]
         self,
-        func: type['_Boardlet'],
-        boardlets_registry: dict[str, 'BoardletConfig']
+        func: type[_Boardlet],
+        boardlets_registry: dict[BoardletKind, dict[str, BoardletConfig]]
     ) -> None:
-        boardlets_registry[self.name] = {
+        boardlets_registry[self.kind][self.name] = {
             'cls': func,
-            'order': self.order
+            'order': self.order,
+            'icon': self.icon,
         }

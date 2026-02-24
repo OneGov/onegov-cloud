@@ -1,0 +1,103 @@
+/*
+    Dashboard
+*/
+
+.boardlet {
+    background: $white-smoke;
+    margin-bottom: 1.5rem;
+    border-top: 5px solid $green-light;
+    padding: 1rem;
+    border-radius: .7rem;
+
+h2.h4 {
+    margin-bottom: 1rem;
+    margin-top: -.2rem;
+}
+
+li {
+    font-size: .9rem;
+}
+
+&.boardlet-warning {
+    border-top-color: $yellow-light;
+}
+
+&.boardlet-failure {
+    border-top-color: $red-light;
+}
+
+h2.h4 {
+    padding: .5rem;
+    background: $white;
+    text-align: center;
+    border-radius: .7rem;
+}
+
+.title {
+    font-weight: normal;
+}
+
+.facts {
+    width: 100%;
+    table-layout: auto;
+    border-collapse: collapse;
+
+    tbody {
+        background: transparent;
+    }
+
+    tr {
+        background: transparent;
+
+        &.none {
+            color: $base;
+        }
+    }
+
+    td {
+        padding: .2rem 0;
+        background: transparent;
+    }
+
+    td:first-child {
+        white-space: nowrap;
+        width: 1%;
+    }
+
+    td:last-child {
+        padding-left: .7rem;
+    }
+}
+
+.fact-number span,
+.fact-icon span{
+    background: $white;
+    padding: .2rem .5rem;
+    border-radius: .2rem;
+    width: 100%;
+    display: block;
+    text-align: right;
+}
+
+.fact-icon {
+    padding: .3rem;
+}
+
+.fact-text {
+    margin-left: .5rem;
+}
+}
+
+
+@include breakpoint(medium only) {
+.boardlet {
+    width: calc(50% - 1rem);
+}
+}
+
+
+@include breakpoint(small only) {
+.boardlet {
+    width: 100%;
+}
+}

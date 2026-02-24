@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import shutil
 import sys
@@ -11,7 +13,7 @@ cli = command_group()
 
 
 def pre_checks() -> None:
-    node_version = check_output('node --version', shell=True)
+    node_version = check_output('node --version', shell=True)  # nosec
     if 'v10' not in node_version.decode('utf-8'):
         click.secho('Foundation CLI currently works with node version 10')
         sys.exit()
@@ -32,11 +34,11 @@ def pre_checks() -> None:
 })
 def update() -> None:
     """ Update helper for foundation6 using node and webpack.
-        By the time this cli is used, probabely things already changed and
-        it needs to be adapted.
-        Also some import might not work and have to be adapted manually.
-        The Backup files can always be consulted.
-     """
+    By the time this cli is used, probabely things already changed and
+    it needs to be adapted.
+    Also some import might not work and have to be adapted manually.
+    The Backup files can always be consulted.
+    """
 
     pre_checks()
     module = Path(module_path('onegov.foundation6', 'foundation')).parent
@@ -50,15 +52,15 @@ def update() -> None:
 
     foundation_js_files = ('foundation.min.js', 'foundation.js')
 
-    os.chdir('/tmp')
-    if not os.path.exists('/tmp/foundation-update'):
-        os.system(
+    os.chdir('/tmp')  # nosec:B108
+    if not os.path.exists('/tmp/foundation-update'):  # nosec:B108
+        os.system(  # nosec
             'echo foundation-update | '
             'foundation new --framework sites --template zurb'
         )
 
     os.chdir('foundation-update')
-    node_root = Path('/tmp/foundation-update/node_modules/foundation-sites')
+    node_root = Path('/tmp/foundation-update/node_modules/foundation-sites')  # nosec:B108
 
     # click.secho('Create a backup', fg='green')
     # shutil.copytree(src, src_bckp)

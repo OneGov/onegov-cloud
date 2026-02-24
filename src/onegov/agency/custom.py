@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
     from onegov.core.elements import LinkGroup
 
 
-def get_global_tools(request: 'AgencyRequest') -> 'Iterator[Link | LinkGroup]':
+def get_global_tools(request: AgencyRequest) -> Iterator[Link | LinkGroup]:
     for item in get_global_tools_base(request):
         title = getattr(item, 'title', None)
 
@@ -29,7 +31,7 @@ def get_global_tools(request: 'AgencyRequest') -> 'Iterator[Link | LinkGroup]':
         yield item
 
 
-def get_top_navigation(request: 'AgencyRequest') -> 'Iterator[Link]':
+def get_top_navigation(request: AgencyRequest) -> Iterator[Link]:
     yield Link(
         text=_('People'),
         url=request.class_link(ExtendedPersonCollection)

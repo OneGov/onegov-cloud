@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.feriennet.const import DEFAULT_DONATION_AMOUNTS
@@ -13,10 +15,10 @@ if TYPE_CHECKING:
 
 class DonationForm(Form):
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     amount = SelectField(
-        label=_("My donation"),
+        label=_('My donation'),
         choices=(),
         validators=[InputRequired()]
     )
@@ -37,7 +39,7 @@ class DonationForm(Form):
         try:
             amount = float(self.amount.data)
         except ValueError:
-            raise ValidationError(_("Invalid amount")) from None
+            raise ValidationError(_('Invalid amount')) from None
 
         if not (0 < amount < float('inf')):
-            raise ValidationError(_("Invalid amount"))
+            raise ValidationError(_('Invalid amount'))

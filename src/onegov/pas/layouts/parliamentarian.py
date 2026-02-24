@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.pas import _
-from onegov.pas.collections import ParliamentarianCollection
+from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.layouts.default import DefaultLayout
 
 
-class ParliamentarianCollectionLayout(DefaultLayout):
+class PASParliamentarianCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
@@ -36,19 +38,19 @@ class ParliamentarianCollectionLayout(DefaultLayout):
                         Link(
                             text=_('Parliamentarian'),
                             url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-parliamentarian'}
+                            attrs={'class': 'new-parliamentarian'},
                         ),
-                    ]
+                    ],
                 ),
             ]
         return None
 
 
-class ParliamentarianLayout(DefaultLayout):
+class PASParliamentarianLayout(DefaultLayout):
 
     @cached_property
-    def collection(self) -> ParliamentarianCollection:
-        return ParliamentarianCollection(self.request.session)
+    def collection(self) -> PASParliamentarianCollection:
+        return PASParliamentarianCollection(self.request.app)
 
     @cached_property
     def title(self) -> str:
@@ -78,7 +80,7 @@ class ParliamentarianLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Role'),
+                            text=_('Role (as a party or group member)'),
                             url=self.request.link(self.model, 'new-role'),
                             attrs={'class': 'new-role'}
                         ),
@@ -112,6 +114,6 @@ class ParliamentarianLayout(DefaultLayout):
                             )
                         )
                     )
-                )
+                ),
             ]
         return None

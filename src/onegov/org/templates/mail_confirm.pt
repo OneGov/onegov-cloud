@@ -5,18 +5,25 @@
     <tal:b metal:fill-slot="body">
         <p i18n:translate>Hello</p>
 
-        <p i18n:translate>You are recieving this mail because you subscribed to the following newsletter:</p>
-        <p><a href="${request.link(newsletters)}">${layout.org.title}</a></p>
+        <p i18n:translate>You are receiving this mail because you subscribed to the following newsletter:</p>
+        <p>
+            <a href="${request.link(newsletters)}">${layout.org.title}</a>
+            <span tal:condition="subscribed_categories" i18n:translate>You subscribed to the following newsletter categories:</span>
+            <span>${', '.join(subscribed_categories)}</span>
+        </p>
 
-        <p i18n:translate>Plese click the following link to confirm your subscription:</p>
+        <p i18n:translate>Please click the following link to confirm your subscription:</p>
         <p><a class="btn-primary" href="${request.link(subscription, 'confirm')}" i18n:translate>Confirm subscription</a></p>
+
+        <p i18n:translate>To update your subscription categories click here:</p>
+        <p><a class="btn-primary" href="${update_link}" i18n:translate>Update subscription</a></p>
 
         <p i18n:translate>If you did not subscribe to this newsletter you can simply ignore this e-mail.</p>
 
     </tal:b>
     <tal:b metal:fill-slot="above-footer">
         <p>
-            <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>.
+            <a href="${unsubscribe_link}" i18n:translate>Click here to unsubscribe.</a>.
         </p>
     </tal:b>
 </div>

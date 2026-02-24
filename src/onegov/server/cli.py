@@ -48,6 +48,7 @@ A onegov.yml file looks like this:
         level: DEBUG
         handlers: [console]
 """
+from __future__ import annotations
 
 import bjoern  # type:ignore[import-untyped]
 import click
@@ -92,65 +93,65 @@ RESOURCE_TRACKER: ResourceTracker = None  # type:ignore[assignment]
 @click.option(
     '--config-file',
     '-c',
-    help="Configuration file to use",
+    help='Configuration file to use',
     type=click.Path(exists=True),
-    default="onegov.yml"
+    default='onegov.yml'
 )
 @click.option(
     '--port',
     '-p',
-    help="Port to bind to",
+    help='Port to bind to',
     type=click.IntRange(min=0, max=65535),
     default=8080
 )
 @click.option(
     '--pdb',
-    help="Enable post-mortem debugging (debug mode only)",
+    help='Enable post-mortem debugging (debug mode only)',
     default=False,
     is_flag=True
 )
 @click.option(
     '--tracemalloc',
-    help="Enable tracemalloc (debug mode only)",
+    help='Enable tracemalloc (debug mode only)',
     default=False,
     is_flag=True
 )
 @click.option(
     '--mode',
-    help="Defines the mode used to run the server cli (debug|production)",
+    help='Defines the mode used to run the server cli (debug|production)',
     type=click.Choice(('debug', 'production'), case_sensitive=False),
     default='debug',
 )
 @click.option(
     '--sentry-dsn',
-    help="Sentry DSN to use (production mode only)",
+    help='Sentry DSN to use (production mode only)',
     default=None,
 )
 @click.option(
     '--sentry-environment',
-    help="Sentry environment tag (production mode only)",
+    help='Sentry environment tag (production mode only)',
     default='testing',
 )
 @click.option(
     '--sentry-release',
-    help="Sentry release tag (production mode only)",
+    help='Sentry release tag (production mode only)',
     default=None,
 )
 @click.option(
     '--send-ppi',
-    help="Allow sentry_sdk to send personally identifiable information",
+    help='Allow sentry_sdk to send personally identifiable information',
     default=False,
     is_flag=True
 )
 @click.option(
     '--traces-sample-rate',
-    help="How often should sentry_sdk send traces to the backend",
+    help='How often should sentry_sdk send traces to the backend',
     type=click.FloatRange(min=0.0, max=1.0),
     default=0.1
 )
 @click.option(
     '--profiles-sample-rate',
-    help="How often should sentry_sdk also send a profile with the trace",
+    help='How often should sentry_sdk also send a profile with the trace',
     type=click.FloatRange(min=0.0, max=1.0),
     default=0.25
 )
@@ -268,7 +269,7 @@ def run_production(
         #       of this top-level application router.
         app = SentryWsgiMiddleware(app)
 
-    log.debug(f"started onegov server on http://127.0.0.1:{port}")
+    log.debug(f'started onegov server on http://127.0.0.1:{port}')
 
     bjoern.run(app, '127.0.0.1', port, reuse_port=True)
 
@@ -310,14 +311,14 @@ class WSGIRequestMonitorMiddleware:
 
     """
 
-    def __init__(self, app: 'WSGIApplication'):
+    def __init__(self, app: WSGIApplication):
         self.app = app
 
     def __call__(
         self,
-        environ: 'WSGIEnvironment',
-        start_response: 'StartResponse'
-    ) -> 'Iterable[bytes]':
+        environ: WSGIEnvironment,
+        start_response: StartResponse
+    ) -> Iterable[bytes]:
 
         received = perf_counter()
         received_status: str = ''
@@ -325,8 +326,8 @@ class WSGIRequestMonitorMiddleware:
         def local_start_response(
             status: str,
             headers: list[tuple[str, str]],
-            exc_info: 'OptExcInfo | None' = None
-        ) -> 'Callable[[bytes], object]':
+            exc_info: OptExcInfo | None = None
+        ) -> Callable[[bytes], object]:
 
             nonlocal received_status
             received_status = status
@@ -339,7 +340,7 @@ class WSGIRequestMonitorMiddleware:
 
     def log(
         self,
-        environ: 'WSGIEnvironment',
+        environ: WSGIEnvironment,
         status: str,
         received: float
     ) -> None:
@@ -350,7 +351,7 @@ class WSGIRequestMonitorMiddleware:
         method = environ['REQUEST_METHOD']
 
         template = (
-            "{status} - {duration} - {method} {path} - {c:.3f} MiB ({d:+.3f})"
+            '{status} - {duration} - {method} {path} - {c:.3f} MiB ({d:+.3f})'
         )
 
         if status in ('302', '304'):
@@ -373,7 +374,7 @@ class WSGIRequestMonitorMiddleware:
         usage = RESOURCE_TRACKER.memory_usage
         delta = RESOURCE_TRACKER.memory_usage_delta
 
-        print(template.format(
+        click.echo(template.format(
             status=status,
             method=method,
             path=path,
@@ -389,11 +390,11 @@ class WsgiProcess(multiprocessing.Process):
 
     """
 
-    _ready: 'Synchronized[int]'
+    _ready: Synchronized[int]
 
     def __init__(
         self,
-        app_factory: 'Callable[[], WSGIApplication]',
+        app_factory: Callable[[], WSGIApplication],
         host: str = '127.0.0.1',
         port: int = 8080,
         env: dict[str, str] | None = None,
@@ -424,17 +425,17 @@ class WsgiProcess(multiprocessing.Process):
     def print_memory_stats(
         self,
         signum: int,
-        frame: 'FrameType | None'
+        frame: FrameType | None
     ) -> None:
 
-        print("-" * shutil.get_terminal_size((80, 20)).columns)
+        click.echo('-' * shutil.get_terminal_size((80, 20)).columns)
 
         RESOURCE_TRACKER.show_memory_usage()
 
         if tracemalloc.is_tracing():
             RESOURCE_TRACKER.show_monotonically_increasing_traces()
 
-        print("-" * shutil.get_terminal_size((80, 20)).columns)
+        click.echo('-' * shutil.get_terminal_size((80, 20)).columns)
 
     def disable_systemwide_darwin_proxies(self):  # type:ignore
         # System-wide proxy settings on darwin need to be disabled, because
@@ -442,8 +443,8 @@ class WsgiProcess(multiprocessing.Process):
         # https://bugs.python.org/issue27126
         # https://bugs.python.org/issue13829
         import urllib.request
-        urllib.request.proxy_bypass_macosx_sysconf = lambda host: None
-        urllib.request.getproxies_macosx_sysconf = lambda: {}
+        urllib.request.proxy_bypass_macosx_sysconf = lambda host: None  # type:ignore[attr-defined]
+        urllib.request.getproxies_macosx_sysconf = dict  # type:ignore[attr-defined]
 
     def run(self) -> None:
         # use the parent's process stdin to be able to provide pdb correctly
@@ -459,7 +460,7 @@ class WsgiProcess(multiprocessing.Process):
 
         # reset the tty every time, fixing problems that might occur if
         # the process is restarted during a pdb session
-        os.system('stty sane')
+        os.system('stty sane')  # nosec
 
         try:
             if sys.platform == 'darwin':
@@ -473,7 +474,7 @@ class WsgiProcess(multiprocessing.Process):
             bjoern.listen(wsgi_application, self.host, self.port)
         except Exception:
             # if there's an error, print it
-            print(traceback.format_exc())
+            click.echo(traceback.format_exc())
 
             # and just never start the server (but don't stop the
             # process either). this makes this work:
@@ -484,7 +485,7 @@ class WsgiProcess(multiprocessing.Process):
 
         self._ready.value = 1
 
-        print(f"started onegov server on http://{self.host}:{self.port}")
+        click.echo(f'started onegov server on http://{self.host}:{self.port}')
         bjoern.run()
 
 
@@ -496,7 +497,7 @@ class WsgiServer(FileSystemEventHandler):
 
     def __init__(
         self,
-        app_factory: 'Callable[[], WSGIApplication]',
+        app_factory: Callable[[], WSGIApplication],
         host: str = '127.0.0.1',
         port: int = 8080,
         **kwargs: Any
@@ -533,13 +534,14 @@ class WsgiServer(FileSystemEventHandler):
         if block:
             self.join()
 
-    def on_any_event(self, event: 'FileSystemEvent') -> None:
+    def on_any_event(self, event: FileSystemEvent) -> None:
         """ If anything of significance changed, restart the process. """
 
-        if getattr(event, 'event_type', None) == 'opened':
+        if getattr(event, 'event_type', None) in ('opened', 'closed_no_write'):
             return
 
         src_path = event.src_path
+        assert isinstance(src_path, str)
 
         if 'tests/' in src_path:
             return
@@ -557,6 +559,9 @@ class WsgiServer(FileSystemEventHandler):
             return
 
         if src_path.endswith('.rdb'):
+            return
+
+        if src_path.endswith('.md'):
             return
 
         if '/.testmondata' in src_path:
@@ -595,6 +600,9 @@ class WsgiServer(FileSystemEventHandler):
         if src_path.endswith('~'):
             return
 
-        print(f'changed: {src_path}')
+        if '.tmp.' in src_path:
+            return
+
+        click.echo(f'changed: {src_path}')
 
         self.restart()

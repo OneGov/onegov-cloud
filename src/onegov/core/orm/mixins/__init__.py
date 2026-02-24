@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm.mixins.content import content_property
 from onegov.core.orm.mixins.content import ContentMixin
 from onegov.core.orm.mixins.content import data_property

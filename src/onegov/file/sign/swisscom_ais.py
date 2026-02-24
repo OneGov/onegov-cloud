@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import io
 import os
 
@@ -35,8 +37,8 @@ class SwisscomAIS(SigningService, service_name='swisscom_ais'):
 
     def sign(
         self,
-        infile: 'SupportsRead[bytes]',
-        outfile: 'SupportsWrite[bytes]'
+        infile: SupportsRead[bytes],
+        outfile: SupportsWrite[bytes]
     ) -> str:
 
         if hasattr(infile, 'seek'):

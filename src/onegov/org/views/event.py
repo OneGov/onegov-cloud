@@ -1,4 +1,6 @@
 """ The onegov org collection of images uploaded to the site. """
+from __future__ import annotations
+
 import morepath
 
 from morepath.request import Response
@@ -11,14 +13,16 @@ from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import EventForm
-from onegov.org.layout import EventLayout
+from onegov.org.layout import EventLayout, TicketLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, EventMessage
 from onegov.org.models.extensions import AccessExtension
+from onegov.org.models.ticket import EventSubmissionTicket
+from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import utcnow
-from uuid import uuid4
+from uuid import UUID, uuid4
 from webob import exc
 
 
@@ -33,7 +37,7 @@ if TYPE_CHECKING:
     FormT = TypeVar('FormT', bound=Form)
 
 
-def get_session_id(request: 'OrgRequest') -> str:
+def get_session_id(request: OrgRequest) -> str:
     if not request.browser_session.has('event_session_id'):
         request.browser_session.event_session_id = uuid4()
 
@@ -41,8 +45,9 @@ def get_session_id(request: 'OrgRequest') -> str:
 
 
 def assert_anonymous_access_only_temporary(
-    request: 'OrgRequest',
-    event: Event
+    request: OrgRequest,
+    event: Event,
+    view_ticket: EventSubmissionTicket | None = None
 ) -> None:
     """ Raises exceptions if the current user is anonymous and no longer
     should be given access to the event.
@@ -53,6 +58,9 @@ def assert_anonymous_access_only_temporary(
 
     """
     if request.is_manager:
+        return
+
+    if view_ticket is not None and request.is_supporter:
         return
 
     if event.state not in ('initiated', 'submitted'):
@@ -77,7 +85,7 @@ def assert_anonymous_access_only_temporary(
 @overload
 def event_form(
     model: object,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: None = None
 ) -> type[EventForm]: ...
 
@@ -85,16 +93,16 @@ def event_form(
 @overload
 def event_form(
     model: object,
-    request: 'OrgRequest',
-    form: type['FormT']
-) -> type['FormT']: ...
+    request: OrgRequest,
+    form: type[FormT]
+) -> type[FormT]: ...
 
 
 def event_form(
     model: object,
-    request: 'OrgRequest',
-    form: type['Form'] | None = None
-) -> type['Form']:
+    request: OrgRequest,
+    form: type[Form] | None = None
+) -> type[Form]:
 
     if form is None:
         form = EventForm
@@ -130,8 +138,9 @@ def event_form(
 )
 def publish_event(
     self: Event,
-    request: 'OrgRequest'
-) -> 'RenderData | BaseResponse':
+    request: OrgRequest,
+    view_ticket: EventSubmissionTicket | None = None
+) -> RenderData | BaseResponse:
     """ Publish an event. """
 
     if self.state == 'initiated':
@@ -151,6 +160,9 @@ def publish_event(
     self.publish()
 
     ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
+    if view_ticket is not None and view_ticket != ticket:
+        # if we access this through the ticket it had better match
+        raise exc.HTTPNotFound()
 
     if not ticket:
         request.success(_("Successfully created the event '${title}'",
@@ -159,7 +171,7 @@ def publish_event(
             OccurrenceCollection(request.session)
         ))
 
-    request.success(_("You have accepted the event ${title}", mapping={
+    request.success(_('You have accepted the event ${title}', mapping={
         'title': self.title
     }))
 
@@ -168,7 +180,7 @@ def publish_event(
         send_ticket_mail(
             request=request,
             template='mail_event_accepted.pt',
-            subject=_("Your event was accepted"),
+            subject=_('Your event was accepted'),
             receivers=(self.meta['submitter_email'], ),
             ticket=ticket,
             content={
@@ -179,7 +191,31 @@ def publish_event(
 
     EventMessage.create(self, ticket, request, 'published')
 
+    if view_ticket is not None:
+        return request.redirect(request.link(view_ticket))
+
     return request.redirect(request.link(self))
+
+
+@OrgApp.view(
+    model=EventSubmissionTicket,
+    name='publish-event',
+    permission=Private
+)
+def publish_event_from_ticket(
+    self: EventSubmissionTicket,
+    request: OrgRequest
+) -> RenderData | BaseResponse:
+
+    event = self.handler.event
+    if event is None or event.state != 'submitted':
+        raise exc.HTTPNotFound()
+
+    return publish_event(
+        event,
+        request,
+        view_ticket=self
+    )
 
 
 @OrgApp.form(
@@ -191,10 +227,10 @@ def publish_event(
 )
 def handle_new_event(
     self: OccurrenceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: EventForm,
     layout: EventLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Add a new event.
 
     The event is created and the user is redirected to a view where he can
@@ -202,7 +238,7 @@ def handle_new_event(
 
     """
 
-    self.title = title = _("Submit an event")  # type:ignore[attr-defined]
+    self.title = title = _('Submit an event')  # type:ignore[attr-defined]
 
     terms: str = _(
         "Only events taking place inside the town or events related to "
@@ -259,18 +295,18 @@ def handle_new_event(
 )
 def handle_new_event_without_workflow(
     self: OccurrenceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: EventForm,
     layout: EventLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Create and submit a new event.
 
-        The event is created and ticket workflow is skipped by setting
-        the state to 'submitted'.
+    The event is created and ticket workflow is skipped by setting
+    the state to 'submitted'.
 
     """
 
-    self.title = title = _("Add event")  # type:ignore[attr-defined]
+    self.title = title = _('Add event')  # type:ignore[attr-defined]
 
     if form.submitted(request):
         assert form.title.data is not None
@@ -286,7 +322,13 @@ def handle_new_event_without_workflow(
         })
         event.state = 'submitted'
         form.populate_obj(event)
-        return morepath.redirect((request.link(event, 'publish')))
+        return morepath.redirect(request.link(event, 'publish'))
+    else:
+        event_id = request.params.get('event_id')
+        if event_id and isinstance(event_id, str):
+            event_obj = EventCollection(self.session).by_id(UUID(event_id))
+            if event_obj:
+                form.process(obj=event_obj)
 
     # FIXME: same hack as in above view, add a proper layout
     layout = layout or EventLayout(self, request)  # type:ignore
@@ -319,9 +361,9 @@ def handle_new_event_without_workflow(
 )
 def view_event(
     self: Event,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: EventLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ View an event.
 
     If the event is not already submitted, the submit form is displayed.
@@ -343,22 +385,22 @@ def view_event(
                     ticket = TicketCollection(session).open_ticket(
                         handler_code='EVN', handler_id=self.id.hex
                     )
-                    TicketMessage.create(ticket, request, 'opened')
+                    TicketMessage.create(ticket, request, 'opened', 'external')
 
                 send_ticket_mail(
                     request=request,
                     template='mail_ticket_opened.pt',
-                    subject=_("Your request has been registered"),
+                    subject=_('Your request has been registered'),
                     receivers=(self.meta['submitter_email'],),
                     ticket=ticket,
                 )
-                if request.email_for_new_tickets:
+                for email in emails_for_new_ticket(request, ticket):
                     send_ticket_mail(
                         request=request,
                         template='mail_ticket_opened_info.pt',
-                        subject=_("New ticket"),
+                        subject=_('New ticket'),
                         ticket=ticket,
-                        receivers=(request.email_for_new_tickets, ),
+                        receivers=(email, ),
                         content={
                             'model': ticket
                         }
@@ -370,7 +412,8 @@ def view_event(
                         'event': 'browser-notification',
                         'title': request.translate(_('New ticket')),
                         'created': ticket.created.isoformat()
-                    }
+                    },
+                    groupids=request.app.groupids_for_ticket(ticket),
                 )
 
                 if request.auto_accept(ticket):
@@ -379,12 +422,12 @@ def view_event(
                         ticket.accept_ticket(request.auto_accept_user)
                         request.view(self, name='publish')
                     except Exception:
-                        request.warning(_("Your request could not be "
-                                          "accepted automatically!"))
+                        request.warning(_('Your request could not be '
+                                          'accepted automatically!'))
                     else:
                         close_ticket(ticket, request.auto_accept_user, request)
 
-        request.success(_("Thank you for your submission!"))
+        request.success(_('Thank you for your submission!'))
 
         return morepath.redirect(request.link(ticket, 'status'))
 
@@ -409,10 +452,11 @@ def view_event(
 )
 def handle_edit_event(
     self: Event,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: EventForm,
-    layout: EventLayout | None = None
-) -> 'RenderData | BaseResponse':
+    layout: EventLayout | TicketLayout | None = None,
+    view_ticket: EventSubmissionTicket | None = None,
+) -> RenderData | BaseResponse:
     """ Edit an event.
 
     An anonymous user might edit an initiated event, a logged in user can also
@@ -426,15 +470,21 @@ def handle_edit_event(
         form.populate_obj(self)
 
         ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
+        if view_ticket is not None and view_ticket != ticket:
+            # if we're accessing through the ticket it had better be the same
+            raise exc.HTTPNotFound()
+
         if ticket:
             EventMessage.create(self, ticket, request, 'changed')
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
+        if view_ticket is not None:
+            return request.redirect(request.link(view_ticket))
         return request.redirect(request.link(self))
 
     form.process(obj=self)
 
     layout = layout or EventLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
     layout.edit_mode = True
 
@@ -446,18 +496,50 @@ def handle_edit_event(
     }
 
 
+@OrgApp.form(
+    model=EventSubmissionTicket,
+    name='edit-event',
+    template='form.pt',
+    permission=Public,
+    form=event_form
+)
+def handle_edit_event_from_ticket(
+    self: EventSubmissionTicket,
+    request: OrgRequest,
+    form: EventForm,
+    layout: TicketLayout | None = None
+) -> RenderData | BaseResponse:
+
+    event = self.handler.event
+    if event is None:
+        raise exc.HTTPNotFound()
+
+    if layout is None:
+        layout = TicketLayout(self, request)
+
+    layout.breadcrumbs[-1].attrs['href'] = request.link(self)
+
+    return handle_edit_event(
+        event,
+        request,
+        form,
+        layout,
+        view_ticket=self,
+    )
+
+
 @OrgApp.view(
     model=Event,
     name='withdraw',
     request_method='POST',
     permission=Private
 )
-def handle_withdraw_event(self: Event, request: 'OrgRequest') -> None:
+def handle_withdraw_event(self: Event, request: OrgRequest) -> None:
     """ Withdraws an (imported) event. """
 
     request.assert_valid_csrf_token()
 
-    if not self.source:
+    if not self.source or self.state not in ('published', 'submitted'):
         raise exc.HTTPForbidden()
 
     self.withdraw()
@@ -468,11 +550,29 @@ def handle_withdraw_event(self: Event, request: 'OrgRequest') -> None:
 
 
 @OrgApp.view(
+    model=EventSubmissionTicket,
+    name='withdraw-event',
+    request_method='POST',
+    permission=Private
+)
+def handle_withdraw_event_from_ticket(
+    self: EventSubmissionTicket,
+    request: OrgRequest
+) -> None:
+
+    event = self.handler.event
+    if event is None:
+        raise exc.HTTPNotFound()
+
+    handle_withdraw_event(event, request)
+
+
+@OrgApp.view(
     model=Event,
     request_method='DELETE',
     permission=Private
 )
-def handle_delete_event(self: Event, request: 'OrgRequest') -> None:
+def handle_delete_event(self: Event, request: OrgRequest) -> None:
     """ Delete an event. """
 
     request.assert_valid_csrf_token()
@@ -487,7 +587,7 @@ def handle_delete_event(self: Event, request: 'OrgRequest') -> None:
         send_ticket_mail(
             request=request,
             template='mail_event_rejected.pt',
-            subject=_("Your event was rejected"),
+            subject=_('Your event was rejected'),
             receivers=(self.meta['submitter_email'], ),
             ticket=ticket,
             content={
@@ -502,11 +602,29 @@ def handle_delete_event(self: Event, request: 'OrgRequest') -> None:
 
 
 @OrgApp.view(
+    model=EventSubmissionTicket,
+    name='delete-event',
+    request_method='DELETE',
+    permission=Private
+)
+def handle_delete_event_from_ticket(
+    self: EventSubmissionTicket,
+    request: OrgRequest
+) -> None:
+
+    event = self.handler.event
+    if event is None or event.source:
+        raise exc.HTTPNotFound()
+
+    handle_delete_event(event, request)
+
+
+@OrgApp.view(
     model=Event,
     name='ical',
     permission=Public
 )
-def ical_export_event(self: Event, request: 'OrgRequest') -> Response:
+def ical_export_event(self: Event, request: OrgRequest) -> Response:
     """ Returns the event with all occurrences as ics. """
 
     try:
@@ -526,12 +644,16 @@ def ical_export_event(self: Event, request: 'OrgRequest') -> Response:
     name='latest',
     permission=Public
 )
-def view_latest_event(self: Event, request: 'OrgRequest') -> 'BaseResponse':
+def view_latest_event(self: Event, request: OrgRequest) -> BaseResponse:
     """ Redirects to the latest occurrence of an event that is, either the
     next future event or the last event in the past if there are no more
     future events.
 
     """
+
+    if not self.occurrences:
+        # redirect to the event instead
+        return morepath.redirect(request.link(self))
 
     now = utcnow()
 

@@ -1,18 +1,17 @@
-from datetime import timedelta
-from uuid import uuid4
+from __future__ import annotations
+
+from datetime import datetime, timedelta
+from uuid import uuid4, UUID
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import UUID
-from onegov.core.orm.types import UTCDateTime
-from sqlalchemy import Column, Index, Text
+from sqlalchemy import Index
 from sqlalchemy.ext.hybrid import hybrid_method
+from sqlalchemy.orm import mapped_column, Mapped
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from datetime import datetime
     from sqlalchemy.sql import ColumnElement
 
 
@@ -34,20 +33,15 @@ class TAN(Base, TimestampMixin, ContentMixin):
         Index('ix_tans_created', 'created'),
     )
 
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type: ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
-    hashed_tan: 'Column[str]' = Column(
-        Text,
-        index=True,
-        nullable=False
-    )
-    scope: 'Column[str]' = Column(Text, index=True, nullable=False)
-    client: 'Column[str]' = Column(Text, nullable=False)
-    expired: 'Column[datetime | None]' = Column(UTCDateTime, index=True)
+    hashed_tan: Mapped[str] = mapped_column(index=True)
+    scope: Mapped[str] = mapped_column(index=True)
+    client: Mapped[str]
+    expired: Mapped[datetime | None] = mapped_column(index=True)
 
     @hybrid_method
     def is_active(
@@ -68,7 +62,7 @@ class TAN(Base, TimestampMixin, ContentMixin):
     def is_active(
         cls,
         expires_after: timedelta | None = DEFAULT_EXPIRES_AFTER
-    ) -> 'ColumnElement[bool]':
+    ) -> ColumnElement[bool]:
 
         now = cls.timestamp()
         expr = (cls.expired > now) | cls.expired.is_(None)

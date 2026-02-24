@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
@@ -27,8 +29,8 @@ if TYPE_CHECKING:
 )
 def view_hidden_agencies(
     self: Organisation,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     session = request.session
 
@@ -66,10 +68,10 @@ def view_hidden_agencies(
 
     layout = DefaultLayout(self, request)
     assert isinstance(layout.breadcrumbs, list)
-    layout.breadcrumbs.append(Link(_("Hidden contents"), '#'))
+    layout.breadcrumbs.append(Link(_('Hidden contents'), '#'))
 
     return {
-        'title': _("Hidden contents"),
+        'title': _('Hidden contents'),
         'agencies': agencies.all(),
         'memberships': memberships.all(),
         'people': people.all(),

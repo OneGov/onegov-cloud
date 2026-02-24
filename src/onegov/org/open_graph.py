@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from onegov.file import File
@@ -15,6 +17,7 @@ class OpenGraphMixin:
     if TYPE_CHECKING:
         model: Any
         request: OrgRequest
+
         @property
         def org(self) -> Organisation: ...
 
@@ -98,7 +101,7 @@ class OpenGraphMixin:
         return self.request.locale
 
     @property
-    def og_locale_alternate(self) -> 'Iterator[str]':
+    def og_locale_alternate(self) -> Iterator[str]:
         return (
             locale
             for locale in self.request.app.settings.i18n.locales

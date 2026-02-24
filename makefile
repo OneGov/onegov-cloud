@@ -1,6 +1,14 @@
 install: ensure_uv
-	# install requirements
-	uv pip install -e '.[test,lint,dev,docs,mypy]' --config-settings editable_mode=compat
+	# install all dependencies
+	uv pip compile setup.cfg --all-extras | uv pip install -r /dev/stdin
+
+	# install source in editable mode
+	uv pip install -e . --config-settings editable_mode=compat
+
+	# TEMPORARY: Uninstall types-urllib3. Some dependency seems to currently
+	#            want to install this even though we depend on v2, which does
+	#            not need type hints, so the stubs mess things up
+	uv pip uninstall types-urllib3
 
 	# enable pre-commit
 	pre-commit install
@@ -11,6 +19,27 @@ install: ensure_uv
 	# gather eggs
 	rm -rf ./eggs
 	scrambler --target eggs
+
+lint: ensure_uv
+	# Run linters in parallel with proper cleanup on exit/interrupt
+	@set -e; \
+	cleanup() { \
+		pkill -P $$ 2>/dev/null || true; \
+		kill $$(jobs -p) 2>/dev/null || true; \
+		pkill -f "mypy\|ruff\|bandit\|flake8" 2>/dev/null || true; \
+		exit 130; \
+	}; \
+	trap cleanup INT TERM; \
+	bash ./mypy.sh & \
+	ruff check src/ tests/ stubs/ & \
+	bandit \
+		--quiet \
+		--recursive \
+		--configfile pyproject.toml \
+		src/ 2> /dev/null & \
+	flake8 \
+		src/ & \
+	wait
 
 update: ensure_uv
 	# update all dependencies

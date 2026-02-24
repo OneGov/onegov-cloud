@@ -1,20 +1,23 @@
+from __future__ import annotations
+
 from onegov.core.security import Private, Public
 from onegov.town6 import TownApp
 from morepath import redirect
 
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
-from onegov.town6.forms.chat import ChatInitiationForm, ChatActionsForm
 from onegov.core.templates import render_template
-from onegov.town6.layout import StaffChatLayout, ClientChatLayout
-from onegov.town6.layout import DefaultLayout, ArchivedChatsLayout
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
-from webob.exc import HTTPForbidden
-from onegov.town6 import _
 from onegov.org.models import TicketMessage
+from onegov.org.utils import emails_for_new_ticket
 from onegov.ticket import TicketCollection
+from onegov.town6 import _
+from onegov.town6.forms.chat import ChatInitiationForm, ChatActionsForm
+from onegov.town6.layout import StaffChatLayout, ClientChatLayout
+from onegov.town6.layout import DefaultLayout, ArchivedChatsLayout
 from onegov.user import User
+from webob.exc import HTTPForbidden
 
 
 from typing import TYPE_CHECKING
@@ -31,9 +34,9 @@ if TYPE_CHECKING:
     permission=Private)
 def view_chats_staff(
     self: ChatCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ChatActionsForm
-) -> 'RenderData':
+) -> RenderData:
 
     user = request.current_user
     assert user is not None
@@ -54,7 +57,7 @@ def view_chats_staff(
             args: RenderData = {
                 'layout': DefaultMailLayout(object(), request),
                 'title': request.translate(
-                    _("Chat History with ${org}", mapping={
+                    _('Chat History with ${org}', mapping={
                         'org': request.app.org.title
                     })
                 ),
@@ -75,12 +78,12 @@ def view_chats_staff(
                 ticket = TicketCollection(request.session).open_ticket(
                     handler_code='CHT', handler_id=chat.id.hex
                 )
-                TicketMessage.create(ticket, request, 'opened')
+                TicketMessage.create(ticket, request, 'opened', 'external')
 
                 send_ticket_mail(
                     request=request,
                     template='mail_turned_chat_into_ticket.pt',
-                    subject=_("Your Chat has been turned into a ticket"),
+                    subject=_('Your Chat has been turned into a ticket'),
                     receivers=(chat.email, ),
                     ticket=ticket,
                     content={
@@ -89,6 +92,25 @@ def view_chats_staff(
                         'chat': chat,
                         'organisation': request.app.org.title,
                     }
+                )
+                for email in emails_for_new_ticket(request, ticket):
+                    send_ticket_mail(
+                        request=request,
+                        template='mail_ticket_opened_info.pt',
+                        subject=_('New ticket'),
+                        ticket=ticket,
+                        receivers=(email, ),
+                        content={'model': ticket},
+                    )
+
+                request.app.send_websocket(
+                    channel=request.app.websockets_private_channel,
+                    message={
+                        'event': 'browser-notification',
+                        'title': request.translate(_('New ticket')),
+                        'created': ticket.created.isoformat()
+                    },
+                    groupids=request.app.groupids_for_ticket(ticket),
                 )
 
     return {
@@ -108,8 +130,8 @@ def view_chats_staff(
     permission=Private)
 def view_chats_archive(
     self: ChatCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     user = request.current_user
 
@@ -129,9 +151,9 @@ def view_chats_archive(
     form=ChatInitiationForm)
 def view_chat_form(
     self: ChatCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ChatInitiationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not request.app.chat_open(request) and not request.is_manager:
         raise HTTPForbidden()
@@ -162,7 +184,7 @@ def view_chat_form(
     model=Chat,
     template='chat_customer.pt',
     permission=Public)
-def view_customer_chat(self: Chat, request: 'TownRequest') -> 'RenderData':
+def view_customer_chat(self: Chat, request: TownRequest) -> RenderData:
 
     active_chat_id = request.browser_session.get('active_chat_id')
     if not request.is_manager and self.id != active_chat_id:
@@ -181,7 +203,7 @@ def view_customer_chat(self: Chat, request: 'TownRequest') -> 'RenderData':
     template='chat_staff.pt',
     name='staff-view',
     permission=Public)
-def view_staff_chat(self: Chat, request: 'TownRequest') -> 'RenderData':
+def view_staff_chat(self: Chat, request: TownRequest) -> RenderData:
 
     active_chat_id = request.browser_session.get('active_chat_id')
     if not request.is_manager and self.id != active_chat_id:

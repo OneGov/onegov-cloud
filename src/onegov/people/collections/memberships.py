@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.collection import GenericCollection
 from onegov.core.orm.abstract import MoveDirection
 from onegov.people.models import AgencyMembership
@@ -25,12 +27,12 @@ class AgencyMembershipCollection(GenericCollection[AgencyMembership]):
     def model_class(self) -> type[AgencyMembership]:
         return AgencyMembership
 
-    def by_id(self, id: 'UUID') -> AgencyMembership | None:  # type:ignore
-        return super(AgencyMembershipCollection, self).query().filter(
+    def by_id(self, id: UUID) -> AgencyMembership | None:  # type:ignore
+        return super().query().filter(
             self.primary_key == id).first()
 
-    def query(self, order_by: str | None = None) -> 'Query[AgencyMembership]':
-        query = super(AgencyMembershipCollection, self).query()
+    def query(self, order_by: str | None = None) -> Query[AgencyMembership]:
+        query = super().query()
         if not order_by:
             return query
         assert hasattr(self.model_class, order_by)
@@ -73,7 +75,7 @@ class AgencyMembershipCollection(GenericCollection[AgencyMembership]):
         else:
             siblings = target.siblings_by_agency.all()
 
-        def new_order() -> 'Iterator[AgencyMembership]':
+        def new_order() -> Iterator[AgencyMembership]:
             for sibling in siblings:
                 if sibling == subject:
                     continue

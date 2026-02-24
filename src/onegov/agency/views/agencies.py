@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from datetime import timedelta
 from morepath import redirect
@@ -25,6 +27,7 @@ from onegov.org.forms.generic import ChangeAdjacencyListUrlForm
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
 from onegov.ticket import TicketCollection
+from sqlalchemy.orm import joinedload
 from uuid import uuid4
 
 
@@ -37,7 +40,7 @@ if TYPE_CHECKING:
 
 def get_agency_form_class(
     model: object,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> type[ExtendedAgencyForm]:
 
     if isinstance(model, ExtendedAgency):
@@ -49,7 +52,7 @@ def get_agency_form_class(
 
 def get_membership_form_class(
     model: object,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> type[MembershipForm]:
 
     if isinstance(model, ExtendedAgencyMembership):
@@ -66,8 +69,8 @@ def get_membership_form_class(
 )
 def view_agencies(
     self: ExtendedAgencyCollection,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     pdf_link = None
     root_pdf_modified = request.app.root_pdf_modified
@@ -77,7 +80,7 @@ def view_agencies(
     layout = AgencyCollectionLayout(self, request)
 
     return {
-        'title': _("Agencies"),
+        'title': _('Agencies'),
         'agencies': self.roots,
         'pdf_link': pdf_link,
         'layout': layout
@@ -92,13 +95,13 @@ def view_agencies(
 )
 def view_agencies_sort(
     self: ExtendedAgencyCollection,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     layout = AgencyCollectionLayout(self, request)
 
     return {
-        'title': _("Sort"),
+        'title': _('Sort'),
         'layout': layout,
         'items': (
             (
@@ -117,12 +120,16 @@ def view_agencies_sort(
 )
 def view_agency(
     self: ExtendedAgency,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     return {
         'title': self.title,
         'agency': self,
+        # NOTE: Avoid N+1 query for rendering the person's name
+        'memberships': self.memberships.options(
+            joinedload(ExtendedAgencyMembership.person)
+        ).all(),
         'layout': AgencyLayout(self, request),
         'coordinates': self.coordinates
     }
@@ -136,12 +143,12 @@ def view_agency(
 )
 def view_agency_sort(
     self: ExtendedAgency,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     layout = AgencyLayout(self, request)
     return {
-        'title': _("Sort"),
+        'title': _('Sort'),
         'layout': layout,
         'items': (
             (
@@ -171,12 +178,12 @@ def view_agency_sort(
 )
 def view_agency_as_nav_item(
     self: ExtendedAgency,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> str:
     layout = AgencyCollectionLayout(self, request)
 
     @request.after
-    def push_history_state(response: 'BaseResponse') -> None:
+    def push_history_state(response: BaseResponse) -> None:
         response.headers.add(
             'X-IC-PushURL',
             request.class_link(
@@ -202,22 +209,22 @@ def view_agency_as_nav_item(
 )
 def add_root_agency(
     self: ExtendedAgencyCollection,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: ExtendedAgencyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         agency = self.add_root(**form.get_useful_data())
-        request.success(_("Added a new agency"))
+        request.success(_('Added a new agency'))
         return redirect(request.link(agency))
 
     layout = AgencyCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _("New agency"),
+        'title': _('New agency'),
         'form': form
     }
 
@@ -231,23 +238,23 @@ def add_root_agency(
 )
 def add_agency(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: ExtendedAgencyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         collection = ExtendedAgencyCollection(request.session)
         agency = collection.add(self, **form.get_useful_data())
-        request.success(_("Added a new agency"))
+        request.success(_('Added a new agency'))
         return redirect(request.link(agency))
 
     layout = AgencyLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _("New agency"),
+        'title': _('New agency'),
         'form': form
     }
 
@@ -261,22 +268,22 @@ def add_agency(
 )
 def add_membership(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: MembershipForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         self.add_person(**form.get_useful_data())
-        request.success(_("Added a new membership"))
+        request.success(_('Added a new membership'))
         return redirect(request.link(self))
 
     layout = AgencyLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New membership"), '#'))
+    layout.breadcrumbs.append(Link(_('New membership'), '#'))
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New membership"),
+        'title': _('New membership'),
         'form': form
     }
 
@@ -287,7 +294,7 @@ def add_membership(
     request_method='POST',
     permission=Private,
 )
-def sort_relationships(self: ExtendedAgency, request: 'AgencyRequest') -> None:
+def sort_relationships(self: ExtendedAgency, request: AgencyRequest) -> None:
     request.assert_valid_csrf_token()
     self.sort_relationships()
 
@@ -298,7 +305,7 @@ def sort_relationships(self: ExtendedAgency, request: 'AgencyRequest') -> None:
     request_method='POST',
     permission=Private,
 )
-def sort_children(self: ExtendedAgency, request: 'AgencyRequest') -> None:
+def sort_children(self: ExtendedAgency, request: AgencyRequest) -> None:
     request.assert_valid_csrf_token()
     self.sort_children()
 
@@ -312,13 +319,13 @@ def sort_children(self: ExtendedAgency, request: 'AgencyRequest') -> None:
 )
 def edit_agency(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: ExtendedAgencyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         form.update_model(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         if 'return-to' in request.GET:
             return request.redirect(request.url)
         return redirect(request.link(self))
@@ -327,7 +334,7 @@ def edit_agency(
         form.apply_model(self)
 
     layout = AgencyLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.include_editor()
     layout.edit_mode = True
 
@@ -348,19 +355,19 @@ def edit_agency(
 )
 def change_agency_url(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: ChangeAdjacencyListUrlForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     layout = AgencyLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Change URL"), '#'))
+    layout.breadcrumbs.append(Link(_('Change URL'), '#'))
 
     form.delete_field('test')
 
     if form.submitted(request):
         assert form.name.data is not None
         self.name = form.name.data
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return redirect(request.link(self))
 
     elif not request.POST:
@@ -386,26 +393,26 @@ def change_agency_url(
 )
 def move_agency(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: MoveAgencyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         form.update_model(self)
-        request.success(_("Agency moved"))
+        request.success(_('Agency moved'))
         return redirect(request.link(self.proxy()))
 
     form.apply_model(self)
 
     layout = AgencyLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Move"), '#'))
+    layout.breadcrumbs.append(Link(_('Move'), '#'))
 
     return {
         'layout': layout,
         'title': self.title,
         'helptext': _(
-            "Moves the whole agency and all its people and suborganizations "
-            "to the given destination."
+            'Moves the whole agency and all its people and suborganizations '
+            'to the given destination.'
         ),
         'form': form
     }
@@ -418,7 +425,7 @@ def move_agency(
 )
 def get_root_pdf(
     self: ExtendedAgencyCollection,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> Response:
 
     last_modified = request.app.root_pdf_modified
@@ -426,7 +433,7 @@ def get_root_pdf(
         return Response(status='503 Service Unavailable')
 
     @request.after
-    def cache_headers(response: 'BaseResponse') -> None:
+    def cache_headers(response: BaseResponse) -> None:
         max_age = 1 * 24 * 60 * 60
         expires = datetime.now() + timedelta(seconds=max_age)
         fmt = '%a, %d %b %Y %H:%M:%S GMT'
@@ -454,9 +461,9 @@ def get_root_pdf(
 )
 def create_root_pdf(
     self: ExtendedAgencyCollection,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: Form
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     org = request.app.org
     page_break_level = int(org.meta.get(
@@ -473,18 +480,18 @@ def create_root_pdf(
             link_color=org.meta.get('pdf_link_color'),
             underline_links=org.meta.get('pdf_underline_links', False)
         ).getvalue()
-        request.success(_("PDF created"))
+        request.success(_('PDF created'))
         return redirect(request.link(self))
 
     layout = AgencyCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Create PDF"), '#'))
+    layout.breadcrumbs.append(Link(_('Create PDF'), '#'))
 
     return {
         'layout': layout,
-        'title': _("Create PDF"),
+        'title': _('Create PDF'),
         'helptext': _(
-            "Create a PDF of this agency and all its suborganizations. "
-            "This may take a while."
+            'Create a PDF of this agency and all its suborganizations. '
+            'This may take a while.'
         ),
         'form': form
     }
@@ -499,16 +506,15 @@ def create_root_pdf(
 )
 def create_agency_pdf(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: Form
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     org = request.app.org
     page_break_level = int(org.meta.get(
         'page_break_on_level_org_pdf', 1))
     if form.submitted(request):
-        # FIXME: asymmetric property
-        self.pdf_file = request.app.pdf_class.from_agencies(  # type:ignore
+        self.pdf_file = request.app.pdf_class.from_agencies(
             agencies=[self],
             title=self.title,
             toc=False,
@@ -517,18 +523,18 @@ def create_agency_pdf(
             link_color=org.meta.get('pdf_link_color'),
             underline_links=org.meta.get('pdf_underline_links', False)
         )
-        request.success(_("PDF created"))
+        request.success(_('PDF created'))
         return redirect(request.link(self))
 
     layout = AgencyLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Create PDF"), '#'))
+    layout.breadcrumbs.append(Link(_('Create PDF'), '#'))
 
     return {
         'layout': layout,
-        'title': _("Create PDF"),
+        'title': _('Create PDF'),
         'helptext': _(
-            "Create a PDF of this agency and all its suborganizations. "
-            "This may take a while."
+            'Create a PDF of this agency and all its suborganizations. '
+            'This may take a while.'
         ),
         'form': form
     }
@@ -539,7 +545,7 @@ def create_agency_pdf(
     request_method='DELETE',
     permission=Private
 )
-def delete_agency(self: ExtendedAgency, request: 'AgencyRequest') -> None:
+def delete_agency(self: ExtendedAgency, request: AgencyRequest) -> None:
     if not self.deletable(request):
         request.alert(
             _("Agency with memberships or suborganizations can't be deleted")
@@ -554,7 +560,7 @@ def delete_agency(self: ExtendedAgency, request: 'AgencyRequest') -> None:
     permission=Private,
     request_method='PUT'
 )
-def execute_agency_move(self: AgencyMove, request: 'AgencyRequest') -> None:
+def execute_agency_move(self: AgencyMove, request: AgencyRequest) -> None:
     request.assert_valid_csrf_token()
     self.execute()
 
@@ -568,9 +574,9 @@ def execute_agency_move(self: AgencyMove, request: 'AgencyRequest') -> None:
 )
 def report_agency_change(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: AgencyMutationForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         assert form.submitter_email.data is not None
@@ -586,13 +592,13 @@ def report_agency_change(
                     'proposed_changes': form.proposed_changes
                 }
             )
-            TicketMessage.create(ticket, request, 'opened')
+            TicketMessage.create(ticket, request, 'opened', 'external')
             ticket.create_snapshot(request)
 
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened.pt',
-            subject=_("Your ticket has been opened"),
+            subject=_('Your ticket has been opened'),
             receivers=(form.submitter_email.data, ),
             ticket=ticket
         )
@@ -601,7 +607,7 @@ def report_agency_change(
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened_info.pt',
-                subject=_("New ticket"),
+                subject=_('New ticket'),
                 ticket=ticket,
                 receivers=(email, ),
                 content={
@@ -616,17 +622,21 @@ def report_agency_change(
                 'title': request.translate(_('New ticket')),
                 'created': ticket.created.isoformat()
             }
+            # FIXME: set groupids to all groups which are linked
+            #        to this agency or the first parent agency with
+            #        links to one or more groups, to mirror email
+            #        notifications.
         )
 
-        request.success(_("Thank you for your submission!"))
+        request.success(_('Thank you for your submission!'))
         return redirect(request.link(ticket, 'status'))
 
     layout = AgencyLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Report change"), '#'))
+    layout.breadcrumbs.append(Link(_('Report change'), '#'))
 
     return {
         'layout': layout,
-        'title': _("Report change"),
+        'title': _('Report change'),
         'lead': self.title,
         'form': form
     }

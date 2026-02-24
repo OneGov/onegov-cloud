@@ -1,6 +1,13 @@
-from tests.shared.utils import create_app
+from __future__ import annotations
+
 from onegov.agency.app import AgencyApp
 from onegov.agency.initial_content import create_new_organisation
+from tests.shared.utils import create_app
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import pytest
 
 
 homepage_structure = """<row>
@@ -21,7 +28,7 @@ homepage_structure = """<row>
 </row>"""
 
 
-def test_initial_content(request):
+def test_initial_content(request: pytest.FixtureRequest) -> None:
     app = create_app(
         AgencyApp,
         request,
@@ -36,8 +43,9 @@ def test_initial_content(request):
 
     assert org.locales == 'de_CH'
     assert org.name == "Test"
-    assert ''.join([
+    assert org.homepage_structure is not None
+    assert '\n'.join(
         line.strip() for line in org.homepage_structure.splitlines()
-    ]) == ''.join([
+    ) == '\n'.join(
         line.strip() for line in homepage_structure.splitlines()
-    ])
+    )

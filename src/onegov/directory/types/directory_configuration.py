@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import yaml
 
@@ -15,10 +17,9 @@ from urllib.parse import quote_plus
 
 from typing import overload, Any, Literal, NoReturn, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Callable, Mapping
     from sqlalchemy.engine import Dialect
-    from typing import TypeVar
-    from typing_extensions import Self
+    from typing import Self, TypeVar
 
     _Base = TypeDecorator['DirectoryConfiguration']
     _MutableT = TypeVar('_MutableT', bound=Mutable)
@@ -26,7 +27,7 @@ else:
     _Base = TypeDecorator
 
 # XXX i18n
-SAFE_FORMAT_TRANSLATORS = {
+SAFE_FORMAT_TRANSLATORS: dict[type[object], Callable[[Any], str]] = {
     date: lambda d: d.strftime('%d.%m.%Y'),
     datetime: lambda d: d.strftime('%d.%m.%Y %H:%M'),
     time: lambda t: t.strftime('%H:%M')
@@ -46,10 +47,10 @@ def pad_numbers_in_chunks(text: str, padding: int = 8) -> str:
         https://nedbatchelder.com/blog/200712/human_sorting.html
 
     """
-    return ''.join((
+    return ''.join(
         part.rjust(padding, '0') if part.isdigit() else part
         for part in number_chunks.split(text)
-    ))
+    )
 
 
 class DirectoryConfigurationStorage(_Base, ScalarCoercible):
@@ -57,13 +58,13 @@ class DirectoryConfigurationStorage(_Base, ScalarCoercible):
     impl = TEXT
 
     @property
-    def python_type(self) -> type['DirectoryConfiguration']:
+    def python_type(self) -> type[DirectoryConfiguration]:
         return DirectoryConfiguration
 
     def process_bind_param(
         self,
-        value: 'DirectoryConfiguration | None',
-        dialect: 'Dialect'
+        value: DirectoryConfiguration | None,
+        dialect: Dialect
     ) -> str | None:
 
         if value is None:
@@ -74,8 +75,8 @@ class DirectoryConfigurationStorage(_Base, ScalarCoercible):
     def process_result_value(
         self,
         value: str | None,
-        dialect: 'Dialect'
-    ) -> 'DirectoryConfiguration | None':
+        dialect: Dialect
+    ) -> DirectoryConfiguration | None:
 
         if value is None:
             return None
@@ -101,11 +102,11 @@ class StoredConfiguration:
         return text.replace('\n- ', '\n  - ')
 
     @classmethod
-    def from_json(cls, text: str) -> 'Self':
+    def from_json(cls, text: str) -> Self:
         return cls(**json.loads(text))
 
     @classmethod
-    def from_yaml(cls, text: str) -> 'Self':
+    def from_yaml(cls, text: str) -> Self:
         return cls(**yaml.safe_load(text))
 
 
@@ -210,8 +211,8 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
     @overload
     @classmethod
     def coerce(  # type:ignore[overload-overlap]
-        cls, key: str, value: '_MutableT'
-    ) -> '_MutableT': ...
+        cls, key: str, value: _MutableT
+    ) -> _MutableT: ...
     @overload
     @classmethod
     def coerce(cls, key: str, value: object) -> NoReturn: ...
@@ -225,7 +226,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
     def join(
         self,
-        data: 'Mapping[str, Any]',
+        data: Mapping[str, Any],
         attribute: str,
         separator: str = '\n'
     ) -> str:
@@ -243,11 +244,11 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             data.get(as_internal_id(key)) for key in getattr(self, attribute)
         ))
 
-    def safe_format(self, fmt: str, data: 'Mapping[str, Any]') -> str:
+    def safe_format(self, fmt: str, data: Mapping[str, Any]) -> str:
         return safe_format(
             fmt, self.for_safe_format(data), adapt=as_internal_id)
 
-    def for_safe_format(self, data: 'Mapping[str, Any]') -> dict[str, Any]:
+    def for_safe_format(self, data: Mapping[str, Any]) -> dict[str, Any]:
         return {
             k: SAFE_FORMAT_TRANSLATORS.get(type(v), str)(v)
             for k, v in data.items()
@@ -257,21 +258,21 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             )
         }
 
-    def extract_name(self, data: 'Mapping[str, Any]') -> str:
+    def extract_name(self, data: Mapping[str, Any]) -> str:
         return normalize_for_url(self.extract_title(data))
 
-    def extract_title(self, data: 'Mapping[str, Any]') -> str:
+    def extract_title(self, data: Mapping[str, Any]) -> str:
         return self.safe_format(self.title, data)
 
-    def extract_lead(self, data: 'Mapping[str, Any]') -> str | None:
+    def extract_lead(self, data: Mapping[str, Any]) -> str | None:
         return self.lead and self.safe_format(self.lead, data)
 
-    def extract_link(self, data: 'Mapping[str, Any]') -> str | None:
+    def extract_link(self, data: Mapping[str, Any]) -> str | None:
         return self.link_pattern and self.safe_format(self.link_pattern, {
             k: quote_plus(v) for k, v in self.for_safe_format(data).items()
         })
 
-    def extract_order(self, data: 'Mapping[str, Any]') -> str:
+    def extract_order(self, data: Mapping[str, Any]) -> str:
         # by default we use the title as order
         attribute = (
             (self.order and 'order')
@@ -282,7 +283,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
         return order
 
-    def extract_searchable(self, data: 'Mapping[str, Any]') -> str:
+    def extract_searchable(self, data: Mapping[str, Any]) -> str:
         # Remove non-searchable fields from data
         assert self.searchable is not None
         data = {as_internal_id(id): data.get(as_internal_id(id))
@@ -290,7 +291,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
         return self.join(data, 'searchable')
 
-    def extract_keywords(self, data: 'Mapping[str, Any]') -> set[str] | None:
+    def extract_keywords(self, data: Mapping[str, Any]) -> set[str] | None:
         if not self.keywords:
             return None
 
@@ -304,7 +305,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
                     value = value.strip()
 
                 if value:
-                    keywords.add(':'.join((key, value)))
+                    keywords.add(f'{key}:{value}')
 
         return keywords
 

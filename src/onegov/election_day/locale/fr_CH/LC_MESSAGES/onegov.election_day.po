@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-08 12:33+0200\n"
+"POT-Creation-Date: 2026-02-20 12:30+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -105,11 +105,19 @@ msgstr "Couleur non valide : ${col}"
 msgid "File not supported"
 msgstr "Format de fichier non pris en charge"
 
+#, python-format
+msgid "Cannot import election information. Year ${year} does not exist."
+msgstr "Impossible d'importer les informations de l'élection. L'année ${year} n'existe pas."
+
 msgid "Domain not supported"
 msgstr "Domaine non pris en charge."
 
 msgid "Changing types is not supported"
 msgstr "Le changement de types n'est pas pris en charge"
+
+#, python-format
+msgid "Cannot import election results. Year ${year} does not exist."
+msgstr "Impossible d'importer les résultats de l'élection. L'année ${year} n'existe pas."
 
 msgid "Election does not exist"
 msgstr "L'élection n'existe pas"
@@ -207,6 +215,10 @@ msgstr "Aucun résultat de parti pour l'année ${year}"
 
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids and id ne sont pas consistente"
+
+#, python-format
+msgid "Cannot import votes. Year ${year} does not exist."
+msgstr "Impossible d'importer les votes. L'année ${year} n'existe pas."
 
 msgid "Vote type not supported"
 msgstr "Type de vote non pris en charge"
@@ -936,12 +948,12 @@ msgstr "Aucune candidature."
 msgid "Download diagram"
 msgstr "Télécharger le diagramme"
 
+#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
-#.
 msgid "figcaption_connections"
 msgstr ""
 "Le diagramme montre la répartition des voix et des mandats sur la liste et "
@@ -965,11 +977,11 @@ msgstr "Aucun candidat n'a encore été élu."
 msgid "Note on the voters count"
 msgstr "Note sur le nombre d'électeurs"
 
+#.
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
-#.
 msgid "figcaption_list_groups"
 msgstr ""
 "Dans une première étape - appelée répartition supérieure - on considère "
@@ -1080,17 +1092,17 @@ msgstr "Votes blancs"
 msgid "Invalid votes"
 msgstr "Votes non valides"
 
+#.
 #. Default: Turnout
 #. Default: Voter turnout
-#.
 msgid "turnout_vote"
 msgstr "Participation au vote"
 
 msgid "List connection"
 msgstr "Connexion de listes"
 
-#. Default: Votes
 #.
+#. Default: Votes
 msgid "single_votes"
 msgstr "Votes"
 
@@ -1138,6 +1150,9 @@ msgstr "Oui"
 
 msgid "No"
 msgstr "Non"
+
+msgid "Pending"
+msgstr "On cours"
 
 msgid "All candidates"
 msgstr "Tous les candidats"
@@ -1293,10 +1308,10 @@ msgstr "Vos résultats n'ont pas pu être mis à jour."
 msgid "Line"
 msgstr "Ligne"
 
+#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
-#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Le diagramme montre les votes et les mandats des partis. Les barres à rebord "
@@ -1309,10 +1324,10 @@ msgstr "Année"
 msgid "Difference"
 msgstr "Différence"
 
+#.
 #. Default: The diagram shows the origin of votes won and lost by panache. On
 #. the left side are the lost votes, on the right side the won votes. The width
 #. of the bars and the connections is proportional to the number of votes.
-#.
 msgid "figcaption_panachage"
 msgstr ""
 "Le diagramme montre l'origine des votes gagnés et perdus par le panache. Sur "
@@ -1433,6 +1448,12 @@ msgstr "Pas encore d’abonnés."
 
 msgid "Locale"
 msgstr "Locaux"
+
+msgid "Subscribed"
+msgstr "Abonnement"
+
+msgid "Unsubscribed"
+msgstr "Annulation"
 
 msgid "Active"
 msgstr "Actif"

@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import os
 import pglast  # type:ignore[import-untyped]
 import re
 
-from onegov.core.cache import lru_cache
+from functools import lru_cache
 from onegov.core.orm import types as onegov_types
 from sqlalchemy import text
 from sqlalchemy import types as sqlalchemy_types
@@ -13,14 +15,14 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from pglast.ast import RawStmt  # type:ignore[import-untyped]
-    from sqlalchemy.sql.selectable import Alias
+    from sqlalchemy.sql import Subquery
     from sqlalchemy.types import TypeEngine
 
 
 NESTED_TYPE = re.compile(r'(\w+)\((\w+)\)')
 
 
-def as_selectable(query: str, alias: str | None = None) -> 'Alias':
+def as_selectable(query: str, alias: str | None = None) -> Subquery:
     """ Takes a raw SQL query and turns it into a selectable SQLAlchemy
     expression using annotations in comments.
 
@@ -67,7 +69,7 @@ def as_selectable(query: str, alias: str | None = None) -> 'Alias':
 
 def type_by_string(
     expression: str
-) -> 'type[TypeEngine[Any]] | TypeEngine[Any]':
+) -> type[TypeEngine[Any]] | TypeEngine[Any]:
     nested_match = NESTED_TYPE.match(expression)
 
     if nested_match:
@@ -81,17 +83,17 @@ def type_by_string(
 
 
 @lru_cache(maxsize=64)
-def as_selectable_from_path(path: str) -> 'Alias':
+def as_selectable_from_path(path: str) -> Subquery:
     alias = os.path.basename(path).split('.', 1)[0]
 
-    with open(path, 'r') as f:
+    with open(path) as f:
         return as_selectable(f.read(), alias=alias)
 
 
 def column_names_with_comments(
-    statement: 'RawStmt',
+    statement: RawStmt,
     query: str
-) -> 'Iterator[tuple[str, str]]':
+) -> Iterator[tuple[str, str]]:
 
     for target in statement.stmt.targetList:
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
@@ -17,10 +19,10 @@ if TYPE_CHECKING:
 
 class TriggerNotificationForm(Form):
 
-    request: 'ElectionDayRequest'
+    request: ElectionDayRequest
 
     notifications = MultiCheckboxField(
-        label=_("Notifications"),
+        label=_('Notifications'),
         choices=[],
         validators=[
             InputRequired()
@@ -35,27 +37,27 @@ class TriggerNotificationForm(Form):
 
         self.notifications.choices = []
         if principal.email_notification:
-            self.notifications.choices.append(('email', _("Email")))
+            self.notifications.choices.append(('email', _('Email')))
         if principal.sms_notification:
-            self.notifications.choices.append(('sms', _("SMS")))
+            self.notifications.choices.append(('sms', _('SMS')))
         if principal.webhooks:
-            self.notifications.choices.append(('webhooks', _("Webhooks")))
+            self.notifications.choices.append(('webhooks', _('Webhooks')))
 
 
 class TriggerNotificationsForm(TriggerNotificationForm):
 
     votes = MultiCheckboxField(
-        label=_("Votes"),
+        label=_('Votes'),
         choices=[],
     )
 
     election_compounds = MultiCheckboxField(
-        label=_("Compounds of elections"),
+        label=_('Compounds of elections'),
         choices=[],
     )
 
     elections = MultiCheckboxField(
-        label=_("Elections"),
+        label=_('Elections'),
         choices=[],
     )
 
@@ -65,7 +67,7 @@ class TriggerNotificationsForm(TriggerNotificationForm):
             and not self.elections.data
             and not self.election_compounds.data
         ):
-            message = _("Select at least one election or vote.")
+            message = _('Select at least one election or vote.')
             assert isinstance(self.votes.errors, list)
             self.votes.errors.append(message)
             assert isinstance(self.elections.errors, list)
@@ -73,7 +75,7 @@ class TriggerNotificationsForm(TriggerNotificationForm):
             return False
         return True
 
-    def latest_date(self, session: 'Session') -> 'date | None':
+    def latest_date(self, session: Session) -> date | None:
         query = session.query(Election.date)
         row = query.order_by(Election.date.desc()).first()
         latest_election = row[0] if row else None
@@ -86,7 +88,7 @@ class TriggerNotificationsForm(TriggerNotificationForm):
             return max((latest_election, latest_vote))
         return latest_election or latest_vote
 
-    def available_elections(self, session: 'Session') -> 'Query[Election]':
+    def available_elections(self, session: Session) -> Query[Election]:
         query = session.query(Election)
         query = query.order_by(Election.shortcode)
         query = query.filter(Election.date == self.latest_date(session))
@@ -94,8 +96,8 @@ class TriggerNotificationsForm(TriggerNotificationForm):
 
     def available_election_compounds(
         self,
-        session: 'Session'
-    ) -> 'Query[ElectionCompound]':
+        session: Session
+    ) -> Query[ElectionCompound]:
 
         query = session.query(ElectionCompound)
         query = query.order_by(ElectionCompound.shortcode)
@@ -104,13 +106,13 @@ class TriggerNotificationsForm(TriggerNotificationForm):
         )
         return query
 
-    def available_votes(self, session: 'Session') -> 'Query[Vote]':
+    def available_votes(self, session: Session) -> Query[Vote]:
         query = session.query(Vote)
         query = query.order_by(Vote.shortcode)
         query = query.filter(Vote.date == self.latest_date(session))
         return query
 
-    def election_models(self, session: 'Session') -> list[Election]:
+    def election_models(self, session: Session) -> list[Election]:
         if not self.elections.data:
             return []
 
@@ -121,7 +123,7 @@ class TriggerNotificationsForm(TriggerNotificationForm):
 
     def election_compound_models(
         self,
-        session: 'Session'
+        session: Session
     ) -> list[ElectionCompound]:
 
         if not self.election_compounds.data:
@@ -134,7 +136,7 @@ class TriggerNotificationsForm(TriggerNotificationForm):
         query = query.order_by(ElectionCompound.shortcode)
         return query.all()
 
-    def vote_models(self, session: 'Session') -> list[Vote]:
+    def vote_models(self, session: Session) -> list[Vote]:
         if not self.votes.data:
             return []
 

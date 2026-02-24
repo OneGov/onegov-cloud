@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 import pytest
 
@@ -12,14 +14,19 @@ from urllib.parse import quote
 from uuid import uuid4
 
 
-def test_url_safe_token():
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from webob import Response
+
+
+def test_url_safe_token() -> None:
 
     request = CoreRequest(environ={
         'PATH_INFO': '/',
         'SERVER_NAME': '',
         'SERVER_PORT': '',
         'SERVER_PROTOCOL': 'https'
-    }, app=Bunch(identity_secret='asdf', lookup=None))
+    }, app=Bunch(identity_secret='asdf', lookup=None))  # type: ignore[arg-type]
 
     token = request.new_url_safe_token({'foo': 'bar'})
 
@@ -30,30 +37,31 @@ def test_url_safe_token():
         assert request.load_url_safe_token(token, max_age=1) is None
 
 
-def test_return_to_mixin():
+def test_return_to_mixin() -> None:
 
     class Request(ReturnToMixin):
 
-        GET = {}
+        if not TYPE_CHECKING:
+            GET = {}
 
         @property
-        def identity_secret(self):
+        def identity_secret(self) -> str:
             return 'foobar'
 
         @property
-        def url(self):
+        def url(self) -> str:
             return 'http://here'
 
-    def param(url):
+    def param(url: str) -> str:
         return url.split('=')[1]
 
-    r = Request()
+    r = Request()  # type: ignore[call-arg]
 
-    assert r.return_to('https://example.org', '/')\
-        .startswith('https://example.org?return-to=')
+    assert r.return_to('https://example.org', '/').startswith(
+        'https://example.org?return-to=')
 
-    assert r.return_here('https://example.org')\
-        .startswith('https://example.org?return-to=')
+    assert r.return_here('https://example.org').startswith(
+        'https://example.org?return-to=')
 
     r.GET['return-to'] = 'http://phising'
     assert r.redirect('http://safe').location == 'http://safe'
@@ -69,7 +77,7 @@ def test_return_to_mixin():
     assert r.redirect('http://safe').location == 'http://safe'
 
 
-def test_vhm_root_urls():
+def test_vhm_root_urls() -> None:
 
     request = CoreRequest(environ={
         'wsgi.url_scheme': 'https',
@@ -81,7 +89,7 @@ def test_vhm_root_urls():
         'SERVER_PROTOCOL': 'https',
         'HTTP_HOST': 'example.com',
         'HTTP_X_VHM_ROOT': '/town/example/',
-    }, app=Bunch())
+    }, app=Bunch())  # type: ignore[arg-type]
 
     assert request.x_vhm_root == '/town/example'
     assert request.application_url == 'https://example.com'
@@ -89,7 +97,7 @@ def test_vhm_root_urls():
     assert request.url == 'https://example.com/events?page=1'
 
 
-def test_return_to(redis_url):
+def test_return_to(redis_url: str) -> None:
 
     class App(Framework):
         pass
@@ -99,11 +107,11 @@ def test_return_to(redis_url):
         pass
 
     @App.view(model=Root)
-    def homepage(self, request):
+    def homepage(self: Root, request: CoreRequest) -> str:
         return request.return_to(request.link(self, 'do-something'), '/')
 
     @App.view(model=Root, name='do-something')
-    def do_something(self, request):
+    def do_something(self: Root, request: CoreRequest) -> Response:
         return request.redirect('/default')
 
     App.commit()
@@ -120,34 +128,45 @@ def test_return_to(redis_url):
     assert c.get('/do-something').location == 'http://localhost/default'
 
 
-def test_link_with_query_parameters_and_fragement(redis_url):
+@pytest.mark.parametrize('class_link', [False, True])
+def test_link_with_query_parameters_and_fragment(
+    redis_url: str,
+    class_link: bool
+) -> None:
 
     class App(Framework):
         pass
 
     @App.path(path='/')
     class Root:
-        def __init__(self, foo=None):
+        def __init__(self, foo: str | None = None) -> None:
             self.foo = foo
 
     @App.view(model=Root)
-    def homepage(self, request):
+    def homepage(self: Root, request: CoreRequest) -> str:
+        link: Any
+        if class_link:
+            def link(obj: Root, **kwargs: Any) -> str | None:
+                return request.class_link(Root, {'foo': obj.foo}, **kwargs)
+        else:
+            link = request.link
+
         foo = Root(foo='bar')
         return '\n'.join((
-            request.link(self),
-            request.link(self, query_params={'a': '1'}),
-            request.link(self, query_params={'a': '1', 'b': 2}),
-            request.link(self, fragment='main'),
-            request.link(self, query_params={'a': '1'}, fragment='main'),
-            request.link(foo),
-            request.link(foo, query_params={'a': '1'}),
-            request.link(foo, query_params={'a': '1', 'b': 2}),
-            request.link(foo, fragment='main'),
-            request.link(foo, query_params={'a': '1'}, fragment='main'),
+            link(self),
+            link(self, query_params={'a': '1'}),
+            link(self, query_params={'a': '1', 'b': 2}),
+            link(self, fragment='main'),
+            link(self, query_params={'a': '1'}, fragment='main'),
+            link(foo),
+            link(foo, query_params={'a': '1'}),
+            link(foo, query_params={'a': '1', 'b': 2}),
+            link(foo, fragment='main'),
+            link(foo, query_params={'a': '1'}, fragment='main'),
         ))
 
     @App.view(model=Root, name='foo')
-    def do_something(self, request):
+    def do_something(self: Root, request: CoreRequest) -> Response:
         return request.redirect('/default')
 
     App.commit()
@@ -172,7 +191,7 @@ def test_link_with_query_parameters_and_fragement(redis_url):
     )
 
 
-def test_has_permission(redis_url):
+def test_has_permission(redis_url: str) -> None:
 
     class App(Framework):
         pass
@@ -182,30 +201,31 @@ def test_has_permission(redis_url):
         allowed_for = (Public, Personal, Private, Secret)
 
     @App.view(model=Root, permission=Public)
-    def view(self, request):
+    def view(self: Root, request: CoreRequest) -> str:
         permission = {
             'public': Public,
             'personal': Personal,
             'private': Private,
             'secret': Secret
-        }[request.params.get('permission')]
+        }[request.GET['permission']]
 
-        user = request.params.get('user')
+        user: Any = request.GET.get('user')
         if user:
-            user = Bunch(username=user, id=uuid4(), group_id=None, role=None)
+            user = Bunch(username=user, id=uuid4(), groups=[], role=None)
 
         if request.has_permission(self, permission, user):
             return 'true'
         return 'false'
 
     @App.view(model=Root, permission=Public, name='login')
-    def login(self, request):
+    def login(self: Root, request: CoreRequest) -> str:
 
         @request.after
-        def remember_identity(response):
+        def remember_identity(response: Response) -> None:
             request.app.remember_identity(response, request, morepath.Identity(
+                uid='1',
                 userid='foo',
-                groupid='admins',
+                groupids=frozenset({'admins'}),
                 role='admin',
                 application_id=request.app.application_id
             ))
@@ -213,11 +233,19 @@ def test_has_permission(redis_url):
         return 'ok'
 
     @App.permission_rule(model=Root, permission=object, identity=None)
-    def has_permission_not_logged_in(identity, model, permission):
+    def has_permission_not_logged_in(
+        identity: None,
+        model: Root,
+        permission: object
+    ) -> bool:
         return permission is Public
 
     @App.permission_rule(model=Root, permission=object)
-    def has_permission_logged_in(identity, model, permission):
+    def has_permission_logged_in(
+        identity: morepath.Identity,
+        model: Root,
+        permission: object
+    ) -> bool:
         return permission in model.allowed_for
 
     scan_morepath_modules(App)
@@ -249,7 +277,7 @@ def test_has_permission(redis_url):
     assert c.get('/?permission=secret').text == 'true'
 
 
-def test_permission_by_view(redis_url):
+def test_permission_by_view(redis_url: str) -> None:
     class App(Framework):
         pass
 
@@ -258,29 +286,30 @@ def test_permission_by_view(redis_url):
         pass
 
     @App.view(model=Root, name='public', permission=Public)
-    def public_view(self, request):
+    def public_view(self: Root, request: CoreRequest) -> None:
         raise AssertionError()  # we don't want this view to be called
 
     @App.view(model=Root, name='personal', permission=Personal)
-    def personal_view(self, request):
+    def personal_view(self: Root, request: CoreRequest) -> None:
         raise AssertionError()  # we don't want this view to be called
 
     @App.view(model=Root, name='private', permission=Private)
-    def private_view(self, request):
+    def private_view(self: Root, request: CoreRequest) -> None:
         raise AssertionError()  # we don't want this view to be called
 
     @App.view(model=Root, name='secret', permission=Secret)
-    def secret_view(self, request):
+    def secret_view(self: Root, request: CoreRequest) -> None:
         raise AssertionError()  # we don't want this view to be called
 
     @App.view(model=Root, name='login', permission=Public)
-    def login(self, request):
+    def login(self: Root, request: CoreRequest) -> str:
 
         @request.after
-        def remember_identity(response):
+        def remember_identity(response: Response) -> None:
             request.app.remember_identity(response, request, morepath.Identity(
+                uid='1',
                 userid='foo',
-                groupid='',
+                groupids=frozenset(),
                 role='admin',
                 application_id=request.app.application_id,
             ))
@@ -288,8 +317,8 @@ def test_permission_by_view(redis_url):
         return 'ok'
 
     @App.view(model=Root)
-    def view(self, request):
-        url = request.params.get('url')
+    def view(self: Root, request: CoreRequest) -> str:
+        url = request.GET['url']
         return request.has_access_to_url(url) and 'true' or 'false'
 
     scan_morepath_modules(App)
@@ -303,8 +332,8 @@ def test_permission_by_view(redis_url):
 
     c = Client(app)
 
-    def has_access(url):
-        return c.get('/?url={}'.format(quote(url))).text == 'true'
+    def has_access(url: str) -> bool:
+        return c.get(f'/?url={quote(url)}').text == 'true'
 
     assert app.permission_by_view(Root) is None
     assert app.permission_by_view(Root, 'login') is Public
@@ -328,19 +357,19 @@ def test_permission_by_view(redis_url):
 
     # the domain is ignored
     for domain in ('', 'https://example.org'):
-        assert has_access('{}/'.format(domain))
-        assert has_access('{}/login'.format(domain))
-        assert has_access('{}/public'.format(domain))
-        assert not has_access('{}/personal'.format(domain))
-        assert not has_access('{}/private'.format(domain))
-        assert not has_access('{}/secret'.format(domain))
+        assert has_access(f'{domain}/')
+        assert has_access(f'{domain}/login')
+        assert has_access(f'{domain}/public')
+        assert not has_access(f'{domain}/personal')
+        assert not has_access(f'{domain}/private')
+        assert not has_access(f'{domain}/secret')
 
     c.get('/login')
 
     for domain in ('', 'https://example.org'):
-        assert has_access('{}/'.format(domain))
-        assert has_access('{}/login'.format(domain))
-        assert has_access('{}/public'.format(domain))
-        assert has_access('{}/personal'.format(domain))
-        assert has_access('{}/private'.format(domain))
-        assert has_access('{}/secret'.format(domain))
+        assert has_access(f'{domain}/')
+        assert has_access(f'{domain}/login')
+        assert has_access(f'{domain}/public')
+        assert has_access(f'{domain}/personal')
+        assert has_access(f'{domain}/private')
+        assert has_access(f'{domain}/secret')

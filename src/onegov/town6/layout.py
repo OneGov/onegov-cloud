@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 import secrets
 from functools import cached_property
 
 from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
 from onegov.core.static import StaticFile
-from onegov.core.utils import to_html_ul
+from onegov.core.utils import append_query_param, to_html_ul
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.directory import DirectoryCollection
+from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.org.layout import (
@@ -31,6 +34,8 @@ from onegov.org.layout import (
     FormEditorLayout as OrgFormEditorLayout,
     FormSubmissionLayout as OrgFormSubmissionLayout,
     SurveySubmissionLayout as OrgSurveySubmissionLayout,
+    SurveySubmissionWindowLayout as OrgSurveySubmissionWindowLayout,
+    FormDocumentLayout as OrgFormDocumentLayout,
     HomepageLayout as OrgHomepageLayout,
     ImageSetCollectionLayout as OrgImageSetCollectionLayout,
     ImageSetLayout as OrgImageSetLayout,
@@ -55,6 +60,8 @@ from onegov.org.layout import (
     TextModuleLayout as OrgTextModuleLayout,
     TextModulesLayout as OrgTextModulesLayout,
     TicketChatMessageLayout as OrgTicketChatMessageLayout,
+    TicketInvoiceLayout as OrgTicketInvoiceLayout,
+    TicketInvoiceCollectionLayout as OrgTicketInvoiceCollectionLayout,
     TicketLayout as OrgTicketLayout,
     TicketNoteLayout as OrgTicketNoteLayout,
     TicketsLayout as OrgTicketsLayout,
@@ -62,7 +69,12 @@ from onegov.org.layout import (
     UserGroupLayout as OrgUserGroupLayout,
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
-from onegov.org.models import News, PageMove
+from onegov.org.models import MeetingCollection
+from onegov.org.models import PageMove
+from onegov.org.models import PoliticalBusinessCollection
+from onegov.org.models import RISCommissionCollection
+from onegov.org.models import RISParliamentarianCollection
+from onegov.org.models import RISParliamentaryGroupCollection
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
 from onegov.stepsequence import step_sequences
@@ -79,15 +91,16 @@ if TYPE_CHECKING:
     from onegov.form.models.definition import SurveyDefinition
     from onegov.form.models.submission import SurveySubmission
     from onegov.org.models import ExtendedDirectoryEntry
+    from onegov.org.request import PageMeta
     from onegov.page import Page
     from onegov.reservation import Resource
     from onegov.ticket import Ticket
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     NavigationEntry: TypeAlias = tuple[
-        Page,
+        PageMeta,
         Link,
         tuple['NavigationEntry', ...]
     ]
@@ -103,10 +116,10 @@ class PartnerCard(NamedTuple):
 
 class Layout(OrgLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
-    def __init__(self, model: Any, request: 'TownRequest',
+    def __init__(self, model: Any, request: TownRequest,
                  edit_mode: bool = False) -> None:
         super().__init__(model, request)
         self.request.include('foundation6')
@@ -133,7 +146,7 @@ class Layout(OrgLayout):
 
     @cached_property
     def drilldown_back(self) -> str:
-        back = self.request.translate(_("back"))
+        back = self.request.translate(_('back'))
         return (
             '<li class="js-drilldown-back">'
             f'<a tabindex="0">{back}</a></li>'
@@ -183,7 +196,7 @@ class Layout(OrgLayout):
     def page_collection(self) -> PageCollection:
         return PageCollection(self.request.session)
 
-    def page_by_path(self, path: str) -> 'Page | None':
+    def page_by_path(self, path: str) -> Page | None:
         return self.page_collection.by_path(path)
 
 
@@ -192,21 +205,23 @@ class DefaultLayout(OrgDefaultLayout, Layout):
     if TYPE_CHECKING:
         app: TownApp
         request: TownRequest
+
         def __init__(self, model: Any, request: TownRequest) -> None: ...
 
     @cached_property
-    def top_navigation(self) -> tuple['NavigationEntry', ...]:  # type:ignore
+    def top_navigation(self) -> tuple[NavigationEntry, ...]:  # type:ignore
 
-        def yield_children(page: 'Page') -> 'NavigationEntry':
-            if not isinstance(page, News):
+        def yield_children(page: PageMeta) -> NavigationEntry:
+            if page.type != 'news':
                 children = tuple(
                     yield_children(p)
-                    for p in self.exclude_invisible(page.children)
+                    for p in page.children
                 )
             else:
                 children = ()
             return (
-                page, Link(page.title, self.request.link(page)),
+                page,
+                Link(page.title, page.link(self.request)),
                 children
             )
 
@@ -225,39 +240,54 @@ class DefaultLayout(OrgDefaultLayout, Layout):
             )
         )
 
+    @cached_property
+    def ris_overview_url(self) -> str:
+        if self.request.is_logged_in:
+            return self.request.link(self.request.app.org, 'ris-settings')
+
+        if self.request.app.org.ris_main_url:
+            return self.request.link(
+                self.request.app.org, self.request.app.org.ris_main_url
+            )
+
+        # fallback to the homepage
+        return self.request.link(self.request.app.org, '')
+
 
 class DefaultMailLayout(OrgDefaultMailLayout, Layout):
     """ A special layout for creating HTML E-Mails. """
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class AdjacencyListLayout(OrgAdjacencyListLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class SettingsLayout(OrgSettingsLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class PageLayout(OrgPageLayout, AdjacencyListLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
     @cached_property
     def contact_html(self) -> str:
-        return self.model.contact_html or to_html_ul(self.org.contact)
+        return self.model.contact_html or to_html_ul(
+            self.org.contact
+        )
 
 
 class NewsLayout(OrgNewsLayout, AdjacencyListLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
     @cached_property
     def contact_html(self) -> str:
@@ -268,14 +298,14 @@ class NewsLayout(OrgNewsLayout, AdjacencyListLayout):
 
 class EditorLayout(OrgEditorLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class FormEditorLayout(OrgFormEditorLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 @step_sequences.registered_step(
@@ -304,15 +334,15 @@ class FormSubmissionLayout(
     DefaultLayout
 ):
 
-    app: 'TownApp'
-    request: 'TownRequest'
-    model: 'FormSubmission | FormDefinition'
+    app: TownApp
+    request: TownRequest
+    model: FormSubmission | FormDefinition
 
     if TYPE_CHECKING:
         def __init__(
             self,
-            model: 'FormSubmission | FormDefinition',
-            request: 'TownRequest',
+            model: FormSubmission | FormDefinition,
+            request: TownRequest,
             title: str | None = None,
             *,
             hide_steps: bool = False
@@ -320,7 +350,7 @@ class FormSubmissionLayout(
 
     @property
     def step_position(self) -> int | None:
-        if self.request.view_name in ('send-message',):
+        if self.request.view_name == 'send-message':
             return None
         if self.model.__class__.__name__ == 'CustomFormDefinition':
             return 1
@@ -333,15 +363,15 @@ class SurveySubmissionLayout(
     DefaultLayout
 ):
 
-    app: 'TownApp'
-    request: 'TownRequest'
-    model: 'SurveySubmission | SurveyDefinition'
+    app: TownApp
+    request: TownRequest
+    model: SurveySubmission | SurveyDefinition
 
     if TYPE_CHECKING:
         def __init__(
             self,
-            model: 'SurveySubmission | SurveyDefinition',
-            request: 'TownRequest',
+            model: SurveySubmission | SurveyDefinition,
+            request: TownRequest,
             title: str | None = None,
             *,
             hide_steps: bool = False
@@ -349,57 +379,70 @@ class SurveySubmissionLayout(
 
     @property
     def step_position(self) -> int | None:
-        if self.request.view_name in ('send-message',):
+        if self.request.view_name == 'send-message':
             return None
         if self.model.__class__.__name__ == 'SurveyDefinition':
             return 1
         return 2
 
 
+class FormDocumentLayout(OrgFormDocumentLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
+
+
 class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
     @property
     def forms_url(self) -> str:
         return self.request.class_link(FormCollection)
 
 
+class SurveySubmissionWindowLayout(OrgSurveySubmissionWindowLayout,
+                                   DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
+
+
 class SurveyCollectionLayout(OrgSurveyCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class PersonCollectionLayout(OrgPersonCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class PersonLayout(OrgPersonLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class TicketsLayout(OrgTicketsLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ArchivedTicketsLayout(OrgArchivedTicketsLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class TicketLayout(OrgTicketLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
@@ -408,16 +451,16 @@ class TicketLayout(OrgTicketLayout, DefaultLayout):
             if self.request.app.org.gever_endpoint:
                 links.append(
                     Link(
-                        text=_("Upload to Gever"),
+                        text=_('Upload to Gever'),
                         url=self.request.link(self.model, 'send-to-gever'),
                         attrs={'class': 'upload'},
                         traits=(
                             Confirm(
-                                _("Do you really want to upload this ticket?"),
-                                _("This will upload this ticket to the "
-                                  "Gever instance, if configured."),
-                                _("Upload Ticket"),
-                                _("Cancel")
+                                _('Do you really want to upload this ticket?'),
+                                _('This will upload this ticket to the '
+                                  'Gever instance, if configured.'),
+                                _('Upload Ticket'),
+                                _('Cancel')
                             )
                         )
                     )
@@ -427,8 +470,14 @@ class TicketLayout(OrgTicketLayout, DefaultLayout):
 
 class TicketNoteLayout(OrgTicketNoteLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
+
+
+class TicketInvoiceLayout(OrgTicketInvoiceLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
 
 
 @step_sequences.registered_step(
@@ -446,13 +495,13 @@ class TicketChatMessageLayout(
     DefaultLayout
 ):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
     if TYPE_CHECKING:
         def __init__(
             self,
-            model: 'Ticket',
-            request: 'TownRequest',
+            model: Ticket,
+            request: TownRequest,
             internal: bool = False,
             *,
             hide_steps: bool = False,
@@ -465,32 +514,32 @@ class TicketChatMessageLayout(
 
 class TextModulesLayout(OrgTextModulesLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class TextModuleLayout(OrgTextModuleLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ResourcesLayout(OrgResourcesLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class FindYourSpotLayout(OrgFindYourSpotLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ResourceRecipientsLayout(OrgResourceRecipientsLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ResourceRecipientsFormLayout(
@@ -498,20 +547,20 @@ class ResourceRecipientsFormLayout(
     DefaultLayout
 ):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ResourceLayout(OrgResourceLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 @step_sequences.registered_step(
-    1, _("Form"), cls_after='ReservationLayout')
+    1, _('Form'), cls_after='ReservationLayout')
 @step_sequences.registered_step(
-    2, _("Check"),
+    2, _('Check'),
     cls_before='ReservationLayout', cls_after='TicketChatMessageLayout')
 class ReservationLayout(
     StepsLayoutExtension,
@@ -519,8 +568,8 @@ class ReservationLayout(
     ResourceLayout
 ):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
     editbar_links = None
 
     if TYPE_CHECKING:
@@ -545,8 +594,8 @@ class ReservationLayout(
 
 class AllocationRulesLayout(OrgAllocationRulesLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class AllocationEditFormLayout(OrgAllocationEditFormLayout, DefaultLayout):
@@ -554,14 +603,14 @@ class AllocationEditFormLayout(OrgAllocationEditFormLayout, DefaultLayout):
     there's not really an allocation view, but there are allocation forms.
 
     """
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class OccurrencesLayout(OrgOccurrencesLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
@@ -569,10 +618,10 @@ class OccurrencesLayout(OrgOccurrencesLayout, DefaultLayout):
         if self.request.is_manager:
             links.append(
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Event"),
+                            text=_('Event'),
                             url=self.request.link(self.model, 'enter-event'),
                             attrs={'class': 'new-form'}
                         ),
@@ -584,8 +633,26 @@ class OccurrencesLayout(OrgOccurrencesLayout, DefaultLayout):
 
 class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links = super().editbar_links or []
+        if self.request.is_manager:
+            copy_url = self.request.link(
+                OccurrenceCollection(self.request.session), 'enter-event')
+            copy_url = append_query_param(copy_url,
+                                          'event_id', self.model.event.id.hex)
+
+            links.append(
+                Link(
+                    text=_('Copy'),
+                    url=copy_url,
+                    attrs={'class': 'copy-link'}
+                )
+            )
+        return links
 
 
 @step_sequences.registered_step(1, _('Form'), cls_after='FormSubmissionLayout')
@@ -596,15 +663,15 @@ class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
 )
 class EventLayout(StepsLayoutExtension, OrgEventLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
-    model: 'Event'
+    app: TownApp
+    request: TownRequest
+    model: Event
 
     if TYPE_CHECKING:
         def __init__(
             self,
-            model: 'Event',
-            request: 'TownRequest',
+            model: Event,
+            request: TownRequest,
             *,
             hide_steps: bool = False
         ) -> None: ...
@@ -618,80 +685,89 @@ class EventLayout(StepsLayoutExtension, OrgEventLayout, DefaultLayout):
 
 class NewsletterLayout(OrgNewsletterLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class RecipientLayout(OrgRecipientLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ImageSetCollectionLayout(OrgImageSetCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ImageSetLayout(OrgImageSetLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class UserManagementLayout(OrgUserManagementLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class UserLayout(OrgUserLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class UserGroupCollectionLayout(OrgUserGroupCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class UserGroupLayout(OrgUserGroupLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ExportCollectionLayout(OrgExportCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class PaymentProviderLayout(OrgPaymentProviderLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class PaymentCollectionLayout(OrgPaymentCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
+
+
+class TicketInvoiceCollectionLayout(
+    OrgTicketInvoiceCollectionLayout,
+    DefaultLayout
+):
+
+    app: TownApp
+    request: TownRequest
 
 
 class MessageCollectionLayout(OrgMessageCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class DirectoryCollectionLayout(OrgDirectoryCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 @step_sequences.registered_step(
@@ -704,13 +780,13 @@ class DirectoryEntryCollectionLayout(
 ):
 
     if TYPE_CHECKING:
-        app: 'TownApp'
-        request: 'TownRequest'
+        app: TownApp
+        request: TownRequest
 
         def __init__(
             self,
             model: ExtendedDirectoryEntryCollection,
-            request: 'TownRequest',
+            request: TownRequest,
             *,
             hide_steps: bool = False,
         ) -> None: ...
@@ -725,16 +801,16 @@ class DirectoryEntryCollectionLayout(
     def editbar_links(self) -> list[Link | LinkGroup]:
 
         export_link = Link(
-            text=_("Export"),
+            text=_('Export'),
             url=self.request.link(self.model, name='+export'),
             attrs={'class': 'export-link'}
         )
 
-        def links() -> 'Iterator[Link | LinkGroup]':
+        def links() -> Iterator[Link | LinkGroup]:
             qr_link = None
             if self.request.is_admin:
                 yield Link(
-                    text=_("Configure"),
+                    text=_('Configure'),
                     url=self.request.link(self.model, '+edit'),
                     attrs={'class': 'edit-link'}
                 )
@@ -743,7 +819,7 @@ class DirectoryEntryCollectionLayout(
                 yield export_link
 
                 yield Link(
-                    text=_("Import"),
+                    text=_('Import'),
                     url=self.request.class_link(
                         ExtendedDirectoryEntryCollection, {
                             'directory_name': self.model.directory_name
@@ -753,14 +829,14 @@ class DirectoryEntryCollectionLayout(
                 )
 
                 qr_link = QrCodeLink(
-                    text=_("QR"),
+                    text=_('QR'),
                     url=self.request.link(self.model),
                     attrs={'class': 'qr-code-link'}
                 )
 
             if self.request.is_admin:
                 yield Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -773,9 +849,9 @@ class DirectoryEntryCollectionLayout(
                                     'title': self.model.directory.title
                                 }
                             ),
-                            _("All entries will be deleted as well!"),
-                            _("Delete directory"),
-                            _("Cancel")
+                            _('All entries will be deleted as well!'),
+                            _('Delete directory'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -786,7 +862,7 @@ class DirectoryEntryCollectionLayout(
                     )
                 )
                 yield Link(
-                    text=self.request.translate(_("Change URL")),
+                    text=self.request.translate(_('Change URL')),
                     url=self.request.link(
                         self.model.directory,
                         'change-url'),
@@ -795,10 +871,10 @@ class DirectoryEntryCollectionLayout(
 
             if self.request.is_manager:
                 yield LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Entry"),
+                            text=_('Entry'),
                             url=self.request.link(
                                 self.model,
                                 name='+new'
@@ -812,7 +888,7 @@ class DirectoryEntryCollectionLayout(
                 yield qr_link
             if self.request.is_manager:
                 yield IFrameLink(
-                    text=_("iFrame"),
+                    text=_('iFrame'),
                     url=self.request.link(self.model),
                     attrs={'class': 'new-iframe'}
                 )
@@ -827,8 +903,8 @@ class DirectoryEntryLayout(
     DefaultLayout
 ):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
     if TYPE_CHECKING:
         def __init__(
@@ -846,19 +922,19 @@ class DirectoryEntryLayout(
 
 class PublicationLayout(OrgPublicationLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class DashboardLayout(OrgDashboardLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class GeneralFileCollectionLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'TownRequest') -> None:
+    def __init__(self, model: Any, request: TownRequest) -> None:
         """
         The order of assets differ from org where common.js must come first
         including jquery. Here, the foundation6 assets contain jquery and must
@@ -871,7 +947,7 @@ class GeneralFileCollectionLayout(DefaultLayout):
 
 class ImageFileCollectionLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'TownRequest') -> None:
+    def __init__(self, model: Any, request: TownRequest) -> None:
         super().__init__(model, request)
         request.include('upload')
         request.include('editalttext')
@@ -879,19 +955,19 @@ class ImageFileCollectionLayout(DefaultLayout):
 
 class ExternalLinkLayout(OrgExternalLinkLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class HomepageLayout(OrgHomepageLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ChatLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'TownRequest') -> None:
+    def __init__(self, model: Any, request: TownRequest) -> None:
         super().__init__(model, request)
 
         token = self.make_websocket_token()
@@ -917,7 +993,7 @@ class ChatLayout(DefaultLayout):
 
 class StaffChatLayout(ChatLayout):
 
-    def __init__(self, model: Any, request: 'TownRequest') -> None:
+    def __init__(self, model: Any, request: TownRequest) -> None:
         super().__init__(model, request)
         self.request.include('websockets')
         self.request.include('staff-chat')
@@ -931,8 +1007,8 @@ class StaffChatLayout(ChatLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Chats"), self.request.link(
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Chats'), self.request.link(
                 self.request.app.org, name='chats'
             ))
         ]
@@ -940,7 +1016,7 @@ class StaffChatLayout(ChatLayout):
 
 class ClientChatLayout(ChatLayout):
 
-    def __init__(self, model: Any, request: 'TownRequest') -> None:
+    def __init__(self, model: Any, request: TownRequest) -> None:
         super().__init__(model, request)
         self.request.include('websockets')
         self.request.include('client-chat')
@@ -960,9 +1036,9 @@ class ArchivedChatsLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         bc = [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Chat Archive"),
+                _('Chat Archive'),
                 self.request.class_link(
                     ChatCollection, {
                         'state': 'archived',
@@ -983,3 +1059,678 @@ class ArchivedChatsLayout(DefaultLayout):
             )
 
         return bc
+
+
+class MeetingCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Meetings')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(self.title, self.request.link(self.model)),
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Meeting'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-meeting'},
+                        ),
+                    ],
+                ),
+            ]
+        return None
+
+
+class MeetingLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> MeetingCollection:
+        return MeetingCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.title
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(_('Meetings'), self.request.class_link(MeetingCollection)),
+            Link(self.title, self.request.link(self.model)),
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'},
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(self.request.link(self.model)),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete this meeting?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Delete meeting'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.collection
+                            )
+                        )
+                    )
+                ),
+                Link(
+                    text=_('Export'),
+                    url=self.request.link(self.model, name='+export'),
+                    attrs={'class': 'export-link'}
+                )
+            ]
+        return None
+
+
+class RISParliamentarianCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Parliamentarians')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Parliamentarian'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-parliamentarian'},
+                        ),
+                    ],
+                ),
+            ]
+        return None
+
+
+class RISParliamentarianLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> RISParliamentarianCollection:
+        return RISParliamentarianCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return f'{self.model.first_name} {self.model.last_name}'
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(
+                _('Parliamentarians'),
+                self.request.link(self.collection)
+            ),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete this '
+                                'parliamentarian?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Delete parliamentarian'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.collection
+                            )
+                        )
+                    )
+                ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('New parliamentary group function'),
+                            url=self.request.link(
+                                self.model, 'new-role'),
+                            # change to `new-group-role`
+                            attrs={'class': 'new-role'}
+                        ),
+                        Link(
+                            text=_('New commission function'),
+                            url=self.request.link(
+                                self.model, 'new-commission-role'),
+                            attrs={'class': 'new-commission-role'}
+                        )
+                    ],
+                ),
+            ]
+        return None
+
+
+class RISParliamentarianRoleLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.role_label
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def parliamentarian_collection(self) -> RISParliamentarianCollection:
+        return RISParliamentarianCollection(self.request.session)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(
+                _('Parliamentarians'),
+                self.request.link(self.parliamentarian_collection)
+            ),
+            Link(
+                self.model.parliamentarian.title,
+                self.request.link(self.model.parliamentarian)
+            ),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Remove'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to remove this role?'),
+                            _('This cannot be undone.'),
+                            _('Remove role'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.model.parliamentarian
+                            )
+                        )
+                    )
+                )
+            ]
+        return None
+
+
+class RISParliamentaryGroupCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Parliamentary groups')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Parliamentary group'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-parliamentary-group'}
+                        ),
+                    ]
+                ),
+            ]
+        return None
+
+
+class RISParliamentaryGroupLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> RISParliamentaryGroupCollection:
+        return RISParliamentaryGroupCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.name
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(
+                _('Parliamentary groups'),
+                self.request.link(self.collection)
+            ),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete this '
+                                'parliamentary group?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Delete parliamentary group'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.collection
+                            )
+                        )
+                    )
+                )
+            ]
+        return None
+
+
+class RISPartyCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Political Parties')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(self.title, self.request.link(self.model)),
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Political Party'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-party'},
+                        ),
+                    ],
+                ),
+            ]
+        return None
+
+
+class RISCommissionCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Commissions')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Commission'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-commission'}
+                        ),
+                    ]
+                ),
+            ]
+        return None
+
+
+class RISCommissionLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> RISCommissionCollection:
+        return RISCommissionCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.name
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(_('Commissions'),
+                 self.request.class_link(RISCommissionCollection)),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete this commission?'),
+                            _('This cannot be undone.'),
+                            _('Delete commission'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(RISCommissionCollection)
+                        )
+                    )
+                )
+            ]
+        return None
+
+
+class PoliticalBusinessCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Political Businesses')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Political Business'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-political-business'}
+                        ),
+                    ]
+                ),
+            ]
+        return None
+
+
+class PoliticalBusinessLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> PoliticalBusinessCollection:
+        return PoliticalBusinessCollection(self.request)
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.title
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(_('Political Businesses'),
+                 self.request.class_link(PoliticalBusinessCollection)),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete this '
+                              'political business?'),
+                            _('This cannot be undone.'),
+                            _('Delete political business'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                              PoliticalBusinessCollection)
+                        )
+                    )
+                )
+            ]
+        return None
+
+
+class RISCommissionMembershipLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.parliamentarian.title
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def commission_collection(self) -> RISCommissionCollection:
+        return RISCommissionCollection(self.request.session)
+
+    @cached_property
+    def parliamentarian_collection(self) -> RISParliamentarianCollection:
+        return RISParliamentarianCollection(self.request.session)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS settings'), self.ris_overview_url),
+
+            Link(
+                _('Parliamentarians'),
+                self.request.link(self.parliamentarian_collection)
+            ),
+            Link(
+                self.model.parliamentarian.title,
+                self.request.link(self.model.parliamentarian)
+            ),
+            Link(
+                _('Commission membership'),
+                self.request.link(self.model)
+            )
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Remove'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to remove this '
+                                'commission membership?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Remove commission membership'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.model.commission
+                            )
+                        )
+                    )
+                )
+            ]
+        return None

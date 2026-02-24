@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from base64 import b64decode, b64encode
 from markupsafe import Markup
 from onegov.core.custom import json
@@ -13,7 +15,7 @@ if TYPE_CHECKING:
     from onegov.form.types import (
         FormT, PricingRules, RawFormValue, Validators)
     from onegov.gis.models.coordinates import AnyCoordinates
-    from typing_extensions import Self
+    from typing import Self
     from wtforms.fields.core import _Filter, _Widget
     from wtforms.form import BaseForm
     from wtforms.meta import _SupportsGettextAndNgettext, DefaultMeta
@@ -43,29 +45,29 @@ class CoordinatesField(StringField):
 
     """
 
-    data: 'AnyCoordinates'  # type:ignore[assignment]
-    widget: '_Widget[Self]' = CoordinatesWidget()  # type:ignore[assignment]
+    data: AnyCoordinates  # type:ignore[assignment]
+    widget: _Widget[Self] = CoordinatesWidget()
 
     def __init__(
         self,
         label: str | None = None,
-        validators: 'Validators[FormT, Self] | None' = None,
-        filters: 'Sequence[_Filter]' = (),
+        validators: Validators[FormT, Self] | None = None,
+        filters: Sequence[_Filter] = (),
         description: str = '',
         id: str | None = None,
-        default: 'AnyCoordinates | Callable[[], AnyCoordinates] | None' = None,
-        widget: '_Widget[Self] | None' = None,
+        default: AnyCoordinates | Callable[[], AnyCoordinates] | None = None,
+        widget: _Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
-        _form: 'BaseForm | None' = None,
+        _form: BaseForm | None = None,
         _prefix: str = '',
-        _translations: '_SupportsGettextAndNgettext | None' = None,
-        _meta: 'DefaultMeta | None' = None,
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
         # onegov specific kwargs that get popped off
         *,
         fieldset: str | None = None,
-        depends_on: 'Sequence[Any] | None' = None,
-        pricing: 'PricingRules | None' = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
     ):
         super().__init__(
             label=label,
@@ -85,11 +87,10 @@ class CoordinatesField(StringField):
         self.data = getattr(self, 'data', Coordinates())
 
     def _value(self) -> str:
-        text = json.dumps(self.data) or '{}'
-        text_b = b64encode(text.encode('ascii'))
-        text = text_b.decode('ascii')
+        text = b'{}' if self.data is None else json.dumps_bytes(self.data)
+        text = b64encode(text)
 
-        return text
+        return text.decode('ascii')
 
     def process_data(self, value: object) -> None:
         if isinstance(value, dict):
@@ -102,12 +103,10 @@ class CoordinatesField(StringField):
     def populate_obj(self, obj: object, name: str) -> None:
         setattr(obj, name, self.data)
 
-    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if valuelist and valuelist[0]:
             assert isinstance(valuelist[0], str)
-            text_b = b64decode(valuelist[0])
-            text = text_b.decode('ascii')
-            data = json.loads(text)
+            data = json.loads(b64decode(valuelist[0]))
 
             # if the data we receive doesn't result in a coordinates value
             # for some reason, we create one

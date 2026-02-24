@@ -86,7 +86,7 @@ $publications-icon: '\f1ea';
 .side-panel {
     @include clean-ul;
     @include breakpoint(medium up) {
-        margin-bottom: 4rem;
+        margin-bottom: 2.5rem;
 
         &:last-child {
             margin-bottom: 1rem;
@@ -105,6 +105,20 @@ $publications-icon: '\f1ea';
 
     ul.more-list {
         margin: 0 -.5rem;
+    }
+
+    #search {
+        @include smooth-edges;
+
+        + .input-group-button .button {
+            margin-left: 1.5rem;
+            padding: .2rem .7rem !important;
+
+            &:hover {
+                margin-left: 1rem;
+                padding: .2rem 1.2rem !important;
+            }
+        }
     }
 
     .services-panel {
@@ -126,10 +140,6 @@ $publications-icon: '\f1ea';
         a::before {
             margin-right: $panel-icon-margin-right;
             padding-right: $panel-icon-padding-right;
-        }
-
-        .callout {
-            border: 0;
         }
 
         a {

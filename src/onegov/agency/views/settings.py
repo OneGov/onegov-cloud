@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.agency.app import AgencyApp
 from onegov.core.security import Secret
@@ -22,47 +24,48 @@ class AgencySettingsForm(Form):
     topmost_levels = 1, 2, 3
 
     pdf_layout = RadioField(
-        label=_("PDF Design"),
-        fieldset=_("PDF Layout"),
+        label=_('PDF Design'),
+        fieldset=_('PDF Layout'),
         default='default',
         choices=[
-            ('default', _("Default")),
-            ('ar', "Kanton Appenzell Ausserrhoden"),
-            ('zg', "Kanton Zug"),
-            ('bs', "Kanton Basel-Stadt"),
+            ('default', _('Default')),
+            ('ar', 'Kanton Appenzell Ausserrhoden'),
+            ('zg', 'Kanton Zug'),
+            ('bs', 'Kanton Basel-Stadt'),
+            ('lu', 'Kanton Luzern'),
         ],
     )
 
     root_pdf_page_break = RadioField(
         label=_('For root PDF, page after every:'),
-        fieldset=_("PDF Layout"),
+        fieldset=_('PDF Layout'),
         choices=[
-            ('1', _("1 Heading")),
-            ('2', _("1.1 Heading")),
-            ('3', _("1.1.1 Heading")),
+            ('1', _('1 Heading')),
+            ('2', _('1.1 Heading')),
+            ('3', _('1.1.1 Heading')),
         ],
         default='1'
     )
 
     orga_pdf_page_break = RadioField(
         label=_("For organisation PDF's, page after every:"),
-        fieldset=_("PDF Layout"),
+        fieldset=_('PDF Layout'),
         choices=[
-            ('1', _("1 Heading")),
-            ('2', _("1.1 Heading")),
-            ('3', _("1.1.1 Heading")),
+            ('1', _('1 Heading')),
+            ('2', _('1.1 Heading')),
+            ('3', _('1.1.1 Heading')),
         ],
         default='1'
     )
 
     link_color = ColorField(
         label=_('PDF link color'),
-        fieldset=_("PDF Layout")
+        fieldset=_('PDF Layout')
     )
 
     underline_links = BooleanField(
-        label=_("Underline pdf links"),
-        fieldset=_("PDF Layout")
+        label=_('Underline pdf links'),
+        fieldset=_('PDF Layout')
     )
 
     agency_display = ChosenSelectMultipleField(
@@ -102,8 +105,8 @@ class AgencySettingsForm(Form):
     )
 
     report_changes = BooleanField(
-        label=_("Users may report corrections"),
-        fieldset=_("Data"),
+        label=_('Users may report corrections'),
+        fieldset=_('Data'),
         default=True,
     )
 
@@ -142,8 +145,8 @@ class AgencySettingsForm(Form):
     def populate_obj(  # type: ignore[override]
         self,
         obj: Organisation,  # type: ignore[override]
-        exclude: 'Collection[str] | None' = None,
-        include: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None
     ) -> None:
 
         super().populate_obj(obj, exclude, include)
@@ -170,12 +173,12 @@ class AgencySettingsForm(Form):
     template='form.pt',
     permission=Secret,
     form=AgencySettingsForm,
-    setting=_("Agencies"),
+    setting=_('Agencies'),
     icon='fa-university'
 )
 def handle_agency_settings(
     self: Organisation,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: AgencySettingsForm
-) -> 'RenderData | Response':
-    return handle_generic_settings(self, request, form, _("Agencies"))
+) -> RenderData | Response:
+    return handle_generic_settings(self, request, form, _('Agencies'))

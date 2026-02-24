@@ -1,15 +1,19 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from copy import copy
 from onegov.core.crypto import random_password
 from onegov.core.directives import query_form_class
 from onegov.core.security import Secret
 from onegov.core.templates import render_template
-from onegov.form import merge_forms
+from onegov.form import merge_forms, Form
+from onegov.form.fields import PanelField
 from onegov.org import _, OrgApp
-from onegov.org.forms import ManageUserForm, NewUserForm
+from onegov.org.forms import ChangeUsernameForm, ManageUserForm, NewUserForm
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.layout import UserLayout
 from onegov.org.layout import UserManagementLayout
+from onegov.org.utils import can_change_username
 from onegov.core.elements import Link, LinkGroup
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import Auth, User, UserCollection
@@ -23,7 +27,6 @@ from typing import overload, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from onegov.core.types import RenderData
-    from onegov.form import Form
     from onegov.org.request import OrgRequest
     from typing import TypeVar
     from webob import Response
@@ -35,10 +38,10 @@ if TYPE_CHECKING:
              permission=Secret)
 def view_usermanagement(
     self: UserCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: UserManagementLayout | None = None,
-    roles: 'Mapping[str, str] | None' = None
-) -> 'RenderData':
+    roles: Mapping[str, str] | None = None
+) -> RenderData:
     """ Allows the management of organisation users. """
 
     layout = layout or UserManagementLayout(self, request)
@@ -50,9 +53,18 @@ def view_usermanagement(
         users[user.role].append(user)
 
     roles = roles or {
-        'admin': _("Administrator"),
-        'editor': _("Editor"),
-        'member': _("Member"),
+        'admin': _('Administrator'),
+        'editor': _('Editor'),
+        'supporter': _('Supporter'),
+        'member': _('Member'),
+    }
+
+    # hide roles that are not configured for the current app
+    roles_setting = request.app.settings.roles
+    roles = {
+        role: label
+        for role, label in roles.items()
+        if hasattr(roles_setting, role)
     }
 
     filters = {}
@@ -71,8 +83,8 @@ def view_usermanagement(
             active=value in self.filters.get('active', ()),
             url=request.link(self.for_filter(active=value))
         ) for title, value in (
-            (_("Active"), True),
-            (_("Inactive"), False)
+            (_('Active'), True),
+            (_('Inactive'), False)
         )
     ]
 
@@ -94,12 +106,12 @@ def view_usermanagement(
             }.get(value, value),
             active=value in self.filters.get('source', ()),
             url=request.link(self.for_filter(source=value))
-        ) for value in self.sources + ('', )
+        ) for value in (*self.sources, '')
     ]
 
     return {
         'layout': layout,
-        'title': _("User Management"),
+        'title': _('User Management'),
         'roles': roles.keys(),
         'users': users,
         'filters': filters
@@ -115,10 +127,10 @@ def view_usermanagement(
 )
 def handle_create_signup_link(
     self: UserCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: SignupLinkForm,
     layout: UserManagementLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     link = None
 
@@ -129,12 +141,12 @@ def handle_create_signup_link(
         link = request.link(auth, 'register')
 
     layout = layout or UserManagementLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New Signup Link"), '#'))
+    layout.breadcrumbs.append(Link(_('New Signup Link'), '#'))
     layout.editbar_links = None  # type:ignore[assignment]
 
     return {
         'layout': layout,
-        'title': _("New Signup Link"),
+        'title': _('New Signup Link'),
         'link': link,
         'form': form
     }
@@ -143,9 +155,9 @@ def handle_create_signup_link(
 @OrgApp.html(model=User, template='user.pt', permission=Secret)
 def view_user(
     self: User,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: UserLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
     """ Shows all objects owned by the given user. """
 
     layout = layout or UserLayout(self, request)
@@ -163,24 +175,26 @@ def view_user(
 
 
 @OrgApp.userlinks()
-def ticket_links(request: 'OrgRequest', user: User) -> LinkGroup:
+def ticket_links(request: OrgRequest, user: User) -> LinkGroup:
     tickets = TicketCollection(request.session).query()
     tickets = tickets.filter_by(user_id=user.id)
     tickets = tickets.order_by(Ticket.number)
-    tickets = tickets.with_entities(
-        Ticket.id, Ticket.number, Ticket.handler_code)
 
     return LinkGroup(
-        title=_("Tickets"),
+        title=_('Tickets'),
         links=[
             Link(
-                ticket.number,
+                number,
                 request.class_link(Ticket, {
-                    'handler_code': ticket.handler_code,
-                    'id': ticket.id
+                    'handler_code': handler_code,
+                    'id': ticket_id
                 }),
             )
-            for ticket in tickets
+            for ticket_id, number, handler_code in tickets.with_entities(
+                Ticket.id,
+                Ticket.number,
+                Ticket.handler_code
+            ).tuples()
         ]
     )
 
@@ -188,32 +202,44 @@ def ticket_links(request: 'OrgRequest', user: User) -> LinkGroup:
 @overload
 def get_manage_user_form(
     self: User,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[ManageUserForm]: ...
 
 
 @overload
 def get_manage_user_form(
     self: User,
-    request: 'OrgRequest',
-    base: type['FormT']
-) -> type['FormT']: ...
+    request: OrgRequest,
+    base: type[FormT]
+) -> type[FormT]: ...
 
 
 def get_manage_user_form(
     self: User,
-    request: 'OrgRequest',
-    base: type['Form'] = ManageUserForm
-) -> type['Form']:
+    request: OrgRequest,
+    base: type[Form] = ManageUserForm
+) -> type[Form]:
 
     userprofile_form = query_form_class(request, self, name='userprofile')
     assert userprofile_form
+    if can_change_username(self, request):
+        class ChangeUsernameCallout(Form):
+            username_callout = PanelField(
+                text=_(
+                    'The username can be changed <a href="${url}">here</a>.',
+                    mapping={'url': request.link(self, 'change-username')},
+                    markup=True
+                ),
+                kind='callout'
+            )
+
+        base = merge_forms(ChangeUsernameCallout, base)
 
     class OptionalUserprofile(userprofile_form):  # type:ignore
 
         hooked = False
 
-        def submitted(self, request: 'OrgRequest') -> bool:
+        def submitted(self, request: OrgRequest) -> bool:
             # fields only present on the userprofile_form are made optional
             # to make sure that we can always change the active/inactive state
             # of the user and the role the user has
@@ -240,10 +266,10 @@ def get_manage_user_form(
              permission=Secret, name='edit')
 def handle_manage_user(
     self: User,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ManageUserForm,
     layout: UserManagementLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if self.source:
         raise HTTPForbidden()
@@ -259,9 +285,12 @@ def handle_manage_user(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
-        return request.redirect(request.class_link(UserCollection))
+        return request.redirect(request.class_link(
+            UserCollection,
+            variables={'active': '1'}
+        ))
 
     elif not request.POST:
         form.process(obj=self)
@@ -276,20 +305,68 @@ def handle_manage_user(
     }
 
 
+@OrgApp.form(
+    model=User,
+    template='form.pt',
+    form=ChangeUsernameForm,
+    pass_model=True,
+    permission=Secret,
+    name='change-username'
+)
+def handle_change_username(
+    self: User,
+    request: OrgRequest,
+    form: ChangeUsernameForm,
+    layout: UserManagementLayout | None = None
+) -> RenderData | Response:
+
+    if not can_change_username(self, request, form.factors):
+        raise HTTPForbidden()
+
+    if form.submitted(request):
+        assert form.new_username.data is not None
+        old_username = self.username
+        form.populate_obj(self)
+        request.success(_(
+            'Succesfully changed ${old_username} to ${new_username}',
+            mapping={
+                'old_username': old_username,
+                'new_username': form.new_username.data
+            }
+        ))
+
+        return request.redirect(request.class_link(
+            UserCollection,
+            variables={'active': '1'}
+        ))
+
+    layout = layout or UserManagementLayout(self, request)
+    layout.breadcrumbs.extend((
+        Link(self.username, request.link(self)),
+        Link(_('Change username'), '#')
+    ))
+
+    return {
+        'layout': layout,
+        'title': _('Change username'),
+        'form': form
+    }
+
+
 @OrgApp.form(model=UserCollection, template='newuser.pt',
              form=NewUserForm, name='new', permission=Secret)
 def handle_new_user(
     self: UserCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: NewUserForm,
     layout: UserManagementLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     if not request.app.enable_yubikey:
         form.delete_field('yubikey')
 
     layout = layout or UserManagementLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New User"), '#'))
+    layout.breadcrumbs.append(Link(_('New User'), '#'))
     layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
@@ -315,11 +392,11 @@ def handle_new_user(
         except ExistingUserError:
             assert isinstance(form.username.errors, list)
             form.username.errors.append(
-                _("A user with this e-mail address already exists"))
+                _('A user with this e-mail address already exists'))
         else:
             if form.send_activation_email.data:
                 subject = request.translate(
-                    _("An account was created for you")
+                    _('An account was created for you')
                 )
 
                 content = render_template('mail_new_user.pt', request, {
@@ -335,11 +412,11 @@ def handle_new_user(
                     content=content,
                 )
 
-            request.info(_("The user was created successfully"))
+            request.info(_('The user was created successfully'))
 
             return {
                 'layout': layout,
-                'title': _("New User"),
+                'title': _('New User'),
                 'username': form.username.data,
                 'password': password,
                 'sent_email': form.send_activation_email.data
@@ -347,8 +424,8 @@ def handle_new_user(
 
     return {
         'layout': layout,
-        'title': _("New User"),
+        'title': _('New User'),
         'form': form,
-        'password': None,
+        'password': None,  # nosec: B105
         'sent_email': False
     }

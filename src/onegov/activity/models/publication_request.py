@@ -1,16 +1,16 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
-from sqlalchemy import Column, ForeignKey
-from sqlalchemy.orm import relationship
-from uuid import uuid4
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from .activity import Activity
-    from .period import Period
+    from .period import BookingPeriod
 
 
 class PublicationRequest(Base, TimestampMixin):
@@ -27,32 +27,21 @@ class PublicationRequest(Base, TimestampMixin):
     __tablename__ = 'publication_requests'
 
     #: The public id of the publication request
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The activity linked to this request
-    activity_id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('activities.id'),
-        nullable=False
-    )
-    activity: 'relationship[Activity]' = relationship(
-        'Activity',
+    activity_id: Mapped[UUID] = mapped_column(ForeignKey('activities.id'))
+    activity: Mapped[Activity] = relationship(
         back_populates='publication_requests',
         lazy='joined'
     )
 
     #: The period linked to this request
-    period_id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('periods.id'),
-        nullable=False
-    )
-    period: 'relationship[Period]' = relationship(
-        'Period',
+    period_id: Mapped[UUID] = mapped_column(ForeignKey('periods.id'))
+    period: Mapped[BookingPeriod] = relationship(
         back_populates='publication_requests',
         lazy='joined'
     )

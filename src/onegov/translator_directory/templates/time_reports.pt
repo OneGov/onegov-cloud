@@ -1,0 +1,112 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.translator_directory">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="cell small-12">
+                <div class="callout secondary"
+                     tal:condition="python: finanzstelle_names or not archive"
+                     style="margin-bottom: 1rem;">
+                    <p tal:condition="finanzstelle_names" >
+                        <strong i18n:translate="">
+                            Showing time reports for:
+                        </strong>
+                        <span tal:content="', '.join(finanzstelle_names)">
+                            Finanzstelle names
+                        </span>
+                    </p>
+                    <p style=""
+                       tal:condition="not: archive">
+                        <em i18n:translate="">
+                            Note: Export will only include confirmed reports.
+                        </em>
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center;
+                            gap: 0.5rem; margin-bottom: 1rem;
+                            flex-wrap: wrap;">
+                    <a tal:condition="not: archive"
+                       href="${archive_toggle_url}"
+                       class="button secondary round small"
+                       >${archive_toggle_text}</a>
+                    <a tal:condition="archive"
+                       href="${archive_toggle_url}"
+                       class="button primary round small"
+                       >${archive_toggle_text}</a>
+                    <tal:b condition="export_link"
+                           replace="export_link(layout)" />
+                </div>
+                <div class="time-reports-list">
+                    <p tal:condition="python: not reports and not archive"
+                       i18n:translate="">
+                        No time reports found
+                    </p>
+                    <p tal:condition="python: not reports and archive"
+                       i18n:translate="">
+                        No archived time reports found
+                    </p>
+                    <table class="fullwidth" tal:condition="reports">
+                        <thead>
+                            <th i18n:translate="">Translator</th>
+                            <th i18n:translate="">Created</th>
+                            <th i18n:translate="">Assignment Date</th>
+                            <th i18n:translate="">Type</th>
+                            <th i18n:translate="">Duration</th>
+                            <th i18n:translate="">Total</th>
+                            <th i18n:translate="">Status</th>
+                            <th i18n:translate="">Ticket</th>
+                            <th i18n:translate="">Actions</th>
+                        </thead>
+                        <tbody>
+                            <tr tal:repeat="report reports">
+                                <td>
+                                    <a href="${request.link(report.translator)}"
+                                       tal:condition="report.translator">
+                                        ${report.translator.title}
+                                    </a>
+                                </td>
+                                <td>
+                                    ${layout.format_date(report.created, 'datetime')}
+                                </td>
+                                <td>
+                                    ${layout.format_date(
+                                        report.assignment_date, 'date')}
+                                </td>
+                                <td>${layout.format_interpreting_type(
+                                    report.assignment_type) if report.assignment_type else '-'}</td>
+                                <td>${report.duration} min</td>
+                                <td>${layout.format_currency(
+                                    report.total_compensation)}</td>
+                                <td>
+                                    <span tal:condition="report.status == 'pending'"
+                                          class="label secondary"
+                                          i18n:translate="">Pending</span>
+                                    <span tal:condition="python: report.status == 'confirmed' and not report.exported"
+                                          class="label"
+                                          i18n:translate="">Confirmed</span>
+                                    <span tal:condition="python: report.status == 'confirmed' and report.exported"
+                                          class="label success"
+                                          i18n:translate="">Exported</span>
+                                </td>
+                                <td tal:define="ticket report_tickets.get(
+                                    str(report.id))">
+                                    <a href="${request.link(ticket)}"
+                                       tal:condition="ticket"
+                                       i18n:translate="">View Ticket</a>
+                                    <span tal:condition="not: ticket">-</span>
+                                </td>
+                                <td tal:define="delete_link delete_links.get(
+                                    str(report.id))">
+                                    <tal:b condition="delete_link"
+                                           replace="delete_link(layout)" />
+                                    <span tal:condition="not: delete_link">-</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

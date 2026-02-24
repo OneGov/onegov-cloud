@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core import utils
 from onegov.gis import Coordinates
 from onegov.translator_directory.initial_content import create_new_organisation
-from onegov.org import OrgApp
-from onegov.org.app import get_common_asset as default_common_asset
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.town6 import TownApp
+from onegov.town6.app import get_common_asset as default_common_asset
+from onegov.town6.app import get_i18n_localedirs as get_town_i18n_localedirs
+from onegov.translator_directory.forms.user_group import (
+    TranslatorUserGroupForm
+)
 from onegov.org.models import Organisation, GeneralFile, GeneralFileCollection
 from onegov.translator_directory.request import TranslatorAppRequest
 from onegov.translator_directory.theme import TranslatorDirectoryTheme
@@ -19,12 +24,12 @@ if TYPE_CHECKING:
     from onegov.gis.models.coordinates import AnyCoordinates
 
 
-class TranslatorDirectoryApp(OrgApp):
+class TranslatorDirectoryApp(TownApp):
 
     send_ticket_statistics = False
     request_class = TranslatorAppRequest
 
-    def es_may_use_private_search(
+    def fts_may_use_private_search(
         self,
         request: TranslatorAppRequest  # type:ignore[override]
     ) -> bool:
@@ -46,16 +51,20 @@ class TranslatorDirectoryApp(OrgApp):
         )
 
     @property
-    def coordinates(self) -> 'AnyCoordinates':
+    def coordinates(self) -> AnyCoordinates:
         return self.org.meta.get('translator_directory_home') or Coordinates()
 
     @coordinates.setter
-    def coordinates(self, value: 'AnyCoordinates') -> None:
+    def coordinates(self, value: AnyCoordinates) -> None:
         self.org.meta['translator_directory_home'] = value or {}
+
+    @property
+    def accountant_email(self) -> str | None:
+        return self.org.meta.get('accountant_email')
 
     def redirect_after_login(
         self,
-        identity: 'Identity | NoIdentity',
+        identity: Identity | NoIdentity,
         request: TranslatorAppRequest,  # type:ignore[override]
         default: str
     ) -> str | None:
@@ -64,7 +73,9 @@ class TranslatorDirectoryApp(OrgApp):
             return None
         return URL(request.class_link(Organisation)).path()
 
-    # FIXME: Should this perhaps use orm_cached?
+    # We deliberately do not use @orm_cached here, because if the user
+    # uploads a new file, it's not immediately visible in the list of
+    # available templates.
     @property
     def mail_templates(self) -> list[str]:
         """ Templates are special docx files which are filled with
@@ -84,7 +95,7 @@ class TranslatorDirectoryApp(OrgApp):
             Translator.email)
         emails = q.distinct().all()
         bcc_addresses = '; '.join(str(email) for (email,) in emails if email)
-        mailto_link = f"mailto:?bcc={bcc_addresses}"
+        mailto_link = f'mailto:?bcc={bcc_addresses}'
         return mailto_link
 
 
@@ -105,14 +116,25 @@ def get_theme() -> TranslatorDirectoryTheme:
 
 @TranslatorDirectoryApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[TranslatorDirectoryApp, str], Organisation]':
+) -> Callable[[TranslatorDirectoryApp, str], Organisation]:
     return create_new_organisation
+
+
+# NOTE: Feriennet doesn't need a citizen login
+@TranslatorDirectoryApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False
+
+
+@TranslatorDirectoryApp.setting(section='org', name='usergroup_form_class')
+def get_usergroup_form_class() -> type:
+    return TranslatorUserGroupForm
 
 
 @TranslatorDirectoryApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.translator_directory', 'locale')
-    return [mine] + get_org_i18n_localedirs()
+    return [mine, *get_town_i18n_localedirs()]
 
 
 @TranslatorDirectoryApp.webasset_path()
@@ -126,6 +148,6 @@ def get_webasset_output() -> str:
 
 
 @TranslatorDirectoryApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield from default_common_asset()
     yield 'translator_directory.js'

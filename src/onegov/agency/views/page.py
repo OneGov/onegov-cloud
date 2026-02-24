@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import AgencyApp
 from onegov.agency.layout import PageLayout
 from onegov.core.security import Public
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
 @AgencyApp.html(model=Topic, template='topic.pt', permission=Public)
 def view_topic(
     self: Topic,
-    request: 'AgencyRequest'
-) -> 'RenderData | Response':
+    request: AgencyRequest
+) -> RenderData | Response:
     layout = PageLayout(self, request)
     return view_topic_base(self, request, layout)

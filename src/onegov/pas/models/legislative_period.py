@@ -1,54 +1,52 @@
+from __future__ import annotations
+
+from datetime import date
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
+from onegov.pas.i18n import _
 from onegov.search import ORMSearchable
-from sqlalchemy import Column
-from sqlalchemy import Date
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    import uuid
-    from datetime import date
+from uuid import UUID
 
 
 class LegislativePeriod(Base, TimestampMixin, ORMSearchable):
 
-    __tablename__ = 'pas_legislative_periods'
+    __tablename__ = 'par_legislative_periods'
 
-    es_public = False
-    es_properties = {'name': {'type': 'text'}}
+    fts_type_title = _('Legislative periods')
+    fts_public = False
+    fts_title_property = 'name'
+    fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
     @property
-    def es_suggestion(self) -> str:
+    def fts_suggestion(self) -> str:
         return self.name
+
+    #: The polymorphic type of legislative period
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'pas_legislative_period',
+    }
 
     @property
     def title(self) -> str:
         return self.name
 
     #: Internal ID
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The start date
-    start: 'Column[date]' = Column(
-        Date,
-        nullable=False
-    )
+    start: Mapped[date]
 
     #: The end date
-    end: 'Column[date]' = Column(
-        Date,
-        nullable=False
-    )
+    end: Mapped[date]
 
     #: The name
-    name: 'Column[str]' = Column(
-        Text,
-        nullable=False
-    )
+    name: Mapped[str]

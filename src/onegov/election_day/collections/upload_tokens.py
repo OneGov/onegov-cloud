@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.models import UploadToken
 
 
@@ -10,10 +12,10 @@ if TYPE_CHECKING:
 
 class UploadTokenCollection:
 
-    def __init__(self, session: 'Session'):
+    def __init__(self, session: Session):
         self.session = session
 
-    def query(self) -> 'Query[UploadToken]':
+    def query(self) -> Query[UploadToken]:
         return self.session.query(UploadToken).order_by(UploadToken.created)
 
     def create(self) -> UploadToken:
@@ -30,7 +32,7 @@ class UploadTokenCollection:
         self.session.delete(item)
         self.session.flush()
 
-    def by_id(self, id: 'UUID') -> UploadToken | None:
+    def by_id(self, id: UUID) -> UploadToken | None:
         """ Returns the token by its id. """
 
         return self.query().filter_by(id=id).first()

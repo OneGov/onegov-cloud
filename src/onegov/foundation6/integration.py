@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core import Framework
 from onegov.core.layout import ChameleonLayout
 
@@ -18,7 +20,7 @@ def get_foundation_js_path() -> str:
 
 
 @FoundationApp.webasset('foundation6')
-def get_foundation_js_assets() -> 'Iterator[str]':
+def get_foundation_js_assets() -> Iterator[str]:
     yield 'jquery.js'
     yield 'what-input.js'
     yield 'foundation.min.js'
@@ -26,6 +28,6 @@ def get_foundation_js_assets() -> 'Iterator[str]':
 
 
 class FoundationLayout(ChameleonLayout):
-    def __init__(self, model: object, request: 'CoreRequest'):
+    def __init__(self, model: object, request: CoreRequest):
         super().__init__(model, request)
         self.request.include('foundation6')

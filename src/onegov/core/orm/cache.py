@@ -20,45 +20,73 @@ If there are any changes to the users table, the cache is removed. Since the
 cache is usually a shared redis instance, this works for multiple processes.
 
 """
+from __future__ import annotations
 
 import inspect
-import sqlalchemy
 
+from functools import wraps
+from libres.db.models import ORMBase
+from onegov.core.orm.utils import maybe_merge
 from sqlalchemy.orm.query import Query
+from time import time
 
 
-from typing import overload, Any, Generic, TypeVar, TYPE_CHECKING
+from typing import cast, overload, Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
+    from morepath.request import Request
+    from onegov.core.framework import Framework
     from sqlalchemy.orm import Session
     from typing import Protocol
-    from typing_extensions import Self
+    from typing import Self
 
     from . import Base
     from .session_manager import SessionManager
     from ..cache import RedisCacheRegion
 
-    _M = TypeVar('_M', bound=Base)
     # NOTE: it would be more correct to make OrmCacheApp the first
     #       argument, but this gets a bit complicated for actually
     #       using the decorator
     Creator = Callable[[Any], '_T']
     CachePolicy = str | Callable[[Base], bool]
 
+    _T_co = TypeVar('_T_co', covariant=True)
+    _FrameworkT = TypeVar('_FrameworkT', bound=Framework, contravariant=True)
+
+    class _RequestCached(Protocol[_FrameworkT, _T_co]):
+        @overload
+        def __get__(
+            self,
+            instance: None,
+            owner: type[_FrameworkT]
+        ) -> property: ...
+        @overload
+        def __get__(
+            self,
+            instance: _FrameworkT,
+            owner: type[_FrameworkT]
+        ) -> _T_co: ...
+
     class _OrmCacheDecorator(Protocol):
         @overload
         def __call__(
             self,
-            fn: 'Creator[Query[_T]]'
-        ) -> 'OrmCacheDescriptor[tuple[_T, ...]]': ...
+            fn: Creator[Query[_T]]
+        ) -> OrmCacheDescriptor[tuple[_T, ...]]: ...
 
         @overload
         def __call__(
             self,
-            fn: 'Creator[_T]'
-        ) -> 'OrmCacheDescriptor[_T]': ...
+            fn: Creator[_T]
+        ) -> OrmCacheDescriptor[_T]: ...
+
+    class _HasApp(Protocol):
+        @property
+        def app(self) -> OrmCacheApp: ...
 
 _T = TypeVar('_T')
+_QT = TypeVar('_QT')
+unset = object()
 
 
 class OrmCacheApp:
@@ -75,9 +103,12 @@ class OrmCacheApp:
         # forward declare the attributes we need from Framework
         session_manager: SessionManager
         schema: str
+
         @property
         def cache(self) -> RedisCacheRegion: ...
         request_cache: dict[str, Any]
+        request_class: type[Request]
+        schema_cache: dict[str, Any]
 
     def configure_orm_cache(self, **cfg: Any) -> None:
         self.is_orm_cache_setup = getattr(self, 'is_orm_cache_setup', False)
@@ -102,8 +133,8 @@ class OrmCacheApp:
 
     def descriptor_bound_orm_change_handler(
         self,
-        descriptor: 'OrmCacheDescriptor[Any]'
-    ) -> 'Callable[[str, Base], None]':
+        descriptor: OrmCacheDescriptor[Any]
+    ) -> Callable[[str, Base], None]:
         """ Listens to changes to the database and evicts the cache if the
         policy demands it. Available policies:
 
@@ -115,7 +146,13 @@ class OrmCacheApp:
 
         """
 
-        def handle_orm_change(schema: str, obj: 'Base') -> None:
+        def handle_orm_change(
+            schema: str,
+            obj: Base,
+            # NOTE: We don't ever use this parameter, but `on_delete` needs
+            #       to support this parameter in order to attach correctly
+            session: Session | None = None
+        ) -> None:
 
             if callable(descriptor.cache_policy):
                 dirty = descriptor.cache_policy(obj)
@@ -136,52 +173,113 @@ class OrmCacheApp:
                 #
                 # Still, trust but verify:
                 assert self.schema == schema
-                self.cache.delete(descriptor.cache_key)
-
-                if descriptor.cache_key in self.request_cache:
-                    del self.request_cache[descriptor.cache_key]
+                for cache_key in descriptor.used_cache_keys:
+                    self.cache.delete(cache_key)
+                    # NOTE: We also need to delete the timestamp, so we don't
+                    #       get stuck on an old timestamp forever, we use
+                    #       get_or_create for the timestamp below in order to
+                    #       avoid data races in cache invalidation
+                    self.cache.delete(f'{cache_key}_ts')
+                    if cache_key in self.schema_cache:
+                        del self.schema_cache[cache_key]
+                    if cache_key in self.request_cache:
+                        del self.request_cache[cache_key]
 
         return handle_orm_change
 
     @property
-    def orm_cache_descriptors(self) -> 'Iterator[OrmCacheDescriptor[Any]]':
+    def orm_cache_descriptors(self) -> Iterator[OrmCacheDescriptor[Any]]:
         """ Yields all orm cache descriptors installed on the class. """
 
         for member_name, member in inspect.getmembers(self.__class__):
             if isinstance(member, OrmCacheDescriptor):
                 yield member
 
+        # some descriptors are installed on the linked request instead
+        for member_name, member in inspect.getmembers(self.request_class):
+            if isinstance(member, OrmCacheDescriptor):
+                yield member
+
 
 class OrmCacheDescriptor(Generic[_T]):
     """ The descriptor implements the protocol for fetching the objects
-    either from cache or from the database (through the handler).
+    either from cache or creating them using the :param:``creator``.
 
+    You are not allowed to store ORM objects in this cache, since it
+    leads to unpredictable results when attempting to merge the restored
+    objects with the current session.
     """
+
+    #: A set of cache keys that have been accessed
+    used_cache_keys: set[str]
 
     @overload
     def __init__(
-        self: 'OrmCacheDescriptor[tuple[_T, ...]]',
-        cache_policy: 'CachePolicy',
-        creator: 'Creator[Query[_T]]'
+        self: OrmCacheDescriptor[tuple[_QT, ...]],
+        cache_policy: CachePolicy,
+        creator: Creator[Query[_QT]],
+        by_role: bool = False
     ): ...
 
     @overload
     def __init__(
-        self: 'OrmCacheDescriptor[_T]',
-        cache_policy: 'CachePolicy',
-        creator: 'Creator[_T]'
+        self: OrmCacheDescriptor[_T],
+        cache_policy: CachePolicy,
+        creator: Creator[_T],
+        by_role: bool = False
     ): ...
 
     def __init__(
         self,
-        cache_policy: 'CachePolicy',
-        creator: 'Creator[Query[_T]] | Creator[_T]'
+        cache_policy: CachePolicy,
+        creator: Creator[Query[Any]] | Creator[_T],
+        by_role: bool = False
     ):
         self.cache_policy = cache_policy
-        self.cache_key = creator.__qualname__
+        self.cache_key_prefix = creator.__qualname__
+        self.used_cache_keys = set()
         self.creator = creator
+        self.by_role = by_role
 
-    def create(self, app: OrmCacheApp) -> _T:
+    def cache_key(self, obj: OrmCacheApp | _HasApp) -> str:
+        if not self.by_role:
+            return self.cache_key_prefix
+
+        role = getattr(getattr(obj, 'identity', None), 'role', None)
+        return f'{self.cache_key_prefix}-{role}'
+
+    def assert_no_orm_objects(self, obj: object, depth: int = 0) -> None:
+        """ Ensures the object contains no ORM objects
+
+        """
+        # FIXME: circular import
+        from onegov.core.orm import Base
+        assert not isinstance(obj, (Base, ORMBase)), (
+            'You are not allowed to cache ORM objects with orm_cached.'
+        )
+
+        # for performance reasons we only check the first level of nesting
+        # we also run into recursion depth issues if two orm_cached properties
+        # rely on one another
+        if depth >= 1:
+            return
+
+        if isinstance(obj, str):
+            # avoid infinite recursion
+            pass
+
+        elif hasattr(obj, 'items'):
+            # we need to check keys as well as values
+            for key, value in obj.items():
+                self.assert_no_orm_objects(key, depth + 1)
+                self.assert_no_orm_objects(value, depth + 1)
+
+        elif hasattr(obj, '__iter__'):
+            # recurse into iterables
+            for child in obj:
+                self.assert_no_orm_objects(obj, depth + 1)
+
+    def create(self, instance: OrmCacheApp | _HasApp) -> _T:
         """ Uses the creator to load the object to be cached.
 
         Since the return value of the creator might not be something we want
@@ -190,102 +288,88 @@ class OrmCacheDescriptor(Generic[_T]):
 
         """
 
-        result = self.creator(app)
+        result = self.creator(instance)
 
         if isinstance(result, Query):
-            return tuple(result)  # type:ignore[return-value]
+            result = cast('_T', tuple(result))
 
+        self.assert_no_orm_objects(result)
         return result
 
-    def merge(self, session: 'Session', obj: '_M') -> '_M':
-        """ Merges the given obj into the given session, *if* this is possible.
-
-        That is it acts like more forgiving session.merge().
-
-        """
-        if self.requires_merge(obj):
-            obj = session.merge(obj, load=False)
-            obj.is_cached = True
-
-        return obj
-
-    def requires_merge(self, obj: 'Base') -> bool:
-        """ Returns true if the given object requires a merge, which is the
-        case if the object is detached.
-
-        """
-
-        # no need for an expensive sqlalchemy.inspect call for these
-        if isinstance(obj, (int, str, bool, float, tuple, list, dict, set)):
-            return False
-
-        info = sqlalchemy.inspect(obj, raiseerr=False)
-
-        if not info:
-            return False
-
-        return info.detached
-
-    def load(self, app: OrmCacheApp) -> _T:
+    def load(self, instance: OrmCacheApp | _HasApp) -> _T:
         """ Loads the object from the database or cache. """
 
-        session = app.session_manager.session()
+        if isinstance(instance, OrmCacheApp):
+            app = instance
+        else:
+            app = instance.app
 
         # before accessing any cached values we need to make sure that all
         # pending changes are properly flushed -> this leads to some extra cpu
         # cycles spent but eliminates the chance of accessing a stale entry
         # after a change
+        session = app.session_manager.session()
         if session.dirty:
             session.flush()
 
-        # we use a secondary request cache for even more lookup speed and to
+        cache_key = self.cache_key(instance)
+        self.used_cache_keys.add(cache_key)
+
+        # we use a tertiary request cache for even more lookup speed and to
         # make sure that inside a request we always get the exact same instance
         # (otherwise we don't see changes reflected)
-        if self.cache_key in app.request_cache:
+        if cache_key in app.request_cache:
+            return app.request_cache[cache_key]
 
-            # it is possible for objects in the request cache to become
-            # detached - in this case we need to merge them again
-            # (the merge function only does this if necessary)
-            return self.merge(session, app.request_cache[self.cache_key])
+        # we separately store when the redis cache was last populated
+        # so we can detect when we need to invalidate the memory cache
+        # dogpile has its own time metadata, but we can't retrieve it
+        # without paying the deserialization overhead, defeating the
+        # entire purpose of this secondary cache
+        ts_key = f'{cache_key}_ts'
 
-        else:
+        # we use a secondary in-memory cache for more lookup speed
+        ts, obj = app.schema_cache.get(cache_key, (float('-Inf'), unset))
+        if obj is unset or ts != app.cache.get(key=ts_key):
+            # NOTE: Ideally we would create these values as a pair
+            #       but then we would have to start circumventing
+            #       most of dogpile's API, at which point we may
+            #       as well just use raw Redis, which would give us
+            #       even better possibilities.
+            #       A data race isn't really harmful here, but it is
+            #       kind of inefficient that we're sending two separate
+            #       Redis commands, when one would suffice.
             obj = app.cache.get_or_create(
-                key=self.cache_key,
-                creator=lambda: self.create(app)
+                key=cache_key,
+                creator=lambda: self.create(instance)
             )
+            ts = app.cache.get_or_create(
+                key=ts_key,
+                # NOTE: There are some corner-cases where time can lead
+                #       to incorrect cache-invalidation, but we can't use
+                #       monotonic, since that will not lead to a meaningful
+                #       comparison between different processes, dogpile
+                #       also uses time for its own cache invalidation, so
+                #       we should be fine
+                creator=time
+            )
+            app.schema_cache[cache_key] = (ts, obj)
 
-        # named tuples
-        if isinstance(obj, tuple) and hasattr(obj.__class__, '_make'):
-            obj = obj._make(self.merge(session, o) for o in obj)  # type:ignore
-
-        # lists (we can save some memory here)
-        elif isinstance(obj, list):
-            for ix, o in enumerate(obj):
-                obj[ix] = self.merge(session, o)
-
-        # generic iterables
-        elif isinstance(obj, (tuple, set)):
-            obj = obj.__class__(self.merge(session, o) for o in obj)
-
-        # generic objects
-        else:
-            obj = self.merge(session, obj)
-
-        app.request_cache[self.cache_key] = obj
+        app.request_cache[cache_key] = obj
 
         return obj
 
     # NOTE: Technically this descriptor should only work on
-    #       applications that derive from OrmCacheApp, however
-    #       since we heavily use mixins that restriction becomes
-    #       tedious, once Intersection is a thing, we can restrict
-    #       this once again
+    #       applications or objects with applications that derive
+    #       from OrmCacheApp, however since we heavily use mixins
+    #       that restriction becomes tedious, once Intersection
+    #       is a thing, we can restrict this once again
     @overload
     def __get__(
         self,
         instance: None,
         owner: type[Any]
-    ) -> 'Self': ...
+    ) -> Self: ...
 
     @overload
     def __get__(
@@ -298,7 +382,7 @@ class OrmCacheDescriptor(Generic[_T]):
         self,
         instance: Any | None,
         owner: type[Any]
-    ) -> 'Self | _T':
+    ) -> Self | _T:
         """ Handles the object/cache access. """
 
         if instance is None:
@@ -307,7 +391,10 @@ class OrmCacheDescriptor(Generic[_T]):
         return self.load(instance)
 
 
-def orm_cached(policy: 'CachePolicy') -> '_OrmCacheDecorator':
+def orm_cached(
+    policy: CachePolicy,
+    by_role: bool = False
+) -> _OrmCacheDecorator:
     """ The decorator use to setup the cache descriptor.
 
     See the :mod:`onegov.core.orm.cache` docs for usage.
@@ -316,14 +403,46 @@ def orm_cached(policy: 'CachePolicy') -> '_OrmCacheDecorator':
 
     @overload
     def orm_cache_decorator(
-        fn: 'Creator[Query[_T]]'
-    ) -> 'OrmCacheDescriptor[tuple[_T, ...]]': ...
+        fn: Creator[Query[_T]]
+    ) -> OrmCacheDescriptor[tuple[_T, ...]]: ...
 
     @overload
     def orm_cache_decorator(
-        fn: 'Creator[_T]'
-    ) -> 'OrmCacheDescriptor[_T]': ...
+        fn: Creator[_T]
+    ) -> OrmCacheDescriptor[_T]: ...
 
-    def orm_cache_decorator(fn: 'Creator[Any]') -> 'OrmCacheDescriptor[Any]':
-        return OrmCacheDescriptor(policy, fn)
+    def orm_cache_decorator(fn: Creator[Any]) -> OrmCacheDescriptor[Any]:
+        return OrmCacheDescriptor(policy, fn, by_role)
     return orm_cache_decorator
+
+
+def request_cached(
+    appmethod: Callable[[_FrameworkT], _T]
+) -> _RequestCached[_FrameworkT, _T]:
+    """ This is like a request scoped :func:`orm_cached`.
+
+    This may store ORM objects in contrast to :func:`orm_cached`, which
+    should only be used to store other kinds of objects.
+
+    """
+
+    cache_key = appmethod.__qualname__
+
+    @wraps(appmethod)
+    def wrapper(self: _FrameworkT) -> _T:
+        session = self.session()
+
+        # before accessing any cached values we need to make sure that all
+        # pending changes are properly flushed -> this leads to some extra cpu
+        # cycles spent but eliminates the chance of accessing a stale entry
+        # after a change
+        if session.dirty:
+            session.flush()
+
+        if cache_key in self.request_cache:
+            return maybe_merge(self.session(), self.request_cache[cache_key])
+
+        self.request_cache[cache_key] = value = appmethod(self)
+        return value
+
+    return property(wrapper)

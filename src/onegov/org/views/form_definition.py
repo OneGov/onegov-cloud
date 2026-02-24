@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.security import Private, Public
@@ -32,7 +34,7 @@ if TYPE_CHECKING:
 
 def get_form_class(
     model: BuiltinFormDefinition | CustomFormDefinition | FormCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[FormDefinitionForm]:
 
     if isinstance(model, FormCollection):
@@ -50,26 +52,26 @@ def get_form_class(
 #        first and on the layout second, passing around layouts in contexts
 #        where we don't actually always have one is weird
 def get_hints(
-    layout: 'Layout',
+    layout: Layout,
     window: FormRegistrationWindow | None
-) -> 'Iterator[tuple[str, str]]':
+) -> Iterator[tuple[str, str]]:
 
     if not window:
         return
 
     if window.in_the_past:
-        yield 'stop', _("The registration has ended")
+        yield 'stop', _('The registration has ended')
     elif not window.enabled:
-        yield 'stop', _("The registration is closed")
+        yield 'stop', _('The registration is closed')
 
     if window.enabled and window.in_the_future:
-        yield 'date', _("The registration opens on ${day}, ${date}", mapping={
+        yield 'date', _('The registration opens on ${day}, ${date}', mapping={
             'day': layout.format_date(window.start, 'weekday_long'),
             'date': layout.format_date(window.start, 'date_long')
         })
 
     if window.enabled and window.in_the_present:
-        yield 'date', _("The registration closes on ${day}, ${date}", mapping={
+        yield 'date', _('The registration closes on ${day}, ${date}', mapping={
             'day': layout.format_date(window.end, 'weekday_long'),
             'date': layout.format_date(window.end, 'date_long')
         })
@@ -83,20 +85,20 @@ def get_hints(
             spots = window.available_spots
 
             if spots == 0:
-                yield 'stop', _("There are no spots left")
+                yield 'stop', _('There are no spots left')
             elif spots == 1:
-                yield 'count', _("There is one spot left")
+                yield 'count', _('There is one spot left')
             else:
-                yield 'count', _("There are ${count} spots left", mapping={
+                yield 'count', _('There are ${count} spots left', mapping={
                     'count': spots
                 })
 
 
 def handle_form_change_name(
-    form: 'FormDefinitionT',
-    session: 'Session',
+    form: FormDefinitionT,
+    session: Session,
     new_name: str
-) -> 'FormDefinitionT':
+) -> FormDefinitionT:
 
     new_form = form.for_new_name(new_name)
     session.add(new_form)
@@ -132,10 +134,10 @@ def handle_form_change_name(
 )
 def handle_change_form_name(
     self: FormDefinition,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormDefinitionUrlForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """Since the name used for the url is the primary key, we create a new
     FormDefinition to make our live easier """
     site_title = _('Change URL')
@@ -163,10 +165,10 @@ def handle_change_form_name(
 )
 def handle_defined_form(
     self: FormDefinition,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     layout: FormSubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Renders the empty form and takes input, even if it's not valid, stores
     it as a pending submission and redirects the user to the view that handles
     pending submissions.
@@ -215,17 +217,17 @@ def handle_defined_form(
 )
 def handle_new_definition(
     self: FormCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormDefinitionForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.title.data is not None
         assert form.definition.data is not None
 
         if self.definitions.by_name(normalize_for_url(form.title.data)):
-            request.alert(_("A form with this name already exists"))
+            request.alert(_('A form with this name already exists'))
         else:
             definition = self.definitions.add(
                 title=form.title.data,
@@ -234,20 +236,20 @@ def handle_new_definition(
             )
             form.populate_obj(definition)
 
-            request.success(_("Added a new form"))
+            request.success(_('Added a new form'))
             return morepath.redirect(request.link(definition))
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(self)),
-        Link(_("New Form"), request.link(self, name='new'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Forms'), request.link(self)),
+        Link(_('New Form'), request.link(self, name='new'))
     ]
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New Form"),
+        'title': _('New Form'),
         'form': form,
         'form_width': 'large',
     }
@@ -260,10 +262,10 @@ def handle_new_definition(
 )
 def handle_edit_definition(
     self: FormDefinition,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormDefinitionForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.definition.data is not None
@@ -272,7 +274,7 @@ def handle_edit_definition(
         form.populate_obj(self, exclude={'definition'})
         self.definition = form.definition.data
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return morepath.redirect(request.link(self))
     elif not request.POST:
         form.process(obj=self)
@@ -281,10 +283,10 @@ def handle_edit_definition(
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(collection)),
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Forms'), request.link(collection)),
         Link(self.title, request.link(self)),
-        Link(_("Edit"), request.link(self, name='edit'))
+        Link(_('Edit'), request.link(self, name='edit'))
     ]
     layout.edit_mode = True
 
@@ -303,7 +305,7 @@ def handle_edit_definition(
 )
 def delete_form_definition(
     self: FormDefinition,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
     """
     With introduction of cancelling submissions over the registration window,
@@ -324,7 +326,7 @@ def delete_form_definition(
     if self.type != 'custom':
         raise exc.HTTPMethodNotAllowed()
 
-    def handle_ticket(submission: 'FormSubmission') -> None:
+    def handle_ticket(submission: FormSubmission) -> None:
         ticket = submission_deletable(submission, request.session)
         if ticket is False:
             raise exc.HTTPMethodNotAllowed()
@@ -333,7 +335,7 @@ def delete_form_definition(
             close_ticket(ticket, request.current_user, request)
             ticket.create_snapshot(request)
 
-    def handle_submissions(submissions: 'Iterable[FormSubmission]') -> None:
+    def handle_submissions(submissions: Iterable[FormSubmission]) -> None:
         for s in submissions:
             handle_ticket(s)
 

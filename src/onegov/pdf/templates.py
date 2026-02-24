@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pdfdocument.document import ReportingDocTemplate
 
 
@@ -9,7 +11,7 @@ if TYPE_CHECKING:
 class Template(ReportingDocTemplate):
     """ Extends the ReportingDocTemplate with Table of Contents printing. """
 
-    def afterFlowable(self, flowable: 'Flowable') -> None:
+    def afterFlowable(self, flowable: Flowable) -> None:
 
         ReportingDocTemplate.afterFlowable(self, flowable)
 

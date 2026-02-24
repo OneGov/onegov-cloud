@@ -1,43 +1,131 @@
+from __future__ import annotations
+
+from datetime import date
 from freezegun import freeze_time
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
-from onegov.pas.collections import CommissionCollection
+from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import LegislativePeriodCollection
-from onegov.pas.collections import ParliamentarianCollection
-from onegov.pas.collections import ParliamentarianRoleCollection
-from onegov.pas.collections import ParliamentaryGroupCollection
+from onegov.pas.collections import PASParliamentarianCollection
+from onegov.pas.collections import PASParliamentarianRoleCollection
+from onegov.pas.collections import PASParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
-from datetime import date
+from tests.onegov.pas.conftest import DummyApp
 
 
-def test_attendence_collection(session):
-    parliamentarians = ParliamentarianCollection(session)
-    parliamentarian = parliamentarians.add(
-        first_name='a',
-        last_name='b'
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+
+@freeze_time('2024-01-01')
+def test_attendence_collection(session: Session) -> None:
+    app: Any = DummyApp(session=session)
+    parliamentarians = PASParliamentarianCollection(app)
+    parliamentarian1 = parliamentarians.add(
+        first_name='John', last_name='Doe'
+    )
+    parliamentarian2 = parliamentarians.add(
+        first_name='Jane', last_name='Smith'
+    )
+
+    commissions = PASCommissionCollection(session)
+    commission1 = commissions.add(name='Commission A')
+    commission2 = commissions.add(name='Commission B')
+
+    settlement_runs = SettlementRunCollection(session)
+    settlement_run1 = settlement_runs.add(
+        name='Run 2024-Q1',
+        start=date(2024, 1, 1),
+        end=date(2024, 3, 31),
+        active=True,
+    )
+    settlement_run2 = settlement_runs.add(
+        name='Run 2024-Q2',
+        start=date(2024, 4, 1),
+        end=date(2024, 6, 30),
+        active=True,
     )
 
     attendences = AttendenceCollection(session)
     attendences.add(
         date=date(2024, 1, 1),
-        duration=1,
+        duration=60,
         type='plenary',
-        parliamentarian_id=parliamentarian.id
+        parliamentarian_id=parliamentarian1.id,
     )
     attendences.add(
-        date=date(2024, 1, 2),
-        duration=1,
-        type='plenary',
-        parliamentarian_id=parliamentarian.id
+        date=date(2024, 2, 15),
+        duration=120,
+        type='commission',
+        parliamentarian_id=parliamentarian2.id,
+        commission_id=commission1.id,
+    )
+    attendences.add(
+        date=date(2024, 4, 10),
+        duration=90,
+        type='study',
+        parliamentarian_id=parliamentarian1.id,
+        commission_id=commission2.id,
     )
 
-    # ordering
-    assert [a.date.day for a in attendences.query()] == [2, 1]
+    # Test basic ordering
+    assert [a.date for a in attendences.query()] == [
+        date(2024, 4, 10),
+        date(2024, 2, 15),
+        date(2024, 1, 1),
+    ]
 
+    # Test settlement run filtering
+    filtered = attendences.for_filter(
+        settlement_run_id=str(settlement_run1.id)
+    )
+    assert [a.date for a in filtered.query()] == [
+        date(2024, 2, 15),
+        date(2024, 1, 1),
+    ]
 
-def test_change_collection(session):
+    # Test date filtering
+    filtered = attendences.for_filter(date_from=date(2024, 2, 1))
+    assert [a.date for a in filtered.query()] == [
+        date(2024, 4, 10),
+        date(2024, 2, 15),
+    ]
+
+    # Test type filtering
+    filtered = attendences.for_filter(type='commission')
+    assert [a.type for a in filtered.query()] == ['commission']
+
+    # Test parliamentarian filtering
+    filtered = attendences.for_filter(
+        parliamentarian_id=str(parliamentarian1.id)
+    )
+    assert [a.parliamentarian.last_name for a in filtered.query()] == [
+        'Doe',
+        'Doe',
+    ]
+
+    # Test commission filtering
+    filtered = attendences.for_filter(commission_id=str(commission1.id))
+    assert [a.commission.name for a in filtered.query()] == [  # type: ignore[union-attr]
+        'Commission A'
+    ]
+
+    # Test combined filtering
+    filtered = attendences.for_filter(
+        date_from=date(2024, 2, 1),
+        date_to=date(2024, 3, 31),
+        type='commission',
+        parliamentarian_id=str(parliamentarian2.id),
+        commission_id=str(commission1.id),
+    )
+    assert len(filtered.query().all()) == 1
+    assert filtered.query().first().type == 'commission'  # type: ignore[union-attr]
+
+def test_change_collection(session: Session) -> None:
     changes = ChangeCollection(session)
     changes.add(action='add', model='attendence')
     changes.add(action='edit', model='attendence')
@@ -47,8 +135,8 @@ def test_change_collection(session):
 
 
 @freeze_time('2024-01-01')
-def test_commission_collection(session):
-    commissions = CommissionCollection(session)
+def test_commission_collection(session: Session) -> None:
+    commissions = PASCommissionCollection(session)
     commissions.add(name='c')
     commissions.add(name='b', end=date(2025, 1, 1))
     commissions.add(name='a', end=date(2023, 1, 1))
@@ -62,7 +150,7 @@ def test_commission_collection(session):
 
 
 @freeze_time('2024-01-01')
-def test_legiaslative_period_collection(session):
+def test_legiaslative_period_collection(session: Session) -> None:
     periods = LegislativePeriodCollection(session)
     periods.add(name='b', start=date(2023, 1, 1), end=date(2025, 1, 1))
     periods.add(name='a', start=date(2021, 1, 1), end=date(2023, 1, 1))
@@ -76,8 +164,9 @@ def test_legiaslative_period_collection(session):
 
 
 @freeze_time('2024-01-01')
-def test_parliamentarian_collection(session):
-    parliamentarians = ParliamentarianCollection(session)
+def test_parliamentarian_collection(session: Session) -> None:
+    app: Any = DummyApp(session=session)
+    parliamentarians = PASParliamentarianCollection(app)
     a = parliamentarians.add(
         first_name='a',
         last_name='b'
@@ -91,7 +180,7 @@ def test_parliamentarian_collection(session):
         last_name='c'
     )
 
-    roles = ParliamentarianRoleCollection(session)
+    roles = PASParliamentarianRoleCollection(session)
     roles.add(parliamentarian_id=a.id)
     roles.add(parliamentarian_id=b.id, end=date(2023, 1, 1))
 
@@ -104,8 +193,8 @@ def test_parliamentarian_collection(session):
 
 
 @freeze_time('2024-01-01')
-def test_parliamentarian_group_collection(session):
-    groups = ParliamentaryGroupCollection(session)
+def test_parliamentarian_group_collection(session: Session) -> None:
+    groups = PASParliamentaryGroupCollection(session)
     groups.add(name='c')
     groups.add(name='b', end=date(2025, 1, 1))
     groups.add(name='a', end=date(2023, 1, 1))
@@ -119,7 +208,7 @@ def test_parliamentarian_group_collection(session):
 
 
 @freeze_time('2024-01-01')
-def test_party_collection(session):
+def test_party_collection(session: Session) -> None:
     parties = PartyCollection(session)
     parties.add(name='c')
     parties.add(name='b', end=date(2025, 1, 1))
@@ -134,7 +223,7 @@ def test_party_collection(session):
 
 
 @freeze_time('2024-01-01')
-def test_rate_set_collection(session):
+def test_rate_set_collection(session: Session) -> None:
     rates = RateSetCollection(session)
     rates.add(year=2022)
     rates.add(year=2023)
@@ -148,7 +237,7 @@ def test_rate_set_collection(session):
     assert rates.for_filter(active=False).query().count() == 2
 
 
-def test_settlement_run_collection(session):
+def test_settlement_run_collection(session: Session) -> None:
     runs = SettlementRunCollection(session)
     runs.add(
         name='c',

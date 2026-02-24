@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from onegov.core import Framework, utils
 from onegov.file import DepotApp
 from onegov.onboarding.theme import OnboardingTheme
 from onegov.reservation import LibresIntegration
-from onegov.search import ElasticsearchApp
+from onegov.search import SearchApp
 
 
 from typing import Any, TYPE_CHECKING
@@ -10,7 +12,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 
-class OnboardingApp(Framework, LibresIntegration, DepotApp, ElasticsearchApp):
+class OnboardingApp(Framework, LibresIntegration, DepotApp, SearchApp):
 
     serve_static_files = True
 
@@ -73,7 +75,7 @@ def get_webasset_output() -> str:
 
 
 @OnboardingApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield 'modernizr.js'
     yield 'jquery.js'
     yield 'placeholder.js'

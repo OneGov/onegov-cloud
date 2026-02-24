@@ -1,7 +1,8 @@
 """ Contains the legacy models of files for url redirect support. Going
 forward, onegov.file and onegov.org.models.file is used.
 
- """
+"""
+from __future__ import annotations
 
 import base64
 
@@ -13,18 +14,18 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date as date_t
     from onegov.org.app import OrgApp
-    from typing_extensions import Self
+    from typing import Self
 
 
 class LegacyFileCollection:
 
-    def __init__(self, app: 'OrgApp') -> None:
+    def __init__(self, app: OrgApp) -> None:
         assert app.has_filestorage and app.filestorage is not None
 
         self.path_prefix = 'files/'
         self.file_storage = utils.makeopendir(app.filestorage, 'files')
 
-    def get_file_by_filename(self, filename: str) -> 'LegacyFile | None':
+    def get_file_by_filename(self, filename: str) -> LegacyFile | None:
         if self.file_storage.exists(filename):
             return LegacyFile(filename)
         return None
@@ -32,13 +33,13 @@ class LegacyFileCollection:
 
 class LegacyImageCollection:
 
-    def __init__(self, app: 'OrgApp') -> None:
+    def __init__(self, app: OrgApp) -> None:
         assert app.has_filestorage and app.filestorage is not None
 
         self.path_prefix = 'images/'
         self.file_storage = utils.makeopendir(app.filestorage, 'images')
 
-    def get_file_by_filename(self, filename: str) -> 'LegacyImage | None':
+    def get_file_by_filename(self, filename: str) -> LegacyImage | None:
         if self.file_storage.exists(filename):
             return LegacyImage(filename)
         return None
@@ -52,7 +53,7 @@ class LegacyFile(FilestorageFile):
         self.info = info or {}
 
     @property
-    def date(self) -> 'date_t | None':
+    def date(self) -> date_t | None:
         if 'modified_time' in self.info:
             return self.info['modified_time'].date()
         return None
@@ -69,7 +70,7 @@ class LegacyFile(FilestorageFile):
         return None
 
     @classmethod
-    def from_url(cls, url: str) -> 'Self':
+    def from_url(cls, url: str) -> Self:
         return cls(url.split('/')[-1])
 
 

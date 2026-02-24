@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -83,13 +85,13 @@ WABSTIC_PROPORZ_HEADERS_WP_KANDIDATENGDE = (
 )
 
 
-def get_entity_id(line: 'DefaultRow', expats: 'Collection[int]') -> int:
+def get_entity_id(line: DefaultRow, expats: Collection[int]) -> int:
     col = 'bfsnrgemeinde'
     entity_id = validate_integer(line, col)
     return 0 if entity_id in expats else entity_id
 
 
-def get_list_id_from_knr(line: 'DefaultRow') -> str:
+def get_list_id_from_knr(line: DefaultRow) -> str:
     """
     Takes a line from csv file with a candidate number (knr) in it and
     returns the derived listnr for this candidate. Will also handle the new
@@ -100,7 +102,7 @@ def get_list_id_from_knr(line: 'DefaultRow') -> str:
     return line.knr[0:-2]
 
 
-def get_list_id(line: 'DefaultRow') -> str:
+def get_list_id(line: DefaultRow) -> str:
     number = line.listnr or '0'
     # wabstiC 99 is blank list that maps to 999 see open_data_de.md
     number = '999' if number == '99' else number
@@ -109,7 +111,7 @@ def get_list_id(line: 'DefaultRow') -> str:
 
 def import_election_wabstic_proporz(
     election: ProporzElection,
-    principal: 'Canton | Municipality',
+    principal: Canton | Municipality,
     number: str,
     district: str | None = None,
     file_wp_wahl: IO[bytes] | None = None,
@@ -226,7 +228,7 @@ def import_election_wabstic_proporz(
                 line, 'anzpendentgde', default=None)
         except Exception as e:
             line_errors.append(
-                _("Error in anzpendentgde: ${msg}",
+                _('Error in anzpendentgde: ${msg}',
                   mapping={'msg': e.args[0]}))
 
         # Pass the errors and continue to next line
@@ -257,11 +259,11 @@ def import_election_wabstic_proporz(
         else:
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
 
             if entity_id in added_entities:
                 line_errors.append(
-                    _("${name} was found twice", mapping={'name': entity_id}))
+                    _('${name} was found twice', mapping={'name': entity_id}))
 
         # Parse the eligible voters
         try:
@@ -310,7 +312,7 @@ def import_election_wabstic_proporz(
         else:
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
 
             if entity_id not in added_entities:
                 # Only add it if present (there is there no SortGeschaeft)
@@ -324,7 +326,7 @@ def import_election_wabstic_proporz(
             # From wabstic export docs: Einheit ist grün-gesperrt
             # (1442=14:42 Uhr von der Oberbehörde gesperrt), sonst leer
             locking_time = validate_integer(line, 'sperrung', default=False)
-            entity['counted'] = False if not locking_time else True
+            entity['counted'] = locking_time != 0
         except ValueError as e:
             line_errors.append(e.args[0])
 
@@ -395,7 +397,7 @@ def import_election_wabstic_proporz(
         else:
             if list_id in added_lists:
                 line_errors.append(
-                    _("${name} was found twice", mapping={'name': list_id}))
+                    _('${name} was found twice', mapping={'name': list_id}))
 
         # Pass the errors and continue to next line
         if line_errors:
@@ -460,13 +462,13 @@ def import_election_wabstic_proporz(
 
             if entity_id not in added_entities:
                 line_errors.append(
-                    _("Entity with id ${id} not in added_entities",
+                    _('Entity with id ${id} not in added_entities',
                       mapping={'id': entity_id}))
 
             if list_id in added_list_results.get(entity_id, {}):
                 line_errors.append(
                     _(
-                        "${name} was found twice",
+                        '${name} was found twice',
                         mapping={
                             'name': '{}/{}'.format(entity_id, list_id)
                         }
@@ -508,16 +510,16 @@ def import_election_wabstic_proporz(
             family_name = line.nachname
             first_name = line.vorname
         except TypeError:
-            line_errors.append(_("Invalid candidate values"))
+            line_errors.append(_('Invalid candidate values'))
         else:
             if candidate_id in added_candidates:
                 line_errors.append(
-                    _("${name} was found twice",
+                    _('${name} was found twice',
                       mapping={'name': candidate_id}))
 
             if list_id not in added_lists:
                 line_errors.append(
-                    _("List_id ${list_id} has not been found in list numbers",
+                    _('List_id ${list_id} has not been found in list numbers',
                         mapping={
                             'list_id': list_id
                         })
@@ -561,7 +563,7 @@ def import_election_wabstic_proporz(
         else:
             if candidate_id not in added_candidates:
                 line_errors.append(
-                    _("Candidate with id ${id} not in wpstatic_kandidaten",
+                    _('Candidate with id ${id} not in wpstatic_kandidaten',
                       mapping={'id': candidate_id}))
             added_candidates[candidate_id]['elected'] = elected
 
@@ -601,7 +603,7 @@ def import_election_wabstic_proporz(
             if candidate_id in added_results.get(entity_id, {}):
                 line_errors.append(
                     _(
-                        "${name} was found twice",
+                        '${name} was found twice',
                         mapping={
                             'name': '{}/{}'.format(entity_id, candidate_id)
                         }
@@ -643,23 +645,25 @@ def import_election_wabstic_proporz(
     result_uids = {entity_id: uuid4() for entity_id in added_results}
 
     session = object_session(election)
+    assert session is not None
+    # FIXME: Switch to regular `session.execute` with insert statements
     session.bulk_insert_mappings(
-        ListConnection,
+        ListConnection,  # type: ignore[arg-type]
         (
             added_connections[key]
             for key in sorted(added_connections, key=lambda x: x[1] or '')
         )
     )
     session.bulk_insert_mappings(
-        List,
+        List,  # type: ignore[arg-type]
         (
             added_lists[key]
             for key in filter(lambda x: x != '999', added_lists)
         )
     )
-    session.bulk_insert_mappings(Candidate, added_candidates.values())
+    session.bulk_insert_mappings(Candidate, added_candidates.values())  # type: ignore[arg-type]
     session.bulk_insert_mappings(
-        ElectionResult,
+        ElectionResult,  # type: ignore[arg-type]
         (
             {
                 'id': result_uids[entity_id],
@@ -682,7 +686,7 @@ def import_election_wabstic_proporz(
         )
     )
     session.bulk_insert_mappings(
-        CandidateResult,
+        CandidateResult,  # type: ignore[arg-type]
         (
             {
                 'id': uuid4(),
@@ -695,7 +699,7 @@ def import_election_wabstic_proporz(
         )
     )
     session.bulk_insert_mappings(
-        ListResult,
+        ListResult,  # type: ignore[arg-type]
         (
             {
                 'id': uuid4(),
@@ -739,7 +743,7 @@ def import_election_wabstic_proporz(
                 'counted': False
             }
         )
-    session.bulk_insert_mappings(ElectionResult, result_inserts)
+    session.bulk_insert_mappings(ElectionResult, result_inserts)  # type: ignore[arg-type]
     session.flush()
     session.expire_all()
 

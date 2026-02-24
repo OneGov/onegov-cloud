@@ -32,6 +32,7 @@ The folder can either be a directory relative to the app class or an absolute
 path.
 
 """
+from __future__ import annotations
 
 import os.path
 
@@ -66,18 +67,18 @@ BOOLEAN_HTML_ATTRS = frozenset(
         # List of Boolean attributes in HTML that should be rendered in
         # minimized form (e.g. <img ismap> rather than <img ismap="">)
         # From http://www.w3.org/TR/xhtml1/#guidelines (C.10)
-        "compact",
-        "nowrap",
-        "ismap",
-        "declare",
-        "noshade",
-        "checked",
-        "disabled",
-        "readonly",
-        "multiple",
-        "selected",
-        "noresize",
-        "defer",
+        'compact',
+        'nowrap',
+        'ismap',
+        'declare',
+        'noshade',
+        'checked',
+        'disabled',
+        'readonly',
+        'multiple',
+        'selected',
+        'noresize',
+        'defer',
     ]
 )
 
@@ -97,8 +98,8 @@ class PageTemplateFile(PageTemplateFileBase):
 
 
 def get_default_vars(
-    request: 'CoreRequest',
-    content: 'Mapping[str, Any]',
+    request: CoreRequest,
+    content: Mapping[str, Any],
     suppress_global_variables: bool = False
 ) -> dict[str, Any]:
 
@@ -130,11 +131,11 @@ class TemplateLoader(PageTemplateLoader):
     }
 
     @cached_property
-    def macros(self) -> 'MacrosLookup':
+    def macros(self) -> MacrosLookup:
         return MacrosLookup(self.search_path, name='macros.pt')
 
     @cached_property
-    def mail_macros(self) -> 'MacrosLookup':
+    def mail_macros(self) -> MacrosLookup:
         return MacrosLookup(self.search_path, name='mail_macros.pt')
 
 
@@ -158,7 +159,7 @@ class MacrosLookup:
 
     def __init__(
         self,
-        search_paths: 'Iterable[StrPath]',
+        search_paths: Iterable[StrPath],
         name: str = 'macros.pt'
     ):
         paths = (os.path.join(base, name) for base in search_paths)
@@ -178,7 +179,7 @@ class MacrosLookup:
             for name in template.macros.names
         }
 
-    def __getitem__(self, name: str) -> 'Macro':
+    def __getitem__(self, name: str) -> Macro:
         # macro names in chameleon are normalized internally and we need
         # to do the same to get the correct name in any case:
         name = name.replace('-', '_')
@@ -207,14 +208,14 @@ def get_template_loader(
 def get_chameleon_render(
     loader: TemplateLoader,
     name: str,
-    original_render: 'Callable[[str, CoreRequest], _T]'
-) -> 'Callable[[dict[str, Any], CoreRequest], _T]':
+    original_render: Callable[[str, CoreRequest], _T]
+) -> Callable[[dict[str, Any], CoreRequest], _T]:
     """ Returns the Chameleon template renderer for the required template.
 
     """
     template = loader.load(name, 'xml')
 
-    def render(content: dict[str, Any], request: 'CoreRequest') -> Any:
+    def render(content: dict[str, Any], request: CoreRequest) -> Any:
 
         variables = get_default_vars(request, content)
         return original_render(template.render(**variables), request)
@@ -224,7 +225,7 @@ def get_chameleon_render(
 
 def render_template(
     template: str,
-    request: 'CoreRequest',
+    request: CoreRequest,
     content: dict[str, Any],
     suppress_global_variables: bool | Literal['infer'] = 'infer'
 ) -> Markup:
@@ -246,12 +247,12 @@ def render_template(
     variables = get_default_vars(
         request, content, suppress_global_variables=suppress_global_variables)
 
-    return Markup(page_template.render(**variables))  # noqa: MS001
+    return Markup(page_template.render(**variables))  # nosec: B704
 
 
 def render_macro(
-    macro: 'Macro',
-    request: 'CoreRequest',
+    macro: Macro,
+    request: CoreRequest,
     content: dict[str, Any],
     suppress_global_variables: bool = True
 ) -> Markup:
@@ -292,4 +293,4 @@ def render_macro(
     stream: list[str] = []
     macro.include(stream, Scope(variables), {})
 
-    return Markup(''.join(stream))  # noqa: MS001
+    return Markup(''.join(stream))  # nosec: B704

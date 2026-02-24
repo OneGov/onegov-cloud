@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.chat import Message
 from sqlalchemy.orm import object_session
 
@@ -13,8 +15,10 @@ class FileMessage(Message):
     }
 
     @classmethod
-    def log_signature(cls, file: 'File', signee: str) -> None:
-        cls.bound_messages(object_session(file)).add(
+    def log_signature(cls, file: File, signee: str) -> None:
+        session = object_session(file)
+        assert session is not None
+        cls.bound_messages(session).add(
             channel_id=file.id,
             owner=signee,
             meta={
@@ -27,10 +31,12 @@ class FileMessage(Message):
     @classmethod
     def log_signed_file_removal(
         cls,
-        file: 'File',
+        file: File,
         username: str | None
     ) -> None:
-        cls.bound_messages(object_session(file)).add(
+        session = object_session(file)
+        assert session is not None
+        cls.bound_messages(session).add(
             channel_id=file.id,
             owner=username,
             meta={

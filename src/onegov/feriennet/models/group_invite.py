@@ -1,23 +1,25 @@
+from __future__ import annotations
+
 from functools import cached_property
-from onegov.activity.models import Attendee, Booking, Occasion, Period
+from onegov.activity.models import Attendee, Booking, Occasion, BookingPeriod
 from onegov.activity.utils import random_group_code
 from onegov.user import User
 from sqlalchemy import func, or_
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager, joinedload
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
 
 
 class GroupInvite:
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         group_code: str,
         username: str | None
     ) -> None:
@@ -26,7 +28,7 @@ class GroupInvite:
         self.username = username
 
     @classmethod
-    def create(cls, session: 'Session', username: str | None) -> 'Self':
+    def create(cls, session: Session, username: str | None) -> Self:
         """ Creates a new group invite with a code that is not yet used. """
         candidate = cls(
             session=session, group_code=random_group_code(), username=username)
@@ -37,7 +39,7 @@ class GroupInvite:
 
         return candidate
 
-    def for_username(self, username: str | None) -> 'Self':
+    def for_username(self, username: str | None) -> Self:
         return self.__class__(self.session, self.group_code, username)
 
     @cached_property
@@ -57,19 +59,21 @@ class GroupInvite:
         """
         return self.session.query(self.bookings().exists()).scalar()
 
-    def bookings(self) -> 'Query[Booking]':
+    def bookings(self) -> Query[Booking]:
         """ Returns a query of the bookings associated with this invite. """
 
         return (
             self.session.query(Booking)
-            .options(joinedload(Booking.attendee))
-            .options(joinedload(Booking.occasion))
-            .options(joinedload(Booking.period))
-            .filter_by(group_code=self.group_code)
+            .filter(Booking.group_code == self.group_code)
+            .join(Booking.period)
             .filter(or_(
                 Booking.state.in_(('open', 'accepted')),
-                Period.confirmed == False
+                BookingPeriod.confirmed == False
             ))
+            .join(Booking.attendee)
+            .options(contains_eager(Booking.attendee))
+            .options(contains_eager(Booking.period))
+            .options(joinedload(Booking.occasion).selectinload(Occasion.dates))
         )
 
     @cached_property
@@ -83,25 +87,25 @@ class GroupInvite:
         """
 
         return self.session.query(Occasion).filter(Occasion.id.in_(
-            self.bookings().with_entities(Booking.occasion_id).subquery()
+            self.bookings()
+            .with_entities(Booking.occasion_id)
+            .scalar_subquery()
         )).one()
 
     @cached_property
     def attendees(self) -> tuple[tuple[Attendee, Booking], ...]:
         """ Returns the attendees linked to this invite. """
-
         return tuple(
-            (booking.attendee, booking) for booking in self.bookings()
-            # FIXME: Why is this an outerjoin? attendee_id is not nullable
-            #        so a regular join should work just fine
-            .outerjoin(Attendee)
-            .order_by(func.unaccent(Attendee.name))
+            (booking.attendee, booking)
+            for booking in self.bookings().order_by(
+                func.unaccent(Attendee.name)
+            )
         )
 
     def prospects(
         self,
         username: str
-    ) -> 'Iterator[tuple[Attendee, Booking | None]]':
+    ) -> Iterator[tuple[Attendee, Booking | None]]:
         """ Returns the attendees associated with the given users that are
         not yet part of the group.
 
@@ -126,7 +130,7 @@ class GroupInvite:
             self.session.query(Booking)
             .filter(Booking.occasion_id == self.occasion.id)
             .filter(Booking.attendee_id.in_(
-                attendees.with_entities(Attendee.id).subquery()))
+                attendees.with_entities(Attendee.id).scalar_subquery()))
         )
 
         bookings = {b.attendee_id: b for b in bookings_query}

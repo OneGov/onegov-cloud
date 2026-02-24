@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import or_
 
 from onegov.core.collection import GenericCollection, Pagination
@@ -10,7 +12,7 @@ from onegov.fsi.models.course_subscription import CourseSubscription
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
@@ -23,9 +25,9 @@ class SubscriptionsCollection(
 
     def __init__(
         self,
-        session: 'Session',
-        attendee_id: 'UUID | None' = None,
-        course_event_id: 'UUID | None' = None,
+        session: Session,
+        attendee_id: UUID | None = None,
+        course_event_id: UUID | None = None,
         external_only: bool = False,
         auth_attendee: CourseAttendee | None = None,
         page: int = 0
@@ -79,7 +81,7 @@ class SubscriptionsCollection(
             return False
         return str(self.auth_attendee.id) == str(self.attendee_id)
 
-    def query(self) -> 'Query[CourseSubscription]':
+    def query(self) -> Query[CourseSubscription]:
         query = super().query()
         if self.auth_attendee and self.auth_attendee.role == 'editor':
             query = query.join(CourseAttendee)
@@ -99,18 +101,18 @@ class SubscriptionsCollection(
 
     def by_id(
         self,
-        id: 'UUID'  # type:ignore[override]
+        id: UUID  # type:ignore[override]
     ) -> CourseSubscription | None:
         return super().query().filter(self.primary_key == id).first()
 
-    def subset(self) -> 'Query[CourseSubscription]':
+    def subset(self) -> Query[CourseSubscription]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session, page=index,
             auth_attendee=self.auth_attendee,

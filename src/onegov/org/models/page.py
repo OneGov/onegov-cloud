@@ -1,4 +1,9 @@
+from __future__ import annotations
+
 from datetime import datetime
+from functools import cached_property
+from onegov.core.collection import Pagination
+from onegov.core.orm.abstract import AdjacencyListCollection
 from onegov.core.orm.mixins import (
     content_property, dict_markup_property, dict_property, meta_property)
 from onegov.form import Form, move_fields
@@ -8,7 +13,9 @@ from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
     ContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
-    NewsletterExtension, PublicationExtension, DeletableContentExtension
+    PublicationExtension, DeletableContentExtension,
+    InlinePhotoAlbumExtension, SidebarContactLinkExtension,
+    PushNotificationExtension
 )
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import CoordinatesExtension
@@ -18,18 +25,21 @@ from onegov.org.models.extensions import VisibleOnHomepageExtension
 from onegov.org.models.extensions import SidebarLinksExtension
 from onegov.org.models.traitinfo import TraitInfo
 from onegov.org.observer import observes
-from onegov.page import Page
+from onegov.page import Page, PageCollection
 from onegov.search import SearchableContent
 from sedate import replace_timezone
 from sqlalchemy import desc, func, or_, and_
-from sqlalchemy.dialects.postgresql import array, JSON
-from sqlalchemy.orm import undefer, object_session
+from sqlalchemy.dialects.postgresql import array
+from sqlalchemy.orm import object_session, relationship, undefer, Mapped
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.org.models import PushNotification
     from onegov.org.request import OrgRequest
-    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Query, Session
+    from typing import Self
 
 
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
@@ -37,11 +47,22 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             ContactExtension, ContactHiddenOnPageExtension,
             PeopleShownOnMainPageExtension, PersonLinkExtension,
             CoordinatesExtension, ImageExtension,
-            GeneralFileLinkExtension, SidebarLinksExtension):
+            GeneralFileLinkExtension, SidebarLinksExtension,
+            SidebarContactLinkExtension, InlinePhotoAlbumExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
-    es_type_name = 'topics'
+    fts_type_title = _('Topics')
+    fts_public = True
+
+    # NOTE: Topics should not decrease in relevance over time
+    @property
+    def fts_last_change(self) -> None:
+        return None
+
+    @property
+    def fts_skip(self) -> bool:
+        return self.meta.get('trait') == 'link'  # do not index links
 
     lead: dict_property[str | None] = content_property()
     text = dict_markup_property('content')
@@ -51,14 +72,6 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     # Show the lead on topics page
     lead_when_child: dict_property[bool] = content_property(default=True)
-
-    @property
-    def es_skip(self) -> bool:
-        return self.meta.get('trait') == 'link'  # do not index links
-
-    @property
-    def es_public(self) -> bool:
-        return self.access == 'public' and self.published
 
     @property
     def deletable(self) -> bool:
@@ -75,9 +88,9 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         return True
 
     @property
-    def paste_target(self) -> 'Topic | News':
+    def paste_target(self) -> Topic | News:
         if self.trait == 'link':
-            return self.parent or self  # type:ignore[return-value]
+            return self.parent or self  # type: ignore[return-value]
 
         if self.trait == 'page':
             return self
@@ -104,7 +117,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         self,
         trait: str,
         action: str,
-        request: 'OrgRequest'
+        request: OrgRequest
     ) -> type[LinkForm | PageForm | IframeForm]:
 
         if trait == 'link':
@@ -134,36 +147,53 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         raise NotImplementedError
 
 
-class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
-           AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
+class News(Page, TraitInfo, SearchableContent, AccessExtension,
+           PublicationExtension, VisibleOnHomepageExtension,
            ContactExtension, ContactHiddenOnPageExtension,
            PeopleShownOnMainPageExtension, PersonLinkExtension,
            CoordinatesExtension, ImageExtension, GeneralFileLinkExtension,
-           DeletableContentExtension):
+           DeletableContentExtension, InlinePhotoAlbumExtension,
+           PushNotificationExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
-    es_type_name = 'news'
+    # FIXME: A plural form of News would probably be better, for now
+    #        this label seems good enough
+    fts_type_title = _('Latest news')
+    fts_public = True
+
+    @property
+    def fts_last_change(self) -> datetime:
+        return self.published_or_created
+
+    filter_years = None
+    filter_tags = None
+    page = None
 
     lead: dict_property[str | None] = content_property()
     text = dict_markup_property('content')
     url: dict_property[str | None] = content_property()
 
-    filter_years: list[int] = []
-    filter_tags: list[str] = []
-
     hashtags: dict_property[list[str]] = meta_property(default=list)
 
-    @property
-    def es_public(self) -> bool:
-        return self.access == 'public' and self.published
+    push_notifications: dict_property[list[list[str]]] = (
+        meta_property(default=list)
+    )
+    send_push_notifications_to_app: dict_property[bool] = meta_property(
+        default=False
+    )
+
+    sent_notifications: Mapped[PushNotification] = relationship(
+        back_populates='news',
+        passive_deletes=True
+    )
 
     @observes('content')
     def content_observer(self, content: dict[str, Any]) -> None:
-        self.hashtags = self.es_tags or []
+        self.hashtags = self.fts_tags or []
 
     @property
-    def absorb(self) -> str:  # type:ignore[override]
+    def absorb(self) -> str:
         return ''.join(self.path.split('/', 1)[1:])
 
     @property
@@ -180,9 +210,9 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         return self.parent_id is not None
 
     @property
-    def paste_target(self) -> 'Topic | News':
+    def paste_target(self) -> Topic | News:
         if self.parent:
-            return self.parent  # type:ignore[return-value]
+            return self.parent  # type: ignore[return-value]
         else:
             return self
 
@@ -195,9 +225,9 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
             return ()
 
     def is_supported_trait(self, trait: str) -> bool:
-        return trait in {'news'}
+        return trait == 'news'
 
-    def get_root_page_form_class(self, request: 'OrgRequest') -> type[Form]:
+    def get_root_page_form_class(self, request: OrgRequest) -> type[Form]:
         return self.with_content_extensions(
             Form, request, extensions=(
                 ContactExtension, ContactHiddenOnPageExtension,
@@ -209,7 +239,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         self,
         trait: str,
         action: str,
-        request: 'OrgRequest'
+        request: OrgRequest
     ) -> type[Form | PageForm]:
 
         if trait == 'news':
@@ -222,7 +252,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
                 # the effect is not entirely the same (news may be shown on the
                 # homepage anyway)
                 form_class.is_visible_on_homepage.kwargs['label'] = _(
-                    "Always visible on homepage")
+                    'Always visible on homepage')
 
             form_class = move_fields(
                 form_class=form_class,
@@ -234,97 +264,238 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
                 after='title'
             )
 
+            if hasattr(form_class, 'send_push_notifications_to_app'):
+                form_class = move_fields(
+                    form_class=form_class,
+                    fields=(
+                        'send_push_notifications_to_app',
+                        'push_notifications',
+                    ),
+                    after='publication_start'
+                )
+
             return form_class
 
         raise NotImplementedError
 
-    def for_year(self, year: int) -> 'News':
-        years_ = set(self.filter_years)
-        years = list(years_ - {year} if year in years_ else years_ | {year})
-        return News(  # type:ignore[misc]
-            id=self.id,
-            title=self.title,
-            name=self.name,
-            filter_years=sorted(years),
-            filter_tags=sorted(self.filter_tags)
-        )
+    def push_notifications_were_sent_before(self) -> bool:
+        from onegov.org.models import PushNotification
+        session = object_session(self)
+        assert session is not None
+        query = session.query(PushNotification).filter(
+            PushNotification.news_id == self.id)
+        return session.query(query.exists()).scalar()
 
-    def for_tag(self, tag: str) -> 'News':
-        tags_ = set(self.filter_tags)
-        tags = list(tags_ - {tag} if tag in tags_ else tags_ | {tag})
-        return News(  # type:ignore[misc]
-            id=self.id,
-            title=self.title,
-            name=self.name,
-            filter_years=sorted(self.filter_years),
-            filter_tags=sorted(tags)
-        )
 
-    def news_query(
+class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
+    """
+    Use it like this:
+
+        from onegov.page import TopicCollection
+        topics = TopicCollection(session)
+    """
+
+    __listclass__ = Topic
+
+    def __init__(
         self,
-        limit: int | None = 2,
-        published_only: bool = True
-    ) -> 'Query[News]':
+        session: Session,
+        page: int = 0,
+        only_public: bool = False,
+    ):
+        self.session = session
+        self.page = page
+        self.only_public = only_public
 
-        news = object_session(self).query(News)
-        news = news.filter(Page.parent == self)
-        if published_only:
+    def subset(self) -> Query[Topic]:
+        topics = self.session.query(Topic)
+        if self.only_public:
+            topics = topics.filter(or_(
+                Topic.meta['access'].astext == 'public',
+                Topic.meta['access'].is_(None)
+            ))
+
+        topics = topics.filter(
+            News.publication_started == True,
+            News.publication_ended == False
+        )
+
+        topics = topics.order_by(desc(Topic.published_or_created))
+        topics = topics.options(undefer(Topic.created))
+        topics = topics.options(undefer(Topic.content))
+        return topics
+
+    @property
+    def page_index(self) -> int:
+        return self.page
+
+    def page_by_index(self, index: int) -> Self:
+        return self.__class__(
+            self.session,
+            page=index
+        )
+
+
+class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
+    """
+    Use it like this:
+
+        from onegov.page import NewsCollection
+        news = NewsCollection(request)
+    """
+
+    __listclass__ = News
+    batch_size = 40
+    absorb = ''
+
+    def __init__(
+        self,
+        request: CoreRequest,
+        page: int = 0,
+        filter_years: list[int] | None = None,
+        filter_tags: list[str] | None = None,
+        root: News | None = None,
+    ) -> None:
+
+        self.request = request
+        self.session = request.session
+        self.page = page
+        self.filter_years = filter_years or []
+        self.filter_tags = filter_tags or []
+        if root is not None:
+            self.root = root
+
+    @cached_property
+    def root(self) -> News | None:
+        pages = PageCollection(self.session)
+        return pages.by_path(  # type: ignore[return-value]
+            '/news/', ensure_type='news'
+        ) or pages.by_path(
+            '/aktuelles/', ensure_type='news'
+        )
+
+    @property
+    def access(self) -> str:
+        return self.root.access if self.root else 'public'
+
+    def subset(self) -> Query[News]:
+        news = self.session.query(News)
+
+        if self.root is not None:
+            news = news.filter(News.parent == self.root)
+
+        role = getattr(self.request.identity, 'role', 'anonymous')
+        available_accesses = {
+            'admin': (),  # can see everything
+            'editor': (),  # can see everything
+            'member': ('member', 'mtan', 'public')
+        }.get(role, ('mtan', 'public'))
+        if available_accesses:
+            news = news.filter(or_(
+                *(
+                    News.meta['access'].astext == access
+                    for access in available_accesses
+                ),
+                News.meta['access'].is_(None)
+            ))
+
+        if role not in ('admin', 'editor'):
             news = news.filter(
                 News.publication_started == True,
                 News.publication_ended == False
             )
 
-        filter = []
-        for year in self.filter_years:
-            start = replace_timezone(datetime(year, 1, 1), 'UTC')
-            filter.append(
+        if self.filter_years:
+            news = news.filter(or_(*(
                 and_(
-                    News.published_or_created >= start,
+                    News.published_or_created >= (
+                        start := replace_timezone(datetime(year, 1, 1), 'UTC')
+                    ),
                     News.published_or_created < start.replace(year=year + 1)
                 )
-            )
-        if filter:
-            news = news.filter(or_(*filter))
+                for year in self.filter_years
+            )))
 
         if self.filter_tags:
             news = news.filter(
-                News.meta['hashtags'].has_any(
-                    array(self.filter_tags)  # type:ignore[call-overload]
-                )
+                News.meta['hashtags'].has_any(array(self.filter_tags))
             )
 
         news = news.order_by(desc(News.published_or_created))
-        news = news.options(undefer('created'))
-        news = news.options(undefer('content'))
-        news = news.limit(limit)
+        news = news.options(undefer(News.created))
+        news = news.options(undefer(News.content))
+        return news
 
-        sticky = func.json_extract_path_text(
-            func.cast(News.meta, JSON), 'is_visible_on_homepage') == 'true'
+    def sticky(self) -> Query[News]:
+        """Get a query with only the sticky news."""
+        return self.subset().filter(
+            News.meta['is_visible_on_homepage'].astext == 'true'
+        )
 
-        sticky_news = news.limit(None)
-        sticky_news = sticky_news.filter(sticky)
+    @property
+    def page_index(self) -> int:
+        return self.page
 
-        return news.union(sticky_news).order_by(
-            desc(News.published_or_created))
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, self.__class__)
+            and self.page == other.page
+            and self.filter_years == other.filter_years
+            and self.filter_tags == other.filter_tags
+        )
+
+    def page_by_index(self, index: int) -> Self:
+        return self.__class__(
+            self.request,
+            page=index,
+            filter_years=sorted(self.filter_years),
+            filter_tags=sorted(self.filter_tags),
+        )
+
+    def for_year(self, year: int) -> Self:
+        years_ = set(self.filter_years)
+        years = sorted(years_ - {year} if year in years_ else years_ | {year})
+        return self.__class__(
+            self.request,
+            filter_years=years,
+            filter_tags=sorted(self.filter_tags),
+        )
+
+    def for_tag(self, tag: str) -> Self:
+        tags_ = set(self.filter_tags)
+        tags = sorted(tags_ - {tag} if tag in tags_ else tags_ | {tag})
+        return self.__class__(
+            self.request,
+            filter_years=sorted(self.filter_years),
+            filter_tags=tags,
+        )
 
     @property
     def all_years(self) -> list[int]:
-        query = object_session(self).query(News)
-        query = query.with_entities(
-            func.date_part('year', Page.published_or_created))
-        query = query.group_by(
-            func.date_part('year', Page.published_or_created))
-        query = query.filter(Page.parent == self)
+        query = self.session.query(
+            func.date_part('year', News.published_or_created))
+        query = query.filter(News.parent == self.root)
+        query = query.distinct()
         return sorted((int(year) for year, in query), reverse=True)
 
     @property
     def all_tags(self) -> list[str]:
-        query = object_session(self).query(News.meta['hashtags'])
-        query = query.filter(Page.parent == self)
-        all_hashtags = set()
-        for hashtags, in query:
-            all_hashtags.update(hashtags)
-        return sorted(all_hashtags)
+        query = self.session.query(
+            func.jsonb_array_elements_text(News.meta['hashtags']))
+        query = query.filter(Page.parent == self.root)
+        query = query.distinct()
+        return sorted(hashtag for hashtag, in query)
+
+    def __link_alias__(self) -> str:
+        return self.request.class_link(
+            News,
+            {
+                'absorb': None,
+                'filter_years': self.filter_years,
+                'filter_tags': self.filter_tags,
+                'page': self.page
+            }
+        )
 
 
 class AtoZPages(AtoZ[Topic]):

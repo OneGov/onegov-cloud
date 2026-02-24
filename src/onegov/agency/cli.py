@@ -1,13 +1,18 @@
+from __future__ import annotations
+
 import click
 import transaction
 
 from onegov.agency.collections import ExtendedAgencyCollection
-from onegov.agency.data_import import import_bs_data, import_membership_titles
+from onegov.agency.data_import import (import_bs_data,
+                                       import_membership_titles,
+                                       import_lu_data)
 from onegov.agency.excel_export import export_person_xlsx
 from onegov.agency.models import ExtendedAgencyMembership, ExtendedPerson
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.people import Agency, Person, AgencyMembership
+from sqlalchemy import text
 
 
 from typing import TYPE_CHECKING
@@ -31,14 +36,13 @@ def consolidate_cli(
     ignore_case: bool,
     dry_run: bool,
     verbose: bool
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+) -> Callable[[AgencyRequest, AgencyApp], None]:
     """
     Consolidates double entries of person objects based on the property
     `based_on`. Property must be convertible to string.
     """
-    buffer = 100
 
-    def find_double_entries(session: 'Session') -> tuple[
+    def find_double_entries(session: Session) -> tuple[
         dict[str, ExtendedPerson],
         dict[str, list[ExtendedPerson]]
     ]:
@@ -82,12 +86,12 @@ def consolidate_cli(
                 existing = getattr(person, attr)
                 if not existing and value:
                     if verbose:
-                        print(f'Setting {person.title}: {attr}={value}')
+                        click.echo(f'Setting {person.title}: {attr}={value}')
                     setattr(person, attr, value)
         return person
 
     def consolidate_memberships(
-        session: 'Session',
+        session: Session,
         person: ExtendedPerson,
         persons: list[ExtendedPerson]
     ) -> None:
@@ -98,25 +102,23 @@ def consolidate_cli(
                 session.flush()
             session.delete(p)
 
-    def do_consolidate(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def do_consolidate(request: AgencyRequest, app: AgencyApp) -> None:
+        app.fts_orm_events.max_queue_size = 0
         session = request.session
         first_seen, to_consolidate = find_double_entries(session)
-        print(f'Double entries found based on '
-              f'{based_on}: {len(to_consolidate)}')
+        click.echo(f'Double entries found based on '
+                   f'{based_on}: {len(to_consolidate)}')
         count = session.query(ExtendedAgencyMembership).count()
         for ix, (id_, persons) in enumerate(to_consolidate.items()):
             person = first_seen[id_]
             person = consolidate_persons(person, persons, id_)
             session.flush()
             consolidate_memberships(session, person, persons)
-            if ix % buffer == 0:
-                app.es_indexer.process()
-                app.psql_indexer.bulk_process(session)
         count_after = session.query(ExtendedAgencyMembership).count()
         assert count == count_after, f'before: {count}, after {count_after}'
         if dry_run:
             transaction.abort()
-            click.secho("Aborting transaction", fg='yellow')
+            click.secho('Aborting transaction', fg='yellow')
 
     return do_consolidate
 
@@ -129,9 +131,9 @@ def import_bs_function(
     agency_file: str,
     people_file: str,
     dry_run: bool
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+) -> Callable[[AgencyRequest, AgencyApp], None]:
 
-    def execute(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def execute(request: AgencyRequest, app: AgencyApp) -> None:
         import_membership_titles(agency_file, people_file, request, app)
 
         total_empty_titles = 0
@@ -142,11 +144,11 @@ def import_bs_function(
                 membership.title = 'Mitglied'
                 total_empty_titles += 1
 
-        print('Corrected remaining empty titles: ', total_empty_titles)
+        click.echo(f'Corrected remaining empty titles: {total_empty_titles}')
 
         if dry_run:
             transaction.abort()
-            click.secho("Aborting transaction", fg='yellow')
+            click.secho('Aborting transaction', fg='yellow')
     return execute
 
 
@@ -160,38 +162,27 @@ def import_bs_data_files(
     people_file: str,
     dry_run: bool,
     clean: bool
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+) -> Callable[[AgencyRequest, AgencyApp], None]:
     """
+
     Usage:
 
         onegov-agency  --select /onegov_agency/bs import-bs-data \
-        $agency_file \
-        $people_file \
+        $agency_file $people_file
     """
 
-    buffer = 100
-
-    def execute(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def execute(request: AgencyRequest, app: AgencyApp) -> None:
 
         if clean:
             session = request.session
             for ix, membership in enumerate(session.query(AgencyMembership)):
                 session.delete(membership)
-                if ix % buffer == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
 
             for ix, person in enumerate(session.query(Person)):
                 session.delete(person)
-                if ix % buffer == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
 
             for ix, agency in enumerate(session.query(Agency)):
                 session.delete(agency)
-                if ix % buffer == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
 
             session.flush()
             click.secho(
@@ -202,12 +193,79 @@ def import_bs_data_files(
         agencies, people = import_bs_data(
             agency_file, people_file, request, app)
 
-        click.secho(f"Imported {len(agencies.keys())} agencies "
-                    f"and {len(people)} persons",
+        click.secho(f'Imported {len(agencies.keys())} agencies '
+                    f'and {len(people)} persons',
                     fg='green')
         if dry_run:
             transaction.abort()
-            click.secho("Aborting transaction", fg='yellow')
+            click.secho('Aborting transaction', fg='yellow')
+
+    return execute
+
+
+@cli.command('import-lu-data', context_settings={'singular': True})
+@click.argument('data-file', type=click.Path(exists=True))
+@click.option('--dry-run', is_flag=True, default=False)
+@click.option('--clean', is_flag=True, default=False)
+def import_lu_data_files(
+    data_file: str,
+    dry_run: bool,
+    clean: bool
+) -> Callable[[AgencyRequest, AgencyApp], None]:
+    """
+
+    Usage:
+
+        onegov-agency --select /onegov_agency/lu import-lu-data $people_file
+    """
+
+    def execute(request: AgencyRequest, app: AgencyApp) -> None:
+        if clean:
+            schema = app.session_manager.current_schema
+            assert schema is not None
+
+            click.secho(f'Cleaning data in schema: {schema}', fg='yellow')
+
+            session = request.session
+            agency_count = session.execute(
+                text('SELECT COUNT(*) FROM agencies')
+            ).scalar()
+            people_count = session.execute(
+                text('SELECT COUNT(*) FROM people')
+            ).scalar()
+
+            click.secho(
+                f'Removing {agency_count} Agencies and {people_count} '
+                f'Persons from database',
+                fg='green'
+            )
+            request.session.execute(
+                text("""
+                    TRUNCATE TABLE agencies CASCADE;
+                    TRUNCATE TABLE people CASCADE;
+                    COMMIT;
+                """)
+            )
+            session.flush()
+            if app.fts_search_enabled:
+                # remove the relevant entries from the search index
+                session.execute(text("""
+                    DELETE
+                      FROM search_index
+                     WHERE owner_tablename IN ('agencies', 'people');
+                    COMMIT;
+                """))
+
+            click.secho('Exiting...', fg='green')
+            return
+
+        agencies, people = import_lu_data(data_file, request, app)
+        click.secho(f'Imported {len(people)} persons and '
+                    f'{len(agencies)} agencies', fg='green')
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
 
     return execute
 
@@ -217,18 +275,17 @@ def import_bs_data_files(
 @click.option('--root/--no-root', default=True)
 @click.option('--recursive/--no-recursive', default=True)
 def create_pdf(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     root: bool,
     recursive: bool
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+) -> Callable[[AgencyRequest, AgencyApp], None]:
 
-    def _create_pdf(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def _create_pdf(request: AgencyRequest, app: AgencyApp) -> None:
         session = app.session()
         agencies = ExtendedAgencyCollection(session)
 
         if root:
-            # FIXME: asymmetric property
-            app.root_pdf = app.pdf_class.from_agencies(  # type:ignore
+            app.root_pdf = app.pdf_class.from_agencies(
                 agencies=agencies.roots,
                 title=app.org.name,
                 toc=True,
@@ -239,12 +296,11 @@ def create_pdf(
                 underline_links=app.org.meta.get('pdf_underline_links', False)
             )
 
-            click.secho("Root PDF created", fg='green')
+            click.secho('Root PDF created', fg='green')
 
         if recursive:
             for agency in agencies.query():
-                # FIXME: asymmetric property
-                agency.pdf_file = app.pdf_class.from_agencies(  # type:ignore
+                agency.pdf_file = app.pdf_class.from_agencies(
                     agencies=[agency],
                     title=agency.title,
                     toc=False,
@@ -264,16 +320,15 @@ def create_pdf(
 @pass_group_context
 @click.option('--people', default=True, is_flag=True)
 def export_xlsx(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     people: bool
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+) -> Callable[[AgencyRequest, AgencyApp], None]:
 
-    def _export_xlsx(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def _export_xlsx(request: AgencyRequest, app: AgencyApp) -> None:
         session = app.session()
         if people:
             xlsx = export_person_xlsx(session)
-            # FIXME: asymmetric property
-            app.people_xlsx = xlsx  # type:ignore[assignment]
+            app.people_xlsx = xlsx
             click.secho("Created XLSX for people'", fg='green')
     return _export_xlsx
 
@@ -281,13 +336,13 @@ def export_xlsx(
 @cli.command('enable-yubikey')
 @pass_group_context
 def enable_yubikey(
-    group_context: 'GroupContext'
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+    group_context: GroupContext
+) -> Callable[[AgencyRequest, AgencyApp], None]:
 
-    def _enable_yubikey(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def _enable_yubikey(request: AgencyRequest, app: AgencyApp) -> None:
         if app.org:
             app.org.meta['enable_yubikey'] = True
-            click.secho("YubiKey enabled", fg='green')
+            click.secho('YubiKey enabled', fg='green')
 
     return _enable_yubikey
 
@@ -295,12 +350,12 @@ def enable_yubikey(
 @cli.command('disable-yubikey')
 @pass_group_context
 def disable_yubikey(
-    group_context: 'GroupContext'
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+    group_context: GroupContext
+) -> Callable[[AgencyRequest, AgencyApp], None]:
 
-    def _disable_yubikey(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def _disable_yubikey(request: AgencyRequest, app: AgencyApp) -> None:
         if app.org:
             app.org.meta['enable_yubikey'] = False
-            click.secho("YubiKey disabled", fg='green')
+            click.secho('YubiKey disabled', fg='green')
 
     return _disable_yubikey

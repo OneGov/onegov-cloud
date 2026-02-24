@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Secret
 from onegov.translator_directory import _
@@ -26,16 +28,16 @@ if TYPE_CHECKING:
 )
 def apply_translator_mutation(
     self: TranslatorMutation,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: ApplyMutationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if self.target is None or self.ticket is None:
         raise exc.HTTPNotFound()
 
     if form.submitted(request):
         form.update_model()
-        request.success(_("Proposed changes applied"))
+        request.success(_('Proposed changes applied'))
         TranslatorMutationMessage.create(
             self.ticket,
             request,
@@ -52,6 +54,6 @@ def apply_translator_mutation(
 
     return {
         'layout': layout,
-        'title': _("Apply proposed changes"),
+        'title': _('Apply proposed changes'),
         'form': form
     }

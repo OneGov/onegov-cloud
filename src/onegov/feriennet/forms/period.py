@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from functools import cached_property
 from datetime import date, datetime
-from onegov.activity import Activity, Period, Occasion, OccasionDate
-from onegov.activity import PeriodCollection
+from onegov.activity import Activity, BookingPeriod, Occasion, OccasionDate
+from onegov.activity import BookingPeriodCollection
 from onegov.core.utils import Bunch
 from onegov.feriennet import _
 from onegov.form import Form, merge_forms
@@ -20,34 +22,38 @@ from wtforms.validators import InputRequired, Optional, NumberRange
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.activity.models import BookingPeriodMeta
     from onegov.feriennet.request import FeriennetRequest
     from wtforms.fields.choices import _Choice
 
 
 class PeriodSelectForm(Form):
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     period = SelectField(
-        label=_("Period"),
+        label=_('Period'),
         validators=[InputRequired()],
         default='0xdeadbeef')
 
     @property
-    def period_choices(self) -> list['_Choice']:
-        q = PeriodCollection(self.request.session).query()
-        q = q.with_entities(Period.id, Period.title)
-        q = q.order_by(Period.execution_start)
-
-        return [(row.id.hex, row.title) for row in q]
+    def period_choices(self) -> list[_Choice]:
+        return [
+            (row.id.hex, row.title)
+            for row in (
+                BookingPeriodCollection(self.request.session).query()
+                .with_entities(BookingPeriod.id, BookingPeriod.title)
+                .order_by(BookingPeriod.execution_start)
+            )
+        ]
 
     @property
-    def selected_period(self) -> Period | None:
-        return PeriodCollection(self.request.session).by_id(
+    def selected_period(self) -> BookingPeriod | None:
+        return BookingPeriodCollection(self.request.session).by_id(
             self.period.data)
 
     @property
-    def active_period(self) -> Period | None:
+    def active_period(self) -> BookingPeriodMeta | None:
         return self.request.app.active_period
 
     def on_request(self) -> None:
@@ -68,30 +74,30 @@ else:
 class PeriodForm(Form):
 
     title = StringField(
-        label=_("Title"),
-        description=_("Ferienpass Summer ${year}", mapping={
+        label=_('Title'),
+        description=_('Ferienpass Summer ${year}', mapping={
             'year': datetime.now().year
         }),
         validators=[InputRequired()]
     )
 
     confirmable = BooleanField(
-        label=_("With pre-booking phase"),
+        label=_('With pre-booking phase'),
         default=True
     )
 
     unconfirmable_warning = PanelField(
         text=_(
-            "A period that is started without pre-booking phase cannot be "
-            "turned into a period with pre-booking phase later. If in doubt, "
-            "use the pre-booking phase and confirm it manually."
+            'A period that is started without pre-booking phase cannot be '
+            'turned into a period with pre-booking phase later. If in doubt, '
+            'use the pre-booking phase and confirm it manually.'
         ),
         kind='callout',
         depends_on=('confirmable', '!y')
     )
 
     finalizable = BooleanField(
-        label=_("With billing"),
+        label=_('With billing'),
         default=True
     )
 
@@ -107,66 +113,86 @@ class PeriodForm(Form):
     )
 
     prebooking_start = DateField(
-        label=_("Prebooking Start"),
-        fieldset=_("Dates"),
+        label=_('Prebooking Start'),
+        fieldset=_('Dates'),
         validators=[InputRequired()],
         depends_on=('confirmable', 'y'),
     )
 
     prebooking_end = DateField(
-        label=_("Prebooking End"),
-        fieldset=_("Dates"),
+        label=_('Prebooking End'),
+        fieldset=_('Dates'),
         validators=[InputRequired()],
         depends_on=('confirmable', 'y'),
     )
 
     booking_start = DateField(
-        label=_("Booking Start"),
-        fieldset=_("Dates"),
+        label=_('Booking Start'),
+        fieldset=_('Dates'),
         validators=[InputRequired()]
     )
 
     booking_end = DateField(
-        label=_("Booking End"),
-        fieldset=_("Dates"),
+        label=_('Booking End'),
+        fieldset=_('Dates'),
         validators=[InputRequired()]
     )
 
+    deadline = RadioField(
+        label=_('Stop accepting bookings'),
+        fieldset=_('Deadline'),
+        choices=[
+            ('fix', _('At the end of the booking phase')),
+            ('rel', _('X days before each occasion')),
+        ],
+        default='fix',
+    )
+
+    deadline_days = IntegerField(
+        label=_('X Days Before'),
+        fieldset=_('Deadline'),
+        validators=[
+            InputRequired(),
+            NumberRange(0, 360),
+        ],
+        depends_on=('deadline', 'rel')
+    )
+
     execution_start = DateField(
-        label=_("Execution Start"),
-        fieldset=_("Dates"),
+        label=_('Execution Start'),
+        fieldset=_('Execution phase'),
         validators=[InputRequired()]
     )
 
     execution_end = DateField(
-        label=_("Execution End"),
-        fieldset=_("Dates"),
+        label=_('Execution End'),
+        fieldset=_('Execution phase'),
         validators=[InputRequired()]
     )
 
     pass_system = RadioField(
-        label=_("How are the activities conducted?"),
-        fieldset=_("Execution"),
+        label=_('How are the activities conducted?'),
+        fieldset=_('Execution'),
         choices=[
             ('no', _(
-                "Each attendee may book as many activites as he likes. "
-                "Each activity is billed separately."
+                'Each attendee may book as many activites as he likes. '
+                'Each activity is billed separately.'
             )),
             ('yes', _(
-                "Each attendee may attend a limited number of activites "
-                "for a fixed price."
+                'Each attendee may attend a limited number of activites '
+                'for a fixed price.'
             )),
             ('fixed', _(
-                "Each attendee may attend a fixed number of activites. "
-                "Each activity is billed separately."
+                'Each attendee may attend a fixed number of activites. '
+                'Each activity is billed separately.'
             )),
         ],
         default='no',
     )
 
     pass_system_limit = IntegerField(
-        label=_("Maximum Number of Activities per Attendee"),
-        fieldset=_("Execution"),
+        label=_('Maximum Number of Activities per Attendee'),
+        fieldset=_('Execution'),
         validators=[
             Optional(),
             NumberRange(0, 100)
@@ -175,8 +201,8 @@ class PeriodForm(Form):
     )
 
     fixed_system_limit = IntegerField(
-        label=_("Maximum Number of Bookings per Attendee and period"),
-        fieldset=_("Execution"),
+        label=_('Maximum Number of Bookings per Attendee and period'),
+        fieldset=_('Execution'),
         validators=[
             Optional(),
             NumberRange(0, 100)
@@ -185,8 +211,8 @@ class PeriodForm(Form):
     )
 
     pass_system_cost = DecimalField(
-        label=_("Cost of the Pass"),
-        fieldset=_("Execution"),
+        label=_('Cost of the Pass'),
+        fieldset=_('Execution'),
         validators=[
             Optional(),
             NumberRange(0.00, 10000.00)
@@ -195,8 +221,8 @@ class PeriodForm(Form):
     )
 
     single_booking_cost = DecimalField(
-        label=_("The administrative cost of each booking"),
-        fieldset=_("Execution"),
+        label=_('The administrative cost of each booking'),
+        fieldset=_('Execution'),
         validators=[
             Optional(),
             NumberRange(0.00, 10000.00)
@@ -205,16 +231,16 @@ class PeriodForm(Form):
     )
 
     pay_organiser_directly = RadioField(
-        label=_("How is the organiser paid?"),
-        fieldset=_("Execution"),
+        label=_('How is the organiser paid?'),
+        fieldset=_('Execution'),
         choices=[
             ('indirect', _(
-                "The parents pay everything by bill, "
-                "the organisers are paid later"
+                'The parents pay everything by bill, '
+                'the organisers are paid later'
             )),
             ('direct', _(
-                "The parents pay the pass by bill, the organisers are paid in "
-                "cash at the beginning of each occasion"
+                'The parents pay the pass by bill, the organisers are paid in '
+                'cash at the beginning of each occasion'
             ))
         ],
         default='indirect',
@@ -222,8 +248,8 @@ class PeriodForm(Form):
     )
 
     minutes_between = IntegerField(
-        label=_("Required minutes between bookings"),
-        fieldset=_("Bookings"),
+        label=_('Required minutes between bookings'),
+        fieldset=_('Bookings'),
         filters=(lambda x: x or 0, ),
         validators=[
             Optional(),
@@ -233,68 +259,48 @@ class PeriodForm(Form):
     )
 
     one_booking_per_day = RadioField(
-        label=_("Attendees are limited to one activity per day"),
-        fieldset=_("Bookings"),
+        label=_('Attendees are limited to one activity per day'),
+        fieldset=_('Bookings'),
         choices=[
-            ('yes', _("Yes")),
-            ('no', _("No"))
+            ('yes', _('Yes')),
+            ('no', _('No'))
         ],
         default='no'
     )
 
-    deadline = RadioField(
-        label=_("Stop accepting bookings"),
-        fieldset=_("Deadline"),
-        choices=[
-            ('fix', _("At the end of the booking phase")),
-            ('rel', _("X days before each occasion")),
-        ],
-        default='fix',
-    )
-
-    deadline_days = IntegerField(
-        label=_("X Days Before"),
-        fieldset=_("Deadline"),
-        validators=[
-            InputRequired(),
-            NumberRange(0, 360),
-        ],
-        depends_on=('deadline', 'rel')
-    )
-
     book_finalized = BooleanField(
-        label=_("Allow bookings after the bills have been created."),
+        label=_('Allow bookings after the bills have been created.'),
         description=_(
-            "By default, only admins can create bookings after the billing "
-            "has been confirmed. With this setting, every user can create new "
-            "bookings after confirmation and before the deadline. Booking "
-            "costs incurred after confirmation will be added to the existing "
-            "bill."
+            'By default, only admins can create bookings after the billing '
+            'has been confirmed. With this setting, every user can create new '
+            'bookings after confirmation and before the deadline. Booking '
+            'costs incurred after confirmation will be added to the existing '
+            'bill.'
         ),
         depends_on=('deadline', 'rel'),
     )
 
     cancellation = RadioField(
-        label=_("Allow members to cancel confirmed bookings"),
-        fieldset=_("Cancellation Deadline"),
+        label=_('Allow members to cancel confirmed bookings'),
+        fieldset=_('Cancellation Deadline'),
         choices=[
-            ('no', _("No, only allow admins")),
-            ('fix', _("Until a fixed day")),
-            ('rel', _("Up to X days before each occasion")),
+            ('no', _('No, only allow admins')),
+            ('fix', _('Until a fixed day')),
+            ('rel', _('Up to X days before each occasion')),
         ],
         default='no',
     )
 
     cancellation_date = DateField(
-        label=_("Fixed day"),
-        fieldset=_("Cancellation Deadline"),
+        label=_('Fixed day'),
+        fieldset=_('Cancellation Deadline'),
         validators=[InputRequired()],
         depends_on=('cancellation', 'fix')
     )
 
     cancellation_days = IntegerField(
-        label=_("X Days Before"),
-        fieldset=_("Cancellation Deadline"),
+        label=_('X Days Before'),
+        fieldset=_('Cancellation Deadline'),
         validators=[
             InputRequired(),
             NumberRange(0, 360),
@@ -303,16 +309,16 @@ class PeriodForm(Form):
     )
 
     age_barrier_type = RadioField(
-        label=_("Method"),
-        fieldset=_("Age check"),
+        label=_('Method'),
+        fieldset=_('Age check'),
         choices=[
             ('exact', _(
-                "Exact - the attendees need to be of the expected age "
-                "at the beginning of the occasion"
+                'Exact - the attendees need to be of the expected age '
+                'at the beginning of the occasion'
             )),
             ('year', _(
-                "Age group - The attendees need to be of the expected "
-                "age sometime during the year of the occasion"
+                'Age group - The attendees need to be of the expected '
+                'age sometime during the year of the occasion'
             )),
         ],
         default='exact'
@@ -332,7 +338,7 @@ class PeriodForm(Form):
 
     @property
     def is_new(self) -> bool:
-        return isinstance(self.model, PeriodCollection)
+        return isinstance(self.model, BookingPeriodCollection)
 
     def on_request(self) -> None:
 
@@ -347,7 +353,7 @@ class PeriodForm(Form):
             self.confirmable.data = self.model.confirmable
         return super().validate()
 
-    def populate_obj(self, model: Period) -> None:  # type:ignore[override]
+    def populate_obj(self, model: BookingPeriod) -> None:  # type:ignore[override]
         adjust_defaults = model.booking_start != self.booking_start.data
         also_exclude: tuple[str, ...]
         if not self.confirmable.data and not adjust_defaults:
@@ -413,7 +419,7 @@ class PeriodForm(Form):
         else:
             model.pay_organiser_directly = False
 
-    def process_obj(self, model: Period) -> None:  # type:ignore[override]
+    def process_obj(self, model: BookingPeriod) -> None:  # type:ignore[override]
         super().process_obj(model)
 
         if model.all_inclusive:
@@ -457,7 +463,7 @@ class PeriodForm(Form):
 
     @cached_property
     def conflicting_activities(self) -> tuple[Activity, ...] | None:
-        if not isinstance(self.model, Period):
+        if not isinstance(self.model, BookingPeriod):
             return None
 
         session = self.request.session
@@ -486,10 +492,10 @@ class PeriodForm(Form):
         q = session.query(OccasionDate).join(Occasion)
         q = q.with_entities(distinct(Occasion.activity_id))
         q = q.filter(Occasion.period == self.model)
-        q = q.filter(Occasion.id.in_(qd.subquery()))
+        q = q.filter(Occasion.id.in_(qd.scalar_subquery()))
 
         return tuple(
-            session.query(Activity).filter(Activity.id.in_(q.subquery()))
+            session.query(Activity).filter(Activity.id.in_(q.scalar_subquery()))
             .order_by(Activity.order)
         )
 
@@ -507,7 +513,7 @@ class PeriodForm(Form):
 
     def ensure_no_occasion_conflicts(self) -> bool | None:
         if self.conflicting_activities:
-            msg = _("The execution phase conflicts with existing occasions")
+            msg = _('The execution phase conflicts with existing occasions')
             assert isinstance(self.execution_start.errors, list)
             assert isinstance(self.execution_end.errors, list)
             self.execution_start.errors.append(msg)
@@ -520,54 +526,54 @@ class PeriodForm(Form):
             if self.prebooking_start.data > self.prebooking_end.data:
                 assert isinstance(self.prebooking_start.errors, list)
                 self.prebooking_start.errors.append(_(
-                    "Prebooking must start before it ends"))
+                    'Prebooking must start before it ends'))
                 return False
 
         if self.booking_start.data and self.booking_end.data:
             if self.booking_start.data > self.booking_end.data:
                 assert isinstance(self.booking_start.errors, list)
                 self.booking_start.errors.append(_(
-                    "Booking must start before it ends"))
+                    'Booking must start before it ends'))
                 return False
 
         if self.execution_start.data and self.execution_end.data:
             if self.execution_start.data > self.execution_end.data:
                 assert isinstance(self.execution_start.errors, list)
                 self.execution_start.errors.append(_(
-                    "Execution must start before it ends"))
+                    'Execution must start before it ends'))
                 return False
 
         if self.prebooking_end.data and self.booking_start.data:
             if self.prebooking_end.data > self.booking_start.data:
                 assert isinstance(self.prebooking_end.errors, list)
                 self.prebooking_end.errors.append(_(
-                    "Prebooking must end before booking starts"))
+                    'Prebooking must end before booking starts'))
                 return False
 
         if self.prebooking_end.data and self.execution_start.data:
             if self.prebooking_end.data > self.execution_start.data:
                 assert isinstance(self.prebooking_end.errors, list)
                 self.prebooking_end.errors.append(_(
-                    "Prebooking must end before execution starts"))
+                    'Prebooking must end before execution starts'))
                 return False
 
         if self.booking_start.data and self.execution_start.data:
             if self.booking_start.data > self.execution_start.data:
                 assert isinstance(self.execution_start.errors, list)
                 self.execution_start.errors.append(_(
-                    "Execution may not start before booking starts"))
+                    'Execution may not start before booking starts'))
                 return False
 
         if self.booking_end.data and self.execution_end.data:
             if self.booking_end.data > self.execution_end.data:
                 assert isinstance(self.execution_end.errors, list)
                 self.execution_end.errors.append(_(
-                    "Execution may not end before booking ends"))
+                    'Execution may not end before booking ends'))
                 return False
         return None
 
     def ensure_no_payment_changes_after_confirmation(self) -> bool | None:
-        if isinstance(self.model, Period) and self.model.confirmed:
+        if isinstance(self.model, BookingPeriod) and self.model.confirmed:
             preview: Any = Bunch(
                 confirmable=self.model.confirmable,
                 booking_start=self.model.booking_start
@@ -583,8 +589,8 @@ class PeriodForm(Form):
                 if getattr(self.model, field) != getattr(preview, field):
                     assert isinstance(self.pass_system.errors, list)
                     self.pass_system.errors.append(_(
-                        "It is no longer possible to change the execution "
-                        "settings since the period has already been confirmed."
+                        'It is no longer possible to change the execution '
+                        'settings since the period has already been confirmed.'
                     ))
                     return False
         return None
@@ -594,8 +600,8 @@ class PeriodForm(Form):
             if self.one_booking_per_day.data != 'no':
                 assert isinstance(self.minutes_between.errors, list)
                 self.minutes_between.errors.append(_(
-                    "It is not possible to have required minutes between "
-                    "bookings when limiting attendees to one activity per day."
+                    'It is not possible to have required minutes between '
+                    'bookings when limiting attendees to one activity per day.'
                 ))
                 return False
         return None

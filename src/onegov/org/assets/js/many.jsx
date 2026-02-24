@@ -446,52 +446,96 @@ var StringField = React.createClass({
 });
 
 function extractType(target) {
-    return _.first(_.filter(
-        target.attr('class').split(' '),
-        function(c) { return c.startsWith('many-'); }
-    )).replace('many-', '');
+    // More robust type extraction
+    var classes = target.attr('class').split(' ');
+    var manyClass = classes.find(function(c) {
+        return c.startsWith('many-');
+    });
+    return manyClass ? manyClass.replace('many-', '') : 'links'; // Default to links if no type found
 }
 
 jQuery.fn.many = function() {
-    return this.each(function() {
 
+    return this.each(function(index) {
         var target = $(this);
+
+        // Get type before any DOM modifications
         var type = extractType(target);
-        var data = JSON.parse(target.val());
+
+        // Safely parse data with fallback
+        var rawValue = target.val();
+
+        var data;
+        try {
+            data = rawValue ? JSON.parse(rawValue) : null;
+        } catch (e) {
+            console.warn('Failed to parse JSON for many-' + type, e);
+            data = null;
+        }
+
+        // Provide default data structure if needed
+        if (!data) {
+            data = {
+                labels: {
+                    text: type === 'contactlinks' ? 'Contact Text' : 'Text',
+                    link: type === 'contactlinks' ? 'Contact URL' : 'URL',
+                    add: 'Add',
+                    remove: 'Remove'
+                },
+                values: []
+            };
+        }
+
         var label = target.closest('label');
-        var errors = label.siblings('.error');
+
+        // Create a unique wrapper for this instance
+        var wrapperId = 'many-wrapper-' + Math.random().toString(36).substr(2, 9);
+        var el = $('<div class="many-wrapper" id="' + wrapperId + '" />');
 
         // straight-up hiding the element prevents it from getting update
         // with the target.val call below
         label.attr('aria-hidden', true);
         label.css({
-            'position': 'absolute'
+            'position': 'absolute',
+            'visibility': 'hidden'
         });
-        label.hide();
-        errors.hide();
 
-        var el = $('<div class="many-wrapper" />');
         el.appendTo(label.parent());
 
-        // transfer javascript dependencies to the wrapper
+        // Handle dependencies
         var dependency = target.attr('data-depends-on');
-        if (!_.isUndefined(dependency)) {
+        if (dependency) {
             target.removeAttr('data-depends-on');
             el.attr('data-depends-on', dependency);
         }
 
+        // Create scoped onChange handler
         var onChange = function(newValues) {
             data.values = newValues.values;
             var json = JSON.stringify(data);
-            label.show();
             target.val(json);
-            label.hide();
         };
 
-        ReactDOM.render(
-            <ManyFields type={type} data={data} onChange={onChange} />,
-            el.get(0)
-        );
+        // Render with error handling
+        try {
+            ReactDOM.render(
+                React.createElement(ManyFields, {
+                    type: type,
+                    data: data,
+                    onChange: onChange
+                }),
+                document.getElementById(wrapperId)
+            );
+        } catch (e) {
+            console.error('Failed to render ManyFields for ' + type, e);
+            // Restore original input if render fails
+            el.remove();
+            label.css({
+                'position': 'static',
+                'visibility': 'visible'
+            });
+        }
+
     });
 };
 

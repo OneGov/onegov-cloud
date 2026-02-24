@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org.request import OrgRequest
 
 
@@ -10,4 +12,4 @@ if TYPE_CHECKING:
 #       in our election day app have the election day app available
 class TownRequest(OrgRequest):
     if TYPE_CHECKING:
-        app: 'TownApp'
+        app: TownApp

@@ -9,26 +9,36 @@
 <metal:reservations define-macro="reservations" i18n:domain="onegov.org">
     <tal:b condition="reservations">
         <tal:b repeat="reservation reservations">
-            <tal:b define="start reservation.display_start(); end reservation.display_end()">
+            <tal:b define="start reservation.display_start(); end reservation.display_end(); quota reservation.quota; accepted reservation.data and reservation.data.get('accepted')">
                 <p>
-                    <span>
-                        ${layout.format_date(start, 'weekday_long')},
-                        ${layout.format_date(start, 'date_long')}
-                        <!--! simple whole day check: -->
-                        <tal:b condition="start.time() != end.time()">
-                        <br>
-                            ${layout.format_time_range(start, end)}
-                        </tal:b>
-                    </span>
-                    <br>
-                    <span i18n:translate>Quota</span>: <span>
-                        ${reservation.quota}
-                    </span>
+                    <metal:b use-macro="layout.macros['reservation']" />
                 </p>
             </tal:b>
         </tal:b>
     </tal:b>
 </metal:reservations>
+
+<metal:reservation define-macro="reservation" i18n:domain="onegov.org">
+    <span>
+        ${layout.format_date(start, 'weekday_long')},
+        ${layout.format_date(start, 'date_long')}
+        <!--! simple whole day check: -->
+        <tal:b condition="start.time() != end.time()">
+        <br>
+            ${layout.format_time_range(start, end)}
+        </tal:b>
+    </span>
+    <tal:b tal:condition="exists:quota">
+        <br>
+        <span i18n:translate>Quota</span>: <span>
+            ${quota}
+        </span>
+    </tal:b>
+    <tal:b tal:condition="show_status and not accepted|False">
+        <br>
+        <span i18n:translate>Pending approval</span>
+    </tal:b>
+</metal:reservation>
 
 <metal:event define-macro="event" i18n:domain="onegov.org">
     <p><b>${model.title}</b></p>
@@ -56,6 +66,13 @@
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()" />
         </tal:b>
     </p>
+    <p>
+        <tal:b condition="price|nothing">
+            <tr><td><b i18n:translate>Total Amount</b></td></tr>
+            <tr><td><metal:b use-macro="layout.macros['price']" /></td></tr>
+            <tr><td height="5"></td></tr>
+        </tal:b>
+    </p>
 </metal:display_form>
 
 <metal:display_field define-macro="display_fields" i18n:domain="onegov.org">
@@ -73,11 +90,86 @@
     <table class="field-display" tal:condition="rendered_fields">
         <tal:b repeat="(field, rendered) rendered_fields">
             <tr><td><b>${field.label.text}</b></td></tr>
-            <tr><td>${rendered}</td></tr>
+            <tal:b tal:define="is_value field.type in ('IntegerField', 'FloatField', 'DecimalField')">
+                <tr><td>${rendered} <span tal:condition="is_value" i18n:translate="">Item(s)</span></td></tr>
+            </tal:b>
             <tr><td height="5"></td></tr>
         </tal:b>
     </table>
 </metal:display_field>
+
+<metal:price define-macro="price" i18n:domain="onegov.org">
+    <tal:b tal:define="show_fee show_fee|False; show_vat show_vat|False">
+        ${layout.format_number(price.net_amount if show_fee else price.amount)} ${price.currency}
+        <tal:b condition="show_fee and price.fee">
+            (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+        </tal:b>
+        <tal:b tal:define="vat_amount layout.get_vat_amount(price.amount); hide_vat_amount hide_vat_amount|False" tal:condition="show_vat and layout.vat_rate and vat_amount">
+            <br>
+            (<tal:b i18n:translate>VAT</tal:b> <tal:b i18n:translate><tal:b i18n:name="vat_rate">${layout.format_number(layout.vat_rate, 1)}</tal:b>% included</tal:b><tal:b tal:condition="not:hide_vat_amount">: ${layout.format_number(vat_amount, 2)} ${price.currency}</tal:b>)
+        </tal:b>
+    </tal:b>
+</metal:price>
+
+<metal:payment define-macro="payment" i18n:domain="onegov.org">
+    <tal:b tal:define="show_fee show_fee|False" tal:condition="payment|nothing">
+        <p><b i18n:translate>Payment</b></p>
+        <p>
+            <table class="field-display">
+                <tr><td><b i18n:translate>Total Amount</b></td></tr>
+                <tr><td>${layout.format_number(payment.amount)} ${payment.currency}</td></tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+        <p tal:define="show_vat show_vat|False; vat_amount layout.get_vat_amount(payment.amount); hide_vat_amount hide_vat_amount|False" tal:condition="show_vat and layout.vat_rate and vat_amount">
+            <table class="field-display">
+                <tr><td><b i18n:translate>Value Added Tax</b></td></tr>
+                <tr><td><tal:b i18n:translate><tal:b i18n:name="vat_rate">${layout.format_number(layout.vat_rate, 1)}</tal:b>% included</tal:b><tal:b tal:condition="not:hide_vat_amount">: ${layout.format_number(vat_amount, 2)} ${payment.currency}</tal:b></td></tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+        <p>
+            <table class="field-display">
+                <tr><td><b i18n:translate>State</b></td></tr>
+                <tr tal:switch="payment.state">
+                    <td tal:case="'open'" i18n:translate>Open</td>
+                    <td tal:case="'paid'" i18n:translate>Paid</td>
+                    <td tal:case="'failed'" i18n:translate>Failed</td>
+                    <td tal:case="'cancelled'" i18n:translate>Refunded</td>
+                </tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+        <p tal:condition="not:show_fee">
+            <table class="field-display">
+                <tr><td><b i18n:translate>Payment Method</b></td></tr>
+                <tr tal:switch="payment.source">
+                    <td tal:case="'manual'" i18n:translate>Offline Payment</td>
+                    <td tal:case="default" i18n:translate>Online Payment</td>
+                </tr>
+            </table>
+        </p>
+        <p tal:condition="show_fee">
+            <table class="field-display">
+                <tr><td><b i18n:translate>Source</b></td></tr>
+                <tr tal:switch="payment.source">
+                    <td tal:case="'manual'" i18n:translate>Manual</td>
+                    <td tal:case="'datatrans'" i18n:translate>Datatrans</td>
+                    <td tal:case="'stripe_connect'" i18n:translate>Stripe Connect</td>
+                    <td tal:case="'worldline_saferpay'" i18n:translate>Worldline Saferpay</td>
+                </tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+        <p tal:condition="show_fee and payment.fee">
+            <table class="field-display">
+                <tr><td><b i18n:translate>Fee</b></td></tr>
+                <tr><td>${layout.format_number(payment.fee)</td></tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+    </tal:b>
+</metal:payment>
 
 </body>
 </html>

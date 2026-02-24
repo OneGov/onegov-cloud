@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.form.fields import ChosenSelectMultipleField
@@ -18,16 +20,23 @@ class UserGroupForm(ManageUserGroupForm):
         choices=[]
     )
 
-    immediate_notification = RadioField(
+    # NOTE: We use the value of agencies to determine which tickets
+    #       the immediate notifications are for, so we only need a
+    #       radio field with two values here, rather than the complex
+    #       thing we use in Org. We may need to change this in the future.
+    immediate_notification: RadioField = RadioField(  # type:ignore[assignment]
         label=_(
-            "Immediate e-mail notification to members upon ticket submission"
+            'Immediate e-mail notification to members upon ticket submission'
         ),
         choices=(
-            ('yes', _("Yes")),
-            ('no', _("No"))
+            ('yes', _('Yes')),
+            ('no', _('No'))
         ),
         default='no'
     )
+
+    # NOTE: This settting is not supported in agency yet
+    shared_email = None  # type:ignore[assignment]
 
     def on_request(self) -> None:
         super().on_request()
@@ -36,9 +45,9 @@ class UserGroupForm(ManageUserGroupForm):
             for a in ExtendedAgencyCollection(self.request.session).query()
         ]
 
-    def update_model(self, model: 'UserGroup') -> None:
+    def update_model(self, model: UserGroup) -> None:
         super().update_model(model)
-        model.role_mappings = [  # type:ignore[assignment]
+        model.role_mappings = [
             RoleMapping(
                 group_id=model.id,
                 content_type='agencies',
@@ -51,7 +60,7 @@ class UserGroupForm(ManageUserGroupForm):
             model.meta = {}
         model.meta['immediate_notification'] = self.immediate_notification.data
 
-    def apply_model(self, model: 'UserGroup') -> None:
+    def apply_model(self, model: UserGroup) -> None:
         super().apply_model(model)
         mappings = model.role_mappings.all()
         self.agencies.data = [m.content_id for m in mappings]

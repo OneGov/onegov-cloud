@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import time
 import yaml
 
@@ -8,10 +10,10 @@ from onegov.core.static import StaticFile
 from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.feriennet.request import FeriennetRequest
-    from typing_extensions import Self
+    from typing import Self
 
 
-def load_sponsors(sponsors_path: str) -> list['Sponsor']:
+def load_sponsors(sponsors_path: str) -> list[Sponsor]:
     root = Path(sponsors_path)
 
     with (root / 'sponsors.yml').open('r') as f:
@@ -35,29 +37,29 @@ class Sponsor:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    def url_for(self, request: 'FeriennetRequest', path: str) -> str:
+    def url_for(self, request: FeriennetRequest, path: str) -> str:
         assert path.startswith('sponsors/')
         return request.link(StaticFile(path, version=request.app.version))
 
     @overload
     def compiled(
         self,
-        request: 'FeriennetRequest',
+        request: FeriennetRequest,
         data: None = None
-    ) -> 'Self': ...
+    ) -> Self: ...
 
     @overload
     def compiled(
         self,
-        request: 'FeriennetRequest',
+        request: FeriennetRequest,
         data: dict[str, Any]
-    ) -> 'dict[str, Any]': ...
+    ) -> dict[str, Any]: ...
 
     def compiled(
         self,
-        request: 'FeriennetRequest',
+        request: FeriennetRequest,
         data: dict[str, Any] | None = None
-    ) -> 'Self | dict[str, Any]':
+    ) -> Self | dict[str, Any]:
         """ Returns an instance of the sponsor with all data localized and
         all variables replaced with the related values.
 

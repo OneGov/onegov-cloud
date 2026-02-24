@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
@@ -12,21 +14,28 @@ from onegov.user.errors import (
 )
 
 
-def test_user_add(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_user_add(session: Session) -> None:
 
     users = UserCollection(session)
     user = users.add('dmr@example.org', 'p@ssw0rd', 'root')
 
-    assert users.by_username(user.username).username == 'dmr@example.org'
+    assert users.by_username(user.username).username == 'dmr@example.org'  # type: ignore[union-attr]
 
     groups = UserGroupCollection(session)
     group = groups.add(name='group')
 
-    user = users.add('abc@example.org', 'p@ssw0rd', 'root', group=group)
-    assert users.by_username(user.username).group.name == 'group'
+    user = users.add('abc@example.org', 'p@ssw0rd', 'root', groups=[group])
+    user_groups = users.by_username(user.username).groups  # type: ignore[union-attr]
+    assert len(user_groups) == 1
+    assert user_groups[0].name == 'group'
 
 
-def test_user_add_conflict(session):
+def test_user_add_conflict(session: Session) -> None:
 
     users = UserCollection(session)
     users.add('dmr@example.org', 'p@ssw0rd', 'root')
@@ -35,7 +44,7 @@ def test_user_add_conflict(session):
         users.add('dmr@example.org', 'p@ssw0rd', 'root')
 
 
-def test_user_exists(session):
+def test_user_exists(session: Session) -> None:
 
     users = UserCollection(session)
 
@@ -44,7 +53,7 @@ def test_user_exists(session):
     assert users.exists('dmr@example.org')
 
 
-def test_user_by_yubikey(session):
+def test_user_by_yubikey(session: Session) -> None:
 
     users = UserCollection(session)
     users.add('dmr@example.org', 'p@ssw0rd', 'root', second_factor={
@@ -55,7 +64,7 @@ def test_user_by_yubikey(session):
     assert users.by_yubikey('cccccccdefgh')
 
 
-def test_set_yubikey(session):
+def test_set_yubikey(session: Session) -> None:
     users = UserCollection(session)
     user = users.add('dmr@example.org', 'p@ssw0rd', 'root')
 
@@ -63,7 +72,7 @@ def test_set_yubikey(session):
         user.yubikey = 'xxx'
 
 
-def test_user_data(session):
+def test_user_data(session: Session) -> None:
 
     users = UserCollection(session)
 
@@ -76,7 +85,7 @@ def test_user_data(session):
     assert user.data['lastname'] == 'Ritchie'
 
 
-def test_user_delete(session):
+def test_user_delete(session: Session) -> None:
 
     users = UserCollection(session)
     users.add('dmr@example.org', 'p@ssw0rd', 'root')
@@ -89,7 +98,7 @@ def test_user_delete(session):
         users.delete('dmr@example.org')
 
 
-def test_user_password(session):
+def test_user_password(session: Session) -> None:
 
     users = UserCollection(session)
     hash_start = '$bcrypt-sha256$v=2'
@@ -97,7 +106,7 @@ def test_user_password(session):
     assert user.password.startswith(hash_start)
     assert user.password_hash.startswith(hash_start)
 
-    def may_login(username, password):
+    def may_login(username: str, password: str) -> bool:
         return bool(users.by_username_and_password(username, password))
 
     assert may_login('AzureDiamond', 'hunter2')
@@ -117,22 +126,22 @@ def test_user_password(session):
     assert not may_login('AzureDiamon', '')
 
 
-def test_register_user(session):
+def test_register_user(session: Session) -> None:
 
     users = UserCollection(session)
 
     class MockRequest:
         client_addr = '127.0.0.1'
 
-    request = MockRequest()
+    request: Any = MockRequest()
 
     with pytest.raises(AssertionError):
-        users.register(None, None, request)
+        users.register(None, None, request)  # type: ignore[arg-type]
 
     with pytest.raises(InsecurePasswordError):
         users.register('user', 'short', request)
 
-    user = users.register('user', 'p@ssw0rd', request)
+    user = users.register('user', 'p@ssw0rd12', request)
     token = user.data['activation_token']
 
     assert len(token) == RANDOM_TOKEN_LENGTH
@@ -146,17 +155,19 @@ def test_register_user(session):
         users.activate_with_token('user', 'asdf')
 
     users.activate_with_token('user', token)
-    assert user.active
+    # undo mypy narrowing of user.active
+    user2 = user
+    assert user2.active
     assert 'activation_token' not in user.data
 
     with pytest.raises(ExistingUserError):
-        user = users.register('user', 'p@ssw0rd', request)
+        user = users.register('user', 'p@ssw0rd12', request)
 
     with pytest.raises(AlreadyActivatedError):
         users.activate_with_token('user', token)
 
 
-def test_user_by_role(session):
+def test_user_by_role(session: Session) -> None:
 
     users = UserCollection(session)
 
@@ -170,13 +181,13 @@ def test_user_by_role(session):
     assert users.by_roles('member').count() == 1
 
 
-def test_user_lowercase(session):
+def test_user_lowercase(session: Session) -> None:
 
     users = UserCollection(session)
     users.add('Admin@Foo.Bar', 'p@ssw0rd', role='admin')
 
-    assert users.by_username('Admin@Foo.Bar').username == 'admin@foo.bar'
-    assert users.by_username('admin@foo.bar').username == 'admin@foo.bar'
+    assert users.by_username('Admin@Foo.Bar').username == 'admin@foo.bar'  # type: ignore[union-attr]
+    assert users.by_username('admin@foo.bar').username == 'admin@foo.bar'  # type: ignore[union-attr]
 
     with pytest.raises(ExistingUserError) as e:
         users.add('admin@foo.Bar', 'p@ssw0rd', role='admin')
@@ -184,7 +195,7 @@ def test_user_lowercase(session):
     assert e.value.message == 'admin@foo.Bar'
 
 
-def test_user_sources(session):
+def test_user_sources(session: Session) -> None:
     users = UserCollection(session)
 
     assert users.sources == tuple()
@@ -200,7 +211,7 @@ def test_user_sources(session):
     assert UserCollection(session, source={'ldap', ''}).query().count() == 3
 
 
-def test_user_group(session):
+def test_user_group(session: Session) -> None:
     groups = UserGroupCollection(session)
 
     groups.add(name='group y')

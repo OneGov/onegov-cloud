@@ -10,6 +10,7 @@
                     <li tal:repeat="settlement_run settlement_runs">
                         <a class="list-link" tal:attributes="href request.link(settlement_run)">
                             <h5 class="list-title">${settlement_run.name}</h5>
+                            <p class="list-subtitle">&nbsp;${layout.format_date(settlement_run.start, 'date')} - ${layout.format_date(settlement_run.end, 'date')}</p>
                         </a>
                     </li>
                 </ul>

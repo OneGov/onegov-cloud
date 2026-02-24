@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import timedelta
 from depot.io.utils import file_from_content
 from onegov.file.models import File, FileSet
@@ -38,8 +40,8 @@ class FileCollection(Generic[FileT]):
 
     @overload
     def __init__(
-        self: 'FileCollection[File]',
-        session: 'Session',
+        self: FileCollection[File],
+        session: Session,
         type: Literal['*', 'generic'] = '*',
         allow_duplicates: bool = True
     ) -> None: ...
@@ -47,14 +49,14 @@ class FileCollection(Generic[FileT]):
     @overload
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         type: str,
         allow_duplicates: bool = True
     ) -> None: ...
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         type: str = '*',
         allow_duplicates: bool = True
     ) -> None:
@@ -62,7 +64,7 @@ class FileCollection(Generic[FileT]):
         self.type = type
         self.allow_duplicates = allow_duplicates
 
-    def query(self) -> 'Query[FileT]':
+    def query(self) -> Query[FileT]:
         if self.type != '*':
             model_class = File.get_polymorphic_class(self.type, File)
 
@@ -85,8 +87,8 @@ class FileCollection(Generic[FileT]):
         content: bytes | IO[bytes],
         note: str | None = None,
         published: bool = True,
-        publish_date: 'datetime | None' = None,
-        publish_end_date: 'datetime | None' = None
+        publish_date: datetime | None = None,
+        publish_end_date: datetime | None = None
     ) -> FileT:
         """ Adds a file with the given filename. The content maybe either
         in bytes or a file object.
@@ -134,8 +136,8 @@ class FileCollection(Generic[FileT]):
 
     def no_longer_published_files(
         self,
-        horizon: 'datetime'
-    ) -> 'Query[FileT]':
+        horizon: datetime
+    ) -> Query[FileT]:
         """ Returns a query of files where the publishing end date has expired.
         """
         return self.query().filter(and_(
@@ -143,7 +145,7 @@ class FileCollection(Generic[FileT]):
             File.publish_end_date < horizon
         ))
 
-    def publishable_files(self, horizon: 'datetime') -> 'Query[FileT]':
+    def publishable_files(self, horizon: datetime) -> Query[FileT]:
         """ Returns a query of files which may be published. """
 
         return self.query().filter(and_(
@@ -155,7 +157,7 @@ class FileCollection(Generic[FileT]):
             )
         ))
 
-    def publish_files(self, horizon: 'datetime | None' = None) -> None:
+    def publish_files(self, horizon: datetime | None = None) -> None:
         """ Publishes unpublished files with a publish date older than the
         given horizon.
 
@@ -183,7 +185,7 @@ class FileCollection(Generic[FileT]):
 
         return self.query().filter(File.id == file_id).first()
 
-    def by_filename(self, filename: str) -> 'Query[FileT]':
+    def by_filename(self, filename: str) -> Query[FileT]:
         """ Returns a query that matches the files with the given filename.
 
         Be aware that there may be multiple files with the same filename!
@@ -191,14 +193,14 @@ class FileCollection(Generic[FileT]):
         """
         return self.query().filter(File.name == filename)
 
-    def by_checksum(self, checksum: str) -> 'Query[FileT]':
+    def by_checksum(self, checksum: str) -> Query[FileT]:
         """ Returns a query that matches the given checksum (may be more than
         one record).
 
         """
         return self.query().filter(File.checksum == checksum)
 
-    def by_content(self, content: bytes | IO[bytes]) -> 'Query[FileT]':
+    def by_content(self, content: bytes | IO[bytes]) -> Query[FileT]:
         """ Returns a query that matches the given content (may be more than
         one record).
 
@@ -225,7 +227,7 @@ class FileCollection(Generic[FileT]):
             File.signature_metadata['old_digest'].astext == sha
         ))
 
-    def by_content_type(self, content_type: str) -> 'Query[FileT]':
+    def by_content_type(self, content_type: str) -> Query[FileT]:
         """ Returns a query that matches the given MIME content type (may be
         more than one record).
 
@@ -237,7 +239,7 @@ class FileCollection(Generic[FileT]):
             )
         )
 
-    def by_signature_digest(self, digest: str) -> 'Query[FileT]':
+    def by_signature_digest(self, digest: str) -> Query[FileT]:
         """ Returns a query that matches the given digest in the signature
         metadata. In other words, given a digest this function will find
         signed files that match the digest - either before or after signing.
@@ -262,7 +264,7 @@ class FileCollection(Generic[FileT]):
     def locate_signature_metadata(
         self,
         digest: str
-    ) -> 'SignatureMetadata | None':
+    ) -> SignatureMetadata | None:
         """ Looks for the given digest in the files table - if that doesn't
         work it will go through the audit trail (i.e. the chat messages) and
         see if the digest can be found there.
@@ -299,19 +301,19 @@ class FileSetCollection(Generic[FileSetT]):
 
     @overload
     def __init__(
-        self: 'FileSetCollection[FileSet]',
-        session: 'Session',
+        self: FileSetCollection[FileSet],
+        session: Session,
         type: Literal['*', 'generic'] = '*'
     ) -> None: ...
 
     @overload
-    def __init__(self, session: 'Session', type: str) -> None: ...
+    def __init__(self, session: Session, type: str) -> None: ...
 
-    def __init__(self, session: 'Session', type: str = '*') -> None:
+    def __init__(self, session: Session, type: str = '*') -> None:
         self.session = session
         self.type = type
 
-    def query(self) -> 'Query[FileSetT]':
+    def query(self) -> Query[FileSetT]:
         if self.type != '*':
             model_class = FileSet.get_polymorphic_class(self.type, FileSet)
 

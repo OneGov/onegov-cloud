@@ -2,13 +2,13 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-import textwrap
-
-from sqlalchemy import Column, ARRAY, Text, Boolean
+# pragma: exclude file
+from __future__ import annotations
 
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.fsi.models.course_attendee import external_attendee_org
+from sqlalchemy import text, Boolean, Column, Text, ARRAY
 
 
 @upgrade_task('Remove department column')
@@ -19,12 +19,12 @@ def remove_department_column(context: UpgradeContext) -> None:
 
 @upgrade_task('Fix wrong json type')
 def fix_wrong_json_type(context: UpgradeContext) -> None:
-    context.session.execute("""
+    context.session.execute(text("""
         ALTER TABLE fsi_attendees
         ALTER COLUMN meta
         SET DATA TYPE jsonb
         USING meta::jsonb
-    """)
+    """))
 
 
 @upgrade_task('Delete attendee title')
@@ -39,7 +39,7 @@ def add_attendee_permissions_col(context: UpgradeContext) -> None:
         context.add_column_with_defaults(
             'fsi_attendees',
             Column('permissions', ARRAY(Text), default=list),
-            default=lambda x: []
+            default=lambda x: []  # type: ignore
         )
 
 
@@ -117,12 +117,12 @@ def add_source_id_to_attendee(context: UpgradeContext) -> None:
             'fsi_attendees',
             Column('source_id', Text, nullable=True))
 
-    context.session.execute("""
+    context.session.execute(text("""
         UPDATE fsi_attendees t2
         SET source_id = t1.source_id
         FROM users t1
         WHERE  t2.user_id = t1.id
-    """)
+    """))
 
 
 @upgrade_task('Change refresh_interval to integer representing years')
@@ -132,7 +132,7 @@ def change_refresh_interval(context: UpgradeContext) -> None:
     if context.is_empty_table('fsi_courses'):
         return
 
-    context.session.execute(textwrap.dedent("""\
+    context.session.execute(text("""
         ALTER TABLE fsi_courses ALTER COLUMN refresh_interval
         TYPE INT USING extract(days FROM refresh_interval) / 30 / 12::int
         """))
@@ -140,7 +140,7 @@ def change_refresh_interval(context: UpgradeContext) -> None:
 
 @upgrade_task('Adds organisation to external attendees')
 def add_org_to_external_attendee(context: UpgradeContext) -> None:
-    context.session.execute(textwrap.dedent(f"""\
+    context.session.execute(text(f"""
         UPDATE fsi_attendees
         SET organisation = '{external_attendee_org}'
         WHERE fsi_attendees.user_id IS NULL;
@@ -151,7 +151,7 @@ def add_org_to_external_attendee(context: UpgradeContext) -> None:
 def append_org_to_external_attendee(context: UpgradeContext) -> None:
     if not context.has_column('fsi_attendees', 'permissions'):
         return
-    context.session.execute(textwrap.dedent(f"""
+    context.session.execute(text(f"""
         UPDATE fsi_attendees
         SET permissions = array_append(permissions, '{external_attendee_org}')
         WHERE fsi_attendees.id IN (
@@ -180,5 +180,5 @@ def add_evaluation_url_to_course(context: UpgradeContext) -> None:
         context.add_column_with_defaults(
             'fsi_courses',
             Column('evaluation_url', Text, nullable=True),
-            default=lambda x: None
+            default=lambda x: None  # type: ignore
         )

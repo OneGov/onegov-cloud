@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import click
 
 from contextlib import contextmanager
 from sedate import utcnow
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-from sqlparse import format  # type:ignore[import-untyped]
+from sqlparse import format
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -26,7 +28,7 @@ class Timer:
     def start(self) -> None:
         self.started = utcnow()
 
-    def stop(self) -> 'timedelta':
+    def stop(self) -> timedelta:
         return utcnow() - self.started
 
 
@@ -35,13 +37,13 @@ def print_query(query: bytes) -> None:
     formatted = format(query.decode('utf-8'), reindent=True)
     formatted = formatted.replace('\n', '\n  ')
 
-    print('> {}'.format(formatted))
+    click.echo('> {}'.format(formatted))
 
 
 @contextmanager
 def analyze_sql_queries(
     report: Literal['summary', 'redundant', 'all'] = 'summary'
-) -> 'Iterator[None]':
+) -> Iterator[None]:
     """ Analyzes the sql-queries executed during its context. There are three
     levels of information (report argument):
 
@@ -63,22 +65,22 @@ def analyze_sql_queries(
 
     @event.listens_for(Engine, 'before_cursor_execute')
     def before_exec(
-        conn: 'Connection',
+        conn: Connection,
         cursor: Any,
         statement: str,
         parameters: Any,
-        context: 'ExecutionContext',
+        context: ExecutionContext,
         executemany: bool
     ) -> None:
         timer.start()
 
     @event.listens_for(Engine, 'after_cursor_execute')
     def after_exec(
-        conn: 'Connection',
+        conn: Connection,
         cursor: Any,
         statement: str,
         parameters: Any,
-        context: 'ExecutionContext',
+        context: ExecutionContext,
         executemany: bool
     ) -> None:
         runtime = timer.stop()
@@ -99,7 +101,7 @@ def analyze_sql_queries(
                 handle_query(cursor.mogrify(statement, parameter))
 
         if report == 'all':
-            print('< took {}'.format(runtime))
+            click.echo('< took {}'.format(runtime))
     yield
 
     event.remove(Engine, 'before_cursor_execute', before_exec)
@@ -121,11 +123,11 @@ def analyze_sql_queries(
         redundant_queries_str = '0'
 
     if total_queries:
-        print("executed {} queries, {} of which were redundant".format(
+        click.echo('executed {} queries, {} of which were redundant'.format(
             total_queries_str, redundant_queries_str))
 
     if redundant_queries and report == 'redundant':
-        print("The following queries were redundant:")
+        click.echo('The following queries were redundant:')
         for query, count in queries.items():
             if count > 1:
                 print_query(query)

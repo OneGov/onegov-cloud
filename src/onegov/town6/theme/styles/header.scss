@@ -16,6 +16,7 @@ $edit-link-icon: '\f044';
 $save-link-icon: '\f0c7';
 $cancel-link-icon: '\f00d';
 $export-link-icon: '\f019';
+$envelope-icon: '\f0e0';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
 $import-link-icon: '\f093';
@@ -33,6 +34,7 @@ $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f07b';
 $new-recipient: '\f0e0';
 $new-form-icon: '\f044';
+$new-document-form-icon: '\f70e';
 $new-link-icon: '\f0c1';
 $new-iframe-icon: '\f2d0';
 $new-news-icon: '\f1ea';
@@ -45,7 +47,9 @@ $new-photo-album: '\f03e';
 $new-registration-window: '\f067';
 $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
+$new-datatrans-icon: '\f09d';
 $new-stripe-connect-icon: '\f1f5';
+$new-worldline-saferpay-icon: '\f09d';
 $new-user-icon: '\f234';
 $new-text-module-icon: '\f249';
 $paste-link-icon: '\f0ea';
@@ -53,6 +57,7 @@ $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
 $payment-provider-icon: '\f09d';
 $payments-icon: $payment-provider-icon;
+$invoice-icon: '\f1ea';
 $rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d8';
@@ -67,6 +72,8 @@ $pdf-icon: '\f1c1';
 $ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 $results-icon: '\f682';
+$trash-restore-icon: '\f829';
+$settings-icon: '\f1de';
 
 #header {
     background: $smoke;
@@ -160,6 +167,7 @@ $results-icon: '\f682';
         }
     }
 
+    .dashboard::before { @include icon-bold('\f3fd'); }
     .login::before { @include icon-bold("\f2f6"); }
     .logout::before { @include icon-bold("\f2f5"); }
     .register::before { @include icon("\f234"); }
@@ -167,6 +175,7 @@ $results-icon: '\f682';
     .users::before { @include icon-bold("\f0c0"); }
     .payment::before { @include icon($payments-icon); }
     .payment-provider::before { @include icon-bold($payment-provider-icon); }
+    .invoice::before { @include icon($invoice-icon); }
     .profile::before { @include icon("\f2bd"); }
     .management::before { @include icon-bold('\f013'); }
     .chats::before { @include icon-bold('\f086'); }
@@ -177,10 +186,14 @@ $results-icon: '\f682';
     .timeline::before { @include icon('\f017'); }
     .no-tickets::before { @include icon('\f145'); }
     .link-check::before { @include icon-bold('\f0fa'); }
+    .ris-settings::before { @include icon-bold('\f66f'); }
     .ticket-archive::before { @include icon-bold('\f1c6'); }
     .text-modules::before { @include icon('\f249'); }
     .forms::before { @include icon-bold('\f570'); }
     .surveys::before { @include icon-bold('\f681'); }
+    .citizen-login::before { @include icon-bold("\f2f6"); }
+    .citizen-tickets::before { @include icon-bold('\f3ff'); }
+    .citizen-reservations::before { @include icon('\f073'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -444,6 +457,7 @@ $editbar-fg-color-active: $white;
 
 .edit-bar-container {
     background-color: $editbar-bg-color;
+    padding: 0 !important;
 }
 
 .edit-bar {
@@ -452,10 +466,6 @@ $editbar-fg-color-active: $white;
     box-shadow: $navbar-shadow;
     margin-bottom: 2px;
     margin-top: -2px;
-
-    .is-dropdown-submenu-parent > a {
-        padding-top: .9rem !important;
-    }
 
     li {
         a::before, button::before {
@@ -516,6 +526,7 @@ $editbar-fg-color-active: $white;
     .cancel-link::before { @include icon-bold($cancel-link-icon); }
     .move-link::before { @include icon-bold($move-link-icon); }
     .export-link::before { @include icon-bold($export-link-icon); }
+    .envelope::before { @include icon-bold($envelope-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon-bold($import-link-icon); }
@@ -527,6 +538,7 @@ $editbar-fg-color-active: $white;
     .new-directory::before { @include icon-bold($new-directory-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
+    .new-document-form::before { @include icon-bold($new-document-form-icon); }
     .new-link::before { @include icon-bold($new-link-icon); }
     .new-iframe::before { @include icon-bold($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }
@@ -540,7 +552,9 @@ $editbar-fg-color-active: $white;
     .new-registration-window::before { @include icon-bold($new-registration-window); }
     .new-reservation::before { @include icon($new-reservation-icon); }
     .new-room::before { @include icon-bold($new-room-icon); }
+    .new-datatrans::before { @include icon($new-datatrans-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
+    .new-worldline-saferpay::before { @include icon($new-worldline-saferpay-icon); }
     .new-user::before { @include icon-bold($new-user-icon); }
     .new-text-module::before { @include icon($new-text-module-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
@@ -556,13 +570,14 @@ $editbar-fg-color-active: $white;
     .sync::before { @include icon-bold($sync-icon); }
     .upload::before { @include icon-bold($upload-icon); }
     .view-link::before { @include icon($view-link); }
-    .ticket-pdf::before { @include icon($pdf-icon); }
     .ticket-files::before { @include icon-bold($ticket-files-icon); }
     .new-daily-item::before { @include icon-bold($new-daily-item-icon); }
     .new-resource-link::before { @include icon-bold($new-resource-link-icon); }
     .cancel::before { @include icon-bold($disabled-icon); }
     .qr-code-link::before { @include icon-bold($qr-code-icon); }
     .results-link::before { @include icon-bold($results-icon); }
+    .undo-link::before { @include icon-bold($trash-restore-icon); }
+    .settings-link::before { @include icon-bold($settings-icon); }
 }
 
 
@@ -584,8 +599,8 @@ $editbar-fg-color-active: $white;
     }
 }
 
-#offCanvas {
-    background: $primary-color;
+#offCanvas,
+#offCanvasFilters {
     z-index: 1000;
 
     .button-area {
@@ -614,16 +629,16 @@ $editbar-fg-color-active: $white;
         background-color: $white;
     }
 
+    .drilldown a {
+        background-color: transparent;
+    }
+
     .side-navigation {
         padding: 0 2rem;
         width: 30rem;
 
         @include breakpoint(small only) {
             width: auto;
-
-            .menu {
-                background: $primary-color;
-            }
         }
 
         li {
@@ -676,9 +691,6 @@ $editbar-fg-color-active: $white;
         }
     }
 
-    .drilldown a {
-        background-color: $primary-color !important;
-    }
 
     // Overwrite foundation arrows
     .accordion-menu .is-accordion-submenu-parent:not(.has-submenu-toggle) > a::after,
@@ -713,7 +725,6 @@ $editbar-fg-color-active: $white;
         padding-left: 3rem;
 
         &::before {
-            background-color: $primary-color;
             content: "\f053";
             display: block;
             left: 1rem;
@@ -722,9 +733,61 @@ $editbar-fg-color-active: $white;
             top: .8rem;
         }
     }
+}
+
+#offCanvasFilters {
+    background: $white;
+
+    .navigation-area {
+        padding: 2rem 0;
+
+        .menu-wrapper {
+            height: calc(100vh - 240px);
+            overflow: scroll;
+        }
+
+        .accordion {
+            background: transparent;
+
+            .accordion-content {
+                margin: 0;
+                border: 0;
+                background: transparent;
+            }
+
+            .accordion-title {
+                color: $oil;
+                font-size: 1rem;
+                border: 0;
+                border-top: 1px solid $gainsboro;
+                border-radius: 0;
+            }
+
+            @media #{$small-only} {min-width: 90vw;}
+            @media #{$medium-up} {min-width: 60vw;}
+            @media #{$large-up} {min-width: 30vw;}
+        }
+    }
+}
+
+#offCanvas {
+    background: $primary-color;
 
     * {
         color: $white;
+    }
+
+    .side-navigation .menu {
+        background: $primary-color;
+    }
+
+    .drilldown a {
+        background-color: $primary-color !important;
+    }
+
+    .js-drilldown-back::before {
+            background-color: $primary-color;
+            content: "\f053";
     }
 }
 

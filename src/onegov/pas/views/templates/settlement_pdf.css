@@ -1,0 +1,82 @@
+@page {
+    size: A4;
+    margin: 2.5cm 0.75cm 2cm 0.75cm;  /* top right bottom left */
+    @top-right {
+        content: "Staatskanzlei";
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 8pt;
+    }
+}
+
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 7pt;
+    line-height: 1.2;
+}
+
+table {
+    border-collapse: collapse;
+    margin-top: 0;
+    width: 100%;
+    table-layout: fixed;
+}
+
+
+/* Party summary table */
+.summary-table th:nth-child(1), /* Name */
+.summary-table td:nth-child(1) {
+    width: 120pt;
+}
+
+.summary-table th:nth-child(2), /* Meetings */
+.summary-table td:nth-child(2),
+.summary-table th:nth-child(3), /* Expenses */
+.summary-table td:nth-child(3),
+.summary-table th:nth-child(4), /* Total */
+.summary-table td:nth-child(4),
+.summary-table th:nth-child(5), /* COLA */
+.summary-table td:nth-child(5),
+.summary-table th:nth-child(6), /* Final */
+.summary-table td:nth-child(6) {
+    width: 60pt;
+}
+
+.table-title {
+    background-color: #707070;
+    color: white;
+    font-weight: bold;
+    padding: 2pt;
+    border: 1pt solid #000;
+    margin-top: 1cm;
+}
+
+th:not([colspan]) {
+    background-color: #d5d7d9;
+    font-weight: bold;
+    text-align: left;
+    padding: 2pt;
+    border: 1pt solid #000;
+}
+
+td {
+    padding: 2pt;
+    border: 1pt solid #000;
+}
+
+tr:nth-child(even):not(.total-row) td {
+    background-color: #f3f3f3;
+}
+
+.numeric {
+    text-align: right;
+}
+
+.total-row {
+    font-weight: bold;
+    background-color: #d5d7d9;
+}
+
+.summary-table {
+    margin-top: 2cm;
+    /* page-break-before: always; */
+}

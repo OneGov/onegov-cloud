@@ -18,13 +18,19 @@ function moveMailTemplateButtonToEnd() {
     }
 }
 
-// fixes tab title containing html
-if (document.body.id.startsWith("page-translator-")) {
-    if (/div class="adjust-font">.*<\/div>/.test(document.title)) {
-        document.title = document.title.replace(/<div class="adjust-font">(.*)<\/div>/, '$1');
-    }
-}
 
 document.addEventListener("DOMContentLoaded", function() {
     moveMailTemplateButtonToEnd();
+
+    // Auto-set end date to match start date in time report form for convenience while typing
+    const startDateField = document.querySelector(
+        'input[name="start_date"]'
+    );
+    const endDateField = document.querySelector('input[name="end_date"]');
+
+    if (startDateField && endDateField) {
+        startDateField.addEventListener('change', function() {
+            endDateField.value = startDateField.value;
+        });
+    }
 });

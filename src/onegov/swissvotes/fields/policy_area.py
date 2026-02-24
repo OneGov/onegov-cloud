@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from copy import deepcopy
 from json import dumps
 from onegov.swissvotes import _
@@ -15,9 +17,9 @@ if TYPE_CHECKING:
     from onegov.form.types import PricingRules
     from onegov.form.types import Validators
     from onegov.form.types import Widget
+    from typing import NotRequired
+    from typing import Self
     from typing import TypedDict
-    from typing_extensions import NotRequired
-    from typing_extensions import Self
     from markupsafe import Markup
     from wtforms.fields.choices import SelectFieldBase
     from wtforms.form import BaseForm
@@ -27,7 +29,7 @@ if TYPE_CHECKING:
     class PolicyAreaTreeNode(TypedDict):
         value: str
         label: str
-        children: list['PolicyAreaTreeNode']
+        children: list[PolicyAreaTreeNode]
         # NOTE: Technically these are guaranteed to be set when read out
         #       and don't ever need to be provided manually, but it's easier
         #       to just treat them as not required for now, since we just
@@ -41,16 +43,16 @@ class PolicyAreaWidget(Select):
 
     def __call__(
         self,
-        field: 'PolicyAreaField',  # type:ignore[override]
+        field: PolicyAreaField,  # type:ignore[override]
         **kwargs: object
-    ) -> 'Markup':
+    ) -> Markup:
 
         kwargs['class_'] = 'policy-selector'
         kwargs['data-tree'] = dumps(field.tree)
         kwargs['data-placehoder-text'] = field.gettext(
-            _("Select Some Options")
+            _('Select Some Options')
         )
-        kwargs['data-no-matches-text'] = field.gettext(_("No results match"))
+        kwargs['data-no-matches-text'] = field.gettext(_('No results match'))
         return super().__call__(field, **kwargs)
 
     @classmethod
@@ -60,7 +62,7 @@ class PolicyAreaWidget(Select):
         label: str,
         selected: bool,
         **kwargs: object
-    ) -> 'Markup':
+    ) -> Markup:
         """ Adds a level specific class to each option.
 
         This allows to see the hierarchy in case the client has disabled
@@ -85,9 +87,9 @@ class PolicyAreaField(SelectMultipleField):
             label: str | None = None,
             validators: Validators[FormT, Self] | None = None,
             *,
-            tree: list['PolicyAreaTreeNode'] = ...,
+            tree: list[PolicyAreaTreeNode] = ...,
             filters: Sequence[Filter] = (),
-            description: str = "",
+            description: str = '',
             id: str | None = None,
             default: object | None = None,
             widget: Widget[Self] | None = None,
@@ -95,7 +97,7 @@ class PolicyAreaField(SelectMultipleField):
             render_kw: dict[str, Any] | None = None,
             name: str | None = None,
             _form: BaseForm | None = None,
-            _prefix: str = "",
+            _prefix: str = '',
             _translations: _SupportsGettextAndNgettext | None = None,
             _meta: DefaultMeta | None = None,
             # onegov specific kwargs that get popped off
@@ -109,14 +111,14 @@ class PolicyAreaField(SelectMultipleField):
             super().__init__(*args, **kwargs)
 
     @property
-    def tree(self) -> list['PolicyAreaTreeNode']:
+    def tree(self) -> list[PolicyAreaTreeNode]:
         """ Returns the tree data and automatically preselects the selected
         select options.
 
         """
         tree = deepcopy(self._tree)
 
-        def preselect(item: 'PolicyAreaTreeNode') -> bool:
+        def preselect(item: PolicyAreaTreeNode) -> bool:
             checked = item['value'] in (self.data or ())
             expanded = False
             for child in item['children']:
@@ -131,14 +133,14 @@ class PolicyAreaField(SelectMultipleField):
         return tree
 
     @tree.setter
-    def tree(self, value: list['PolicyAreaTreeNode']) -> None:
+    def tree(self, value: list[PolicyAreaTreeNode]) -> None:
         """ Sets the tree data and automatically populates the select's
         choices.
 
         """
         self._tree = value
 
-        def add_choices(item: 'PolicyAreaTreeNode') -> None:
+        def add_choices(item: PolicyAreaTreeNode) -> None:
             self.choices.append((item['value'], item['label']))
             for child in item['children']:
                 add_choices(child)

@@ -35,12 +35,21 @@
                             <span class="h5">${entry.title}</span>
                         </a>
                         <div class="accordion-content" data-tab-content>
-                            <ul tal:repeat="item entry.values.items()" style="list-style: none; margin-left: 0">
-                                <li tal:define="key item[0].capitalize(); value item[1].replace('\r\n', Markup('<br>'))" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                            <ul tal:repeat="field directory.fields" tal:define="content_labels entry.content_labels; hidden_labels entry.hidden_label_fields" style="list-style: none; margin-left: 0">
+                                <tal:block tal:condition="field.id in content_labels">
+                                    <li tal:condition="field.type == 'textarea'" tal:define="key field.id; human_id field.human_id; value entry.values[field.id]" style="white-space: pre-wrap;">
+                                        <tal:block tal:condition="key in hidden_labels" tal:content="value" />
+                                        <tal:block tal:condition="not:key in hidden_labels" tal:content="Markup('&lt;strong&gt;{}&lt;/strong&gt;: &lt;br&gt;{}').format(human_id, value)" />
+                                    </li>
+                                    <li tal:condition="field.type != 'textarea'" tal:define="key field.id; human_id field.human_id; value entry.values[field.id]">
+                                        <tal:block tal:condition="key in hidden_labels" tal:content="value" />
+                                        <tal:block tal:condition="not:key in hidden_labels" tal:content="Markup('&lt;strong&gt;{}&lt;/strong&gt;: {}').format(human_id, value)" />
+                                    </li>
+                                </tal:block>
                             </ul>
                             <ul style="list-style: none; margin-left: 0">
                                 <li>
-                                    <a tal:condition="request.is_manager" class="edit-link" tal:attributes="href request.link(entry, 'edit')">
+                                    <a tal:condition="request.is_manager" class="edit-link" tal:attributes="href request.link(entry)">
                                         <i class="far fa-edit"></i>
                                     </a>
                                 </li>
@@ -99,6 +108,21 @@
                         </div>
                     </div>
 
+                    <div class="side-panel" tal:condition="layout.publication_filters">
+                        <h3 i18n:translate>Publication</h3>
+                        <div class="side-panel-with-bg">
+                            <div class="filter-panel">
+                                <ul class="tags">
+                                    <li tal:repeat="link layout.publication_links">
+                                        <span class="blank-label click-through rounded ${' '.join(link.attrs['class'])}">
+                                            ${link(layout)}
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="filter-panel side-panel" tal:condition="filters">
                         <div tal:repeat="filter filters" class="filter-periods">
                             <h3 class="filter-title">${filter.title}</h3>
@@ -106,52 +130,38 @@
                         </div>
                     </div>
 
-                    <div class="submit-yours side-panel" tal:condition="directory.enable_submissions">
-                        <dl>
-                            <dt>
-                                <a href="${submit}">
-                                    <tal:b tal:condition="request.is_manager" metal:use-macro="layout.macros.access_hint" tal:define="item directory"/>
-                                    <h3 i18n:translate="">Propose entry</h3>
-                                </a>
-                            </dt>
-                            <dd i18n:translate="">Something missing? Propose a new entry.</dd>
-                        </dl>
-                    </div>
-                    <div class="publication-nav side-panel" tal:condition="layout.publication_filters">
-                        <button type="button" data-toggle="pubnav" class="button small dropdown secondary" i18n:translate>${layout.publication_filter_title}</button>
-                        <div id="pubnav" class="dropdown-pane" data-dropdown data-position="bottom" data-alignment="right" data-parent-class="cell" data-hover-pane="true" data-hover="true">
-                            <ul class="f-dropdown">
-                                <li tal:repeat="link layout.publication_links" tal:content="link(layout)"></li>
-                            </ul>
-                        </div>
-                    </div>
-
                     <div class="side-panel files-panel" tal:condition="files and directory.show_file_links_in_sidebar|True">
                         <h3 i18n:translate>Documents</h3>
                         <ul class="more-list">
-                            <li tal:repeat="file files">
+                            <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
                                 <a class="list-link" title="${file.name}" href="${request.link(file)}">
                                     <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
-                                    <span class="list-title">${file.name.split('.')[0]}</span>
+                                    <span class="list-title">${layout.get_filename_without_extension(file.name)}</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
-
-                    <div class="side-panel" tal:condition="directory.enable_update_notifications|False">
-                        <h3 i18n:translate>Actions</h3>
-                        <div class="side-panel-with-bg">
-                            <ul class="more-list">
-                                <li class="icon-item">
-                                    <a class="list-link multi-line" href="${new_recipient_link}">
-                                        <i class="fa fa-bell"></i>
-                                        <span class="list-title" i18n:translate>Get notifications on new entries</span>
-                                    </a>
-                                </li>
-                            </ul>
+                    <tal:b define="enable_update_notifications directory.enable_update_notifications|False">
+                        <div class="side-panel" tal:condition="directory.enable_submissions or enable_update_notifications">
+                            <h3 i18n:translate>Actions</h3>
+                            <div class="side-panel-with-bg">
+                                <ul class="more-list">
+                                    <li class="icon-item" tal:condition="directory.enable_update_notifications|False">
+                                        <a class="list-link multi-line" href="${new_recipient_link}">
+                                            <i class="fa fa-bell"></i>
+                                            <span class="list-title" i18n:translate>Get notifications on new entries</span>
+                                        </a>
+                                    </li>
+                                    <li class="icon-item" tal:condition="directory.enable_submissions">
+                                        <a class="list-link" href="${submit}">
+                                            <i class="fa fa-folder-plus"></i>
+                                            <span class="list-title" i18n:translate>Propose a new entry</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-
+                    </tal:b>
                 </div>
             </div>
 

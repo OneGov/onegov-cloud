@@ -31,6 +31,7 @@ For example::
         return 'en'
 
 """
+from __future__ import annotations
 
 import gettext
 import glob
@@ -40,7 +41,7 @@ import polib
 import re
 import types
 
-from onegov.core.cache import lru_cache
+from functools import lru_cache
 from io import BytesIO
 from itertools import pairwise
 from onegov.core.framework import Framework, log
@@ -57,7 +58,7 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.core.request import CoreRequest
     from translationstring import _ChameleonTranslate
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
     from webob import Response
     from wtforms import Field, Form
     from wtforms.meta import DefaultMeta
@@ -101,7 +102,7 @@ def get_i18n_default_locale() -> None:
 
 
 @Framework.setting(section='i18n', name='locale_negotiator')
-def get_i18n_locale_negotiatior() -> 'LocaleNegotiator':
+def get_i18n_locale_negotiatior() -> LocaleNegotiator:
     """ Returns the language negotiator, which is a function that takes the
     current request as well as a list of available languages and returns the
     angauge that should be used based on that information.
@@ -111,8 +112,8 @@ def get_i18n_locale_negotiatior() -> 'LocaleNegotiator':
 
 
 def default_locale_negotiator(
-    locales: 'Collection[str]',
-    request: 'CoreRequest'
+    locales: Collection[str],
+    request: CoreRequest
 ) -> str | None:
     """ The default locale negotiator.
 
@@ -133,13 +134,16 @@ def default_locale_negotiator(
         return user_locale
 
     if request.accept_language:
-        locale = request.accept_language.lookup(locales, default='default')
+        locale = request.accept_language.lookup(
+            list(locales),
+            default='default'
+        )
         return locale if locale != 'default' else None
 
     return None
 
 
-def pofiles(localedir: 'StrPath') -> 'Iterator[tuple[str, str]]':
+def pofiles(localedir: StrPath) -> Iterator[tuple[str, str]]:
     """ Takes the given directory and yields the language and the path of
     all pofiles found under ``*/LC_MESSAGES/*.po``.
 
@@ -165,7 +169,7 @@ def compile_translation(pofile_path: str) -> gettext.GNUTranslations:
     locale = po.group('locale').lower()
     module = po.group('module').lower().replace('.po', '')
 
-    log.info(f"Compiling locale {locale} for {module}")
+    log.info(f'Compiling locale {locale} for {module}')
 
     mofile = BytesIO()
     mofile.write(polib.pofile(pofile_path).to_binary())
@@ -175,7 +179,7 @@ def compile_translation(pofile_path: str) -> gettext.GNUTranslations:
 
 
 def get_translations(
-    localedirs: 'Iterable[StrPath]'
+    localedirs: Iterable[StrPath]
 ) -> dict[str, gettext.GNUTranslations]:
     """ Takes the given gettext locale directories and loads the po files
     found. The first found po file is assumed to be the main
@@ -198,7 +202,7 @@ def get_translations(
             # try to automatically fix up the language
             if '_' in language:
                 code, country = language.split('_')
-                language = '_'.join((code.lower(), country.upper()))
+                language = f'{code.lower()}_{country.upper()}'
             else:
                 language = language.lower()
 
@@ -223,7 +227,7 @@ def get_translations(
 
 def wrap_translations_for_chameleon(
     translations: dict[str, gettext.GNUTranslations]
-) -> dict[str, '_ChameleonTranslate']:
+) -> dict[str, _ChameleonTranslate]:
     """ Takes the given translations and wraps them for use with Chameleon. """
 
     return {
@@ -234,7 +238,7 @@ def wrap_translations_for_chameleon(
 
 def translation_chain(
     translation: gettext.GNUTranslations
-) -> 'Iterator[gettext.GNUTranslations]':
+) -> Iterator[gettext.GNUTranslations]:
     """ Yields the translation chain with a generator. """
 
     stack = [translation]
@@ -250,7 +254,7 @@ def translation_chain(
 
 def get_translation_bound_meta(
     meta_class: type[_M],
-    translations: gettext.GNUTranslations
+    translations: gettext.GNUTranslations | None
 ) -> type[_M]:
     """ Takes a wtforms Meta class and combines our translate class with
     the one provided by WTForms itself.
@@ -264,7 +268,10 @@ def get_translation_bound_meta(
         # the request has been handled
         cache_translations = False
 
-        def get_translations(self, form: 'Form') -> gettext.GNUTranslations:
+        def get_translations(
+            self,
+            form: Form
+        ) -> gettext.GNUTranslations | None:
             nonlocal translations
 
             try:
@@ -274,6 +281,8 @@ def get_translation_bound_meta(
                 # it might be worth revisiting in the future if we can
                 # enable caching here again, or introduce our own
                 wtf = super().get_translations(form)
+                if wtf is None:
+                    wtf = gettext.NullTranslations()
                 wtf.is_wtforms = True
 
             except FileNotFoundError:
@@ -309,9 +318,9 @@ def get_translation_bound_meta(
 
         def render_field(
             self,
-            field: 'Field',
+            field: Field,
             render_kw: dict[str, Any]
-        ) -> 'Markup':
+        ) -> Markup:
             """ Wtforms does not actually translate labels, it simply leaves
             the translations string be. If those translation strings hit our
             templates directly, they will then be picked up by our template
@@ -328,7 +337,7 @@ def get_translation_bound_meta(
             wtforms does support.
 
             """
-            if hasattr(field, 'label'):
+            if hasattr(field, 'label') and self._translations is not None:
                 if isinstance(field.label.text, TranslationString):
                     field.label.text = field.label.text.interpolate(
                         self._translations.gettext(field.label.text))
@@ -340,21 +349,19 @@ def get_translation_bound_meta(
 
 def get_translation_bound_form(
     form_class: type[_F],
-    translate: gettext.GNUTranslations
+    translate: gettext.GNUTranslations | None
 ) -> type[_F]:
     """ Returns a form setup with the given translate function. """
 
-    MetaClass = get_translation_bound_meta(form_class.Meta, translate)
-
     class TranslationBoundForm(form_class):  # type:ignore
 
-        Meta = MetaClass
+        Meta = get_translation_bound_meta(form_class.Meta, translate)
 
     return TranslationBoundForm
 
 
 def merge(
-    translations: 'Sequence[gettext.GNUTranslations]'
+    translations: Sequence[gettext.GNUTranslations]
 ) -> gettext.GNUTranslations:
     """ Takes the given translations (a list) and merges them into
     each other. The translations at the end of the list are overwritten
@@ -408,8 +415,8 @@ class SiteLocale:
     def for_path(
         cls,
         app: Framework,
-        locale: str | str
-    ) -> 'Self | None':
+        locale: str
+    ) -> Self | None:
 
         if locale in app.locales:
             return cls(locale)
@@ -418,10 +425,10 @@ class SiteLocale:
     def __init__(self, locale: str):
         self.locale = locale
 
-    def link(self, request: 'CoreRequest', to: str) -> str:
+    def link(self, request: CoreRequest, to: str) -> str:
         return request.return_to(request.link(self), to)
 
-    def redirect(self, request: 'CoreRequest') -> 'Response':
+    def redirect(self, request: CoreRequest) -> Response:
         response = request.redirect('')  # use return-to
         response.set_cookie(
             'locale',

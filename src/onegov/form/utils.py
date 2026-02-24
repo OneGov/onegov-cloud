@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import re
 import wtforms.widgets.core
@@ -10,7 +12,7 @@ from unidecode import unidecode
 from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.form import Form
-    from typing_extensions import Self
+    from typing import Self
     from wtforms.fields.core import UnboundField
 
 
@@ -21,15 +23,15 @@ original_html_params = wtforms.widgets.core.html_params
 
 
 def as_internal_id(label: str) -> str:
-    clean = unidecode(label).strip(' \"\'').lower()
+    clean = unidecode(label).strip(' "\'').lower()
     clean = _unwanted_characters.sub('_', clean)
 
     return clean
 
 
 def get_fields_from_class(
-    cls: type['Form']
-) -> list[tuple[str, 'UnboundField[Any]']]:
+    cls: type[Form]
+) -> list[tuple[str, UnboundField[Any]]]:
 
     # often times FormMeta will have already calculated the fields
     # and stored them on the class, so we only need to calculate
@@ -71,7 +73,7 @@ def disable_required_attribute_in_html_inputs() -> None:
         patched_html_params)
 
 
-class decimal_range:
+class decimal_range:  # noqa: N801
     """ Implementation of Python's range builtin using decimal values instead
     of integers.
 
@@ -81,28 +83,27 @@ class decimal_range:
 
     def __init__(
         self,
-        start: float | Decimal,
-        stop: float | Decimal,
+        start: str | float | Decimal,
+        stop: str | float | Decimal,
         step: str | float | Decimal | None = None
-    ):
-        if step is None:
-            step = 1 if start <= stop else -1
+    ) -> None:
 
         self.start = self.current = Decimal(start)
         self.stop = Decimal(stop)
+        if step is None:
+            step = '1' if self.start <= self.stop else '-1'
         self.step = Decimal(step)
 
         assert self.step != Decimal(0)
 
     def __repr__(self) -> str:
-        if self.start <= self.stop and self.step == Decimal('1.0'):
-            return "decimal_range('{}', '{}')".format(self.start, self.stop)
-        elif self.start >= self.stop and self.step == Decimal('-1.0'):
-            return "decimal_range('{}', '{}')".format(self.start, self.stop)
-        else:
-            return "decimal_range('{}', '{}', '{}')".format(
-                self.start, self.stop, self.step
-            )
+        if (
+            (self.start <= self.stop and self.step == Decimal('1.0'))
+            or (self.start >= self.stop and self.step == Decimal('-1.0'))
+        ):
+            return f"decimal_range('{self.start}', '{self.stop}')"
+
+        return f"decimal_range('{self.start}', '{self.stop}', '{self.step}')"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -114,7 +115,7 @@ class decimal_range:
             other.start, other.stop, other.step
         )
 
-    def __iter__(self) -> 'Self':
+    def __iter__(self) -> Self:
         return self
 
     def __next__(self) -> Decimal:
@@ -147,7 +148,7 @@ def path_to_filename(path: str | None) -> str | None:
     if not path:
         return None
     if not isinstance(path, str):
-        raise ValueError
+        raise TypeError
     if '/' in path:
         return path.rsplit('/', 1)[-1]
     if '\\' in path:
@@ -167,7 +168,7 @@ def remove_empty_links(text: str) -> str:
         ):
             if all(tag.name == 'br' for tag in link.contents):
                 link.replace_with(
-                    BeautifulSoup("<br/>", "html.parser")
+                    BeautifulSoup('<br/>', 'html.parser')
                 )
             else:
                 link.decompose()

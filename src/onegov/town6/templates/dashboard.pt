@@ -3,19 +3,40 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="boardlet-group" tal:repeat="group model.boardlets()">
-            <div class="boardlet boardlet-${boardlet.state}" tal:repeat="boardlet group">
-                <h2>${boardlet.title}</h2>
-                <ul class="dense">
-                    <li tal:repeat="fact boardlet.facts">
-                        <i class="fa fa-fw ${fact.icon}" aria-hidden="true"></i>
-
-                        <span class="boardlet-fact">
-                            ${fact.text}
-                        </span>
-                    </li>
-                </ul>
-            </div>
-        </div>        
+        <div class="boardlet-group grid-x grid-padding-x columns small-up-1 medium-up-2 large-up-3 align-center" tal:repeat="group model.boardlets()">
+            <tal:b tal:repeat="boardlet group">
+                <div class="cell" tal:condition="boardlet.is_available">
+                    <div class="boardlet boardlet-${boardlet.state} ${boardlet.name}">
+                        <h2 class="h4">
+                            <a href="${boardlet.url}" tal:omit-tag="not:boardlet.url">
+                                <span>${boardlet.number|''}</span><br tal:condition="exists:boardlet.number"><span class="title">${boardlet.title}</span>
+                            </a>
+                        </h2>
+                        <table class="facts">
+                            <tr tal:repeat="fact boardlet.facts" class="${fact.css_class} small ${'none' if not (fact.number or fact.icon) else ''}">
+                                <td tal:condition="fact.icon" class="fact-icon">
+                                    <span><i class="${fact.icon}"></i></span>
+                                </td>
+                                <td tal:condition="fact.number is not None" class="fact-number">
+                                    <span>${layout.format_number(fact.number) or '-'}</span>
+                                </td>
+                                <td tal:condition="not:(fact.number is not None or fact.icon)" class="fact-number">
+                                    -
+                                </td>
+                                <td class="fact-text">
+                                    ${fact.text}
+                                    <span tal:condition="fact.link">
+                                        <a href="${fact.link[0]}">${fact.link[1]}</a>
+                                    </span>
+                                    <span tal:condition="fact.visibility_icon" class="fact-visibility-icon fa-xs">
+                                        <i class="${fact.visibility_icon}" tal:attributes="title fact.icon_title|None"></i>
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </tal:b>
+        </div>
     </tal:b>
 </div>

@@ -59,12 +59,18 @@ venv/
 # Eggs folder
 eggs/
 
+# Temporary folder
+temp/
+
 # pytest-testmon data
 .testmondata
 .tmontmp
 
 # mypy
-.mypy_cache/*
+.mypy_cache/
+
+# ruff
+.ruff_cache/
 
 # sublime
 *.sublime-workspace
@@ -95,3 +101,10 @@ prof
 
 # chamelon cache
 .chameleon_cache
+
+# redis
+dump.rdb
+
+.codebuddy/
+
+.aider*

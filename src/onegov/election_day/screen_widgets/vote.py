@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 
@@ -62,7 +64,7 @@ class VoteProposalResultBarWidget(ModelBoundWidget['Vote']):
     """
     usage = '<vote-proposal-result-bar class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'proposal': model.proposal,
@@ -87,7 +89,7 @@ class VoteCounterProposalResultBarWidget(ModelBoundWidget['ComplexVote']):
     """
     usage = '<vote-counter-proposal-result-bar class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'counter_proposal': model.counter_proposal,
@@ -112,7 +114,7 @@ class VoteTieBreakerResultBarWidget(ModelBoundWidget['ComplexVote']):
     """
     usage = '<vote-tie-breaker-result-bar class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'tie_breaker': model.tie_breaker,
@@ -138,7 +140,7 @@ class VoteProposalEntitiesTableWidget(ModelBoundWidget['Vote']):
     """
     usage = '<vote-proposal-entities-table class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         ballot = model.proposal
         results = sorted(ballot.results, key=lambda x: x.name)
@@ -167,7 +169,7 @@ class VoteCounterProposalEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
     """
     usage = '<vote-counter-proposal-entities-table class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         ballot = model.counter_proposal
         results = sorted(ballot.results, key=lambda x: x.name)
@@ -196,7 +198,7 @@ class VoteTieBreakerEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
     """
     usage = '<vote-tie-breaker-entities-table class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         ballot = model.tie_breaker
         results = sorted(ballot.results, key=lambda x: x.name)
@@ -224,7 +226,7 @@ class VoteProposalEntitiesMap(ModelBoundWidget['Vote']):
     """
     usage = '<vote-proposal-entities-map class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -250,7 +252,7 @@ class VoteCounterProposalEntitiesMap(ModelBoundWidget['ComplexVote']):
     """
     usage = '<vote-counter-proposal-entities-map class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -276,7 +278,7 @@ class VoteTieBreakerEntitiesMap(ModelBoundWidget['ComplexVote']):
     """
     usage = '<vote-tie-breaker-entities-map class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -302,7 +304,7 @@ class VoteProposalDistrictsMap(ModelBoundWidget['Vote']):
     """
     usage = '<vote-proposal-districts-map class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -328,7 +330,7 @@ class VoteCounterProposalDistrictsMap(ModelBoundWidget['ComplexVote']):
     """
     usage = '<vote-counter-proposal-districts-map class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -354,7 +356,7 @@ class VoteTieBreakerDistrictsMap(ModelBoundWidget['ComplexVote']):
     """
     usage = '<vote-tie-breaker-districts-map class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -377,7 +379,7 @@ class VoteProposalTurnoutWidget(ModelBoundWidget['Vote']):
     """
     usage = '<vote-proposal-turnout class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -400,7 +402,7 @@ class VoteCounterProposalTurnoutWidget(ModelBoundWidget['ComplexVote']):
     """
     usage = '<vote-counter-proposal-turnout class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -423,7 +425,7 @@ class VoteTieBreakerTurnoutWidget(ModelBoundWidget['ComplexVote']):
     """
     usage = '<vote-tie-breaker-turnout class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.qrcode import QrCode
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Election
     from onegov.election_day.models import ElectionCompound
     from onegov.election_day.models import Vote
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Entity: TypeAlias = Election | ElectionCompound | Vote
 
@@ -124,7 +126,7 @@ class PrincipalLogoWidget:
     """
     usage = '<principal-logo class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         logo = layout.app.logo
         return {'logo': layout.request.link(logo) if logo else ''}
 
@@ -150,7 +152,7 @@ class QrCodeWidget:
             QrCode(payload=url, encoding='base64').encoded_image.decode()
         )
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         return {'qr_code': self.qr_code}
 
 
@@ -159,7 +161,7 @@ class ModelBoundWidget(Generic[_E]):
     def __init__(self, model: _E | None = None) -> None:
         self.model = model
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         return {
             'model': self.model or layout.model
         }
@@ -228,7 +230,7 @@ class CountedEntitiesWidget(ModelBoundWidget['Entity']):
     """
     usage = '<counted-entities class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         entities = ', '.join([
             entity or layout.request.translate(_('Expats'))
@@ -242,7 +244,7 @@ class CountedEntitiesWidget(ModelBoundWidget['Entity']):
 
 class ChartWidget(ModelBoundWidget[_E]):
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         return {
             'embed': False,
             'model': self.model or layout.model

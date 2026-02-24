@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.form import Form
 from onegov.org.forms.fields import HtmlField
@@ -8,6 +10,11 @@ from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import Any
+    from collections.abc import Mapping, Sequence
 
 
 class SettlementRunForm(Form):
@@ -29,8 +36,9 @@ class SettlementRunForm(Form):
         default=date.today
     )
 
-    active = BooleanField(
-        label=_('Active'),
+    closed = BooleanField(
+        label=_('Closed'),
+        default=False
     )
 
     description = HtmlField(
@@ -72,3 +80,10 @@ class SettlementRunForm(Form):
                     return False
 
         return True
+
+    def validate(
+        self,
+        extra_validators: Mapping[str, Sequence[Any]] | None = None
+    ) -> bool:
+        result = super().validate(extra_validators)
+        return result and self.ensure_valid_dates()

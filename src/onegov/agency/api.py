@@ -1,16 +1,22 @@
+from __future__ import annotations
+
 from dateutil.parser import isoparse
 from functools import cached_property
+from onegov.agency import _
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
-from onegov.agency.forms import PersonMutationForm
+from onegov.agency.forms.person import AuthenticatedPersonMutationForm
 from onegov.api import ApiEndpoint, ApiInvalidParamException
+from onegov.api.utils import is_authorized
 from onegov.gis import Coordinates
 
 
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.agency.forms import PersonMutationForm
+    from onegov.core.request import CoreRequest
     from onegov.agency.app import AgencyApp
     from onegov.agency.models import ExtendedAgency
     from onegov.agency.models import ExtendedAgencyMembership
@@ -34,8 +40,8 @@ UPDATE_FILTER_PARAMS = frozenset((
 def filter_for_updated(
     filter_operation: str,
     filter_value: str | None,
-    result: 'T'
-) -> 'T':
+    result: T
+) -> T:
     """
     Applies filters for several 'updated' comparisons.
     Refer to UPDATE_FILTER_PARAMS for all filter keywords.
@@ -56,33 +62,33 @@ def filter_for_updated(
         isoparse(filter_value[:16])
     except Exception as ex:
         raise ApiInvalidParamException(f'Invalid iso timestamp for parameter'
-                                       f'\'{filter_operation}\': {ex}') from ex
+                                       f"'{filter_operation}': {ex}") from ex
     return result.for_filter(**{filter_operation: filter_value[:16]})
 
 
 class ApisMixin:
 
-    app: 'AgencyApp'
+    request: CoreRequest
 
     @cached_property
-    def agency_api(self) -> 'AgencyApiEndpoint':
-        return AgencyApiEndpoint(self.app)
+    def agency_api(self) -> AgencyApiEndpoint:
+        return AgencyApiEndpoint(self.request)
 
     @cached_property
-    def person_api(self) -> 'PersonApiEndpoint':
-        return PersonApiEndpoint(self.app)
+    def person_api(self) -> PersonApiEndpoint:
+        return PersonApiEndpoint(self.request)
 
     @cached_property
-    def membership_api(self) -> 'MembershipApiEndpoint':
-        return MembershipApiEndpoint(self.app)
+    def membership_api(self) -> MembershipApiEndpoint:
+        return MembershipApiEndpoint(self.request)
 
 
-def get_geo_location(item: 'ContentMixin') -> dict[str, Any]:
+def get_geo_location(item: ContentMixin) -> dict[str, Any]:
     geo = item.content.get('coordinates', Coordinates()) or Coordinates()
     return {'lon': geo.lon, 'lat': geo.lat, 'zoom': geo.zoom}
 
 
-def get_modified_iso_format(item: 'TimestampMixin') -> str:
+def get_modified_iso_format(item: TimestampMixin) -> str:
     """
     Returns the iso format of the modified or created field of item.
 
@@ -93,10 +99,15 @@ def get_modified_iso_format(item: 'TimestampMixin') -> str:
 
 
 class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
-    app: 'AgencyApp'
+    request: CoreRequest
+    app: AgencyApp
     endpoint = 'people'
     filters = {'first_name', 'last_name'} | UPDATE_FILTER_PARAMS
-    form_class = PersonMutationForm
+    form_class = AuthenticatedPersonMutationForm
+
+    @property
+    def title(self) -> str:
+        return self.request.translate(_('People'))
 
     @property
     def collection(self) -> ExtendedPersonCollection:
@@ -122,37 +133,49 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
         result.batch_size = self.batch_size
         return result
 
-    def item_data(self, item: 'ExtendedPerson') -> dict[str, Any]:
-        data = {
-            attribute: getattr(item, attribute, None)
-            for attribute in (
-                'academic_title',
-                'born',
-                'email',
-                'first_name',
-                'function',
-                'last_name',
-                'location_address',
-                'location_code_city',
-                'notes',
-                'parliamentary_group',
-                'phone',
-                'phone_direct',
-                'political_party',
-                'postal_address',
-                'postal_code_city',
-                'profession',
-                'salutation',
-                'title',
-                'website',
-            )
-            if attribute not in self.app.org.hidden_people_fields
-        }
+    @property
+    def _public_item_data(self) -> tuple[str, ...]:
+        return tuple(attribute for attribute in (
+            'academic_title',
+            'born',
+            'email',
+            'first_name',
+            'function',
+            'last_name',
+            'location_address',
+            'location_code_city',
+            'notes',
+            'parliamentary_group',
+            'phone',
+            'phone_direct',
+            'political_party',
+            'postal_address',
+            'postal_code_city',
+            'profession',
+            'salutation',
+            'title',
+            'website',
+        ) if attribute not in self.app.org.hidden_people_fields)
+
+    def item_data(self, item: ExtendedPerson) -> dict[str, Any]:
+        public_data = self._public_item_data
+        if self.request is not None and is_authorized(self.request):
+            # Authorized users get all fields including external_user_id
+            data = {
+                attribute: getattr(item, attribute, None)
+                for attribute in (*public_data, 'external_user_id')
+            }
+        else:
+            # Non-authenticated users only get non-hidden fields
+            data = {
+                attribute: getattr(item, attribute, None)
+                for attribute in public_data
+            }
 
         data['modified'] = get_modified_iso_format(item)
         return data
 
-    def item_links(self, item: 'ExtendedPerson') -> dict[str, Any]:
+    def item_links(self, item: ExtendedPerson) -> dict[str, Any]:
         result = {
             attribute: getattr(item, attribute, None)
             for attribute in (
@@ -168,7 +191,7 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
 
     def apply_changes(
         self,
-        item: 'ExtendedPerson',
+        item: ExtendedPerson,
         form: PersonMutationForm
     ) -> None:
 
@@ -178,9 +201,14 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
 
 
 class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
-    app: 'AgencyApp'
+    request: CoreRequest
+    app: AgencyApp
     endpoint = 'agencies'
     filters = {'parent', 'title'} | UPDATE_FILTER_PARAMS
+
+    @property
+    def title(self) -> str:
+        return self.request.translate(_('Agencies'))
 
     @property
     def collection(self) -> PaginatedAgencyCollection:
@@ -205,7 +233,7 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
         result.batch_size = self.batch_size
         return result
 
-    def item_data(self, item: 'ExtendedAgency') -> dict[str, Any]:
+    def item_data(self, item: ExtendedAgency) -> dict[str, Any]:
         return {
             'title': item.title,
             'portrait': item.portrait,
@@ -222,10 +250,10 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
             'geo_location': get_geo_location(item),
         }
 
-    def item_links(self, item: 'ExtendedAgency') -> dict[str, Any]:
+    def item_links(self, item: ExtendedAgency) -> dict[str, Any]:
         return {
             'organigram': item.organigram,
-            'parent': self.for_item(item.parent),
+            'parent': self.for_item_id(item.parent_id),
             'children': self.for_filter(parent=str(item.id)),
             'memberships': self.membership_api.for_filter(
                 agency=str(item.id)
@@ -238,7 +266,8 @@ class MembershipApiEndpoint(
     ApisMixin
 ):
 
-    app: 'AgencyApp'
+    request: CoreRequest
+    app: AgencyApp
     endpoint = 'memberships'
     filters = {'agency', 'person'} | UPDATE_FILTER_PARAMS
 
@@ -263,14 +292,14 @@ class MembershipApiEndpoint(
         result.batch_size = self.batch_size
         return result
 
-    def item_data(self, item: 'ExtendedAgencyMembership') -> dict[str, Any]:
+    def item_data(self, item: ExtendedAgencyMembership) -> dict[str, Any]:
         return {
             'title': item.title,
             'modified': get_modified_iso_format(item),
         }
 
-    def item_links(self, item: 'ExtendedAgencyMembership') -> dict[str, Any]:
+    def item_links(self, item: ExtendedAgencyMembership) -> dict[str, Any]:
         return {
-            'agency': self.agency_api.for_item(item.agency),
-            'person': self.person_api.for_item(item.person)
+            'agency': self.agency_api.for_item_id(item.agency_id),
+            'person': self.person_api.for_item_id(item.person_id)
         }

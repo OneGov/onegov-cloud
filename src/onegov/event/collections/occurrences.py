@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from datetime import date, timedelta, datetime
 
@@ -25,11 +27,12 @@ from onegov.event.models import Occurrence
 from onegov.form import as_internal_id
 
 
+from typing import assert_never
 from typing import Any
 from typing import Literal
 from typing import TypeVar
+from typing import Self
 from typing import TYPE_CHECKING
-from typing_extensions import assert_never
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable
@@ -41,8 +44,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Protocol
-    from typing_extensions import Self
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     class OccurenceSearchWidget(Protocol):
         @property
@@ -103,19 +105,19 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
         range: DateRange | None = None,
         start: date | None = None,
         end: date | None = None,
         outdated: bool = False,
-        tags: 'Sequence[str] | None' = None,
-        filter_keywords: 'Mapping[str, list[str] | str] | None' = None,
-        locations: 'Sequence[str] | None' = None,
+        tags: Sequence[str] | None = None,
+        filter_keywords: Mapping[str, list[str] | str] | None = None,
+        locations: Sequence[str] | None = None,
         only_public: bool = False,
-        search_widget: 'OccurenceSearchWidget | None' = None,
+        search_widget: OccurenceSearchWidget | None = None,
         event_filter_configuration: dict[str, Any] | None = None,
-        event_filter_fields: 'Sequence[ParsedField] | None' = None,
+        event_filter_fields: Sequence[ParsedField] | None = None,
     ) -> None:
 
         super().__init__(page=page)
@@ -134,7 +136,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and self.page == other.page
 
-    def subset(self) -> 'Query[Occurrence]':
+    def subset(self) -> Query[Occurrence]:
         return self.query()
 
     @property
@@ -142,14 +144,14 @@ class OccurrenceCollection(Pagination[Occurrence]):
         return self.search_widget.name if self.search_widget else None
 
     @property
-    def search_query(self) -> 'Query[Occurrence] | None':
+    def search_query(self) -> Query[Occurrence] | None:
         return self.search_widget.search_query if self.search_widget else None
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -219,7 +221,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self,
         singular: bool = False,
         **keywords: list[str]
-    ) -> 'Self':
+    ) -> Self:
 
         return self.__class__(
             self.session,
@@ -242,7 +244,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         keyword: str,
         value: str,
         singular: bool = False,
-    ) -> 'Self':
+    ) -> Self:
 
         parameters = dict(self.filter_keywords)
 
@@ -278,14 +280,14 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self,
         *,
         range: DateRange | None = None,
-        start: 'date | None | MissingType' = MISSING,
-        end: 'date | None | MissingType' = MISSING,
+        start: date | MissingType | None = MISSING,
+        end: date | MissingType | None = MISSING,
         outdated: bool | None = None,
-        tags: 'Sequence[str] | None' = None,
+        tags: Sequence[str] | None = None,
         tag: str | None = None,
-        locations: 'Sequence[str] | None' = None,
+        locations: Sequence[str] | None = None,
         location: str | None = None,
-    ) -> 'Self':
+    ) -> Self:
         """ Returns a new instance of the collection with the given filters
         and copies the current filters if not specified.
 
@@ -338,7 +340,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             event_filter_fields=self.event_filter_fields,
         )
 
-    def without_keywords_and_tags(self) -> 'Self':
+    def without_keywords_and_tags(self) -> Self:
         return self.__class__(
             self.session,
             page=self.page,
@@ -372,7 +374,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         """
         counts: dict[str, int] = defaultdict(int)
 
-        base = self.session.query(Occurrence._tags.keys())  # type:ignore
+        base = self.session.query(Occurrence._tags.keys())
         base = base.filter(func.DATE(Occurrence.end) >= date.today())
 
         for keys, in base:
@@ -390,15 +392,15 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     def set_event_filter_fields(
         self,
-        fields: 'Sequence[ParsedField] | None'
+        fields: Sequence[ParsedField] | None
     ) -> None:
 
         self.event_filter_fields = fields or ()
 
     def valid_keywords(
         self,
-        parameters: 'Mapping[str, T]'
-    ) -> dict[str, 'T']:
+        parameters: Mapping[str, T]
+    ) -> dict[str, T]:
 
         valid_keywords = {
             as_internal_id(kw)
@@ -413,8 +415,8 @@ class OccurrenceCollection(Pagination[Occurrence]):
     def available_filters(
         self,
         sort_choices: bool = False,
-        sortfunc: 'Callable[[str], SupportsRichComparison] | None ' = None
-    ) -> 'Iterable[tuple[str, str, list[str]]]':
+        sortfunc: Callable[[str], SupportsRichComparison] | None = None
+    ) -> Iterable[tuple[str, str, list[str]]]:
         """
         Retrieve the filters with their choices. Return by default in the
         order of how they are defined in the config structure.
@@ -440,7 +442,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             )
         }
 
-        def maybe_sorted(values: 'Iterable[str]') -> list[str]:
+        def maybe_sorted(values: Iterable[str]) -> list[str]:
             if not sort_choices:
                 return list(values)
             return sorted(values, key=sortfunc)
@@ -464,7 +466,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         ).filter(func.DATE(Occurrence.end) >= date.today())
         return {key[0] for key in query.distinct()}
 
-    def query(self) -> 'Query[Occurrence]':
+    def query(self) -> Query[Occurrence]:
         """ Queries occurrences with the set parameters.
 
         Finds occurrences which:
@@ -535,7 +537,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         if self.tags:
             query = query.filter(
-                Occurrence._tags.has_any(array(self.tags))  # type:ignore
+                Occurrence._tags.has_any(array(self.tags))
             )
 
         if self.filter_keywords:
@@ -544,20 +546,18 @@ class OccurrenceCollection(Pagination[Occurrence]):
             values = [val for sublist in keywords.values() for val in sublist]
             values.sort()
 
-            values = [
-                Event.filter_keywords[keyword].has_any(  # type:ignore[index]
-                    array(values)  # type:ignore[call-overload]
-                )
+            value_filters = [
+                Event.filter_keywords[keyword].has_any(array(values))
                 for keyword in keywords.keys()
             ]
 
-            if values:
-                query = query.filter(and_(*values))
+            if value_filters:
+                query = query.filter(and_(*value_filters))
 
         if self.locations:
 
             def escape(qstring: str) -> str:
-                purge = "\\(),\"\'."
+                purge = "\\(),\"'."
                 for s in purge:
                     qstring = qstring.replace(s, '')
                 return qstring
@@ -596,7 +596,13 @@ class OccurrenceCollection(Pagination[Occurrence]):
         query = self.session.query(Occurrence).filter(Occurrence.name == name)
         return query.first()
 
-    def as_ical(self, request: 'CoreRequest') -> bytes:
+    def by_id(self, id: str) -> Occurrence | None:
+        """ Returns an occurrence by its id. """
+
+        query = self.session.query(Occurrence).filter(Occurrence.id == id)
+        return query.first()
+
+    def as_ical(self, request: CoreRequest) -> bytes:
         """ Returns the the events of the given occurrences as iCalendar
         string.
 
@@ -670,7 +676,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             event = objectify.Element('event')
             event.id = e.id
             event.title = e.title
-            txs = tags(e.tags)
+            txs = Tags(e.tags)
             event.append(txs)  # type:ignore[arg-type]
             event.description = e.description
             event.start = e.localized_start
@@ -692,13 +698,13 @@ class OccurrenceCollection(Pagination[Occurrence]):
                               pretty_print=True)
 
 
-class tags(etree.ElementBase):
+class Tags(etree.ElementBase):
     """
     Custom class as 'tag' is a member of class Element and cannot be
     used as tag name.
     """
 
-    def __init__(self, tags: 'Sequence[str]' = ()) -> None:  # type:ignore
+    def __init__(self, tags: Sequence[str] = ()) -> None:  # type:ignore
         super().__init__()
         self.tag = 'tags'
 

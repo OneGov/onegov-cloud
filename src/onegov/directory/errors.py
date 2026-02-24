@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.directory.models import DirectoryEntry
@@ -11,8 +13,8 @@ class OnegovDirectoryError(Exception):
 class ValidationError(OnegovDirectoryError):
     def __init__(
         self,
-        entry: 'DirectoryEntry',
-        errors: '_FormErrors',
+        entry: DirectoryEntry,
+        errors: _FormErrors,
         *args: object
     ) -> None:
 

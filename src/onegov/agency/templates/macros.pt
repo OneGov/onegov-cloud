@@ -7,7 +7,7 @@
 <body>
 
     <metal:agency_card define-macro="agency_card" i18n:domain="onegov.agency">
-        <div class="agency-card agency-single-item" tal:define="memberships list(agency.memberships); children list(agency.children)">
+        <div class="agency-card agency-single-item" tal:define="memberships memberships|agency.memberships.all(); children children|agency.children">
             <tal:block tal:condition="agency.portrait">
                 <h3 i18n:translate>Portrait</h3>
                 <div tal:content="agency.portrait_html"></div>
@@ -40,12 +40,12 @@
 
                 <tal:block tal:condition="agency.phone">
                     <dt i18n:translate>Phone</dt>
-                    <dd><a href="tel: ${agency.phone}">${agency.phone}</a></dd>
+                    <dd><a href="tel: ${layout.format_phone_number(agency.phone)}">${layout.format_phone_number(agency.phone)}</a></dd>
                 </tal:block>
 
                 <tal:block tal:condition="agency.phone_direct">
                     <dt i18n:translate>Alternate Phone Number or Fax</dt>
-                    <dd><a href="tel: ${agency.phone_direct}">${agency.phone_direct}</a></dd>
+                    <dd><a href="tel: ${layout.format_phone_number(agency.phone_direct)}">${layout.format_phone_number(agency.phone_direct)}</a></dd>
                 </tal:block>
 
                 <tal:block tal:condition="agency.email">
@@ -115,7 +115,7 @@
                     <a href="mailto:${person.email}">${person.email}</a>
                 </li>
                 <li tal:condition="person.phone and 'phone' not in exclude" class="person-card-phone">
-                    <a href="tel:${person.phone}">${person.phone}</a>
+                    <a href="tel:${layout.format_phone_number(person.phone)}">${layout.format_phone_number(person.phone)}</a>
                 </li>
             </ul>
             <div class="clearfix"></div>
@@ -191,12 +191,12 @@
 
                         <tal:block tal:condition="person.phone and 'phone' not in exclude">
                             <dt i18n:translate>Phone</dt>
-                            <dd><a href="tel:${person.phone}">${person.phone}</a></dd>
+                            <dd><a href="tel:${layout.format_phone_number(person.phone)}">${layout.format_phone_number(person.phone)}</a></dd>
                         </tal:block>
 
                         <tal:block tal:condition="person.phone_direct and 'phone_direct' not in exclude">
                             <dt i18n:translate>Direct Phone</dt>
-                            <dd><a href="tel:${person.phone_direct}">${person.phone_direct}</a></dd>
+                            <dd><a href="tel:${layout.format_phone_number(person.phone_direct)}">${layout.format_phone_number(person.phone_direct)}</a></dd>
                         </tal:block>
 
                         <tal:block tal:condition="person.website and 'website' not in exclude">
@@ -206,7 +206,7 @@
 
                         <tal:block tal:condition="person.website_2 and 'website_2' not in exclude">
                             <dt i18n:translate>Website 2</dt>
-                            <dd><a href="${person.website_2}">${person .website_2}</a></dd>
+                            <dd><a href="${person.website_2}">${person.website_2}</a></dd>
                         </tal:block>
 
                         <tal:block tal:condition="person.notes and 'notes' not in exclude">
@@ -288,12 +288,13 @@
     </metal:search_result_agencies>
 
     <metal:search_result_agency_memberships define-macro="search_result_agency_memberships" i18n:domain="onegov.agency">
-        <a href="${request.link(result.person)}" tal:condition="(result.person.access == 'public' and result.person.published) or request.is_logged_in">
-            ${result.person.title}
+        <a href="${request.link(result.person)}"
+                 tal:condition="result.person is not None and ((result.person.access == 'public' and result.person.published) or request.is_logged_in)">
+                ${result.person.title}
         </a>
         <p>
             <span>${result.title}</span>
-            <span tal:condition="(result.agency.access == 'public' and result.agency.published) or request.is_logged_in">${result.agency.title}</span>
+            <span tal:condition="result.agency is not None and ((result.agency.access == 'public' and result.agency.published) or request.is_logged_in)">${result.agency.title}</span>
         </p>
     </metal:search_result_agency_memberships>
 

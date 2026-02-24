@@ -1,28 +1,33 @@
+from __future__ import annotations
+
 from enum import Enum
+from decimal import Decimal
+from collections.abc import Callable
 from itertools import chain
 from lazy_object_proxy import Proxy  # type:ignore[import-untyped]
 from onegov.core.orm import Base, observes
-from onegov.core.utils import normalize_for_url, increment_name, is_sorted
-from sqlalchemy import Column, ForeignKey, Integer, Text
+from onegov.core.utils import is_sorted, normalize_for_url, increment_name
+from sqlalchemy import ForeignKey, Numeric
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (
-    backref,
     object_session,
+    mapped_column,
     relationship,
-    validates
+    validates,
+    Mapped
 )
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import column, nullsfirst
 
 
-from typing import Any, Generic, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Generic, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from sqlalchemy.orm.query import Query
     from sqlalchemy.orm.session import Session
-    from typing_extensions import Self
+    from typing import Self
     from _typeshed import SupportsRichComparison
 
 
@@ -43,8 +48,8 @@ class MoveDirection(Enum):
 
 
 def sort_siblings(
-    siblings: 'Sequence[_L]',
-    key: 'Callable[[_L], SupportsRichComparison]',
+    siblings: Sequence[_L],
+    key: Callable[[_L], SupportsRichComparison],
     reverse: bool = False
 ) -> None:
     """ Sorts the siblings by the given key, writing the order to the
@@ -54,7 +59,7 @@ def sort_siblings(
     new_order = sorted(siblings, key=key, reverse=reverse)
 
     for ix, sibling in enumerate(new_order):
-        sibling.order = ix
+        sibling.order = Decimal(ix)
 
 
 class AdjacencyList(Base):
@@ -64,73 +69,83 @@ class AdjacencyList(Base):
 
     #: the id fo the db record (only relevant internally)
     #: do not change this id after creation as that would destroy the tree
-    id: 'Column[int]' = Column(Integer, primary_key=True)
-
-    if TYPE_CHECKING:
-        parent_id: 'Column[int | None]'
-        # subclasses need to override with the correct relationship
-        # with generics there's an issue with class vs instance access
-        # technically AdjacencyList is abstract, so as long as we force
-        # subclasses to bind a type we could make this type safe, but
-        # there is no way to express this in mypy, we could write a
-        # mypy plugin to ensure these relationships get generated
-        # properly...
-        parent: 'relationship[AdjacencyList | None]'
-        children: 'relationship[Sequence[AdjacencyList]]'
+    id: Mapped[int] = mapped_column(primary_key=True)
 
     #: the id of the parent
-    @declared_attr  # type:ignore[no-redef]
-    def parent_id(cls) -> 'Column[int | None]':
-        return Column(Integer, ForeignKey("{}.id".format(cls.__tablename__)))
+    @declared_attr
+    @classmethod
+    def parent_id(cls) -> Mapped[int | None]:
+        return mapped_column(
+            ForeignKey(f'{cls.__tablename__}.id')
+        )
 
     #: the name of the item - think of this as the id or better yet
     #: the url segment e.g. ``parent-item/child-item``
     #:
     #: automatically generated from the title if not provided
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Mapped[str]
 
     #: the human readable title of the item
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: the type of the item, this can be used to create custom polymorphic
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
-        Text, nullable=False, default=lambda: 'generic')
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
-    @declared_attr  # type:ignore[no-redef]
-    def children(cls) -> 'relationship[list[Self]]':
+    # subclasses need to override with the correct relationship
+    # with generics there's an issue with class vs instance access
+    # technically AdjacencyList is abstract, so as long as we force
+    # subclasses to bind a type we could make this type safe, but
+    # there is no way to express this in mypy, we could write a
+    # mypy plugin to ensure these relationships get generated
+    # properly...
+    @declared_attr
+    @classmethod
+    def children(cls) -> Mapped[list[Self]]:
         return relationship(
-            cls.__name__,  # type:ignore[attr-defined]
+            cls.__name__,
             order_by=cls.order,
-
             # cascade deletions - it's not the job of this model to prevent
             # the user from deleting all his content
-            cascade="all, delete-orphan",
+            cascade='all, delete-orphan',
+            back_populates='parent'
+        )
 
+    @declared_attr
+    @classmethod
+    def parent(cls) -> Mapped[Self | None]:
+        return relationship(
+            cls.__name__,
             # many to one + adjacency list - remote_side
             # is required to reference the 'remote'
             # column in the join condition.
-            backref=backref("parent", remote_side=cls.id)
+            remote_side=cls.id,
+            back_populates='children'
         )
 
     #: the order of the items - items are added at the end by default
     # FIXME: This should probably have been nullable=False
-    order: 'Column[int]' = Column(Integer, default=2 ** 16)
+    order: Mapped[Decimal] = mapped_column(
+        Numeric(precision=30, scale=15),
+        default=Decimal('65536')  # Default middle value (2**16)
+    )
 
     # default sort order is order, id
-    @declared_attr
-    def __mapper_args__(cls):  # type:ignore
+    @declared_attr.directive
+    @classmethod
+    def __mapper_args__(cls) -> dict[str, Any]:
         return {
             'polymorphic_on': cls.type,
             'polymorphic_identity': 'generic'
         }
 
-    @declared_attr
-    def __table_args__(cls):  # type:ignore
+    @declared_attr.directive
+    @classmethod
+    def __table_args__(cls) -> tuple[Any, ...]:
 
-        prefix = cls.__name__.lower()
+        prefix: str = cls.__name__.lower()
         return (
             # make sure that no children of a single parent share a name
             Index(
@@ -149,42 +164,37 @@ class AdjacencyList(Base):
             # and order by children/siblings
             Index(
                 prefix + '_order',
-                nullsfirst('parent_id'),
-                nullsfirst('"order"')
+                nullsfirst('parent_id'),  # type:ignore[arg-type]
+                nullsfirst('"order"')  # type:ignore[arg-type]
             )
         )
 
     @validates('name')
     def validate_name(self, key: None, name: str) -> str:
         assert normalize_for_url(name) == name, (
-            "The given name was not normalized"
+            'The given name was not normalized'
         )
 
         return name
 
     @property
-    def sort_key(self) -> 'Callable[[Self], SupportsRichComparison]':
+    def sort_key(self) -> Callable[[Self], SupportsRichComparison]:
         """ The sort key used for sorting the siblings if the title changes.
 
         """
         return AdjacencyListCollection.sort_key
 
-    if TYPE_CHECKING:
-        @observes('title')
-        def sort_on_title_change(self, title: str) -> None: ...
-
-    @declared_attr  # type:ignore[no-redef]
-    def sort_on_title_change(  # noqa: F811
-        cls
-    ) -> 'Callable[[Self, str], None]':
+    @declared_attr.directive
+    @classmethod
+    def sort_on_title_change(cls) -> Callable[[Self, str], None]:
         """ Makes sure the A-Z sorting is kept when a title changes. """
 
-        class OldItemProxy(Proxy):
+        class OldItemProxy(Proxy):  # type:ignore[misc]
             title = None
 
         # we need to wrap this here because this is an abstract base class
         @observes('title')
-        def sort_on_title_change(self: 'Self', title: str) -> None:
+        def sort_on_title_change(self: Self, title: str) -> None:
 
             # the title value has already changed at this point, and we
             # probably don't want to touch 'self' which is in transition,
@@ -198,20 +208,25 @@ class AdjacencyList(Base):
             old_item = OldItemProxy(lambda: self)
             old_item.title = deleted[0]
 
-            def old_sort_key(item: 'Self') -> 'SupportsRichComparison':
+            def old_sort_key(item: Self) -> SupportsRichComparison:
                 return self.sort_key(item is self and old_item or item)
 
             siblings = self.siblings.all()
 
+            # Check if the list *was* sorted according to the *old* title
             if is_sorted(siblings, key=old_sort_key):
-                sort_siblings(siblings, key=self.sort_key)
+                calculuate_midpoint_order(siblings, self, self.sort_key)
 
         return sort_on_title_change
+
+    if not TYPE_CHECKING:
+        # NOTE: Avoids confusing SQLAlchemy
+        del sort_on_title_change.fget.__annotations__
 
     def __init__(
         self,
         title: str,
-        parent: 'Self | None' = None,
+        parent: Self | None = None,
         **kwargs: Any
     ):
         """ Initializes a new item with the given title. If no parent
@@ -229,7 +244,7 @@ class AdjacencyList(Base):
             setattr(self, key, value)
 
     @property
-    def root(self) -> 'AdjacencyList':
+    def root(self) -> AdjacencyList:
         """ Returns the root of this item. """
         if self.parent is None:
             return self
@@ -237,18 +252,20 @@ class AdjacencyList(Base):
             return self.parent.root
 
     @property
-    def ancestors(self) -> 'Iterator[AdjacencyList]':
+    def ancestors(self) -> Iterator[AdjacencyList]:
         """ Returns all ancestors of this item. """
         if self.parent:
             yield from self.parent.ancestors
             yield self.parent
 
     @property
-    def siblings(self) -> 'Query[Self]':
+    def siblings(self) -> Query[Self]:
         """ Returns a query that includes all siblings, including the item
         itself.
 
         """
+        session = object_session(self)
+        assert session is not None
 
         # FIXME: There is a subtle issue here if we use this mixin in a
         #        polymorphic class, since it will only return siblings of
@@ -257,7 +274,7 @@ class AdjacencyList(Base):
         #        ancestors, parent, children, etc. We could use inspect
         #        to determine whether or not the model is polymorphic
         #        and to retrieve the base class.
-        query = object_session(self).query(self.__class__)
+        query = session.query(self.__class__)
         query = query.order_by(self.__class__.order)
         query = query.filter(self.__class__.parent == self.parent)
 
@@ -293,6 +310,58 @@ class AdjacencyList(Base):
         )
 
 
+def calculuate_midpoint_order(
+    siblings: list[_L], new_item: _L, key: Callable[[_L], Any]
+) -> None:
+    """Insert/update an item's order """
+    left, right = None, None
+    new_item_key_val = key(new_item)
+
+    # Find the logical position in the key-sorted list
+    for neighbor in siblings:
+        if neighbor == new_item:
+            continue
+        neighbor_key_val = key(neighbor)
+        if neighbor_key_val > new_item_key_val:
+            # This neighbor comes after the new item
+            right = neighbor
+            # The previous neighbor (if any) is the left one
+            # 'left' remains from the previous iteration
+            break
+        else:
+            # This neighbor comes before or is equal, update left
+            left = neighbor
+
+    # Calculate new order value
+    if left and right:
+        # Between two neighbors
+        left_order = Decimal(str(left.order))
+        right_order = Decimal(str(right.order))
+        # Check for potential precision issues or identical orders
+        if left_order == right_order:
+            # This indicates a problem or requires re-numbering.
+            # For now, let's place it slightly after left.
+            # A more robust solution might involve re-spacing siblings.
+            new_item.order = left_order + Decimal(
+                '0.000000000000001'
+            )  # Tiny increment
+        else:
+            new_item.order = (left_order + right_order) / 2
+    elif left:
+        # After last item (based on key)
+        new_item.order = Decimal(str(left.order)) + Decimal(
+            '1'
+        )  # Increment from left
+    elif right:
+        # Before first item (based on key)
+        new_item.order = (
+            Decimal(str(right.order)) / 2
+        )  # Half of the first item's order
+    else:
+        # Only item in the list (or all others filtered out)
+        new_item.order = Decimal('65536')  # Default middle value
+
+
 class AdjacencyListCollection(Generic[_L]):
     """ A base class for collections working with :class:`AdjacencyList`. """
 
@@ -304,17 +373,17 @@ class AdjacencyListCollection(Generic[_L]):
         """
         raise NotImplementedError
 
-    def __init__(self, session: 'Session'):
+    def __init__(self, session: Session):
         self.session = session
 
     @staticmethod
-    def sort_key(item: _L) -> 'SupportsRichComparison':
+    def sort_key(item: _L) -> SupportsRichComparison:
         """ The sort key with which the items are sorted into their siblings.
 
         """
         return normalize_for_url(item.title)
 
-    def query(self, ordered: bool = True) -> 'Query[_L]':
+    def query(self, ordered: bool = True) -> Query[_L]:
         """ Returns a query using
         :attr:`AdjacencyListCollection.__listclass__`.
 
@@ -432,10 +501,13 @@ class AdjacencyListCollection(Generic[_L]):
         title: str,
         name: str | None = None,
         type: str | None = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> _L:
-        """ Adds a child to the given parent. """
-
+        """Adds a child.
+        - If order is explicit, uses it.
+        - If siblings are sorted by sort_key, inserts starting form mid
+        - If siblings are NOT sorted by sort_key, append at the end
+        """
         name = name or self.get_unique_child_name(title, parent)
 
         if type is not None:
@@ -443,21 +515,39 @@ class AdjacencyListCollection(Generic[_L]):
         else:
             child_class = self.__listclass__
 
+        # Handle explicit order passed directly or via kwargs
+        explicit_order = kwargs.pop('order', None)
+        if explicit_order is not None:
+            # Ensure it's Decimal before passing to constructor
+            kwargs['order'] = Decimal(str(explicit_order))
+
         child = child_class(parent=parent, title=title, name=name, **kwargs)
-
         self.session.add(child)
-
-        # impose an order, unless one is given
-        if kwargs.get('order') is not None:
-            self.session.flush()
-            return child
-
-        siblings = child.siblings.all()
-
-        if is_sorted((s for s in siblings if s != child), key=self.sort_key):
-            sort_siblings(siblings, key=self.sort_key)
-
+        # Flush required to get child.id for sibling query and relationship
+        # loading
         self.session.flush()
+
+        # If order was NOT explicitly provided, decide insertion strategy
+        if explicit_order is None:
+            siblings: list[_L] = child.siblings.all()
+            existing_siblings: list[_L] = [s for s in siblings if s != child]
+
+            if not existing_siblings or is_sorted(
+                existing_siblings, key=self.sort_key
+            ):
+                # --- Strategy 1: Insert based on title key ---
+                calculuate_midpoint_order(siblings, child, self.sort_key)
+            else:
+                # --- Strategy 2: Append numerically at the end ---
+                child.order = max(
+                    (s.order for s in existing_siblings if s.order
+                        is not None),
+                    default=Decimal('65535'),
+                ) + Decimal('1')
+
+            # Flush again only if order was calculated (not explicit)
+            self.session.flush()
+
         return child
 
     def add_root(
@@ -537,25 +627,61 @@ class AdjacencyListCollection(Generic[_L]):
 
         siblings = target.siblings.all()
 
-        def new_order() -> 'Iterator[_L]':
-            for sibling in siblings:
-                if sibling == subject:
-                    continue
+        try:
+            target_index = siblings.index(target)
+        except ValueError as err:
+            raise ValueError(
+                'Target not found in its own siblings list .'
+            ) from err
 
-                if sibling == target and direction == MoveDirection.above:
-                    yield subject
-                    yield target
-                    continue
+        left, right = None, None
 
-                if sibling == target and direction == MoveDirection.below:
-                    yield target
-                    yield subject
-                    continue
+        # Determine the neighbors based on the *current* order
+        if direction == MoveDirection.above:
+            # Place subject *before* target
+            right = target
+            # Find the sibling immediately before target (if any)
+            # This sibling must not be the subject itself
+            potential_left_index = target_index - 1
+            while potential_left_index >= 0:
+                if siblings[potential_left_index] != subject:
+                    left = siblings[potential_left_index]
+                    break
+                potential_left_index -= 1
 
-                yield sibling
+        elif direction == MoveDirection.below:
+            # Place subject *after* target
+            left = target
+            # Find the sibling immediately after target (if any)
+            # This sibling must not be the subject itself
+            potential_right_index = target_index + 1
+            while potential_right_index < len(siblings):
+                if siblings[potential_right_index] != subject:
+                    right = siblings[potential_right_index]
+                    break
+                potential_right_index += 1
 
-        for order, sibling in enumerate(new_order()):
-            sibling.order = order
+        if left and right:
+            left_order = Decimal(str(left.order))
+            right_order = Decimal(str(right.order))
+            # Check for duplicate orders or precision issues
+            if left_order == right_order:
+                # Handle collision - maybe re-number or place slightly offset
+                subject.order = left_order + Decimal('0.000000000000001')
+            else:
+                subject.order = (left_order + right_order) / 2
+        elif left:
+            # Place after left (target was left, or target was last)
+            subject.order = Decimal(str(left.order)) + Decimal('1')
+        elif right:
+            # Place before right (target was right, or target was first)
+            subject.order = Decimal(str(right.order)) / 2
+        else:
+            # This case (no left and no right) should only happen if the target
+            # is the only sibling (excluding subject). Place subject with
+            # default.
+            subject.order = Decimal('65536')
+        # The subject.order is now updated. Caller should flush/commit.
 
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -574,6 +700,17 @@ NUMERIC_PRIORITY_TRANS = str.maketrans({
     '8': 'I',
     '9': 'J'
 })
+
+
+# NOTE: As mypy correctly complains these overloads are not safe, but using
+#       this function as a sort key would be very annoying without this
+#       safety hole. (The unsafety occurs when the runtime value for `str`
+#       is the empty string, since the first overload should match, but
+#       there's no way for the type checker to know that)
+@overload
+def numeric_priority(string: Literal[''] | None, max_len: int = 4) -> None: ...  # type: ignore[overload-overlap]
+@overload
+def numeric_priority(string: str, max_len: int = 4) -> int: ...
 
 
 def numeric_priority(string: str | None, max_len: int = 4) -> int | None:

@@ -1,23 +1,37 @@
+from __future__ import annotations
+
 import os
+import pytest
 
 from collections import OrderedDict
 from datetime import datetime, date
 from freezegun import freeze_time
-from onegov.core.request import CoreRequest
 from onegov.core.utils import module_path
-from onegov.org.models import Clipboard, ImageFileCollection
+from onegov.core.utils import Bunch
+from onegov.org.models import Clipboard, ImageFileCollection, PushNotification
+from onegov.org.models import News, NewsCollection
 from onegov.org.models import Organisation
 from onegov.org.models import SiteCollection
 from onegov.org.models.file import GroupFilesByDateMixin
 from onegov.org.models.resource import SharedMethods
+from onegov.org.request import OrgRequest
 from onegov.page import PageCollection
+from sqlalchemy.exc import IntegrityError
 from tests.shared.utils import create_image
 from pytz import utc
 
 
-def test_clipboard(org_app):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.file import File
+    from onegov.org.models import ImageFile
+    from sqlalchemy.orm import Session
+    from .conftest import TestOrgApp
 
-    request = CoreRequest(environ={
+
+def test_clipboard(org_app: TestOrgApp) -> None:
+
+    request = OrgRequest(environ={
         'PATH_INFO': '/',
         'SERVER_NAME': '',
         'SERVER_PORT': '',
@@ -37,41 +51,57 @@ def test_clipboard(org_app):
     assert clipboard.url is None
 
 
-def test_news(session):
+def test_news(session: Session) -> None:
 
+    request: Any = Bunch(**{
+        'session': session,
+        'identity.role': 'member'
+    })
+    manager_request: Any = Bunch(**{
+        'session': session,
+        'identity.role': 'editor'
+    })
     collection = PageCollection(session)
-    news = collection.add_root("News", type='news')
+    root = collection.add_root("News", type='news')
     one = collection.add(
-        news,
+        root,
         title='One',
         type='news',
         lead='#one #both',
+        meta={'access': 'public'}
     )
     one.created = datetime(2016, 1, 1, tzinfo=utc)
     two = collection.add(
-        news,
+        root,
         title='Two',
         type='news',
-        text='#two #both'
+        text='#two #both',
+        meta={'access': 'secret'}
     )
     two.created = datetime(2015, 3, 1, tzinfo=utc)
     three = collection.add(
-        news,
+        root,
         title='Three',
         type='news',
-        text='#three'
+        text='#three',
+        meta={'access': 'mtan'}
     )
     three.created = datetime(2015, 2, 1, tzinfo=utc)
     three.publication_start = datetime(2015, 2, 2, tzinfo=utc)
     three.publication_end = datetime(2015, 2, 4, tzinfo=utc)
     four = collection.add(
-        news,
+        root,
         title='Four',
         type='news',
         text='#four'
     )
     four.created = datetime(2015, 1, 1, tzinfo=utc)
+    assert isinstance(four, News)
     four.is_visible_on_homepage = True
+
+    news = NewsCollection(request)
+    manager_news = NewsCollection(manager_request)
+    assert news.root == root
 
     assert news.all_years == [2016, 2015]
     assert news.all_tags == ['both', 'four', 'one', 'three', 'two']
@@ -93,33 +123,37 @@ def test_news(session):
 
     news.filter_years = []
     news.filter_tags = []
-    assert news.news_query(limit=None, published_only=False).count() == 4
-    assert news.news_query(limit=None, published_only=True).count() == 3
-    assert news.news_query(limit=0, published_only=True).count() == 1
-    assert news.news_query(limit=1, published_only=True).count() == 2
-    assert news.news_query(limit=2, published_only=True).count() == 3
-    assert news.news_query(limit=3, published_only=True).count() == 3
+    assert manager_news.subset().count() == 4
+    assert news.subset().count() == 2
 
-    news.filter_years = [2016]
-    assert news.news_query(limit=None, published_only=False).count() == 1
-    news.filter_years = [2015]
-    assert news.news_query(limit=None, published_only=False).count() == 3
-    news.filter_years = [2015, 2016]
-    assert news.news_query(limit=None, published_only=False).count() == 4
+    news.filter_years = manager_news.filter_years = [2016]
+    assert manager_news.subset().count() == 1
+    assert news.subset().count() == 1
+    news.filter_years = manager_news.filter_years = [2015]
+    assert manager_news.subset().count() == 3
+    assert news.subset().count() == 1
+    news.filter_years = manager_news.filter_years = [2015, 2016]
+    assert manager_news.subset().count() == 4
+    assert news.subset().count() == 2
 
-    news.filter_tags = ['one']
-    assert news.news_query(limit=None, published_only=False).count() == 1
-    news.filter_tags = ['both']
-    assert news.news_query(limit=None, published_only=False).count() == 2
-    news.filter_tags = ['both', 'three']
-    assert news.news_query(limit=None, published_only=False).count() == 3
+    news.filter_tags = manager_news.filter_tags = ['one']
+    assert manager_news.subset().count() == 1
+    assert news.subset().count() == 1
+    news.filter_tags = manager_news.filter_tags = ['both']
+    assert manager_news.subset().count() == 2
+    assert news.subset().count() == 1
+    news.filter_tags = manager_news.filter_tags = ['both', 'three']
+    assert manager_news.subset().count() == 3
+    assert news.subset().count() == 1
 
-    news.filter_years = [2015]
-    news.filter_tags = ['both']
-    assert news.news_query(limit=None, published_only=False).one() == two
+    news.filter_years = manager_news.filter_years = [2015]
+    news.filter_tags = manager_news.filter_tags = ['both']
+    assert manager_news.subset().one() == two
+    assert news.subset().one_or_none() is None
 
 
-def test_group_intervals():
+def test_group_intervals() -> None:
+    mixin: GroupFilesByDateMixin[File]
     mixin = GroupFilesByDateMixin()
 
     intervals = list(mixin.get_date_intervals(datetime(2016, 1, 1)))
@@ -193,15 +227,15 @@ def test_group_intervals():
     assert intervals[5].end.date() == date(2014, 12, 31)
 
 
-def test_image_grouping(session):
+def test_image_grouping(session: Session) -> None:
 
     collection = ImageFileCollection(session)
 
-    def grouped_by_date(today):
+    def grouped_by_date(today: datetime) -> dict[str, list[str]]:
         grouped = collection.grouped_by_date(today=today)
         return OrderedDict((g, [i[1] for i in items]) for g, items in grouped)
 
-    def delete(images):
+    def delete(images: list[ImageFile]) -> None:
         for image in images:
             collection.delete(image)
 
@@ -272,13 +306,13 @@ def test_image_grouping(session):
     delete(images)
 
 
-def test_calendar_date_range():
+def test_calendar_date_range() -> None:
     resource = SharedMethods()
 
     resource.date = None
-    resource.timezone = utc
+    resource.timezone = 'UTC'
 
-    resource.view = 'month'
+    resource.view = 'dayGridMonth'
     with freeze_time(datetime(2016, 5, 14, tzinfo=utc)):
         assert resource.calendar_date_range == (
             datetime(2016, 5, 1, tzinfo=utc),
@@ -291,20 +325,20 @@ def test_calendar_date_range():
         datetime(2016, 5, 31, 23, 59, 59, 999999, tzinfo=utc)
     )
 
-    resource.view = 'agendaWeek'
+    resource.view = 'timeGridWeek'
     assert resource.calendar_date_range == (
         datetime(2016, 5, 9, tzinfo=utc),
         datetime(2016, 5, 15, 23, 59, 59, 999999, tzinfo=utc)
     )
 
-    resource.view = 'agendaDay'
+    resource.view = 'timeGridDay'
     assert resource.calendar_date_range == (
         datetime(2016, 5, 14, tzinfo=utc),
         datetime(2016, 5, 14, 23, 59, 59, 999999, tzinfo=utc)
     )
 
 
-def test_sitecollection(org_app):
+def test_sitecollection(org_app: TestOrgApp) -> None:
 
     sitecollection = SiteCollection(org_app.session())
     objects = sitecollection.get()
@@ -330,7 +364,7 @@ def test_sitecollection(org_app):
     assert {o.name for o in objects['forms']} == builtin_forms
 
 
-def test_holidays():
+def test_holidays() -> None:
     o = Organisation(holiday_settings={})
 
     assert date(2000, 1, 1) not in o.holidays
@@ -362,3 +396,49 @@ def test_holidays():
     assert date(2000, 1, 3) in o.holidays
 
     assert len(o.holidays.all(2000)) == 14
+
+
+def test_cascade_delete(session: Session) -> None:
+    """Test that deleting a news item also deletes related notifications"""
+    collection = PageCollection(session)
+    news = collection.add_root("News", type='news')
+    news_1 = collection.add(
+        news,
+        title='One',
+        type='news',
+        lead='#some #thing',
+    )
+    session.add(news_1)
+    session.flush()
+    news_id = news_1.id
+    PushNotification.record_sent_notification(
+        session, news_id, "topic1", {"status": "sent"}
+    )
+    PushNotification.record_sent_notification(
+        session, news_id, "topic2", {"status": "sent"}
+    )
+    assert session.query(PushNotification).count() == 2
+    session.delete(news_1)
+    session.flush()
+    assert session.query(PushNotification).count() == 0
+
+
+def test_duplicate_prevention_push_notifications(session: Session) -> None:
+    collection = PageCollection(session)
+    news = collection.add_root("News", type='news')
+    news_1 = collection.add(
+        news,
+        title='One',
+        type='news',
+        lead='#some #thing',
+    )
+    session.add(news_1)
+    session.flush()
+    news_id = news_1.id
+    PushNotification.record_sent_notification(
+        session, news_id, "topic1", {"status": "sent"}
+    )
+    with pytest.raises(IntegrityError):
+        PushNotification.record_sent_notification(
+            session, news_id, "topic1", {"status": "sent"}
+        )

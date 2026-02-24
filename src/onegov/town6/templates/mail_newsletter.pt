@@ -2,27 +2,25 @@
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
-    <tal:b metal:fill-slot="logo" tal:condition="layout.org.logo_in_newsletter">
-        <img src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
-    </tal:b>
     <tal:b metal:fill-slot="body">
         <h1>${title}</h1>
         <p tal:condition="lead" tal:content="lead"></p>
 
         <tal:b condition="news">
-            <h2 i18n:translate>Latest news</h2>
+            <h2 i18n:translate tal:condition="not: daily">Latest news</h2>
 
             <tal:b repeat="item news">
-                <strong><a href="${request.link(item)}"><h3>${item.title}</h3></a></strong>
-                <img tal:condition="item.page_image and item.show_preview_image" style="width: 100%; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></img>
-                <p><strong>${layout.with_hashtags(item.lead)}</strong></p>
-                <p tal:content="item.text">
-
                 <hr>
+                    <strong><a href="${request.link(item)}"><h3>${item.title}</h3></a></strong>
+                    <img tal:condition="item.page_image and item.show_preview_image" style="width: 100%; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></img>
+                    <p><strong>${layout.with_hashtags(item.lead)}</strong></p>
+                <p tal:condition="not newsletter.show_only_previews" tal:content="item.text">
+                <a tal:condition="newsletter.show_only_previews" href="${request.link(item)}" i18n:translate>read more</a>
             </tal:b>
         </tal:b>
 
         <tal:b condition="publications">
+            <hr>
             <h2 i18n:translate>Publications</h2>
 
             <tal:b repeat="publication publications">
@@ -34,15 +32,22 @@
         </tal:b>
 
         <tal:b condition="occurrences">
+            <hr>
             <h2 i18n:translate>Events</h2>
 
             <tal:b repeat="occurrence occurrences">
-                <strong><a href="${request.link(occurrence)}">${occurrence.title}</a></strong>
+                <hr class="gray">
+                <strong><a href="${request.link(occurrence)}"><h3>${occurrence.title}</h3></a></strong>
+                <img tal:condition="occurrence.event.image" style="width: 50%; padding-bottom: 30%; background-image: url(${request.link(occurrence.event.image)}); background-size: cover; border-radius: .7rem;"></img>
                 <ul class="flat">
-                    <li>${layout.format_date(occurrence.localized_start, 'date')} ${layout.format_date(occurrence.localized_start, 'time')} - ${layout.format_date(occurrence.localized_end, 'time')}</li>
+                    <li><b>${layout.format_date(occurrence.localized_start, 'date')} ${layout.format_date(occurrence.localized_start, 'time')} - ${layout.format_date(occurrence.localized_end, 'time')}</b></li>
                     <li>${occurrence.location}</li>
                 </ul>
             </tal:b>
+        </tal:b>
+        <tal:b condition="closing_remark">
+            <hr>
+            <p tal:content="closing_remark"></p>
         </tal:b>
 
     </tal:b>
@@ -55,7 +60,7 @@
                 <a href="${request.link(newsletter)}" i18n:translate>Click here to view web version.</a>
             </p>
             <p>
-                <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>.
+                <tal:b i18n:translate="">You no longer wish to receive the newsletter?</tal:b> <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>.
             </p>
         </p>
     </tal:b>

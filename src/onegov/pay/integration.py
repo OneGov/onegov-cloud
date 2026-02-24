@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from enum import IntEnum
 from more.webassets import WebassetsApp
-from onegov.core.orm import orm_cached
+from onegov.core.orm.cache import request_cached
 from onegov.pay import log
 from onegov.pay import PaymentProvider
 from onegov.pay.errors import CARD_ERRORS
@@ -26,7 +28,7 @@ class PayApp(WebassetsApp):
     if TYPE_CHECKING:
         # forward declare the attributes from Framework we depend on
         @cached_property
-        def session(self) -> 'Callable[[], Session]': ...
+        def session(self) -> Callable[[], Session]: ...
 
     def configure_payment_providers(
         self,
@@ -64,7 +66,9 @@ class PayApp(WebassetsApp):
 
         self.payment_provider_defaults = payment_provider_defaults or {}
 
-    @orm_cached(policy='on-table-change:payment_providers')
+    # NOTE: This is another model where we could probably get away with a
+    #       more long-term cache, but again, we have to prove it's worth it
+    @request_cached  # type:ignore[type-var]
     def default_payment_provider(self) -> PaymentProvider[Any] | None:
         return self.session().query(PaymentProvider).filter(
             PaymentProvider.default.is_(True),
@@ -94,23 +98,26 @@ def get_js_path() -> str:
 
 
 @PayApp.webasset('pay')
-def get_pay_assets() -> 'Iterator[str]':
+def get_pay_assets() -> Iterator[str]:
+    yield 'datatrans.js'
     yield 'stripe.js'
 
 
 class PaymentError(IntEnum):
     INSUFFICIENT_FUNDS = 1
+    TRANSACTION_ABORTED = 2
 
 
 INSUFFICIENT_FUNDS = PaymentError.INSUFFICIENT_FUNDS
+TRANSACTION_ABORTED = PaymentError.TRANSACTION_ABORTED
 
 
 def process_payment(
-    method: 'PaymentMethod',
+    method: PaymentMethod,
     price: Price,
     provider: PaymentProvider[Any] | None = None,
     token: str | None = None
-) -> 'Payment | PaymentError | None':
+) -> Payment | PaymentError | None:
     """ Processes a payment using various methods.
 
     This method returns one of the following:
@@ -162,12 +169,20 @@ def process_payment(
             )
         except CARD_ERRORS as e:
 
-            if 'insufficient funds' in str(e):
+            err = str(e).lower()
+
+            if 'insufficient funds' in err:
                 return INSUFFICIENT_FUNDS
 
+            if (
+                getattr(e, 'is_expected_failure', False)
+                or 'transaction aborted' in err
+            ):
+                return TRANSACTION_ABORTED
+
             log.exception(
-                f"Processing {price} through {provider.title} "
-                f"with token {token} failed"
+                f'Processing {price} through {provider.title} '
+                f'with token {token} failed'
             )
 
     return None

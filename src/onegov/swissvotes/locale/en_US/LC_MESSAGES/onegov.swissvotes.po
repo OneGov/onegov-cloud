@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-08-08 12:56+0200\n"
+"POT-Creation-Date: 2024-10-08 08:58+0200\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -108,23 +108,23 @@ msgstr "Vote"
 msgid "Result by canton, district and municipality"
 msgstr "Result by canton, district and municipality"
 
-msgid "Full analysis of post-vote poll results"
-msgstr "Full analysis of post-vote poll results"
+msgid "Full analysis of VOX post-vote poll results"
+msgstr "Full analysis of VOX post-vote poll results"
 
-msgid "Post-vote poll"
-msgstr "Post-vote poll"
+msgid "Post-vote polls"
+msgstr "Post-vote polls"
 
-msgid "Questionnaire of the poll"
-msgstr "Questionnaire of the poll"
+msgid "Questionnaire of the VOX poll"
+msgstr "Questionnaire of the VOX poll"
 
-msgid "Dataset of the post-vote poll (CSV)"
-msgstr "Dataset of the post-vote poll (CSV)"
+msgid "Dataset of the VOX poll (CSV)"
+msgstr "Dataset of the VOX poll (CSV)"
 
-msgid "Dataset of the post-vote poll (SAV)"
-msgstr "Dataset of the post-vote poll (SAV)"
+msgid "Dataset of the VOX poll (SAV)"
+msgstr "Dataset of the VOX poll (SAV)"
 
-msgid "Dataset of the post-vote poll (DTA)"
-msgstr "Dataset of the post-vote poll (DTA)"
+msgid "Dataset of the VOX poll (DTA)"
+msgstr "Dataset of the VOX poll (DTA)"
 
 msgid "Codebook for the post-vote poll (PDF)"
 msgstr "Codebook for the post-vote poll (PDF)"
@@ -132,8 +132,11 @@ msgstr "Codebook for the post-vote poll (PDF)"
 msgid "Codebook for the post-vote poll (XLSX)"
 msgstr "Codebook for the post-vote poll (XLSX)"
 
-msgid "Technical report of the post-vote poll"
-msgstr "Technical report of the post-vote poll"
+msgid "Technical report on the VOX poll"
+msgstr "Technical report on the VOX poll"
+
+msgid "Results of the LeeWas post-vote poll"
+msgstr "Results of the LeeWas post-vote poll"
 
 msgid "Updating the external resources may take some time."
 msgstr "Updating the external resources may take some time."
@@ -146,6 +149,9 @@ msgstr "eMuseum.ch"
 
 msgid "Social Archives"
 msgstr "Social Archives"
+
+msgid "Basel Poster Collection"
+msgstr "Basel Poster Collection"
 
 msgid "No eMuseum API key available."
 msgstr "No eMuseum API key available."
@@ -1238,7 +1244,7 @@ msgid "d-3-938"
 msgstr "Animal protection"
 
 msgid "d-1-10"
-msgstr "Social policy"
+msgstr "Social and societal policy"
 
 msgid "d-2-101"
 msgstr "Health"
@@ -1288,31 +1294,31 @@ msgid "d-3-1028"
 msgstr "Welfare"
 
 msgid "d-2-103"
-msgstr "Social groups"
+msgstr "Societal issues"
 
 msgid "d-3-1031"
-msgstr "Immigration policy"
+msgstr "Migration and integration policy"
 
 msgid "d-3-1032"
-msgstr "Refugees"
+msgstr "Asylum policy"
 
 msgid "d-3-1033"
-msgstr "Status of women"
+msgstr "Women and gender equality policy"
 
 msgid "d-3-1034"
 msgstr "Family policy"
 
 msgid "d-3-1035"
-msgstr "Children and young people"
+msgstr "Children and youth policy"
 
 msgid "d-3-1036"
-msgstr "Senior citizens"
+msgstr "Age policy"
 
 msgid "d-3-1037"
-msgstr "Persons with disabilities"
+msgstr "People with disabilities"
 
 msgid "d-3-1038"
-msgstr "Homosexuals"
+msgstr "LGBTQIA+"
 
 msgid "d-1-11"
 msgstr "Education and research"
@@ -1584,6 +1590,9 @@ msgstr "Link eMuseum.ch"
 msgid "Link Social Archives"
 msgstr "Link Social Archives"
 
+msgid "Link Basel Poster Collection"
+msgstr "Link Basel Poster Collection"
+
 msgid "Swissvotes database"
 msgstr "Swissvotes database"
 
@@ -1599,11 +1608,11 @@ msgstr "Analysis of the advertising campaign by Année Politique"
 msgid "Media coverage: fög analysis"
 msgstr "Media coverage: fög analysis"
 
-msgid "Dataset of the post-vote poll"
-msgstr "Dataset of the post-vote poll"
+msgid "Dataset of the VOX poll"
+msgstr "Dataset of the VOX poll"
 
-msgid "Codebook for the post-vote poll"
-msgstr "Codebook for the post-vote poll"
+msgid "Codebook for the VOX poll"
+msgstr "Codebook for the VOX poll"
 
 msgid "Attachment"
 msgstr "Attachment"
@@ -1995,11 +2004,20 @@ msgstr "Interactive map by the Swiss Federal Statistical Office"
 msgid "Display the map"
 msgstr "Display the map"
 
-msgid "Technical report"
-msgstr "Technical report"
+msgid "Full analysis of VOTO post-vote poll results"
+msgstr "Full analysis of VOTO post-vote poll results"
 
-msgid "Cockpit with selected results"
-msgstr "Cockpit with selected results"
+msgid "Cockpit with selected VOX results"
+msgstr "Cockpit with selected VOX results"
+
+msgid "Cockpit with selected VOTO results"
+msgstr "Cockpit with selected VOTO results"
+
+msgid "Questionnaire of the VOTO poll"
+msgstr "Questionnaire of the VOTO poll"
+
+msgid "Dataset of the VOTO poll"
+msgstr "Dataset of the VOTO poll"
 
 msgid ""
 "Due to data protection requirements, Swissvotes publishes a slightly reduced "
@@ -2011,6 +2029,9 @@ msgstr ""
 "version of this dataset. Access to the full version might be possible for "
 "research purposes; see the Swissvotes codebook for more details on this "
 "(https://swissvotes.ch/page/dataset/codebook-en.pdf)."
+
+msgid "Codebook for the VOTO poll"
+msgstr "Codebook for the VOTO poll"
 
 msgid "Full-text search in all documents on this vote"
 msgstr "Full-text search in all documents on this vote"
@@ -2231,3 +2252,6 @@ msgstr "All votes have been deleted"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Do you really want to delete all votes?!"
+
+#~ msgid "Technical report"
+#~ msgstr "Technical report"

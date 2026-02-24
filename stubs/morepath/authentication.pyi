@@ -1,7 +1,4 @@
 import abc
-from typing import Any
-from typing_extensions import TypeAlias
-from uuid import UUID
 
 from .request import Request, Response
 
@@ -18,11 +15,11 @@ NO_IDENTITY: NoIdentity
 class Identity:
     userid: str  # email
     uid: str  # actual user id
-    groupid: str | None
+    groupids: frozenset[str]
     role: str
     application_id: str
     verified: bool | None
-    def __init__(self, userid: str, *, uid: str, groupid: str | None, role: str, application_id: str) -> None: ...
+    def __init__(self, userid: str, *, uid: str, groupids: frozenset[str], role: str, application_id: str) -> None: ...
     def as_dict(self) -> dict[str, str]: ...
 
 class IdentityPolicy(metaclass=abc.ABCMeta):

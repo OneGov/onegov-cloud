@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import magic
 import os
@@ -17,7 +19,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 
-def content_type_from_fileobj(fileobj: 'SupportsRead[bytes]') -> str:
+def content_type_from_fileobj(fileobj: SupportsRead[bytes]) -> str:
     """ Gets the content type from a file obj. Depot has this as well, but it
     doesn't use python-magic. We use python-magic to be slower, but more
     accurate.
@@ -42,14 +44,14 @@ def as_fileintent(
     # the minimum we could get away with right now is SupportsReadCloseSeek
     # which is not that far off what IO provides, so for simplicity let's
     # just use that
-    msg = "Content must be either a bytes string or a file-like object."
+    msg = 'Content must be either a bytes string or a file-like object.'
     assert isinstance(content, (bytes, IOBase)), msg
 
     if isinstance(content, bytes):
         return FileIntent(BytesIO(content), filename, 'text/plain')
     else:
         if hasattr(content, 'mode'):  # type: ignore[unreachable]
-            assert 'b' in content.mode, "Open file in binary mode."
+            assert 'b' in content.mode, 'Open file in binary mode.'
 
         if hasattr(content, 'seek'):
             content.seek(0)
@@ -130,7 +132,7 @@ def get_image_size(image: Image.Image) -> tuple[str, str]:
 
 
 def digest(
-    fileobj: 'SupportsRead[bytes]',
+    fileobj: SupportsRead[bytes],
     type: str = 'sha256',
     chunksize: int = 4096
 ) -> str:
@@ -179,7 +181,7 @@ def name_without_extension(name: str) -> str:
 
 
 @contextmanager
-def current_dir(dir: 'StrOrBytesPath') -> 'Iterator[None]':
+def current_dir(dir: StrOrBytesPath) -> Iterator[None]:
     previous = os.getcwd()
     os.chdir(dir)
     yield

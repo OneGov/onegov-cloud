@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.gis.forms.fields import CoordinatesField
 from onegov.gis.forms.widgets import CoordinatesWidget
 

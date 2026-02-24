@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
@@ -75,13 +77,13 @@ EXPATS = (
 )
 
 
-STATI: tuple['Status', ...] = (
+STATI: tuple[Status, ...] = (
     'unknown',
     'interim',
     'final',
 )
 
-BALLOT_TYPES: set['BallotType'] = {
+BALLOT_TYPES: set[BallotType] = {
     'proposal',
     'counter-proposal',
     'tie-breaker'
@@ -119,12 +121,12 @@ class FileImportError:
 def load_csv(
     file: IO[bytes],
     mimetype: str,
-    expected_headers: 'Sequence[str] | None',
+    expected_headers: Sequence[str] | None,
     filename: str | None = None,
-    dialect: 'type[Dialect] | Dialect | str | None' = None,
+    dialect: type[Dialect] | Dialect | str | None = None,
     encoding: str | None = None,
     rename_duplicate_column_names: bool = False
-) -> tuple['DefaultCSVFile | None', FileImportError | None]:
+) -> tuple[DefaultCSVFile | None, FileImportError | None]:
     """ Loads the given file and returns it as CSV file.
 
     :return: A tuple CSVFile, FileImportError.
@@ -141,34 +143,34 @@ def load_csv(
             try:
                 csvfile = convert_excel_to_csv(file)
                 dialect = 'excel'
-            except IOError:
+            except OSError:
                 error = FileImportError(
-                    _("Not a valid xls/xlsx file."),
+                    _('Not a valid xls/xlsx file.'),
                     filename=filename
                 )
             except NotImplementedError:
                 error = FileImportError(
-                    _("The xls/xlsx file contains unsupported cells."),
+                    _('The xls/xlsx file contains unsupported cells.'),
                     filename=filename
                 )
             except Exception:
                 error = FileImportError(
-                    _("Not a valid csv/xls/xlsx file."),
+                    _('Not a valid csv/xls/xlsx file.'),
                     filename=filename
                 )
-        except IOError:
+        except OSError:
             error = FileImportError(
-                _("Not a valid xls/xlsx file."),
+                _('Not a valid xls/xlsx file.'),
                 filename=filename
             )
         except NotImplementedError:
             error = FileImportError(
-                _("The xls/xlsx file contains unsupported cells."),
+                _('The xls/xlsx file contains unsupported cells.'),
                 filename=filename
             )
         except Exception:
             error = FileImportError(
-                _("Not a valid csv/xls/xlsx file."),
+                _('Not a valid csv/xls/xlsx file.'),
                 filename=filename
             )
 
@@ -195,30 +197,30 @@ def load_csv(
     except AmbiguousColumnsError:
         error = FileImportError(
             _(
-                "Could not find the expected columns, "
-                "make sure all required columns exist and that there are no "
-                "extra columns."
+                'Could not find the expected columns, '
+                'make sure all required columns exist and that there are no '
+                'extra columns.'
             ),
             filename=filename
         )
     except DuplicateColumnNamesError:
         error = FileImportError(
-            _("Some column names appear twice."),
+            _('Some column names appear twice.'),
             filename=filename
         )
     except InvalidFormatError:
         error = FileImportError(
-            _("Not a valid csv/xls/xlsx file."),
+            _('Not a valid csv/xls/xlsx file.'),
             filename=filename
         )
     except EmptyFileError:
         error = FileImportError(
-            _("The csv/xls/xlsx file is empty."),
+            _('The csv/xls/xlsx file is empty.'),
             filename=filename
         )
     except EmptyLineInFileError:
         error = FileImportError(
-            _("The file contains an empty line."),
+            _('The file contains an empty line.'),
             filename=filename
         )
     except IndexError as e:
@@ -230,7 +232,7 @@ def load_csv(
         )
     except Exception:
         error = FileImportError(
-            _("Not a valid csv/xls/xlsx file."),
+            _('Not a valid csv/xls/xlsx file.'),
             filename=filename
         )
 
@@ -250,7 +252,7 @@ def load_xml(
         return parser.from_bytes(file.read()), None
     except Exception as exception:
         return None, FileImportError(_(
-            "Not a valid eCH xml file: ${error}",
+            'Not a valid eCH xml file: ${error}',
             mapping={'error': exception}
         ))
 
@@ -258,8 +260,8 @@ def load_xml(
 def get_entity_and_district(
     entity_id: int,
     entities: dict[int, dict[str, str]],
-    election_or_vote: 'Election | Vote',
-    principal: 'Canton | Municipality',
+    election_or_vote: Election | Vote,
+    principal: Canton | Municipality,
     errors: list[str] | None = None
 ) -> tuple[str, str, str]:
     """ Returns the entity name and district or region (from our static data,
@@ -283,7 +285,7 @@ def get_entity_and_district(
             if election_or_vote.domain_segment != name:
                 if principal.domain != 'municipality':
                     errors.append(_(
-                        "${name} is not part of this business",
+                        '${name} is not part of this business',
                         mapping={
                             'name': entity_id,
                             'district': election_or_vote.domain_segment
@@ -292,7 +294,7 @@ def get_entity_and_district(
         if election_or_vote.domain in ('region', 'district'):
             if election_or_vote.domain_segment != district:
                 errors.append(_(
-                    "${name} is not part of ${district}",
+                    '${name} is not part of ${district}',
                     mapping={
                         'name': entity_id,
                         'district': election_or_vote.domain_segment
@@ -303,7 +305,7 @@ def get_entity_and_district(
 
 
 def line_is_relevant(
-    line: 'DefaultRow',
+    line: DefaultRow,
     number: str,
     district: str | None = None
 ) -> bool:
@@ -314,7 +316,7 @@ def line_is_relevant(
 
 @overload
 def validate_integer(
-    line: 'DefaultRow',
+    line: DefaultRow,
     col: str,
     treat_none_as_default: bool = True,
     default: int = 0,
@@ -324,7 +326,7 @@ def validate_integer(
 
 @overload
 def validate_integer(
-    line: 'DefaultRow',
+    line: DefaultRow,
     col: str,
     treat_none_as_default: bool,
     default: _T,
@@ -334,7 +336,7 @@ def validate_integer(
 
 @overload
 def validate_integer(
-    line: 'DefaultRow',
+    line: DefaultRow,
     col: str,
     treat_none_as_default: bool = True,
     *,
@@ -344,7 +346,7 @@ def validate_integer(
 
 
 def validate_integer(
-    line: 'DefaultRow',
+    line: DefaultRow,
     col: str,
     treat_none_as_default: bool = True,
     default: int | _T = 0,
@@ -379,19 +381,19 @@ def validate_integer(
 
 @overload
 def validate_numeric(
-    line: 'DefaultRow',
+    line: DefaultRow,
     col: str,
     precision: int,
     scale: int,
     treat_none_as_default: bool = True,
-    default: Decimal = Decimal(0),  # noqa: B008
+    default: Decimal = Decimal(0),
     optional: bool = False
 ) -> Decimal: ...
 
 
 @overload
 def validate_numeric(
-    line: 'DefaultRow',
+    line: DefaultRow,
     col: str,
     precision: int,
     scale: int,
@@ -403,7 +405,7 @@ def validate_numeric(
 
 @overload
 def validate_numeric(
-    line: 'DefaultRow',
+    line: DefaultRow,
     col: str,
     precision: int,
     scale: int,
@@ -415,12 +417,12 @@ def validate_numeric(
 
 
 def validate_numeric(
-    line: 'DefaultRow',
+    line: DefaultRow,
     col: str,
     precision: int,
     scale: int,
     treat_none_as_default: bool = True,
-    default: Decimal | _T = Decimal(0),  # noqa: B008
+    default: Decimal | _T = Decimal(0),
     optional: bool = False
 ) -> Decimal | _T:
     """
@@ -455,7 +457,7 @@ def validate_numeric(
 
 @overload
 def validate_list_id(
-    line: 'DefaultRow',
+    line: DefaultRow,
     col: str,
     treat_empty_as_default: bool = True,
     default: str = '0'
@@ -464,7 +466,7 @@ def validate_list_id(
 
 @overload
 def validate_list_id(
-    line: 'DefaultRow',
+    line: DefaultRow,
     col: str,
     treat_empty_as_default: bool,
     default: _T
@@ -473,7 +475,7 @@ def validate_list_id(
 
 @overload
 def validate_list_id(
-    line: 'DefaultRow',
+    line: DefaultRow,
     col: str,
     treat_empty_as_default: bool = True,
     *,
@@ -482,15 +484,15 @@ def validate_list_id(
 
 
 def validate_list_id(
-    line: 'DefaultRow',
+    line: DefaultRow,
     col: str,
     treat_empty_as_default: bool = True,
     default: str | _T = '0'
 ) -> str | _T:
     """ Used to validate list_id that can also be alphanumeric.
-     Example: 03B.04
-     Previously, the list_id was also 0 if it was empty.
-     """
+    Example: 03B.04
+    Previously, the list_id was also 0 if it was empty.
+    """
     result = getattr(line, col)
     if result:
         if match(r'^[A-Za-z0-9_\.]+$', result):
@@ -503,7 +505,7 @@ def validate_list_id(
     raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
 
 
-def validate_gender(line: 'DefaultRow') -> 'Gender | None':
+def validate_gender(line: DefaultRow) -> Gender | None:
     result = getattr(line, 'candidate_gender', None) or None
     if result not in (None, 'male', 'female', 'undetermined'):
         raise ValueError(
@@ -512,7 +514,7 @@ def validate_gender(line: 'DefaultRow') -> 'Gender | None':
     return result
 
 
-def validate_color(line: 'DefaultRow', col: str) -> str:
+def validate_color(line: DefaultRow, col: str) -> str:
     result = getattr(line, col, '') or ''
     if result and not match(r'^#[0-9A-Fa-f]{6}$', result):
         raise ValueError(
@@ -523,9 +525,9 @@ def validate_color(line: 'DefaultRow', col: str) -> str:
 
 def convert_ech_domain(
     domain: DomainOfInfluenceType,
-    principal: 'Canton | Municipality',
+    principal: Canton | Municipality,
     entities: dict[int, dict[str, str]],
-) -> tuple[bool, 'DomainOfInfluence', str]:
+) -> tuple[bool, DomainOfInfluence, str]:
     """ Convert the given eCH domain to our internal domain and domain
     segment.
 

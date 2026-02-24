@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from onegov.core.security import Public
 from onegov.file import File
@@ -27,18 +29,18 @@ if TYPE_CHECKING:
 
 
 MONTHS = (
-    _("January"),
-    _("Feburary"),
-    _("March"),
-    _("April"),
-    _("May"),
-    _("June"),
-    _("July"),
-    _("August"),
-    _("September"),
-    _("October"),
-    _("November"),
-    _("December"),
+    _('January'),
+    _('Feburary'),
+    _('March'),
+    _('April'),
+    _('May'),
+    _('June'),
+    _('July'),
+    _('August'),
+    _('September'),
+    _('October'),
+    _('November'),
+    _('December'),
 )
 
 
@@ -49,9 +51,9 @@ MONTHS = (
 )
 def view_publications(
     self: PublicationCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: PublicationLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or PublicationLayout(self, request)
 
@@ -79,7 +81,7 @@ def view_publications(
         File.name,
         File.stats,
         File.created.op('AT TIME ZONE')(
-            literal(layout.timezone.zone)  # noqa: MS001
+            literal(layout.timezone.zone)
         ).label('created'),
     ).order_by(desc(File.created))
 
@@ -91,12 +93,12 @@ def view_publications(
     grouped: dict[str, list[FileRow] | None] = OrderedDict()
     spool: Sequence[str] = ()
 
-    def apply_spool(spool: 'Sequence[str]') -> 'Sequence[str]':
+    def apply_spool(spool: Sequence[str]) -> Sequence[str]:
         if spool:
             if len(spool) == 1:
                 label = spool[0]
             else:
-                label = f"{spool[0]} - {spool[-1]}"
+                label = f'{spool[0]} - {spool[-1]}'
 
             grouped[label] = None
 
@@ -119,11 +121,11 @@ def view_publications(
     apply_spool(spool)
 
     # link to file and thumbnail by id
-    def link(f: 'FileRow', name: str = '') -> str:
+    def link(f: FileRow, name: str = '') -> str:
         return request.class_link(File, {'id': f.id}, name=name)
 
     return {
-        'title': _("Publications"),
+        'title': _('Publications'),
         'layout': layout,
         'model': self,
         'filters': filters,

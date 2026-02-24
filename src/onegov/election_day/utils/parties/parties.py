@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from onegov.election_day import _
 from operator import itemgetter
@@ -17,7 +19,7 @@ if TYPE_CHECKING:
 
 
 def get_party_results(
-    item: 'Election | ElectionCompound | ElectionCompoundPart',
+    item: Election | ElectionCompound | ElectionCompoundPart,
     json_serializable: bool = False
 ) -> tuple[list[str], dict[str, Any]]:
 
@@ -60,7 +62,7 @@ def get_party_results(
         total_votes = totals_votes.get(result.year) or 0
         votes_permille = 0
         if total_votes:
-            votes_permille = int(round(1000 * (votes / total_votes)))
+            votes_permille = round(1000 * (votes / total_votes))
         year['votes'] = {
             'total': votes,
             'permille': votes_permille
@@ -68,7 +70,7 @@ def get_party_results(
 
         voters_count: Decimal | float = result.voters_count or Decimal(0)
         if not item.exact_voters_counts:
-            voters_count = int(round(voters_count))
+            voters_count = round(voters_count)
         elif json_serializable:
             voters_count = float(voters_count)
 
@@ -86,8 +88,8 @@ def get_party_results(
 
 
 def get_party_results_deltas(
-    item: 'Election | ElectionCompound | ElectionCompoundPart',
-    years: 'Sequence[str]',
+    item: Election | ElectionCompound | ElectionCompoundPart,
+    years: Sequence[str],
     parties: dict[str, Any]
 ) -> tuple[bool, dict[str, list[list[str]]]]:
 
@@ -135,9 +137,9 @@ def get_party_results_deltas(
 
 
 def get_party_results_data(
-    item: 'Election | ElectionCompound | ElectionCompoundPart',
+    item: Election | ElectionCompound | ElectionCompoundPart,
     horizontal: bool
-) -> 'JSONObject_ro':
+) -> JSONObject_ro:
     """ Retuns the data used for the diagrams showing the party results. """
     if horizontal:
         return get_party_results_horizontal_data(item)
@@ -145,8 +147,8 @@ def get_party_results_data(
 
 
 def get_party_results_horizontal_data(
-    item: 'Election | ElectionCompound | ElectionCompoundPart'
-) -> 'JSONObject_ro':
+    item: Election | ElectionCompound | ElectionCompoundPart
+) -> JSONObject_ro:
 
     """ Retuns the data used for the horitzonal bar diagram showing the party
     results.
@@ -210,8 +212,8 @@ def get_party_results_horizontal_data(
 
 
 def get_party_results_vertical_data(
-    item: 'Election | ElectionCompound | ElectionCompoundPart'
-) -> 'JSONObject_ro':
+    item: Election | ElectionCompound | ElectionCompoundPart
+) -> JSONObject_ro:
 
     """ Retuns the data used for the grouped bar diagram showing the party
     results.
@@ -269,7 +271,7 @@ def get_party_results_vertical_data(
 
 
 def get_party_results_seat_allocation(
-    years: 'Sequence[str]',
+    years: Sequence[str],
     parties: dict[str, Any]
 ) -> list[list[Any]]:
 
@@ -287,21 +289,20 @@ def get_party_results_seat_allocation(
 
     result = []
     for party_id, party in parties.items():
-        row = []
-        row.append(party_names.get(party_id, ''))
-        for year in years:
-            row.append(
-                parties.get(party_id, {}).get(year, {}).get('mandates', 0)
-            )
+        row = [
+            parties.get(party_id, {}).get(year, {}).get('mandates', 0)
+            for year in years
+        ]
+        row.insert(0, party_names.get(party_id, ''))
         result.append(row)
 
     return result
 
 
 def get_parties_panachage_data(
-    item: 'Election | ElectionCompound | ElectionCompoundPart',
-    request: 'ElectionDayRequest | None' = None
-) -> 'JSONObject_ro':
+    item: Election | ElectionCompound | ElectionCompoundPart,
+    request: ElectionDayRequest | None = None
+) -> JSONObject_ro:
     """" Get the panachage data as JSON. Used to for the panachage sankey
     chart.
 
@@ -357,7 +358,7 @@ def get_parties_panachage_data(
 
     # Create the nodes
     names = {r.party_id: r.name for r in party_results}
-    blank = request.translate(_("Blank list")) if request else '-'
+    blank = request.translate(_('Blank list')) if request else '-'
     nodes: list[JSONObject_ro] = [
         {
             'name': names.get(party_id, '') or blank,

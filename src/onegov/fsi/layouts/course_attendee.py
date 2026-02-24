@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
@@ -29,7 +31,7 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
                 _('Add External Attendee'),
                 url=self.request.class_link(
                     CourseAttendeeCollection, name='add-external'),
-                attrs={'class': 'users'}
+                attrs={'class': 'add-external'}
             ),
         ]
 
@@ -90,7 +92,7 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
 
 class CourseAttendeeLayout(DefaultLayout):
 
-    model: 'CourseAttendee'
+    model: CourseAttendee
 
     @cached_property
     def title(self) -> str:
@@ -161,11 +163,11 @@ class CourseAttendeeLayout(DefaultLayout):
                         attrs={'class': 'delete-link'},
                         traits=(
                             Confirm(
-                                _("Do you really want to delete "
-                                  "this external attendee ?"),
-                                _("This cannot be undone."),
-                                _("Delete external attendee"),
-                                _("Cancel")
+                                _('Do you really want to delete '
+                                  'this external attendee ?'),
+                                _('This cannot be undone.'),
+                                _('Delete external attendee'),
+                                _('Cancel')
                             ),
                             Intercooler(
                                 request_method='DELETE',

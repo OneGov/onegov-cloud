@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
@@ -23,26 +25,32 @@ from tests.shared.utils import use_locale
 from translationstring import TranslationString
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from .conftest import TestApp
+
+
 class DummyRequest:
     locale = 'de_CH'
 
-    def translate(self, text):
+    def translate(self, text: str) -> str:
         if isinstance(text, TranslationString):
             return text.interpolate()
         return text
 
-    def link(self, target, suffix=None):
+    def link(self, target: object, suffix: str | None = None) -> str:
         return f'{target}/{suffix}' if suffix else f'{target}'
 
 
-def test_model_actor():
+def test_model_actor() -> None:
     actor = Actor('csp')
     assert actor.name == 'csp'
     assert actor.abbreviation == 'actor-csp-abbreviation'
     assert isinstance(actor.abbreviation, TranslationString)
     assert actor.label == 'actor-csp-label'
     assert isinstance(actor.label, TranslationString)
-    assert actor.html(DummyRequest()) == (
+    assert actor.html(DummyRequest()) == (  # type: ignore[arg-type]
         '<span title="actor-csp-label">actor-csp-abbreviation</span>'
     )
 
@@ -52,13 +60,13 @@ def test_model_actor():
     assert not isinstance(actor.abbreviation, TranslationString)
     assert actor.label == 'xxx'
     assert not isinstance(actor.label, TranslationString)
-    assert actor.html(DummyRequest()) == '<span title="xxx">xxx</span>'
+    assert actor.html(DummyRequest()) == '<span title="xxx">xxx</span>'  # type: ignore[arg-type]
 
     assert Actor('csp') == Actor('csp')
     assert Actor('csp') != Actor('xxx')
 
 
-def test_model_canton():
+def test_model_canton() -> None:
     assert len(Region.cantons()) == 26
 
     canton = Region('lu')
@@ -67,7 +75,7 @@ def test_model_canton():
     assert not isinstance(canton.abbreviation, TranslationString)
     assert canton.label == 'canton-lu-label'
     assert isinstance(canton.label, TranslationString)
-    assert canton.html(DummyRequest()) == (
+    assert canton.html(DummyRequest()) == (  # type: ignore[arg-type]
         '<span title="canton-lu-label">LU</span>'
     )
 
@@ -77,29 +85,29 @@ def test_model_canton():
     assert not isinstance(canton.abbreviation, TranslationString)
     assert canton.label == 'xxx'
     assert not isinstance(canton.label, TranslationString)
-    assert canton.html(DummyRequest()) == '<span title="xxx">xxx</span>'
+    assert canton.html(DummyRequest()) == '<span title="xxx">xxx</span>'  # type: ignore[arg-type]
 
     assert Region('lu') == Region('lu')
     assert Region('lu') != Region('xxx')
 
 
-def test_model_localized_file():
+def test_model_localized_file() -> None:
     class SessionManager:
-        def __init__(self):
+        def __init__(self) -> None:
             self.current_locale = 'de_CH'
 
     class MyClass:
         file = LocalizedFile('pdf', 'title', {})
 
-        def __init__(self):
+        def __init__(self) -> None:
             self.session_manager = SessionManager()
-            self.files = []
+            self.files: list[File] = []
 
     class File:
-        def __init__(self, name):
+        def __init__(self, name: str) -> None:
             self.name = name
 
-    my = MyClass()
+    my: Any = MyClass()
     assert my.file is None
 
     # Add CH
@@ -129,15 +137,15 @@ def test_model_localized_file():
         assert set(file.name for file in my.files) == {'file-de_CH'}
 
 
-def test_model_file_subcollection():
+def test_model_file_subcollection() -> None:
     class MyClass:
         files = [Bunch(name='a'), Bunch(name='x_b'), Bunch(name='x_a')]
         x = FileSubCollection()
 
-    assert MyClass().x == [Bunch(name='x_a'), Bunch(name='x_b')]
+    assert MyClass().x == [Bunch(name='x_a'), Bunch(name='x_b')]  # type: ignore[type-var]
 
 
-def test_model_page(session):
+def test_model_page(session: Session) -> None:
     session.add(
         TranslatablePage(
             id='page',
@@ -174,7 +182,7 @@ def test_model_page(session):
     assert [page.id for page in page.siblings] == ['page-2', 'page-1', 'page']
 
 
-def test_model_page_move(session):
+def test_model_page_move(session: Session) -> None:
     # test execute
     for order, id in enumerate(('about', 'contact', 'dataset')):
         session.add(
@@ -184,10 +192,10 @@ def test_model_page_move(session):
             )
         )
 
-    def ordering():
+    def ordering() -> list[str]:
         query = session.query(TranslatablePage.id)
         query = query.order_by(TranslatablePage.order)
-        return [r.id for r in query.all()]
+        return [page_id for page_id, in query]
 
     assert ordering() == ['about', 'contact', 'dataset']
 
@@ -223,7 +231,7 @@ def test_model_page_move(session):
     assert ordering() == ['contact', 'dataset', 'about']
 
 
-def test_model_page_file(swissvotes_app):
+def test_model_page_file(swissvotes_app: TestApp) -> None:
     session = swissvotes_app.session()
 
     page = TranslatablePage(
@@ -248,7 +256,7 @@ def test_model_page_file(swissvotes_app):
     assert file.locale == 'de_CH'
 
 
-def test_model_swissvotes_file(swissvotes_app):
+def test_model_swissvotes_file(swissvotes_app: TestApp) -> None:
     session = swissvotes_app.session()
 
     vote = SwissVote(
@@ -278,7 +286,7 @@ def test_model_swissvotes_file(swissvotes_app):
     assert file.locale == 'de_CH'
 
 
-def test_model_policy_area(session):
+def test_model_policy_area(session: Session) -> None:
     policy_area = PolicyArea('1')
     assert repr(policy_area) == '1'
     assert policy_area.level == 1
@@ -287,7 +295,7 @@ def test_model_policy_area(session):
     assert policy_area.descriptor_decimal == Decimal('1')
     assert policy_area.label == 'd-1-1'
     assert policy_area.label_path == ['d-1-1']
-    assert policy_area.html(DummyRequest()) == '<span>d-1-1</span>'
+    assert policy_area.html(DummyRequest()) == '<span>d-1-1</span>'  # type: ignore[arg-type]
 
     policy_area = PolicyArea('1.12')
     assert repr(policy_area) == '1.12'
@@ -297,7 +305,7 @@ def test_model_policy_area(session):
     assert policy_area.descriptor_decimal == Decimal('1.2')
     assert policy_area.label == 'd-2-12'
     assert policy_area.label_path == ['d-1-1', 'd-2-12']
-    assert policy_area.html(DummyRequest()) == '<span>d-1-1 &gt; d-2-12</span>'
+    assert policy_area.html(DummyRequest()) == '<span>d-1-1 &gt; d-2-12</span>'  # type: ignore[arg-type]
 
     policy_area = PolicyArea('1.12.121')
     assert repr(policy_area) == '1.12.121'
@@ -307,7 +315,7 @@ def test_model_policy_area(session):
     assert policy_area.descriptor_decimal == Decimal('1.21')
     assert policy_area.label == 'd-3-121'
     assert policy_area.label_path == ['d-1-1', 'd-2-12', 'd-3-121']
-    assert policy_area.html(DummyRequest()) == (
+    assert policy_area.html(DummyRequest()) == (  # type: ignore[arg-type]
         '<span>d-1-1 &gt; d-2-12 &gt; d-3-121</span>'
     )
 
@@ -326,12 +334,16 @@ def test_model_policy_area(session):
     assert PolicyArea('1.12.121') == PolicyArea([1, 12, 121])
 
 
-def test_model_principal(session):
+def test_model_principal(session: Session) -> None:
     principal = Principal()
     assert principal
 
 
-def test_model_vote_properties(session, sample_vote):
+def test_model_vote_properties(
+    session: Session,
+    sample_vote: SwissVote
+) -> None:
+
     session.add(sample_vote)
     session.flush()
     session.expunge_all()
@@ -390,6 +402,14 @@ def test_model_vote_properties(session, sample_vote):
         'https://no.com/objects/1 '
         'https://no.com/objects/2'
     )
+    assert vote.posters_bs_yea == (
+        'https://yes.com/objects/5 '
+        'https://yes.com/objects/6'
+    )
+    assert vote.posters_bs_nay == (
+        'https://no.com/objects/5 '
+        'https://no.com/objects/6'
+    )
     assert vote.posters_sa_yea == (
         'https://yes.com/objects/3 '
         'https://yes.com/objects/4'
@@ -402,6 +422,12 @@ def test_model_vote_properties(session, sample_vote):
         'https://yes.com/objects/1': 'https://detail.com/1'
     }
     assert vote.posters_mfg_nay_imgs == {}
+    assert vote.posters_bs_yea_imgs == {
+        'https://yes.com/objects/5': 'https://detail.com/5',
+    }
+    assert vote.posters_bs_nay_imgs == {
+        'https://no.com/objects/6': 'https://detail.com/6',
+    }
     assert vote.posters_sa_yea_imgs == {}
     assert vote.posters_sa_nay_imgs == {
         'https://no.com/objects/3': 'https://detail.com/3',
@@ -855,7 +881,7 @@ def test_model_vote_properties(session, sample_vote):
     # other
     assert vote.has_national_council_share_data is True
 
-    assert vote.posters(DummyRequest()) == {
+    assert vote.posters(DummyRequest()) == {  # type: ignore[arg-type]
         'nay': [
             Poster(
                 thumbnail='https://detail.com/4',
@@ -868,6 +894,12 @@ def test_model_vote_properties(session, sample_vote):
                 image='https://detail.com/3',
                 url='https://no.com/objects/3',
                 label='Link Social Archives'
+            ),
+            Poster(
+                thumbnail='https://detail.com/6',
+                image='https://detail.com/6',
+                url='https://no.com/objects/6',
+                label='Link Basel Poster Collection'
             )
         ],
         'yea': [
@@ -876,12 +908,18 @@ def test_model_vote_properties(session, sample_vote):
                 image='https://detail.com/1',
                 url='https://yes.com/objects/1',
                 label='Link eMuseum.ch'
+            ),
+            Poster(
+                thumbnail='https://detail.com/5',
+                image='https://detail.com/5',
+                url='https://yes.com/objects/5',
+                label='Link Basel Poster Collection'
             )
         ]
     }
 
 
-def test_model_vote_codes():
+def test_model_vote_codes() -> None:
     assert SwissVote.codes('legal_form')[2] == "Optional referendum"
     assert SwissVote.codes('result')[0] == "Rejected"
     assert SwissVote.codes('result_people_accepted')[0] == "Rejected"
@@ -897,7 +935,7 @@ def test_model_vote_codes():
     assert SwissVote.metadata_codes('doctype')['leaflet'] == "Pamphlet"
 
 
-def test_model_vote_search_term_expression(swissvotes_app):
+def test_model_vote_search_term_expression(swissvotes_app: TestApp) -> None:
     expression = SwissVote.search_term_expression
     assert expression(None) == ''
     assert expression('') == ''
@@ -910,8 +948,12 @@ def test_model_vote_search_term_expression(swissvotes_app):
     assert expression('AHV Mehrwert*') == 'AHV <-> Mehrwert:*'
 
 
-def test_model_vote_attachments(swissvotes_app, attachments,
-                                campaign_material):
+def test_model_vote_attachments(
+    swissvotes_app: TestApp,
+    attachments: dict[str, SwissVoteFile],
+    campaign_material: dict[str, SwissVoteFile]
+) -> None:
+
     session = swissvotes_app.session()
     session.add(
         SwissVote(
@@ -933,6 +975,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.easyvote_booklet is None
     assert vote.federal_council_message is None
     assert vote.foeg_analysis is None
+    assert vote.leewas_post_vote_poll_results is None
     assert vote.parliamentary_initiative is None
     assert vote.parliamentary_committee_report is None
     assert vote.federal_council_opinion is None
@@ -962,6 +1005,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         'easyvote_booklet',
         'federal_council_message',
         'foeg_analysis',
+        'leewas_post_vote_poll_results',
         'parliamentary_initiative',
         'parliamentary_committee_report',
         'federal_council_opinion',
@@ -999,26 +1043,33 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     session.flush()
     session.refresh(vote)
 
+    # undo mypy narrowing
+    vote = vote
+
     assert len(vote.files) == 4
+    assert vote.ad_analysis is not None
     assert vote.ad_analysis.name == 'ad_analysis-de_CH'
     assert vote.ad_analysis.extract == 'Inserateanalyse'
     assert vote.ad_analysis.stats == {'pages': 1, 'words': 1}
     assert vote.ad_analysis.language == 'german'
+    assert vote.brief_description is not None
     assert vote.brief_description.name == 'brief_description-de_CH'
     assert vote.brief_description.extract == 'Kurzbeschreibung'
     assert vote.brief_description.stats == {'pages': 1, 'words': 1}
     assert vote.brief_description.language == 'german'
+    assert vote.parliamentary_debate is not None
     assert vote.parliamentary_debate.name == 'parliamentary_debate-de_CH'
     assert vote.parliamentary_debate.extract == 'Parlamentdebatte'
     assert vote.parliamentary_debate.stats == {'pages': 1, 'words': 1}
     assert vote.parliamentary_debate.language == 'german'
+    assert vote.voting_text is not None
     assert vote.voting_text.name == 'voting_text-de_CH'
     assert vote.voting_text.extract == 'Abstimmungstext'
     assert vote.voting_text.stats == {'pages': 1, 'words': 1}
     assert vote.voting_text.language == 'german'
-    assert "abstimmungstex" in vote.searchable_text_de_CH
-    assert "kurzbeschreib" in vote.searchable_text_de_CH
-    assert "parlamentdebatt" in vote.searchable_text_de_CH
+    assert "abstimmungstex" in vote.searchable_text_de_CH  # type: ignore[operator]
+    assert "kurzbeschreib" in vote.searchable_text_de_CH  # type: ignore[operator]
+    assert "parlamentdebatt" in vote.searchable_text_de_CH  # type: ignore[operator]
     assert vote.searchable_text_fr_CH == ''
     assert vote.search('Inserateanalysen') == [vote.ad_analysis]
     assert vote.search('Kurzbeschreibung') == [vote.brief_description]
@@ -1030,16 +1081,20 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         vote.realization = attachments['realization']
         session.flush()
 
+        # undo mypy narrowing
+        vote = vote
+
         assert len(vote.files) == 5
         assert vote.voting_text is None
+        assert vote.realization is not None
         assert vote.realization.name == 'realization-fr_CH'
         assert vote.realization.stats == {'pages': 1, 'words': 1}
         assert vote.realization.language == 'french'
 
-        assert "abstimmungstex" in vote.searchable_text_de_CH
-        assert "kurzbeschreib" in vote.searchable_text_de_CH
-        assert "parlamentdebatt" in vote.searchable_text_de_CH
-        assert "réalis" in vote.searchable_text_fr_CH
+        assert "abstimmungstex" in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert "kurzbeschreib" in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert "parlamentdebatt" in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert "réalis" in vote.searchable_text_fr_CH  # type: ignore[operator]
         assert vote.search('Réalisation') == [vote.realization]
 
         del vote.realization
@@ -1050,40 +1105,43 @@ def test_model_vote_attachments(swissvotes_app, attachments,
 
         assert len(vote.files) == 7
         assert vote.voting_text is None
+        assert vote.federal_council_message is not None
         assert vote.federal_council_message.name == (
             'federal_council_message-fr_CH'
         )
         assert vote.federal_council_message.stats == {'pages': 1, 'words': 4}
         assert vote.federal_council_message.language == 'french'
+        assert vote.resolution is not None
         assert vote.resolution.name == 'resolution-fr_CH'
         assert vote.resolution.stats == {'pages': 1, 'words': 4}
         assert vote.resolution.language == 'french'
+        assert vote.voting_booklet is not None
         assert vote.voting_booklet.name == 'voting_booklet-fr_CH'
         assert vote.voting_booklet.stats == {'pages': 1, 'words': 2}
         assert vote.voting_booklet.language == 'french'
-        assert "abstimmungstex" in vote.searchable_text_de_CH
-        assert "kurzbeschreib" in vote.searchable_text_de_CH
-        assert "parlamentdebatt" in vote.searchable_text_de_CH
-        assert "réalis" not in vote.searchable_text_fr_CH
-        assert "conseil" in vote.searchable_text_fr_CH
-        assert "fédéral" in vote.searchable_text_fr_CH
+        assert "abstimmungstex" in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert "kurzbeschreib" in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert "parlamentdebatt" in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert "réalis" not in vote.searchable_text_fr_CH  # type: ignore[operator]
+        assert "conseil" in vote.searchable_text_fr_CH  # type: ignore[operator]
+        assert "fédéral" in vote.searchable_text_fr_CH  # type: ignore[operator]
         assert vote.search('Conseil fédéral') == [vote.federal_council_message]
         assert vote.search('Messages') == [vote.federal_council_message]
         assert vote.search('constatant') == [vote.resolution]
         assert vote.search('brochure') == [vote.voting_booklet]
 
-        assert vote.get_file('ad_analysis').name == 'ad_analysis-de_CH'
-        assert vote.get_file('ad_analysis', 'fr_CH').name == (
+        assert vote.get_file('ad_analysis').name == 'ad_analysis-de_CH'  # type: ignore[union-attr]
+        assert vote.get_file('ad_analysis', 'fr_CH').name == (  # type: ignore[union-attr]
             'ad_analysis-de_CH'
         )
-        assert vote.get_file('ad_analysis', 'en_US').name == (
+        assert vote.get_file('ad_analysis', 'en_US').name == (  # type: ignore[union-attr]
             'ad_analysis-de_CH'
         )
         assert vote.get_file('ad_analysis', fallback=False) is None
         assert vote.get_file('ad_analysis', 'en_US', fallback=False) is None
         assert vote.get_file('realization') is None
-        assert vote.get_file('resolution').name == 'resolution-fr_CH'
-        assert vote.get_file('resolution', 'fr_CH').name == 'resolution-fr_CH'
+        assert vote.get_file('resolution').name == 'resolution-fr_CH'  # type: ignore[union-attr]
+        assert vote.get_file('resolution', 'fr_CH').name == 'resolution-fr_CH'  # type: ignore[union-attr]
         assert vote.get_file('resolution', 'de_CH') is None
 
         # Additional campaing material
@@ -1144,9 +1202,9 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         assert files['legal'].language == 'french'
         assert files['legal'].extract == 'Juridique'
         assert files['legal'].stats == {'pages': 1, 'words': 1}
-        assert 'abhandl' in vote.searchable_text_de_CH
-        assert 'volantin' in vote.searchable_text_it_CH
-        assert 'articl' in vote.searchable_text_en_US
+        assert 'abhandl' in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert 'volantin' in vote.searchable_text_it_CH  # type: ignore[operator]
+        assert 'articl' in vote.searchable_text_en_US  # type: ignore[operator]
         assert vote.search('Abhandlung') == [files['essay']]
         assert vote.search('Abhandlungen') == [files['essay']]
         assert vote.search('Volantino') == [files['leaflet']]
@@ -1156,7 +1214,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         assert vote.search('Juridique') == [files['legal']]
         assert vote.search('Juridiques') == [files['legal']]
 
-        assert vote.posters(DummyRequest())['yea'] == [
+        assert vote.posters(DummyRequest())['yea'] == [  # type: ignore[arg-type]
             Poster(
                 thumbnail=f'{file}/thumbnail',
                 image=f'{file}',
@@ -1165,7 +1223,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
             )
             for file in vote.campaign_material_yea
         ]
-        assert vote.posters(DummyRequest())['nay'] == [
+        assert vote.posters(DummyRequest())['nay'] == [  # type: ignore[arg-type]
             Poster(
                 thumbnail=f'{file}/thumbnail',
                 image=f'{file}',
@@ -1176,7 +1234,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         ]
 
 
-def test_model_column_mapper_dataset():
+def test_model_column_mapper_dataset() -> None:
     mapper = ColumnMapperDataset()
     vote = SwissVote()
 
@@ -1301,9 +1359,9 @@ def test_model_column_mapper_dataset():
     )
 
 
-def test_model_column_mapper_metadata():
+def test_model_column_mapper_metadata() -> None:
     mapper = ColumnMapperMetadata()
-    data = {}
+    data: dict[str, Any] = {}
 
     mapper.set_value(data, 'n:f:bfs_number', Decimal('100.1'))
     mapper.set_value(data, 't:f:filename', 'Dateiname')
@@ -1375,14 +1433,14 @@ def test_model_column_mapper_metadata():
     ]
 
 
-def test_model_recommendation_order():
+def test_model_recommendation_order() -> None:
     recommendations = SwissVote.codes('recommendation')
     assert list(recommendations.keys()) == [
         1, 9, 2, 8, 4, 5, 3, 66, 9999, None
     ]
 
 
-def test_model_recommendations_parties(sample_vote):
+def test_model_recommendations_parties(sample_vote: SwissVote) -> None:
     grouped = sample_vote.recommendations_parties
     codes = SwissVote.codes('recommendation')
     # Remove entries in codes for unknown and actor no longer exists
@@ -1391,7 +1449,7 @@ def test_model_recommendations_parties(sample_vote):
     assert list(grouped.keys()) == list(codes.values())
 
 
-def test_model_sorted_actors_list(sample_vote):
+def test_model_sorted_actors_list(sample_vote: SwissVote) -> None:
     sorted_actors = sample_vote.sorted_actors_list
     assert sorted_actors
     for i in range(len(sorted_actors) - 2):
@@ -1400,5 +1458,5 @@ def test_model_sorted_actors_list(sample_vote):
         actual_rec = sample_vote.get_recommendation(actor)
         next_rec = sample_vote.get_recommendation(next_actor)
         if actual_rec == next_rec:
-            assert sample_vote.get_actors_share(actor) > \
-                sample_vote.get_actors_share(next_actor)
+            assert sample_vote.get_actors_share(
+                actor) > sample_vote.get_actors_share(next_actor)

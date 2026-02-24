@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.utils import relative_url
 from onegov.org import _, log
 from onegov.user.collections import TANCollection
+from onegov.user.models import TAN
 from sedate import utcnow
 
 
@@ -27,13 +30,13 @@ class MTANAuth:
 
     """
 
-    def __init__(self, app: 'OrgApp', to: str = '/'):
+    def __init__(self, app: OrgApp, to: str = '/'):
         self.app = app
         self.session = app.session()
         self.application_id = app.application_id
         self.to = relative_url(to)
 
-    def send_mtan(self, request: 'OrgRequest', number: str) -> 'Response':
+    def send_mtan(self, request: OrgRequest, number: str) -> Response:
 
         # we are already authenticated just redirect to the page we wanted
         if request.active_mtan_session:
@@ -66,7 +69,7 @@ class MTANAuth:
 
     def authenticate(
         self,
-        request: 'OrgRequest',
+        request: OrgRequest,
         tan: str,
     ) -> str | None:
 
@@ -83,8 +86,15 @@ class MTANAuth:
 
         # record date and number in session
         request.browser_session.mtan_verified = utcnow()
-        request.browser_session.mtan_number = result.meta['mobile_number']
+        request.browser_session.mtan_number = mobile_number = result.meta[
+            'mobile_number']
 
-        # expire the tan we just used
+        # expire the TAN we just used
         result.expire()
+
+        # expire any other TANs issued to the same mobile number
+        for tan_obj in collection.query().filter(
+            TAN.meta['mobile_number'] == mobile_number
+        ):
+            tan_obj.expire()
         return result.meta.get('redirect_to', self.to)

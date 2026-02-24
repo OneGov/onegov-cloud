@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.crypto import random_token
 from onegov.core.security import Public
@@ -10,6 +12,7 @@ from onegov.org.mail import send_ticket_mail
 from onegov.org.models import Organisation
 from onegov.org.models import TicketMessage
 from onegov.org.pdf.ticket import TicketPdf
+from onegov.org.utils import emails_for_new_ticket
 from onegov.ticket import TicketCollection
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
@@ -26,11 +29,13 @@ from onegov.translator_directory.layout import RefuseAccreditationLayout
 from onegov.translator_directory.layout import RequestAccreditationLayout
 from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.message import AccreditationMessage
+from onegov.translator_directory.utils import get_custom_text
+
 from uuid import uuid4
 from webob import exc
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -46,9 +51,9 @@ if TYPE_CHECKING:
 )
 def request_accreditation(
     self: Organisation,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: RequestAccreditationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.email.data is not None
@@ -68,26 +73,24 @@ def request_accreditation(
                     **form.get_ticket_data()
                 }
             )
-            TicketMessage.create(ticket, request, 'opened')
+            TicketMessage.create(ticket, request, 'opened', 'external')
             ticket.create_snapshot(request)
 
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened.pt',
-            subject=_("Your ticket has been opened"),
+            subject=_('Your ticket has been opened'),
             receivers=(form.email.data, ),
             ticket=ticket
         )
-        if request.email_for_new_tickets:
+        for email in emails_for_new_ticket(request, ticket):
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened_info.pt',
-                subject=_("New ticket"),
+                subject=_('New ticket'),
                 ticket=ticket,
-                receivers=(request.email_for_new_tickets, ),
-                content={
-                    'model': ticket
-                }
+                receivers=(email, ),
+                content={'model': ticket},
             )
 
         request.app.send_websocket(
@@ -96,17 +99,18 @@ def request_accreditation(
                 'event': 'browser-notification',
                 'title': request.translate(_('New ticket')),
                 'created': ticket.created.isoformat()
-            }
+            },
+            groupids=request.app.groupids_for_ticket(ticket),
         )
 
-        request.success(_("Thank you for your submission!"))
+        request.success(_('Thank you for your submission!'))
         return redirect(request.link(ticket, 'status'))
 
     layout = RequestAccreditationLayout(self, request)
     locale = request.locale.split('_')[0] if request.locale else None
     locale = 'de' if locale == 'de' else 'en'
-    title = form.get_custom_text(
-        f'({locale}) Custom request accreditation title')
+    title = get_custom_text(
+        request, f'({locale}) Custom request accreditation title')
 
     return {
         'layout': layout,
@@ -124,9 +128,9 @@ def request_accreditation(
 )
 def grant_accreditation(
     self: Accreditation,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: GrantAccreditationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if self.target is None or self.ticket is None:
         raise exc.HTTPNotFound()
@@ -134,12 +138,12 @@ def grant_accreditation(
     if form.submitted(request):
         self.grant()
         AccreditationMessage.create(self.ticket, request, 'granted')
-        request.success(_("Admission granted."))
+        request.success(_('Admission granted.'))
 
         # store a PDF of the ticket on the translator
         pdf_content = TicketPdf.from_ticket(request, self.ticket)
         self.target.files.append(
-            File(  # type:ignore[misc]
+            File(
                 id=random_token(),
                 name='Ticket.pdf',
                 note='Antrag',
@@ -189,16 +193,16 @@ def grant_accreditation(
 )
 def refuse_accreditation(
     self: Accreditation,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: RequestAccreditationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if self.target is None or self.ticket is None:
         raise exc.HTTPNotFound()
 
     if form.submitted(request):
         self.refuse()
-        request.success(_("Admission refused."))
+        request.success(_('Admission refused.'))
         AccreditationMessage.create(self.ticket, request, 'refused')
         if 'return-to' in request.GET:
             return request.redirect(request.url)

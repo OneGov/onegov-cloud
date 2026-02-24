@@ -5,6 +5,13 @@ $building-icon: '\f0f7';
 $person-icon: '\f2bd';
 $arrow-right: '\f061';
 
+/*
+    hide certain settings
+*/
+.vat-settings {
+    display: none;
+}
+
 .agencies {
     list-style: none;
     margin-left: 0;

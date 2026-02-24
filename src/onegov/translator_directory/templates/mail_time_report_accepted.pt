@@ -1,0 +1,39 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.translator_directory">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p>
+            <span i18n:translate>
+                Your assignment has been approved by the accounting department.
+            </span>
+        </p>
+
+        <p><span class="ticket-number">${ticket.reference(request)}</span></p>
+
+        <p tal:condition="time_report|nothing">
+            <strong i18n:translate>Assignment Date:</strong>
+            ${time_report.assignment_date.strftime('%d.%m.%Y')}
+        </p>
+
+        <p tal:condition="time_report|nothing">
+            <strong i18n:translate>Total Compensation:</strong>
+            CHF ${'{:.2f}'.format(time_report.total_compensation)}
+        </p>
+
+        <p tal:condition="travel_info|nothing">
+            <strong i18n:translate>Travel Distance:</strong><br/>
+            <span i18n:translate>from</span> ${travel_info['from_address']}<br/>
+            <span i18n:translate>to</span> ${travel_info['to_location']}<br/>
+            ${travel_info['one_way_travel_distance']} km
+        </p>
+
+        <p>
+            <a href="${request.link(ticket, 'status')}" i18n:translate>
+                View the time report
+            </a>
+        </p>
+
+    </tal:b>
+</div>

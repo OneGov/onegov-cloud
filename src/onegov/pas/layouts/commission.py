@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.pas import _
-from onegov.pas.collections import CommissionCollection
+from onegov.pas.collections.commission import PASCommissionCollection
 from onegov.pas.layouts.default import DefaultLayout
 
 
-class CommissionCollectionLayout(DefaultLayout):
+class PASCommissionCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
@@ -44,11 +46,11 @@ class CommissionCollectionLayout(DefaultLayout):
         return None
 
 
-class CommissionLayout(DefaultLayout):
+class PASCommissionLayout(DefaultLayout):
 
     @cached_property
-    def collection(self) -> CommissionCollection:
-        return CommissionCollection(self.request.session)
+    def collection(self) -> PASCommissionCollection:
+        return PASCommissionCollection(self.request.session)
 
     @cached_property
     def title(self) -> str:

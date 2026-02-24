@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.org import OrgApp
 from onegov.org.layout import DefaultLayout
@@ -14,9 +16,9 @@ if TYPE_CHECKING:
              permission=Public)
 def view_chat(
     self: ChatCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DefaultLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     return {
         'title': 'Chat',

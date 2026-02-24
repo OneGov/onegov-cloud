@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.landsgemeinde.layouts.agenda import AgendaItemCollectionLayout
 from onegov.landsgemeinde.layouts.agenda import AgendaItemLayout
 from onegov.landsgemeinde.layouts.assembly import AssemblyCollectionLayout

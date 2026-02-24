@@ -6,6 +6,20 @@
         <div class="grid-x grid-padding-x wrapper">
 
             <div class="medium-8 large-7 cell date-range-selector-target content">
+                <div tal:condition="header_html|nothing" class="event-header">
+                    <ul class="accordion" data-accordion data-allow-all-closed="true">
+                        <li class="accordion-item" data-accordion-item>
+                            <a href="#" style="display: flex; align-items: center;">
+                                <tal:b i18n:translate>General information about the event calendar</tal:b>
+                                <i class="fas fa-plus" style="margin-left: auto"></i>
+                            </a>
+                            <div class="accordion-content" data-tab-content>
+                                ${header_html}
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
                 <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model; pagination_centered True" />
                 <div class="grid-x">
                     <div class="large-12 cell">
@@ -13,6 +27,20 @@
                     </div>
                 </div>
                 <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model; pagination_centered True" />
+
+                <div tal:condition="footer_html|nothing" class="event-footer">
+                    <ul class="accordion" data-accordion data-allow-all-closed="true">
+                        <li class="accordion-item" data-accordion-item>
+                            <a href="#" style="display: flex; align-items: center;">
+                                <tal:b i18n:translate>General information about the event calendar</tal:b>
+                                <i class="fas fa-plus" style="margin-left: auto"></i>
+                            </a>
+                            <div class="accordion-content" data-tab-content>
+                                ${footer_html}
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <div class="large-4 medium-4 cell large-offset-1 sidebar occurrence-sidebar">
@@ -79,10 +107,10 @@
                     <div class="side-panel files-panel occurrence-documents" tal:condition="files">
                         <h3 i18n:translate>Documents</h3>
                         <ul class="more-list">
-                            <li tal:repeat="file files">
+                            <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
                                 <a class="list-link" title="${file.name}" href="${request.link(file)}">
                                     <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
-                                    <span class="list-title">${file.name.split('.')[0]}</span>
+                                    <span class="list-title">${layout.get_filename_without_extension(file.name)}</span>
                                 </a>
                             </li>
                         </ul>
@@ -107,6 +135,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </tal:b>
 </div>

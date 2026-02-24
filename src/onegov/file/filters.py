@@ -1,11 +1,18 @@
+from __future__ import annotations
+
+import os
+import shlex
+import logging
 import subprocess
 
 from depot.fields.interfaces import FileFilter
 from depot.io.utils import file_from_content
 from io import BytesIO
+
+from onegov.core.utils import module_path
 from onegov.file.utils import IMAGE_MIME_TYPES, get_image_size
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageOps
 from tempfile import TemporaryDirectory
 
 
@@ -13,6 +20,9 @@ from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRead
     from depot.fields.upload import UploadedFile
+
+
+log = logging.getLogger('onegov.file')
 
 
 class ConditionalFilter(FileFilter):
@@ -24,10 +34,10 @@ class ConditionalFilter(FileFilter):
     def __init__(self, filter: FileFilter):
         self.filter = filter
 
-    def meets_condition(self, uploaded_file: 'UploadedFile') -> bool:
+    def meets_condition(self, uploaded_file: UploadedFile) -> bool:
         raise NotImplementedError
 
-    def on_save(self, uploaded_file: 'UploadedFile') -> None:
+    def on_save(self, uploaded_file: UploadedFile) -> None:
         if self.meets_condition(uploaded_file):
             self.filter.on_save(uploaded_file)
 
@@ -38,7 +48,7 @@ class OnlyIfImage(ConditionalFilter):
 
     """
 
-    def meets_condition(self, uploaded_file: 'UploadedFile') -> bool:
+    def meets_condition(self, uploaded_file: UploadedFile) -> bool:
         return uploaded_file.content_type in IMAGE_MIME_TYPES
 
 
@@ -48,7 +58,7 @@ class OnlyIfPDF(ConditionalFilter):
 
     """
 
-    def meets_condition(self, uploaded_file: 'UploadedFile') -> bool:
+    def meets_condition(self, uploaded_file: UploadedFile) -> bool:
         return uploaded_file.content_type == 'application/pdf'
 
 
@@ -84,7 +94,8 @@ class WithThumbnailFilter(FileFilter):
     ) -> tuple[BytesIO, tuple[str, str]]:
         output = BytesIO()
 
-        thumbnail = Image.open(fp)
+        thumbnail: Image.Image = Image.open(fp)
+        ImageOps.exif_transpose(thumbnail, in_place=True)
         thumbnail.thumbnail(self.size, Image.Resampling.LANCZOS)
         thumbnail = thumbnail.convert('RGBA')
 
@@ -95,7 +106,7 @@ class WithThumbnailFilter(FileFilter):
 
     def store_thumbnail(
         self,
-        uploaded_file: 'UploadedFile',
+        uploaded_file: UploadedFile,
         fp: IO[bytes],
         thumbnail_size: tuple[str, str] | None = None,
     ) -> None:
@@ -114,7 +125,7 @@ class WithThumbnailFilter(FileFilter):
             'size': thumbnail_size
         }
 
-    def on_save(self, uploaded_file: 'UploadedFile') -> None:
+    def on_save(self, uploaded_file: UploadedFile) -> None:
         close, fp = file_from_content(uploaded_file.original_content)
         thumbnail_fp, thumbnail_size = self.generate_thumbnail(fp)
         self.store_thumbnail(uploaded_file, thumbnail_fp, thumbnail_size)
@@ -135,17 +146,17 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
 
     downscale_factor = 4
 
-    def generate_preview(self, fp: 'SupportsRead[bytes]') -> BytesIO:
+    def generate_preview(self, fp: SupportsRead[bytes]) -> BytesIO:
         with TemporaryDirectory() as directory:
             path = Path(directory)
 
             pdf_input = path / 'input.pdf'
-            png_output = path / "preview.png"
+            png_output = path / 'preview.png'
 
             with pdf_input.open('wb') as pdf:
                 pdf.write(fp.read())
 
-            process = subprocess.run((
+            process = subprocess.run((  # nosec:B603
                 'gs',
 
                 # disable read/writes outside of the given files
@@ -173,7 +184,7 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
 
                 # output to png
                 '-sDEVICE=png16m',
-                f'-sOutputFile={png_output}',
+                '-sOutputFile={}'.format(shlex.quote(str(png_output))),
 
                 # from pdf
                 str(pdf_input)
@@ -186,9 +197,22 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
 
     def generate_thumbnail(
         self,
-        fp: 'SupportsRead[bytes]'
+        fp: SupportsRead[bytes]
     ) -> tuple[BytesIO, tuple[str, str]]:
         # FIXME: This is kinda slow. We should be able to render the
         #        PDF directly at the thumbnail size. Maybe we should
         #        use pdf2image rather than roll our own?
-        return super().generate_thumbnail(self.generate_preview(fp))
+        try:
+            return super().generate_thumbnail(self.generate_preview(fp))
+        except Exception as e:
+            log.warning(f'Thumbnail generation failed: {e!s}')
+            fallback = BytesIO()
+            icon_path = (
+                    module_path('onegov.org', 'static/pdf_preview')
+                    + os.sep
+                    + 'thumbnail_medium_pdf_preview_fallback.png'
+            )
+            with open(icon_path, 'rb') as f:
+                fallback.write(f.read())
+            fallback.seek(0)
+            return super().generate_thumbnail(fallback)

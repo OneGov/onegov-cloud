@@ -1,8 +1,10 @@
-from typing import overload, TypeVar, TYPE_CHECKING
+from __future__ import annotations
+
+from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-_T = TypeVar('_T')
+_F = TypeVar('_F', bound='Callable[..., Any]')
 
 
 class DuplicatedStepError(Exception):
@@ -49,13 +51,13 @@ class Step:
         self.cls_after = cls_after
         self.cls_before = cls_before
 
-    def __lt__(self, other: 'Step') -> bool:
+    def __lt__(self, other: Step) -> bool:
         return (
             other.cls_before == self.origin
             and other.position - 1 == self.position
         )
 
-    def __gt__(self, other: 'Step') -> bool:
+    def __gt__(self, other: Step) -> bool:
         return (
             self.cls_before == other.origin
             and self.position - 1 == other.position
@@ -70,7 +72,7 @@ class Step:
 
     def __repr__(self) -> str:
         return (
-            f'Step({self.position}, {str(self.title)}, '
+            f'Step({self.position}, {self.title!s}, '
             f'cls_after={self.cls_after}, cls_before={self.cls_before})'
         )
 
@@ -150,7 +152,7 @@ class StepSequenceRegistry:
                     f'{prev_step.position - 1} not registered'
                 )
 
-        steps = list(reversed(steps))
+        steps.reverse()
         steps.append(step)
 
         next_step = step
@@ -171,12 +173,12 @@ class StepSequenceRegistry:
         return steps
 
     def register(
-            self,
-            cls_name: str,
-            position: int,
-            title: str | None = None,
-            cls_before: str | None = None,
-            cls_after: str | None = None
+        self,
+        cls_name: str,
+        position: int,
+        title: str | None = None,
+        cls_before: str | None = None,
+        cls_after: str | None = None
     ) -> Step:
         """ Registers a step by its position, and the class names that come
         before and after. """
@@ -199,7 +201,7 @@ class StepSequenceRegistry:
         title: str | None = None,
         cls_before: str | None = None,
         cls_after: str | None = None
-    ) -> 'Callable[[type[_T]], type[_T]]':
+    ) -> Callable[[_F], _F]:
 
         """ A decorator to register part of a full step sequence.
 
@@ -211,7 +213,7 @@ class StepSequenceRegistry:
                 pass
 
         """
-        def wrapper(model_class: type[_T]) -> type[_T]:
+        def wrapper(model_class: _F) -> _F:
             self.register(
                 title=title,
                 position=position,

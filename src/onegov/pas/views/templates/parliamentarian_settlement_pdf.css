@@ -1,0 +1,93 @@
+@page {
+    size: A4;
+    margin: 6cm 0.75cm 2cm 3cm;  /* top right bottom left */
+    @top-right {
+        content: "Staatskanzlei";
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 8pt;
+    }
+}
+
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 7pt;
+    line-height: 1.0;
+}
+
+.first-line {
+    font-size: 7pt;
+    text-decoration: underline;
+    margin-left: 0;
+    margin-bottom: 0.2cm;
+}
+
+.address {
+    margin-left: 0;
+    margin-bottom: 0.5cm;
+    font-size: 8pt;
+    line-height: 1.4;
+}
+
+.date {
+    margin-left: 0;
+    margin-bottom: 2cm;
+    font-size: 8pt;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: auto;
+    white-space: nowrap;
+}
+
+.col-types {
+    background-color: #d5d7d9;
+}
+
+.header-row td {
+    background-color: #d5d7d9;
+    font-weight: bold;
+}
+
+/* Makes the text sit on the line of the cell.
+Workaround for `vertical-align` not working. */
+table td th {
+    padding-top: 7pt;
+    padding-bottom: 1pt;
+}
+
+th, td {
+    padding: 2pt;
+    border: 1pt solid #000;
+}
+
+/* Column widths for main table */
+.first-table td:first-child { width: 20%; }
+.first-table td:nth-child(2) { width: 50%; } /* Type  */
+.first-table td:nth-child(3) { width: 15%; }  /* Value column */
+.first-table td:last-child { width: 15%; }    /* CHF column */
+
+.parliamentarian-summary-table td:first-child { width: 70%; }
+.parliamentarian-summary-table td:nth-child(2) { width: 15%; }
+.parliamentarian-summary-table td:last-child { width: 15%; }
+
+.numeric { text-align: right; }
+
+.first-table tr:nth-child(2) td {
+    background-color: #d5d7d9;
+}
+
+.first-table tr:nth-child(even):not(.total-row) td {
+    background-color: #f3f3f3;
+}
+
+.parliamentarian-summary-table {
+    page-break-inside: avoid;
+    margin-top: 1cm;
+}
+
+.parliamentarian-summary-table td {
+    font-weight: bold;
+    background-color: #d5d7d9;
+}

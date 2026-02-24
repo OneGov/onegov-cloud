@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.chat.models import TextModule
 from onegov.core.collection import GenericCollection
 from sqlalchemy import or_
@@ -12,7 +14,7 @@ class TextModuleCollection(GenericCollection[TextModule]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         type: str = '*',
         handler: str = 'ALL',
         owner: str = '*'
@@ -26,7 +28,7 @@ class TextModuleCollection(GenericCollection[TextModule]):
     def model_class(self) -> type[TextModule]:
         return TextModule
 
-    def query(self) -> 'Query[TextModule]':
+    def query(self) -> Query[TextModule]:
         query = super().query()
 
         if self.owner != '*':

@@ -1,4 +1,5 @@
 """ Contains the models describing files and images. """
+from __future__ import annotations
 
 import sedate
 
@@ -11,21 +12,23 @@ from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
 from onegov.file import SearchableFile
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
+from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
-from operator import itemgetter
+from operator import attrgetter, itemgetter
 from sedate import standardize_date, utcnow
-from sqlalchemy import asc, desc, select, nullslast  # type: ignore
+from sqlalchemy import asc, desc, select, nullslast
 
 from typing import (
     overload, Any, Generic, Literal, NamedTuple, TypeVar, TYPE_CHECKING)
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
+    from sqlalchemy.engine import Result
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import Select
-    from typing_extensions import Self
+    from typing import Self
 
     _T = TypeVar('_T')
     _RowT = TypeVar('_RowT')
@@ -61,7 +64,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
     def get_date_intervals(
         self,
         today: datetime
-    ) -> 'Iterator[DateInterval]':
+    ) -> Iterator[DateInterval]:
 
         today = standardize_date(today, 'UTC')
         month_end = today + relativedelta(day=31)
@@ -70,12 +73,12 @@ class GroupFilesByDateMixin(Generic[FileT]):
         in_distant_future = next_month_start + relativedelta(years=100)
 
         yield DateInterval(
-            name=_("In future"),
+            name=_('In future'),
             start=next_month_start,
             end=in_distant_future)
 
         yield DateInterval(
-            name=_("This month"),
+            name=_('This month'),
             start=month_start,
             end=month_end)
 
@@ -83,7 +86,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
         last_month_start = month_start - relativedelta(months=1)
 
         yield DateInterval(
-            name=_("Last month"),
+            name=_('Last month'),
             start=last_month_start,
             end=last_month_end)
 
@@ -93,7 +96,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
                 month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
 
             yield DateInterval(
-                name=_("This year"),
+                name=_('This year'),
                 start=this_year_start,
                 end=this_year_end)
         else:
@@ -106,7 +109,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
             month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
 
         yield DateInterval(
-            name=_("Last year"),
+            name=_('Last year'),
             start=last_year_start,
             end=last_year_end)
 
@@ -114,49 +117,49 @@ class GroupFilesByDateMixin(Generic[FileT]):
         older_start = datetime(2000, 1, 1, tzinfo=today.tzinfo)
 
         yield DateInterval(
-            name=_("Older"),
+            name=_('Older'),
             start=older_start,
             end=older_end)
 
     @overload
     def query_intervals(
         self,
-        intervals: 'Iterable[DateInterval]',
-        before_filter: 'Callable[[Query[FileT]], Query[_RowT]]',
-        process: 'Callable[[_RowT], _T]'
-    ) -> 'Iterator[tuple[str, _T]]': ...
+        intervals: Iterable[DateInterval],
+        before_filter: Callable[[Query[FileT]], Query[_RowT]],
+        process: Callable[[_RowT], _T]
+    ) -> Iterator[tuple[str, _T]]: ...
 
     @overload
     def query_intervals(
         self,
-        intervals: 'Iterable[DateInterval]',
+        intervals: Iterable[DateInterval],
         before_filter: None,
-        process: 'Callable[[FileT], _T]'
-    ) -> 'Iterator[tuple[str, _T]]': ...
+        process: Callable[[FileT], _T]
+    ) -> Iterator[tuple[str, _T]]: ...
 
     @overload
     def query_intervals(
         self,
-        intervals: 'Iterable[DateInterval]',
+        intervals: Iterable[DateInterval],
         before_filter: None = None,
         *,
-        process: 'Callable[[FileT], _T]'
-    ) -> 'Iterator[tuple[str, _T]]': ...
+        process: Callable[[FileT], _T]
+    ) -> Iterator[tuple[str, _T]]: ...
 
     @overload
     def query_intervals(
         self,
-        intervals: 'Iterable[DateInterval]',
-        before_filter: 'Callable[[Query[FileT]], Query[Any]] | None' = None,
+        intervals: Iterable[DateInterval],
+        before_filter: Callable[[Query[FileT]], Query[Any]] | None = None,
         process: None = None
-    ) -> 'Iterator[tuple[str, Any]]': ...
+    ) -> Iterator[tuple[str, Any]]: ...
 
     def query_intervals(
         self,
-        intervals: 'Iterable[DateInterval]',
-        before_filter: 'Callable[[Query[FileT]], Query[Any]] | None' = None,
-        process: 'Callable[[Any], Any] | None' = None
-    ) -> 'Iterator[tuple[str, Any]]':
+        intervals: Iterable[DateInterval],
+        before_filter: Callable[[Query[FileT]], Query[Any]] | None = None,
+        process: Callable[[Any], Any] | None = None
+    ) -> Iterator[tuple[str, Any]]:
 
         base_query = self.query().order_by(desc(File.created))
 
@@ -176,14 +179,14 @@ class GroupFilesByDateMixin(Generic[FileT]):
         self,
         today: datetime | None = None,
         id_only: Literal[True] = True
-    ) -> 'groupby[str, tuple[str, str]]': ...
+    ) -> groupby[str, tuple[str, str]]: ...
 
     @overload
     def grouped_by_date(
         self,
         today: datetime | None,
         id_only: Literal[False]
-    ) -> 'groupby[str, tuple[str, FileT]]': ...
+    ) -> groupby[str, tuple[str, FileT]]: ...
 
     @overload
     def grouped_by_date(
@@ -191,13 +194,13 @@ class GroupFilesByDateMixin(Generic[FileT]):
         today: datetime | None = None,
         *,
         id_only: Literal[False]
-    ) -> 'groupby[str, tuple[str, FileT]]': ...
+    ) -> groupby[str, tuple[str, FileT]]: ...
 
     def grouped_by_date(
         self,
         today: datetime | None = None,
         id_only: bool = True
-    ) -> 'groupby[str, tuple[str, FileT | str]]':
+    ) -> groupby[str, tuple[str, FileT | str]]:
         """ Returns all files grouped by natural language dates.
 
         By default, only ids are returned, as this is enough to build the
@@ -211,10 +214,10 @@ class GroupFilesByDateMixin(Generic[FileT]):
 
         files: Iterator[tuple[str, str | FileT]]
         if id_only:
-            def before_filter(query: 'Query[FileT]') -> 'Query[IdRow]':
+            def before_filter(query: Query[FileT]) -> Query[IdRow]:
                 return query.with_entities(File.id)
 
-            def process(result: 'IdRow') -> str:
+            def process(result: IdRow) -> str:
                 return result.id
 
             files = self.query_intervals(intervals, before_filter, process)
@@ -230,9 +233,12 @@ class GroupFilesByDateMixin(Generic[FileT]):
 class GeneralFile(File, SearchableFile):
     __mapper_args__ = {'polymorphic_identity': 'general'}
 
+    fts_type_title = _('Files')
+
     #: the access of all the linked models
-    linked_accesses: dict_property[dict[str, str]]
-    linked_accesses = meta_property(default=dict)
+    linked_accesses: dict_property[dict[str, str]] = (
+        meta_property(default=dict)
+    )
 
     @property
     def access(self) -> str:
@@ -246,10 +252,6 @@ class GeneralFile(File, SearchableFile):
 
         return widest_access(*self.linked_accesses.values())
 
-    @property
-    def es_public(self) -> bool:
-        return self.published and self.access == 'public'
-
 
 class ImageFile(File):
     __mapper_args__ = {'polymorphic_identity': 'image'}
@@ -258,30 +260,53 @@ class ImageFile(File):
 class ImageSet(FileSet, AccessExtension, ORMSearchable):
     __mapper_args__ = {'polymorphic_identity': 'image'}
 
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'}
+    fts_type_title = _('Photo Albums')
+    fts_public = True
+    fts_title_property = 'title'
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'}
     }
-
-    @property
-    def es_public(self) -> bool:
-        return self.access == 'public'
-
-    @property
-    def es_suggestions(self) -> dict[str, list[str]]:
-        return {
-            "input": [self.title.lower()]
-        }
 
     lead: dict_property[str | None] = meta_property()
     view: dict_property[str | None] = meta_property()
 
+    order: dict_property[str] = meta_property(default='by-last-change')
+    order_direction: dict_property[str] = meta_property(default='desc')
+
     show_images_on_homepage: dict_property[bool | None] = meta_property()
+
+    @property
+    def ordered_files(self) -> list[File]:
+        if self.order == 'by-last-change':
+            # the files are already sorted, since this relationship
+            # is sorted by last change in descending order
+            if self.order_direction == 'desc':
+                return self.files
+            else:
+                return [*reversed(self.files)]
+
+        sort_key: Callable[[File], str]
+        if self.order == 'by-name':
+            sort_key = attrgetter('name')
+        elif self.order == 'by-caption':
+            # we can't use attrgetter since note is nullable
+            def sort_key(file: File) -> str:
+                return file.note or ''
+        else:
+            raise AssertionError('unreachable')
+
+        # for the rest we sort by attribute name
+        return sorted(
+            self.files,
+            key=sort_key,
+            reverse=self.order_direction == 'desc'
+        )
 
 
 class ImageSetCollection(FileSetCollection[ImageSet]):
 
-    def __init__(self, session: 'Session') -> None:
+    def __init__(self, session: Session) -> None:
         super().__init__(session, type='image')
 
 
@@ -290,7 +315,7 @@ class GeneralFileCollection(
     GroupFilesByDateMixin[GeneralFile]
 ):
 
-    supported_content_types = 'all'
+    supported_content_types = WhitelistedMimeType.whitelist
 
     file_list = as_selectable("""
         SELECT
@@ -307,7 +332,7 @@ class GeneralFileCollection(
         WHERE type = 'general'
     """)
 
-    def __init__(self, session: 'Session', order_by: str = 'name') -> None:
+    def __init__(self, session: Session, order_by: str = 'name') -> None:
         super().__init__(session, type='general', allow_duplicates=False)
 
         self.order_by = order_by
@@ -315,7 +340,7 @@ class GeneralFileCollection(
 
         self._last_interval: DateInterval | None = None
 
-    def for_order(self, order: str) -> 'Self':
+    def for_order(self, order: str) -> Self:
         return self.__class__(self.session, order_by=order)
 
     @cached_property
@@ -323,8 +348,8 @@ class GeneralFileCollection(
         return tuple(self.get_date_intervals(today=sedate.utcnow()))
 
     @property
-    def statement(self) -> 'Select':
-        stmt = select(self.file_list.c)
+    def statement(self) -> Select[FileRow]:
+        stmt = select(*self.file_list.c)
 
         if self.order_by == 'name':
             order = self.file_list.c.order
@@ -340,12 +365,12 @@ class GeneralFileCollection(
         return stmt.order_by(nullslast(direction(order)))
 
     @property
-    def files(self) -> 'Query[FileRow]':
+    def files(self) -> Result[FileRow]:
         return self.session.execute(self.statement)
 
-    def group(self, record: 'FileRow') -> str:
+    def group(self, record: FileRow) -> str:
 
-        def get_first_character(record: 'FileRow') -> str:
+        def get_first_character(record: FileRow) -> str:
             if record.order[0].isdigit():
                 return '0-9'
             return record.order[0].upper()
@@ -364,16 +389,16 @@ class GeneralFileCollection(
                     if interval.start <= record.upload_date <= interval.end:
                         break
                 else:
-                    return _("Older")
+                    return _('Older')
             elif self.order_by == 'publish_end_date':
                 for interval in intervals:
                     if not record.publish_end_date:
-                        return _("None")
+                        return _('None')
                     if (interval.start <= record.publish_end_date
                             <= interval.end):
                         break
                 else:
-                    return _("Older")
+                    return _('Older')
 
             # this method is usually called for each item in a sorted set,
             # we optimise for that by caching the last matching interval
@@ -397,5 +422,5 @@ class BaseImageFileCollection(
 
 class ImageFileCollection(BaseImageFileCollection[ImageFile]):
 
-    def __init__(self, session: 'Session') -> None:
+    def __init__(self, session: Session) -> None:
         super().__init__(session, type='image', allow_duplicates=False)

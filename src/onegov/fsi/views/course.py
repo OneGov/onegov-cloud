@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private, Secret, Personal
 from onegov.core.templates import render_template
 from onegov.fsi import FsiApp
@@ -26,10 +28,10 @@ if TYPE_CHECKING:
 def handle_send_invitation_email(
     self: CourseInvitationTemplate,
     course: Course,
-    request: 'FsiRequest',
-    recipients: 'Collection[str]',
+    request: FsiRequest,
+    recipients: Collection[str],
     cc_to_sender: bool = True
-) -> 'FsiRequest':
+) -> FsiRequest:
     """Recipients must be a list of emails"""
 
     if not recipients:
@@ -46,7 +48,7 @@ def handle_send_invitation_email(
 
     errors = []
 
-    def email_iter() -> 'Iterator[EmailJsonDict]':
+    def email_iter() -> Iterator[EmailJsonDict]:
         for email in recipients:
 
             attendee = request.session.query(
@@ -102,8 +104,8 @@ def handle_send_invitation_email(
 )
 def view_email_preview_for_course(
     self: Course,
-    request: 'FsiRequest'
-) -> 'RenderData':
+    request: FsiRequest
+) -> RenderData:
 
     mail_layout = CourseInviteMailLayout(self, request)
 
@@ -124,8 +126,8 @@ def view_email_preview_for_course(
 )
 def view_course_collection(
     self: CourseCollection,
-    request: 'FsiRequest'
-) -> 'RenderData':
+    request: FsiRequest
+) -> RenderData:
     layout = CourseCollectionLayout(self, request)
     return {
         'layout': layout,
@@ -142,17 +144,18 @@ def view_course_collection(
 )
 def view_add_course_event(
     self: CourseCollection,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: CourseForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         course = self.add(**form.get_useful_data())
-        request.success(_("Added a new course"))
+        request.success(_('Added a new course'))
         return request.redirect(request.link(course))
 
     layout = AddCourseLayout(self, request)
     layout.include_editor()
+    layout.edit_mode = True
     return {
         'layout': layout,
         'model': self,
@@ -165,7 +168,7 @@ def view_add_course_event(
     template='course.pt',
     permission=Personal
 )
-def view_course_event(self: Course, request: 'FsiRequest') -> 'RenderData':
+def view_course_event(self: Course, request: FsiRequest) -> RenderData:
     layout = CourseLayout(self, request)
     return {
         'layout': layout,
@@ -179,7 +182,7 @@ def view_course_event(self: Course, request: 'FsiRequest') -> 'RenderData':
     permission=Personal,
     name='content-json'
 )
-def get_course_event_content(self: Course, request: 'FsiRequest') -> str:
+def get_course_event_content(self: Course, request: FsiRequest) -> str:
     return self.description_html
 
 
@@ -192,14 +195,14 @@ def get_course_event_content(self: Course, request: 'FsiRequest') -> str:
 )
 def view_edit_course_event(
     self: Course,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: CourseForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.update_model(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     if not form.errors:
@@ -225,9 +228,9 @@ def view_edit_course_event(
 )
 def invite_attendees_for_event(
     self: Course,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: InviteCourseForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         recipients = form.get_useful_data()
@@ -257,7 +260,7 @@ def invite_attendees_for_event(
     request_method='DELETE',
     permission=Secret
 )
-def delete_course(self: Course, request: 'FsiRequest') -> None:
+def delete_course(self: Course, request: FsiRequest) -> None:
     request.assert_valid_csrf_token()
     if not request.session.query(self.events.exists()).scalar():
         CourseCollection(request.session).delete(self)

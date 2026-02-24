@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import or_
 
 from onegov.core.collection import Pagination, GenericCollection
@@ -8,7 +10,7 @@ from onegov.user import User
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
@@ -19,7 +21,7 @@ class CourseAttendeeCollection(
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
         exclude_external: bool = False,
         external_only: bool = False,
@@ -66,7 +68,7 @@ class CourseAttendeeCollection(
             return self.auth_attendee.permissions or []
         return []
 
-    def query(self) -> 'Query[CourseAttendee]':
+    def query(self) -> Query[CourseAttendee]:
 
         query = super().query()
         query = query.order_by(
@@ -93,14 +95,14 @@ class CourseAttendeeCollection(
 
         return query
 
-    def subset(self) -> 'Query[CourseAttendee]':
+    def subset(self) -> Query[CourseAttendee]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session, index,
             exclude_external=self.exclude_external,
@@ -120,7 +122,7 @@ class CourseAttendeeCollection(
 
     def by_id(
         self,
-        id: 'UUID'  # type:ignore[override]
+        id: UUID  # type:ignore[override]
     ) -> CourseAttendee | None:
         # FIXME: Is this super() call intentional? This means we don't actually
         #        respect all of our filters for this method...

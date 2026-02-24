@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
@@ -19,7 +21,7 @@ class AssemblyCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _('Assemblies')
+        return _('Archive')
 
     @cached_property
     def og_description(self) -> str:
@@ -40,7 +42,7 @@ class AssemblyCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Assembly'),
+                            text=self.assembly_type,
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-form'}
                         ),
@@ -74,7 +76,7 @@ class AssemblyLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
-                _('Assemblies'),
+                self.assembly_type_plural,
                 self.request.link(self.assembly_collection())
             ),
             Link(self.title, self.request.link(self.model))
@@ -108,9 +110,12 @@ class AssemblyLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _('Do you really want to delete this assembly?'),
+                            _('Do you really want to delete this '
+                              '${assembly_type}?',
+                              mapping={'assembly_type': self.assembly_type}),
                             _('This cannot be undone.'),
-                            _('Delete assembly'),
+                            _('Delete ${assembly_type}',
+                              mapping={'assembly_type': self.assembly_type}),
                             _('Cancel')
                         ),
                         Intercooler(
@@ -129,6 +134,11 @@ class AssemblyLayout(DefaultLayout):
                             url=self.request.link(items, 'new'),
                             attrs={'class': 'check-list-link'}
                         ),
+                        Link(
+                            text=_('ZIP Upload'),
+                            url=self.request.link(items, 'new-import'),
+                            attrs={'class': 'ticket-archive'}
+                        ),
                     ]
                 )
             ]
@@ -137,12 +147,12 @@ class AssemblyLayout(DefaultLayout):
 
 class AssemblyTickerLayout(DefaultLayout):
 
-    model: 'Assembly'
+    model: Assembly
 
     def __init__(
         self,
-        model: 'Assembly',
-        request: 'LandsgemeindeRequest'
+        model: Assembly,
+        request: LandsgemeindeRequest
     ) -> None:
 
         super().__init__(model, request)

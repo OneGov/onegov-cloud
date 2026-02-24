@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from markupsafe import escape, Markup
 from sqlalchemy.types import TypeDecorator, TEXT
 
@@ -5,12 +7,9 @@ from sqlalchemy.types import TypeDecorator, TEXT
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.engine.interfaces import Dialect
-    _Base = TypeDecorator[Markup]
-else:
-    _Base = TypeDecorator
 
 
-class MarkupText(_Base):
+class MarkupText(TypeDecorator[Markup]):
     """ Text column that contains HTML/XML markup. """
 
     impl = TEXT
@@ -20,15 +19,15 @@ class MarkupText(_Base):
     def process_bind_param(
         self,
         value: str | None,
-        dialect: 'Dialect'
+        dialect: Dialect
     ) -> Markup | None:
 
         return None if value is None else escape(value)
 
-    def process_literal_param(
+    def process_literal_param(  # type: ignore[override]
         self,
         value: str | None,
-        dialect: 'Dialect'
+        dialect: Dialect
     ) -> Markup | None:
 
         return None if value is None else escape(value)
@@ -36,7 +35,7 @@ class MarkupText(_Base):
     def process_result_value(
         self,
         value: str | None,
-        dialect: 'Dialect'
+        dialect: Dialect
     ) -> Markup | None:
 
         # NOTE: It would be safer to sanitize the text, in case someone
@@ -45,4 +44,4 @@ class MarkupText(_Base):
         #       also add a ton of static overhead. If we decide we want
         #       the additional safety, we should use an approach like
         #       OCQMS' lazy Sanitized text type.
-        return None if value is None else Markup(value)  # noqa: MS001
+        return None if value is None else Markup(value)  # nosec: B704

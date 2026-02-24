@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import FileImportError
 
@@ -11,12 +13,12 @@ if TYPE_CHECKING:
 def unsupported_year_error(year: int) -> FileImportError:
     return FileImportError(
         _(
-            "The year ${year} is not yet supported", mapping={'year': year}
+            'The year ${year} is not yet supported', mapping={'year': year}
         )
     )
 
 
-def set_locale(request: 'ElectionDayRequest') -> None:
+def set_locale(request: ElectionDayRequest) -> None:
     """ Sets the locale of the request by the Accept-Language header. """
 
     locale = request.headers.get('Accept-Language') or 'en'
@@ -26,7 +28,7 @@ def set_locale(request: 'ElectionDayRequest') -> None:
 
 def translate_errors(
     errors: dict[str, list[Any]],
-    request: 'ElectionDayRequest'
+    request: ElectionDayRequest
 ) -> None:
 
     """ Translates and interpolates the given error messages. """

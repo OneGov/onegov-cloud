@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import ActivityCollection
 from onegov.core.security import Public, Private
 from onegov.core.utils import Bunch
@@ -9,12 +11,18 @@ from onegov.feriennet.security import has_private_permission_occasions
 from onegov.feriennet.security import is_owner
 
 
-def test_is_owner():
-    assert not is_owner(username=None, activity=Bunch(username=None))
-    assert is_owner(username='xy', activity=Bunch(username='xy'))
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from .conftest import Scenario
 
 
-def test_activity_query_policy(session, scenario):
+def test_is_owner() -> None:
+    assert not is_owner(username=None, activity=Bunch(username=None))  # type: ignore[arg-type]
+    assert is_owner(username='xy', activity=Bunch(username='xy'))  # type: ignore[arg-type]
+
+
+def test_activity_query_policy(session: Session, scenario: Scenario) -> None:
     scenario.add_period()
     scenario.add_user(username='steven', password='hunter2', role='editor')
     scenario.add_user(username='leland', password='hunter2', role='editor')
@@ -103,13 +111,13 @@ def test_activity_query_policy(session, scenario):
     assert policy.granted_subset(collection.query()).count() == 0
 
 
-def test_activity_permission_anonymous():
+def test_activity_permission_anonymous() -> None:
 
-    def has_permission(state):
+    def has_permission(state: str) -> bool:
         return has_public_permission_not_logged_in(
-            app=None,
+            app=None,  # type: ignore[arg-type]
             identity=None,
-            model=Bunch(state=state),
+            model=Bunch(state=state),  # type: ignore[arg-type]
             permission=Public
         )
 
@@ -120,13 +128,13 @@ def test_activity_permission_anonymous():
     assert not has_permission('archived')
 
 
-def test_activity_permission():
+def test_activity_permission() -> None:
 
-    def has_permission(owner, user, role, state):
+    def has_permission(owner: str, user: str, role: str, state: str) -> bool:
         return has_public_permission_logged_in(
-            app=None,
-            identity=Bunch(userid=user, role=role),
-            model=Bunch(state=state, username=owner),
+            app=None,  # type: ignore[arg-type]
+            identity=Bunch(userid=user, role=role),  # type: ignore[arg-type]
+            model=Bunch(state=state, username=owner),  # type: ignore[arg-type]
             permission=Public
         )
 
@@ -159,21 +167,31 @@ def test_activity_permission():
     assert not has_permission('owner', 'owner', 'member', 'archived')
 
 
-def test_editor_permissions():
+def test_editor_permissions() -> None:
 
-    def has_activity_permission(owner, user, role, state):
+    def has_activity_permission(
+        owner: str,
+        user: str,
+        role: str,
+        state: str
+    ) -> bool:
         return has_private_permission_activities(
-            app=None,
-            identity=Bunch(userid=user, role=role),
-            model=Bunch(state=state, username=owner),
+            app=None,  # type: ignore[arg-type]
+            identity=Bunch(userid=user, role=role),  # type: ignore[arg-type]
+            model=Bunch(state=state, username=owner),  # type: ignore[arg-type]
             permission=Private
         )
 
-    def has_occasion_permission(owner, user, role, state):
+    def has_occasion_permission(
+        owner: str,
+        user: str,
+        role: str,
+        state: str
+    ) -> bool:
         return has_private_permission_occasions(
-            app=None,
-            identity=Bunch(userid=user, role=role),
-            model=Bunch(activity=Bunch(
+            app=None,  # type: ignore[arg-type]
+            identity=Bunch(userid=user, role=role),  # type: ignore[arg-type]
+            model=Bunch(activity=Bunch(  # type: ignore[arg-type]
                 state=state,
                 username=owner
             )),

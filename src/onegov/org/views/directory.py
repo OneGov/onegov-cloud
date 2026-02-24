@@ -1,10 +1,12 @@
-from itertools import groupby
+from __future__ import annotations
+
 import re
 
 import morepath
 import transaction
 
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
+from decimal import Decimal
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
@@ -49,6 +51,7 @@ from typing import cast, Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence, Iterator
     from onegov.core.types import JSON_ro, RenderData, EmailJsonDict
+    from onegov.directory.migration import DirectoryMigration
     from onegov.directory.models.directory import DirectoryEntryForm
     from onegov.org.models.directory import ExtendedDirectoryEntryForm
     from onegov.org.request import OrgRequest
@@ -61,15 +64,15 @@ if TYPE_CHECKING:
 
 def get_directory_form_class(
     model: object,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[DirectoryForm]:
     return ExtendedDirectory().with_content_extensions(DirectoryForm, request)
 
 
 def get_directory_entry_form_class(
     model: ExtendedDirectoryEntry,
-    request: 'OrgRequest'
-) -> type['DirectoryEntryForm']:
+    request: OrgRequest
+) -> type[DirectoryEntryForm]:
 
     form_class = ExtendedDirectoryEntry().with_content_extensions(
         model.directory.form_class, request)
@@ -78,8 +81,8 @@ def get_directory_entry_form_class(
         form_class  # type:ignore
     ):
         internal_notes = TextAreaField(
-            label=_("Internal Notes"),
-            fieldset=_("Administrative"),
+            label=_('Internal Notes'),
+            fieldset=_('Administrative'),
             render_kw={'rows': 7}
         )
 
@@ -95,7 +98,8 @@ def get_directory_entry_form_class(
             if model.directory.enable_map == 'no':
                 self.delete_field('coordinates')
 
-            if not model.directory.enable_publication and not request.is_admin:
+            if (not model.directory.enable_publication and
+                    not request.is_manager):
                 self.delete_field('publication_start')
                 self.delete_field('publication_end')
             elif model.directory.required_publication:
@@ -115,15 +119,15 @@ def get_directory_entry_form_class(
 
 def get_submission_form_class(
     model: ExtendedDirectoryEntry,
-    request: 'OrgRequest'
-) -> type['ExtendedDirectoryEntryForm']:
+    request: OrgRequest
+) -> type[ExtendedDirectoryEntryForm]:
     return model.directory.form_class_for_submissions(change_request=False)
 
 
 def get_change_request_form_class(
     model: ExtendedDirectoryEntry,
-    request: 'OrgRequest'
-) -> type['ExtendedDirectoryEntryForm']:
+    request: OrgRequest
+) -> type[ExtendedDirectoryEntryForm]:
     return model.directory.form_class_for_submissions(change_request=True)
 
 
@@ -133,12 +137,12 @@ def get_change_request_form_class(
     permission=Public)
 def view_directories(
     self: DirectoryCollection[Any],
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DirectoryCollectionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     return {
-        'title': _("Directories"),
+        'title': _('Directories'),
         'layout': layout or DirectoryCollectionLayout(self, request),
         'directories': request.exclude_invisible(self.query()),
         'link': lambda directory: request.link(
@@ -153,7 +157,7 @@ def view_directories(
 @OrgApp.view(model=Directory, permission=Public)
 def view_directory_redirect(
     self: Directory,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> Response:
     return request.redirect(request.class_link(
         ExtendedDirectoryEntryCollection, {'directory_name': self.name}
@@ -164,36 +168,36 @@ def view_directory_redirect(
              permission=Secret, form=get_directory_form_class)
 def handle_new_directory(
     self: DirectoryCollection[Any],
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: DirectoryForm,
     layout: DirectoryCollectionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         try:
             directory = self.add_by_form(form, properties=('configuration', ))
         except DuplicateEntryError as e:
-            request.alert(_("The entry ${name} exists twice", mapping={
+            request.alert(_('The entry ${name} exists twice', mapping={
                 'name': e.name
             }))
             transaction.abort()
             return request.redirect(request.link(self))
 
-        request.success(_("Added a new directory"))
+        request.success(_('Added a new directory'))
         return request.redirect(
             request.link(ExtendedDirectoryEntryCollection(directory)))
 
     layout = layout or DirectoryCollectionLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Directories"), request.link(self)),
-        Link(_("New"), request.link(self, name='new'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Directories'), request.link(self)),
+        Link(_('New'), request.link(self, name='new'))
     ]
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New Directory"),
+        'title': _('New Directory'),
         'form': form,
         'form_width': 'huge',
     }
@@ -204,10 +208,10 @@ def handle_new_directory(
              form=get_directory_form_class)
 def handle_edit_directory(
     self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: DirectoryForm,
     layout: DirectoryCollectionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     migration = None
     error = None
@@ -227,18 +231,18 @@ def handle_edit_directory(
                     if not migration.possible:
                         save_changes = False
                         request.alert(_(
-                            "The requested change cannot be performed, "
-                            "as it is incompatible with existing entries"
+                            'The requested change cannot be performed, '
+                            'as it is incompatible with existing entries'
                         ))
+                        alert_migration_errors(migration, request)
                     else:
                         if not request.params.get('confirm'):
                             form.action += '&confirm=1'
                             save_changes = False
 
             if save_changes:
-                form.populate_obj(self.directory)
-
                 try:
+                    form.populate_obj(self.directory)
                     self.session.flush()
                 except ValidationError as e:
                     error = e
@@ -251,35 +255,35 @@ def handle_edit_directory(
                     )
                     transaction.abort()
                 else:
-                    request.success(_("Your changes were saved"))
+                    request.success(_('Your changes were saved'))
                     return request.redirect(request.link(self))
 
         elif not request.POST:
             form.process(obj=self.directory)
     except InvalidFormSyntax as e:
         request.warning(
-            _("Syntax Error in line ${line}", mapping={'line': e.line})
+            _('Syntax Error in line ${line}', mapping={'line': e.line})
         )
     except AttributeError:
-        request.warning(_("Syntax error in form"))
+        request.warning(_('Syntax error in form'))
 
     except MixedTypeError as e:
         request.warning(
-            _("Syntax error in field ${field_name}",
+            _('Syntax error in field ${field_name}',
               mapping={'field_name': e.field_name})
         )
     except DuplicateLabelError as e:
         request.warning(
-            _("Error: Duplicate label ${label}", mapping={'label': e.label})
+            _('Error: Duplicate label ${label}', mapping={'label': e.label})
         )
 
     layout = layout or DirectoryCollectionLayout(self, request)
     layout.edit_mode = True
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Directories"), request.link(self)),
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Directories'), request.link(self)),
         Link(_(self.directory.title), request.link(self)),
-        Link(_("Edit"), '#')
+        Link(_('Edit'), '#')
     ]
 
     return {
@@ -295,6 +299,52 @@ def handle_edit_directory(
     }
 
 
+def alert_migration_errors(
+    migration: DirectoryMigration,
+    request: OrgRequest
+) -> None:
+    if migration.multiple_option_changes_in_one_step():
+        request.alert(
+            _(
+                'Do not mix adding, removing, and renaming options in the '
+                'same migration. Please use separate migrations for each '
+                'option.'
+            )
+        )
+
+    if migration.added_required_fields():
+        field_names = migration.get_added_required_field_ids()
+        request.alert(_(
+            '${fields}: New fields cannot be required initially. '
+            'Require them in a separate migration step.', mapping={
+                'fields': ', '.join(f'"{f}"' for f in field_names)
+            }
+        ))
+
+    if len(migration.changes.renamed_options) > 1:
+        request.alert(
+            _(
+                'Renaming multiple options in the same migration is not '
+                'supported. Please use separate migrations for each option.'
+            )
+        )
+
+    # check for incompatible type changes
+    for changed in migration.changes.changed_fields:
+        old = migration.changes.old[changed]
+        new = migration.changes.new[changed]
+
+        if not migration.fieldtype_migrations.possible(old.type, new.type):
+            request.alert(_(
+                'Cannot convert field "${field}" from type "${old_type}" '
+                'to "${new_type}".', mapping={
+                    'field': changed,
+                    'old_type': old.type,
+                    'new_type': new.type
+                }
+            ))
+
+
 @OrgApp.view(
     model=ExtendedDirectoryEntryCollection,
     permission=Secret,
@@ -302,7 +352,7 @@ def handle_edit_directory(
 )
 def delete_directory(
     self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -318,7 +368,7 @@ def delete_directory(
         session.delete(entry)
 
     DirectoryCollection(session).delete(self.directory)
-    request.success(_("The directory was deleted"))
+    request.success(_('The directory was deleted'))
 
 
 @OrgApp.form(
@@ -330,21 +380,21 @@ def delete_directory(
 )
 def change_directory_url(
     self: Directory,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: DirectoryUrlForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = layout or DefaultLayout(self, request)
     assert isinstance(layout.breadcrumbs, list)
-    layout.breadcrumbs.append(Link(_("Change URL"), '#'))
+    layout.breadcrumbs.append(Link(_('Change URL'), '#'))
 
     form.delete_field('test')
 
     if form.submitted(request):
         assert form.name.data is not None
         self.name = form.name.data
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return morepath.redirect(request.link(self))
 
     elif not request.POST:
@@ -363,13 +413,13 @@ def change_directory_url(
 
 class Filter(NamedTuple):
     title: str
-    tags: 'Sequence[Link]'
+    tags: Sequence[Link]
 
 
 def get_filters(
-    request: 'OrgRequest',
+    request: OrgRequest,
     self: ExtendedDirectoryEntryCollection,
-    keyword_counts: 'Mapping[str, Mapping[str, int]] | None' = None,
+    keyword_counts: Mapping[str, Mapping[str, int]] | None = None,
     view_name: str = ''
 ) -> list[Filter]:
 
@@ -417,7 +467,7 @@ def get_filters(
 
 
 def keyword_count(
-    request: 'OrgRequest',
+    request: OrgRequest,
     collection: ExtendedDirectoryEntryCollection
 ) -> dict[str, dict[str, int]]:
 
@@ -428,6 +478,13 @@ def keyword_count(
     )
     fields = {f.id: f for f in self.directory.fields if f.id in keywords}
     counts: dict[str, dict[str, int]] = {}
+
+    # NOTE: The counting can get incredibly expensive with many entries
+    #       so we should skip it when we know we can skip it
+    if not fields:
+        return counts
+
+    # FIXME: This is incredibly slow. We need to think of a better way.
     for model in request.exclude_invisible(self.without_keywords().query()):
         for entry in model.keywords:
             field_id, value = entry.split(':', 1)
@@ -443,9 +500,9 @@ def keyword_count(
     template='directory.pt')
 def view_directory(
     self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DirectoryEntryCollectionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     entries = request.exclude_invisible(self.query())
     for i, e in enumerate(entries):
@@ -463,7 +520,7 @@ def view_directory(
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     if request.is_manager:
         layout.editbar_links.append(
-            Link(_("Recipients"), request.link(self, '+recipients'),
+            Link(_('Recipients'), request.link(self, '+recipients'),
                  attrs={'class': 'manage-subscribers'}))
 
     new_recipient_link = request.class_link(
@@ -495,19 +552,19 @@ def view_directory(
     name='geojson')
 def view_geojson(
     self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest'
-) -> 'JSON_ro':
+    request: OrgRequest
+) -> JSON_ro:
 
     q = self.query().with_entities(
         DirectoryEntry.id,
         DirectoryEntry.name,
         DirectoryEntry.title,
         DirectoryEntry.lead,
-        DirectoryEntry.content["coordinates"]["lat"].label('lat'),
-        DirectoryEntry.content["coordinates"]["lon"].label('lon'),
-        DirectoryEntry.meta["access"].label('access'),
+        DirectoryEntry.content['coordinates']['lat'].label('lat'),
+        DirectoryEntry.content['coordinates']['lon'].label('lon'),
+        DirectoryEntry.meta['access'].label('access'),
     )
-    q = q.filter(DirectoryEntry.content["coordinates"]["lat"] != None)
+    q = q.filter(DirectoryEntry.content['coordinates']['lat'] != None)
 
     with_categories = request.params.get('with-categories', False)
 
@@ -540,7 +597,7 @@ def view_geojson(
     #        matches our query above
     def as_dict(entry: Any) -> dict[str, Any]:
         result: dict[str, Any] = {
-            'type': "Feature",
+            'type': 'Feature',
             'properties': {
                 'name': entry.name,
                 'title': entry.title,
@@ -549,7 +606,7 @@ def view_geojson(
             },
             'geometry': {
                 'coordinates': (entry.lon, entry.lat),
-                'type': "Point"
+                'type': 'Point'
             }
         }
 
@@ -567,6 +624,55 @@ def view_geojson(
     return tuple(as_dict(e) for e in entries)
 
 
+def send_email_notification_for_directory_entry(
+    directory: ExtendedDirectory,
+    entry: ExtendedDirectoryEntry,
+    request: OrgRequest
+) -> None:
+    title = request.translate(_(
+        '${org}: New Entry in "${directory}"',
+        mapping={'org': request.app.org.title,
+                 'directory': directory.title},
+    ))
+    entry_link = request.link(entry)
+    recipients = EntryRecipientCollection(request.session).query(
+    ).filter_by(directory_id=directory.id).filter_by(
+        confirmed=True).all()
+
+    def email_iter() -> Iterator[EmailJsonDict]:
+        for recipient in recipients:
+            unsubscribe = request.link(
+                recipient.subscription, 'unsubscribe')
+            content = render_template(
+                'mail_new_directory_entry.pt',
+                request,
+                {
+                    'layout': DefaultMailLayout(object(), request),
+                    'title': title,
+                    'directory': directory,
+                    'entry_title': entry.title,
+                    'entry_link': entry_link,
+                    'unsubscribe': unsubscribe
+                },
+            )
+            plaintext = html_to_text(content)
+            yield request.app.prepare_email(
+                receivers=(recipient.address,),
+                subject=title,
+                content=content,
+                plaintext=plaintext,
+                category='transactional',
+                attachments=(),
+                headers={
+                    'List-Unsubscribe': f'<{unsubscribe}>',
+                    'List-Unsubscribe-Post': (
+                        'List-Unsubscribe=One-Click')
+                }
+            )
+
+    request.app.send_transactional_email_batch(email_iter())
+
+
 @OrgApp.form(
     model=ExtendedDirectoryEntryCollection,
     permission=Private,
@@ -575,69 +681,32 @@ def view_geojson(
     name='new')
 def handle_new_directory_entry(
     self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
-    form: 'DirectoryEntryForm',
+    request: OrgRequest,
+    form: DirectoryEntryForm,
     layout: DirectoryEntryCollectionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         try:
-            entry = self.directory.add_by_form(form, type=(
-                'extended'))
+            entry = self.directory.add_by_form(
+                form,
+                type='extended'
+            )
         except DuplicateEntryError as e:
-            request.alert(_("The entry ${name} exists twice", mapping={
+            request.alert(_('The entry ${name} exists twice', mapping={
                 'name': e.name
             }))
             transaction.abort()
             return request.redirect(request.link(self))
 
-        if self.directory.enable_update_notifications:
-            title = request.translate(_(
-                '${org}: New Entry in "${directory}"',
-                mapping={'org': request.app.org.title,
-                         'directory': self.directory.title},
-            ))
+        if self.directory.enable_update_notifications and entry.access in (
+            'public',
+            'mtan'
+        ) and entry.published:
+            send_email_notification_for_directory_entry(
+                self.directory, entry, request)
 
-            entry_link = request.link(entry)
-
-            recipients = EntryRecipientCollection(request.session).query(
-            ).filter_by(directory_id=self.directory.id).filter_by(
-                confirmed=True).all()
-
-            def email_iter() -> 'Iterator[EmailJsonDict]':
-                for recipient in recipients:
-                    unsubscribe = request.link(
-                        recipient.subscription, 'unsubscribe')
-                    content = render_template(
-                        'mail_new_directory_entry.pt',
-                        request,
-                        {
-                            'layout': DefaultMailLayout(object(), request),
-                            'title': title,
-                            'directory': self.directory,
-                            'entry_title': entry.title,
-                            'entry_link': entry_link,
-                            'unsubscribe': unsubscribe
-                        },
-                    )
-                    plaintext = html_to_text(content)
-                    yield request.app.prepare_email(
-                        receivers=(recipient.address,),
-                        subject=title,
-                        content=content,
-                        plaintext=plaintext,
-                        category='transactional',
-                        attachments=(),
-                        headers={
-                            'List-Unsubscribe': f'<{unsubscribe}>',
-                            'List-Unsubscribe-Post': (
-                                'List-Unsubscribe=One-Click')
-                        }
-                    )
-
-            request.app.send_transactional_email_batch(email_iter())
-
-        request.success(_("Added a new directory entry"))
+        request.success(_('Added a new directory entry'))
         return request.redirect(request.link(entry))
 
     if form.errors:
@@ -646,13 +715,13 @@ def handle_new_directory_entry(
 
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.editbar_links = []
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New Directory Entry"),
+        'title': _('New Directory Entry'),
         'form': form,
     }
 
@@ -665,15 +734,15 @@ def handle_new_directory_entry(
     name='edit')
 def handle_edit_directory_entry(
     self: DirectoryEntry,
-    request: 'OrgRequest',
-    form: 'DirectoryEntryForm',
+    request: OrgRequest,
+    form: DirectoryEntryForm,
     layout: DirectoryEntryLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
     elif not request.POST:
         form.process(obj=self)
@@ -681,7 +750,7 @@ def handle_edit_directory_entry(
     # FIXME: Should we only register this view for ExtendedDirectoryEntry?
     layout = layout or DirectoryEntryLayout(self, request)  # type:ignore
     layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
     layout.edit_mode = True
 
@@ -699,12 +768,12 @@ def handle_edit_directory_entry(
              name='submit')
 def handle_submit_directory_entry(
     self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
-    form: 'ExtendedDirectoryEntryForm',
+    request: OrgRequest,
+    form: ExtendedDirectoryEntryForm,
     layout: DirectoryEntryCollectionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
-    title = _("Submit a New Directory Entry")
+    title = _('Submit a New Directory Entry')
 
     if form.submitted(request):
         forms = FormCollection(request.session)
@@ -714,7 +783,7 @@ def handle_submit_directory_entry(
 
         # the price per submission
         if self.directory.price == 'paid':
-            amount = self.directory.price_per_submission
+            amount = self.directory.price_per_submission or 0.0
         else:
             amount = 0.0
 
@@ -727,10 +796,13 @@ def handle_submit_directory_entry(
             meta={
                 'handler_code': 'DIR',
                 'directory': self.directory.id.hex,
-                'price': {
-                    'amount': amount,
-                    'currency': self.directory.currency
+                'invoice_item': {
+                    'text': request.translate(_('Lump sum')),
+                    'group': 'submission',
+                    'unit': Decimal(amount),
+                    'quantity': Decimal('1'),
                 },
+                'currency': self.directory.currency,
                 'extensions': tuple(
                     ext for ext in self.directory.extensions
                     if ext != 'submitter'
@@ -750,7 +822,6 @@ def handle_submit_directory_entry(
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(title, '#'))
-    layout.edit_mode = True
 
     return {
         'directory': self.directory,
@@ -769,12 +840,12 @@ def handle_submit_directory_entry(
              name='change-request')
 def handle_change_request(
     self: ExtendedDirectoryEntry,
-    request: 'OrgRequest',
-    form: 'ExtendedDirectoryEntryForm',
+    request: OrgRequest,
+    form: ExtendedDirectoryEntryForm,
     layout: DirectoryEntryLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
-    title = _("Propose a change")
+    title = _('Propose a change')
 
     if form.submitted(request):
         forms = FormCollection(request.session)
@@ -821,8 +892,8 @@ def handle_change_request(
         'layout': layout,
         'title': title,
         'hint': _(
-            "To request a change, edit the fields you would like to change, "
-            "leaving the other fields intact. Then submit your request."
+            'To request a change, edit the fields you would like to change, '
+            'leaving the other fields intact. Then submit your request.'
         ),
         'guideline': self.directory.change_requests_guideline,
         'button_text': _('Continue')
@@ -835,9 +906,9 @@ def handle_change_request(
     template='directory_entry.pt')
 def view_directory_entry(
     self: ExtendedDirectoryEntry,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DirectoryEntryLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     directory = self.directory
 
@@ -877,7 +948,7 @@ def view_directory_entry(
     request_method='DELETE')
 def delete_directory_entry(
     self: DirectoryEntry,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -885,7 +956,7 @@ def delete_directory_entry(
     session = request.session
     session.delete(self)
 
-    request.success(_("The entry was deleted"))
+    request.success(_('The entry was deleted'))
 
 
 @OrgApp.form(model=ExtendedDirectoryEntryCollection,
@@ -893,16 +964,16 @@ def delete_directory_entry(
              template='export.pt', form=ExportForm)
 def view_export(
     self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ExportForm,
     layout: DirectoryEntryCollectionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not request.is_visible(self.directory):
         return HTTPForbidden()
 
     layout = layout or DirectoryEntryCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Export"), '#'))
+    layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
@@ -915,18 +986,18 @@ def view_export(
                           view_name='+export')
 
     if filters:
-        pretext = _("On the right side, you can filter the entries of this "
-                    "directory to export.")
+        pretext = _('On the right side, you can filter the entries of this '
+                    'directory to export.')
     else:
-        pretext = _("Exports all entries of this directory.")
+        pretext = _('Exports all entries of this directory.')
 
     return {
         'layout': layout,
-        'title': _("Export"),
+        'title': _('Export'),
         'form': form,
         'explanation': f'{request.translate(pretext)} ' + request.translate(_(
-            "The resulting zipfile contains the selected format as well "
-            "as metadata and images/files if the directory contains any."
+            'The resulting zipfile contains the selected format as well '
+            'as metadata and images/files if the directory contains any.'
         )),
         'filters': filters,
         'count': len(request.exclude_invisible(self.query().all()))
@@ -937,7 +1008,7 @@ def view_export(
              permission=Public, name='zip')
 def view_zip_file(
     self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> Response:
 
     if not request.is_visible(self.directory):
@@ -965,9 +1036,9 @@ def view_zip_file(
             entry = self.by_name(err.entry_name)
             entry_url = request.link(entry, name='edit')
             request.alert(
-                _("You have been redirect to this entry because "
-                  "it could not be exported due to missing file ${name}. "
-                  "Please re-upload them and try again",
+                _('You have been redirect to this entry because '
+                  'it could not be exported due to missing file ${name}. '
+                  'Please re-upload them and try again',
                   mapping={'name': err.filename})
             )
             return request.redirect(entry_url)
@@ -990,15 +1061,15 @@ def view_zip_file(
              template='directory_import.pt', form=DirectoryImportForm)
 def view_import(
     self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: DirectoryImportForm,
     layout: DirectoryEntryCollectionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     error = None
 
     layout = layout or DirectoryEntryCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Import"), '#'))
+    layout.breadcrumbs.append(Link(_('Import'), '#'))
     layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
@@ -1007,27 +1078,27 @@ def view_import(
         except MissingColumnError as e:
             field = self.directory.field_by_id(e.column)
             assert field is not None
-            request.alert(_("The column ${name} is missing", mapping={
+            request.alert(_('The column ${name} is missing', mapping={
                 'name': field.human_id
             }))
         except MissingFileError as e:
-            request.alert(_("The file ${name} is missing", mapping={
+            request.alert(_('The file ${name} is missing', mapping={
                 'name': e.name
             }))
         except DuplicateEntryError as e:
-            request.alert(_("The entry ${name} exists twice", mapping={
+            request.alert(_('The entry ${name} exists twice', mapping={
                 'name': e.name
             }))
         except ValidationError as e:
             error = e
         except NotImplementedError:
             request.alert(_(
-                "The given file is invalid, does it include a metadata.json "
-                "with a data.xlsx, data.csv, or data.json?"
+                'The given file is invalid, does it include a metadata.json '
+                'with a data.xlsx, data.csv, or data.json?'
             ))
         else:
             notify = request.success if imported else request.warning
-            notify(_("Imported ${count} entries", mapping={
+            notify(_('Imported ${count} entries', mapping={
                 'count': imported
             }))
 
@@ -1038,13 +1109,13 @@ def view_import(
 
     return {
         'layout': layout,
-        'title': _("Import"),
+        'title': _('Import'),
         'form': form,
         'explanation': _(
-            "Updates the directory configuration and imports all entries "
-            "given in the ZIP file. The format is the same as produced by "
-            "the export function. Note that only 100 items are imported at a "
-            "time. To import more items repeat the import accordingly."
+            'Updates the directory configuration and imports all entries '
+            'given in the ZIP file. The format is the same as produced by '
+            'the export function. Note that only 100 items are imported at a '
+            'time. To import more items repeat the import accordingly.'
         ),
         'directory': self.directory,
         'error': error,
@@ -1059,7 +1130,7 @@ def view_import(
 )
 def execute_submission_action(
     self: DirectorySubmissionAction,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
     self.execute(request)
 
@@ -1069,14 +1140,14 @@ def execute_submission_action(
              template='form.pt', form=DirectoryRecipientForm)
 def new_recipient(
     self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: DirectoryRecipientForm,
     layout: DirectoryEntryCollectionLayout | None = None,
     mail_layout: DefaultMailLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = layout or DirectoryEntryCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New Recipient"), '#'))
+    layout.breadcrumbs.append(Link(_('New Recipient'), '#'))
     layout.editbar_links = []
 
     if form.submitted(request):
@@ -1131,7 +1202,7 @@ def new_recipient(
 
     return {
         'layout': layout,
-        'title': _("Notification for new entries"),
+        'title': _('Notification for new entries'),
         'form': form,
     }
 
@@ -1143,47 +1214,51 @@ def new_recipient(
 )
 def view_directory_entry_update_recipients(
     self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DirectoryEntryCollectionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     # i18n:attributes translations do not support variables, so we need
     # to do this ourselves
-    warning = request.translate(_("Do you really want to unsubscribe \"{}\"?"))
+    warning = request.translate(_('Do you really want to unsubscribe "{}"?'))
 
     recipients = EntryRecipientCollection(request.session).query().filter_by(
-        directory_id=self.directory.id).filter_by(confirmed=True).all()
-    by_letter = OrderedDict()
+        directory_id=self.directory.id).filter_by(confirmed=True)
 
-    for key, values in groupby(recipients, key=lambda r: r.address[0].upper()):
-        by_letter[key] = list(values)
+    by_letter = defaultdict(list)
+    for recipient in recipients:
+        letter = recipient.address[0].upper()
+        by_letter[letter].append(recipient)
+    by_letter = defaultdict(list, sorted(by_letter.items()))
+
     layout = layout or DirectoryEntryCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Recipients of new entry updates"), '#'))
+    layout.breadcrumbs.append(Link(_('Recipients of new entry updates'), '#'))
     layout.editbar_links = []
 
     return {
         'layout': layout,
-        'title': _("Recipients of new entry updates"),
+        'title': _('Recipients of new entry updates'),
         'recipients': recipients,
         'warning': warning,
         'by_letter': by_letter,
+        'count': recipients.count()
     }
 
 
 # use an english name for this view, so robots know what we use it for
 @OrgApp.view(model=EntrySubscription, name='confirm', permission=Public)
 def view_confirm(
-    self: EntrySubscription, request: 'OrgRequest'
+    self: EntrySubscription, request: OrgRequest
 ) -> Response:
     if self.confirm():
         request.success(_(
-            "the subscription for ${address} was successfully confirmed",
+            'the subscription for ${address} was successfully confirmed',
             mapping={'address': self.recipient.address}
         ))
     else:
         request.alert(_(
-            "the subscription for ${address} could not be confirmed, "
-            "wrong token",
+            'the subscription for ${address} could not be confirmed, '
+            'wrong token',
             mapping={'address': self.recipient.address}
         ))
 
@@ -1198,7 +1273,7 @@ def view_confirm(
 @OrgApp.view(model=EntrySubscription, name='unsubscribe', permission=Public)
 def view_unsubscribe(
     self: EntrySubscription,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> Response:
 
     # RFC-8058: just return an empty response on a POST request
@@ -1211,12 +1286,12 @@ def view_unsubscribe(
 
     if self.unsubscribe():
         request.success(_(
-            "${address} successfully unsubscribed",
+            '${address} successfully unsubscribed',
             mapping={'address': address}
         ))
     else:
         request.alert(_(
-            "${address} could not be unsubscribed, wrong token",
+            '${address} could not be unsubscribed, wrong token',
             mapping={'address': address}
         ))
 
@@ -1236,7 +1311,7 @@ def view_unsubscribe(
 )
 def view_unsubscribe_rfc8058(
     self: EntrySubscription,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> Response:
     # it doesn't really make sense to check for success here
     # since this is an automated action without verficiation

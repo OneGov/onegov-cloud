@@ -1,7 +1,11 @@
+from __future__ import annotations
+
+from functools import cached_property
+from onegov.core.static import StaticFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.collections import AssemblyCollection
-from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
 from onegov.landsgemeinde.models import Assembly
+from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
 
 
 from typing import Any
@@ -14,9 +18,9 @@ if TYPE_CHECKING:
 
 class DefaultLayout(BaseDefaultLayout):
 
-    request: 'LandsgemeindeRequest'
+    request: LandsgemeindeRequest
 
-    def __init__(self, model: Any, request: 'LandsgemeindeRequest') -> None:
+    def __init__(self, model: Any, request: LandsgemeindeRequest) -> None:
         super().__init__(model, request)
 
         self.custom_body_attributes['data-websocket-endpoint'] = ''
@@ -24,19 +28,22 @@ class DefaultLayout(BaseDefaultLayout):
         self.custom_body_attributes['data-websocket-channel'] = ''
 
     def assembly_title(self, assembly: Assembly) -> str:
+
         if assembly.extraordinary:
             return _(
-                'Extraodinary assembly from ${date}',
-                mapping={'date': self.format_date(assembly.date, 'date_long')}
+                'Extraordinary ${assembly_type} from ${date}',
+                mapping={'assembly_type': self.assembly_type,
+                         'date': self.format_date(assembly.date, 'date_long')}
             )
         return _(
-            'Assembly from ${date}',
-            mapping={'date': self.format_date(assembly.date, 'date_long')}
+            '${assembly_type} from ${date}',
+            mapping={'assembly_type': self.assembly_type,
+                     'date': self.format_date(assembly.date, 'date_long')}
         )
 
     def agenda_item_title(
         self,
-        agenda_item: 'AgendaItem',
+        agenda_item: AgendaItem,
         short: bool = False
     ) -> str:
         if agenda_item.irrelevant:
@@ -54,7 +61,7 @@ class DefaultLayout(BaseDefaultLayout):
             agenda_item.title
         )
 
-    def votum_title(self, votum: 'Votum') -> str:
+    def votum_title(self, votum: Votum) -> str:
         return '{} {}'.format(
             self.request.translate(_('Votum')),
             votum.number
@@ -67,3 +74,29 @@ class DefaultLayout(BaseDefaultLayout):
         return AssemblyCollection(self.request.session).query().filter(
             Assembly.state == 'ongoing').order_by(
             Assembly.date.desc()).first()
+
+    @cached_property
+    def terms_icon(self) -> str:
+        static_file = StaticFile.from_application(
+            self.app, 'terms_by.svg'
+        )
+
+        return self.request.link(static_file)
+
+    @property
+    def assembly_type(self) -> str:
+        if self.org.assembly_title == 'general_assembly':
+            return self.request.translate(_('General Assembly'))
+
+        if self.org.assembly_title == 'town_hall_meeting':
+            return self.request.translate(_('Town Hall Meeting'))
+        return self.request.translate(_('Assembly'))
+
+    @property
+    def assembly_type_plural(self) -> str:
+        if self.org.assembly_title == 'general_assembly':
+            return self.request.translate(_('General Assemblies'))
+
+        if self.org.assembly_title == 'town_hall_meeting':
+            return self.request.translate(_('Town Hall Meetings'))
+        return self.request.translate(_('Assemblies'))

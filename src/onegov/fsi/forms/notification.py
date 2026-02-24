@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
@@ -28,21 +30,21 @@ class NotificationForm(Form):
         render_kw={'rows': 10, 'cols': 12},
     )
 
-    def apply_model(self, model: 'CourseNotificationTemplate') -> None:
+    def apply_model(self, model: CourseNotificationTemplate) -> None:
         self.subject.data = model.subject
         self.text.data = model.text
 
-    def update_model(self, model: 'CourseNotificationTemplate') -> None:
+    def update_model(self, model: CourseNotificationTemplate) -> None:
         model.subject = self.subject.data
         model.text = self.text.data
 
 
 class NotificationTemplateSendForm(Form):
 
-    model: 'CourseNotificationTemplate'
+    model: CourseNotificationTemplate
 
     recipients = MultiCheckboxField(
-        label=_("Recipients"),
+        label=_('Recipients'),
         coerce=lambda x: x if isinstance(x, UUID) else UUID(x)
     )
 
@@ -51,11 +53,11 @@ class NotificationTemplateSendForm(Form):
         return len(self.attendees) > 0
 
     @cached_property
-    def attendees(self) -> list['CourseAttendee']:
+    def attendees(self) -> list[CourseAttendee]:
         return [a for a in self.model.course_event.attendees if a.active]
 
     @cached_property
-    def recipients_choices(self) -> list['_Choice']:
+    def recipients_choices(self) -> list[_Choice]:
         return [(a.id, a.email) for a in self.attendees]
 
     def on_request(self) -> None:

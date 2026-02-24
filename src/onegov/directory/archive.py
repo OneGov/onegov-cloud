@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import mimetypes
 import shutil
 import os
@@ -29,8 +31,7 @@ if TYPE_CHECKING:
     from onegov.form.parser.core import MultipleFileinputField
     from onegov.form.parser.core import ParsedField
     from sqlalchemy.orm import Query, Session
-    from typing import Protocol
-    from typing_extensions import Self, TypeAlias
+    from typing import Protocol, Self, TypeAlias
 
     UnknownFieldType: TypeAlias = 'Literal[_Sentinel.UNKNOWN_FIELD]'
     DirectoryEntryFilter: TypeAlias = Callable[
@@ -43,7 +44,7 @@ if TYPE_CHECKING:
     ]
 
     class SupportsReadAndSeek(SupportsRead[bytes], Protocol):
-        def seek(self, __offset: int) -> object: ...
+        def seek(self, offset: int, /) -> object: ...
 
 
 class _Sentinel(Enum):
@@ -55,7 +56,7 @@ UNKNOWN_FIELD = _Sentinel.UNKNOWN_FIELD
 
 class DirectoryFileNotFound(FileNotFoundError):
     def __init__(self, file_id: str, entry_name: str, filename: str) -> None:
-        self.file_id = file_id,
+        self.file_id = file_id
         self.entry_name = entry_name
         self.filename = filename
 
@@ -68,7 +69,7 @@ class FieldParser:
         self.fields_by_id = {f.id: f for f in directory.fields}
         self.archive_path = archive_path
 
-    def get_field(self, key: str) -> 'ParsedField | None':
+    def get_field(self, key: str) -> ParsedField | None:
         """
         CSV Files header parsing is inconsistent with the the internal id (
         field.id) of the field. The headers are lovercased, so that the first
@@ -85,7 +86,7 @@ class FieldParser:
         self,
         key: str,
         value: str,
-        field: 'FileinputField'
+        field: FileinputField
     ) -> Bunch | None:  # FIXME: Use NamedTuple
 
         if not value:
@@ -113,13 +114,13 @@ class FieldParser:
         self,
         key: str,
         value: str,
-        field: 'MultipleFileinputField'
+        field: MultipleFileinputField
     ) -> tuple[Bunch, ...]:  # FIXME: Use NamedTuple
 
         if not value:
             return ()
 
-        def iter_files() -> 'Iterator[Bunch]':
+        def iter_files() -> Iterator[Bunch]:
             for val in value.split(os.pathsep):
                 # be extra paranoid about these path values -> they could
                 # potentially be used to access files on the local system
@@ -145,7 +146,7 @@ class FieldParser:
         self,
         key: str,
         value: str,
-        field: 'ParsedField'
+        field: ParsedField
     ) -> object:
         return field.parse(value)
 
@@ -153,7 +154,7 @@ class FieldParser:
         self,
         key: str,
         value: str
-    ) -> 'tuple[str, Any | None] | UnknownFieldType':
+    ) -> tuple[str, Any | None] | UnknownFieldType:
 
         field = self.get_field(key)
 
@@ -171,7 +172,7 @@ class FieldParser:
 
     def parse(
         self,
-        record: 'SupportsItems[str, str]'
+        record: SupportsItems[str, str]
     ) -> dict[str, Any | None]:
 
         return dict(
@@ -192,7 +193,7 @@ class DirectoryArchiveReader:
         skip_existing: bool = True,
         limit: int = 0,
         apply_metadata: bool = True,
-        after_import: 'Callable[[DirectoryEntry], Any] | None' = None
+        after_import: Callable[[DirectoryEntry], Any] | None = None
     ) -> Directory:
         """ Reads the archive resulting in a dictionary and entries.
 
@@ -217,6 +218,13 @@ class DirectoryArchiveReader:
 
         """
         meta_data = self.read_metadata()
+        # FIXME: It is a little fragile that we don't add the newly created
+        #        target to a session, since some of the logic depends on
+        #        there being a session, afterwards both the directory and the
+        #        entries would need to be added to the session in order for
+        #        them to get properly persisted...
+        #        Since we only ever seem to omit the target parameter in tests
+        #        it's probably best to just no longer make it optional.
         directory = target or Directory.get_polymorphic_class(
             meta_data.get('type', 'generic'),
             Directory
@@ -226,8 +234,11 @@ class DirectoryArchiveReader:
             directory = self.apply_metadata(directory, meta_data)
 
         if skip_existing and target:
+            session = object_session(target)
+            assert session is not None
             existing = {
-                e.name for e in object_session(target).query(DirectoryEntry)
+                entry_name
+                for entry_name, in session.query(DirectoryEntry)
                 .filter_by(directory_id=target.id)
                 .with_entities(DirectoryEntry.name)
             }
@@ -310,7 +321,7 @@ class DirectoryArchiveReader:
         except FileNotFoundError as exception:
             raise MissingFileError('metadata.json') from exception
 
-    def read_data(self) -> 'Sequence[dict[str, Any]]':
+    def read_data(self) -> Sequence[dict[str, Any]]:
         """ Returns the entries as a sequence of dictionaries. """
 
         if (self.path / 'data.json').exists():
@@ -345,14 +356,14 @@ class DirectoryArchiveWriter:
 
     path: Path
     format: Literal['json', 'csv', 'xlsx']
-    transform: 'FieldValueTransform'
+    transform: FieldValueTransform
 
     def write(
         self,
         directory: Directory,
         *args: Any,
-        entry_filter: 'DirectoryEntryFilter | None' = None,
-        query: 'Query[DirectoryEntry] | None' = None,
+        entry_filter: DirectoryEntryFilter | None = None,
+        query: Query[DirectoryEntry] | None = None,
         **kwargs: Any
     ) -> None:
         """ Writes the given directory. """
@@ -379,8 +390,8 @@ class DirectoryArchiveWriter:
     def write_directory_entries(
         self,
         directory: Directory,
-        entry_filter: 'DirectoryEntryFilter | None' = None,
-        query: 'Query[DirectoryEntry] | None' = None
+        entry_filter: DirectoryEntryFilter | None = None,
+        query: Query[DirectoryEntry] | None = None
     ) -> None:
         """ Writes the directory entries. Allows filtering with custom
         entry_filter function as well as passing a query object """
@@ -391,7 +402,7 @@ class DirectoryArchiveWriter:
 
         def file_path(
             entry: DirectoryEntry,
-            field: 'ParsedField',
+            field: ParsedField,
             value: dict[str, Any],
             suffix: str = ''
         ) -> str:
@@ -404,7 +415,7 @@ class DirectoryArchiveWriter:
 
         def as_tuples(
             entry: DirectoryEntry
-        ) -> 'Iterator[tuple[str, Any | None]]':
+        ) -> Iterator[tuple[str, Any | None]]:
 
             for field in fields:
                 value = entry.values.get(field.id)
@@ -458,11 +469,13 @@ class DirectoryArchiveWriter:
         write = getattr(self, f'write_{self.format}')
         write(self.path / f'data.{self.format}', data)
 
-        self.write_paths(object_session(directory), paths, fid_to_entry)
+        session = object_session(directory)
+        assert session is not None
+        self.write_paths(session, paths, fid_to_entry)
 
     def write_paths(
         self,
-        session: 'Session',
+        session: Session,
         paths: dict[str, str],
         fid_to_entry: dict[str, str] | None = None
     ) -> None:
@@ -500,12 +513,12 @@ class DirectoryArchiveWriter:
                     if hasattr(f.reference.file, '_file_path'):
                         src = os.path.abspath(f.reference.file._file_path)
                     else:
-                        tmp = NamedTemporaryFile()
+                        tmp = NamedTemporaryFile()  # noqa: SIM115
                         tmp.write(f.reference.file.read())
                         tempfiles.append(tmp)
                         src = tmp.name
 
-                except IOError as exception:
+                except OSError as exception:
                     if fid_to_entry is None:
                         entry_name = 'unknown'
                     else:
@@ -526,15 +539,15 @@ class DirectoryArchiveWriter:
             for tempfile in tempfiles:
                 tempfile.close()
 
-    def write_json(self, path: Path, data: 'JSON_ro') -> None:
-        with open(str(path), 'w') as f:
-            json.dump(data, f, sort_keys=True, indent=2)
+    def write_json(self, path: Path, data: JSON_ro) -> None:
+        with open(str(path), 'wb') as f:
+            json.dump_bytes(data, f, sort_keys=True, indent=2)
 
-    def write_xlsx(self, path: Path, data: 'Iterable[dict[str, Any]]') -> None:
+    def write_xlsx(self, path: Path, data: Iterable[dict[str, Any]]) -> None:
         with open(str(path), 'wb') as f:
             f.write(convert_list_of_dicts_to_xlsx(data))
 
-    def write_csv(self, path: Path, data: 'Iterable[dict[str, Any]]') -> None:
+    def write_csv(self, path: Path, data: Iterable[dict[str, Any]]) -> None:
         with open(str(path), 'w') as f:
             f.write(convert_list_of_dicts_to_csv(data))
 
@@ -563,9 +576,9 @@ class DirectoryArchive(DirectoryArchiveReader, DirectoryArchiveWriter):
 
     def __init__(
         self,
-        path: 'StrPath',
+        path: StrPath,
         format: Literal['json', 'csv', 'xlsx'] = 'json',
-        transform: 'FieldValueTransform | None ' = None
+        transform: FieldValueTransform | None = None
     ):
         """ Initialise the archive at the given path (must exist).
 
@@ -601,7 +614,7 @@ class DirectoryZipArchive:
 
     def __init__(
         self,
-        path: 'StrPath',
+        path: StrPath,
         *args: Any,
         **kwargs: Any
     ):
@@ -610,10 +623,10 @@ class DirectoryZipArchive:
         self.archive = DirectoryArchive(self.temp.name, *args, **kwargs)
 
     @classmethod
-    def from_buffer(cls, buffer: 'SupportsReadAndSeek') -> 'Self':
+    def from_buffer(cls, buffer: SupportsReadAndSeek) -> Self:
         """ Creates a zip archive instance from a file object in memory. """
 
-        f = NamedTemporaryFile()
+        f = NamedTemporaryFile()  # noqa: SIM115
 
         buffer.seek(0)
 

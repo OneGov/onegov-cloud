@@ -1,13 +1,11 @@
-from typing import TYPE_CHECKING
+from __future__ import annotations
+
+from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from decimal import Decimal
     from onegov.core.orm import Base
     from onegov.pay.models import Payable, PayableManyTimes
-    from typing import type_check_only, Literal, Protocol
-    from typing_extensions import TypeAlias, TypedDict
-
-    PaymentMethod: TypeAlias = Literal['free', 'cc', 'manual']
-    PaymentState: TypeAlias = Literal['open', 'paid', 'failed', 'cancelled']
+    from typing import type_check_only, Protocol, TypeAlias, TypedDict
 
     class PriceDict(TypedDict):
         amount: float
@@ -16,10 +14,11 @@ if TYPE_CHECKING:
         credit_card_payment: bool
 
     class FeePolicy(Protocol):
-        def from_amount(self, __amount: Decimal | float) -> Decimal | float:
+        def from_amount(self, amount: Decimal | float, /) -> Decimal | float:
             ...
 
-        def compensate(self, __amount: Decimal | float) -> Decimal | float: ...
+        def compensate(self, amount: Decimal | float, /) -> Decimal | float:
+            ...
 
     # NOTE: We would like to use intersections here than pseudo classes
     @type_check_only
@@ -31,3 +30,7 @@ if TYPE_CHECKING:
         pass
 
     AnyPayableBase: TypeAlias = PayableBase | PayableManyTimesBase
+
+PaymentMethod: TypeAlias = Literal['free', 'cc', 'manual']
+PaymentState: TypeAlias = Literal[
+'open', 'paid', 'failed', 'cancelled', 'invoiced']

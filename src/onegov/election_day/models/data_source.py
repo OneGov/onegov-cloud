@@ -1,34 +1,34 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.election_day import _
 from onegov.election_day.models.election import Election
 from onegov.election_day.models.vote import Vote
-from sqlalchemy import Column
 from sqlalchemy import desc
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
-from uuid import uuid4
+from sqlalchemy.orm import DynamicMapped
+from sqlalchemy.orm import Mapped
+from uuid import uuid4, UUID
 
 
+from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
-    from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
-    UploadType: TypeAlias = Literal['vote', 'proporz', 'majorz']
 
+UploadType: TypeAlias = Literal['vote', 'proporz', 'majorz']
 
 UPLOAD_TYPE_LABELS = (
-    ('vote', _("Vote")),
-    ('proporz', _("Election based on proportional representation")),
-    ('majorz', _("Election based on the simple majority system")),
+    ('vote', _('Vote')),
+    ('proporz', _('Election based on proportional representation')),
+    ('majorz', _('Election based on the simple majority system')),
 )
 
 
@@ -38,68 +38,61 @@ class DataSource(Base, TimestampMixin):
     __tablename__ = 'upload_data_source'
 
     #: Identifies the data source
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The name of the upload configuration
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Mapped[str]
 
     #: The token used to authenticate
-    token: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
-        nullable=False,
-        default=uuid4
-    )
+    token: Mapped[UUID] = mapped_column(default=uuid4)
 
     #: The type of upload
-    type: 'Column[UploadType]' = Column(
-        Enum(  # type:ignore[arg-type]
+    type: Mapped[UploadType] = mapped_column(
+        Enum(
             'vote',
             'majorz',
             'proporz',
             name='type_of_data_source'
-        ),
-        nullable=False
+        )
     )
 
     #: A configuration may contain n items
-    items: 'relationship[AppenderQuery[DataSourceItem]]' = relationship(
-        "DataSourceItem",
-        cascade="all, delete-orphan",
-        lazy="dynamic",
-        back_populates="source",
+    items: DynamicMapped[DataSourceItem] = relationship(
+        cascade='all, delete-orphan',
+        back_populates='source',
     )
 
     @property
     def label(self) -> str:
         return dict(UPLOAD_TYPE_LABELS)[self.type]
 
-    def query_candidates(self) -> 'Query[Election | Vote]':
+    def query_candidates(self) -> Query[Election] | Query[Vote]:
         """ Returns a list of available votes or elections matching the
         type of the source. """
 
         session = object_session(self)
+        assert session is not None
         if self.type == 'vote':
-            query = session.query(Vote)
-            query = query.order_by(
+            votes = session.query(Vote)
+            votes = votes.order_by(
                 desc(Vote.date),
                 Vote.domain,
                 Vote.shortcode,
                 Vote.title
             )
-            return query
+            return votes
 
-        query = session.query(Election).filter(Election.type == self.type)
-        query = query.order_by(
+        elections = session.query(Election).filter(Election.type == self.type)
+        elections = elections.order_by(
             desc(Election.date),
             Election.domain,
             Election.shortcode,
             Election.title
         )
-        return query
+        return elections
 
 
 class DataSourceItem(Base, TimestampMixin):
@@ -107,51 +100,39 @@ class DataSourceItem(Base, TimestampMixin):
 
     __tablename__ = 'upload_data_source_item'
 
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the upload configuration result belongs to
-    source_id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey(DataSource.id),
-        nullable=False
-    )
+    source_id: Mapped[UUID] = mapped_column(ForeignKey(DataSource.id))
 
     #: the district
-    district: 'Column[str | None]' = Column(Text, nullable=True)
+    district: Mapped[str | None]
 
     #: the vote / election number
-    number: 'Column[str | None]' = Column(Text, nullable=True)
+    number: Mapped[str | None]
 
     #: the election
-    election_id: 'Column[str | None]' = Column(
-        Text,
-        ForeignKey(Election.id, onupdate='CASCADE'),
-        nullable=True
+    election_id: Mapped[str | None] = mapped_column(
+        ForeignKey(Election.id, onupdate='CASCADE')
     )
 
-    election: 'relationship[Election | None]' = relationship(
-        'Election',
-        back_populates="data_sources"
+    election: Mapped[Election | None] = relationship(
+        back_populates='data_sources'
     )
 
     #: the vote
-    vote_id: 'Column[str | None]' = Column(
-        Text,
+    vote_id: Mapped[str | None] = mapped_column(
         ForeignKey(Vote.id, onupdate='CASCADE'),
-        nullable=True
     )
 
-    vote: 'relationship[Vote | None]' = relationship(
-        'Vote',
-        back_populates="data_sources"
+    vote: Mapped[Vote | None] = relationship(
+        back_populates='data_sources'
     )
 
-    source: 'relationship[DataSource]' = relationship(
-        DataSource,
+    source: Mapped[DataSource] = relationship(
         back_populates='items'
     )
 

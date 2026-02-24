@@ -1,30 +1,29 @@
-from uuid import uuid4
+from __future__ import annotations
 
+from datetime import datetime
 from markupsafe import Markup
-from sqlalchemy import Column, Text, ForeignKey, Enum, UniqueConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, Enum, UniqueConstraint
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi import _
 
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterable
-    from datetime import datetime
     from onegov.fsi.request import FsiRequest
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
     from .course_event import CourseEvent
 
-    NotificationType: TypeAlias = Literal[
-        'info', 'reservation', 'reminder', 'cancellation',
-    ]
 
+NotificationType: TypeAlias = Literal[
+    'info', 'reservation', 'reminder', 'cancellation',
+]
 
-NOTIFICATION_TYPES: tuple['NotificationType', ...] = (
+NOTIFICATION_TYPES: tuple[NotificationType, ...] = (
     'info', 'reservation', 'reminder', 'cancellation')
 NOTIFICATION_TYPE_TRANSLATIONS = (
     _('Info Mail'), _('Subscription Confirmation'),
@@ -42,7 +41,7 @@ GERMAN_TYPE_TRANSLATIONS = {
 
 # for forms...
 def template_type_choices(
-    request: 'FsiRequest | None' = None
+    request: FsiRequest | None = None
 ) -> tuple[tuple[str, str], ...]:
 
     if request:
@@ -65,8 +64,8 @@ def get_template_default(
 
 
 def template_name(
-    type: 'NotificationType | Literal["invitation"]',
-    request: 'FsiRequest | None' = None
+    type: NotificationType | Literal['invitation'],
+    request: FsiRequest | None = None
 ) -> str:
     try:
         if type == 'invitation':
@@ -106,9 +105,8 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
                       )
 
     # the notification type used to choose the correct chameleon template
-    type: 'Column[NotificationType]' = Column(
-        Enum(*NOTIFICATION_TYPES, name='notification_types'),  # type:ignore
-        nullable=False,
+    type: Mapped[NotificationType] = mapped_column(
+        Enum(*NOTIFICATION_TYPES, name='notification_types'),
     )
 
     __mapper_args__ = {
@@ -117,34 +115,32 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
     }
 
     # One-To-Many relationship with course
-    course_event_id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('fsi_course_events.id'),
-        nullable=False
+    course_event_id: Mapped[UUID] = mapped_column(
+        ForeignKey('fsi_course_events.id')
     )
 
-    course_event: 'relationship[CourseEvent]' = relationship(
-        'CourseEvent',
-        back_populates='notification_templates'
+    course_event: Mapped[CourseEvent] = relationship(
+        back_populates='notification_templates',
+        overlaps='info_template,reservation_template,'
+                 'cancellation_template,reminder_template'
     )
 
     #: The public id of the notification template
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The subject of the notification would be according to template type
-    subject: 'Column[str | None]' = Column(Text, default=get_template_default)
+    subject: Mapped[str | None] = mapped_column(default=get_template_default)
 
     #: The body text injected in plaintext (not html)
-    text: 'Column[str | None]' = Column(Text)
+    text: Mapped[str | None]
 
     # when email based on template was sent last time
-    last_sent: 'Column[datetime | None]' = Column(UTCDateTime)
+    last_sent: Mapped[datetime | None]
 
-    def duplicate(self) -> 'Self':
+    def duplicate(self) -> Self:
         return self.__class__(
             type=self.type,
             id=uuid4(),
@@ -157,7 +153,7 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
         if not self.text:
             return None
 
-        return Markup(" ").join(
+        return Markup(' ').join(
             Markup('<p>{}</p>').format(part)
             for part in self.text.split('\n') if part
         )

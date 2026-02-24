@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.form.fields import PhoneNumberField
 from onegov.form.validators import ValidPhoneNumber
@@ -9,7 +11,7 @@ from wtforms.validators import InputRequired
 class MTANForm(Form):
 
     tan = StringField(
-        label=_("mTAN"),
+        label=_('mTAN'),
         # the TAN alphabet is all uppercase so we're nice and just
         # auto uppercase the entered data, as well as strip any
         # whitespace introduced through copy-pasta
@@ -26,8 +28,8 @@ class MTANForm(Form):
 class RequestMTANForm(Form):
 
     phone_number = PhoneNumberField(
-        label=_("Phone number"),
-        description="+41791112233",
+        label=_('Phone number'),
+        description='+41791112233',
         validators=(
             InputRequired(),
             # FIXME: Make configurable, for now we just use a sane default for

@@ -3,8 +3,16 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="row">
-            <div class="columns medium-8">
+        <div id="activities-page">
+            <div class="grid-x grid-padding-x content" >
+                <div class="cell small-12 medium-9">
+                    <tal:b metal:use-macro="layout.macros['filters']" />
+                </div>
+                <div class="cell small-12 medium-3">
+                    <tal:b metal:use-macro="layout.macros['volunteer-cart']" tal:define="is_dropdown True"/>
+                </div>
+
+            <div class="small-12 cell content">
                 <div class="panel">
                     <tal:b i18n:translate>
                         Join us as a volunteer. Select the activities you are interested in and fill out the volunteer form. We will contact you afterwards. Activities not listed
@@ -15,114 +23,83 @@
                     </tal:b>
                 </div>
 
-                <div class="activity-list-item" tal:condition="not:activities">
-                    <span i18n:translate>No activities found.</span>
-                    <b><a tal:condition="filtered" href="${request.class_link(layout.model.__class__)}" i18n:translate>Reset filter.</a></b>
-                </div>
+                <div id="activities" class="activities-list grid-x grid-padding-x">
+                    <tal:b tal:repeat="activity activities" tal:condition="activities">
+                        <div class="subpage-cards small-12 medium-6 large-4 cell" tal:define="occasions occasions_for_volunteer(activity)" tal:condition="python: any(wants_more_volunteers(need) for occasion in occasions for need in occasion.needs)">
+                            <div class="activity-list-item card">
+                                <div class="grid-x align-middle">
+                                    <div tal:condition="activity.thumbnail|nothing" style="width: 100%; padding-bottom: 60%; background-image: url('${activity.thumbnail}'); background-size: cover;"></div>
+                                    <div class="cell small-12 card-section">
+                                        <a href="${request.link(activity)}">
+                                        <h5>${activity.title}</h5>
+                                        <span class="page-lead" tal:content="layout.paragraphify(layout.linkify(activity.lead))"/></a>
 
-                <div class="activities-list" tal:condition="activities">
-                    <div class="activity-list-item" tal:repeat="activity activities">
-                        <div class="row collapse">
-                            <div class="columns small-2 thumbnail-column">
-                                <a class="thumbnail" href="${request.link(activity)}">
-                                    <div tal:condition="activity.thumbnail|nothing"
-                                         style="background-image: url('${activity.thumbnail}');"></div>
-                                </a>
-                            </div>
+                                        <div class="columns small-10">
+                                            <tal:b repeat="occasion occasions">
+                                                <div class="call-for-volunteers" tal:define="dates exclude_filtered_dates(layout.model, occasion.dates)" tal:condition="any(wants_more_volunteers(need) for need in occasion.needs) and occasion.seeking_volunteers and dates">
 
-                            <div class="columns small-10">
-                                <h3><a href="${request.link(activity)}">${activity.title}</a></h3>
-                                <span class="page-lead" tal:content="layout.paragraphify(layout.linkify(activity.lead))" />
+                                                    <h3 i18n:translate>Occasion</h3>
+                                                    <ul class="dense">
+                                                        <li tal:repeat="date dates">
+                                                            ${layout.format_datetime_range(date.localized_start, date.localized_end)}
+                                                        </li>
+                                                    </ul>
+                                                        <h3 i18n:translate>Needs</h3>
+                                                        <ul class="dense needs">
+                                                            <tal:b repeat="need occasion.needs">
+                                                                <li tal:condition="need.accept_signups" tal:condition="wants_more_volunteers(need)">
+                                                                    <span>${need.name}</span>
 
-                                <tal:b repeat="occasion activity.occasions">
-                                    <div class="call-for-volunteers" tal:define="dates exclude_filtered_dates(layout.model, occasion.dates)" tal:condition="occasion.seeking_volunteers and dates">
+                                                                    <a class="button narrow" data-need="${need.id.hex}" data-error-container="#error-for-${occasion.id.hex}">
+                                                                        <i class="fa fa-plus" aria-hidden="true"></i>
+                                                                        <span><tal:b i18n:translate>To my list</tal:b></span>
+                                                                    </a>
+                                                                </li>
+                                                            </tal:b>
+                                                        </ul>
 
-                                        <h3 i18n:translate>Occasion</h3>
-                                        <ul class="dense">
-                                            <li tal:repeat="date dates">
-                                                ${layout.format_datetime_range(date.localized_start, date.localized_end)}
-                                            </li>
-                                        </ul>
-
-                                        <h3 i18n:translate tal:condition="occasion.needs">Needs</h3>
-                                        <ul class="dense needs">
-                                            <tal:b repeat="need occasion.needs">
-                                                <li tal:condition="need.accept_signups">
-                                                    <span>${need.name}</span>
-                                                    <a class="button tiny" onclick="volunteerCart.append('${need.id.hex}', '#error-for-${occasion.id.hex}')">
-                                                        <i class="fa fa-plus" aria-hidden="true"></i>
-                                                        <span><tal:b i18n:translate>To my list</tal:b></span>
-                                                    </a>
-                                                </li>
+                                                    <div id="error-for-${occasion.id.hex}" class="alert" style="display: none;"></div>
+                                                </div>
                                             </tal:b>
-                                        </ul>
-
-                                        <div id="error-for-${occasion.id.hex}" class="alert" style="display: none;"></div>
+                                        </div>
                                     </div>
-                                </tal:b>
+                                </div>
                             </div>
+                        </div>
+                    </tal:b>
+                </div>
+                <div id="show-more-target" class="grid-x grid-padding-x">
+                    <div class="cell small-12">
+
+                        <div class="show-more" tal:condition="activities">
+                            <tal:b define="next_page layout.model.by_page_range((0, (layout.model.page_range[1] + 1)))" condition="layout.model.next">
+                                <a class="button"
+                                    href="${request.link(next_page)}"
+                                    ic-get-from="${request.link(next_page, name='volunteer')}"
+                                    ic-select-from-response="#content"
+                                    ic-target="#content"
+                                    i18n:translate>
+                                        Show more
+                                </a>
+                            </tal:b>
+                            <div ></div>
+                            <a href="#" class="navigate-up"
+                                data-location="${current_location}"
+                                id="click-to-load-location"
+                                ><i class="fa fa-chevron-up"></i> <span i18n:translate>Navigate up</span></a>
                         </div>
                     </div>
                 </div>
-
-                <div id="click-to-load-target"></div>
-
-                <div class="show-more" tal:condition="activities">
-                    <tal:b define="next_page layout.model.next" condition="next_page">
-                        <a class="click-to-load" id="click-to-load"
-                            href="${request.link(next_page, name='volunteer')}"
-                            data-source="${request.link(next_page, name='volunteer')} .activities-list"
-                            data-target="#click-to-load-target"
-                            i18n:translate>
-                                Show more
-                        </a>
-                    </tal:b>
-                    <div ></div>
-                    <a href="#" class="navigate-up"
-                        data-location="${current_location}"
-                        id="click-to-load-location"
-                        i18n:translate>Navigate up</a>
-                </div>
-            </div>
-
-            <div class="columns medium-4 filter-panel" ic-target="#content" ic-push-url="true" ic-select-from-response="#content" ic-scroll-to-target="true">
-                <div class="volunteer-cart-panel">
-                    <h2 class="filter-title" i18n:translate>My list</h2>
-
-                    <tal:b metal:use-macro="layout.macros['volunteer-cart']" />
-                </div>
-
-                <div tal:condition="filters['weeks']|nothing" class="filter-weeks">
-                    <h2 class="filter-title" i18n:translate>Weeks</h2>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['weeks']" />
-                </div>
-
-                <div tal:condition="filters['weekdays']|nothing" class="filter-weekdays">
-                    <h2 class="filter-title" i18n:translate>Weekdays</h2>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['weekdays']" />
-                </div>
-
-                <div tal:condition="filters['durations']|nothing" class="filter-durations">
-                    <h2 class="filter-title" i18n:translate>Duration</h2>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['durations']" />
-                </div>
-
-                <div tal:condition="filters['timelines']|nothing" class="filter-timelines">
-                    <h2 class="filter-title" i18n:translate>Occasion</h2>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['timelines']" />
-                </div>
-
-                <div tal:condition="filters['tags']|nothing" class="filter-tags">
-                    <h2 class="filter-title" i18n:translate>Tags</h2>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['tags']" />
-                </div>
-
-                <div tal:condition="filters['municipalities']|nothing" class="filter-municipalities">
-                    <h2 class="filter-title" i18n:translate>Municipalities</h2>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['municipalities']" />
+                <div class="grid-x grid-padding-x">
+                    <div class="cell small-12" tal:condition="not:activities">
+                        <p i18n:translate>No activities found.</p>
+                        <b><a class="button hollow" tal:condition="filtered" href="${request.class_link(layout.model.__class__)}/volunteer" i18n:translate>Reset filter.</a></b>
+                    </div>
                 </div>
 
             </div>
+
+        </div>
         </div>
     </tal:b>
 </div>

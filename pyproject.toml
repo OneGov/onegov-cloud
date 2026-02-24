@@ -5,15 +5,32 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 log_level = "INFO"
 testpaths = ["tests"]
+python_classes = []
+python_files = ["test_*.py"]
 timeout = 300
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    '''ignore:pkg_resources is deprecated as an API''',
+    '''ignore:Deprecated call to `pkg_resources\.declare_namespace\('.*'\):DeprecationWarning''',
+    # potential issue for future upgrades
+    # unfortunately it's not possible to filter escape sequence warnings in
+    # specific modules, but we should be covered by Ruff for our own code
+    '''ignore:invalid escape sequence '[^']+':::''',
+    '''ignore:'crypt':DeprecationWarning:passlib.*:''',
+    # fixed upstream
+    '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:pyasn1.*:''',
+    '''ignore:'cgi':DeprecationWarning:webob.*:''',
+]
 
 [tool.coverage.run]
 data_file = "/tmp/.coverage"
 include = ["*/onegov/*"]
-omit = ["*/tests/*", "**/upgrade.py"]
+omit = ["*/tests/*"]
 
 [tool.coverage.report]
 ignore_errors = true
+skip_covered = true
+skip_empty = true
 exclude_lines = [
     "pragma: no cover",
     "pragma: unreachable",
@@ -22,7 +39,8 @@ exclude_lines = [
     "raise NotImplementedError",
     "raise AssertionError[(].unreachable.[)]",
     "if TYPE_CHECKING:",
-    "if __name__ == .__main__."
+    "if __name__ == .__main__.",
+    '''\A(?s:.*# pragma: exclude file.*)\Z'''
 ]
 
 [tool.mypy]
@@ -30,16 +48,11 @@ python_version = "3.11"
 follow_imports = "silent"
 namespace_packages = true
 explicit_package_bases = true
-warn_unused_ignores = true
-warn_redundant_casts = true
-warn_unused_configs = true
+strict = true
+implicit_reexport = true
 warn_unreachable = true
-disallow_any_generics = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-strict_equality = true
-extra_checks = true
-plugins = "sqlmypy"
+warn_return_any = false
+untyped_calls_exclude = "pycurl,selenium.webdriver.chrome.webdriver"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
 [[tool.mypy.overrides]]
@@ -49,11 +62,10 @@ module = [
     #        in OCQMS, so we could just copy that code over... plus the
     #        standard lib technically supports some ISO-8601 formats as well
     "isodate.*",
-    # TODO: Consider switching to fasttext-langdetect
-    #       langdetect is really, really slow by comparison...
-    "langdetect.*",
     # FIXME: Remove after https://github.com/lipoja/URLExtract/issues/164
     "urlextract.*",
+    # FIXME: Remove after https://github.com/jmcnamara/XlsxWriter/issues/1123
+    "xlsxwriter.*"
 ]
 ignore_missing_imports = true
 
@@ -67,20 +79,243 @@ exclude_dirs = [
 skips = [
     # ignore asserts
     "B101",
-    # ignore pickle (SEA-1030)
-    "B301",
+    # ignore meta-codes, we are aware of the implications
     "B403",
-    # ignore XML (SEA-1031)
-    "B314",
-    "B320",
-    "B405",
-    "B410",
-    # ignore subprocesses (SEA-1032)
     "B404",
-    "B602",
-    "B603",
-    "B605",
-    "B607",
-    # ignore temp directory (SEA-1033)
-    "B108"
+    "B405",
 ]
+
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+src = ["src", "test", "stubs"]
+include = [
+    "pyproject.toml",
+    "src/**/*.py",
+    "tests/**/*.py",
+    "stubs/**/*.pyi"
+]
+line-length = 79
+indent-width = 4
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "A005",
+    "ASYNC",
+    "B0",
+    "B904",
+    "B909",
+    "C4",
+    "COM818",
+    "D2",
+    "D301",
+    "D4",
+    "E",
+    "F",
+    "FLY002",
+    "FURB",
+    "G010",
+    "G2",
+    "I002",
+    "ISC",
+    "LOG",
+    "N",
+    "PERF",
+    "PGH004",
+    "PGH005",
+    "PIE",
+    "PYI",
+    "Q",
+    "RUF",
+    "SIM",
+    "SLOT",
+    "T",
+    "TRY",
+    "UP",
+    "W"
+]
+ignore = [
+    "B007",
+    "C420",
+    "D200",
+    "D201",
+    "D202",
+    "D204",
+    "D205",
+    "D209",
+    "D210",
+    "D211",
+    "D400",
+    "D401",
+    "D412",
+    "E226",
+    "E402",
+    "E711",
+    "E712",
+    "E741",
+    "FURB101",
+    "FURB103",
+    "FURB110",
+    # NOTE: We should probably enable this, but we use repeated appends
+    #       as a stylistic choice in some cases, extend would add another
+    #       level of indentation.
+    "FURB113",
+    "FURB145",
+    "FURB140",
+    "FURB156",
+    "FURB157",
+    "FURB180",
+    "FURB189",
+    "LOG002",
+    "N818",
+    "PYI019",
+    "PYI041",
+    "RUF012",
+    "RUF013",
+    "RUF021",
+    "RUF022",
+    "RUF023",
+    "RUF031",
+    "RUF052",
+    "RUF056",
+    # TODO: Brings lots of violations, needs cleanup in all __init__.py files
+    "RUF067",
+    # TODO: We would like to enable SIM102, but it has a ton of
+    #       violations, so it's a big job to clean it up
+    "SIM102",
+    "SIM103",
+    "SIM105",
+    "SIM108",
+    "SIM110",
+    "SIM118",
+    "SIM210",
+    "SIM910",
+    "TRY003",
+    "TRY300",
+    # NOTE: It probably makes sense to enable this, but the refactor
+    #       will take a bit of effort.
+    "TRY301",
+    "UP009",
+    "UP012",
+    "UP032",
+]
+unfixable = []
+external = ["TC"]
+allowed-confusables = ["×"]
+preview = true
+
+[tool.ruff.lint.extend-per-file-ignores]
+"src/onegov/core/types.py" = ["B018"]
+"reportlab_settings.py" = ["N", "I002"]
+"*/__init__.py" = ["I002"]
+"*.pyi" = [
+    "E501",
+    "FURB",
+    "N",
+    "Q",
+    # NOTE: We would prefer to set a different target version instead
+    #       but there's no per-file-target-version
+    "UP",
+]
+"src/onegov/*/upgrade.py" = [
+    "T2",
+]
+"tests/**/*.py" = [
+    "B018",
+    "C4",
+    "D",
+    "E301",
+    "E302",
+    "E303",
+    "E304",
+    "E305",
+    "E306",
+    "F841",
+    "FLY002",
+    "FURB",
+    "ISC",
+    "N",
+    "Q",
+    "PERF",
+    "PGH004",
+    "PIE",
+    "PYI",
+    "RUF",
+    "SIM",
+    "T",
+    "TRY",
+    "UP",
+]
+
+[tool.ruff.lint.isort]
+required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.lint.pep8-naming]
+extend-ignore-names = [
+    "afterFlowable",
+    "HSTORE",
+    "sortKey",
+    "URL",
+    "UUID"
+]
+classmethod-decorators = [
+    # NOTE: We can potentially get rid some of these with SQLAlchemy 2.0
+    #       since they should cleanly combine with classmethod
+    "declared_attr",
+    "expression",
+    "comparator",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+ignore-decorators = ["typing.overload"]
+
+[tool.ruff.lint.flake8-quotes]
+avoid-escape = true
+docstring-quotes = "double"
+inline-quotes = "single"
+multiline-quotes = "double"
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
+
+[tool.ruff.lint.ruff]
+extend-markup-names = ["chameleon.utils.Markup"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["attr.attrib"]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "lf"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"

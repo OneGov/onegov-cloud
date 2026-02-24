@@ -1,19 +1,37 @@
+from __future__ import annotations
+
+from onegov.core.converters import LiteralConverter
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.collections.language import LanguageCollection
+from onegov.translator_directory.collections.ticket import (
+    TimeReportFilteredTicketCollection,
+    TimeReportFilteredArchivedTicketCollection,
+)
+from onegov.translator_directory.collections.time_report import (
+    TimeReportCollection,
+)
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.mutation import TranslatorMutation
+from onegov.translator_directory.models.time_report import (
+    TranslatorTimeReport,
+)
 from onegov.translator_directory.models.translator import Translator
+from onegov.ticket.collection import (
+    ArchivedTicketCollection,
+    TicketCollection,
+)
 from uuid import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.translator_directory.request import TranslatorAppRequest
+    from onegov.ticket.collection import ExtendedTicketState
 
 
 @TranslatorDirectoryApp.path(
@@ -21,7 +39,7 @@ if TYPE_CHECKING:
     converters={'id': UUID}
 )
 def get_translator(
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     id: UUID
 ) -> Translator | None:
     return request.session.query(Translator).filter_by(id=id).first()
@@ -38,11 +56,12 @@ def get_translator(
         'guilds': [str],
         'interpret_types': [str],
         'admissions': [str],
-        'genders': [str]
+        'genders': [str],
+        'include_hidden': bool
     }
 )
 def get_translators(
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     page: int | None = None,
     written_langs: list[str] | None = None,
     spoken_langs: list[str] | None = None,
@@ -53,7 +72,8 @@ def get_translators(
     guilds: list[str] | None = None,
     interpret_types: list[str] | None = None,
     admissions: list[str] | None = None,
-    genders: list[str] | None = None
+    genders: list[str] | None = None,
+    include_hidden: bool | None = None
 ) -> TranslatorCollection:
 
     user = request.current_user
@@ -70,7 +90,8 @@ def get_translators(
         guilds=guilds,
         interpret_types=interpret_types,
         admissions=admissions,
-        genders=genders
+        genders=genders,
+        include_hidden=include_hidden if include_hidden is not None else False
     )
 
 
@@ -134,3 +155,95 @@ def get_accreditation(
     ticket_id: UUID
 ) -> Accreditation:
     return Accreditation(app.session(), target_id, ticket_id)
+
+
+@TranslatorDirectoryApp.path(
+    model=TimeReportCollection,
+    path='/time-reports',
+    converters={'page': int, 'archive': bool},
+)
+def get_time_reports(
+    app: TranslatorDirectoryApp,
+    page: int = 0,
+    archive: bool = False,
+) -> TimeReportCollection:
+    return TimeReportCollection(app, page, archive)
+
+
+@TranslatorDirectoryApp.path(
+    model=TranslatorTimeReport,
+    path='/time-report/{id}',
+    converters={'id': UUID},
+)
+def get_time_report(
+    request: TranslatorAppRequest, id: UUID
+) -> TranslatorTimeReport | None:
+    return request.session.query(TranslatorTimeReport).filter_by(id=id).first()
+
+
+@TranslatorDirectoryApp.path(
+    model=TicketCollection,
+    path='/tickets/{handler}/{state}',
+    converters={
+        'page': int,
+        'state': LiteralConverter(
+            'open', 'pending', 'closed', 'archived', 'all', 'unfinished'
+        ),
+    },
+)
+def get_tickets(
+    request: TranslatorAppRequest,
+    handler: str = 'ALL',
+    state: ExtendedTicketState | None = 'open',
+    page: int = 0,
+    group: str | None = None,
+    owner: str | None = None,
+    submitter: str | None = None,
+    q: str | None = None,
+    extra_parameters: dict[str, str] | None = None,
+) -> TicketCollection | None:
+
+    if state is None:
+        return None
+
+    return TimeReportFilteredTicketCollection(
+        request.session,
+        handler=handler,
+        state=state,
+        page=page,
+        group=group,
+        owner=owner or '*',
+        submitter=submitter or '*',
+        term=q,
+        extra_parameters=extra_parameters,
+        request=request,
+    )
+
+
+@TranslatorDirectoryApp.path(
+    model=ArchivedTicketCollection,
+    path='/tickets-archive/{handler}',
+    converters={'page': int},
+)
+def get_archived_tickets(
+    request: TranslatorAppRequest,
+    handler: str = 'ALL',
+    page: int = 0,
+    group: str | None = None,
+    owner: str | None = None,
+    submitter: str | None = None,
+    q: str | None = None,
+    extra_parameters: dict[str, str] | None = None,
+) -> ArchivedTicketCollection | None:
+    return TimeReportFilteredArchivedTicketCollection(
+        request.session,
+        handler=handler,
+        state='archived',
+        page=page,
+        group=group,
+        owner=owner or '*',
+        submitter=submitter or '*',
+        term=q,
+        extra_parameters=extra_parameters,
+        request=request,
+    )

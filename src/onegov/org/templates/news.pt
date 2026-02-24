@@ -36,5 +36,10 @@
 
         <tal:b metal:use-macro="layout.macros.page_content"
          tal:define="lead page.content.get('lead');text page.text|None; people page.people; contact page.contact_html; coordinates page.coordinates; files page.files; sidepanel_links page.sidepanel_links|False;" />
+
+        <div class="pagination-centered" tal:condition="pagination">
+            <div metal:use-macro="layout.macros['pagination']" tal:define="
+            collection pagination; current_page pagination;" />
+        </div>
     </tal:b>
 </div>

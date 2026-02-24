@@ -1,4 +1,5 @@
 """ Offers tools to deal with csv (and xls, xlsx) files. """
+from __future__ import annotations
 
 import codecs
 
@@ -15,13 +16,13 @@ from csv import reader as csv_reader
 from csv import writer as csv_writer
 from datetime import datetime
 from editdistance import eval as distance
+from functools import lru_cache
 from io import BytesIO, StringIO
 from itertools import permutations
 from onegov.core import errors
-from onegov.core.cache import lru_cache
 from ordered_set import OrderedSet
 from unidecode import unidecode
-from xlsxwriter.workbook import Workbook  # type:ignore[import-untyped]
+from xlsxwriter.workbook import Workbook
 from onegov.core.utils import normalize_for_url
 
 
@@ -32,8 +33,7 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Sequence)
     from csv import Dialect
     from openpyxl.worksheet.worksheet import Worksheet
-    from typing import Protocol
-    from typing_extensions import TypeAlias
+    from typing import Protocol, TypeAlias
 
     _T = TypeVar('_T')
     _T_co = TypeVar('_T_co', covariant=True)
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     )
 
     class _RowType(Protocol[_T_co]):
-        def __call__(self, rownumber: int, **kwargs: str) -> _T_co: ...
+        def __call__(self, *, rownumber: int, **kwargs: str) -> _T_co: ...
 
     class DefaultRow(Protocol):
         @property
@@ -52,13 +52,14 @@ if TYPE_CHECKING:
 
     KeyFunc: TypeAlias = Callable[[_T], SupportsRichComparison]
     DefaultCSVFile: TypeAlias = 'CSVFile[DefaultRow]'
-
-
-_RowT = TypeVar('_RowT')
+    _RowT = TypeVar('_RowT', default=DefaultRow)
+else:
+    _RowT = TypeVar('_RowT')
 
 
 VALID_CSV_DELIMITERS = ',;\t'
 WHITESPACE = re.compile(r'\s+')
+INVALID_XLSX_TITLE = re.compile(r'[\\*?:/\[\]]')
 
 small_chars = 'fijlrt:,;.+i '
 large_chars = 'GHMWQ_'
@@ -125,14 +126,14 @@ class CSVFile(Generic[_RowT]):
 
     """
 
-    rowtype: '_RowType[_RowT]'
+    rowtype: _RowType[_RowT]
 
     @overload
     def __init__(
-        self: 'DefaultCSVFile',
+        self: DefaultCSVFile,
         csvfile: IO[bytes],
-        expected_headers: 'Collection[str] | None ' = None,
-        dialect: 'type[Dialect] | Dialect | str | None' = None,
+        expected_headers: Collection[str] | None = None,
+        dialect: type[Dialect] | Dialect | str | None = None,
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
         rowtype: None = None
@@ -140,24 +141,24 @@ class CSVFile(Generic[_RowT]):
 
     @overload
     def __init__(
-        self: 'CSVFile[_RowT]',
+        self: CSVFile[_RowT],
         csvfile: IO[bytes],
-        expected_headers: 'Collection[str] | None ' = None,
-        dialect: 'type[Dialect] | Dialect | str | None' = None,
+        expected_headers: Collection[str] | None = None,
+        dialect: type[Dialect] | Dialect | str | None = None,
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
         *,
-        rowtype: '_RowType[_RowT]'
+        rowtype: _RowType[_RowT]
     ): ...
 
     def __init__(
         self,
         csvfile: IO[bytes],
-        expected_headers: 'Collection[str] | None ' = None,
-        dialect: 'type[Dialect] | Dialect | str | None' = None,
+        expected_headers: Collection[str] | None = None,
+        dialect: type[Dialect] | Dialect | str | None = None,
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
-        rowtype: '_RowType[_RowT] | None' = None
+        rowtype: _RowType[_RowT] | None = None
     ):
 
         # guess the encoding if not already provided
@@ -198,28 +199,28 @@ class CSVFile(Generic[_RowT]):
             rownumber can't be used as a header
         """
 
-        self.rowtype = rowtype or namedtuple(  # type:ignore[assignment]
-            "CSVFileRow", ['rownumber'] + [
+        self.rowtype = rowtype or namedtuple(  # type:ignore  # noqa: PYI024
+            'CSVFileRow', ['rownumber', *(
                 self.as_valid_identifier(k)
                 for k in self.headers.keys()
-            ]
+            )]
         )
 
     @staticmethod
     @lru_cache(maxsize=128)
     def as_valid_identifier(value: str) -> str:
         result = normalize_header(value)
-        for invalid in '- .%/,;':
+        for invalid in '- .%/,;()':
             result = result.replace(invalid, '_')
         while result and result[0] in '_0123456789':
             result = result[1:]
         return result
 
-    def __iter__(self) -> 'Iterator[_RowT]':
+    def __iter__(self) -> Iterator[_RowT]:
         yield from self.lines
 
     @property
-    def lines(self) -> 'Iterator[_RowT]':
+    def lines(self) -> Iterator[_RowT]:
         self.csvfile.seek(0)
 
         encountered_empty_line = False
@@ -266,7 +267,7 @@ def detect_encoding(csvfile: IO[bytes]) -> str:
         return 'cp1252'
 
 
-def sniff_dialect(csv: str) -> type['Dialect']:
+def sniff_dialect(csv: str) -> type[Dialect]:
     """ Takes the given csv string and returns the dialect or raises an error.
     Works just like Python's built in sniffer, just that it is a bit more
     conservative and doesn't just accept any kind of character as csv
@@ -322,7 +323,7 @@ def convert_xlsx_to_csv(
     try:
         excel = openpyxl.load_workbook(xlsx, data_only=True)
     except Exception as exception:
-        raise IOError("Could not read XLSX file") from exception
+        raise OSError('Could not read XLSX file') from exception
 
     sheet: Worksheet
     if sheet_name:
@@ -330,7 +331,7 @@ def convert_xlsx_to_csv(
             sheet = excel[sheet_name]
         except KeyError as exception:
             raise KeyError(
-                "Could not find the given sheet in this excel file!"
+                'Could not find the given sheet in this excel file!'
             ) from exception
     else:
         sheet = excel.worksheets[0]
@@ -397,14 +398,14 @@ def convert_xls_to_csv(
     try:
         excel = xlrd.open_workbook(file_contents=xls.read())
     except Exception as exception:
-        raise IOError("Could not read XLS file") from exception
+        raise OSError('Could not read XLS file') from exception
 
     if sheet_name:
         try:
             sheet = excel.sheet_by_name(sheet_name)
         except xlrd.XLRDError as exception:
             raise KeyError(
-                "Could not find the given sheet in this excel file!"
+                'Could not find the given sheet in this excel file!'
             ) from exception
     else:
         sheet = excel.sheet_by_index(0)
@@ -412,7 +413,7 @@ def convert_xls_to_csv(
     text_output = StringIO()
     writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
 
-    for rownum in range(0, sheet.nrows):
+    for rownum in range(sheet.nrows):
         values = []
 
         for cell in sheet.row(rownum):
@@ -460,7 +461,7 @@ def convert_excel_to_csv(
 
     try:
         return convert_xlsx_to_csv(file, sheet_name)
-    except IOError:
+    except OSError:
         return convert_xls_to_csv(file, sheet_name)
 
 
@@ -493,23 +494,23 @@ def estimate_width(text: str) -> float:
 
 @overload
 def get_keys_from_list_of_dicts(
-    rows: 'Iterable[dict[_SupportsRichComparisonT, Any]]',
+    rows: Iterable[dict[_SupportsRichComparisonT, Any]],
     key: None = None,
     reverse: bool = False
-) -> tuple['_SupportsRichComparisonT', ...]: ...
+) -> tuple[_SupportsRichComparisonT, ...]: ...
 
 
 @overload
 def get_keys_from_list_of_dicts(
-    rows: 'Iterable[dict[_T, Any]]',
-    key: 'KeyFunc[_T]',
+    rows: Iterable[dict[_T, Any]],
+    key: KeyFunc[_T],
     reverse: bool = False
-) -> tuple['_T', ...]: ...
+) -> tuple[_T, ...]: ...
 
 
 def get_keys_from_list_of_dicts(
-    rows: 'Iterable[dict[Any, Any]]',
-    key: 'KeyFunc[Any] | None' = None,
+    rows: Iterable[dict[Any, Any]],
+    key: KeyFunc[Any] | None = None,
     reverse: bool = False
 ) -> tuple[Any, ...]:
     """ Returns all keys of a list of dicts in an ordered tuple.
@@ -540,9 +541,9 @@ def get_keys_from_list_of_dicts(
 
 
 def convert_list_of_dicts_to_csv(
-    rows: 'Iterable[dict[str, Any]]',
-    fields: 'Sequence[str] | None' = None,
-    key: 'KeyFunc[str] | None' = None,
+    rows: Iterable[dict[str, Any]],
+    fields: Sequence[str] | None = None,
+    key: KeyFunc[str] | None = None,
     reverse: bool = False
 ) -> str:
     """ Takes a list of dictionaries and returns a csv.
@@ -578,9 +579,9 @@ def convert_list_of_dicts_to_csv(
 
 
 def convert_list_of_dicts_to_xlsx(
-    rows: 'Iterable[dict[str, Any]]',
-    fields: 'Sequence[str] | None' = None,
-    key: 'KeyFunc[str] | None' = None,
+    rows: Iterable[dict[str, Any]],
+    fields: Sequence[str] | None = None,
+    key: KeyFunc[str] | None = None,
     reverse: bool = False
 ) -> bytes:
     """ Takes a list of dictionaries and returns a xlsx.
@@ -603,7 +604,7 @@ def convert_list_of_dicts_to_xlsx(
         # keep track of the maximum character width
         column_widths = [estimate_width(field) for field in fields_]
 
-        def values(row: dict[str, Any]) -> 'Iterator[str]':
+        def values(row: dict[str, Any]) -> Iterator[str]:
             for ix, field in enumerate(fields_):
                 value = row.get(field, '')
                 column_widths[ix] = max(
@@ -631,9 +632,9 @@ def convert_list_of_dicts_to_xlsx(
 
 
 def convert_list_of_list_of_dicts_to_xlsx(
-    row_list: 'Sequence[Iterable[dict[str, Any]]]',
-    titles_list: 'Sequence[str]',
-    key_list: 'Sequence[KeyFunc[str] | None] | None' = None,
+    row_list: Sequence[Iterable[dict[str, Any]]],
+    titles_list: Sequence[str],
+    key_list: Sequence[KeyFunc[str] | None] | None = None,
     reverse: bool = False
 ) -> bytes:
     """
@@ -663,7 +664,7 @@ def convert_list_of_list_of_dicts_to_xlsx(
                 row: dict[str, Any],
                 fields: tuple[str, ...] = fields,
                 column_widths: list[float] = column_widths
-            ) -> 'Iterator[str]':
+            ) -> Iterator[str]:
                 for ix, field in enumerate(fields):
                     value = row.get(field, '')
                     column_widths[ix] = max(
@@ -689,16 +690,15 @@ def convert_list_of_list_of_dicts_to_xlsx(
         return file.read()
 
 
-def normalize_sheet_titles(titles: 'Sequence[str]') -> list[str]:
+def normalize_sheet_titles(titles: Sequence[str]) -> list[str]:
     """
-        Ensuring the title of the xlsx is valid.
+    Ensuring the title of the xlsx is valid.
     """
 
     def valid_characters_or_raise(title: str) -> None:
-        INVALID_TITLE_REGEX = re.compile(r'[\\*?:/\[\]]')
-        m = INVALID_TITLE_REGEX.search(title)
+        m = INVALID_XLSX_TITLE.search(title)
         if m:
-            msg = f"Invalid character {m.group(0)} found in xlsx sheet title"
+            msg = f'Invalid character {m.group(0)} found in xlsx sheet title'
             raise ValueError(msg)
 
     titles = [normalize_for_url(title) for title in titles]
@@ -719,7 +719,7 @@ def normalize_sheet_titles(titles: 'Sequence[str]') -> list[str]:
     return titles
 
 
-def avoid_duplicate_name(titles: 'Sequence[str]', title: str) -> str:
+def avoid_duplicate_name(titles: Sequence[str], title: str) -> str:
     """
     Naive check to see whether name already exists.
     If name does exist suggest a name using an incrementer
@@ -728,9 +728,9 @@ def avoid_duplicate_name(titles: 'Sequence[str]', title: str) -> str:
     # Check for an absolute match in which case we need to find an alternative
     match = [n for n in titles if n.lower() == title.lower()]
     if match:
-        titles = u",".join(titles)
+        titles = ','.join(titles)
         sheet_title_regex = re.compile(
-            f'(?P<title>{re.escape(title)})(?P<count>\\d*),?', re.I
+            f'(?P<title>{re.escape(title)})(?P<count>\\d*),?', re.IGNORECASE
         )
         matches = sheet_title_regex.findall(titles)
         if matches:
@@ -739,35 +739,35 @@ def avoid_duplicate_name(titles: 'Sequence[str]', title: str) -> str:
             highest = 0
             if counts:
                 highest = max(counts)
-            title = u"{0}_{1}".format(title, highest + 1)
+            title = f'{title}_{highest + 1}'
     return title
 
 
 def remove_first_word(title: str) -> str:
     """
-        Removes all chars from beginning up until and including the first "-".
+    Removes all chars from beginning up until and including the first "-".
     """
     return re.sub(r'^.*?-', '', title)
 
 
-def has_duplicates(a_list: 'Sequence[Any]') -> bool:
+def has_duplicates(a_list: Sequence[Any]) -> bool:
     return len(a_list) != len(set(a_list))
 
 
-def list_duplicates_index(a: 'Sequence[Any]') -> list[int]:
+def list_duplicates_index(a: Sequence[Any]) -> list[int]:
     """
-        returns a list of indexes of duplicates in a list.
-        for example::
+    Returns a list of indexes of duplicates in a list.
+    for example::
 
-            a = [1, 2, 3, 2, 1, 5, 6, 5, 5, 5]
-            list_duplicates_index(a) == [3, 4, 7, 8, 9]
+        a = [1, 2, 3, 2, 1, 5, 6, 5, 5, 5]
+        list_duplicates_index(a) == [3, 4, 7, 8, 9]
     """
     return [idx for idx, item in enumerate(a) if item in a[:idx]]
 
 
 def parse_header(
     csv: str,
-    dialect: 'type[Dialect] | Dialect | str | None' = None,
+    dialect: type[Dialect] | Dialect | str | None = None,
     rename_duplicate_column_names: bool = False
 ) -> list[str]:
     """ Takes the first line of the given csv string and returns the headers.
@@ -796,7 +796,7 @@ def parse_header(
         indexes: dict[str, list[int]] = {}
         for i, item in enumerate(headers):
             indexes.setdefault(item, []).append(i)
-        for key, value in indexes.items():
+        for value in indexes.values():
             for suffix, index in enumerate(value[1:]):
                 headers[index] += '_{}'.format(suffix + 1)
 
@@ -804,8 +804,8 @@ def parse_header(
 
 
 def match_headers(
-    headers: 'Collection[str]',
-    expected: 'Collection[str]'
+    headers: Collection[str],
+    expected: Collection[str]
 ) -> list[str]:
     """ Takes a list of normalized headers and matches them up against a
     list of expected headers.

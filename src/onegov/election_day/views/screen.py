@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
@@ -25,11 +27,11 @@ if TYPE_CHECKING:
     template='screen.pt',
     permission=MaybePublic
 )
-def view_screen(self: Screen, request: 'ElectionDayRequest') -> 'RenderData':
+def view_screen(self: Screen, request: ElectionDayRequest) -> RenderData:
     """ Shows a screen. """
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
@@ -71,11 +73,11 @@ def view_screen(self: Screen, request: 'ElectionDayRequest') -> 'RenderData':
     request_method='HEAD',
     permission=MaybePublic
 )
-def view_screen_head(self: Screen, request: 'ElectionDayRequest') -> None:
+def view_screen_head(self: Screen, request: ElectionDayRequest) -> None:
     """ Get the last modification date. """
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
@@ -85,11 +87,11 @@ def view_screen_head(self: Screen, request: 'ElectionDayRequest') -> None:
     name='json',
     permission=MaybePublic
 )
-def view_screen_json(self: Screen, request: 'ElectionDayRequest') -> 'JSON_ro':
+def view_screen_json(self: Screen, request: ElectionDayRequest) -> JSON_ro:
     """ Get the last modification date. """
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 

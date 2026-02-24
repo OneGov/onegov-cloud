@@ -1,10 +1,12 @@
+from __future__ import annotations
+
+from markupsafe import Markup
 from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
-from onegov.core.orm.types import MarkupText
 from onegov.core.utils import normalize_for_url
 from onegov.file import File
 from onegov.file.utils import as_fileintent
@@ -13,10 +15,14 @@ from onegov.file.utils import extension_for_content_type
 from onegov.gis import CoordinatesMixin
 from onegov.people.models.membership import AgencyMembership
 from onegov.search import ORMSearchable
-from sqlalchemy import Column
-from sqlalchemy import Text
+from decimal import Decimal
+from sqlalchemy import func
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import DynamicMapped
+from sqlalchemy.orm import Mapped
+from translationstring import TranslationString
 
 
 from typing import Any
@@ -27,9 +33,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Iterator
     from depot.io.interfaces import StoredFile
-    from markupsafe import Markup
-    from onegov.core.types import AppenderQuery
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from uuid import UUID
 
     AgencySortKey: TypeAlias = Callable[['Agency'], SupportsRichComparison]
@@ -53,87 +57,92 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'generic',
     }
 
-    es_public = True
-    es_properties = {
-        'title': {'type': 'text'},
-        'description': {'type': 'localized'},
-        'portrait': {'type': 'localized_html'},
+    # HACK: We don't want to set up translations in this module for this single
+    #       string, we know we already have a translation in a different domain
+    #       so we just manually specify it for now.
+    fts_type_title = TranslationString('Agencies', domain='onegov.agency')
+    fts_public = True
+    fts_title_property = 'title'
+    fts_properties = {
+        'title': {'type': 'text', 'weight': 'A'},
+        'description': {'type': 'localized', 'weight': 'B'},
+        'portrait': {'type': 'localized', 'weight': 'B'},
     }
 
+    # NOTE: When an agency was last changed should not influence how
+    #       relevant it is in the search results
+    @property
+    def fts_last_change(self) -> None:
+        return None
+
     #: a short description of the agency
-    description: 'Column[str | None]' = Column(Text, nullable=True)
+    description: Mapped[str | None]
 
     #: describes the agency
-    portrait: 'Column[Markup | None]' = Column(MarkupText, nullable=True)
+    portrait: Mapped[Markup | None]
 
     #: location address (street name and number) of agency
-    location_address: 'Column[str | None]' = Column(Text, nullable=True)
+    location_address: Mapped[str | None]
 
     #: location code and city of agency
-    location_code_city: 'Column[str | None]' = Column(Text, nullable=True)
+    location_code_city: Mapped[str | None]
 
     #: postal address (street name and number) of agency
-    postal_address: 'Column[str | None]' = Column(Text, nullable=True)
+    postal_address: Mapped[str | None]
 
     #: postal code and city of agency
-    postal_code_city: 'Column[str | None]' = Column(Text, nullable=True)
+    postal_code_city: Mapped[str | None]
 
     #: the phone number of agency
-    phone: 'Column[str | None]' = Column(Text, nullable=True)
+    phone: Mapped[str | None]
 
     #: the direct phone number of agency
-    phone_direct: 'Column[str | None]' = Column(Text, nullable=True)
+    phone_direct: Mapped[str | None]
 
     #: the email of agency
-    email: 'Column[str | None]' = Column(Text, nullable=True)
+    email: Mapped[str | None]
 
     #: the website related to agency
-    website: 'Column[str | None]' = Column(Text, nullable=True)
+    website: Mapped[str | None]
 
     #: opening hours of agency
-    opening_hours: 'Column[str | None]' = Column(Text, nullable=True)
+    opening_hours: Mapped[str | None]
 
     #: a reference to the organization chart
     organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
 
-    memberships: 'relationship[AppenderQuery[AgencyMembership]]'
-    memberships = relationship(
-        AgencyMembership,
+    memberships: DynamicMapped[AgencyMembership] = relationship(
         back_populates='agency',
         cascade='all, delete-orphan',
-        lazy='dynamic',
         order_by='AgencyMembership.order_within_agency'
     )
 
     if TYPE_CHECKING:
         # override the attributes from AdjacencyList
-        parent: relationship['Agency | None']
-        children: relationship[list['Agency']]
+        parent: Mapped[Agency | None]
+        children: Mapped[list[Agency]]
+
         @property
-        def root(self) -> 'Agency': ...
+        def root(self) -> Agency: ...
         @property
-        def ancestors(self) -> 'Iterator[Agency]': ...
+        def ancestors(self) -> Iterator[Agency]: ...
 
     @property
-    def organigram_file(self) -> 'StoredFile | None':
+    def organigram_file(self) -> StoredFile | None:
         """ Returns the file-like content of the organigram. """
 
-        if self.organigram:
-            return self.organigram.reference.file
-        return None
+        try:
+            return self.organigram.reference.file if self.organigram else None
+        except (OSError, Exception):
+            return None
 
-    # FIXME: asymmetric property
     @organigram_file.setter
     def organigram_file(self, value: IO[bytes]) -> None:
         """ Sets the organigram, expects a file-like value. """
@@ -154,64 +163,67 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
 
     def add_person(
         self,
-        person_id: 'UUID',
+        person_id: UUID,
         title: str,
         *,
         order_within_agency: int = 2 ** 16,
         # FIXME: Specify the arguments supported by AgencyMembership
         **kwargs: Any
-    ) -> None:
+    ) -> AgencyMembership:
         """ Appends a person to the agency with the given title. """
 
         session = object_session(self)
+        assert session is not None
 
-        orders_for_person_q = session.query(
-            AgencyMembership.order_within_person
-        ).filter_by(person_id=person_id)
+        order_within_person = session.query(
+            func.coalesce(func.max(AgencyMembership.order_within_person), -1)
+        ).filter_by(person_id=person_id).scalar() + 1
 
-        orders_for_person = [order for order, in orders_for_person_q]
+        next_order_within_agency = session.query(
+            func.coalesce(func.max(AgencyMembership.order_within_agency), -1)
+        ).filter_by(agency_id=self.id).scalar() + 1
 
-        if orders_for_person:
-            try:
-                order_within_person = max(orders_for_person) + 1
-            except ValueError:
-                order_within_person = 0
-            assert len(orders_for_person) == max(orders_for_person) + 1
+        if order_within_agency > next_order_within_agency:
+            # just use the next available number
+            order_within_agency = next_order_within_agency
         else:
-            order_within_person = 0
+            # move everyone after the desired position up by one
+            for membership in self.memberships:
+                if membership.order_within_agency >= order_within_agency:
+                    membership.order_within_agency += 1
 
-        self.memberships.append(
-            AgencyMembership(
-                person_id=person_id,
-                title=title,
-                order_within_agency=order_within_agency,
-                order_within_person=order_within_person,
-                **kwargs
-            )
+        membership = AgencyMembership(
+            person_id=person_id,
+            title=title,
+            order_within_agency=order_within_agency,
+            order_within_person=order_within_person,
+            **kwargs
         )
+        self.memberships.append(membership)
 
-        for order, membership in enumerate(self.memberships):
-            membership.order_within_agency = order
+        session.flush()
+
+        return membership
 
     def sort_children(
         self,
-        sortkey: 'AgencySortKey | None' = None
+        sortkey: AgencySortKey | None = None
     ) -> None:
         """ Sorts the suborganizations.
 
         Sorts by the agency title by default.
         """
         if sortkey is None:
-            def sortkey(agency: 'Agency') -> str:
+            def sortkey(agency: Agency) -> str:
                 return normalize_for_url(agency.title)
 
         children = sorted(self.children, key=sortkey)
         for order, child in enumerate(children):
-            child.order = order
+            child.order = Decimal(order)
 
     def sort_relationships(
         self,
-        sortkey: 'AgencyMembershipSortKey | None' = None
+        sortkey: AgencyMembershipSortKey | None = None
     ) -> None:
         """ Sorts the relationships.
 

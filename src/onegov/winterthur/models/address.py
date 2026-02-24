@@ -1,13 +1,14 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from sqlalchemy import Column
-from sqlalchemy import Integer
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing_extensions import Self
+    from typing import Self
 
 
 class WinterthurAddress(Base, TimestampMixin):
@@ -15,38 +16,38 @@ class WinterthurAddress(Base, TimestampMixin):
     __tablename__ = 'winterthur_addresses'
 
     #: the adress id
-    id: 'Column[int]' = Column(Integer, nullable=False, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
     #: the street
-    street_id: 'Column[int]' = Column(Integer, nullable=False)
-    street: 'Column[str]' = Column(Text, nullable=False)
+    street_id: Mapped[int]
+    street: Mapped[str]
 
     #: the house
-    house_number: 'Column[int]' = Column(Integer, nullable=False)
-    house_extra: 'Column[str | None]' = Column(Text, nullable=True)
+    house_number: Mapped[int]
+    house_extra: Mapped[str | None]
 
     #: the place
-    zipcode: 'Column[int]' = Column(Integer, nullable=False)
-    zipcode_extra: 'Column[int | None]' = Column(Integer, nullable=True)
+    zipcode: Mapped[int]
+    zipcode_extra: Mapped[int | None]
 
-    place: 'Column[str]' = Column(Text, nullable=False)
+    place: Mapped[str]
 
     #: the district
-    district: 'Column[str]' = Column(Text, nullable=False)
+    district: Mapped[str]
 
     #: the neighbourhood
-    neighbourhood: 'Column[str]' = Column(Text, nullable=False)
+    neighbourhood: Mapped[str]
 
     @classmethod
-    def as_addressless(cls, street_id: int, street: str) -> 'Self':
+    def as_addressless(cls, street_id: int, street: str) -> Self:
         return cls(
             street_id=street_id,
             street=street,
             house_number=-1,
             zipcode=-1,
-            place="",
-            district="",
-            neighbourhood="",
+            place='',
+            district='',
+            neighbourhood='',
         )
 
     @property
@@ -58,4 +59,4 @@ class WinterthurAddress(Base, TimestampMixin):
         if self.is_addressless:
             return self.street
         else:
-            return f"{self.street} {self.house_number}{self.house_extra}"
+            return f'{self.street} {self.house_number}{self.house_extra}'

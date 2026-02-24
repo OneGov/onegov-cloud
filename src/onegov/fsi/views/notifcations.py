@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Secret
 from onegov.core.templates import render_template
 from onegov.fsi import FsiApp
@@ -28,16 +30,16 @@ if TYPE_CHECKING:
 
 def handle_send_email(
     self: CourseNotificationTemplate,
-    request: 'FsiRequest',
-    recipients: 'Sequence[UUID] | Sequence[CourseAttendee]',
+    request: FsiRequest,
+    recipients: Sequence[UUID] | Sequence[CourseAttendee],
     cc_to_sender: bool = True,
     show_sent_count: bool = True,
-    attachments: 'Iterable[Attachment | StrPath] | None' = None
-) -> 'FsiRequest':
+    attachments: Iterable[Attachment | StrPath] | None = None
+) -> FsiRequest:
     """Recipients must be a list of attendee id's or attendees"""
 
     if not recipients:
-        request.alert(_("There are no recipients matching the selection"))
+        request.alert(_('There are no recipients matching the selection'))
         return request
 
     att = request.attendee
@@ -57,7 +59,7 @@ def handle_send_email(
 
     mail_layout = MailLayout(self, request)
 
-    def email_iter() -> 'Iterator[EmailJsonDict]':
+    def email_iter() -> Iterator[EmailJsonDict]:
         for attendee in recipients:
             content = render_template('mail_notification.pt', request, {
                 'layout': mail_layout,
@@ -79,7 +81,7 @@ def handle_send_email(
 
     if show_sent_count:
         request.success(_(
-            "Successfully sent the e-mail to ${count} recipients",
+            'Successfully sent the e-mail to ${count} recipients',
             mapping={
                 'count': len(recipients)
             }
@@ -94,8 +96,8 @@ def handle_send_email(
 )
 def view_notifications(
     self: CourseNotificationTemplateCollection,
-    request: 'FsiRequest'
-) -> 'RenderData':
+    request: FsiRequest
+) -> RenderData:
 
     layout = NotificationTemplateCollectionLayout(self, request)
     # This was a workaround and should be removed in the future
@@ -115,8 +117,8 @@ def view_notifications(
 )
 def view_notification_details(
     self: CourseNotificationTemplate,
-    request: 'FsiRequest'
-) -> 'RenderData':
+    request: FsiRequest
+) -> RenderData:
     return {
         'layout': NotificationTemplateLayout(self, request)
     }
@@ -131,13 +133,13 @@ def view_notification_details(
 )
 def view_edit_notification(
     self: CourseNotificationTemplate,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: NotificationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.update_model(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     form.apply_model(self)
@@ -160,8 +162,8 @@ def view_edit_notification(
 )
 def view_email_preview(
     self: CourseNotificationTemplate,
-    request: 'FsiRequest'
-) -> 'RenderData':
+    request: FsiRequest
+) -> RenderData:
 
     layout = MailLayout(self, request)
 
@@ -183,9 +185,9 @@ def view_email_preview(
 )
 def handle_send_notification(
     self: CourseNotificationTemplate,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: NotificationTemplateSendForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = SendNotificationTemplateLayout(self, request)
 
@@ -201,6 +203,6 @@ def handle_send_notification(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Send E-Mail Now"),
+        'button_text': _('Send E-Mail Now'),
         'model': self,
     }

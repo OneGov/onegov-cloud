@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from fs.errors import ResourceNotFound
 from morepath.request import Response
 from onegov.election_day import ElectionDayApp
@@ -29,8 +31,8 @@ if TYPE_CHECKING:
 )
 def view_archive(
     self: ArchivedResultCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ Shows all the results from the elections and votes for a given year
     or date.
 
@@ -53,8 +55,8 @@ def view_archive(
 )
 def view_archive_json(
     self: ArchivedResultCollection,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ Shows all the results from the elections and votes for a given year
     or date as JSON.
 
@@ -85,8 +87,8 @@ def view_archive_json(
 )
 def view_principal(
     self: Principal,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ Shows all the results from the elections and votes of the last election
     day. It's the landing page.
 
@@ -110,8 +112,8 @@ def view_principal(
 )
 def view_principal_json(
     self: Principal,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ Shows all the results from the elections and votes of the last election
     day as JSON.
 
@@ -138,7 +140,7 @@ def view_principal_json(
 
 def search_form(
     model: SearchableArchivedResultCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: None = None
 ) -> type[ArchiveSearchFormVote | ArchiveSearchFormElection]:
 
@@ -155,9 +157,9 @@ def search_form(
 )
 def view_archive_search(
     self: SearchableArchivedResultCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ArchiveSearchFormVote | ArchiveSearchFormElection
-) -> 'RenderData':
+) -> RenderData:
     """ Shows all the results from the elections and votes of the last election
     day. It's the landing page.
     """
@@ -186,18 +188,18 @@ def view_archive_search(
 )
 def view_archive_download(
     self: Principal,
-    request: 'ElectionDayRequest'
+    request: ElectionDayRequest
 ) -> Response:
 
     filestorage = request.app.filestorage
     assert filestorage is not None
 
-    if not filestorage.isdir("archive"):
+    if not filestorage.isdir('archive'):
         raise HTTPNotFound()
     try:
-        zip_dir = filestorage.opendir("archive/zip")
+        zip_dir = filestorage.opendir('archive/zip')
         content = None
-        with zip_dir.open("archive.zip", mode="rb") as zipfile:
+        with zip_dir.open('archive.zip', mode='rb') as zipfile:
             content = zipfile.read()
         if not content:
             raise HTTPNotFound()

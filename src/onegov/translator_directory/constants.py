@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from decimal import Decimal
+from typing import NamedTuple
+from typing import TypeAlias
 from onegov.translator_directory import _
 
 full_text_max_chars = 25
@@ -5,12 +10,13 @@ member_can_see = (
     'first_name',
     'last_name',
     'pers_id',
+    'contract_number',
     'admission',
     'withholding_tax',
     'self_employed',
     'gender',
     'date_of_birth',
-    'nationality',
+    'nationalities',
     'coordinates',
     'address',
     'zip_code',
@@ -32,7 +38,8 @@ member_can_see = (
     'expertise_professional_guilds_all'
 )
 
-editor_can_see = member_can_see + (
+editor_can_see = (
+    *member_can_see,
     'social_sec_number',
     'bank_name',
     'bank_address',
@@ -40,7 +47,8 @@ editor_can_see = member_can_see + (
     'iban'
 )
 
-translator_can_see = editor_can_see + (
+translator_can_see = (
+    *editor_can_see,
     'profession',
     'occupation',
     'operation_comments',
@@ -58,12 +66,13 @@ field_order = (
     'first_name',
     'last_name',
     'pers_id',
+    'contract_number',
     'admission',
     'withholding_tax',
     'self_employed',
     'gender',
     'date_of_birth',
-    'nationality',
+    'nationalities',
     'coordinates',
     'address',
     'zip_code',
@@ -138,4 +147,154 @@ INTERPRETING_TYPES = {
     'consecutive': _('Consecutive interpreting'),
     'negotiation': _('Negotiation interpreting'),
     'whisper': _('Whisper interpreting'),
+}
+
+# SHPOL ====
+TIME_REPORT_INTERPRETING_TYPES = {
+    'telephonic': _('telephonic'),
+    'on-site': _('On Site'),
+    'schriftlich': _('Written'),
+}
+HOURLY_RATE_CERTIFIED = Decimal('90.00')
+HOURLY_RATE_UNCERTIFIED = Decimal('75.00')
+
+TIME_REPORT_SURCHARGE_LABELS = {
+    'night_work': 'Zuschlag Nacht',
+    'weekend_holiday': 'Zuschlag WE',
+    'urgent': _('Exceptionally urgent'),
+}
+
+# Lohnart codes for L001 accounting export
+LOHNART_COMPENSATION = '2603'
+LOHNART_EXPENSES = '8102'
+# ====
+
+TRANSLATOR_FA_ICON = 'translator'
+
+LocationMapping: TypeAlias = tuple[str, str]
+
+
+class Finanzstelle(NamedTuple):
+    name: str
+    street: str
+    zip_code: str
+    city: str
+    kostenstelle: str
+
+
+ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
+    'obergericht': ('Obergericht', 'Frauengasse 17, 8200 Schaffhausen'),
+    'kantonsgericht': ('Kantonsgericht', 'Herrenacker 26,  8200 Schaffhausen'),
+    'staatsanwaltschaft': (
+        'Staatsanwaltschaft Allgemeine Abteilung',
+        'Beckenstube 5, 8200 Schaffhausen'
+    ),
+    'staatsanwaltschaft_postgebaeude': (
+        'Staatsanwaltschaft Allgemeine Abteilung Postgebäude',
+        'Bahnhofstrasse 34, 8200 Schaffhausen',
+    ),
+    'verkehrsabteilung_staatsanwaltschaft': (
+        'Verkehrsabteilung der Staatsanwaltschaft',
+        'Bahnhofstrasse 29, 8200 Schaffhausen'
+    ),
+    'jugendanwaltschaft': (
+        'Abteilung Jugendanwaltschaft',
+        'J.J. Wepfer-Strasse 6, 8200 Schaffhausen'
+    ),
+    'migrationsamt': (
+        'Migrationsamt und Passbüro',
+        'Mühlentalstrasse 105, 8200 Schaffhausen'
+    ),
+    'kantonales_gefaengnis': (
+        'Kantonales Gefängnis',
+        'Beckenstube 5, 8200 Schaffhausen'
+    ),
+    'polizei': (
+        'Schaffhauser Polizei',
+        'Beckenstube 1, 8200 Schaffhausen'
+    ),
+    'polizei_verkehrsabteilung': (
+        'Schaffhauser Polizei Verkehrsabteilung',
+        'Emmersbergstrasse 1, 8200 Schaffhausen'
+    ),
+    'polizei_klettgau': (
+        'Schaffhauser Polizei Polizeistation Klettgau',
+        'Zelgstrasse 8, 8222 Beringen'
+    ),
+    'polizei_neuhausen': (
+        'Schaffhauser Polizei Polizeistation Neuhausen',
+        'Rheingoldstrasse 26, 8212 Neuhausen am Rheinfall'
+    ),
+    'polizei_reiat': (
+        'Schaffhauser Polizei Polizeistation Reiat',
+        'Biberstrasse 33, 8240 Thayngen'
+    ),
+    'polizei_stein': (
+        'Schaffhauser Polizei Polizeistation Stein am Rhein',
+        'Chlini Schanz 12, 8250, Stein am Rhein'
+    ),
+    'spitaeler': (
+        'Spitäler Schaffhausen Einvernahme Polizei',
+        'Geissbergstrasse 81, 8208 Schaffhausen'
+    ),
+}
+
+
+FINANZSTELLE: dict[str, Finanzstelle] = {
+    'migrationsamt_und_passbuero': Finanzstelle(
+        name='Migrationsamt und Passbüro',
+        street='Mühlentalstrasse 105',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='2122',
+    ),
+    'staatsanwaltschaft': Finanzstelle(
+        name='Staatsanwaltschaft Allgemeine Abteilung',
+        street='Beckenstube 5',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='2466',
+    ),
+    'gefaengnisverwaltung': Finanzstelle(
+        name='Kantonales Gefängnis',
+        street='Beckenstube 5',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='2472',
+    ),
+    'polizei': Finanzstelle(
+        name='Schaffhauser Polizei',
+        street='Beckenstube 1',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='2550-DO00',
+    ),
+    'obergericht': Finanzstelle(
+        name='Obergericht',
+        street='Frauengasse 17',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='3010',
+    ),
+    'kantonsgericht': Finanzstelle(
+        name='Kantonsgericht',
+        street='Herrenacker 26',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='3030',
+    ),
+    'verkehrsabteilung_staatsanwaltschaft': Finanzstelle(
+        name='Verkehrsabteilung der Staatsanwaltschaft',
+        street='Bahnhofstrasse 29',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='2466',
+    ),
+    'jugendanwaltschaft': Finanzstelle(
+        name='Abteilung Jugendanwaltschaft',
+        street='J.J. Wepfer-Strasse 6',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='2466',
+    ),
 }

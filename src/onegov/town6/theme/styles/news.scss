@@ -18,9 +18,6 @@
         }
     }
 
-    .news-item {
-    }
-
     .news-lead {
         color: $body-font-color;
         display: block;
@@ -68,6 +65,11 @@
         color: $body-font-color;
         line-height: 1.5;
     }
+}
+
+.card.news-card {
+    height: calc(100% - 2rem);
+    margin-bottom: 2rem;
 }
 
 .news-card .card-section a:first-child {

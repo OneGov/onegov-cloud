@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import textwrap
 import yaml
 
@@ -23,7 +25,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
     from wtforms.form import BaseForm
 
@@ -39,13 +41,13 @@ SERVICE_DAYS = {
 }
 
 SERVICE_DAYS_LABELS = {
-    0: _("Monday"),
-    1: _("Tuesday"),
-    2: _("Wednesday"),
-    3: _("Thursday"),
-    4: _("Friday"),
-    5: _("Saturday"),
-    6: _("Sunday"),
+    0: _('Monday'),
+    1: _('Tuesday'),
+    2: _('Wednesday'),
+    3: _('Thursday'),
+    4: _('Friday'),
+    5: _('Saturday'),
+    6: _('Sunday'),
 }
 
 # http://babel.pocoo.org/en/latest/numbers.html#pattern-syntax
@@ -83,7 +85,7 @@ class Daycare:
 
     def __init__(
         self,
-        id: 'UUID',
+        id: UUID,
         title: str,
         rate: Decimal | float | str,
         weeks: int
@@ -118,7 +120,7 @@ class Services:
         self.selected = defaultdict(set)
 
     @classmethod
-    def from_org(cls, org: Organisation) -> 'Self':
+    def from_org(cls, org: Organisation) -> Self:
         if 'daycare_settings' not in org.meta:
             return cls(None)
 
@@ -128,11 +130,11 @@ class Services:
         return cls(org.meta['daycare_settings']['services'])
 
     @classmethod
-    def from_session(cls, session: 'Session') -> 'Self':
+    def from_session(cls, session: Session) -> Self:
         return cls.from_org(session.query(Organisation).one())
 
     @staticmethod
-    def parse_definition(definition: str) -> 'Iterator[tuple[str, Service]]':
+    def parse_definition(definition: str) -> Iterator[tuple[str, Service]]:
         for service in yaml.safe_load(definition):
             service_id = normalize_for_url(service['titel'])
             days = (d.strip() for d in service['tage'].split(','))
@@ -175,7 +177,7 @@ class Result:
         operation: str | None = None,
         important: bool = False,
         currency: str | None = 'CHF',
-        output_format: 'Callable[[Decimal], str] | None' = None
+        output_format: Callable[[Decimal], str] | None = None
     ) -> None:
 
         self.title = title
@@ -213,7 +215,7 @@ class Block:
         operation: str | None = None,
         important: bool = False,
         currency: str | None = 'CHF',
-        output_format: 'Callable[[Decimal], str] | None' = None,
+        output_format: Callable[[Decimal], str] | None = None,
         total_places: int = 2,
         amount_places: int = 2
     ) -> Decimal:
@@ -271,7 +273,7 @@ class Block:
 
 class DirectoryDaycareAdapter:
 
-    def __init__(self, directory: 'ExtendedDirectory') -> None:
+    def __init__(self, directory: ExtendedDirectory) -> None:
         self.directory = directory
 
     @cached_property
@@ -298,7 +300,7 @@ class DirectoryDaycareAdapter:
 
         return fieldmap
 
-    def as_daycare(self, entry: 'ExtendedDirectoryEntry') -> Daycare:
+    def as_daycare(self, entry: ExtendedDirectoryEntry) -> Daycare:
         assert self.fieldmap['daycare_rate'] is not None
         assert self.fieldmap['daycare_weeks'] is not None
         return Daycare(
@@ -334,7 +336,7 @@ class Settings:
                 #       dict_property/dict_markup_property, we would
                 #       need to do something special for is_valid
                 #       however
-                value = Markup(value)  # noqa: MS001
+                value = Markup(value)  # nosec: B704
             setattr(self, key, value)
 
     def is_valid(self) -> bool:
@@ -377,7 +379,7 @@ class SubsidyResult(NamedTuple):
 
 class DaycareSubsidyCalculator:
 
-    def __init__(self, session: 'Session') -> None:
+    def __init__(self, session: Session) -> None:
         self.session = session
 
     @cached_property
@@ -389,7 +391,7 @@ class DaycareSubsidyCalculator:
         return Settings(self.organisation)
 
     @cached_property
-    def directory(self) -> 'ExtendedDirectory':
+    def directory(self) -> ExtendedDirectory:
         directory: ExtendedDirectory | None = (
             DirectoryCollection(self.session, type='extended')
             .by_id(self.settings.directory)
@@ -451,23 +453,23 @@ class DaycareSubsidyCalculator:
 
         # Base Rate
         # ---------
-        base = Block('base', "Berechnungsgrundlage für die Elternbeiträge")
+        base = Block('base', 'Berechnungsgrundlage für die Elternbeiträge')
 
         base.op(
-            title="Steuerbares Einkommen",
+            title='Steuerbares Einkommen',
             amount=income,
             note="""
                 Steuerbares Einkommen gemäss letzter Veranlagung.
             """)
 
         base.op(
-            title="Vermögenszuschlag",
+            title='Vermögenszuschlag',
             amount=max(
                 (wealth - cfg.max_wealth)
                 * cfg.wealth_premium
                 / Decimal('100'),
                 Decimal(0)),
-            operation="+",
+            operation='+',
             note=f"""
                 Der Vermögenszuschlag beträgt
                 {fmt(cfg.wealth_premium).rstrip('0').rstrip('.')}% des
@@ -476,31 +478,31 @@ class DaycareSubsidyCalculator:
             """)
 
         base.op(
-            title="Massgebendes Gesamteinkommen",
-            operation="=")
+            title='Massgebendes Gesamteinkommen',
+            operation='=')
 
         base.op(
-            title="Abzüglich Minimaleinkommen",
-            operation="-",
+            title='Abzüglich Minimaleinkommen',
+            operation='-',
             amount=cfg.min_income)
 
         base.op(
-            title="Berechnungsgrundlage",
-            operation="=")
+            title='Berechnungsgrundlage',
+            operation='=')
 
         # Gross Contribution
         # ------------------
-        gross = Block('gross', "Berechnung des Brutto-Elternbeitrags")
+        gross = Block('gross', 'Berechnung des Brutto-Elternbeitrags')
 
         gross.op(
-            title="Übertrag",
+            title='Übertrag',
             amount=base.total)
 
         gross.op(
-            title="Faktor",
+            title='Faktor',
             amount=cfg.factor(daycare),
             currency=None,
-            operation="×",
+            operation='×',
             note="""
                 Ihr Elternbeitrag wird aufgrund eines Faktors berechnet
                 (Kita-Reglement Art. 20 Abs 3).
@@ -509,17 +511,17 @@ class DaycareSubsidyCalculator:
             amount_places=10)
 
         gross.op(
-            title="Einkommensabhängiger Elternbeitragsbestandteil",
-            operation="=")
+            title='Einkommensabhängiger Elternbeitragsbestandteil',
+            operation='=')
 
         gross.op(
-            title="Mindestbeitrag Eltern",
+            title='Mindestbeitrag Eltern',
             amount=cfg.min_rate,
-            operation="+")
+            operation='+')
 
         gross.op(
-            title="Elternbeitrag brutto",
-            operation="=",
+            title='Elternbeitrag brutto',
+            operation='=',
             amount=min(gross.total, daycare.rate))
 
         # Actual contribution
@@ -530,21 +532,21 @@ class DaycareSubsidyCalculator:
         )
 
         actual = Block('actual', (
-            "Berechnung des Elternbeitrags und des "
-            "städtischen Beitrags pro Tag"
+            'Berechnung des Elternbeitrags und des '
+            'städtischen Beitrags pro Tag'
         ))
 
         actual.op(
-            title="Übertrag",
+            title='Übertrag',
             amount=gross.total)
 
         actual.op(
-            title="Zusatzbeitrag Eltern",
+            title='Zusatzbeitrag Eltern',
             amount=max(
                 daycare.rate - cfg.max_subsidy - cfg.min_rate,
                 Decimal(0)
             ),
-            operation="+",
+            operation='+',
             note=f"""
                 Zusatzbeitrag für Kitas, deren Tagestarif über
                 {cfg.max_rate} CHF liegt.
@@ -552,9 +554,9 @@ class DaycareSubsidyCalculator:
 
         if actual.total >= rebate_amount and rebate_amount > 0:
             actual.op(
-                title="Rabatt",
+                title='Rabatt',
                 amount=rebate_amount,
-                operation="-",
+                operation='-',
                 note=f"""
                     Bei einem Betreuungsumfang von insgesamt mehr als 2 ganzen
                     Tagen pro Woche gilt ein Rabatt von
@@ -562,15 +564,15 @@ class DaycareSubsidyCalculator:
                 """)
 
         parent_share_per_day = actual.op(
-            title="Elternbeitrag pro Tag",
-            operation="=",
+            title='Elternbeitrag pro Tag',
+            operation='=',
             note="""
                 Ihr Beitrag pro Tag (100%) und Kind.
             """,
             important=True)
 
         city_share_per_day = actual.op(
-            title="Städtischer Beitrag pro Tag",
+            title='Städtischer Beitrag pro Tag',
             amount=max(daycare.rate - parent_share_per_day, Decimal('0.00')),
             important=True,
             note="""
@@ -581,23 +583,23 @@ class DaycareSubsidyCalculator:
         # --------------------
         monthly = Block(
             'monthly', (
-                "Berechnung des Elternbeitrags und des städtischen "
-                "Beitrags pro Monat"
+                'Berechnung des Elternbeitrags und des städtischen '
+                'Beitrags pro Monat'
             )
         )
 
         monthly.op(
-            title="Wochentarif",
+            title='Wochentarif',
             amount=parent_share_per_day * services.total / 100,
             note="""
                 Wochentarif: Elternbeiträge der gewählten Betreuungstage.
             """)
 
         monthly.op(
-            title="Faktor",
+            title='Faktor',
             amount=daycare.factor,
             currency=None,
-            operation="×",
+            operation='×',
             note="""
                 Faktor für jährliche Öffnungswochen Ihrer Kita.
             """,
@@ -605,20 +607,20 @@ class DaycareSubsidyCalculator:
             amount_places=4)
 
         parent_share_per_month = monthly.op(
-            title="Elternbeitrag pro Monat",
-            operation="=",
+            title='Elternbeitrag pro Monat',
+            operation='=',
             important=True,
             output_format=format_5_cents)
 
         city_share_per_month = monthly.op(
-            title="Städtischer Beitrag pro Monat",
+            title='Städtischer Beitrag pro Monat',
             amount=city_share_per_day * services.total / 100 * daycare.factor,
             important=True,
             output_format=format_5_cents)
 
         # Services table
         # --------------
-        def services_table() -> 'Iterator[tuple[str, str | None, str]]':
+        def services_table() -> Iterator[tuple[str, str | None, str]]:
             total = Decimal(0)
             total_percentage = Decimal(0)
 
@@ -634,7 +636,7 @@ class DaycareSubsidyCalculator:
                         label = SERVICE_DAYS_LABELS[day]
                         yield (label, service.title, format_5_cents(cost))
 
-            yield (_("Total"), None, format_5_cents(total))
+            yield (_('Total'), None, format_5_cents(total))
 
         total = (
             round_to(parent_share_per_month, '0.05')
@@ -704,11 +706,11 @@ class DaycareServicesWidget:
         </table
     """)
 
-    def __call__(self, field: 'DaycareServicesField', **kwargs: Any) -> Markup:
+    def __call__(self, field: DaycareServicesField, **kwargs: Any) -> Markup:
         self.field = field
         self.services = field.services
 
-        return Markup(self.template.render(this=self))  # noqa: MS001
+        return Markup(self.template.render(this=self))  # nosec: B704
 
     def is_selected(self, service: Service, day: int) -> bool:
         return self.services.is_selected(service.id, day)
@@ -740,7 +742,7 @@ class DaycareServicesField(Field):
             service_id, day = value.rsplit('-', maxsplit=1)
             self.services.select(service_id, int(day))
 
-    def pre_validate(self, form: 'BaseForm') -> None:
+    def pre_validate(self, form: BaseForm) -> None:
         for day in SERVICE_DAYS.values():
             days = sum(
                 1 for id in self.services.available
@@ -748,7 +750,7 @@ class DaycareServicesField(Field):
             )
 
             if days > 1:
-                raise ValidationError(_("Each day may only be selected once."))
+                raise ValidationError(_('Each day may only be selected once.'))
 
 
 class DaycareSubsidyCalculatorForm(Form):
@@ -756,39 +758,39 @@ class DaycareSubsidyCalculatorForm(Form):
     model: DaycareSubsidyCalculator
 
     daycare = SelectField(
-        label=_("Select Daycare"),
+        label=_('Select Daycare'),
         validators=(InputRequired(), ),
         choices=())
 
     services = DaycareServicesField(
-        label=_("Care"),
+        label=_('Care'),
         validators=(InputRequired(), ))
 
     income = DecimalField(
-        label=_("Definite Taxable income"),
+        label=_('Definite Taxable income'),
         validators=(InputRequired(), NumberRange(min=0)))
 
     wealth = DecimalField(
-        label=_("Definite Taxable wealth"),
+        label=_('Definite Taxable wealth'),
         validators=(InputRequired(), NumberRange(min=0)))
 
     rebate = BooleanField(
-        label=_("Rebate"),
+        label=_('Rebate'),
         description=_(
-            "Does at least one child in your household attend the same "
-            "daycare for more than two whole days a week?"
+            'Does at least one child in your household attend the same '
+            'daycare for more than two whole days a week?'
         ))
 
     def on_request(self) -> None:
         self.daycare.choices = list(self.daycare_choices)
 
     @property
-    def daycare_choices(self) -> 'Iterator[tuple[str, str]]':
+    def daycare_choices(self) -> Iterator[tuple[str, str]]:
 
         def choice(daycare: Daycare) -> tuple[str, str]:
             label = _((
-                "${title} / day rate CHF ${rate} / "
-                "${weeks} weeks open per year"
+                '${title} / day rate CHF ${rate} / '
+                '${weeks} weeks open per year'
             ), mapping={
                 'title': daycare.title,
                 'rate': daycare.rate,

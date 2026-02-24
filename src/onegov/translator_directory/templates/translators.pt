@@ -3,87 +3,90 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="row">
-            <div class="columns small-12">
-                <div class="row">
-                    <div class="columns small-12">
-                        <div class="translators-filter">
-                            <div class="search"></div>
-                        </div>
-                        <div class="search-results">
-                            <p tal:condition="not: results" i18n:translate="">
-                                No results found
-                            </p>
-                            <div metal:use-macro="layout.macros['form']" tal:define="form_two_columns True"/>
-                            <table id="search-results-table" class="fullwidth" tal:condition="results">
-                                <thead>
-                                    <th i18n:translate="" tal:condition="layout.show('pers_id')">Personal ID</th>
-                                    <th i18n:translate="" tal:condition="layout.show('withholding_tax')">Withholding tax</th>
-                                    <th i18n:translate="" tal:condition="layout.show('self_employed')">Self-employed</th>
-                                    <th i18n:translate="">Name</th>
-                                    <th i18n:translate="">Gender</th>
-                                    <th i18n:translate="">Written languages</th>
-                                    <th i18n:translate="">Spoken languages</th>
-                                    <th class="drive-distance" i18n:translate="">Drive distance</th>
-                                    <th i18n:translate="">Monitoring languages</th>
-                                    <th i18n:translate="">Phone numbers</th>
-                                    <th i18n:translate="">Email</th>
-                                </thead>
-                                <tbody>
-                                    <tr tal:repeat="translator results">
-                                        <td tal:condition="layout.show('pers_id')">${translator.pers_id or ''}</td>
-                                        <td tal:condition="layout.show('withholding_tax')" class="text-center">
-                                            <tal:b tal:switch="translator.withholding_tax">
-                                                <span tal:case="True" class="check-icon"></span>
-                                                <span tal:case="False">-</span>
-                                            </tal:b>
-                                        </td>
-                                        <td tal:condition="layout.show('self_employed')" class="text-center">
-                                            <tal:b tal:switch="translator.self_employed">
-                                                <span tal:case="True" class="check-icon"></span>
-                                                <span tal:case="False">-</span>
-                                            </tal:b>
-                                        </td>
-                                        <td><a href="${request.link(translator)}">${translator.full_name_lastname_upper}</a></td>
-                                        <td>${translator.gender}</td>
-                                        <td>
-                                            <tal:b tal:repeat="language translator.written_languages">
-                                                <span tal:attributes="class layout.color_class(language.writers_count)">
-                                                    ${language.name} (${language.writers_count})
-                                                </span>
-                                            </tal:b>
-                                        </td>
-                                        <td>
-                                            <tal:b tal:repeat="language translator.spoken_languages">
-                                                <span tal:attributes="class layout.color_class(language.writers_count)">
-                                                ${language.name} (${language.speakers_count})
-                                                </span>
-                                            </tal:b>
-                                        </td>
-                                        <td class="drive-distance">${layout.format_drive_distance(translator.drive_distance)}</td>
-                                        <td>
-                                            <tal:b tal:repeat="language translator.monitoring_languages">
-                                                <span tal:attributes="class layout.color_class(language.writers_count)">
-                                                ${language.name} (${language.speakers_count})
-                                                </span>
-                                            </tal:b>
-                                        </td>
-                                        <td>
-                                            <span class="mobile-phone nowrap" tal:condition="translator.tel_mobile" tal:content="layout.linkify(translator.tel_mobile)"></span>
-                                            <span class="private-phone nowrap" tal:condition="translator.tel_private" tal:content="layout.linkify(translator.tel_private)"></span>
-                                            <span class="office-phone nowrap" tal:condition="translator.tel_office" tal:content="layout.linkify(translator.tel_office)"></span>
-                                        </td>
-                                        <td class="nowrap" tal:content="layout.linkify(translator.email or '')"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="pagination-centered">
-                                <div metal:use-macro="layout.macros['pagination']" tal:define="collection model; current_page model;" />
-                            </div>
-                        </div>
+        <div class="grid-x grid-padding-x">
+            <div class="cell small-12">
+                <div class="translators-filter">
+                </div>
+                <div class="search-results">
+                    <p tal:condition="not: results" i18n:translate="">
+                        No results found
+                    </p>
+                    <div metal:use-macro="layout.macros['form']" tal:define="form_two_columns True"/>
+                    <div class="export-button-container" tal:condition="layout.export_link">
+                         <a tal:attributes="href layout.export_link"
+                           class="button secondary export-button">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            <span i18n:translate="">Export Excel (from filter)</span>
+                        </a>
+                    </div>
+                    <table id="search-results-table" class="fullwidth" tal:condition="results">
+                        <thead>
+                            <th i18n:translate="" tal:condition="layout.show('pers_id')">Personal ID</th>
+                            <th i18n:translate="" tal:condition="layout.show('withholding_tax')">Withholding tax</th>
+                            <th i18n:translate="" tal:condition="layout.show('self_employed')">Self-employed</th>
+                            <th i18n:translate="">Name</th>
+                            <th i18n:translate="">Gender</th>
+                            <th i18n:translate="">Written languages</th>
+                            <th i18n:translate="">Spoken languages</th>
+                            <th class="drive-distance" i18n:translate="">Drive distance</th>
+                            <th i18n:translate="">Monitoring languages</th>
+                            <th i18n:translate="">Phone numbers</th>
+                            <th i18n:translate="">Email</th>
+                        </thead>
+                        <tbody>
+                            <tr tal:repeat="translator results">
+                                <td tal:condition="layout.show('pers_id')">${translator.pers_id or ''}</td>
+                                <td tal:condition="layout.show('withholding_tax')" class="text-center">
+                                    <tal:b tal:switch="translator.withholding_tax">
+                                        <span tal:case="True" class="check-icon"></span>
+                                        <span tal:case="False">-</span>
+                                    </tal:b>
+                                </td>
+                                <td tal:condition="layout.show('self_employed')" class="text-center">
+                                    <tal:b tal:switch="translator.self_employed">
+                                        <span tal:case="True" class="check-icon"></span>
+                                        <span tal:case="False">-</span>
+                                    </tal:b>
+                                </td>
+                                <td><a href="${request.link(translator)}">${translator.title}</a></td>
+                                <td>${translator.gender}</td>
+                                <td>
+                                    <tal:b tal:repeat="language translator.written_languages">
+                                        <span tal:attributes="class layout.color_class(language.writers_count)">
+                                            ${language.name} (${language.writers_count})
+                                        </span>
+                                    </tal:b>
+                                </td>
+                                <td>
+                                    <tal:b tal:repeat="language translator.spoken_languages">
+                                        <span tal:attributes="class layout.color_class(language.writers_count)">
+                                        ${language.name} (${language.speakers_count})
+                                        </span>
+                                    </tal:b>
+                                </td>
+                                <td class="drive-distance">${layout.format_drive_distance(translator.drive_distance)}</td>
+                                <td>
+                                    <tal:b tal:repeat="language translator.monitoring_languages">
+                                        <span tal:attributes="class layout.color_class(language.writers_count)">
+                                        ${language.name} (${language.speakers_count})
+                                        </span>
+                                    </tal:b>
+                                </td>
+                                <td>
+                                    <span class="mobile-phone nowrap" tal:condition="translator.tel_mobile" tal:content="layout.linkify(translator.tel_mobile)"></span>
+                                    <span class="private-phone nowrap" tal:condition="translator.tel_private" tal:content="layout.linkify(translator.tel_private)"></span>
+                                    <span class="office-phone nowrap" tal:condition="translator.tel_office" tal:content="layout.linkify(translator.tel_office)"></span>
+                                </td>
+                                <td class="nowrap" tal:content="layout.linkify(translator.email or '')"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pagination-centered">
+                        <div metal:use-macro="layout.macros['pagination']" tal:define="collection model; current_page model;" />
                     </div>
                 </div>
             </div>
         </div>
+
     </tal:b>
 </div>

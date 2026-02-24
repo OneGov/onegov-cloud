@@ -1,6 +1,9 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.town6">
-    <tal:b metal:fill-slot="title">
+    <tal:b metal:fill-slot="title" tal:define="title title|layout.title">
         ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="post-title" tal:condition="subtitle|None">
+        <span class="small">${subtitle}</span>
     </tal:b>
     <tal:b metal:fill-slot="content">
         <!--! The form is either rendered with a panel on the right (boxed), or
@@ -33,8 +36,8 @@
             <metal:hint use-macro="layout.macros['empty_page_lead_hint']" />
         </tal:b>
 
-        <div class="panel callout" tal:condition="callout|nothing">
-             <p>${callout}</p>
+        <div class="panel callout" tal:condition="form.callout|callout|nothing">
+             <p>${form.callout|callout}</p>
         </div>
 
         <div class="panel" tal:condition="helptext|nothing">
@@ -48,7 +51,7 @@
         </tal:b>
 
         <tal:b metal:use-macro="layout.macros.page_content"
-                   tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing; coordinates coordinates|nothing">
+                   tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing; coordinates coordinates|nothing; files files|nothing;">
             <tal:b metal:fill-slot="after-text">
                 <div class="grid-x" tal:condition="hints|nothing">
                     <div class="cell small-12 panel ${hints_callout and 'callout' or ''}">
@@ -58,10 +61,10 @@
                     </div>
                 </div>
                 <div class="grid-x" tal:define="form_id 'main-form'">
-                    <div tal:attributes="class boxed_size" tal:condition="people or contact">
+                    <div tal:attributes="class boxed_size" tal:condition="people or contact or coordinates or files">
                         <div metal:use-macro="layout.macros['form']" tal:condition="form" />
                     </div>
-                    <div tal:attributes="class size" tal:condition="not: people or contact">
+                    <div tal:attributes="class size" tal:condition="not: people or contact or coordinates or files">
                         <div metal:use-macro="layout.macros['form']" tal:condition="form" />
                     </div>
                 </div>

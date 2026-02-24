@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -20,13 +22,10 @@ if TYPE_CHECKING:
     template='parties.pt',
     permission=Private
 )
-def view_parties(
+def pas_view_parties(
     self: PartyCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
-
-    layout = PartyCollectionLayout(self, request)
-
+    request: TownRequest
+) -> RenderData:
     filters = {}
     filters['active'] = [
         Link(
@@ -34,11 +33,12 @@ def view_parties(
             active=self.active == value,
             url=request.link(self.for_filter(active=value))
         ) for title, value in (
-            (_("Active"), True),
-            (_("Inactive"), False)
+            (_('Active'), True),
+            (_('Inactive'), False)
         )
     ]
 
+    layout = PartyCollectionLayout(self, request)
     return {
         'add_link': request.link(self, name='new'),
         'filters': filters,
@@ -55,25 +55,24 @@ def view_parties(
     permission=Private,
     form=PartyForm
 )
-def add_party(
+def pas_add_party(
     self: PartyCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: PartyForm
-) -> 'RenderData | Response':
-
+) -> RenderData | Response:
     if form.submitted(request):
         party = self.add(**form.get_useful_data())
-        request.success(_("Added a new party"))
+        request.success(_('Added a new party'))
 
         return request.redirect(request.link(party))
 
     layout = PartyCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _("New party"),
+        'title': _('New party'),
         'form': form,
         'form_width': 'large'
     }
@@ -84,13 +83,12 @@ def add_party(
     template='party.pt',
     permission=Private
 )
-def view_party(
+def pas_view_party(
     self: Party,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = PartyLayout(self, request)
-
     return {
         'layout': layout,
         'party': self,
@@ -103,23 +101,22 @@ def view_party(
     name='edit',
     template='form.pt',
     permission=Private,
-    form=PartyForm
+    form=PartyForm,
+    pass_model=True
 )
-def edit_party(
+def pas_edit_party(
     self: Party,
-    request: 'TownRequest',
+    request: TownRequest,
     form: PartyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
-    form.process(obj=self)
-
     layout = PartyLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
     layout.include_editor()
 
@@ -136,12 +133,10 @@ def edit_party(
     request_method='DELETE',
     permission=Private
 )
-def delete_party(
+def pas_delete_party(
     self: Party,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> None:
-
-    request.assert_valid_csrf_token()
 
     collection = PartyCollection(request.session)
     collection.delete(self)

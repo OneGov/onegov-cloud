@@ -3,20 +3,16 @@
         ${layout.title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="row">
-            <div class="columns small-12">
-                <div class="row">
-                    <div class="columns small-12" tal:define="upcoming_only request.is_member">
-                        <tal:b tal:define="items layout.accordion_items(upcoming_only)" tal:switch="items != ()">
-                            <span tal:case="False" i18n:translate="">No entries found.</span>
-                            <tal:b tal:case="True">
-                                <tal:b metal:use-macro="layout.macros['accordion']" />
-                            </tal:b>
-                        </tal:b>
-                        <a class="button" i18n:translate href="${request.link(model.toggled_hidden())}" tal:condition="request.is_admin">Toggle hidden</a>
+        <tal:b define="upcoming_only request.is_member">
+            <tal:b tal:define="items layout.accordion_items(upcoming_only)" tal:switch="items != ()">
+                <span tal:case="False" i18n:translate="">No entries found.</span>
+                <tal:b tal:case="True">
+                    <div class="courses">
+                        <tal:b metal:use-macro="layout.macros['accordion']" />
                     </div>
-                </div>
-            </div>
-        </div>
+                </tal:b>
+            </tal:b>
+            <a class="button" i18n:translate href="${request.link(model.toggled_hidden())}" tal:condition="request.is_admin">Toggle hidden</a>
+        </tal:b>
     </tal:b>
 </div>

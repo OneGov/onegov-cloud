@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from functools import cached_property
 from datetime import date
-from onegov.activity import InvoiceItem
+from onegov.activity import ActivityInvoiceItem
 
 
 from typing import Literal, TYPE_CHECKING
@@ -14,8 +16,8 @@ class InvoiceAction:
 
     def __init__(
         self,
-        session: 'Session',
-        id: 'UUID',
+        session: Session,
+        id: UUID,
         action: Literal['mark-paid', 'mark-unpaid', 'remove-manual'],
         extend_to: Literal['invoice', 'family'] | None = None,
         text: str | None = None
@@ -27,8 +29,9 @@ class InvoiceAction:
         self.text = text
 
     @cached_property
-    def item(self) -> InvoiceItem | None:
-        return self.session.query(InvoiceItem).filter_by(id=self.id).first()
+    def item(self) -> ActivityInvoiceItem | None:
+        return self.session.query(ActivityInvoiceItem
+            ).filter_by(id=self.id).first()
 
     @property
     def valid(self) -> bool:
@@ -47,23 +50,23 @@ class InvoiceAction:
         return True
 
     @property
-    def targets(self) -> 'Iterator[InvoiceItem]':
+    def targets(self) -> Iterator[ActivityInvoiceItem]:
         item = self.item
 
         if item:
             yield item
 
             if self.extend_to == 'invoice':
-                q = self.session.query(InvoiceItem)
-                q = q.filter(InvoiceItem.id != item.id)
-                q = q.filter(InvoiceItem.invoice_id == item.invoice_id)
+                q = self.session.query(ActivityInvoiceItem)
+                q = q.filter(ActivityInvoiceItem.id != item.id)
+                q = q.filter(ActivityInvoiceItem.invoice_id == item.invoice_id)
 
                 yield from q
 
             if self.extend_to == 'family':
-                q = self.session.query(InvoiceItem)
-                q = q.filter(InvoiceItem.id != item.id)
-                q = q.filter(InvoiceItem.family == item.family)
+                q = self.session.query(ActivityInvoiceItem)
+                q = q.filter(ActivityInvoiceItem.id != item.id)
+                q = q.filter(ActivityInvoiceItem.family == item.family)
 
                 yield from q
 
@@ -83,20 +86,26 @@ class InvoiceAction:
 
     def assert_safe_to_change(
         self,
-        targets: 'Collection[InvoiceItem]'
+        targets: Collection[ActivityInvoiceItem]
     ) -> None:
         for target in targets:
             if target.invoice.disable_changes_for_items((target, )):
-                raise RuntimeError("Item was paid online")
+                raise RuntimeError('Item was paid online')
 
-    def execute_mark_paid(self, targets: 'Collection[InvoiceItem]') -> None:
+    def execute_mark_paid(
+        self,
+        targets: Collection[ActivityInvoiceItem]
+    ) -> None:
         self.assert_safe_to_change(targets)
 
         for target in targets:
             target.payment_date = date.today()
             target.paid = True
 
-    def execute_mark_unpaid(self, targets: 'Collection[InvoiceItem]') -> None:
+    def execute_mark_unpaid(
+        self,
+        targets: Collection[ActivityInvoiceItem]
+    ) -> None:
         self.assert_safe_to_change(targets)
 
         for target in targets:
@@ -107,7 +116,7 @@ class InvoiceAction:
 
     def execute_remove_manual(
         self,
-        targets: 'Collection[InvoiceItem]'
+        targets: Collection[ActivityInvoiceItem]
     ) -> None:
 
         self.assert_safe_to_change(targets)

@@ -1,4 +1,10 @@
+from __future__ import annotations
+
+import datetime
+
+from collections.abc import Mapping
 from copy import deepcopy
+
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -7,35 +13,29 @@ from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins.content import dictionary_based_property_factory
 from onegov.core.orm.types import HSTORE
-from onegov.core.orm.types import UTCDateTime
-from onegov.core.orm.types import UUID
 from onegov.election_day.models.election import Election
 from onegov.election_day.models.election_compound import ElectionCompound
 from onegov.election_day.models.mixins import DomainOfInfluenceMixin
 from onegov.election_day.models.mixins import TitleTranslationsMixin
-from onegov.election_day.models.vote import Vote
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import Date
+from onegov.election_day.models.vote import ComplexVote, Vote
 from sqlalchemy import Enum
-from sqlalchemy import Integer
-from sqlalchemy import Text
-from uuid import uuid4
-
+from sqlalchemy.orm import mapped_column, Mapped
+from uuid import uuid4, UUID
 
 from typing import Any
+from typing import Literal
 from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    import datetime
-    import uuid
-    from builtins import type as _type
-    from collections.abc import Mapping
-    from onegov.election_day.request import ElectionDayRequest
-    from typing import Literal
-    from typing_extensions import Self
-    from typing_extensions import TypeAlias
 
-    ResultType: TypeAlias = Literal['election', 'election_compound', 'vote']
+if TYPE_CHECKING:
+    from builtins import type as _type
+    from onegov.election_day.request import ElectionDayRequest
+    from typing import Self
+    from typing import TypeAlias
+
+
+ResultType: TypeAlias = Literal[
+    'election', 'election_compound', 'complex_vote', 'vote'
+]
 
 
 meta_local_property = dictionary_based_property_factory('local')
@@ -43,79 +43,94 @@ meta_local_property = dictionary_based_property_factory('local')
 
 class ArchivedResult(Base, ContentMixin, TimestampMixin,
                      DomainOfInfluenceMixin, TitleTranslationsMixin):
-
     """ Stores the result of an election or vote. """
 
     __tablename__ = 'archived_results'
 
     #: Identifies the result
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The date of the election/vote
-    date: 'Column[datetime.date]' = Column(Date, nullable=False)
+    date: Mapped[datetime.date]
 
     #: The last change of the results election/vote
-    last_modified: 'Column[datetime.datetime | None]' = Column(
-        UTCDateTime,
-        nullable=True
-    )
+    last_modified: Mapped[datetime.datetime | None]
 
     #: The last change of election/vote
-    last_result_change: 'Column[datetime.datetime | None]' = Column(
-        UTCDateTime,
-        nullable=True
-    )
+    last_result_change: Mapped[datetime.datetime | None]
 
     #: Type of the result
-    type: 'Column[ResultType]' = Column(
-        Enum(  # type:ignore[arg-type]
-            'vote', 'election', 'election_compound',
+    type: Mapped[ResultType] = mapped_column(
+        Enum(
+            'vote', 'complex_vote', 'election', 'election_compound',
             name='type_of_result'
-        ),
-        nullable=False
+        )
     )
 
     #: Origin of the result
-    schema: 'Column[str]' = Column(Text, nullable=False)
+    schema: Mapped[str]
 
     #: The name of the principal
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Mapped[str]
 
     #: Total number of political entities
-    total_entities: 'Column[int | None]' = Column(Integer, nullable=True)
+    total_entities: Mapped[int | None]
 
     #: Number of already counted political entities
-    counted_entities: 'Column[int | None]' = Column(Integer, nullable=True)
+    counted_entities: Mapped[int | None]
+
+    @property
+    def vote_finalized(self) -> bool:
+        if self.total_entities == 0:
+            return False
+
+        return self.counted_entities == self.total_entities
 
     @property
     def progress(self) -> tuple[int, int]:
         return self.counted_entities or 0, self.total_entities or 0
 
     #: Number of already counted political entities
-    has_results: 'Column[bool | None]' = Column(Boolean, nullable=True)
+    has_results: Mapped[bool | None]
 
     #: The link to the detailed results
-    url: 'Column[str]' = Column(Text, nullable=False)
+    url: Mapped[str]
 
     #: Title of the election/vote
-    title_translations: 'Column[Mapping[str, str]]' = Column(
-        HSTORE,
-        nullable=False
-    )
+    title_translations: Mapped[Mapping[str, str]] = mapped_column(HSTORE)
     title = translation_hybrid(title_translations)
 
-    def title_prefix(self, request: 'ElectionDayRequest') -> str:
+    #: Proposal title of the election/vote (complex votes)
+    title_proposal_translations: Mapped[Mapping[str, str] | None] = (
+        mapped_column(HSTORE)
+    )
+    title_proposal = translation_hybrid(title_proposal_translations)
+
+    #: Counterproposal title of the election/vote (complex votes)
+    title_counter_proposal_translations: Mapped[Mapping[str, str] | None] = (
+        mapped_column(HSTORE)
+    )
+    title_counter_proposal = translation_hybrid(
+        title_counter_proposal_translations
+    )
+
+    #: Tiebreaker title of the election/vote (complex votes)
+    title_tie_breaker_translations: Mapped[Mapping[str, str] | None] = (
+        mapped_column(HSTORE)
+    )
+    title_tie_breaker = translation_hybrid(title_tie_breaker_translations)
+
+    def title_prefix(self, request: ElectionDayRequest) -> str:
         if self.is_fetched(request) and self.domain == 'municipality':
             return self.name or ''
 
         return ''
 
     #: Shortcode for cantons that use it
-    shortcode: 'Column[str | None]' = Column(Text, nullable=True)
+    shortcode: Mapped[str | None]
 
     #: The id of the election/vote.
     external_id: dict_property[str | None] = meta_property('id')
@@ -144,6 +159,42 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     #: The yeas rate of a vote.
     yeas_percentage: dict_property[float] = meta_property(
         'yeas_percentage',
+        default=0.0
+    )
+
+    #: The nays rate of a vote proposal for complex votes.
+    nays_percentage_proposal: dict_property[float] = meta_property(
+        'nays_percentage_proposal',
+        default=100.0
+    )
+
+    #: The yeas rate of a vote.
+    yeas_percentage_proposal: dict_property[float] = meta_property(
+        'yeas_percentage_proposal',
+        default=0.0
+    )
+
+    #: The nays rate of a vote counterproposal for complex votes.
+    nays_percentage_counter_proposal: dict_property[float] = meta_property(
+        'nays_percentage_counter_proposal',
+        default=100.0
+    )
+
+    #: The yeas rate of a vote counterproposal for complex votes.
+    yeas_percentage_counter_proposal: dict_property[float] = meta_property(
+        'yeas_percentage_counter_proposal',
+        default=0.0
+    )
+
+    #: The nays rate of a vote tiebreaker for complex votes.
+    nays_percentage_tie_breaker: dict_property[float] = meta_property(
+        'nays_percentage_tie_breaker',
+        default=100.0
+    )
+
+    #: The yeas rate of a vote tiebreaker for complex votes.
+    yeas_percentage_tie_breaker: dict_property[float] = meta_property(
+        'yeas_percentage_tie_breaker',
         default=0.0
     )
 
@@ -187,16 +238,29 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     )
 
     @property
-    def type_class(self) -> '_type[Election | ElectionCompound | Vote]':
+    def type_class(
+        self
+    ) -> _type[Election | ElectionCompound | Vote | ComplexVote]:
         if self.type == 'vote':
             return Vote
+        elif self.type == 'complex_vote':
+            return ComplexVote
         elif self.type == 'election':
             return Election
         elif self.type == 'election_compound':
             return ElectionCompound
         raise NotImplementedError
 
-    def is_fetched(self, request: 'ElectionDayRequest') -> bool:
+    @property
+    def is_complex_vote(self) -> bool:
+        """ Returns True if this result represents a complex vote. """
+
+        if self.type == 'complex_vote':
+            return True
+
+        return False
+
+    def is_fetched(self, request: ElectionDayRequest) -> bool:
         """ Returns True, if this results has been fetched from another
         instance.
 
@@ -205,7 +269,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
 
     def is_fetched_by_municipality(
         self,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> bool:
         """ Returns True, if this results has been fetched from another
         instance by a communal instance.
@@ -216,7 +280,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
             and request.app.principal.domain == 'municipality'
         )
 
-    def adjusted_url(self, request: 'ElectionDayRequest') -> str:
+    def adjusted_url(self, request: ElectionDayRequest) -> str:
         """ Returns the url adjusted to the current host. Needed if the
         instance is accessible under different hosts at the same time.
 
@@ -229,28 +293,52 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
             {'id': self.external_id}
         )
 
-    def display_answer(self, request: 'ElectionDayRequest') -> str:
+    def display_answer(self, request: ElectionDayRequest) -> str:
         """ Returns the answer (depending on the current instance). """
 
         if self.is_fetched_by_municipality(request):
             return self.local_answer
         return self.answer
 
-    def display_nays_percentage(self, request: 'ElectionDayRequest') -> float:
+    def display_nays_percentage(self, request: ElectionDayRequest) -> float:
         """ Returns the nays rate (depending on the current instance). """
 
         if self.is_fetched_by_municipality(request):
             return self.local_nays_percentage
         return self.nays_percentage
 
-    def display_yeas_percentage(self, request: 'ElectionDayRequest') -> float:
+    def display_yeas_percentage(self, request: ElectionDayRequest) -> float:
         """ Returns the yeas rate (depending on the current instance). """
 
         if self.is_fetched_by_municipality(request):
             return self.local_yeas_percentage
         return self.yeas_percentage
 
-    def copy_from(self, source: 'Self') -> None:
+    def display_nays_percentage_proposal(self) -> float:
+        """ Returns the proposal nays rate for complex votes. """
+        return self.nays_percentage_proposal
+
+    def display_yeas_percentage_proposal(self) -> float:
+        """ Returns the proposal yeas rate for complex votes. """
+        return self.yeas_percentage_proposal
+
+    def display_nays_percentage_counter_proposal(self) -> float:
+        """ Returns the counterproposal nays rate for complex votes. """
+        return self.nays_percentage_counter_proposal
+
+    def display_yeas_percentage_counter_proposal(self) -> float:
+        """ Returns the counterproposal yeas rate for complex votes. """
+        return self.yeas_percentage_counter_proposal
+
+    def display_nays_percentage_tie_breaker(self) -> float:
+        """ Returns the tiebreaker nays rate for complex votes. """
+        return self.nays_percentage_tie_breaker
+
+    def display_yeas_percentage_tie_breaker(self) -> float:
+        """ Returns the tiebreaker yeas rate for complex votes. """
+        return self.yeas_percentage_tie_breaker
+
+    def copy_from(self, source: Self) -> None:
         self.date = source.date
         self.last_modified = source.last_modified
         self.last_result_change = source.last_result_change
@@ -261,7 +349,18 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
         self.counted_entities = source.counted_entities
         self.has_results = source.has_results
         self.url = source.url
-        self.title_translations = deepcopy(dict(source.title_translations))
+        self.title_translations = deepcopy(
+            dict(source.title_translations)
+        )
+        self.title_proposal_translations = deepcopy(
+            dict(source.title_proposal_translations or {})
+        )
+        self.title_counter_proposal_translations = deepcopy(
+            dict(source.title_counter_proposal_translations or {})
+        )
+        self.title_tie_breaker_translations = deepcopy(
+            dict(source.title_tie_breaker_translations or {})
+        )
         self.shortcode = source.shortcode
         self.domain = source.domain
         self.meta = deepcopy(dict(source.meta))

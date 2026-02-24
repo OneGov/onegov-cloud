@@ -1,34 +1,35 @@
+from __future__ import annotations
+
+from collections.abc import Mapping
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
-from onegov.core.orm.types import UUID
 from onegov.election_day.models.mixins import summarized_property
 from onegov.election_day.models.mixins import TitleTranslationsMixin
 from onegov.election_day.models.vote.ballot_result import BallotResult
 from onegov.election_day.models.vote.mixins import DerivedAttributesMixin
 from onegov.election_day.models.vote.mixins import DerivedBallotsCountMixin
+from onegov.election_day.types import BallotType
 from sqlalchemy import case
 from sqlalchemy import cast
-from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import select
-from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
+from uuid import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from collections.abc import Mapping
     from onegov.election_day.models import Vote
-    from onegov.election_day.types import BallotType
     from sqlalchemy.orm import Query
     from sqlalchemy.sql import ColumnElement
     from typing import NamedTuple
@@ -36,7 +37,7 @@ if TYPE_CHECKING:
     class ResultsByDistrictRow(NamedTuple):
         name: str
         counted: bool
-        accepted: bool
+        accepted: bool | None
         yeas: int
         nays: int
         yeas_percentage: float
@@ -66,14 +67,13 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     __tablename__ = 'ballots'
 
     #: identifies the ballot, maybe used in the url
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: external identifier
-    external_id: 'Column[str | None]' = Column(Text, nullable=True)
+    external_id: Mapped[str | None]
 
     #: the type of the ballot, 'standard' for normal votes, 'counter-proposal'
     #: if there's an alternative to the standard ballot. And 'tie-breaker',
@@ -81,25 +81,23 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     #: only relevant if both standard and counter proposal are accepted.
     #: If that's the case, the accepted tie breaker selects the standard,
     #: the rejected tie breaker selects the counter proposal.
-    type: 'Column[BallotType]' = Column(
-        Enum(  # type:ignore[arg-type]
+    type: Mapped[BallotType] = mapped_column(
+        Enum(
             'proposal',
             'counter-proposal',
             'tie-breaker',
             name='ballot_result_type'
-        ),
-        nullable=False
+        )
     )
 
     #: identifies the vote this ballot result belongs to
-    vote_id: 'Column[str]' = Column(
-        Text, ForeignKey('votes.id', onupdate='CASCADE'), nullable=False
+    vote_id: Mapped[str] = mapped_column(
+        ForeignKey('votes.id', onupdate='CASCADE')
     )
 
     #: all translations of the title
-    title_translations: 'Column[Mapping[str, str] | None]' = Column(
-        HSTORE,
-        nullable=True
+    title_translations: Mapped[Mapping[str, str] | None] = mapped_column(
+        HSTORE
     )
 
     #: the translated title (uses the locale of the request, falls back to the
@@ -107,22 +105,19 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     title = translation_hybrid(title_translations)
 
     #: a ballot contains n results
-    results: 'relationship[list[BallotResult]]' = relationship(
-        'BallotResult',
+    results: Mapped[list[BallotResult]] = relationship(
         cascade='all, delete-orphan',
         back_populates='ballot',
         order_by='BallotResult.district, BallotResult.name',
     )
 
-    vote: 'relationship[Vote]' = relationship(
-        'Vote',
-        back_populates='ballots',
-    )
+    vote: Mapped[Vote] = relationship(back_populates='ballots')
 
     @property
-    def results_by_district(self) -> 'Query[ResultsByDistrictRow]':
+    def results_by_district(self) -> Query[ResultsByDistrictRow]:
         """ Returns the results aggregated by the distict.  """
         session = object_session(self)
+        assert session is not None
 
         counted = func.coalesce(func.bool_and(BallotResult.counted), False)
         yeas = func.sum(BallotResult.yeas)
@@ -131,7 +126,11 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
             cast(func.coalesce(func.nullif(yeas + nays, 0), 1), Float)
         )
         nays_percentage = 100 - yeas_percentage
-        accepted = case({True: yeas > nays}, counted)
+        accepted = case(
+            (counted.is_(False), None),
+            (yeas > nays, True),
+            else_=False
+        )
         results = session.query(BallotResult).filter(
             BallotResult.ballot_id == self.id
         ).with_entities(
@@ -151,10 +150,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
         results = results.order_by(None).order_by(BallotResult.district)
         return results
 
-    if TYPE_CHECKING:
-        counted: Column[bool]
-
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def counted(self) -> bool:
         """ True if all results have been counted. """
         if not self.results:
@@ -162,11 +158,12 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
         return all(result.counted for result in self.results)
 
-    @counted.expression  # type:ignore[no-redef]
-    def counted(cls) -> 'ColumnElement[bool]':
-        expr = select([
+    @counted.inplace.expression
+    @classmethod
+    def _counted_expression(cls) -> ColumnElement[bool]:
+        expr = select(
             func.coalesce(func.bool_and(BallotResult.counted), False)
-        ])
+        )
         expr = expr.where(BallotResult.ballot_id == cls.id)
         return expr.label('counted')
 
@@ -179,7 +176,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
         """
 
         return (
-            sum([1 for result in self.results if result.counted]),
+            sum(1 for result in self.results if result.counted),
             len(self.results)
         )
 
@@ -214,24 +211,24 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     def aggregate_results(self, attribute: str) -> int:
         """ Gets the sum of the given attribute from the results. """
 
-        return sum((getattr(r, attribute, 0) or 0 for r in self.results))
+        return sum(getattr(r, attribute, 0) or 0 for r in self.results)
 
     @classmethod
     def aggregate_results_expression(
         cls,
         attribute: str
-    ) -> 'ColumnElement[int]':
+    ) -> ColumnElement[int]:
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 
         """
 
-        expr = select([
+        expr = select(
             func.coalesce(
                 func.sum(getattr(BallotResult, attribute)),
                 0
             )
-        ])
+        )
         expr = expr.where(BallotResult.ballot_id == cls.id)
         return expr.label(attribute)
 

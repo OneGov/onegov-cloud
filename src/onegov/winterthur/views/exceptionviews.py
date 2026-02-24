@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.winterthur import WinterthurApp, _
 from onegov.org.layout import DefaultLayout
@@ -17,14 +19,14 @@ if TYPE_CHECKING:
     template='roadwork_connection_error.pt')
 def handle_roadwork_connection_error(
     self: RoadworkConnectionError,
-    request: 'WinterthurRequest'
-) -> 'RenderData':
+    request: WinterthurRequest
+) -> RenderData:
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = 500
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _("Connection Error"),
+        'title': _('Connection Error'),
     }

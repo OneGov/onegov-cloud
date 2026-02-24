@@ -1,7 +1,5 @@
 # Error: variable differs from runtime
 # ======================
-# These are false positives due to Action using ABCMeta
-morepath\.directive\.[A-Z]\w+Action\.group_class
 # bound directives are very complex and can't be verified properly
 morepath\.(app\.)?App\.setting
 morepath\.(app\.)?App\.setting_section
@@ -33,3 +31,4 @@ morepath\.(app\.)?App\.link_prefix
 # can contain arbitary attributes
 morepath.settings.SettingRegistry.__getattr__
 morepath.settings.SettingSection.__getattr__
+morepath.settings.SettingSection.__setattr__

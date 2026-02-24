@@ -183,6 +183,7 @@ If a selector is passed which matches more than one application, the command
 is not executed.
 
 """
+from __future__ import annotations
 
 import click
 import inspect
@@ -198,7 +199,7 @@ from onegov.server.core import Server
 from sqlalchemy.pool import NullPool
 from sqlalchemy import create_engine
 from uuid import uuid4
-from webtest import TestApp as Client  # type:ignore[import-untyped]
+from webtest import TestApp as Client
 
 
 from typing import Any, NoReturn, TYPE_CHECKING
@@ -206,6 +207,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator, Sequence
     from typing import Protocol, TypedDict
 
+    from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
     from onegov.core.security.permissions import Intent
     from onegov.server.config import ApplicationConfig
@@ -214,19 +216,22 @@ if TYPE_CHECKING:
     #       exist in the mixed in class
     class _GroupContextAttrs(Protocol):
         selector: str | None
+
         @property
         def available_selectors(self) -> list[str]: ...
         @property
-        def matches(self) -> 'Iterator[str]': ...
+        def matches(self) -> Iterator[str]: ...
         matches_required: bool
         singular: bool
         creates_path: bool
+        skip_search_indexing: bool
 
     class ContextSpecificSettings(TypedDict, total=False):
         default_selector: str
         creates_path: bool
         singular: bool
         matches_required: bool
+        skip_search_indexing: bool
 
 else:
     _GroupContextAttrs = object
@@ -237,7 +242,8 @@ CONTEXT_SPECIFIC_SETTINGS = (
     'default_selector',
     'creates_path',
     'singular',
-    'matches_required'
+    'matches_required',
+    'skip_search_indexing'
 )
 
 
@@ -259,77 +265,77 @@ class GroupContextGuard(_GroupContextAttrs):
     def abort_if_no_selector(
         self,
         click_context: click.Context,
-        matches: 'Collection[str]'
+        matches: Collection[str]
     ) -> None:
 
         if not self.selector:
-            click.secho("Available selectors:")
+            click.secho('Available selectors:')
 
             for selector in self.available_selectors:
-                click.secho(" - {}".format(selector))
+                click.secho(' - {}'.format(selector))
 
-            abort("No selector provided, aborting.")
+            abort('No selector provided, aborting.')
 
     def abort_if_no_subcommand(
         self,
         click_context: click.Context,
-        matches: 'Collection[str]'
+        matches: Collection[str]
     ) -> None:
 
         if click_context.invoked_subcommand is None:
-            click.secho("Paths matching the selector:")
+            click.secho('Paths matching the selector:')
 
             for match in matches:
-                click.secho(" - {}".format(match))
+                click.secho(' - {}'.format(match))
 
-            abort("No subcommand provided, aborting.")
+            abort('No subcommand provided, aborting.')
 
     def abort_if_no_match(
         self,
         click_context: click.Context,
-        matches: 'Collection[str]'
+        matches: Collection[str]
     ) -> None:
 
         if self.matches_required and not matches:
-            click.secho("Available selectors:")
+            click.secho('Available selectors:')
 
             for selector in self.available_selectors:
-                click.secho(" - {}".format(selector))
+                click.secho(' - {}'.format(selector))
 
             abort("Selector doesn't match any paths, aborting.")
 
     def abort_if_not_singular(
         self,
         click_context: click.Context,
-        matches: 'Collection[str]'
+        matches: Collection[str]
     ) -> None:
 
         if self.singular and len(matches) > 1:
-            click.secho("Paths matching the selector:")
+            click.secho('Paths matching the selector:')
 
             for match in matches:
-                click.secho(" - {}".format(match))
+                click.secho(' - {}'.format(match))
 
-            abort("The selector must match a single path, aborting.")
+            abort('The selector must match a single path, aborting.')
 
     def abort_if_no_create_path(
         self,
         click_context: click.Context,
-        matches: 'Collection[str]'
+        matches: Collection[str]
     ) -> None:
 
         if self.creates_path:
             if len(matches) > 1:
-                abort("This selector may not reference an existing path")
+                abort('This selector may not reference an existing path')
 
             self.abort_if_no_selector(click_context, matches)
 
             assert self.selector is not None
             if len(self.selector.lstrip('/').split('/')) != 2:
-                abort("This selector must reference a full path")
+                abort('This selector must reference a full path')
 
             if '*' in self.selector:
-                abort("This selector may not contain a wildcard")
+                abort('This selector may not contain a wildcard')
 
 
 class GroupContext(GroupContextGuard):
@@ -359,6 +365,11 @@ class GroupContext(GroupContextGuard):
     :param singular:
         True if the selector may not match multiple applications.
 
+    :param skip_search_indexing:
+        True if no search indexing is required. Should result in a free
+        speed-up in commands that don't modify data that's duplicated in
+        the search index.
+
     :param matches_required:
         True if the selector *must* match at least one application.
 
@@ -371,6 +382,7 @@ class GroupContext(GroupContextGuard):
         default_selector: str | None = None,
         creates_path: bool = False,
         singular: bool = False,
+        skip_search_indexing: bool = False,
         matches_required: bool = True
     ):
 
@@ -381,6 +393,7 @@ class GroupContext(GroupContextGuard):
 
         self.selector = selector or default_selector
         self.creates_path = creates_path
+        self.skip_search_indexing = skip_search_indexing
 
         if self.creates_path:
             self.singular = True
@@ -389,7 +402,7 @@ class GroupContext(GroupContextGuard):
             self.singular = singular
             self.matches_required = matches_required
 
-    def available_schemas(self, appcfg: 'ApplicationConfig') -> list[str]:
+    def available_schemas(self, appcfg: ApplicationConfig) -> list[str]:
         """ Returns all available schemas, if the application is database
         bound.
 
@@ -401,9 +414,14 @@ class GroupContext(GroupContextGuard):
         # creating your engine should usually be avoided, be sure to only
         # copy this code when you don't need the typical session manager
         # engine setup
-        engine = create_engine(appcfg.configuration['dsn'], poolclass=NullPool)
+        engine = create_engine(
+            appcfg.configuration['dsn'],
+            poolclass=NullPool,
+            future=True
+        )
 
-        return list(query_schemas(engine, namespace=appcfg.namespace))
+        with engine.connect() as conn:
+            return list(query_schemas(conn, namespace=appcfg.namespace))
 
     def split_match(self, match: str) -> tuple[str, str]:
         match = match.lstrip('/')
@@ -424,10 +442,10 @@ class GroupContext(GroupContextGuard):
 
         return None
 
-    def match_to_appcfg(self, match: str) -> 'ApplicationConfig | None':
+    def match_to_appcfg(self, match: str) -> ApplicationConfig | None:
         """ Takes the given match and returns the maching appcfg object. """
 
-        namespace, id = self.split_match(match)
+        namespace, _id = self.split_match(match)
 
         for appcfg in self.config.applications:
             if appcfg.namespace == namespace:
@@ -436,7 +454,7 @@ class GroupContext(GroupContextGuard):
         return None
 
     @property
-    def appcfgs(self) -> 'Iterator[ApplicationConfig]':
+    def appcfgs(self) -> Iterator[ApplicationConfig]:
         """ Returns the matching appconfigs.
 
         Since there's only one appconfig per namespace, we ignore the path
@@ -469,7 +487,7 @@ class GroupContext(GroupContextGuard):
         return sorted(selectors)
 
     @property
-    def all_wildcard_selectors(self) -> 'Iterator[str]':
+    def all_wildcard_selectors(self) -> Iterator[str]:
         """ Returns all selectors targeting a namespace by wildcard. """
 
         for appcfg in self.config.applications:
@@ -477,7 +495,7 @@ class GroupContext(GroupContextGuard):
                 yield '/' + appcfg.namespace + '/*'
 
     @property
-    def all_specific_selectors(self) -> 'Iterator[str]':
+    def all_specific_selectors(self) -> Iterator[str]:
         """ Returns all selectors targeting an application directly. """
 
         for appcfg in self.config.applications:
@@ -488,7 +506,7 @@ class GroupContext(GroupContextGuard):
                     yield '/' + schema.replace('-', '/')
 
     @property
-    def matches(self) -> 'Iterator[str]':
+    def matches(self) -> Iterator[str]:
         """ Returns the specific selectors matching the context selector.
 
         That is, a combination of namespace / application id is returned.
@@ -512,7 +530,7 @@ class GroupContext(GroupContextGuard):
 
 def get_context_specific_settings(
     context: click.Context
-) -> 'ContextSpecificSettings':
+) -> ContextSpecificSettings:
     """ Takes the given *click* context and extracts all context specific
     settings from it.
 
@@ -548,7 +566,7 @@ pass_group_context = click.make_pass_decorator(GroupContext, ensure=True)
 
 def run_processors(
     group_context: GroupContext,
-    processors: 'Sequence[Callable[..., Any]]'
+    processors: Sequence[Callable[..., Any]]
 ) -> None:
     """ Runs a sequence of processors either in a raw context or
     in a fully running application within a server.
@@ -572,6 +590,7 @@ def run_processors(
     #       below.
     processor = processors[0]
 
+    CliApplication: type[Framework]  # noqa: N806
     for appcfg in group_context.appcfgs:
 
         class CliApplication(appcfg.application_class):  # type:ignore
@@ -586,6 +605,16 @@ def run_processors(
 
                 return super().is_allowed_application_id(application_id)
 
+            def configure_application(self, **cfg: Any) -> None:
+                if group_context.skip_search_indexing:
+                    cfg['enable_search'] = False
+                else:
+                    # in CLI commands we don't want to have to worry
+                    # about the maximum size of the queue
+                    cfg['search_max_queue_size'] = 0
+
+                super().configure_application(**cfg)
+
             def configure_debug(self, **cfg: Any) -> None:
                 # disable debug options in cli (like query output)
                 pass
@@ -595,7 +624,7 @@ def run_processors(
             pass
 
         @CliApplication.view(model=Model, permission=Public)
-        def run_command(self: Model, request: 'CoreRequest') -> None:
+        def run_command(self: Model, request: CoreRequest) -> None:
             # NOTE: This is kind of fragile, this depends on the loop
             #       variable 'processor' from the loop below, this works
             #       because Python will look up the variable at the time
@@ -606,14 +635,12 @@ def run_processors(
         def get_cronjobs_enabled() -> bool:
             return False
 
-        @CliApplication.setting_section(section='roles')
-        def get_roles_setting() -> dict[str, set[type['Intent']]]:
+        @CliApplication.replace_setting(section='roles', name='anonymous')
+        def get_anonymous_intents() -> set[type[Intent]]:
             # override the security settings -> we need the public
             # role to work for anonymous users, even if the base
             # application disables that
-            return {
-                'anonymous': {Public},
-            }
+            return {Public}
 
         scan_morepath_modules(CliApplication)
         CliApplication.commit()
@@ -629,11 +656,16 @@ def run_processors(
         Config({
             'applications': applications,
         }),
-        configure_morepath=False,
+        # NOTE: For commands that create a new schema this is essential
+        #       otherwise the SQLAlchemy metadata may be incomplete
+        # FIXME: For some reason when this is enabled we get noisy logging
+        #        related to i18n, so we should replace the affected logger
+        #        with a NullHandler...
+        configure_morepath=group_context.creates_path,
         configure_logging=False
     )
 
-    def expects_request(processor: 'Callable[..., Any]') -> bool:
+    def expects_request(processor: Callable[..., Any]) -> bool:
         return 'request' in processor.__code__.co_varnames
 
     # call the matching applications
@@ -679,10 +711,10 @@ def command_group() -> click.Group:
     @click.group(invoke_without_command=True)
     @click.option(
         '--select', default=None,
-        help="Selects the applications this command should be applied to")
+        help='Selects the applications this command should be applied to')
     @click.option(
         '--config', default='onegov.yml',
-        help="The onegov config file")
+        help='The onegov config file')
     def command_group(select: str | None, config: str) -> None:
         try:
             context = click.get_current_context()
@@ -692,13 +724,12 @@ def command_group() -> click.Group:
             context.obj.config.logging.setdefault('version', 1)
             logging.config.dictConfig(context.obj.config.logging)
         except DB_CONNECTION_ERRORS as e:
-            print("Could not connect to database:")
-            print(e)
+            click.echo(f'Could not connect to database:\n{e}')
             sys.exit(1)
 
     @command_group.result_callback()
     def process_results(
-        processor: 'Callable[..., Any] | Sequence[Callable[..., Any]]',
+        processor: Callable[..., Any] | Sequence[Callable[..., Any]],
         select: str,
         config: str
     ) -> None:

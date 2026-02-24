@@ -1,13 +1,15 @@
 """
-    Send E-Mail through SMTP
+Send E-Mail through SMTP
 
-    Adapted from repoze.sendmail: https://github.com/repoze/repoze.sendmail
+Adapted from `repoze.sendmail<https://github.com/repoze/repoze.sendmail>`_.
 
-    Usage:
-        mailer = smptlib.SMTP(host, port)
-        qp = SMTPEmailQueueProcessor(mailer, maildir1, maildir2, ..., limit=x)
-        qp.send_messages()
+Usage::
+
+    mailer = smptlib.SMTP(host, port)
+    qp = SMTPEmailQueueProcessor(mailer, maildir1, maildir2, ..., limit=x)
+    qp.send_messages()
 """
+from __future__ import annotations
 
 import json
 import smtplib
@@ -39,7 +41,7 @@ class SMTPMailQueueProcessor(MailQueueProcessor):
         try:
             items = json.loads(payload)
             if not isinstance(items, list):
-                raise ValueError('Invalid JSON payload')
+                raise ValueError('Invalid JSON payload')  # noqa: TRY004
 
             messages: list[EmailMessage] = []
             for item in items:
@@ -47,7 +49,14 @@ class SMTPMailQueueProcessor(MailQueueProcessor):
                 message['from'] = item['From']
                 message['to'] = item['To']
                 message['date'] = formatdate()
-                message['message-id'] = make_msgid()
+
+                has_message_id = any(
+                    h['Name'].lower() == 'message-id'
+                    for h in item.get('Headers', [])
+                )
+                if not has_message_id:
+                    message['message-id'] = make_msgid()
+
                 if 'ReplyTo' in item:
                     message['reply-to'] = item['ReplyTo']
                 if 'Cc' in item:

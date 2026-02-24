@@ -1,25 +1,25 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import datetime
+from datetime import time
 from onegov.core.utils import append_query_param
 from sedate import to_timezone
 from sedate import utcnow
-from sqlalchemy import Column
-from sqlalchemy import Time
+from sqlalchemy.orm import Mapped
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_property
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from datetime import time
     from onegov.landsgemeinde.models import Assembly
-    from sqlalchemy.orm import relationship
 
 
 class StartTimeMixin:
 
     #: The local start time
-    start_time: 'Column[time | None]' = Column(Time, nullable=True)
+    start_time: Mapped[time | None]
 
     def start(self) -> None:
         self.start_time = to_timezone(utcnow(), 'Europe/Zurich').time()
@@ -29,7 +29,7 @@ class TimestampedVideoMixin(StartTimeMixin):
 
     if TYPE_CHECKING:
         # forward declare required attributes
-        assembly: 'Assembly | relationship[Assembly]'
+        assembly: Assembly | Mapped[Assembly]
 
     #: The manual video timestamp of this agenda item
     video_timestamp: dict_property[str | None] = content_property()

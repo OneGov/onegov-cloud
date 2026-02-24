@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 import sass
 
@@ -79,7 +81,7 @@ class BaseTheme(CoreTheme):
         return []
 
     @property
-    def foundation_components(self) -> 'Sequence[str]':
+    def foundation_components(self) -> Sequence[str]:
         """ All used foundation components. """
         return (
             'grid',
@@ -122,7 +124,7 @@ class BaseTheme(CoreTheme):
         )
 
     @property
-    def imports(self) -> 'Iterator[str]':
+    def imports(self) -> Iterator[str]:
         """ All imports, including the foundation ones. Override with care. """
         return chain(
             self.pre_imports,
@@ -162,7 +164,7 @@ class BaseTheme(CoreTheme):
         """
         return os.path.join(os.path.dirname(__file__), 'foundation')
 
-    def compile(self, options: 'Mapping[str, Any] | None' = None) -> str:
+    def compile(self, options: Mapping[str, Any] | None = None) -> str:
         """ Compiles the theme with the given options. """
 
         # copy, because the dict may be static if it's a basic property
@@ -174,7 +176,7 @@ class BaseTheme(CoreTheme):
         print("@import 'foundation/functions';", file=theme)
 
         for key, value in _options.items():
-            print("${}: {};".format(key, value), file=theme)
+            print('${}: {};'.format(key, value), file=theme)
 
         for i in self.imports:
             print("@import '{}';".format(i), file=theme)

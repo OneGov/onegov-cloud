@@ -1,41 +1,51 @@
+from __future__ import annotations
+
+from datetime import datetime
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UTCDateTime
-from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.votum import Votum
 from onegov.landsgemeinde.models.mixins import TimestampedVideoMixin
+from onegov.landsgemeinde.observer import observes
+from onegov.org.models.extensions import SidebarLinksExtension
 from onegov.search import ORMSearchable
-from sqlalchemy import Boolean
-from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm.attributes import flag_modified
+from sqlalchemy.orm.attributes import set_committed_value
 from uuid import uuid4
+from uuid import UUID
 
 
+from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
+    from collections.abc import Iterator
     from datetime import date as date_t
+    from onegov.file.models.file import File
     from onegov.landsgemeinde.models import Assembly
     from translationstring import TranslationString
-    from typing import Literal
-    from typing_extensions import TypeAlias
-
-    AgendaItemState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
+    from typing import TypeAlias
 
 
-STATES: dict['AgendaItemState', 'TranslationString'] = {
+AgendaItemState: TypeAlias = Literal[
+    'draft', 'scheduled', 'ongoing', 'completed'
+]
+
+
+STATES: dict[AgendaItemState, TranslationString] = {
+    'draft': _('draft'),
     'scheduled': _('scheduled'),
     'ongoing': _('ongoing'),
     'completed': _('completed')
@@ -44,63 +54,88 @@ STATES: dict['AgendaItemState', 'TranslationString'] = {
 
 class AgendaItem(
     Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable,
-    TimestampedVideoMixin
+    TimestampedVideoMixin, SidebarLinksExtension
 ):
 
     __tablename__ = 'landsgemeinde_agenda_items'
 
-    es_public = True
-    es_properties = {
-        'title': {'type': 'text'},
-        'overview': {'type': 'localized_html'},
-        'text': {'type': 'localized_html'},
-        'resolution': {'type': 'localized_html'},
+    fts_type_title = _('Agenda items')
+    fts_public = True
+    fts_title_property = 'title'
+    fts_properties = {
+        'title': {'type': 'text', 'weight': 'A'},
+        'overview': {'type': 'localized', 'weight': 'B'},
+        'text': {'type': 'localized', 'weight': 'C'},
+        'resolution': {'type': 'localized', 'weight': 'C'},
     }
 
+    @property
+    def fts_last_change(self) -> datetime:
+        self._fetch_if_necessary()
+        return self.assembly.fts_last_change
+
+    @property
+    def fts_suggestion(self) -> list[str]:
+        def suggestions() -> Iterator[str]:
+            for line in self.title.splitlines():
+                line = line.strip()
+                if len(line) < 3:
+                    continue
+
+                yield line
+                # another suggestion without the leading A./B./C. etc.
+                if line[1] == '.':
+                    yield line[2:].lstrip()
+
+        return list(suggestions())
+
+    def _fetch_if_necessary(self) -> None:
+        session = object_session(self)
+        if session is None:
+            return
+
+        if self.assembly_id is not None and self.assembly is None:
+            # retrieve the assembly
+            from onegov.landsgemeinde.models import Assembly  # type: ignore[unreachable]
+            set_committed_value(
+                self,
+                'assembly',
+                session.get(Assembly, self.assembly_id)
+            )
+
     #: the internal id of the agenda item
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the external id of the agenda item
-    number: 'Column[int]' = Column(Integer, nullable=False)
+    number: Mapped[int]
 
     #: the state of the agenda item
-    state: 'Column[AgendaItemState]' = Column(
-        Enum(*STATES.keys(), name='agenda_item_state'),  # type:ignore
-        nullable=False
+    state: Mapped[AgendaItemState] = mapped_column(
+        Enum(*STATES.keys(), name='agenda_item_state')
     )
 
     #: True if the item has been declared irrelevant
-    irrelevant: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    irrelevant: Mapped[bool] = mapped_column(default=False)
 
     #: True if the item has been tacitly accepted
-    tacitly_accepted: 'Column[bool]' = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    tacitly_accepted: Mapped[bool] = mapped_column(default=False)
 
     #: the assembly this agenda item belongs to
-    assembly_id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    assembly_id: Mapped[UUID] = mapped_column(
         ForeignKey(
             'landsgemeinde_assemblies.id',
             onupdate='CASCADE',
             ondelete='CASCADE'
-        ),
-        nullable=False
+        )
     )
 
-    assembly: 'relationship[Assembly]' = relationship(
-        'Assembly',
-        back_populates='agenda_items',
-    )
+    assembly: Mapped[Assembly] = relationship(back_populates='agenda_items')
 
     #: Title of the agenda item (not translated)
-    title: 'Column[str]' = Column(Text, nullable=False, default=lambda: '')
+    title: Mapped[str] = mapped_column(default=lambda: '')
 
     #: The memorial of the assembly
     memorial_pdf = NamedFile(cls=LandsgemeindeFile)
@@ -121,21 +156,20 @@ class AgendaItem(
     resolution_tags: dict_property[list[str] | None] = content_property()
 
     #: An agenda item contains n vota
-    vota: 'relationship[list[Votum]]' = relationship(
-        Votum,
+    vota: Mapped[list[Votum]] = relationship(
         cascade='all, delete-orphan',
         back_populates='agenda_item',
         order_by='Votum.number',
     )
 
     #: The timestamp of the last modification
-    last_modified = Column(UTCDateTime)
+    last_modified: Mapped[datetime | None]
 
     def stamp(self) -> None:
         self.last_modified = self.timestamp()
 
     @property
-    def date(self) -> 'date_t':
+    def date(self) -> date_t:
         return self.assembly.date
 
     @property
@@ -145,3 +179,31 @@ class AgendaItem(
             for line in (self.title or '').splitlines()
             if (stripped_line := line.strip())
         ]
+
+    @property
+    def more_files(self) -> list[File]:
+        files = self.files
+        if self.memorial_pdf:
+            return [file for file in files if file.name != 'memorial_pdf']
+        return files
+
+    @more_files.setter
+    def more_files(self, value: list[File]) -> None:
+        if self.memorial_pdf:
+            self.files = [*value, self.memorial_pdf]
+        else:
+            self.files = value
+
+    @observes('files', 'assembly.date')
+    def update_assembly_date(self, files: list[File], date: date_t) -> None:
+        # NOTE: Makes sure we will get reindexed, it doesn't really
+        #       matter what we flag as modified, we just pick something.
+        flag_modified(self, 'number')
+        if not files or date is None:
+            # nothing else to do
+            return
+
+        for file in files:
+            if file.meta.get('assembly_date') != date:
+                file.meta['assembly_date'] = date
+                flag_modified(file, 'meta')

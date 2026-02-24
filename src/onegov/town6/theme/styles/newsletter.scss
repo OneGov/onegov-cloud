@@ -34,21 +34,36 @@
     }
 }
 
-.subscribers li:hover span {
-    background-color: $yellow-pastel;
-}
+.subscribers {
 
-.newsletter-block > h2,
-.newsletter-block .newslist h2 {
-    @include breakpoint(small only) {
-        font-size: $h3-font-size - $h3-font-reduction;
+    .info {
+        color: $aluminum;
     }
-    font-size: $h3-font-size;
+
+    li:hover span:not(.info) {
+       background-color: $yellow-pastel;
+   }
 }
 
-.newsletter-block + .newsletter-block {
+.newsletter-block {
+    hr {
+        margin: 1.5rem 0;
+    }
+
+    > h2,
+    .newslist h2 {
+        @include breakpoint(small only) {
+            font-size: $h3-font-size - $h3-font-reduction;
+        }
+        font-size: $h3-font-size;
+    }
+
+    + .newsletter-block {
     margin-top: 2rem;
+    }
 }
+
+
 
 .newsletter-publications-block {
     margin-bottom: 3.5rem;

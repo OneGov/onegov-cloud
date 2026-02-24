@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import time
 from collections import defaultdict
@@ -19,7 +21,7 @@ if TYPE_CHECKING:
     from onegov.form import Form
     from onegov.org.request import OrgRequest
     from onegov.page import Page
-    from typing_extensions import Self
+    from typing import Self
 
 
 class ModelsWithLinksMixin:
@@ -37,7 +39,7 @@ class LinkMigration(ModelsWithLinksMixin):
 
     def __init__(
         self,
-        request: 'OrgRequest',
+        request: OrgRequest,
         old_uri: str,
         new_uri: str = ''
     ) -> None:
@@ -57,14 +59,14 @@ class LinkMigration(ModelsWithLinksMixin):
     def migrate_url(
         self,
         item: object,
-        fields: 'Iterable[str]',
+        fields: Iterable[str],
         test: bool = False,
         group_by: str | None = None,
         count_obj: dict[str, dict[str, int]] | None = None
     ) -> tuple[int, dict[str, dict[str, int]]]:
         """Supports replacing url's and domain names.
 
-         """
+        """
         count = 0
         count_by_id = count_obj or {}
 
@@ -112,7 +114,7 @@ class LinkMigration(ModelsWithLinksMixin):
         grouped: dict[str, dict[str, int]] = {}
         total = 0
 
-        for name, entries in self.site_collection.get().items():
+        for entries in self.site_collection.get().values():
             for item in entries:
                 count, grouped_count = self.migrate_url(
                     item, self.fields_with_urls,
@@ -128,8 +130,8 @@ class PageNameChange(ModelsWithLinksMixin):
 
     def __init__(
         self,
-        request: 'OrgRequest',
-        page: 'Page',
+        request: OrgRequest,
+        page: Page,
         new_name: str
     ) -> None:
 
@@ -141,10 +143,10 @@ class PageNameChange(ModelsWithLinksMixin):
         self.new_name = new_name
 
     @property
-    def subpages(self) -> list['Page']:
+    def subpages(self) -> list[Page]:
         pages: list[Page] = []
 
-        def add(page: 'Page') -> None:
+        def add(page: Page) -> None:
             nonlocal pages
             pages.append(page)
             for child in page.children:
@@ -168,20 +170,22 @@ class PageNameChange(ModelsWithLinksMixin):
         def run() -> int:
             # Make sure the order before and after is the same
             urls_before = tuple(
-                self.request.link(p) for p in subpages + [page])
+                self.request.link(p) for p in (*subpages, page))
             page.name = self.new_name
-            urls_after = tuple(self.request.link(p) for p in subpages + [page])
+            urls_after = tuple(self.request.link(p) for p in (*subpages, page))
             assert urls_before != urls_after
 
             count = 0
             for before, after in zip(urls_before, urls_after):
                 migration = LinkMigration(self.request, before, after)
-                total, grouped = migration.migrate_site_collection(test=test)
+                total, _grouped = migration.migrate_site_collection(test=test)
                 count += total
             return count
 
         if test:
-            with object_session(page).no_autoflush:
+            session = object_session(page)
+            assert session is not None
+            with session.no_autoflush:
                 counter = run()
                 page.name = old_name
                 transaction.abort()
@@ -189,7 +193,7 @@ class PageNameChange(ModelsWithLinksMixin):
         return run()
 
     @classmethod
-    def from_form(cls, model: 'Page', form: 'Form') -> 'Self':
+    def from_form(cls, model: Page, form: Form) -> Self:
         return cls(form.request, model, form['name'].data)  # type:ignore
 
 
@@ -221,7 +225,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
 
     def __init__(
         self,
-        request: 'OrgRequest',
+        request: OrgRequest,
         link_type: Literal['internal', 'external', ''] | None = None,
         total_timout: float = 30
     ) -> None:
@@ -253,15 +257,15 @@ class LinkHealthCheck(ModelsWithLinksMixin):
     def internal_link(self, url: str) -> bool:
         return self.domain in url
 
-    def filter_urls(self, urls: 'Sequence[str]') -> 'Sequence[str]':
+    def filter_urls(self, urls: Sequence[str]) -> Sequence[str]:
         if self.external_only:
             return tuple(url for url in urls if not self.internal_link(url))
         if self.internal_only:
             return tuple(url for url in urls if self.internal_link(url))
         return urls
 
-    def find_urls(self) -> 'Iterator[tuple[str, str, Sequence[str]]]':
-        for name, entries in self.site_collection.get().items():
+    def find_urls(self) -> Iterator[tuple[str, str, Sequence[str]]]:
+        for entries in self.site_collection.get().values():
             for entry in entries:
                 urls = []
                 for field in self.fields_with_urls:
@@ -287,17 +291,17 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                     self.filter_urls(urls)
                 )
 
-    def url_list_generator(self) -> 'Iterator[LinkCheck]':
+    def url_list_generator(self) -> Iterator[LinkCheck]:
         for name, model_link, urls in self.find_urls():
             for url in urls:
                 yield LinkCheck(name, model_link, url)
 
-    def unhealthy_urls(self) -> tuple[Statistic, 'Sequence[LinkCheck]']:
+    def unhealthy_urls(self) -> tuple[Statistic, Sequence[LinkCheck]]:
         """ We check the urls in the backend, unless they are internal.
-         In that case, we can not do that since we do not have async support.
-         Otherwise returns the LinkChecks with empty statistics for use in
-         the frontend.
-         """
+        In that case, we can not do that since we do not have async support.
+        Otherwise returns the LinkChecks with empty statistics for use in
+        the frontend.
+        """
         assert self.link_type, 'link_type must be set'
         started = time.time()
 
@@ -306,20 +310,18 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         not_okay_status = 0
 
         def handle_errors(check: LinkCheck, exception: Exception) -> LinkCheck:
-            nonlocal total_count
-            nonlocal error_count
+            nonlocal total_count, error_count
             check.message = str(exception)
             total_count += 1
             error_count += 1
             return check
 
         def on_success(check: LinkCheck, status: int) -> LinkCheck:
-            nonlocal total_count
-            nonlocal not_okay_status
+            nonlocal total_count, not_okay_status
             check.status = status
             check.message = f'Status {status}'
             total_count += 1
-            if not status == 200:
+            if status != 200:
                 not_okay_status += 1
             return check
 

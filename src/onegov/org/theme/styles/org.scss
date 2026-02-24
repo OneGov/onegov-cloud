@@ -2,9 +2,9 @@
     useful mixins
 */
 
-// sass-lint:disable-all
+// stylelint-disable declaration-block-no-duplicate-properties
 @mixin grayscale {
-    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
+            filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
             filter: grayscale(100%);
        -moz-filter: grayscale(100%);
         -ms-filter: grayscale(100%);
@@ -20,7 +20,7 @@
             filter: none;
     -webkit-filter: none;
 }
-// sass-lint:enable-all
+// stylelint-enable declaration-block-no-duplicate-properties
 
 @mixin hairline {
     border: 0;
@@ -127,7 +127,7 @@ a[href^="mailto:"] {
     @include prefix(word-break, break-all);
 
     // Non standard for WebKit
-    word-break: break-word;
+    word-break: break-word; /* stylelint-disable-line declaration-property-value-keyword-no-deprecated */
 }
 
 /*
@@ -328,6 +328,7 @@ $globals-height: 2.5rem;
         text-align: center;
     }
 
+    .dashboard::before { @include icon('\f0e4'); }
     .login::before { @include icon('\f090'); }
     .logout::before { @include icon('\f08b'); }
     .register::before { @include icon('\f234'); }
@@ -347,6 +348,9 @@ $globals-height: 2.5rem;
     .ticket-archive::before { @include icon('\f1c6'); }
     .forms::before { @include icon('\f15c'); }
     .surveys::before { @include icon('\f080'); }
+    .citizen-login::before { @include icon('\f090'); }
+    .citizen-tickets::before { @include icon('\f145'); }
+    .citizen-reservations::before { @include icon('\f133'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -620,6 +624,11 @@ $footer-border-width: 0;
     margin: 0 0 1rem;
 }
 
+.tiktok {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
 /*
     Links in simple text style (side by side)
 */
@@ -801,6 +810,18 @@ form {
         }
     }
 
+    .duration-widget label {
+        display: inline-block;
+        white-space: nowrap;
+        margin-right: .5rem;
+
+        input {
+            display: inline-block;
+            width: auto;
+            margin-right: .25rem;
+        }
+    }
+
     .group-label > ul li {
         align-content: flex-start;
         align-items: flex-start;
@@ -854,6 +875,45 @@ form {
             display: inline-block;
             margin-left: 0;
             vertical-align: text-top;
+        }
+
+        &:checked + label .with-count::before {
+            background-color: $primary-color;
+            color: $white;
+        }
+
+        + label .with-count::before {
+            background-color: $secondary-color;
+            color: $body-font-color;
+            border: 0px solid #000;
+            border-radius: 1000px;
+            box-sizing: content-box;
+            content: attr(data-count);
+            display: inline-block;
+            font-size: .75rem;
+            line-height: 22px;
+            min-width: 4ex;
+            padding: 0 .5rem;
+            text-align: right;
+            margin-right: 1ex;
+        }
+    }
+
+    .two-columns ul {
+        -moz-column-count: 2;
+        -moz-column-gap: 2em;
+        -webkit-column-count: 2;
+        -webkit-column-gap: 2em;
+        column-count: 2;
+        column-gap: 2em;
+        max-width: calc(100% - 2em);
+        margin-left: 0;
+        list-style: none;
+
+        li {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            break-inside: avoid;
         }
     }
 
@@ -1619,6 +1679,7 @@ $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f114';
 $new-recipient: '\f1fa';
 $new-form-icon: '\f044';
+$new-document-form-icon: '\f15b';
 $new-link-icon: '\f0c1';
 $new-iframe-icon: '\f2d0';
 $new-news-icon: '\f1ea';
@@ -1631,7 +1692,9 @@ $new-photo-album: '\f03e';
 $new-registration-window: '\f067';
 $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
+$new-datatrans-icon: '\f09d';
 $new-stripe-connect-icon: '\f1f5';
+$new-worldline-saferpay-icon: '\f09d';
 $new-user-icon: '\f234';
 $new-text-module-icon: '\f24a';
 $paste-link-icon: '\f0ea';
@@ -1639,6 +1702,7 @@ $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
 $payment-provider-icon: '\f283';
 $payments-icon: '\f09d';
+$invoice-icon: '\f1ea';
 $rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
@@ -1654,6 +1718,7 @@ $ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 $envelope-icon: '\f0e0';
 $results-icon: '\f080';
+$settings-icon: '\f1de';
 $editbar-bg-color: $topbar-link-bg-hover;
 
 .edit-bar {
@@ -1754,6 +1819,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-directory::before { @include icon($new-directory-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
+    .new-document-form::before { @include icon($new-document-form-icon); }
     .new-link::before { @include icon($new-link-icon); }
     .new-iframe::before { @include icon($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }
@@ -1767,13 +1833,16 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-registration-window::before { @include icon($new-registration-window); }
     .new-reservation::before { @include icon($new-reservation-icon); }
     .new-room::before { @include icon($new-room-icon); }
+    .new-datatrans::before { @include icon($new-datatrans-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
+    .new-worldline-saferpay::before { @include icon($new-worldline-saferpay-icon); }
     .new-user::before { @include icon($new-user-icon); }
     .new-text-module::before { @include icon($new-text-module-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
     .paste-link::before { @include icon($paste-link-icon); }
     .payment-provider::before { @include icon($payment-provider-icon); }
     .payments::before { @include icon($payments-icon); }
+    .invoice::before { @include icon($invoice-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
     .sort-link::before { @include icon($sort-link-icon); }
@@ -1783,7 +1852,6 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .sync::before { @include icon($sync-icon); }
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
-    .ticket-pdf::before { @include icon($pdf-icon); }
     .ticket-files::before { @include icon($ticket-files-icon); }
     .new-daily-item::before { @include icon($new-daily-item-icon); }
     .new-resource-link::before { @include icon($new-resource-link-icon); }
@@ -1792,8 +1860,10 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .envelope::before { @include icon($envelope-icon); }
     .internal-link::before { @include icon($internal-link-icon); }
     .results-link::before { @include icon($results-icon); }
+    .settings-link::before { @include icon($settings-icon); }
 }
 
+.ticket-pdf::before { @include icon($pdf-icon); }
 .mark-as-paid::before { @include icon($mark-as-paid); }
 .mark-as-unpaid::before { @include icon($mark-as-unpaid); }
 .payment-capture::before { @include icon($payment-capture-icon); }
@@ -1831,8 +1901,9 @@ $editbar-bg-color: $topbar-link-bg-hover;
 
     .label-text {
         color: $form-label-font-color;
-        display: inline-block;
+        display: block;
         font-size: .875rem;
+        font-weight: normal;
         margin-right: 1rem;
     }
 
@@ -1851,6 +1922,10 @@ $editbar-bg-color: $topbar-link-bg-hover;
         label:last-child {
             margin-right: 0;
         }
+    }
+
+    .checkbox {
+        margin-top: .75rem;
     }
 
     .split > div {
@@ -2010,6 +2085,12 @@ div#redactor-droparea {
 .main-title {
     margin-bottom: 1rem;
     margin-top: -.5rem;
+
+    .small {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: normal;
+    }
 }
 
 /*
@@ -2456,12 +2537,8 @@ $person-email-icon: '\f003';
         margin-bottom: 1em;
     }
 
-    .person-card-organisation {
+    :nth-last-child(1 of .person-card-organisation) {
         margin-bottom: 1em;
-
-        span:not(:last-child)::after {
-            content: ' -';
-        }
     }
 
     .person-card-personal {
@@ -2544,9 +2621,6 @@ $person-email-icon: '\f003';
     ul {
         > li {
             font-size: .875rem;
-            max-width: calc(100vw - 7.5rem);
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
     }
 
@@ -2822,6 +2896,20 @@ $archive-ticket-icon: '\f1c6';
     margin-right: 1ex;
 }
 
+.FRM-option label::before { @include icon($frm-handler-icon); }
+.RSV-option label::before { @include icon($rsv-handler-icon); }
+.EVN-option label::before { @include icon($evn-handler-icon); }
+.DIR-option label::before { @include icon($dir-handler-icon); }
+
+.ALL-option label::before,
+.FRM-option label::before,
+.RSV-option label::before,
+.EVN-option label::before,
+.DIR-option label::before {
+    display: inline-block;
+    margin-right: 1ex;
+}
+
 .ticket-handler-FRM td:first-child::before {
     @include icon($frm-handler-icon);
 }
@@ -2918,6 +3006,13 @@ tr.ticket:hover {
     }
 }
 
+.ticket-change-tag {
+    &::before {
+        @include icon($edit-link-icon);
+        margin-right: 1ex;
+    }
+}
+
 .ticket-archive {
     &::before {
         @include icon($archive-ticket-icon);
@@ -2994,7 +3089,7 @@ button {
     }
 }
 
-.selected-owner {
+.selected-owner, .selected-submitter {
     margin-left: 1rem !important;
 
     &.secondary {
@@ -3052,7 +3147,99 @@ button {
     to {box-shadow: none;}
 }
 
-.calendar {
+.occupancy-calendar {
+    .fc-view:not(.fc-list) .fc-event,
+    .fc-view:not(.fc-list) + .fc-popover .fc-event,
+    .fc-view-harness:has(.fc-view:not(.fc-list)) ~ .fc-event-dragging {
+        &.event-accepted,
+        &.event-accepted .fc-bg,
+        &.event-accepted .fc-content {
+            border-width: 0;
+            background-color: $blue-dark;
+        }
+
+        &.event-pending,
+        &.event-pending .fc-bg,
+        &.event-pending .fc-content {
+            border-width: 0;
+            background-color: lighten(desaturate($blue-dark, 50%), 10%);
+        }
+
+        &.event-blocker, &.fc-event-mirror:not(.event-accepted,.event-pending) {
+            border-width: 0;
+            background-color: $red;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0, 0, 0, 0.1) 10px,
+                rgba(0, 0, 0, 0.1) 20px
+            );
+
+            & .fc-event-main {
+                position: relative;
+                padding: 2px 4px !important;
+                padding-right: 20px !important;
+                font-weight: bold;
+                font-size: .875rem;
+            }
+
+            & .delete-blocker {
+                display: inline-block;
+                position: absolute;
+                padding: 2px 6px;
+                top: 0;
+                right: 0;
+                font-size: .75rem;
+
+                &:hover {
+                    opacity: .75;
+                }
+            }
+        }
+    }
+
+    .fc-event, .fc-event-main {
+        padding: 0 !important;
+    }
+
+    .fc-event .fc-content {
+        position: relative;
+        z-index: 2;
+        padding: 2px 4px;
+        border-top-right-radius: 1.2rem;
+        white-space: nowrap;
+
+        &::first-line {
+            font-weight: bold;
+        }
+    }
+
+    .fc-event.fc-timegrid-event-short .fc-title {
+        font-weight: bold;
+    }
+
+    .fc-list-item-title::first-line {
+        font-weight: bold;
+    }
+
+    &[data-editable="true"] .fc-list-item {
+        cursor: pointer;
+    }
+
+    .fc-event .fc-bg {
+        opacity: 1 !important;
+        border-top-right-radius: 1.5rem;
+    }
+
+    .fc-bg-event {
+        background-color: $green;
+        opacity: .15;
+        cursor: default !important;
+    }
+}
+
+.calendar, .occupancy-calendar {
 
     margin-bottom: 1.5rem;
 
@@ -3068,14 +3255,12 @@ button {
         outline: none;
     }
 
-    .fc-content {
-        // pass through pointer events to the background, where we have the
-        // hover and javascript handling
-        pointer-events: none;
-    }
-
     .fc-toolbar {
-        margin-bottom: 0;
+        align-items: end;
+
+        &.fc-header-toolbar {
+            margin-bottom: 2rem;
+        }
 
         h2 {
             clear: both;
@@ -3083,15 +3268,18 @@ button {
             float: none;
             margin-bottom: 1rem;
             text-align: left;
+
+            &:hover .fa {
+                color: $primary-color;
+            }
         }
 
-        .fc-left {
-            float: none;
+        h2 + button {
+            margin-left: 0 !important;
+        }
 
-            button {
-                margin-bottom: 15px;
-                margin-left: 0;
-            }
+        select {
+            margin: 0;
         }
     }
 
@@ -3123,10 +3311,23 @@ button {
         background-color: $primary-color !important;
     }
 
-    .fc-month-view {
-        .fc-day-number {
+    .fc-dayGridMonth-view, .fc-multimonth {
+        .fc-daygrid-day-number {
             font-size: .875rem;
             padding: .25rem .5rem;
+        }
+    }
+
+    .fc-view.fc-multimonth {
+        max-height: 850px;
+
+        .fc-event .fc-content {
+            max-height: 2.5rem;
+            overflow-y: hidden;
+
+            .fc-title {
+                font-size: .675rem;
+            }
         }
     }
 
@@ -3152,16 +3353,17 @@ button {
             }
         }
 
-        .event-in-past {
+        .event-in-past, .event-outside-booking-window {
             filter: grayscale(1);
         }
 
-        .fc-day-header,
-        .fc-day-number {
+        .fc-daygrid-day-header,
+        .fc-daygrid-day-number {
             font-size: .9em;
         }
 
         .fc-event {
+            overflow: hidden;
             border: 0;
             border-radius: 2px;
             margin: 0 0 2px;
@@ -3169,7 +3371,13 @@ button {
         }
 
         .fc-bg {
-            background: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            opacity: .25;
         }
 
         .event-unavailable {
@@ -3191,8 +3399,8 @@ button {
     }
 
     .fc-event {
-        div.fc-time,
-        span.fc-time {
+        div.fc-event-time,
+        span.fc-event-time {
             display: none;
         }
 
@@ -3201,7 +3409,7 @@ button {
             padding: 0;
         }
 
-        &.fc-short .fc-title {
+        &.fc-timegrid-event-short .fc-title {
             display: inline-block;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -3221,25 +3429,53 @@ button {
         }
     }
 
-    .fc button,
-    .fc-button {
+    .fc-more-link {
+        font-size: .8rem;
+    }
+
+    &.fc button,
+    &.fc .fc-button {
         @include button(
             $padding: $button-tny,
             $bg: $smoke
         );
+        margin-bottom: 0;
+        border-radius: 4px;
         background-image: none;
-        box-shadow: none;
+        box-shadow: none !important;
         font-size: .9rem;
         height: 2.25rem;
         text-shadow: none;
 
-        &.fc-state-active,
-        &.fc-state-disabled {
-            background: $charcoal;
-            color: $white;
+        .fc-icon {
+            margin-top: -4px;
+        }
+
+        &.fc-button-active,
+        &:disabled {
+            background: $charcoal !important;
+            color: $white !important;
             opacity: 1;
         }
+
+        &:hover,
+        &:focus,
+        &:active {
+          color: #333;
+          background-color: #bebebe;
+        }
     }
+
+    &.fc .fc-button-primary {
+        background-color: #f5f5f5;
+        color: #333;
+    }
+}
+
+.calendar .fc-event-main {
+    // pass through pointer events to the background, where we have the
+    // hover and javascript handling
+    pointer-events: none;
 }
 
 .calendar-footer {
@@ -3258,28 +3494,27 @@ button {
     Fullcalendar responsive design
 */
 @media #{$small-up} {
-    .fc .fc-toolbar {
+    .calendar .fc-toolbar {
         width: 100%;
     }
 }
 
 @media #{$large-up} {
-    .fc .fc-toolbar {
+    .calendar .fc-toolbar {
         width: 80%;
     }
 }
 
 @media (max-width: 850px) {
-    .fc-center {
-        display: block;
-        width: 100%;
-    }
-}
+    .calendar {
+        .fc-toolbar {
+            flex-direction: column;
+            align-items: start;
+        }
 
-@media (min-width: 850px) {
-    .fc-center {
-        display: inline-block;
-        width: 40%;
+        .fc-toolbar-chunk {
+            margin-bottom: .5rem;
+        }
     }
 }
 
@@ -3292,6 +3527,17 @@ button {
 @media #{$medium-only} {
     .calendar-footer {
         width: 75%;
+    }
+
+    .occupancy-calendar {
+        .fc-toolbar {
+            flex-direction: column;
+            align-items: start;
+        }
+
+        .fc-toolbar-chunk {
+            margin-bottom: .5rem;
+        }
     }
 }
 
@@ -3738,6 +3984,13 @@ button {
     Search results
 */
 ul.search-results {
+    em {
+        color: $red !important;
+        font-style: initial;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+
     a {
         display: block;
         font-weight: bold;
@@ -3847,23 +4100,6 @@ ul.search-results {
             font-weight: normal;
         }
     }
-}
-
-/*
-    The list of people on the form view can swell to a large number. For now
-    we limit the size of this list. In the future we might replace it with
-    a better way of doing this.
-*/
-#fieldset-people > div {
-    border: 1px solid $iron;
-    border-color: $iron;
-    border-style: solid;
-    border-width: 1px;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
-    max-height: 500px;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    padding: 1em;
 }
 
 /*
@@ -4041,7 +4277,11 @@ ul.search-results {
     .button {
         border-radius: 3px;
         display: block;
-        margin: 0;
+        margin-left: 0;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
     }
 
     .failed {
@@ -4090,6 +4330,7 @@ ul.search-results {
     }
 
     a,
+    .reservation-resource,
     .reservation-time,
     .reservation-price {
         display: block;
@@ -4112,6 +4353,7 @@ ul.search-results {
             width: 24px;
         }
 
+        .reservation-resource,
         .reservation-time,
         .reservation-price {
             margin-left: 2.3rem;
@@ -4171,7 +4413,7 @@ ul.search-results {
         width: 20%;
     }
 
-    .fc-view-container,
+    .calendar .fc-view,
     .reservation-list {
         display: inline-block;
         float: left;
@@ -4188,7 +4430,7 @@ ul.search-results {
         }
     }
 
-    .fc-view-container,
+    .calendar .fc-view,
     .reservation-list {
         width: 75%;
     }
@@ -4201,7 +4443,7 @@ ul.search-results {
         width: 100%;
     }
 
-    .fc-view-container,
+    .calendar .fc-view,
     .reservation-list {
         display: block;
         width: 100%;
@@ -4212,12 +4454,6 @@ ul.search-results {
         .fc-button-group {
             display: inline-block;
             font-size: .7rem;
-        }
-
-        .fc-right {
-            left: -7px;
-            margin-bottom: 1rem;
-            position: relative;
         }
     }
 
@@ -4266,6 +4502,26 @@ ul.search-results {
 
         li {
             margin-bottom: .5rem;
+        }
+
+        .reservation {
+            background: $white-smoke;
+            border-radius: 2px;
+            margin-bottom: 1rem;
+            margin-left: -0.5rem;
+            position: relative;
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem 8rem .5rem .5rem;
+        }
+
+        .reservation-actions {
+            font-size: .8rem;
+            position: absolute;
+            right: .5rem;
+            top: .275rem;
         }
     }
 
@@ -4520,11 +4776,21 @@ ul.recipients {
         font-size: 1rem;
         font-weight: bold;
         margin: 0 0 .5rem;
+    }
 
-        &::before {
-            @include icon('\f1f5');
-            margin-right: 1.5ex;
-        }
+    .payment-provider-stripe-connect h2::before {
+        @include icon('\f1f5');
+        margin-right: 1.5ex;
+    }
+
+    .payment-provider-datatrans h2::before {
+        @include icon('\f09d');
+        margin-right: 1.5ex;
+    }
+
+    .payment-provider-worldline-saferpay h2::before {
+        @include icon('\f09d');
+        margin-right: 1.5ex;
     }
 }
 
@@ -4535,6 +4801,7 @@ ul.recipients {
     background-color: $white;
     display: inline-block;
     padding: 2px 8px;
+    white-space:nowrap;
 
     &.payment-state-open {
         border: 1px solid $info-color;
@@ -4575,6 +4842,16 @@ ul.recipients {
             margin-right: .75ex;
         }
     }
+
+    &.payment-state-invoiced {
+        border: 1px solid get-color(info);
+
+        &::before {
+            @include icon('\f1ea');
+            color: get-color(info);
+            margin-right: .75ex;
+        }
+    }
 }
 
 .tickets-table .payment-state {
@@ -4602,6 +4879,163 @@ ul.recipients {
     td {
         padding-right: 5px;
         vertical-align: top;
+    }
+}
+
+/*
+    Invoices table
+*/
+#ticket_group_chosen .chosen-results {
+
+    .ticket-group-filter {
+        font-weight: normal;
+        margin-left: 1.4rem;
+    }
+}
+
+.invoices-table {
+    width: 100%;
+
+    tr.paid {
+        &.uninvoiced .invoiced-state {
+            color: get-color(warning);
+            filter: grayscale(1);
+        }
+        &.invoiced .invoiced-state, .paid-state {
+            color: get-color(success);
+        }
+    }
+
+    tr.unpaid.invoiced {
+        .invoiced-state {
+            color: get-color(success);
+        }
+        .paid-state {
+            color: get-color(warning);
+        }
+    }
+
+    tr.unpaid.uninvoiced {
+        .invoiced-state {
+            color: get-color(alert);
+        }
+        .paid-state {
+            color: get-color(warning);
+            filter: grayscale(1);
+        }
+    }
+
+    .invoiced-state, .paid-state {
+        font-size: 1.25rem;
+        text-align: center;
+        white-space: nowrap;
+        width: 1%;
+    }
+
+    td {
+        padding-right: 5px;
+        vertical-align: top;
+    }
+}
+
+/*
+    Invoice
+*/
+.invoice-items {
+    position: relative;
+    width: 100%;
+
+    thead th.centered {
+        text-align: center !important;
+    }
+
+    tbody tr {
+        background-color: transparent;
+
+        &.paid:hover {
+            background-color: $green-pastel !important;
+        }
+
+        &.unpaid:hover {
+            background-color: $red-pastel !important;
+        }
+    }
+
+    td {
+        border: 0;
+        padding-bottom: .35rem;
+        padding-top: .35rem;
+
+        &:not(:first-child) {
+            white-space: nowrap;
+        }
+    }
+
+    .group th {
+        padding-bottom: .75rem;
+        padding-top: .75rem;
+    }
+
+    .amount, .unit, .quantity, .vat, .vat-rate {
+        font-family: $font-family-monospace;
+        text-align: right;
+        width: 1%;
+    }
+
+    .actions {
+        width: 1%;
+    }
+
+    .total .amount,
+    .total .vat {
+        padding-top: .75rem;
+    }
+
+    .total td {
+        padding-bottom: .5rem;
+        padding-top: .5rem;
+    }
+
+    .total td:last-child {
+        padding-right: .75rem;
+    }
+
+    .total td:first-child,
+    .group th:first-child {
+        font-weight: bold;
+        text-decoration: underline;
+        text-decoration-color: $body-font-color;
+    }
+
+    tbody tr:last-child td {
+        // make sure the backgrounds of all item lines cover the same
+        // height, here we mask the extended height of the row with
+        // a white box-shadow
+        box-shadow: 0 -.75rem $white inset;
+        padding-bottom: 1rem;
+    }
+
+    .unpaid .amount {
+        color: $red-dark;
+    }
+
+    .paid .amount {
+        color: $green-dark;
+    }
+
+    a.remove-invoice-item {
+        color: $red-dark;
+
+        &:link,
+        &:visited {
+            color: $red-dark;
+        }
+
+        &:hover,
+        &:active,
+        &:focus {
+            color: rgba($red-dark, .9);
+        }
     }
 }
 
@@ -4810,6 +5244,29 @@ h2 + div.timeline {
     .file {
         margin-left: 4rem;
     }
+
+    .reservation-adjustment {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 0;
+
+        .fa {
+            font-size: 1.5rem;
+            color: rgba(0, 0, 0, .5);
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem;
+            background: rgba(255, 255, 255, .7);
+            border-radius: 2px;
+            box-shadow: 3px 3px 3px rgba(220, 220, 220, .2);
+            flex: 0 0 32.66%;
+            margin: .5rem 0;
+        }
+
+    }
 }
 
 /*
@@ -4821,6 +5278,10 @@ h2 + div.timeline {
 .message-directory,
 .message-submission {
     background: lighten($green-pastel, 2.5%);
+}
+
+.message-reservation_adjusted {
+    background: lighten($yellow-pastel, 2.5%);
 }
 
 .message-ticket_note {
@@ -5355,6 +5816,10 @@ h2 + div.timeline {
     // used for better performance
     table-layout: fixed;
     width: 100%;
+
+    thead tr {
+        background-color: $white;
+    }
 
     th {
         padding-top: 2rem;
@@ -6062,6 +6527,68 @@ h2 + div.timeline {
         margin-top: -1px;
     }
 
+    a.mute {
+        color: #333;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: none;
+        }
+        .fa-microphone {
+            display: inline;
+        }
+
+        &:hover {
+            color: $red;
+
+            .fa-microphone-slash {
+                display: inline;
+            }
+            .fa-microphone {
+                display: none;
+            }
+        }
+    }
+
+    a.unmute {
+        color: $red;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: inline;
+        }
+        .fa-microphone {
+            display: none;
+        }
+
+        &:hover {
+            color: #333;
+
+            .fa-microphone-slash {
+                display: none;
+            }
+            .fa-microphone {
+                display: inline;
+            }
+
+            &.disabled {
+                color: $red;
+                cursor: disabled;
+
+                .fa-microphone-slash {
+                    display: inline;
+                }
+                .fa-microphone {
+                    display: none;
+                }
+            }
+        }
+    }
+
     .button {
         display: block;
         font-size: .875rem;
@@ -6334,18 +6861,12 @@ h2 + div.timeline {
 /*
     Dashboard
 */
-.boardlet-group {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-}
 
 .boardlet {
     background: $gray-pastel;
     border-top: 10px solid $green-light;
     margin-bottom: 1.5rem;
     padding: .5rem 1rem 1rem;
-    width: calc((100% / 3) - 1rem);
 
     h2 {
         font-size: 1.3rem;
@@ -6354,11 +6875,35 @@ h2 + div.timeline {
         word-wrap: break-word;
     }
 
-    li {
+    table {
+        margin-bottom: 0;
+    }
+
+    tr {
         font-size: .9rem;
 
         &.zero {
             color: $base;
+        }
+
+        .facts {
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        .fact-number,
+        .fact-icon {
+            padding: 0.5rem;
+            text-align: right;
+        }
+
+        .fact-icon {
+            text-align: center;
+        }
+
+        .fact-text {
+            margin-left: .5rem;
+            width: 100%;
         }
     }
 
@@ -6592,6 +7137,9 @@ a#results {
     margin-bottom: 1.5rem;
     overflow-x: auto;
     position: relative;
+    /* NOTE: Since we allow shift as a modifier key, text-selection would
+             become annoying, rather than helpful. */
+    user-select: none;
 
     table {
         margin-bottom: 0;
@@ -6640,6 +7188,10 @@ a#results {
                     rgba($iron, .25) 20px
                 );
                 cursor: default;
+
+                &.event-available.event-adjustable {
+                    cursor: pointer;
+                }
             }
 
             &.not-selected:not(:hover) {
@@ -6661,6 +7213,13 @@ a#results {
         .event-available {
             background-color: $green;
             cursor: pointer;
+        }
+
+        .event-adjustable::before {
+            float: right;
+            color: white;
+            font-size: 1.5rem;
+            @include icon($edit-link-icon);
         }
     }
 }
@@ -6775,4 +7334,71 @@ a#results {
     #formcode-snippet-markdown {
         display: none;
     }
+}
+
+.no-list-div {
+    ul li {
+        list-style: none;
+    }
+}
+
+
+/*
+    Code Block, Code Inline, Code
+
+    <pre><code>...</code></pre>
+*/
+
+$code-background: #f5f5f5;
+$code-border-radius: 4px;
+$code-padding-block: 0.5rem;
+$code-padding-inline: 0.125rem;
+$code-block-margin-bottom: 0.8rem;
+
+pre code,
+.code-block,
+.code-inline,
+code {
+    background: $code-background;
+    border-radius: $code-border-radius;
+}
+
+pre code,
+.code-block {
+    padding: $code-padding-block;
+    margin-bottom: $code-block-margin-bottom;
+    display: block;
+}
+
+.code-inline,
+code {
+    padding: $code-padding-inline;
+    display: inline;
+}
+
+// confirm scrollable list
+.confirm-list {
+    margin-bottom: 1rem;
+    max-height: 40vh;
+    overflow: auto;
+    padding: 10px;
+
+    ul {
+        margin-bottom: 0;
+    }
+}
+
+.button.alert.yes.disabled {
+    cursor: not-allowed !important;
+    opacity: .6;
+}
+
+.scroll-hint {
+    color: #8e1c26;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+p.full-text-width {
+    max-width: 100% !important;
 }

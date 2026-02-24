@@ -1,13 +1,17 @@
+from __future__ import annotations
+
 from io import BytesIO
 from os.path import splitext, basename
 from sqlalchemy import and_
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.ticket import Ticket, TicketCollection
 from onegov.translator_directory import _
+from onegov.translator_directory.utils import country_code_to_name
 from docxtpl import DocxTemplate, InlineImage  # type:ignore[import-untyped]
 
 
 from typing import Any, IO, NamedTuple, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.translator_directory.models.translator import Translator
@@ -16,8 +20,8 @@ if TYPE_CHECKING:
 
 def fill_docx_with_variables(
     original_docx: IO[bytes],
-    t: 'Translator',
-    request: 'TranslatorAppRequest',
+    t: Translator,
+    request: TranslatorAppRequest,
     signature_file: IO[bytes] | None = None,
     **kwargs: Any
 ) -> tuple[dict[str, Any], bytes]:
@@ -30,11 +34,15 @@ def fill_docx_with_variables(
         - The rendered docx file (bytes).
     """
 
+    mapping = country_code_to_name(request.locale)
+    nationalities = ', '.join(mapping[n] for n in t.nationalities) if (
+        t.nationalities) else ''
+
     docx_template = DocxTemplate(original_docx)
     template_variables = {
         'translator_last_name': t.last_name,
         'translator_first_name': t.first_name,
-        'translator_nationality': t.nationality,
+        'translator_nationalities': nationalities,
         'translator_address': t.address,
         'translator_city': t.city,
         'translator_zip_code': t.zip_code,
@@ -73,7 +81,7 @@ def fill_docx_with_variables(
         return {}, render_docx(docx_template, template_variables)
 
 
-class FixedInplaceInlineImage(InlineImage):
+class FixedInplaceInlineImage(InlineImage):  # type:ignore[misc]
     """ InlineImage adds images to .docx files, but additional tweaking
     was required for left margin alignment.
 
@@ -93,7 +101,7 @@ class FixedInplaceInlineImage(InlineImage):
 
     def fix_inline_image_alignment(self, orig_xml: str) -> str:
         """ Fixes the position of the image by setting the `distL` to zero."""
-        fix_pos = ' distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\"'
+        fix_pos = ' distT="0" distB="0" distL="0" distR="0"'
         index = orig_xml.find('wp:inline')
         if index != -1:
             return (
@@ -120,7 +128,7 @@ def render_docx(
     return in_memory_docx.getvalue()
 
 
-def translator_functions(translator: 'Translator') -> 'Iterator[str]':
+def translator_functions(translator: Translator) -> Iterator[str]:
     if translator.written_languages:
         yield 'Übersetzen'
     if translator.spoken_languages:
@@ -129,18 +137,18 @@ def translator_functions(translator: 'Translator') -> 'Iterator[str]':
         yield 'Kommunikationsüberwachung'
 
 
-def gendered_greeting(translator: 'Translator') -> str:
-    if translator.gender == "M":
-        return "Sehr geehrter Herr"
-    elif translator.gender == "F":
-        return "Sehr geehrte Frau"
+def gendered_greeting(translator: Translator) -> str:
+    if translator.gender == 'M':
+        return 'Sehr geehrter Herr'
+    elif translator.gender == 'F':
+        return 'Sehr geehrte Frau'
     else:
-        return "Sehr geehrte*r Herr/Frau"
+        return 'Sehr geehrte*r Herr/Frau'
 
 
 def get_ticket_nr_of_translator(
-    translator: 'Translator',
-    request: 'TranslatorAppRequest'
+    translator: Translator,
+    request: TranslatorAppRequest
 ) -> str:
     query = TicketCollection(request.session).by_handler_data_id(
         translator.id
@@ -159,8 +167,8 @@ class Signature(NamedTuple):
 def parse_from_filename(abs_signature_filename: str) -> Signature:
     """ Parses information from the filename. The delimiter is '__'.
 
-     This is kind of implicit here, information about the user is stored in
-     the filename of the signature image of the user.
+    This is kind of implicit here, information about the user is stored in
+    the filename of the signature image of the user.
     """
     filename, _ = splitext(basename(abs_signature_filename))
     filename = filename.replace('Unterschrift__', '')
@@ -173,7 +181,7 @@ def parse_from_filename(abs_signature_filename: str) -> Signature:
 
 
 def signature_for_mail_templates(
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 ) -> GeneralFile | None:
     """ The signature of the current user. It is an image that is manually
     uploaded. It should contain the string 'Unterschrift', as well as the

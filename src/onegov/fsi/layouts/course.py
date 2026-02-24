@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler
@@ -23,9 +25,9 @@ if TYPE_CHECKING:
 class CourseInviteMailLayout(OrgDefaultMailLayout, FormatMixin):
     """Takes a course as its model, not a notification template """
 
-    app: 'FsiApp'
-    request: 'FsiRequest'
-    model: 'Course'
+    app: FsiApp
+    request: FsiRequest
+    model: Course
 
     @cached_property
     def event_collection(self) -> CourseEventCollection:
@@ -33,7 +35,7 @@ class CourseInviteMailLayout(OrgDefaultMailLayout, FormatMixin):
             self.request.session, course_id=self.model.id, upcoming_only=True)
 
     @cached_property
-    def default_macros(self) -> 'MacrosLookup':
+    def default_macros(self) -> MacrosLookup:
         return self.template_loader.macros
 
     @cached_property
@@ -83,7 +85,7 @@ class CourseCollectionLayout(DefaultLayout):
         if self.request.is_admin:
             links.append(
                 Link(
-                    text=_("New Course"),
+                    text=_('New Course'),
                     url=self.request.class_link(
                         CourseCollection, name='add'
                     ),
@@ -96,7 +98,7 @@ class CourseCollectionLayout(DefaultLayout):
     def accordion_items(
         self,
         upcoming_only: bool = True
-    ) -> list['RenderData']:
+    ) -> list[RenderData]:
 
         assert self.request.attendee is not None
         coll = CourseEventCollection(
@@ -119,7 +121,7 @@ class CourseCollectionLayout(DefaultLayout):
 
 class CourseLayout(CourseCollectionLayout):
 
-    model: 'Course'
+    model: Course
 
     @cached_property
     def audit_collection(self) -> AuditCollection:
@@ -185,10 +187,10 @@ class CourseLayout(CourseCollectionLayout):
                     traits=(
                         Confirm(
                             _(
-                                "Do you really want to delete this course ?"),
-                            _("This cannot be undone."),
-                            _("Delete course"),
-                            _("Cancel")
+                                'Do you really want to delete this course ?'),
+                            _('This cannot be undone.'),
+                            _('Delete course'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -222,7 +224,7 @@ class AddCourseLayout(DefaultLayout):
 
 class EditCourseLayout(DefaultLayout):
 
-    model: 'Course'
+    model: Course
 
     @property
     def title(self) -> str:
@@ -244,7 +246,7 @@ class EditCourseLayout(DefaultLayout):
 
 class InviteCourseLayout(DefaultLayout):
 
-    model: 'Course'
+    model: Course
 
     @property
     def title(self) -> str:

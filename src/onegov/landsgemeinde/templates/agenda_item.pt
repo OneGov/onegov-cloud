@@ -9,9 +9,12 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x wrapper">
             <div class="medium-7 cell main-content content">
+                <div class="print-button">
+                    <i class="fa fa-print" data-print-current-page aria-hidden="true"></i>
+                </div>
                 <div class="video" tal:condition="video_url">
                     <h2 i18n:translate="" class="visually-hidden">Video</h2>
-                    <div class="videowrapper">
+                    <div class="videowrapper" id="assembly-video-iframe">
                         <iframe allow="fullscreen" width="100%" frameborder="0" src="${video_url}"></iframe>
                     </div>
                 </div>
@@ -20,36 +23,76 @@
                     <tal:block tal:content="agenda_item.resolution">
                     <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
                 </div>
-                <div class="agenda-item-overview" tal:condition="agenda_item.overview" tal:content="agenda_item.overview"></div>
-                <div class="agenda-item-content" tal:condition="agenda_item.text" tal:content="agenda_item.text"></div>
+                <div class="agenda-item-overview page-text" tal:condition="agenda_item.overview" tal:content="agenda_item.overview"></div>
+                <div class="agenda-item-content page-text" tal:condition="agenda_item.text" tal:content="agenda_item.text"></div>
                 <div class="agenda-item-vota">
                     <tal:block tal:repeat="votum agenda_item.vota" metal:use-macro="layout.macros['votum']" />
                 </div>
                 <div class="agenda-item-tags">
                     <span tal:repeat="tag agenda_item.resolution_tags" class="blank-label">${tag}</span>
                 </div>
+                <div class="item-arrows">
+                    <div class="prev-item" tal:condition="prev_item">
+                        <a href="${request.link(prev_item)}" class="button hollow">
+                            <i class="fa fa-chevron-left" aria-hidden="true"></i>
+                            <span class="hide-for-large">${prev_item.number}</span>
+                            <span class="show-for-large" i18n:translate="">Previous agenda item</span>
+                        </a>
+                    </div>
+                    <div class="next-item" tal:condition="next_item">
+                        <a href="${request.link(next_item)}" class="button hollow">
+                            <span class="hide-for-large">${next_item.number}</span>
+                            <span class="show-for-large" i18n:translate="">Next agenda item</span>
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
                 <div class="sidebar-wrapper">
-                    <div class="side-panel downloads" tal:condition="agenda_item.memorial_pdf or (agenda_item.assembly.memorial_pdf and agenda_item.memorial_page)">
-                        <tal:block tal:condition="agenda_item.memorial_pdf">
-                            <h2 i18n:translate="">Downloads</h2>
-                            <p tal:condition="agenda_item.assembly.memorial_pdf and agenda_item.memorial_page">
-                                <a href="${f'{request.link(agenda_item.assembly.memorial_pdf)}#page={agenda_item.memorial_page}'}" class="memorial-link">
-                                    <i class="fa fa-download" aria-hidden="true"></i>
-                                    <span i18n:translate="">Memorial (PDF)</span>
-                                </a>
-                            </p>
-                            <p tal:condition="agenda_item.memorial_pdf and not (agenda_item.assembly.memorial_pdf and agenda_item.memorial_page)">
-                                <a href="${request.link(agenda_item.memorial_pdf)}" class="memorial-link">
-                                    <i class="fa fa-download" aria-hidden="true"></i>
-                                    <span i18n:translate="">Excerpt from the Memorial (PDF)</span>
-                                </a>
-                            </p>
-                        </tal:block>
+                    <div class="side-panel content-panel" style="display: none;" data-toc-level="${layout.org.level_table_of_contents}">
+                        <h3 i18n:translate>Content</h3>
+                        <ul class="more-list"></ul>
                     </div>
                     <tal:block metal:use-macro="layout.macros['agenda-item-list']" />
+                    <div class="side-panel downloads" tal:condition="agenda_item.memorial_pdf or agenda_item.assembly.memorial_pdf and agenda_item.memorial_page">
+                        <tal:b tal:condition="agenda_item.assembly.memorial_pdf and agenda_item.memorial_page">
+                            <h3 i18n:translate="">Memorial</h3>
+                            <a href="${f'{request.link(agenda_item.assembly.memorial_pdf)}#page={agenda_item.memorial_page}'}" class="memorial-link">
+                                <i class="fa fa-file-pdf" aria-hidden="true"></i>
+                                <span><tal:b i18n:translate="">Memorial</tal:b>.pdf</span>
+                            </a>
+                        </tal:b>
+                        <tal:b tal:condition="agenda_item.memorial_pdf and not (agenda_item.assembly.memorial_pdf and agenda_item.memorial_page)">
+                            <a href="${request.link(agenda_item.memorial_pdf)}" class="memorial-link">
+                                <i class="fa fa-file-pdf" aria-hidden="true"></i>
+                                <span i18n:translate="">Excerpt from the Memorial.pdf</span>
+                            </a>
+                        </tal:b>
+                    </div>
+                    <div class="side-panel downloads" tal:condition="agenda_item.more_files">
+                        <tal:b tal:condition="agenda_item.more_files">
+                            <h3 i18n:translate="">Downloads</h3>
+                            <tal:b tal:repeat="file agenda_item.more_files">
+                                <a href="${request.link(file)}" class="more-files-link">
+                                    <tal:block metal:use-macro="layout.macros['file-icons']" />
+                                    <span tal:content="file.name" />
+                                </a>
+                            </tal:b>
+                        </tal:b>
+                    </div>
+                    <div class="side-panel links-panel" tal:condition="agenda_item.sidepanel_links|False">
+                        <h3 i18n:translate>Links</h3>
+                        <ul class="more-list">
+                            <li tal:repeat="sl python: sorted(agenda_item.sidepanel_links, key=lambda sl: sl[0] if sl[0] else sl[1])">
+                                <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
+                                    <i class="fa fa-link" aria-hidden="true"></i>
+                                    <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 

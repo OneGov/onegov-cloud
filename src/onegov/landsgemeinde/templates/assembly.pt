@@ -5,64 +5,88 @@
 
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x wrapper">
-            <div class="medium-6 cell main-content content">
+            <div class="medium-6 cell main-content content page-text">
+                <div class="print-button">
+                    <i class="fa fa-print" data-print-current-page aria-hidden="true"></i>
+                </div>
                 <div class="videowrapper" tal:condition="assembly.video_url">
                     <iframe allow="fullscreen" frameborder="0" src="${assembly.video_url}"></iframe>
                 </div>
                 <div class="assembly-overview" tal:content="assembly.overview"></div>
             </div>
 
-            <div class="medium-5 cell medium-offset-1 sidebar" id="right-sidebar">
+            <div class="medium-5 cell medium-offset-1 sidebar" id="right-sidebar" data-sidebar-mobile-title="Downloads, Audio & Assembly items" i18n:attributes="data-sidebar-mobile-title">
                 <div class="sidebar-wrapper">
+                    <div class="side-panel content-panel" style="display: none;" data-toc-level="${layout.org.level_table_of_contents}">
+                        <h3 i18n:translate>Content</h3>
+                        <ul class="more-list"></ul>
+                    </div>
                     <div class="side-panel downloads">
-                        <h2 i18n:translate="">Downloads</h2>
                         <p tal:condition="assembly.memorial_pdf">
+                            <h3 i18n:translate="">Memorial</h3>
                             <a href="${request.link(assembly.memorial_pdf)}" class="memorial-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
-                                <span tal:condition="not: assembly.memorial_2_pdf" i18n:translate="">Memorial (PDF)</span>
-                                <span tal:condition="assembly.memorial_2_pdf" i18n:translate="">Memorial part 1 (PDF)</span>
+                                <i class="fa fa-file-pdf" aria-hidden="true"></i>
+                                <span tal:condition="not: assembly.memorial_2_pdf" i18n:translate="">Memorial</span>
+                                <span tal:condition="assembly.memorial_2_pdf" i18n:translate="">Memorial part 1</span>
                             </a>
                         </p>
                         <p tal:condition="assembly.memorial_2_pdf">
                             <a href="${request.link(assembly.memorial_2_pdf)}" class="memorial-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
-                                <span i18n:translate="">Memorial part 2 (PDF)</span>
+                                <i class="fa fa-file-pdf" aria-hidden="true"></i>
+                                <span i18n:translate="">Memorial part 2</span>
                             </a>
                         </p>
                         <p tal:condition="assembly.memorial_supplement_pdf">
                             <a href="${request.link(assembly.memorial_supplement_pdf)}" class="memorial-supplement-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
-                                <span i18n:translate="">Supplement to the memorial (PDF)</span>
-                            </a>
-                        </p>
-                        <p tal:condition="assembly.protocol_pdf">
-                            <a href="${request.link(assembly.protocol_pdf)}" class="protocol-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
-                                <span i18n:translate="">Protocol (PDF)</span>
-                            </a>
-                        </p>
-                        <p tal:condition="assembly.audio_mp3">
-                            <a href="${request.link(assembly.audio_mp3)}" class="audio-mp3-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
-                                <span i18n:translate="">Audio (MP3)</span>
-                            </a>
-                        </p>
-                        <p tal:condition="assembly.audio_zip">
-                            <a href="${request.link(assembly.audio_zip)}" class="audio-zip-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
-                                <span i18n:translate="">Audio (ZIP)</span>
-                            </a>
-                        </p>
-                        <p>
-                            <a href="${request.link(assembly, 'json')}" class="json-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
-                                <span>Open Data (JSON)</span>
+                                <i class="fa fa-file-pdf" aria-hidden="true"></i>
+                                <span i18n:translate="">Supplement to the memorial</span>
                             </a>
                         </p>
                     </div>
+                    <div class="side-panel downloads">
+                        <tal:b tal:condition="assembly.protocol_pdf">
+                            <h3 i18n:translate="">Protocol</h3>
+                            <a href="${request.link(assembly.protocol_pdf)}" class="protocol-link">
+                                <i class="fa fa-file-pdf" aria-hidden="true"></i>
+                                <span i18n:translate="">Protocol</span>
+                            </a>
+                        </tal:b>
+                    </div>
+                    <div class="side-panel downloads">
+                        <h3 i18n:translate="">Downloads</h3>
+                        <a tal:condition="assembly.audio_zip" href="${request.link(assembly.audio_zip)}" class="audio-zip-link">
+                            <i class="fas fa-file-archive" aria-hidden="true"></i>
+                            <span i18n:translate="">Memorial as audio for the visually impaired and blind</span>
+                        </a>
+                        <a tal:condition="assembly.audio_mp3" href="${request.link(assembly.audio_mp3)}" class="audio-mp3-link">
+                            <i class="fas fa-file-audio" aria-hidden="true"></i>
+                            <span i18n:translate="">Audio</span>
+                        </a>
+                        <tal:b tal:condition="assembly.more_files" tal:repeat="file assembly.more_files">
+                            <a href="${request.link(file)}" class="more-files-link">
+                                <tal:block metal:use-macro="layout.macros['file-icons']" />
+                                <span tal:content="file.name" />
+                            </a>
+                        </tal:b>
+                        <a href="${request.link(assembly, 'open-data')}" class="json-link">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            <span>Open Data</span>
+                        </a>
+                    </div>
+                    <div class="side-panel links-panel" tal:condition="assembly.sidepanel_links|False">
+                        <h3 i18n:translate>Links</h3>
+                        <ul class="more-list">
+                            <li tal:repeat="sl python: sorted(assembly.sidepanel_links, key=lambda sl: sl[0] if sl[0] else sl[1])">
+                                <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
+                                    <i class="fa fa-link" aria-hidden="true"></i>
+                                    <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
                     <div class="side-panel audio" tal:condition="assembly.audio_mp3">
-                        <h2 i18n:translate="">Audio</h2>
+                        <h3 i18n:translate="">Audio</h3>
                         <audio preload="none" controls="">
                             <source type="audio/mpeg" src="${request.link(assembly.audio_mp3)}" />
                             <p><a href="${request.link(assembly.audio_mp3)}" i18n:translate="">Download audio</a></p>

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import merge_forms
 from onegov.form.fields import MultiCheckboxField
 from onegov.org import _
@@ -21,7 +23,7 @@ class SurveySubmissionsExport(SurveySubmissionsExportBase):
         request: OrgRequest
 
     submission_window = MultiCheckboxField(
-        label=_("Submission Window"),
+        label=_('Submission Window'),
         choices=None,
     )
 
@@ -45,6 +47,12 @@ class SurveySubmissionsExport(SurveySubmissionsExportBase):
             return
 
         self.submission_window.choices = [
-            (window.id.hex, layout.format_date_range(window.start, window.end))
+            (window.id.hex,
+             (f'{layout.format_date_range(window.start, window.end)}, '
+             f'{window.title}'))
             for window in windows
         ]
+
+        if self.request.params.get('submission_window_id'):
+            self.submission_window.data = [
+                self.request.params['submission_window_id']]

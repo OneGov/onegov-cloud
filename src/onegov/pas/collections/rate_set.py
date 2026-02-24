@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.core.collection import GenericCollection
 from onegov.pas.models import RateSet
@@ -6,14 +8,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
+    from typing import Self
 
 
 class RateSetCollection(GenericCollection[RateSet]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         active: bool | None = None
     ):
         super().__init__(session)
@@ -23,7 +25,7 @@ class RateSetCollection(GenericCollection[RateSet]):
     def model_class(self) -> type[RateSet]:
         return RateSet
 
-    def query(self) -> 'Query[RateSet]':
+    def query(self) -> Query[RateSet]:
         query = super().query()
 
         if self.active is not None:
@@ -38,5 +40,5 @@ class RateSetCollection(GenericCollection[RateSet]):
     def for_filter(
         self,
         active: bool | None = None
-    ) -> 'Self':
+    ) -> Self:
         return self.__class__(self.session, active)

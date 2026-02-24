@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from io import BytesIO
 
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import ExtendedPerson
-from xlsxwriter.workbook import Workbook  # type:ignore[import-untyped]
+from xlsxwriter.workbook import Workbook
 from decimal import Decimal
 
 
@@ -35,7 +37,7 @@ column_mapper = OrderedDict(
 )
 
 
-def extract_person_data(session: 'Session') -> list[dict[str, object]]:
+def extract_person_data(session: Session) -> list[dict[str, object]]:
     collection = ExtendedPersonCollection(session)
     collection.exclude_hidden = False
     query = collection.query().outerjoin(ExtendedPerson.memberships)
@@ -44,8 +46,8 @@ def extract_person_data(session: 'Session') -> list[dict[str, object]]:
 
     for person in query:
         out_dict: dict[str, object] = OrderedDict()
-        memberships = "\n".join(
-            (f"{m.agency.title} - {m.title}" for m in person.memberships)
+        memberships = '\n'.join(
+            f'{m.agency.title} - {m.title}' for m in person.memberships
         )
         for col in column_mapper.keys():
             if col == 'memberships':
@@ -56,7 +58,7 @@ def extract_person_data(session: 'Session') -> list[dict[str, object]]:
     return write_out
 
 
-def export_person_xlsx(session: 'Session') -> BytesIO:
+def export_person_xlsx(session: Session) -> BytesIO:
     """ Exports every person with their memberships in xlsx format. """
     file = BytesIO()
     workbook = Workbook(file, {'default_date_format': 'dd.mm.yyyy'})
@@ -65,16 +67,14 @@ def export_person_xlsx(session: 'Session') -> BytesIO:
 
     write_out = extract_person_data(session)
 
-    row = 0
-    for entry in write_out:
-        row += 1
-        for col_ix, value in enumerate(entry.values()):
+    for row, entry in enumerate(write_out, start=1):
+        for column, value in enumerate(entry.values()):
             if value is None:
-                worksheet.write_string(row, col_ix, '')
+                worksheet.write_string(row, column, '')
             elif isinstance(value, str):
-                worksheet.write_string(row, col_ix, value)
-            elif isinstance(value, int) or isinstance(value, Decimal):
-                worksheet.write_number(row, col_ix, value)
+                worksheet.write_string(row, column, value)
+            elif isinstance(value, (int, Decimal)):
+                worksheet.write_number(row, column, value)
             else:
                 raise NotImplementedError()
 

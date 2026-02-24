@@ -34,6 +34,10 @@ section#content .files {
     table-layout: fixed;
     width: 100%;
 
+    thead tr {
+        background-color: $white;
+    }
+
     th {
         padding-top: 1.8rem;
         text-align: left;
@@ -81,6 +85,8 @@ section#content .files {
     }
 
     tr.file-info {
+        border-bottom: .5rem solid $white;
+
         td:nth-child(1) {
             overflow: hidden;
             text-overflow: ellipsis;
@@ -116,6 +122,10 @@ section#content .files {
         td:nth-child(5) {
             white-space: nowrap;
         }
+
+        a[id^="button"] {
+            cursor: pointer;
+        }
     }
 
     .file-info + tr {
@@ -146,9 +156,9 @@ section#content .files {
 }
 
 .file-actions {
-
     display: flex;
     flex-direction: column;
+    text-wrap: nowrap;
 
     a {
         margin-bottom: .5rem;
@@ -160,6 +170,7 @@ section#content .files {
 */
 
 .file-status {
+    margin: 0 0.6rem 0 0.6rem;
     flex-grow: 1;
 
     h3 {
@@ -174,12 +185,13 @@ section#content .files {
 .file-status-tag {
     font-size: .875rem;
     line-height: 1rem;
-    margin: .3rem 2rem .75rem 0;
+    margin: .3rem 1rem .75rem 0;
+    text-wrap: nowrap;
 
     .alert-box {
-        margin-bottom: .5rem;
-        padding: 5px 10px 5px 7px;
-        width: 100%;
+        display: block;
+        margin-bottom: .5rem !important;
+        padding: 5px 10px 5px 7px !important;
 
         &::before {
             font-size: .875rem;
@@ -187,8 +199,10 @@ section#content .files {
             margin-right: 2px;
         }
 
-        .close {
-            padding-right: 2px;
+        .close-button {
+            font-size: 1.3rem;
+            top: .25rem;
+            right: .4rem;
         }
     }
 

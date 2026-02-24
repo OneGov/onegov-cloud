@@ -3,8 +3,8 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="row">
-            <div class="columns small-12 medium-8">
+        <div class="grid-x grid-padding-x">
+            <div class="medium-8 large-7 cell content">
                 <div tal:condition="not period.confirmed" i18n:translate>
                     This period has not been confirmed yet.
                 </div>
@@ -21,22 +21,23 @@
                                 <span class="show-for-sr" i18n:translate>Print</span>
                             </a>
                         </h2>
+                        <div class="occurence-info panel">
+                            <div class="organisation show-for-print">
+                                <strong>${organisation.name}</strong>
+                                <div tal:content="organisation.contact_html" />
+                            </div>
 
-                        <div class="organisation show-for-print">
-                            <strong>${organisation.name}</strong>
-                            <div tal:content="organisation.contact_html" />
+                            <div class="occasion-dates">
+                                <ul>
+                                    <li tal:repeat="date occasion.dates" class="calendar-icon before"
+                                        tal:content="layout.format_datetime_range(date.localized_start, date.localized_end)" />
+                                </ul>
+                            </div>
+
+                            <div tal:condition="occasion.meeting_point" class="location-icon before" i18n:translate>${occasion.meeting_point}</div>
+
+                            <div class="child-icon before" i18n:translate><tal:b i18n:name="count" replace="occasion.attendee_count" /> attendees</div>
                         </div>
-
-                        <div class="occasion-dates">
-                            <ul>
-                                <li tal:repeat="date occasion.dates" class="calendar-icon before fixed-width"
-                                    tal:content="layout.format_datetime_range(date.localized_start, date.localized_end)" />
-                            </ul>
-                        </div>
-
-                        <div tal:condition="occasion.meeting_point" class="location-icon before fixed-width" i18n:translate>${occasion.meeting_point}</div>
-
-                        <div class="child-icon before fixed-width" i18n:translate><tal:b i18n:name="count" replace="occasion.attendee_count" /> attendees</div>
                     </div>
 
                     <tal:b define="volunteers occasion_volunteers(occasion)" tal:condition="volunteers">
@@ -55,17 +56,16 @@
                                 </div>
                                 <div>
                                     <span i18n:translate>Phone:</span>
-                                    <span><a href="tel:${volunteer.phone}">${volunteer.phone}</a></span>
+                                    <span><a href="tel:${layout.format_phone_number(volunteer.phone)}">${layout.format_phone_number(volunteer.phone)}</a></span>
                                 </div>
                             </li>
                         </ul>
                     </tal:b>
 
-
                     <h4 i18n:translate>Attendees</h4>
-                    <ul class="attendees">
+                    <ul class="attendees more-list">
                         <li tal:repeat="details occasions[occasion]">
-                            <strong class="${details.attendee.gender or ''}">${details.attendee.name} (${details.attendee.age})</strong>
+                            <strong class="${details.attendee.gender or ''} list-link">${details.attendee.name} (${details.attendee.age})</strong>
                             <div>
                                 <span i18n:translate>Emergency Contact:</span>
                                 <span tal:condition="details.info.emergency">${details.info.emergency}</span>
@@ -94,9 +94,13 @@
                     </ul>
                 </div>
             </div>
-            <div class="columns small-12 medium-4">
-                <div class="hide-for-print">
-                    <tal:b metal:use-macro="layout.macros.periods" />
+            <div class="medium-4 cell large-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel">
+                        <div class="hide-for-print">
+                            <tal:b metal:use-macro="layout.macros.periods" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

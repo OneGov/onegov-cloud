@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
@@ -17,12 +19,12 @@ if TYPE_CHECKING:
 
 class ElectionCompoundPartLayout(DetailLayout):
 
-    model: 'ElectionCompoundPart'
+    model: ElectionCompoundPart
 
     def __init__(
         self,
-        model: 'ElectionCompoundPart',
-        request: 'ElectionDayRequest',
+        model: ElectionCompoundPart,
+        request: ElectionDayRequest,
         tab: str | None = None
     ) -> None:
         super().__init__(model, request)
@@ -69,11 +71,11 @@ class ElectionCompoundPartLayout(DetailLayout):
         return tuple(result)
 
     @cached_property
-    def results(self) -> list['ResultRow']:
+    def results(self) -> list[ResultRow]:
         return self.model.results
 
     @cached_property
-    def totals(self) -> 'TotalRow':
+    def totals(self) -> TotalRow:
         return self.model.totals
 
     def label(self, value: str) -> str:
@@ -81,12 +83,12 @@ class ElectionCompoundPartLayout(DetailLayout):
             if self.model.election_compound.domain_elections == 'region':
                 return self.principal.label('region')
             if self.model.election_compound.domain_elections == 'municipality':
-                return _("Municipality")
+                return _('Municipality')
         if value == 'districts':
             if self.model.election_compound.domain_elections == 'region':
                 return self.principal.label('regions')
             if self.model.election_compound.domain_elections == 'municipality':
-                return _("Municipalities")
+                return _('Municipalities')
         return self.principal.label(value)
 
     def title(self, tab: str | None = None) -> str:
@@ -95,11 +97,11 @@ class ElectionCompoundPartLayout(DetailLayout):
         if tab == 'districts':
             return self.label('districts')
         if tab == 'candidates':
-            return _("Elected candidates")
+            return _('Elected candidates')
         if tab == 'party-strengths':
-            return _("Party strengths")
+            return _('Party strengths')
         if tab == 'statistics':
-            return _("Election statistics")
+            return _('Election statistics')
 
         return ''
 
@@ -130,7 +132,7 @@ class ElectionCompoundPartLayout(DetailLayout):
         return self.request.link(self.model, 'districts')
 
     @cached_property
-    def menu(self) -> 'NestedMenu':
+    def menu(self) -> NestedMenu:
         return [
             (
                 self.title(tab),

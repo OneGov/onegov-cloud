@@ -11,6 +11,23 @@
         <div class="row" tal:condition="room_slots is not None">
             <a id="results"></a>
             <h2 i18n:translate>All dates</h2>
+            <div class="callout alert-box info" i18n:translate>
+                By default we assume that you only want to select a single
+                time slot and room per day. If you want to select more than
+                one time slot or room on a given day, you may hold and press
+                any one of your Shift, Alt or Ctrl keys while clicking the
+                time slots you want to reserve.
+            </div>
+            <div class="callout alert-box alert" tal:condition="missing_dates" i18n:translate>
+                We were unable to reserve some slots matching your criteria for the following dates<tal:b i18n:name="and_rooms" i18n:translate tal:condition="any(missing_dates.values())"> and rooms</tal:b>, please note that some of those dates may still have one or more available slots that are either shorter or longer than your selected duration.
+                <ul i18n:name="dates">
+                    <li tal:repeat="item missing_dates.items()">
+                        <a href="#row-${item[0].isoformat()}">
+                            ${layout.format_date(item[0], 'date')}<tal:b tal:condition="item[1]">: ${', '.join(room.title for room in item[1])}</tal:b>
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <div class="reservation-list"
                 data-whole-day="false"
                 data-reservations="${request.link(layout.model, name='reservations')}"
@@ -25,8 +42,8 @@
                 <tbody>
                     <tr tal:repeat="item room_slots.items()"
                         data-date="${item[0].isoformat()}">
-                        <th>${layout.format_date(item[0], 'weekday_long')}<br/>${layout.format_date(item[0], 'date')}</th>
-                        <td tal:repeat="room rooms">
+                        <th><a id="row-${item[0].isoformat()}"></a>${layout.format_date(item[0], 'weekday_long')}<br/>${layout.format_date(item[0], 'date')}</th>
+                        <td valign="top" tal:repeat="room rooms">
                         <tal:b tal:define="slots item[1].get(room.id, [])">
                             <div tal:repeat="slot slots"
                                 class="event ${slot.css_class}"

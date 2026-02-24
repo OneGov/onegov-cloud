@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 import os.path
 import shlex
@@ -10,18 +12,21 @@ from contextlib import contextmanager
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 from depot.middleware import FileServeApp
+from depot.utils import make_content_disposition
 from more.transaction.main import transaction_tween_factory
 from morepath import App
 from onegov.core.custom import json
 from onegov.core.security import Private, Public
 from onegov.core.utils import is_valid_yubikey, yubikey_public_id
+from onegov.file import log
 from onegov.file.collection import FileCollection
 from onegov.file.errors import AlreadySignedError
 from onegov.file.errors import InvalidTokenError
 from onegov.file.errors import TokenConfigurationError
 from onegov.file.models import File
 from onegov.file.sign import SigningService
-from onegov.file.utils import digest, current_dir
+from onegov.file.utils import (
+    digest, current_dir, get_supported_image_mime_types)
 from pathlib import Path
 from sedate import utcnow
 from sqlalchemy.orm import object_session
@@ -60,6 +65,7 @@ class DepotApp(App):
         yubikey_client_id: str | None
         yubikey_secret_key: str | None
         session_manager: SessionManager
+
         @cached_property
         def session(self) -> Callable[[], Session]: ...
         @property
@@ -73,7 +79,7 @@ class DepotApp(App):
         depot_backend: str | None = None,
         depot_storage_path: str | None = None,
         frontend_cache_buster: str | None = None,
-        frontend_cache_bust_delay: int = 2,
+        frontend_cache_bust_delay: float = 2,
         signing_services: str | None = None,
         **cfg: Any
     ) -> None:
@@ -161,16 +167,21 @@ class DepotApp(App):
             self.signing_services = Path(signing_services)
 
         if not shutil.which('gs'):
-            raise RuntimeError("onegov.file requires ghostscript")
+            raise RuntimeError('onegov.file requires ghostscript')
 
         if not shutil.which('java'):
-            raise RuntimeError("onegov.file requires java")
+            raise RuntimeError('onegov.file requires java')
 
         if self.frontend_cache_buster:
 
             @self.session_manager.on_update.connect_via(ANY, weak=False)
             @self.session_manager.on_delete.connect_via(ANY, weak=False)
-            def on_file_change(schema: str, obj: object) -> None:
+            def on_file_change(
+                schema: str,
+                obj: object,
+                # NOTE: This parameter is required by `on_delete`
+                session: Session | None = None
+            ) -> None:
                 if isinstance(obj, File):
                     self.bust_frontend_cache(obj.id)
 
@@ -181,23 +192,23 @@ class DepotApp(App):
     ) -> None:
 
         if backend not in SUPPORTED_STORAGE_BACKENDS:
-            raise RuntimeError("Depot app without valid storage backend")
+            raise RuntimeError('Depot app without valid storage backend')
 
         self.depot_backend = backend
         self.depot_storage_path = storage_path
 
         if self.depot_backend == 'depot.io.local.LocalFileStorage':
             if self.depot_storage_path is None:
-                raise ValueError("Depot storage path needs to be configured")
+                raise ValueError('Depot storage path needs to be configured')
             if not os.path.isdir(self.depot_storage_path):
-                raise FileNotFoundError("Depot storage path does not exist")
+                raise FileNotFoundError('Depot storage path does not exist')
 
     @property
     def bound_depot_id(self) -> str:
         return self.custom_depot_id or self.schema
 
     @property
-    def bound_depot(self) -> 'FileStorage | None':
+    def bound_depot(self) -> FileStorage | None:
         # FIXME: Do we actually care that the default depot is our depot?
         #        One could imagine a separate thread which works on all
         #        the file depots and gets the bound depot for each App
@@ -243,11 +254,12 @@ class DepotApp(App):
         if not self.frontend_cache_buster:
             return
 
+        delay = shlex.quote(str(self.frontend_cache_bust_delay))
         bin = shlex.quote(self.frontend_cache_buster)
         fid = shlex.quote(file_id)
-        cmd = f'sleep {self.frontend_cache_bust_delay} && {bin} {fid}'
+        cmd = f'sleep {delay} && {bin} {fid}'
 
-        subprocess.Popen(cmd, close_fds=True, shell=True)
+        subprocess.Popen(cmd, close_fds=True, shell=True)  # nosec:B602
 
     def sign_file(  # nosec: B105,B107
         self,
@@ -304,13 +316,14 @@ class DepotApp(App):
                     yubikey=token
                 )
         else:
-            raise NotImplementedError(f"Unknown token type: {token_type}")
+            raise NotImplementedError(f'Unknown token type: {token_type}')
 
         if not is_valid_token(token):
             raise InvalidTokenError(token)
 
         mb = 1024 ** 2
         session = object_session(file)
+        assert session is not None
 
         with SpooledTemporaryFile(max_size=16 * mb, mode='wb') as signed:
             old_digest = digest(file.reference.file)
@@ -346,9 +359,9 @@ class DepotApp(App):
         return self.application_id.replace('/', '-')
 
     @property
-    def signing_service_config(self) -> 'SigningServiceConfig':
-        if not self.signing_services:
-            raise RuntimeError("No signing service config path set")
+    def signing_service_config(self) -> SigningServiceConfig:
+        if not getattr(self, 'signing_services', None):
+            raise RuntimeError('No signing service config path set')
 
         paths = (
             self.signing_services / f'{self.signing_service_id}.yml',
@@ -361,7 +374,7 @@ class DepotApp(App):
                     return yaml.safe_load(f.read())
 
         raise RuntimeError(
-            f"No service config found at {self.signing_services}")
+            f'No service config found at {self.signing_services}')
 
     @property
     def signing_service(self) -> SigningService:
@@ -394,7 +407,7 @@ class DepotApp(App):
         depot_storage_path: str | None = None,
         # FIXME: Remove this parameter
         **ignored: Any
-    ) -> 'Iterator[None]':
+    ) -> Iterator[None]:
         """ Temporarily use another depot. """
 
         original_depot_backend = self.depot_backend
@@ -427,12 +440,12 @@ class DepotApp(App):
 @DepotApp.tween_factory(over=transaction_tween_factory)
 def configure_depot_tween_factory(
     app: DepotApp,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
 
-    assert app.has_database_connection, "This module requires a db backed app."
+    assert app.has_database_connection, 'This module requires a db backed app.'
 
-    def configure_depot_tween(request: 'CoreRequest') -> 'Response':
+    def configure_depot_tween(request: CoreRequest) -> Response:
         app.bind_depot()
         return handler(request)
 
@@ -440,41 +453,61 @@ def configure_depot_tween_factory(
 
 
 def render_depot_file(
-    file: 'StoredFile',
-    request: 'CoreRequest'
-) -> 'Response':
+    file: StoredFile,
+    request: CoreRequest
+) -> Response:
     return request.get_response(
         FileServeApp(file, cache_max_age=3600 * 24 * 7))
 
 
-def respond_with_alt_text(reference: File, request: 'CoreRequest') -> None:
+def respond_with_content_disposition(file: File, request: CoreRequest) -> None:
+    # NOTE: Technically `FileServeApp` already sets the `Content-Disposition`
+    #       header, but it will always be `inline`. We only really want that
+    #       for images, videos and PDFs, the rest should be `attachment`.
     @request.after
-    def include_alt_text(response: 'Response') -> None:
+    def include_content_disposition(response: Response) -> None:
+        response.headers['Content-Disposition'] = make_content_disposition(
+            'inline' if file.reference.content_type in {
+                'application/pdf',
+                'video/mp4',
+                'video/webm',
+                *get_supported_image_mime_types()
+            } else 'attachment',
+            file.reference.filename
+        )
+
+
+def respond_with_alt_text(reference: File, request: CoreRequest) -> None:
+    @request.after
+    def include_alt_text(response: Response) -> None:
         # HTTP headers are limited to ASCII, so we encode our result in
         # JSON before showing it
         response.headers.add('X-File-Note', json.dumps(
-            {'note': reference.note or ''},
+            {'note': reference.note or ''}, ensure_ascii=True
         ))
 
 
-def respond_with_caching_header(
-    reference: File,
-    request: 'CoreRequest'
-) -> None:
-    if not reference.published:
+def respond_with_caching_header(file: File, request: CoreRequest) -> None:
+    if not file.published:
         @request.after
-        def include_private_header(response: 'Response') -> None:
+        def include_private_header(response: Response) -> None:
             response.headers['Cache-Control'] = 'private'
 
 
-def respond_with_x_robots_tag_header(
-    reference: File,
-    request: 'CoreRequest'
-) -> None:
-    if getattr(reference, 'access', None) in ('secret', 'secret_mtan'):
+def respond_with_x_robots_tag_header(file: File, request: CoreRequest) -> None:
+    if getattr(file, 'access', None) in ('secret', 'secret_mtan'):
         @request.after
-        def include_x_robots_tag_header(response: 'Response') -> None:
-            response.headers.add('X-Robots-Tag', 'noindex')
+        def include_x_robots_tag_header(response: Response) -> None:
+            response.headers['X-Robots-Tag'] = 'noindex'
+
+
+def respond_with_x_content_type_options_header(
+    file: File,
+    request: CoreRequest
+) -> None:
+    @request.after
+    def include_x_content_type_options(response: Response) -> None:
+        response.headers['X-Content-Type-Options'] = 'nosniff'
 
 
 @DepotApp.path(model=File, path='/storage/{id}')
@@ -483,10 +516,12 @@ def get_file(app: DepotApp, id: str) -> File | None:
 
 
 @DepotApp.view(model=File, render=render_depot_file, permission=Public)
-def view_file(self: File, request: 'CoreRequest') -> 'StoredFile':
+def view_file(self: File, request: CoreRequest) -> StoredFile:
+    respond_with_content_disposition(self, request)
     respond_with_alt_text(self, request)
     respond_with_caching_header(self, request)
     respond_with_x_robots_tag_header(self, request)
+    respond_with_x_content_type_options_header(self, request)
     return self.reference.file
 
 
@@ -498,8 +533,8 @@ def view_file(self: File, request: 'CoreRequest') -> 'StoredFile':
                render=render_depot_file)
 def view_thumbnail(
     self: File,
-    request: 'CoreRequest'
-) -> 'StoredFile | Response':
+    request: CoreRequest
+) -> StoredFile | Response:
     if request.view_name in ('small', 'medium'):
         size = request.view_name
     else:
@@ -514,15 +549,17 @@ def view_thumbnail(
     if not thumbnail_id:
         return morepath.redirect(request.link(self))
 
+    respond_with_content_disposition(self, request)
+    respond_with_x_content_type_options_header(self, request)
     return request.app.bound_depot.get(thumbnail_id)  # type:ignore
 
 
 @DepotApp.view(model=File, render=render_depot_file, permission=Public,
                request_method='HEAD')
-def view_file_head(self: File, request: 'CoreRequest') -> 'StoredFile':
+def view_file_head(self: File, request: CoreRequest) -> StoredFile:
 
     @request.after
-    def set_cache(response: 'Response') -> None:
+    def set_cache(response: Response) -> None:
         response.cache_control.max_age = 60
 
     return view_file(self, request)
@@ -536,11 +573,11 @@ def view_file_head(self: File, request: 'CoreRequest') -> 'StoredFile':
                permission=Public, request_method='HEAD')
 def view_thumbnail_head(
     self: File,
-    request: 'CoreRequest'
-) -> 'StoredFile | Response':
+    request: CoreRequest
+) -> StoredFile | Response:
 
     @request.after
-    def set_cache(response: 'Response') -> None:
+    def set_cache(response: Response) -> None:
         response.cache_control.max_age = 60
 
     return view_thumbnail(self, request)
@@ -548,7 +585,7 @@ def view_thumbnail_head(
 
 @DepotApp.view(model=File, name='note', request_method='POST',
                permission=Private)
-def handle_note_update(self: File, request: 'CoreRequest') -> None:
+def handle_note_update(self: File, request: CoreRequest) -> None:
     request.assert_valid_csrf_token()
     note = request.POST.get('note')
 
@@ -565,7 +602,7 @@ def handle_note_update(self: File, request: 'CoreRequest') -> None:
 
 @DepotApp.view(model=File, name='rename', request_method='POST',
                permission=Private)
-def handle_rename(self: File, request: 'CoreRequest') -> None:
+def handle_rename(self: File, request: CoreRequest) -> None:
     request.assert_valid_csrf_token()
     name = request.POST.get('name')
 
@@ -573,8 +610,20 @@ def handle_rename(self: File, request: 'CoreRequest') -> None:
     if not isinstance(name, str) or not name:
         return
 
+    _, old_ext = os.path.splitext(self.name)
+    _, new_ext = os.path.splitext(name)
+    if old_ext and new_ext != old_ext:
+        # prevent changing the file extension (adding one is allowed)
+        name = f'{name}{old_ext}'
+
     self.name = name
-    self._update_metadata(filename=self.name)
+    try:
+        self._update_metadata(filename=self.name)
+    except NotImplementedError:
+        log.warning(
+            'Failed to update file metadata for current storage backend',
+            exc_info=True
+        )
 
     # when updating the name we offer the option not to update the
     # modified date, which is helpful if the files are in modified order
@@ -585,7 +634,7 @@ def handle_rename(self: File, request: 'CoreRequest') -> None:
 
 
 @DepotApp.view(model=File, request_method='DELETE', permission=Private)
-def delete_file(self: File, request: 'CoreRequest') -> None:
+def delete_file(self: File, request: CoreRequest) -> None:
     """ Deletes the given file. By default the permission is
     ``Private``. An application using the framework can override this though.
 

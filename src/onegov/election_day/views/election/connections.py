@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.hidden_by_principal import (
     hide_connections_chart)
@@ -7,7 +9,6 @@ from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_connection_results_api
 from onegov.election_day.utils.election import get_connections_data
-from sqlalchemy.orm import object_session
 from onegov.election_day import _
 
 
@@ -32,8 +33,8 @@ election_incomplete_text = _(
 )
 def view_election_connections_data(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" View the list connections as JSON.
 
     Used to for the connection sankey chart.
@@ -50,12 +51,12 @@ def view_election_connections_data(
 )
 def view_election_connections_chart(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the connections as sankey chart. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     skip_rendering = hide_connections_chart(self, request)
@@ -77,18 +78,18 @@ def view_election_connections_chart(
 )
 def view_election_connections_table(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the connections tables as widget. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
         'model': self,
         'layout': ElectionLayout(self, request),
-        'connections': get_connection_results_api(self, object_session(self)),
+        'connections': get_connection_results_api(self, request.session),
         'type': 'election-table',
         'scope': 'connections'
     }
@@ -102,15 +103,15 @@ def view_election_connections_table(
 )
 def view_election_connections(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
     layout = ElectionLayout(self, request, 'connections')
     return {
         'election': self,
         'layout': layout,
-        'connections': get_connection_results_api(self, object_session(self)),
+        'connections': get_connection_results_api(self, request.session),
         'skip_rendering': hide_connections_chart(self, request),
         'help_text': election_incomplete_text,
     }
@@ -123,8 +124,8 @@ def view_election_connections(
 )
 def view_election_connections_svg(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the connections as SVG. """
 
     layout = ElectionLayout(self, request, 'connections')
