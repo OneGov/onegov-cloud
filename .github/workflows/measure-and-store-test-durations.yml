@@ -83,6 +83,9 @@ jobs:
         # add unprivileged test user
         adduser --disabled-password --gecos "" test
         redis-server --daemonize yes
+        PG_DATA_DIR="$(pg_config --sharedir)/tsearch_data"
+        cp "${PG_DATA_DIR}/unaccent.rules" "${PG_DATA_DIR}/german.rules"
+        sed -i 's/^\([ÄÖÜäöü]\t.*\)/\1e/' "${PG_DATA_DIR}/german.rules"
         # NOTE: Allow the test user to write to this file
         chown test .test_durations
         # NOTE: Avoid dubious ownership error when commiting
