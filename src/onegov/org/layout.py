@@ -61,7 +61,8 @@ from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.open_graph import OpenGraphMixin
 from onegov.org.theme.org_theme import user_options
-from onegov.org.utils import IMG_URLS, get_current_tickets_url
+from onegov.org.utils import can_change_username, get_current_tickets_url
+from onegov.org.utils import IMG_URLS
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
@@ -3199,16 +3200,25 @@ class UserLayout(DefaultLayout):
         ]
 
     @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup] | None:
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
         if self.request.is_admin and not self.model.source:
-            return [
+            links.append(
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 )
-            ]
-        return None
+            )
+        if can_change_username(self.model, self.request):
+            links.append(
+                Link(
+                    text=_('Change username'),
+                    url=self.request.link(self.model, 'change-username'),
+                    attrs={'class': 'edit-link'}
+                )
+            )
+        return links
 
 
 class UserGroupCollectionLayout(DefaultLayout):

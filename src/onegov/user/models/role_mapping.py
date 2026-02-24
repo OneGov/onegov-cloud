@@ -63,7 +63,9 @@ class RoleMapping(Base, ContentMixin, TimestampMixin):
     )
 
     #: the username of the user this mapping belongs to
-    username: Mapped[str | None] = mapped_column(ForeignKey(User.username))
+    username: Mapped[str | None] = mapped_column(
+        ForeignKey(User.username, onupdate='CASCADE')
+    )
 
     #: the user this mapping belongs to
     user: Mapped[User | None] = relationship(back_populates='role_mappings')
