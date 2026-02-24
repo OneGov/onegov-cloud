@@ -416,12 +416,12 @@ class Layout(Action):
         app_class: type[Framework]
     ) -> None:
 
-        layout_obj = obj
+        layout_class = obj
 
         try:
             # `lambda self, obj` is required to match the signature
             app_class.get_layout.register(  # type:ignore[attr-defined]
-                lambda self, obj: layout_obj,
+                lambda self, obj, request: layout_class(obj, request),
                 model=self.model)
         except RegistrationError as e:
             # ignore `already have registration for key` error
