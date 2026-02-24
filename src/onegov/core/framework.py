@@ -1562,7 +1562,8 @@ class Framework(
     def get_layout(
         self,
         obj: object,
-    ) -> type[Layout] | None:
+        request: CoreRequest
+    ) -> Layout | None:
         return None
 
 
