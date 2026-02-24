@@ -208,13 +208,13 @@ def update_archived_results(host: str, scheme: str) -> Processor:
 
     def generate(request: ElectionDayRequest, app: ElectionDayApp) -> None:
         if (
-            app.principal
+            app.principal is not None
             and app.principal.official_host is None
             or host == 'localhost:8080'
         ):
             click.secho(
                 'Official host is not set! Do not run this command on '
-                'staging. Uploading results later  may create '
+                'staging environment. Uploading results later may create '
                 'duplicate archived result entries.',
                 fg='red',
             )
