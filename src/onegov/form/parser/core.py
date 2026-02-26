@@ -763,12 +763,14 @@ class Choice:
         key: str,
         label: str,
         selected: bool = False,
-        fields: Sequence[ParsedField] | None = None
+        fields: Sequence[ParsedField] | None = None,
+        fieldset: str | None = None
     ):
         self.key = key
         self.label = label
         self.selected = selected
         self.fields = fields
+        self.fieldset = fieldset
 
 
 class Field:
@@ -1288,8 +1290,23 @@ def parse_field_block(
     # go through nested blocks and recursively add them
     if result.type == 'radio' or result.type == 'checkbox':
         for ix, choice in enumerate(field.choices):
-            if not choice.dependencies:
+            dependencies = choice.dependencies
+            if not dependencies:
                 continue
+
+            # HACK: This is a really ugly hack to support nested
+            #       fieldsets, we really want to do something
+            #       more robust here
+            first = dependencies[0]
+            if (
+                isinstance(first, dict)
+                and len(first) == 1
+                and first[(key := next(iter(first)))] is None
+            ):
+                result.choices[ix].fieldset = key
+                dependencies = choice.dependencies[1:]
+                if not dependencies:
+                    continue
 
             result.choices[ix].fields = [
                 parse_field_block(
@@ -1299,7 +1316,7 @@ def parse_field_block(
                     fieldset=fieldset,
                     parent=result
                 )
-                for child in choice.dependencies
+                for child in dependencies
             ]
 
     return result
@@ -1400,6 +1417,8 @@ def translate_to_yaml(
     identifier_indent_stack: list[int] = []
     option_indent_stack: list[int] = []
     expect_option = False
+    # HACK: Do something better
+    len_previous_indent = 0
 
     def escape_single(text: str) -> str:
         return text.replace("'", "''")
@@ -1443,9 +1462,19 @@ def translate_to_yaml(
 
         # the top level are the fieldsets
         if match(ELEMENTS.fieldset_title, line):
-            yield '- "{}":'.format(escape_double(line.lstrip('# ').rstrip()))
+            if expect_nested and len_indent > len_previous_indent:
+                extra_indent = indent
+            else:
+                extra_indent = ''
+            yield '{}- "{}":'.format(
+                extra_indent,
+                escape_double(line.lstrip('# ').rstrip())
+            )
             expect_nested = False
+            len_previous_indent = len_indent
             continue
+
+        len_previous_indent = len_indent
 
         # fields are nested lists of dictionaries
         try:

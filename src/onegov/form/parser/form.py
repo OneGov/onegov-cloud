@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from html import escape
 from onegov.form import errors
 from onegov.form.core import FieldDependency
@@ -35,6 +36,7 @@ from wtforms.validators import URL
 
 from typing import overload, Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from onegov.form.parser.core import ParsedField
     from onegov.form.types import PricingRules, Validator, Widget
     from wtforms import Field as WTField
@@ -375,9 +377,11 @@ def handle_field(
         for choice in field.choices:
             if not choice.fields:
                 continue
-            dependency = FieldDependency(field.id, choice.key)
-            for choice_field in choice.fields:
-                handle_field(builder, choice_field, dependency)
+
+            with builder.handle_nested_fieldset(choice.fieldset):
+                dependency = FieldDependency(field.id, choice.key)
+                for choice_field in choice.fields:
+                    handle_field(builder, choice_field, dependency)
 
 
 class WTFormsClassBuilder(Generic[_FormT]):
@@ -397,13 +401,54 @@ class WTFormsClassBuilder(Generic[_FormT]):
     def __init__(self, base_class: type[_FormT]):
 
         class DynamicForm(base_class):  # type:ignore
-            pass
+            # NOTE: The way we build field dependencies is not quite
+            #       the same as for manual dependencies, so this method
+            #       will not work for field dependencies from nested
+            #       fields
+            def is_visible_through_dependencies(self, field_id: str) -> bool:
+                if not super().is_visible_through_dependencies(field_id):
+                    return False
+
+                field = self[field_id]
+                dependency = (field.render_kw or {}).get('data-depends-on')
+                if not dependency:
+                    return True
+
+                # NOTE: This shouldn't happen for fields created from form code
+                if ';' in dependency:
+                    return False
+
+                field_id, expected = dependency.split('/', 1)
+                if field_id not in self:
+                    return False
+
+                value = self[field_id].data
+                if isinstance(value, list):
+                    if expected not in value:
+                        return False
+                elif value != expected:
+                    return False
+
+                return self.is_visible_through_dependencies(field_id)
 
         self.form_class = DynamicForm
         self.current_fieldset = None
 
     def set_current_fieldset(self, label: str | None) -> None:
         self.current_fieldset = label
+
+    @contextmanager
+    def handle_nested_fieldset(self, label: str | None) -> Iterator[None]:
+        if label is None:
+            yield None
+            return
+
+        old_fieldset = self.current_fieldset
+        self.current_fieldset = label
+        try:
+            yield
+        finally:
+            self.current_fieldset = old_fieldset
 
     def validators_extend(
         self,

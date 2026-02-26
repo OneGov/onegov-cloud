@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      i18n:domain="onegov.fedpol">
+
+<body>
+
+<metal:footer_links define-macro="footer_links" i18n:domain="onegov.town6">
+<div class="medium-4 cell"></div>
+<div class="small-12 medium-4 cell footer-links">
+    <tal:b condition="not request.app.org.hide_onegov_footer|True">
+        <span>
+            <a class="footer-link" href="https://www.admin.digital">OneGov Cloud</a> | <a class="footer-link" href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
+        </span>
+        <br/>
+        <span>
+            <a class="footer-link" href="https://www.admin.digital/datenschutz" i18n:translate>
+                Privacy Protection
+            </a>
+        </span>
+        <span tal:condition="request.app.org.impressum_url|None">
+            <a class="footer-link" href="${request.app.org.impressum_url}" i18n:translate>
+                Impressum
+            </a>
+        </span>
+    </tal:b>
+    <span tal:condition="not request.is_logged_in">
+        <a class="footer-link" href="${layout.login_from_path()}" i18n:translate>
+            Login
+        </a>
+    </span>
+    <span tal:condition="request.app.org.citizen_login_enabled and not request.authenticated_email">
+        <a href="${layout.citizen_login()}" i18n:translate>
+            Citizen Login
+        </a>
+    </span>
+    <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">
+        <a class="footer-link" href="${about_url}" i18n:translate>
+            About
+        </a>
+    </span>
+</div>
+<div class="small-12 medium-4 cell footer-links">
+    <span tal:repeat="(name, url) layout.locales">
+        <a class="footer-link" tal:condition="request.locale not in url" href="${url}">${name}</a>
+        <a class="footer-link" tal:condition="request.locale in url" style="cursor: default"><strong>${name}</strong></a>
+    </span>
+</div>
+</metal:footer_links>
+
+</body>
+</html>

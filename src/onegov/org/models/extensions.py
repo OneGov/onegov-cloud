@@ -3,11 +3,12 @@ from __future__ import annotations
 import re
 
 import json
+from babel import Locale
 from collections import OrderedDict
 from functools import cached_property
 
 from markupsafe import Markup
-from onegov.core.i18n import get_translation_bound_meta
+from onegov.core.i18n import get_translation_bound_meta, SiteLocale
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property, UTCPublicationMixin)
@@ -1285,3 +1286,74 @@ class InlinePhotoAlbumExtension(ContentExtension):
                 obj.photo_album_id = self.photo_album_id.data or None
 
         return PhotoAlbumForm
+
+
+class LocalizeableExtension(ContentExtension):
+
+    locale: dict_property[str | None] = meta_property()
+    alt_locale_ids: dict_property[dict[str, Any]] = meta_property(default=dict)
+
+    def localized_url(self, request: OrgRequest) -> str | None:
+        """
+        Returns the URL to the localized version of this content.
+        """
+        if self.locale is None or self.locale == request.locale:
+            return None
+
+        assert request.locale is not None
+        alt_id = self.alt_locale_ids.get(request.locale)
+        if alt_id is None:
+            return None
+
+        item = request.session.get(self.__class__, alt_id)
+        if item is None:
+            return None
+
+        target_url = request.link(item)
+        self_url = request.link(self)
+        if self_url in request.url:
+            target_url = request.url.replace(self_url, target_url)
+
+        return SiteLocale(request.locale).link(request, target_url)
+
+    def extend_form(
+        self,
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
+
+        if not request.app.localizeable or len(request.app.locales) < 2:
+            return form_class
+
+        assert request.locale is not None
+        loc = Locale.parse(request.locale)
+
+        class LocalizeableForm(form_class):  # type:ignore
+            locale = RadioField(
+                label=_('Languages'),
+                choices=(
+                    (
+                        locale,
+                        (loc.get_language_name(locale) or locale).capitalize()
+                    )
+                    for locale in sorted(request.app.locales)
+                ),
+                validators=[InputRequired()]
+            )
+
+            show_preview_image = BooleanField(
+                label=_('Show image on preview on the parent page'),
+                default=True,
+            )
+
+            show_page_image = BooleanField(
+                label=_('Show image on page'),
+                default=True,
+            )
+
+            position_choices = [
+                ('in_content', _('As first element of the content')),
+                ('header', _('As a full width header')),
+            ]
+
+        return LocalizeableForm

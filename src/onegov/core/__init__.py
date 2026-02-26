@@ -60,6 +60,7 @@ LEVELS = (
         'onegov.election_day',
         'onegov.feriennet',
         'onegov.foundation6',
+        'onegov.fedpol',
         'onegov.fsi',
         'onegov.intranet',
         'onegov.landsgemeinde',

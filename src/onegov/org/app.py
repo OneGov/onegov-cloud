@@ -58,6 +58,7 @@ if TYPE_CHECKING:
 class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
              DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
 
+    localizeable = False
     serve_static_files = True
     request_class = OrgRequest
 
