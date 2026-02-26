@@ -149,20 +149,20 @@ class Attendence(Base, TimestampMixin):
             duration_hours = Decimal(str(self.duration)) / Decimal('60')
 
             if duration_hours <= Decimal('2'):
-                # Round to 1 decimal place
+                # Round to 2 decimal places
                 return duration_hours.quantize(
-                    Decimal('0.1'), rounding=ROUND_HALF_UP
+                    Decimal('0.01'), rounding=ROUND_HALF_UP
                 )
             else:
                 base_hours = Decimal('2')
                 additional_hours = (duration_hours - base_hours)
                 # Round additional time to nearest 0.5
                 additional_hours = (additional_hours * 2).quantize(
-                    Decimal('1.0'), rounding=ROUND_HALF_UP
+                    Decimal('1'), rounding=ROUND_HALF_UP
                 ) / 2
                 total_hours = base_hours + additional_hours
                 return total_hours.quantize(
-                    Decimal('0.1'), rounding=ROUND_HALF_UP
+                    Decimal('0.01'), rounding=ROUND_HALF_UP
                 )
 
         raise ValueError(f'Unknown attendance type: {self.type}')

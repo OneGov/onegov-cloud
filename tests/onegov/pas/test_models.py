@@ -156,3 +156,71 @@ def test_fibu_konten_mapping_completeness() -> None:
     assert not missing_keys, (
         f"FIBU_KONTEN_MAPPING is missing keys: {missing_keys}"
     )
+
+
+def h(hours: float) -> int:
+    return round(hours * 60)
+
+
+def test_attendence_calculate_value_precision(session: Session) -> None:
+    """Test that calculate_value displays 2 decimal places."""
+    parliamentarian = PASParliamentarian(
+        first_name='Test',
+        last_name='User',
+        gender='male',
+        shipping_method='plus',
+    )
+    session.add(parliamentarian)
+    session.flush()
+
+    att_1 = Attendence(
+        date=date(2022, 1, 1),
+        duration=h(1.5),
+        type='commission',
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.add(att_1)
+    session.flush()
+    assert str(att_1.calculate_value()) == '1.50'
+
+    att_2 = Attendence(
+        date=date(2022, 1, 2),
+        duration=h(2),
+        type='study',
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.add(att_2)
+    session.flush()
+    assert str(att_2.calculate_value()) == '2.00'
+
+    # 3.25h = 2h + 1.25h, 1.25 rounds to 1.5 → total 3.50
+    att_3 = Attendence(
+        date=date(2022, 1, 3),
+        duration=h(3.25),
+        type='commission',
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.add(att_3)
+    session.flush()
+    assert str(att_3.calculate_value()) == '3.50'
+
+    # plenary is returned verbatim
+    att_4 = Attendence(
+        date=date(2022, 1, 3),
+        duration=h(3.25),
+        type='plenary',
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.add(att_4)
+    session.flush()
+    assert str(att_4.calculate_value()) == '3.25'
+
+    att_5 = Attendence(
+        date=date(2022, 1, 4),
+        duration=h(1.25),
+        type='shortest',
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.add(att_5)
+    session.flush()
+    assert str(att_5.calculate_value()) == '1.25'
