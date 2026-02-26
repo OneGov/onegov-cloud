@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.org.models import Export
-from onegov.town6 import _
+from onegov.org import _
 
 
 from typing import Any, TYPE_CHECKING

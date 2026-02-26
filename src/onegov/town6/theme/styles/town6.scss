@@ -241,6 +241,7 @@ footer {
     }
 }
 
+
 /*
     page text
 */
@@ -847,6 +848,12 @@ $pageref-color-hover: $iron;
                     padding-right: 0;
                 }
             }
+        }
+
+        &:target,
+        &:has(:target) {
+            background-color: rgba($primary-color, 0.2);
+            transition: background-color 0.5s ease;
         }
 
         &.more-list-level-2 {

@@ -20,8 +20,8 @@ from vobject import vCard
 from vobject.vcard import Address
 from vobject.vcard import Name
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Collection
     from vobject.base import Component
@@ -90,6 +90,24 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         parts.append(self.last_name)
 
         return ' '.join(parts)
+
+    @property
+    def organisation_texts(self) -> list[str]:
+        parts: list[str] = []
+        if self.organisations_multiple:
+            it = iter(self.organisations_multiple)
+            parts.extend(
+                f'{item} - {next(it).lstrip("-")}' for item in it
+            )
+            return parts
+
+        if self.organisation and self.sub_organisation:
+            parts.append(f'{self.organisation} - {self.sub_organisation}')
+        elif self.organisation:
+            parts.append(self.organisation)
+        elif self.sub_organisation:
+            parts.append(self.sub_organisation)
+        return parts
 
     #: the unique id, part of the url
     id: Mapped[UUID] = mapped_column(

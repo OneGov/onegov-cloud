@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-01-27 10:35+0100\n"
+"POT-Creation-Date: 2026-02-12 11:47+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -317,6 +317,9 @@ msgstr "iFrame"
 
 msgid "Homepage"
 msgstr "Pagina principale"
+
+msgid "Files"
+msgstr "File"
 
 msgid "Chat Archive"
 msgstr "Archivio chat"
@@ -1133,6 +1136,15 @@ msgstr "${count} pagine"
 
 msgid "Further occurrences:"
 msgstr "Ulteriori occorrenze:"
+
+msgid "Former member or parliament"
+msgstr "Ex membro del parlamento"
+
+msgid "Parliament"
+msgstr "Parlamento"
+
+msgid "Parliamentary Group"
+msgstr "Gruppo parlamentare"
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
@@ -2053,9 +2065,6 @@ msgstr "Invia il tuo evento"
 
 msgid "Functions"
 msgstr "Funzioni"
-
-msgid "Parliament"
-msgstr "Parlamento"
 
 msgid "in"
 msgstr "di"

@@ -74,7 +74,7 @@ def create_directory(
 ) -> ExtendedResponse:
 
     client.login_admin()
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = title
     if lead:
         page.form['lead'] = lead
@@ -308,7 +308,7 @@ def test_directory_change_requests(client: Client) -> None:
     client.login_admin()
 
     # create a directory that accepts change requests
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Playgrounds"
     page.form['structure'] = """
         Name *= ___
@@ -375,7 +375,7 @@ def test_directory_submissions(
     client.login_admin()
 
     # create a directory does not accept submissions
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Points of Interest"
     page.form['structure'] = """
         Name *= ___
@@ -553,7 +553,7 @@ def test_directory_visibility(client: Client) -> None:
     page = client.get('/directories')
     assert 'Noch keine Verzeichnisse' in page
 
-    page = page.click('Verzeichnis')
+    page = page.click('^Verzeichnis$')
     page.form['title'] = "Clubs"
     page.form['lead'] = 'The famous club directory'
     page.form['structure'] = """
@@ -634,7 +634,7 @@ def test_directory_visibility(client: Client) -> None:
 def test_markdown_in_directories(client: Client) -> None:
     client.login_admin()
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Clubs"
     page.form['structure'] = """
         Name *= ___
@@ -810,7 +810,7 @@ def test_add_directory_entries_with_duplicate_names(client: Client) -> None:
     client.login_admin()
     duplicate_name = "duplicate"
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Playgrounds"
     page.form['structure'] = """
         Name *= ___
@@ -836,7 +836,7 @@ def test_add_directory_entries_with_duplicate_names(client: Client) -> None:
 def test_directory_numbering(client: Client) -> None:
     client.login_admin()
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Trainers"
     page.form['structure'] = """
         Name *= ___
@@ -922,7 +922,7 @@ def test_newline_in_directory_header(client: Client) -> None:
 
     client.login_admin()
     page = client.get('/directories')
-    page = page.click('Verzeichnis')
+    page = page.click('^Verzeichnis$')
     page.form['title'] = "Clubs"
     page.form['lead'] = 'this is a multiline\nlead'
     page.form['structure'] = """
@@ -943,7 +943,7 @@ def test_newline_in_directory_header(client: Client) -> None:
 def test_change_directory_url(client: Client) -> None:
     client.login_admin()
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Trainers"
     page.form['structure'] = """
         Name *= ___
@@ -960,7 +960,7 @@ def test_change_directory_url(client: Client) -> None:
     assert sr.request.url.endswith('/sr')
 
     # now attempt to change url to a directory url which already exists
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Clubs"
     page.form['structure'] = """
         Name *= ___
@@ -981,7 +981,7 @@ def test_directory_entry_subscription(client: Client) -> None:
 
     assert len(os.listdir(client.app.maildir)) == 0
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Trainers"
     page.form['structure'] = """
         Name *= ___
@@ -1037,7 +1037,7 @@ def test_create_directory_accordion_layout(client: Client) -> None:
 
     def create_directory(client: Client, title: str) -> ExtendedResponse:
         page = (client.get('/directories').
-                click('Verzeichnis'))
+                click('^Verzeichnis$'))
         page.form['title'] = title
         page.form['structure'] = "Question *= ___\nAnswer *= ___"
         page.form['title_format'] = '[Question]'
@@ -1072,7 +1072,7 @@ def test_directory_migration(client: Client) -> None:
     # tests changing radio and checkbox options in directory structure
 
     client.login_admin()
-    page = (client.get('/directories').click('Verzeichnis'))
+    page = (client.get('/directories').click('Verzeichnis', index=0))
     page.form['title'] = 'Order sweets'
     page.form['structure'] = dedent("""
         Nickname *= ___

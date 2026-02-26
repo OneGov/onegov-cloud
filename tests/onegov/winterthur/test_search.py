@@ -16,7 +16,7 @@ def test_search_excluding_image(client_with_fts: Client[TestApp]) -> None:
     client.login_admin()
 
     # Create directory
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = 'Clubs'
     page.form['structure'] = """
                     Name *= ___
@@ -52,7 +52,7 @@ def test_search_malicious_term(client_with_fts: Client[TestApp]) -> None:
     client.login_admin()
 
     # Create directory
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = 'Clubs'
     page.form['structure'] = """
                     Name *= ___

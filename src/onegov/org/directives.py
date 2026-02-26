@@ -3,8 +3,8 @@ from __future__ import annotations
 from dectate import Action
 from itertools import count
 
-
 from typing import cast, Any, ClassVar, Literal, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.elements import LinkGroup

@@ -1979,15 +1979,27 @@
     </ul>
 </metal:search_results>
 
+<metal:search_breadcrumbs define-macro="search_breadcrumbs" i18n:domain="onegov.town6">
+    <tal:b tal:condition="layout and len(layout.breadcrumbs) > 1" tal:define="links layout.breadcrumbs">
+        <ul class="breadcrumbs search-breadcrumbs">
+            <tal:b repeat="link links">
+                <li class="breadcrumb-item" tal:content="link(layout)"></li>
+            </tal:b>
+        </ul>
+    </tal:b>
+</metal:search_breadcrumbs>
+
 <metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.town6">
     <a href="${request.return_here(request.link(result))}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
-    <p class="search-preview">
+    <div class="search-preview">
         ${translate(result.role.capitalize())}
-    </p>
+    </div>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_users>
-
 
 <metal:search_result_files define-macro="search_result_files" i18n:domain="onegov.town6">
     <a class="list-link" href="${request.return_here(request.link(result))}">
@@ -1996,7 +2008,7 @@
         </h5>
     </a>
     <a href="${request.return_here(request.link(result))}">
-        <p class="search-preview">
+        <div class="search-preview">
             <tal:b condition="result.signed">
                 <span i18n:translate>Has a digital seal</span>,
             </tal:b>
@@ -2009,10 +2021,12 @@
                     <tal:b i18n:name="count">${result.stats.get('pages', 0)}</tal:b> pages
                 </tal:b>
             </span>
-        </p>
+        </div>
     </a>
+    <div tal:condition="request.get_layout(result) and request.is_manager">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_files>
-
 
 <metal:search_result_tickets define-macro="search_result_tickets" i18n:domain="onegov.town6">
     <a class="list-link" href="${request.link(result)}">
@@ -2028,6 +2042,9 @@
             <tal:b tal:content="result.subtitle"></tal:b>
         </p>
     </a>
+    <div tal:condition="request.get_layout(result) and request.is_manager">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_tickets>
 
 
@@ -2072,6 +2089,9 @@
                 </div></li>
         </ul>
     </tal:b>
+    <div tal:condition="request.get_layout(result.latest_occurrence)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result.latest_occurrence)" />
+    </div>
 </metal:search_result_events>
 
 
@@ -2079,9 +2099,61 @@
     <a href="${request.link(result)}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
-        <p class="search-preview" tal:condition="result.function|nothing">${result.function}</p>
-        <p class="search-preview" tal:condition="not:result.function|nothing" i18n:translate>People</p>
+    <div class="search-preview" tal:condition="result.organisation_texts|nothing" tal:repeat="org result.organisation_texts">
+        ${org}
+    </div>
+    <div class="search-preview" tal:condition="result.function|nothing"><i>${result.function}</i></div>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_people>
+
+
+<metal:search_result_par_parliamentarians define-macro="search_result_par_parliamentarians" i18n:domain="onegov.town6">
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <div class="search-preview" tal:condition="result.function|nothing">${result.function}</div>
+    <div class="search-preview" tal:condition="not:result.active|nothing" i18n:translate>Former member or parliament</div>
+    <div class="search-preview" tal:condition="result.roles|nothing" tal:repeat="role result.roles">
+        <div class="search-preview" tal:condition="role.role_label">
+            <span>${role.role_label}</span> <span i18n:translate>Parliament</span>
+        </div>
+        <div tal:condition="role.parliamentary_group">
+            ${role.parliamentary_group_role_label}
+            <span i18n:translate>Parliamentary Group</span>
+            ${role.parliamentary_group.title}
+        </div>
+    </div>
+    <div class="search-preview" tal:condition="result.commission_memberships|nothing" tal:repeat="role result.commission_memberships">
+        <span>${role.role_label}</span> <span>${role.commission.title}
+    </div>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
+</metal:search_result_par_parliamentarians>
+
+
+<metal:search_result_par_political_businesses define-macro="search_result_par_political_businesses" i18n:domain="onegov.town6">
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <div class="search-preview" tal:condition="result.number|nothing">
+        <span i18n:translate>Number:</span>
+        <span>${result.number}</span>
+    </div>
+    <div class="search-preview" tal:condition="result.entry_date|nothing">
+        <span i18n:translate>Entry Date:</span>
+        <span>${layout.format_date(result.entry_date, 'date')}</span>
+    </div>
+    <div class="search-preview" tal:condition="result.status|nothing">
+        <span i18n:translate>Status:</span>
+        <span>${result.status.capitalize()}</span>
+    </div>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
+</metal:search_result_par_political_businesses>
 
 
 <metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.town6">
@@ -2102,10 +2174,13 @@
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
     <a tal:condition="result.lead|None" href="${request.link(result)}">
-        <p class="search-preview">
-            ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
-        </p>
+        <div class="search-preview">
+            ${result.lead[:260]}<tal:b condition="len(result.lead) > 260">…</tal:b>
+        </div>
     </a>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_default>
 
 
@@ -2808,7 +2883,7 @@
         file_upload file.upload_date|file.created;
         file_publish_end file.publish_end_date|None;
     ">
-        <tr class="file-info ${'signed' if file.signed else ''}">
+        <tr class="file-info ${'signed' if file.signed else ''}" id="${file.name}">
             <td>
                 ${file.name}
             </td>

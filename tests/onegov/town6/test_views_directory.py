@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 def test_directory_prev_next(client: Client) -> None:
     client.login_admin()
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Trainers"
     page.form['structure'] = """
         Name *= ___
@@ -64,7 +64,7 @@ def test_directory_prev_next(client: Client) -> None:
 def test_newline_in_directory_header(client: Client) -> None:
     client.login_admin()
     page = client.get('/directories')
-    page = page.click('Verzeichnis')
+    page = page.click('^Verzeichnis$')
     page.form['title'] = "Clubs"
     page.form['lead'] = 'this is a multiline\nlead'
     page.form['structure'] = """
@@ -85,7 +85,7 @@ def test_newline_in_directory_header(client: Client) -> None:
 def test_change_directory_url(client: Client) -> None:
     client.login_admin()
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Trainers"
     page.form['structure'] = """
         Name *= ___
@@ -101,7 +101,7 @@ def test_change_directory_url(client: Client) -> None:
     assert sr.request.url.endswith('/sr')
 
     # now attempt to change url to a directory url which already exists
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Clubs"
     page.form['structure'] = """
         Name *= ___
@@ -122,7 +122,7 @@ def test_directory_entry_subscription(client: Client) -> None:
 
     assert len(os.listdir(client.app.maildir)) == 0
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Trainers"
     page.form['structure'] = """
         Name *= ___
@@ -221,7 +221,7 @@ def test_create_directory_accordion_layout(
         title: str,
         hide_labels: str
     ) -> ExtendedResponse:
-        page = (client.get('/directories').click('Verzeichnis'))
+        page = (client.get('/directories').click('^Verzeichnis$'))
         page.form['title'] = title + f' {index}'
         page.form['structure'] = "Question *= ___\nAnswer *= ___"
         page.form['title_format'] = '[Question]'
