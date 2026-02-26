@@ -5,8 +5,11 @@ from onegov.core.elements import Link
 from onegov.fedpol import _
 from onegov.form import FormCollection, FormDefinition, FormSubmission
 from onegov.form.parser import parse_form
+from onegov.org.models.ticket import FormSubmissionTicket
 from onegov.stepsequence import step_sequences, Step
 from onegov.town6.layout import DefaultLayout
+from onegov.town6.layout import (
+    TicketChatMessageLayout as TownTicketChatMessageLayout)
 
 
 from typing import TYPE_CHECKING
@@ -83,6 +86,7 @@ class FormSubmissionStepLayout(DefaultLayout):
 
     def get_step_sequence(self, position: int | None = None) -> list[Step]:
         cls_name = self.__class__.__name__
+        end_name = TicketChatMessageLayout.__name__
         num_steps = len(self.form_step_names)
         return [
             *(
@@ -95,6 +99,57 @@ class FormSubmissionStepLayout(DefaultLayout):
                 )
                 for idx, step_name in enumerate(self.form_step_names, start=1)
             ),
-            Step(_('Check'), cls_name, num_steps + 1, cls_name, cls_name),
+            Step(_('Check'), cls_name, num_steps + 1, end_name, cls_name),
+            Step(_('Confirmation'), cls_name, num_steps + 2, None, cls_name),
+        ]
+
+
+class TicketChatMessageLayout(TownTicketChatMessageLayout):
+
+    @cached_property
+    def form_step_names(self) -> list[str] | None:
+        if self.request.is_manager:
+            return None
+
+        if not isinstance(self.model, FormSubmissionTicket):
+            return None
+
+        submission = self.model.handler.submission
+        if submission is None:
+            return None
+
+        fieldsets = parse_form(submission.definition)().fieldsets
+        if len(fieldsets) < 2:
+            return None
+
+        form = submission.form
+        form_title = _('Form') if form is None else form.title
+        return [fieldset.label or form_title for fieldset in fieldsets]
+
+    @property
+    def step_position(self) -> int:
+        if not self.form_step_names:
+            return 3
+        return len(self.form_step_names) + 2
+
+    def get_step_sequence(self, position: int | None = None) -> list[Step]:
+        if not self.form_step_names:
+            return super().get_step_sequence(position)
+
+        cls_name = FormSubmissionStepLayout.__name__
+        end_name = self.__class__.__name__
+        num_steps = len(self.form_step_names)
+        return [
+            *(
+                Step(
+                    step_name,
+                    cls_name,
+                    idx,
+                    cls_name,
+                    cls_name if idx > 1 else None
+                )
+                for idx, step_name in enumerate(self.form_step_names, start=1)
+            ),
+            Step(_('Check'), cls_name, num_steps + 1, end_name, cls_name),
             Step(_('Confirmation'), cls_name, num_steps + 2, None, cls_name),
         ]
