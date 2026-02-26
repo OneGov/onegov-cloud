@@ -88,9 +88,10 @@ var get_dependency_target = function(form, dependency) {
 /*
     Evaluates the dependency and acts on the result.
 */
-var evaluate_dependencies = function(form, input, dependencies) {
+var evaluate_dependencies = function(form, input, dependencies, _handle_fieldset) {
     var visible = true;
     var hide_label = true;
+    var handle_fieldset = _handle_fieldset || false;
 
     _.each(dependencies, function(dependency) {
         visible &= (dependency.invert ^ _.contains(get_choices(form, dependency.name), dependency.value));
@@ -99,6 +100,9 @@ var evaluate_dependencies = function(form, input, dependencies) {
 
     var fieldset = input.closest('fieldset');
     if (visible) {
+        if (handle_fieldset) {
+            fieldset.toggle(true);
+        }
         var always_hidden = typeof input.attr('data-always-hidden') !== 'undefined';
 
         if (!always_hidden) {
@@ -107,14 +111,13 @@ var evaluate_dependencies = function(form, input, dependencies) {
 
         input.closest('label, .group-label').show().siblings('.error').toggle(true);
         input.toggle(true);
-        fieldset.toggle(true);
     } else {
         input.toggle(false);
         if (hide_label) {
             input.closest('label, .group-label').hide().siblings('.error').toggle(false);
         }
         input.toggle(false);
-        if (fieldset.find('*[data-depends-on]:visible').length === 0) {
+        if (handle_fieldset && fieldset.find('input, select, textarea, label, .group-label').filter(':visible').length === 0) {
             fieldset.toggle(false);
         }
     }
@@ -133,7 +136,7 @@ var setup_depends_on = function(form) {
 
     _.each(_.map(inputs, $), function(input) {
         var dependencies = get_dependencies(input);
-        evaluate_dependencies(form, input, dependencies);
+        evaluate_dependencies(form, input, dependencies, false);
 
         _.each(dependencies, function(dependency) {
             var target = get_dependency_target(form, dependency);
@@ -142,12 +145,23 @@ var setup_depends_on = function(form) {
                 trigger = 'keyup';
             }
             target.on(trigger, function() {
-                evaluate_dependencies(form, input, dependencies);
+                evaluate_dependencies(form, input, dependencies, true);
             });
         });
     });
 
     form.toggle(true);
+
+    // since we were hiding our form during setup, the fieldset logic
+    // doesn't work properly, so we need to handle them manually after
+    // we unhide the form and already processed the fields
+    var fieldsets = form.find('fieldset');
+
+    _.each(_.map(fieldsets, $), function(fieldset) {
+        if (fieldset.find('input, select, textarea, label, .group-label').filter(':visible').length === 0) {
+            fieldset.toggle(false);
+        }
+    });
 };
 
 /*
