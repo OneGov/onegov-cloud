@@ -16,7 +16,11 @@ from onegov.translator_directory.constants import (
     HOURLY_RATE_UNCERTIFIED,
     TIME_REPORT_INTERPRETING_TYPES
 )
-from sedate import to_timezone
+from onegov.translator_directory.models.time_report import (
+    TranslatorTimeReport,
+)
+from onegov.translator_directory.models.translator import Translator
+from sedate import replace_timezone, to_timezone
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import StringField
@@ -28,10 +32,6 @@ from wtforms.validators import ValidationError
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.translator_directory.models.time_report import (
-        TranslatorTimeReport
-    )
-    from onegov.translator_directory.models.translator import Translator
     from onegov.translator_directory.request import TranslatorAppRequest
 
 
@@ -152,6 +152,51 @@ class TranslatorTimeReportForm(Form):
 
         if end_dt <= start_dt:
             raise ValidationError(_('End time must be after start time'))
+
+    def validate_start_time(self, field: TimeField) -> None:
+        if not all([self.start_date.data, field.data]):
+            return
+        if not hasattr(self, 'model'):
+            return
+
+        assert self.start_date.data is not None
+        assert field.data is not None
+
+        start_dt = replace_timezone(
+            datetime.combine(self.start_date.data, field.data),
+            'Europe/Zurich',
+        )
+
+        translator_id = None
+        current_report_id = None
+
+        if isinstance(self.model, Translator):
+            translator_id = self.model.id
+        elif isinstance(self.model, TranslatorTimeReport):
+            translator_id = self.model.translator_id
+            current_report_id = self.model.id
+
+        if translator_id is None:
+            return
+
+        session = self.request.session
+        query = session.query(TranslatorTimeReport.id).filter(
+            TranslatorTimeReport.translator_id == translator_id,
+            TranslatorTimeReport.start == start_dt,
+        )
+
+        if current_report_id is not None:
+            query = query.filter(
+                TranslatorTimeReport.id != current_report_id
+            )
+
+        if session.query(query.exists()).scalar():
+            raise ValidationError(
+                _(
+                    'A time report already exists for '
+                    'this start time'
+                )
+            )
 
     def on_request(self) -> None:
 
@@ -507,8 +552,6 @@ class TranslatorTimeReportForm(Form):
 
     def update_model(self, model: TranslatorTimeReport) -> None:
         """Update the time report model with form data."""
-        from sedate import replace_timezone
-
         assert self.start_date.data is not None
         assert self.start_time.data is not None
         assert self.end_date.data is not None
