@@ -930,7 +930,11 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 # registers the `DefaultLayout` as the default layout for all models in
 # org. Look for this kind of decorator `@TownApp.layout(model=<ModelName>)`
 @OrgApp.predicate_fallback(Framework.get_layout, layout_predicate)
-def layout_not_found(self: OrgApp, obj: object, request: CoreRequest) -> Layout:
+def layout_not_found(
+    self: OrgApp,
+    obj: object,
+    request: OrgRequest
+) -> Layout:
     return DefaultLayout(obj, request)
 
 

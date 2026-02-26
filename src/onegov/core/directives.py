@@ -21,6 +21,7 @@ if TYPE_CHECKING:
 
     from .analytics import AnalyticsProvider
     from onegov.core import Framework
+    from onegov.core.layout import Layout as CoreLayout
     from onegov.core.request import CoreRequest
 
 
@@ -412,7 +413,7 @@ class Layout(Action):
 
     def perform(  # type:ignore[override]
         self,
-        obj: type[Layout],
+        obj: type[CoreLayout],
         app_class: type[Framework]
     ) -> None:
 

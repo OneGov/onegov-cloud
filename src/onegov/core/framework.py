@@ -1571,7 +1571,7 @@ class Framework(
     Framework.get_layout,
     name='model',
     default=None,
-    index=ClassIndex  # type: ignore[arg-type]
+    index=ClassIndex
 )
 def layout_predicate(
     self: type[Framework],
