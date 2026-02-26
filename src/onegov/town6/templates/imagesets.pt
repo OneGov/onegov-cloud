@@ -13,9 +13,13 @@
                             <tal:b tal:repeat="image imageset.ordered_files">
                                 <div tal:condition="repeat.image.number <= 4" class="cell">
                                     <tal:b tal:define="size getattr(image.reference, 'size', None)">
-                                    <img src="${request.link(image)}" alt="${image.note}"
-                                         tal:attributes="width size and size[0] or None;
-                                                         height size and size[1] or None" />
+                                        <span tal:condition="not size">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span i18n:translate="">Cannot display</span> ${image.name}
+                                        </span>
+                                        <img tal:condition="size" src="${request.link(image)}" alt="${image.note}"
+                                             tal:attributes="width size and size[0];
+                                                             height size and size[1]" />
                                     </tal:b>
                                 </div>
                             </tal:b>
