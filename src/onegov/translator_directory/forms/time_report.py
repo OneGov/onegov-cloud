@@ -73,7 +73,6 @@ class TranslatorTimeReportForm(Form):
         label=_('Cost center'),
         choices=[],
         validators=[InputRequired()],
-        default='polizei',
     )
 
     start_date = DateField(
@@ -164,9 +163,10 @@ class TranslatorTimeReportForm(Form):
             for key, (name, _) in ASSIGNMENT_LOCATIONS.items()
         ]
         choices.insert(0, ('', ''))
-        self.finanzstelle.choices = [
+        finanzstelle_choices = self.finanzstelle.choices = [
             (key, fs.name) for key, fs in FINANZSTELLE.items()
         ]
+        finanzstelle_choices.insert(0, ('', ''))
 
     def get_hourly_rate(self, translator: Translator) -> Decimal:
         """Determine hourly rate based on translator certification."""
