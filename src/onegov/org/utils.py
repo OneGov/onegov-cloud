@@ -530,7 +530,7 @@ class AllocationEventInfo:
 
     @property
     def outside_booking_window(self) -> bool:
-        return self.request.is_manager and (
+        return not self.request.is_manager and (
             self.resource.is_past_deadline(
                 # for partly available allocations we use the end of the
                 # allocation, since some small sliver of the allocation
