@@ -97,6 +97,7 @@ var evaluate_dependencies = function(form, input, dependencies) {
         hide_label &= dependency.hide_label;
     });
 
+    var fieldset = input.closest('fieldset');
     if (visible) {
         var always_hidden = typeof input.attr('data-always-hidden') !== 'undefined';
 
@@ -106,12 +107,16 @@ var evaluate_dependencies = function(form, input, dependencies) {
 
         input.closest('label, .group-label').show().siblings('.error').toggle(true);
         input.toggle(true);
+        fieldset.toggle(true);
     } else {
         input.toggle(false);
         if (hide_label) {
             input.closest('label, .group-label').hide().siblings('.error').toggle(false);
         }
         input.toggle(false);
+        if (fieldset.find('*[data-depends-on]:visible').length === 0) {
+            fieldset.toggle(false);
+        }
     }
 };
 
