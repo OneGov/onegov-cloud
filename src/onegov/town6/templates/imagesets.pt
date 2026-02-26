@@ -11,17 +11,13 @@
                     <div class="card">
                         <div class="grid-x columns small-up-2 image-card-grid">
                             <tal:b tal:repeat="image imageset.ordered_files">
-                                <div tal:condition="repeat.image.number <= 4" class="cell">
-                                    <tal:b tal:define="size getattr(image.reference, 'size', None)">
-                                        <span tal:condition="not size">
-                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                            <span i18n:translate="">Cannot display</span> ${image.name}
-                                        </span>
-                                        <img tal:condition="size" src="${request.link(image)}" alt="${image.note}"
+                                <tal:b tal:define="size getattr(image.reference, 'size', None)">
+                                    <div tal:condition="size and repeat.image.number <= 4" class="cell">
+                                        <img src="${request.link(image)}" alt="${image.note}"
                                              tal:attributes="width size and size[0];
                                                              height size and size[1]" />
-                                    </tal:b>
-                                </div>
+                                    </div>
+                                </tal:b>
                             </tal:b>
                         </div>
                         <div class="card-section">
