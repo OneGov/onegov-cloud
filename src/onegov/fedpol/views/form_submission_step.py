@@ -53,15 +53,17 @@ def handle_pending_submission(
     elif not request.POST and request.GET.get('submitted') == '1':
         form.validate()
 
+    assert self.submission.form is not None
     if hasattr(form, 'step_name'):
-        title = form.step_name
-    else:
-        assert self.submission.form is not None
         title = self.submission.form.title
+        step_title = form.step_name
+    else:
+        title = self.submission.form.title
+        step_title = None
 
     return {
-        'layout': FormSubmissionStepLayout(self, request, title),
-        'title': title,
+        'layout': FormSubmissionStepLayout(self, request, title, step_title),
+        'title': step_title or title,
         'form': form,
         'button_text': _('Continue')
     }

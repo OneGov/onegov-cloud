@@ -84,9 +84,12 @@ def handle_defined_form(
 
         return morepath.redirect(next_url)
 
-    layout = (
-        FormSubmissionStepLayout if has_steps else FormSubmissionLayout
-    )(self, request, title=self.title)
+    layout = FormSubmissionStepLayout(
+        self,
+        request,
+        title=self.title,
+        step_title=getattr(form, 'step_name', None)
+    ) if has_steps else FormSubmissionLayout(self, request, title=self.title)
 
     return {
         'layout': layout,
