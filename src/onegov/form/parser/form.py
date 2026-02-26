@@ -418,8 +418,15 @@ class WTFormsClassBuilder(Generic[_FormT]):
                 if ';' in dependency:
                     return False
 
-                field_id, value = dependency.split('/', 1)
-                if field_id not in self or self[field_id].data != value:
+                field_id, expected = dependency.split('/', 1)
+                if field_id not in self:
+                    return False
+
+                value = self[field_id].data
+                if isinstance(value, list):
+                    if expected not in value:
+                        return False
+                elif value != expected:
                     return False
 
                 return self.is_visible_through_dependencies(field_id)

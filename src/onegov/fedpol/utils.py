@@ -93,7 +93,7 @@ def get_step_form(
         if not isinstance(validators[0], If):
             continue
 
-        validators = [
+        kwargs['validators'] = [
             *validators[0].validators,
             *validators[2:]
         ]
