@@ -35,7 +35,7 @@ schedule_maintenance() {
 
 dry_run_option=false
 
-next_tuesday=$(date -d "next Tuesday" + "%d.%m.%Y")
+next_tuesday=$(date -d "next Tuesday" +"%d.%m.%Y")
 
 # first batch at 12:00
 date_time="$next_tuesday 12:00"
@@ -53,6 +53,6 @@ nodes=("caicias" "caicinus" "caicus" "carcinus")
 schedule_maintenance "$date_time" "${dry_run_option}" "${nodes[@]}"
 
 # fourth batch feriennet Monday in a week at 7:00
-date_time=$(date -d "next Monday +7 days 07:00" + "%d.%m.%Y ")
-nodes=("ister", "istrus")
+date_time="$(date -d "next Monday +7 days" +"%d.%m.%Y") 07:00"
+nodes=("ister" "istrus")
 schedule_maintenance "$date_time" "${dry_run_option}" "${nodes[@]}"
