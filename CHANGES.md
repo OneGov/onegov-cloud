@@ -1,8 +1,97 @@
 # Changes
 
+## 2026.11
+
+`2026-02-27` | [f5feeeea66...6730b8d860](https://github.com/OneGov/onegov-cloud/compare/f5feeeea66^...6730b8d860)
+
+### Feriennet
+
+##### Show error if file cannot be displayed in photo album
+
+`Feature` | [OGC-2976](https://linear.app/onegovcloud/issue/OGC-2976) | [6730b8d860](https://github.com/onegov/onegov-cloud/commit/6730b8d860436c2d1ebfeea74f43ea2c0b95ae8e)
+
+##### Fix period info
+
+Show wishlist info not only when wishlist phase is active
+
+`Bugfix` | [PRO-1487](https://linear.app/projuventute/issue/PRO-1487) | [33fe463c48](https://github.com/onegov/onegov-cloud/commit/33fe463c48b1ccfef78a3d9520414e6365ad02ac)
+
+##### Prevent photoalbum and photoalbum overview from crashing due to missing size attribute (e.g. video)
+
+This is just an intermediate step. We may need to handle different file types in albums differently
+
+`Bugfix` | [OGC-2976](https://linear.app/onegovcloud/issue/OGC-2976) | [31a6fed7c2](https://github.com/onegov/onegov-cloud/commit/31a6fed7c27933281242b1bc0490da68a6bf695d)
+
+### Org
+
+##### Adds a change username function for admins
+
+Changing usernames is only allowed for users that are not sourced from
+an external login provider and if the current admin user has either a
+Yubikey or TOTP second factor configured (mTAN is not yet supported).
+
+This also adds a CLI command to change usernames, which can be utilized
+in all applications, not just Org.
+
+`Feature` | [OGC-2532](https://linear.app/onegovcloud/issue/OGC-2532) | [4b4467c068](https://github.com/onegov/onegov-cloud/commit/4b4467c068fe9add20957ecde58e2443a941ba87)
+
+##### Makes `OrgRequest.current_user` more robust
+
+With SQLAlchemy 2.0 it is possible for the `User` object to become
+detached, which can result in errors if we try to access a deferred
+attribute later on.
+
+`Bugfix` | [47bf5c3bd0](https://github.com/onegov/onegov-cloud/commit/47bf5c3bd0cf87baa1bcf1f9b57c8e7f86616421)
+
+##### Fixes inverted condition in allocation display
+
+`Bugfix` | [OGC-2984](https://linear.app/onegovcloud/issue/OGC-2984) | [17e9addabd](https://github.com/onegov/onegov-cloud/commit/17e9addabde93d74f60661976585c15f3e067cd7)
+
+### Pas
+
+##### Fixes an issue with comma in filename on windows.
+
+`Bugfix` | [NONE](#NONE) | [64908b60ac](https://github.com/onegov/onegov-cloud/commit/64908b60ac0b0ef184d62d8181a096c378aef130)
+
+##### Make sure address fits in letter.
+
+`Bugfix` | [NONE](#NONE) | [0d478902be](https://github.com/onegov/onegov-cloud/commit/0d478902beda550c5cd7f8c9e4d11acfbcd31b57)
+
+##### Display the true value for plenary session.
+
+`Bugfix` | [NONE](#NONE) | [7fac7accd6](https://github.com/onegov/onegov-cloud/commit/7fac7accd61a164d84ad6ae71f6129d9b327eec2)
+
+##### Round to two decimal places.
+
+`Bugfix` | [74859ffcc8](https://github.com/onegov/onegov-cloud/commit/74859ffcc85a968c0d6df2fcca99222bbf82863d)
+
+### Town6
+
+##### Remove searchbar in empty slider
+
+Don't display the searchbar if there are no images in the slider
+
+`Other` | [f5feeeea66](https://github.com/onegov/onegov-cloud/commit/f5feeeea66ccc9ff407fc3008f434afbde8eabb5)
+
+### Wab
+
+##### Handle invalid polling day date
+
+`Feature` | [OGC-2785](https://linear.app/onegovcloud/issue/OGC-2785) | [3d0b3fe3d4](https://github.com/onegov/onegov-cloud/commit/3d0b3fe3d4c4a1e5db126e8122a64214260c8393)
+
+##### Prevent cli update archived results for development and staging
+
+As `official_host` is not set for development and staging, cli `upload-archived-results` may cause duplicates when uploading new results due to different urls.
+
+`Feature` | [OGC-2978](https://linear.app/onegovcloud/issue/OGC-2978) | [34820b252c](https://github.com/onegov/onegov-cloud/commit/34820b252c306342d9defa6f2f38bbf4d3fcdb48)
+
+## ui
+
+`2026-02-23` | [dd502dc069...997bc59a4a](https://github.com/OneGov/onegov-cloud/compare/dd502dc069^...997bc59a4a)
+
 ## 2026.10
 
-`2026-02-20` | [673622456d...6815e1e5e3](https://github.com/OneGov/onegov-cloud/compare/673622456d^...6815e1e5e3)
+`2026-02-20` | [673622456d...007adfdc2d](https://github.com/OneGov/onegov-cloud/compare/673622456d^...007adfdc2d)
 
 ### Wab
 
@@ -2329,46 +2418,4 @@ Display private address if available, otherwise show place of residence
 ##### Event import - prevent setting coordiantes to invalid values
 
 `Bugfix` | [OGC-2380](https://linear.app/onegovcloud/issue/OGC-2380) | [867117fc85](https://github.com/onegov/onegov-cloud/commit/867117fc8565efa154eb5e82849ba6aba8d26aa8)
-
-## 2025.35
-
-`2025-07-22` | [bc20e0010f...df94f48648](https://github.com/OneGov/onegov-cloud/compare/bc20e0010f^...df94f48648)
-
-### Org
-
-##### Update for importing reservations
-
-`Feature` | [101a598cd2](https://github.com/onegov/onegov-cloud/commit/101a598cd244cd4519ef61723bcbc5572bcfa519)
-
-### Ris
-
-##### Adds filters to political businesses
-
-`Feature` | [OGC-2423](https://linear.app/onegovcloud/issue/OGC-2423) | [1412fcec16](https://github.com/onegov/onegov-cloud/commit/1412fcec1659f52650e44b084742a290ed77bc51)
-
-##### Remove date of death field from parliamentarian form
-
-`Feature` | [OGC-2393](https://linear.app/onegovcloud/issue/OGC-2393) | [7cc9da50d2](https://github.com/onegov/onegov-cloud/commit/7cc9da50d2ca3c94fd05c826545d612e55a76f3c)
-
-##### Fix delete parliamentarian
-
-`Bugfix` | [OGC-2397](https://linear.app/onegovcloud/issue/OGC-2397) | [bc4b8784c2](https://github.com/onegov/onegov-cloud/commit/bc4b8784c22678704900cc86cddf816aa08cb10f)
-
-##### Update political business types
-
-`Bugfix` | [OGC-2465, OGC-2466](https://linear.app/onegovcloud/issue/OGC-2465, OGC-2466) | [f88d24869c](https://github.com/onegov/onegov-cloud/commit/f88d24869ca6cbdf75684746acd72b1bd2c9e201)
-
-## 2025.34
-
-`2025-07-18` | [86456cadbf...57a3644696](https://github.com/OneGov/onegov-cloud/compare/86456cadbf^...57a3644696)
-
-### Ris
-
-##### Menu to add, edit and remove meetings
-
-`Feature` | [OGC-2453](https://linear.app/onegovcloud/issue/OGC-2453) | [7990d46167](https://github.com/onegov/onegov-cloud/commit/7990d461674eaff84f1dc5e342c4b7e54296f4e5)
-
-##### Adds filter for future/past meetings (#1913)
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [4fea222a0b](https://github.com/onegov/onegov-cloud/commit/4fea222a0b0eb79b7b5cf4123352b38df154280b)
 
