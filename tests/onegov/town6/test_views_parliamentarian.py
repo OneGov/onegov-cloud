@@ -116,6 +116,7 @@ def test_parliamentarians(client: Client) -> None:
         assert 'Neue Rolle hinzugefügt' in parliamentarian
         assert 'Mitglied Parlament' in parliamentarian
         assert 'Mitglied Fraktion' in parliamentarian
+        assert 'Partei' in parliamentarian  # ensure proper translation
         assert 'Die Moderne Fraktion' in parliamentarian
 
         # add commission
