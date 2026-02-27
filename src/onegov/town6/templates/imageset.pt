@@ -13,15 +13,19 @@
         <div tal:repeat="image imageset.ordered_files" tal:condition="imageset.view == 'full'" class="page-text full-imageset photoswipe">
             <!--! the first three images are loaded conventionally, the rest are loaded lazily -->
             <tal:b tal:define="size getattr(image.reference, 'size', None)">
-                <p class="has-img" tal:condition="repeat.image.number <= 3">
+                <span tal:condition="not size">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span i18n:translate="">Cannot display</span> ${image.name}
+                </span>
+                <p class="has-img" tal:condition="size and repeat.image.number <= 3">
                     <img src="${request.link(image)}" alt="${image.note}"
-                         tal:attributes="width size and size[0] or None;
-                                         height size and size[1] or None" />
+                         tal:attributes="width size and size[0];
+                                         height size and size[1]" />
                 </p>
-                <p class="has-img" tal:condition="repeat.image.number > 3">
+                <p class="has-img" tal:condition="size and repeat.image.number > 3">
                     <img data-src="${request.link(image)}" class="lazyload" alt="${image.note}"
-                         tal:attributes="width size and size[0] or None;
-                                         height size and size[1] or None" />
+                         tal:attributes="width size and size[0];
+                                         height size and size[1]" />
                 </p>
             </tal:b>
         </div>
@@ -30,16 +34,21 @@
             <div class="image-grid">
                 <div tal:repeat="image imageset.ordered_files" class="image-container">
                     <tal:b tal:define="size getattr(image.reference, 'size', None);
-                                       thumb_size getattr(image.reference, 'thumbnail_small', None) and getattr(getattr(image.reference, 'thumbnail_small', None), 'size', None) or size;
-                                       width thumb_size and thumb_size[0] or None;
-                                       height thumb_size and thumb_size[1] or None;
-                                       full_width size and size[0] or None;
-                                       full_height size and size[1] or None">
-                        <!--! the first eight images are loaded conventionally, the rest are loaded lazily -->
-                        <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" tal:condition="repeat.image.number <= 8"
-                             tal:attributes="width width; height height; data-full-width full_width; data-full-height full_height" />
-                        <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" class="lazyload" tal:condition="repeat.image.number > 8"
-                             tal:attributes="width width; height height; data-full-width full_width; data-full-height full_height" />
+                            thumb_size getattr(image.reference, 'thumbnail_small') and getattr(getattr(image.reference, 'thumbnail_small'), 'size') or size;">
+                        <span tal:condition="not size">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span i18n:translate="">Cannot display</span> ${image.name}
+                        </span>
+                        <tal:b tal:condition="size" tal:define="size getattr(image.reference, 'size', None);
+                                thumb_size getattr(image.reference, 'thumbnail_small') and getattr(getattr(image.reference, 'thumbnail_small'), 'size') or size;
+                                width thumb_size and thumb_size[0];
+                                height thumb_size and thumb_size[1];
+                                full_width size and size[0];
+                                full_height size and size[1]">
+                            <!--! the first eight images are loaded conventionally, the rest are loaded lazily -->
+                            <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" tal:condition="repeat.image.number <= 8" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                            <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" class="lazyload" tal:condition="repeat.image.number > 8" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                        </tal:b>
                     </tal:b>
                 </div>
             </div>
