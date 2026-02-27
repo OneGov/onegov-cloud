@@ -334,7 +334,7 @@ To synchronize between different modules:
 
     do/apply-translations onegov.org onegov.town6
 
-Additionally, you can use <https://gengo.com> to translate English messages
+Additionally, you can use <https://gengo.com> <https://www.marstranslation.com> to translate English messages
 to other languages, like German, French or Italian.
 
 For this to work, you need to set the following variables (note the single quotes!):
