@@ -22,7 +22,14 @@ schedule_maintenance() {
       cmd+=(--dry-run)
       echo "Dry-run: ${cmd[*]}"
     fi
-    "${cmd[@]}"
+
+    if "${cmd[@]}"; then
+      echo "Scheduled maintenance for $node successfully"
+    else
+      rc=$?
+      echo "Warning: scheduling maintenance for $node failed with exit code $rc; continuing" >&2
+      continue
+    fi
   done
 }
 
