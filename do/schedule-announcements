@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# this `do/schedule-announcements` script is used to schedule maintenance announcements
+# for the next Tuesday
+
+# schedule_announcements date_time dry_run node1 node2 ...
+schedule_maintenance() {
+  local date_time="$1"
+  local dry_run="${2:-false}"
+  shift 2
+  local nodes=("$@")
+
+  echo "Scheduling maintenance for $date_time for nodes ${nodes[*]}"
+  sleep 3
+
+  for node in "${nodes[@]}"; do
+    echo
+    echo "Scheduling maintenance for $node on $date_time"
+    cmd=(puppeteer schedule-maintenance --node "$node" --time "$date_time" --send-mail)
+    if [ "${dry_run}" = true ]; then
+      cmd+=(--dry-run)
+      echo "Dry-run: ${cmd[*]}"
+    fi
+    "${cmd[@]}"
+  done
+}
+
+dry_run_option=false
+
+next_tuesday=$(date -d "next Tuesday" +"%d.%m.%Y")
+
+# first batch at 12:00
+date_time="$next_tuesday 12:00"
+nodes=("pherusa" "loxo" "tyche")
+schedule_maintenance "$date_time" "${dry_run_option}" "${nodes[@]}"
+
+# second batch at 14:00
+date_time="$next_tuesday 14:00"
+nodes=("aether" "alecto" "theros" "arete" "calais")
+schedule_maintenance "$date_time" "${dry_run_option}" "${nodes[@]}"
+
+# third batch at 15:00
+date_time="$next_tuesday 15:00"
+nodes=("caicias" "caicinus" "caicus" "carcinus")
+schedule_maintenance "$date_time" "${dry_run_option}" "${nodes[@]}"
