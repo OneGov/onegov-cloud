@@ -9,17 +9,9 @@
         margin-bottom: 0;
     }
 
-    .person-card-membership {
-        border-bottom: 1px dashed rgba(28, 57, 71, .53);
-        margin-bottom: .5rem;
-        padding-bottom: .4rem;
-    }
-
-    .person-card-membership:last-child {
-        border-bottom: 0;
-    }
-
     a:not(:last-child):not(:nth-last-child(-n+2))::after {
-        content: ' > ';
+        @include icon-bold('\f054');
+        margin-left: .5rem;
+        margin-right: .2rem;
     }
 }

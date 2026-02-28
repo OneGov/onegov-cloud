@@ -1,0 +1,22 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.agency">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <p tal:condition="not:agencies" i18n:translate="">No agencies added yet.</p>
+
+        <a class="button hollow" href="${request.link(agencies_collection)}" i18n:translate="">Back to list view</a>
+
+        <div class="chart-container">
+            <div class="loading-info">
+                <i class="fas fa-spinner fa-spin"></i> <span i18n:translate>Loading agencies...</span>
+            </div>
+        </div>
+
+        <div class="orgchart" data-url="${request.link(agencies_collection, name='json')}">
+        </div>
+
+
+    </tal:block>
+</div>

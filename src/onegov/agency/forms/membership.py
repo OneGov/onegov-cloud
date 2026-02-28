@@ -68,8 +68,6 @@ class MembershipForm(Form):
             raise ValidationError(_('This field is required.'))
 
     def on_request(self) -> None:
-        self.request.include('common')
-        self.request.include('chosen')
 
         ambiguous = duplicates(
             name for name, in self.request.session.query(

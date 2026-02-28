@@ -10,7 +10,7 @@ from onegov.org.views.settings import handle_generic_settings
 from wtforms.fields import BooleanField, IntegerField, RadioField
 from wtforms.validators import Optional, NumberRange
 
-
+from onegov.town6.layout import SettingsLayout
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
@@ -181,4 +181,5 @@ def handle_agency_settings(
     request: AgencyRequest,
     form: AgencySettingsForm
 ) -> RenderData | Response:
-    return handle_generic_settings(self, request, form, _('Agencies'))
+    return handle_generic_settings(self, request, form, _('Agencies'),
+                                   SettingsLayout(self, request))

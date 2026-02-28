@@ -148,7 +148,7 @@
                         <div class="grid-container navigation">
                             <div class="grid-x">
                                 <div class="large-2 small-2 cell">
-                                    <button class="menu-button" tal:condition="layout.root_pages" data-toggle="offCanvas">
+                                    <button class="menu-button" tal:condition="top_navigation|layout.top_navigation" data-toggle="offCanvas">
                                         <i class="fas fa-bars"></i>
                                     </button>
                                 </div>

@@ -81,9 +81,73 @@ def view_agencies(
 
     return {
         'title': _('Agencies'),
+        'agencies_collection': self,
         'agencies': self.roots,
         'pdf_link': pdf_link,
         'layout': layout
+    }
+
+
+@AgencyApp.html(
+    model=ExtendedAgencyCollection,
+    template='agencies_chart.pt',
+    name='chart',
+    permission=Public
+)
+def view_agencies_chart(
+    self: ExtendedAgencyCollection,
+    request: AgencyRequest
+) -> RenderData:
+
+    layout = AgencyCollectionLayout(self, request)
+    request.include('d3-charts')
+
+    layout.breadcrumbs.append(
+        Link(_('Chart view'), request.link(self, name='chart'))
+    )
+
+    return {
+        'title': _('Agencies'),
+        'agencies_collection': self,
+        'agencies': self.roots,
+        'layout': layout
+    }
+
+
+@AgencyApp.json(
+    model=ExtendedAgencyCollection,
+    name='json',
+    permission=Public
+)
+def view_agencies_json(
+    self: ExtendedAgencyCollection,
+    request: AgencyRequest
+) -> RenderData:
+
+    def to_node(agency: ExtendedAgency) -> dict[str, object]:
+        node = {
+            'id': agency.id,
+            'name': agency.title,
+            'url': request.link(agency)
+        }
+        children = [to_node(child) for child in agency.children]
+        if children:
+            node['children'] = children
+        return node
+
+    tree = [to_node(a) for a in self.roots]
+
+    name = request.translate(_('Agencies'))
+
+    return {
+        'tree': [
+            {
+            'id': 0,
+            'url': request.link(self),
+            'name': name,
+            'children': tree
+            }
+        ]
     }
 
 
@@ -99,6 +163,8 @@ def view_agencies_sort(
 ) -> RenderData:
 
     layout = AgencyCollectionLayout(self, request)
+    layout.edit_mode = True
+    layout.editmode_links = layout.editmode_links[1:]
 
     return {
         'title': _('Sort'),
@@ -147,6 +213,9 @@ def view_agency_sort(
 ) -> RenderData:
 
     layout = AgencyLayout(self, request)
+    layout.edit_mode = True
+    layout.editmode_links = layout.editmode_links[1:]
+
     return {
         'title': _('Sort'),
         'layout': layout,
@@ -158,7 +227,7 @@ def view_agency_sort(
             ),
             (
                 _('Memberships'),
-                layout.move_membership_within_agency_url_template,
+                layout.move_membership_url_template,
                 (
                     (
                         membership.id,
@@ -221,6 +290,7 @@ def add_root_agency(
     layout = AgencyCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -251,6 +321,7 @@ def add_agency(
     layout = AgencyLayout(self, request)
     layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -406,7 +477,7 @@ def move_agency(
 
     layout = AgencyLayout(self, request)
     layout.breadcrumbs.append(Link(_('Move'), '#'))
-
+    layout.edit_mode = True
     return {
         'layout': layout,
         'title': self.title,

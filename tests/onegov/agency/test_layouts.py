@@ -148,7 +148,7 @@ def test_agency_layout(session: Session) -> None:
         "'target_id': '{target_id}', "
         "'direction': '{direction}'}"
         "/?csrf-token=x")
-    assert layout.move_membership_within_agency_url_template == (
+    assert layout.move_membership_url_template == (
         "AgencyMembershipMoveWithinAgency{"
         "'subject_id': '{subject_id}', "
         "'target_id': '{target_id}', "
