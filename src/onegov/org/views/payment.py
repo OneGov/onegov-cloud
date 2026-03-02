@@ -14,7 +14,7 @@ from onegov.org.models import PaymentMessage
 from onegov.core.elements import Link
 from sedate import align_range_to_day, standardize_date, as_datetime
 from onegov.org.pdf.ticket import TicketsPdf
-from onegov.pay import Payment, Invoice
+from onegov.pay import Payment
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.pay.errors import DatatransApiError, SaferpayApiError
@@ -248,7 +248,7 @@ def handle_batch_set(
     invoices_query = self.session.query(TicketInvoice).filter(
         TicketInvoice.id.in_(invoice_ids)
     ).options(
-        joinedload(Invoice.items.of_type(TicketInvoiceItem))
+        joinedload(TicketInvoice.items.of_type(TicketInvoiceItem))
         .selectinload(TicketInvoiceItem.payments)
     )
     updated_count = 0
