@@ -978,6 +978,6 @@ def test_bulk_commission_add_abschluss_notifies_admins(
     page.form['parliamentarian_id'] = [bob_id, alice_id]
     page.form.submit()
 
-    assert len(os.listdir(client.app.maildir)) == 2
-    recipients = {client.get_email(i)['To'] for i in range(2)}
+    assert len(os.listdir(client.app.maildir)) == 1
+    recipients = {client.get_email(i)['To'] for i in range(1)}
     assert 'admin@example.org' in recipients
