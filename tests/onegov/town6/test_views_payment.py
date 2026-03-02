@@ -7,7 +7,6 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from onegov.pay import Payment, PaymentProvider
 
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .conftest import Client
@@ -237,3 +236,37 @@ def test_view_payments_invoices_handle_batch_set(client: Client) -> None:
     assert session.query(Payment).filter_by(state='open').count() == 3
     assert session.query(Payment).filter_by(state='invoiced').count() == 5
     assert session.query(Payment).filter_by(state='paid').count() == 2
+
+    # now mark two as uninvoiced
+    page = client.get('/invoices')
+    url = page.pyquery('[data-action-url]').attr('data-action-url')
+    assert url
+    selected_ids = invoiced_invoice_ids[2:4]
+    response = client.post(
+        url,
+        json.dumps({'invoice_ids': selected_ids, 'state': 'uninvoiced'}),
+        content_type='application/json'
+    )
+    assert response.status_int == 200
+
+    session.expire_all()
+    assert session.query(Payment).filter_by(state='open').count() == 5
+    assert session.query(Payment).filter_by(state='invoiced').count() == 3
+    assert session.query(Payment).filter_by(state='paid').count() == 2
+
+    # mark two as open again
+    page = client.get('/invoices')
+    url = page.pyquery('[data-action-url]').attr('data-action-url')
+    assert url
+    selected_ids = invoiced_invoice_ids[:2]
+    response = client.post(
+        url,
+        json.dumps({'invoice_ids': selected_ids, 'state': 'open'}),
+        content_type='application/json'
+    )
+    assert response.status_int == 200
+
+    session.expire_all()
+    assert session.query(Payment).filter_by(state='open').count() == 5
+    assert session.query(Payment).filter_by(state='invoiced').count() == 5
+    assert session.query(Payment).filter_by(state='paid').count() == 0
