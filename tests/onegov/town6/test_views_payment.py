@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import transaction
 
 from datetime import datetime, timezone
@@ -201,6 +200,17 @@ def test_view_payments_invoices_handle_batch_set(client: Client) -> None:
     assert session.query(Payment).filter_by(state='open').count() == 5
     assert session.query(Payment).filter_by(state='invoiced').count() == 5
     assert session.query(Payment).filter_by(state='paid').count() == 0
+
+    # submit invalid batch state
+    page = client.get('/invoices')
+    url = page.pyquery('[data-action-url]').attr('data-action-url')
+    response = client.post(
+        url,
+        json.dumps({'invoice_ids': open_invoice_ids[:2], 'state': 'invalid'}),
+        content_type='application/json',
+        expect_errors=True
+    )
+    assert response.status_code == 400
 
     # select two open payments and submit the batch action
     # to mark them as invoiced
