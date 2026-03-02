@@ -420,7 +420,8 @@ def generate_accounting_export_rows(
             raise ValueError(f'Unknown finanzstelle: {report.finanzstelle}')
         kostenstelle = finanzstelle_info.kostenstelle
 
-        row_2603 = [
+        # row 2603
+        yield [
             'L001',
             pers_nr,
             date_str,
@@ -454,10 +455,10 @@ def generate_accounting_export_rows(
             '',
             'L001',
         ]
-        yield row_2603
 
         if report.travel_compensation > 0:
-            row_8102_travel = [
+            # row 8102 travel
+            yield [
                 'L001',
                 pers_nr,
                 date_str,
@@ -491,10 +492,10 @@ def generate_accounting_export_rows(
                 '',
                 'L001',
             ]
-            yield row_8102_travel
 
         if report.meal_allowance > 0:
-            row_8102_meal = [
+            # row 8102 meal
+            yield [
                 'L001',
                 pers_nr,
                 date_str,
@@ -528,7 +529,6 @@ def generate_accounting_export_rows(
                 '',
                 'L001',
             ]
-            yield row_8102_meal
 
 
 @TranslatorDirectoryApp.view(

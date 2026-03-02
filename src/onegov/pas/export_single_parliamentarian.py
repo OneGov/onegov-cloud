@@ -92,7 +92,7 @@ def generate_parliamentarian_settlement_pdf(
             </div>
 
             <div class="date">
-                Zug {settlement_run.end.strftime('%d.%m.%Y')}
+                Zug, {settlement_run.end.strftime('%d.%m.%Y')}
             </div>
 
             <h2 class="title">
