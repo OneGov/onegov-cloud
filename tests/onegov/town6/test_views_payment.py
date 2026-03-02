@@ -143,3 +143,97 @@ def test_view_payments_filter_by_payment_type(client: Client) -> None:
     assert '30.00' not in filtered_page.text
     assert 'Stripe Connect' in filtered_page.text
     assert "No payments found." not in filtered_page.text
+
+
+def test_view_payments_invoices_handle_batch_set(client: Client) -> None:
+    import json
+    from onegov.org.models.ticket import FormSubmissionTicket
+    from onegov.ticket import TicketInvoice
+    from uuid import uuid4
+
+    client.login_admin()
+    session = client.app.session()
+
+    transaction.begin()
+    open_invoice_ids = []
+    invoiced_invoice_ids = []
+    for i in range(10):
+        state = 'open' if i % 2 == 0 else 'invoiced'
+
+        ticket = FormSubmissionTicket(
+            number=f'FRM-{i:04d}-0001',
+            title=f'Test Ticket {i}',
+            group='Test',
+            handler_id=str(uuid4()),
+            state='pending',
+            handler_data={}
+        )
+        session.add(ticket)
+
+        invoice = TicketInvoice(id=uuid4())
+        session.add(invoice)
+        ticket.invoice = invoice
+
+        payment = Payment(
+            source='manual',
+            amount=Decimal('10.00') + i,
+            currency='CHF',
+            state=state
+        )
+        session.add(payment)
+
+        invoice_item = invoice.add(
+            group='test',
+            text=f'Item {i}',
+            unit=Decimal('10.00') + i,
+            quantity=Decimal('1')
+        )
+        invoice_item.payments.append(payment)
+
+        if state == 'open':
+            open_invoice_ids.append(str(invoice.id))
+        if state == 'invoiced':
+            invoice.invoiced = True
+            invoiced_invoice_ids.append(str(invoice.id))
+
+    transaction.commit()
+
+    assert session.query(Payment).count() == 10
+    assert session.query(Payment).filter_by(state='open').count() == 5
+    assert session.query(Payment).filter_by(state='invoiced').count() == 5
+    assert session.query(Payment).filter_by(state='paid').count() == 0
+
+    # select two open payments and submit the batch action
+    # to mark them as invoiced
+    page = client.get('/invoices')
+    url = page.pyquery('[data-action-url]').attr('data-action-url')
+    selected_ids = open_invoice_ids[:2]
+    response = client.post(
+        url,
+        json.dumps({'invoice_ids': selected_ids, 'state': 'invoiced'}),
+        content_type='application/json'
+    )
+    assert response.status_int == 200
+
+    session.expire_all()
+    assert session.query(Payment).filter_by(state='open').count() == 3
+    assert session.query(Payment).filter_by(state='invoiced').count() == 7
+    assert session.query(Payment).filter_by(state='paid').count() == 0
+
+    # select two invoiced payments and submit the batch action
+    # to mark them as paid
+    page = client.get('/invoices')
+    url = page.pyquery('[data-action-url]').attr('data-action-url')
+    assert url
+    selected_ids = invoiced_invoice_ids[:2]
+    response = client.post(
+        url,
+        json.dumps({'invoice_ids': selected_ids, 'state': 'paid'}),
+        content_type='application/json'
+    )
+    assert response.status_int == 200
+
+    session.expire_all()
+    assert session.query(Payment).filter_by(state='open').count() == 3
+    assert session.query(Payment).filter_by(state='invoiced').count() == 5
+    assert session.query(Payment).filter_by(state='paid').count() == 2
