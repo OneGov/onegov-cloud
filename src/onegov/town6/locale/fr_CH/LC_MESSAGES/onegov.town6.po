@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-01-27 10:35+0100\n"
+"POT-Creation-Date: 2026-03-03 15:41+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -694,14 +694,14 @@ msgstr "Extension"
 msgid "Upload Date"
 msgstr "Date de téléchargement"
 
+msgid "Published until"
+msgstr "Publié jusqu'à"
+
 msgid "All Files"
 msgstr "Tous les fichiers"
 
 msgid "No files uploaded yet"
 msgstr "Aucun fichier téléchargé pour le moment"
-
-msgid "Published until"
-msgstr "Publié jusqu'à"
 
 msgid "You are trying to open a page for which you are not authorized."
 msgstr "Vous essayez d'ouvrir une page pour laquelle vous n'êtes pas autorisé."
@@ -762,6 +762,12 @@ msgstr "Terme de recherche"
 
 msgid "Skip navigation"
 msgstr "Ignorez la navigation"
+
+msgid "Modules"
+msgstr "Modules"
+
+msgid "User manual"
+msgstr "Manuel de l'utilisateur"
 
 msgid "Back to the homepage"
 msgstr "Retour à la page d'accueil"
@@ -1470,8 +1476,8 @@ msgstr "Nouveau message du client dans le ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -2378,9 +2384,6 @@ msgstr ""
 msgid "Select the images that should be shown inside this album."
 msgstr "Sélectionnez les images qui devraient être affichées dans cet album."
 
-msgid "Confirm selection"
-msgstr "Confirmer la sélection"
-
 msgid "This newsletter has not been sent yet."
 msgstr "Ce bulletin d'information n'a pas encore été envoyé."
 
@@ -2853,9 +2856,6 @@ msgstr "En-tête"
 msgid "Footer"
 msgstr "Bas de page"
 
-msgid "Modules"
-msgstr "Modules"
-
 msgid "Analytics"
 msgstr "Analytics"
 
@@ -2898,6 +2898,9 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Confirm selection"
+#~ msgstr "Confirmer la sélection"
 
 #~ msgid "Parties"
 #~ msgstr "Partis"

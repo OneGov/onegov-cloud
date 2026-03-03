@@ -301,7 +301,7 @@ def handle_gever_settings(
 @OrgApp.form(
     model=Organisation, name='kaba-settings', template='form.pt',
     permission=Secret, form=KabaSettingsForm, setting='dormakaba API',
-    icon='fa-key', order=400)
+    icon='fa-key', order=400, category='General')
 def handle_kaba_settings(
     self: Organisation,
     request: OrgRequest,

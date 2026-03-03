@@ -94,11 +94,24 @@
         <main>
             <header id="header" tal:define="header_options request.app.org.header_options or {}">
                 <div id="sticky-header-area">
-                    <div id="globals" class="globals" tal:define="toolbox global_tools|False" tal:condition="request.is_logged_in or request.authenticated_email">
+                    <div id="globals" class="globals" tal:define="toolbox global_tools|False; modules modules|False" tal:condition="request.is_logged_in or request.authenticated_email">
                         <div class="grid-container">
                         <div class="grid-x grid-padding-x">
                             <div class="cell small-12">
                                 <div class="global-header-flex ${'' if toolbox else 'centered'}">
+                                    <ul class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
+                                        <li>
+                                            <a href="#" data-dropdown="modules-dropdown" class="dropdown modules " i18n:translate>Modules</a>
+                                            <ul id="modules-dropdown" data-dropdown-content class="vertical menu">
+                                                <li tal:repeat="link modules.links">
+                                                    <tal:b replace="link(layout)" />
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <a class="docs" href="https://docs.admin.digital/" i18n:translate>User manual</a>
+                                        </li>
+                                    </ul>
                                     <ul tal:condition="toolbox" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
                                     <li tal:repeat="tool toolbox">
                                         <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">

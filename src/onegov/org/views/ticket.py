@@ -1734,6 +1734,14 @@ def view_tickets(
     owner = next((o for o in owners if o.active), None)
     submitter = next((s for s in submitters if s.active), None)
     layout = layout or TicketsLayout(self, request)
+    layout.editbar_links = [
+        Link(
+            _('Archived Tickets'),
+            request.class_link(
+                ArchivedTicketCollection, {'handler': 'ALL'}),
+            attrs={'class': 'ticket-archive'}
+        )
+    ]
 
     def archive_link(ticket: Ticket) -> str:
         return layout.csrf_protected_url(request.link(ticket, name='archive'))
@@ -1789,6 +1797,7 @@ def view_archived_tickets(
     owner = next((o for o in owners if o.active), None)
     submitter = next((s for s in submitters if s.active), None)
     layout = layout or ArchivedTicketsLayout(self, request)
+    layout.breadcrumbs[-1] = Link(_('Archived Tickets'), request.link(self))
 
     def action_link(ticket: Ticket) -> str:
         return ''

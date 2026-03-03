@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-02-18 16:10+0100\n"
+"POT-Creation-Date: 2026-03-03 15:37+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -210,6 +210,36 @@ msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
 msgid "New ticket"
 msgstr "Neues Ticket"
 
+msgid "Activate/deactivate modules"
+msgstr "Module aktivieren/deaktivieren"
+
+msgid "Latest news"
+msgstr "Aktuelles"
+
+msgid "Newsletter"
+msgstr "Newsletter"
+
+msgid "Events"
+msgstr "Veranstaltungen"
+
+msgid "Directories"
+msgstr "Verzeichnisse"
+
+msgid "People"
+msgstr "Personen"
+
+msgid "Forms"
+msgstr "Formulare"
+
+msgid "Surveys"
+msgstr "Umfragen"
+
+msgid "RIS Settings"
+msgstr "Ratsinformationssystem"
+
+msgid "Modules"
+msgstr "Module"
+
 msgid "Account"
 msgstr "Konto"
 
@@ -243,20 +273,11 @@ msgstr "Dateien"
 msgid "Images"
 msgstr "Bilder"
 
-msgid "Payment Provider"
-msgstr "Zahlungsanbieter"
-
 msgid "Payments"
 msgstr "Zahlungen"
 
 msgid "Invoices"
 msgstr "Rechnungen"
-
-msgid "Text modules"
-msgstr "Textbausteine"
-
-msgid "Settings"
-msgstr "Einstellungen"
 
 msgid "Users"
 msgstr "Benutzer"
@@ -264,23 +285,14 @@ msgstr "Benutzer"
 msgid "User groups"
 msgstr "Benutzergruppen"
 
-msgid "RIS Settings"
-msgstr "Ratsinformationssystem"
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "Text modules (Tickets)"
+msgstr "Textbausteine (Tickets)"
 
 msgid "Link Check"
 msgstr "Link-Prüfung"
-
-msgid "Archived Tickets"
-msgstr "Archivierte Tickets"
-
-msgid "Forms"
-msgstr "Formulare"
-
-msgid "Surveys"
-msgstr "Umfragen"
-
-msgid "Newsletter"
-msgstr "Newsletter"
 
 msgid "Management"
 msgstr "Verwaltung"
@@ -327,6 +339,9 @@ msgstr "Netto Betrag"
 
 msgid "Fee"
 msgstr "Gebühr"
+
+msgid "Payment Provider"
+msgstr "Zahlungsanbieter"
 
 msgid "Date Paid"
 msgstr "Datum Bezahlt"
@@ -1338,17 +1353,11 @@ msgstr "Schlussbemerkung"
 msgid "Closing remark at the end of the newsletter"
 msgstr "Schlussbemerkung am Ende des Newsletters"
 
-msgid "Latest news"
-msgstr "Aktuelles"
-
 msgid "Show only lead of news"
 msgstr "Nur Einleitung der News anzeigen"
 
 msgid "Only show the lead of the news and a \"read more\"link."
 msgstr "Nur die Einleitung der News und einen \"Weiterlesen\"-Link anzeigen."
-
-msgid "Events"
-msgstr "Veranstaltungen"
 
 msgid "Publications"
 msgstr "Publikationen"
@@ -3154,9 +3163,6 @@ msgstr "Zusätzliche Dateien verknüpfen"
 msgid "All directories"
 msgstr "Alle Verzeichnisse"
 
-msgid "Directories"
-msgstr "Verzeichnisse"
-
 msgid "All events"
 msgstr "Alle Veranstaltungen"
 
@@ -3295,9 +3301,6 @@ msgstr "Befragungszeiträume"
 msgid "Survey"
 msgstr "Umfrage"
 
-msgid "People"
-msgstr "Personen"
-
 msgid "Person"
 msgstr "Person"
 
@@ -3368,6 +3371,9 @@ msgstr "Rechnung"
 
 msgid "Discount / Surcharge"
 msgstr "Abzug / Zuschlag"
+
+msgid "Text modules"
+msgstr "Textbausteine"
 
 msgid "Text module"
 msgstr "Textbaustein"
@@ -4571,6 +4577,9 @@ msgstr "Navigation überspringen"
 
 msgid "Straight to ..."
 msgstr "Direkt zu ..."
+
+msgid "User manual"
+msgstr "Benutzerhandbuch"
 
 msgid "Back to the homepage"
 msgstr "Zurück zur Startseite"
@@ -7448,9 +7457,6 @@ msgstr "Kopfzeile"
 msgid "Footer"
 msgstr "Fusszeile"
 
-msgid "Modules"
-msgstr "Module"
-
 msgid "Analytics"
 msgstr "Web-Statistik"
 
@@ -7802,6 +7808,9 @@ msgstr "Alle Benutzer"
 
 msgid "All Submitters"
 msgstr "Alle Antragsteller"
+
+msgid "Archived Tickets"
+msgstr "Archivierte Tickets"
 
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"

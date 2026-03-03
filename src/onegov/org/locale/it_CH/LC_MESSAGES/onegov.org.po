@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-02-18 16:10+0100\n"
+"POT-Creation-Date: 2026-03-03 15:37+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -211,6 +211,36 @@ msgstr "È stato creato un ticket dalla loro chat"
 msgid "New ticket"
 msgstr "Nuovo biglietto"
 
+msgid "Activate/deactivate modules"
+msgstr "Attiva/disattiva moduli"
+
+msgid "Latest news"
+msgstr "Ultime notizie"
+
+msgid "Newsletter"
+msgstr "Abbonamento alla newsletter"
+
+msgid "Events"
+msgstr "Evento"
+
+msgid "Directories"
+msgstr "Cartelle"
+
+msgid "People"
+msgstr "Persone"
+
+msgid "Forms"
+msgstr "Moduli"
+
+msgid "Surveys"
+msgstr "Sondaggi"
+
+msgid "RIS Settings"
+msgstr "Impostazioni RIS"
+
+msgid "Modules"
+msgstr "Moduli"
+
 msgid "Account"
 msgstr "Conto"
 
@@ -244,20 +274,11 @@ msgstr "File"
 msgid "Images"
 msgstr "Immagini"
 
-msgid "Payment Provider"
-msgstr "Elaboratore dei pagamenti"
-
 msgid "Payments"
 msgstr "Pagamenti"
 
 msgid "Invoices"
 msgstr "Fatture"
-
-msgid "Text modules"
-msgstr "Moduli di testo"
-
-msgid "Settings"
-msgstr "Impostazioni"
 
 msgid "Users"
 msgstr "Utenti"
@@ -265,23 +286,14 @@ msgstr "Utenti"
 msgid "User groups"
 msgstr "Gruppi di utenti"
 
-msgid "RIS Settings"
-msgstr "Impostazioni RIS"
+msgid "Settings"
+msgstr "Impostazioni"
+
+msgid "Text modules (Tickets)"
+msgstr "Moduli di testo (Biglietti)"
 
 msgid "Link Check"
 msgstr "Controllo del collegamento"
-
-msgid "Archived Tickets"
-msgstr "Biglietto archiviati"
-
-msgid "Forms"
-msgstr "Moduli"
-
-msgid "Surveys"
-msgstr "Sondaggi"
-
-msgid "Newsletter"
-msgstr "Abbonamento alla newsletter"
 
 msgid "Management"
 msgstr "Gestione"
@@ -328,6 +340,9 @@ msgstr "Importo netto"
 
 msgid "Fee"
 msgstr "Tariffa"
+
+msgid "Payment Provider"
+msgstr "Elaboratore dei pagamenti"
 
 msgid "Date Paid"
 msgstr "Data di pagamento"
@@ -1340,17 +1355,11 @@ msgstr "Osservazione finale"
 msgid "Closing remark at the end of the newsletter"
 msgstr "Osservazione finale alla fine della newsletter"
 
-msgid "Latest news"
-msgstr "Ultime notizie"
-
 msgid "Show only lead of news"
 msgstr "Mostra solo l'estratto delle notizie"
 
 msgid "Only show the lead of the news and a \"read more\"link."
 msgstr "Mostra solo l'estratto delle notizie e un link \"leggi di più\"."
-
-msgid "Events"
-msgstr "Evento"
 
 msgid "Publications"
 msgstr "Pubblicazioni"
@@ -3164,9 +3173,6 @@ msgstr "Collegare file aggiuntivi"
 msgid "All directories"
 msgstr "Tutte le cartelle"
 
-msgid "Directories"
-msgstr "Cartelle"
-
 msgid "All events"
 msgstr "Tutti gli eventi"
 
@@ -3303,9 +3309,6 @@ msgstr "Finestre di invio"
 msgid "Survey"
 msgstr "Sondaggio"
 
-msgid "People"
-msgstr "Persone"
-
 msgid "Person"
 msgstr "Persona"
 
@@ -3376,6 +3379,9 @@ msgstr "Fattura"
 
 msgid "Discount / Surcharge"
 msgstr "Deduzione / Supplemento"
+
+msgid "Text modules"
+msgstr "Moduli di testo"
 
 msgid "Text module"
 msgstr "Modulo di testo"
@@ -4570,6 +4576,9 @@ msgstr "Migrazione dei link"
 
 msgid "Straight to ..."
 msgstr "Direttamente a ..."
+
+msgid "User manual"
+msgstr "Manuale utente"
 
 msgid "Back to the homepage"
 msgstr "Torna alla pagina principale"
@@ -7431,9 +7440,6 @@ msgstr "Intestazione"
 msgid "Footer"
 msgstr "Piè di pagina"
 
-msgid "Modules"
-msgstr "Moduli"
-
 msgid "Analytics"
 msgstr "Analitica"
 
@@ -7781,6 +7787,9 @@ msgstr "Tutti gli utenti"
 
 msgid "All Submitters"
 msgstr "Tutti i mittenti"
+
+msgid "Archived Tickets"
+msgstr "Biglietto archiviati"
 
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"

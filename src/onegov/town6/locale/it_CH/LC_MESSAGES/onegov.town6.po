@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-01-27 10:35+0100\n"
+"POT-Creation-Date: 2026-03-03 15:41+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -692,15 +692,15 @@ msgstr "Estensione"
 msgid "Upload Date"
 msgstr "Data di caricamento"
 
+msgid "Published until"
+msgstr "Pubblicato fino a"
+
 #, fuzzy
 msgid "All Files"
 msgstr "Tutti gli articoli"
 
 msgid "No files uploaded yet"
 msgstr "Nessun file caricato"
-
-msgid "Published until"
-msgstr "Pubblicato fino a"
 
 msgid "You are trying to open a page for which you are not authorized."
 msgstr "Stai cercando di aprire una pagina per la quale non sei autorizzato."
@@ -760,6 +760,12 @@ msgstr "Termine di ricerca"
 #, fuzzy
 msgid "Skip navigation"
 msgstr "Migrazione dei link"
+
+msgid "Modules"
+msgstr "Moduli"
+
+msgid "User manual"
+msgstr "Manuale utente"
 
 msgid "Back to the homepage"
 msgstr "Torna alla pagina principale"
@@ -1467,8 +1473,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -2367,10 +2373,6 @@ msgstr ""
 "Seleziona le immagini che dovrebbero essere mostrate all'interno di questo "
 "album."
 
-#, fuzzy
-msgid "Confirm selection"
-msgstr "Conferma"
-
 msgid "This newsletter has not been sent yet."
 msgstr "Questa newsletter non è stata ancora inviata."
 
@@ -2842,9 +2844,6 @@ msgstr "Intestazione"
 msgid "Footer"
 msgstr "Piè di pagina"
 
-msgid "Modules"
-msgstr "Moduli"
-
 msgid "Analytics"
 msgstr "Analitica"
 
@@ -2888,6 +2887,10 @@ msgstr "Sistema di informazione sui ratti (RIS)"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#, fuzzy
+#~ msgid "Confirm selection"
+#~ msgstr "Conferma"
 
 #~ msgid "Parties"
 #~ msgstr "Partiti"
