@@ -15,8 +15,8 @@ from onegov.election_day.models import BallotResult
 from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Vote
 
-
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from click.testing import Result
     from onegov.core.orm import SessionManager
@@ -429,26 +429,31 @@ def test_update_archived_results(
     redis_url: str,
     session_manager: SessionManager
 ) -> None:
-
+    session = session_manager.session()
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
-    write_principal(temporary_directory, 'Govikon', entity='1200')
+    write_principal(
+        temporary_directory,
+        "Govikon",
+        entity="1200",
+        params={"official_host": "https://wab.govikon.ch"},
+    )
     assert run_command(cfg_path, 'govikon', ['add']).exit_code == 0
 
     add_vote(1, session_manager)
 
-    assert run_command(
+    result = (run_command(
         cfg_path,
         'govikon',
-        ['update-archived-results']
-    ).exit_code == 0
+        [
+            'update-archived-results',
+        ]
+    ))
+    assert result.exit_code == 0
+    assert 'Official host is not set!' in result.stdout
+    assert session.query(ArchivedResult).count() == 0
 
-    session = session_manager.session()
-    assert session.query(ArchivedResult).one().url == (
-        'http://localhost:8080/onegov_election_day/govikon/vote/vote-1'
-    )
-
-    assert run_command(
+    result = run_command(
         cfg_path,
         'govikon',
         [
@@ -456,7 +461,9 @@ def test_update_archived_results(
             '--host', 'wab.govikon.ch',
             '--scheme', 'https'
         ]
-    ).exit_code == 0
+    )
+    assert result.exit_code == 0
+    assert 'Official host is not set!' not in result.stdout
 
     assert session.query(ArchivedResult).one().url == (
         'https://wab.govikon.ch/onegov_election_day/govikon/vote/vote-1'

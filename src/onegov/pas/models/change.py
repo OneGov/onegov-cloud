@@ -118,6 +118,10 @@ class Change(Base, ContentMixin, TimestampMixin):
         return None
 
     @property
+    def abschluss(self) -> bool:
+        return bool((self.changes or {}).get('abschluss', False))
+
+    @property
     def parliamentarian(self) -> PASParliamentarian | None:
         parliamentarian_id = (self.changes or {}).get('parliamentarian_id')
         if self.model == 'attendence' and parliamentarian_id:
@@ -170,6 +174,7 @@ class Change(Base, ContentMixin, TimestampMixin):
                 attendence.commission.title
                 if attendence.commission else ''
             ),
+            'abschluss': attendence.abschluss,
         }
         request.session.add(change)
         return change
