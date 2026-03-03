@@ -1,34 +1,31 @@
 """ Provides commands used to initialize org websites. """
 from __future__ import annotations
-import base64
-import json
 
+import base64
 import click
 import html
 import isodate
+import json
+import locale
+import pytz
 import re
+import requests
 import shutil
 import sys
 import textwrap
-
-from bs4 import BeautifulSoup
-from collections import defaultdict
-from datetime import date, datetime, timedelta
-from io import BytesIO
-
-import pytz
-import locale
-import requests
 import transaction
 import yaml
 
-from onegov.core.orm.utils import QueryChain
+from collections import defaultdict
+from datetime import date, datetime, timedelta
+from io import BytesIO
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
                                    TimerangeTooLong)
 from markupsafe import Markup
 from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.crypto import random_token
+from onegov.core.orm.utils import QueryChain
 from onegov.core.utils import Bunch
 from onegov.directory import (
     Directory,
@@ -51,6 +48,7 @@ from onegov.form import (
     FormSubmissionCollection,
 )
 from onegov.form.errors import FormError
+from onegov.form.utils import remove_empty_links
 from onegov.newsletter.collection import RecipientCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
@@ -92,9 +90,10 @@ from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
 
-from typing import IO, Any, TYPE_CHECKING, TypedDict
 
+from typing import IO, Any, TypedDict, TYPE_CHECKING
 if TYPE_CHECKING:
+    from bs4 import Tag
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
     from onegov.core.cli.core import GroupContext
@@ -972,30 +971,21 @@ def delete_invisible_links() -> Callable[[OrgRequest, OrgApp], None]:
             fg='yellow'
         ))
 
-        invisible_links = []
+        invisible_links: list[Tag] = []
         for page in models:
             # Find links with no text, only br tags and/or whitespaces
             for field in page.content_fields_containing_links_to_files:
                 if not page.content.get(field):
                     continue
-                soup = BeautifulSoup(page.content.get(field), 'html.parser')
-                for link in soup.find_all('a'):
-                    if not any(
-                        tag.name != 'br' and (
-                            tag.name or not tag.isspace()
-                        ) for tag in link.contents
-                    ):
-                        invisible_links.append(link)
-                        if all(tag.name == 'br' for tag in link.contents):
-                            link.replace_with(
-                                BeautifulSoup('<br/>', 'html.parser')
-                            )
-                        else:
-                            link.decompose()
+
+                cleaned = remove_empty_links(
+                    page.content.get(field),
+                    invisible_links
+                )
 
                 # Save the modified HTML back to page.text
-                if page.content[field] != str(soup):
-                    page.content[field] = str(soup)
+                if page.content[field] != cleaned:
+                    page.content[field] = cleaned
 
         click.echo(
             click.style(
