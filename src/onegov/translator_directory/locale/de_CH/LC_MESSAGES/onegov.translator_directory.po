@@ -584,7 +584,7 @@ msgid "Notes"
 msgstr "Notizen"
 
 msgid "Please select a location"
-msgstr "Bitte wählen Sie einen Standort"
+msgstr "Bitte wählen Sie einen Einsatzort"
 
 msgid "End time must be after start time"
 msgstr "Endzeit muss nach Startzeit liegen"

@@ -2215,74 +2215,6 @@ def test_view_time_reports(client: Client) -> None:
     assert '162.75' in page
 
 
-def test_time_reports_finanzstelle_filtering(client: Client) -> None:
-    """Test that non-admin users only see reports from their finanzstelle."""
-
-    session = client.app.session()
-    translators = TranslatorCollection(client.app)
-    translator1 = translators.add(
-        first_name='Test1',
-        last_name='Translator1',
-        admission='certified',
-        email='translator1@example.org',
-    )
-    translator2 = translators.add(
-        first_name='Test2',
-        last_name='Translator2',
-        admission='certified',
-        email='translator2@example.org',
-    )
-
-    report1 = TranslatorTimeReport(
-        translator_id=translator1.id,
-        assignment_type='consecutive',
-        finanzstelle='migrationsamt',
-        duration=90,
-        case_number='CASE-001',
-        assignment_date=date(2025, 1, 15),
-        hourly_rate=Decimal('90.0'),
-        travel_compensation=Decimal('50.0'),
-        total_compensation=Decimal('162.75'),
-        status='pending',
-    )
-    report2 = TranslatorTimeReport(
-        translator_id=translator2.id,
-        assignment_type='consecutive',
-        finanzstelle='polizei',
-        duration=120,
-        case_number='CASE-002',
-        assignment_date=date(2025, 1, 16),
-        hourly_rate=Decimal('100.0'),
-        travel_compensation=Decimal('60.0'),
-        total_compensation=Decimal('200.00'),
-        status='pending',
-    )
-    session.add(report1)
-    session.add(report2)
-    session.flush()
-    transaction.commit()
-
-    user_group_collection = UserGroupCollection(session)
-    user_group = user_group_collection.add(name='migrationsamt_group')
-    user_group.meta = {
-        'finanzstelle': 'migrationsamt',
-        'accountant_emails': ['accountant@example.org'],
-    }
-
-    session.add(User(
-        username='accountant@example.org',
-        password_hash=hash_password('password'),
-        role='member'
-    ))
-    transaction.commit()
-
-    client.login(username='accountant@example.org', password='password')
-    page = client.get('/time-reports')
-
-    assert '162.75' in page
-    assert '200.00' not in page
-
-
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
@@ -3072,7 +3004,7 @@ def test_time_report_telephonic_no_location(client: Client) -> None:
     page.form['case_number'] = 'PHONE-123'
     page.form['notes'] = 'Telephonic interpretation'
     page = page.form.submit()
-    assert 'Bitte wählen Sie einen Standort' in page
+    assert 'Bitte wählen Sie einen Einsatzort' in page
 
     # proceed testing
     page.form['assignment_type'] = 'telephonic'
@@ -3118,67 +3050,14 @@ def test_delete_time_report(
     connect: MagicMock,
     client: Client,
 ) -> None:
-    """Test that admins and accountants can delete time reports."""
-    session = client.app.session()
-    create_languages(session)
-    translators = TranslatorCollection(client.app)
-    translator = translators.add(
-        first_name='Test',
-        last_name='Translator',
-        admission='certified',
-        email='translator@example.org',
-        drive_distance=35.0,
-    )
-    translator_id = translator.id
-
-    user_group_collection = UserGroupCollection(session)
-    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
-    user_group.meta = {
-        'finanzstelle': 'migrationsamt_und_passbuero',
-        'accountant_emails': ['editor@example.org'],
-    }
-    transaction.commit()
-
+    """Test that only admins can access /time-reports."""
     client.login_member()
-    page = client.get(f'/translator/{translator_id}')
-    page = page.click('Zeit erfassen')
-    page.form['assignment_type'] = 'telephonic'
-    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
-    page.form['start_date'] = '2025-01-15'
-    page.form['start_time'] = '10:00'
-    page.form['end_date'] = '2025-01-15'
-    page.form['end_time'] = '11:30'
-    page.form['case_number'] = 'DELETE-TEST'
-    page = page.form.submit().follow()
-
-    time_report = (
-        session.query(TranslatorTimeReport)
-        .filter_by(translator_id=translator_id)
-        .first()
-    )
-    assert time_report is not None
-    report_id = time_report.id
-
-    client.login_member()
-    page = client.get('/time-reports')
-    assert 'Delete</a>' not in str(page)
+    page = client.get('/time-reports', expect_errors=True)
+    assert page.status_code == 403
 
     client.login_editor()
-    page = client.get('/time-reports')
-    csrf_token_match = re.search(
-        r'\?csrf-token=([a-zA-Z0-9\._\-]+)', str(page)
-    )
-    assert csrf_token_match is not None
-    csrf_token = csrf_token_match.group(1)
-
-    response = client.delete(
-        f'/time-report/{report_id}?csrf-token={csrf_token}',
-    )
-    assert response.status_code == 200
-
-    session.expire_all()
-    time_report = session.get(TranslatorTimeReport, report_id)
-    assert time_report is None
+    page = client.get('/time-reports', expect_errors=True)
+    assert page.status_code == 403
 
 
 @patch('onegov.websockets.integration.connect')

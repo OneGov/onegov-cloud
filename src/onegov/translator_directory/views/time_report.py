@@ -23,7 +23,7 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 )
 
 from onegov.core.elements import Confirm, Intercooler, Link
-from onegov.core.security import Private, Personal
+from onegov.core.security import Secret, Private, Personal
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.org.cli import close_ticket
 from onegov.org.mail import send_ticket_mail
@@ -71,7 +71,7 @@ if TYPE_CHECKING:
 @TranslatorDirectoryApp.html(
     model=TimeReportCollection,
     template='time_reports.pt',
-    permission=Personal,
+    permission=Secret,
 )
 def view_time_reports(
     self: TimeReportCollection,
@@ -91,18 +91,9 @@ def view_time_reports(
         )
         archive_toggle_text = _('Show archived (exported) reports')
 
-    user_finanzstelles = self._get_user_finanzstelles(request)
-    finanzstelle_names = []
-    for fs_key in user_finanzstelles:
-        fs_info = FINANZSTELLE.get(fs_key)
-        if fs_info:
-            finanzstelle_names.append(fs_info.name)
+    reports = list(self.query())
 
-    query = self.query()
-    query = self._apply_finanzstelle_filter(query, request)
-    reports = list(query)
-
-    unexported_count = self.for_accounting_export(request).count()
+    unexported_count = self.for_accounting_export().count()
     export_link = None
     if unexported_count > 0 and not self.archive:
         export_link = Link(
@@ -178,7 +169,6 @@ def view_time_reports(
         'archive': self.archive,
         'archive_toggle_url': archive_toggle_url,
         'archive_toggle_text': archive_toggle_text,
-        'finanzstelle_names': finanzstelle_names,
     }
 
 
@@ -534,7 +524,7 @@ def generate_accounting_export_rows(
 @TranslatorDirectoryApp.view(
     model=TimeReportCollection,
     name='export-accounting',
-    permission=Personal,
+    permission=Secret,
 )
 def export_accounting_csv(
     self: TimeReportCollection,
@@ -544,7 +534,7 @@ def export_accounting_csv(
 
     request.assert_valid_csrf_token()
 
-    confirmed_reports = list(self.for_accounting_export(request))
+    confirmed_reports = list(self.for_accounting_export())
     if not confirmed_reports:
         request.message(_('No unexported time reports found'), 'warning')
         return request.redirect(request.link(self))
