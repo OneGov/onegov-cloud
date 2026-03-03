@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-02-10 15:41+0100\n"
+"POT-Creation-Date: 2026-03-03 15:11+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -391,9 +391,6 @@ msgstr "Postleitzahl muss aus 4 Ziffern bestehen"
 msgid "A translator with this email already exists"
 msgstr "Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits"
 
-msgid "A time report already exists for this start time"
-msgstr "Für diese Startzeit existiert bereits eine Zeiterfassung"
-
 msgid "Please confirm the correctness of the above data."
 msgstr "Bitte bestätigen Sie die Richtigkeit der vorstehenden Daten."
 
@@ -539,16 +536,12 @@ msgstr "Art der Übersetzung/Dolmetschung"
 msgid "Assignment Location"
 msgstr "Einsatzort"
 
-msgid "Location Override (manual entry)"
-msgstr "Ortsangabe überschreiben (manuelle Eingabe)"
+msgid "Different place"
+msgstr "Anderer Ort"
 
-msgid ""
-"Enter a custom location address. Travel compensation will be calculated "
-"based on the geocoded location. Example: Beckenstube 1, 8200 Schaffhausen"
+msgid "Enter the address of the assignment location"
 msgstr ""
-"Geben Sie eine benutzerdefinierte Ortsadresse ein. Die "
-"Reisekostenentschädigung wird basierend auf dem geokodierten Standort "
-"berechnet. Beispiel: Beckenstube 1, 8200 Schaffhausen"
+"Adresse des Einsatzortes. Beispiel: Friedbergstrasse 36, 8200 Schaffhausen"
 
 msgid "Cost center"
 msgstr "Finanzstelle"
@@ -571,6 +564,13 @@ msgstr "Pausenzeit, in Stunden"
 msgid "Case Number"
 msgstr "Geschäfts- oder Verfahrensnummer"
 
+msgid ""
+"Exceptionally urgent (only for assignments with less than 4 hours advance "
+"notice)"
+msgstr ""
+"Ausserordentlich dringlich (nur bei Aufgeboten mit weniger als 4 Stunden "
+"Vorlaufzeit)"
+
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
 
@@ -588,6 +588,12 @@ msgstr "Bitte wählen Sie einen Standort"
 
 msgid "End time must be after start time"
 msgstr "Endzeit muss nach Startzeit liegen"
+
+msgid "A time report already exists for this start time"
+msgstr "Für diese Startzeit existiert bereits eine Zeiterfassung"
+
+msgid "Other location (please enter address in next field)"
+msgstr "Anderer Ort (bitte Adresse im nächsten Feld eingeben)"
 
 msgid "Contract Number"
 msgstr "Vertragsnummer"
@@ -1211,66 +1217,3 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
-
-#~ msgid "Showing archived (exported) time reports."
-#~ msgstr "Zeigt archivierte (exportierte) Zeiterfassungen an."
-
-#~ msgid ""
-#~ "No confirmed time reports available for export. Time reports must be "
-#~ "confirmed before they can be exported."
-#~ msgstr ""
-#~ "Keine bestätigten Zeiterfassungen für den Export verfügbar. "
-#~ "Zeiterfassungen müssen bestätigt werden, bevor sie exportiert werden "
-#~ "können."
-
-#~ msgid "Month"
-#~ msgstr "Monat"
-
-#~ msgid "Year"
-#~ msgstr "Jahr"
-
-#~ msgid "Export für Buchhaltung"
-#~ msgstr "Export für Buchhaltung"
-
-#~ msgid "January"
-#~ msgstr "Januar"
-
-#~ msgid "February"
-#~ msgstr "Februar"
-
-#~ msgid "March"
-#~ msgstr "März"
-
-#~ msgid "April"
-#~ msgstr "April"
-
-#~ msgid "May"
-#~ msgstr "Mai"
-
-#~ msgid "June"
-#~ msgstr "Juni"
-
-#~ msgid "July"
-#~ msgstr "Juli"
-
-#~ msgid "August"
-#~ msgstr "August"
-
-#~ msgid "September"
-#~ msgstr "September"
-
-#~ msgid "October"
-#~ msgstr "Oktober"
-
-#~ msgid "November"
-#~ msgstr "November"
-
-#~ msgid "December"
-#~ msgstr "Dezember"
-
-#~ msgid "Invalid form data"
-#~ msgstr "Ungültige Formulardaten"
-
-#, python-format
-#~ msgid "No confirmed time reports found for ${month}/${year}"
-#~ msgstr "Keine bestätigten Zeiterfassungen gefunden für ${month}/${year}"

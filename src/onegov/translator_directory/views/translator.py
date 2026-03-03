@@ -583,10 +583,10 @@ def add_time_report(
         assert form.assignment_type.data is not None
 
         if form.assignment_type.data == 'on-site':
-            location = (
-                form.assignment_location_override.data
-                or form.assignment_location.data
-            )
+            if form.assignment_location.data == 'other':
+                location = form.assignment_location_override.data or None
+            else:
+                location = form.assignment_location.data or None
         else:
             location = None
 
