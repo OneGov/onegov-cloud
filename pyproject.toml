@@ -52,7 +52,7 @@ strict = true
 implicit_reexport = true
 warn_unreachable = true
 warn_return_any = false
-untyped_calls_exclude = "pycurl,selenium.webdriver.chrome.webdriver"
+untyped_calls_exclude = "icalendar,pycurl,selenium.webdriver.chrome.webdriver"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
 [[tool.mypy.overrides]]
