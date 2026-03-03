@@ -13,10 +13,11 @@
         <div tal:repeat="image imageset.ordered_files" tal:condition="imageset.view == 'full'" class="page-text full-imageset photoswipe">
             <!--! the first three images are loaded conventionally, the rest are loaded lazily -->
             <tal:b tal:define="size getattr(image.reference, 'size', None)">
-                <span tal:condition="not size">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span i18n:translate="">Cannot display</span> ${image.name}
-                </span>
+                <tal:b tal:condition="image.reference.content_type.startswith('video/')">
+                    <video controls preload="metadata" style="width: 100%">
+                        <source src="${request.link(image)}" tal:attributes="type image.reference.content_type" />
+                    </video>
+                </tal:b>
                 <p class="has-img" tal:condition="size and repeat.image.number <= 3">
                     <img src="${request.link(image)}" alt="${image.note}"
                          tal:attributes="width size and size[0];
@@ -34,13 +35,14 @@
             <div class="image-grid">
                 <div tal:repeat="image imageset.ordered_files" class="image-container">
                     <tal:b tal:define="size getattr(image.reference, 'size', None);
-                            thumb_size getattr(image.reference, 'thumbnail_small') and getattr(getattr(image.reference, 'thumbnail_small'), 'size') or size;">
-                        <span tal:condition="not size">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span i18n:translate="">Cannot display</span> ${image.name}
-                        </span>
+                            thumb_size python: (image.reference.get('thumbnail_small') or {}).get('size') or size;">
+                        <tal:b tal:condition="image.reference.content_type.startswith('video/')">
+                            <video controls preload="metadata" style="width: 100%">
+                                <source src="${request.link(image)}" tal:attributes="type image.reference.content_type" />
+                            </video>
+                        </tal:b>
                         <tal:b tal:condition="size" tal:define="size getattr(image.reference, 'size', None);
-                                thumb_size getattr(image.reference, 'thumbnail_small') and getattr(getattr(image.reference, 'thumbnail_small'), 'size') or size;
+                                thumb_size python: (image.reference.get('thumbnail_small') or {}).get('size') or size;
                                 width thumb_size and thumb_size[0];
                                 height thumb_size and thumb_size[1];
                                 full_width size and size[0];

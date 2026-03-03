@@ -12,10 +12,14 @@
                         <div class="grid-x columns small-up-2 image-card-grid">
                             <tal:b tal:repeat="image imageset.ordered_files">
                                 <tal:b tal:define="size getattr(image.reference, 'size', None)">
-                                    <div tal:condition="size and repeat.image.number <= 4" class="cell">
-                                        <img src="${request.link(image)}" alt="${image.note}"
+                                    <div tal:condition="repeat.image.number <= 4" class="cell">
+                                        <img tal:condition="size" src="${request.link(image)}" alt="${image.note}"
                                              tal:attributes="width size and size[0];
                                                              height size and size[1]" />
+                                        <video tal:condition="image.reference.content_type.startswith('video/')" muted preload="metadata" style="width: 100%" alt="${image.note}">
+                                            <source src="${request.link(image)}#t=0.001"
+                                                    tal:attributes="type image.reference.content_type" />
+                                        </video>
                                     </div>
                                 </tal:b>
                             </tal:b>
