@@ -8,6 +8,7 @@ from onegov.org.models.extensions import ContactExtension
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.org.models.extensions import HoneyPotExtension
+from onegov.org.models.extensions import LocalizeableExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.search import SearchableContent
 from onegov.ticket import TicketCollection
@@ -40,7 +41,8 @@ class BuiltinFormDefinition(FormDefinition, AccessExtension,
 class CustomFormDefinition(FormDefinition, AccessExtension,
                            ContactExtension, PersonLinkExtension,
                            CoordinatesExtension, SearchableContent,
-                           HoneyPotExtension, GeneralFileLinkExtension):
+                           HoneyPotExtension, GeneralFileLinkExtension,
+                           LocalizeableExtension):
     __mapper_args__ = {'polymorphic_identity': 'custom'}
 
     fts_type_title = _('Forms')

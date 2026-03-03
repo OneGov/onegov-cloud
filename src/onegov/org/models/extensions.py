@@ -3,7 +3,6 @@ from __future__ import annotations
 import re
 
 import json
-from babel import Locale
 from collections import OrderedDict
 from functools import cached_property
 
@@ -1291,6 +1290,14 @@ class InlinePhotoAlbumExtension(ContentExtension):
 class LocalizeableExtension(ContentExtension):
 
     locale: dict_property[str | None] = meta_property()
+
+    # FIXME: We should probably use an association table with ON UPDATE CASCADE
+    #        so we can easily handle forms getting renamed. Or we use a shared
+    #        id like order_id on Ticket to group the versions together, but for
+    #        a demo this should suffice, we just have to make sure we propagate
+    #        changes to the name to all the linked form definitions, this would
+    #        be more robust with an observer, but we can get away with just
+    #        doing it manually in any view that changes the name.
     alt_locale_ids: dict_property[dict[str, Any]] = meta_property(default=dict)
 
     def localized_url(self, request: OrgRequest) -> str | None:
@@ -1326,34 +1333,20 @@ class LocalizeableExtension(ContentExtension):
             return form_class
 
         assert request.locale is not None
-        loc = Locale.parse(request.locale)
 
         class LocalizeableForm(form_class):  # type:ignore
-            locale = RadioField(
-                label=_('Languages'),
-                choices=(
-                    (
-                        locale,
-                        (loc.get_language_name(locale) or locale).capitalize()
-                    )
-                    for locale in sorted(request.app.locales)
-                ),
-                validators=[InputRequired()]
-            )
 
-            show_preview_image = BooleanField(
-                label=_('Show image on preview on the parent page'),
-                default=True,
-            )
+            def populate_obj(
+                self,
+                obj: LocalizeableExtension,
+                *args: Any,
+                **kwargs: Any
+            ) -> None:
+                super().populate_obj(obj, *args, **kwargs)
 
-            show_page_image = BooleanField(
-                label=_('Show image on page'),
-                default=True,
-            )
-
-            position_choices = [
-                ('in_content', _('As first element of the content')),
-                ('header', _('As a full width header')),
-            ]
+                # NOTE: For now we just assume the form should have the
+                #       same locale as we do.
+                if obj.locale is None:
+                    obj.locale = request.locale
 
         return LocalizeableForm

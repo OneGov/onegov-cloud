@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from babel import Locale
 from functools import cached_property
-from onegov.core.elements import Link
+from onegov.core.elements import Link, LinkGroup
 from onegov.fedpol import _
 from onegov.form import FormCollection, FormDefinition, FormSubmission
 from onegov.form.parser import parse_form
@@ -9,6 +10,7 @@ from onegov.org.models.ticket import FormSubmissionTicket
 from onegov.stepsequence import step_sequences, Step
 from onegov.town6.layout import DefaultLayout
 from onegov.town6.layout import (
+    FormSubmissionLayout as TownFormSubmissionLayout,
     TicketChatMessageLayout as TownTicketChatMessageLayout)
 
 
@@ -102,6 +104,40 @@ class FormSubmissionStepLayout(DefaultLayout):
             Step(_('Check'), cls_name, num_steps + 1, end_name, cls_name),
             Step(_('Confirmation'), cls_name, num_steps + 2, None, cls_name),
         ]
+
+
+class FormSubmissionLayout(TownFormSubmissionLayout):
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        links = super().editbar_links
+        if (
+            not links
+            or len(self.request.app.locales) < 2
+            or not getattr(self.model, 'locale', None)
+        ):
+            return links
+
+        assert hasattr(self.model, 'locale')
+        assert self.request.locale is not None
+        links.insert(-1, LinkGroup(
+            title=_('Translations'),
+            links=[
+                Link(
+                    text=(Locale.parse(locale).get_language_name(
+                        self.request.locale) or locale).capitalize(),
+                    url=self.request.link(
+                        self.model,
+                        'translate',
+                        query_params={'locale': locale}
+                    ),
+                    attrs={'class': 'edit-link'}
+                )
+                for locale in sorted(self.request.app.locales)
+                if locale != self.model.locale
+            ]
+        ))
+        return links
 
 
 class TicketChatMessageLayout(TownTicketChatMessageLayout):
