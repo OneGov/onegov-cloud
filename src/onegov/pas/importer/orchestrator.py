@@ -449,7 +449,7 @@ class KubImporter:
                                 f'⊘ {result.title}: Person not found in API'
                             )
                         else:
-                            self.output.error(
+                            self.output.info(
                                 f'✗ Failed to fetch {result.title}: '
                                 f'{result.error}'
                             )

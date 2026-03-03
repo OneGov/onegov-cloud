@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-01-27 10:35+0100\n"
+"POT-Creation-Date: 2026-02-26 13:35+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -694,14 +694,14 @@ msgstr "Extension"
 msgid "Upload Date"
 msgstr "Date de téléchargement"
 
+msgid "Published until"
+msgstr "Publié jusqu'à"
+
 msgid "All Files"
 msgstr "Tous les fichiers"
 
 msgid "No files uploaded yet"
 msgstr "Aucun fichier téléchargé pour le moment"
-
-msgid "Published until"
-msgstr "Publié jusqu'à"
 
 msgid "You are trying to open a page for which you are not authorized."
 msgstr "Vous essayez d'ouvrir une page pour laquelle vous n'êtes pas autorisé."
@@ -732,6 +732,9 @@ msgstr "Aucune image téléchargée pour le moment"
 
 msgid "This album does not contain any images yet."
 msgstr "Cet album ne contient pas encore d'images."
+
+msgid "Cannot display"
+msgstr "Impossible d'afficher"
 
 msgid "No photo albums defined yet."
 msgstr "Aucun album photo défini pour le moment."

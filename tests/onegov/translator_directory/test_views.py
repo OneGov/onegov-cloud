@@ -3315,3 +3315,72 @@ def test_export_time_reports(client: Client) -> None:
     assert report is not None
     assert report.status == 'confirmed'
     assert report.exported is False
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_time_report_duplicate_start_time_rejected(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    """Two reports with same start time on same day are rejected."""
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+    ).id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(
+        name='migrationsamt_und_passbuero'
+    )
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'telephonic'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '08:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '09:00'
+    page.form['case_number'] = 'CASE-001'
+    page = page.form.submit().follow()
+
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'telephonic'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '08:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '09:30'
+    page.form['case_number'] = 'CASE-002'
+    page = page.form.submit()
+
+    assert page.status_int == 200
+    assert (
+        'Für diese Startzeit existiert bereits eine Zeiterfassung' in page
+    )
+
+    session.expire_all()
+    reports = (
+        session.query(TranslatorTimeReport)
+        .filter_by(translator_id=translator_id)
+        .all()
+    )
+    assert len(reports) == 1

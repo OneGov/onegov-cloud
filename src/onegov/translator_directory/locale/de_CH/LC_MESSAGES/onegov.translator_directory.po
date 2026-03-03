@@ -391,6 +391,9 @@ msgstr "Postleitzahl muss aus 4 Ziffern bestehen"
 msgid "A translator with this email already exists"
 msgstr "Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits"
 
+msgid "A time report already exists for this start time"
+msgstr "Für diese Startzeit existiert bereits eine Zeiterfassung"
+
 msgid "Please confirm the correctness of the above data."
 msgstr "Bitte bestätigen Sie die Richtigkeit der vorstehenden Daten."
 
