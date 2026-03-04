@@ -210,3 +210,59 @@ def handle_translate_definition(
         'form': form,
         'form_width': 'large',
     }
+
+
+@FedpolApp.form(
+    model=CustomFormDefinition,
+    template='form.pt',
+    permission=Private,
+    form=get_form_class,
+    pass_model=True,
+    name='duplicate'
+)
+def handle_duplicate_definition(
+    self: CustomFormDefinition,
+    request: FedpolRequest,
+    form: FormDefinitionForm
+) -> RenderData | Response:
+
+    collection = FormCollection(request.session)
+    if form.submitted(request):
+        assert form.title.data is not None
+        assert form.definition.data is not None
+
+        if collection.definitions.by_name(normalize_for_url(form.title.data)):
+            request.alert(_('A form with this name already exists'))
+        else:
+            definition = collection.definitions.add(
+                title=form.title.data,
+                definition=form.definition.data,
+                type='custom'
+            )
+            assert isinstance(definition, CustomFormDefinition)
+            with request.session.no_autoflush:
+                form.populate_obj(definition)
+                definition.locale = self.locale
+
+            request.success(_('Added a new form'))
+            return morepath.redirect(request.link(definition))
+    elif not request.POST:
+        if form.title.data:
+            # FIXME: i18n
+            form.title.data += ' Kopie'
+
+    layout = FormEditorLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Forms'), request.link(collection)),
+        Link(self.title, request.link(self)),
+        Link(_('Duplicate'), '#')
+    ]
+    layout.edit_mode = True
+
+    return {
+        'layout': layout,
+        'title': _('Duplicate'),
+        'form': form,
+        'form_width': 'large',
+    }

@@ -118,6 +118,13 @@ class FormSubmissionLayout(TownFormSubmissionLayout):
         ):
             return links
 
+        if getattr(self.model, 'type', None) == 'custom':
+            links.insert(1, Link(
+                text=_('Duplicate'),
+                url=self.request.link(self.model, 'duplicate'),
+                attrs={'class': 'duplicate-link'},
+            ))
+
         assert hasattr(self.model, 'locale')
         assert self.request.locale is not None
         links.insert(-1, LinkGroup(

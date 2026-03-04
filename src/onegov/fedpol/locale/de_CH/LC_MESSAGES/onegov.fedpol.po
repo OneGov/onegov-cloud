@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-02-25 09:19+0100\n"
+"POT-Creation-Date: 2026-03-04 08:08+0100\n"
 "PO-Revision-Date: 2026-02-25 09:19+0100\n"
 "Last-Translator: David Salvisberg <david.salvisberg@seantis.ch>\n"
 "Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
@@ -13,5 +13,51 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Language"
-msgstr "Sprache"
+msgid "Form"
+msgstr "Formular"
+
+msgid "Homepage"
+msgstr "Startseite"
+
+msgid "Forms"
+msgstr "Formulare"
+
+msgid "Check"
+msgstr "Kontrolle"
+
+msgid "Confirmation"
+msgstr "Bestätigung"
+
+msgid "Duplicate"
+msgstr "Duplizieren"
+
+msgid "Translations"
+msgstr "Übersetzungen"
+
+msgid "Privacy Protection"
+msgstr "Datenschutz"
+
+msgid "Impressum"
+msgstr "Impressum"
+
+msgid "Login"
+msgstr "Anmelden"
+
+msgid "Citizen Login"
+msgstr "Kunden-Login"
+
+msgid "About"
+msgstr "Impressum"
+
+msgid "Continue"
+msgstr "Weiter"
+
+msgid "A form with this name already exists"
+msgstr "Ein Formular mit diesem Namen existiert bereits"
+
+msgid "Added a new form"
+msgstr "Ein neues Formular wurd hinzugefügt"
+
+#, python-format
+msgid "Translate to ${language}"
+msgstr "In ${language} übersetzen"
