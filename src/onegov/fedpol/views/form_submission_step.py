@@ -52,6 +52,7 @@ def handle_pending_submission(
         )
     elif not request.POST and request.GET.get('submitted') == '1':
         form.validate()
+        form.ignore_csrf_error()
 
     assert self.submission.form is not None
     if hasattr(form, 'step_name'):
