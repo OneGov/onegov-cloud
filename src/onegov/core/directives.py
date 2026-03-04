@@ -7,10 +7,12 @@ from itertools import count
 from morepath.directive import HtmlAction
 from morepath.directive import SettingAction
 from morepath.settings import SettingRegistry, SettingSection
+from reg import RegistrationError
+
 from onegov.core.utils import Bunch
 
-
 from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable, Mapping
@@ -18,7 +20,9 @@ if TYPE_CHECKING:
     from wtforms import Form
 
     from .analytics import AnalyticsProvider
-    from .request import CoreRequest
+    from onegov.core import Framework
+    from onegov.core.layout import Layout as CoreLayout
+    from onegov.core.request import CoreRequest
 
 
 _T = TypeVar('_T')
@@ -388,3 +392,39 @@ class ReplaceSettingAction(SettingAction):
     """
 
     depends = [ReplaceSettingSectionAction]
+
+
+class Layout(Action):
+    """
+    Registers a layout for a model. This is used to show breadcrumbs
+    for search results.
+    """
+
+    app_class_arg = True
+
+    def __init__(self, model: type) -> None:
+        self.model = model
+
+    def identifier(  # type:ignore[override]
+        self,
+        app_class: type[Framework]
+    ) -> str:
+        return str(self.model)
+
+    def perform(  # type:ignore[override]
+        self,
+        obj: type[CoreLayout],
+        app_class: type[Framework]
+    ) -> None:
+
+        layout_class = obj
+
+        try:
+            # `lambda self, obj` is required to match the signature
+            app_class.get_layout.register(  # type:ignore[attr-defined]
+                lambda self, obj, request: layout_class(obj, request),
+                model=self.model)
+        except RegistrationError as e:
+            # ignore `already have registration for key` error
+            if 'Already have registration for key' not in str(e):
+                raise
