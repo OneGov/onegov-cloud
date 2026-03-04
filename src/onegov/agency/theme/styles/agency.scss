@@ -1,6 +1,6 @@
-$sort-icon: '\f074';
-$caret-right: '\f0da';
-$caret-down: '\f0d7';
+$sort-icon: '\f0dc';
+$chevron-up: '\f077';
+$chevron-down: '\f078';
 $building-icon: '\f0f7';
 $person-icon: '\f2bd';
 $arrow-right: '\f061';
@@ -57,12 +57,12 @@ $arrow-right: '\f061';
 .edit-bar {
     .create-pdf::before { @include icon('\f1c1'); }
     .create-excel::before { @include icon('\f1c3'); }
-    .move::before { @include icon('\f047'); }
-    .new-agency::before { @include icon('\f0e8'); }
-    .sort-alphabetically::before { @include icon('\f15d'); }
+    .move::before { @include icon-bold('\f0b2'); }
+    .new-agency::before { @include icon-bold('\f0e8'); }
+    .sort-alphabetically::before { @include icon-bold('\f15d'); }
     .view-hidden::before { @include icon('\f070'); }
-    .sort::before { @include icon($sort-icon); }
-    .change-url::before { @include icon('\f0c1'); }
+    .sort::before { @include icon-bold($sort-icon); }
+    .change-url::before { @include icon-bold('\f0c1'); }
 }
 
 
@@ -77,24 +77,6 @@ ul.hidden-people span {
     &:not(.last)::after {
         content: '/';
         margin-left: .5em;
-    }
-}
-
-ul[data-sortable] {
-    list-style: none;
-    margin-left: 0;
-}
-
-li[data-sortable-id] {
-    background: $white-smoke;
-    border: 1px dashed $gainsboro;
-    cursor: grab;
-    margin-bottom: 1em;
-    padding: .25rem;
-
-    &::before {
-        @include icon('\f0dc');
-        color: $aluminum;
     }
 }
 
@@ -134,13 +116,12 @@ ul.agency-nav {
         margin-left: 1rem;
     }
 
-    .memberships {
+    .memberships:has(li) {
         margin-bottom: 1rem;
         margin-left: 2.4rem;
     }
 
     .person {
-
         padding: .25rem;
 
         a:hover {
@@ -155,25 +136,57 @@ ul.agency-nav {
     .details {
         display: flex;
         justify-content: flex-end;
-        margin-top: .5rem;
+
+        .button {
+            @media #{$large-up} {
+                margin-top: -2.15rem;
+                position: absolute;
+            }
+
+            margin-bottom: 0;
+            margin-top: .5rem;
+            padding-bottom: .4rem !important;
+            padding-top: .4rem !important;
+        }
     }
 
     .collapsible {
-
-        @include hairline;
+        border-top: 1px solid $gray;
         cursor: pointer;
-        padding-bottom: .25rem;
-        padding-top: .25rem;
+        display: flex;
+        padding: .5rem;
+        transition: background .3s;
 
-        &::before {
-            @include icon($caret-right);
-            color: $anchor-font-color;
+        &.active a.title:first-of-type {
+            @media #{$medium-up} {
+                width: calc(100% - 225px);
+            }
         }
 
-        &:hover::before,
+        + .details,
+        + * .details {
+            @media #{$small-only} {
+                background: white;
+                display: flex;
+                justify-content: center;
+                margin-bottom: .5rem;
+                margin-top: -.8rem;
+            }
+        }
+
+        &::before {
+            @include icon-bold($chevron-down);
+            color: $anchor-font-color;
+            margin-right: .5rem;
+        }
+
         &.active::before {
-            @include icon($caret-down);
+            @include icon-bold($chevron-up);
             color: $anchor-font-color-hover;
+        }
+
+        &:hover {
+            background: $vapor;
         }
     }
 
@@ -186,15 +199,6 @@ ul.agency-nav {
     li:last-of-type {
         border-bottom: 0;
     }
-}
-
-/*
-    Breadcrumbs
-*/
-
-.breadcrumbs {
-    text-overflow: clip;
-    white-space: normal;
 }
 
 
@@ -210,4 +214,23 @@ ul.agency-nav {
 // hide the sub organisation field
 .row.field-sub_organisation {
     display: none;
+}
+
+/*
+    People view
+*/
+.people-list {
+    margin-bottom: 2rem;
+
+    @media #{$medium-up} {
+        .subpage-cards {
+            column-count: 2;
+            column-gap: 1.5rem;
+        }
+    }
+
+    .card {
+        height: calc(100% - 1.5rem);
+        margin-bottom: 1.5rem;
+    }
 }
