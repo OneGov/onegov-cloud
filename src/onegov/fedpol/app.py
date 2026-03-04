@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from onegov.core import utils
+from onegov.core.i18n import default_locale_negotiator
 from onegov.fedpol.initial_content import create_new_organisation
 from onegov.fedpol.request import FedpolRequest
 from onegov.fedpol.theme import FedpolTheme
@@ -11,7 +12,7 @@ from onegov.town6.app import get_i18n_localedirs as get_town6_i18n_localedirs
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator
+    from collections.abc import Callable, Iterator, Sequence
     from onegov.org.models import Organisation
 
 
@@ -51,6 +52,12 @@ def get_i18n_used_locales() -> set[str]:
 @FedpolApp.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale() -> str:
     return 'de_CH'
+
+
+@FedpolApp.setting(section='i18n', name='locale_negotiator')
+def get_locale_negotiator(
+) -> Callable[[Sequence[str], FedpolRequest], str | None]:
+    return default_locale_negotiator
 
 
 @FedpolApp.webasset_path()
