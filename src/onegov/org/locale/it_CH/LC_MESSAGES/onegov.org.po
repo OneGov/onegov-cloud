@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-02-10 14:27+0100\n"
+"POT-Creation-Date: 2026-02-19 15:13+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1038,9 +1038,6 @@ msgstr "Gli eventi non vengono salvati."
 msgid "Expected header line with the following columns:"
 msgstr "La prima riga deve avere i seguenti nomi di colonna:"
 
-msgid "Map"
-msgstr "Mappa"
-
 msgid "Comment"
 msgstr "Commento"
 
@@ -1199,22 +1196,22 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number of attendees "
-"(${claimed_spots})"
+"The limit cannot be lower than the already confirmed number of attendees ($"
+"{claimed_spots})"
 msgstr ""
-"Il limite non può essere inferiore numero di partecipanti già confermato "
-"(${claimed_spots})"
+"Il limite non può essere inferiore numero di partecipanti già confermato ($"
+"{claimed_spots})"
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number attendees "
-"(${claimed_spots}) and the number of pending requests (${pending_requests}). "
+"The limit cannot be lower than the already confirmed number attendees ($"
+"{claimed_spots}) and the number of pending requests (${pending_requests}). "
 "Either enable the waiting list, process the pending requests or increase the "
 "limit. "
 msgstr ""
 "Il limite non può essere inferiore al numero di partecipanti già confermato "
-"(${claimed_spots}) e al numero di richieste in sospeso "
-"(${pending_requests}). Abilita la lista d'attesa, elabora le richieste in "
+"(${claimed_spots}) e al numero di richieste in sospeso ($"
+"{pending_requests}). Abilita la lista d'attesa, elabora le richieste in "
 "sospeso o aumenta il limite. "
 
 msgid "The end date must be later than the start date"
@@ -3068,14 +3065,42 @@ msgstr "Yubikey non valida"
 msgid "This Yubikey is already used by ${username}"
 msgstr "Questa Yubikey è già utilizzata da ${username}"
 
+msgid "Current E-Mail"
+msgstr "E-mail attuale"
+
+msgid "New E-Mail"
+msgstr "E-mail nuova"
+
 msgid "The users e-mail address (a.k.a. username)"
 msgstr "L'indirizzo e-mail dell'utente (noto anche come nome utente)"
 
-msgid "Send Activation E-Mail with Instructions"
-msgstr "Invia e-mail di attivazione con le istruzioni"
+msgid "Confirm action via your second factor"
+msgstr "Conferma l'azione tramite il tuo secondo fattore"
+
+msgid "Code"
+msgstr "Codice"
+
+msgid "Enter the six digit code from your authenticator app."
+msgstr "Inserisci il codice a sei cifre dalla tua app di autenticazione."
+
+msgid ""
+"The new username must be different from the old username (the username is "
+"case-insensitive)"
+msgstr ""
+"Il nuovo nome utente deve essere diverso da quello precedente (il nome "
+"utente non fa distinzione tra maiuscole e minuscole)"
 
 msgid "A user with this e-mail address exists already"
 msgstr "Esiste già un utente con questo indirizzo e-mail"
+
+msgid "Wrong yubikey."
+msgstr "Yubikey sbagliato."
+
+msgid "Invalid or expired TOTP provided."
+msgstr "È stato fornito un TOTP non valido o scaduto."
+
+msgid "Send Activation E-Mail with Instructions"
+msgstr "Invia e-mail di attivazione con le istruzioni"
 
 msgid "Ticket permissions"
 msgstr "Permessi sul biglietto"
@@ -3533,6 +3558,9 @@ msgstr "Gestione utenti"
 
 msgid "Create Signup Link"
 msgstr "Crea collegamento di iscrizione"
+
+msgid "Change username"
+msgstr "Modifica email"
 
 msgid "User group"
 msgstr "Gruppo di utenti"
@@ -4029,8 +4057,8 @@ msgstr "Rifiuta tutto con messaggio"
 msgid "Add reservation"
 msgstr "Aggiungi prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -4946,8 +4974,8 @@ msgstr "Ciao!"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su "
-"${homepage}."
+"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su $"
+"{homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Per attivare il tuo account, fai clic su conferma qui di seguito:"
@@ -5027,8 +5055,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -5040,9 +5068,9 @@ msgid "Have a great day!"
 msgstr "Ti auguro una buona giornata!"
 
 msgid ""
-"This is the notification for customer messages on reservations for ${request."
-"app.org.title}. If you no longer want to receive this e-mail please contact "
-"an administrator so they can remove you from the recipients list."
+"This is the notification for customer messages on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
 "Questa è la notifica relativa ai messaggi dei clienti sulle prenotazioni per "
 "${request.app.org.title}. Se non desideri più ricevere questa e-mail, "
@@ -5171,13 +5199,13 @@ msgid "New note in Ticket ${link}"
 msgstr "Nuova nota nel ticket ${link}"
 
 msgid ""
-"This is the notification for notes on reservations for ${request.app.org."
-"title}. If you no longer want to receive this e-mail please contact an "
-"administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Questa è la notifica per le note sulle prenotazioni per ${request.app.org."
-"title}. Se non si desidera più ricevere questo messaggio di posta "
-"elettronica si prega di contattare un amministratore in modo che possa "
+"Questa è la notifica per le note sulle prenotazioni per $"
+"{request.app.org.title}. Se non si desidera più ricevere questo messaggio di "
+"posta elettronica si prega di contattare un amministratore in modo che possa "
 "rimuovervi dall'elenco dei destinatari lista"
 
 msgid "Pending approval"
@@ -5748,8 +5776,8 @@ msgstr "ore"
 #, python-format
 msgid "Reservations can only be made at most ${n} ${unit} in advance."
 msgstr ""
-"Le prenotazioni possono essere effettuate solo con un anticipo massimo di "
-"${n} ${unit}."
+"Le prenotazioni possono essere effettuate solo con un anticipo massimo di $"
+"{n} ${unit}."
 
 msgid ""
 "Reservations must be made at least ${n1} ${unit1} and at most ${n2} ${unit2} "
@@ -6209,8 +6237,8 @@ msgid ""
 "Availability period updated. ${deleted} allocations removed, ${updated} "
 "allocations adjusted and ${created} new allocations created."
 msgstr ""
-"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, "
-"${updated} allocazioni modificate e ${created} nuove allocazioni create."
+"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, $"
+"{updated} allocazioni modificate e ${created} nuove allocazioni create."
 
 msgid "Availability period not found"
 msgstr "Periodo di disponibilità non trovato"
@@ -6306,8 +6334,8 @@ msgid ""
 "A password reset link has been sent to ${email}, provided an active account "
 "exists for this email address."
 msgstr ""
-"Il collegamento per reimpostare la password è stato inviato all'indirizzo "
-"${email} (se si tratta di un account attivo esistente)."
+"Il collegamento per reimpostare la password è stato inviato all'indirizzo $"
+"{email} (se si tratta di un account attivo esistente)."
 
 msgid "Password changed."
 msgstr "Password modificata."
@@ -6331,9 +6359,6 @@ msgstr "Immettre mTAN"
 
 msgid "Setup mTAN"
 msgstr "Setup mTAN"
-
-msgid "Invalid or expired TOTP provided."
-msgstr "È stato fornito un TOTP non valido o scaduto."
 
 msgid "Please enter the six digit code from your authenticator app"
 msgstr "Immettere il codice a sei cifre dall'app Autenticatore"
@@ -6425,11 +6450,11 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Cannot convert field \"${field}\" from type \"${old_type}\" to "
-"\"${new_type}\"."
+"Cannot convert field \"${field}\" from type \"${old_type}\" to \"${new_type}"
+"\"."
 msgstr ""
-"Impossibile convertire il campo \"${field}\" dal tipo \"${old_type}\" a "
-"\"${new_type}\"."
+"Impossibile convertire il campo \"${field}\" dal tipo \"${old_type}\" a \"$"
+"{new_type}\"."
 
 msgid "The directory was deleted"
 msgstr "La cartella è stata cancellata"
@@ -6528,11 +6553,11 @@ msgstr "Nuovo destinatario"
 
 #, python-format
 msgid ""
-"Registration for notifications on new entries in the directory "
-"\"${directory}\""
+"Registration for notifications on new entries in the directory \"${directory}"
+"\""
 msgstr ""
-"Registrazione per le notifiche sui nuovi elementi nella cartella "
-"\"${directory}\""
+"Registrazione per le notifiche sui nuovi elementi nella cartella \"$"
+"{directory}\""
 
 #, python-format
 msgid ""
@@ -7245,8 +7270,8 @@ msgid ""
 "Failed to create visits using the dormakaba API for site ID ${site_id} "
 "please make sure your credentials are still valid."
 msgstr ""
-"Impossibile creare visite con l'API di dormakaba per l'ID del sito "
-"${site_id}. Assicurarsi che le credenziali siano ancora valide."
+"Impossibile creare visite con l'API di dormakaba per l'ID del sito $"
+"{site_id}. Assicurarsi che le credenziali siano ancora valide."
 
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
@@ -7457,8 +7482,8 @@ msgstr "Totale di ${number} collegamenti trovati."
 msgid ""
 "Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
-"Migra i collegamenti dal dominio specificato al dominio corrente "
-"\"${domain}\"."
+"Migra i collegamenti dal dominio specificato al dominio corrente \"${domain}"
+"\"."
 
 msgid "OneGov API"
 msgstr "API OneGov"
@@ -7757,8 +7782,8 @@ msgstr "Si è verificato un errore durante il caricamento su Gever."
 
 #, python-format
 msgid ""
-"Encountered an error while uploading to Gever. Response status code is "
-"${status}."
+"Encountered an error while uploading to Gever. Response status code is $"
+"{status}."
 msgstr ""
 "Si è verificato un errore durante il caricamento su Gever.Il codice di stato "
 "della risposta è ${status}."
@@ -7805,6 +7830,14 @@ msgstr "Gestione utente"
 
 msgid "New Signup Link"
 msgstr "Nuovo collegamento di registrazione"
+
+#, python-format
+msgid "The username can be changed <a href=\"${url}\">here</a>."
+msgstr "L'indirizzo e-mail può essere modificato <a href=\"${url}\">qui</a>."
+
+#, python-format
+msgid "Succesfully changed ${old_username} to ${new_username}"
+msgstr "Modifica riuscita da ${old_username} a ${new_username}"
 
 msgid "New User"
 msgstr "Nuovo utente"

@@ -14,6 +14,7 @@ from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.feriennet.models import InvoiceAction, VacationActivity
+from onegov.org.utils import can_change_username
 from onegov.pay import PaymentProviderCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.layout import DefaultLayout as BaseLayout
@@ -1002,7 +1003,7 @@ class UserLayout(TownUserLayout):
         ) -> None: ...
 
     @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup] | None:
+    def editbar_links(self) -> list[Link | LinkGroup]:
         links: list[Link | LinkGroup] = []
         if self.request.is_admin and not self.model.source:
             links.append(
@@ -1012,6 +1013,14 @@ class UserLayout(TownUserLayout):
                     attrs={'class': 'edit-link'}
                 )
             )
+            if can_change_username(self.model, self.request):
+                links.append(
+                    Link(
+                        text=_('Change username'),
+                        url=self.request.link(self.model, 'change-username'),
+                        attrs={'class': 'edit-link'}
+                    )
+                )
 
             if self.model.role != 'admin':
                 links.append(Link(
@@ -1034,5 +1043,4 @@ class UserLayout(TownUserLayout):
                         )
                     )
                 ))
-            return links
-        return None
+        return links

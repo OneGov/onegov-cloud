@@ -15,7 +15,7 @@ from webob.response import Response
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator, Mapping
+    from collections.abc import Callable, Collection, Iterator, Mapping
     from functools import cached_property
     from onegov.core.cache import RedisCacheRegion
     from onegov.core.request import CoreRequest
@@ -114,6 +114,22 @@ class UserApp(WebassetsApp):
                 break
         else:
             self.auto_login_provider = None
+
+
+@UserApp.setting(section='user', name='change_username_roles')
+def get_change_username_roles() -> Collection[str]:
+    """ Returns a collection of roles, that allow changes to their username """
+    return ('admin', 'editor', 'supporter', 'member')
+
+
+@UserApp.setting(section='user', name='change_username_callback')
+def get_change_username_callback() -> Callable[[User, CoreRequest], None]:
+    """ Returns a function that will be called when a user changes username """
+
+    def on_change_username(user: User, request: CoreRequest) -> None:
+        """ The default username change callback doesn't do anything """
+
+    return on_change_username
 
 
 @UserApp.path(

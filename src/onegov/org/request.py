@@ -10,6 +10,7 @@ from onegov.org.models import News, TANAccessCollection, Topic
 from onegov.page import Page, PageCollection
 from onegov.user import User
 from sedate import utcnow
+from sqlalchemy import inspect
 from sqlalchemy.orm import noload
 
 
@@ -102,16 +103,33 @@ class OrgRequest(CoreRequest):
     def current_username(self) -> str | None:
         return self.identity.userid if self.identity else None
 
-    @cached_property
+    # NOTE: Internal cache, don't use directly!
+    _current_user: User | None
+
+    @property
     def current_user(self) -> User | None:
         if not self.identity:
             return None
 
-        return (
-            self.session.query(User)
-            .filter_by(username=self.identity.userid)
-            .first()
-        )
+        if not hasattr(self, '_current_user'):
+            self._current_user = (
+                self.session.query(User)
+                .filter_by(username=self.identity.userid)
+                .first()
+            )
+            return self._current_user
+
+        if self._current_user is None:
+            return None
+
+        # NOTE: In rare cases our cached version of the User object
+        #       gets detached, in which case we need to merge it
+        #       back into the current session, when we try to access it
+        #       otherwise accessing deferred attributes can result in
+        #       exceptions.
+        if inspect(self._current_user).detached:
+            self._current_user = self.session.merge(self._current_user)
+        return self._current_user
 
     @cached_property
     def authenticated_email(self) -> str | None:

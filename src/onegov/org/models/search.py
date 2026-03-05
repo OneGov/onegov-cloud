@@ -305,8 +305,8 @@ class Search(Pagination[Any]):
                 # FIXME: We could probably improve performance a lot if
                 #        we stored the time decay in the search table and
                 #        recomputed it once a day in a crobjob
-                * func.greatest(
-                    func.exp(
+                * func.exp(
+                    func.greatest(
                         -func.greatest(
                             func.abs(
                                 func.extract(
@@ -318,9 +318,10 @@ class Search(Pagination[Any]):
                                 )
                             ) - offset,
                             0
-                        ).op('^')(2) / two_times_variance_squared
-                    ),
-                    1e-6
+                        ).op('^')(2) / two_times_variance_squared,
+                        # NOTE: Avoids the modifier getting smaller than 1e-6
+                        math.log(1e-6)
+                    )
                 )
                 # HACK: We may want to add some fts_rank_modifier property
                 #       to searchable models instead and add a column to

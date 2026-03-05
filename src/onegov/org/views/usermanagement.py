@@ -6,12 +6,14 @@ from onegov.core.crypto import random_password
 from onegov.core.directives import query_form_class
 from onegov.core.security import Secret
 from onegov.core.templates import render_template
-from onegov.form import merge_forms
+from onegov.form import merge_forms, Form
+from onegov.form.fields import PanelField
 from onegov.org import _, OrgApp
-from onegov.org.forms import ManageUserForm, NewUserForm
+from onegov.org.forms import ChangeUsernameForm, ManageUserForm, NewUserForm
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.layout import UserLayout
 from onegov.org.layout import UserManagementLayout
+from onegov.org.utils import can_change_username
 from onegov.core.elements import Link, LinkGroup
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import Auth, User, UserCollection
@@ -25,7 +27,6 @@ from typing import overload, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from onegov.core.types import RenderData
-    from onegov.form import Form
     from onegov.org.request import OrgRequest
     from typing import TypeVar
     from webob import Response
@@ -221,6 +222,18 @@ def get_manage_user_form(
 
     userprofile_form = query_form_class(request, self, name='userprofile')
     assert userprofile_form
+    if can_change_username(self, request):
+        class ChangeUsernameCallout(Form):
+            username_callout = PanelField(
+                text=_(
+                    'The username can be changed <a href="${url}">here</a>.',
+                    mapping={'url': request.link(self, 'change-username')},
+                    markup=True
+                ),
+                kind='callout'
+            )
+
+        base = merge_forms(ChangeUsernameCallout, base)
 
     class OptionalUserprofile(userprofile_form):  # type:ignore
 
@@ -288,6 +301,54 @@ def handle_manage_user(
     return {
         'layout': layout,
         'title': self.username,
+        'form': form
+    }
+
+
+@OrgApp.form(
+    model=User,
+    template='form.pt',
+    form=ChangeUsernameForm,
+    pass_model=True,
+    permission=Secret,
+    name='change-username'
+)
+def handle_change_username(
+    self: User,
+    request: OrgRequest,
+    form: ChangeUsernameForm,
+    layout: UserManagementLayout | None = None
+) -> RenderData | Response:
+
+    if not can_change_username(self, request, form.factors):
+        raise HTTPForbidden()
+
+    if form.submitted(request):
+        assert form.new_username.data is not None
+        old_username = self.username
+        form.populate_obj(self)
+        request.success(_(
+            'Succesfully changed ${old_username} to ${new_username}',
+            mapping={
+                'old_username': old_username,
+                'new_username': form.new_username.data
+            }
+        ))
+
+        return request.redirect(request.class_link(
+            UserCollection,
+            variables={'active': '1'}
+        ))
+
+    layout = layout or UserManagementLayout(self, request)
+    layout.breadcrumbs.extend((
+        Link(self.username, request.link(self)),
+        Link(_('Change username'), '#')
+    ))
+
+    return {
+        'layout': layout,
+        'title': _('Change username'),
         'form': form
     }
 

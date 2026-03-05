@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-10 15:02+0100\n"
+"POT-Creation-Date: 2026-03-03 08:17+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,6 +12,9 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.0\n"
+
+msgid "Google Analytics (Global site tag)"
+msgstr "Google Analytics (Global site tag)"
 
 msgid "No active period"
 msgstr "Kein aktiver Zeitraum"
@@ -132,6 +135,12 @@ msgstr "Rechnungen"
 
 msgid "Wishlist"
 msgstr "Wunschliste"
+
+msgid "Contact"
+msgstr "Kontakt"
+
+msgid "Photo Albums"
+msgstr "Fotoalben"
 
 msgid "Activity Title"
 msgstr "Angebot Titel"
@@ -1508,6 +1517,9 @@ msgstr "Registration als Hilfsperson"
 msgid "Sort"
 msgstr "Sortieren"
 
+msgid "Change username"
+msgstr "Benutzernamen ändern"
+
 msgid "Delete"
 msgstr "Löschen"
 
@@ -1840,14 +1852,17 @@ msgstr "Kostenlos"
 msgid "This occasion does not have enough attendees yet."
 msgstr "Diese Durchführung hat noch nicht genügend Anmeldungen."
 
+msgid "carpool"
+msgstr "Fahrgemeinschaft bilden"
+
+msgid "The following persons can be asked to form carpools."
+msgstr "Folgende Personen können für Fahrgemeinschaften angefragt werden."
+
 msgid "Parent"
 msgstr "Elternteil"
 
 msgid "Children"
 msgstr "Kinder"
-
-msgid "Contact"
-msgstr "Kontakt"
 
 msgid "E-Mail ${name}"
 msgstr "${name} schreiben"
@@ -3265,6 +3280,9 @@ msgstr "Buchungen ${period}"
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
 
+msgid "Admin accounts cannot be deleted."
+msgstr "Administratorkonten können nicht gelöscht werden."
+
 msgid ""
 "The user cannot be deleted because they are organizers of existing "
 "activities."
@@ -3292,10 +3310,10 @@ msgstr ""
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} wurde gelöscht, inklusive aller damit verbundenen Daten."
 
-msgid "Could not delete account; try again or contact an administrator."
-msgstr ""
-"Konnte das Konto nicht löschen; versuchen Sie es erneut oder kontaktieren "
-"Sie einen Administrator."
+#~ msgid "Could not delete account; try again or contact an administrator."
+#~ msgstr ""
+#~ "Konnte das Konto nicht löschen; versuchen Sie es erneut oder kontaktieren "
+#~ "Sie einen Administrator."
 
 #~ msgid "Parents can see the contacts of other parents in the same activity"
 #~ msgstr ""

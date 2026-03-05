@@ -87,7 +87,9 @@ class Activity(Base, ContentMixin, TimestampMixin):
     )
 
     #: The user to which this activity belongs to (organiser)
-    username: Mapped[str] = mapped_column(ForeignKey(User.username))
+    username: Mapped[str] = mapped_column(
+        ForeignKey(User.username, onupdate='CASCADE')
+    )
 
     #: The user which initially reported this activity (same as username, but
     #: this value may not change after initialisation)

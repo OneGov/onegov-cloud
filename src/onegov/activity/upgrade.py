@@ -806,3 +806,23 @@ def update_invoice_tables_for_polymorphism(context: UpgradeContext) -> None:
             'type',
             server_default=None
         )
+
+
+@upgrade_task('Add ON UPDATE CASCADE to username FOREIGN KEY constraints')
+def add_on_update_cascade_to_username_fks(context: UpgradeContext) -> None:
+    for table_name in ('activities', 'attendees', 'bookings'):
+        constraint_name = f'{table_name}_username_fkey'
+        if context.has_constraint(table_name, constraint_name, 'FOREIGN KEY'):
+            context.operations.drop_constraint(
+                constraint_name,
+                table_name,
+                type_='foreignkey'
+            )
+            context.operations.create_foreign_key(
+                constraint_name,
+                table_name,
+                'users',
+                ['username'],
+                ['username'],
+                onupdate='CASCADE'
+            )

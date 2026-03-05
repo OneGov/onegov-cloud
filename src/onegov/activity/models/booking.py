@@ -66,7 +66,9 @@ class Booking(Base, TimestampMixin):
     )
 
     #: the user owning the booking
-    username: Mapped[str] = mapped_column(ForeignKey('users.username'))
+    username: Mapped[str] = mapped_column(
+        ForeignKey('users.username', onupdate='CASCADE')
+    )
 
     #: the priority of the booking, a higher number = a higher priority
     priority: Mapped[int] = mapped_column(default=0)

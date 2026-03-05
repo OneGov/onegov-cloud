@@ -1,0 +1,42 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p i18n:translate>
+            <tal:b i18n:name="user_name">${user_name}</tal:b>
+            has closed commission
+            <tal:b i18n:name="commission_name">${commission_name}</tal:b>
+            for settlement run
+            <tal:b i18n:name="settlement_run_name">${settlement_run_name}</tal:b>.
+        </p>
+
+        <table>
+            <tr>
+                <td><strong i18n:translate>Parliamentarian:</strong></td>
+                <td>${parliamentarian_name}</td>
+            </tr>
+            <tr tal:condition="commission_name">
+                <td><strong i18n:translate>Commission:</strong></td>
+                <td>${commission_name}</td>
+            </tr>
+            <tr>
+                <td><strong i18n:translate>Date:</strong></td>
+                <td>${layout.format_date(attendance_date, 'date')}</td>
+            </tr>
+            <tr>
+                <td><strong i18n:translate>Set by:</strong></td>
+                <td>${user_name}</td>
+            </tr>
+        </table>
+
+        <p i18n:translate>
+            <tal:b i18n:name="parliamentarian_name">${parliamentarian_name}</tal:b>
+            can no longer add new commission attendances for the period
+            <tal:b i18n:name="start">${layout.format_date(settlement_run_start, 'date')}</tal:b>
+            –
+            <tal:b i18n:name="end">${layout.format_date(settlement_run_end, 'date')}</tal:b>.
+        </p>
+    </tal:b>
+</div>

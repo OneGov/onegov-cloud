@@ -913,6 +913,7 @@ form {
         li {
             white-space: nowrap;
             text-overflow: ellipsis;
+            break-inside: avoid;
         }
     }
 

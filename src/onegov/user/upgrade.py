@@ -335,3 +335,23 @@ def add_last_login_column(context: UpgradeContext) -> None:
             ) AS subquery
             WHERE users.id = subquery.id;
         """))
+
+
+@upgrade_task('Add ON UPDATE CASCADE to username FOREIGN KEY constraint')
+def add_on_update_cascade_to_username_fk(context: UpgradeContext) -> None:
+    table_name = 'role_mappings'
+    constraint_name = f'{table_name}_username_fkey'
+    if context.has_constraint(table_name, constraint_name, 'FOREIGN KEY'):
+        context.operations.drop_constraint(
+            constraint_name,
+            table_name,
+            type_='foreignkey'
+        )
+        context.operations.create_foreign_key(
+            constraint_name,
+            table_name,
+            'users',
+            ['username'],
+            ['username'],
+            onupdate='CASCADE'
+        )
