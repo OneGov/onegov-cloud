@@ -796,6 +796,12 @@ msgstr "Finanzstelle"
 msgid "Hourly Rate"
 msgstr "Stundenansatz"
 
+msgid "Pages"
+msgstr "Seiten"
+
+msgid "Per-page rate"
+msgstr "Seitenansatz"
+
 msgid "Duration"
 msgstr "Dauer"
 
