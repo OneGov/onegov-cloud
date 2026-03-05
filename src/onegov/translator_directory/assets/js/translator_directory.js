@@ -30,8 +30,8 @@ function setupAutoEndDate() {
 
 
 function setupTimeReportForm() {
-    if (!document.querySelector('.field-finanzstelle')) { return; }
 
+    // check if we are on the desired page, else don't run
     const assignmentTypeField = document.querySelector(
         'select[name="assignment_type"]'
     );
@@ -43,8 +43,32 @@ function setupTimeReportForm() {
         'start_time', 'end_date', 'end_time', 'break_time', 'is_urgent'
     ];
 
+    const startDateLabel = document.querySelector(
+        '.field-start_date .label-text'
+    );
+    const startDateOriginalLabel = startDateLabel
+        ? startDateLabel.textContent : null;
+
     function updateTimeFields() {
         const isSchriftlich = assignmentTypeField.value === 'schriftlich';
+        if (startDateLabel && startDateOriginalLabel) {
+            startDateLabel.textContent = isSchriftlich
+                ? 'Datum' : startDateOriginalLabel;
+        }
+        const pagesLabel = document.querySelector('.field-pages .label-text');
+        if (pagesLabel) {
+            const existing = pagesLabel.parentElement.querySelector(
+                '.label-required'
+            );
+            if (isSchriftlich && !existing) {
+                const star = document.createElement('span');
+                star.className = 'label-required';
+                star.textContent = '*';
+                pagesLabel.insertAdjacentElement('afterend', star);
+            } else if (!isSchriftlich && existing) {
+                existing.remove();
+            }
+        }
         timeOnlyFields.forEach(function(name) {
             const wrapper = document.querySelector('.field-' + name);
             const input = document.querySelector('[name="' + name + '"]');
@@ -61,7 +85,7 @@ function setupTimeReportForm() {
         }
     }
 
-    assignmentTypeField.addEventListener('change', updateTimeFields);
+    $(document).on('change', 'select[name="assignment_type"]', updateTimeFields);
     updateTimeFields();
 }
 
