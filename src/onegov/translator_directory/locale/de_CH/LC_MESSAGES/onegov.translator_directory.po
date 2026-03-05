@@ -637,6 +637,9 @@ msgstr "Suche in Vor- und Nachname"
 msgid "Hidden only"
 msgstr "Nur versteckte anzeigen"
 
+msgid "Show all translators including hidden"
+msgstr "Alle Dolmetscher inkl. versteckte anzeigen"
+
 msgid "Order by"
 msgstr "Sortiere nach"
 

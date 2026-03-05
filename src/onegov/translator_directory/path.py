@@ -57,8 +57,9 @@ def get_translator(
         'interpret_types': [str],
         'admissions': [str],
         'genders': [str],
-        'include_hidden': bool
-    }
+        'include_hidden': bool,
+        'show_all_including_hidden': bool,
+    },
 )
 def get_translators(
     request: TranslatorAppRequest,
@@ -73,7 +74,8 @@ def get_translators(
     interpret_types: list[str] | None = None,
     admissions: list[str] | None = None,
     genders: list[str] | None = None,
-    include_hidden: bool | None = None
+    include_hidden: bool | None = None,
+    show_all_including_hidden: bool | None = None,
 ) -> TranslatorCollection:
 
     user = request.current_user
@@ -91,7 +93,14 @@ def get_translators(
         interpret_types=interpret_types,
         admissions=admissions,
         genders=genders,
-        include_hidden=include_hidden if include_hidden is not None else False
+        include_hidden=(
+            include_hidden if include_hidden is not None else False
+        ),
+        show_all_including_hidden=(
+            show_all_including_hidden
+            if show_all_including_hidden is not None
+            else False
+        ),
     )
 
 
