@@ -54,15 +54,15 @@
         </div>
         <div class="title">
             <div class="row row-wide">
-                <div class="columns">
+                <div class="columns hide-for-small medium-2">
                     <a href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
                     <div class="clearfix"></div>
                 </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="columns small-12">
-                <div metal:use-macro="layout.macros['top_navigation']"></div>
+                <div class="columns small-12 medium-8">
+                    <div metal:use-macro="layout.macros['top_navigation']"></div>
+                </div>
+                <div class="columns hide-for-small medium-2">
+                </div>
             </div>
         </div>
         <div class="row">
