@@ -390,15 +390,28 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
                         body='Could not retrieve product id from Infomaniak API',
                         content_type='text/plain')
 
-    # prompt = (
-    #     'Generate a valid onegov.form definition based on https://docs.admin.digital/module/formulare/. '
-    #     'Return only the generated form definition as plain text suitable for the definition field.\n\n'
-    #     'Snippet:\n' + snippet
-    # )
     prompt = (
-            'Generate a valid onegovcloud form definition based on https://docs.admin.digital/module/formulare/'
-            'syntax. Return only the generated form definition as plain.\n\n'
-            'Snippet:\n' + snippet
+        'You are an expert in onegov-cloud formcode syntax. '
+        'Generate a valid formcode definition strictly following the syntax documented at '
+        'https://docs.admin.digital/module/formulare/.\n\n'
+        'FORMCODE SYNTAX RULES - follow exactly:\n'
+        '- Every field MUST follow this exact pattern: `Label * = fieldtype` (required) or `Label = fieldtype` (optional)\n'
+        '- The label is a human-readable name, followed by optional `*`, then ` = `, then the field type token\n'
+        '- Indents are a always a multiple of 4, options (radio, checkbox) can have nested elements\n'
+        '- NEVER output a field type token alone on a line without its label and `=`\n\n'
+        'Field type reference:\n'
+        '- Short text:   Label * = ___\n'
+        '- Email:        Label * = @@@\n'
+        '- AHV number:   Label * = # ch.ssn\n'
+        '- Date:         Label * = YYYY.MM.DD\n'
+        '- Textarea:     Label * = ...\n'
+        '- Radio choice: Label * =\n'
+        '    ( ) Option A\n'
+        '    (x) Option B\n\n'
+        'Mark all fields as required (*) unless explicitly stated otherwise.\n'
+        'Return ONLY the raw formcode. No explanations, no markdown code fences, no extra text.\n\n'
+        'Form fields requested:\n'
+        + snippet
     )
     # available llms ["mixtral","llama3","granite","mistral24b","mistral3","qwen3","gemma3n"]
     model = 'qwen3'
