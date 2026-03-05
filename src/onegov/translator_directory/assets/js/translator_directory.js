@@ -19,24 +19,25 @@ function moveMailTemplateButtonToEnd() {
 }
 
 
-document.addEventListener("DOMContentLoaded", function() {
-    moveMailTemplateButtonToEnd();
-
+function setupAutoEndDate() {
     const startDateField = document.querySelector('input[name="start_date"]');
     const endDateField = document.querySelector('input[name="end_date"]');
+    if (!startDateField || !endDateField) { return; }
+    startDateField.addEventListener('change', function() {
+        endDateField.value = startDateField.value;
+    });
+}
 
-    if (startDateField && endDateField) {
-        startDateField.addEventListener('change', function() {
-            endDateField.value = startDateField.value;
-        });
-    }
 
+function setupTimeReportForm() {
     if (!document.querySelector('.field-finanzstelle')) { return; }
 
     const assignmentTypeField = document.querySelector(
         'select[name="assignment_type"]'
     );
     if (!assignmentTypeField) { return; }
+
+    setupAutoEndDate();
 
     const timeOnlyFields = [
         'start_time', 'end_date', 'end_time', 'break_time', 'is_urgent'
@@ -62,4 +63,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     assignmentTypeField.addEventListener('change', updateTimeFields);
     updateTimeFields();
+}
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    moveMailTemplateButtonToEnd();
+    setupTimeReportForm();
 });
