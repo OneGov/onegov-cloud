@@ -1250,11 +1250,17 @@ msgstr "Initiative angenommen"
 msgid "Tie breaker in favor of the proposal"
 msgstr "Stichfrage zugunsten der Initiative"
 
+msgid "in favor of the proposal"
+msgstr "zugunsten der Initiative"
+
 msgid "Tie breaker in favor of the direct counter proposal"
 msgstr "Stichfrage zugunsten des Gegenentwurfs"
 
 msgid "Tie breaker in favor of the indirect counter proposal"
 msgstr "Stichfrage zugunsten des Gegenvorschlags"
+
+msgid "in favor of the counter proposal"
+msgstr "zugunsten des Gegenentwurfs"
 
 msgid "Download a PDF with all the results:"
 msgstr "Ein PDF mit allen Resultaten kann hier heruntergeladen werden:"
