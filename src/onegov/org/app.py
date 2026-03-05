@@ -144,6 +144,15 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
 
         self.azizi_api_token = azizi_api_token
 
+    def configure_infomaniak_api_token(
+            self,
+            *,
+            infomaniak_api_token: str = '',
+            ** cfg: Any
+    ) -> None:
+
+        self.infomaniak_api_token = infomaniak_api_token
+
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
         This inserts an mtan hook by wrapping the callable we receive

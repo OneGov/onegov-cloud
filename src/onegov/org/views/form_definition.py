@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import morepath
+import requests
 
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection, FormDefinition
 from onegov.form import FormRegistrationWindow
 from onegov.gis import Coordinates
-from onegov.org import _, OrgApp
+from onegov.org import _, OrgApp, log
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import FormDefinitionForm
@@ -16,7 +17,7 @@ from onegov.org.layout import FormEditorLayout, FormSubmissionLayout
 from onegov.org.models import BuiltinFormDefinition, CustomFormDefinition
 from onegov.org.models.form import submission_deletable
 from webob import exc
-
+from webob import Response
 
 from typing import TypeVar, TYPE_CHECKING
 
@@ -345,3 +346,100 @@ def delete_form_definition(
         with_registration_windows=True,
         handle_submissions=handle_submissions
     )
+
+
+@OrgApp.view(
+    model=FormCollection,
+    name='formcoder',
+    request_method='POST',
+    permission=Private
+)
+def formcoder(self: FormCollection, request: OrgRequest) -> Response:
+    """Generate formcode for a new form being created or edited.
+
+    This handles POSTs to e.g. /forms/formcoder, requesting AI support
+    from infomaniak and finally returns plain text beeing replaced in the
+    form defintion text field.
+    """
+    token = request.app.infomaniak_api_token
+    snippet = request.params.get('snippet', '')
+    product_id: str | None = None
+
+    if not snippet:
+        return Response(body='Missing prompt', content_type='text/plain')
+
+    if not token:
+        log.warning('Formcoder: Infomaniak API token not configured')
+        return Response(status='error',
+                        body='INFOMANIAK_API_TOKEN_NOT_CONFIGURED',
+                        content_type='text/plain')
+
+    # read product id
+    url = 'https://api.infomaniak.com/1/ai'
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json',
+    }
+    response = requests.get(url=url, headers=headers, timeout=5).json()
+    if response['result'] == 'success':
+        product_id = response['data'][0]['product_id']
+
+    if not product_id:
+        log.warning('Formcocder: Could not retrieve product id from Infomaniak API')
+        return Response(status='error',
+                        body='Could not retrieve product id from Infomaniak API',
+                        content_type='text/plain')
+
+    # prompt = (
+    #     'Generate a valid onegov.form definition based on https://docs.admin.digital/module/formulare/. '
+    #     'Return only the generated form definition as plain text suitable for the definition field.\n\n'
+    #     'Snippet:\n' + snippet
+    # )
+    prompt = (
+            'Generate a valid onegovcloud form definition based on https://docs.admin.digital/module/formulare/'
+            'syntax. Return only the generated form definition as plain.\n\n'
+            'Snippet:\n' + snippet
+    )
+    # available llms ["mixtral","llama3","granite","mistral24b","mistral3","qwen3","gemma3n"]
+    model = 'qwen3'
+    url = f'https://api.infomaniak.com/1/ai/{product_id}/openai/chat/completions'
+    payload = {
+        'model': model,
+        'messages': [
+            {'role': 'user', 'content': prompt}
+        ],
+        'temperature': 0,
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
+    except Exception as e:
+        log.error('Formcoder: Infomaniak API request failed: %s', e, exc_info=True)
+        # does it appear on the ui as not reloaded??
+        request.alert(_('Failed to generate form code: {error}', mapping={'error': str(e)}))
+        return Response(body=f'Infomaniak API request failed with \'{e}\'', content_type='text/plain')
+
+    if not response.ok:
+        log.error('Formcoder: Failed to generate form code. API error: %s, %s',
+                  response.status_code, response.text)
+        # does it appear on the ui as not reloaded??
+        request.alert(_('Formcoder: Failed to generate form code. API error {status}',
+                        mapping={'status': response.status_code}))
+        return Response(status='error',
+                        body='Formcoder: Failed to generate form code. API error {text}'.format(status=response.text),
+                        content_type='text/plain')
+
+    generated = ''
+    try:
+        data = response.json()
+        print('*** response data: ' + str(data))
+        if isinstance(data, dict):
+            if 'choices' in data and data['choices']:
+                choice = data['choices'][0]
+                if isinstance(choice, dict):
+                    if 'message' in choice and isinstance(choice['message'], dict) and 'content' in choice['message']:
+                        generated = choice['message']['content']
+    except ValueError:
+        pass
+
+    return Response(body=generated, content_type='text/plain')
