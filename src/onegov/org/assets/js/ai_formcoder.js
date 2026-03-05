@@ -14,12 +14,12 @@
 
     overlay.innerHTML = [
       '<div style="background:#fff;width:800px;max-width:92%;max-height:80vh;overflow:auto;padding:20px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:4px;box-sizing:border-box;">',
-      '<h5>Form Coder</h5>',
+      '<h5>Formcoder</h5>',
       '<form id="' + FORM_ID + '" method="post">',
-      '<textarea name="snippet" placeholder="Enter snippet" rows="12" style="width:100%;margin-bottom:10px;box-sizing:border-box;font-family:inherit;font-size:inherit;"></textarea>',
+      '<textarea name="snippet" placeholder="What fields for the form you need?" rows="12" style="width:100%;margin-bottom:10px;box-sizing:border-box;font-family:inherit;font-size:inherit;"></textarea>',
       '<div style="text-align:right;">',
-      '<button type="button" class="button secondary small" id="' + CANCEL_ID + '">Cancel</button>',
-      '<button type="submit" class="button primary small">Insert</button>',
+      '<button type="button" class="button hollow" id="' + CANCEL_ID + '">Cancel</button>',
+      '<button type="submit" class="button" style="margin-left: 8px">Ok</button>',
       '</div>',
       '</form>',
       '</div>'
