@@ -361,8 +361,14 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
     from infomaniak and finally returns plain text beeing replaced in the
     form defintion text field.
     """
+
+    # improvements
+    # - logging needed?
+    # - alert useful as page not relaoded?
+    # - store/cache product id
+
     token = request.app.infomaniak_api_token
-    snippet = request.params.get('snippet', '')
+    snippet: str = str(request.params.get('snippet', ''))
     product_id: str | None = None
 
     if not snippet:
@@ -385,20 +391,27 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
         product_id = response['data'][0]['product_id']
 
     if not product_id:
-        log.warning('Formcocder: Could not retrieve product id from Infomaniak API')
-        return Response(status='error',
-                        body='Could not retrieve product id from Infomaniak API',
-                        content_type='text/plain')
+        log.warning(
+            'Formcocder: Could not retrieve product id from Infomaniak API')
+        return Response(
+            status='error',
+            body='Could not retrieve product id from Infomaniak API',
+            content_type='text/plain',
+        )
 
     prompt = (
         'You are an expert in onegov-cloud formcode syntax. '
-        'Generate a valid formcode definition strictly following the syntax documented at '
-        'https://docs.admin.digital/module/formulare/.\n\n'
+        'Generate a valid formcode definition strictly following the syntax '
+        'documented at https://docs.admin.digital/module/formulare/.\n\n'
         'FORMCODE SYNTAX RULES - follow exactly:\n'
-        '- Every field MUST follow this exact pattern: `Label * = fieldtype` (required) or `Label = fieldtype` (optional)\n'
-        '- The label is a human-readable name, followed by optional `*`, then ` = `, then the field type token\n'
-        '- Indents are a always a multiple of 4, options (radio, checkbox) can have nested elements\n'
-        '- NEVER output a field type token alone on a line without its label and `=`\n\n'
+        '- Every field MUST follow this exact pattern: `Label * = fieldtype` '
+        '(required) or `Label = fieldtype` (optional)\n'
+        '- The label is a human-readable name, followed by optional `*`, '
+        'then ` = `, then the field type token\n'
+        '- Indents are a always a multiple of 4, options (radio, checkbox) '
+        'can have nested elements\n'
+        '- NEVER output a field type token alone on a line without its label '
+        'and `=`\n\n'
         'Field type reference:\n'
         '- Short text:   Label * = ___\n'
         '- Email:        Label * = @@@\n'
@@ -409,11 +422,12 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
         '    ( ) Option A\n'
         '    (x) Option B\n\n'
         'Mark all fields as required (*) unless explicitly stated otherwise.\n'
-        'Return ONLY the raw formcode. No explanations, no markdown code fences, no extra text.\n\n'
+        'Return ONLY the raw formcode. No explanations, no markdown code '
+        'fences, no extra text.\n\n'
         'Form fields requested:\n'
-        + snippet
+        + str(snippet)
     )
-    # available llms ["mixtral","llama3","granite","mistral24b","mistral3","qwen3","gemma3n"]
+    # llms: mixtral,llama3,granite,mistral24b,mistral3,qwen3,gemma3n]
     model = 'qwen3'
     url = f'https://api.infomaniak.com/1/ai/{product_id}/openai/chat/completions'
     payload = {
@@ -425,32 +439,45 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
     }
 
     try:
-        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        response = requests.post(
+            url, headers=headers, json=payload, timeout=30)
     except Exception as e:
-        log.error('Formcoder: Infomaniak API request failed: %s', e, exc_info=True)
+        log.error(
+            f'Formcoder: Infomaniak API request failed: {e}', exc_info=True)
         # does it appear on the ui as not reloaded??
-        request.alert(_('Failed to generate form code: {error}', mapping={'error': str(e)}))
-        return Response(body=f'Infomaniak API request failed with \'{e}\'', content_type='text/plain')
+        request.alert(
+            _('Failed to generate form code: {error}',
+              mapping={'error': str(e)})
+        )
+        return Response(
+            body=f"Infomaniak API request failed with '{e}'",
+            content_type='text/plain')
 
     if not response.ok:
-        log.error('Formcoder: Failed to generate form code. API error: %s, %s',
-                  response.status_code, response.text)
+        log.error(f'Formcoder: Failed to generate form code. '
+                  f'API error: {response.status_code}, {response.text}')
         # does it appear on the ui as not reloaded??
-        request.alert(_('Formcoder: Failed to generate form code. API error {status}',
-                        mapping={'status': response.status_code}))
-        return Response(status='error',
-                        body='Formcoder: Failed to generate form code. API error {text}'.format(status=response.text),
-                        content_type='text/plain')
+        request.alert(
+            _('Formcoder: Failed to generate form code. API error {status}',
+              mapping={'status': response.status_code}))
+        return Response(
+            status='error',
+            body=f'Formcoder: Failed to generate form code. API error '
+                 f'{response.text}',
+            content_type='text/plain')
 
     generated = ''
     try:
         data = response.json()
-        print('*** response data: ' + str(data))
         if isinstance(data, dict):
-            if 'choices' in data and data['choices']:
+            if data.get('choices', [{}]):
                 choice = data['choices'][0]
                 if isinstance(choice, dict):
-                    if 'message' in choice and isinstance(choice['message'], dict) and 'content' in choice['message']:
+                    if (
+                        'message' in choice
+                        and isinstance(choice['message'], dict)
+                        and 'content' in choice['message']
+                    ):
                         generated = choice['message']['content']
     except ValueError:
         pass
