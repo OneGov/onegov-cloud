@@ -2215,6 +2215,29 @@ def test_view_time_reports(client: Client) -> None:
     assert '162.75' in page
 
 
+def test_time_reports_finanzstelle_filtering(client: Client) -> None:
+    """Test that non-admin accountants cannot access /time-reports."""
+    session = client.app.session()
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_group')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt',
+        'accountant_emails': ['accountant@example.org'],
+    }
+    session.add(User(
+        username='accountant@example.org',
+        password_hash=hash_password('password'),
+        role='member',
+    ))
+    transaction.commit()
+
+    client.login(username='accountant@example.org', password='password')
+    assert client.get(
+        '/time-reports', expect_errors=True
+    ).status_code == 403
+
+
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
