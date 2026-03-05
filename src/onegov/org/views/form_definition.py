@@ -33,28 +33,17 @@ if TYPE_CHECKING:
     FormDefinitionT = TypeVar('FormDefinitionT', bound=FormDefinition)
 
 
-TRANSLATE_SYSTEM_PROMPT = """\
-You are an expert translator working for the Swiss government and are tasked
-with translating forms to {to_locale}.
+FORMCODE_PROMPT = """\
+You are an expert in onegov-cloud formcode syntax, the specialized Markdown 
+inspired syntax for defining forms.
 
-You are also very familiar with formcode, the specialized Markdown inspired
-syntax for defining forms. When translating forms you need to take special
-care to preserve the semantic structure of formcode.
+Special care to field types like social security number
+`AHV number:   Label * = # ch.ssn\n`
 
-The user prompt will give you a JSON object with all of the strings that need
-to be translated. Pay special attention to the "definition" key which contains
-formcode, when translating this field keep the structure exactly the same,
-ensure the translated formcode is still valid syntax, pay close attention to
-date and time fields, which will always have the same format string, regardless
-of the target language. Furthermore the "text" key will contain HTML, here once
-again make sure to generate valid HTML, with the same semantic structure.
+Do not add any explanations, markdown code blocks, or preamble. 
+Only output the raw formcode as plain text.
 
-Respond with a JSON object that contains all of the translated strings.
-
-When translating strings be honest and reproduce the original intent, do not
-invent new text or alter the meaning of existing text in any way.
-
-Here is the complete specification of the aforementioned formcode:
+Take care to only use the syntax described in the following specification:
 
 {specification}
 """
@@ -414,11 +403,17 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
             content_type='text/plain',
         )
 
-    system_prompt = TRANSLATE_SYSTEM_PROMPT.format(
-        to_locale=request.locale,
+    if not request.app.formcode_specification:
+        log.warning('Formcoder: Formcode specification not configured')
+        return Response(
+            body='Formcode specification not configured',
+            content_type='text/plain'
+        )
+
+    prompt = FORMCODE_PROMPT.format(
         specification=request.app.formcode_specification
     )
-
+    print('Formcoder: Sending prompt to Infomaniak API:\n', prompt)
     url = (
         f'https://api.infomaniak.com/1/ai/{product_id}'
         f'/openai/chat/completions'
@@ -434,7 +429,7 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
             json={
                 'model': 'qwen3',
                 'messages': [
-                    {'role': 'system', 'content': system_prompt},
+                    {'role': 'system', 'content': prompt},
                     {'role': 'user', 'content': snippet}
                 ],
                 'temperature': 0,
@@ -466,6 +461,6 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
             content_type='text/plain')
 
     data = response.json()
-    translated = json.loads(data['choices'][0]['message']['content'])
+    definition = data['choices'][0]['message']['content']
 
-    return Response(body=translated['definition'], content_type='text/plain')
+    return Response(body=definition, content_type='text/plain')
