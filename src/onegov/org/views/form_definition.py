@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import morepath
 import requests
 
@@ -28,9 +29,35 @@ if TYPE_CHECKING:
     from onegov.form import Form, FormSubmission
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Session
-    from webob import Response
 
     FormDefinitionT = TypeVar('FormDefinitionT', bound=FormDefinition)
+
+
+TRANSLATE_SYSTEM_PROMPT = """\
+You are an expert translator working for the Swiss government and are tasked
+with translating forms to {to_locale}.
+
+You are also very familiar with formcode, the specialized Markdown inspired
+syntax for defining forms. When translating forms you need to take special
+care to preserve the semantic structure of formcode.
+
+The user prompt will give you a JSON object with all of the strings that need
+to be translated. Pay special attention to the "definition" key which contains
+formcode, when translating this field keep the structure exactly the same,
+ensure the translated formcode is still valid syntax, pay close attention to
+date and time fields, which will always have the same format string, regardless
+of the target language. Furthermore the "text" key will contain HTML, here once
+again make sure to generate valid HTML, with the same semantic structure.
+
+Respond with a JSON object that contains all of the translated strings.
+
+When translating strings be honest and reproduce the original intent, do not
+invent new text or alter the meaning of existing text in any way.
+
+Here is the complete specification of the aforementioned formcode:
+
+{specification}
+"""
 
 
 def get_form_class(
@@ -358,95 +385,68 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
     """Generate formcode for a new form being created or edited.
 
     This handles POSTs to e.g. /forms/formcoder, requesting AI support
-    from infomaniak and finally returns plain text beeing replaced in the
-    form defintion text field.
+    from infomaniak and finally returns plain text being replaced in the
+    form definition text field.
     """
 
     # improvements
     # - logging needed?
-    # - alert useful as page not relaoded?
-    # - store/cache product id
+    # - alert useful as page not reloaded?
 
     token = request.app.infomaniak_api_token
+    product_id = request.app.infomaniak_product_id
     snippet: str = str(request.params.get('snippet', ''))
-    product_id: str | None = None
 
     if not snippet:
         return Response(body='Missing prompt', content_type='text/plain')
 
     if not token:
         log.warning('Formcoder: Infomaniak API token not configured')
-        return Response(status='error',
-                        body='INFOMANIAK_API_TOKEN_NOT_CONFIGURED',
-                        content_type='text/plain')
-
-    # read product id
-    url = 'https://api.infomaniak.com/1/ai'
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json',
-    }
-    response = requests.get(url=url, headers=headers, timeout=5).json()
-    if response['result'] == 'success':
-        product_id = response['data'][0]['product_id']
+        return Response(
+            body='INFOMANIAK_API_TOKEN_NOT_CONFIGURED',
+            content_type='text/plain')
 
     if not product_id:
         log.warning(
-            'Formcocder: Could not retrieve product id from Infomaniak API')
+            'Formcoder: Could not retrieve product id from Infomaniak API')
         return Response(
-            status='error',
             body='Could not retrieve product id from Infomaniak API',
             content_type='text/plain',
         )
 
-    prompt = (
-        'You are an expert in onegov-cloud formcode syntax. '
-        'Generate a valid formcode definition strictly following the syntax '
-        'documented at https://docs.admin.digital/module/formulare/.\n\n'
-        'FORMCODE SYNTAX RULES - follow exactly:\n'
-        '- Every field MUST follow this exact pattern: `Label * = fieldtype` '
-        '(required) or `Label = fieldtype` (optional)\n'
-        '- The label is a human-readable name, followed by optional `*`, '
-        'then ` = `, then the field type token\n'
-        '- Indents are a always a multiple of 4, options (radio, checkbox) '
-        'can have nested elements\n'
-        '- NEVER output a field type token alone on a line without its label '
-        'and `=`\n\n'
-        'Field type reference:\n'
-        '- Short text:   Label * = ___\n'
-        '- Email:        Label * = @@@\n'
-        '- AHV number:   Label * = # ch.ssn\n'
-        '- Date:         Label * = YYYY.MM.DD\n'
-        '- Textarea:     Label * = ...\n'
-        '- Radio choice: Label * =\n'
-        '    ( ) Option A\n'
-        '    (x) Option B\n\n'
-        'Mark all fields as required (*) unless explicitly stated otherwise.\n'
-        'Return ONLY the raw formcode. No explanations, no markdown code '
-        'fences, no extra text.\n\n'
-        'Form fields requested:\n'
-        + str(snippet)
+    system_prompt = TRANSLATE_SYSTEM_PROMPT.format(
+        to_locale=request.locale,
+        specification=request.app.formcode_specification
     )
-    # llms: mixtral,llama3,granite,mistral24b,mistral3,qwen3,gemma3n]
-    model = 'qwen3'
-    url = f'https://api.infomaniak.com/1/ai/{product_id}/openai/chat/completions'
-    payload = {
-        'model': model,
-        'messages': [
-            {'role': 'user', 'content': prompt}
-        ],
-        'temperature': 0,
-    }
+
+    url = (
+        f'https://api.infomaniak.com/1/ai/{product_id}'
+        f'/openai/chat/completions'
+    )
 
     try:
         response = requests.post(
-            url, headers=headers, json=payload, timeout=30)
+            url=url,
+            headers={
+                'Authorization': f'Bearer {token}',
+                'Content-Type': 'application/json',
+            },
+            json={
+                'model': 'qwen3',
+                'messages': [
+                    {'role': 'system', 'content': system_prompt},
+                    {'role': 'user', 'content': snippet}
+                ],
+                'temperature': 0,
+            },
+            timeout=30
+        )
     except Exception as e:
         log.error(
             f'Formcoder: Infomaniak API request failed: {e}', exc_info=True)
         # does it appear on the ui as not reloaded??
         request.alert(
-            _('Failed to generate form code: {error}',
+            _('Formcoder: Infomaniak API request failed: {error}',
               mapping={'error': str(e)})
         )
         return Response(
@@ -461,25 +461,11 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
             _('Formcoder: Failed to generate form code. API error {status}',
               mapping={'status': response.status_code}))
         return Response(
-            status='error',
             body=f'Formcoder: Failed to generate form code. API error '
                  f'{response.text}',
             content_type='text/plain')
 
-    generated = ''
-    try:
-        data = response.json()
-        if isinstance(data, dict):
-            if data.get('choices', [{}]):
-                choice = data['choices'][0]
-                if isinstance(choice, dict):
-                    if (
-                        'message' in choice
-                        and isinstance(choice['message'], dict)
-                        and 'content' in choice['message']
-                    ):
-                        generated = choice['message']['content']
-    except ValueError:
-        pass
+    data = response.json()
+    translated = json.loads(data['choices'][0]['message']['content'])
 
-    return Response(body=generated, content_type='text/plain')
+    return Response(body=translated['definition'], content_type='text/plain')
