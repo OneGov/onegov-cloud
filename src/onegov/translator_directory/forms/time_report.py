@@ -599,6 +599,7 @@ class TranslatorTimeReportForm(Form):
         model.hourly_rate = self.get_hourly_rate(model.translator)
 
         if self.assignment_type.data == 'schriftlich':
+            # written has no date or time, as it only depends on sites
             model.pages = self.pages.data
             model.duration = 0
             model.break_time = 0

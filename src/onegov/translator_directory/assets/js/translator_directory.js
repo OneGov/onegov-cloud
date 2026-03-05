@@ -22,10 +22,7 @@ function moveMailTemplateButtonToEnd() {
 document.addEventListener("DOMContentLoaded", function() {
     moveMailTemplateButtonToEnd();
 
-    // Auto-set end date to match start date in time report form for convenience while typing
-    const startDateField = document.querySelector(
-        'input[name="start_date"]'
-    );
+    const startDateField = document.querySelector('input[name="start_date"]');
     const endDateField = document.querySelector('input[name="end_date"]');
 
     if (startDateField && endDateField) {
@@ -33,4 +30,36 @@ document.addEventListener("DOMContentLoaded", function() {
             endDateField.value = startDateField.value;
         });
     }
+
+    if (!document.querySelector('.field-finanzstelle')) { return; }
+
+    const assignmentTypeField = document.querySelector(
+        'select[name="assignment_type"]'
+    );
+    if (!assignmentTypeField) { return; }
+
+    const timeOnlyFields = [
+        'start_time', 'end_date', 'end_time', 'break_time', 'is_urgent'
+    ];
+
+    function updateTimeFields() {
+        const isSchriftlich = assignmentTypeField.value === 'schriftlich';
+        timeOnlyFields.forEach(function(name) {
+            const wrapper = document.querySelector('.field-' + name);
+            const input = document.querySelector('[name="' + name + '"]');
+            if (wrapper) {
+                wrapper.style.display = isSchriftlich ? 'none' : '';
+            }
+            if (input) {
+                input.required = !isSchriftlich;
+            }
+        });
+        const pagesInput = document.querySelector('[name="pages"]');
+        if (pagesInput) {
+            pagesInput.required = isSchriftlich;
+        }
+    }
+
+    assignmentTypeField.addEventListener('change', updateTimeFields);
+    updateTimeFields();
 });
