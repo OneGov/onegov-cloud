@@ -3286,3 +3286,54 @@ def test_time_report_duplicate_start_time_rejected(
         .all()
     )
     assert len(reports) == 1
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_time_report_schriftlich(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+    session = client.app.session()
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+    ).id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+
+    page.form['assignment_type'] = 'schriftlich'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-03-10'
+    page.form['pages'] = '5'
+    page.form['case_number'] = 'CASE-SCHRIFT-001'
+    page = page.form.submit().follow()
+
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    session.expire_all()
+    translator = session.query(Translator).filter_by(id=translator_id).one()
+    report = translator.time_reports[0]
+
+    assert report.assignment_type == 'schriftlich'
+    assert report.pages == 5
+    assert report.start is None
+    assert report.end is None
+    assert report.duration == 0
+    assert report.total_compensation == Decimal('450.00')  # 5 * 90
