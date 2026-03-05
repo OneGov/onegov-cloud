@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import morepath
+import requests
 
 from babel import Locale
+from onegov.core.custom import json
+from onegov.core.elements import Intercooler, Link
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.fedpol import _, FedpolApp
@@ -11,7 +14,6 @@ from onegov.fedpol.layout import FormSubmissionLayout, FormSubmissionStepLayout
 from onegov.fedpol.utils import get_step_form
 from onegov.form import FormCollection, FormDefinition
 from onegov.gis import Coordinates
-from onegov.org.elements import Link
 from onegov.org.models import CustomFormDefinition
 from onegov.org.views.form_definition import get_hints, get_form_class
 from onegov.town6.layout import FormEditorLayout
@@ -27,6 +29,33 @@ if TYPE_CHECKING:
     from webob import Response
 
     FormDefinitionT = TypeVar('FormDefinitionT', bound=FormDefinition)
+
+
+TRANSLATE_SYSTEM_PROMPT = """\
+You are an expert translator working for the Swiss government and are tasked
+with translating forms from {from_locale} to {to_locale}.
+
+You are also very familiar with formcode, the specialized Markdown inspired
+syntax for defining forms. When translating forms you need to take special
+care to preserve the semantic structure of formcode.
+
+The user prompt will give you a JSON object with all of the strings that need
+to be translated. Pay special attention to the "definition" key which contains
+formcode, when translating this field keep the structure exactly the same,
+ensure the translated formcode is still valid syntax, pay close attention to
+date and time fields, which will always have the same format string, regardless
+of the target language. Furthermore the "text" key will contain HTML, here once
+again make sure to generate valid HTML, with the same semantic structure.
+
+Respond with a JSON object that contains all of the translated strings.
+
+When translating strings be honest and reproduce the original intent, do not
+invent new text or alter the meaning of existing text in any way.
+
+Here is the complete specification of the aforementioned formcode:
+
+{specification}
+"""
 
 
 def get_defined_form_class(
@@ -149,6 +178,9 @@ def handle_translate_definition(
             name='edit'
         ))
 
+    api_key = request.app.infomaniak_api_token
+    product_id = request.app.infomaniak_product_id
+    can_translate = api_key is not None and product_id is not None
     collection = FormCollection(request.session)
     if form.submitted(request):
         assert form.title.data is not None
@@ -190,6 +222,67 @@ def handle_translate_definition(
 
             request.success(_('Added a new form'))
             return morepath.redirect(request.link(definition))
+    elif (
+        can_translate
+        and not request.POST
+        and request.GET.get('translate') == '1'
+    ):
+        # NOTE: Hide the AI translate button after translation
+        can_translate = False
+        url = (
+            f'https://api.infomaniak.com/1/ai/{product_id}'
+            f'/openai/chat/completions'
+        )
+        system_prompt = TRANSLATE_SYSTEM_PROMPT.format(
+            from_locale=self.locale,
+            to_locale=locale,
+            specification=request.app.formcode_specification,
+        )
+        payload = {
+            key: value
+            for key in (
+                'title',
+                'lead',
+                'text',
+                'group',
+                'definition',
+                'pick_up',
+                'custom_above_footer'
+            )
+            if isinstance((value := form[key].data), str)
+        }
+        result = requests.post(
+            url,
+            headers={
+                'Authorization': f'Bearer {api_key}',
+                'Content-Type': 'application/json',
+            },
+            json={
+                'model': 'qwen3',
+                'messages': [
+                    {'role': 'system', 'content': system_prompt},
+                    {'role': 'user', 'content': json.dumps(payload)}
+                ],
+                'temperature': 0,
+                'response_format': {
+                    'type': 'json_schema',
+                    'json_schema': {
+                        'name': 'translation_output',
+                        'schema': {
+                            'type': 'object',
+                            'properties': {
+                                key: {'type': 'string'}
+                                for key in payload
+                            }
+                        }
+                    }
+                }
+            },
+            timeout=30,
+        ).json()
+        translated = json.loads(result['choices'][0]['message']['content'])
+        for key, value in translated.items():
+            form[key].data = value
 
     language = Locale.parse(locale).get_language_name(request.locale)
     if language is None:
@@ -203,6 +296,23 @@ def handle_translate_definition(
         Link(title, '#')
     ]
     layout.edit_mode = True
+    if can_translate:
+        layout.editmode_links.insert(1, Link(
+            text=_('AI Translate'),
+            url=request.link(self, 'translate', query_params={
+                'locale': locale,
+                'translate': '1'
+            }),
+            traits=(
+                Intercooler('GET', 'main'),
+            ),
+            attrs={
+                'class': 'translate-link',
+                'ic-action-target': 'this',
+                'ic-beforeSend-action': 'addClass:in-progress',
+                'ic-select-from-response': 'main',
+            }
+        ))
 
     return {
         'layout': layout,

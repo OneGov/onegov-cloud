@@ -1,1 +1,6 @@
 .duplicate-link::before { @include icon('\f24d'); }
+.translate-link::before { @include icon-bold('\f1ab'); }
+.translate-link.in-progress::before {
+    @include icon-bold('\f110');
+    animation: fa-spin 2s infinite linear;
+}

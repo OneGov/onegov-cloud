@@ -541,3 +541,6 @@ jQuery.fn.many = function() {
 
 // since we intercept the dependency setup we need to run before document.ready
 $('.many').many();
+$(document).on('process-common-nodes', function(_e, elements) {
+    $(elements).find('.many').many();
+});
