@@ -152,7 +152,7 @@
             '<textarea name="snippet" placeholder="What fields for the form you need?" rows="12" style="width:100%;margin-bottom:10px;box-sizing:border-box;font-family:inherit;font-size:inherit;"></textarea>',
             '<div style="text-align:right;">',
             '<button type="button" class="button hollow" id="' + CANCEL_ID + '">Cancel</button>',
-            '<button type="submit" class="button" style="margin-left: 8px">Ok</button>',
+            '<button type="submit" class="button" style="margin-left: 8px">Generate Form Code</button>',
             '</div>',
             '</form>',
             '</div>'
@@ -160,15 +160,43 @@
 
         document.body.appendChild(overlay);
 
+        // Localize overlay text at creation-time as a best-effort
+        // declare once so variables are available outside try/catch (linters)
+        var locale, ta, cancelBtn, submitBtn;
+        try {
+            if (typeof window !== 'undefined' && typeof window.locale === 'function') {
+                locale = window.locale;
+            } else {
+                locale = function(s) { return s; };
+            }
+
+            ta = overlay.querySelector('textarea[name="snippet"]');
+            if (ta) {
+                ta.placeholder = locale('What fields for the form you need?');
+            }
+
+            cancelBtn = overlay.querySelector('#' + CANCEL_ID);
+            if (cancelBtn) {
+                cancelBtn.textContent = locale('Cancel');
+            }
+
+            submitBtn = overlay.querySelector('#' + FORM_ID + ' [type="submit"]');
+            if (submitBtn) {
+                submitBtn.textContent = locale('Generate Form Code');
+            }
+        } catch (e) {
+            // ignore localization failures
+        }
+
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay) {
                 overlay.style.display = 'none';
             }
         });
 
-        var cancel = overlay.querySelector('#' + CANCEL_ID);
-        if (cancel) {
-            cancel.addEventListener('click', function() {
+        cancelBtn = cancelBtn || overlay.querySelector('#' + CANCEL_ID);
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function() {
                 overlay.style.display = 'none';
             });
         }
@@ -218,6 +246,7 @@
             if (!overlay) {
                 return;
             }
+
             overlay._aceEditor = btn._aceEditor;
             var form = overlay.querySelector('#' + FORM_ID);
             if (form) {
