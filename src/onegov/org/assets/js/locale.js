@@ -40,7 +40,10 @@ var locales = {
         "The site could not be found.": "Die Seite wurde nicht gefunden.",
         "Access denied. Please log in before continuing.": "Zugriff verweigert. Bitte melden Sie sich an bevor Sie weiterfahren.",
         "Unsupported Media Type": "Nicht unterstützter Medientyp",
-        "Upload failed": "Upload fehlgeschlagen"
+        "Upload failed": "Upload fehlgeschlagen",
+        "What fields for the form you need?": "Welche Felder benötigt das Formular?",
+        "Generate Form Code": "Formularcode generieren",
+        "Cancel": "Abbrechen"
     },
     fr: {
         "Allocation": "Allocation",
@@ -83,7 +86,10 @@ var locales = {
         "The site could not be found.": "Impossible de trouver le site.",
         "Access denied. Please log in before continuing.": "Accès refusé. Veuillez vous connecter avant de continuer.",
         "Unsupported Media Type": "Type de média non supporté",
-        "Upload failed": "L'envoi a échoué"
+        "Upload failed": "L'envoi a échoué",
+        "What fields for the form you need?": "Quels champs le formulaire doit-il contenir ?",
+        "Generate Form Code": "Générer le code du formulaire",
+        "Cancel": "Annuler"
     },
     it: {
         "Allocation": "Allocazione",
@@ -126,7 +132,10 @@ var locales = {
         "The site could not be found.": "Impossibile trovare il sito.",
         "Access denied. Please log in before continuing.": "Accesso negato. Effettua il login prima di continuare.",
         "Unsupported Media Type": "Tipo di media non supportato",
-        "Upload failed": "L'upload non è andato a buon fine"
+        "Upload failed": "L'upload non è andato a buon fine",
+        "What fields for the form you need?": "Quali campi servono per il modulo?",
+        "Generate Form Code": "Genera il codice del modulo",
+        "Cancel": "Annulla"
     }
 };
 
