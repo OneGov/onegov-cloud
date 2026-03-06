@@ -7,27 +7,8 @@
     text-align: right;
 }
 
-/* Trigger helper for AI formcoder button: float right and ensure the following
-   code editor wrapper clears floats so the editor stays below the button. */
 .formcoder-trigger {
     float: right;
-    margin-left: 8px;
-}
-.formcoder-trigger ~ .code-editor-wrapper {
-    clear: both;
-}
-
-/* Force the trigger to the top-right of label containers inside formfields.
-   This is a targeted rule that avoids affecting unrelated labels. */
-.formfields .large-12.cell label {
-    position: relative;
-}
-.formfields .large-12.cell label > .formcoder-trigger {
-    position: absolute;
-    right: 0.5rem;
-    top: 0.25rem;
-    float: none;
-    margin-left: 0;
 }
 
 .formcode-toolbar-element {
@@ -79,7 +60,7 @@
 
 .formcode-snippet-title {
     color: $monsoon;
-    display: table-cell;
+    display: cell;
     font-weight: 400;
     margin-top: .5rem;
     padding-left: 6px;

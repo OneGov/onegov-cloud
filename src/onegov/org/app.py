@@ -423,7 +423,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
             import onegov.form.parser.core as parser
             return parser.__doc__
 
-        speficiation = response.text
+        specification = response.text
 
         # try to extend specification with examples
         response = requests.get(
@@ -432,8 +432,8 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
             timeout=(5, 10)
         )
         if not response.ok:
-            return speficiation
-        return f'{speficiation}\n\n{response.text}'
+            return specification
+        return f'{specification}\n\n{response.text}'
 
     @property
     def formcode_specification(self) -> str:
