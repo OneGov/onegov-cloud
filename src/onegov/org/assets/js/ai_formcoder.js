@@ -112,7 +112,7 @@
         overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;';
 
         overlay.innerHTML = [
-            '<div style="background:#fff;width:800px;max-width:92%;max-height:80vh;overflow:auto;padding:20px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:4px;box-sizing:border-box;">',
+            '<div style="background:#fff;width:800px;max-width:92%;max-height:80vh;overflow:auto;padding:20px;position:absolute;top:50%;left:40%;transform:translate(-50%,-50%);border-radius:4px;box-sizing:border-box;">',
             '<h5>Formcoder</h5>',
             '<form id="' + FORM_ID + '" method="post">',
             '<textarea name="snippet" placeholder="What fields for the form you need?" rows="12" style="width:100%;margin-bottom:10px;box-sizing:border-box;font-family:inherit;font-size:inherit;"></textarea>',
@@ -174,8 +174,8 @@
     function makeTrigger(aceEl) {
         var btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'button small secondary ' + TRIGGER_CLASS + ' formcoder-trigger';
-        btn.style.cssText = 'float:right;margin-left:8px;display:inline-block;width:auto;';
+        btn.className = 'button secondary ' + TRIGGER_CLASS + ' formcoder-trigger';
+        btn.style.cssText = 'display:inline-block;width:auto;position:relative;z-index:1;';
         btn.textContent = 'AI Formcoder';
         btn._aceEditor = aceEl || null;
         btn.addEventListener('click', function(e) {
