@@ -117,7 +117,8 @@
       if (toolbar.getAttribute('data-formcoder-added')) return;
       var aceEl = findAceForToolbar(toolbar);
       var btn = makeTrigger(aceEl);
-      toolbar.parentNode.insertBefore(btn, toolbar);
+      var anchor = toolbar.closest('label') || toolbar;
+      anchor.parentNode.insertBefore(btn, anchor);
       toolbar.setAttribute('data-formcoder-added', '1');
     });
     return true;
