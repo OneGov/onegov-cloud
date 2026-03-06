@@ -4,6 +4,7 @@
     var CANCEL_ID = 'formcoder-cancel';
     var TRIGGER_CLASS = 'formcoder-trigger';
     var TOOLBAR_SELECTOR = '.formcode-ace-editor-toolbar';
+    var LOADING_CLASS = 'formcoder-loading';
 
     function normalizeUrl(url) {
         try {
@@ -76,11 +77,26 @@
     }
 
     function submitForm(form, overlay) {
+        var submit = form.querySelector('[type="submit"]');
+
+        function setLoading(loading) {
+            if (!submit) {
+                return;
+            }
+            submit.disabled = loading;
+            if (loading) {
+                submit.classList.add(LOADING_CLASS);
+            } else {
+                submit.classList.remove(LOADING_CLASS);
+            }
+        }
+
         try {
             setFormAction(form);
         } catch (e) {
             // ignore
         }
+        setLoading(true);
         var fd = new FormData(form);
         var action = form.getAttribute('action') || form.action || '/formcoder';
         fetch(action, {method: 'POST', body: fd, credentials: 'same-origin'})
@@ -91,6 +107,7 @@
                 return resp.text();
             })
             .then(function(text) {
+                setLoading(false);
                 var aceEl = overlay._aceEditor;
                 if (aceEl) {
                     trySetAceValue(aceEl, text);
@@ -98,6 +115,7 @@
                 overlay.style.display = 'none';
             })
             .catch(function(err) {
+                setLoading(false);
                 console.error('formcoder POST failed', err); // eslint-disable-line no-console
             });
     }
@@ -105,6 +123,22 @@
     function createOverlay() {
         if (document.getElementById(OVERLAY_ID)) {
             return;
+        }
+
+        if (!document.getElementById('formcoder-styles')) {
+            var style = document.createElement('style');
+            style.id = 'formcoder-styles';
+            style.textContent = [
+                '@keyframes formcoder-spin { to { transform: rotate(360deg); } }',
+                '.' + LOADING_CLASS + ' { opacity: .65; pointer-events: none; }',
+                '.' + LOADING_CLASS + '::after {',
+                '  content: ""; display: inline-block; vertical-align: middle;',
+                '  width: .75em; height: .75em; margin-left: .4em;',
+                '  border: 2px solid; border-top-color: transparent; border-radius: 50%;',
+                '  animation: formcoder-spin .7s linear infinite;',
+                '}'
+            ].join('\n');
+            document.head.appendChild(style);
         }
 
         var overlay = document.createElement('div');
