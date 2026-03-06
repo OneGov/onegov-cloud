@@ -378,10 +378,6 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
     form definition text field.
     """
 
-    # improvements
-    # - logging needed?
-    # - alert useful as page not reloaded?
-
     token = request.app.infomaniak_api_token
     product_id = request.app.infomaniak_product_id
     snippet: str = str(request.params.get('snippet', ''))
@@ -438,11 +434,6 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
     except Exception as e:
         log.error(
             f'Formcoder: Infomaniak API request failed: {e}', exc_info=True)
-        # does it appear on the ui as not reloaded??
-        request.alert(
-            _('Formcoder: Infomaniak API request failed: {error}',
-              mapping={'error': str(e)})
-        )
         return Response(
             body=f"Infomaniak API request failed with '{e}'",
             content_type='text/plain')
@@ -450,10 +441,6 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
     if not response.ok:
         log.error(f'Formcoder: Failed to generate form code. '
                   f'API error: {response.status_code}, {response.text}')
-        # does it appear on the ui as not reloaded??
-        request.alert(
-            _('Formcoder: Failed to generate form code. API error {status}',
-              mapping={'status': response.status_code}))
         return Response(
             body=f'Formcoder: Failed to generate form code. API error '
                  f'{response.text}',
