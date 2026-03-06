@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import morepath
 import requests
 
@@ -34,13 +33,13 @@ if TYPE_CHECKING:
 
 
 FORMCODE_PROMPT = """\
-You are an expert in onegov-cloud formcode syntax, the specialized Markdown 
+You are an expert in onegov-cloud formcode syntax, the specialized Markdown
 inspired syntax for defining forms.
+Always include an email address field.
+Special care to comments and fieldset definition, never put a fieldset
+definition without a field.
 
-Special care to field types like social security number
-`AHV number:   Label * = # ch.ssn\n`
-
-Do not add any explanations, markdown code blocks, or preamble. 
+Do not add any explanations, markdown code blocks, or preamble.
 Only output the raw formcode as plain text.
 
 Take care to only use the syntax described in the following specification:
@@ -413,7 +412,6 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
     prompt = FORMCODE_PROMPT.format(
         specification=request.app.formcode_specification
     )
-    print('Formcoder: Sending prompt to Infomaniak API:\n', prompt)
     url = (
         f'https://api.infomaniak.com/1/ai/{product_id}'
         f'/openai/chat/completions'
