@@ -142,13 +142,6 @@ def get_global_tools(
                         request.class_link(TimeReportCollection),
                         attrs={'class': 'time-reports'},
                     ),
-                ),
-            )
-        elif request.is_accountant:
-            yield LinkGroup(
-                _('Management'),
-                classes=('management',),
-                links=(
                     Link(
                         _('Time Reports'),
                         request.class_link(TimeReportCollection),
