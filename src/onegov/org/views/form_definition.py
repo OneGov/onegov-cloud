@@ -36,7 +36,8 @@ FORMCODE_PROMPT = """\
 You are an expert in onegov-cloud formcode syntax, the specialized Markdown
 inspired syntax for defining forms.
 Always include an email address field.
-Special care to comments and fieldset definition, never put a fieldset
+Special care to comments, please.
+Don't use fieldset definitions as 'form title' and never put a fieldset
 definition without a field.
 
 Do not add any explanations, markdown code blocks, or preamble.
@@ -432,7 +433,7 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
                 ],
                 'temperature': 0,
             },
-            timeout=30
+            timeout=(10, 30)
         )
     except Exception as e:
         log.error(
