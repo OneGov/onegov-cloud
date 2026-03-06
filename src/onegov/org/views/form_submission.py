@@ -4,17 +4,17 @@ from __future__ import annotations
 import morepath
 from datetime import date
 from onegov.core.elements import Link
+from onegov.core.mail import Attachment
 from onegov.core.security import Public, Private
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.submission import SurveySubmission
-from onegov.org.cli import close_ticket
-from onegov.ticket import TicketCollection
 from onegov.form import (
     FormCollection,
     PendingFormSubmission,
     CompleteFormSubmission
 )
 from onegov.org import _, OrgApp
+from onegov.org.cli import close_ticket
 from onegov.org.layout import (
     FormSubmissionLayout,
     SurveySubmissionLayout,
@@ -27,6 +27,7 @@ from onegov.org.models.ticket import (
     FormSubmissionTicket,
     ReservationTicket,
 )
+from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.utils import (
     currency_for_submission,
     emails_for_new_ticket,
@@ -34,7 +35,7 @@ from onegov.org.utils import (
     invoice_items_for_submission,
 )
 from onegov.pay import InvoiceItemMeta, PaymentError, Price
-from onegov.ticket import TicketInvoice
+from onegov.ticket import TicketCollection, TicketInvoice
 from purl import URL
 from uuid import uuid4
 from webob.exc import HTTPMethodNotAllowed, HTTPNotFound
@@ -391,12 +392,29 @@ def handle_complete_submission(
             )
             custom_above_footer = (
                 self.form.custom_above_footer if self.form else None)
+            if self.meta['show_submission']:
+                # HACK: This PDF isn't really intended for customers, but for
+                #       demo purposes it's fine...
+                attachments: tuple[Attachment, ...] = (
+                    Attachment(
+                        f'{ticket.number}.pdf',
+                        TicketPdf.from_ticket(
+                            request,
+                            ticket,
+                            for_customer=True
+                        ),
+                        'application/pdf'
+                    ),
+                )
+            else:
+                attachments = ()
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened.pt',
                 subject=_('Your request has been registered'),
                 ticket=ticket,
                 receivers=(self.email, ),
+                attachments=attachments,
                 content={
                     'model': ticket,
                     'form': form,

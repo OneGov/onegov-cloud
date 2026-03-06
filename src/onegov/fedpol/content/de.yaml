@@ -1,0 +1,42 @@
+page-default: &lorem-ipsum
+  text: |
+    <p>
+      Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und
+      Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in
+      Buchstabhausen an der Küste des Semantik, eines grossen Sprachozeans.
+    </p>
+
+    <p>
+      Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt
+      sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land,
+      in dem einem gebratene Satzteile in den Mund fliegen.
+    </p>
+
+    <p>
+      Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte
+      beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber
+      beschloss eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum,
+      hinaus zu gehen in die weite Grammatik.
+    </p>
+
+pages:
+  - title: Informationen
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Demo-Applikation Präsentation Fedpol
+  - title: Aktuelles
+    type: news
+    name: news
+    meta:
+      trait: news
+
+organisation:
+  theme_options:
+    primary-color-ui: '#2f6db4'
+  meta:
+    homepage_structure: |
+      <slider />

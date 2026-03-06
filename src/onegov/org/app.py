@@ -1,10 +1,11 @@
 """ Contains the base application used by other applications. """
 from __future__ import annotations
 
+import morepath
 import re
+import requests
 import yaml
 
-import morepath
 from dectate import directive
 from email.headerregistry import Address
 from functools import wraps
@@ -58,6 +59,7 @@ if TYPE_CHECKING:
 class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
              DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
 
+    localizeable = False
     serve_static_files = True
     request_class = OrgRequest
 
@@ -125,6 +127,17 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         self.enable_user_registration = enable_user_registration
         self.enable_yubikey = enable_yubikey
         self.disable_password_reset = disable_password_reset
+
+    def configure_infomaniak_api_token(
+            self,
+            *,
+            infomaniak_api_token: str | None = None,
+            infomaniak_product_id: int | None = None,
+            ** cfg: Any
+    ) -> None:
+
+        self.infomaniak_api_token = infomaniak_api_token
+        self.infomaniak_product_id = infomaniak_product_id
 
     def configure_plausible_api_token(
         self,
@@ -398,6 +411,37 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
 
         with fs.open('eventsettings.yml', 'r') as f:
             return yaml.safe_load(f).get('event_form_lead', None)
+
+    def load_formcode_specification(self) -> str:
+        response = requests.get(
+            'https://raw.githubusercontent.com/seantis/docs-admin-digital'
+            '/refs/heads/main/content/module/formulare/index.md',
+            timeout=(5, 10)
+        )
+        if not response.ok:
+            # Fallback to our docstring
+            import onegov.form.parser.core as parser
+            return parser.__doc__
+
+        speficiation = response.text
+
+        # try to extend specification with examples
+        response = requests.get(
+            'https://raw.githubusercontent.com/seantis/docs-admin-digital'
+            '/refs/heads/main/content/module/formulare/beispiele.md',
+            timeout=(5, 10)
+        )
+        if not response.ok:
+            return speficiation
+        return f'{speficiation}\n\n{response.text}'
+
+    @property
+    def formcode_specification(self) -> str:
+        return self.cache.get_or_create(
+            'formcode_specification',
+            self.load_formcode_specification,
+            expiration_time=86400
+        )
 
     def checkout_button(
         self,
