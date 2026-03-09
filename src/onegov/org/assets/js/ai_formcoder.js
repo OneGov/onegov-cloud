@@ -6,37 +6,8 @@
     var TOOLBAR_SELECTOR = '.formcode-ace-editor-toolbar';
     var LOADING_CLASS = 'formcoder-loading';
 
-    function normalizeUrl(url) {
-        try {
-            return (new URL(url, window.location.origin)).toString();
-        } catch (e) {
-            return url;
-        }
-    }
-
-    function getAiFormcoderUrlFromPage(form) {
-        try {
-            if (form && form.dataset && form.dataset.aiFormcoderUrl) {
-                return normalizeUrl(form.dataset.aiFormcoderUrl);
-            }
-            var hostForm = document.querySelector('form[data-ai-formcoder-url]');
-            if (hostForm && hostForm.dataset && hostForm.dataset.aiFormcoderUrl) {
-                return normalizeUrl(hostForm.dataset.aiFormcoderUrl);
-            }
-        } catch (e) {
-            // ignore
-        }
-        return null;
-    }
-
     function setFormAction(form) {
         try {
-            var aiUrl = getAiFormcoderUrlFromPage(form);
-            if (aiUrl) {
-                form.action = aiUrl;
-                return;
-            }
-
             var path = window.location.pathname.replace((/\/$/), '');
             if ((/\/form\/[^^\/]+(\/edit)?$/).test(path) || (/\/form\/[^^\/]+$/).test(path)) {
                 path = path.replace((/\/form\/[^^\/]+(\/edit)?$/), '/forms');
@@ -50,29 +21,64 @@
             }
             form.action = path + '/formcoder';
         } catch (e) {
-            form.action = '/formcoder';
+            /* eslint-disable-next-line no-empty */
         }
     }
 
-    function trySetAceValue(aceEl, text) {
-        if (typeof ace !== 'undefined') {
-            try {
-                var editor = ace.edit(aceEl);
-                if (editor && typeof editor.setValue === 'function') {
-                    editor.setValue(text, -1);
-                    return;
-                }
-                if (editor && editor.session && typeof editor.session.setValue === 'function') {
-                    editor.session.setValue(text);
-                    return;
-                }
-            } catch (e) {
-                // ignore
+    function trySetTextAreaValue(aceEl, text) {
+        try {
+            var editor = ace.edit(aceEl);
+            if (editor && typeof editor.setValue === 'function') {
+                editor.setValue(text, -1);
+                return;
             }
+        } catch (e) {
+            /* eslint-disable-next-line no-empty */
         }
-        var ta = aceEl.querySelector && aceEl.querySelector('textarea');
-        if (ta) {
-            ta.value = text;
+    }
+
+    function ensureFormcoderStyles() {
+        if (document.getElementById('formcoder-styles')) { return; }
+        var style = document.createElement('style');
+        style.id = 'formcoder-styles';
+        style.textContent = [
+            '@keyframes formcoder-spin { to { transform: rotate(360deg); } }',
+            '.' + LOADING_CLASS + ' { opacity: .65; pointer-events: none; }',
+            '.' + LOADING_CLASS + '::after {',
+            '  content: ""; display: inline-block; vertical-align: middle;',
+            '  width: .75em; height: .75em; margin-left: .4em;',
+            '  border: 2px solid; border-top-color: transparent; border-radius: 50%;',
+            '  animation: formcoder-spin .7s linear infinite;',
+            '}'
+        ].join('\n');
+        document.head.appendChild(style);
+    }
+
+    function localizeOverlay(overlay) {
+        try {
+            var localeFn;
+            if (typeof window !== 'undefined' && typeof window.locale === 'function') {
+                localeFn = window.locale;
+            } else {
+                localeFn = function(s) { return s; };
+            }
+
+            var ta = overlay.querySelector('textarea[name="snippet"]');
+            if (ta) {
+                ta.placeholder = localeFn('What fields for the form you need?');
+            }
+
+            var cancelBtn = overlay.querySelector('#' + CANCEL_ID);
+            if (cancelBtn) {
+                cancelBtn.textContent = localeFn('Cancel');
+            }
+
+            var submitBtn = overlay.querySelector('#' + FORM_ID + ' [type="submit"]');
+            if (submitBtn) {
+                submitBtn.textContent = localeFn('Generate Form Code');
+            }
+        } catch (e) {
+            /* eslint-disable-next-line no-empty */
         }
     }
 
@@ -94,7 +100,7 @@
         try {
             setFormAction(form);
         } catch (e) {
-            // ignore
+            /* eslint-disable-next-line no-empty */
         }
         setLoading(true);
         var fd = new FormData(form);
@@ -110,7 +116,7 @@
                 setLoading(false);
                 var aceEl = overlay._aceEditor;
                 if (aceEl) {
-                    trySetAceValue(aceEl, text);
+                    trySetTextAreaValue(aceEl, text);
                 }
                 overlay.style.display = 'none';
             })
@@ -125,21 +131,7 @@
             return;
         }
 
-        if (!document.getElementById('formcoder-styles')) {
-            var style = document.createElement('style');
-            style.id = 'formcoder-styles';
-            style.textContent = [
-                '@keyframes formcoder-spin { to { transform: rotate(360deg); } }',
-                '.' + LOADING_CLASS + ' { opacity: .65; pointer-events: none; }',
-                '.' + LOADING_CLASS + '::after {',
-                '  content: ""; display: inline-block; vertical-align: middle;',
-                '  width: .75em; height: .75em; margin-left: .4em;',
-                '  border: 2px solid; border-top-color: transparent; border-radius: 50%;',
-                '  animation: formcoder-spin .7s linear infinite;',
-                '}'
-            ].join('\n');
-            document.head.appendChild(style);
-        }
+        ensureFormcoderStyles();
 
         var overlay = document.createElement('div');
         overlay.id = OVERLAY_ID;
@@ -160,33 +152,7 @@
 
         document.body.appendChild(overlay);
 
-        // Localize overlay text at creation-time as a best-effort
-        // declare once so variables are available outside try/catch (linters)
-        var locale, ta, cancelBtn, submitBtn;
-        try {
-            if (typeof window !== 'undefined' && typeof window.locale === 'function') {
-                locale = window.locale;
-            } else {
-                locale = function(s) { return s; };
-            }
-
-            ta = overlay.querySelector('textarea[name="snippet"]');
-            if (ta) {
-                ta.placeholder = locale('What fields for the form you need?');
-            }
-
-            cancelBtn = overlay.querySelector('#' + CANCEL_ID);
-            if (cancelBtn) {
-                cancelBtn.textContent = locale('Cancel');
-            }
-
-            submitBtn = overlay.querySelector('#' + FORM_ID + ' [type="submit"]');
-            if (submitBtn) {
-                submitBtn.textContent = locale('Generate Form Code');
-            }
-        } catch (e) {
-            // ignore localization failures
-        }
+        localizeOverlay(overlay);
 
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay) {
@@ -194,7 +160,7 @@
             }
         });
 
-        cancelBtn = cancelBtn || overlay.querySelector('#' + CANCEL_ID);
+        var cancelBtn = overlay.querySelector('#' + CANCEL_ID);
         if (cancelBtn) {
             cancelBtn.addEventListener('click', function() {
                 overlay.style.display = 'none';
@@ -213,16 +179,7 @@
         if (!toolbar) {
             return null;
         }
-        var wrapper = toolbar.closest('.code-editor-wrapper');
-        if (wrapper) {
-            var aceEl = wrapper.querySelector('.ace_editor');
-            if (aceEl) {
-                return aceEl;
-            }
-            if (wrapper.classList && wrapper.classList.contains('ace_editor')) {
-                return wrapper;
-            }
-        }
+
         var parent = toolbar.parentNode;
         if (parent) {
             var found = parent.querySelector('.ace_editor');
