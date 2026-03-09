@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import morepath
+import requests
 
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection, FormDefinition
 from onegov.form import FormRegistrationWindow
 from onegov.gis import Coordinates
-from onegov.org import _, OrgApp
+from onegov.org import _, OrgApp, log
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import FormDefinitionForm
@@ -16,7 +17,7 @@ from onegov.org.layout import FormEditorLayout, FormSubmissionLayout
 from onegov.org.models import BuiltinFormDefinition, CustomFormDefinition
 from onegov.org.models.form import submission_deletable
 from webob import exc
-
+from webob import Response
 
 from typing import TypeVar, TYPE_CHECKING
 
@@ -27,9 +28,25 @@ if TYPE_CHECKING:
     from onegov.form import Form, FormSubmission
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Session
-    from webob import Response
 
     FormDefinitionT = TypeVar('FormDefinitionT', bound=FormDefinition)
+
+
+FORMCODE_PROMPT = """\
+You are an expert in onegov-cloud formcode syntax, the specialized Markdown
+inspired syntax for defining forms.
+Always include an email address field.
+Special care to comments, please.
+Don't use fieldset definitions/title as 'form title' and never put a fieldset
+definition without a field.
+
+Do not add any explanations, markdown code blocks, or preamble.
+Only output the raw formcode as plain text.
+
+Take care to only use the syntax described in the following specification:
+
+{specification}
+"""
 
 
 def get_form_class(
@@ -371,3 +388,91 @@ def delete_form_definition(
         with_registration_windows=True,
         handle_submissions=handle_submissions
     )
+
+
+@OrgApp.view(
+    model=FormCollection,
+    name='formcoder',
+    request_method='POST',
+    permission=Private
+)
+def formcoder(self: FormCollection, request: OrgRequest) -> Response:
+    """Generate formcode for a new form being created or edited.
+
+    This handles POSTs to e.g. /forms/formcoder, requesting AI support
+    from infomaniak and finally returns plain text being replaced in the
+    form definition text field.
+    """
+
+    token = request.app.infomaniak_api_token
+    product_id = request.app.infomaniak_product_id
+    snippet: str = str(request.params.get('snippet', ''))
+
+    if not snippet:
+        return Response(body='Missing prompt', content_type='text/plain')
+
+    if not token:
+        log.warning('Formcoder: Infomaniak API token not configured')
+        return Response(
+            body='INFOMANIAK_API_TOKEN_NOT_CONFIGURED',
+            content_type='text/plain')
+
+    if not product_id:
+        log.warning(
+            'Formcoder: Could not retrieve product id from Infomaniak API')
+        return Response(
+            body='Could not retrieve product id from Infomaniak API',
+            content_type='text/plain',
+        )
+
+    if not request.app.formcode_specification:
+        log.warning('Formcoder: Formcode specification not configured')
+        return Response(
+            body='Formcode specification not configured',
+            content_type='text/plain'
+        )
+
+    prompt = FORMCODE_PROMPT.format(
+        specification=request.app.formcode_specification
+    )
+    url = (
+        f'https://api.infomaniak.com/1/ai/{product_id}'
+        f'/openai/chat/completions'
+    )
+
+    try:
+        response = requests.post(
+            url=url,
+            headers={
+                'Authorization': f'Bearer {token}',
+                'Content-Type': 'application/json',
+            },
+            json={
+                'model': 'qwen3',
+                'messages': [
+                    {'role': 'system', 'content': prompt},
+                    {'role': 'user', 'content': snippet}
+                ],
+                'temperature': 0,
+            },
+            timeout=(10, 30)
+        )
+    except Exception as e:
+        log.error(
+            f'Formcoder: Infomaniak API request failed: {e}', exc_info=True)
+        return Response(
+            body=f"Infomaniak API request failed with '{e}'",
+            content_type='text/plain')
+
+    if not response.ok:
+        log.error(f'Formcoder: Failed to generate form code. '
+                  f'API error: {response.status_code}, {response.text}')
+        return Response(
+            body=f'Formcoder: Failed to generate form code. API error '
+                 f'{response.text}',
+            content_type='text/plain')
+
+    data = response.json()
+    definition = data['choices'][0]['message']['content']
+
+    return Response(body=definition, content_type='text/plain')
