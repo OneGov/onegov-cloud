@@ -4,7 +4,9 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.election_day.models.vote.mixins import DerivedAttributesMixin
 from onegov.election_day.models.vote.mixins import DerivedBallotsCountMixin
+from sqlalchemy import case
 from sqlalchemy import ForeignKey
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Mapped
@@ -14,6 +16,7 @@ from uuid import UUID
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.models import Ballot
+    from sqlalchemy.sql import ColumnElement
 
 
 class BallotResult(Base, TimestampMixin, DerivedAttributesMixin,
@@ -63,6 +66,26 @@ class BallotResult(Base, TimestampMixin, DerivedAttributesMixin,
 
     #: number of expats
     expats: Mapped[int | None]
+
+    #: number of votes received (total cast ballots from source data)
+    received: Mapped[int | None] = mapped_column(default=lambda: None)
+
+    @hybrid_property
+    def cast_ballots(self) -> int:
+        if self.received is not None:
+            return self.received
+        return (
+            (self.yeas or 0) + (self.nays or 0) + (self.empty or 0)
+            + (self.invalid or 0)
+        )
+
+    @cast_ballots.inplace.expression
+    @classmethod
+    def _cast_ballots_expression(cls) -> ColumnElement[int]:
+        return case(
+            (cls.received.isnot(None), cls.received),
+            else_=cls.yeas + cls.nays + cls.empty + cls.invalid
+        )
 
     #: the id of the ballot this result belongs to
     ballot_id: Mapped[UUID] = mapped_column(

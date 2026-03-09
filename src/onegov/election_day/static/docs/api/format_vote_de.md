@@ -54,6 +54,7 @@ Name|Beschreibung
 `empty`|Die Anzahl leerer Stimmen
 `eligible_voters`|Die Anzahl Stimmberechtigter
 `expats`|Anzahl Auslandschweizer. Optional.
+`received`|Anzahl eingegangener Stimmzettel. Optional.
 
 
 #### Temporäre Resultate
