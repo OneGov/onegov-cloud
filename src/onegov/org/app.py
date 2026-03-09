@@ -138,20 +138,20 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         self.plausible_api_token = plausible_api_token
 
     def configure_stadt_wil_azizi_api_token(
-            self,
-            *,
-            azizi_api_token: str = '',
-            ** cfg: Any
+        self,
+        *,
+        azizi_api_token: str = '',
+        ** cfg: Any
     ) -> None:
 
         self.azizi_api_token = azizi_api_token
 
     def configure_infomaniak_api_token(
-            self,
-            *,
-            infomaniak_api_token: str | None = None,
-            infomaniak_product_id: str | None = None,
-            **cfg: Any
+        self,
+        *,
+        infomaniak_api_token: str | None = None,
+        infomaniak_product_id: str | None = None,
+        **cfg: Any
     ) -> None:
 
         self.infomaniak_api_token = infomaniak_api_token
