@@ -40,8 +40,8 @@ from types import MethodType
 from webob import Response
 from webob.exc import WSGIHTTPException
 
-from typing import Any, Literal, TYPE_CHECKING
 
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from collections.abc import (

@@ -1514,7 +1514,7 @@ def translate_to_yaml(
             yield '{indent}"{identifier}": \'{message}\''.format(
                 indent=indent + 2 * ' ',
                 identifier='field_help',
-                message=parse_result.message
+                message=escape_single(parse_result.message)
             )
             identifier_indent_stack = handle_indent_stack(
                 identifier_indent_stack, ix, len_indent, enable_edit_checks

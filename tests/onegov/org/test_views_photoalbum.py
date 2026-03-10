@@ -46,3 +46,11 @@ def test_manage_album(client: Client) -> None:
 
     album = albums.click("Comicon 2016")
     assert "This is an alt text" in album
+
+    # switch to grid mode
+    settings = album.click("Bearbeiten")
+    settings.form['view'] = 'grid'
+    settings.form.submit()
+
+    album = albums.click("Comicon 2016")
+    assert "This is an alt text" in album
