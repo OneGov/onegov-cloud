@@ -146,10 +146,19 @@ function handleFilesAutoExpand() {
     if (!window.location.pathname.endsWith('/files')) {
         return;
     }
-    window.addEventListener('load', function () {
-        document.querySelectorAll('[data-toggle]').forEach(function (btn) {
-            btn.click();
-        });
+    document.querySelectorAll('[data-ogc-toggle]').forEach(function (btn) {
+        var targetSel = btn.getAttribute('data-ogc-toggle');
+        var target = document.querySelector(targetSel);
+        if (!target) { return; }
+        var loader = target.querySelector('[ic-get-from]');
+        if (!loader) { return; }
+        var url = loader.getAttribute('ic-get-from');
+        if (!url) { return; }
+        target.style.display = '';
+        target.classList.remove('hidden');
+        fetch(url)
+            .then(function (r) { return r.text(); })
+            .then(function (html) { loader.innerHTML = html; });
     });
 }
 
