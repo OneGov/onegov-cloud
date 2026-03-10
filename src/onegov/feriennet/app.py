@@ -311,6 +311,11 @@ def get_citizen_login_enabled() -> bool:
     return False
 
 
+@FeriennetApp.setting(section='org', name='ris_settings_enabled')
+def get_ris_settings_enabled() -> bool:
+    return False
+
+
 @FeriennetApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     return [

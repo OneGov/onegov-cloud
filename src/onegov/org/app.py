@@ -698,6 +698,11 @@ def get_citizen_login_enabled() -> bool:
     return True
 
 
+@OrgApp.setting(section='org', name='ris_settings_enabled')
+def get_ris_settings_enabled() -> bool:
+    return True
+
+
 @OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')
 def get_render_mtan_access_limit_exceeded(
 ) -> Callable[[MTANAccessLimitExceeded, OrgRequest], Response]:

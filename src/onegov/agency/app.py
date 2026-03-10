@@ -175,6 +175,11 @@ def get_citizen_login_enabled() -> bool:
     return False
 
 
+@AgencyApp.setting(section='org', name='ris_settings_enabled')
+def get_ris_settings_enabled() -> bool:
+    return False
+
+
 @AgencyApp.webasset_output()
 def get_webasset_output() -> str:
     return 'assets/bundles'
