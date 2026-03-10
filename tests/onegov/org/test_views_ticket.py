@@ -15,8 +15,8 @@ from onegov.reservation import ResourceCollection
 from textwrap import dedent
 from webtest import Upload
 
-
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from tests.shared.client import ExtendedResponse
     from .conftest import Client
@@ -853,6 +853,40 @@ def test_disable_tickets(client: Client) -> None:
     assert ticket_number in page
     assert 'hans.maulwurf@simpsons.com' in page.pyquery('.ticket-group').text()
     assert 'hans.maulwurf@simpsons.com' in page.click('Annehmen').follow()
+
+
+def test_event_ticket(client: Client) -> None:
+    # enable submit events
+    client.login_admin()
+    settings = client.get('/event-settings')
+    settings.form['submit_events_visible'] = True
+    settings.form.submit()
+
+    new_event = client.get('/events').click('Veranstaltung erfassen')
+    new_event.form['title'] = 'Bicycle Day'
+    new_event.form['location'] = 'Around the Lake'
+    new_event.form['organizer'] = 'Pro Bicycle'
+    new_event.form['start_date'] = date.today().isoformat()
+    new_event.form['start_time'] = '11:00'
+    new_event.form['end_time'] = '17:00'
+    review = new_event.form.submit().follow()
+    # verify no event link on review page (event not yet published)
+    assert review.pyquery('.occurrence a').attr('href') == 'False'
+
+    page = review.form.submit().follow()
+    ticket_number = page.pyquery('.ticket-number').text()
+    ticket = client.get('/tickets/ALL/open')
+    ticket = ticket.click(ticket_number)
+    # verify no event link on ticket page (event not yet published)
+    assert ticket.pyquery('.occurrence a').attr('href') == 'False'
+
+    ticket = ticket.click('Ticket annehmen').follow()
+    assert ticket.pyquery('.occurrence a').attr('href') == 'False'
+    ticket = ticket.click('Veranstaltung annehmen').follow()
+    # verify link to ticket on ticket view as it is now published
+    assert ticket.pyquery('.occurrence a').attr('href') != 'False'
+    assert (ticket.pyquery('.occurrence a').attr('href') ==
+            f'http://localhost/event/bicycle-day-{date.today().isoformat()}')
 
 
 def test_assign_tickets(client: Client) -> None:
