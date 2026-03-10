@@ -82,6 +82,13 @@ def view_settings(
                     and not request.app.settings.org.citizen_login_enabled
                 ):
                     continue
+
+                if (
+                    setting['name'] == 'ris-enable'
+                    and not request.app.settings.org.ris_settings_enabled
+                ):
+                    continue
+
                 setting['title'] = setting['setting']
                 setting['link'] = request.link(self, name=setting['name'])
 

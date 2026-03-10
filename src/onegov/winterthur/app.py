@@ -257,6 +257,11 @@ def get_default_event_search_widget() -> str:
     return 'inline'
 
 
+@WinterthurApp.setting(section='org', name='ris_settings_enabled')
+def get_ris_settings_enabled() -> bool:
+    return False
+
+
 @WinterthurApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.winterthur', 'locale')
