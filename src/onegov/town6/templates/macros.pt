@@ -1416,7 +1416,7 @@
         <dd tal:content="escape(event.description).replace('\n', Markup('<br>'))" />
 
         <dt i18n:translate>List Preview</dt>
-        <dd tal:define="occurrence event.latest_occurrence or event.virtual_occurrence; use_links False">
+        <dd tal:define="occurrence event.latest_occurrence or event.virtual_occurrence">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
         </dd>
 
