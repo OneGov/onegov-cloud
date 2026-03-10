@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     handleBulkAddCommission();
     handleAttendanceFormSync();
     handleParliamentarianCounter();
+    handleFilesAutoExpand();
 });
 
 
@@ -141,12 +142,20 @@ function handleParliamentarianCounter() {
 }
 
 
+function handleFilesAutoExpand() {
+    if (!window.location.pathname.endsWith('/files')) {
+        return;
+    }
+    window.addEventListener('load', function () {
+        document.querySelectorAll('[data-toggle]').forEach(function (btn) {
+            btn.click();
+        });
+    });
+}
+
+
 function handleAttendanceFormSync() {
-    // Pre-restrict interdependent dropdown values to prevent invalid
-    // combinations. When a user selects a commission or parliamentarian,
-    // the other dropdown dynamically filters to show only valid pairings.
-    // This improves UX by preventing form submissions with mismatched
-    // selections and making the valid options immediately clear.
+    // Prevent invalid combinations in dependent dropdowns
 
     // Applies to *single* attendance form only.
    if (!window.location.href.includes('attendences/new')) {
