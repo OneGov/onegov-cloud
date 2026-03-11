@@ -4,7 +4,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.election_day.models.vote.mixins import DerivedAttributesMixin
 from onegov.election_day.models.vote.mixins import DerivedBallotsCountMixin
-from sqlalchemy import case
+from sqlalchemy import func
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column
