@@ -69,6 +69,13 @@ def view_settings(
         for action, fn in q(request.app):
             if 'setting' in action.predicates:
                 setting = copy(action.predicates)
+
+                # ogc-3003: for now we don't show the `Migration Links` in
+                # settings as it breaks html. Still directly accessible
+                # via `/migrate-links`
+                if setting['name'] == 'migrate-links':
+                    continue
+
                 # exclude this setting view if it's disabled for the app
                 if (
                     setting['name'] == 'citizen-login-settings'

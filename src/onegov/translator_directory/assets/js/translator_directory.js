@@ -69,13 +69,14 @@ function setupTimeReportForm() {
                 existing.remove();
             }
         }
+        const requiredWhenTimed = ['start_time', 'end_date', 'end_time'];
         timeOnlyFields.forEach(function(name) {
             const wrapper = document.querySelector('.field-' + name);
             const input = document.querySelector('[name="' + name + '"]');
             if (wrapper) {
                 wrapper.style.display = isSchriftlich ? 'none' : '';
             }
-            if (input) {
+            if (input && requiredWhenTimed.includes(name)) {
                 input.required = !isSchriftlich;
             }
         });
