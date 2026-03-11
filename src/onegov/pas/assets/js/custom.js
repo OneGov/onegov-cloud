@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     handleBulkAddCommission();
     handleAttendanceFormSync();
     handleParliamentarianCounter();
+    handleFilesAutoExpand();
 });
 
 
@@ -141,12 +142,29 @@ function handleParliamentarianCounter() {
 }
 
 
+function handleFilesAutoExpand() {
+    if (!window.location.pathname.endsWith('/files')) {
+        return;
+    }
+    document.querySelectorAll('[data-ogc-toggle]').forEach(function (btn) {
+        var targetSel = btn.getAttribute('data-ogc-toggle');
+        var target = document.querySelector(targetSel);
+        if (!target) { return; }
+        var loader = target.querySelector('[ic-get-from]');
+        if (!loader) { return; }
+        var url = loader.getAttribute('ic-get-from');
+        if (!url) { return; }
+        target.style.display = '';
+        target.classList.remove('hidden');
+        fetch(url)
+            .then(function (r) { return r.text(); })
+            .then(function (html) { loader.innerHTML = html; });
+    });
+}
+
+
 function handleAttendanceFormSync() {
-    // Pre-restrict interdependent dropdown values to prevent invalid
-    // combinations. When a user selects a commission or parliamentarian,
-    // the other dropdown dynamically filters to show only valid pairings.
-    // This improves UX by preventing form submissions with mismatched
-    // selections and making the valid options immediately clear.
+    // Prevent invalid combinations in dependent dropdowns
 
     // Applies to *single* attendance form only.
    if (!window.location.href.includes('attendences/new')) {

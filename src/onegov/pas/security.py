@@ -7,7 +7,7 @@ from onegov.pas import PasApp
 from onegov.pas.collections import (
     AttendenceCollection
 )
-from onegov.org.models import GeneralFileCollection
+from onegov.org.models import GeneralFile, GeneralFileCollection
 
 from datetime import date
 from onegov.pas.models.attendence import Attendence
@@ -219,6 +219,22 @@ def restrict_files_collection_access(
         isinstance(permission, type) and issubclass(permission, Private)):
         return True
     # Default: check role permissions
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@PasApp.permission_rule(model=GeneralFile, permission=object)
+def restrict_general_file_access(
+    app: PasApp,
+    identity: Identity,
+    model: GeneralFile,
+    permission: type[Intent],
+) -> bool:
+    if (
+        identity.role in ('parliamentarian', 'commission_president')
+        and isinstance(permission, type)
+        and issubclass(permission, Private)
+    ):
+        return True
     return permission in getattr(app.settings.roles, identity.role)
 
 
