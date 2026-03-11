@@ -82,9 +82,9 @@ class BallotResult(Base, TimestampMixin, DerivedAttributesMixin,
     @cast_ballots.inplace.expression
     @classmethod
     def _cast_ballots_expression(cls) -> ColumnElement[int]:
-        return case(
-            (cls.received.isnot(None), cls.received),
-            else_=cls.yeas + cls.nays + cls.empty + cls.invalid
+        return func.coalesce(
+            cls.received,
+            cls.yeas + cls.nays + cls.empty + cls.invalid
         )
 
     #: the id of the ballot this result belongs to
