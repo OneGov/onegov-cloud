@@ -23,7 +23,7 @@ from math import isclose
 from onegov.core.layout import Layout
 from onegov.core.mail import coerce_address
 from onegov.core.security import Secret
-from onegov.file import File, FileCollection
+from onegov.file import FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
@@ -45,6 +45,7 @@ if TYPE_CHECKING:
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
     from onegov.form import Form, FormSubmission
+    from onegov.org.models import ImageFile
     from onegov.org.request import OrgRequest
     from onegov.pay import InvoiceItem
     from onegov.pay.types import PriceDict
@@ -270,11 +271,13 @@ def set_image_sizes(
     }
 
     if images_dict:
-
+        collection: FileCollection[ImageFile]
+        collection = FileCollection(request.session, type='image')
+        model_class = collection.model_class
         uploaded_files = dict(
-            FileCollection(request.session, type='image').query()
-            .with_entities(File.id, File.reference)
-            .filter(File.id.in_(images_dict))
+            collection.query()
+            .with_entities(model_class.id, model_class.reference)
+            .filter(model_class.id.in_(images_dict))
             .tuples()
         )
 

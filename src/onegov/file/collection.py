@@ -279,7 +279,7 @@ class FileCollection(Generic[FileT]):
         """
 
         match = self.by_signature_digest(digest).with_entities(
-            File.signature_metadata).first()
+            self.model_class.signature_metadata).first()
 
         if match:
             return match.signature_metadata
