@@ -390,6 +390,9 @@ class TicketPdf(OrgPdf):
             if row is None:
                 continue
 
+            if row[1] and len(row[1]) > 2000:
+                row[1] = row[1][:2000] + '...'
+
             table.append(row)
 
         for date_, data in tables.items():

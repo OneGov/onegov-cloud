@@ -142,11 +142,6 @@ def get_global_tools(
                         request.class_link(TimeReportCollection),
                         attrs={'class': 'time-reports'},
                     ),
-                    Link(
-                        _('Time Reports'),
-                        request.class_link(TimeReportCollection),
-                        attrs={'class': 'time-reports'},
-                    ),
                 ),
             )
 
