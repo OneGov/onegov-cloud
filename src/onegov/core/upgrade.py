@@ -538,10 +538,13 @@ class UpgradeContext:
               FROM pg_enum
               JOIN pg_type
                 ON pg_type.oid = pg_enum.enumtypid
+              JOIN pg_namespace n
+                ON pg_type.typnamespace = n.oid
              WHERE pg_type.typname = :enum_name
+               AND n.nspname = :schema
              GROUP BY pg_enum.enumlabel
             """),
-            {'enum_name': enum_name}
+            {'enum_name': enum_name, 'schema': self.schema}
         )
         return {value for (value,) in result}
 
@@ -555,16 +558,24 @@ class UpgradeContext:
         if not missing:
             return False
 
-        # HACK: ALTER TYPE has to be run outside transaction
-        self.operations.execute(text('COMMIT'))
+        # ALTER TYPE must run outside transactional savepoints. Execute the
+        # statements directly on the operations connection in autocommit
+        # mode so SQLAlchemy's nested transaction/savepoint handling isn't
+        # affected (which otherwise leads to InvalidSavepointSpecification
+        # under SQLAlchemy 2.0).
+        # enum that belongs to the current schema (multi-tenancy support)
+        qualified = f'"{self.schema}"."{enum_name}"'
         for value in missing:
-            # NOTE: This should be safe just by virtue of naming
-            #       restrictions on classes and enum members
-            self.operations.execute(text(
-                f"ALTER TYPE {enum_name} ADD VALUE '{value}'"
-            ))
-        # start a new transaction
-        self.operations.execute(text('BEGIN'))
+            stmt = text(f"ALTER TYPE {qualified} ADD VALUE '{value}'")
+            try:
+                # Preferred: run with autocommit/isolation override
+                self.operations_connection.execution_options(
+                    isolation_level='AUTOCOMMIT'
+                ).execute(stmt)
+            except Exception:
+                # Fallback to driver-level execution
+                self.operations_connection.exec_driver_sql(str(stmt))
+
         return True
 
     def models(self, table: str) -> Iterator[Any]:
