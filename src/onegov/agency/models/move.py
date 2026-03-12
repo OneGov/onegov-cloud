@@ -4,9 +4,7 @@ from functools import cached_property
 from onegov.people import AgencyMembershipCollection
 
 
-from typing import Generic
 from typing import Protocol
-from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.agency.collections import ExtendedAgencyCollection
@@ -18,23 +16,18 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-_M = TypeVar('_M', bound='Base')
-_M_co = TypeVar('_M_co', bound='Base', covariant=True)
-_IdT_contra = TypeVar('_IdT_contra', bound='UUID | int', contravariant=True)
+class SupportsById[M_co, IdT_contra](Protocol):
+    def by_id(self, id: IdT_contra, /) -> M_co | None: ...
 
 
-class SupportsById(Protocol[_M_co, _IdT_contra]):
-    def by_id(self, id: _IdT_contra, /) -> _M_co | None: ...
-
-
-class Move(Generic[_M, _IdT_contra]):
+class Move[M: Base, IdT_contra: UUID | int]:
     """ Base class for moving things. """
 
     def __init__(
         self,
         session: Session,
-        subject_id: _IdT_contra,
-        target_id: _IdT_contra,
+        subject_id: IdT_contra,
+        target_id: IdT_contra,
         direction: MoveDirection
     ) -> None:
         self.session = session
@@ -43,15 +36,15 @@ class Move(Generic[_M, _IdT_contra]):
         self.direction = direction
 
     @cached_property
-    def collection(self) -> SupportsById[_M, _IdT_contra]:
+    def collection(self) -> SupportsById[M, IdT_contra]:
         raise NotImplementedError
 
     @cached_property
-    def subject(self) -> _M | None:
+    def subject(self) -> M | None:
         return self.collection.by_id(self.subject_id)
 
     @cached_property
-    def target(self) -> _M | None:
+    def target(self) -> M | None:
         return self.collection.by_id(self.target_id)
 
     def execute(self) -> None:

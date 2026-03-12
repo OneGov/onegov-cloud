@@ -30,18 +30,17 @@ from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from onegov.user import User
-    from typing import TypeAlias
 
     from .certificate import LanguageCertificate
     from .language import Language
     from .time_report import TranslatorTimeReport
 
-TranslatorState: TypeAlias = Literal['proposed', 'published']
-AdmissionState: TypeAlias = Literal[
+type TranslatorState = Literal['proposed', 'published']
+type AdmissionState = Literal[
     'uncertified', 'in_progress', 'certified'
 ]
-Gender: TypeAlias = Literal['M', 'F', 'N']
-InterpretingType: TypeAlias = Literal[
+type Gender = Literal['M', 'F', 'N']
+type InterpretingType = Literal[
     'simultaneous', 'consecutive', 'negotiation', 'whisper'
 ]
 

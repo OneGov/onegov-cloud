@@ -8,18 +8,14 @@ from sedate import utcnow
 from sqlalchemy import and_, text, or_
 
 
-from typing import overload, Any, Generic, IO, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, IO, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
     from onegov.file.types import SignatureMetadata
     from sqlalchemy.orm import Query, Session
 
 
-FileT = TypeVar('FileT', bound=File)
-FileSetT = TypeVar('FileSetT', bound=FileSet)
-
-
-class FileCollection(Generic[FileT]):
+class FileCollection[FileT: File]:
     """ Manages files.
 
     :param session:
@@ -298,7 +294,7 @@ class FileCollection(Generic[FileT]):
         return match.meta['action_metadata'] if match else None
 
 
-class FileSetCollection(Generic[FileSetT]):
+class FileSetCollection[FileSetT: FileSet]:
     """ Manages filesets. """
 
     @overload

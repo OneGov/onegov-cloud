@@ -41,10 +41,10 @@ if TYPE_CHECKING:
     from onegov.form.parser.core import (
         BasicParsedField, FileParsedField, ParsedField)
     from sqlalchemy.sql import ColumnElement
-    from typing import type_check_only, TypeAlias
+    from typing import type_check_only
     from .directory_entry import DirectoryEntry
 
-    InheritType: TypeAlias = 'Literal[_Sentinel.INHERIT]'
+    type InheritType = Literal[_Sentinel.INHERIT]
 
     @type_check_only
     class DirectoryEntryForm(Form):

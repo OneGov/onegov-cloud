@@ -13,11 +13,11 @@ from uuid import uuid4
 from uuid import UUID
 
 
-from typing import Literal, TypeAlias, TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.parliament.models import Commission, Parliamentarian
 
-MembershipRole: TypeAlias = Literal[
+type MembershipRole = Literal[
     'guest',
     'member',
     'extended_member',

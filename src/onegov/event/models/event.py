@@ -44,10 +44,9 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.request import CoreRequest
     from sqlalchemy.orm import Query
-    from typing import TypeAlias
 
 
-EventState: TypeAlias = Literal[
+type EventState = Literal[
     'initiated',
     'submitted',
     'published',

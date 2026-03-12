@@ -22,7 +22,6 @@ if TYPE_CHECKING:
     from datetime import datetime
     from sqlalchemy.orm import InstrumentedAttribute, Session
     from sqlalchemy.sql import ColumnElement
-    from typing import TypeAlias
     from typing import TypedDict
 
     class IndexTask(TypedDict):
@@ -50,8 +49,8 @@ if TYPE_CHECKING:
         owner_type: str
         tablename: str
 
-    Task: TypeAlias = IndexTask | DeleteTask
-    PKColumn: TypeAlias = (
+    type Task = IndexTask | DeleteTask
+    type PKColumn = (
         InstrumentedAttribute[UUID | None]
         | InstrumentedAttribute[int | None]
         | InstrumentedAttribute[str | None]

@@ -31,10 +31,7 @@ if TYPE_CHECKING:
     from onegov.form import Form
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
-    from typing import TypeVar
     from webob import Response as BaseResponse
-
-    FormT = TypeVar('FormT', bound=Form)
 
 
 def get_session_id(request: OrgRequest) -> str:
@@ -91,11 +88,11 @@ def event_form(
 
 
 @overload
-def event_form(
+def event_form[T: Form](
     model: object,
     request: OrgRequest,
-    form: type[FormT]
-) -> type[FormT]: ...
+    form: type[T]
+) -> type[T]: ...
 
 
 def event_form(

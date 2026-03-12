@@ -9,9 +9,8 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from typing import TypeAlias
 
-    ColumnItem: TypeAlias = tuple[
+    type ColumnItem = tuple[
         str,         # attribute
         str,         # column
         str | None,  # type

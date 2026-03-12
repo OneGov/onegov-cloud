@@ -62,17 +62,16 @@ def migrate_to_jsonb(
         except NoInspectionAvailable:
             pass
 
-    classes = list(find_models(Base, is_match=lambda cls: True))
+    classes: list[type[Base | ORMBase]] = list(
+        find_models(Base, is_match=lambda cls: True)
+    )
 
     # XXX onegov.libres (but not libres itself) uses json with a different orm
     # base - so we need to included it manually
     try:
         from libres.db.models import ORMBase
         classes.extend(find_models(
-            # TODO: we should change find_models to operate on
-            #       sqlalchemy.orm.DeclarativeBase once we upgrade
-            #       to SQLAlchemy 2.0
-            ORMBase,  # type: ignore[arg-type]
+            ORMBase,
             is_match=lambda cls: True)
         )
     except ImportError:

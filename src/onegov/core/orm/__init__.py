@@ -24,15 +24,14 @@ from .types import MarkupText
 from .types import UTCDateTime
 
 
-from typing import overload, Any, TypeVar, TYPE_CHECKING
+from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Mapping
     from sqlalchemy.ext.hybrid import hybrid_property
     from sqlalchemy.orm import Mapped
     from sqlalchemy_utils.i18n import _TranslatableColumn
-    from typing import Self
-
-_T = TypeVar('_T')
+    from typing import Self, TypeGuard
+    from typing_extensions import TypeIs
 
 
 MISSING = object()
@@ -58,15 +57,18 @@ class ModelBase:
 
     @overload
     @classmethod
-    def get_polymorphic_class(cls, identity_value: str, default: _T
-                              ) -> type[Self] | _T: ...
+    def get_polymorphic_class[T](
+        cls,
+        identity_value: str,
+        default: T
+    ) -> type[Self] | T: ...
 
     @classmethod
     def get_polymorphic_class(
         cls,
         identity_value: str,
-        default: _T = MISSING  # type:ignore[assignment]
-    ) -> type[Self] | _T:
+        default: Any = MISSING
+    ) -> type[Self] | Any:
         """ Returns the polymorphic class if it exists, given the value
         of the polymorphic identity.
 
@@ -186,10 +188,29 @@ translation_markup_hybrid = TranslationMarkupHybrid(
 )
 
 
-def find_models(
-    base: type[_T],
-    is_match: Callable[[type[_T]], bool]
-) -> Iterator[type[_T]]:
+@overload
+def find_models[T, TG](
+    base: type[T],
+    is_match: Callable[[type[T]], TypeGuard[TG]]
+) -> Iterator[type[TG]]: ...
+
+@overload
+def find_models[T, TG](
+    base: type[T],
+    is_match: Callable[[type[T]], TypeIs[TG]]
+) -> Iterator[type[TG]]: ...
+
+@overload
+def find_models[T](
+    base: type[T],
+    is_match: Callable[[type[T]], bool]
+) -> Iterator[type[T]]: ...
+
+
+def find_models[T](
+    base: type[T],
+    is_match: Callable[[type[T]], bool]
+) -> Iterator[type[Any]]:
     """ Finds the ORM models in the given ORM base class that match a filter.
 
     The filter is called with each class in the instance and it is supposed

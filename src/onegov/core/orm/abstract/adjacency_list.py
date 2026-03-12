@@ -22,16 +22,13 @@ from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import column, nullsfirst
 
 
-from typing import overload, Any, Generic, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from sqlalchemy.orm.query import Query
     from sqlalchemy.orm.session import Session
     from typing import Self
     from _typeshed import SupportsRichComparison
-
-
-_L = TypeVar('_L', bound='AdjacencyList')
 
 
 class MoveDirection(Enum):
@@ -47,9 +44,9 @@ class MoveDirection(Enum):
     below = 2
 
 
-def sort_siblings(
-    siblings: Sequence[_L],
-    key: Callable[[_L], SupportsRichComparison],
+def sort_siblings[L: AdjacencyList](
+    siblings: Sequence[L],
+    key: Callable[[L], SupportsRichComparison],
     reverse: bool = False
 ) -> None:
     """ Sorts the siblings by the given key, writing the order to the
@@ -310,8 +307,10 @@ class AdjacencyList(Base):
         )
 
 
-def calculuate_midpoint_order(
-    siblings: list[_L], new_item: _L, key: Callable[[_L], Any]
+def calculuate_midpoint_order[L: AdjacencyList](
+    siblings: list[L],
+    new_item: L,
+    key: Callable[[L], Any]
 ) -> None:
     """Insert/update an item's order """
     left, right = None, None
@@ -362,11 +361,11 @@ def calculuate_midpoint_order(
         new_item.order = Decimal('65536')  # Default middle value
 
 
-class AdjacencyListCollection(Generic[_L]):
+class AdjacencyListCollection[L: AdjacencyList]:
     """ A base class for collections working with :class:`AdjacencyList`. """
 
     @property
-    def __listclass__(self) -> type[_L]:
+    def __listclass__(self) -> type[L]:
         """ The list class this collection handles. Must inherit from
         :class:`AdjacencyList`.
 
@@ -377,13 +376,13 @@ class AdjacencyListCollection(Generic[_L]):
         self.session = session
 
     @staticmethod
-    def sort_key(item: _L) -> SupportsRichComparison:
+    def sort_key(item: L) -> SupportsRichComparison:
         """ The sort key with which the items are sorted into their siblings.
 
         """
         return normalize_for_url(item.title)
 
-    def query(self, ordered: bool = True) -> Query[_L]:
+    def query(self, ordered: bool = True) -> Query[L]:
         """ Returns a query using
         :attr:`AdjacencyListCollection.__listclass__`.
 
@@ -394,13 +393,13 @@ class AdjacencyListCollection(Generic[_L]):
         return query
 
     @property
-    def roots(self) -> list[_L]:
+    def roots(self) -> list[L]:
         """ Returns the root elements. """
         return self.query().filter(
             self.__listclass__.parent_id.is_(None)
         ).all()
 
-    def by_id(self, item_id: int) -> _L | None:
+    def by_id(self, item_id: int) -> L | None:
         """ Takes the given page id and returns the page. Try to keep this
         id away from the public. It's not a security problem if it leaks, but
         it's not something the public can necessarly count on.
@@ -412,7 +411,7 @@ class AdjacencyListCollection(Generic[_L]):
         item = query.filter(self.__listclass__.id == item_id).first()
         return item
 
-    def by_path(self, path: str, ensure_type: str | None = None) -> _L | None:
+    def by_path(self, path: str, ensure_type: str | None = None) -> L | None:
         """ Takes a path and returns the page associated with it.
 
         For example, given this hierarchy::
@@ -466,7 +465,7 @@ class AdjacencyListCollection(Generic[_L]):
             return item
         return None
 
-    def get_unique_child_name(self, name: str, parent: _L | None) -> str:
+    def get_unique_child_name(self, name: str, parent: L | None) -> str:
         """ Takes the given name or title, normalizes it and makes sure
         that it's unique among the siblings of the item.
 
@@ -497,12 +496,12 @@ class AdjacencyListCollection(Generic[_L]):
     #       but you can still set `type` to whatever you want...
     def add(
         self,
-        parent: _L | None,
+        parent: L | None,
         title: str,
         name: str | None = None,
         type: str | None = None,
         **kwargs: Any,
-    ) -> _L:
+    ) -> L:
         """Adds a child.
         - If order is explicit, uses it.
         - If siblings are sorted by sort_key, inserts starting form mid
@@ -529,8 +528,8 @@ class AdjacencyListCollection(Generic[_L]):
 
         # If order was NOT explicitly provided, decide insertion strategy
         if explicit_order is None:
-            siblings: list[_L] = child.siblings.all()
-            existing_siblings: list[_L] = [s for s in siblings if s != child]
+            siblings: list[L] = child.siblings.all()
+            existing_siblings: list[L] = [s for s in siblings if s != child]
 
             if not existing_siblings or is_sorted(
                 existing_siblings, key=self.sort_key
@@ -555,16 +554,16 @@ class AdjacencyListCollection(Generic[_L]):
         title: str,
         name: str | None = None,
         **kwargs: Any
-    ) -> _L:
+    ) -> L:
         return self.add(None, title, name, **kwargs)
 
     def add_or_get(
         self,
-        parent: _L | None,
+        parent: L | None,
         title: str,
         name: str | None = None,
         **kwargs: Any
-    ) -> _L:
+    ) -> L:
 
         name = name or normalize_for_url(title)
 
@@ -584,21 +583,21 @@ class AdjacencyListCollection(Generic[_L]):
         title: str,
         name: str | None = None,
         **kwargs: Any
-    ) -> _L:
+    ) -> L:
         return self.add_or_get(None, title, name, **kwargs)
 
-    def delete(self, item: _L) -> None:
+    def delete(self, item: L) -> None:
         """ Deletes the given item and *all* it's desecendants!. """
         self.session.delete(item)
         self.session.flush()
 
-    def move_above(self, subject: _L, target: _L) -> None:
+    def move_above(self, subject: L, target: L) -> None:
         return self.move(subject, target, MoveDirection.above)
 
-    def move_below(self, subject: _L, target: _L) -> None:
+    def move_below(self, subject: L, target: L) -> None:
         return self.move(subject, target, MoveDirection.below)
 
-    def move(self, subject: _L, target: _L, direction: MoveDirection) -> None:
+    def move(self, subject: L, target: L, direction: MoveDirection) -> None:
         """ Takes the given subject and moves it somehwere in relation to the
         target.
 

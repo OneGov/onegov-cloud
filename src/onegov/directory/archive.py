@@ -31,14 +31,14 @@ if TYPE_CHECKING:
     from onegov.form.parser.core import MultipleFileinputField
     from onegov.form.parser.core import ParsedField
     from sqlalchemy.orm import Query, Session
-    from typing import Protocol, Self, TypeAlias
+    from typing import Protocol, Self
 
-    UnknownFieldType: TypeAlias = 'Literal[_Sentinel.UNKNOWN_FIELD]'
-    DirectoryEntryFilter: TypeAlias = Callable[
+    type UnknownFieldType = Literal[_Sentinel.UNKNOWN_FIELD]
+    type DirectoryEntryFilter = Callable[
         [Iterable[DirectoryEntry]],
         Iterable[DirectoryEntry]
     ]
-    FieldValueTransform: TypeAlias = Callable[
+    type FieldValueTransform = Callable[
         [str, Any],
         tuple[str, Any | None]
     ]

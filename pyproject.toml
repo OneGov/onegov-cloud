@@ -17,6 +17,7 @@ filterwarnings = [
     # specific modules, but we should be covered by Ruff for our own code
     '''ignore:invalid escape sequence '[^']+':::''',
     '''ignore:'crypt':DeprecationWarning:passlib.*:''',
+    '''ignore:datetime.datetime.utcnow() is deprecated:DeprecationWarning:depot''',
     # fixed upstream
     '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:pyasn1.*:''',
     '''ignore:'cgi':DeprecationWarning:webob.*:''',
@@ -123,7 +124,7 @@ include = [
 ]
 line-length = 79
 indent-width = 4
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = [

@@ -3,8 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from typing import (
-        Any, Literal, NotRequired, Protocol, TypedDict, TypeAlias, TypeVar)
+    from typing import Any, Literal, NotRequired, Protocol, TypedDict
 
     # re-export JSON types
     from onegov.server.types import (
@@ -17,9 +16,9 @@ if TYPE_CHECKING:
     )
 
     # output for views rendered through Chameleon
-    RenderData: TypeAlias = dict[str, Any]
+    type RenderData = dict[str, Any]
 
-    MessageType: TypeAlias = Literal['success', 'info', 'warning', 'alert']
+    type MessageType = Literal['success', 'info', 'warning', 'alert']
 
     class HeaderJsonDict(TypedDict):
         Name: str
@@ -59,5 +58,4 @@ if TYPE_CHECKING:
         @property
         def role(self) -> str: ...
 
-    _T = TypeVar('_T')
-    SequenceOrScalar: TypeAlias = Sequence[_T] | _T
+    type SequenceOrScalar[_T] = Sequence[_T] | _T

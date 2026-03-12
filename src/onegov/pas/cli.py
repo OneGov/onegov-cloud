@@ -25,9 +25,8 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.pas.app import PasApp
     from onegov.pas.request import PasRequest
-    from typing import TypeAlias
 
-    Processor: TypeAlias = Callable[[PasRequest, PasApp], None]
+    type Processor = Callable[[PasRequest, PasApp], None]
 
 
 log = logging.getLogger('onegov.org.cli')

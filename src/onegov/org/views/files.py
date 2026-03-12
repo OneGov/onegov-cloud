@@ -51,10 +51,7 @@ if TYPE_CHECKING:
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.models.file import BaseImageFileCollection
     from onegov.org.request import OrgRequest
-    from typing import TypeVar
     from webob import Response
-
-    FileT = TypeVar('FileT', bound=File)
 
 
 def get_thumbnail_size(image: ImageFile) -> tuple[str, str]:
@@ -429,7 +426,7 @@ def view_get_image_collection_json(
     ]
 
 
-def handle_file_upload(
+def handle_file_upload[FileT: File](
     self: FileCollection[FileT],
     request: OrgRequest
 ) -> FileT:
@@ -461,7 +458,7 @@ def handle_file_upload(
 
 
 @overload
-def view_upload_file(
+def view_upload_file[FileT: File](
     self: FileCollection[FileT],
     request: OrgRequest,
     return_file: Literal[True]
@@ -469,7 +466,7 @@ def view_upload_file(
 
 
 @overload
-def view_upload_file(
+def view_upload_file[FileT: File](
     self: FileCollection[FileT],
     request: OrgRequest,
     return_file: Literal[False] = False

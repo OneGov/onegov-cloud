@@ -13,7 +13,8 @@ from time import mktime, strptime
 from uuid import UUID
 
 
-from typing import get_args, get_origin, overload, Any, Literal, TYPE_CHECKING
+from typing import get_args, get_origin, overload
+from typing import Any, Literal, TypeAliasType, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from typing import LiteralString
@@ -247,8 +248,12 @@ class LiteralConverter(LiteralConverterBase):
     def __init__(self, *literals: LiteralString) -> None: ...
 
     def __init__(self, *literals: Any) -> None:
-        if len(literals) == 1 and get_origin(literals[0]) is Literal:
-            literals = get_args(literals[0])
+        if len(literals) == 1:
+            _literal = literals[0]
+            if isinstance(_literal, TypeAliasType):
+                _literal = _literal.__value__
+            if get_origin(_literal) is Literal:
+                literals = get_args(literals[0])
 
         if not all(isinstance(v, str) for v in literals):
             # TODO: Consider supporting float/int literals via their
