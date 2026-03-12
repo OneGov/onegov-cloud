@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import re
 
 from onegov.org.models import ImageFileCollection
@@ -66,17 +65,17 @@ def test_image_selection(client: Client) -> None:
 
     albums = client.get('/photoalbums')
     new = albums.click('Fotoalbum')
-    new.form['title'] = "Vacation Destinations 2026"
+    new.form['title'] = 'Vacation Destinations 2026'
     new.form.submit()
 
-    album = client.get('/photoalbums').click("Vacation Destinations 2026")
+    album = client.get('/photoalbums').click('Vacation Destinations 2026')
     for i in range(number_of_images):
         images = albums.click("Bilder verwalten")
         images.form['file'] = [Upload(f'image_{i}.jpg', create_image().read())]
         images.form.submit()
 
     # select all images
-    select = album.click("Bilder auswählen")
+    select = album.click('Bilder auswählen')
     select.form[tuple(select.form.fields.keys())[1]] = True
     select.form[tuple(select.form.fields.keys())[2]] = True
     select.form[tuple(select.form.fields.keys())[3]] = True
@@ -85,16 +84,15 @@ def test_image_selection(client: Client) -> None:
     images = ImageFileCollection(client.app.session()).query().all()
     assert len(images) == number_of_images
     images = {(i.id, i.name) for i in images}
-    print(images)
-    album = client.get('/photoalbums').click("Vacation Destinations 2026")
+    album = client.get('/photoalbums').click('Vacation Destinations 2026')
     for i in images:
         assert i[0] in album, '{} not found in album'.format(i)
 
     # switch to grid mode
-    settings = album.click("Bearbeiten")
+    settings = album.click('Bearbeiten')
     settings.form['view'] = 'grid'
     settings.form.submit()
 
-    album = client.get('/photoalbums').click("Vacation Destinations 2026")
+    album = client.get('/photoalbums').click('Vacation Destinations 2026')
     for i in images:
         assert i[0] in album, '{} not found in album'.format(i)
