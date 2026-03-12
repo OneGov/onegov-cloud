@@ -1572,10 +1572,7 @@
                 <div class="grid-x align-middle">
                     <div class="cell medium-7 card-section">
                         <h5>${occurrence.title}</h5>
-                        <tal:b tal:define="
-                            date occurrence.localized_start;
-                            link use_links and request.link(occurrence)
-                        ">
+                        <tal:b tal:define="date occurrence.localized_start">
                             <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
 
                             <div class="date-place">

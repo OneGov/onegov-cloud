@@ -1252,7 +1252,6 @@
                 tal:define="
                     date occurrence.localized_start;
                     image occurrence.event.image;
-                    link use_links and request.link(occurrence)
                 "
                 use-macro="layout.macros['calendar-day']"
             />
