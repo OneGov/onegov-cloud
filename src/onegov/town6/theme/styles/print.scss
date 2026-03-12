@@ -18,7 +18,9 @@
     .counts,
     .top-bar,
     #nav-bar,
-    .dark-overlay {
+    .dark-overlay,
+    .sidebar-toggler,
+    .item-arrows {
         display: none !important;
     }
 
@@ -215,7 +217,30 @@
         border: 1px solid blue;
     }
 
-    a[href]:after {
+    a[href]::after {
         content: none !important;
     }
+
+    .votum {
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none;
+        margin: 0 !important;
+        margin-bottom: 1.5rem !important;
+        padding: 0 !important;
+
+        .person-card-title,
+        .person-card-function {
+            font-size: .8rem !important;
+        }
+
+        .person-card-function {
+            font-style: italic !important;
+        }
+
+        blockquote {
+            border: none !important;
+        }
+    }
+
 }

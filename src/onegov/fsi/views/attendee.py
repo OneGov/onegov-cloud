@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private, Personal, Secret
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
@@ -25,8 +27,8 @@ if TYPE_CHECKING:
 )
 def view_course_attendee_collection(
     self: CourseAttendeeCollection,
-    request: 'FsiRequest'
-) -> 'RenderData':
+    request: FsiRequest
+) -> RenderData:
 
     layout = CourseAttendeeCollectionLayout(self, request)
     has_entries = request.session.query(self.query().exists()).scalar()
@@ -45,16 +47,16 @@ def view_course_attendee_collection(
 )
 def view_course_attendee(
     self: CourseAttendee,
-    request: 'FsiRequest'
-) -> 'RenderData':
+    request: FsiRequest
+) -> RenderData:
 
     layout = CourseAttendeeLayout(self, request)
     limit = 5
 
     def last_subscriptions(
-        query: 'Query[CourseSubscription]',
+        query: Query[CourseSubscription],
         limit: int
-    ) -> list['CourseSubscription']:
+    ) -> list[CourseSubscription]:
         return (
             query.join(CourseEvent)
             .order_by(CourseEvent.start.desc())
@@ -79,15 +81,15 @@ def view_course_attendee(
 )
 def view_edit_course_attendee(
     self: CourseAttendee,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: CourseAttendeeForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
 
         form.update_model(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     if not form.errors:
@@ -109,18 +111,19 @@ def view_edit_course_attendee(
     name='add-external',
     permission=Private
 )
-def view_att_external_attendee(
+def view_add_external_attendee(
     self: CourseAttendeeCollection,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: AddExternalAttendeeForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         attendee = self.add(**form.get_useful_data())
-        request.success(_("Added a new external attendee"))
+        request.success(_('Added a new external attendee'))
         return request.redirect(request.link(attendee))
 
     layout = CourseAttendeeCollectionLayout(self, request)
+    layout.edit_mode = True
     return {
         'title': layout.title,
         'layout': layout,
@@ -135,7 +138,7 @@ def view_att_external_attendee(
 )
 def view_delete_reservation(
     self: CourseAttendee,
-    request: 'FsiRequest'
+    request: FsiRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

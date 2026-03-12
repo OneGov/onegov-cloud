@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import yaml
 
 from onegov.server import errors
@@ -7,7 +9,7 @@ from onegov.server.utils import load_class
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
-    from typing_extensions import Self
+    from typing import Self
 
     from .application import Application
 
@@ -35,19 +37,19 @@ class Config:
 
         if len(unique_namespaces) != len(all_namespaces):
             raise errors.ApplicationConflictError(
-                "Not all namespaces are unique")
+                'Not all namespaces are unique')
 
     @classmethod
-    def from_yaml_file(cls, yaml_file: 'StrOrBytesPath') -> 'Self':
+    def from_yaml_file(cls, yaml_file: StrOrBytesPath) -> Self:
         """ Load the given yaml file and return a new Configuration instance
         with the configuration values found in the yaml file.
 
         """
-        with open(yaml_file, 'r') as fp:
+        with open(yaml_file) as fp:
             return cls(yaml.safe_load(fp))
 
     @classmethod
-    def from_yaml_string(cls, yaml_string: str | bytes) -> 'Self':
+    def from_yaml_string(cls, yaml_string: str | bytes) -> Self:
         """ Load the given yaml string and return a new Configuration instance
         with the configuration values found in the yaml string.
 
@@ -135,12 +137,12 @@ class ApplicationConfig:
         return self._cfg['namespace'].replace('-', '_')
 
     @property
-    def application_class(self) -> type['Application']:
+    def application_class(self) -> type[Application]:
         application_class = load_class(self._cfg['application'])
 
         if application_class is None:
             raise errors.ApplicationConfigError(
-                "The application class could not be found.")
+                'The application class could not be found.')
 
         return application_class
 

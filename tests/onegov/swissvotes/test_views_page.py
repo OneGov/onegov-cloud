@@ -1,11 +1,21 @@
+from __future__ import annotations
+
+import pytest
+
 from onegov.swissvotes.models import TranslatablePage
-from pytest import mark
 from transaction import commit
 from webtest import TestApp as Client
 from webtest.forms import Upload
 
 
-def test_view_page(swissvotes_app):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.swissvotes.models import TranslatablePageFile
+    from .conftest import TestApp
+
+
+
+def test_view_page(swissvotes_app: TestApp) -> None:
     client = Client(swissvotes_app)
 
     home = client.get('/').maybe_follow()
@@ -50,7 +60,10 @@ def test_view_page(swissvotes_app):
     client.get('/page/about', status=404)
 
 
-def test_view_page_attachments(swissvotes_app, page_attachments):
+def test_view_page_attachments(
+    swissvotes_app: TestApp,
+    page_attachments: dict[str, dict[str, TranslatablePageFile]]
+) -> None:
 
     client = Client(swissvotes_app)
 
@@ -69,11 +82,11 @@ def test_view_page_attachments(swissvotes_app, page_attachments):
     assert "No attachments." in manage
 
     # Upload two attachment (en_US, de_CH)
-    manage.form['file'] = Upload(
+    manage.form['file'] = [Upload(
         '1.pdf',
         page_attachments['en_US']['CODEBOOK'].reference.file.read(),
         'application/pdf'
-    )
+    )]
     manage = manage.form.submit().maybe_follow()
     assert manage.status_code == 200
 
@@ -84,11 +97,11 @@ def test_view_page_attachments(swissvotes_app, page_attachments):
     client.get('/locale/de_CH').follow()
     manage = client.get('/page/about').click("Anhänge verwalten")
 
-    manage.form['file'] = Upload(
+    manage.form['file'] = [Upload(
         '2.pdf',
         page_attachments['de_CH']['CODEBOOK'].reference.file.read(),
         'application/pdf'
-    )
+    )]
     manage = manage.form.submit().maybe_follow()
     assert manage.status_code == 200
 
@@ -120,11 +133,14 @@ def test_view_page_attachments(swissvotes_app, page_attachments):
     assert "2.pdf" not in view
 
 
-@mark.parametrize('locale', ('de_CH', 'fr_CH', 'en_US'))
+@pytest.mark.parametrize('locale', ('de_CH', 'fr_CH', 'en_US'))
 def test_view_page_static_attachment_links(
-    swissvotes_app, page_attachments, page_attachment_urls,
-    locale
-):
+    swissvotes_app: TestApp,
+    page_attachments: dict[str, dict[str, TranslatablePageFile]],
+    page_attachment_urls: dict[str, dict[str, str]],
+    locale: str
+) -> None:
+
     client = Client(swissvotes_app)
     url = client.get('/').maybe_follow().click('imprint').request.url
 
@@ -143,7 +159,10 @@ def test_view_page_static_attachment_links(
         assert view.status_code in (200, 301, 302)
 
 
-def test_view_page_slider_images(swissvotes_app, slider_images):
+def test_view_page_slider_images(
+    swissvotes_app: TestApp,
+    slider_images: dict[str, TranslatablePageFile]
+) -> None:
 
     client = Client(swissvotes_app)
 
@@ -162,11 +181,11 @@ def test_view_page_slider_images(swissvotes_app, slider_images):
     assert 'No attachments.' in manage
 
     # Upload image
-    manage.form['file'] = Upload(
+    manage.form['file'] = [Upload(
         '2.1-x.png',
         slider_images['2.1-x'].reference.file.read(),
         'image/png'
-    )
+    )]
     assert manage.form.submit().maybe_follow().status_code == 200
 
     manage = client.get('/page/about').click('Manage slider images')

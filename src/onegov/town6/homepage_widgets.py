@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import lxml.etree
 import requests
 from datetime import datetime
@@ -79,11 +81,11 @@ class AutoplayVideoWidget:
     template = """
         <xsl:template match="autoplay_video">
             <div metal:use-macro="layout.macros.autoplay_video"
-             tal:define="max_height '{@max-height}'; link_mp4 '{@link_mp4}';
-             link_mp4_low_res '{@link_mp4_low_res}';
-             link_webm '{@link_webm}';
-              link_webm_low_res '{@link_webm_low_res}'; text '{@text}'
-             "
+            tal:define="max_height '{@max-height}'; link_mp4 '{@link_mp4}';
+            link_mp4_low_res '{@link_mp4_low_res}';
+            link_webm '{@link_webm}'; button_url '{@button_url}';
+            link_webm_low_res '{@link_webm_low_res}'; text '{@text}';
+            button_text '{@button_text}'; searchbox '{@searchbox}';"
             />
         </xsl:template>
     """
@@ -183,7 +185,7 @@ class EventsWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         occurrences = OccurrenceCollection(layout.app.session()).query()
         occurrences = occurrences.limit(layout.org.event_limit_homepage)
 
@@ -193,7 +195,7 @@ class EventsWidget:
                 url=layout.request.link(o),
                 subtitle=(
                     layout.format_date(
-                        o.localized_start, 'event_short').title() + ", "
+                        o.localized_start, 'event_short').title() + ', '
                     + layout.format_time_range(
                         o.localized_start, o.localized_end).title()),
                 image_url=(
@@ -206,14 +208,14 @@ class EventsWidget:
         ]
 
         latest_events = LinkGroup(
-            title=_("Events"),
+            title=_('Events'),
             links=event_links,  # type:ignore[arg-type]
         ) if event_links else None
 
         return {
             'event_panel': latest_events,
             'all_events_link': Link(
-                text=_("All events"),
+                text=_('All events'),
                 url=layout.events_url,
                 classes=('more-link', )
             ),
@@ -255,7 +257,7 @@ class PartnerWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         return {'partners': layout.partners}
 
 
@@ -286,14 +288,14 @@ class ServicesWidget:
         </xsl:template>
     """
 
-    def get_service_links(self, layout: 'DefaultLayout') -> 'Iterator[Link]':
+    def get_service_links(self, layout: DefaultLayout) -> Iterator[Link]:
         if not layout.org.hide_online_counter:
             yield Link(
-                text=_("Online Counter"),
+                text=_('Online Counter'),
                 url=layout.request.class_link(FormCollection),
                 subtitle=(
                     layout.org.meta.get('online_counter_label')
-                    or _("Forms and applications")
+                    or _('Forms and applications')
                 ),
                 classes=('online-counter', 'h5')
             )
@@ -301,33 +303,33 @@ class ServicesWidget:
         # only if there are publications, will we enable the link to them
         if not layout.org.hide_publications and layout.app.publications_count:
             yield Link(
-                text=_("Publications"),
+                text=_('Publications'),
                 url=layout.request.class_link(PublicationCollection),
                 subtitle=_(
                     layout.org.meta.get('publications_label')
-                    or _("Official Documents")
+                    or _('Official Documents')
                 ),
                 classes=('publications', 'h5')
             )
 
         if not layout.org.hide_reservations:
             yield Link(
-                text=_("Reservations"),
+                text=_('Reservations'),
                 url=layout.request.class_link(ResourceCollection),
                 subtitle=(
                     layout.org.meta.get('reservations_label')
-                    or _("Daypasses and rooms")
+                    or _('Daypasses and rooms')
                 ),
                 classes=('reservations', 'h5')
             )
 
         if move_url := layout.org.meta.get('e_move_url'):
             yield Link(
-                text=_("E-Move"),
+                text=_('E-Move'),
                 url=move_url,
                 subtitle=(
                     layout.org.meta.get('e_move_label')
-                    or _("Move with eMovingCH")
+                    or _('Move with eMovingCH')
                 ),
                 classes=('e-move', 'h5')
             )
@@ -342,18 +344,18 @@ class ServicesWidget:
 
         if sbb_daypass:
             yield Link(
-                text=_("SBB Daypass"),
+                text=_('SBB Daypass'),
                 url=layout.request.link(sbb_daypass),
                 subtitle=(
                     layout.org.meta.get('daypass_label')
-                    or _("Generalabonnement for Towns")
+                    or _('Generalabonnement for Towns')
                 ),
                 classes=('sbb-daypass', 'h5')
             )
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         return {
-            'services_panel': LinkGroup(_("Services"), links=tuple(
+            'services_panel': LinkGroup(_('Services'), links=tuple(
                 self.get_service_links(layout)
             ))
         }
@@ -373,17 +375,17 @@ class ContactsAndAlbumsWidget:
            </xsl:template>
        """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         request = layout.request
 
         return {
             'contacts_and_albums_panel': LinkGroup(
-                title=_("Contacts"),
+                title=_('Contacts'),
                 links=[
                     Link(
-                        text=_("People"),
+                        text=_('People'),
                         url=request.class_link(PersonCollection),
-                        subtitle=_("All contacts"),
+                        subtitle=_('All contacts'),
                         classes=('list-link list-title',)
                     )
                 ]
@@ -472,7 +474,7 @@ class FocusWidget:
     </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         return {}
 
 
@@ -520,8 +522,8 @@ class JobsWidget:
     </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
-        def rss_widget_builder(rss_feed_url: str) -> 'RSSChannel | None':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
+        def rss_widget_builder(rss_feed_url: str) -> RSSChannel | None:
             """ Builds and caches widget data from the given RSS URL.
 
             Note that this is called within the <?python> tag in the macro.
@@ -529,13 +531,26 @@ class JobsWidget:
             dependency to build the actual widget.
             """
             try:
-                response = layout.app.cache.get_or_create(
+                # FIXME: We may want to consider caching the parsed feed
+                #        rather than the raw content, although we would
+                #        either need to add a JSON serializer for RSSFeed
+                #        or change them to plain dictionaries.
+                def get_content() -> bytes | None:
+                    response = requests.get(rss_feed_url, timeout=4)
+                    if response.status_code == 200:
+                        return response.content
+                    return None
+
+                content = layout.app.cache.get_or_create(
                     'jobs_rss_feed',
-                    creator=lambda: requests.get(rss_feed_url, timeout=4),
+                    creator=get_content,
                     expiration_time=3600,
-                    should_cache_fn=lambda respon: respon.status_code == 200,
+                    should_cache_fn=bool,
                 )
-                parsed = parsed_rss(response.content)
+                if content is None:
+                    return None
+
+                parsed = parsed_rss(content)
                 return parsed
             except Exception:
                 return None
@@ -548,7 +563,7 @@ class RSSItem(NamedTuple):
     title: str
     description: str
     guid: str
-    pubDate: datetime | None
+    pubDate: datetime | None  # noqa: N815
 
 
 class RSSChannel(NamedTuple):
@@ -558,7 +573,7 @@ class RSSChannel(NamedTuple):
     description: str
     language: str
     copyright: str
-    items: 'Iterator[RSSItem]'
+    items: Iterator[RSSItem]
 
 
 def parsed_rss(rss: bytes) -> RSSChannel:
@@ -569,11 +584,11 @@ def parsed_rss(rss: bytes) -> RSSChannel:
         except ValueError:
             return None
 
-    def get_text(element: '_Element | None') -> str:
+    def get_text(element: _Element | None) -> str:
         return element.text or '' if element is not None else ''
 
     def extract_channel_info(
-        channel: '_Element',
+        channel: _Element,
     ) -> tuple[str, str, str, str, str]:
         return (  # type:ignore[return-value]
             get_text(channel.find(field))
@@ -581,7 +596,7 @@ def parsed_rss(rss: bytes) -> RSSChannel:
             if field != 'items'
         )
 
-    def extract_items(channel: '_Element') -> 'Iterator[RSSItem]':
+    def extract_items(channel: _Element) -> Iterator[RSSItem]:
         for item in channel.findall('item'):
             yield RSSItem(
                 title=get_text(item.find('title')),
@@ -591,7 +606,7 @@ def parsed_rss(rss: bytes) -> RSSChannel:
             )
 
     root = lxml.etree.fromstring(rss)
-    channel = root.find(".//channel")
+    channel = root.find('.//channel')
     assert channel is not None
 
     return RSSChannel(

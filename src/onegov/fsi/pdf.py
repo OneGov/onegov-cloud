@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from datetime import date
 from io import BytesIO
+from operator import itemgetter
 from reportlab.lib import colors
 from reportlab.lib.colors import HexColor
 from reportlab.lib.units import cm
@@ -27,11 +30,11 @@ class FsiPdf(Pdf):
     previous_level_context: int | None = None
 
     @property
-    def page_fn(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn(self) -> Callable[[Canvas, Template], None]:
         return page_fn_footer
 
     @property
-    def page_fn_later(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn_later(self) -> Callable[[Canvas, Template], None]:
         return page_fn_header_and_footer
 
     @property
@@ -45,8 +48,8 @@ class FsiPdf(Pdf):
     @classmethod
     def from_subscriptions(
         cls,
-        collection: 'SubscriptionsCollection',
-        layout: 'DefaultLayout',
+        collection: SubscriptionsCollection,
+        layout: DefaultLayout,
         title: str
     ) -> BytesIO:
 
@@ -56,7 +59,7 @@ class FsiPdf(Pdf):
         pdf = cls(
             result,
             title=title,
-            created=f"{date.today():%d.%m.%Y}",
+            created=f'{date.today():%d.%m.%Y}',
         )
         pdf.init_a4_portrait(
             page_fn=pdf.page_fn,
@@ -77,7 +80,7 @@ class FsiPdf(Pdf):
             headers += ['Course Status', 'Course attended', 'Last info mail']
             return [translate(_(h)) for h in headers]
 
-        def get_row(subscription: 'CourseSubscription') -> list[str]:
+        def get_row(subscription: CourseSubscription) -> list[str]:
             row = [str(subscription)]
             att = subscription.attendee
             row.append(att and att.source_id or '')
@@ -100,9 +103,11 @@ class FsiPdf(Pdf):
             row.append(layout.format_date(sent, 'date') if sent else '')
             return row
 
-        data = [get_headers()] + sorted((
-            get_row(subs) for subs in collection.query()
-        ), key=lambda row: row[0])
+        data = sorted(
+            (get_row(subs) for subs in collection.query()),
+            key=itemgetter(0)
+        )
+        data.insert(0, get_headers())
 
         pdf.table(
             data,
@@ -116,8 +121,8 @@ class FsiPdf(Pdf):
     @classmethod
     def from_audit_collection(
         cls,
-        collection: 'AuditCollection',
-        layout: 'AuditLayout',
+        collection: AuditCollection,
+        layout: AuditLayout,
         title: str
     ) -> BytesIO:
 
@@ -129,7 +134,7 @@ class FsiPdf(Pdf):
         pdf = cls(
             result,
             title=title,
-            created=f"{date.today():%d.%m.%Y}",
+            created=f'{date.today():%d.%m.%Y}',
         )
         pdf.init_a4_portrait(
             page_fn=pdf.page_fn,
@@ -137,18 +142,18 @@ class FsiPdf(Pdf):
         )
 
         pdf.h(title)
-        filter_str = ""
+        filter_str = ''
         if collection.organisations:
-            orgs = ", ".join(collection.organisations)
-            org_title = request.translate(_("Organisations"))
-            filter_str = f"{org_title}: {orgs}"
+            orgs = ', '.join(collection.organisations)
+            org_title = request.translate(_('Organisations'))
+            filter_str = f'{org_title}: {orgs}'
 
         if collection.letter:
-            letter_title = request.translate(_("Letter"))
-            letter_title += f" {collection.letter}"
+            letter_title = request.translate(_('Letter'))
+            letter_title += f' {collection.letter}'
 
             if filter_str:
-                filter_str += f"{filter_str}, {letter_title}"
+                filter_str += f'{filter_str}, {letter_title}'
             else:
                 filter_str = letter_title
 
@@ -168,7 +173,7 @@ class FsiPdf(Pdf):
 
         style = pdf.table_style
 
-        def bgcolor(ix: int, row: int, color: 'Color') -> tuple[Any, ...]:
+        def bgcolor(ix: int, row: int, color: Color) -> tuple[Any, ...]:
             return 'BACKGROUND', (row, ix), (row, ix), color
 
         next_subscriptions = collection.next_subscriptions(request)
@@ -189,10 +194,10 @@ class FsiPdf(Pdf):
             style.append(bgcolor(ix + 1, 4, color))
 
             data_line = [
-                f"{e.last_name}, {e.first_name}",
+                f'{e.last_name}, {e.first_name}',
                 e.source_id,
                 layout.format_date(e.start, 'datetime'),
-                "✔" if next_subscriptions.get(e[0], None) else "-",
+                '✔' if next_subscriptions.get(e[0], None) else '-',
                 next_event_hint
             ]
             data.append(data_line)

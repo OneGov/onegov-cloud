@@ -6,36 +6,27 @@
 
 <!-- You can also use data-content instead of href to point to the content of the accordion -->
 
-        <div class="row">
-            <div class="columns small-12">
-                <div class="row">
-                    <div class="columns small-12">
-                        <tal:b tal:switch="has_entries">
-                            <strong tal:case="False">There are no templates set for this course event</strong>
-                            <tal:b tal:case="True" tal:define="notifications layout.model.query()">
-                            <table class="fullwidth">
-                                <thead>
-                                    <th i18n:translate="">Mail Subject</th>
-                                    <th i18n:translate="">Mail Type</th>
-                                    <th i18n:translate="">Last Modified</th>
-                                </thead>
-                                <tbody>
-                                    <tal:b tal:repeat="notification notifications">
-                                        <tr>
-                                            <td><a href="${layout.instance_link(notification)}">${notification.subject or notification.type}</a></td>
-                                            <td>${layout.format_notification_type(notification.type)}</td>
-                                            <td>${layout.format_date(notification.modified, 'datetime_short')}</td>
-                                        </tr>
-                                    </tal:b>
-                                </tbody>
-                            </table>
-                        </tal:b>
-                        </tal:b>
+        <tal:b tal:switch="has_entries">
+            <strong tal:case="False">There are no templates set for this course event</strong>
+            <tal:b tal:case="True" tal:define="notifications layout.model.query()">
+            <table class="fullwidth">
+                <thead>
+                    <th i18n:translate="">Mail Subject</th>
+                    <th i18n:translate="">Mail Type</th>
+                    <th i18n:translate="">Last Modified</th>
+                </thead>
+                <tbody>
+                    <tal:b tal:repeat="notification notifications">
+                        <tr>
+                            <td><a href="${layout.instance_link(notification)}">${notification.subject or notification.type}</a></td>
+                            <td>${layout.format_notification_type(notification.type)}</td>
+                            <td>${layout.format_date(notification.modified, 'datetime_short')}</td>
+                        </tr>
+                    </tal:b>
+                </tbody>
+            </table>
+        </tal:b>
+        </tal:b>
 
-
-                    </div>
-                </div>
-            </div>
-        </div>
     </tal:b>
 </div>

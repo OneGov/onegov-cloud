@@ -1,13 +1,27 @@
+from __future__ import annotations
+
+import pytest
 from onegov.core import Framework
 from onegov.file import DepotApp
 from os import path
-from pytest import fixture
 from tests.shared.utils import create_app
 from yaml import dump
 
 
-@fixture(scope='function')
-def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.orm import SessionManager
+
+
+@pytest.fixture(scope='function')
+def cfg_path(
+    postgres_dsn: str,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> str:
+
     cfg = {
         'applications': [
             {
@@ -32,11 +46,11 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
 
 
 class TestApp(Framework, DepotApp):
-    pass
+    __test__ = False
 
 
-@fixture(scope='function')
-def test_app(request):
+@pytest.fixture(scope='function')
+def test_app(request: pytest.FixtureRequest) -> Iterator[TestApp]:
     app = create_app(TestApp, request, use_maildir=False)
     yield app
     app.session_manager.dispose()

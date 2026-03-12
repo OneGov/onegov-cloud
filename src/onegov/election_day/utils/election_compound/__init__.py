@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.utils.election_compound.candidates import (
     get_candidate_statistics)
 from onegov.election_day.utils.election_compound.candidates import (

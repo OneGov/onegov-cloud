@@ -17,12 +17,6 @@ transaction.interfaces.ISynchronizer
 transaction.interfaces.ITransaction
 transaction.interfaces.ITransactionManager
 
-# Error: is inconsistent
-# ================================
-# False positive for positional only overloads with different
-# argument name, see: https://github.com/python/mypy/issues/16956
-transaction(\._manager)?\.(Thread)?TransactionManager\.run
-
 # Error: failed to find stubs
 # ================================
 # Tests should not be part of the stubs

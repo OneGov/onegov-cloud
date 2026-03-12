@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.feriennet import _
 from onegov.form import Form
 from wtforms.fields import DateField
@@ -9,38 +11,40 @@ from wtforms.validators import InputRequired, Email
 
 class VolunteerForm(Form):
 
+    css_class = 'two-columns'
+
     first_name = StringField(
-        label=_("First Name"),
+        label=_('First Name'),
         validators=[InputRequired()])
 
     last_name = StringField(
-        label=_("Last Name"),
+        label=_('Last Name'),
         validators=[InputRequired()])
 
     birth_date = DateField(
-        label=_("Birthdate"),
+        label=_('Birthdate'),
         validators=[InputRequired()])
 
     organisation = StringField(
-        label=_("Organisation"))
+        label=_('Organisation'))
 
     address = TextAreaField(
-        label=_("Address"),
+        label=_('Address'),
         render_kw={'rows': 4},
         validators=[InputRequired()])
 
     zip_code = StringField(
-        label=_("Zip Code"),
+        label=_('Zip Code'),
         validators=[InputRequired()])
 
     place = StringField(
-        label=_("Place"),
+        label=_('Place'),
         validators=[InputRequired()])
 
     email = EmailField(
-        label=_("E-Mail Address"),
+        label=_('E-Mail Address'),
         validators=[InputRequired(), Email()])
 
     phone = StringField(
-        label=_("Phone"),
+        label=_('Phone'),
         validators=[InputRequired()])

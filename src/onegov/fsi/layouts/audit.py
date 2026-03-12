@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import timedelta
 
 from functools import cached_property
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
 
 class AuditLayout(DefaultLayout):
 
-    model: 'AuditCollection'
+    model: AuditCollection
 
     @property
     def title(self) -> str:
@@ -36,7 +38,7 @@ class AuditLayout(DefaultLayout):
             return []
         return [
             Link(
-                text=_("PDF"),
+                text=_('PDF'),
                 url=self.request.link(self.model, name='pdf'),
                 attrs={'class': 'print-icon', 'target': '_blank'}
             ),
@@ -44,8 +46,8 @@ class AuditLayout(DefaultLayout):
 
     def render_start_end(
         self,
-        start: 'datetime | None',
-        end: 'datetime | None'
+        start: datetime | None,
+        end: datetime | None
     ) -> str:
         if not start:
             return '-'
@@ -67,9 +69,9 @@ class AuditLayout(DefaultLayout):
 
     @staticmethod
     def next_event_date(
-        start: 'datetime | None',
+        start: datetime | None,
         refresh_interval: int | None
-    ) -> 'datetime | None':
+    ) -> datetime | None:
         if not start:
             return None
         if refresh_interval is None:
@@ -90,11 +92,11 @@ class AuditLayout(DefaultLayout):
         due_in = self.format_refresh_interval(
             self.model.course.refresh_interval)
         titles = (
-            _("Name"),
-            _("Shortcode"),
-            _("Last Event"),
-            _("Registered"),
-            _("Due by (every ${refresh_interval})", mapping={
+            _('Name'),
+            _('Shortcode'),
+            _('Last Event'),
+            _('Registered'),
+            _('Due by (every ${refresh_interval})', mapping={
                 'refresh_interval': due_in}
               )
         )

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import icalendar
 
 from onegov.activity import Attendee
@@ -14,10 +16,11 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.activity.models.booking import BookingState
     from onegov.feriennet.request import FeriennetRequest
-    from sqlalchemy.orm import Query, Session
-    from sqlalchemy.sql.selectable import Alias
+    from sqlalchemy.engine import Result
+    from sqlalchemy.orm import Session
+    from sqlalchemy.sql import Subquery
     from typing import NamedTuple
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
     class AttendeeCalendarRow(NamedTuple):
@@ -42,7 +45,7 @@ class Calendar:
     """ A base for all calendars that return icalendar renderings. """
 
     name: ClassVar[str]
-    calendars: ClassVar[dict[str, type['Calendar']]] = {}
+    calendars: ClassVar[dict[str, type[Calendar]]] = {}
 
     def __init_subclass__(cls, name: str, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
@@ -52,22 +55,22 @@ class Calendar:
         cls.calendars[name] = cls
 
     @classmethod
-    def from_token(cls, session: 'Session', token: str) -> 'Calendar | None':
+    def from_token(cls, session: Session, token: str) -> Calendar | None:
         raise NotImplementedError
 
     @classmethod
     def from_name_and_token(
         cls,
-        session: 'Session',
+        session: Session,
         name: str,
         token: str
-    ) -> 'Calendar | None':
+    ) -> Calendar | None:
         calendar = cls.calendars.get(name)
         if calendar is None:
             return None
         return calendar.from_token(session, token)
 
-    def calendar(self, request: 'FeriennetRequest') -> bytes:
+    def calendar(self, request: FeriennetRequest) -> bytes:
         raise NotImplementedError
 
     def new(self) -> icalendar.Calendar:
@@ -82,12 +85,12 @@ class Calendar:
 class AttendeeCalendar(Calendar, name='attendee'):
     """ Renders all confirmed activites of the given attendee. """
 
-    def __init__(self, session: 'Session', attendee: Attendee) -> None:
+    def __init__(self, session: Session, attendee: Attendee) -> None:
         self.session = session
         self.attendee = attendee
 
     @property
-    def attendee_calendar(self) -> 'Alias':
+    def attendee_calendar(self) -> Subquery:
         return as_selectable_from_path(
             module_path('onegov.feriennet', 'queries/attendee_calendar.sql'))
 
@@ -100,7 +103,7 @@ class AttendeeCalendar(Calendar, name='attendee'):
         return self.attendee.subscription_token
 
     @classmethod
-    def from_token(cls, session: 'Session', token: str) -> 'Self | None':
+    def from_token(cls, session: Session, token: str) -> Self | None:
         attendee = (
             session.query(Attendee)
             .filter_by(subscription_token=token)
@@ -109,7 +112,7 @@ class AttendeeCalendar(Calendar, name='attendee'):
 
         return cls(session, attendee) if attendee else None
 
-    def calendar(self, request: 'FeriennetRequest') -> bytes:
+    def calendar(self, request: FeriennetRequest) -> bytes:
         calendar = self.new()
         calendar.add('x-wr-calname', self.attendee.name)
 
@@ -123,15 +126,15 @@ class AttendeeCalendar(Calendar, name='attendee'):
 
     def events(
         self,
-        request: 'FeriennetRequest'
-    ) -> 'Iterator[icalendar.Event]':
+        request: FeriennetRequest
+    ) -> Iterator[icalendar.Event]:
         session = request.session
         stmt = self.attendee_calendar
 
-        records: Query[AttendeeCalendarRow]
+        records: Result[AttendeeCalendarRow]
         # FIXME: Should this exclude cancelled occasions, or does an accepted
         #        booking guarantee that the occassion is not cancelled?
-        records = session.execute(select(stmt.c).where(and_(
+        records = session.execute(select(*stmt.c).where(and_(
             stmt.c.attendee_id == self.attendee_id,
             stmt.c.state == 'accepted',
             stmt.c.confirmed == True
@@ -139,7 +142,7 @@ class AttendeeCalendar(Calendar, name='attendee'):
 
         datestamp = utcnow()
 
-        for record in records:
+        for record in records.tuples():
             event = icalendar.Event()
 
             event.add('uid', record.uid)
@@ -162,13 +165,13 @@ class AttendeeCalendar(Calendar, name='attendee'):
 
             if record.meeting_point and record.lat and record.lon:
                 event.add(
-                    "X-APPLE-STRUCTURED-LOCATION",
-                    f"geo:{record.lat},{record.lon}",
+                    'X-APPLE-STRUCTURED-LOCATION',
+                    f'geo:{record.lat},{record.lon}',
                     parameters={
-                        "VALUE": "URI",
-                        "X-ADDRESS": record.meeting_point,
-                        "X-APPLE-RADIUS": "50",
-                        "X-TITLE": record.meeting_point
+                        'VALUE': 'URI',
+                        'X-ADDRESS': record.meeting_point,
+                        'X-APPLE-RADIUS': '50',
+                        'X-TITLE': record.meeting_point
                     }
                 )
 

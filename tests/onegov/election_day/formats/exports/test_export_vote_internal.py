@@ -1,10 +1,17 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.election_day.formats import export_vote_internal
 from onegov.election_day.models import BallotResult
 from onegov.election_day.models import ComplexVote
 
 
-def test_vote_export_internal(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_vote_export_internal(session: Session) -> None:
     vote = ComplexVote(
         title="Abstimmung",
         short_title="A",
@@ -12,8 +19,8 @@ def test_vote_export_internal(session):
         domain='federation',
         date=date(2015, 6, 14)
     )
-    vote.title_translations['it_CH'] = 'Votazione'
-    vote.short_title_translations['it_CH'] = 'V'
+    vote.title_translations['it_CH'] = 'Votazione'  # type: ignore[index]
+    vote.short_title_translations['it_CH'] = 'V'  # type: ignore[index]
     vote.counter_proposal.title_translations = {
         'de_CH': 'Gegenvorschlag',
         'it_CH': 'Controprogetto'

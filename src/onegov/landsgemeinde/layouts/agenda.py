@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
@@ -20,9 +22,10 @@ class AgendaItemCollectionLayout(DefaultLayout):
     @cached_property
     def title(self) -> str:
         return _(
-            'Agenda items of assembly from ${date}',
+            'Agenda items of ${assembly_type} from ${date}',
             mapping={
-                'date': self.format_date(self.model.date, 'date_long')
+                'date': self.format_date(self.model.date, 'date_long'),
+                'assembly_type': self.assembly_type
             }
         )
 
@@ -35,7 +38,7 @@ class AgendaItemCollectionLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
-                _('Assemblies'),
+                self.assembly_type_plural,
                 self.request.link(self.assembly_collection())
             ),
             Link(
@@ -65,13 +68,13 @@ class AgendaItemCollectionLayout(DefaultLayout):
 
 class AgendaItemLayout(DefaultLayout):
 
-    model: 'AgendaItem'
-    request: 'LandsgemeindeRequest'
+    model: AgendaItem
+    request: LandsgemeindeRequest
 
     def __init__(
         self,
-        model: 'AgendaItem',
-        request: 'LandsgemeindeRequest'
+        model: AgendaItem,
+        request: LandsgemeindeRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -90,7 +93,7 @@ class AgendaItemLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
-                _('Assemblies'),
+                self.assembly_type_plural,
                 self.request.link(self.assembly_collection())
             ),
             Link(
@@ -152,7 +155,7 @@ class AgendaItemLayout(DefaultLayout):
 
     def editbar_links_for_votum(
         self,
-        votum: 'Votum'
+        votum: Votum
     ) -> list[Link | LinkGroup] | None:
 
         if self.request.is_manager:

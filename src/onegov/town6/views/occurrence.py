@@ -1,4 +1,5 @@
 """ The onegov org collection of images uploaded to the site. """
+from __future__ import annotations
 
 from onegov.core.security import Public, Private, Secret
 
@@ -27,16 +28,16 @@ if TYPE_CHECKING:
 )
 def town_view_occurrences(
     self: OccurrenceCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_occurrences(self, request, OccurrencesLayout(self, request))
 
 
 @TownApp.html(model=Occurrence, template='occurrence.pt', permission=Public)
 def town_view_occurrence(
     self: Occurrence,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     layout = OccurrenceLayout(self, request)
     request.include('monthly-view')
     return view_occurrence(self, request, layout)
@@ -51,9 +52,9 @@ def town_view_occurrence(
 )
 def town_handle_edit_event_filters(
     self: OccurrenceCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: EventConfigurationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     layout = OccurrencesLayout(self, request)
     return handle_edit_event_filters(self, request, form, layout)
 
@@ -67,9 +68,9 @@ def town_handle_edit_event_filters(
 )
 def town_export_occurrences(
     self: OccurrenceCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ExportForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return export_occurrences(
         self, request, form, OccurrencesLayout(self, request))
 
@@ -83,8 +84,8 @@ def town_export_occurrences(
 )
 def town_import_occurrences(
     self: OccurrenceCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: EventImportForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return import_occurrences(
         self, request, form, OccurrencesLayout(self, request))

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
@@ -10,16 +12,16 @@ if TYPE_CHECKING:
     from onegov.core.types import JSONObject_ro
     from onegov.election_day.models import ElectionCompoundPart
     from onegov.election_day.request import ElectionDayRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     ElectionCompoundOrPart: TypeAlias = ElectionCompound | ElectionCompoundPart
 
 
 def get_election_summary(
     election: Election | ArchivedResult,
-    request: 'ElectionDayRequest | None',
+    request: ElectionDayRequest | None,
     url: str | None = None
-) -> 'JSONObject_ro':
+) -> JSONObject_ro:
     """ Returns some basic informations about the given election as a JSON
     seriazable dict. """
 
@@ -43,11 +45,11 @@ def get_election_summary(
 
 
 def get_election_compound_summary(
-    election_compound: 'ElectionCompoundOrPart | ArchivedResult',
-    request: 'ElectionDayRequest | None',
+    election_compound: ElectionCompoundOrPart | ArchivedResult,
+    request: ElectionDayRequest | None,
     url: str | None = None,
     type_: str = 'election_compound'
-) -> 'JSONObject_ro':
+) -> JSONObject_ro:
 
     last_modified = election_compound.last_modified
 
@@ -75,9 +77,9 @@ def get_election_compound_summary(
 
 def get_vote_summary(
     vote: Vote | ArchivedResult,
-    request: 'ElectionDayRequest | None',
+    request: ElectionDayRequest | None,
     url: str | None = None
-) -> 'JSONObject_ro':
+) -> JSONObject_ro:
     """ Returns some basic informations about the given vote as a JSON
     seriazable dict. """
 
@@ -110,7 +112,7 @@ def get_vote_summary(
     }
     if 'local' in (vote.meta or {}):
         summary['local'] = {
-            'answer': vote.local_answer or "",  # type:ignore
+            'answer': vote.local_answer or '',  # type:ignore
             'nays_percentage': vote.local_nays_percentage,  # type:ignore
             'yeas_percentage': vote.local_yeas_percentage,  # type:ignore
         }
@@ -119,8 +121,8 @@ def get_vote_summary(
 
 def get_summary(
     item: Election | ElectionCompound | Vote | ArchivedResult,
-    request: 'ElectionDayRequest'
-) -> 'JSONObject_ro':
+    request: ElectionDayRequest
+) -> JSONObject_ro:
     """ Returns some basic informations about the given election/vote as a JSON
     seriazable dict. """
 
@@ -142,7 +144,7 @@ def get_summary(
             return get_election_compound_summary(
                 item, None, item.adjusted_url(request)
             )
-        if item.type == 'vote':
+        if item.type in ('vote', 'complex_vote'):
             return get_vote_summary(
                 item, None, item.adjusted_url(request)
             )
@@ -153,9 +155,9 @@ def get_summary(
 
 
 def get_summaries(
-    items: 'Iterable[Election | ElectionCompound | Vote | ArchivedResult]',
-    request: 'ElectionDayRequest'
-) -> list['JSONObject_ro']:
+    items: Iterable[Election | ElectionCompound | Vote | ArchivedResult],
+    request: ElectionDayRequest
+) -> list[JSONObject_ro]:
     """ Converts the given list of election/votes to a JSON seriazable
     list of summaries.
 

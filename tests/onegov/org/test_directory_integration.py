@@ -1,40 +1,55 @@
-from tempfile import NamedTemporaryFile
+from __future__ import annotations
 
 import pytest
 import transaction
 
 from onegov.core.utils import Bunch
-from onegov.directory import DirectoryCollection, DirectoryConfiguration, \
+from onegov.directory import (
+    DirectoryCollection, DirectoryConfiguration,
     DirectoryZipArchive, DirectoryEntryCollection
+)
 from onegov.org.forms import DirectoryImportForm
 from onegov.org.layout import DirectoryEntryCollectionLayout
+from tempfile import NamedTemporaryFile
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
+    from pathlib import Path
+    from sqlalchemy.orm import Session
 
 
 class DummyApp:
 
-    def __init__(self, session, application_id='my-app'):
+    def __init__(
+        self,
+        session: Session,
+        application_id: str = 'my-app'
+    ) -> None:
+
         self._session = session
         self.application_id = application_id
-        self.org = Bunch(
+        self.org: Any = Bunch(
             geo_provider='none',
             open_files_target_blank=True
         )
 
-    def session(self):
+    def session(self) -> Session:
         return self._session
 
 
 class DummyRequest:
-    def __init__(self, session):
+    def __init__(self, session: Session) -> None:
 
         self.session = session
         self.app = DummyApp(session)
 
-    def include(self, name):
+    def include(self, name: object) -> None:
         pass
 
     @property
-    def is_manager(self):
+    def is_manager(self) -> bool:
         return True
 
 
@@ -48,7 +63,13 @@ class DummyRequest:
     ('json', True),
 ])
 def test_directory_roundtrip(
-        session, temporary_path, export_fmt, clear):
+    session: Session,
+    temporary_path: Path,
+    export_fmt: str,
+    clear: bool
+) -> None:
+
+    directories: DirectoryCollection[ExtendedDirectory]
     directories = DirectoryCollection(session, type='extended')
     dir_structure = """
             Name *= ___
@@ -104,14 +125,15 @@ def test_directory_roundtrip(
     ))
     transaction.commit()
 
-    events = directories.by_name('events')
+    events = directories.by_name('events')  # type: ignore[assignment]
 
-    request = DummyRequest(session)
+    request: Any = DummyRequest(session)
+    self: DirectoryEntryCollection[ExtendedDirectoryEntry]
     self = DirectoryEntryCollection(events, type='extended')
-    layout = DirectoryEntryCollectionLayout(self, request)
+    layout = DirectoryEntryCollectionLayout(self, request)  # type: ignore[arg-type]
     formatter = layout.export_formatter(export_fmt)
 
-    def transform(key, value):
+    def transform(key: Any, value: Any) -> tuple[Any, Any]:
         return formatter(key), formatter(value)
 
     with NamedTemporaryFile() as f:
@@ -124,7 +146,7 @@ def test_directory_roundtrip(
 
     count = 0
 
-    def count_entry(entry):
+    def count_entry(entry: object) -> None:
         nonlocal count
         count += 1
 

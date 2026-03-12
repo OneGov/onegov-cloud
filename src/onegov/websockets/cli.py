@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from asyncio import run
 from json import loads
 from typing import TYPE_CHECKING
@@ -5,7 +7,7 @@ from urllib.parse import urlparse
 
 import click
 from sentry_sdk import init as init_sentry
-from websockets.legacy.client import connect
+from websockets.asyncio.client import connect
 
 from onegov.core.cli import command_group, pass_group_context
 from onegov.websockets.client import authenticate
@@ -40,7 +42,7 @@ cli = command_group()
 @click.option('--sentry-release')
 @pass_group_context
 def serve(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     host: str | None,
     port: int | None,
     token: str | None,
@@ -66,7 +68,7 @@ def serve(
             port = port or url.port
         token = token or config.get('manage_token')
 
-    assert host and port and token, "invalid configuration"
+    assert host and port and token, 'invalid configuration'
 
     if sentry_dsn:
         init_sentry(
@@ -85,12 +87,12 @@ def serve(
 @click.option('--private', is_flag=True, default=False)
 @pass_group_context
 def listen(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     url: str | None,
     schema: str | None,
     channel: str | None,
     private: bool
-) -> 'Callable[[CoreRequest, WebsocketsApp], None]':
+) -> Callable[[CoreRequest, WebsocketsApp], None]:
     """ Listens for application-bound broadcasts from the websocket server.
 
     Requires either the selection of a websockets-enabled application or
@@ -100,7 +102,7 @@ def listen(
 
     """
 
-    def _listen(request: 'CoreRequest', app: 'WebsocketsApp') -> None:
+    def _listen(request: CoreRequest, app: WebsocketsApp) -> None:
         nonlocal url, schema, channel
         if private and channel:
             raise click.UsageError('Use either channel or private, not both')
@@ -128,10 +130,10 @@ def listen(
 @click.option('--token')
 @pass_group_context
 def status(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     url: str | None,
     token: str | None
-) -> 'Callable[[CoreRequest, WebsocketsApp], None]':
+) -> Callable[[CoreRequest, WebsocketsApp], None]:
     """ Shows the global status of the websocket server.
 
     Requires either the selection of a websockets-enabled application or
@@ -141,7 +143,7 @@ def status(
 
     """
 
-    def _status(request: 'CoreRequest', app: 'WebsocketsApp') -> None:
+    def _status(request: CoreRequest, app: WebsocketsApp) -> None:
         nonlocal url, token
         url = url or app.websockets_manage_url
         token = token or app.websockets_manage_token
@@ -166,14 +168,14 @@ def status(
 @click.option('--private', is_flag=True, default=False)
 @pass_group_context
 def broadcast(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     message: str,
     url: str | None,
     schema: str | None,
     token: str | None,
     channel: str | None,
     private: bool
-) -> 'Callable[[CoreRequest, WebsocketsApp], None]':
+) -> Callable[[CoreRequest, WebsocketsApp], None]:
     """ Broadcast to all application-bound connected clients.
 
     Requires either the selection of a websockets-enabled application or
@@ -185,7 +187,7 @@ def broadcast(
 
     """
 
-    def _broadcast(request: 'CoreRequest', app: 'WebsocketsApp') -> None:
+    def _broadcast(request: CoreRequest, app: WebsocketsApp) -> None:
         nonlocal url, schema, token, channel, private
         if private and channel:
             raise click.UsageError('Use either channel or private, not both')

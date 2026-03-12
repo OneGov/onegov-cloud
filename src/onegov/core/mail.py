@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 import magic
 import re
@@ -137,7 +139,7 @@ def format_single_address(address: Address | str) -> str:
     return f'{name} <{address.addr_spec}>'
 
 
-def format_address(addresses: 'SequenceOrScalar[Address | str]') -> str:
+def format_address(addresses: SequenceOrScalar[Address | str]) -> str:
     """
     Convenience function that accepts both a single Address and a
     sequence of Address, otherwise identical to format_single_address
@@ -168,8 +170,8 @@ class Attachment:
     #       we need to make sure to coerce self.filename to str
     def __init__(
         self,
-        filename: 'StrPath',
-        content: 'SupportsRead[str | bytes] | str | bytes | None' = None,
+        filename: StrPath,
+        content: SupportsRead[str | bytes] | str | bytes | None = None,
         content_type: str | None = None
     ):
 
@@ -198,7 +200,7 @@ class Attachment:
                 content_type = magic.from_buffer(self.content, mime=True)
         self.content_type = content_type
 
-    def prepare(self) -> 'AttachmentJsonDict':
+    def prepare(self) -> AttachmentJsonDict:
         """
         Prepares attachment so it can be sent to Postmark API.
         """
@@ -213,22 +215,22 @@ class Attachment:
 def prepare_email(
     sender: Address | str,
     reply_to: Address | str | None = None,
-    receivers: 'SequenceOrScalar[Address | str]' = (),
-    cc: 'SequenceOrScalar[Address | str]' = (),
-    bcc: 'SequenceOrScalar[Address | str]' = (),
+    receivers: SequenceOrScalar[Address | str] = (),
+    cc: SequenceOrScalar[Address | str] = (),
+    bcc: SequenceOrScalar[Address | str] = (),
     subject: str | None = None,
     content: str | None = None,
     plaintext: str | None = None,
-    attachments: 'Iterable[Attachment | StrPath]' = (),
+    attachments: Iterable[Attachment | StrPath] = (),
     headers: dict[str, str] | None = None,
     stream: str = 'marketing'
-) -> 'EmailJsonDict':
+) -> EmailJsonDict:
     """
     Creates a dictiornary that can be turned into JSON as is and sent
     to the Postmark API.
 
     :param content: HTML content.
-    :param attachments: Either a list of :class:`onegov.core.email.Attachment`
+    :param attachments: Either a list of :class:`onegov.core.mail.Attachment`
         or a list of filenames/os.PathLike to attach to the email.
     :param headers: Dictionary containing additional headers to be set
 

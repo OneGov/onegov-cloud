@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import tarfile
 
 from datetime import date
@@ -10,13 +12,19 @@ from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import get_tar_file_path
 
 
-def test_import_wabstic_vote(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.types import DomainOfInfluence
+    from sqlalchemy.orm import Session
+
+
+def test_import_wabstic_vote(session: Session) -> None:
     # The tar file contains (modified) vote results from SG from the 12.02.2017
     # with 2 federal votes, 1 cantonal vote, 6 simple communal votes and one
     # complex communal vote
 
-    domain = 'federation'
-    principal = 'sg'
+    domain: DomainOfInfluence = 'federation'
+    principal_name = 'sg'
 
     session.add(
         Vote(title='vote', domain=domain, date=date(2017, 2, 12))
@@ -25,19 +33,19 @@ def test_import_wabstic_vote(session):
     vote = session.query(Vote).one()
 
     tar_file = get_tar_file_path(
-        domain, principal, 'wabstic', 'vote')
+        domain, principal_name, 'wabstic', 'vote')
 
     with tarfile.open(tar_file, 'r|gz') as f:
-        sgstatic_gemeinden = f.extractfile(f.next()).read()
-        sgstatic_geschaefte = f.extractfile(f.next()).read()
-        sg_gemeinden = f.extractfile(f.next()).read()
-        sg_geschaefte = f.extractfile(f.next()).read()
+        sgstatic_gemeinden = f.extractfile(f.next()).read()  # type: ignore
+        sgstatic_geschaefte = f.extractfile(f.next()).read()  # type: ignore
+        sg_gemeinden = f.extractfile(f.next()).read()  # type: ignore
+        sg_geschaefte = f.extractfile(f.next()).read()  # type: ignore
 
     assert sgstatic_gemeinden  # we don't need this file atm
     assert sgstatic_geschaefte  # we don't need this file atm
 
     # Test federal results
-    principal = Canton(name='sg', canton='sg')
+    principal: Canton | Municipality = Canton(name=principal_name, canton='sg')
     vote.has_expats = True
     for number, yeas, completed, status in (
         ('1', 70821, True, 'final'),     # final and progress (78, 78)
@@ -81,7 +89,7 @@ def test_import_wabstic_vote(session):
         ('69', '1', 3375, 365),
     ):
         principal = Municipality(
-            name=str(entity_id), municipality=entity_id,
+            name=str(entity_id), municipality=str(entity_id),
             canton='sg', canton_name='Kanton St.Gallen'
         )
         errors = import_vote_wabstic(
@@ -104,7 +112,7 @@ def test_import_wabstic_vote(session):
     ):
         vote.domain = domain
         principal = Municipality(
-            name=str(entity_id), municipality=entity_id,
+            name=str(entity_id), municipality=str(entity_id),
             canton='sg', canton_name='Kanton St.Gallen'
         )
         errors = import_vote_wabstic(
@@ -113,6 +121,8 @@ def test_import_wabstic_vote(session):
             BytesIO(sg_gemeinden), 'text/plain'
         )
         assert not errors
+        # undo mypy narrowing
+        vote = vote
         assert vote.last_result_change
         assert not vote.completed
         assert not vote.ballots[0].results[0].counted
@@ -126,7 +136,7 @@ def test_import_wabstic_vote(session):
     session.flush()
     vote = session.query(ComplexVote).one()
     principal = Municipality(
-        name=str(3402), municipality=3402,
+        name=str(3402), municipality=str(3402),
         canton='sg', canton_name='Kanton St.Gallen'
     )
     errors = import_vote_wabstic(
@@ -143,7 +153,7 @@ def test_import_wabstic_vote(session):
     assert vote.tie_breaker.yeas == 0
 
 
-def test_import_wabstic_vote_missing_headers(session):
+def test_import_wabstic_vote_missing_headers(session: Session) -> None:
     session.add(
         Vote(title='vote', domain='federation', date=date(2017, 2, 12))
     )
@@ -185,14 +195,14 @@ def test_import_wabstic_vote_missing_headers(session):
         ).encode('utf-8')),
         'text/plain'
     )
-    assert [(e.filename, e.error.interpolate()) for e in errors] == [
+    assert [(e.filename, e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         ('sg_geschaefte', "Missing columns: 'sortwahlkreis'"
          ),
         ('sg_gemeinden', "Missing columns: 'art, sperrung'")
     ]
 
 
-def test_import_wabstic_vote_invalid_values(session):
+def test_import_wabstic_vote_invalid_values(session: Session) -> None:
     session.add(
         Vote(title='vote', domain='federation', date=date(2017, 2, 12))
     )
@@ -200,7 +210,7 @@ def test_import_wabstic_vote_invalid_values(session):
     vote = session.query(Vote).one()
     principal = Canton(canton='sg')
 
-    errors = import_vote_wabstic(
+    raw_errors = import_vote_wabstic(
         vote, principal, '0', '0',
         BytesIO((
             '\n'.join((
@@ -284,9 +294,9 @@ def test_import_wabstic_vote_invalid_values(session):
         ).encode('utf-8')),
         'text/plain'
     )
-    errors = sorted([
-        (e.filename, e.line, e.error.interpolate()) for e in errors
-    ])
+    errors = sorted(
+        (e.filename, e.line, e.error.interpolate()) for e in raw_errors  # type: ignore[attr-defined]
+    )
     assert errors == [
         ('sg_gemeinden', 2, '100 is unknown'),
         ('sg_gemeinden', 2, 'Could not read the empty votes'),
@@ -305,7 +315,7 @@ def test_import_wabstic_vote_invalid_values(session):
     ]
 
 
-def test_import_wabstic_vote_expats(session):
+def test_import_wabstic_vote_expats(session: Session) -> None:
     session.add(
         Vote(title='vote', domain='federation', date=date(2017, 2, 12))
     )
@@ -387,12 +397,13 @@ def test_import_wabstic_vote_expats(session):
                 (r for r in vote.proposal.results if r.entity_id == 0), None
             )
             if has_expats:
+                assert result is not None
                 assert result.empty == 1
             else:
                 assert result is None
 
 
-def test_import_wabstic_vote_temporary_results(session):
+def test_import_wabstic_vote_temporary_results(session: Session) -> None:
     session.add(
         Vote(title='vote', domain='federation', date=date(2017, 2, 12))
     )
@@ -472,49 +483,53 @@ def test_import_wabstic_vote_temporary_results(session):
     assert vote.progress == (1, 77)
 
 
-def test_import_wabstic_vote_regional(session):
+def test_import_wabstic_vote_regional(session: Session) -> None:
 
-    def create_csv(results):
-        lines = []
-        lines.append((
-            'Art',
-            'SortWahlkreis',
-            'SortGeschaeft',
-            'BfsNrGemeinde',
-            'Sperrung',
-            'Stimmberechtigte',
-            'StmUngueltig',
-            'StmLeer',
-            'StmHGJa',
-            'StmHGNein',
-            'StmHGOhneAw',
-            'StmN1Ja',
-            'StmN1Nein',
-            'StmN1OhneAw',
-            'StmN2Ja',
-            'StmN2Nein',
-            'StmN2OhneAw',
-        ))
-        for entity_id in results:
-            lines.append((
-                'Gde',
-                '0',
-                '0',
-                str(entity_id),  # 'BfsNrGemeinde',
-                '2000',  # 'Sperrung',
-                '100',  # 'Stimmberechtigte',
-                '0',  # 'StmUngueltig',
-                '1',  # 'StmLeer',
-                '',  # 'StmHGJa',
-                '',  # 'StmHGNein',
-                '',  # 'StmHGOhneAw',
-                '',  # 'StmN1Ja',
-                '',  # 'StmN1Nein',
-                '',  # 'StmN1OhneAw',
-                '',  # 'StmN2Ja',
-                '',  # 'StmN2Nein',
-                '',  # 'StmN2OhneAw',
-            ))
+    def create_csv(
+        results: tuple[int, ...]
+    ) -> tuple[BytesIO, str, BytesIO, str]:
+        lines = [
+            (
+                'Art',
+                'SortWahlkreis',
+                'SortGeschaeft',
+                'BfsNrGemeinde',
+                'Sperrung',
+                'Stimmberechtigte',
+                'StmUngueltig',
+                'StmLeer',
+                'StmHGJa',
+                'StmHGNein',
+                'StmHGOhneAw',
+                'StmN1Ja',
+                'StmN1Nein',
+                'StmN1OhneAw',
+                'StmN2Ja',
+                'StmN2Nein',
+                'StmN2OhneAw',
+            ),
+            *(
+                (
+                    'Gde',
+                    '0',
+                    '0',
+                    str(entity_id),  # 'BfsNrGemeinde',
+                    '2000',  # 'Sperrung',
+                    '100',  # 'Stimmberechtigte',
+                    '0',  # 'StmUngueltig',
+                    '1',  # 'StmLeer',
+                    '',  # 'StmHGJa',
+                    '',  # 'StmHGNein',
+                    '',  # 'StmHGOhneAw',
+                    '',  # 'StmN1Ja',
+                    '',  # 'StmN1Nein',
+                    '',  # 'StmN1OhneAw',
+                    '',  # 'StmN2Ja',
+                    '',  # 'StmN2Nein',
+                    '',  # 'StmN2OhneAw',
+                ) for entity_id in results
+            )
+        ]
 
         return (
             BytesIO((
@@ -558,7 +573,7 @@ def test_import_wabstic_vote_regional(session):
         vote, principal, '0', '0',
         *create_csv((1701, 1702))
     )
-    assert [(e.error.interpolate()) for e in errors] == [
+    assert [(e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         '1702 is not part of this business'
     ]
 

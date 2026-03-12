@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.core.utils import Bunch
 from onegov.core.utils import normalize_for_url
@@ -11,8 +13,7 @@ from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import PanelField
 from onegov.form.fields import UploadField
-from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
+from onegov.form.validators import FileSizeLimit, MIME_TYPES_PDF
 from re import findall
 from sqlalchemy import or_
 from wtforms.fields import BooleanField
@@ -37,38 +38,38 @@ if TYPE_CHECKING:
 
 class ElectionForm(Form):
 
-    request: 'ElectionDayRequest'
+    request: ElectionDayRequest
 
     id_hint = PanelField(
-        label=_("Identifier"),
-        fieldset=_("Identifier"),
+        label=_('Identifier'),
+        fieldset=_('Identifier'),
         kind='callout',
         text=_(
-            "The ID is used in the URL and might be used somewhere. "
-            "Changing the ID might break links on external sites!"
+            'The ID is used in the URL and might be used somewhere. '
+            'Changing the ID might break links on external sites!'
         )
     )
 
     id = StringField(
-        label=_("Identifier"),
-        fieldset=_("Identifier"),
+        label=_('Identifier'),
+        fieldset=_('Identifier'),
         validators=[
             InputRequired()
         ],
     )
 
     external_id = StringField(
-        label=_("External ID"),
-        fieldset=_("Identifier"),
-        render_kw={'long_description': _("Used for import if set.")},
+        label=_('External ID'),
+        fieldset=_('Identifier'),
+        render_kw={'long_description': _('Used for import if set.')},
     )
 
     type = RadioField(
-        label=_("System"),
-        fieldset=_("Properties"),
+        label=_('System'),
+        fieldset=_('Properties'),
         choices=[
-            ('majorz', _("Election based on the simple majority system")),
-            ('proporz', _("Election based on proportional representation")),
+            ('majorz', _('Election based on the simple majority system')),
+            ('proporz', _('Election based on proportional representation')),
         ],
         validators=[
             InputRequired()
@@ -77,11 +78,11 @@ class ElectionForm(Form):
     )
 
     majority_type = RadioField(
-        label=_("Majority Type"),
-        fieldset=_("Properties"),
+        label=_('Majority Type'),
+        fieldset=_('Properties'),
         choices=[
-            ('absolute', _("Absolute")),
-            ('relative', _("Relative")),
+            ('absolute', _('Absolute')),
+            ('relative', _('Relative')),
         ],
         default='absolute',
         validators=[
@@ -91,8 +92,8 @@ class ElectionForm(Form):
     )
 
     absolute_majority = IntegerField(
-        label=_("Absolute majority"),
-        fieldset=_("Properties"),
+        label=_('Absolute majority'),
+        fieldset=_('Properties'),
         validators=[
             Optional(),
             NumberRange(min=1)
@@ -101,16 +102,16 @@ class ElectionForm(Form):
     )
 
     domain = RadioField(
-        label=_("Domain"),
-        fieldset=_("Properties"),
+        label=_('Domain'),
+        fieldset=_('Properties'),
         validators=[
             InputRequired()
         ]
     )
 
     region = ChosenSelectField(
-        label=_("District"),
-        fieldset=_("Properties"),
+        label=_('District'),
+        fieldset=_('Properties'),
         validators=[
             InputRequired()
         ],
@@ -118,8 +119,8 @@ class ElectionForm(Form):
     )
 
     district = ChosenSelectField(
-        label=_("District"),
-        fieldset=_("Properties"),
+        label=_('District'),
+        fieldset=_('Properties'),
         validators=[
             InputRequired()
         ],
@@ -127,8 +128,8 @@ class ElectionForm(Form):
     )
 
     municipality = ChosenSelectField(
-        label=_("Municipality"),
-        fieldset=_("Properties"),
+        label=_('Municipality'),
+        fieldset=_('Properties'),
         validators=[
             InputRequired()
         ],
@@ -136,24 +137,24 @@ class ElectionForm(Form):
     )
 
     tacit = BooleanField(
-        label=_("Tacit election"),
-        fieldset=_("Properties"),
+        label=_('Tacit election'),
+        fieldset=_('Properties'),
         render_kw={'force_simple': True}
     )
 
     has_expats = BooleanField(
-        label=_("Expats are listed separately"),
-        fieldset=_("Properties"),
+        label=_('Expats are listed separately'),
+        fieldset=_('Properties'),
         description=_(
-            "Expats are uploaded and listed as a separate row in the results. "
-            "Changing this option requires a new upload of the data."
+            'Expats are uploaded and listed as a separate row in the results. '
+            'Changing this option requires a new upload of the data.'
         ),
         render_kw={'force_simple': True}
     )
 
     date = DateField(
-        label=_("Date"),
-        fieldset=_("Properties"),
+        label=_('Date'),
+        fieldset=_('Properties'),
         validators=[
             InputRequired()
         ],
@@ -161,14 +162,14 @@ class ElectionForm(Form):
     )
 
     shortcode = StringField(
-        label=_("Shortcode"),
-        fieldset=_("Properties"),
-        render_kw={'long_description': _("Used for sorting.")}
+        label=_('Shortcode'),
+        fieldset=_('Properties'),
+        render_kw={'long_description': _('Used for sorting.')}
     )
 
     mandates = IntegerField(
-        label=_("Mandates / Seats"),
-        fieldset=_("Properties"),
+        label=_('Mandates / Seats'),
+        fieldset=_('Properties'),
         validators=[
             InputRequired(),
             NumberRange(min=1)
@@ -176,160 +177,160 @@ class ElectionForm(Form):
     )
 
     voters_counts = BooleanField(
-        label=_("Voters counts"),
-        fieldset=_("View options"),
+        label=_('Voters counts'),
+        fieldset=_('View options'),
         description=_(
-            "Shows voters counts instead of votes in the party strengths "
-            "view."
+            'Shows voters counts instead of votes in the party strengths '
+            'view.'
         ),
         depends_on=('type', 'proporz'),
     )
 
     exact_voters_counts = BooleanField(
-        label=_("Exact voters counts"),
-        fieldset=_("View options"),
+        label=_('Exact voters counts'),
+        fieldset=_('View options'),
         description=_(
-            "Shows exact voters counts instead of rounded values."
+            'Shows exact voters counts instead of rounded values.'
         ),
         depends_on=('type', 'proporz'),
         render_kw={'force_simple': True}
     )
 
     horizontal_party_strengths = BooleanField(
-        label=_("Horizonal party strengths chart"),
-        fieldset=_("View options"),
+        label=_('Horizonal party strengths chart'),
+        fieldset=_('View options'),
         description=_(
-            "Shows a horizontal bar chart instead of a vertical bar chart."
+            'Shows a horizontal bar chart instead of a vertical bar chart.'
         ),
         depends_on=('type', 'proporz', 'show_party_strengths', 'y'),
         render_kw={'force_simple': True}
     )
 
     use_historical_party_results = BooleanField(
-        label=_("Use party results from the last legislative period"),
-        fieldset=_("View options"),
+        label=_('Use party results from the last legislative period'),
+        fieldset=_('View options'),
         description=_(
-            "Requires party results. Requires a related election from another "
-            "legislative period with party results. Requires that both "
-            "elections use the same party IDs."
+            'Requires party results. Requires a related election from another '
+            'legislative period with party results. Requires that both '
+            'elections use the same party IDs.'
         ),
         depends_on=('type', 'proporz'),
         render_kw={'force_simple': True}
     )
 
     show_party_strengths = BooleanField(
-        label=_("Party strengths"),
+        label=_('Party strengths'),
         description=_(
-            "Shows a tab with the comparison of party strengths as a bar "
-            "chart. Requires party results."
+            'Shows a tab with the comparison of party strengths as a bar '
+            'chart. Requires party results.'
         ),
-        fieldset=_("Views"),
+        fieldset=_('Views'),
         depends_on=('type', 'proporz'),
         render_kw={'force_simple': True}
     )
 
     show_party_panachage = BooleanField(
-        label=_("Panachage (parties)"),
+        label=_('Panachage (parties)'),
         description=_(
-            "Shows a tab with the panachage. Requires party results."
+            'Shows a tab with the panachage. Requires party results.'
         ),
-        fieldset=_("Views"),
+        fieldset=_('Views'),
         depends_on=('type', 'proporz'),
         render_kw={'force_simple': True}
     )
 
     title_de = StringField(
-        label=_("German"),
-        fieldset=_("Title of the election"),
+        label=_('German'),
+        fieldset=_('Title of the election'),
         render_kw={'lang': 'de'}
     )
     title_fr = StringField(
-        label=_("French"),
-        fieldset=_("Title of the election"),
+        label=_('French'),
+        fieldset=_('Title of the election'),
         render_kw={'lang': 'fr'}
     )
     title_it = StringField(
-        label=_("Italian"),
-        fieldset=_("Title of the election"),
+        label=_('Italian'),
+        fieldset=_('Title of the election'),
         render_kw={'lang': 'it'}
     )
     title_rm = StringField(
-        label=_("Romansh"),
-        fieldset=_("Title of the election"),
+        label=_('Romansh'),
+        fieldset=_('Title of the election'),
         render_kw={'lang': 'rm'}
     )
 
     short_title_de = StringField(
-        label=_("German"),
-        fieldset=_("Short title of the election"),
+        label=_('German'),
+        fieldset=_('Short title of the election'),
         render_kw={'lang': 'de'}
     )
     short_title_fr = StringField(
-        label=_("French"),
-        fieldset=_("Short title of the election"),
+        label=_('French'),
+        fieldset=_('Short title of the election'),
         render_kw={'lang': 'fr'}
     )
     short_title_it = StringField(
-        label=_("Italian"),
-        fieldset=_("Short title of the election"),
+        label=_('Italian'),
+        fieldset=_('Short title of the election'),
         render_kw={'lang': 'it'}
     )
     short_title_rm = StringField(
-        label=_("Romansh"),
-        fieldset=_("Short title of the election"),
+        label=_('Romansh'),
+        fieldset=_('Short title of the election'),
         render_kw={'lang': 'rm'}
     )
 
     related_elections_historical = ChosenSelectMultipleField(
-        label=_("Other legislative periods"),
-        fieldset=_("Related elections"),
+        label=_('Other legislative periods'),
+        fieldset=_('Related elections'),
         choices=[]
     )
 
     related_elections_other = ChosenSelectMultipleField(
-        label=_("Rounds of voting or by-elections"),
-        fieldset=_("Related elections"),
+        label=_('Rounds of voting or by-elections'),
+        fieldset=_('Related elections'),
         choices=[]
     )
 
     related_link = URLField(
-        label=_("Link"),
-        fieldset=_("Related link"),
+        label=_('Link'),
+        fieldset=_('Related link'),
         validators=[URL(), Optional()]
     )
 
     related_link_label_de = StringField(
-        label=_("Link label german"),
-        fieldset=_("Related link"),
+        label=_('Link label german'),
+        fieldset=_('Related link'),
         render_kw={'lang': 'de'}
     )
     related_link_label_fr = StringField(
-        label=_("Link label french"),
-        fieldset=_("Related link"),
+        label=_('Link label french'),
+        fieldset=_('Related link'),
         render_kw={'lang': 'fr'}
     )
     related_link_label_it = StringField(
-        label=_("Link label italian"),
-        fieldset=_("Related link"),
+        label=_('Link label italian'),
+        fieldset=_('Related link'),
         render_kw={'lang': 'it'}
     )
     related_link_label_rm = StringField(
-        label=_("Link label romansh"),
-        fieldset=_("Related link"),
+        label=_('Link label romansh'),
+        fieldset=_('Related link'),
         render_kw={'lang': 'rm'}
     )
     explanations_pdf = UploadField(
-        label=_("Explanations (PDF)"),
+        label=_('Explanations (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024)
         ],
-        fieldset=_("Related link")
+        allowed_mimetypes=MIME_TYPES_PDF,
+        fieldset=_('Related link')
     )
 
     color_hint = PanelField(
         label=_('Color suggestions'),
-        fieldset=_("Colors"),
+        fieldset=_('Colors'),
         hide_label=False,
         text=(
             'AL #a74c97\n'
@@ -349,7 +350,7 @@ class ElectionForm(Form):
 
     colors = TextAreaField(
         label=_('Colors'),
-        fieldset=_("Colors"),
+        fieldset=_('Colors'),
         render_kw={'rows': 12},
     )
 
@@ -453,11 +454,11 @@ class ElectionForm(Form):
         choices: list[_Choice] = [
             (
                 election.id,
-                "{} {} {}".format(
+                '{} {} {}'.format(
                     layout.format_date(election.date, 'date'),
                     election.shortcode or '',
                     election.title,
-                ).strip().replace("  ", " ")
+                ).strip().replace('  ', ' ')
             ) for election in query
         ]
         self.related_elections_historical.choices = choices
@@ -630,19 +631,19 @@ class ElectionForm(Form):
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage
 
-        self.colors.data = '\n'.join((
+        self.colors.data = '\n'.join(
             f'{name} {model.colors[name]}' for name in sorted(model.colors)
-        ))
+        )
 
         if model.type == 'majorz':
             self.type.choices = [
-                ('majorz', _("Election based on the simple majority system"))
+                ('majorz', _('Election based on the simple majority system'))
             ]
             self.type.data = 'majorz'
 
         else:
             self.type.choices = [
-                ('proporz', _("Election based on proportional representation"))
+                ('proporz', _('Election based on proportional representation'))
             ]
             self.type.data = 'proporz'
 

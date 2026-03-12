@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.models import ElectionCompoundPart
 
 
@@ -18,9 +20,9 @@ if TYPE_CHECKING:
 
 
 def get_superregions(
-    compound: 'ElectionCompound',
-    principal: 'Canton | Municipality'
-) -> dict[str, 'SuperregionInfo']:
+    compound: ElectionCompound,
+    principal: Canton | Municipality
+) -> dict[str, SuperregionInfo]:
     """ Returns all superregions. """
 
     if compound.domain_elections != 'region':
@@ -57,10 +59,10 @@ def get_superregions(
 
 
 def get_superregions_data(
-    compound: 'ElectionCompound',
-    principal: 'Canton | Municipality',
-    request: 'ElectionDayRequest | None' = None
-) -> 'JSONObject_ro':
+    compound: ElectionCompound,
+    principal: Canton | Municipality,
+    request: ElectionDayRequest | None = None
+) -> JSONObject_ro:
     """ Returns the data used by elections compounds for rendering entities and
     districts maps. """
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.election_day.layouts.default import DefaultLayout
 
@@ -20,8 +22,8 @@ class DetailLayout(DefaultLayout):
 
     """
 
-    model: 'Election | ElectionCompound | ElectionCompoundPart | Vote'
-    request: 'ElectionDayRequest'
+    model: Election | ElectionCompound | ElectionCompoundPart | Vote
+    request: ElectionDayRequest
 
     @cached_property
     def has_results(self) -> bool:
@@ -32,11 +34,11 @@ class DetailLayout(DefaultLayout):
         return self.model.completed
 
     @cached_property
-    def last_result_change(self) -> 'datetime | None':
+    def last_result_change(self) -> datetime | None:
         return self.model.last_result_change
 
     @cached_property
-    def last_modified(self) -> 'datetime | None':
+    def last_modified(self) -> datetime | None:
         return self.model.last_modified
 
     @cached_property
@@ -53,7 +55,7 @@ class DetailLayout(DefaultLayout):
         return link_labels.get(locale, None)
 
     @cached_property
-    def explanations_pdf(self) -> 'File | None':
+    def explanations_pdf(self) -> File | None:
         return getattr(self.model, 'explanations_pdf', None)
 
     @cached_property

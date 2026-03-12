@@ -1,13 +1,15 @@
+from __future__ import annotations
+
 import click
-import sys
 
 from onegov.core.cli import command_group
-from onegov.activity.models import Period
+from onegov.activity.models import BookingPeriod
 from onegov.activity.models import Occasion
 from sqlalchemy import text
 
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.feriennet.app import FeriennetApp
@@ -21,35 +23,35 @@ cli = command_group()
 @click.argument('title')
 def delete_period(
     title: str
-) -> 'Callable[[FeriennetRequest, FeriennetApp], None]':
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
     """ Deletes all the data associated with a period, including:
 
-    - Payments
-    - Bookings
-    - Occasions
-    - Publication Requests
-    - Tickets
+    * Payments
+    * Bookings
+    * Occasions
+    * Publication Requests
+    * Tickets
 
     We usually don't allow for this, but there tends to be a request here and
     there about this, where a Ferienpass created a period for testing and
     tries to return to a semi-clean state.
 
-    Example:
+    Example::
 
         onegov-feriennet --select /foo/bar delete-period "Ferienpass Test"
 
     """
 
     def delete_period(
-        request: 'FeriennetRequest',
-        app: 'FeriennetApp'
+        request: FeriennetRequest,
+        app: FeriennetApp
     ) -> None:
 
-        period = request.session.query(Period).filter_by(title=title).first()
+        period = request.session.query(
+            BookingPeriod).filter_by(title=title).first()
 
         if not period:
-            print(f"Could not find period «{title}»")
-            sys.exit(1)
+            raise click.ClickException(f'Could not find period «{title}»')
 
         request.session.execute(text("""
             DELETE FROM payments WHERE payments.id IN (
@@ -150,18 +152,18 @@ def delete_period(
 
 @cli.command(name='compute-occasion-durations')
 def compute_occasion_durations(
-) -> 'Callable[[FeriennetRequest, FeriennetApp], None]':
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
     """ Recomputes the durations of all occassions.
 
-    Example:
+    Example::
 
         onegov-feriennet --select /foo/bar compute-occasion-durations
 
     """
 
     def compute_occasion_durations(
-        request: 'FeriennetRequest',
-        app: 'FeriennetApp'
+        request: FeriennetRequest,
+        app: FeriennetApp
     ) -> None:
 
         occasions = request.session.query(Occasion)

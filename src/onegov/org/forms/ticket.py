@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from onegov.chat import MessageFile
 from onegov.core.security import Private
 from onegov.form import Form
 from onegov.form.fields import (ChosenSelectField,
-                                ChosenSelectMultipleEmailField)
+                                ChosenSelectMultipleEmailField, PanelField)
 from onegov.form.fields import TextAreaFieldWithTextModules
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.filters import strip_whitespace
@@ -29,8 +31,8 @@ if TYPE_CHECKING:
 class TicketNoteForm(Form):
 
     text = TextAreaFieldWithTextModules(
-        label=_("Text"),
-        description=_("Your note about this ticket"),
+        label=_('Text'),
+        description=_('Your note about this ticket'),
         validators=[
             InputRequired(),
             Length(max=TABLE_CELL_CHAR_LIMIT)
@@ -39,7 +41,7 @@ class TicketNoteForm(Form):
         render_kw={'rows': 10, 'data-max-length': TABLE_CELL_CHAR_LIMIT})
 
     file = UploadFileWithORMSupport(
-        label=_("Attachment"),
+        label=_('Attachment'),
         file_class=MessageFile,
         validators=[
             Optional(),
@@ -50,8 +52,8 @@ class TicketNoteForm(Form):
 class TicketChatMessageForm(Form):
 
     text = TextAreaField(
-        label=_("Message"),
-        description=_("Your message"),
+        label=_('Message'),
+        description=_('Your message'),
         validators=[
             InputRequired(),
             Length(max=TABLE_CELL_CHAR_LIMIT)
@@ -61,7 +63,7 @@ class TicketChatMessageForm(Form):
 
     def validate_text(self, field: TextAreaField) -> None:
         if not self.text.data or not self.text.data.strip():
-            raise ValidationError(_("The message is empty"))
+            raise ValidationError(_('The message is empty'))
 
 
 class InternalTicketChatMessageForm(TicketChatMessageForm):
@@ -69,29 +71,38 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
     if TYPE_CHECKING:
         request: OrgRequest
 
+    notify_hint = PanelField(
+        label=_('Notify about replies hint'),
+        kind='callout',
+        text=_(
+            'The "Always send email notifications for new ticket messages" '
+            'setting is enabled. You will receive an email whenever theres a '
+            'reply to your messages. You can change this behaviour in the '
+            'general ticket settings.'
+        )
+    )
+
     notify = BooleanField(
-        label=_("Notify me about replies"),
+        label=_('Notify me about replies'),
         default=True,
     )
 
     def on_request(self) -> None:
         self.text.widget = TextAreaWithTextModules()
         if self.request.app.org.ticket_always_notify:
-            if isinstance(self.notify.render_kw, dict):
-                self.notify.render_kw.update({'disabled': True})
-            else:
-                self.notify.render_kw = {'disabled': True}  # type:ignore
-            self.notify.description = _('Setting "Always notify" is active')
+            self.delete_field('notify')
+        else:
+            self.delete_field('notify_hint')
 
 
 class ExtendedInternalTicketChatMessageForm(InternalTicketChatMessageForm):
     """ Extends the form with Email BCC-Fields. """
 
     email_bcc = ChosenSelectMultipleEmailField(
-        label=_("BCC"),
+        label=_('BCC'),
         fieldset=('Email'),
-        description=_("You can send a copy of the message to one or more "
-                      "recipients"),
+        description=_('You can send a copy of the message to one or more '
+                      'recipients'),
         validators=[StrictOptional()],
         choices=[]
     )
@@ -140,7 +151,8 @@ class TicketAssignmentForm(Form):
         self.user.choices = [
             (
                 str(user.id),
-                f'{user.title} ({user.group.name})' if user.group
+                f'{user.title} ({", ".join(str(g.name) for g in user.groups)})'
+                if user.groups
                 else user.title
             )
             for user in UserCollection(self.request.session).query()
@@ -149,3 +161,22 @@ class TicketAssignmentForm(Form):
                 and user.active == True
             )
         ]
+
+
+class TicketChangeTagForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
+
+    tag = ChosenSelectField(
+        _('Tag'),
+        choices=[],
+    )
+
+    def on_request(self) -> None:
+        choices = self.tag.choices = [
+            (tag, tag)
+            for item in self.request.app.org.ticket_tags
+            for tag in (item.keys() if isinstance(item, dict) else (item,))
+        ]
+        choices.insert(0, ('', ''))

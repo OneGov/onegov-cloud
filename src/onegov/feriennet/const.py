@@ -1,5 +1,7 @@
 #: Describes the states which are visible to the given role (not taking
 # ownership in account!)
+from __future__ import annotations
+
 VISIBLE_ACTIVITY_STATES = {
     'admin': (
         'preview',

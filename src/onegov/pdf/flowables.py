@@ -1,6 +1,8 @@
-from pdfrw import PdfReader
-from pdfrw.buildxobj import pagexobj
-from pdfrw.toreportlab import makerl
+from __future__ import annotations
+
+from pdfrw import PdfReader  # type:ignore[import-untyped]
+from pdfrw.buildxobj import pagexobj  # type:ignore[import-untyped]
+from pdfrw.toreportlab import makerl  # type:ignore[import-untyped]
 from reportlab.platypus import Flowable
 
 
@@ -14,10 +16,13 @@ class InlinePDF(Flowable):
 
     def __init__(
         self,
-        pdf_file: 'StrOrBytesPath | SupportsRead[bytes]',
+        pdf_file: StrOrBytesPath | SupportsRead[bytes],
         width: float
     ):
         Flowable.__init__(self)
+        # FIXME: Can we re-implement this using pypdf? This is the only
+        #        thing we use pdfrw for and it's not really maintained
+        #        anymore...
         page = PdfReader(pdf_file, decompress=False).pages[0]
         self.page = pagexobj(page)
         self.scale = width / self.page.BBox[2]

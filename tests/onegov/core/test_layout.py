@@ -1,13 +1,15 @@
+from __future__ import annotations
+
 from datetime import date, datetime, timedelta
 from sedate import replace_timezone, utcnow
 from onegov.core.layout import Layout
 from onegov.core.utils import Bunch
 
 
-def test_batched():
+def test_batched() -> None:
     layout = Layout(
         model=object(),
-        request=Bunch(app=Bunch(version='1.0', sentry_dsn=None))
+        request=Bunch(app=Bunch(version='1.0', sentry_dsn=None))  # type: ignore[arg-type]
     )
     assert list(layout.batched('ABCDEFG', 3)) == [
         ('A', 'B', 'C'),
@@ -16,10 +18,10 @@ def test_batched():
     ]
 
 
-def test_format_date():
+def test_format_date() -> None:
     layout = Layout(
         model=object(),
-        request=Bunch(app=Bunch(version='1.0', sentry_dsn=None))
+        request=Bunch(app=Bunch(version='1.0', sentry_dsn=None))  # type: ignore[arg-type]
     )
 
     dt = replace_timezone(datetime(2015, 6, 17, 15, 0), 'Europe/Zurich')
@@ -37,14 +39,14 @@ def test_format_date():
     assert layout.format_date(date(2016, 1, 3), 'date') == '03.01.2016'
     assert layout.format_date(None, 'datetime') == ''
 
-    layout.day_long_format = 'skeleton:MMMMd'
+    layout.day_long_format = 'skeleton:MMMMd'  # type: ignore[attr-defined]
     assert layout.format_date(dt, 'day_long') == '17. Juni'
 
 
-def test_format_number():
+def test_format_number() -> None:
     layout = Layout(
         model=object(),
-        request=Bunch(app=Bunch(version='1.0', sentry_dsn=None))
+        request=Bunch(app=Bunch(version='1.0', sentry_dsn=None))  # type: ignore[arg-type]
     )
 
     layout.request.locale = 'de_CH'
@@ -78,10 +80,10 @@ def test_format_number():
     assert layout.format_number(None) == ""
 
 
-def test_relative_date():
+def test_relative_date() -> None:
     layout = Layout(
         model=object(),
-        request=Bunch(locale='en', app=Bunch(version='1.0', sentry_dsn=None))
+        request=Bunch(locale='en', app=Bunch(version='1.0', sentry_dsn=None))  # type: ignore[arg-type]
     )
     text = layout.format_date(utcnow() - timedelta(seconds=60 * 5), 'relative')
     assert text == '5 minutes ago'

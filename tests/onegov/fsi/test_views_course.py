@@ -1,9 +1,16 @@
+from __future__ import annotations
+
 import os
 
 from onegov.fsi.models import Course
 
 
-def test_add_course_and_invite(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_add_course_and_invite(client: Client) -> None:
     view = '/fsi/courses/add'
     client.login_editor()
     client.get(view, status=403)
@@ -40,10 +47,11 @@ def test_add_course_and_invite(client):
     assert 'Verfügbare Kurstermine finden Sie unter' in text
 
 
-def test_course_details(client_with_db):
+def test_course_details(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     course = session.query(Course).first()
+    assert course is not None
     view = f'/fsi/course/{course.id}'
     client.get(view, status=403)
 
@@ -54,10 +62,11 @@ def test_course_details(client_with_db):
     assert course.description in page
 
 
-def test_edit_course(client_with_db):
+def test_edit_course(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     course = session.query(Course).first()
+    assert course is not None
     view = f'/fsi/course/{course.id}/edit'
 
     client.login_editor()
@@ -71,11 +80,12 @@ def test_edit_course(client_with_db):
     assert 'Changed' in page
 
 
-def test_delete_course_1(client_with_db):
+def test_delete_course_1(client_with_db: Client) -> None:
     client = client_with_db
     assert client.use_intercooler is True
     session = client.app.session()
     course = session.query(Course).first()
+    assert course is not None
     # course_id = course.id
     view = f'/fsi/course/{course.id}'
     client.login_admin()
@@ -87,14 +97,15 @@ def test_delete_course_1(client_with_db):
     page.click('Löschen')
 
     page = client.get(view)
-    assert "Dieser Kurs besitzt bereits Durchführungen " \
-           "und kann nicht gelöscht werden" in page
+    assert ("Dieser Kurs besitzt bereits Durchführungen "
+            "und kann nicht gelöscht werden") in page
 
 
-def test_course_invite(client_with_db):
+def test_course_invite(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     course = session.query(Course).first()
+    assert course is not None
     view = f'/fsi/course/{course.id}/invite'
 
     client.login_member()
@@ -104,7 +115,7 @@ def test_course_invite(client_with_db):
     client.get(view)
 
 
-def test_course_collection(client):
+def test_course_collection(client: Client) -> None:
     view = '/fsi/courses'
     client.get(view, status=403)
 
@@ -112,10 +123,11 @@ def test_course_collection(client):
     client.get(view)
 
 
-def test_course_1(client_with_db):
+def test_course_1(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     course = session.query(Course).first()
+    assert course is not None
     view = f'/fsi/course/{course.id}'
     client.get(view, status=403)
 

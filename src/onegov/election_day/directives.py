@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dectate import Action
 from morepath.directive import HtmlAction
 from morepath.directive import ViewAction
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
     from onegov.core.directives import _RequestT
     from onegov.core.request import CoreRequest
     from typing import Protocol
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from webob import Response as BaseResponse
     from wtforms import Form
 
@@ -50,9 +52,9 @@ class ManageHtmlAction(HtmlAction):
     def __init__(
         self,
         model: type | str,
-        render: 'Callable[[Any, _RequestT], BaseResponse] | str | None' = None,
-        template: 'StrOrBytesPath | None' = None,
-        load: 'Callable[[_RequestT], Any] | str | None' = None,
+        render: Callable[[Any, _RequestT], BaseResponse] | str | None = None,
+        template: StrOrBytesPath | None = None,
+        load: Callable[[_RequestT], Any] | str | None = None,
         permission: object | str | None = None,
         internal: bool = False,
         **predicates: Any,
@@ -79,10 +81,10 @@ class ManageFormAction(HtmlHandleFormAction):
     def __init__(
         self,
         model: type | str,
-        form: 'type[Form] | FormCallable[_RequestT]' = EmptyForm,
-        render: 'Callable[[Any, _RequestT], BaseResponse] | str | None' = None,
-        template: 'StrOrBytesPath' = 'form.pt',
-        load: 'Callable[[_RequestT], Any] | str | None' = None,
+        form: type[Form] | FormCallable[_RequestT] = EmptyForm,
+        render: Callable[[Any, _RequestT], BaseResponse] | str | None = None,
+        template: StrOrBytesPath = 'form.pt',
+        load: Callable[[_RequestT], Any] | str | None = None,
         permission: object | str | None = None,
         internal: bool = False,
         **predicates: Any,
@@ -100,7 +102,7 @@ class ManageFormAction(HtmlHandleFormAction):
         )
 
 
-def render_svg(content: dict[str, Any], request: 'CoreRequest') -> Response:
+def render_svg(content: dict[str, Any], request: CoreRequest) -> Response:
     path = content.get('path')
     name = content.get('name')
     if not path:
@@ -119,7 +121,7 @@ def render_svg(content: dict[str, Any], request: 'CoreRequest') -> Response:
     )
 
 
-def render_pdf(content: dict[str, Any], request: 'CoreRequest') -> Response:
+def render_pdf(content: dict[str, Any], request: CoreRequest) -> Response:
     path = content.get('path')
     name = content.get('name')
     if not path:
@@ -138,16 +140,16 @@ def render_pdf(content: dict[str, Any], request: 'CoreRequest') -> Response:
     )
 
 
-def render_json(content: dict[str, Any], request: 'CoreRequest') -> Response:
+def render_json(content: dict[str, Any], request: CoreRequest) -> Response:
     data = content.get('data', {})
     name = content.get('name', 'data')
     return Response(
-        json.dumps(data, sort_keys=True, indent=2).encode('utf-8'),
+        json.dumps_bytes(data, sort_keys=True, indent=2),
         content_type='application/json; charset=utf-8',
         content_disposition=f'inline; filename={name}.json')
 
 
-def render_csv(content: dict[str, Any], request: 'CoreRequest') -> Response:
+def render_csv(content: dict[str, Any], request: CoreRequest) -> Response:
     data = content.get('data', {})
     name = content.get('name', 'data')
     return Response(
@@ -165,7 +167,7 @@ class SvgFileViewAction(ViewAction):
     def __init__(
         self,
         model: type | str,
-        load: 'Callable[[_RequestT], Any] | str | None' = None,
+        load: Callable[[_RequestT], Any] | str | None = None,
         permission: object | str = Public,
         internal: bool = False,
         **predicates: Any,
@@ -190,7 +192,7 @@ class PdfFileViewAction(ViewAction):
     def __init__(
         self,
         model: type | str,
-        load: 'Callable[[_RequestT], Any] | str | None' = None,
+        load: Callable[[_RequestT], Any] | str | None = None,
         permission: object | str = Public,
         internal: bool = False,
         **predicates: Any,
@@ -214,7 +216,7 @@ class JsonFileAction(ViewAction):
     def __init__(
         self,
         model: type | str,
-        load: 'Callable[[_RequestT], Any] | str | None' = None,
+        load: Callable[[_RequestT], Any] | str | None = None,
         permission: object | str = Public,
         internal: bool = False,
         **predicates: Any,
@@ -238,7 +240,7 @@ class CsvFileAction(ViewAction):
     def __init__(
         self,
         model: type | str,
-        load: 'Callable[[_RequestT], Any] | str | None' = None,
+        load: Callable[[_RequestT], Any] | str | None = None,
         permission: object | str = Public,
         internal: bool = False,
         **predicates: Any,
@@ -259,8 +261,8 @@ class ScreenWidgetRegistry(dict[str, dict[str, 'ScreenWidget']]):
 
     def by_categories(
         self,
-        categories: 'Iterable[str]'
-    ) -> dict[str, 'ScreenWidget']:
+        categories: Iterable[str]
+    ) -> dict[str, ScreenWidget]:
 
         result: dict[str, ScreenWidget] = {}
         for category in categories:
@@ -287,7 +289,7 @@ class ScreenWidgetAction(Action):
 
     def perform(  # type:ignore[override]
         self,
-        func: 'Callable[[], InputScreenWidget]',
+        func: Callable[[], InputScreenWidget],
         screen_widget_registry: ScreenWidgetRegistry
     ) -> None:
 

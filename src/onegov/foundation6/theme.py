@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 import textwrap
 
@@ -109,7 +111,7 @@ class BaseTheme(CoreTheme):
         """)
 
     @property
-    def foundation_config_vars(self) -> 'Sequence[str]':
+    def foundation_config_vars(self) -> Sequence[str]:
         vars = []
         vars.append(
             f'$flex: {"true" if self.use_flex else "false"};\n'
@@ -129,7 +131,7 @@ class BaseTheme(CoreTheme):
     @property
     def foundation_grid(self) -> str:
         """Defines the settings that are grid related as in the mixin
-                foundation_everything. """
+        foundation_everything. """
         return textwrap.dedent("""
         @if not $flex {
           @include foundation-grid;
@@ -145,7 +147,7 @@ class BaseTheme(CoreTheme):
         """)
 
     @property
-    def foundation_styles(self) -> 'Sequence[str]':
+    def foundation_styles(self) -> Sequence[str]:
         """The default styles"""
         return 'global-styles', 'forms', 'typography'
 
@@ -189,7 +191,7 @@ class BaseTheme(CoreTheme):
         )
 
     @property
-    def foundation_motion_ui(self) -> 'Sequence[str]':
+    def foundation_motion_ui(self) -> Sequence[str]:
         if self.include_motion_ui:
             return 'motion-ui-transitions', 'motion-ui-animations'
         return []
@@ -231,7 +233,7 @@ class BaseTheme(CoreTheme):
             os.path.dirname(__file__), 'foundation', 'vendor')
 
     @property
-    def includes(self) -> 'Iterator[str]':
+    def includes(self) -> Iterator[str]:
         not_allowed = ('flex-classes', 'flex-grid', 'grid', 'xy-grid-classes',
                        'visibility-classes', 'prototype-classes',
                        'float-classes', 'global-styles', 'forms', 'typography')
@@ -242,12 +244,12 @@ class BaseTheme(CoreTheme):
             (var_ for var_ in self.foundation_config_vars),
             (f'@include foundation-{i};' for i in self.foundation_styles),
             (self.foundation_grid, ),
-            (f"@include foundation-{i};" for i in self.foundation_components),
+            (f'@include foundation-{i};' for i in self.foundation_components),
             (self.foundation_helpers, ),
-            (f"@include {i};" for i in self.foundation_motion_ui)
+            (f'@include {i};' for i in self.foundation_motion_ui)
         )
 
-    def compile(self, options: 'Mapping[str, Any] | None' = None) -> str:
+    def compile(self, options: Mapping[str, Any] | None = None) -> str:
         """ Compiles the theme with the given options. """
 
         # copy, because the dict may be static if it's a basic property
@@ -259,16 +261,16 @@ class BaseTheme(CoreTheme):
         print('@charset "utf-8";', file=theme)
 
         # Fix depreciation warnings
-        print("\n".join(
-            f"${var}: null;" for var in self._uninitialized_vars), file=theme)
+        print('\n'.join(
+            f'${var}: null;' for var in self._uninitialized_vars), file=theme)
 
         for key, value in _options.items():
-            print(f"${key}: {value};", file=theme)
+            print(f'${key}: {value};', file=theme)
 
         print('\n'.join(
             f"@import '{i}';" for i in self.pre_imports), file=theme)
 
-        print("@include add-foundation-colors;", file=theme)
+        print('@include add-foundation-colors;', file=theme)
         print("@import 'foundation';", file=theme)
 
         if self.include_motion_ui:
@@ -277,7 +279,7 @@ class BaseTheme(CoreTheme):
         print('\n'.join(
             f"@import '{i}';" for i in self.post_imports), file=theme)
 
-        print("\n".join(self.includes), file=theme)
+        print('\n'.join(self.includes), file=theme)
 
         paths = self.extra_search_paths
         paths.append(self.foundation_path)

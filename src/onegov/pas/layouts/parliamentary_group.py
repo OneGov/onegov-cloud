@@ -1,14 +1,18 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.pas import _
-from onegov.pas.collections import ParliamentaryGroupCollection
+from onegov.pas.collections.parliamentary_group import (
+    PASParliamentaryGroupCollection
+)
 from onegov.pas.layouts.default import DefaultLayout
 
 
-class ParliamentaryGroupCollectionLayout(DefaultLayout):
+class PASParliamentaryGroupCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
@@ -22,6 +26,7 @@ class ParliamentaryGroupCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
+            Link(_('PAS settings'), self.pas_settings_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -43,11 +48,11 @@ class ParliamentaryGroupCollectionLayout(DefaultLayout):
         return None
 
 
-class ParliamentaryGroupLayout(DefaultLayout):
+class PASParliamentaryGroupLayout(DefaultLayout):
 
     @cached_property
-    def collection(self) -> ParliamentaryGroupCollection:
-        return ParliamentaryGroupCollection(self.request.session)
+    def collection(self) -> PASParliamentaryGroupCollection:
+        return PASParliamentaryGroupCollection(self.request.session)
 
     @cached_property
     def title(self) -> str:
@@ -61,6 +66,7 @@ class ParliamentaryGroupLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
+            Link(_('PAS settings'), self.pas_settings_url),
             Link(
                 _('Parliamentary groups'),
                 self.request.link(self.collection)

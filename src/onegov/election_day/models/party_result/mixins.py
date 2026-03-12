@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 
@@ -6,8 +8,8 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.models import PartyPanachageResult
     from onegov.election_day.models import PartyResult
-    from sqlalchemy import Column
-    from sqlalchemy.orm import relationship, Query
+    from sqlalchemy.orm import Mapped
+    from sqlalchemy.orm import Query
     import datetime
 
 
@@ -46,8 +48,8 @@ class PartyResultsCheckMixin:
 
     if TYPE_CHECKING:
         # forward declare required relationships
-        party_results: relationship[list[PartyResult]]
-        party_panachage_results: relationship[list[PartyPanachageResult]]
+        party_results: Mapped[list[PartyResult]]
+        party_panachage_results: Mapped[list[PartyPanachageResult]]
 
     @property
     def has_party_results(self) -> bool:
@@ -72,15 +74,15 @@ class HistoricalPartyResultsMixin:
 
     if TYPE_CHECKING:
         # forward declare required relationships
-        date: Column[datetime.date]
-        party_results: relationship[list[PartyResult]]
+        date: Mapped[datetime.date]
+        party_results: Mapped[list[PartyResult]]
 
     @property
-    def relationships_for_historical_party_results(self) -> 'Query[Any]':
+    def relationships_for_historical_party_results(self) -> Query[Any]:
         raise NotImplementedError()
 
     @property
-    def historical_party_results(self) -> 'list[PartyResult]':
+    def historical_party_results(self) -> list[PartyResult]:
         """ Returns the party results while adding party results from the last
         legislative period, Requires that a related election or compound has
         been set with type "historical".

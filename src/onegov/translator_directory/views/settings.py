@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Secret
 from onegov.org.models import Organisation
 from onegov.translator_directory import TranslatorDirectoryApp
@@ -23,15 +25,15 @@ if TYPE_CHECKING:
 )
 def view_locations_settings(
     self: Organisation,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: TranslatorDirectorySettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = DefaultLayout(self, request)
 
     if form.submitted(request):
         form.update_model(request.app)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self, 'directory-settings'))
 
     form.apply_model(request.app)

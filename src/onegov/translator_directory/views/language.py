@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Secret, Private
 from onegov.translator_directory import TranslatorDirectoryApp
@@ -25,9 +27,9 @@ if TYPE_CHECKING:
 )
 def add_new_language(
     self: LanguageCollection,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: LanguageForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         lang = self.add(**form.get_useful_data())
@@ -36,8 +38,11 @@ def add_new_language(
         )
         return request.redirect(request.class_link(LanguageCollection))
 
+    layout = AddLanguageLayout(self, request)
+    layout.edit_mode = True
+
     return {
-        'layout': AddLanguageLayout(self, request),
+        'layout': layout,
         'model': self,
         'form': form,
         'title': _('Add new language')
@@ -51,8 +56,8 @@ def add_new_language(
 )
 def view_languages(
     self: LanguageCollection,
-    request: 'TranslatorAppRequest'
-) -> 'RenderData':
+    request: TranslatorAppRequest
+) -> RenderData:
 
     letters = tuple(
         Link(
@@ -84,9 +89,9 @@ def view_languages(
 )
 def edit_language(
     self: Language,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: LanguageForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -100,8 +105,12 @@ def edit_language(
     if not form.errors:
         form.process(obj=self)
 
+    layout = EditLanguageLayout(self, request)
+    layout.edit_mode = True
+    layout.editmode_links.extend(layout.editbar_links)
+
     return {
-        'layout': EditLanguageLayout(self, request),
+        'layout': layout,
         'model': self,
         'form': form,
         'title': _('Edit language')
@@ -113,7 +122,7 @@ def edit_language(
     request_method='DELETE',
     permission=Secret
 )
-def delete_language(self: Language, request: 'TranslatorAppRequest') -> None:
+def delete_language(self: Language, request: TranslatorAppRequest) -> None:
     request.assert_valid_csrf_token()
     if not self.deletable:
         request.warning(_("This language is used and can't be deleted."))

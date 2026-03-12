@@ -1,32 +1,60 @@
+from __future__ import annotations
+
+import transaction
+
 from datetime import datetime, date
+from io import BytesIO
 from onegov.core.utils import Bunch
 from onegov.form import FormCollection
+from onegov.org.models.ticket import ReservationTicket
 from onegov.org.models import TicketMessage, TicketChatMessage
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.pdf.utils import extract_pdf_info
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from tests.onegov.pdf.test_pdf import LONGEST_TABLE_CELL_TEXT
+from textwrap import dedent
 from webob.multidict import MultiDict
 
 
-def open_ticket(request, token, handler_code, create_message=True):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.form import Form, FormSubmission
+    from onegov.org.request import OrgRequest
+    from onegov.reservation import Resource
+    from onegov.ticket import Ticket
+    from sqlalchemy.orm import Session
+    from uuid import UUID
+    from .conftest import Client, TestOrgApp
+
+
+def open_ticket(
+    request: OrgRequest,
+    token: str,
+    handler_code: str,
+    create_message: bool = True
+) -> Ticket:
     with request.session.no_autoflush:
         ticket = TicketCollection(request.session).open_ticket(
             handler_code=handler_code, handler_id=token
         )
+        ticket.handler.refresh_invoice_items(request)
         if create_message:
             TicketMessage.create(ticket, request, 'opened')
     return ticket
 
 
-def add_submission(session, resource, token):
+def add_submission(
+    session: Session,
+    resource: Resource,
+    token: UUID
+) -> FormSubmission | None:
     # add the submission if it doesn't yet exist
     forms = FormCollection(session)
     submission = None
     if resource.definition:
         submission = forms.submissions.add_external(
-            form=resource.form_class(),
+            form=resource.form_class(),  # type: ignore[misc]
             state='pending',
             id=token,
             payment_method=resource.payment_method
@@ -34,60 +62,87 @@ def add_submission(session, resource, token):
     return submission
 
 
-def update_submission(session, submission, form):
+def update_submission(
+    session: Session,
+    submission: FormSubmission,
+    form: Form
+) -> None:
     # update the data on the submission
     forms = FormCollection(session)
     if submission:
         forms.submissions.update(submission, form)
 
 
-def add_ticket_message(request, ticket, text):
+def add_ticket_message(
+    request: OrgRequest,
+    ticket: Ticket,
+    text: str
+) -> TicketChatMessage:
     message = TicketChatMessage.create(
         ticket, request,
         text=text,
         owner='info@example.org',
         recipient=None,
-        notify=None,
+        notify=False,
         origin='internal')
     return message
 
 
-def test_ticket_pdf(org_app):
+def test_ticket_pdf(org_app: TestOrgApp) -> None:
 
     session = org_app.session()
     libres_context = org_app.libres_context
     owner = 'info@example.org'
 
-    def get_translate(**kwargs):
+    def get_translate(**kwargs: object) -> Any:
         return org_app.chameleon_translations.get('de_CH')
 
-    def class_link(cls, *args, **kwargs):
+    def get_form(form_cls: type[Form], **kwargs: object) -> Form:
+        form = form_cls(meta={'request': request})
+        form.request = request
+        return form
+
+    def class_link(cls: type[object], *args: object, **kwargs: object) -> str:
         return cls.__name__
 
-    def link(*args, **kwargs):
+    def link(*args: object, **kwargs: object) -> str:
         name = kwargs.pop('name')
         return f'https://seantis.ch/{name or ""}'
 
+    template_loader = (
+        org_app.config.template_engine_registry._template_loaders['.pt'])
+
     host_url = '127.0.0.1:8080'
 
-    request = Bunch(
+    request: Any = Bunch(
         app=org_app,
         translate=lambda x: x,
         session=session,
         include=lambda x: None,
         current_username=owner,
         is_manager=True,
+        is_manager_for_model=lambda model: True,
         get_translate=get_translate,
+        get_form=get_form,
         locale='de_CH',
         host_url=host_url,
         class_link=class_link,
         link=link,
-        url=''
+        url='',
+        template_loader=template_loader
     )
     collection = ResourceCollection(libres_context)
     forms = FormCollection(session)
-    room = collection.add('Stairway to Heaven', 'Europe/Zurich', type='room',
-                          definition='# Data\nName *= ___')
+    room = collection.add(
+        'Stairway to Heaven',
+        'Europe/Zurich',
+        type='room',
+        definition='# Data\nName *= ___',
+        content={
+            'pricing_method': 'per_hour',
+            'price_per_hour': 50.0
+        }
+    )
 
     scheduler = room.get_scheduler(libres_context)
     dates = (datetime(2017, 6, 7, 12), datetime(2017, 6, 7, 18))
@@ -95,23 +150,25 @@ def test_ticket_pdf(org_app):
 
     token = scheduler.reserve(owner, dates)
     submission = add_submission(session, room, token)
+    assert submission is not None
 
     form_data = MultiDict([('data_name', 'John')])
 
     # We skip the combining ReservationForm and the form from definition
-    form = room.form_class(form_data)
+    form = room.form_class(form_data)  # type: ignore[misc]
     assert form.validate()
     update_submission(session, submission, form)
 
     # scheduler.approve_reservations(token)
     reservation = scheduler.reservations_by_token(token).one()
     assert reservation
-    ticket = open_ticket(request, token, 'RSV', owner)
+    ticket = open_ticket(request, str(token), 'RSV', True)
+    assert isinstance(ticket, ReservationTicket)
 
     add_ticket_message(request, ticket, LONGEST_TABLE_CELL_TEXT)
 
     # We have to mitigate the case but its hard since we deal with html
-    # add_ticket_message(request, ticket, 2 * LONGEST_TABLE_CELL_TEXT)
+    add_ticket_message(request, ticket, 2 * LONGEST_TABLE_CELL_TEXT)
 
     assert ticket.handler.resource
 
@@ -140,10 +197,49 @@ def test_ticket_pdf(org_app):
     metadata = ('Betreff', 'Antragsteller/in', 'Status', 'Gruppe', 'Zuständig',
                 'Erstellt', 'Reaktionszeit', 'Bearbeitungszeit')
 
-    titles = ('Zusammenfassung', 'Aktivität')
+    titles = ('Zusammenfassung', 'Aktivität', 'Rechnung')
 
     for entry in metadata:
         assert entry in page
 
     for title in titles:
         assert title in page
+
+
+def test_ticket_pdf_long_message(client: Client) -> None:
+    """PDF generation must not fail when a ticket message is long:
+
+    https://reportlab-users.reportlab.narkive.com/4eO58iDH/
+    flowable-too-large-how-to-keeptogether
+    """
+
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Contact', definition=dedent("""
+        Name * = ___
+        E-Mail * = @@@
+    """), type='custom')
+    transaction.commit()
+
+    client.login_admin()
+
+    page = client.get('/forms').click('Contact')
+    page.form['name'] = 'John'
+    page.form['e_mail'] = 'john@example.org'
+    page = page.form.submit().follow().form.submit().follow()
+    assert 'FRM-' in page
+
+    ticket_page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket_url = ticket_page.request.url
+
+    # This should work with 4000 chars. (customer explicitly asked for it)
+    # TABLE_CELL_CHAR_LIMIT
+    long_message = 'word ' * (4000 // 5 - 1)
+    assert len(long_message) < 4000
+    note_page = ticket_page.click('Neue Notiz')
+    note_page.form['text'] = long_message
+    res = note_page.form.submit().follow()
+
+    pdf = client.get(ticket_url + '/pdf')
+    assert pdf.content_type == 'application/pdf'
+    _, page_text = extract_pdf_info(BytesIO(pdf.body))
+    assert 'John' in page_text

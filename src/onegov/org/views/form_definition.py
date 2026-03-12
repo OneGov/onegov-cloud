@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 import morepath
+import requests
 
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection, FormDefinition
+from onegov.form import FormRegistrationWindow
 from onegov.gis import Coordinates
-from onegov.org import _, OrgApp
+from onegov.org import _, OrgApp, log
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import FormDefinitionForm
@@ -13,24 +17,41 @@ from onegov.org.layout import FormEditorLayout, FormSubmissionLayout
 from onegov.org.models import BuiltinFormDefinition, CustomFormDefinition
 from onegov.org.models.form import submission_deletable
 from webob import exc
-
+from webob import Response
 
 from typing import TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.layout import Layout
     from onegov.core.types import RenderData
-    from onegov.form import Form, FormRegistrationWindow, FormSubmission
+    from onegov.form import Form, FormSubmission
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Session
-    from webob import Response
 
     FormDefinitionT = TypeVar('FormDefinitionT', bound=FormDefinition)
 
 
+FORMCODE_PROMPT = """\
+You are an expert in onegov-cloud formcode syntax, the specialized Markdown
+inspired syntax for defining forms.
+Always include an email address field.
+Special care to comments, please.
+Don't use fieldset definitions/title as 'form title' and never put a fieldset
+definition without a field.
+
+Do not add any explanations, markdown code blocks, or preamble.
+Only output the raw formcode as plain text.
+
+Take care to only use the syntax described in the following specification:
+
+{specification}
+"""
+
+
 def get_form_class(
     model: BuiltinFormDefinition | CustomFormDefinition | FormCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[FormDefinitionForm]:
 
     if isinstance(model, FormCollection):
@@ -48,53 +69,53 @@ def get_form_class(
 #        first and on the layout second, passing around layouts in contexts
 #        where we don't actually always have one is weird
 def get_hints(
-    layout: 'Layout',
-    window: 'FormRegistrationWindow | None'
-) -> 'Iterator[tuple[str, str]]':
+    layout: Layout,
+    window: FormRegistrationWindow | None
+) -> Iterator[tuple[str, str]]:
 
     if not window:
         return
 
     if window.in_the_past:
-        yield 'stop', _("The registration has ended")
+        yield 'stop', _('The registration has ended')
     elif not window.enabled:
-        yield 'stop', _("The registration is closed")
+        yield 'stop', _('The registration is closed')
 
     if window.enabled and window.in_the_future:
-        yield 'date', _("The registration opens on ${day}, ${date}", mapping={
+        yield 'date', _('The registration opens on ${day}, ${date}', mapping={
             'day': layout.format_date(window.start, 'weekday_long'),
             'date': layout.format_date(window.start, 'date_long')
         })
 
     if window.enabled and window.in_the_present:
-        yield 'date', _("The registration closes on ${day}, ${date}", mapping={
+        yield 'date', _('The registration closes on ${day}, ${date}', mapping={
             'day': layout.format_date(window.end, 'weekday_long'),
             'date': layout.format_date(window.end, 'date_long')
         })
 
         if window.limit and window.overflow:
             yield 'count', _("There's a limit of ${count} attendees", mapping={
-                'count': window.limit
-            })
+                             'count': window.limit
+                             })
 
         if window.limit and not window.overflow:
             spots = window.available_spots
 
             if spots == 0:
-                yield 'stop', _("There are no spots left")
+                yield 'stop', _('There are no spots left')
             elif spots == 1:
-                yield 'count', _("There is one spot left")
+                yield 'count', _('There is one spot left')
             else:
-                yield 'count', _("There are ${count} spots left", mapping={
+                yield 'count', _('There are ${count} spots left', mapping={
                     'count': spots
                 })
 
 
 def handle_form_change_name(
-    form: 'FormDefinitionT',
-    session: 'Session',
+    form: FormDefinitionT,
+    session: Session,
     new_name: str
-) -> 'FormDefinitionT':
+) -> FormDefinitionT:
 
     new_form = form.for_new_name(new_name)
     session.add(new_form)
@@ -130,10 +151,10 @@ def handle_form_change_name(
 )
 def handle_change_form_name(
     self: FormDefinition,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormDefinitionUrlForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """Since the name used for the url is the primary key, we create a new
     FormDefinition to make our live easier """
     site_title = _('Change URL')
@@ -161,10 +182,10 @@ def handle_change_form_name(
 )
 def handle_defined_form(
     self: FormDefinition,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     layout: FormSubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Renders the empty form and takes input, even if it's not valid, stores
     it as a pending submission and redirects the user to the view that handles
     pending submissions.
@@ -195,7 +216,7 @@ def handle_defined_form(
         'definition': self,
         'form_width': 'small',
         'lead': layout.linkify(self.meta.get('lead')),
-        'text': self.content.get('text'),
+        'text': self.text,
         'people': getattr(self, 'people', None),
         'files': getattr(self, 'files', None),
         'contact': getattr(self, 'contact_html', None),
@@ -213,17 +234,17 @@ def handle_defined_form(
 )
 def handle_new_definition(
     self: FormCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormDefinitionForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.title.data is not None
         assert form.definition.data is not None
 
         if self.definitions.by_name(normalize_for_url(form.title.data)):
-            request.alert(_("A form with this name already exists"))
+            request.alert(_('A form with this name already exists'))
         else:
             definition = self.definitions.add(
                 title=form.title.data,
@@ -232,20 +253,20 @@ def handle_new_definition(
             )
             form.populate_obj(definition)
 
-            request.success(_("Added a new form"))
+            request.success(_('Added a new form'))
             return morepath.redirect(request.link(definition))
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(self)),
-        Link(_("New Form"), request.link(self, name='new'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Forms'), request.link(self)),
+        Link(_('New Form'), request.link(self, name='new'))
     ]
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New Form"),
+        'title': _('New Form'),
         'form': form,
         'form_width': 'large',
     }
@@ -258,10 +279,10 @@ def handle_new_definition(
 )
 def handle_edit_definition(
     self: FormDefinition,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormDefinitionForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.definition.data is not None
@@ -270,7 +291,7 @@ def handle_edit_definition(
         form.populate_obj(self, exclude={'definition'})
         self.definition = form.definition.data
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return morepath.redirect(request.link(self))
     elif not request.POST:
         form.process(obj=self)
@@ -279,10 +300,10 @@ def handle_edit_definition(
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(collection)),
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Forms'), request.link(collection)),
         Link(self.title, request.link(self)),
-        Link(_("Edit"), request.link(self, name='edit'))
+        Link(_('Edit'), request.link(self, name='edit'))
     ]
     layout.edit_mode = True
 
@@ -301,7 +322,7 @@ def handle_edit_definition(
 )
 def delete_form_definition(
     self: FormDefinition,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
     """
     With introduction of cancelling submissions over the registration window,
@@ -322,7 +343,7 @@ def delete_form_definition(
     if self.type != 'custom':
         raise exc.HTTPMethodNotAllowed()
 
-    def handle_ticket(submission: 'FormSubmission') -> None:
+    def handle_ticket(submission: FormSubmission) -> None:
         ticket = submission_deletable(submission, request.session)
         if ticket is False:
             raise exc.HTTPMethodNotAllowed()
@@ -331,7 +352,7 @@ def delete_form_definition(
             close_ticket(ticket, request.current_user, request)
             ticket.create_snapshot(request)
 
-    def handle_submissions(submissions: 'Iterable[FormSubmission]') -> None:
+    def handle_submissions(submissions: Iterable[FormSubmission]) -> None:
         for s in submissions:
             handle_ticket(s)
 
@@ -341,3 +362,91 @@ def delete_form_definition(
         with_registration_windows=True,
         handle_submissions=handle_submissions
     )
+
+
+@OrgApp.view(
+    model=FormCollection,
+    name='formcoder',
+    request_method='POST',
+    permission=Private
+)
+def formcoder(self: FormCollection, request: OrgRequest) -> Response:
+    """Generate formcode for a new form being created or edited.
+
+    This handles POSTs to e.g. /forms/formcoder, requesting AI support
+    from infomaniak and finally returns plain text being replaced in the
+    form definition text field.
+    """
+
+    token = request.app.infomaniak_api_token
+    product_id = request.app.infomaniak_product_id
+    snippet: str = str(request.params.get('snippet', ''))
+
+    if not snippet:
+        return Response(body='Missing prompt', content_type='text/plain')
+
+    if not token:
+        log.warning('Formcoder: Infomaniak API token not configured')
+        return Response(
+            body='INFOMANIAK_API_TOKEN_NOT_CONFIGURED',
+            content_type='text/plain')
+
+    if not product_id:
+        log.warning(
+            'Formcoder: Could not retrieve product id from Infomaniak API')
+        return Response(
+            body='Could not retrieve product id from Infomaniak API',
+            content_type='text/plain',
+        )
+
+    if not request.app.formcode_specification:
+        log.warning('Formcoder: Formcode specification not configured')
+        return Response(
+            body='Formcode specification not configured',
+            content_type='text/plain'
+        )
+
+    prompt = FORMCODE_PROMPT.format(
+        specification=request.app.formcode_specification
+    )
+    url = (
+        f'https://api.infomaniak.com/1/ai/{product_id}'
+        f'/openai/chat/completions'
+    )
+
+    try:
+        response = requests.post(
+            url=url,
+            headers={
+                'Authorization': f'Bearer {token}',
+                'Content-Type': 'application/json',
+            },
+            json={
+                'model': 'qwen3',
+                'messages': [
+                    {'role': 'system', 'content': prompt},
+                    {'role': 'user', 'content': snippet}
+                ],
+                'temperature': 0,
+            },
+            timeout=(10, 30)
+        )
+    except Exception as e:
+        log.error(
+            f'Formcoder: Infomaniak API request failed: {e}', exc_info=True)
+        return Response(
+            body=f"Infomaniak API request failed with '{e}'",
+            content_type='text/plain')
+
+    if not response.ok:
+        log.error(f'Formcoder: Failed to generate form code. '
+                  f'API error: {response.status_code}, {response.text}')
+        return Response(
+            body=f'Formcoder: Failed to generate form code. API error '
+                 f'{response.text}',
+            content_type='text/plain')
+
+    data = response.json()
+    definition = data['choices'][0]['message']['content']
+
+    return Response(body=definition, content_type='text/plain')

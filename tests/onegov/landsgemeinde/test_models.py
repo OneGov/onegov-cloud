@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import time
 from onegov.landsgemeinde.models import AgendaItem
@@ -10,7 +12,13 @@ from onegov.landsgemeinde.models import Votum
 from onegov.people import Person
 
 
-def test_models(session, assembly):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.landsgemeinde.models import Assembly
+    from sqlalchemy.orm import Session
+
+
+def test_models(session: Session, assembly: Assembly) -> None:
     # create models
     session.add(assembly)
     session.flush()
@@ -47,6 +55,9 @@ def test_models(session, assembly):
     assert agenda_item.last_modified is None
     assembly.stamp()
     agenda_item.stamp()
+    # undo mypy narrowing
+    assembly = assembly
+    agenda_item = agenda_item
     assert assembly.last_modified is not None
     assert agenda_item.last_modified is not None
 
@@ -57,6 +68,10 @@ def test_models(session, assembly):
     assembly.start()
     agenda_item.start()
     votum.start()
+    # undo mypy narrowing
+    assembly = assembly
+    agenda_item = agenda_item
+    votum = votum
     assert agenda_item.start_time is not None
     assert votum.start_time is not None
 
@@ -119,7 +134,7 @@ def test_models(session, assembly):
     assert session.query(Votum).count() == 0
 
 
-def test_suggestions(session):
+def test_suggestions(session: Session) -> None:
 
     # no data yet
     assert PersonNameSuggestion(session).query() == []

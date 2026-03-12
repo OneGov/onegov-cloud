@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.layouts.default import DefaultLayout
 from onegov.election_day.layouts.election import ElectionLayout
 from onegov.election_day.layouts.election_compound import (

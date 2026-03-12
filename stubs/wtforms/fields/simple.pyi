@@ -8,6 +8,22 @@ from wtforms.meta import DefaultMeta, _SupportsGettextAndNgettext
 
 from onegov.form.types import PricingRules
 
+__all__ = (
+    "BooleanField",
+    "TextAreaField",
+    "PasswordField",
+    "FileField",
+    "MultipleFileField",
+    "HiddenField",
+    "SearchField",
+    "SubmitField",
+    "StringField",
+    "TelField",
+    "URLField",
+    "EmailField",
+    "ColorField",
+)
+
 class BooleanField(Field):
     data: bool
     default: bool | Callable[[], bool] | None

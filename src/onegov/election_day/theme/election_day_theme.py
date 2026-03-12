@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.foundation import BaseTheme
 from onegov.core.utils import module_path
 
@@ -22,7 +24,7 @@ class ElectionDayTheme(BaseTheme):
         # Leave this empty, see below
         return {}
 
-    def compile(self, options: 'Mapping[str, Any] | None' = None) -> str:
+    def compile(self, options: Mapping[str, Any] | None = None) -> str:
         # We cannot use the default_options attribute since we need to know
         # the primary color which happens to be in the options argument.
         # We merge the options and default options ourselve and call the

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
@@ -27,8 +29,8 @@ if TYPE_CHECKING:
 )
 def view_election_compounds(
     self: ElectionCompoundCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View a list of all election compoundss. """
 
     years = [
@@ -37,12 +39,12 @@ def view_election_compounds(
             year == self.year,
             request.link(self.for_year(year))
         )
-        for year in [None] + self.get_years()
+        for year in [None, *self.get_years()]
     ]
 
     return {
         'layout': ManageElectionCompoundsLayout(self, request),
-        'title': _("Compounds of elections"),
+        'title': _('Compounds of elections'),
         'groups': groupbylist(self.batch, key=lambda items: items.date),
         'new_election_compound': request.link(self, 'new-election-compound'),
         'redirect_filters': {_('Year'): years},
@@ -56,9 +58,9 @@ def view_election_compounds(
 )
 def create_election_compound(
     self: ElectionCompoundCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ElectionCompoundForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Create a new election compound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
@@ -71,13 +73,13 @@ def create_election_compound(
         election_compound = ElectionCompound()
         form.update_model(election_compound)
         archive.add(election_compound, request)
-        request.message(_("Compound added."), 'success')
+        request.message(_('Compound added.'), 'success')
         return redirect(layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New compound"),
+        'title': _('New compound'),
         'cancel': layout.manage_model_link
     }
 
@@ -89,9 +91,9 @@ def create_election_compound(
 )
 def edit_election_compound(
     self: ElectionCompound,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ElectionCompoundForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Edit an existing election compound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
@@ -101,7 +103,7 @@ def edit_election_compound(
         old = request.link(self)
         form.update_model(self)
         archive.update(self, request, old=old)
-        request.message(_("Compound modified."), 'success')
+        request.message(_('Compound modified.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -113,7 +115,7 @@ def edit_election_compound(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Edit compound"),
+        'subtitle': _('Edit compound'),
         'cancel': layout.manage_model_link
     }
 
@@ -125,9 +127,9 @@ def edit_election_compound(
 )
 def clear_election_compound(
     self: ElectionCompound,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ClearResultsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Clear the results of an election ompound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
@@ -135,7 +137,7 @@ def clear_election_compound(
 
     if form.submitted(request):
         archive.clear_results(self, request, form.clear_all.data)
-        request.message(_("Results deleted."), 'success')
+        request.message(_('Results deleted.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -150,8 +152,8 @@ def clear_election_compound(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Clear results"),
-        'button_text': _("Clear results"),
+        'subtitle': _('Clear results'),
+        'button_text': _('Clear results'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -163,9 +165,9 @@ def clear_election_compound(
 )
 def clear_election_compound_media(
     self: ElectionCompound,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Deletes alls SVGs and PDFs of this election compound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
@@ -195,8 +197,8 @@ def clear_election_compound_media(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Clear media"),
-        'button_text': _("Clear media"),
+        'subtitle': _('Clear media'),
+        'button_text': _('Clear media'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -208,9 +210,9 @@ def clear_election_compound_media(
 )
 def delete_election_compound(
     self: ElectionCompound,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Delete an existing election compound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
@@ -218,7 +220,7 @@ def delete_election_compound(
 
     if form.submitted(request):
         archive.delete(self, request)
-        request.message(_("Compound deleted."), 'success')
+        request.message(_('Compound deleted.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -233,8 +235,8 @@ def delete_election_compound(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Delete compound"),
-        'button_text': _("Delete compound"),
+        'subtitle': _('Delete compound'),
+        'button_text': _('Delete compound'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -248,9 +250,9 @@ def delete_election_compound(
 )
 def trigger_election(
     self: ElectionCompound,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: TriggerNotificationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Trigger the notifications related to an election. """
 
     session = request.session
@@ -260,23 +262,23 @@ def trigger_election(
     if form.submitted(request):
         assert form.notifications.data is not None
         notifications.trigger(request, self, form.notifications.data)
-        request.message(_("Notifications triggered."), 'success')
+        request.message(_('Notifications triggered.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
     callout = None
     message = ''
-    title = _("Trigger notifications")
+    title = _('Trigger notifications')
     button_class = 'primary'
     subject = MailLayout(None, request).subject(self)
 
     if notifications.by_model(self):
         callout = _(
-            "There are no changes since the last time the notifications "
-            "have been triggered!"
+            'There are no changes since the last time the notifications '
+            'have been triggered!'
         )
         message = _(
-            "Do you really want to retrigger the notfications?",
+            'Do you really want to retrigger the notfications?',
         )
         button_class = 'alert'
 

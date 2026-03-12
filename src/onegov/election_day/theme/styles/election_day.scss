@@ -449,6 +449,14 @@ table {
     }
 }
 
+.title-indent {
+    span {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+}
+
 @media (min-width: 40em) {
     .tablesaw-modeswitch {
         display: none;

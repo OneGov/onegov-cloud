@@ -1,24 +1,25 @@
+from __future__ import annotations
+
+from datetime import datetime
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UTCDateTime
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from onegov.election_day.models.file import File
+from onegov.election_day.types import DomainOfInfluence
+from onegov.election_day.types import Status
 from onegov.file import NamedFile
-from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import func
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
-    from datetime import datetime
     from onegov.core.orm import SessionManager
-    from onegov.election_day.types import DomainOfInfluence
-    from onegov.election_day.types import Status
     from sqlalchemy.orm import Session
     from sqlalchemy.sql import ColumnElement
 
@@ -37,49 +38,39 @@ class DomainOfInfluenceMixin:
 
     """
 
-    if TYPE_CHECKING:
-        domain: Column[DomainOfInfluence]
-
     #: scope of the election or vote
-    @declared_attr  # type:ignore[no-redef]
-    def domain(cls) -> 'Column[DomainOfInfluence]':
-        return Column(
-            Enum(  # type:ignore[arg-type]
-                'federation',
-                'canton',
-                'region',
-                'district',
-                'municipality',
-                'none',
-                name='domain_of_influence'
-            ),
-            nullable=False
+    domain: Mapped[DomainOfInfluence] = mapped_column(
+        Enum(
+            'federation',
+            'canton',
+            'region',
+            'district',
+            'municipality',
+            'none',
+            name='domain_of_influence'
         )
+    )
 
 
 class StatusMixin:
     """ Mixin providing status indication for votes and elections. """
 
     if TYPE_CHECKING:
-        status: Column[Status | None]
-
         # forward declare required attributes
-        counted: Column[bool]
+        counted: Mapped[bool]
+
         @property
         def progress(self) -> tuple[int, int]: ...
 
     #: Status of the election or vote
-    @declared_attr  # type:ignore[no-redef]
-    def status(cls) -> 'Column[Status | None]':
-        return Column(
-            Enum(  # type:ignore[arg-type]
-                'unknown',
-                'interim',
-                'final',
-                name='election_or_vote_status'
-            ),
-            nullable=True
+    status: Mapped[Status | None] = mapped_column(
+        Enum(
+            'unknown',
+            'interim',
+            'final',
+            name='election_or_vote_status'
         )
+    )
 
     @property
     def completed(self) -> bool:
@@ -110,8 +101,8 @@ class TitleTranslationsMixin:
     if TYPE_CHECKING:
         # forward declare required attributes
         title_translations: (
-            Column[Mapping[str, str]]
-            | Column[Mapping[str, str] | None]
+            Mapped[Mapping[str, str]]
+            | Mapped[Mapping[str, str] | None]
         )
 
     def get_title(
@@ -140,10 +131,10 @@ class IdFromTitlesMixin:
         def session_manager(self) -> SessionManager | None: ...
 
         title_translations: (
-            Column[Mapping[str, str]]
-            | Column[Mapping[str, str] | None]
+            Mapped[Mapping[str, str]]
+            | Mapped[Mapping[str, str] | None]
         )
-        short_title_translations: Column[Mapping[str, str] | None]
+        short_title_translations: Mapped[Mapping[str, str] | None]
 
         def get_title(
             self,
@@ -170,7 +161,7 @@ class IdFromTitlesMixin:
             or self.get_title(locale, default_locale)
         )
 
-    def id_from_title(self, session: 'Session') -> str:
+    def id_from_title(self, session: Session) -> str:
         """ Returns a unique, user friendly id derived from the title. """
 
         session_manager = self.session_manager
@@ -187,7 +178,7 @@ class IdFromTitlesMixin:
             id = increment_name(id)
 
 
-def summarized_property(name: str) -> 'Column[int]':
+def summarized_property(name: str) -> hybrid_property[int]:
     """ Adds an attribute as hybrid_property which returns the sum of the
     underlying results if called.
 
@@ -205,7 +196,7 @@ def summarized_property(name: str) -> 'Column[int]':
 
             @classmethod
             def aggregate_results_expression(cls, attribute):
-                expr = select([func.sum(getattr(Result, attribute))])
+                expr = select(func.sum(getattr(Result, attribute)))
                 expr = expr.where(Result.xxx_id == cls.id)
                 expr = expr.label(attribute)
                 return expr
@@ -215,30 +206,28 @@ def summarized_property(name: str) -> 'Column[int]':
     def getter(self: Any) -> int:
         return self.aggregate_results(name)
 
-    def expression(cls: type[Any]) -> 'ColumnElement[int]':
+    def expression(cls: type[Any]) -> ColumnElement[int]:
         return cls.aggregate_results_expression(name)
 
-    return hybrid_property(getter, expr=expression)  # type:ignore
+    return hybrid_property(getter, expr=expression)
 
 
 class LastModifiedMixin(TimestampMixin):
 
-    if TYPE_CHECKING:
-        last_result_change: Column[datetime | None]
-        last_modified: Column[datetime | None]
+    last_result_change: Mapped[datetime | None]
 
-    @declared_attr  # type:ignore[no-redef]
-    def last_result_change(cls) -> 'Column[datetime | None]':
-        return Column(UTCDateTime)
+    @hybrid_property
+    def last_modified(self) -> datetime | None:
+        changes = (self.last_change, self.last_result_change)
+        return max((
+            change
+            for change in changes
+            if change is not None
+        ), default=None)
 
-    @hybrid_property  # type:ignore[no-redef]
-    def last_modified(self) -> 'datetime | None':
-        changes = [self.last_change, self.last_result_change]
-        changes = [change for change in changes if change]
-        return max(changes) if changes else None
-
-    @last_modified.expression  # type:ignore[no-redef]
-    def last_modified(cls) -> 'ColumnElement[datetime | None]':
+    @last_modified.inplace.expression
+    @classmethod
+    def _last_modified_expression(cls) -> ColumnElement[datetime | None]:
         return func.greatest(cls.last_change, cls.last_result_change)
 
 

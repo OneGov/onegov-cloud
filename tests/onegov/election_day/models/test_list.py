@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.election_day.models import ElectionResult
 from onegov.election_day.models import List
@@ -6,7 +8,12 @@ from onegov.election_day.models import ListResult
 from onegov.election_day.models import ProporzElection
 
 
-def test_list(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_list(session: Session) -> None:
     election = ProporzElection(
         title='Election',
         domain='federation',
@@ -176,19 +183,19 @@ def test_list(session):
     # Test hybrid properties
     assert list_connection.votes == 93
     assert list_connection.number_of_mandates == 1
-    assert session.query(ListConnection.votes).\
-        filter(ListConnection.id == list_connection.id).scalar() == 93
-    assert session.query(ListConnection.number_of_mandates).\
-        filter(ListConnection.id == list_connection.id).scalar() == 1
+    assert session.query(ListConnection.votes
+        ).filter(ListConnection.id == list_connection.id).scalar() == 93
+    assert session.query(ListConnection.number_of_mandates
+        ).filter(ListConnection.id == list_connection.id).scalar() == 1
     assert list_1.votes == 82
-    assert session.query(List.votes).\
-        filter(List.id == list_1.id).scalar() == 82
+    assert session.query(List.votes
+        ).filter(List.id == list_1.id).scalar() == 82
 
     # Test percentages
     tot = {t.entity_id: t.votes for t in election.votes_by_entity.all()}
     tot_d = {t.district: t.votes for t in election.votes_by_district.all()}
 
-    def round_(n, z):
+    def round_(n: int, z: int) -> float:
         return round(100 * n / z, 2)
 
     assert list_1.percentage_by_entity == {

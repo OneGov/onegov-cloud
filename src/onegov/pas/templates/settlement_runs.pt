@@ -1,0 +1,30 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="medium-7 cell main-content">
+                <p tal:condition="not:settlement_runs" i18n:translate="">No settlement runs defined yet.</p>
+                <ul tal:condition="settlement_runs" class="more-list settlement-runs-list">
+                    <li tal:repeat="settlement_run settlement_runs">
+                        <a class="list-link" tal:attributes="href request.link(settlement_run)">
+                            <h5 class="list-title">${settlement_run.name}</h5>
+                            <p class="list-subtitle">&nbsp;${layout.format_date(settlement_run.start, 'date')} - ${layout.format_date(settlement_run.end, 'date')}</p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel">
+                        <h3 i18n:translate="">Filters</h3>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['active']" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </tal:b>
+</div>

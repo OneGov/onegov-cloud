@@ -129,3 +129,15 @@ a {
         color: $anchor-color;
     }
 }
+
+p.edit-note,
+.redactor-dropdown .redactor-formatting-p-edit-note {
+    color: $aluminum;
+    font-size: .875rem;
+    font-style: italic;
+
+    &::before {
+        @include icon('\f249');
+        margin-right: .25rem;
+    }
+}

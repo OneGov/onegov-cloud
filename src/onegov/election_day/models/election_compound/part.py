@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.models.election_compound.mixins import \
     DerivedAttributesMixin
 from onegov.election_day.models.party_result.mixins import \
@@ -21,7 +23,7 @@ if TYPE_CHECKING:
 T = TypeVar('T')
 
 
-class inherited_attribute(Generic[T]):
+class inherited_attribute(Generic[T]):  # noqa: N801
 
     def __set_name__(
         self,
@@ -61,7 +63,7 @@ class ElectionCompoundPart(
 
     def __init__(
         self,
-        election_compound: 'ElectionCompound',
+        election_compound: ElectionCompound,
         domain: str,
         segment: str
     ):
@@ -86,12 +88,12 @@ class ElectionCompoundPart(
     #       can be arbitrary readable attributes, which cannot be expressed
     #       yet using a Protocol, once we can do that, this should become
     #       cleaner
-    date: inherited_attribute['datetime.date'] = (
-        inherited_attribute['datetime.date']())  # type:ignore[assignment]
+    date: inherited_attribute[datetime.date] = (
+        inherited_attribute['datetime.date']())
     completes_manually: inherited_attribute[bool] = (
-        inherited_attribute[bool]())  # type:ignore[assignment]
+        inherited_attribute[bool]())
     manually_completed: inherited_attribute[bool] = (
-        inherited_attribute[bool]())  # type:ignore[assignment]
+        inherited_attribute[bool]())
     pukelsheim = inherited_attribute[bool]()
     last_result_change = inherited_attribute['datetime.datetime | None']()
     last_change = inherited_attribute['datetime.datetime | None']()
@@ -133,7 +135,7 @@ class ElectionCompoundPart(
         }
 
     @property
-    def elections(self) -> list['Election']:
+    def elections(self) -> list[Election]:
         return [
             election for election in
             self.election_compound.elections
@@ -146,7 +148,7 @@ class ElectionCompoundPart(
         return sum(1 for r in result if r), len(result)
 
     @property
-    def party_results(self) -> 'list[PartyResult]':  # type:ignore[override]
+    def party_results(self) -> list[PartyResult]:  # type:ignore[override]
         return [
             result for result in self.election_compound.party_results
             if (
@@ -180,5 +182,5 @@ class ElectionCompoundPart(
     @property
     def relationships_for_historical_party_results(
         self
-    ) -> 'Query[ElectionCompoundRelationship]':
+    ) -> Query[ElectionCompoundRelationship]:
         return self.election_compound.related_compounds

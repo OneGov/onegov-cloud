@@ -1,22 +1,29 @@
+from __future__ import annotations
+
 from onegov.fsi.models.course_attendee import external_attendee_org
 from onegov.user import User
 
 
-def test_course_attendee_collection(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client, FsiScenario
+
+
+def test_course_attendee_collection(client: Client) -> None:
     view = '/fsi/attendees'
     client.get(view, status=403)
     client.login_member()
     client.get(view, status=403)
 
 
-def test_attendee_details(client_with_db):
+def test_attendee_details(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
 
-    planner = session.query(User).filter_by(
+    planner = session.query(User).filter_by(  # type: ignore[union-attr]
         username='admin@example.org').first().attendee
 
-    attendee = session.query(User).filter_by(
+    attendee = session.query(User).filter_by(  # type: ignore[union-attr]
         username='member@example.org').first().attendee
 
     client.login_member()
@@ -29,11 +36,11 @@ def test_attendee_details(client_with_db):
     client.get(f'/fsi/attendee/{planner.id}', status=200)
 
 
-def test_edit_attendee(client_with_db):
+def test_edit_attendee(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
 
-    attendee = session.query(User).filter_by(
+    attendee = session.query(User).filter_by(  # type: ignore[union-attr]
         username='member@example.org').first().attendee
 
     client.login_member()
@@ -55,13 +62,17 @@ def test_edit_attendee(client_with_db):
     assert 'New FN' in page
 
 
-def test_add_edit_external_attendee(client, scenario):
+def test_add_edit_external_attendee(
+    client: Client,
+    scenario: FsiScenario
+) -> None:
     # Add an external to have multiple choices in organisations
     real_org = 'AA'
     scenario.add_attendee(external=True, organisation=real_org)
 
     session = client.app.session()
     editor = session.query(User).filter_by(role='editor').first()
+    assert editor is not None
     # Add an attendee with permissions
     scenario.add_attendee(user_id=editor.id, permissions=[real_org])
     scenario.commit()

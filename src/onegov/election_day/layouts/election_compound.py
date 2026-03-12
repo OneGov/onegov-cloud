@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
@@ -18,12 +20,12 @@ if TYPE_CHECKING:
 
 class ElectionCompoundLayout(DetailLayout):
 
-    model: 'ElectionCompound'
+    model: ElectionCompound
 
     def __init__(
         self,
-        model: 'ElectionCompound',
-        request: 'ElectionDayRequest',
+        model: ElectionCompound,
+        request: ElectionDayRequest,
         tab: str | None = None
     ) -> None:
         super().__init__(model, request)
@@ -78,11 +80,11 @@ class ElectionCompoundLayout(DetailLayout):
         return tuple(result)
 
     @cached_property
-    def results(self) -> list['ResultRow']:
+    def results(self) -> list[ResultRow]:
         return self.model.results
 
     @cached_property
-    def totals(self) -> 'TotalRow':
+    def totals(self) -> TotalRow:
         return self.model.totals
 
     @cached_property
@@ -105,35 +107,35 @@ class ElectionCompoundLayout(DetailLayout):
             if self.model.domain_elections == 'region':
                 return self.principal.label('region')
             if self.model.domain_elections == 'municipality':
-                return _("Municipality")
+                return _('Municipality')
         if value == 'districts':
             if self.model.domain_elections == 'region':
                 return self.principal.label('regions')
             if self.model.domain_elections == 'municipality':
-                return _("Municipalities")
+                return _('Municipalities')
         return self.principal.label(value)
 
     def title(self, tab: str | None = None) -> str:
         tab = self.tab if tab is None else tab
 
         if tab == 'seat-allocation':
-            return _("Seat allocation")
+            return _('Seat allocation')
         if tab == 'list-groups':
-            return _("List groups")
+            return _('List groups')
         if tab == 'superregions':
             return self.label('superregions')
         if tab == 'districts':
             return self.label('districts')
         if tab == 'candidates':
-            return _("Elected candidates")
+            return _('Elected candidates')
         if tab == 'party-strengths':
-            return _("Party strengths")
+            return _('Party strengths')
         if tab == 'parties-panachage':
-            return _("Panachage")
+            return _('Panachage')
         if tab == 'data':
-            return _("Downloads")
+            return _('Downloads')
         if tab == 'statistics':
-            return _("Election statistics")
+            return _('Election statistics')
 
         return ''
 
@@ -187,7 +189,7 @@ class ElectionCompoundLayout(DetailLayout):
         return self.request.link(self.model, 'districts')
 
     @cached_property
-    def menu(self) -> 'NestedMenu':
+    def menu(self) -> NestedMenu:
         return [
             (
                 self.title(tab),

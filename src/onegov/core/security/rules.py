@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.cronjobs import Job
 from onegov.core.framework import Framework
 from onegov.core.security import Public
@@ -39,7 +41,7 @@ def has_permission_not_logged_in(
 @Framework.permission_rule(model=object, permission=object)
 def has_permission_logged_in(
     app: Framework,
-    identity: 'HasRole',
+    identity: HasRole,
     model: object,
     permission: object
 ) -> bool:

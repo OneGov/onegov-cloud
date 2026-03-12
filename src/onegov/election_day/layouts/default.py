@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from babel import Locale
 from fs.errors import ResourceNotFound
 from functools import cached_property
@@ -36,10 +38,10 @@ class DefaultLayout(ChameleonLayout):
     docs_base_url = ('https://github.com/OneGov/onegov-cloud/blob/master/src'
                      '/onegov/election_day/static/docs/api')
 
-    app: 'ElectionDayApp'
-    request: 'ElectionDayRequest'
+    app: ElectionDayApp
+    request: ElectionDayRequest
 
-    def __init__(self, model: Any, request: 'ElectionDayRequest') -> None:
+    def __init__(self, model: Any, request: ElectionDayRequest) -> None:
         super().__init__(model, request)
 
         self.request.include('common')
@@ -56,7 +58,7 @@ class DefaultLayout(ChameleonLayout):
         return ''
 
     @cached_property
-    def principal(self) -> 'Canton | Municipality':
+    def principal(self) -> Canton | Municipality:
         return self.request.app.principal
 
     def label(self, value: str) -> str:
@@ -84,7 +86,7 @@ class DefaultLayout(ChameleonLayout):
         return self.request.link(self.principal)
 
     def get_opendata_link(self, lang: str) -> str:
-        return f"{self.docs_base_url}/open_data_{lang}.md"
+        return f'{self.docs_base_url}/open_data_{lang}.md'
 
     @cached_property
     def opendata_link(self) -> str:
@@ -102,12 +104,12 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def terms_link(self) -> str:
         lang = (self.request.locale or 'en')[:2]
-        return f"https://opendata.swiss/{lang}/terms-of-use"
+        return f'https://opendata.swiss/{lang}/terms-of-use'
 
     @cached_property
     def format_description_link(self) -> str:
         lang = (self.request.locale or 'en')[:2]
-        return f"{self.docs_base_url}/format__{lang}.md"
+        return f'{self.docs_base_url}/format__{lang}.md'
 
     @cached_property
     def font_awesome_path(self) -> str:
@@ -181,10 +183,10 @@ class DefaultLayout(ChameleonLayout):
             for locale in sorted(self.app.locales)
         ]
 
-    def format_name(self, item: 'HasName') -> str:
+    def format_name(self, item: HasName) -> str:
         if hasattr(item, 'entity_id'):
-            return item.name if item.entity_id else _("Expats")
-        return item.name or _("Expats")
+            return item.name if item.entity_id else _('Expats')
+        return item.name or _('Expats')
 
     @cached_property
     def logo_alt_text(self) -> str:
@@ -197,15 +199,15 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def archive_download(self) -> str:
-        return self.request.link(self.principal, name="archive-download")
+        return self.request.link(self.principal, name='archive-download')
 
     @property
-    def last_archive_modification(self) -> 'datetime | None':
+    def last_archive_modification(self) -> datetime | None:
         try:
             filestorage = self.request.app.filestorage
             assert filestorage is not None
             filestorage_info = filestorage.getinfo(
-                "archive/zip/archive.zip", namespaces="details"
+                'archive/zip/archive.zip', namespaces='details'
             )
             return filestorage_info.modified
         except ResourceNotFound:

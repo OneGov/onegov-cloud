@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from itertools import groupby
 from onegov.activity import Volunteer, VolunteerCollection
 from onegov.core.security import Public, Secret
@@ -28,15 +30,15 @@ if TYPE_CHECKING:
     permission=Secret)
 def view_volunteers(
     self: VolunteerCollection,
-    request: 'FeriennetRequest'
-) -> 'RenderData':
+    request: FeriennetRequest
+) -> RenderData:
 
     layout = VolunteerLayout(self, request)
 
     def grouped(
-        records: 'Iterable[ReportRow]',
+        records: Iterable[ReportRow],
         name: str
-    ) -> tuple[tuple['ReportRow', ...], ...]:
+    ) -> tuple[tuple[ReportRow, ...], ...]:
 
         return tuple(
             tuple(g) for k, g in groupby(records, key=attrgetter(name)))
@@ -47,7 +49,7 @@ def view_volunteers(
     else:
         has_needs = False
 
-    def state_change(record: 'ReportRow', state: str) -> str:
+    def state_change(record: ReportRow, state: str) -> str:
         assert record.volunteer_id is not None
         url = request.class_link(
             Volunteer, name=state, variables={'id': record.volunteer_id.hex})
@@ -58,7 +60,7 @@ def view_volunteers(
 
     return {
         'layout': layout,
-        'title': _("Volunteers"),
+        'title': _('Volunteers'),
         'records': records,
         'grouped': grouped,
         'periods': request.app.periods,
@@ -75,7 +77,7 @@ def view_volunteers(
     permission=Secret,
     name='open',
     request_method='POST')
-def handle_open(self: Volunteer, request: 'FeriennetRequest') -> 'Response':
+def handle_open(self: Volunteer, request: FeriennetRequest) -> Response:
     request.assert_valid_csrf_token()
     self.state = 'open'
 
@@ -90,8 +92,8 @@ def handle_open(self: Volunteer, request: 'FeriennetRequest') -> 'Response':
     request_method='POST')
 def handle_contacted(
     self: Volunteer,
-    request: 'FeriennetRequest'
-) -> 'Response':
+    request: FeriennetRequest
+) -> Response:
 
     request.assert_valid_csrf_token()
     self.state = 'contacted'
@@ -107,8 +109,8 @@ def handle_contacted(
     request_method='POST')
 def handle_confirmed(
     self: Volunteer,
-    request: 'FeriennetRequest'
-) -> 'Response':
+    request: FeriennetRequest
+) -> Response:
 
     request.assert_valid_csrf_token()
     self.state = 'confirmed'
@@ -122,7 +124,7 @@ def handle_confirmed(
     permission=Secret,
     name='remove',
     request_method='POST')
-def handle_remove(self: Volunteer, request: 'FeriennetRequest') -> 'Response':
+def handle_remove(self: Volunteer, request: FeriennetRequest) -> Response:
     request.assert_valid_csrf_token()
     request.session.delete(self)
 
@@ -133,7 +135,7 @@ def handle_remove(self: Volunteer, request: 'FeriennetRequest') -> 'Response':
 # Public, even though this is personal data -> the storage is limited to the
 # current browser session, which is separated from other users
 @FeriennetApp.json(model=VolunteerCart, permission=Public)
-def view_cart(self: VolunteerCart, request: 'FeriennetRequest') -> 'JSON_ro':
+def view_cart(self: VolunteerCart, request: FeriennetRequest) -> JSON_ro:
     return list(self.for_frontend(DefaultLayout(self, request)))
 
 
@@ -143,8 +145,8 @@ def view_cart(self: VolunteerCart, request: 'FeriennetRequest') -> 'JSON_ro':
     request_method='POST')
 def execute_cart_action(
     self: VolunteerCartAction,
-    request: 'FeriennetRequest'
-) -> 'JSON_ro':
+    request: FeriennetRequest
+) -> JSON_ro:
 
     # FIXME: Despite the reasons listed below we should try to do better
     #
@@ -165,9 +167,9 @@ def execute_cart_action(
     name='submit')
 def submit_volunteer(
     self: VolunteerCart,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: VolunteerForm
-) -> 'RenderData':
+) -> RenderData:
 
     layout = VolunteerFormLayout(self, request)
     request.include('volunteer-cart')
@@ -192,7 +194,7 @@ def submit_volunteer(
     return {
         'layout': layout,
         'form': form,
-        'title': _("Register as Volunteer"),
+        'title': _('Register as Volunteer'),
         'complete': complete,
         'cart_url': request.class_link(VolunteerCart),
         'cart_submit_url': request.class_link(VolunteerCart, name='submit'),

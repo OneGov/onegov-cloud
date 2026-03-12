@@ -3,34 +3,44 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <p tal:condition="lead" class="newsletter-lead" tal:content="structure lead" />
+        <p tal:condition="lead" class="newsletter-lead" tal:content="lead" />
 
         <div class="newsletter-block">
             <tal:b condition="news">
+                <p tal:condition="secret_news|nothing">
+                <div tal:condition="not:secret_content_allowed|nothing">
+                    <i class="fa fa-exclamation-triangle" style="color: #cca000;" aria-hidden="true" title="Warning secret content" i18n:attributes="title"></i>
+                    <span i18n:translate="">You selected 'secret' content for your newsletter. Secret content will not be visible unless you enable it in</span> <a href=${link_newsletter_settings} i18n:translate=""> newsletter settings</a>.
+                </div>
+                </p>
+                <p tal:condition="private_news|nothing">
+                    <i class="fa fa-exclamation-triangle" style="color: #cca000;" aria-hidden="true" title="Warning private content" i18n:attributes="title"></i>
+                    <span i18n:translate="">You selected 'private' content for your newsletter. Private content cannot be part of a newsletter.</span>
+                </p>
                 <metal:newslist use-macro="layout.macros['newslist']" />
             </tal:b>
         </div>
 
-        <div class="newsletter-block newsletter-publications-block">
-            <tal:b condition="publications">
-                <h2 i18n:translate>Publications</h2>
-                <ul tal:repeat="publication publications" class="dense">
-                    <li>
-                        <metal:newslist use-macro="layout.macros['publication']" />
-                    </li>
-                </ul>
-            </tal:b>
+        <div class="newsletter-block newsletter-publications-block" tal:condition="publications">
+            <h2 i18n:translate>Publications</h2>
+            <ul tal:repeat="publication publications" class="dense">
+                <li>
+                    <metal:newslist use-macro="layout.macros['publication']" />
+                </li>
+            </ul>
         </div>
 
-        <div class="newsletter-block">
-            <tal:b condition="occurrences">
-                <h2 i18n:translate>Events</h2>
-                <div class="row">
-                    <div class="columns small-12 medium-8 end">
-                        <metal:occurrences use-macro="layout.macros['occurrences']" />
-                    </div>
+        <div class="newsletter-block" tal:condition="occurrences">
+            <h2 i18n:translate>Events</h2>
+            <div class="row">
+                <div class="columns small-12 medium-8 end">
+                    <metal:occurrences use-macro="layout.macros['occurrences']" />
                 </div>
-            </tal:b>
+            </div>
+        </div>
+        <div class="newsletter-block" tal:condition="closing_remark|False">
+            <hr/>
+            <tal:b tal:content="closing_remark" />
         </div>
     </tal:b>
 </div>

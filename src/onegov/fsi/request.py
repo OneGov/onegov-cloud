@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from functools import cached_property
-from onegov.org.request import OrgRequest
+from onegov.town6.request import TownRequest
 
 
 from typing import TYPE_CHECKING
@@ -8,10 +10,10 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-class FsiRequest(OrgRequest):
+class FsiRequest(TownRequest):
 
     @cached_property
-    def attendee(self) -> 'CourseAttendee | None':
+    def attendee(self) -> CourseAttendee | None:
         return (
             # FIXME: backref across module boundaries
             self.current_user.attendee  # type:ignore[attr-defined]
@@ -19,7 +21,7 @@ class FsiRequest(OrgRequest):
         )
 
     @cached_property
-    def attendee_id(self) -> 'UUID | None':
+    def attendee_id(self) -> UUID | None:
         return self.attendee.id if self.attendee else None
 
     @cached_property

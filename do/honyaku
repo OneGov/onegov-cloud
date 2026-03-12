@@ -11,9 +11,11 @@ function repository-path() {
 
 function help() {
     echo ""
-    echo "Usage: do/honyaku MODULE-NAME LOCALE [COMMENT]"
+    echo "Usage: do/honyaku MODULE-NAME LOCALE [COMMENT] [--accept-all]"
     echo ""
-
+    echo "Options:"
+    echo "  --accept-all    Automatically accept all translations without prompting"
+    echo ""
     exit 1
 }
 
@@ -21,6 +23,14 @@ function main() {
     local module="${1-}"
     local locale="${2-}"
     local comment="${3-}"
+    local accept_all=""
+
+    # Check for --accept-all flag in any position
+    for arg in "$@"; do
+        if [[ "$arg" == "--accept-all" ]]; then
+            accept_all="--accept-all"
+        fi
+    done
 
     if [[ "$module" == "" ]]; then
         echo "Please pass in a module (e.g. do/honyaku onegov.org fr_CH)"
@@ -43,10 +53,10 @@ function main() {
     local lang
     lang=$(echo "$locale" | cut -d '_' -f 1)
 
-    if [[ -z "$comment" ]]; then
-        honyaku "$pofile" en "$lang" --tone "formal" --limit 100
+    if [[ -z "$comment" || "$comment" == "--accept-all" ]]; then
+        honyaku "$pofile" en "$lang" --tone "formal" --limit 100 $accept_all
     else
-        honyaku "$pofile" en "$lang" --tone "formal" --limit 100 --comment "$comment"
+        honyaku "$pofile" en "$lang" --tone "formal" --limit 100 --comment "$comment" $accept_all
     fi
 }
 

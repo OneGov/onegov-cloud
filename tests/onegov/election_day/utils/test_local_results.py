@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import BallotResult
@@ -8,7 +10,12 @@ from onegov.election_day.models import Vote
 from onegov.election_day.utils import add_local_results
 
 
-def test_add_local_results_simple(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_add_local_results_simple(session: Session) -> None:
     target = ArchivedResult()
 
     be = Canton(name='BE', canton='be')
@@ -82,7 +89,7 @@ def test_add_local_results_simple(session):
     assert target.local_nays_percentage == 30.0
 
 
-def test_add_local_results_complex(session):
+def test_add_local_results_complex(session: Session) -> None:
     target = ArchivedResult()
 
     be = Canton(name='BE', canton='be')

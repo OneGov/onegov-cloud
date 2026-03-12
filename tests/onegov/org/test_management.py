@@ -1,14 +1,22 @@
+from __future__ import annotations
+
+from markupsafe import Markup
 from onegov.people import AgencyCollection
 from onegov.core.utils import Bunch
 from onegov.org.management import LinkHealthCheck
 from onegov.page import PageCollection
 
 
-def test_link_health_check(org_app):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import TestOrgApp
+
+
+def test_link_health_check(org_app: TestOrgApp) -> None:
 
     test_domain = 'example.org'
 
-    def get_request():
+    def get_request() -> Any:
         return Bunch(
             link=lambda x: 'URL-' + x.__class__.__name__,
             session=org_app.session(),
@@ -52,12 +60,13 @@ def test_link_health_check(org_app):
     text = "\n".join(f.replace('$URL', u) for f, u in zip(fragments, links))
 
     page = pages.query().first()
-    page.lead = text
+    assert page is not None
+    page.lead = text  # type: ignore[attr-defined]
 
     agencies.add(
         title='Test',
         parent=None,
-        portrait='<a href="http://www.google.com"></a>'
+        portrait=Markup('<a href="http://www.google.com"></a>')
     )
 
     # check external

@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import timedelta
 from onegov.election_day.models import BallotResult
 from onegov.election_day.models import Vote
 from onegov.election_day.utils.pdf_generator import PdfGenerator
-from pdfrw import PdfReader
+from pdfrw import PdfReader  # type: ignore[import-untyped]
 from tests.onegov.election_day.common import DummyRequest
 from tests.onegov.election_day.utils.common import add_election_compound
 from tests.onegov.election_day.utils.common import add_majorz_election
@@ -12,14 +14,25 @@ from tests.onegov.election_day.utils.common import add_vote
 from tests.onegov.election_day.utils.common import PatchedD3Renderer
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
 class PatchedPdfGenerator(PdfGenerator):
-    def __init__(self, app):
+    def __init__(self, app: TestApp) -> None:
         renderer = PatchedD3Renderer(app)
-        request = DummyRequest(app=app)
+        request: Any = DummyRequest(app=app)
         super().__init__(app, request, renderer)
 
 
-def test_generate_pdf_election(session, election_day_app_zg):
+def test_generate_pdf_election(
+    session: Session,
+    election_day_app_zg: TestApp
+) -> None:
+
+    assert election_day_app_zg.filestorage is not None
     generator = PatchedPdfGenerator(election_day_app_zg)
 
     # Majorz election
@@ -60,7 +73,12 @@ def test_generate_pdf_election(session, election_day_app_zg):
             assert len(PdfReader(f, decompress=False).pages) == 1
 
 
-def test_generate_pdf_election_compound(session, election_day_app_bl):
+def test_generate_pdf_election_compound(
+    session: Session,
+    election_day_app_bl: TestApp
+) -> None:
+
+    assert election_day_app_bl.filestorage is not None
     generator = PatchedPdfGenerator(election_day_app_bl)
 
     election = add_proporz_election(session)
@@ -84,7 +102,12 @@ def test_generate_pdf_election_compound(session, election_day_app_bl):
             assert len(PdfReader(f, decompress=False).pages) == 9
 
 
-def test_generate_pdf_vote(session, election_day_app_zg):
+def test_generate_pdf_vote(
+    session: Session,
+    election_day_app_zg: TestApp
+) -> None:
+
+    assert election_day_app_zg.filestorage is not None
     generator = PatchedPdfGenerator(election_day_app_zg)
 
     # Simple vote
@@ -114,7 +137,12 @@ def test_generate_pdf_vote(session, election_day_app_zg):
             assert len(PdfReader(f, decompress=False).pages) == 9
 
 
-def test_generate_pdf_vote_districts(session, election_day_app_gr):
+def test_generate_pdf_vote_districts(
+    session: Session,
+    election_day_app_gr: TestApp
+) -> None:
+
+    assert election_day_app_gr.filestorage is not None
     generator = PatchedPdfGenerator(election_day_app_gr)
 
     # Simple vote
@@ -144,7 +172,12 @@ def test_generate_pdf_vote_districts(session, election_day_app_gr):
             assert len(PdfReader(f, decompress=False).pages) == 15
 
 
-def test_generate_pdf_long_title(session, election_day_app_zg):
+def test_generate_pdf_long_title(
+    session: Session,
+    election_day_app_zg: TestApp
+) -> None:
+
+    assert election_day_app_zg.filestorage is not None
     title = """This is a very long title so that it breaks the header line to
     a second line which must also be ellipsed.
 
@@ -171,13 +204,14 @@ def test_generate_pdf_long_title(session, election_day_app_zg):
         assert len(PdfReader(f, decompress=False).pages) == 3
 
 
-def test_create_pdfs(election_day_app_zg):
+def test_create_pdfs(election_day_app_zg: TestApp) -> None:
     generator = PatchedPdfGenerator(election_day_app_zg)
     session = election_day_app_zg.session()
     fs = election_day_app_zg.filestorage
+    assert fs is not None
 
     generator.create_pdfs()
-    assert election_day_app_zg.filestorage.listdir('pdf') == []
+    assert fs.listdir('pdf') == []
 
     majorz_election = add_majorz_election(session)
     proporz_election = add_proporz_election(session)

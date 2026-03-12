@@ -1,0 +1,518 @@
+{
+    "2761": {
+        "district": "Arlesheim",
+        "name": "Aesch (BL)",
+        "region": "Reinach",
+        "superregion": "Region 2"
+    },
+    "2762": {
+        "district": "Arlesheim",
+        "name": "Allschwil",
+        "region": "Allschwil",
+        "superregion": "Region 1"
+    },
+    "2763": {
+        "district": "Arlesheim",
+        "name": "Arlesheim",
+        "region": "M\u00fcnchenstein",
+        "superregion": "Region 2"
+    },
+    "2764": {
+        "district": "Arlesheim",
+        "name": "Biel-Benken",
+        "region": "Oberwil",
+        "superregion": "Region 1"
+    },
+    "2765": {
+        "district": "Arlesheim",
+        "name": "Binningen",
+        "region": "Binningen",
+        "superregion": "Region 1"
+    },
+    "2766": {
+        "district": "Arlesheim",
+        "name": "Birsfelden",
+        "region": "Muttenz",
+        "superregion": "Region 2"
+    },
+    "2767": {
+        "district": "Arlesheim",
+        "name": "Bottmingen",
+        "region": "Binningen",
+        "superregion": "Region 1"
+    },
+    "2768": {
+        "district": "Arlesheim",
+        "name": "Ettingen",
+        "region": "Oberwil",
+        "superregion": "Region 1"
+    },
+    "2769": {
+        "district": "Arlesheim",
+        "name": "M\u00fcnchenstein",
+        "region": "M\u00fcnchenstein",
+        "superregion": "Region 2"
+    },
+    "2770": {
+        "district": "Arlesheim",
+        "name": "Muttenz",
+        "region": "Muttenz",
+        "superregion": "Region 2"
+    },
+    "2771": {
+        "district": "Arlesheim",
+        "name": "Oberwil (BL)",
+        "region": "Oberwil",
+        "superregion": "Region 1"
+    },
+    "2772": {
+        "district": "Arlesheim",
+        "name": "Pfeffingen",
+        "region": "Reinach",
+        "superregion": "Region 2"
+    },
+    "2773": {
+        "district": "Arlesheim",
+        "name": "Reinach (BL)",
+        "region": "Reinach",
+        "superregion": "Region 2"
+    },
+    "2774": {
+        "district": "Arlesheim",
+        "name": "Sch\u00f6nenbuch",
+        "region": "Allschwil",
+        "superregion": "Region 1"
+    },
+    "2775": {
+        "district": "Arlesheim",
+        "name": "Therwil",
+        "region": "Oberwil",
+        "superregion": "Region 1"
+    },
+    "2781": {
+        "district": "Laufen",
+        "name": "Blauen",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2782": {
+        "district": "Laufen",
+        "name": "Brislach",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2783": {
+        "district": "Laufen",
+        "name": "Burg im Leimental",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2784": {
+        "district": "Laufen",
+        "name": "Dittingen",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2785": {
+        "district": "Laufen",
+        "name": "Duggingen",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2786": {
+        "district": "Laufen",
+        "name": "Grellingen",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2787": {
+        "district": "Laufen",
+        "name": "Laufen",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2788": {
+        "district": "Laufen",
+        "name": "Liesberg",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2789": {
+        "district": "Laufen",
+        "name": "Nenzlingen",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2790": {
+        "district": "Laufen",
+        "name": "Roggenburg",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2791": {
+        "district": "Laufen",
+        "name": "R\u00f6schenz",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2792": {
+        "district": "Laufen",
+        "name": "Wahlen",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2793": {
+        "district": "Laufen",
+        "name": "Zwingen",
+        "region": "Laufen",
+        "superregion": "Region 2"
+    },
+    "2821": {
+        "district": "Liestal",
+        "name": "Arisdorf",
+        "region": "Pratteln",
+        "superregion": "Region 3"
+    },
+    "2822": {
+        "district": "Liestal",
+        "name": "Augst",
+        "region": "Pratteln",
+        "superregion": "Region 3"
+    },
+    "2823": {
+        "district": "Liestal",
+        "name": "Bubendorf",
+        "region": "Liestal",
+        "superregion": "Region 3"
+    },
+    "2824": {
+        "district": "Liestal",
+        "name": "Frenkendorf",
+        "region": "Pratteln",
+        "superregion": "Region 3"
+    },
+    "2825": {
+        "district": "Liestal",
+        "name": "F\u00fcllinsdorf",
+        "region": "Pratteln",
+        "superregion": "Region 3"
+    },
+    "2826": {
+        "district": "Liestal",
+        "name": "Giebenach",
+        "region": "Pratteln",
+        "superregion": "Region 3"
+    },
+    "2827": {
+        "district": "Liestal",
+        "name": "Hersberg",
+        "region": "Pratteln",
+        "superregion": "Region 3"
+    },
+    "2828": {
+        "district": "Liestal",
+        "name": "Lausen",
+        "region": "Liestal",
+        "superregion": "Region 3"
+    },
+    "2829": {
+        "district": "Liestal",
+        "name": "Liestal",
+        "region": "Liestal",
+        "superregion": "Region 3"
+    },
+    "2830": {
+        "district": "Liestal",
+        "name": "Lupsingen",
+        "region": "Liestal",
+        "superregion": "Region 3"
+    },
+    "2831": {
+        "district": "Liestal",
+        "name": "Pratteln",
+        "region": "Pratteln",
+        "superregion": "Region 3"
+    },
+    "2832": {
+        "district": "Liestal",
+        "name": "Ramlinsburg",
+        "region": "Liestal",
+        "superregion": "Region 3"
+    },
+    "2833": {
+        "district": "Liestal",
+        "name": "Seltisberg",
+        "region": "Liestal",
+        "superregion": "Region 3"
+    },
+    "2834": {
+        "district": "Liestal",
+        "name": "Ziefen",
+        "region": "Liestal",
+        "superregion": "Region 3"
+    },
+    "2841": {
+        "district": "Sissach",
+        "name": "Anwil",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2842": {
+        "district": "Sissach",
+        "name": "B\u00f6ckten",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2843": {
+        "district": "Sissach",
+        "name": "Buckten",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2844": {
+        "district": "Sissach",
+        "name": "Buus",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2845": {
+        "district": "Sissach",
+        "name": "Diepflingen",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2846": {
+        "district": "Sissach",
+        "name": "Gelterkinden",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2847": {
+        "district": "Sissach",
+        "name": "H\u00e4felfingen",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2848": {
+        "district": "Sissach",
+        "name": "Hemmiken",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2849": {
+        "district": "Sissach",
+        "name": "Itingen",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2850": {
+        "district": "Sissach",
+        "name": "K\u00e4nerkinden",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2851": {
+        "district": "Sissach",
+        "name": "Kilchberg (BL)",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2852": {
+        "district": "Sissach",
+        "name": "L\u00e4ufelfingen",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2853": {
+        "district": "Sissach",
+        "name": "Maisprach",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2854": {
+        "district": "Sissach",
+        "name": "Nusshof",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2855": {
+        "district": "Sissach",
+        "name": "Oltingen",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2856": {
+        "district": "Sissach",
+        "name": "Ormalingen",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2857": {
+        "district": "Sissach",
+        "name": "Rickenbach (BL)",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2858": {
+        "district": "Sissach",
+        "name": "Rothenfluh",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2859": {
+        "district": "Sissach",
+        "name": "R\u00fcmlingen",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2860": {
+        "district": "Sissach",
+        "name": "R\u00fcnenberg",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2861": {
+        "district": "Sissach",
+        "name": "Sissach",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2862": {
+        "district": "Sissach",
+        "name": "Tecknau",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2863": {
+        "district": "Sissach",
+        "name": "Tenniken",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2864": {
+        "district": "Sissach",
+        "name": "Th\u00fcrnen",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2865": {
+        "district": "Sissach",
+        "name": "Wenslingen",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2866": {
+        "district": "Sissach",
+        "name": "Wintersingen",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2867": {
+        "district": "Sissach",
+        "name": "Wittinsburg",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2868": {
+        "district": "Sissach",
+        "name": "Zeglingen",
+        "region": "Gelterkinden",
+        "superregion": "Region 4"
+    },
+    "2869": {
+        "district": "Sissach",
+        "name": "Zunzgen",
+        "region": "Sissach",
+        "superregion": "Region 4"
+    },
+    "2881": {
+        "district": "Waldenburg",
+        "name": "Arboldswil",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2882": {
+        "district": "Waldenburg",
+        "name": "Bennwil",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2883": {
+        "district": "Waldenburg",
+        "name": "Bretzwil",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2884": {
+        "district": "Waldenburg",
+        "name": "Diegten",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2885": {
+        "district": "Waldenburg",
+        "name": "Eptingen",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2886": {
+        "district": "Waldenburg",
+        "name": "H\u00f6lstein",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2887": {
+        "district": "Waldenburg",
+        "name": "Lampenberg",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2888": {
+        "district": "Waldenburg",
+        "name": "Langenbruck",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2889": {
+        "district": "Waldenburg",
+        "name": "Lauwil",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2890": {
+        "district": "Waldenburg",
+        "name": "Liedertswil",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2891": {
+        "district": "Waldenburg",
+        "name": "Niederdorf",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2892": {
+        "district": "Waldenburg",
+        "name": "Oberdorf (BL)",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2893": {
+        "district": "Waldenburg",
+        "name": "Reigoldswil",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2894": {
+        "district": "Waldenburg",
+        "name": "Titterten",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    },
+    "2895": {
+        "district": "Waldenburg",
+        "name": "Waldenburg",
+        "region": "Waldenburg",
+        "superregion": "Region 4"
+    }
+}

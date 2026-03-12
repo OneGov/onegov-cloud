@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from sedate import utcnow
 from sqlalchemy import func, desc
@@ -13,7 +15,7 @@ if TYPE_CHECKING:
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Query, Session
     from typing import NamedTuple, TypeVar
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
     T = TypeVar('T')
@@ -67,8 +69,8 @@ class AuditCollection(
 
     def __init__(
         self,
-        session: 'Session',
-        course_id: 'UUID | None',
+        session: Session,
+        course_id: UUID | None,
         auth_attendee: CourseAttendee,
         organisations: list[str] | None = None,
         letter: str | None = None,
@@ -89,14 +91,14 @@ class AuditCollection(
         self.letter = letter.upper() if letter else None
         self.exclude_inactive = exclude_inactive
 
-    def subset(self) -> 'Query[AuditRow]':
+    def subset(self) -> Query[AuditRow]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -111,7 +113,7 @@ class AuditCollection(
         self,
         letter: str | None = None,
         orgs: list[str] | None = None
-    ) -> 'Self':
+    ) -> Self:
         return self.__class__(
             self.session,
             page=0,
@@ -122,7 +124,7 @@ class AuditCollection(
             exclude_inactive=self.exclude_inactive
         )
 
-    def by_letter(self, letter: str | None) -> 'Self':
+    def by_letter(self, letter: str | None) -> Self:
         return self.__class__(
             self.session,
             page=0,
@@ -147,7 +149,7 @@ class AuditCollection(
     def ranked_subscription_query(
         self,
         past_only: bool = True
-    ) -> 'Query[RankedSubscriptionRow]':
+    ) -> Query[RankedSubscriptionRow]:
         """
         Ranks all subscriptions of all events of a course
         windowed over the attendee_id and ranked after completed, most recent
@@ -180,22 +182,22 @@ class AuditCollection(
             ranked = ranked.filter(CourseEvent.start < utcnow())
         return ranked
 
-    def last_subscriptions(self) -> 'Query[LastSubscriptionRow]':
+    def last_subscriptions(self) -> Query[LastSubscriptionRow]:
         """Retrieve the last completed subscription by attemdee for
         a given the course_id.
         """
         ranked = self.ranked_subscription_query().subquery('ranked')
         subquery = self.session.query(
-            CourseSubscription.attendee_id,
+            ranked.c.attendee_id,
             ranked.c.start,
             ranked.c.end,
             ranked.c.name,
             ranked.c.event_completed,
             ranked.c.refresh_interval,
-        ).select_entity_from(ranked)
+        )
         return subquery.filter(ranked.c.rownum == 1)
 
-    def filter_attendees_by_role(self, query: 'Query[T]') -> 'Query[T]':
+    def filter_attendees_by_role(self, query: Query[T]) -> Query[T]:
         """Filter permissions of editor, exclude external, """
         if self.auth_attendee.role == 'admin':
             if not self.organisations:
@@ -212,7 +214,7 @@ class AuditCollection(
                 ) if self.organisations else editors_permissions)
             )
 
-    def query(self) -> 'Query[AuditRow]':
+    def query(self) -> Query[AuditRow]:
         last = self.last_subscriptions().subquery()
         query = self.session.query(
             CourseAttendee.id,
@@ -245,8 +247,8 @@ class AuditCollection(
 
     def next_subscriptions(
         self,
-        request: 'FsiRequest'
-    ) -> dict['UUID', tuple[str, 'datetime']]:
+        request: FsiRequest
+    ) -> dict[UUID, tuple[str, datetime]]:
         next_subscriptions: dict[UUID, tuple[str, datetime]] = {}
         if self.course_id:
             # FIXME: We can do this in a single query, this is N+1...
@@ -285,8 +287,8 @@ class AuditCollection(
         return [r.letter for r in query if r.letter]
 
     @cached_property
-    def relevant_courses(self) -> tuple[tuple['UUID', str], ...]:
+    def relevant_courses(self) -> tuple[tuple[UUID, str], ...]:
         return tuple(self.session.query(Course.id, Course.name).filter(
             Course.hidden_from_public == False,
             Course.mandatory_refresh != None
-        ))
+        ).tuples())

@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 from onegov.core.security import Private
 from onegov.core.security import Public
@@ -40,7 +41,7 @@ def has_permission_maybe_public_not_logged_in(
 )
 def has_permission_maybe_public_logged_in(
     app: ElectionDayApp,
-    identity: 'Identity',
+    identity: Identity,
     model: object,
     permission: MaybePublic
 ) -> bool:

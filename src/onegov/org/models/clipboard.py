@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
-    from typing_extensions import Self
+    from typing import Self
 
 
 class Clipboard:
@@ -17,7 +19,7 @@ class Clipboard:
 
     """
 
-    def __init__(self, request: 'OrgRequest', token: str) -> None:
+    def __init__(self, request: OrgRequest, token: str) -> None:
         self.request = request
         self.token = token
 
@@ -41,14 +43,14 @@ class Clipboard:
             self.request.browser_session['clipboard_url'] = self.url
 
     @classmethod
-    def from_url(cls, request: 'OrgRequest', url: str) -> 'Self':
+    def from_url(cls, request: OrgRequest, url: str) -> Self:
         return cls(
             request,
             request.new_url_safe_token({'url': url}, salt='clipboard')
         )
 
     @classmethod
-    def from_session(cls, request: 'OrgRequest') -> 'Self':
+    def from_session(cls, request: OrgRequest) -> Self:
         return cls(
             request,
             request.new_url_safe_token(

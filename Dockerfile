@@ -18,6 +18,7 @@ RUN apt -qq update \
     golang \
     iproute2 \
     libcairo2 \
+    libcairo2-dev \
     libcurl4 \
     libcurl4-openssl-dev \
     libev-dev \
@@ -33,6 +34,7 @@ RUN apt -qq update \
     libsqlite3-0 \
     libxmlsec1 \
     libxmlsec1-openssl \
+    libxt-dev \
     nodejs \
     openssl \
     pkg-config \
@@ -41,6 +43,7 @@ RUN apt -qq update \
     python3-dev \
     python3-venv \
     tzdata \
+    weasyprint \
     xmlsec1 \
     zip
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_vote
 from time import sleep
@@ -6,7 +8,12 @@ from webtest import TestApp as Client
 from webtest.forms import Upload
 
 
-def test_upload_vote_year_unavailable(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_upload_vote_year_unavailable(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -27,7 +34,7 @@ def test_upload_vote_year_unavailable(election_day_app_zg):
     assert "Das Jahr 2000 wird noch nicht unterstützt" in results
 
 
-def test_upload_vote_submit(election_day_app_zg):
+def test_upload_vote_submit(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
     login(client)
@@ -61,7 +68,7 @@ def test_upload_vote_submit(election_day_app_zg):
         assert import_.called
 
 
-def test_upload_vote_invalidate_cache(election_day_app_zg):
+def test_upload_vote_invalidate_cache(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -75,11 +82,12 @@ def test_upload_vote_invalidate_cache(election_day_app_zg):
     assert ">522<" in anonymous.get('/vote/vote/entities')
 
     csv = anonymous.get('/vote/vote/data-csv').text
-    csv = csv.replace('522', '533').encode('utf-8')
+    csv = csv.replace('522', '533')
 
     upload = client.get('/vote/vote/upload')
     upload.form['file_format'] = 'internal'
-    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['proposal'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain')
     upload = upload.form.submit()
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
@@ -87,7 +95,7 @@ def test_upload_vote_invalidate_cache(election_day_app_zg):
     assert ">533<" in anonymous.get('/vote/vote/entities')
 
 
-def test_upload_vote_notify_zulip(election_day_app_zg):
+def test_upload_vote_notify_zulip(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -105,5 +113,6 @@ def test_upload_vote_notify_zulip(election_day_app_zg):
         election_day_app_zg.zulip_key = 'aabbcc'
         upload_vote(client)
         sleep(5)
+        urlopen = urlopen  # undo mypy narrowing
         assert urlopen.called
         assert 'zulipchat.com' in urlopen.call_args[0][0].get_full_url()

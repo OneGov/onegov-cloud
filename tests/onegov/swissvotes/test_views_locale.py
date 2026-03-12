@@ -1,7 +1,15 @@
+from __future__ import annotations
+
 from webtest import TestApp as Client
 
 
-def test_view_change_site_locale(swissvotes_app):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import TestApp
+
+
+
+def test_view_change_site_locale(swissvotes_app: TestApp) -> None:
     client = Client(swissvotes_app)
 
     login = client.get('/auth/login')

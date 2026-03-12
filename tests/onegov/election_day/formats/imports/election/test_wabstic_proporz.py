@@ -1,17 +1,27 @@
+from __future__ import annotations
+
 from datetime import date
 from io import BytesIO
 from onegov.election_day.formats import import_election_wabstic_proporz
-from onegov.election_day.formats.imports.election.wabstic_proporz import \
-    get_list_id_from_knr
+from onegov.election_day.formats.imports.election.wabstic_proporz import (
+    get_list_id_from_knr)
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Election
 from onegov.election_day.models import ProporzElection
 
 
-def test_get_list_id_from_knr():
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from tests.onegov.election_day.conftest import ImportTestDatasets
 
-    class DummyLine:
-        def __init__(self, knr):
+
+def test_get_list_id_from_knr() -> None:
+
+    DummyLine: Any
+
+    class DummyLine:  # type: ignore[no-redef]
+        def __init__(self, knr: str) -> None:
             self.knr = knr
     # position on the list is always two numbers value
     # 05a.01 and 0501 can never be in the same vote
@@ -21,11 +31,14 @@ def test_get_list_id_from_knr():
     assert get_list_id_from_knr(DummyLine('05a.1')) == '05a'
 
 
-def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
+def test_import_wabstic_proporz_cantonal(
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
 
     # - cantonal results from SG from the 18.10.2015 (Nationalrat)
 
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'wabstic',
         'election',
         'sg',
@@ -37,6 +50,8 @@ def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
         has_expats=True,
     )
 
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
     assert election.last_result_change
     assert election.completed
@@ -73,7 +88,10 @@ def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
     assert sorted((c.votes for c in election.list_connections))[-1] == 636317
 
 
-def test_import_wabstic_proporz_regional_sg(session, import_test_datasets):
+def test_import_wabstic_proporz_regional_sg(
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
     for number, district, segment, mandates, entities, votes, turnout in (
         ('1', '1', 'St. Gallen', 29, 9, 949454, 44.45),
         ('2', '2', 'Rorschach', 10, 9, 105959, 43.07),
@@ -84,7 +102,7 @@ def test_import_wabstic_proporz_regional_sg(session, import_test_datasets):
         ('7', '8', 'Toggenburg', 11, 12, 159038, 49.15),
         ('8', '13', 'Wil', 18, 10, 352595, 43.94),
     ):
-        election, errors = import_test_datasets(
+        results = import_test_datasets(
             'wabstic',
             'election',
             'sg',
@@ -97,6 +115,8 @@ def test_import_wabstic_proporz_regional_sg(session, import_test_datasets):
             election_district=district
         )
 
+        assert len(results) == 1
+        election, errors = next(iter(results.values()))
         assert not errors
         assert election.last_result_change
         assert election.completed
@@ -105,7 +125,7 @@ def test_import_wabstic_proporz_regional_sg(session, import_test_datasets):
         assert round(election.turnout, 2) == turnout
 
 
-def test_import_wabstic_proporz_missing_headers(session):
+def test_import_wabstic_proporz_missing_headers(session: Session) -> None:
     session.add(
         ProporzElection(
             title='election',
@@ -116,6 +136,7 @@ def test_import_wabstic_proporz_missing_headers(session):
     )
     session.flush()
     election = session.query(Election).one()
+    assert isinstance(election, ProporzElection)
     principal = Canton(canton='sg')
 
     errors = import_election_wabstic_proporz(
@@ -187,7 +208,7 @@ def test_import_wabstic_proporz_missing_headers(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
-    assert sorted([(e.filename, e.error.interpolate()) for e in errors]) == [
+    assert sorted([(e.filename, e.error.interpolate()) for e in errors]) == [  # type: ignore[attr-defined]
         ('wp_gemeinden', "Missing columns: 'bfsnrgemeinde'"),
         ('wp_kandidaten', "Missing columns: 'sortgeschaeft'"),
         ('wp_kandidatengde', "Missing columns: 'bfsnrgemeinde'"),
@@ -199,7 +220,7 @@ def test_import_wabstic_proporz_missing_headers(session):
     ]
 
 
-def test_import_wabstic_proporz_invalid_values(session):
+def test_import_wabstic_proporz_invalid_values(session: Session) -> None:
     session.add(
         ProporzElection(
             title='election',
@@ -210,6 +231,7 @@ def test_import_wabstic_proporz_invalid_values(session):
     )
     session.flush()
     election = session.query(Election).one()
+    assert isinstance(election, ProporzElection)
     principal = Canton(canton='sg')
 
     errors = import_election_wabstic_proporz(
@@ -354,7 +376,7 @@ def test_import_wabstic_proporz_invalid_values(session):
         ).encode('utf-8')), 'text/plain'
     )
     assert sorted([
-        (e.filename, e.line, e.error.interpolate()) for e in errors
+        (e.filename, e.line, e.error.interpolate()) for e in errors  # type: ignore[attr-defined]
     ]) == [
         ('wp_gemeinden', 2, 'Invalid integer: sperrung'),
         ('wp_gemeinden', 2, 'Invalid integer: stimmberechtigte'),
@@ -369,7 +391,7 @@ def test_import_wabstic_proporz_invalid_values(session):
     ]
 
 
-def test_import_wabstic_proporz_expats(session):
+def test_import_wabstic_proporz_expats(session: Session) -> None:
     session.add(
         ProporzElection(
             title='election',
@@ -380,12 +402,13 @@ def test_import_wabstic_proporz_expats(session):
     )
     session.flush()
     election = session.query(Election).one()
+    assert isinstance(election, ProporzElection)
     principal = Canton(canton='sg')
 
     for has_expats in (False, True):
         election.has_expats = has_expats
         for entity_id in ('9170', '0'):
-            errors = import_election_wabstic_proporz(
+            raw_errors = import_election_wabstic_proporz(
                 election, principal, '0', '0',
                 BytesIO((  # wp_wahl
                     '\n'.join((
@@ -518,19 +541,20 @@ def test_import_wabstic_proporz_expats(session):
                     ))
                 ).encode('utf-8')), 'text/plain'
             )
-            errors = [(e.line, e.error.interpolate()) for e in errors]
+            errors = [(e.line, e.error.interpolate()) for e in raw_errors]  # type: ignore[attr-defined]
             result = next(
                 (r for r in election.results if r.entity_id == 0), None
             )
             if has_expats:
                 assert errors == []
+                assert result is not None
                 assert result.blank_ballots == 1
             else:
                 assert errors == []
                 assert result is None
 
 
-def test_import_wabstic_proporz_temporary_results(session):
+def test_import_wabstic_proporz_temporary_results(session: Session) -> None:
     session.add(
         ProporzElection(
             title='election',
@@ -541,6 +565,7 @@ def test_import_wabstic_proporz_temporary_results(session):
     )
     session.flush()
     election = session.query(Election).one()
+    assert isinstance(election, ProporzElection)
     principal = Canton(canton='sg')
 
     errors = import_election_wabstic_proporz(
@@ -708,9 +733,19 @@ def test_import_wabstic_proporz_temporary_results(session):
     assert election.progress == (1, 77)
 
 
-def test_import_wabstic_proporz_regional(session):
+def test_import_wabstic_proporz_regional(session: Session) -> None:
 
-    def create_csv(results):
+    def create_csv(results: tuple[tuple[int, bool], ...]) -> tuple[
+        str, str,
+        BytesIO, str,
+        BytesIO, str,
+        BytesIO, str,
+        BytesIO, str,
+        BytesIO, str,
+        BytesIO, str,
+        BytesIO, str,
+        BytesIO, str,
+    ]:
         lines_wm_wahl = []
         lines_wm_wahl.append((
             'SortGeschaeft',
@@ -884,6 +919,7 @@ def test_import_wabstic_proporz_regional(session):
     )
     session.flush()
     election = session.query(Election).one()
+    assert isinstance(election, ProporzElection)
 
     # ZG, municipality, too many municipalitites
     principal = Canton(canton='zg')
@@ -893,7 +929,7 @@ def test_import_wabstic_proporz_regional(session):
         election, principal,
         *create_csv(((1701, False), (1702, False)))
     )
-    assert [(e.error.interpolate()) for e in errors] == [
+    assert [(e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         '1702 is not part of this business'
     ]
 
@@ -923,7 +959,7 @@ def test_import_wabstic_proporz_regional(session):
         election, principal,
         *create_csv(((3271, False), (3201, False)))
     )
-    assert [(e.error.interpolate()) for e in errors] == [
+    assert [(e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         '3201 is not part of Werdenberg'
     ]
 
@@ -956,7 +992,7 @@ def test_import_wabstic_proporz_regional(session):
         election, principal,
         *create_csv(((3572, True), (3513, False)))
     )
-    assert [(e.error.interpolate()) for e in errors] == [
+    assert [(e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         '3513 is not part of Ilanz'
     ]
 

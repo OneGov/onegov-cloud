@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import module_path
 
 

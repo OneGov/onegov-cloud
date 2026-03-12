@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 log = logging.getLogger('onegov.form')
 log.addHandler(logging.NullHandler())
@@ -20,9 +22,12 @@ from onegov.form.extensions import FormExtension, Extendable
 from onegov.form.integration import FormApp
 from onegov.form.models import (
     FormDefinition,
+    SurveyDefinition,
     FormFile,
     FormSubmission,
+    SurveySubmission,
     FormRegistrationWindow,
+    SurveySubmissionWindow,
     PendingFormSubmission,
     CompleteFormSubmission
 )
@@ -58,6 +63,9 @@ __all__ = (
     'parse_form',
     'parse_formcode',
     'PendingFormSubmission',
+    'SurveyDefinition',
+    'SurveySubmissionWindow',
+    'SurveySubmission',
     'render_field',
     'WTFormsClassBuilder',
 )

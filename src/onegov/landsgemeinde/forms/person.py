@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org.forms.person import (
     PersonForm as OrgPersonForm)
 

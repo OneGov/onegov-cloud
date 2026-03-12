@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from onegov.core.collection import GenericCollection
@@ -24,8 +26,8 @@ class CourseNotificationTemplateCollection(
 
     def __init__(
         self,
-        session: 'Session',
-        course_event_id: 'UUID | None' = None
+        session: Session,
+        course_event_id: UUID | None = None
     ) -> None:
         super().__init__(session)
         self.course_event_id = course_event_id
@@ -39,14 +41,14 @@ class CourseNotificationTemplateCollection(
         return self.session.query(CourseEvent).filter_by(
             id=self.course_event_id).first()
 
-    def query(self) -> 'Query[CourseNotificationTemplate]':
+    def query(self) -> Query[CourseNotificationTemplate]:
         query = super().query()
         if self.course_event_id:
             query = query.filter_by(course_event_id=self.course_event_id)
         return query
 
     @cached_property
-    def course_reservations(self) -> 'Query[CourseSubscription]':
+    def course_reservations(self) -> Query[CourseSubscription]:
         assert self.course_event is not None
         return self.course_event.subscriptions
 

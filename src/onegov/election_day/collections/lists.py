@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.models import List
 
 
@@ -9,11 +11,11 @@ if TYPE_CHECKING:
 
 class ListCollection:
 
-    def __init__(self, session: 'Session'):
+    def __init__(self, session: Session):
         self.session = session
 
-    def query(self) -> 'Query[List]':
+    def query(self) -> Query[List]:
         return self.session.query(List)
 
-    def by_id(self, id: 'UUID') -> List | None:
+    def by_id(self, id: UUID) -> List | None:
         return self.query().filter(List.id == id).first()

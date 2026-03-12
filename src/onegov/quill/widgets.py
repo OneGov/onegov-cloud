@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from json import dumps
 from markupsafe import Markup
 from random import choice
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
 
 HEADINGS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
 LISTS = ['ol', 'ul']
-TAGS = ['strong', 'em', 'a'] + HEADINGS + LISTS + ['blockquote']
+TAGS = ['strong', 'em', 'a', *HEADINGS, *LISTS, 'blockquote']
 
 
 class QuillInput(HiddenInput):
@@ -28,7 +30,7 @@ class QuillInput(HiddenInput):
     def __init__(
         self,
         *,
-        tags: 'Sequence[str] | None' = None,
+        tags: Sequence[str] | None = None,
         **kwargs: Any
     ):
         if tags is None:
@@ -36,7 +38,7 @@ class QuillInput(HiddenInput):
         else:
             tags = list(set(tags) & set(TAGS))
 
-        super(QuillInput, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.id = ''.join(choice('abcdefghi') for i in range(8))  # nosec B311
 
@@ -82,7 +84,7 @@ class QuillInput(HiddenInput):
 
     def __call__(
         self,
-        field: 'QuillField',  # type:ignore[override]
+        field: QuillField,  # type:ignore[override]
         **kwargs: Any
     ) -> Markup:
 
@@ -106,11 +108,11 @@ class QuillInput(HiddenInput):
             input_id=input_id,
             container_id=f'quill-container-{self.id}',
             scroll_container_id=f'scrolling-container-{self.id}',
-            input=super(QuillInput, self).__call__(field, **kwargs),
+            input=super().__call__(field, **kwargs),
             # FIXME: we should probably escape the json dump, but then we
             #        need to adjust the tests to detect the &quot; for the
             #        strings inside the JSON. (The &quot; will be turned back
             #        into `"` in javascript, so there's no harm to it)
-            formats=Markup(dumps(self.formats)),  # noqa: MS001
-            toolbar=Markup(dumps(self.toolbar)),  # noqa: MS001
+            formats=Markup(dumps(self.formats)),  # nosec: B704
+            toolbar=Markup(dumps(self.toolbar)),  # nosec: B704
         )

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from io import BytesIO
 from onegov.core.security import Public
 from onegov.landsgemeinde import _
@@ -37,7 +39,7 @@ def sub(
 )
 def view_rdf(
     self: Organisation,
-    request: 'LandsgemeindeRequest'
+    request: LandsgemeindeRequest
 ) -> bytes:
 
     """ Returns an XML / RDF / DCAT-AP for Switzerland format for
@@ -55,7 +57,7 @@ def view_rdf(
         raise HTTPNotImplemented()
 
     @request.after
-    def set_headers(response: 'Response') -> None:
+    def set_headers(response: Response) -> None:
         response.headers['Content-Type'] = 'application/rdf+xml; charset=UTF-8'
 
     layout = DefaultLayout(self, request)
@@ -128,7 +130,7 @@ def view_rdf(
 
         # Description
         description = request.translate(_(
-            "Results from the ${title}, structured as json",
+            'Results from the ${title}, structured as json',
             mapping={'title': title}
         ))
         sub(ds, 'dct:description', {'xml:lang': 'de'}, description)
@@ -187,12 +189,8 @@ def view_rdf(
         url = request.link(item, 'json')
         sub(dist, 'dcat:accessURL', {'rdf:resource': url})
         sub(dist, 'dcat:downloadURL', {'rdf:resource': url})
-        license = sub(
-            dist, 'dct:license',
-            {'rdf:about': 'http://dcat-ap.ch/vocabulary/licenses/terms_by'}
-        )
-        sub(license, 'rdf:type', {
-            'rdf:resource': 'http://purl.org/dc/terms/RightsStatement'
+        sub(dist, 'dct:license', {
+            'rdf:resource': 'http://dcat-ap.ch/vocabulary/licenses/terms_by'
         })
         sub(dist, 'dcat:mediaType', {
             'rdf:resource': 'https://www.iana.org/assignments/media-types/'

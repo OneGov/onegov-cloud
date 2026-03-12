@@ -557,30 +557,34 @@
                                                       layout.attachments['post_vote_poll_dataset_dta'] or
                                                       layout.attachments['post_vote_poll_codebook'] or
                                                       layout.attachments['post_vote_poll_codebook_xlsx'] or
-                                                      layout.attachments['post_vote_poll_report']
+                                                      layout.attachments['post_vote_poll_report'] or
+                                                      layout.attachments['leewas_post_vote_poll_results']
                                                       ">
                 <thead>
-                    <tr><th colspan="2" i18n:translate>Post-vote poll</th></tr>
+                    <tr><th colspan="2" i18n:translate>Post-vote polls</th></tr>
                 </thead>
                 <tbody>
                     <tr tal:condition="layout.attachments['post_vote_poll']">
-                        <th class="column-30" i18n:translate>Full analysis of post-vote poll results</th>
+                        <th class="column-30" tal:condition="not float(layout.format_bfs_number(vote.bfs_number)) in range(605, 636)" i18n:translate>Full analysis of VOX post-vote poll results</th>
+                        <th class="column-30" tal:condition="float(layout.format_bfs_number(vote.bfs_number)) in range(605, 636)" i18n:translate>Full analysis of VOTO post-vote poll results</th>
                         <td>
                             <tal:block metal:use-macro="layout.macros['attachment_link']" tal:define="name 'post_vote_poll'" />
                         </td>
                     </tr>
                     <tr tal:condition="layout.attachments['post_vote_poll_report']">
-                        <th class="column-30" i18n:translate>Technical report</th>
+                        <th class="column-30" i18n:translate>Technical report on the VOX poll</th>
                         <td>
                             <tal:block metal:use-macro="layout.macros['attachment_link']" tal:define="name 'post_vote_poll_report'" />
                         </td>
                     </tr>
                     <tr tal:condition="vote.link_post_vote_poll">
-                        <th class="column-30" i18n:translate>Cockpit with selected results</th>
+                        <th class="column-30" tal:condition="not float(layout.format_bfs_number(vote.bfs_number)) in range(605, 636)" i18n:translate>Cockpit with selected VOX results</th>
+                        <th class="column-30" tal:condition="float(layout.format_bfs_number(vote.bfs_number)) in range(605, 636)" i18n:translate>Cockpit with selected VOTO results</th>
                         <td><a href="${vote.link_post_vote_poll}" target="_blank" i18n:translate>Link</a></td>
                     </tr>
                     <tr tal:condition="layout.attachments['post_vote_poll_methodology']">
-                        <th class="column-30" i18n:translate>Questionnaire of the poll</th>
+                        <th class="column-30" tal:condition="not float(layout.format_bfs_number(vote.bfs_number)) in range(605, 636)" i18n:translate>Questionnaire of the VOX poll</th>
+                        <th class="column-30" tal:condition="float(layout.format_bfs_number(vote.bfs_number)) in range(605, 636)" i18n:translate>Questionnaire of the VOTO poll</th>
                         <td>
                             <tal:block metal:use-macro="layout.macros['attachment_link']" tal:define="name 'post_vote_poll_methodology'" />
                         </td>
@@ -589,7 +593,8 @@
                                        layout.attachments['post_vote_poll_dataset_sav'] or
                                        layout.attachments['post_vote_poll_dataset_dta']">
                         <th class="column-30">
-                            <span i18n:translate>Dataset of the post-vote poll</span>
+                            <span i18n:translate tal:condition="not float(layout.format_bfs_number(vote.bfs_number)) in range(605, 636)" >Dataset of the VOX poll</span>
+                            <span i18n:translate tal:condition="float(layout.format_bfs_number(vote.bfs_number)) in range(605, 636)" >Dataset of the VOTO poll</span>
                             <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Due to data protection requirements, Swissvotes publishes a slightly reduced version of this dataset. Access to the full version might be possible for research purposes; see the Swissvotes codebook for more details on this (https://swissvotes.ch/page/dataset/codebook-en.pdf)."><i class="fa fa-info" aria-hidden="true"></i></span>
                         </th>
                         <td class="inline-links">
@@ -600,11 +605,18 @@
                     </tr>
                     <tr tal:condition="layout.attachments['post_vote_poll_codebook'] or
                                        layout.attachments['post_vote_poll_codebook_xlsx']">
-                        <th class="column-30" i18n:translate>Codebook for the post-vote poll</th>
+                        <th class="column-30" tal:condition="not float(layout.format_bfs_number(vote.bfs_number)) in range(605, 636)" i18n:translate>Codebook for the VOX poll</th>
+                        <th class="column-30" tal:condition="float(layout.format_bfs_number(vote.bfs_number)) in range(605, 636)" i18n:translate>Codebook for the VOTO poll</th>
                         <td class="inline-links">
                             <a tal:condition="layout.attachments['post_vote_poll_codebook']" href="${layout.attachments['post_vote_poll_codebook']['url']}" target="_blank" class="post-vote-poll-codebook">PDF</a>
                             <a tal:condition="layout.attachments['post_vote_poll_codebook_xlsx']" href="${layout.attachments['post_vote_poll_codebook_xlsx']['url']}" target="_blank" class="post-vote-poll-codebook-xlsx">Excel</a>
                             <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                        </td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['leewas_post_vote_poll_results']">
+                        <th class="column-30" i18n:translate>Results of the LeeWas post-vote poll</th>
+                        <td>
+                            <tal:block metal:use-macro="layout.macros['attachment_link']" tal:define="name 'leewas_post_vote_poll_results'" />
                         </td>
                     </tr>
                 </tbody>

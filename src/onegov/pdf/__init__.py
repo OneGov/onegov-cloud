@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 
 from onegov.pdf.page_functions import page_fn_footer

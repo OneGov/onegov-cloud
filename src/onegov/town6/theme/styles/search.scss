@@ -141,3 +141,16 @@
     font-size: .8rem;
     padding: 0 3px;
 }
+
+.search-preview {
+    color: $jumbo;
+}
+
+    .typeahead {
+        margin-top: 2.5rem;
+        position: absolute;
+    }
+
+    .input-group-field:not(:focus) + .typeahead:not(:hover) {
+        display: none;
+    }

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.org.views.editor import get_form_class
 from onegov.org.views.editor import handle_page_form, view_topics_sort
@@ -22,9 +24,9 @@ if TYPE_CHECKING:
 )
 def town_handle_page_form(
     self: Editor,
-    request: 'TownRequest',
-    form: 'Form'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: Form
+) -> RenderData | Response:
     return handle_page_form(
         self, request, form, EditorLayout(self, request, site_title=None)
     )
@@ -38,6 +40,6 @@ def town_handle_page_form(
 )
 def town_view_topics_sort(
     self: Editor,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_topics_sort(self, request, EditorLayout(self, request, 'sort'))

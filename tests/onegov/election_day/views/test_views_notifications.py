@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 
@@ -10,7 +12,12 @@ from tests.onegov.election_day.common import upload_vote
 from tests.shared import Client
 
 
-def test_view_notifications_votes(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_view_notifications_votes(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -27,7 +34,7 @@ def test_view_notifications_votes(election_day_app_zg):
     assert "Benachrichtigungen auszulösen" in upload_vote(client, False)
 
     principal = election_day_app_zg.principal
-    principal.webhooks = {'http://example.com/1': None}
+    principal.webhooks = {'http://example.com/1': {}}
     election_day_app_zg.cache.set('principal', principal)
 
     assert "Benachrichtigungen auslösen" in client.get('/manage/votes')
@@ -76,7 +83,7 @@ def test_view_notifications_votes(election_day_app_zg):
     assert "Vote - Refusé" in message
 
 
-def test_view_notifications_elections(election_day_app_gr):
+def test_view_notifications_elections(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -92,11 +99,12 @@ def test_view_notifications_elections(election_day_app_gr):
 
     # Test retrigger messages
     assert "Benachrichtigungen auslösen" in client.get('/manage/elections')
-    assert "Benachrichtigungen auszulösen" in \
-        upload_majorz_election(client, False)
+    assert "Benachrichtigungen auszulösen" in upload_majorz_election(
+        client, False
+    )
 
     principal = election_day_app_gr.principal
-    principal.webhooks = {'http://example.com/1': None}
+    principal.webhooks = {'http://example.com/1': {}}
     election_day_app_gr.cache.set('principal', principal)
 
     assert "Benachrichtigungen auslösen" in client.get('/manage/elections')
@@ -154,7 +162,9 @@ def test_view_notifications_elections(election_day_app_gr):
     assert "Majorz Election - Nouveaux résultats intermédiaires" in message
 
 
-def test_view_notifications_election_compouds(election_day_app_gr):
+def test_view_notifications_election_compouds(
+    election_day_app_gr: TestApp
+) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -171,7 +181,7 @@ def test_view_notifications_election_compouds(election_day_app_gr):
     )
 
     principal = election_day_app_gr.principal
-    principal.webhooks = {'http://example.com/1': None}
+    principal.webhooks = {'http://example.com/1': {}}
     election_day_app_gr.cache.set('principal', principal)
 
     assert "Benachrichtigungen auslösen" in client.get(
@@ -229,7 +239,7 @@ def test_view_notifications_election_compouds(election_day_app_gr):
     assert 'Sieger Hans' in message
 
 
-def test_view_notifications_summarized(election_day_app_zg):
+def test_view_notifications_summarized(election_day_app_zg: TestApp) -> None:
     sms_path = os.path.join(
         election_day_app_zg.sms_directory,
         election_day_app_zg.schema
@@ -272,7 +282,7 @@ def test_view_notifications_summarized(election_day_app_zg):
 
     # Add configuration
     principal = election_day_app_zg.principal
-    principal.webhooks = {'http://example.com/1': None}
+    principal.webhooks = {'http://example.com/1': {}}
     principal.email_notification = True
     principal.sms_notification = 'http://example.com'
     election_day_app_zg.cache.set('principal', principal)

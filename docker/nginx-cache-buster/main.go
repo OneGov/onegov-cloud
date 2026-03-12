@@ -2,18 +2,10 @@
 //
 // The default cache path is '/var/cache/nginx'. All subfolders of the cache
 // path are searched and any corresponding files are deleted.
-
-// Note that the domain part of the URL is ignored, so this is equivalent to
-// the example given above:
-
-// 	nginx-cache-buster https://my-site/assets/cached.js
-
-// The full URL would often not match anything since nginx caches by proxy
-// backend and not by publicly visible URL.
-
-// Also note that this deletes all cached resources independent of request method,
+//
+// Note that this deletes all cached resources independent of request method,
 // so GET/PUT/POST etc. are all deleted.
-
+//
 // This CLI is meant to be run with setuid/sticky bit. That is, we run with
 // root permissions under an unprivileged account. Therefore this CLI needs
 // to be as minimal as possible to not expose an attack surface.
@@ -25,7 +17,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -33,12 +24,13 @@ import (
 )
 
 var banner = `
-Usage: nginx-cache-buster /assets/cached.js --dir /var/cache/nginx
+Usage: nginx-cache-buster <file-id> --dir /var/cache/nginx
 
 Parameters:
 `
 
-var lineURL = regexp.MustCompile(`KEY: (http|https)(GET|HEAD)(.*)`)
+var lineURL = regexp.MustCompile(`KEY: [^/]*(/.*)`)
+
 
 func mustBeADirectory(d string) {
 	if i, err := os.Stat(d); err != nil {
@@ -46,16 +38,6 @@ func mustBeADirectory(d string) {
 	} else if !i.IsDir() {
 		log.Fatalf("not a direcrory: %s", d)
 	}
-}
-
-func mustParseURLPath(u string) string {
-	parsed, err := url.Parse("http://" + u)
-
-	if err != nil {
-		log.Fatalf("error parsing %s: %v", u, err)
-	}
-
-	return parsed.Path
 }
 
 func mustPassArgument(count int, name string) {
@@ -102,14 +84,14 @@ func findLine(path string, prefix string) (string, error) {
 	return "", sc.Err()
 }
 
-func parseProxyLine(line string) (method, protocol, url string) {
+func parseProxyLine(line string) (url string) {
 	matches := lineURL.FindStringSubmatch(line)
 
-	if len(matches) < 3 {
-		return "", "", ""
+	if len(matches) < 1 {
+		return ""
 	}
 
-	return matches[1], matches[2], matches[3]
+	return matches[1]
 }
 
 func main() {
@@ -121,8 +103,11 @@ func main() {
 	mustBeADirectory(directory)
 
 	// get the URL fragment
-	mustPassArgument(1, "url")
-	requestedURLPath := mustParseURLPath(flag.Arg(0))
+	mustPassArgument(1, "fileid")
+	fileid := flag.Arg(0)
+	if len(fileid) < 1 {
+		log.Fatal("fileid empty")
+	}
 
 	// files that are going to be deleted
 	var files []string
@@ -149,22 +134,14 @@ func main() {
 		}
 
 		// it contains a method, protocol and URL
-		_, _, u := parseProxyLine(line)
+		u := parseProxyLine(line)
 
 		if u == "" {
 			return fmt.Errorf("could not parse line %s", line)
 		}
 
-		// we want only the actual path of the URL
-		urlPath := mustParseURLPath(u)
-
-		// if the path is empty we have nothing to do
-		if urlPath == "" {
-			return nil
-		}
-
 		// finally we can match the URL
-		if strings.Contains(urlPath, requestedURLPath) {
+		if strings.Contains(u, fileid) {
 			files = append(files, path)
 		}
 

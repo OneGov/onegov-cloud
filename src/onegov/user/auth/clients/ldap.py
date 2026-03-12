@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import socket
 
 from attr import attrs, attrib
@@ -11,7 +13,7 @@ from time import sleep
 from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
-    from typing_extensions import Concatenate, ParamSpec
+    from typing import Concatenate, ParamSpec
 
     _P = ParamSpec('_P')
 
@@ -19,10 +21,10 @@ _T = TypeVar('_T')
 
 
 def auto_retry(
-    fn: 'Callable[Concatenate[LDAPClient, _P], _T]',
+    fn: Callable[Concatenate[LDAPClient, _P], _T],
     max_tries: int = 5,
     pause: float = 0.1
-) -> 'Callable[Concatenate[LDAPClient, _P], _T]':
+) -> Callable[Concatenate[LDAPClient, _P], _T]:
     """ Retries the decorated function if a LDAP connection error occurs, up
     to a given set of retries, using linear backoff.
 
@@ -31,16 +33,16 @@ def auto_retry(
 
     @wraps(fn)
     def retry(
-        self: 'LDAPClient',
+        self: LDAPClient,
         /,
-        *args: '_P.args',
-        **kwargs: '_P.kwargs'
+        *args: _P.args,
+        **kwargs: _P.kwargs
     ) -> _T:
         nonlocal tried
 
         try:
             return fn(self, *args, **kwargs)
-        except (LDAPCommunicationError, socket.error):
+        except (OSError, LDAPCommunicationError):
             tried += 1
 
             if tried >= max_tries:
@@ -57,7 +59,7 @@ def auto_retry(
 
 
 @attrs()
-class LDAPClient():
+class LDAPClient:
 
     # The URL of the LDAP server
     url: str = attrib()
@@ -75,7 +77,7 @@ class LDAPClient():
         name = self.username.lower()
 
         if 'dc=' in name:
-            return 'dc=' + name.split(",dc=", 1)[-1]
+            return 'dc=' + name.split(',dc=', 1)[-1]
 
         return ''
 
@@ -100,20 +102,20 @@ class LDAPClient():
 
         # disconnect if necessary
         with suppress(LDAPCommunicationError, socket.error):
-            self.connection.unbind()
+            self.connection.unbind()  # type: ignore[no-untyped-call]
 
         # clear cache
         del self.__dict__['connection']
 
         # reconnect
         if not self.connection.rebind(self.username, self.password):
-            raise ValueError(f"Failed to connect to {self.url}")
+            raise ValueError(f'Failed to connect to {self.url}')
 
     @auto_retry
     def search(
         self,
         query: str,
-        attributes: 'Sequence[str]' = ()
+        attributes: Sequence[str] = ()
     ) -> dict[str, dict[str, Any]]:
         """ Runs an LDAP query against the server and returns a dictionary
         with the distinguished name as key and the given attributes as values
@@ -148,4 +150,4 @@ class LDAPClient():
 
         """
 
-        return self.connection.compare(name, attribute, value)
+        return self.connection.compare(name, attribute, value)  # type: ignore[no-untyped-call]

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import BookingCollection
 from onegov.feriennet import FeriennetApp, _
@@ -16,7 +18,7 @@ if TYPE_CHECKING:
 
 
 @FeriennetApp.userlinks()
-def activity_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
+def activity_links(request: FeriennetRequest, user: User) -> LinkGroup:
     activities: Query[tuple[str, str]] = (
         VacationActivityCollection(
             session=request.session,
@@ -29,10 +31,11 @@ def activity_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
             VacationActivity.name,
             VacationActivity.title
         )
+        .tuples()
     )
 
     return LinkGroup(
-        title=_("Activities"),
+        title=_('Activities'),
         links=[
             Link(
                 title,
@@ -44,16 +47,17 @@ def activity_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
 
 
 @FeriennetApp.userlinks()
-def attendee_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
+def attendee_links(request: FeriennetRequest, user: User) -> LinkGroup:
     attendees: Query[tuple[UUID, str]] = (
         AttendeeCollection(request.session).query()
         .filter_by(username=user.username)
         .order_by(Attendee.name)
         .with_entities(Attendee.id, Attendee.name)
+        .tuples()
     )
 
     return LinkGroup(
-        title=_("Attendees"),
+        title=_('Attendees'),
         links=[
             Link(
                 name,
@@ -66,12 +70,12 @@ def attendee_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
 
 
 @FeriennetApp.userlinks()
-def booking_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
+def booking_links(request: FeriennetRequest, user: User) -> LinkGroup:
     return LinkGroup(
-        title=_("Bookings"),
+        title=_('Bookings'),
         links=[
             Link(
-                _("Bookings for ${period}", mapping={'period': period.title}),
+                _('Bookings for ${period}', mapping={'period': period.title}),
                 request.class_link(BookingCollection, {
                     'period_id': period.id,
                     'username': user.username
@@ -82,12 +86,12 @@ def booking_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
 
 
 @FeriennetApp.userlinks()
-def billing_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
+def billing_links(request: FeriennetRequest, user: User) -> LinkGroup:
     return LinkGroup(
-        title=_("Billing"),
+        title=_('Billing'),
         links=[
             Link(
-                _("Billing for ${period}", mapping={'period': period.title}),
+                _('Billing for ${period}', mapping={'period': period.title}),
                 request.class_link(BillingCollection, {
                     'period_id': period.id,
                     'username': user.username

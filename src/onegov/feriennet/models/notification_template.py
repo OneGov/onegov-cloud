@@ -1,26 +1,27 @@
+from __future__ import annotations
+
+from datetime import datetime
 from markupsafe import Markup
-from onegov.activity import BookingCollection, InvoiceCollection
+from onegov.activity import BookingCollection, BookingPeriodInvoiceCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.feriennet import _
 from onegov.feriennet.collections import VacationActivityCollection
-from sqlalchemy import Column, Text
-from uuid import uuid4
+from sqlalchemy.orm import mapped_column, Mapped
+from uuid import uuid4, UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Callable
-    from datetime import datetime
-    from onegov.activity.models import Period
+    from onegov.activity.models import BookingPeriod
     from onegov.feriennet.request import FeriennetRequest
     from typing import Protocol
-    from typing_extensions import Self
+    from typing import Self
 
     class BoundCallable(Protocol):
         __doc__: str
+
         def __call__(self) -> str: ...
 
 
@@ -32,26 +33,31 @@ class NotificationTemplate(Base, ContentMixin, TimestampMixin):
 
     __tablename__ = 'notification_templates'
 
+    if TYPE_CHECKING:
+        # NOTE: We don't want this to end up in __annotations__
+        #       since it should not be mapped by SQLAlchemy
+        period_id: UUID | None
+
     #: holds the selected period id (not stored in the database)
-    period_id: 'uuid.UUID | None' = None
+    period_id = None
 
     #: The public id of the notification template
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The subject of the notification
-    subject: 'Column[str]' = Column(Text, nullable=False, unique=True)
+    subject: Mapped[str] = mapped_column(unique=True)
 
+    # FIXME: Should this be annotated as `Markup` instead?
     #: The template text in html, fully rendered html content
-    text: 'Column[str]' = Column(Text, nullable=False)
+    text: Mapped[str]
 
     #: The date the notification was last sent
-    last_sent: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+    last_sent: Mapped[datetime | None]
 
-    def for_period(self, period: 'Period') -> 'Self':
+    def for_period(self, period: BookingPeriod) -> Self:
         """ Implements the required interface for the 'periods' macro in
         onegov.feriennet.
 
@@ -62,13 +68,13 @@ class NotificationTemplate(Base, ContentMixin, TimestampMixin):
 
 class TemplateVariables:
 
-    bound: dict[str, 'BoundCallable']
+    bound: dict[str, BoundCallable]
     expanded: dict[str, str]
 
     def __init__(
         self,
-        request: 'FeriennetRequest',
-        period: 'Period | None'
+        request: FeriennetRequest,
+        period: BookingPeriod | None
     ) -> None:
         self.request = request
         self.period = period
@@ -76,28 +82,28 @@ class TemplateVariables:
 
         self.bound = {}
         self.bind(
-            _("Period"),
-            _("Title of the period."),
+            _('Period'),
+            _('Title of the period.'),
             self.period_title,
         )
         self.bind(
-            _("Invoices"),
+            _('Invoices'),
             _("Link to the user's invoices."),
             self.invoices_link,
         )
         self.bind(
-            _("Bookings"),
+            _('Bookings'),
             _("Link to the user's bookings."),
             self.bookings_link
         )
         self.bind(
-            _("Activities"),
-            _("Link to the activities."),
+            _('Activities'),
+            _('Link to the activities.'),
             self.activities_link
         )
         self.bind(
-            _("Homepage"),
-            _("Link to the homepage."),
+            _('Homepage'),
+            _('Link to the homepage.'),
             self.homepage_link
         )
 
@@ -105,7 +111,7 @@ class TemplateVariables:
         self,
         name: str,
         description: str,
-        method: 'Callable[[], str]'
+        method: Callable[[], str]
     ) -> None:
 
         assert hasattr(method, '__func__')
@@ -132,23 +138,23 @@ class TemplateVariables:
             self.request.class_link(BookingCollection, {
                 'period_id': self.period.id if self.period else None
             }),
-            self.request.translate(_("Bookings"))
+            self.request.translate(_('Bookings'))
         )
 
     def invoices_link(self) -> Markup:
         return Markup('<a href="{}">{}</a>').format(
-            self.request.class_link(InvoiceCollection),
-            self.request.translate(_("Invoices"))
+            self.request.class_link(BookingPeriodInvoiceCollection),
+            self.request.translate(_('Invoices'))
         )
 
     def activities_link(self) -> Markup:
         return Markup('<a href="{}">{}</a>').format(
             self.request.class_link(VacationActivityCollection),
-            self.request.translate(_("Activities"))
+            self.request.translate(_('Activities'))
         )
 
     def homepage_link(self) -> Markup:
         return Markup('<a href="{}">{}</a>').format(
             self.request.link(self.request.app.org),
-            self.request.translate(_("Homepage"))
+            self.request.translate(_('Homepage'))
         )

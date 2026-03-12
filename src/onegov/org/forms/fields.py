@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.file import File, FileCollection
 from onegov.core.utils import binary_to_dictionary, dictionary_to_binary
 from onegov.form.fields import HtmlField as HtmlFieldBase
@@ -23,7 +25,7 @@ class HtmlField(HtmlFieldBase):
 
     """
 
-    def pre_validate(self, form: 'Form') -> None:  # type:ignore[override]
+    def pre_validate(self, form: Form) -> None:  # type:ignore[override]
         super().pre_validate(form)
         self.data = remove_empty_paragraphs(
             annotate_html(
@@ -35,12 +37,13 @@ class HtmlField(HtmlFieldBase):
 def file_choices_from_collection(
     collection: FileCollection[Any]
 ) -> list[tuple[str, str]]:
+    model_class = collection.model_class
     return sorted(
         (
             (file_id, name)
             for file_id, name in collection.query().with_entities(
-                File.id,
-                File.name,
+                model_class.id,
+                model_class.name,
             )
         ),
         key=itemgetter(1)
@@ -179,7 +182,7 @@ class UploadOrSelectExistingFileField(UploadOrLinkExistingFileField):
             _choices = file_choices_from_collection(self.collection)
         self.choices = _choices
 
-    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
 
         if not valuelist:
             self.data = {}
@@ -192,7 +195,7 @@ class UploadOrSelectExistingFileField(UploadOrLinkExistingFileField):
             action = valuelist[0]
             fieldstorage = valuelist[1]
             existing = valuelist[2]
-            self.data = binary_to_dictionary(
+            self.data = binary_to_dictionary(  # type: ignore[assignment]
                 dictionary_to_binary({'data': str(valuelist[4])}),
                 str(valuelist[3])
             )
@@ -297,7 +300,7 @@ class UploadOrSelectExistingMultipleFilesField(
             _choices=self.choices,
         )
 
-    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if not valuelist:
             return
 

@@ -1,16 +1,19 @@
+from __future__ import annotations
+
+import re
 from dateutil.rrule import MO, TU, WE, TH, FR, SA, SU
 
 from onegov.org import _
 
 
 WEEKDAYS = (
-    (MO.weekday, _("Mo")),
-    (TU.weekday, _("Tu")),
-    (WE.weekday, _("We")),
-    (TH.weekday, _("Th")),
-    (FR.weekday, _("Fr")),
-    (SA.weekday, _("Sa")),
-    (SU.weekday, _("Su")),
+    (MO.weekday, _('Mo')),
+    (TU.weekday, _('Tu')),
+    (WE.weekday, _('We')),
+    (TH.weekday, _('Th')),
+    (FR.weekday, _('Fr')),
+    (SA.weekday, _('Sa')),
+    (SU.weekday, _('Su')),
 )
 
 TIMESPANS = (
@@ -20,3 +23,5 @@ TIMESPANS = (
     (712, _('2 years')),
     (1068, _('3 years')),
 )
+
+KABA_CODE_RE = re.compile(r'^[0-9]{4,6}$')

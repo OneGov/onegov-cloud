@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -63,15 +65,15 @@ WABSTIC_MAJORZ_HEADERS_WM_KANDIDATENGDE = (
 )
 
 
-def get_entity_id(line: 'DefaultRow') -> int:
+def get_entity_id(line: DefaultRow) -> int:
     col = 'bfsnrgemeinde'
     entity_id = validate_integer(line, col)
     return 0 if entity_id in EXPATS else entity_id
 
 
 def import_election_wabstic_majorz(
-    election: 'Election',
-    principal: 'Canton | Municipality',
+    election: Election,
+    principal: Canton | Municipality,
     number: str,
     district: str,
     file_wm_wahl: IO[bytes],
@@ -174,7 +176,7 @@ def import_election_wabstic_majorz(
                 line, 'anzpendentgde', default=None)
         except Exception as e:
             line_errors.append(
-                _("Error in anzpendentgde: ${msg}",
+                _('Error in anzpendentgde: ${msg}',
                   mapping={'msg': e.args[0]}))
 
         # Pass the errors and continue to next line
@@ -204,11 +206,11 @@ def import_election_wabstic_majorz(
         else:
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
 
             if entity_id in added_entities:
                 line_errors.append(
-                    _("${name} was found twice", mapping={'name': entity_id}))
+                    _('${name} was found twice', mapping={'name': entity_id}))
 
             # Skip expats if not enabled
             if entity_id == 0 and not election.has_expats:
@@ -257,7 +259,7 @@ def import_election_wabstic_majorz(
         else:
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
 
             if entity_id not in added_entities:
                 # Only add it if present (there is there no SortGeschaeft)
@@ -268,8 +270,7 @@ def import_election_wabstic_majorz(
 
         # Check if the entity is counted
         try:
-            entity['counted'] = False if validate_integer(
-                line, 'sperrung') == 0 else True
+            entity['counted'] = validate_integer(line, 'sperrung') != 0
         except ValueError as e:
             line_errors.append(e.args[0])
 
@@ -372,11 +373,11 @@ def import_election_wabstic_majorz(
             candidate_id = line.knr
             votes = validate_integer(line, 'stimmen', default=None)
         except ValueError:
-            line_errors.append(_("Invalid candidate results"))
+            line_errors.append(_('Invalid candidate results'))
         else:
             if added_candidates and candidate_id not in added_candidates:
                 line_errors.append(
-                    _("Candidate with id ${id} not in wm_kandidaten",
+                    _('Candidate with id ${id} not in wm_kandidaten',
                       mapping={'id': candidate_id}))
             if entity_id == 0 and not election.has_expats:
                 # Skip expats if not enabled
@@ -384,7 +385,7 @@ def import_election_wabstic_majorz(
 
             if entity_id not in added_entities:
                 line_errors.append(
-                    _("Entity with id ${id} not in wmstatic_gemeinden",
+                    _('Entity with id ${id} not in wmstatic_gemeinden',
                         mapping={'id': entity_id}))
 
         # Pass the errors and continue to next line
@@ -428,9 +429,11 @@ def import_election_wabstic_majorz(
     result_uids = {entity_id: uuid4() for entity_id in added_results}
 
     session = object_session(election)
-    session.bulk_insert_mappings(Candidate, added_candidates.values())
+    assert session is not None
+    # FIXME: Switch to regular `session.execute` with insert statements
+    session.bulk_insert_mappings(Candidate, added_candidates.values())  # type: ignore[arg-type]
     session.bulk_insert_mappings(
-        ElectionResult,
+        ElectionResult,  # type: ignore[arg-type]
         (
             {
                 'id': result_uids[entity_id],
@@ -454,7 +457,7 @@ def import_election_wabstic_majorz(
         )
     )
     session.bulk_insert_mappings(
-        CandidateResult,
+        CandidateResult,  # type: ignore[arg-type]
         (
             {
                 'id': uuid4(),
@@ -497,7 +500,7 @@ def import_election_wabstic_majorz(
                 'counted': False
             }
         )
-    session.bulk_insert_mappings(ElectionResult, result_inserts)
+    session.bulk_insert_mappings(ElectionResult, result_inserts)  # type: ignore[arg-type]
     session.flush()
     session.expire_all()
 

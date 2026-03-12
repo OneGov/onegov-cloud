@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from bleach.sanitizer import Cleaner
+from markupsafe import Markup
 from onegov.quill.widgets import QuillInput
 from onegov.quill.widgets import TAGS
 from wtforms.fields import TextAreaField
@@ -19,10 +22,12 @@ class QuillField(TextAreaField):
 
     """
 
+    data: Markup
+
     def __init__(
         self,
         *,
-        tags: 'Sequence[str] | None' = None,
+        tags: Sequence[str] | None = None,
         **kwargs: Any
     ):
         if tags is None:
@@ -30,11 +35,11 @@ class QuillField(TextAreaField):
         else:
             tags = list(set(tags) & set(TAGS))
 
-        super(TextAreaField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.widget = QuillInput(tags=tags)
 
-        tags = ['p', 'br'] + tags
+        tags = ['p', 'br', *tags]
         if 'ol' in tags or 'ul' in tags:
             tags.append('li')
 
@@ -44,5 +49,5 @@ class QuillField(TextAreaField):
 
         self.cleaner = Cleaner(tags=tags, attributes=attributes, strip=True)
 
-    def pre_validate(self, form: 'BaseForm') -> None:
-        self.data = self.cleaner.clean(self.data or '')
+    def pre_validate(self, form: BaseForm) -> None:
+        self.data = Markup(self.cleaner.clean(self.data or ''))  # nosec: B704

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from email.headerregistry import Address
 from email.policy import SMTP
 
@@ -5,18 +7,18 @@ from onegov.core.mail import format_single_address
 from onegov.core.mail import needs_qp_encode
 
 
-def addr(email, name=''):
+def addr(email: str, name: str = '') -> Address:
     # let's keep the code a bit shorter...
     return Address(name, addr_spec=email)
 
 
-def test_needs_qp_encode():
+def test_needs_qp_encode() -> None:
     assert needs_qp_encode('test') is False
     assert needs_qp_encode('"') is True
     assert needs_qp_encode('ö') is True
 
 
-def test_format_single_address():
+def test_format_single_address() -> None:
     # basic case
     assert format_single_address(
         addr('test@example.com')
@@ -59,7 +61,7 @@ def test_format_single_address():
     assert all(len(part) <= 75 for part in words)
 
 
-def test_format_single_address_coerced():
+def test_format_single_address_coerced() -> None:
     # basic case
     assert format_single_address('test@example.com') == 'test@example.com'
     # basic case with a display name

@@ -1,4 +1,6 @@
 """ The upload view. """
+from __future__ import annotations
+
 import transaction
 
 from onegov.election_day import ElectionDayApp
@@ -26,9 +28,9 @@ if TYPE_CHECKING:
 )
 def view_upload(
     self: Vote,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: UploadVoteForm
-) -> 'RenderData':
+) -> RenderData:
     """ Uploads votes results. """
 
     errors = []
@@ -62,7 +64,7 @@ def view_upload(
                 assert form.sg_gemeinden.data is not None
                 assert form.sg_gemeinden.file is not None
                 source: DataSourceItem
-                for source in self.data_sources:  # type:ignore[attr-defined]
+                for source in self.data_sources:
                     assert source.number is not None
                     assert source.district is not None
                     errors.extend(
@@ -78,7 +80,7 @@ def view_upload(
                         )
                     )
             else:
-                raise NotImplementedError("Unsupported import format")
+                raise NotImplementedError('Unsupported import format')
             archive = ArchivedResultCollection(session)
             archive.update(self, request)
 

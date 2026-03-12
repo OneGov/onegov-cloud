@@ -7,9 +7,8 @@ from typing_extensions import TypeAlias
 from webob import Response as BaseResponse
 
 import dectate
-from dectate.sentinel import Sentinel
 from morepath.authentication import Identity, NoIdentity
-from morepath.converter import Converter, ConverterRegistry
+from morepath.converter import ConverterRegistry
 from morepath.path import PathRegistry  # type:ignore[import-untyped]
 from morepath.predicate import PredicateRegistry  # type:ignore[import-untyped]
 from morepath.request import Request

@@ -1,15 +1,31 @@
+var translation = $.Redactor.opts.langs[language];
+
+(function($) {
+    $.Redactor.prototype.superscript = function() {
+        return {
+            init: function() {
+                var button = this.button.add('superscript', translation.superscript);
+                this.button.addCallback(button, this.superscript.format);
+                button.html('x<sup>2</sup>')
+            },
+            format: function() {
+                this.inline.format('sup');
+            }
+        };
+    };
+})(jQuery);
+
 $(function() {
     _.each($('textarea.editor'), function(el) {
         var textarea = $(el);
         var form = textarea.closest('form');
         var language = window.locale.language;
-        var translation = $.Redactor.opts.langs[language];
 
         textarea.redactor({
             buttons: [
                 'formatting', 'bold', 'italic', 'deleted',
                 'unorderedlist', 'orderedlist', 'image', 'file', 'link',
-                'horizontalrule', 'html'
+                'horizontalrule', 'html', 'superscript'
             ],
             formatting: ['p', 'blockquote', 'pre'],
             fileUpload: form.data('file-upload-url'),
@@ -17,7 +33,7 @@ $(function() {
             imageUpload: form.data('image-upload-url'),
             imageManagerJson: form.data('image-list-url'),
             definedLinks: form.data('sitecollection-url'),
-            plugins: ['bufferbuttons', 'filemanager', 'imagemanager', 'definedlinks', 'table'],
+            plugins: ['bufferbuttons', 'filemanager', 'imagemanager', 'definedlinks', 'table', 'superscript'],
             lang: language,
             convertVideoLinks: false,
             imageResizable: false,
@@ -29,6 +45,19 @@ $(function() {
                 {
                     tag: 'h3',
                     title: translation.subtitle
+                },
+                {
+                    tag: 'h4',
+                    title: translation.subsubtitle
+                },
+                {
+                    tag: 'h5',
+                    title: translation.subsubsubtitle
+                },
+                {
+                    tag: 'p',
+                    class: 'edit-note',
+                    title: translation.editnote
                 }
             ],
             /* defined in input_with_button.js */

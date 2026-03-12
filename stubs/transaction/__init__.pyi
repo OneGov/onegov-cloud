@@ -4,7 +4,6 @@ from typing import Protocol
 from transaction._manager import Attempt, ThreadTransactionManager, TransactionManager as TransactionManager
 from transaction._transaction import Savepoint as Savepoint, Transaction as Transaction
 
-
 class _CreateSavepoint(Protocol):
     def __call__(self, optimistic: bool = False) -> Savepoint: ...
 

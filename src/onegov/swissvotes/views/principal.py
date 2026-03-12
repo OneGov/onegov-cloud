@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.swissvotes import SwissvotesApp
 from onegov.swissvotes.collections import TranslatablePageCollection
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
     template='home.pt',
     permission=Public
 )
-def view_home(self: Principal, request: 'SwissvotesRequest') -> 'Response':
+def view_home(self: Principal, request: SwissvotesRequest) -> Response:
     """ The home page. """
 
     page = TranslatablePageCollection(request.session).setdefault('home')

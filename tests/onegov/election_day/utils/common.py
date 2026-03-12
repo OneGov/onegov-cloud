@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from datetime import date
 from io import BytesIO
 from onegov.election_day.models import BallotResult
 from onegov.election_day.models import Candidate
 from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import ElectionResult
@@ -19,17 +22,29 @@ from reportlab.pdfgen.canvas import Canvas
 from uuid import uuid4
 
 
+from typing import overload, Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
 class PatchedD3Renderer(D3Renderer):
-    def get_chart(self, chart, fmt, data, width=1000, params=None):
-        chart = BytesIO()
-        canvas = Canvas(chart, pagesize=(140, 140))
+    def get_chart(  # type: ignore[override]
+        self,
+        chart: str,
+        fmt: object,
+        data: object,
+        width: int = 1000,
+        params: object = None
+    ) -> BytesIO:
+        output = BytesIO()
+        canvas = Canvas(output, pagesize=(140, 140))
         canvas.drawString(10, 70, "This is a diagram")
         canvas.save()
-        chart.seek(0)
-        return chart
+        output.seek(0)
+        return output
 
 
-def add_majorz_election(session):
+def add_majorz_election(session: Session) -> Election:
     election = Election(
         title='Majorz Election',
         domain='federation',
@@ -81,7 +96,11 @@ def add_majorz_election(session):
     return election
 
 
-def add_proporz_election(session, year=2015):
+def add_proporz_election(
+    session: Session,
+    year: int = 2015
+) -> ProporzElection:
+
     election = ProporzElection(
         title='Proporz Election',
         domain='federation',
@@ -234,7 +253,11 @@ def add_proporz_election(session, year=2015):
     return election
 
 
-def add_vote(session, type_):
+@overload
+def add_vote(session: Session, type_: Literal['complex']) -> ComplexVote: ...
+@overload
+def add_vote(session: Session, type_: Literal['simple']) -> Vote: ...
+def add_vote(session: Session, type_: Literal['simple', 'complex']) -> Vote:
     vote = Vote.get_polymorphic_class(type_, Vote)(
         title='Vote', domain='federation', date=date(2015, 6, 18)
     )
@@ -243,6 +266,7 @@ def add_vote(session, type_):
     ))
 
     if type_ == 'complex':
+        assert isinstance(vote, ComplexVote)
         vote.counter_proposal.results.append(BallotResult(
             name='x', yeas=90, nays=10, counted=True, entity_id=1
         ))
@@ -256,7 +280,13 @@ def add_vote(session, type_):
     return vote
 
 
-def add_election_compound(session, year=2015, elections=None, **kwargs):
+def add_election_compound(
+    session: Session,
+    year: int = 2015,
+    elections: list[Election] | None = None,
+    **kwargs: Any
+) -> ElectionCompound:
+
     compound = ElectionCompound(
         title='Election Compound',
         domain='canton',

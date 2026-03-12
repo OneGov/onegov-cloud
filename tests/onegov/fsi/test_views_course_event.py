@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 from datetime import timedelta
@@ -5,7 +7,12 @@ from sedate import utcnow
 from onegov.fsi.models import CourseEvent
 
 
-def test_course_event_collection(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client, FsiScenario
+
+
+def test_course_event_collection(client: Client) -> None:
     view = '/fsi/events'
     client.get(view, status=403)
 
@@ -13,10 +20,11 @@ def test_course_event_collection(client):
     client.get(view)
 
 
-def test_course_event_details(client_with_db):
+def test_course_event_details(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     event = session.query(CourseEvent).first()
+    assert event is not None
 
     view = f'/fsi/event/{event.id}'
     client.get(view, status=403)
@@ -25,11 +33,12 @@ def test_course_event_details(client_with_db):
     client.get(view)
 
 
-def test_edit_course_event(client_with_db):
+def test_edit_course_event(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
 
     event = session.query(CourseEvent).first()
+    assert event is not None
     view = f'/fsi/event/{event.id}/edit'
 
     client.login_editor()
@@ -58,7 +67,7 @@ def test_edit_course_event(client_with_db):
     page.form.submit().follow()
 
 
-def test_add_delete_course_event(client_with_db):
+def test_add_delete_course_event(client_with_db: Client) -> None:
     view = '/fsi/events/add'
     client = client_with_db
     client.login_editor()
@@ -112,10 +121,11 @@ def test_add_delete_course_event(client_with_db):
     client.get(view, status=404)
 
 
-def test_duplicate_course_event(client_with_db):
+def test_duplicate_course_event(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     event = session.query(CourseEvent).first()
+    assert event is not None
 
     client.login_admin()
     view = f'/fsi/event/{event.id}/duplicate'
@@ -130,11 +140,12 @@ def test_duplicate_course_event(client_with_db):
     assert dup.form['max_attendees'].value == str(event.max_attendees)
 
 
-def test_cancel_course_event(client_with_db):
+def test_cancel_course_event(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     event = session.query(CourseEvent).filter(
         CourseEvent.start > utcnow()).first()
+    assert event is not None
 
     wanted_count = event.attendees.count()
 
@@ -156,7 +167,7 @@ def test_cancel_course_event(client_with_db):
         assert message['Subject'] == 'Absage Kursveranstaltung'
 
 
-def test_register_for_course_event_member(client_with_db):
+def test_register_for_course_event_member(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     event = session.query(CourseEvent).filter_by(
@@ -185,7 +196,7 @@ def test_register_for_course_event_member(client_with_db):
     assert message['Subject'] == 'Absage Kursveranstaltung'
 
 
-def test_register_for_course_event_editor(client_with_db):
+def test_register_for_course_event_editor(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     event = session.query(CourseEvent).filter_by(
@@ -201,7 +212,7 @@ def test_register_for_course_event_editor(client_with_db):
     assert message['To'] == 'editor@example.org'
 
 
-def test_register_for_course_event_admin(client_with_db):
+def test_register_for_course_event_admin(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     event = session.query(CourseEvent).filter_by(
@@ -215,16 +226,16 @@ def test_register_for_course_event_admin(client_with_db):
     assert len(os.listdir(client.app.maildir)) == 1
 
 
-def test_add_subscription_for_other_attendee(client_with_db):
+def test_add_subscription_for_other_attendee(client_with_db: Client) -> None:
     client = client_with_db
     client.login_admin()
     new = client.get('/fsi/reservations').click('Anmeldung')
 
     # There is already a subscription for this course and attendee
-    assert new.form['course_event_id'].options[0][2] == \
-           'Course - 01.01.2050 01:00'
-    assert new.form['course_event_id'].options[1][2] == \
-           'Course - 01.01.2060 01:00'
+    assert new.form['course_event_id'].options[0][2] == (
+           'Course - 01.01.2050 01:00')
+    assert new.form['course_event_id'].options[1][2] == (
+           'Course - 01.01.2060 01:00')
     bookable_id = new.form['course_event_id'].options[1][0]
 
     # take the fist choice and fail
@@ -238,7 +249,7 @@ def test_add_subscription_for_other_attendee(client_with_db):
     assert len(os.listdir(client.app.maildir)) == 1
 
 
-def test_edit_subscription_for_other_attendee(client_with_db):
+def test_edit_subscription_for_other_attendee(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     event = session.query(CourseEvent).filter_by(
@@ -252,7 +263,11 @@ def test_edit_subscription_for_other_attendee(client_with_db):
     assert len(os.listdir(client.app.maildir)) == 1
 
 
-def test_delete_subscriptions_past_present(client, scenario):
+def test_delete_subscriptions_past_present(
+    client: Client,
+    scenario: FsiScenario
+) -> None:
+
     now = utcnow()
     scenario.add_course(name='Testcourse with Templates')
     scenario.add_attendee()
@@ -278,8 +293,8 @@ def test_delete_subscriptions_past_present(client, scenario):
     scenario.refresh()
 
     client.login_admin()
-    event_subscriptions = f'/fsi/reservations?course_event_id=' \
-                          f'{scenario.latest_event.id}'
+    event_subscriptions = (
+        f'/fsi/reservations?course_event_id={scenario.latest_event.id}')
 
     page = client.get(event_subscriptions)
     response = client.delete(
@@ -290,8 +305,8 @@ def test_delete_subscriptions_past_present(client, scenario):
     page = client.get(event_subscriptions)
     assert 'Keine Einträge gefunden' in page
 
-    past_event_subscriptions = f'/fsi/reservations?course_event_id=' \
-                               f'{scenario.course_events[-2].id}'
+    past_event_subscriptions = (
+        f'/fsi/reservations?course_event_id={scenario.course_events[-2].id}')
 
     page = client.get(past_event_subscriptions)
     response = client.delete(

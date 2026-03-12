@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 
 from contextlib import contextmanager, suppress
@@ -19,7 +21,7 @@ if TYPE_CHECKING:
 class SigningService:
     """ A generic interface for various file signing services. """
 
-    registry: ClassVar[dict[str, type['SigningService']]] = {}
+    registry: ClassVar[dict[str, type[SigningService]]] = {}
     service_name: ClassVar[str]
 
     def __init_subclass__(cls, service_name: str, **kwargs: Any):
@@ -29,7 +31,7 @@ class SigningService:
         super().__init_subclass__(**kwargs)
 
     @staticmethod
-    def for_config(config: 'SigningServiceConfig') -> 'SigningService':
+    def for_config(config: SigningServiceConfig) -> SigningService:
         """ Spawns a service instance using the given config. """
 
         return SigningService.registry[config['name']](
@@ -63,8 +65,8 @@ class SigningService:
 
     def sign(
         self,
-        infile: 'SupportsRead[bytes]',
-        outfile: 'SupportsWrite[bytes]'
+        infile: SupportsRead[bytes],
+        outfile: SupportsWrite[bytes]
     ) -> str:
         """ Signs the input file and writes it to the given output file.
 
@@ -105,8 +107,8 @@ class SigningService:
     @contextmanager
     def materialise(
         self,
-        file: 'SupportsRead[bytes]'
-    ) -> 'Iterator[SupportsReadAndHasName]':
+        file: SupportsRead[bytes]
+    ) -> Iterator[SupportsReadAndHasName]:
         """ Takes the given file-like object and ensures that it exists
         somewhere on the disk during the lifetime of the context.
 
@@ -118,11 +120,10 @@ class SigningService:
         if hasattr(file, 'name') and os.path.exists(file.name):
             yield file  # type:ignore[misc]
         else:
-            fd, path = mkstemp()
+            _fd, path = mkstemp()
 
             with open(path, 'rb+') as output:
-                for chunk in iter(lambda: file.read(4096), b''):
-                    output.write(chunk)
+                output.writelines(iter(lambda: file.read(4096), b''))
 
                 output.seek(0)
 

@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 from onegov.core.custom import json
 
 
-from typing import overload, Any, Literal, TYPE_CHECKING
+from typing import overload, Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
-    from sqlalchemy.schema import Column
-    from typing_extensions import TypeAlias
+    from sqlalchemy.orm import Mapped
+    from typing import TypeAlias
+
+    AnyCoordinates: TypeAlias = 'RealCoordinates | NullCoordinates'
 
 
 class Coordinates(json.Serializable, keys=('lon', 'lat', 'zoom')):
@@ -29,7 +33,7 @@ class Coordinates(json.Serializable, keys=('lon', 'lat', 'zoom')):
             lat: float,
             lon: float,
             zoom: int | None = None,
-        ) -> 'RealCoordinates': ...
+        ) -> RealCoordinates: ...
 
         @overload
         def __new__(
@@ -37,14 +41,14 @@ class Coordinates(json.Serializable, keys=('lon', 'lat', 'zoom')):
             lat: None = None,
             lon: None = None,
             zoom: None = None,
-        ) -> 'NullCoordinates': ...
+        ) -> NullCoordinates: ...
 
         def __new__(
             cls,
             lat: float | None = None,
             lon: float | None = None,
             zoom: int | None = None,
-        ) -> 'Coordinates':
+        ) -> Self:
             raise NotImplementedError()
     else:
 
@@ -94,8 +98,6 @@ if TYPE_CHECKING:
         def __bool__(self) -> Literal[True]:
             return True
 
-    AnyCoordinates: TypeAlias = RealCoordinates | NullCoordinates
-
 
 class CoordinatesMixin:
     """ Extends any class that has a content dictionary field with a single
@@ -105,13 +107,13 @@ class CoordinatesMixin:
 
     if TYPE_CHECKING:
         # forward declare content column from ContentMixin
-        content: Column[dict[str, Any]]
+        content: Mapped[dict[str, Any]]
 
     @property
-    def coordinates(self) -> 'AnyCoordinates':
+    def coordinates(self) -> AnyCoordinates:
         return self.content.get('coordinates') or Coordinates()
 
     @coordinates.setter
-    def coordinates(self, value: 'AnyCoordinates') -> None:
+    def coordinates(self, value: AnyCoordinates) -> None:
         self.content = self.content or {}
         self.content['coordinates'] = value or {}

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.models import Election
@@ -12,8 +14,8 @@ hide_candidates_chart_intermediate_results = False
 
 
 def hide_candidates_chart(
-    election: 'Election',
-    request: 'ElectionDayRequest',
+    election: Election,
+    request: ElectionDayRequest,
     default: bool = hide_candidates_chart_intermediate_results
 ) -> bool:
     return request.app.principal.hidden_elements.get(
@@ -23,8 +25,8 @@ def hide_candidates_chart(
 
 
 def hide_connections_chart(
-    election: 'Election',
-    request: 'ElectionDayRequest',
+    election: Election,
+    request: ElectionDayRequest,
     default: bool = hide_connections_chart_intermediate_results
 ) -> bool:
     return request.app.principal.hidden_elements.get(
@@ -34,7 +36,7 @@ def hide_connections_chart(
 
 
 def hide_candidate_entity_map_percentages(
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     default: bool = always_hide_candidate_by_entity_chart_percentages
 ) -> bool:
     return request.app.principal.hidden_elements.get(
@@ -44,7 +46,7 @@ def hide_candidate_entity_map_percentages(
 
 
 def hide_candidate_district_map_percentages(
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     default: bool = always_hide_candidate_by_district_chart_percentages
 ) -> bool:
     return request.app.principal.hidden_elements.get(

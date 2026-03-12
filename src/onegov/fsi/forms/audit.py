@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
@@ -17,11 +19,11 @@ if TYPE_CHECKING:
 
 class AuditForm(Form):
 
-    model: 'AuditCollection'
-    request: 'FsiRequest'
+    model: AuditCollection
+    request: FsiRequest
 
     course_id = SelectField(
-        label=_("Course"),
+        label=_('Course'),
         choices=[],
         validators=[
             InputRequired()
@@ -31,12 +33,12 @@ class AuditForm(Form):
     )
 
     organisations = ChosenSelectMultipleField(
-        label=_("By Organisation"),
+        label=_('By Organisation'),
         choices=[],
     )
 
     letter = SelectField(
-        label="Always Hidden, used for redirection persistence",
+        label='Always Hidden, used for redirection persistence',
         choices=[]
     )
 
@@ -52,7 +54,7 @@ class AuditForm(Form):
         return tuple(a.organisation for a in query)
 
     @cached_property
-    def courses(self) -> tuple[tuple['UUID', str], ...]:
+    def courses(self) -> tuple[tuple[UUID, str], ...]:
         return self.model.relevant_courses
 
     @cached_property
@@ -64,7 +66,7 @@ class AuditForm(Form):
         # NOTE: We assume that every user is a CourseAttendee
         return self.request.attendee  # type:ignore[return-value]
 
-    def get_course_choices(self) -> list['_Choice']:
+    def get_course_choices(self) -> list[_Choice]:
         if not self.courses:
             return [self.none_choice]
         return [(str(course_id), name) for course_id, name in self.courses]

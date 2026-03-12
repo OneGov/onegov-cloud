@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import scan_morepath_modules
 from onegov.core.widgets import transform_structure
 from onegov.town6 import TownApp
@@ -5,7 +7,7 @@ from onegov.town6.homepage_widgets import parsed_rss
 from datetime import datetime, timezone, timedelta
 
 
-def test_focus_widget():
+def test_focus_widget() -> None:
 
     class App(TownApp):
         pass
@@ -26,7 +28,7 @@ def test_focus_widget():
     assert "image_src '#';" in result
 
 
-def test_partner_widget():
+def test_partner_widget() -> None:
     class App(TownApp):
         pass
 
@@ -50,7 +52,7 @@ def test_partner_widget():
     assert 'tal:define="title \'\'; show_title False;"' in result
 
 
-def test_services_widget(town_app):
+def test_services_widget() -> None:
     class App(TownApp):
         pass
 
@@ -70,7 +72,7 @@ def test_services_widget(town_app):
     assert 'tal:define="icon \'address-book\'' in result
 
 
-def test_text_widgets(town_app):
+def test_text_widgets() -> None:
     class App(TownApp):
         pass
 
@@ -88,7 +90,7 @@ def test_text_widgets(town_app):
     assert '<p class="homepage-text">Normal text</p>' in result
 
 
-def test_video_widget(town_app):
+def test_video_widget() -> None:
     class App(TownApp):
         pass
 
@@ -106,7 +108,7 @@ def test_video_widget(town_app):
     assert "link_webm \'\'" in result
 
 
-def test_link_icon_widget(town_app):
+def test_link_icon_widget() -> None:
     class App(TownApp):
         pass
 
@@ -131,7 +133,7 @@ def test_link_icon_widget(town_app):
     assert "text \'Whenever you want\'" in result
 
 
-def test_testimonial_widget(town_app):
+def test_testimonial_widget() -> None:
     class App(TownApp):
         pass
 
@@ -153,7 +155,7 @@ def test_testimonial_widget(town_app):
     assert "quote \'very good hospital\'" in result
 
 
-def test_testimonial_slider_widget(town_app):
+def test_testimonial_slider_widget() -> None:
     class App(TownApp):
         pass
 
@@ -179,7 +181,7 @@ def test_testimonial_slider_widget(town_app):
     assert "quote_2 \'so much space\'" in result
 
 
-def test_parse_rss_to_named_tuple():
+def test_parse_rss_to_named_tuple() -> None:
     rss = """<?xml version="1.0" encoding="UTF-8"?>
     <rss version="2.0">
         <channel>
@@ -238,7 +240,7 @@ def test_parse_rss_to_named_tuple():
     )
 
 
-def test_rss_jobs_widget(town_app):
+def test_rss_jobs_widget() -> None:
     class App(TownApp):
         pass
 

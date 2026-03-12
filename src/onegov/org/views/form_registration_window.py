@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from collections import defaultdict
+from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Block
 from onegov.core.security import Private
 from onegov.form import CompleteFormSubmission
 from onegov.form import FormDefinition
@@ -8,14 +11,14 @@ from onegov.org import OrgApp, _
 from onegov.org.cli import close_ticket
 from onegov.org.forms import FormRegistrationWindowForm
 from onegov.org.forms.form_registration import FormRegistrationMessageForm
-from onegov.org.layout import FormSubmissionLayout
-from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Block
-
+from onegov.org.layout import FormSubmissionLayout, TicketLayout
 from onegov.org.models import TicketNote
+from onegov.org.models.ticket import FormSubmissionTicket
 from onegov.org.views.form_submission import handle_submission_action
 from onegov.org.mail import send_transactional_html_mail
 from onegov.org.views.ticket import accept_ticket, send_email_if_enabled
 from onegov.ticket import TicketCollection, Ticket
+from webob.exc import HTTPNotFound
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -35,11 +38,11 @@ if TYPE_CHECKING:
 )
 def handle_new_registration_form(
     self: FormDefinition,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormRegistrationWindowForm,
     layout: FormSubmissionLayout | None = None
-) -> 'RenderData | Response':
-    title = _("New Registration Window")
+) -> RenderData | Response:
+    title = _('New Registration Window')
 
     layout = layout or FormSubmissionLayout(self, request)
     layout.editbar_links = None
@@ -53,7 +56,7 @@ def handle_new_registration_form(
             form.end.data
         ))
 
-        request.success(_("The registration window was added successfully"))
+        request.success(_('The registration window was added successfully'))
         return request.redirect(request.link(self))
 
     return {
@@ -61,20 +64,20 @@ def handle_new_registration_form(
         'title': title,
         'form': form,
         'helptext': _(
-            "Registration windows limit forms to a set number of submissions "
-            "and a specific time-range."
+            'Registration windows limit forms to a set number of submissions '
+            'and a specific time-range.'
         )
     }
 
 
 def send_form_registration_email(
-    request: 'OrgRequest',
-    receivers: 'SequenceOrScalar[Address | str]',
+    request: OrgRequest,
+    receivers: SequenceOrScalar[Address | str],
     content: dict[str, Any],
     action: Literal['general-message']
 ) -> None:
     if action == 'general-message':
-        subject = _("General Message")
+        subject = _('General Message')
     else:
         raise NotImplementedError
 
@@ -88,7 +91,7 @@ def send_form_registration_email(
 
 
 def ticket_linkable(
-    request: 'OrgRequest',
+    request: OrgRequest,
     ticket: Ticket | None
 ) -> Ticket | None:
 
@@ -108,10 +111,10 @@ def ticket_linkable(
 )
 def view_send_form_registration_message(
     self: FormRegistrationWindow,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormRegistrationMessageForm,
     layout: FormSubmissionLayout | None = None,
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         count = 0
@@ -128,7 +131,7 @@ def view_send_form_registration_message(
             if ticket is not None:
                 TicketNote.create(ticket, request, (
                     request.translate(_(
-                        "New e-mail: ${message}",
+                        'New e-mail: ${message}',
                         mapping={'message': form.message.data.strip()}
                     ))
                 ))
@@ -146,7 +149,7 @@ def view_send_form_registration_message(
             count += 1
 
         request.success(
-            _("Successfully sent ${count} emails", mapping={'count': count})
+            _('Successfully sent ${count} emails', mapping={'count': count})
         )
         return request.redirect(request.link(self))
 
@@ -169,14 +172,16 @@ def view_send_form_registration_message(
 )
 def view_registration_window(
     self: FormRegistrationWindow,
-    request: 'OrgRequest',
-    layout: FormSubmissionLayout | None = None
-) -> 'RenderData':
+    request: OrgRequest,
+    layout: FormSubmissionLayout | TicketLayout | None = None,
+    ticket: FormSubmissionTicket | None = None,
+) -> RenderData:
 
     layout = layout or FormSubmissionLayout(self.form, request)
     title = layout.format_date_range(self.start, self.end)
 
-    layout.breadcrumbs.append(Link(title, '#'))
+    if ticket is None:
+        layout.breadcrumbs.append(Link(title, '#'))
 
     registrations = defaultdict(list)
 
@@ -199,73 +204,90 @@ def view_registration_window(
         if submission.registration_state != 'cancelled':
             has_pending_or_confirmed = True
 
-    editbar_links: list[Link | LinkGroup] = [
-        Link(
-            text=_("Edit"),
-            url=request.link(self, 'edit'),
-            attrs={'class': 'edit-link'}
-        )
-    ]
-    if registrations:
-        editbar_links.append(
+    if request.is_manager:
+        edit_url = request.link(self, 'edit')
+        if ticket is None:
+            redirect_after_delete = request.link(self.form)
+        else:
+            edit_url = request.return_here(edit_url)
+            redirect_after_delete = request.link(ticket)
+
+        editbar_links: list[Link | LinkGroup] = [
             Link(
-                text=_("Email attendees"),
-                url=request.link(self, name="send-message"),
-                attrs={'class': 'manage-recipients'}
+                text=_('Edit'),
+                url=edit_url,
+                attrs={'class': 'edit-link'}
             )
-        )
+        ]
+        if registrations:
+            send_url = request.link(self, name='send-message')
+            if ticket is None:
+                redirect_after_cancel = request.link(self)
+            else:
+                send_url = request.return_here(send_url)
+                redirect_after_cancel = request.link(ticket, 'window')
+
+            editbar_links.append(
+                Link(
+                    text=_('Email attendees'),
+                    url=send_url,
+                    attrs={'class': 'manage-recipients'}
+                )
+            )
+            editbar_links.append(
+                Link(
+                    text=_('Cancel Registration Window'),
+                    url=layout.csrf_protected_url(
+                        request.link(self, name='cancel')),
+                    attrs={'class': 'cancel'},
+                    traits=(
+                        Confirm(
+                            _('You really want to cancel all confirmed and '
+                              'deny all open submissions for this '
+                              'registration window?'),
+                            _('Each attendee will receive a ticket email '
+                              'unless ticket messages are not muted.'),
+                            _('Cancel Registration Window'),
+                            _('Cancel'),
+                        ),
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=redirect_after_cancel
+                        )
+                    )
+                ),
+            )
         editbar_links.append(
             Link(
-                text=_("Cancel Registration Window"),
-                url=layout.csrf_protected_url(
-                    request.link(self, name='cancel')),
-                attrs={'class': 'cancel'},
+                text=_('Delete'),
+                url=layout.csrf_protected_url(request.link(self)),
+                attrs={'class': 'delete-link'},
                 traits=(
                     Confirm(
-                        _("You really want to cancel all confirmed and "
-                          "deny all open submissions for this "
-                          "registration window?"),
-                        _("Each attendee will receive a ticket email "
-                          "unless ticket messages are not muted."),
-                        _("Cancel Registration Window"),
-                        _("Cancel"),
+                        _(
+                            'Do you really want to delete '
+                            'this registration window?'
+                        ),
+                        _('Existing submissions will be disassociated.'),
+                        _('Delete registration window'),
+                        _('Cancel')
                     ),
                     Intercooler(
-                        request_method='POST',
-                        redirect_after=request.link(self)
+                        request_method='DELETE',
+                        redirect_after=redirect_after_delete
                     )
-                )
-            ),
-        )
-    editbar_links.append(
-        Link(
-            text=_("Delete"),
-            url=layout.csrf_protected_url(request.link(self)),
-            attrs={'class': 'delete-link'},
-            traits=(
-                Confirm(
-                    _(
-                        "Do you really want to delete "
-                        "this registration window?"
-                    ),
-                    _("Existing submissions will be disassociated."),
-                    _("Delete registration window"),
-                    _("Cancel")
-                ),
-                Intercooler(
-                    request_method='DELETE',
-                    redirect_after=request.link(self.form)
-                )
-            ) if not has_pending_or_confirmed else (
-                Block(
-                    _("This registration window can't be deleted."),
-                    _("There are confirmed or open submissions associated "
-                      "with it. Cancel the registration window first."),
-                    _("Cancel")
+                ) if not has_pending_or_confirmed else (
+                    Block(
+                        _("This registration window can't be deleted."),
+                        _('There are confirmed or open submissions associated '
+                          'with it. Cancel the registration window first.'),
+                        _('Cancel')
+                    )
                 )
             )
         )
-    )
+    else:
+        editbar_links = []
 
     layout.editbar_links = editbar_links
 
@@ -281,12 +303,48 @@ def view_registration_window(
         'model': self,
         'registrations': registrations,
         'groups': (
-            (_("Open"), 'open'),
-            (_("Confirmed"), 'confirmed'),
-            (_("Cancelled"), 'cancelled'),
+            (_('Open'), 'open'),
+            (_('Confirmed'), 'confirmed'),
+            (_('Cancelled'), 'cancelled'),
         ),
         'ticket_link': ticket_link
     }
+
+
+@OrgApp.html(
+    model=FormSubmissionTicket,
+    permission=Private,
+    template='registration_window.pt',
+    name='window'
+)
+def view_registration_window_from_ticket(
+    self: FormSubmissionTicket,
+    request: OrgRequest,
+    layout: TicketLayout | None = None
+) -> RenderData:
+
+    submission = self.handler.submission
+    if not (
+        isinstance(submission, CompleteFormSubmission)
+        and (window := submission.registration_window)
+    ):
+        raise HTTPNotFound()
+
+    if layout is None:
+        layout = TicketLayout(self, request)
+
+    layout.breadcrumbs = [
+        *layout.breadcrumbs[:-1],
+        Link(self.number, request.link(self)),
+        Link(_('Registration Window'), '#')
+    ]
+
+    return view_registration_window(
+        window,
+        request,
+        layout,
+        ticket=self
+    )
 
 
 @OrgApp.form(
@@ -298,12 +356,12 @@ def view_registration_window(
 )
 def handle_edit_registration_form(
     self: FormRegistrationWindow,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormRegistrationWindowForm,
     layout: FormSubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
-    title = _("Edit Registration Window")
+    title = _('Edit Registration Window')
 
     layout = layout or FormSubmissionLayout(self.form, request)
     layout.breadcrumbs.append(Link(title, '#'))
@@ -312,7 +370,7 @@ def handle_edit_registration_form(
     if form.submitted(request):
         form.populate_obj(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self.form))
 
     elif not request.POST:
@@ -333,7 +391,7 @@ def handle_edit_registration_form(
 )
 def view_cancel_submissions_for_registration_window(
     self: FormRegistrationWindow,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
     """ Cancels a bunch of submissions either open ones or already accepted
     ones. If there is a corresponding ticket, it is accepted before denying
@@ -369,12 +427,12 @@ def view_cancel_submissions_for_registration_window(
                 ticket=ticket,
                 request=request,
                 template='mail_ticket_closed.pt',
-                subject=_("Your request has been closed.")
+                subject=_('Your request has been closed.')
             )
         count += 1
     if count:
         request.success(
-            _("${count} submissions cancelled / denied over the ticket system",
+            _('${count} submissions cancelled / denied over the ticket system',
               mapping={'count': count}))
 
 
@@ -385,7 +443,7 @@ def view_cancel_submissions_for_registration_window(
 )
 def delete_registration_window(
     self: FormRegistrationWindow,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -393,4 +451,4 @@ def delete_registration_window(
     self.disassociate()
     request.session.delete(self)
 
-    request.success(_("The registration window was deleted"))
+    request.success(_('The registration window was deleted'))

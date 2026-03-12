@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.models import ElectionCompound
@@ -23,8 +25,8 @@ if TYPE_CHECKING:
 )
 def view_election_compound_seat_allocation_data(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ Retuns the data used for the grouped bar diagram showing the seat
     allocation.
 
@@ -41,12 +43,12 @@ def view_election_compound_seat_allocation_data(
 )
 def view_election_compound_seat_allocation_chart(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the seat allocation as grouped bar chart. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -64,8 +66,8 @@ def view_election_compound_seat_allocation_chart(
 )
 def view_election_compound_seat_allocation(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
     layout = ElectionCompoundLayout(self, request, 'seat-allocation')
@@ -88,8 +90,8 @@ def view_election_compound_seat_allocation(
 )
 def view_election_compound_seat_allocation_svg(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the seat allocation as SVG. """
 
     layout = ElectionCompoundLayout(self, request, 'seat-allocation')
@@ -107,12 +109,12 @@ def view_election_compound_seat_allocation_svg(
 )
 def view_election_compound_seat_allocation_table(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" Displays the seat allocation as standalone table. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     party_years, parties = get_party_results(self)

@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Any
 
 from dectate import directive
 from more.webassets import directives

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import NamedTuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -9,19 +11,19 @@ if TYPE_CHECKING:
 
 class ListGroupsRow(NamedTuple):
     name: str | None
-    voters_count: 'Decimal | int | None'
+    voters_count: Decimal | int | None
     number_of_mandates: int
 
 
 def get_list_groups(
-    election_compound: 'ElectionCompound'
+    election_compound: ElectionCompound
 ) -> list[ListGroupsRow]:
     """" Get list groups data. """
 
     if not election_compound.pukelsheim:
         return []
 
-    def get_voters_count(result: 'PartyResult') -> 'Decimal | int | None':
+    def get_voters_count(result: PartyResult) -> Decimal | int | None:
         if result.voters_count is None:
             return result.voters_count
         if election_compound.exact_voters_counts:
@@ -44,8 +46,8 @@ def get_list_groups(
 
 
 def get_list_groups_data(
-    election_compound: 'ElectionCompound'
-) -> 'JSONObject_ro':
+    election_compound: ElectionCompound
+) -> JSONObject_ro:
     """" Get the list groups bar chart data as JSON. """
 
     results = get_list_groups(election_compound)

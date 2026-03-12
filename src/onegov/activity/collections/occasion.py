@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from onegov.activity.models import Occasion, OccasionDate
 from onegov.activity.types import BoundedIntegerRange
@@ -9,7 +11,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from datetime import datetime
-    from onegov.activity.models import Activity, Period
+    from onegov.activity.models import Activity, BookingPeriod
 
 
 class OccasionCollection(GenericCollection[Occasion]):
@@ -30,16 +32,16 @@ class OccasionCollection(GenericCollection[Occasion]):
 
     def add(  # type:ignore[override]
         self,
-        activity: 'Activity',
-        period: 'Period',
-        start: 'datetime',
-        end: 'datetime',
+        activity: Activity,
+        period: BookingPeriod,
+        start: datetime,
+        end: datetime,
         timezone: str,
         meeting_point: str | None = None,
-        age: 'Sequence[int] | None' = None,
-        spots: 'Sequence[int] | None' = None,
+        age: Sequence[int] | None = None,
+        spots: Sequence[int] | None = None,
         note: str | None = None,
-        cost: Decimal = Decimal(0),  # noqa: B008
+        cost: Decimal = Decimal(0),
         exclude_from_overlap_check: bool = False
     ) -> Occasion:
 
@@ -61,8 +63,8 @@ class OccasionCollection(GenericCollection[Occasion]):
     def add_date(
         self,
         occasion: Occasion,
-        start: 'datetime',
-        end: 'datetime',
+        start: datetime,
+        end: datetime,
         timezone: str
     ) -> OccasionDate:
 
@@ -83,8 +85,8 @@ class OccasionCollection(GenericCollection[Occasion]):
     def find_date(
         self,
         occasion: Occasion,
-        start: 'datetime',
-        end: 'datetime',
+        start: datetime,
+        end: datetime,
         timezone: str
     ) -> OccasionDate | None:
 

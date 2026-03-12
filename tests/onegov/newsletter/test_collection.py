@@ -1,19 +1,27 @@
+from __future__ import annotations
+
 import pytest
 
+from markupsafe import Markup
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.newsletter.errors import AlreadyExistsError
 
 
-def test_newsletter_collection(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_newsletter_collection(session: Session) -> None:
 
     newsletters = NewsletterCollection(session)
-    n = newsletters.add("My Newsletter", "<h1>My Newsletter</h1>")
+    n = newsletters.add("My Newsletter", Markup("<h1>My Newsletter</h1>"))
 
     assert n.name == "my-newsletter"
     assert n.title == "My Newsletter"
     assert n.html == "<h1>My Newsletter</h1>"
 
-    n = newsletters.by_name('my-newsletter')
+    n = newsletters.by_name('my-newsletter')  # type: ignore[assignment]
 
     assert n.name == "my-newsletter"
     assert n.title == "My Newsletter"
@@ -24,7 +32,7 @@ def test_newsletter_collection(session):
     assert newsletters.by_name('my-newsletter') is None
 
 
-def test_recipient_collection(session):
+def test_recipient_collection(session: Session) -> None:
 
     recipients = RecipientCollection(session)
     r1 = recipients.add("info@example.org", confirmed=True)
@@ -38,7 +46,7 @@ def test_recipient_collection(session):
     assert r2.group == 'tech'
     assert not r2.confirmed
 
-    r1 = recipients.by_id(r1.id)
+    r1 = recipients.by_id(r1.id)  # type: ignore[assignment]
 
     assert r1.address == "info@example.org"
     assert r1.group is None
@@ -48,7 +56,7 @@ def test_recipient_collection(session):
 
     assert recipients.ordered_by_status_address().all() == [r2, r1]
 
-    r1 = recipients.by_address('info@example.org')
+    r1 = recipients.by_address('info@example.org')  # type: ignore[assignment]
 
     assert r1.address == "info@example.org"
     assert r1.group is None
@@ -62,12 +70,12 @@ def test_recipient_collection(session):
     assert recipients.count() == 0
 
 
-def test_newsletter_already_exists(session):
+def test_newsletter_already_exists(session: Session) -> None:
 
     newsletters = NewsletterCollection(session)
-    newsletters.add("My Newsletter", "<h1>My Newsletter</h1>")
+    newsletters.add("My Newsletter", Markup("<h1>My Newsletter</h1>"))
 
     with pytest.raises(AlreadyExistsError) as e:
-        newsletters.add("My Newsletter", "<h1>My Newsletter</h1>")
+        newsletters.add("My Newsletter", Markup("<h1>My Newsletter</h1>"))
 
     assert e.value.args == ('my-newsletter', )

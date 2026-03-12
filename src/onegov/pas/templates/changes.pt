@@ -1,0 +1,42 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="medium-7 cell main-content">
+                <p tal:condition="not:changes" i18n:translate="">No changes yet.</p>
+                <table tal:condition="changes" class="changes">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>Timestamp</th>
+                            <th i18n:translate>User</th>
+                            <th i18n:translate>Action</th>
+                            <th i18n:translate>Date</th>
+                            <th i18n:translate>Parliamentarian</th>
+                            <th i18n:translate>Comission</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:repeat="change changes">
+                            <td><a href="${request.link(change)}">${layout.format_date(change.last_change, 'datetime')}</a></td>
+                            <td>${change.user}</td>
+                            <td>${change.action_label}</td>
+                            <td><tal:block tal:condition="change.date">${layout.format_date(change.date, 'date')}</tal:block></td>
+                            <td tal:define="parliamentarian_id change.changes.get('parliamentarian_id'); parliamentarian parliamentarians.get(parliamentarian_id)">
+                                <tal:block tal:condition="parliamentarian">${parliamentarian.title}</tal:block>
+                            </td>
+                            <td tal:define="commission_id change.changes.get('commission_id'); commission commissions.get(commission_id)">
+                                <tal:block tal:condition="commission">${commission.title}</tal:block>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+            </div>
+        </div>
+
+    </tal:b>
+</div>

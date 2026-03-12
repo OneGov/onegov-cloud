@@ -1,30 +1,29 @@
+from __future__ import annotations
+
+from datetime import datetime
 from email_validator import validate_email
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import (
-    ContentMixin, TimestampMixin, content_property, dict_property)
-from onegov.core.orm.types import UTCDateTime, UUID
+    content_property, dict_markup_property, dict_property,
+    ContentMixin, TimestampMixin)
 from onegov.core.utils import normalize_for_url
 from onegov.search import SearchableContent
 from sqlalchemy import and_
-from sqlalchemy import Boolean
 from sqlalchemy import column
+from sqlalchemy import not_
+from sqlalchemy import select
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
-from sqlalchemy import not_
-from sqlalchemy import select
 from sqlalchemy import Table
 from sqlalchemy import Text
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import object_session, validates, relationship
+from sqlalchemy import UUID as UUIDType
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from sqlalchemy.orm import object_session, validates
+from translationstring import TranslationString
 from uuid import uuid4
-
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    import uuid
-    from datetime import datetime
+from uuid import UUID
 
 
 # Newsletters and recipients are joined in a many to many relationship
@@ -32,7 +31,7 @@ newsletter_recipients = Table(
     'newsletter_recipients',
     Base.metadata,
     Column('newsletter_id', Text, ForeignKey('newsletters.name')),
-    Column('recipient_id', UUID, ForeignKey('recipients.id'))
+    Column('recipient_id', UUIDType(as_uuid=True), ForeignKey('recipients.id'))
 )
 
 
@@ -47,60 +46,74 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
 
     __tablename__ = 'newsletters'
 
-    es_id = 'name'
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'html': {'type': 'localized_html'}
+    # HACK: We don't want to set up translations in this module for this single
+    #       string, we know we already have a translation in a different domain
+    #       so we just manually specify it for now.
+    fts_type_title = TranslationString('Newsletter', domain='onegov.org')
+    fts_id = 'name'
+    fts_title_property = 'title'
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        'html': {'type': 'localized', 'weight': 'C'}
     }
 
     @property
-    def es_public(self) -> bool:
+    def fts_public(self) -> bool:
         return self.sent is not None
 
     #: the name of the newsletter, derived from the title
-    name: 'Column[str]' = Column(Text, nullable=False, primary_key=True)
+    name: Mapped[str] = mapped_column(primary_key=True)
 
     @validates('name')
     def validate_name(self, key: str, name: str) -> str:
         assert normalize_for_url(name) == name, (
-            "The given name was not normalized"
+            'The given name was not normalized'
         )
 
         return name
 
     #: the title of the newsletter
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: the optional lead or editorial of the newsletter
-    lead: 'Column[str | None]' = Column(Text, nullable=True)
+    lead: Mapped[str | None]
 
     #: the content of the newsletter in html, this is not just the partial
     #: content, but the actual, fully rendered html content.
-    html: 'Column[str]' = Column(Text, nullable=False)
+    html: Mapped[str]
+
+    #: the closing remark of the newsletter
+    closing_remark = dict_markup_property('content')
 
     #: null if not sent yet, otherwise the date this newsletter was first sent
-    sent: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+    sent: Mapped[datetime | None]
 
     #: time the newsletter is scheduled to be sent (in UTC)
-    scheduled: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+    scheduled: Mapped[datetime | None]
 
     #: the recipients of this newsletter, meant in part as a tracking feature
     #: to answer the question "who got which newsletters?" - for this to work
     #: the user of onegov.newsletter has to make sure that sent out
     #: newsletters can't have actual recipients removed from them.
     #: onegov.newsletter does not make any guarantees here
-    recipients: 'relationship[list[Recipient]]' = relationship(
-        'Recipient',
+    recipients: Mapped[list[Recipient]] = relationship(
         secondary=newsletter_recipients,
-        back_populates='newsletters')
+        back_populates='newsletters'
+    )
+
+    #: whether the newsletter should only show previews instead of full text
+    show_only_previews: Mapped[bool] = mapped_column(default=True)
 
     @property
-    def open_recipients(self) -> tuple['Recipient', ...]:
-        received = select([newsletter_recipients.c.recipient_id]).where(
+    def open_recipients(self) -> tuple[Recipient, ...]:
+        session = object_session(self)
+        assert session is not None
+
+        received = select(newsletter_recipients.c.recipient_id).where(
             newsletter_recipients.c.newsletter_id == self.name)
 
-        return tuple(object_session(self).query(Recipient).filter(
+        return tuple(session.query(Recipient).filter(
             and_(
                 not_(
                     Recipient.id.in_(received)
@@ -109,10 +122,11 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
             )
         ))
 
-    show_news_as_tiles: dict_property[bool] = content_property(default=True)
+    #: categories the newsletter reports on
+    newsletter_categories: dict_property[list[str] | None] = content_property()
 
 
-class Recipient(Base, TimestampMixin):
+class Recipient(Base, TimestampMixin, ContentMixin):
     """ Represents a single recipient.
 
     Recipients may be grouped by any kind of string. Only inside their groups
@@ -126,14 +140,13 @@ class Recipient(Base, TimestampMixin):
     __tablename__ = 'recipients'
 
     #: the id of the recipient, used in the url
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the email address of the recipient, unique per group
-    address: 'Column[str]' = Column(Text, nullable=False)
+    address: Mapped[str]
 
     @validates('address')
     def validate_address(self, key: str, address: str) -> str:
@@ -141,38 +154,69 @@ class Recipient(Base, TimestampMixin):
         return address
 
     #: the recipient group, a freely choosable string - may be null
-    group: 'Column[str | None]' = Column(Text, nullable=True)
+    group: Mapped[str | None]
 
     #: the newsletters that this recipient received
-    newsletters: 'relationship[list[Newsletter]]' = relationship(
-        'Newsletter',
+    newsletters: Mapped[list[Newsletter]] = relationship(
         secondary=newsletter_recipients,
-        back_populates='recipients')
+        back_populates='recipients'
+    )
 
     #: this token is used for confirm and unsubscribe
-    token: 'Column[str]' = Column(Text, nullable=False, default=random_token)
+    token: Mapped[str] = mapped_column(default=random_token)
 
     #: when recipients are added, they are unconfirmed. At this point they get
     #: one e-mail with a confirmation link. If they ignore said e-mail they
     #: should not get another one.
-    confirmed: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    confirmed: Mapped[bool] = mapped_column(default=False)
 
-    @declared_attr
-    def __table_args__(cls) -> tuple[Index, ...]:
-        return (
-            Index(
-                'recipient_address_in_group', 'address', 'group',
-                unique=True, postgresql_where=column('group') != None
-            ),
-            Index(
-                'recipient_address_without_group', 'address',
-                unique=True, postgresql_where=column('group') == None
-            ),
-        )
+    #: subscribed newsletter categories. For legacy reasons, no selection
+    # means all topics are subscribed to.
+    subscribed_categories: dict_property[list[str] | None] = content_property()
+
+    daily_newsletter: Mapped[bool] = mapped_column(default=False)
+
+    __table_args__ = (
+        Index(
+            'recipient_address_in_group', 'address', 'group',
+            unique=True, postgresql_where=column('group') != None
+        ),
+        Index(
+            'recipient_address_without_group', 'address',
+            unique=True, postgresql_where=column('group') == None
+        ),
+    )
 
     @property
-    def subscription(self) -> 'Subscription':
+    def subscription(self) -> Subscription:
         return Subscription(self, self.token)
+
+    @property
+    def is_inactive(self) -> bool:
+        """
+        Checks if the recipient's email address is marked as inactive.
+
+        Returns:
+            bool: True if the email address is marked as inactive, False
+            otherwise.
+        """
+        return self.meta.get('inactive', False)
+
+    def mark_inactive(self) -> None:
+        """
+        Marks the recipient's email address as inactive.
+
+        This method sets the 'inactive' flag in the recipient's metadata to
+        True. It is typically used when a bounce event causes the email
+        address to be deactivated by Postmark.
+        """
+        self.meta['inactive'] = True
+
+    def reactivate(self) -> None:
+        """
+        Marks a previously `inactive` recipient as active again.
+        """
+        self.meta['inactive'] = False
 
 
 class Subscription:
@@ -183,7 +227,7 @@ class Subscription:
         self.token = token
 
     @property
-    def recipient_id(self) -> 'uuid.UUID':
+    def recipient_id(self) -> UUID:
         # even though this seems redundant, we need this property
         # for morepath, so it can match it to the path variable
         return self.recipient.id
@@ -204,6 +248,7 @@ class Subscription:
             return True
 
         session = object_session(self.recipient)
+        assert session is not None
         session.delete(self.recipient)
         session.flush()
 

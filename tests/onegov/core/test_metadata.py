@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.framework import Framework
 from webtest import TestApp as Client
 
 
-def test_metadata(redis_url):
+def test_metadata(redis_url: str) -> None:
 
     class App(Framework):
         pass

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.security import Public
@@ -19,8 +21,8 @@ if TYPE_CHECKING:
 @OnboardingApp.view(model=DefaultAssistant, permission=Public)
 def view_default_assistant(
     self: DefaultAssistant,
-    request: 'CoreRequest'
-) -> 'Response':
+    request: CoreRequest
+) -> Response:
     return morepath.redirect(request.link(self.assistant))
 
 
@@ -32,9 +34,9 @@ def view_default_assistant(
 )
 def view_assistant(
     self: Assistant,
-    request: 'CoreRequest',
-    form: 'Form | None'
-) -> 'RenderData | Response':
+    request: CoreRequest,
+    form: Form | None
+) -> RenderData | Response:
 
     # usually this is morepath's job, but we're doing some funny things here ;)
     if form is None and request.method == 'POST':
@@ -50,8 +52,8 @@ def view_assistant(
             response['form'] = form
 
         if self.is_last_step:
-            response['button_text'] = _("Launch")
+            response['button_text'] = _('Launch')
         else:
-            response['button_text'] = _("Continue")
+            response['button_text'] = _('Continue')
 
     return response

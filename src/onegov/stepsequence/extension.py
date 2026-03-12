@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from onegov.stepsequence import step_sequences
@@ -21,14 +23,14 @@ class StepsModelExtension:
     def get_step_sequence(
         self,
         position: int | None = None
-    ) -> list['Step']:
+    ) -> list[Step]:
         step = self.registered_steps().get(
             position=position or self.step_position
         )
         return step and step_sequences.by_id(step.id) or []
 
     @classmethod
-    def registered_steps(cls) -> 'StepCollection':
+    def registered_steps(cls) -> StepCollection:
         return step_sequences.registry[cls.__name__]
 
 
@@ -47,13 +49,13 @@ class StepsLayoutExtension:
         raise NotImplementedError
 
     @cached_property
-    def registered_steps(self) -> 'StepCollection':
+    def registered_steps(self) -> StepCollection:
         return step_sequences.registry[self.__class__.__name__]
 
     def get_step_sequence(
         self,
         position: int | None = None
-    ) -> list['Step']:
+    ) -> list[Step]:
         """ Retrieve the full step sequence for the current model.
         If the latter has multiple steps registered, you must provide
         the position or a ValueError gets raised.

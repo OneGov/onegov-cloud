@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.collection import Pagination
 from onegov.election_day.models import ElectionCompound
 from sqlalchemy import cast
@@ -11,7 +13,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
 
 
 class ElectionCompoundCollection(Pagination[ElectionCompound]):
@@ -20,7 +22,7 @@ class ElectionCompoundCollection(Pagination[ElectionCompound]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
         year: int | None = None
     ):
@@ -34,7 +36,7 @@ class ElectionCompoundCollection(Pagination[ElectionCompound]):
 
         return self.year == other.year and self.page == other.page
 
-    def subset(self) -> 'Query[ElectionCompound]':
+    def subset(self) -> Query[ElectionCompound]:
         query = self.query()
         query = query.order_by(
             desc(ElectionCompound.date),
@@ -52,13 +54,13 @@ class ElectionCompoundCollection(Pagination[ElectionCompound]):
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(self.session, index, self.year)
 
-    def for_year(self, year: int | None) -> 'Self':
+    def for_year(self, year: int | None) -> Self:
         return self.__class__(self.session, 0, year)
 
-    def query(self) -> 'Query[ElectionCompound]':
+    def query(self) -> Query[ElectionCompound]:
         return self.session.query(ElectionCompound)
 
     def get_latest(self) -> list[ElectionCompound] | None:
@@ -80,7 +82,7 @@ class ElectionCompoundCollection(Pagination[ElectionCompound]):
 
         return [year for year, in query]
 
-    def by_date(self, date: 'date') -> list[ElectionCompound]:
+    def by_date(self, date: date) -> list[ElectionCompound]:
         """ Returns the election compounds on the given date. """
 
         query = self.query()

@@ -3,7 +3,7 @@ from collections.abc import Callable, Iterator
 from typing import ClassVar, TypeVar, overload
 
 from transaction._transaction import Savepoint, Transaction
-from transaction.interfaces import ISynchronizer, ITransactionManager, _Attempt
+from transaction.interfaces import ISynchronizer
 
 _T = TypeVar("_T")
 

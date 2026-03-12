@@ -1,0 +1,11 @@
+# Error: is inconsistent
+# ======================
+# Reportlab and pdfdocument are inconsistent about the argument names
+# of these functions, so we treat them as positional only
+pdfdocument.document.BottomSpacer.wrap
+
+# Error: failed to find stubs
+# ======================
+# these modules only work with django installed, we don't want them
+pdfdocument.elements
+pdfdocument.utils

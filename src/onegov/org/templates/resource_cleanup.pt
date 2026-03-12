@@ -3,8 +3,8 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="panel" i18n:translate>
-            Removes all unreserved allocations between the start and end date.
+        <div class="panel callout" i18n:translate>
+            Removes all unreserved allocations between the start and end date. This includes allocations that were created by using an availability period. To recreate these allocations, click on "edit" in the availability period and then "save" without changing anything.
         </div>
         <div class="row">
             <div class="small-12 medium-8 large-6 columns">

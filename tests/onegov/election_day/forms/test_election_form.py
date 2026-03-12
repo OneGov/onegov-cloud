@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from cgi import FieldStorage
 from datetime import date
 from io import BytesIO
@@ -11,11 +13,18 @@ from tests.onegov.election_day.common import DummyRequest
 from wtforms.validators import InputRequired
 
 
-def test_election_form_on_request(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from io import BytesIO
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
+def test_election_form_on_request(session: Session) -> None:
     form = ElectionForm()
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'de_CH'
-    form.request.app.principal = Canton(name='zg', canton='zg')
+    form.request.app.principal = Canton(name='zg', canton='zg')  # type: ignore[misc]
     form.on_request()
     assert [x[0] for x in form.domain.choices] == [
         'federation', 'canton', 'none', 'municipality'
@@ -29,9 +38,9 @@ def test_election_form_on_request(session):
     assert form.title_rm.validators == []
 
     form = ElectionForm()
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'fr_CH'
-    form.request.app.principal = Canton(name='sg', canton='sg')
+    form.request.app.principal = Canton(name='sg', canton='sg')  # type: ignore[misc]
     form.on_request()
     assert [x[0] for x in form.domain.choices] == [
         'federation', 'canton', 'district', 'none', 'municipality'
@@ -45,9 +54,9 @@ def test_election_form_on_request(session):
     assert form.title_rm.validators == []
 
     form = ElectionForm()
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'it_CH'
-    form.request.app.principal = Canton(name='gr', canton='gr')
+    form.request.app.principal = Canton(name='gr', canton='gr')  # type: ignore[misc]
     form.on_request()
     assert [x[0] for x in form.domain.choices] == [
         'federation', 'canton', 'region', 'district', 'none', 'municipality'
@@ -61,9 +70,9 @@ def test_election_form_on_request(session):
     assert form.title_rm.validators == []
 
     form = ElectionForm()
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'rm_CH'
-    form.request.app.principal = Municipality(
+    form.request.app.principal = Municipality(  # type: ignore[misc]
         name='bern', municipality='351',
         canton='be', canton_name='Kanton Bern'
     )
@@ -80,8 +89,12 @@ def test_election_form_on_request(session):
     assert isinstance(form.title_rm.validators[0], InputRequired)
 
 
-def test_election_form_model(election_day_app_zg, related_link_labels,
-                             explanations_pdf):
+def test_election_form_model(
+    election_day_app_zg: TestApp,
+    related_link_labels: dict[str, str],
+    explanations_pdf: BytesIO
+) -> None:
+
     session = election_day_app_zg.session()
 
     model = Election()
@@ -126,7 +139,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
 
     form = ElectionForm()
     form.apply_model(model)
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
 
     assert form.id.data == 'election'
     assert form.external_id.data == '740'
@@ -149,7 +162,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     assert form.related_link_label_fr.data == 'FR'
     assert form.related_link_label_it.data == 'IT'
     assert form.related_link_label_rm.data == 'RM'
-    assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
+    assert form.explanations_pdf.data['mimetype'] == 'application/pdf'  # type: ignore[index]
     assert form.tacit.data is False
     assert form.has_expats.data is False
     assert form.voters_counts.data is False
@@ -199,6 +212,8 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     )
     form.update_model(model)
 
+    # undo mypy narrowing
+    model = model
     assert form.id.data == 'an-election'
     assert form.external_id.data == '710'
     assert model.title == 'An Election (DE)'
@@ -246,16 +261,17 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     assert model.domain_segment == 'm1'
 
     # Update supersegment
-    form.request.app.principal = Canton('bl')
+    form.request.app.principal = Canton('bl')  # type: ignore[misc]
     form.domain.data = 'region'
     form.date.data = date(2022, 1, 1)
     form.region.data = 'Reinach'
     form.update_model(model)
+    # undo mypy narrowing
+    model = model
     assert model.domain == 'region'
     assert model.domain_segment == 'Reinach'
     assert model.domain_supersegment == 'Region 2'
 
-    form.explanations_pdf.action = 'upload'
 
     field_storage = FieldStorage()
     field_storage.file = BytesIO('my-file'.encode())
@@ -267,12 +283,15 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
 
     form.update_model(model)
 
+    # undo mypy narrowing
+    model = model
+    assert model.explanations_pdf is not None
     assert model.explanations_pdf.name == 'explanations_pdf'
     assert model.explanations_pdf.reference.filename == 'my-file.pdf'
     assert model.explanations_pdf.reference.file.read() == b'my-file'
 
 
-def test_election_form_validate(session):
+def test_election_form_validate(session: Session) -> None:
     model = Election(
         id='election',
         title='Election',
@@ -302,9 +321,9 @@ def test_election_form_validate(session):
     session.flush()
 
     form = ElectionForm()
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'de_CH'
-    form.request.app.principal = Canton(name='be', canton='be')
+    form.request.app.principal = Canton(name='be', canton='be')  # type: ignore[misc]
     form.on_request()
     form.apply_model(model)
     assert form.id.data == 'election'
@@ -320,9 +339,9 @@ def test_election_form_validate(session):
     }
 
     form = ElectionForm(DummyPostData({'id': 'election copy'}))
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'de_CH'
-    form.request.app.principal = Canton(name='be', canton='be')
+    form.request.app.principal = Canton(name='be', canton='be')  # type: ignore[misc]
     form.on_request()
     form.model = model
     assert not form.validate()
@@ -331,9 +350,9 @@ def test_election_form_validate(session):
     form = ElectionForm(
         DummyPostData({'id': 'election-copy', 'external_id': 'ext-1'})
     )
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'de_CH'
-    form.request.app.principal = Canton(name='be', canton='be')
+    form.request.app.principal = Canton(name='be', canton='be')  # type: ignore[misc]
     form.on_request()
     form.model = model
     assert not form.validate()
@@ -341,9 +360,9 @@ def test_election_form_validate(session):
     assert form.errors['external_id'] == ['ID already exists']
 
     form = ElectionForm(DummyPostData({'external_id': 'ext-2'}))
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'de_CH'
-    form.request.app.principal = Canton(name='be', canton='be')
+    form.request.app.principal = Canton(name='be', canton='be')  # type: ignore[misc]
     form.on_request()
     form.model = model
     assert not form.validate()
@@ -358,9 +377,9 @@ def test_election_form_validate(session):
         'majority_type': 'absolute',
         'mandates': 1,
     }))
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'de_CH'
-    form.request.app.principal = Canton(name='be', canton='be')
+    form.request.app.principal = Canton(name='be', canton='be')  # type: ignore[misc]
     form.on_request()
     form.model = model
     assert form.validate()
@@ -369,7 +388,7 @@ def test_election_form_validate(session):
     assert session.query(Election).filter_by(id='election-new').one()
 
 
-def test_election_form_relations(session):
+def test_election_form_relations(session: Session) -> None:
     session.add(
         Election(
             title="First Election",
@@ -389,8 +408,8 @@ def test_election_form_relations(session):
     election = Election()
 
     form = ElectionForm()
-    form.request = DummyRequest(session=session)
-    form.request.app.principal = Canton(name='gr', canton='gr')
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
+    form.request.app.principal = Canton(name='gr', canton='gr')  # type: ignore[misc]
     form.on_request()
     assert form.related_elections_historical.choices == [
         ('second-election', '02.01.2011 Second Election'),
@@ -416,8 +435,8 @@ def test_election_form_relations(session):
     election = session.query(Election).filter_by(id='first-election').one()
 
     form = ElectionForm()
-    form.request = DummyRequest(session=session)
-    form.request.app.principal = Canton(name='gr', canton='gr')
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
+    form.request.app.principal = Canton(name='gr', canton='gr')  # type: ignore[misc]
     form.on_request()
     assert form.related_elections_historical.choices == [
         ('third-election', '03.01.2011 SC Third Election'),

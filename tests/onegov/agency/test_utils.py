@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from markupsafe import Markup
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedPerson
 from onegov.agency.utils import emails_for_new_ticket
@@ -9,9 +12,16 @@ from onegov.user.models import User
 from onegov.user.models import UserGroup
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from email.headerregistry import Address
+    from onegov.agency import AgencyApp
+
+
 # helper function to create an easier to check data structure
 # from the output of emails_for_new_ticket
-def condense(emails):
+def condense(emails: Iterable[Address]) -> set[str]:
     result = set()
     for addr in emails:
         # make sure deduplication worked
@@ -20,13 +30,13 @@ def condense(emails):
     return result
 
 
-def test_emails_for_new_ticket_AGN(agency_app):
+def test_emails_for_new_ticket_AGN(agency_app: AgencyApp) -> None:
     session = agency_app.session()
 
     agency = ExtendedAgency(
         title="Test Agency",
         name="test-agency",
-        portrait="This is a test\nagency."
+        portrait=Markup("This is a test\nagency.")
     )
     user_1 = User(
         username='user1@example.org',
@@ -48,17 +58,17 @@ def test_emails_for_new_ticket_AGN(agency_app):
     session.add_all((agency, user_1, user_2, user_3, group_1, group_2))
     session.flush()
 
-    user_1.group = group_1
-    user_2.group = group_1
-    user_3.group = group_2
+    user_1.groups = [group_1]
+    user_2.groups = [group_1]
+    user_3.groups = [group_2]
 
-    request_1 = Bunch(
+    request_1: Any = Bunch(
         app=agency_app,
         email_for_new_tickets=None
     )
     # this request has a notification email configured that happens
     # to match the email for user_1 to test deduplication
-    request_2 = Bunch(
+    request_2: Any = Bunch(
         app=agency_app,
         email_for_new_tickets='user1@example.org'
     )
@@ -127,18 +137,18 @@ def test_emails_for_new_ticket_AGN(agency_app):
     }
 
 
-def test_emails_for_new_ticket_PER(agency_app):
+def test_emails_for_new_ticket_PER(agency_app: AgencyApp) -> None:
     session = agency_app.session()
 
     agency_1 = ExtendedAgency(
         title="Test Agency 1",
         name="test-agency-1",
-        portrait="This is a test\nagency."
+        portrait=Markup("This is a test\nagency.")
     )
     agency_2 = ExtendedAgency(
         title="Test Agency 2",
         name="test-agency-2",
-        portrait="This is a test\nagency."
+        portrait=Markup("This is a test\nagency.")
     )
     person = ExtendedPerson(
         first_name='A',
@@ -167,13 +177,13 @@ def test_emails_for_new_ticket_PER(agency_app):
     group_2.meta = {'immediate_notification': 'yes'}
     agency_1.add_person(person.id, "Staff", since="2012", note="N", prefix="*")
     agency_2.add_person(person.id, "Staff", since="2012", note="N", prefix="*")
-    user_1.group = group_1
-    user_2.group = group_2
+    user_1.groups = [group_1]
+    user_2.groups = [group_2]
 
     # we don't test email_for_new_tickets deduplication here too
     # since that is in the same code path for agencies, we instead
     # test deduplication between multiple agencies
-    request = Bunch(
+    request: Any = Bunch(
         app=agency_app,
         email_for_new_tickets=None
     )
@@ -248,7 +258,86 @@ def test_emails_for_new_ticket_PER(agency_app):
     }
 
 
-def test_get_html_paragraph_with_line_breaks():
+def test_emails_for_new_ticket_parent_agency(agency_app: AgencyApp) -> None:
+    session = agency_app.session()
+
+    parent_agency = ExtendedAgency(
+        title="Test Parent Agency",
+        name="test-parent-agency",
+        portrait=Markup("This is a test\nparent agency.")
+    )
+    agency = ExtendedAgency(
+        title="Test Agency",
+        name="test-agency",
+        portrait=Markup("This is a test\nagency."),
+    )
+    user_1 = User(
+        username='user1@example.org',
+        password_hash='password_hash',
+        role='member',
+    )
+    user_2 = User(
+        username='user2@example.org',
+        password_hash='password_hash',
+        role='member',
+    )
+    user_3 = User(
+        username='user3@example.org',
+        password_hash='password_hash',
+        role='member',
+    )
+    group_1 = UserGroup(name='group1')
+    group_2 = UserGroup(name='group2')
+    session.add_all(
+        (parent_agency, agency, user_1, user_2, user_3, group_1, group_2)
+    )
+    session.flush()
+
+    agency.parent = parent_agency
+    group_1.meta = {'immediate_notification': 'yes'}
+    group_2.meta = {'immediate_notification': 'yes'}
+    user_1.groups = [group_1]
+    user_2.groups = [group_1]
+    user_3.groups = [group_2]
+
+    request: Any = Bunch(
+        app=agency_app,
+        email_for_new_tickets=None
+    )
+    assert condense(emails_for_new_ticket(agency, request)) == set()
+
+    group_mapping = RoleMapping(
+        group_id=group_1.id,
+        content_type='agencies',
+        content_id=str(parent_agency.id),
+        role='editor'
+    )
+    session.add(group_mapping)
+    session.flush()
+
+    # since no groups are mapped to agency, the tickets should
+    # go to the group mapped to agency.parent instead
+    assert condense(emails_for_new_ticket(agency, request)) == {
+        'user1@example.org', 'user2@example.org'
+    }
+
+    # but if we map group 2 to the affected agency then
+    # they should get the notification without the parent
+    # agency being notified
+    group_mapping = RoleMapping(
+        group_id=group_2.id,
+        content_type='agencies',
+        content_id=str(agency.id),
+        role='editor'
+    )
+    session.add(group_mapping)
+    session.flush()
+    assert condense(emails_for_new_ticket(agency, request)) == {
+        'user3@example.org'
+    }
+
+
+def test_get_html_paragraph_with_line_breaks() -> None:
     assert get_html_paragraph_with_line_breaks(None) == ''
     assert get_html_paragraph_with_line_breaks('') == ''
     assert get_html_paragraph_with_line_breaks('Text') == '<p>Text</p>'

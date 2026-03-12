@@ -1,0 +1,23 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+            ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div tal:condition="form.errors" class="callout alert">
+            <p i18n:translate="">Please correct the errors below:</p>
+            <ul>
+                <li tal:repeat="field_errors form.errors.items()">
+                    <strong tal:content="field_errors[0]" />:
+                    <span tal:repeat="error field_errors[1]" tal:content="error" />
+                </li>
+            </ul>
+        </div>
+
+        <div metal:use-macro="layout.macros['form']" />
+
+        <div tal:condition="error_message" class="callout alert import-error">
+            <h4 i18n:translate="">Import Error</h4>
+            <pre tal:content="error_message" />
+        </div>
+    </tal:b>
+</div>

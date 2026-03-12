@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.models import Election
@@ -21,8 +23,8 @@ if TYPE_CHECKING:
 )
 def view_election_lists_panachage_data(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" View the panachage data as JSON. Used to for the panachage sankey
     chart.
 
@@ -39,12 +41,12 @@ def view_election_lists_panachage_data(
 )
 def view_election_lists_panachage_chart(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the panachage data as sankey chart. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -62,8 +64,8 @@ def view_election_lists_panachage_chart(
 )
 def view_election_lists_panachage(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
     layout = ElectionLayout(self, request, 'lists-panachage')
@@ -81,8 +83,8 @@ def view_election_lists_panachage(
 )
 def view_election_lists_panachage_svg(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the panachage as SVG. """
 
     layout = ElectionLayout(self, request, 'lists-panachage')

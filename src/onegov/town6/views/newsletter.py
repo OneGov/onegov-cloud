@@ -1,13 +1,25 @@
+from __future__ import annotations
+
 from onegov.core.security import Public, Private
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import RecipientCollection
 from onegov.org.forms.newsletter import NewsletterSubscriberImportExportForm
 from onegov.org.views.newsletter import (
-    handle_newsletters, view_newsletter, view_subscribers,
-    handle_new_newsletter, get_newsletter_form, edit_newsletter,
-    handle_send_newsletter, handle_test_newsletter, handle_preview_newsletter,
-    export_newsletter_recipients, import_newsletter_recipients)
+    handle_newsletters,
+    view_newsletter,
+    view_subscribers,
+    handle_new_newsletter,
+    handle_paste_newsletter,
+    get_newsletter_form,
+    edit_newsletter,
+    handle_send_newsletter,
+    handle_test_newsletter,
+    handle_preview_newsletter,
+    export_newsletter_recipients,
+    import_newsletter_recipients,
+    handle_update_newsletters_subscription,
+)
 from onegov.town6 import TownApp
 from onegov.org.forms import NewsletterSendForm, ExportForm
 from onegov.org.forms import NewsletterTestForm
@@ -32,10 +44,29 @@ if TYPE_CHECKING:
 )
 def town_handle_newsletters(
     self: NewsletterCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: SignupForm
-) -> 'RenderData':
+) -> RenderData | Response:
     return handle_newsletters(
+        self, request, form, NewsletterLayout(self, request),
+        DefaultMailLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=NewsletterCollection,
+    template='newsletter_collection.pt',
+    permission=Public,
+    name='update',
+    form=SignupForm
+)
+def town_handle_update_newsletters_subscription(
+    self: NewsletterCollection,
+    request: TownRequest,
+    form: SignupForm
+) -> RenderData | Response:
+
+    return handle_update_newsletters_subscription(
         self, request, form, NewsletterLayout(self, request),
         DefaultMailLayout(self, request)
     )
@@ -44,8 +75,8 @@ def town_handle_newsletters(
 @TownApp.html(model=Newsletter, template='newsletter.pt', permission=Public)
 def town_view_newsletter(
     self: Newsletter,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_newsletter(self, request, NewsletterLayout(self, request))
 
 
@@ -56,8 +87,8 @@ def town_view_newsletter(
 )
 def town_view_subscribers(
     self: RecipientCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_subscribers(self, request, RecipientLayout(self, request))
 
 
@@ -65,15 +96,30 @@ def town_view_subscribers(
     model=NewsletterCollection,
     name='new',
     template='form.pt',
-    permission=Public,
+    permission=Private,
     form=get_newsletter_form
 )
 def town_handle_new_newsletter(
     self: NewsletterCollection,
-    request: 'TownRequest',
-    form: 'NewsletterForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: NewsletterForm
+) -> RenderData | Response:
     return handle_new_newsletter(
+        self, request, form, NewsletterLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=NewsletterCollection,
+    name='new-paste',
+    template='form.pt',
+    permission=Private,
+    form=get_newsletter_form,
+)
+def town_handle_paste_newsletter(
+    self: NewsletterCollection, request: TownRequest, form: NewsletterForm
+) -> RenderData | Response:
+    return handle_paste_newsletter(
         self, request, form, NewsletterLayout(self, request))
 
 
@@ -86,9 +132,9 @@ def town_handle_new_newsletter(
 )
 def town_edit_newsletter(
     self: Newsletter,
-    request: 'TownRequest',
-    form: 'NewsletterForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: NewsletterForm
+) -> RenderData | Response:
     return edit_newsletter(
         self, request, form, NewsletterLayout(self, request))
 
@@ -102,9 +148,9 @@ def town_edit_newsletter(
 )
 def town_handle_send_newsletter(
     self: Newsletter,
-    request: 'TownRequest',
+    request: TownRequest,
     form: NewsletterSendForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_send_newsletter(
         self, request, form, NewsletterLayout(self, request))
 
@@ -118,9 +164,9 @@ def town_handle_send_newsletter(
 )
 def town_handle_test_newsletter(
     self: Newsletter,
-    request: 'TownRequest',
+    request: TownRequest,
     form: NewsletterTestForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_test_newsletter(
         self, request, form, NewsletterLayout(self, request))
 
@@ -133,8 +179,8 @@ def town_handle_test_newsletter(
 )
 def town_handle_preview_newsletter(
     self: Newsletter,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return handle_preview_newsletter(
         self, request, DefaultMailLayout(self, request))
 
@@ -148,9 +194,9 @@ def town_handle_preview_newsletter(
 )
 def town_export_newsletter_recipients(
     self: RecipientCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ExportForm,
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return export_newsletter_recipients(
         self, request, form, RecipientLayout(self, request))
 
@@ -164,8 +210,8 @@ def town_export_newsletter_recipients(
 )
 def town_import_newsletter_recipients(
     self: RecipientCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: NewsletterSubscriberImportExportForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return import_newsletter_recipients(
         self, request, form, RecipientLayout(self, request))

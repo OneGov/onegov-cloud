@@ -1,10 +1,17 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.election_day.collections import ListCollection
 from onegov.election_day.models import List
 from onegov.election_day.models import ProporzElection
 
 
-def test_lists(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_lists(session: Session) -> None:
     election = ProporzElection(
         title="Election",
         domain='federation',
@@ -23,5 +30,4 @@ def test_lists(session):
     collection = ListCollection(session)
 
     assert collection.query().count() == 1
-    assert collection.by_id(election.lists[0].id) == \
-        election.lists[0]
+    assert collection.by_id(election.lists[0].id) == election.lists[0]

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Iterable
 from onegov.core.crypto import random_token
 from onegov.core.utils import toggle
@@ -10,7 +12,7 @@ from onegov.user.errors import (
     InvalidActivationTokenError,
     UnknownUserError,
 )
-from sqlalchemy import sql, or_
+from sqlalchemy import or_, exists, text
 
 
 from typing import overload, Any, TypeVar, TYPE_CHECKING
@@ -19,14 +21,14 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.user import UserGroup
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
 _T = TypeVar('_T')
 
 
-MIN_PASSWORD_LENGTH = 8
+MIN_PASSWORD_LENGTH = 10
 
 
 @overload
@@ -48,15 +50,15 @@ def as_set(value: Any) -> set[Any]:
 
 @overload
 def as_dictionary_of_sets(
-    d: 'Mapping[str, _T | Iterable[_T] | None]'
+    d: Mapping[str, _T | Iterable[_T] | None]
 ) -> dict[str, set[_T]]: ...
 
 
 @overload
-def as_dictionary_of_sets(d: 'Mapping[str, Any]') -> dict[str, set[Any]]: ...
+def as_dictionary_of_sets(d: Mapping[str, Any]) -> dict[str, set[Any]]: ...
 
 
-def as_dictionary_of_sets(d: 'Mapping[str, Any]') -> dict[str, set[Any]]:
+def as_dictionary_of_sets(d: Mapping[str, Any]) -> dict[str, set[Any]]:
     return {
         k: (set() if v is None else as_set(v))
         for k, v in d.items()
@@ -73,7 +75,7 @@ class UserCollection:
 
     """
 
-    def __init__(self, session: 'Session', **filters: Any):
+    def __init__(self, session: Session, **filters: Any):
         self.session = session
         self.filters = as_dictionary_of_sets(filters)
 
@@ -83,7 +85,7 @@ class UserCollection:
 
         return self.filters[name]
 
-    def for_filter(self, **filters: Any) -> 'Self':
+    def for_filter(self, **filters: Any) -> Self:
         toggled = {
             key: toggle(self.filters.get(key, set()), value)
             for key, value in filters.items()
@@ -95,7 +97,7 @@ class UserCollection:
 
         return self.__class__(self.session, **toggled)
 
-    def query(self) -> 'Query[User]':
+    def query(self) -> Query[User]:
         """ Returns a query using :class:`onegov.user.models.User`. With
         the current filters applied.
 
@@ -111,10 +113,10 @@ class UserCollection:
 
     def apply_filter(
         self,
-        query: 'Query[User]',
+        query: Query[User],
         key: str,
-        values: 'Collection[Any]'
-    ) -> 'Query[User]':
+        values: Collection[Any]
+    ) -> Query[User]:
 
         if '' in values:
             return query.filter(
@@ -128,10 +130,10 @@ class UserCollection:
 
     def apply_tag_filter(
         self,
-        query: 'Query[User]',
+        query: Query[User],
         key: str,
         values: Iterable[str]
-    ) -> 'Query[User]':
+    ) -> Query[User]:
         return query.filter(or_(
             *(User.data['tags'].contains((v, )) for v in values)
         ))
@@ -147,12 +149,12 @@ class UserCollection:
         realname: str | None = None,
         phone_number: str | None = None,
         signup_token: str | None = None,
-        group: 'UserGroup | None' = None
+        groups: list[UserGroup] | None = None
     ) -> User:
         """ Add a user to the collection.
 
-            The arguments given to this function are the attributes of the
-            :class:`~onegov.user.models.User` class with the same name.
+        The arguments given to this function are the attributes of the
+        :class:`~onegov.user.models.User` class with the same name.
         """
         assert username
         assert password
@@ -165,7 +167,7 @@ class UserCollection:
         #        like phone_number, for SQLAlchemy 2.0 we will probably do
         #        that transformation anyways unless we want to switch all
         #        the models to being dataclasses
-        user = User(  # type:ignore[misc]
+        user = User(
             username=username,
             password=password,
             role=role,
@@ -174,7 +176,7 @@ class UserCollection:
             active=active,
             realname=realname,
             signup_token=signup_token,
-            group_id=group.id if group else None,
+            groups=groups or [],
             phone_number=phone_number
         )
 
@@ -186,14 +188,14 @@ class UserCollection:
     @property
     def tags(self) -> tuple[str, ...]:
         """ All available tags. """
-        records = self.session.execute("""
+        records = self.session.execute(text("""
             SELECT DISTINCT tags FROM (
                 SELECT jsonb_array_elements(data->'tags') AS tags
                 FROM users
             ) AS elements ORDER BY tags
-        """)
+        """))
 
-        return tuple(r[0] for r in records)
+        return tuple(tag for tag, in records)
 
     @property
     def sources(self) -> tuple[str, ...]:
@@ -203,19 +205,17 @@ class UserCollection:
         records = records.filter(User.source.isnot(None))
         records = records.order_by(User.source).distinct()
 
-        # NOTE: We are doing the None check in SQL. So mypy
-        #       doesn't know about it.
-        return tuple(r[0] for r in records)  # type:ignore[misc]
+        return tuple(source for source, in records)
 
     @property
     def usernames(self) -> tuple[tuple[str, str], ...]:
         """ All available usernames. """
-        records = self.session.execute("""
+        records = self.session.execute(text("""
             SELECT username, initcap(realname)
             FROM users ORDER BY COALESCE(initcap(realname), username)
-        """)
+        """))
 
-        return tuple((r[0], r[1]) for r in records)
+        return tuple((username, realname) for username, realname in records)
 
     def usernames_by_tags(self, tags: list[str]) -> tuple[str, ...]:
         """ All usernames where the user's tags match at least one tag
@@ -223,12 +223,12 @@ class UserCollection:
 
         """
 
-        records = self.session.execute("""
+        records = self.session.execute(text("""
             SELECT username FROM users
             WHERE data->'tags' ?| :tags
-        """, {'tags': tags})
+        """), {'tags': tags})
 
-        return tuple(r.username for r in records)
+        return tuple(username for username, in records)
 
     def exists(self, username: str) -> bool:
         """ Returns True if the given username exists.
@@ -238,12 +238,12 @@ class UserCollection:
         care about finding out anything about the user.
 
         """
-        query = self.session.query(sql.exists().where(
+        query = self.session.query(exists().where(
             User.username == username))
 
         return query.scalar()
 
-    def by_id(self, id: 'UUID') -> User | None:
+    def by_id(self, id: UUID) -> User | None:
         """ Returns the user by the internal id.
 
         Use this if you need to refer to a user by path. Usernames are not
@@ -283,19 +283,18 @@ class UserCollection:
         else:
             return None
 
-    def by_roles(self, role: str, *roles: str) -> 'Query[User]':
+    def by_roles(self, role: str, *roles: str) -> Query[User]:
         """ Queries the users by roles. """
-        roles_list = [role] + list(roles)
-        return self.query().filter(User.role.in_(roles_list))
+        return self.query().filter(User.role.in_([role, *roles]))
 
-    def by_signup_token(self, signup_token: str) -> 'Query[User]':
+    def by_signup_token(self, signup_token: str) -> Query[User]:
         return self.query().filter_by(signup_token=signup_token)
 
     def register(
         self,
         username: str,
         password: str,
-        request: 'CoreRequest',
+        request: CoreRequest,
         role: str = 'member',
         signup_token: str | None = None
     ) -> User:
@@ -321,9 +320,9 @@ class UserCollection:
             raise InsecurePasswordError()
 
         if self.by_username(username):
-            raise ExistingUserError("{} already exists".format(username))
+            raise ExistingUserError('{} already exists'.format(username))
 
-        log.info("Registration by {} ({})".format(
+        log.info('Registration by {} ({})'.format(
             request.client_addr, username))
 
         return self.add(
@@ -345,13 +344,13 @@ class UserCollection:
         user = self.by_username(username)
 
         if not user:
-            raise UnknownUserError(f"{username} does not exist")
+            raise UnknownUserError(f'{username} does not exist')
 
         if user.active:
-            raise AlreadyActivatedError(f"{username} already active")
+            raise AlreadyActivatedError(f'{username} already active')
 
         if user.data.get('activation_token', object()) != token:
-            raise InvalidActivationTokenError(f"{token} is invalid")
+            raise InvalidActivationTokenError(f'{token} is invalid')
 
         del user.data['activation_token']
         user.active = True
@@ -391,7 +390,7 @@ class UserCollection:
         user = self.by_username(username)
 
         if not user:
-            raise UnknownUserError("user {} does not exist".format(username))
+            raise UnknownUserError('user {} does not exist'.format(username))
 
         self.session.delete(user)
         self.session.flush()

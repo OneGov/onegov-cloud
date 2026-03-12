@@ -8,9 +8,8 @@
                 <div class="row">
                     <div class="columns small-12">
                         <div class="tab-navigation clearfix" tal:condition="layout.menu">
-                            <nav class="top-bar clearfix" data-topbar data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
-                                <section class="top-bar-section">
-                                    <ul class="left">
+                                <section class="ticket-filters">
+                                    <ul class="menu">
                                         <tal:b repeat="(title, link, active) layout.menu">
                                             <li tal:attributes="class python: 'active' if active else ''">
                                                 <a href="${link}">${title}</a>
@@ -18,7 +17,6 @@
                                         </tal:b>
                                     </ul>
                                 </section>
-                            </nav>
                         </div>
 
                         <strong tal:condition="not: has_entries" i18n:translate>No attendees in the database</strong>
@@ -29,9 +27,6 @@
                                     <th i18n:translate="">Family name, surname</th>
                                     <th i18n:translate="">Email</th>
                                     <th i18n:translate="" tal:condition="not: layout.model.external_only">Organisation</th>
-<!--?                                    <th i18n:translate="">All Open Subscriptions</th>-->
-<!--?                                    <th i18n:translate="">Confirmed Open Subscriptions</th>-->
-<!--?                                    <th i18n:translate="">Total Course Events done</th>-->
                                     <th i18n:translate="" tal:condition="layout.model.unfiltered">External</th>
 
                                 </thead>
@@ -57,10 +52,8 @@
                                 </tbody>
                             </table>
 
-                            <div class="pagination-centered">
-                                <div metal:use-macro="layout.macros['pagination']" tal:define="
-                                collection model; current_page model;" />
-                            </div>
+                            <div metal:use-macro="layout.macros['pagination']" tal:define="
+                            collection model; current_page model; pagination_centered True" />
 
                         </tal:b>
                     </div>

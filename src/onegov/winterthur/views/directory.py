@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.winterthur import WinterthurApp
 from onegov.org.views import directory as base
@@ -18,8 +20,8 @@ if TYPE_CHECKING:
 
 def get_directory_form_class(
     model: DirectoryCollection[Any] | ExtendedDirectoryEntryCollection,
-    request: 'WinterthurRequest'
-) -> type['DirectoryForm']:
+    request: WinterthurRequest
+) -> type[DirectoryForm]:
     forms = [base.get_directory_form_class(model, request)]
     registry = request.app.config.directory_search_widget_registry
 
@@ -36,7 +38,7 @@ def get_directory_form_class(
 
         def populate_obj(
             self,
-            obj: 'ExtendedDirectory',
+            obj: ExtendedDirectory,
             *args: Any,
             **kwargs: Any
         ) -> None:
@@ -49,7 +51,7 @@ def get_directory_form_class(
             for name, fields in widget_fields.items():
                 config[name] = {f: self.data[f] for f in fields}
 
-        def process_obj(self, obj: 'ExtendedDirectory') -> None:
+        def process_obj(self, obj: ExtendedDirectory) -> None:
             nonlocal widget_fields
 
             super().process_obj(obj)
@@ -73,9 +75,9 @@ def get_directory_form_class(
 )
 def handle_new_directory(
     self: DirectoryCollection[Any],
-    request: 'WinterthurRequest',
-    form: 'DirectoryForm'
-) -> 'RenderData | Response':
+    request: WinterthurRequest,
+    form: DirectoryForm
+) -> RenderData | Response:
     return base.handle_new_directory(self, request, form)
 
 
@@ -86,7 +88,7 @@ def handle_new_directory(
 )
 def handle_edit_directory(
     self: ExtendedDirectoryEntryCollection,
-    request: 'WinterthurRequest',
-    form: 'DirectoryForm'
-) -> 'RenderData | Response':
+    request: WinterthurRequest,
+    form: DirectoryForm
+) -> RenderData | Response:
     return base.handle_edit_directory(self, request, form)

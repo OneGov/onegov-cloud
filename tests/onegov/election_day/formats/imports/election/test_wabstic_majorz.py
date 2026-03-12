@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from io import BytesIO
 from onegov.election_day.formats import import_election_wabstic_majorz
@@ -5,9 +7,18 @@ from onegov.election_day.models import Canton
 from onegov.election_day.models import Election
 
 
-def test_import_wabstic_majorz(session, import_test_datasets):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from tests.onegov.election_day.conftest import ImportTestDatasets
 
-    election, errors = import_test_datasets(
+
+def test_import_wabstic_majorz(
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+
+    results = import_test_datasets(
         'wabstic',
         'election',
         'sg',
@@ -21,6 +32,8 @@ def test_import_wabstic_majorz(session, import_test_datasets):
         election_district='1'
     )
 
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
     assert election.last_result_change
     assert election.completed
@@ -42,9 +55,12 @@ def test_import_wabstic_majorz(session, import_test_datasets):
     ]
 
 
-def test_import_wabstic_intermediate(session, import_test_datasets):
+def test_import_wabstic_intermediate(
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
 
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'wabstic',
         'election',
         'sg',
@@ -58,6 +74,8 @@ def test_import_wabstic_intermediate(session, import_test_datasets):
         election_district='1'
     )
 
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
     assert election.last_result_change
     assert not election.completed
@@ -75,7 +93,7 @@ def test_import_wabstic_intermediate(session, import_test_datasets):
     assert sum((c.votes for c in election.candidates)) == 1790
 
 
-def test_import_wabstic_majorz_missing_headers(session):
+def test_import_wabstic_majorz_missing_headers(session: Session) -> None:
     session.add(
         Election(
             title='election',
@@ -140,7 +158,7 @@ def test_import_wabstic_majorz_missing_headers(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
-    assert [(e.filename, e.error.interpolate()) for e in errors] == [
+    assert [(e.filename, e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         ('wm_wahl', "Missing columns: 'absolutesmehr, anzpendentgde'"),
         ('wmstatic_gemeinden', "Missing columns: 'bfsnrgemeinde'"),
         ('wm_gemeinden', "Missing columns: 'sperrung'"),
@@ -149,7 +167,7 @@ def test_import_wabstic_majorz_missing_headers(session):
     ]
 
 
-def test_import_wabstic_majorz_invalid_values(session):
+def test_import_wabstic_majorz_invalid_values(session: Session) -> None:
     session.add(
         Election(
             title='election',
@@ -277,7 +295,7 @@ def test_import_wabstic_majorz_invalid_values(session):
         ).encode('utf-8')), 'text/plain'
     )
     assert sorted([
-        (e.filename, e.line, e.error.interpolate()) for e in errors
+        (e.filename, e.line, e.error.interpolate()) for e in errors  # type: ignore[attr-defined]
     ]) == [
         ('wm_gemeinden', 2, 'Invalid integer: sperrung'),
         ('wm_gemeinden', 2, 'Invalid integer: stimmberechtigte'),
@@ -293,7 +311,7 @@ def test_import_wabstic_majorz_invalid_values(session):
     ]
 
 
-def test_import_wabstic_majorz_expats(session):
+def test_import_wabstic_majorz_expats(session: Session) -> None:
     session.add(
         Election(
             title='election',
@@ -309,7 +327,7 @@ def test_import_wabstic_majorz_expats(session):
     for has_expats in (False, True):
         election.has_expats = has_expats
         for entity_id in ('9170', '0'):
-            errors = import_election_wabstic_majorz(
+            raw_errors = import_election_wabstic_majorz(
                 election, principal, '0', '0',
                 BytesIO((
                     '\n'.join((
@@ -404,19 +422,20 @@ def test_import_wabstic_majorz_expats(session):
                     ))
                 ).encode('utf-8')), 'text/plain'
             )
-            errors = [(e.line, e.error.interpolate()) for e in errors]
+            errors = [(e.line, e.error.interpolate()) for e in raw_errors]  # type: ignore[attr-defined]
             result = next(
                 (r for r in election.results if r.entity_id == 0), None
             )
             if has_expats:
                 assert errors == []
+                assert result is not None
                 assert result.invalid_votes == 1
             else:
                 assert errors == []
                 assert result is None
 
 
-def test_import_wabstic_majorz_temporary_results(session):
+def test_import_wabstic_majorz_temporary_results(session: Session) -> None:
     session.add(
         Election(
             title='election',
@@ -552,93 +571,110 @@ def test_import_wabstic_majorz_temporary_results(session):
     assert election.progress == (1, 77)
 
 
-def test_import_wabstic_majorz_regional(session):
+def test_import_wabstic_majorz_regional(session: Session) -> None:
 
-    def create_csv(results):
-        lines_wm_wahl = []
-        lines_wm_wahl.append((
-            'SortGeschaeft',
-            'AbsolutesMehr',
-            'Ausmittlungsstand',
-            'AnzPendendGde'
-        ))
-        lines_wm_wahl.append((
-            '0',  # SortGeschaeft
-            '5000',  # AbsolutesMehr
-            '0',  # Ausmittlungsstand
-            '1'  # AnzPendendGde
-        ))
-
-        lines_wmstatic_gemeinden = []
-        lines_wmstatic_gemeinden.append((
-            'SortWahlkreis',
-            'SortGeschaeft',
-            'BfsNrGemeinde',
-            'Stimmberechtigte',
-        ))
-        for entity_id, counted in results:
-            lines_wmstatic_gemeinden.append((
-                '0',  # SortWahlkreis
+    def create_csv(
+        results: tuple[tuple[int, bool], ...]
+    ) -> tuple[
+        str, str,
+        BytesIO, str,
+        BytesIO, str,
+        BytesIO, str,
+        BytesIO, str,
+        BytesIO, str
+    ]:
+        lines_wm_wahl = [
+            (
+                'SortGeschaeft',
+                'AbsolutesMehr',
+                'Ausmittlungsstand',
+                'AnzPendendGde'
+            ),
+            (
                 '0',  # SortGeschaeft
-                str(entity_id),  # BfsNrGemeinde
-                '10000',  # Stimmberechtigte
-            ))
+                '5000',  # AbsolutesMehr
+                '0',  # Ausmittlungsstand
+                '1'  # AnzPendendGde
+            )
+        ]
 
-        lines_wm_gemeinden = []
-        lines_wm_gemeinden.append((
-            'BfsNrGemeinde',
-            'Stimmberechtigte',
-            'Sperrung',
-            'StmAbgegeben',
-            'StmLeer',
-            'StmUngueltig',
-            'StimmenLeer',
-            'StimmenUngueltig',
-        ))
-        for entity_id, counted in results:
-            lines_wm_gemeinden.append((
-                str(entity_id),  # BfsNrGemeinde
-                '10000',  # Stimmberechtigte
-                '1200' if counted else '',  # Sperrung
-                '',  # StmAbgegeben
-                '',  # StmLeer
-                '1',  # StmUngueltig
-                '',  # StimmenLeer
-                '1',  # StimmenUngueltig
-            ))
+        lines_wmstatic_gemeinden = [
+            (
+                'SortWahlkreis',
+                'SortGeschaeft',
+                'BfsNrGemeinde',
+                'Stimmberechtigte',
+            ),
+            *(
+                (
+                    '0',  # SortWahlkreis
+                    '0',  # SortGeschaeft
+                    str(entity_id),  # BfsNrGemeinde
+                    '10000',  # Stimmberechtigte
+                ) for entity_id, counted in results
+            )
+        ]
 
-        lines_wm_kandidaten = []
-        lines_wm_kandidaten.append((
-            'SortGeschaeft',
-            'KNR',
-            'Nachname',
-            'Vorname',
-            'Gewaehlt',
-            'Partei',
-        ))
-        lines_wm_kandidaten.append((
-            '0',  # SortGeschaeft
-            '1',  # KNR
-            'xxx',  # Nachname
-            'xxx',  # Vorname
-            '',  # Gewaehlt
-            '',  # Partei
-        ))
+        lines_wm_gemeinden = [
+            (
+                'BfsNrGemeinde',
+                'Stimmberechtigte',
+                'Sperrung',
+                'StmAbgegeben',
+                'StmLeer',
+                'StmUngueltig',
+                'StimmenLeer',
+                'StimmenUngueltig',
+            ),
+            *(
+                (
+                    str(entity_id),  # BfsNrGemeinde
+                    '10000',  # Stimmberechtigte
+                    '1200' if counted else '',  # Sperrung
+                    '',  # StmAbgegeben
+                    '',  # StmLeer
+                    '1',  # StmUngueltig
+                    '',  # StimmenLeer
+                    '1',  # StimmenUngueltig
+                ) for entity_id, counted in results
+            )
+        ]
 
-        lines_wm_kandidatengde = []
-        lines_wm_kandidatengde.append((
-            'SortGeschaeft',
-            'BfsNrGemeinde',
-            'KNR',
-            'Stimmen',
-        ))
-        for entity_id, counted in results:
-            lines_wm_kandidatengde.append((
+        lines_wm_kandidaten = [
+            (
+                'SortGeschaeft',
+                'KNR',
+                'Nachname',
+                'Vorname',
+                'Gewaehlt',
+                'Partei',
+            ),
+            (
                 '0',  # SortGeschaeft
-                str(entity_id),  # BfsNrGemeinde
                 '1',  # KNR
-                '10',  # Stimmen
-            ))
+                'xxx',  # Nachname
+                'xxx',  # Vorname
+                '',  # Gewaehlt
+                '',  # Partei
+            )
+        ]
+
+        lines_wm_kandidatengde = [
+            (
+                'SortGeschaeft',
+                'BfsNrGemeinde',
+                'KNR',
+                'Stimmen',
+            ),
+            *(
+                (
+                    '0',  # SortGeschaeft
+                    str(entity_id),  # BfsNrGemeinde
+                    '1',  # KNR
+                    '10',  # Stimmen
+                ) for entity_id, counted in results
+            )
+        ]
 
         return (
             '0', '0',
@@ -689,7 +725,7 @@ def test_import_wabstic_majorz_regional(session):
         *create_csv(((1701, False), (1702, False)))
     )
     assert '1702 is not part of this business' in [
-        (e.error.interpolate()) for e in errors
+        (e.error.interpolate()) for e in errors  # type: ignore[attr-defined]
     ]
 
     # ZG, municipality, ok
@@ -719,7 +755,7 @@ def test_import_wabstic_majorz_regional(session):
         *create_csv(((3271, False), (3201, False)))
     )
     assert '3201 is not part of Werdenberg' in [
-        (e.error.interpolate()) for e in errors
+        (e.error.interpolate()) for e in errors  # type: ignore[attr-defined]
     ]
 
     # SG, district, ok
@@ -752,7 +788,7 @@ def test_import_wabstic_majorz_regional(session):
         *create_csv(((3572, True), (3513, False)))
     )
     assert '3513 is not part of Ilanz' in [
-        (e.error.interpolate()) for e in errors
+        (e.error.interpolate()) for e in errors  # type: ignore[attr-defined]
     ]
 
     # GR, region, ok

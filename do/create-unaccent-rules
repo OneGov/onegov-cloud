@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DATA_DIR="$(pg_config --sharedir)/tsearch_data"
+if [ ! -f "${DATA_DIR}/unaccent.rules"  ]; then
+    echo "Could not find unaccent.rules file in your Postgres installation"
+    exit 1
+fi
+
+# copy default rules
+sudo cp -p "${DATA_DIR}/unaccent.rules" "${DATA_DIR}/german.rules"
+# change rules for umlauts (add an e to the end of the replacement)
+sudo sed -i 's/^\([ÄÖÜäöü]\t.*\)/\1e/' "${DATA_DIR}/german.rules"

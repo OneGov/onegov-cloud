@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 
 from onegov.core.security import Public
@@ -23,8 +25,8 @@ if TYPE_CHECKING:
 )
 def landsgemeinde_view_org(
     self: Organisation,
-    request: 'LandsgemeindeRequest'
-) -> 'RenderData | Response':
+    request: LandsgemeindeRequest
+) -> RenderData | Response:
 
     current_assembly = AssemblyCollection(request.session).query().filter(
         Assembly.state == 'ongoing').order_by(

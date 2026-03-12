@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 
@@ -8,42 +10,51 @@ from pytest import raises
 from unittest.mock import Mock
 
 
-def test_sms_queue_processor(temporary_directory):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pathlib import Path
+
+
+def test_sms_queue_processor(temporary_directory: str) -> None:
     sms_path = os.path.join(
         temporary_directory, 'sms', 'onegov_town6-meggen'
     )
     os.makedirs(sms_path)
 
     qp = SmsQueueProcessor(sms_path, 'username', 'password')
-    qp.send = Mock(return_value=None)
+    qp.send = Mock(return_value=None)  # type: ignore[method-assign]
 
-    def create(name, receivers, content='Fancy new results!'):
+    def create(
+        name: str,
+        receivers: object,
+        content: str = 'Fancy new results!'
+    ) -> None:
         with open(os.path.join(sms_path, name), 'w') as f:
             f.write(json.dumps({
                 'receivers': receivers, 'content': content
             }))
 
     valid = [
-        ['one', ['+41791112233'], 'Fancy new results'],
-        ['batch', ['+41794445566', '+41794445577'], 'Fancy new results'],
-        ['0.000000', ['+41791112233'], 'Fancy new results'],
-        ['0.1.054981', ['+41794445566'], 'Fancy new results'],
-        ['0.1.aeerwe', ['+41797778899'], 'Fancy new results'],
-        ['0.89791.98766', ['+41791112233'], 'Fancy new results'],
-        ['0.1.2.3.4.-.334', ['+41794445566'], 'Fancy new results'],
-        ['wo03.03002.', ['+41797778899'], 'Fancy new results'],
-        ['one_invalid', ['+41797778899', 'invalid'], 'Fancy new results'],
+        ('one', ['+41791112233'], 'Fancy new results'),
+        ('batch', ['+41794445566', '+41794445577'], 'Fancy new results'),
+        ('0.000000', ['+41791112233'], 'Fancy new results'),
+        ('0.1.054981', ['+41794445566'], 'Fancy new results'),
+        ('0.1.aeerwe', ['+41797778899'], 'Fancy new results'),
+        ('0.89791.98766', ['+41791112233'], 'Fancy new results'),
+        ('0.1.2.3.4.-.334', ['+41794445566'], 'Fancy new results'),
+        ('wo03.03002.', ['+41797778899'], 'Fancy new results'),
+        ('one_invalid', ['+41797778899', 'invalid'], 'Fancy new results'),
     ]
     invalid = [
-        ['missing_content', ['+41797779999'], ''],
-        ['no_recipients', [], 'Fancy new results'],
-        ['missing_list', '+41797779999', 'Fancy new results'],
-        ['all_invalid', ['+41abcdef'], 'Fancy new results'],
+        ('missing_content', ['+41797779999'], ''),
+        ('no_recipients', [], 'Fancy new results'),
+        ('missing_list', '+41797779999', 'Fancy new results'),
+        ('all_invalid', ['+41abcdef'], 'Fancy new results'),
     ]
     ignored = [
-        ['.sending-0', ['+41791119999'], 'Fancy new results'],
-        ['.rejected-0', ['+41791119999'], 'Fancy new results'],
-        ['.qq89988e7e', ['+41791119999'], 'Fancy new results'],
+        ('.sending-0', ['+41791119999'], 'Fancy new results'),
+        ('.rejected-0', ['+41791119999'], 'Fancy new results'),
+        ('.qq89988e7e', ['+41791119999'], 'Fancy new results'),
     ]
     for name, receivers, content in valid + invalid + ignored:
         create(name, receivers, content)
@@ -72,14 +83,14 @@ def test_sms_queue_processor(temporary_directory):
     ]
 
 
-def test_sms_queue_processor_failed(temporary_directory):
+def test_sms_queue_processor_failed(temporary_directory: str) -> None:
     sms_path = os.path.join(
         temporary_directory, 'sms', 'onegov_town6-meggen'
     )
     os.makedirs(sms_path)
 
     qp = SmsQueueProcessor(sms_path, 'username', 'password')
-    qp.send = Mock(return_value={'StatusCode': '0'})
+    qp.send = Mock(return_value={'StatusCode': '0'})  # type: ignore[method-assign]
 
     filename = '0.1.0.0'
     with open(os.path.join(sms_path, filename), 'w') as f:
@@ -94,9 +105,9 @@ def test_sms_queue_processor_failed(temporary_directory):
     assert os.path.exists(os.path.join(sms_path, '.failed-' + filename))
 
 
-def test_sms_queue_processor_send():
+def test_sms_queue_processor_send() -> None:
     processor = SmsQueueProcessor('path', 'username', 'password')
-    processor.send_request = Mock()
+    processor.send_request = Mock()  # type: ignore[method-assign]
 
     processor.send_request.return_value = (200, '{}')
     assert processor.send(['1234'], 'content') == {}
@@ -117,9 +128,10 @@ def test_sms_queue_processor_send():
     assert processor.send(['1234'], 'content') == None
 
 
-def test_get_sms_queue_processor(tmpdir):
-    smsdir = tmpdir.mkdir('sms')
-    schemadir = str(smsdir.join('test'))
+def test_get_sms_queue_processor(tmp_path: Path) -> None:
+    smsdir = tmp_path / 'sms'
+    smsdir.mkdir()
+    schemadir = str(smsdir / 'test')
     app = Framework()
     app.namespace = 'test'
     app.schema = 'test'
@@ -137,6 +149,7 @@ def test_get_sms_queue_processor(tmpdir):
 
     assert get_sms_queue_processor(app) is None
     qp = get_sms_queue_processor(app, missing_path_ok=True)
+    assert qp is not None
     assert qp.path == os.path.abspath(schemadir)
     assert qp.username == 'shared'
     assert qp.password == 'sharedpw'
@@ -150,14 +163,16 @@ def test_get_sms_queue_processor(tmpdir):
         }
     }
     qp = get_sms_queue_processor(app, missing_path_ok=True)
+    assert qp is not None
     assert qp.path == os.path.abspath(schemadir)
     assert qp.username == 'test'
     assert qp.password == 'testpw'
     assert qp.originator == 'shared'
 
     app.sms['tenants']['test']['originator'] = 'test'
-    smsdir.mkdir('test')
+    (smsdir / 'test').mkdir()
     qp = get_sms_queue_processor(app)
+    assert qp is not None
     assert qp.path == os.path.abspath(schemadir)
     assert qp.username == 'test'
     assert qp.password == 'testpw'

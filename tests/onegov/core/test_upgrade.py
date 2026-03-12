@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 import pytest
 import textwrap
@@ -8,19 +10,29 @@ from onegov.core.upgrade import get_tasks, upgrade_task, get_module_order_key
 from unittest.mock import patch
 
 
-def test_upgrade_task_registration():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from onegov.core.upgrade import UpgradeContext
+    from onegov.core.orm import SessionManager
+    from sqlalchemy.engine import Connection
+
+
+def test_upgrade_task_registration() -> None:
 
     class MyUpgradeModule:
 
+        @staticmethod
         @upgrade_task(name='Add new field')
-        def add_new_field(request):
+        def add_new_field(context: UpgradeContext) -> None:
             pass
 
+        @staticmethod
         @upgrade_task(name='Add another field', always_run=True)
-        def add_another_field(request):
+        def add_another_field(context: UpgradeContext) -> None:
             pass
 
-    tasks = get_tasks([('onegov.core', MyUpgradeModule)])
+    tasks = get_tasks([('onegov.core', MyUpgradeModule)])  # type: ignore[list-item]
 
     assert len(tasks) == 2
 
@@ -35,43 +47,51 @@ def test_upgrade_task_registration():
     assert tasks[1][1].requires is None
 
 
-def test_raw_task_requirement():
+def test_raw_task_requirement() -> None:
 
     class MyUpgradeModule:
 
+        @staticmethod
         @upgrade_task(name='Add new field', raw=True, always_run=True)
-        def add_new_field(session_manager, schemas):
+        def add_new_field(
+            connection: Connection,
+            schemas: Sequence[str]
+        ) -> None:
             pass
 
+        @staticmethod
         @upgrade_task(name='Add another field', requires='one:Add new field')
-        def add_another_field(request):
+        def add_another_field(context: UpgradeContext) -> None:
             pass
 
     with pytest.raises(AssertionError) as e:
-        get_tasks([('one', MyUpgradeModule)])
+        get_tasks([('one', MyUpgradeModule)])  # type: ignore[list-item]
 
     assert "Raw tasks cannot be required" in str(e.value)
 
 
-def test_upgrade_task_requirements():
+def test_upgrade_task_requirements() -> None:
 
     class Two:
 
+        @staticmethod
         @upgrade_task(name='New Field', requires='one:Init Database')
-        def new_field(request):
+        def new_field(context: UpgradeContext) -> None:
             pass
 
+        @staticmethod
         @upgrade_task(name='Destroy Database', requires='two:New Field')
-        def destroy_database(request):
+        def destroy_database(context: UpgradeContext) -> None:
             pass
 
     class One:
 
+        @staticmethod
         @upgrade_task(name='Init Database')
-        def init(request):
+        def init(context: UpgradeContext) -> None:
             pass
 
-    tasks = get_tasks([('one', One), ('two', Two)])
+    tasks = get_tasks([('one', One), ('two', Two)])  # type: ignore[list-item]
 
     assert len(tasks) == 3
 
@@ -84,42 +104,50 @@ def test_upgrade_task_requirements():
     assert tasks[2][1].task_name == 'Destroy Database'
 
 
-def test_upgrade_duplicate_tasks():
+def test_upgrade_duplicate_tasks() -> None:
 
     class MyUpgradeModule:
 
+        @staticmethod
         @upgrade_task(name='Add new field')
-        def add_new_field(request):
+        def add_new_field(context: UpgradeContext) -> None:
             pass
 
+        @staticmethod
         @upgrade_task(name='Add new field')
-        def add_another_field(request):
+        def add_another_field(context: UpgradeContext) -> None:
             pass
 
     with pytest.raises(AssertionError):
-        get_tasks([('onegov.core.tests', MyUpgradeModule)])
+        get_tasks([('onegov.core.tests', MyUpgradeModule)])  # type: ignore[list-item]
 
 
-def test_upgrade_duplicate_function_names():
+def test_upgrade_duplicate_function_names() -> None:
 
     class Foo:
 
+        @staticmethod
         @upgrade_task(name='Foo')
-        def task(request):
+        def task(context: UpgradeContext) -> None:
             pass
 
     class Bar:
 
+        @staticmethod
         @upgrade_task(name='Bar')
-        def task(request):
+        def task(context: UpgradeContext) -> None:
             pass
 
     with pytest.raises(AssertionError):
-        get_tasks([('foo', Foo), ('bar', Bar)])
+        get_tasks([('foo', Foo), ('bar', Bar)])  # type: ignore[list-item]
 
 
-def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
-                     redis_url):
+def test_upgrade_cli(
+    postgres_dsn: str,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
 
     config = os.path.join(temporary_directory, 'test.yml')
     with open(config, 'w') as cfg:
@@ -149,7 +177,7 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
             class Upgrades:
                 @staticmethod
                 @upgrade_task(name='Foobar')
-                def run_upgrade(context):
+                def run_upgrade(context: UpgradeContext) -> None:
                     pass
 
             get_1.return_value = get_2.return_value = [
@@ -173,7 +201,7 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
             class NewUpgrades:
                 @staticmethod
                 @upgrade_task(name='Barfoo')
-                def run_upgrade(context):
+                def run_upgrade(context: UpgradeContext) -> None:
                     pass
 
             get_1.return_value = get_2.return_value = [
@@ -228,8 +256,12 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
             assert result.exit_code == 0
 
 
-def test_raw_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
-                         redis_url):
+def test_raw_upgrade_cli(
+    postgres_dsn: str,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
 
     config = os.path.join(temporary_directory, 'test.yml')
     with open(config, 'w') as cfg:
@@ -259,7 +291,10 @@ def test_raw_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
             class Upgrades:
                 @staticmethod
                 @upgrade_task(name='Foobar', raw=True, always_run=True)
-                def run_upgrade(session_manager, schemas):
+                def run_upgrade(
+                    connection: Connection,
+                    schemas: Sequence[str]
+                ) -> bool:
                     assert schemas == ['foo-bar', 'foo-fah']
                     return False
 
@@ -286,7 +321,10 @@ def test_raw_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
             class NewUpgrades:
                 @staticmethod
                 @upgrade_task(name='Barfoo', raw=True, always_run=True)
-                def run_upgrade(session_manager, schemas):
+                def run_upgrade(
+                    connection: Connection,
+                    schemas: Sequence[str]
+                ) -> bool:
                     return True
 
             get_1.return_value = get_2.return_value = [
@@ -311,17 +349,21 @@ def test_raw_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
             assert result.exit_code == 0
 
 
-def test_get_module_order_key():
-    def first():
+def test_get_module_order_key() -> None:
+    @upgrade_task('first')
+    def first(context: UpgradeContext) -> None:
         pass
 
-    def second():
+    @upgrade_task('second')
+    def second(context: UpgradeContext) -> None:
         pass
 
-    def third():
+    @upgrade_task('third')
+    def third(context: UpgradeContext) -> None:
         pass
 
-    def fourth():
+    @upgrade_task('fourth')
+    def fourth(context: UpgradeContext) -> None:
         pass
 
     order_key = get_module_order_key({

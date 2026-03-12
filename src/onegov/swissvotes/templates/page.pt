@@ -30,7 +30,7 @@
 
                         <div tal:condition="layout.model.show_timeline" class="timeline">
                             <h5 i18n:translate>Swissvotes on Mastodon</h5>
-                            <div class="dummy-container">
+                            <div class="mt-container">
                                 <div class="mt-timeline">
                                     <div id="mt-body" class="mt-body" role="feed">
                                         <div class="loading-spinner"></div>

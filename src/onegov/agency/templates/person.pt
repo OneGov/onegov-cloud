@@ -21,10 +21,10 @@
                 <div class="borderless-side-panel" tal:condition="request.app.org.meta.report_changes|True">
                     <h2 i18n:translate>Changes</h2>
                     <div class="submit-yours">
-                    <p i18n:translate>The contact form can be used to report changes to incorrect information of the persons or organizations listed. The form is not intended for contacting or sending messages to the respective persons and organizations.</p>
-                    <a href="${request.link(person, 'report-change')}">
-                       <b i18n:translate>Report change</b>
-                    </a>
+                        <p i18n:translate>The contact form can be used to report changes to incorrect information of the persons or organizations listed. The form is not intended for contacting or sending messages to the respective persons and organizations.</p>
+                        <a href="${request.link(person, 'report-change')}">
+                           <b i18n:translate>Report change</b>
+                        </a>
                     </div>
                </div>
 

@@ -1,14 +1,21 @@
-import textwrap
+from __future__ import annotations
 
 import requests_mock
+import textwrap
 import transaction
-from purl import URL
 
 from onegov.form import FormCollection
 from onegov.pay import PaymentProviderCollection
+from onegov.pay.models.payment_providers import StripeConnect
+from purl import URL
 
 
-def test_setup_stripe(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_setup_stripe(client: Client) -> None:
     client.login_admin()
 
     assert client.app.default_payment_provider is None
@@ -34,13 +41,27 @@ def test_setup_stripe(client):
 
         client.get(url.as_string())
 
+    # undo mypy narrowing
+    client = client
     provider = client.app.default_payment_provider
+    assert isinstance(provider, StripeConnect)
     assert provider.title == 'Stripe Connect'
     assert provider.publishable_key == 'stripe_publishable_key'
     assert provider.user_id == 'stripe_user_id'
     assert provider.refresh_token == 'refresh_token'
     assert provider.access_token == 'access_token'
 
+    # test new format for business name
+    with requests_mock.Mocker() as m:
+        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+            'business_profile': {'name': 'Govikon City'},
+            'email': 'info@example.org'
+        })
+
+        page = client.get('/payment-provider')
+        assert 'Govikon City / info@example.org' in page
+
+    # test old format
     with requests_mock.Mocker() as m:
         m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
             'business_name': 'Govikon City',
@@ -76,7 +97,7 @@ def test_setup_stripe(client):
     assert client.app.default_payment_provider is None
 
 
-def test_stripe_form_payment(client):
+def test_stripe_form_payment(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Donate', definition=textwrap.dedent("""
         E-Mail *= @@@
@@ -145,7 +166,7 @@ def test_stripe_form_payment(client):
     assert "0.59" in payments
 
 
-def test_stripe_charge_fee_to_customer(client):
+def test_stripe_charge_fee_to_customer(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Donate', definition=textwrap.dedent("""
         E-Mail *= @@@

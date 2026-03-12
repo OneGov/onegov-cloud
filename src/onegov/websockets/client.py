@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from json import dumps
 from json import loads
 from onegov.websockets import log
@@ -6,10 +8,14 @@ from onegov.websockets import log
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import JSON_ro
-    from websockets.legacy.client import WebSocketClientProtocol
+    from typing import TypedDict
+    from websockets.asyncio.client import ClientConnection
+
+    class StatusMessage(TypedDict):
+        connections: dict[str, int]
 
 
-async def acknowledged(websocket: 'WebSocketClientProtocol') -> None:
+async def acknowledged(websocket: ClientConnection) -> None:
     """ Wait for an OK from the server. """
 
     message = await websocket.recv()
@@ -19,11 +25,11 @@ async def acknowledged(websocket: 'WebSocketClientProtocol') -> None:
         # FIXME: technically message can be bytes
         log.error(f'Unexpected response: {message}')  # type:ignore
         await websocket.close()
-        raise IOError(message) from exception
+        raise OSError(message) from exception
 
 
 async def register(
-    websocket: 'WebSocketClientProtocol',
+    websocket: ClientConnection,
     schema: str,
     channel: str | None
 ) -> None:
@@ -40,7 +46,7 @@ async def register(
 
 
 async def authenticate(
-    websocket: 'WebSocketClientProtocol',
+    websocket: ClientConnection,
     token: str
 ) -> None:
     """ Authenticates with the given token. """
@@ -55,12 +61,17 @@ async def authenticate(
 
 
 async def broadcast(
-    websocket: 'WebSocketClientProtocol',
+    websocket: ClientConnection,
     schema: str,
     channel: str | None,
-    message: 'JSON_ro'
+    message: JSON_ro,
+    groupids: list[str] | None = None
 ) -> None:
     """ Broadcasts the given message to all connected clients.
+
+    Optionally can be filtered to a list of groupids, for users with
+    a lower privilege level like editors or members. admins will always
+    receive all broadcasts in channels they've subscribed to.
 
     Assumes prior authentication.
 
@@ -71,13 +82,14 @@ async def broadcast(
             'type': 'broadcast',
             'schema': schema,
             'channel': channel,
-            'message': message
+            'message': message,
+            'groupids': groupids,
         })
     )
     await acknowledged(websocket)
 
 
-async def status(websocket: 'WebSocketClientProtocol') -> str | None:
+async def status(websocket: ClientConnection) -> StatusMessage | None:
     """ Receives the status of the server.
 
     Assumes prior authentication.

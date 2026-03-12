@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import click
 import os
 import transaction
@@ -12,6 +14,7 @@ from onegov.file.utils import as_fileintent
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.external_resources import MfgPosters
 from onegov.swissvotes.external_resources import SaPosters
+from onegov.swissvotes.external_resources import BsPosters
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
 from onegov.swissvotes.models.file import LocalizedFile
@@ -31,17 +34,19 @@ cli = command_group()
 @cli.command(context_settings={'creates_path': True})
 @pass_group_context
 def add(
-    group_context: 'GroupContext'
-) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
+    group_context: GroupContext
+) -> Callable[[SwissvotesRequest, SwissvotesApp], None]:
     """ Adds an instance to the database. For example:
+
+    .. code-block:: bash
 
         onegov-swissvotes --select '/onegov_swissvotes/swissvotes' add
 
     """
 
     def add_instance(
-        request: 'SwissvotesRequest',
-        app: 'SwissvotesApp'
+        request: SwissvotesRequest,
+        app: SwissvotesApp
     ) -> None:
 
         app.cache.flush()
@@ -54,17 +59,19 @@ def add(
 @click.argument('folder', type=click.Path(exists=True))
 @pass_group_context
 def import_attachments(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     folder: str
-) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
-    """ Import a attachments from the given folder. For example:
+) -> Callable[[SwissvotesRequest, SwissvotesApp], None]:
+    r""" Import a attachments from the given folder. For example:
+
+    .. code-block:: bash
 
         onegov-swissvotes \
             --select '/onegov_swissvotes/swissvotes' \
             import-attachments data_folder
 
     Expects a data folder structure with the first level representing an
-    attachment and the second level a locale. The PDFs have to be name by
+    attachment and the second level a locale. The PDFs have to be named by
     BFS number (single number or range). For example:
 
         data/voting_text/de_CH/001.pdf
@@ -73,7 +80,7 @@ def import_attachments(
 
     """
 
-    def _import(request: 'SwissvotesRequest', app: 'SwissvotesApp') -> None:
+    def _import(request: SwissvotesRequest, app: SwissvotesApp) -> None:
         votes = SwissVoteCollection(app)
 
         attachments = {}
@@ -156,10 +163,12 @@ def import_attachments(
 @click.argument('folder', type=click.Path(exists=True))
 @pass_group_context
 def import_campaign_material(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     folder: str
-) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
-    """ Import a campaign material from the given folder. For example:
+) -> Callable[[SwissvotesRequest, SwissvotesApp], None]:
+    r""" Import a campaign material from the given folder. For example:
+
+    .. code-block:: bash
 
         onegov-swissvotes \
             --select '/onegov_swissvotes/swissvotes' \
@@ -173,7 +182,7 @@ def import_campaign_material(
 
     """
 
-    def _import(request: 'SwissvotesRequest', app: 'SwissvotesApp') -> None:
+    def _import(request: SwissvotesRequest, app: SwissvotesApp) -> None:
         attachments: dict[Decimal, list[str]] = {}
 
         votes = SwissVoteCollection(app)
@@ -226,11 +235,11 @@ def import_campaign_material(
 @cli.command('reindex')
 @pass_group_context
 def reindex_attachments(
-    group_context: 'GroupContext'
-) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
+    group_context: GroupContext
+) -> Callable[[SwissvotesRequest, SwissvotesApp], None]:
     """ Reindexes the attachments. """
 
-    def _reindex(request: 'SwissvotesRequest', app: 'SwissvotesApp') -> None:
+    def _reindex(request: SwissvotesRequest, app: SwissvotesApp) -> None:
         bfs_numbers = sorted(app.session().query(SwissVote.bfs_number))
         for bfs_number, in bfs_numbers:
             click.secho(f'Reindexing vote {bfs_number}', fg='green')
@@ -246,26 +255,43 @@ def reindex_attachments(
 @click.option('--details', is_flag=True, default=False)
 @click.option('--mfg', is_flag=True, default=False)
 @click.option('--sa', is_flag=True, default=False)
+@click.option('--bs', is_flag=True, default=False)
 @pass_group_context
 def update_resources(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     details: bool,
     sa: bool,
-    mfg: bool
-) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
+    bs: bool,
+    mfg: bool,
+) -> Callable[[SwissvotesRequest, SwissvotesApp], None]:
     """ Updates external resources. """
 
     def _update_sources(
-        request: 'SwissvotesRequest',
-        app: 'SwissvotesApp'
+        request: SwissvotesRequest,
+        app: SwissvotesApp
     ) -> None:
 
-        posters: MfgPosters | SaPosters
+        posters: MfgPosters | BsPosters | SaPosters
         if mfg:
             click.echo('Updating MfG posters')
             if not app.mfg_api_token:
                 abort('No token configured, aborting')
             posters = MfgPosters(app.mfg_api_token)
+            added, updated, removed, failed = posters.fetch(app.session())
+            click.secho(
+                f'{added} added, {updated} updated, {removed} removed, '
+                f'{len(failed)} failed',
+                fg='green' if not failed else 'yellow'
+            )
+            if failed and details:
+                failed_str = ', '.join(str(item) for item in sorted(failed))
+                click.secho(f'Failed: {failed_str}', fg='yellow')
+
+        if bs:
+            click.echo('Updating BS posters')
+            if not app.bs_api_token:
+                abort('No token configured, aborting')
+            posters = BsPosters(app.bs_api_token)
             added, updated, removed, failed = posters.fetch(app.session())
             click.secho(
                 f'{added} added, {updated} updated, {removed} removed, '

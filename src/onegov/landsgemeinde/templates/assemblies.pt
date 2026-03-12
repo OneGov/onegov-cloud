@@ -2,10 +2,10 @@
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
-    <tal:b metal:fill-slot="content">
+    <tal:b metal:fill-slot="content" tal:define="assembly_type_plural layout.assembly_type_plural">
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell main-content">
-                <p tal:condition="not:assemblies" i18n:translate="">No assemblies defined yet.</p>
+                <p tal:condition="not:assemblies" i18n:translate="">No <tal:b i18n:name="assembly">${assembly_type_plural}</tal:b> defined yet.</p>
                 <ul tal:condition="assemblies" class="more-list assembly-list">
                     <li tal:repeat="assembly assemblies">
                         <a class="list-link" tal:attributes="href request.link(assembly)">

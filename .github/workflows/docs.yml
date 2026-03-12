@@ -1,0 +1,80 @@
+name: Docs
+
+on:
+  workflow_dispatch:  # allow to run manually
+  push:
+    branches: [master]
+
+jobs:
+  pages:
+    runs-on: ubuntu-24.04
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+    - name: Install packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install \
+          build-essential \
+          git \
+          gcc \
+          g++ \
+          libcurl4-openssl-dev \
+          libffi-dev \
+          libjpeg-dev \
+          libpq-dev \
+          libxml2-dev \
+          libxslt1-dev \
+          zlib1g-dev \
+          libev-dev \
+          libgnutls28-dev \
+          libkrb5-dev \
+          libpoppler-cpp-dev \
+          pv \
+          libzbar0 \
+          openssl \
+          libssl-dev \
+          xmlsec1 \
+          libxmlsec1-openssl \
+          ghostscript \
+          zip \
+          libev4 \
+          libmagic1 \
+          wget \
+          apparmor \
+          curl \
+          git-core \
+          postgresql \
+          redis \
+          gcc \
+          libc-dev \
+          fonts-liberation \
+          libappindicator3-1 \
+          libasound2t64  \
+          libcairo2-dev \
+          libdrm2 \
+          libgbm1 \
+          libnspr4 \
+          libnss3 \
+          libu2f-udev \
+          libvulkan1 \
+          libx11-xcb1 \
+          libxcb-dri3-0 \
+          libxshmfence1 \
+          libxss1 \
+          libxt-dev \
+          xdg-utils \
+          make \
+          --fix-missing
+
+    - id: deployment
+      uses: sphinx-notes/pages@v3
+      with:
+        python_version: '3.11'

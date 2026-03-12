@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.election_day.layouts import MailLayout
 from onegov.election_day.models import Election
@@ -5,8 +7,13 @@ from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_mail_layout_model_title(session):
-    layout = MailLayout(None, DummyRequest())
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_mail_layout_model_title(session: Session) -> None:
+    layout = MailLayout(None, DummyRequest())  # type: ignore[arg-type]
     assert layout.model_title(Vote()) is None
     assert layout.model_title(Vote(title='Test')) == 'Test'
     assert layout.model_title(
@@ -24,7 +31,7 @@ def test_mail_layout_model_title(session):
         Election(title_translations={'fr_CH': 'FR', 'rm_CH': 'RM'})
     ) is None
 
-    layout = MailLayout(None, DummyRequest(locale='fr_CH'))
+    layout = MailLayout(None, DummyRequest(locale='fr_CH'))  # type: ignore[arg-type]
     assert layout.model_title(
         Vote(title_translations={'fr_CH': 'FR', 'de_CH': 'DE'})
     ) == 'FR'
@@ -39,12 +46,12 @@ def test_mail_layout_model_title(session):
     ) == 'DE'
 
 
-def test_mail_layout_optout(session):
-    layout = MailLayout(None, DummyRequest())
+def test_mail_layout_optout(session: Session) -> None:
+    layout = MailLayout(None, DummyRequest())  # type: ignore[arg-type]
     assert layout.optout_link == 'DummyPrincipal/unsubscribe-email'
 
 
-def test_mail_layout_subject(session):
+def test_mail_layout_subject(session: Session) -> None:
     # Note: the dummy setup does not translate the strings
 
     vote = Vote(
@@ -55,10 +62,10 @@ def test_mail_layout_subject(session):
     session.add(vote)
     session.flush()
 
-    layout = MailLayout(None, DummyRequest(locale='de_CH'))
+    layout = MailLayout(None, DummyRequest(locale='de_CH'))  # type: ignore[arg-type]
     assert layout.subject(vote) == 'DE - New intermediate results'
 
-    layout = MailLayout(None, DummyRequest(locale='fr_CH'))
+    layout = MailLayout(None, DummyRequest(locale='fr_CH'))  # type: ignore[arg-type]
     assert layout.subject(vote) == 'FR - New intermediate results'
 
     vote.status = 'final'

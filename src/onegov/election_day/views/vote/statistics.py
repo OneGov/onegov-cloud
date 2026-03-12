@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import VoteLayout
@@ -23,8 +25,8 @@ if TYPE_CHECKING:
 )
 def view_vote_statistics(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The statistics view (simple vote). """
 
     return {
@@ -41,8 +43,8 @@ def view_vote_statistics(
 )
 def view_vote_statistics_proposal(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The statistics view (proposal). """
 
     return {
@@ -59,8 +61,8 @@ def view_vote_statistics_proposal(
 )
 def view_vote_statistics_counter_proposal(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The statistics view (counter-proposal). """
 
     return {
@@ -77,8 +79,8 @@ def view_vote_statistics_counter_proposal(
 )
 def view_vote_statistics_tie_breaker(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The statistics view (tie-breaker). """
 
     return {
@@ -95,12 +97,12 @@ def view_vote_statistics_tie_breaker(
 )
 def view_ballot_as_statistics_table(
     self: Ballot,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the statistics of the entities of ballot as table. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.vote.last_modified)
 
     return {
@@ -119,8 +121,8 @@ def view_ballot_as_statistics_table(
 )
 def view_vote_statistics_table_proposal(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
 
     """ A static link to the statistics table of the proposal. """
 
@@ -144,8 +146,8 @@ def view_vote_statistics_table_proposal(
 )
 def view_vote_statistics_table_counter_proposal(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
 
     """ A static link to the statistics table of the counter proposal. """
 
@@ -169,8 +171,8 @@ def view_vote_statistics_table_counter_proposal(
 )
 def view_vote_statistics_table_tie_breaker(
     self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
 
     """ A static link to the statistics table of the tie breaker. """
 

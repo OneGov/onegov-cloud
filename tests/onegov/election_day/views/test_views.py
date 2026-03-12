@@ -1,8 +1,15 @@
+from __future__ import annotations
+
+import pyotp
+import transaction
+
 from freezegun import freeze_time
 from onegov import election_day
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.models import Ballot
 from onegov.election_day.models import Vote
+from onegov.user import UserCollection
+from sqlalchemy.orm.session import close_all_sessions
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_election_compound
 from tests.onegov.election_day.common import upload_majorz_election
@@ -18,11 +25,17 @@ from webtest.forms import Upload
 from xml.etree.ElementTree import fromstring
 
 
-def test_view_permissions():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from io import BytesIO
+    from ..conftest import TestApp
+
+
+def test_view_permissions() -> None:
     utils.assert_explicit_permissions(election_day, ElectionDayApp)
 
 
-def test_view_private(election_day_app_zg):
+def test_view_private(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/')
 
@@ -36,7 +49,42 @@ def test_view_private(election_day_app_zg):
     login(client)
 
 
-def test_i18n(election_day_app_zg):
+def test_login_totp(election_day_app_zg: TestApp) -> None:
+    election_day_app_zg.totp_enabled = True
+    client = Client(election_day_app_zg)
+
+    totp_secret = pyotp.random_base32()
+    totp = pyotp.TOTP(totp_secret)
+
+    # configure TOTP for admin user
+    users = UserCollection(client.app.session())
+    admin = users.by_username('admin@example.org')
+    assert admin is not None
+    admin.second_factor = {'type': 'totp', 'data': totp_secret}
+    transaction.commit()
+    close_all_sessions()
+
+    login_page = client.get('/').maybe_follow().click('Anmelden')
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+
+    totp_page = login_page.form.submit().maybe_follow()
+    assert "Bitte geben Sie den sechsstelligen Code" in totp_page.text
+    totp_page.form['totp'] = 'bogus'
+    totp_page = totp_page.form.submit()
+    assert "Ungültige oder abgelaufenes TOTP eingegeben." in totp_page.text
+
+    totp_page.form['totp'] = totp.now()
+    page = totp_page.form.submit().maybe_follow()
+    assert 'Abmelden' in page
+    assert 'Anmelden' not in page
+
+    page = client.get('/').maybe_follow().click('Abmelden').maybe_follow()
+    assert 'Abmelden' not in page
+    assert 'Anmelden' in page
+
+
+def test_i18n(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -77,7 +125,7 @@ def test_i18n(election_day_app_zg):
     assert "Tick" in client.get('/').click('Deutsch').follow()
 
 
-def test_cache_control(election_day_app_zg):
+def test_cache_control(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
 
     response = client.get('/')
@@ -105,10 +153,10 @@ def test_cache_control(election_day_app_zg):
     assert 'no_cache' not in client.cookies
 
 
-def test_content_security_policy(election_day_app_zg):
+def test_content_security_policy(election_day_app_zg: TestApp) -> None:
     principal = election_day_app_zg.principal
-    principal.csp_script_src = ('https://scripts.onegov.cloud', )
-    principal.csp_connect_src = ('https://data.onegov.cloud', )
+    principal.csp_script_src = ['https://scripts.onegov.cloud']
+    principal.csp_connect_src = ['https://data.onegov.cloud']
     election_day_app_zg.cache.set('principal', principal)
 
     client = Client(election_day_app_zg)
@@ -124,28 +172,28 @@ def test_content_security_policy(election_day_app_zg):
 
     # check content security policy
     response = client.get('/')
-    csp = response.headers['Content-Security-Policy']
-    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
+    csp_str = response.headers['Content-Security-Policy']
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp_str.split(';')}
     assert "frame-ancestors" not in csp
     assert "https://scripts.onegov.cloud" in csp['script-src']
     assert "https://data.onegov.cloud" in csp['connect-src']
 
     response = client.get('/auth/login')
-    csp = response.headers['Content-Security-Policy']
-    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
+    csp_str = response.headers['Content-Security-Policy']
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp_str.split(';')}
     assert "'none'" in csp['frame-ancestors']
     assert "https://scripts.onegov.cloud" in csp['script-src']
     assert "https://data.onegov.cloud" in csp['connect-src']
 
     response = client.get('/vote/vote')
-    csp = response.headers['Content-Security-Policy']
-    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
+    csp_str = response.headers['Content-Security-Policy']
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp_str.split(';')}
     assert "http://* https://*" in csp['frame-ancestors']
     assert "https://scripts.onegov.cloud" in csp['script-src']
     assert "https://data.onegov.cloud" in csp['connect-src']
 
 
-def test_pages_cache(election_day_app_zg):
+def test_pages_cache(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH')
 
@@ -201,12 +249,12 @@ def test_pages_cache(election_day_app_zg):
     assert '0xd3adc0d3' in anonymous.get('/vote/0xdeadbeef/entities')
     assert '0xd3adc0d3' in anonymous.get(
         '/vote/0xdeadbeef/entities',
-        headers=[('Cache-Control', 'no-cache')]
+        headers={'Cache-Control': 'no-cache'}
     )
     assert '0xd3adc0d3' in client.get('/vote/0xdeadbeef/entities')
 
 
-def test_view_last_modified(election_day_app_sg):
+def test_view_last_modified(election_day_app_sg: TestApp) -> None:
     with freeze_time("2014-01-01 12:00"):
         client = Client(election_day_app_sg)
         client.get('/locale/de_CH').follow()
@@ -289,7 +337,7 @@ def test_view_last_modified(election_day_app_sg):
             assert 'Last-Modified' not in client.get(path).headers
 
 
-def test_view_headerless(election_day_app_zg):
+def test_view_headerless(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -313,7 +361,7 @@ def test_view_headerless(election_day_app_zg):
         assert 'manage-links' in client.get(path)
 
 
-def test_view_pdf(election_day_app_zg):
+def test_view_pdf(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -334,9 +382,10 @@ def test_view_pdf(election_day_app_zg):
         assert client.get(path, expect_errors=True).status_code == 202
 
     pdf = '%PDF-1.6'.encode('utf-8')
+    assert election_day_app_zg.filestorage is not None
     election_day_app_zg.filestorage.makedir('pdf')
     with election_day_app_zg.filestorage.open('pdf/test.pdf', 'wb') as f:
-        f.write(pdf)
+        f.write(pdf)  # type: ignore[arg-type]
 
     filenames = []
     with patch('onegov.election_day.layouts.vote.pdf_filename',
@@ -395,7 +444,7 @@ def test_view_pdf(election_day_app_zg):
     ]
 
 
-def test_view_svg(election_day_app_zg):
+def test_view_svg(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -429,9 +478,10 @@ def test_view_svg(election_day_app_zg):
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" ></svg>'
     ).encode('utf-8')
+    assert election_day_app_zg.filestorage is not None
     election_day_app_zg.filestorage.makedir('svg')
     with election_day_app_zg.filestorage.open('svg/test.svg', 'wb') as f:
-        f.write(svg)
+        f.write(svg)  # type: ignore[arg-type]
 
     filenames = []
     with patch('onegov.election_day.layouts.vote.svg_filename',
@@ -496,7 +546,7 @@ def test_view_svg(election_day_app_zg):
     ]
 
 
-def test_view_opendata_catalog(election_day_app_zg):
+def test_view_opendata_catalog(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -531,6 +581,10 @@ def test_view_opendata_catalog(election_day_app_zg):
         x[0][0].text
         for x in root.findall('.//{http://purl.org/dc/terms/}publisher')
     ]) == {'Staatskanzlei Kanton Govikon'}
+    assert set([
+        list(x[0].attrib.values())[0]
+        for x in root.findall('.//{http://purl.org/dc/terms/}publisher')
+    ]) == {'urn:onegov_election_day:publisher:kanton-govikon'}
     assert set([
         list(x.attrib.values())[0]
         for x in root.findall('.//{http://www.w3.org/2006/vcard/ns#}hasEmail')
@@ -573,7 +627,7 @@ def test_view_opendata_catalog(election_day_app_zg):
         'vote.csv',
         'vote.json'
     }
-    assert set([list(x[0].attrib.values())[0] for x in root[0]]) == {
+    assert {list(x[0].attrib.values())[0] for x in root[0]} == {
         'http://kanton-govikon/election-majorz-election',
         'http://kanton-govikon/election-proporz-election',
         'http://kanton-govikon/election-regional-election-a',
@@ -582,8 +636,17 @@ def test_view_opendata_catalog(election_day_app_zg):
         'http://kanton-govikon/vote-vote'
     }
 
+    # explicit publisher URI, rather than implicit based on ID
+    principal.open_data['uri'] = 'https://staatskanzlei.govikon.ch'
+    election_day_app_zg.cache.set('principal', principal)
+    root = fromstring(client.get('/catalog.rdf').text)
+    assert {
+        list(x[0].attrib.values())[0]
+        for x in root.findall('.//{http://purl.org/dc/terms/}publisher')
+    } == {'https://staatskanzlei.govikon.ch'}
 
-def test_view_screen(election_day_app_zg):
+
+def test_view_screen(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -633,7 +696,7 @@ def test_view_screen(election_day_app_zg):
     }
 
 
-def test_view_custom_css(election_day_app_zg):
+def test_view_custom_css(election_day_app_zg: TestApp) -> None:
     principal = election_day_app_zg.principal
     principal.custom_css = 'tr { display: none }'
     election_day_app_zg.cache.set('principal', principal)
@@ -643,9 +706,12 @@ def test_view_custom_css(election_day_app_zg):
 
 
 def test_view_attachments(
-    election_day_app_gr, explanations_pdf, upper_apportionment_pdf,
-    lower_apportionment_pdf
-):
+    election_day_app_gr: TestApp,
+    explanations_pdf: BytesIO,
+    upper_apportionment_pdf: BytesIO,
+    lower_apportionment_pdf: BytesIO
+) -> None:
+
     content = explanations_pdf.read()
 
     client = Client(election_day_app_gr)

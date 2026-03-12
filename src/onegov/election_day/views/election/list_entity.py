@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
 
 
 def list_options(
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     election: Election
 ) -> list[tuple[str, str]]:
 
@@ -53,8 +55,8 @@ def list_options(
 )
 def view_list_by_entity(
     self: List,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" View the list by entity as JSON. """
 
     return self.percentage_by_entity  # type:ignore[return-value]
@@ -68,8 +70,8 @@ def view_list_by_entity(
 )
 def view_election_list_by_entity(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the list as heatmap by entity. """
 
     layout = ElectionLayout(self, request, 'list-by-entity')
@@ -108,12 +110,12 @@ def view_election_list_by_entity(
 )
 def view_election_list_by_entity_chart(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" Embed the heatmap. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     options = list_options(request, self)

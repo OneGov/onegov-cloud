@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import convert_ech_domain
 from onegov.election_day.formats.imports.common import EXPATS
@@ -17,6 +19,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.formats.imports.common import ECHImportResultType
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
     from onegov.election_day.models import Municipality
     from sqlalchemy.orm import Session
     from xsdata_ech.e_ch_0252_1_0 import Delivery as DeliveryV1
@@ -24,10 +28,10 @@ if TYPE_CHECKING:
 
 
 def import_votes_ech(
-    principal: 'Canton | Municipality',
-    delivery: 'DeliveryV1 | DeliveryV2',
-    session: 'Session'
-) -> 'ECHImportResultType':
+    principal: Canton | Municipality,
+    delivery: DeliveryV1 | DeliveryV2,
+    session: Session
+) -> ECHImportResultType:
     """ Imports all votes in a given eCH-0252 delivery.
 
     Deletes votes on the same day not appearing in the delivery.
@@ -41,13 +45,22 @@ def import_votes_ech(
     if not delivery.vote_base_delivery:
         return [], set(), set()
 
+    errors = []
     vote_base_delivery = delivery.vote_base_delivery
     assert vote_base_delivery.polling_day is not None
     polling_day = vote_base_delivery.polling_day.to_date()
+
+    if polling_day.year not in principal.entities:
+        errors.append(
+            FileImportError(
+                _('Cannot import votes. Year ${year} does not exist.',
+                  mapping={'year': polling_day.year})
+            ))
+        return errors, set(), set()
     entities = principal.entities[polling_day.year]
 
     # extract vote and ballot structure
-    classes: dict[str, type[Vote] | type[ComplexVote]] = {}
+    classes: dict[str, type[Vote | ComplexVote]] = {}
     for vote_info in vote_base_delivery.vote_info:
         assert vote_info.vote
         sub_type = vote_info.vote.vote_sub_type
@@ -89,10 +102,10 @@ def import_votes_ech(
         votes[identification] = vote
 
     # delete obsolete votes
+    deleted: set[ElectionCompound | Election | Vote]
     deleted = {vote for vote in existing_votes if vote not in votes.values()}
 
     # update information and add results
-    errors = []
     for vote_info in vote_base_delivery.vote_info:
 
         # titles and domain
@@ -172,7 +185,7 @@ def import_votes_ech(
             ballot_results[entity_id] = ballot_result
 
             # name and district
-            name, district, superregion = get_entity_and_district(
+            name, district, _superregion = get_entity_and_district(
                 entity_id, entities, vote, principal
             )
             ballot_result.name = name
@@ -222,7 +235,7 @@ def import_votes_ech(
             remaining.add(0)
         remaining -= set(ballot_results.keys())
         for entity_id in remaining:
-            name, district, superregion = get_entity_and_district(
+            name, district, _superregion = get_entity_and_district(
                 entity_id, entities, vote, principal
             )
             if vote.domain == 'none':

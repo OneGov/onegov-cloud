@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell main-content">
-                <p tal:condition="not:commissions" i18n:translate="">No commissions defined yet.</p>
+                <p tal:condition="not:commissions" i18n:translate="">No active commissions.</p>
                 <ul tal:condition="commissions" class="more-list commission-list">
                     <li tal:repeat="commission commissions">
                         <a class="list-link" tal:attributes="href request.link(commission)">

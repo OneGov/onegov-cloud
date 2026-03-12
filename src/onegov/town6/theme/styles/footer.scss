@@ -20,6 +20,17 @@ $footer-hover-color: $primary-fg-color;
         line-height: 1.5rem;
     }
 
+    a {
+        transition: all .2s linear;
+        border-radius: .7rem;
+    }
+
+    .footer-link:hover {
+        background: rgba(255, 255, 255, .2);
+        padding: .1rem 0rem;
+        margin: -.1rem 0rem;
+    }
+
     h2 {
         font-weight: 500;
         letter-spacing: 1px;
@@ -30,7 +41,11 @@ $footer-hover-color: $primary-fg-color;
         text-transform: none;
     }
 
-    .cell {
+    h5.custom-links {
+        margin-top: .5rem;
+    }
+
+    &> .cell {
 
         @include clean-ul;
         padding-bottom: .5rem;
@@ -39,11 +54,6 @@ $footer-hover-color: $primary-fg-color;
         p {
             line-height: 1.5rem;
             margin-bottom: .5rem;
-        }
-
-        p,
-        span {
-            opacity: .75;
         }
 
         a:hover {

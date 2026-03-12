@@ -1,10 +1,12 @@
-import json
-from datetime import date, datetime, timezone
-import transaction
-from sqlalchemy import or_, and_
+from __future__ import annotations
 
 import click
+import json
+import transaction
+
+from datetime import date, datetime, UTC
 from sedate import replace_timezone
+from sqlalchemy import or_, and_
 from sqlalchemy import cast, Date
 
 from onegov.core.cli import command_group
@@ -34,8 +36,8 @@ if TYPE_CHECKING:
 cli = command_group()
 
 
-def do_ims_import(path: str, request: 'FsiRequest') -> None:
-    errors, persons, courses, events, possible_ldap_users = parse_ims_data(
+def do_ims_import(path: str, request: FsiRequest) -> None:
+    _errors, persons, courses, events, possible_ldap_users = parse_ims_data(
         f'{path}/Teilnehmer.txt',
         f'{path}/Ausführungen.txt',
         f'{path}/Kurse.txt',
@@ -53,23 +55,23 @@ def do_ims_import(path: str, request: 'FsiRequest') -> None:
 
 @cli.command(name='import-ims-data', context_settings={'singular': True})
 @click.option('--path', help='Path with pre-named files', required=True)
-def import_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
+def import_ims_data_cli(path: str) -> Callable[[FsiRequest, FsiApp], None]:
 
-    def execute(request: 'FsiRequest', app: 'FsiApp') -> None:
+    def execute(request: FsiRequest, app: FsiApp) -> None:
         do_ims_import(path, request)
     return execute
 
 
 @cli.command(name='correct-ims-data', context_settings={'singular': True})
 @click.option('--path', help='Path Ausführungen.txt', required=False)
-def correct_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
+def correct_ims_data_cli(path: str) -> Callable[[FsiRequest, FsiApp], None]:
 
-    def fix_original_ims_import(request: 'FsiRequest', app: 'FsiApp') -> None:
+    def fix_original_ims_import(request: FsiRequest, app: FsiApp) -> None:
         # Import of data was done according to timestamps 15.01.2020
         session = request.session
 
         def delete_events_without_subscriptions(
-            session: 'Session'
+            session: Session
         ) -> tuple[int, int]:
             query = session.query(CourseEvent).filter(
                 cast(CourseEvent.created, Date) == date(2020, 1, 15)
@@ -95,13 +97,13 @@ def correct_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
                 dt.month,
                 dt.hour,
                 dt.minute,
-                tzinfo=timezone.utc)
+                tzinfo=UTC)
 
         @with_open
         def open_events_file(
-            csvfile: 'CSVFile[DefaultRow]',
-            session: 'Session'
-        ) -> tuple[set['UUID'], list[str]]:
+            csvfile: CSVFile[DefaultRow],
+            session: Session
+        ) -> tuple[set[UUID], list[str]]:
             corrected_event_ids: set[UUID] = set()
             control_messages: list[str] = []
             for line in csvfile.lines:
@@ -156,9 +158,11 @@ def correct_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
             )
             for event in by_created_query:
                 start = event.start
-                if start.day < 13 and not start.day == start.month:
+                if start.day < 13 and start.day != start.month:
                     to_change_ids.add(event.id)
-            print(f'To correct by using created date: {len(to_change_ids)}')
+            click.echo(
+                f'To correct by using created date: {len(to_change_ids)}'
+            )
             assert len(to_change_ids) == len(corrected_event_ids)
 
             return corrected_event_ids, control_messages
@@ -166,15 +170,17 @@ def correct_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
         # delete old course events
         total, deleted_count = delete_events_without_subscriptions(session)
         session.flush()
-        print(f'Deleted course events without subs: {deleted_count}/{total}')
-        corrected_ids, ctrl_msgs = open_events_file(path, session)
+        click.echo(
+            f'Deleted course events without subs: {deleted_count}/{total}'
+        )
+        corrected_ids, _ctrl_msgs = open_events_file(path, session)
         session.flush()
 
-        print(f'Corrected course events using '
+        click.echo(f'Corrected course events using '
               f'original file: {len(corrected_ids)}')
 
         with open('changed_events.log', 'w') as log_file:
-            print('\n'.join((str(i) for i in corrected_ids)), file=log_file)
+            click.echo('\n'.join(str(i) for i in corrected_ids), file=log_file)
 
     return fix_original_ims_import
 
@@ -186,9 +192,9 @@ def correct_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
 def import_teacher_data_cli(
     path: str,
     clear: bool
-) -> 'Callable[[FsiRequest, FsiApp], None]':
+) -> Callable[[FsiRequest, FsiApp], None]:
 
-    def execute(request: 'FsiRequest', app: 'FsiApp') -> None:
+    def execute(request: FsiRequest, app: FsiApp) -> None:
         import_teacher_data(path, request, clear)
     return execute
 
@@ -201,23 +207,26 @@ def import_teacher_data_cli(
 @click.option('--ldap-password', required=True)
 @click.option('--sort-by', required=True, default='mail')
 def test_ldap(
-    base: 'Sequence[str]',
+    base: Sequence[str],
     search_filter: str,
     ldap_server: str,
     ldap_username: str,
     ldap_password: str,
     sort_by: str
 ) -> None:
-    """
+    r"""
     Examples:
-    Search for an email: (mail=walter.roderer@zg.ch)
-    Search for names: (&(zgXGivenName=Vorname)(zgXSurname=Nachname))
-    Search for mail ending in: (mail=*@phgz.ch)
 
-    onegov-fsi --select /fsi/zug test-ldap --base 'ou=Kanton,o=KTZG' \
-      --ldap-server 'ldaps://.....' \
-      --ldap-username 'user' \
-      --ldap-password 'xxxx' --search-filter "(mail=*@zg.ch)"
+        * Search for an email: ``(mail=walter.roderer@zg.ch)``
+        * Search for names: ``(&(zgXGivenName=Vorname)(zgXSurname=Nachname))``
+        * Search for mail ending in: ``(mail=*@phgz.ch)``
+
+    .. code-block:: bash
+
+        onegov-fsi --select /fsi/zug test-ldap --base 'ou=Kanton,o=KTZG' \
+          --ldap-server 'ldaps://.....' \
+          --ldap-username 'user' \
+          --ldap-password 'xxxx' --search-filter "(mail=*@zg.ch)"
 
     """
 
@@ -241,14 +250,12 @@ def test_ldap(
         success = client.connection.search(
             ba, search_filter, attributes=attributes)
         if not success:
-            print(f'Search not successfull in base {ba}')
+            click.echo(f'Search not successfull in base {ba}')
             continue
-        for ix, entry in enumerate(
-            sorted(client.connection.entries, key=sort_func)
-        ):
-            print(json.dumps(entry.entry_attributes_as_dict, indent=4))
+        for entry in sorted(client.connection.entries, key=sort_func):
+            click.echo(json.dumps(entry.entry_attributes_as_dict, indent=4))
             count += 1
-    print(f'Found {count} entries')
+    click.echo(f'Found {count} entries')
 
 
 @cli.command(name='fetch-users', context_settings={'singular': True})
@@ -269,8 +276,8 @@ def fetch_users_cli(
     verbose: bool,
     skip_deactivate: bool,
     dry_run: bool
-) -> 'Callable[[FsiRequest, FsiApp], None]':
-    """ Updates the list of users/course attendees by fetching matching users
+) -> Callable[[FsiRequest, FsiApp], None]:
+    r""" Updates the list of users/course attendees by fetching matching users
     from a remote LDAP server.
 
     This is currently highly specific for the Canton of Zug and therefore most
@@ -278,20 +285,22 @@ def fetch_users_cli(
 
     Example:
 
-        onegov-fsi --select /fsi/fsi fetch-users \\
-            --ldap-server 'ldaps://1.2.3.4' \\
-            --ldap-username 'foo' \\
-            --ldap-password 'bar' \\
-            --admin-group 'ou=Admins' \\
+    .. code-block:: bash
+
+        onegov-fsi --select /fsi/fsi fetch-users \
+            --ldap-server 'ldaps://1.2.3.4' \
+            --ldap-username 'foo' \
+            --ldap-password 'bar' \
+            --admin-group 'ou=Admins' \
             --editor-group 'ou=Editors'
 
     """
 
-    def execute(request: 'FsiRequest', app: 'FsiApp') -> None:
+    def execute(request: FsiRequest, app: FsiApp) -> None:
 
         if dry_run and hasattr(app, 'es_orm_events'):
             # disable search indexing during operation
-            print('es_orm_events disabled')
+            click.echo('es_orm_events disabled')
             app.es_orm_events.stopped = True
 
         fetch_users(
@@ -311,8 +320,8 @@ def fetch_users_cli(
 
 
 def fetch_users(
-    app: 'FsiApp',
-    session: 'Session',
+    app: FsiApp,
+    session: Session,
     ldap_server: str,
     ldap_username: str,
     ldap_password: str,
@@ -329,14 +338,14 @@ def fetch_users(
     editor_group = editor_group.lower()
     sources = ZugUserSource.factory(verbose=verbose)
 
-    def users(connection: 'LDAPConnection') -> 'Iterator[dict[str, Any]]':
+    def users(connection: LDAPConnection) -> Iterator[dict[str, Any]]:
         for src in sources:
             for base, search_filter, attrs in src.bases_filters_attributes:
                 success = connection.search(
                     base, search_filter, attributes=attrs
                 )
                 if not success:
-                    log.error("Error importing events", exc_info=True)
+                    log.error('Error importing events', exc_info=True)
                     raise RuntimeError(
                         f"Could not query '{base}' "
                         f"with filter '{search_filter}'"
@@ -350,7 +359,7 @@ def fetch_users(
                     search_filter=search_filter
                 )
 
-    def handle_inactive(synced_ids: list['UUID']) -> None:
+    def handle_inactive(synced_ids: list[UUID]) -> None:
         inactive = session.query(User).filter(
             and_(
                 User.id.notin_(synced_ids),
@@ -360,7 +369,7 @@ def fetch_users(
                 )
             )
         )
-        for ix, user_ in enumerate(inactive):
+        for user_ in inactive:
             if user_.active:
                 log.info(f'Deactivating inactive user {user_.username}')
             user_.active = False
@@ -368,17 +377,11 @@ def fetch_users(
             if att:
                 att.active = False
 
-            if not dry_run:
-                if ix % 200 == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
-
     client = LDAPClient(ldap_server, ldap_username, ldap_password)
     client.try_configuration()
     count = 0
     synced_users = []
-    for ix, data in enumerate(users(client.connection)):
-
+    for data in users(client.connection):
         if data['type'] == 'ldap':
             source = 'ldap'
             source_id = data['source_id']
@@ -388,7 +391,7 @@ def fetch_users(
             source_id = None
             force_role = False
         else:
-            log.error("Unknown auth provider", exc_info=False)
+            log.error('Unknown auth provider', exc_info=False)
             raise NotImplementedError()
 
         user = ensure_user(
@@ -417,10 +420,6 @@ def fetch_users(
             user.attendee.active = user.active
 
         count += 1
-        if not dry_run:
-            if ix % 200 == 0:
-                app.es_indexer.process()
-                app.psql_indexer.bulk_process(session)
 
     log.info(f'Synchronized {count} users')
 

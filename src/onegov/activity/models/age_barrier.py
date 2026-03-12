@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date, datetime
 
 from dateutil import relativedelta
@@ -6,7 +8,7 @@ from dateutil import relativedelta
 class AgeBarrier:
     """ Holds various age barrier approaches available to the period. """
 
-    registry: dict[str, type['AgeBarrier']] = {}
+    registry: dict[str, type[AgeBarrier]] = {}
 
     def __init_subclass__(cls, name: str, **kwargs: object):
         assert name not in cls.registry
@@ -20,7 +22,7 @@ class AgeBarrier:
         name: str,
         *args: object,
         **kwargs: object
-    ) -> 'AgeBarrier':
+    ) -> AgeBarrier:
         return cls.registry[name](*args, **kwargs)
 
     def is_too_young(

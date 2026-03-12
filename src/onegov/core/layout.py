@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 import arrow
 import babel.dates
 import babel.numbers
@@ -7,8 +10,8 @@ import sedate
 
 from datetime import datetime
 from functools import cached_property
+from functools import lru_cache
 from onegov.core import utils
-from onegov.core.cache import lru_cache
 from onegov.core.templates import PageTemplate
 from pytz import timezone
 
@@ -80,7 +83,7 @@ class Layout:
     custom_body_attributes: dict[str, Any]
     custom_html_attributes: dict[str, Any]
 
-    def __init__(self, model: Any, request: 'CoreRequest'):
+    def __init__(self, model: Any, request: CoreRequest):
         self.model = model
         self.request = request
         self.custom_body_attributes = {}
@@ -93,25 +96,25 @@ class Layout:
             ] = request.app.sentry_dsn
 
     @cached_property
-    def app(self) -> 'Framework':
+    def app(self) -> Framework:
         """ Returns the application behind the request. """
         return self.request.app
 
     @overload
     def batched(
         self,
-        iterable: 'Iterable[_T]',
+        iterable: Iterable[_T],
         batch_size: int,
-        container_factory: 'type[tuple]' = ...  # type:ignore[type-arg]
-    ) -> 'Iterator[tuple[_T, ...]]': ...
+        container_factory: type[tuple] = ...  # type:ignore[type-arg]
+    ) -> Iterator[tuple[_T, ...]]: ...
 
     @overload
     def batched(
         self,
-        iterable: 'Iterable[_T]',
+        iterable: Iterable[_T],
         batch_size: int,
-        container_factory: 'type[list]'  # type:ignore[type-arg]
-    ) -> 'Iterator[list[_T]]': ...
+        container_factory: type[list]  # type:ignore[type-arg]
+    ) -> Iterator[list[_T]]: ...
 
     # NOTE: If there were higher order TypeVars, we could properly infer
     #       the type of the Container, for now we just add overloads for
@@ -119,17 +122,17 @@ class Layout:
     @overload
     def batched(
         self,
-        iterable: 'Iterable[_T]',
+        iterable: Iterable[_T],
         batch_size: int,
-        container_factory: 'Callable[[Iterator[_T]], Collection[_T]]'
-    ) -> 'Iterator[Collection[_T]]': ...
+        container_factory: Callable[[Iterator[_T]], Collection[_T]]
+    ) -> Iterator[Collection[_T]]: ...
 
     def batched(
         self,
-        iterable: 'Iterable[_T]',
+        iterable: Iterable[_T],
         batch_size: int,
-        container_factory: 'Callable[[Iterator[_T]], Collection[_T]]' = tuple
-    ) -> 'Iterator[Collection[_T]]':
+        container_factory: Callable[[Iterator[_T]], Collection[_T]] = tuple
+    ) -> Iterator[Collection[_T]]:
         """ See :func:`onegov.core.utils.batched`. """
 
         return utils.batched(
@@ -138,20 +141,19 @@ class Layout:
             container_factory
         )
 
-    @cached_property
+    @property
     def csrf_token(self) -> str:
         """ Returns a csrf token for use with DELETE links (forms do their
         own thing automatically).
 
         """
-        token = self.request.new_csrf_token()
-        return token.decode('utf-8') if isinstance(token, bytes) else token
+        return self.request.csrf_token
 
     def csrf_protected_url(self, url: str) -> str:
         """ Adds a csrf token to the given url. """
-        return utils.append_query_param(url, 'csrf-token', self.csrf_token)
+        return self.request.csrf_protected_url(url)
 
-    def format_date(self, dt: 'datetime | date | None', format: str) -> str:
+    def format_date(self, dt: datetime | date | None, format: str) -> str:
         """ Takes a datetime and formats it according to local timezone and
         the given format.
 
@@ -165,7 +167,7 @@ class Layout:
             )
 
         locale = self.request.locale
-        assert locale is not None, "Cannot format date without a locale"
+        assert locale is not None, 'Cannot format date without a locale'
         if format == 'relative':
             adt = arrow.get(dt)
 
@@ -207,9 +209,9 @@ class Layout:
 
     def format_number(
         self,
-        number: 'numbers.Number | Decimal | float | None',
+        number: numbers.Number | Decimal | float | str | None,
         decimal_places: int | None = None,
-        padding: str = ''
+        padding: int | str = ''
     ) -> str:
         """ Takes the given numer and formats it according to locale.
 
@@ -217,6 +219,9 @@ class Layout:
         otherwise 2.
 
         """
+        if isinstance(number, str):
+            return number
+
         if number is None:
             return ''
 
@@ -240,7 +245,7 @@ class Layout:
         """
         return self.request.unconsumed and self.request.unconsumed[-1] or None
 
-    def today(self) -> 'date':
+    def today(self) -> date:
         return self.now().date()
 
     def now(self) -> datetime:
@@ -259,13 +264,12 @@ class ChameleonLayout(Layout):
     """
 
     @cached_property
-    def template_loader(self) -> 'TemplateLoader':
+    def template_loader(self) -> TemplateLoader:
         """ Returns the chameleon template loader. """
-        registry = self.app.config.template_engine_registry
-        return registry._template_loaders['.pt']
+        return self.request.template_loader
 
     @cached_property
-    def base(self) -> 'PageTemplateFile':
+    def base(self) -> PageTemplateFile:
         """ Returns the layout, which defines the base layout of all pages.
 
         See ``templates/layout.pt``.
@@ -274,7 +278,7 @@ class ChameleonLayout(Layout):
         return self.template_loader['layout.pt']
 
     @cached_property
-    def macros(self) -> 'MacrosLookup':
+    def macros(self) -> MacrosLookup:
         """ Returns the macros, which offer often used html constructs.
         See ``templates/macros.pt``.
 
@@ -282,7 +286,7 @@ class ChameleonLayout(Layout):
         return self.template_loader.macros
 
     @cached_property
-    def elements(self) -> 'PageTemplate | PageTemplateFile':
+    def elements(self) -> PageTemplate | PageTemplateFile:
         """ The templates used by the elements. Overwrite this with your
         own ``templates/elements.pt`` if neccessary.
 

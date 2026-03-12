@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.user.models import UserGroup
 from onegov.core.collection import GenericCollection
 
@@ -21,15 +23,15 @@ class UserGroupCollection(GenericCollection[_G]):
 
     @overload
     def __init__(
-        self: 'UserGroupCollection[UserGroup]',
-        session: 'Session',
+        self: UserGroupCollection[UserGroup],
+        session: Session,
         type: Literal['*', 'generic'] = ...
     ): ...
 
     @overload
-    def __init__(self, session: 'Session', type: str): ...
+    def __init__(self, session: Session, type: str): ...
 
-    def __init__(self, session: 'Session', type: str = '*'):
+    def __init__(self, session: Session, type: str = '*'):
         self.session = session
         self.type = type
 
@@ -38,6 +40,6 @@ class UserGroupCollection(GenericCollection[_G]):
         return UserGroup.get_polymorphic_class(  # type:ignore[return-value]
             self.type, default=UserGroup)  # type:ignore[arg-type]
 
-    def query(self) -> 'Query[_G]':
-        query = super(UserGroupCollection, self).query()
+    def query(self) -> Query[_G]:
+        query = super().query()
         return query.order_by(self.model_class.name)

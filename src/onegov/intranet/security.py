@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.metadata import PublicMetadata
 from onegov.core.security import Public, Private, Personal, Secret
 from onegov.core.static import StaticFile
@@ -12,8 +14,8 @@ if TYPE_CHECKING:
     from onegov.core.security.roles import Intent
 
 
-@IntranetApp.setting_section(section="roles")
-def get_roles_setting() -> dict[str, set[type['Intent']]]:
+@IntranetApp.replace_setting_section(section='roles')
+def get_roles_setting() -> dict[str, set[type[Intent]]]:
     """ Returns the default roles available to onegov.core applications.
 
     Applications building on onegov.core may add more roles and permissions,
@@ -69,7 +71,7 @@ def get_roles_setting() -> dict[str, set[type['Intent']]]:
 )
 def may_view_static_files_not_logged_in(
     app: IntranetApp,
-    identity: 'NoIdentity',
+    identity: NoIdentity,
     model: StaticFile,
     permission: type[Public]
 ) -> bool:
@@ -88,7 +90,7 @@ def may_view_static_files_not_logged_in(
 )
 def may_view_theme_files_not_logged_in(
     app: IntranetApp,
-    identity: 'NoIdentity',
+    identity: NoIdentity,
     model: ThemeFile,
     permission: type[Public]
 ) -> bool:
@@ -107,7 +109,7 @@ def may_view_theme_files_not_logged_in(
 )
 def may_view_auth_not_logged_in(
     app: IntranetApp,
-    identity: 'NoIdentity',
+    identity: NoIdentity,
     model: Auth,
     permission: type[Public]
 ) -> bool:
@@ -122,7 +124,7 @@ def may_view_auth_not_logged_in(
 )
 def may_view_public_identity(
     app: IntranetApp,
-    identity: 'NoIdentity',
+    identity: NoIdentity,
     model: PublicMetadata,
     permission: type[Public]
 ) -> bool:

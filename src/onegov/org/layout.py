@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import numbers
+
 import babel.dates
 import re
 
@@ -8,11 +12,15 @@ from dateutil.rrule import rrulestr
 from decimal import Decimal
 from functools import cached_property
 from markupsafe import Markup
+from math import isclose
+from os.path import splitext, basename
+
 from onegov.chat import TextModuleCollection
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
 from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
+from onegov.form.collection import SurveyCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
@@ -22,10 +30,19 @@ from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
-from onegov.newsletter import NewsletterCollection, RecipientCollection
+from onegov.org.models.document_form import (
+    FormDocument,
+    FormDocumentCollection)
+from onegov.newsletter import (
+    Newsletter,
+    NewsletterCollection,
+    RecipientCollection,
+)
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.exports.base import OrgExport
+from onegov.org.models import CitizenDashboard
+from onegov.org.models import Clipboard
 from onegov.org.models import ExportCollection, Editor
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
@@ -44,15 +61,17 @@ from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.open_graph import OpenGraphMixin
 from onegov.org.theme.org_theme import user_options
+from onegov.org.utils import can_change_username, get_current_tickets_url
 from onegov.org.utils import IMG_URLS
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
 from onegov.reservation import ResourceCollection
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
+from operator import itemgetter
 from sedate import to_timezone
 from translationstring import TranslationString
 
@@ -69,20 +88,25 @@ if TYPE_CHECKING:
     from onegov.directory import DirectoryEntryCollection
     from onegov.event import Event, Occurrence
     from onegov.form import FormDefinition, FormSubmission
+    from onegov.form.models.definition import (
+        SurveySubmission, SurveyDefinition)
     from onegov.org.models import (
         ExtendedDirectory, ExtendedDirectoryEntry, ImageSet, Organisation)
     from onegov.org.app import OrgApp
-    from onegov.org.request import OrgRequest
-    from onegov.page import Page
+    from onegov.org.request import OrgRequest, PageMeta
     from onegov.reservation import Resource
     from onegov.ticket import Ticket
     from onegov.user import User, UserGroup
     from sedate.types import TzInfoOrName
-    from typing import TypeVar
+    from typing import TypeAlias, TypeVar
     from webob import Response
     from wtforms import Field
 
     _T = TypeVar('_T')
+
+    AnyFormDefinitionOrCollection: TypeAlias = (
+        FormDefinition | FormCollection | SurveyCollection | SurveyDefinition
+        | FormDocumentCollection | FormDocument)
 
 
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
@@ -108,8 +132,8 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     """
 
-    app: 'OrgApp'
-    request: 'OrgRequest'
+    app: OrgApp
+    request: OrgRequest
 
     date_long_without_year_format = 'E d. MMMM'
     datetime_long_without_year_format = 'E d. MMMM HH:mm'
@@ -118,7 +142,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     event_short_format = 'EE d. MMMM YYYY'
     isodate_format = 'y-M-d'
 
-    def has_model_permission(self, permission: type['Intent'] | None) -> bool:
+    def has_model_permission(self, permission: type[Intent] | None) -> bool:
         return self.request.has_permission(self.model, permission)
 
     @property
@@ -133,7 +157,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         )
 
     @property
-    def org(self) -> 'Organisation':
+    def org(self) -> Organisation:
         """ An alias for self.request.app.org. """
         return self.request.app.org
 
@@ -167,7 +191,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         }
 
     @cached_property
-    def svg(self) -> 'PageTemplateFile':
+    def svg(self) -> PageTemplateFile:
         return self.template_loader['svg.pt']
 
     @cached_property
@@ -187,14 +211,11 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def static_file_path(self, path: str) -> str:
         return self.request.link(StaticFile(path, version=self.app.version))
 
-    def with_hashtags(self, text: str | None) -> str | None:
-        if not text:
-            return text
+    def with_hashtags(self, text: str | None) -> Markup | None:
+        if text is None:
+            return None
 
-        # FIXME: utils.hashtag_elements should return Markup
-        return Markup(  # noqa: MS001
-            utils.hashtag_elements(self.request, text)
-        )
+        return utils.hashtag_elements(self.request, text)
 
     @cached_property
     def page_id(self) -> str:
@@ -212,7 +233,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         return 'page-' + (page_id or 'root')
 
     @cached_property
-    def body_classes(self) -> 'Iterator[str]':
+    def body_classes(self) -> Iterator[str]:
         """ Yields a list of body classes used on the body. """
 
         if self.request.is_logged_in:
@@ -224,7 +245,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         yield self.name
 
     @cached_property
-    def top_navigation(self) -> 'Sequence[Link] | None':
+    def top_navigation(self) -> Sequence[Link] | None:
         """ Returns a list of :class:`onegov.org.elements.Link` objects.
         Those links are used for the top navigation.
 
@@ -234,7 +255,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         return None
 
     @cached_property
-    def breadcrumbs(self) -> 'Sequence[Link] | None':
+    def breadcrumbs(self) -> Sequence[Link] | None:
         """ Returns a list of :class:`onegov.org.elements.Link` objects.
         Those links are used for the breadcrumbs.
 
@@ -244,12 +265,12 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         return None
 
     @cached_property
-    def sidebar_links(self) -> 'Sequence[Link | LinkGroup] | None':
+    def sidebar_links(self) -> Sequence[Link | LinkGroup] | None:
         """ A list of links shown in the sidebar, used for navigation. """
         return None
 
     @cached_property
-    def editbar_links(self) -> 'Sequence[BaseLink | LinkGroup] | None':
+    def editbar_links(self) -> Sequence[BaseLink | LinkGroup] | None:
         """ A of :class:`onegov.org.elements.LinkGroup` classes. Each of them
         will be shown in the top editbar, with the group title being the
         dropdown title.
@@ -361,6 +382,10 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def newsletter_url(self) -> str:
         return self.request.class_link(NewsletterCollection)
 
+    @cached_property
+    def vat_rate(self) -> Decimal:
+        return Decimal(self.app.org.vat_rate or 0.0)
+
     def login_to_url(self, to: str | None, skip: bool = False) -> str:
         auth = Auth.from_request(self.request, to=to, skip=skip)
         return self.request.link(auth, 'login')
@@ -369,7 +394,18 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         auth = Auth.from_request_path(self.request)
         return self.request.link(auth, name='login')
 
-    def export_formatter(self, format: str) -> 'Callable[[object], Any]':
+    def citizen_login(self) -> str:
+        dashboard = CitizenDashboard(self.request)
+        if dashboard.is_available:
+            auth = Auth.from_request(
+                self.request,
+                self.request.link(dashboard)
+            )
+        else:
+            auth = Auth.from_request_path(self.request)
+        return self.request.link(auth, name='citizen-login')
+
+    def export_formatter(self, format: str) -> Callable[[object], Any]:
         """ Returns a formatter function which takes a value and returns
         the value ready for export.
 
@@ -407,7 +443,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             if hasattr(value, 'domain'):
                 return self.request.translator(value)  # type:ignore[arg-type]
             if isinstance(value, str):
-                return "\n".join(value.splitlines())  # normalize newlines
+                return '\n'.join(value.splitlines())  # normalize newlines
             if isinstance(value, (list, tuple)):
                 return tuple(formatter(v) for v in value)
 
@@ -432,7 +468,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
                 if isinstance(value, (list, tuple)):
                     return '\n'.join(formatter(v) for v in value)
                 if isinstance(value, bool):
-                    value = value and _("Yes") or _("No")
+                    value = value and _('Yes') or _('No')
                 if isinstance(value, dict):
                     return value and json.dumps(value) or None
                 return default(value)
@@ -476,7 +512,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
         return [
             (v['name'], v['url']) for k, v in sorted(
-                links.items(), key=lambda item: item[0])
+                links.items(), key=itemgetter(0))
             if v['name'] and v['url']
         ]
 
@@ -516,7 +552,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     def field_download_link(
         self,
-        field: 'Field'
+        field: Field
     ) -> list[str | None] | str | None:
 
         if field.type == 'UploadField':
@@ -528,7 +564,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             ]
         return None
 
-    def field_file(self, field: 'Field') -> list[File | None] | File | None:
+    def field_file(self, field: Field) -> list[File | None] | File | None:
         if field.type == 'UploadField':
             return self.file_data_file(field.data)
         elif field.type == 'UploadMultipleField':
@@ -562,7 +598,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def to_timezone(
         self,
         date: datetime,
-        timezone: 'TzInfoOrName'
+        timezone: TzInfoOrName
     ) -> datetime:
         return to_timezone(date, timezone)
 
@@ -575,7 +611,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         time_range = utils.render_time_range(start, end)
 
         if time_range in ('00:00 - 24:00', '00:00 - 23:59'):
-            return self.request.translate(_("all day"))
+            return self.request.translate(_('all day'))
 
         return time_range
 
@@ -600,9 +636,10 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         with_year: bool = False
     ) -> str:
 
-        if start.date() == end.date():
-            show_single_day = True
-        elif (end - start) <= timedelta(hours=23) and end.time() < time(6, 0):
+        if start.date() == end.date() or (
+            (end - start) <= timedelta(hours=23)
+            and end.time() < time(6, 0)
+        ):
             show_single_day = True
         else:
             show_single_day = False
@@ -631,7 +668,26 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def format_seconds(self, seconds: float) -> str:
         return self.format_timedelta(timedelta(seconds=seconds))
 
-    def password_reset_url(self, user: 'User | None') -> str | None:
+    def get_vat_amount(
+        self,
+        amount: numbers.Number | Decimal | float | None
+    ) -> Decimal | None:
+        """
+        Takes the given amount and currency returning the amount
+        of the paid price that is attributed to the VAT.
+        """
+        if amount is not None and self.vat_rate:
+            if isinstance(amount, (Decimal, int, float, str)):
+                amount = Decimal(amount)
+            else:
+                amount = Decimal(str(amount))
+            return amount / (100 + self.vat_rate) * self.vat_rate
+        return None
+
+    def format_phone_number(self, phone_number: str) -> str:
+        return utils.format_phone_number(phone_number)
+
+    def password_reset_url(self, user: User | None) -> str | None:
         if not user:
             return None
 
@@ -642,20 +698,25 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         )
 
     @overload
-    def linkify(self, text: None) -> None: ...
+    def linkify(self, text: str) -> Markup: ...
     @overload
-    def linkify(self, text: str) -> str: ...
+    def linkify(self, text: None) -> None: ...
 
-    def linkify(self, text: str | None) -> str | None:
+    def linkify(self, text: str | None) -> Markup | None:
+        if text is None:
+            return None
+
         if isinstance(text, TranslationString):
             # translate the text before applying linkify if it's a
             # translation string
             text = self.request.translate(text)
-        # FIXME: linkify should return Markup, so then this replace
-        #        needs to use Markup('<br>') as well
-        return linkify(text).replace('\n', '<br>') if text else text
 
-    def linkify_field(self, field: 'Field', rendered: Markup) -> Markup:
+        linkified = linkify(text)
+        if isinstance(text, Markup):
+            return linkified
+        return linkified.replace('\n', Markup('<br>'))
+
+    def linkify_field(self, field: Field, rendered: Markup) -> Markup:
         include = ('TextAreaField', 'StringField', 'EmailField', 'URLField')
         if field.render_kw:
             if field.render_kw.get('data-editor') == 'markdown':
@@ -664,25 +725,13 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             if field.render_kw.get('class_') == 'editor':
                 return rendered
         if field.type in include:
-            # FIXME: Get rid of this conversion back and forth between Markup
-            #        and str, but for now we only wanted to ensure rendered
-            #        fields always return Markup, so we don't have to change
-            #        as many places
-            return Markup(  # noqa: MS001
-                self.linkify(str(rendered).replace('<br>', '\n'))
-            )
+            return self.linkify(rendered)
         return rendered
 
     @property
     def file_link_target(self) -> str | None:
         """ Use with tal:attributes='target layout.file_link_target' """
         return '_blank' if self.org.open_files_target_blank else None
-
-    # so we can create Markup in layouts
-    # FIXME: We added Markup to the globals in our templates, so we
-    #        can get rid of this, we just have to replace instances
-    #        of layout.Markup with Markup
-    Markup = Markup
 
     file_extension_fa_icon_mapping = {
         'pdf': 'fa-file-pdf',
@@ -733,11 +782,26 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         versions, hence this only works for town6.
         """
         default_icon = 'fa-file'
-        if '.' not in filename:
-            return default_icon
-
-        ext = filename.split('.')[1].lower()
+        ext = self.get_filename_extension(filename)
         return self.file_extension_fa_icon_mapping.get(ext, default_icon)
+
+    def get_filename_extension(self, filename: str) -> str:
+        """ Returns the filename extension. """
+        base = self.get_filename_without_extension(filename)
+        ext = filename.removeprefix(base).lstrip('.')
+        return ext.lower()
+
+    def get_filename_without_extension(self, filename: str) -> str:
+        """ Returns the filename stem (no extension)."""
+        name = basename(filename)
+        lower = name.lower()
+
+        # handle common compound extensions
+        for ext in ('.tar.gz', '.tar.bz2', '.tar.xz'):
+            if lower.endswith(ext):
+                return name[:-len(ext)]
+
+        return splitext(filename)[0]
 
 
 class DefaultLayoutMixin:
@@ -761,17 +825,17 @@ class DefaultLayoutMixin:
             return
 
         @self.request.after
-        def respond_with_no_index(response: 'Response') -> None:
+        def respond_with_no_index(response: Response) -> None:
             response.headers['X-Robots-Tag'] = 'noindex'
 
 
 class DefaultLayout(Layout, DefaultLayoutMixin):
     """ The default layout meant for the public facing parts of the site. """
 
-    request: 'OrgRequest'
+    request: OrgRequest
     edit_mode: bool
 
-    def __init__(self, model: Any, request: 'OrgRequest',
+    def __init__(self, model: Any, request: OrgRequest,
                  edit_mode: bool = False) -> None:
         super().__init__(model, request)
 
@@ -799,28 +863,28 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 
         self.hide_from_robots()
 
-    def show_label(self, field: 'Field') -> bool:
+    def show_label(self, field: Field) -> bool:
         return True
 
     @cached_property
-    def breadcrumbs(self) -> 'Sequence[Link] | None':
+    def breadcrumbs(self) -> Sequence[Link] | None:
         """ Returns the breadcrumbs for the current page. """
-        return [Link(_("Homepage"), self.homepage_url)]
+        return [Link(_('Homepage'), self.homepage_url)]
 
-    def exclude_invisible(self, items: 'Iterable[_T]') -> 'Sequence[_T]':
+    def exclude_invisible(self, items: Iterable[_T]) -> Sequence[_T]:
         items = self.request.exclude_invisible(items)
         if not self.request.is_manager:
             return tuple(i for i in items if getattr(i, 'published', True))
         return items
 
-    @cached_property
-    def root_pages(self) -> 'Sequence[Page]':
-        return self.exclude_invisible(self.app.root_pages)
+    @property
+    def root_pages(self) -> tuple[PageMeta, ...]:
+        return self.request.root_pages
 
     @cached_property
-    def top_navigation(self) -> 'Sequence[Link] | None':
+    def top_navigation(self) -> Sequence[Link] | None:
         return tuple(
-            Link(r.title, self.request.link(r)) for r in self.root_pages
+            Link(r.title, r.link(self.request)) for r in self.root_pages
         )
 
     @cached_property
@@ -831,12 +895,12 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     def editmode_links(self) -> list[Link | LinkGroup | Button]:
         return [
             Button(
-                text=_("Save"),
+                text=_('Save'),
                 attrs={'class': 'save-link', 'form': 'main-form',
                        'type': 'submit'},
             ),
             Link(
-                text=_("Cancel"),
+                text=_('Cancel'),
                 url=self.request.link(self.model),
                 attrs={'class': 'cancel-link'}
             ),]
@@ -846,6 +910,7 @@ class DefaultMailLayoutMixin:
     if TYPE_CHECKING:
         # forward declare required attributes
         request: OrgRequest
+
         @property
         def org(self) -> Organisation: ...
 
@@ -858,23 +923,23 @@ class DefaultMailLayoutMixin:
             )
         )
 
-    def paragraphify(self, text: str) -> str:
+    def paragraphify(self, text: str) -> Markup:
         return paragraphify(text)
 
 
-class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
+class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
     """ A special layout for creating HTML E-Mails. """
 
     @cached_property
-    def base(self) -> 'PageTemplateFile':
+    def base(self) -> PageTemplateFile:
         return self.template_loader['mail_layout.pt']
 
     @cached_property
-    def macros(self) -> 'MacrosLookup':
+    def macros(self) -> MacrosLookup:
         return self.template_loader.mail_macros
 
     @cached_property
-    def contact_html(self) -> str:
+    def contact_html(self) -> Markup:
         """ Returns the contacts html, but instead of breaking it into multiple
         lines (like on the site footer), this version puts it all on one line.
 
@@ -882,18 +947,18 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
 
         lines = (l.strip() for l in self.org.meta['contact'].splitlines())
         lines = (l for l in lines if l)
-
         return linkify(', '.join(lines))
 
 
 class AdjacencyListMixin:
     """ Provides layouts for models inheriting from
-        :class:`onegov.core.orm.abstract.AdjacencyList`
+    :class:`onegov.core.orm.abstract.AdjacencyList`
     """
 
     if TYPE_CHECKING:
         model: AdjacencyList
         request: OrgRequest
+
         def csrf_protected_url(self, url: str) -> str: ...
         @property
         def homepage_url(self) -> str: ...
@@ -911,9 +976,9 @@ class AdjacencyListMixin:
             )
         )
 
-    def get_breadcrumbs(self, item: 'AdjacencyList') -> 'Iterator[Link]':
+    def get_breadcrumbs(self, item: AdjacencyList) -> Iterator[Link]:
         """ Yields the breadcrumbs for the given adjacency list item. """
-        yield Link(_("Homepage"), self.homepage_url)
+        yield Link(_('Homepage'), self.homepage_url)
 
         if item:
             for ancestor in item.ancestors:
@@ -924,13 +989,13 @@ class AdjacencyListMixin:
     def get_sidebar(
         self,
         type: str | None = None
-    ) -> 'Iterator[Link | LinkGroup]':
+    ) -> Iterator[Link | LinkGroup]:
         """ Yields the sidebar for the given adjacency list item. """
         query = self.model.siblings.filter(self.model.__class__.type == type)
 
         def filter(
-            items: 'Iterable[AdjacencyList]'
-        ) -> 'Sequence[AdjacencyList]':
+            items: Iterable[AdjacencyList]
+        ) -> Sequence[AdjacencyList]:
 
             items = self.request.exclude_invisible(items)
             if not self.request.is_manager:
@@ -956,14 +1021,14 @@ class AdjacencyListMixin:
 
 
 class AdjacencyListLayout(DefaultLayout, AdjacencyListMixin):
-    request: 'OrgRequest'
+    request: OrgRequest
 
 
 class SettingsLayout(DefaultLayout):
     def __init__(
         self,
         model: Any,
-        request: 'OrgRequest',
+        request: OrgRequest,
         setting: str | None = None
     ) -> None:
         super().__init__(model, request)
@@ -974,11 +1039,13 @@ class SettingsLayout(DefaultLayout):
 
         self.setting = setting
 
+    edit_mode = True
+
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         bc = [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Settings"), self.request.link(self.org, 'settings'))
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Settings'), self.request.link(self.org, 'settings'))
         ]
 
         if self.setting:
@@ -999,11 +1066,11 @@ class PageLayout(AdjacencyListLayout):
         return super().og_image_source
 
     @cached_property
-    def breadcrumbs(self) -> 'Sequence[Link]':
+    def breadcrumbs(self) -> Sequence[Link]:
         return tuple(self.get_breadcrumbs(self.model))
 
     @cached_property
-    def sidebar_links(self) -> 'Sequence[Link | LinkGroup]':
+    def sidebar_links(self) -> Sequence[Link | LinkGroup]:
         return tuple(self.get_sidebar(type='topic'))
 
 
@@ -1019,7 +1086,7 @@ class NewsLayout(AdjacencyListLayout):
         return super().og_image_source
 
     @cached_property
-    def breadcrumbs(self) -> 'Sequence[Link]':
+    def breadcrumbs(self) -> Sequence[Link]:
         return tuple(self.get_breadcrumbs(self.model))
 
 
@@ -1030,12 +1097,13 @@ class EditorLayout(AdjacencyListLayout):
     def __init__(
         self,
         model: Editor,
-        request: 'OrgRequest',
+        request: OrgRequest,
         site_title: str | None
     ) -> None:
         super().__init__(model, request)
         self.site_title = site_title
         self.include_editor()
+        self.edit_mode = True
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
@@ -1044,29 +1112,15 @@ class EditorLayout(AdjacencyListLayout):
 
         return links
 
-    @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup | Button]:
-        return [
-            Button(
-                text=_("Save"),
-                attrs={'class': 'save-link', 'form': 'main-form',
-                       'type': 'submit'},
-            ),
-            Link(
-                text=_("Cancel"),
-                url=self.request.link(self.model.page),
-                attrs={'class': 'cancel-link'}
-            ),]
-
 
 class FormEditorLayout(DefaultLayout):
 
-    model: 'FormDefinition | FormCollection'
+    model: AnyFormDefinitionOrCollection
 
     def __init__(
         self,
-        model: 'FormDefinition | FormCollection',
-        request: 'OrgRequest'
+        model: AnyFormDefinitionOrCollection,
+        request: OrgRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -1076,12 +1130,12 @@ class FormEditorLayout(DefaultLayout):
 
 class FormSubmissionLayout(DefaultLayout):
 
-    model: 'FormSubmission | FormDefinition'
+    model: FormSubmission | FormDefinition
 
     def __init__(
         self,
-        model: 'FormSubmission | FormDefinition',
-        request: 'OrgRequest',
+        model: FormSubmission | FormDefinition,
+        request: OrgRequest,
         title: str | None = None
     ) -> None:
 
@@ -1090,7 +1144,7 @@ class FormSubmissionLayout(DefaultLayout):
         self.title = title or self.form.title
 
     @cached_property
-    def form(self) -> 'FormDefinition':
+    def form(self) -> FormDefinition:
         if hasattr(self.model, 'form'):
             return self.model.form  # type:ignore[return-value]
         else:
@@ -1101,8 +1155,8 @@ class FormSubmissionLayout(DefaultLayout):
         collection = FormCollection(self.request.session)
 
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Forms"), self.request.link(collection)),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Forms'), self.request.link(collection)),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -1129,46 +1183,46 @@ class FormSubmissionLayout(DefaultLayout):
         collection = FormCollection(self.request.session)
 
         edit_link = Link(
-            text=_("Edit"),
+            text=_('Edit'),
             url=self.request.link(self.form, name='edit'),
             attrs={'class': 'edit-link'}
         )
 
         qr_link = QrCodeLink(
-            text=_("QR"),
+            text=_('QR'),
             url=self.request.link(self.model),
             attrs={'class': 'qr-code-link'}
         )
 
         if not self.can_delete_form:
             delete_link = Link(
-                text=_("Delete"),
+                text=_('Delete'),
                 attrs={'class': 'delete-link'},
                 traits=(
                     Block(
                         _("This form can't be deleted."),
                         _(
-                            "There are submissions associated with the form. "
-                            "Those need to be removed first."
+                            'There are submissions associated with the form. '
+                            'Those need to be removed first.'
                         ),
-                        _("Cancel")
+                        _('Cancel')
                     )
                 )
             )
 
         else:
             delete_link = Link(
-                text=_("Delete"),
+                text=_('Delete'),
                 url=self.csrf_protected_url(
                     self.request.link(self.form)
                 ),
                 attrs={'class': 'delete-link'},
                 traits=(
                     Confirm(
-                        _("Do you really want to delete this form?"),
-                        _("This cannot be undone."),
-                        _("Delete form"),
-                        _("Cancel")
+                        _('Do you really want to delete this form?'),
+                        _('This cannot be undone.'),
+                        _('Delete form'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='DELETE',
@@ -1178,22 +1232,22 @@ class FormSubmissionLayout(DefaultLayout):
             )
 
         export_link = Link(
-            text=_("Export"),
+            text=_('Export'),
             url=self.request.link(self.form, name='export'),
             attrs={'class': 'export-link'}
         )
 
         change_url_link = Link(
-            text=_("Change URL"),
+            text=_('Change URL'),
             url=self.request.link(self.form, name='change-url'),
             attrs={'class': 'internal-url'}
         )
 
         registration_windows_link = LinkGroup(
-            title=_("Registration Windows"),
+            title=_('Registration Windows'),
             links=[
                 Link(
-                    text=_("Add"),
+                    text=_('Add'),
                     url=self.request.link(
                         self.model, 'new-registration-window'
                     ),
@@ -1224,46 +1278,344 @@ class FormCollectionLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Forms"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Forms'), '#')
         ]
 
     @property
     def external_forms(self) -> ExternalLinkCollection:
         return ExternalLinkCollection(self.request.session)
 
-    @cached_property
+    @property
+    def form_definitions(self) -> FormCollection:
+        return FormCollection(self.request.session)
+
+    @property
+    def document_forms(self) -> FormDocumentCollection:
+        return FormDocumentCollection(self.request.session)
+
+    @property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Form"),
+                            text=_('Form'),
                             url=self.request.link(
-                                self.model,
+                                self.form_definitions,
                                 name='new'
                             ),
                             attrs={'class': 'new-form'}
                         ),
                         Link(
-                            text=_("External form"),
+                            text=_('External form'),
                             url=self.request.link(
                                 self.external_forms,
                                 query_params={
                                     'title': self.request.translate(
-                                        _("New external form")),
+                                        _('New external form')),
                                     'type': 'form'
                                 },
                                 name='new'
                             ),
                             attrs={'class': 'new-form'}
-                        )
+                        ),
+                        Link(
+                            text=_('Document form'),
+                            url=self.request.link(
+                                self.document_forms,
+                                name='new'
+                            ),
+                            attrs={'class': 'new-document-form'}
+                        ),
                     ]
                 ),
             ]
         return None
+
+
+class SurveySubmissionWindowLayout(DefaultLayout):
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        collection = SurveyCollection(self.request.session)
+
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Surveys'), self.request.link(collection)),
+            Link(self.model.survey.title, self.request.link(self.model.survey)
+                 ),
+            Link(self.model.title, self.request.link(self.model))
+        ]
+
+    @property
+    def editbar_links(self) -> list[Link] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(self.request.link(self.model)),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete '
+                                'this submission window?'
+                            ),
+                            _('Submissions associated with this submission '
+                              'window will be deleted as well.'),
+                            _('Delete submission window'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.model.survey)
+                        )
+                    )
+                ),
+                QrCodeLink(
+                    text=_('QR'),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'qr-code-link'}
+                ),
+                Link(
+                    text=_('Results'),
+                    url=self.request.link(
+                        self.model,
+                        name='results'
+                    ),
+                    attrs={'class': 'results-link'}
+                ),
+            ]
+        return None
+
+
+class SurveySubmissionLayout(DefaultLayout):
+
+    model: SurveySubmission | SurveyDefinition
+
+    def __init__(
+        self,
+        model: SurveySubmission | SurveyDefinition,
+        request: OrgRequest,
+        title: str | None = None
+    ) -> None:
+
+        super().__init__(model, request)
+        self.include_code_editor()
+        self.title = title or self.form.title
+
+    @cached_property
+    def form(self) -> SurveyDefinition:
+        if hasattr(self.model, 'survey'):
+            return self.model.survey  # type:ignore[return-value]
+        else:
+            return self.model
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        collection = SurveyCollection(self.request.session)
+
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Surveys'), self.request.link(collection)),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+
+        if not self.request.is_manager:
+            return None
+
+        # only show the edit bar links if the site is the base of the form
+        # -> if the user already entered some form data remove the edit bar
+        # because it makes it seem like it's there to edit the submission,
+        # not the actual form
+        if hasattr(self.model, 'form'):
+            return None
+
+        collection = SurveyCollection(self.request.session)
+
+        edit_link = Link(
+            text=_('Edit'),
+            url=self.request.link(self.form, name='edit'),
+            attrs={'class': 'edit-link'}
+        )
+
+        qr_link = QrCodeLink(
+            text=_('QR'),
+            url=self.request.link(self.model),
+            attrs={'class': 'qr-code-link'}
+        )
+
+        delete_link = Link(
+            text=_('Delete'),
+            url=self.csrf_protected_url(
+                self.request.link(self.form)
+            ),
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _('Do you really want to delete this survey?'),
+                    _('This cannot be undone. And all submissions will be '
+                      'deleted with it.'),
+                    _('Delete survey'),
+                    _('Cancel')
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=self.request.link(collection)
+                )
+            )
+        )
+
+        export_link = Link(
+            text=_('Export'),
+            url=self.request.link(self.form, name='export'),
+            attrs={'class': 'export-link'}
+        )
+
+        change_url_link = Link(
+            text=_('Change URL'),
+            url=self.request.link(self.form, name='change-url'),
+            attrs={'class': 'internal-url'}
+        )
+
+        results_link = Link(
+            text=_('Results'),
+            url=self.request.link(self.model, name='results'),
+            attrs={'class': 'results-link'}
+        )
+
+        submission_windows_link = LinkGroup(
+            title=_('Submission Windows'),
+            links=[
+                Link(
+                    text=_('Add'),
+                    url=self.request.link(
+                        self.model, 'new-submission-window'
+                    ),
+                    attrs={'class': 'new-submission-window'}
+                ),
+                *(
+                    Link(
+                        text=w.title if w.title else self.format_date_range(
+                            w.start, w.end),
+                        url=self.request.link(w),
+                        attrs={'class': 'view-link'}
+                    ) for w in self.form.submission_windows
+                )
+            ]
+        )
+
+        return [
+            edit_link,
+            delete_link,
+            export_link,
+            change_url_link,
+            submission_windows_link,
+            qr_link,
+            results_link,
+        ]
+
+
+class SurveyCollectionLayout(DefaultLayout):
+    @property
+    def survey_definitions(self) -> SurveyCollection:
+        return SurveyCollection(self.request.session)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Surveys'), '#')
+        ]
+
+    @property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Survey'),
+                            url=self.request.link(
+                                self.survey_definitions,
+                                name='new'
+                            ),
+                            attrs={'class': 'new-form'}
+                        ),
+                    ]
+                ),
+            ]
+        return None
+
+
+class FormDocumentLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        collection = FormCollection(self.request.session)
+
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Forms'), self.request.link(collection)),
+            Link(self.model.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+
+        if not self.request.is_manager:
+            return None
+
+        collection = FormCollection(self.request.session)
+
+        edit_link = Link(
+            text=_('Edit'),
+            url=self.request.link(self.model, name='edit'),
+            attrs={'class': 'edit-link'}
+        )
+
+        qr_link = QrCodeLink(
+            text=_('QR'),
+            url=self.request.link(self.model),
+            attrs={'class': 'qr-code-link'}
+        )
+
+        delete_link = Link(
+            text=_('Delete'),
+            url=self.csrf_protected_url(
+                self.request.link(self.model)
+            ),
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _('Do you really want to delete this form?'),
+                    _('This cannot be undone.'),
+                    _('Delete form'),
+                    _('Cancel')
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=self.request.link(collection)
+                )
+            )
+        )
+
+        return [
+            edit_link,
+            delete_link,
+            qr_link
+        ]
 
 
 class PersonCollectionLayout(DefaultLayout):
@@ -1271,19 +1623,25 @@ class PersonCollectionLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("People"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('People'), '#')
         ]
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
+                Link(
+                    text=_('Settings'),
+                    url=self.request.link(
+                        self.request.app.org, 'people-settings'),
+                    attrs={'class': 'settings-link'}
+                ),
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Person"),
+                            text=_('Person'),
                             url=self.request.link(
                                 self.model,
                                 name='new'
@@ -1305,8 +1663,8 @@ class PersonLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("People"), self.request.link(self.collection)),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('People'), self.request.link(self.collection)),
             Link(_(self.model.title), self.request.link(self.model))
         ]
 
@@ -1315,22 +1673,22 @@ class PersonLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to delete this person?"),
-                            _("This cannot be undone."),
-                            _("Delete person"),
-                            _("Cancel")
+                            _('Do you really want to delete this person?'),
+                            _('This cannot be undone.'),
+                            _('Delete person'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -1347,8 +1705,8 @@ class TicketsLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Tickets"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Tickets'), '#')
         ]
 
 
@@ -1357,15 +1715,15 @@ class ArchivedTicketsLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Tickets"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Tickets'), '#')
         ]
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
         links: list[Link | LinkGroup] = []
         if self.request.is_admin:
-            text = self.request.translate(_("Delete archived tickets"))
+            text = self.request.translate(_('Delete archived tickets'))
             links.append(
                 Link(
                     text=text,
@@ -1373,11 +1731,11 @@ class ArchivedTicketsLayout(DefaultLayout):
                                                                   'delete')),
                     traits=(
                         Confirm(
-                            _("Do you really want to delete all archived "
-                              "tickets?"),
-                            _("This cannot be undone."),
-                            _("Delete archived tickets"),
-                            _("Cancel"),
+                            _('Do you really want to delete all archived '
+                              'tickets?'),
+                            _('This cannot be undone.'),
+                            _('Delete archived tickets'),
+                            _('Cancel'),
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -1395,9 +1753,9 @@ class ArchivedTicketsLayout(DefaultLayout):
 
 class TicketLayout(DefaultLayout):
 
-    model: 'Ticket'
+    model: Ticket
 
-    def __init__(self, model: 'Ticket', request: 'OrgRequest') -> None:
+    def __init__(self, model: Ticket, request: OrgRequest) -> None:
         super().__init__(model, request)
         self.request.include('timeline')
 
@@ -1408,19 +1766,24 @@ class TicketLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Tickets"), self.request.link(self.collection)),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
             Link(self.model.number, '#')
         ]
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
-        if self.request.is_manager:
-
-            links: list[Link | LinkGroup]
+        links: list[Link | LinkGroup] = []
+        if is_manager := self.request.is_manager_for_model(self.model):
 
             # only show the model related links when the ticket is pending
-            if self.model.state == 'pending':
+            # or if the handler explicitly allows it for closed tickets
+            show_links_when_closed = getattr(
+                self.model.handler, 'show_links_when_closed', False
+            )
+            if self.model.state == 'pending' or (
+                self.model.state == 'closed' and show_links_when_closed
+            ):
                 # FIXME: This is a weird discrepancy where we unsafely change
                 #        the API for Handler.get_links inside onegov.org, not
                 #        sure what to do about this. We should probably move
@@ -1439,41 +1802,44 @@ class TicketLayout(DefaultLayout):
 
             if self.model.state == 'open':
                 links.append(Link(
-                    text=_("Accept ticket"),
+                    text=_('Accept ticket'),
                     url=self.request.link(self.model, 'accept'),
                     attrs={'class': ('ticket-button', 'ticket-accept')}
                 ))
 
             elif self.model.state == 'pending':
-                traits: Sequence[Trait] = ()
+                if self.model.handler_code != 'TRP':
+                    traits: Sequence[Trait] = ()
 
-                if self.model.handler.undecided:
-                    traits = (
-                        Block(
-                            _("This ticket can't be closed."),
-                            _(
-                                "This ticket requires a decision, but no "
-                                "decision has been made yet."
+                    if self.model.handler.undecided:
+                        traits = (
+                            Block(
+                                _("This ticket can't be closed."),
+                                _(
+                                    'This ticket requires a decision, '
+                                    'but no decision has been made yet.'
+                                ),
+                                _('Cancel'),
                             ),
-                            _("Cancel")
-                        ),
-                    )
+                        )
 
-                links.append(Link(
-                    text=_("Close ticket"),
-                    url=self.request.link(self.model, 'close'),
-                    attrs={'class': ('ticket-button', 'ticket-close')},
-                    traits=traits
-                ))
+                    links.append(
+                        Link(
+                            text=_('Close ticket'),
+                            url=self.request.link(self.model, 'close'),
+                            attrs={'class': ('ticket-button', 'ticket-close')},
+                            traits=traits,
+                        )
+                    )
 
             elif self.model.state == 'closed':
                 links.append(Link(
-                    text=_("Reopen ticket"),
+                    text=_('Reopen ticket'),
                     url=self.request.link(self.model, 'reopen'),
                     attrs={'class': ('ticket-button', 'ticket-reopen')}
                 ))
                 links.append(Link(
-                    text=_("Archive ticket"),
+                    text=_('Archive ticket'),
                     url=self.request.link(self.model, 'archive'),
                     attrs={'class': ('ticket-button', 'ticket-archive')})
                 )
@@ -1484,7 +1850,7 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': ('ticket-button', 'ticket-reopen')}
                 ))
                 links.append(Link(
-                    text=_("Delete Ticket"),
+                    text=_('Delete Ticket'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model, 'delete')
                     ),
@@ -1493,37 +1859,57 @@ class TicketLayout(DefaultLayout):
 
             if self.model.state != 'closed':
                 links.append(Link(
-                    text=_("Assign ticket"),
+                    text=_('Assign ticket'),
                     url=self.request.link(self.model, 'assign'),
                     attrs={'class': ('ticket-button', 'ticket-assign')},
                 ))
 
+        if self.request.is_logged_in:
             # ticket notes are always enabled
             links.append(
                 Link(
-                    text=_("New Note"),
+                    text=_('New Note'),
                     url=self.request.link(self.model, 'note'),
                     attrs={'class': 'new-note'}
                 )
             )
-            links.append(
-                Link(
-                    text=_("PDF"),
-                    url=self.request.link(self.model, 'pdf'),
-                    attrs={'class': 'ticket-pdf'}
-                )
-            )
-            if self.has_submission_files:
+            if getattr(self.model, 'order_id', None) is not None:
+                links.append(LinkGroup(
+                    title=_('PDF'),
+                    links=[
+                        Link(
+                            text=_('Only this ticket'),
+                            url=self.request.link(self.model, 'pdf'),
+                            attrs={'class': 'ticket-pdf'}
+                        ),
+                        Link(
+                            text=_('With related tickets'),
+                            url=self.request.link(
+                                self.model, 'related-tickets-pdf'),
+                            attrs={'class': 'ticket-pdf'}
+                        ),
+                    ],
+                    classes=['ticket-pdf']
+                ))
+            else:
                 links.append(
                     Link(
-                        text=_("Download files"),
-                        url=self.request.link(self.model, 'files'),
-                        attrs={'class': 'ticket-files'}
+                        text=_('PDF'),
+                        url=self.request.link(self.model, 'pdf'),
+                        attrs={'class': 'ticket-pdf'}
                     )
                 )
 
-            return links
-        return None
+        if is_manager and self.has_submission_files:
+            links.append(
+                Link(
+                    text=_('Download files'),
+                    url=self.request.link(self.model, 'files'),
+                    attrs={'class': 'ticket-files'}
+                )
+            )
+
+        return links or None
 
     @cached_property
     def has_submission_files(self) -> bool:
@@ -1533,13 +1919,13 @@ class TicketLayout(DefaultLayout):
 
 class TicketNoteLayout(DefaultLayout):
 
-    ticket: 'Ticket'
+    ticket: Ticket
 
     @overload
     def __init__(
         self,
-        model: 'Ticket',
-        request: 'OrgRequest',
+        model: Ticket,
+        request: OrgRequest,
         title: str,
         ticket: None = None
     ) -> None: ...
@@ -1548,17 +1934,17 @@ class TicketNoteLayout(DefaultLayout):
     def __init__(
         self,
         model: Any,
-        request: 'OrgRequest',
+        request: OrgRequest,
         title: str,
-        ticket: 'Ticket'
+        ticket: Ticket
     ) -> None: ...
 
     def __init__(
         self,
         model: Any,
-        request: 'OrgRequest',
+        request: OrgRequest,
         title: str,
-        ticket: 'Ticket | None' = None
+        ticket: Ticket | None = None
     ) -> None:
 
         super().__init__(model, request)
@@ -1568,10 +1954,8 @@ class TicketNoteLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Tickets"), self.request.link(
-                TicketCollection(self.request.session)
-            )),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
             Link(self.ticket.number, self.request.link(self.ticket)),
             Link(self.title, '#')
         ]
@@ -1584,12 +1968,12 @@ class TicketNoteLayout(DefaultLayout):
 #        ticket attribute, much akin to TicketNoteLayout
 class TicketChatMessageLayout(DefaultLayout):
 
-    model: 'Ticket'
+    model: Ticket
 
     def __init__(
         self,
-        model: 'Ticket',
-        request: 'OrgRequest',
+        model: Ticket,
+        request: OrgRequest,
         internal: bool = False
     ) -> None:
 
@@ -1607,21 +1991,63 @@ class TicketChatMessageLayout(DefaultLayout):
     @property
     def internal_breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Tickets"), self.request.link(
-                TicketCollection(self.request.session)
-            )),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
             Link(self.model.number, self.request.link(self.model)),
-            Link(_("New Message"), '#')
+            Link(_('New Message'), '#')
         ]
 
     @property
     def public_breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Ticket Status"), self.request.link(self.model, 'status')),
-            Link(_("New Message"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Ticket Status'), self.request.link(self.model, 'status')),
+            Link(_('New Message'), '#')
         ]
+
+
+class TicketInvoiceLayout(DefaultLayout):
+
+    model: Ticket
+
+    def __init__(self, model: Ticket, request: OrgRequest) -> None:
+        super().__init__(model, request)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
+            Link(self.model.number, self.request.link(self.model)),
+            Link(_('Invoice'), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager_for_model(self.model):
+            payment = self.model.payment
+            if payment is not None and (
+                payment.source != 'manual'
+                or payment.state != 'open'
+            ):
+                return None
+
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Discount / Surcharge'),
+                            url=self.request.link(
+                                self.model,
+                                name='add-invoice-item'
+                            ),
+                            attrs={'class': 'new-invoice-item'}
+                        )
+                    ]
+                ),
+            ]
+        return None
 
 
 class TextModulesLayout(DefaultLayout):
@@ -1629,8 +2055,8 @@ class TextModulesLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Text modules"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Text modules'), '#')
         ]
 
     @cached_property
@@ -1638,10 +2064,10 @@ class TextModulesLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Text module"),
+                            text=_('Text module'),
                             url=self.request.link(
                                 self.model,
                                 name='add'
@@ -1673,12 +2099,12 @@ class TextModuleLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -1686,12 +2112,12 @@ class TextModuleLayout(DefaultLayout):
                     traits=(
                         Confirm(
                             _(
-                                "Do you really want to delete this text "
-                                "module?"
+                                'Do you really want to delete this text '
+                                'module?'
                             ),
-                            _("This cannot be undone."),
-                            _("Delete text module"),
-                            _("Cancel")
+                            _('This cannot be undone.'),
+                            _('Delete text module'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -1708,8 +2134,8 @@ class ResourcesLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Reservations"), self.request.link(self.model))
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Reservations'), self.request.link(self.model))
         ]
 
     @property
@@ -1725,15 +2151,15 @@ class ResourcesLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    text=_("Recipients"),
+                    text=_('Recipients'),
                     url=self.request.class_link(ResourceRecipientCollection),
                     attrs={'class': 'manage-recipients'}
                 ),
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Room"),
+                            text=_('Room'),
                             url=self.request.link(
                                 self.model,
                                 name='new-room'
@@ -1741,7 +2167,7 @@ class ResourcesLayout(DefaultLayout):
                             attrs={'class': 'new-room'}
                         ),
                         Link(
-                            text=_("Daypass"),
+                            text=_('Daypass'),
                             url=self.request.link(
                                 self.model,
                                 name='new-daypass'
@@ -1749,7 +2175,7 @@ class ResourcesLayout(DefaultLayout):
                             attrs={'class': 'new-daypass'}
                         ),
                         Link(
-                            text=_("Resource Item"),
+                            text=_('Resource Item'),
                             url=self.request.link(
                                 self.model,
                                 name='new-daily-item'
@@ -1757,13 +2183,13 @@ class ResourcesLayout(DefaultLayout):
                             attrs={'class': 'new-daily-item'}
                         ),
                         Link(
-                            text=_("External resource link"),
+                            text=_('External resource link'),
                             url=self.request.link(
                                 self.external_resources,
                                 query_params={
                                     'to': self.resources_url,
                                     'title': self.request.translate(
-                                        _("New external resource")),
+                                        _('New external resource')),
                                     'type': 'resource'
                                 },
                                 name='new'
@@ -1773,11 +2199,11 @@ class ResourcesLayout(DefaultLayout):
                     ]
                 ),
                 Link(
-                    text=_("Export All"),
-                    url=self.request.link(self.model, name="export-all"),
+                    text=_('Export All'),
+                    url=self.request.link(self.model, name='export-all'),
                 ),
                 IFrameLink(
-                    text=_("iFrame"),
+                    text=_('iFrame'),
                     url=self.request.link(self.model),
                     attrs={'class': 'new-iframe'}
                 )
@@ -1791,13 +2217,13 @@ class FindYourSpotLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(
-                _("Homepage"), self.homepage_url
+                _('Homepage'), self.homepage_url
             ),
             Link(
-                _("Reservations"), self.request.class_link(ResourceCollection)
+                _('Reservations'), self.request.class_link(ResourceCollection)
             ),
             Link(
-                _("Find Your Spot"), self.request.link(self.model)
+                _('Find Your Spot'), self.request.link(self.model)
             )
         ]
 
@@ -1808,13 +2234,13 @@ class ResourceRecipientsLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(
-                _("Homepage"), self.homepage_url
+                _('Homepage'), self.homepage_url
             ),
             Link(
-                _("Reservations"), self.request.class_link(ResourceCollection)
+                _('Reservations'), self.request.class_link(ResourceCollection)
             ),
             Link(
-                _("Notifications"), self.request.link(self.model)
+                _('Notifications'), self.request.link(self.model)
             )
         ]
 
@@ -1823,10 +2249,10 @@ class ResourceRecipientsLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("E-Mail Recipient"),
+                            text=_('E-Mail Recipient'),
                             url=self.request.link(
                                 self.model,
                                 name='new-recipient'
@@ -1841,7 +2267,7 @@ class ResourceRecipientsLayout(DefaultLayout):
 
 class ResourceRecipientsFormLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'OrgRequest', title: str) -> None:
+    def __init__(self, model: Any, request: OrgRequest, title: str) -> None:
         super().__init__(model, request)
         self.title = title
 
@@ -1849,13 +2275,13 @@ class ResourceRecipientsFormLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(
-                _("Homepage"), self.homepage_url
+                _('Homepage'), self.homepage_url
             ),
             Link(
-                _("Reservations"), self.request.class_link(ResourceCollection)
+                _('Reservations'), self.request.class_link(ResourceCollection)
             ),
             Link(
-                _("Notifications"), self.request.class_link(
+                _('Notifications'), self.request.class_link(
                     ResourceRecipientCollection
                 )
             ),
@@ -1865,9 +2291,9 @@ class ResourceRecipientsFormLayout(DefaultLayout):
 
 class ResourceLayout(DefaultLayout):
 
-    model: 'Resource'
+    model: Resource
 
-    def __init__(self, model: 'Resource', request: 'OrgRequest') -> None:
+    def __init__(self, model: Resource, request: OrgRequest) -> None:
         super().__init__(model, request)
 
         self.request.include('fullcalendar')
@@ -1879,9 +2305,13 @@ class ResourceLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Reservations"), self.request.link(self.collection)),
-            Link(_(self.model.title), self.request.link(self.model))
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Reservations'), self.request.link(self.collection)),
+            Link(
+                _(self.model.title),
+                self.request.link(self.model),
+                {'class': 'calendar-dependent'}
+            )
         ]
 
     @cached_property
@@ -1890,17 +2320,18 @@ class ResourceLayout(DefaultLayout):
             # FIXME: Should deletable be part of the base Resource class?
             if getattr(self.model, 'deletable', False):
                 delete_link = Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to delete this resource?"),
-                            _("This cannot be undone."),
-                            _("Delete resource"),
-                            _("Cancel")
+                            _('Do you really want to delete this resource?'),
+                            _('This cannot be undone and will take a while '
+                              'depending on the number of reservations.'),
+                            _('Delete resource'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -1911,53 +2342,61 @@ class ResourceLayout(DefaultLayout):
 
             else:
                 delete_link = Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
                     attrs={'class': 'delete-link'},
                     traits=(
-                        Block(
-                            _("This resource can't be deleted."),
-                            _(
-                                "There are existing reservations associated "
-                                "with this resource"
-                            ),
-                            _("Cancel")
+                        Confirm(
+                            _('Do you really want to delete this resource?'),
+                            _('There are future reservations associated with '
+                              'this resource that will also be deleted. This '
+                              'cannot be undone and will take a while '
+                              'depending on the number of reservations.'),
+                            _('Delete resource'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
                         )
                     )
                 )
             return [
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 delete_link,
                 Link(
-                    text=_("Clean up"),
+                    text=_('Clean up'),
                     url=self.request.link(self.model, 'cleanup'),
                     attrs={'class': ('cleanup-link', 'calendar-dependent')}
                 ),
                 Link(
-                    text=_("Occupancy"),
+                    text=_('Occupancy'),
                     url=self.request.link(self.model, 'occupancy'),
                     attrs={'class': ('occupancy-link', 'calendar-dependent')}
                 ),
                 Link(
-                    text=_("Export"),
+                    text=_('Export'),
                     url=self.request.link(self.model, 'export'),
                     attrs={'class': ('export-link', 'calendar-dependent')}
                 ),
                 Link(
-                    text=_("Subscribe"),
+                    text=_('Subscribe'),
                     url=self.request.link(self.model, 'subscribe'),
                     attrs={'class': 'subscribe-link'}
                 ),
                 Link(
-                    text=_("Rules"),
+                    text=_('Availability periods'),
                     url=self.request.link(self.model, 'rules'),
                     attrs={'class': 'rule-link'}
                 ),
                 IFrameLink(
-                    text=_("iFrame"),
+                    text=_('iFrame'),
                     url=self.request.link(self.model),
                     attrs={'class': 'new-iframe'}
                 )
@@ -1966,7 +2405,7 @@ class ResourceLayout(DefaultLayout):
             if getattr(self.model, 'occupancy_is_visible_to_members', False):
                 return [
                     Link(
-                        text=_("Occupancy"),
+                        text=_('Occupancy'),
                         url=self.request.link(self.model, 'occupancy'),
                         attrs={
                             'class': ('occupancy-link', 'calendar-dependent')}
@@ -1984,29 +2423,50 @@ class AllocationRulesLayout(ResourceLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Reservations"), self.request.link(self.collection)),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Reservations'), self.request.link(self.collection)),
             Link(_(self.model.title), self.request.link(self.model)),
-            Link(_("Rules"), '#')
+            Link(_('Availability periods'), '#')
         ]
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
-        return [
-            LinkGroup(
-                title=_("Add"),
-                links=[
-                    Link(
-                        text=_("Rule"),
-                        url=self.request.link(
-                            self.model,
-                            name='new-rule'
+        add_link = LinkGroup(
+            title=_('Add'),
+            links=[
+                Link(
+                    text=_('Availability period'),
+                    url=self.request.link(
+                        self.model,
+                        name='new-rule'
+                    ),
+                    attrs={'class': 'new-link'}
+                )
+            ]
+        )
+
+        if self.request.browser_session.get(  # type: ignore[call-overload]
+            'copied_allocation_rules', {}
+        ).get(self.model.type):
+            return [
+                add_link,
+                Link(
+                    text=_('Paste'),
+                    url=self.request.csrf_protected_url(
+                        self.request.link(self.model, 'paste-rule')
+                    ),
+                    attrs={'class': 'paste-link'},
+                    traits=(
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=self.request.link(
+                                self.model, 'rules'
+                            )
                         ),
-                        attrs={'class': 'new-link'}
                     )
-                ]
-            ),
-        ]
+                )
+            ]
+        return [add_link]
 
 
 class AllocationEditFormLayout(DefaultLayout):
@@ -2022,30 +2482,30 @@ class AllocationEditFormLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Reservations"), self.request.link(self.collection)),
-            Link(_("Edit allocation"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Reservations'), self.request.link(self.collection)),
+            Link(_('Edit allocation'), '#')
         ]
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
-        def links() -> 'Iterator[Link | LinkGroup]':
+        def links() -> Iterator[Link | LinkGroup]:
             if not self.request.is_manager:
                 return
 
-            if self.model.availability == 100.0:
+            if isclose(self.model.availability, 100.0, abs_tol=.005):
                 yield Link(
-                    _("Delete"),
+                    _('Delete'),
                     self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to delete this allocation?"),
-                            _("This cannot be undone."),
-                            _("Delete allocation"),
-                            _("Cancel")
+                            _('Do you really want to delete this allocation?'),
+                            _('This cannot be undone.'),
+                            _('Delete allocation'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -2055,16 +2515,16 @@ class AllocationEditFormLayout(DefaultLayout):
                 )
             else:
                 yield Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Block(
                             _("This resource can't be deleted."),
                             _(
-                                "There are existing reservations associated "
-                                "with this resource"
+                                'There are existing reservations associated '
+                                'with this resource'
                             ),
-                            _("Cancel")
+                            _('Cancel')
                         )
                     )
                 )
@@ -2073,13 +2533,16 @@ class AllocationEditFormLayout(DefaultLayout):
 
 class EventLayoutMixin:
 
-    request: 'OrgRequest'
+    request: OrgRequest
 
     def format_recurrence(self, recurrence: str | None) -> str:
         """ Returns a human readable version of an RRULE used by us. """
 
-        WEEKDAYS = (_("Mo"), _("Tu"), _("We"), _("Th"), _("Fr"), _("Sa"),
-                    _("Su"))
+        # FIXME: We define a very similar constant in our forms, we should
+        #        move this to onegov.org.constants and use it for both.
+        WEEKDAYS = (  # noqa: N806
+            _('Mo'), _('Tu'), _('We'), _('Th'), _('Fr'), _('Sa'), _('Su')
+        )
 
         if recurrence:
             rule = rrulestr(recurrence)
@@ -2087,12 +2550,12 @@ class EventLayoutMixin:
             # FIXME: Implement this without relying on internal attributes
             if getattr(rule, '_freq', None) == rrule.WEEKLY:
                 return _(
-                    "Every ${days} until ${end}",
+                    'Every ${days} until ${end}',
                     mapping={
-                        'days': ', '.join((
+                        'days': ', '.join(
                             self.request.translate(WEEKDAYS[day])
                             for day in rule._byweekday  # type:ignore
-                        )),
+                        ),
                         'end': rule._until.date(  # type:ignore
                         ).strftime('%d.%m.%Y')
                     }
@@ -2100,54 +2563,61 @@ class EventLayoutMixin:
 
         return ''
 
-    def event_deletable(self, event: 'Event') -> bool:
+    def event_deletable(self, event: Event) -> bool:
         tickets = TicketCollection(self.request.session)
         ticket = tickets.by_handler_id(event.id.hex)
-        return False if ticket else True
+        return not ticket
 
 
 class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
 
-    app: 'OrgApp'
-    request: 'OrgRequest'
+    app: OrgApp
+    request: OrgRequest
 
     @property
     def og_description(self) -> str:
-        return self.request.translate(_("Events"))
+        return self.request.translate(_('Events'))
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Events"), self.request.link(self.model))
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Events'), self.request.link(self.model))
         ]
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
-        def links() -> 'Iterator[Link | LinkGroup]':
+        def links() -> Iterator[Link | LinkGroup]:
             if (self.request.is_admin and self.request.app.org.
                     event_filter_type in ['filters', 'tags_and_filters']):
                 yield Link(
-                    text=_("Configure"),
+                    text=_('Configure'),
                     url=self.request.link(self.model, '+edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'filters-link'}
                 )
 
             if self.request.is_manager:
                 yield Link(
-                    text=_("Import"),
+                    text=_('Edit'),
+                    url=self.request.link(self.request.app.org,
+                                          'event-settings'),
+                    attrs={'class': 'edit-link'}
+                )
+
+                yield Link(
+                    text=_('Import'),
                     url=self.request.link(self.model, 'import'),
                     attrs={'class': 'import-link'}
                 )
 
                 yield Link(
-                    text=_("Export"),
+                    text=_('Export'),
                     url=self.request.link(self.model, 'export'),
                     attrs={'class': 'export-link'}
                 )
 
                 yield IFrameLink(
-                    text=_("iFrame"),
+                    text=_('iFrame'),
                     url=self.request.link(self.model),
                     attrs={'class': 'new-iframe'}
                 )
@@ -2157,11 +2627,11 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
 
 class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
 
-    app: 'OrgApp'
-    request: 'OrgRequest'
-    model: 'Occurrence'
+    app: OrgApp
+    request: OrgRequest
+    model: Occurrence
 
-    def __init__(self, model: 'Occurrence', request: 'OrgRequest') -> None:
+    def __init__(self, model: Occurrence, request: OrgRequest) -> None:
         super().__init__(model, request)
         self.request.include('monthly-view')
 
@@ -2180,8 +2650,8 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Events"), self.request.link(self.collection)),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Events'), self.request.link(self.collection)),
             Link(self.model.title, self.request.link(self.model))
         ]
 
@@ -2191,28 +2661,28 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
             if self.model.event.source:
                 return [
                     Link(
-                        text=_("Edit"),
+                        text=_('Edit'),
                         attrs={'class': 'edit-link'},
                         traits=(
                             Block(
                                 _("This event can't be edited."),
-                                _("Imported events can not be edited."),
-                                _("Cancel")
+                                _('Imported events can not be edited.'),
+                                _('Cancel')
                             )
                         )
                     ),
                     Link(
-                        text=_("Delete"),
+                        text=_('Delete'),
                         url=self.csrf_protected_url(
                             self.request.link(self.model.event, 'withdraw'),
                         ),
                         attrs={'class': 'delete-link'},
                         traits=(
                             Confirm(
-                                _("Do you really want to delete this event?"),
-                                _("This cannot be undone."),
-                                _("Delete event"),
-                                _("Cancel")
+                                _('Do you really want to delete this event?'),
+                                _('This cannot be undone.'),
+                                _('Delete event'),
+                                _('Cancel')
                             ),
                             Intercooler(
                                 request_method='POST',
@@ -2223,7 +2693,7 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
                 ]
 
             edit_link = Link(
-                text=_("Edit"),
+                text=_('Edit'),
                 url=self.request.return_here(
                     self.request.link(self.model.event, 'edit')
                 ),
@@ -2232,17 +2702,17 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
 
             if self.event_deletable(self.model.event):
                 delete_link = Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model.event)
                     ),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to delete this event?"),
-                            _("This cannot be undone."),
-                            _("Delete event"),
-                            _("Cancel")
+                            _('Do you really want to delete this event?'),
+                            _('This cannot be undone.'),
+                            _('Delete event'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -2252,16 +2722,16 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
                 )
             else:
                 delete_link = Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Block(
                             _("This event can't be deleted."),
                             _(
-                                "To remove this event, go to the ticket "
-                                "and reject it."
+                                'To remove this event, go to the ticket '
+                                'and reject it.'
                             ),
-                            _("Cancel")
+                            _('Cancel')
                         )
                     )
                 )
@@ -2272,18 +2742,18 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
 
 class EventLayout(EventLayoutMixin, DefaultLayout):
 
-    app: 'OrgApp'
-    request: 'OrgRequest'
-    model: 'Event'
+    app: OrgApp
+    request: OrgRequest
+    model: Event
 
     if TYPE_CHECKING:
-        def __init__(self, model: 'Event', request: 'OrgRequest') -> None: ...
+        def __init__(self, model: Event, request: OrgRequest) -> None: ...
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Events"), self.events_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Events'), self.events_url),
             Link(self.model.title, self.request.link(self.model)),
         ]
 
@@ -2296,30 +2766,30 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
         if self.model.source:
             links = [
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     attrs={'class': 'edit-link'},
                     traits=(
                         Block(
                             _("This event can't be edited."),
-                            _("Imported events can not be edited."),
-                            _("Cancel")
+                            _('Imported events can not be edited.'),
+                            _('Cancel')
                         )
                     )
                 )]
         if self.model.source and self.model.state == 'published':
             links.append(
                 Link(
-                    text=_("Withdraw event"),
+                    text=_('Withdraw event'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model, 'withdraw'),
                     ),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to withdraw this event?"),
-                            _("You can re-publish an imported event later."),
-                            _("Withdraw event"),
-                            _("Cancel")
+                            _('Do you really want to withdraw this event?'),
+                            _('You can re-publish an imported event later.'),
+                            _('Withdraw event'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='POST',
@@ -2331,7 +2801,7 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
         if self.model.source and self.model.state == 'withdrawn':
             links.append(
                 Link(
-                    text=_("Re-publish event"),
+                    text=_('Re-publish event'),
                     url=self.request.return_here(
                         self.request.link(self.model, 'publish')),
                     attrs={'class': 'accept-link'}
@@ -2341,23 +2811,23 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
             return links
 
         edit_link = Link(
-            text=_("Edit"),
+            text=_('Edit'),
             url=self.request.link(self.model, 'edit'),
             attrs={'class': 'edit-link'}
         )
         if self.event_deletable(self.model):
             delete_link = Link(
-                text=_("Delete"),
+                text=_('Delete'),
                 url=self.csrf_protected_url(
                     self.request.link(self.model)
                 ),
                 attrs={'class': 'delete-link'},
                 traits=(
                     Confirm(
-                        _("Do you really want to delete this event?"),
-                        _("This cannot be undone."),
-                        _("Delete event"),
-                        _("Cancel")
+                        _('Do you really want to delete this event?'),
+                        _('This cannot be undone.'),
+                        _('Delete event'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='DELETE',
@@ -2367,16 +2837,16 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
             )
         else:
             delete_link = Link(
-                text=_("Delete"),
+                text=_('Delete'),
                 attrs={'class': 'delete-link'},
                 traits=(
                     Block(
                         _("This event can't be deleted."),
                         _(
-                            "To remove this event, go to the ticket "
-                            "and reject it."
+                            'To remove this event, go to the ticket '
+                            'and reject it.'
                         ),
-                        _("Cancel")
+                        _('Cancel')
                     )
                 )
             )
@@ -2403,19 +2873,31 @@ class NewsletterLayout(DefaultLayout):
 
         if self.is_collection and self.view_name == 'new':
             return [
-                Link(_("Homepage"), self.homepage_url),
-                Link(_("Newsletter"), self.request.link(self.collection)),
-                Link(_("New"), '#')
+                Link(_('Homepage'), self.homepage_url),
+                Link(_('Newsletter'), self.request.link(self.collection)),
+                Link(_('New'), '#')
+            ]
+        if self.is_collection and self.view_name == 'new-paste':
+            return [
+                Link(_('Homepage'), self.homepage_url),
+                Link(_('Newsletter'), self.request.link(self.collection)),
+                Link(_('Paste'), '#'),
+            ]
+        if self.is_collection and self.view_name == 'update':
+            return [
+                Link(_('Homepage'), self.homepage_url),
+                Link(_('Newsletter'), self.request.link(self.collection)),
+                Link(_('Edit'), '#')
             ]
         elif self.is_collection:
             return [
-                Link(_("Homepage"), self.homepage_url),
-                Link(_("Newsletter"), '#')
+                Link(_('Homepage'), self.homepage_url),
+                Link(_('Newsletter'), '#')
             ]
         else:
             return [
-                Link(_("Homepage"), self.homepage_url),
-                Link(_("Newsletter"), self.request.link(self.collection)),
+                Link(_('Homepage'), self.homepage_url),
+                Link(_('Newsletter'), self.request.link(self.collection)),
                 Link(self.model.title, '#')
             ]
 
@@ -2425,17 +2907,40 @@ class NewsletterLayout(DefaultLayout):
             return None
 
         if self.is_collection:
-            return [
+            links: list[Link | LinkGroup] = [
                 Link(
-                    text=_("Subscribers"),
+                    text=_('Subscribers'),
                     url=self.request.link(self.recipients),
                     attrs={'class': 'manage-subscribers'}
                 ),
+                Link(
+                    text=_('Settings'),
+                    url=self.request.link(
+                        self.request.app.org, 'newsletter-settings'),
+                    attrs={'class': 'settings-link'}
+                ),
+            ]
+
+            if self.request.browser_session.has('clipboard_url'):
+                clipboard = Clipboard.from_session(self.request)
+                source = clipboard.get_object()
+                if source is None:
+                    clipboard.clear()
+                elif isinstance(source, Newsletter):
+                    links.append(
+                        Link(
+                            text=_('Paste'),
+                            url=self.request.link(self.model, 'new-paste'),
+                            attrs={'class': 'paste-link'},
+                        )
+                    )
+
+            links.append(
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Newsletter"),
+                            text=_('Newsletter'),
                             url=self.request.link(
                                 NewsletterCollection(self.app.session()),
                                 name='new'
@@ -2443,27 +2948,41 @@ class NewsletterLayout(DefaultLayout):
                             attrs={'class': 'new-newsletter'}
                         ),
                     ]
-                ),
-            ]
+                )
+            )
+
+            return links
         else:
+            if self.view_name == 'send':
+                return []
+
             return [
                 Link(
-                    text=_("Send"),
+                    text=_('Send'),
                     url=self.request.link(self.model, 'send'),
                     attrs={'class': 'send-link'}
                 ),
                 Link(
-                    text=_("Test"),
+                    text=_('Test'),
                     url=self.request.link(self.model, 'test'),
                     attrs={'class': 'test-link'}
                 ),
                 Link(
-                    text=_("Edit"),
+                    text=_('Copy'),
+                    url=self.request.link(
+                        Clipboard.from_url(
+                            self.request, self.request.path_info or ''
+                        )
+                    ),
+                    attrs={'class': 'copy-link'},
+                ),
+                Link(
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -2473,9 +2992,9 @@ class NewsletterLayout(DefaultLayout):
                             _('Do you really want to delete "{}"?'.format(
                                 self.model.title
                             )),
-                            _("This cannot be undone."),
-                            _("Delete newsletter"),
-                            _("Cancel")
+                            _('This cannot be undone.'),
+                            _('Delete newsletter'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -2491,11 +3010,11 @@ class RecipientLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Newsletter"), self.request.link(
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Newsletter'), self.request.link(
                 NewsletterCollection(self.app.session())
             )),
-            Link(_("Subscribers"), self.request.link(self.model))
+            Link(_('Subscribers'), self.request.link(self.model))
         ]
 
     @cached_property
@@ -2503,13 +3022,13 @@ class RecipientLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    text=_("Import"),
+                    text=_('Import'),
                     url=self.request.link(self.model,
                                           'import-newsletter-recipients'),
                     attrs={'class': 'import-link'},
                 ),
                 Link(
-                    text=_("Export"),
+                    text=_('Export'),
                     url=self.request.link(self.model,
                                           'export-newsletter-recipients'),
                     attrs={'class': 'export-link'},
@@ -2523,8 +3042,8 @@ class ImageSetCollectionLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Photo Albums"), self.request.link(self.model))
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Photo Albums'), self.request.link(self.model))
         ]
 
     @cached_property
@@ -2532,17 +3051,17 @@ class ImageSetCollectionLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    text=_("Manage images"),
+                    text=_('Manage images'),
                     url=self.request.link(
                         ImageFileCollection(self.request.session)
                     ),
                     attrs={'class': 'upload'}
                 ),
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Photo Album"),
+                            text=_('Photo Album'),
                             url=self.request.link(
                                 self.model,
                                 name='new'
@@ -2557,9 +3076,9 @@ class ImageSetCollectionLayout(DefaultLayout):
 
 class ImageSetLayout(DefaultLayout):
 
-    model: 'ImageSet'
+    model: ImageSet
 
-    def __init__(self, model: 'ImageSet', request: 'OrgRequest') -> None:
+    def __init__(self, model: ImageSet, request: OrgRequest) -> None:
         super().__init__(model, request)
         self.request.include('photoswipe')
 
@@ -2570,8 +3089,8 @@ class ImageSetLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Photo Albums"), self.request.link(self.collection)),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Photo Albums'), self.request.link(self.collection)),
             Link(self.model.title, self.request.link(self.model))
         ]
 
@@ -2580,12 +3099,12 @@ class ImageSetLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    text=_("Choose images"),
+                    text=_('Choose images'),
                     url=self.request.link(self.model, 'select'),
                     attrs={'class': 'select'}
                 ),
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(
                         self.model,
                         name='edit'
@@ -2593,7 +3112,7 @@ class ImageSetLayout(DefaultLayout):
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -2603,9 +3122,9 @@ class ImageSetLayout(DefaultLayout):
                             _('Do you really want to delete "{}"?'.format(
                                 self.model.title
                             )),
-                            _("This cannot be undone."),
-                            _("Delete photo album"),
-                            _("Cancel")
+                            _('This cannot be undone.'),
+                            _('Delete photo album'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -2622,8 +3141,11 @@ class UserManagementLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Usermanagement"), self.request.class_link(UserCollection))
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Usermanagement'), self.request.class_link(
+                UserCollection,
+                variables={'active': '1'}
+        )),
         ]
 
     @cached_property
@@ -2635,7 +3157,7 @@ class UserManagementLayout(DefaultLayout):
             if self.app.enable_user_registration:
                 links.append(
                     Link(
-                        text=_("Create Signup Link"),
+                        text=_('Create Signup Link'),
                         url=self.request.class_link(
                             UserCollection,
                             name='signup-link'
@@ -2646,10 +3168,10 @@ class UserManagementLayout(DefaultLayout):
 
             links.append(
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=(
                         Link(
-                            text=_("User"),
+                            text=_('User'),
                             url=self.request.class_link(
                                 UserCollection, name='new'
                             ),
@@ -2666,27 +3188,40 @@ class UserLayout(DefaultLayout):
 
     if TYPE_CHECKING:
         model: User
+
         def __init__(self, model: User, request: OrgRequest) -> None: ...
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Usermanagement"), self.request.class_link(UserCollection)),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Usermanagement'), self.request.class_link(
+                UserCollection,
+                variables={'active': '1'}
+        )),
             Link(self.model.title, self.request.link(self.model))
         ]
 
     @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup] | None:
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
         if self.request.is_admin and not self.model.source:
-            return [
+            links.append(
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
-                ),
-            ]
-        return None
+                )
+            )
+        if can_change_username(self.model, self.request):
+            links.append(
+                Link(
+                    text=_('Change username'),
+                    url=self.request.link(self.model, 'change-username'),
+                    attrs={'class': 'edit-link'}
+                )
+            )
+        return links
 
 
 class UserGroupCollectionLayout(DefaultLayout):
@@ -2723,10 +3258,11 @@ class UserGroupLayout(DefaultLayout):
 
     if TYPE_CHECKING:
         model: UserGroup
+
         def __init__(self, model: UserGroup, request: OrgRequest) -> None: ...
 
     @cached_property
-    def collection(self) -> UserGroupCollection['UserGroup']:
+    def collection(self) -> UserGroupCollection[UserGroup]:
         return UserGroupCollection(self.request.session)
 
     @cached_property
@@ -2742,22 +3278,22 @@ class UserGroupLayout(DefaultLayout):
         if self.request.is_admin:
             return [
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to delete this user group?"),
-                            _("This cannot be undone."),
-                            _("Delete user group"),
-                            _("Cancel")
+                            _('Do you really want to delete this user group?'),
+                            _('This cannot be undone.'),
+                            _('Delete user group'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -2774,8 +3310,8 @@ class ExportCollectionLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Exports"), self.request.class_link(ExportCollection))
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Exports'), self.request.class_link(ExportCollection))
         ]
 
 
@@ -2784,8 +3320,8 @@ class PaymentProviderLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Payment Providers"), self.request.class_link(
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Payment Providers'), self.request.class_link(
                 PaymentProviderCollection
             ))
         ]
@@ -2795,20 +3331,36 @@ class PaymentProviderLayout(DefaultLayout):
         if self.request.is_admin:
             return [
                 Link(
-                    text=_("Payments"),
+                    text=_('Payments'),
                     url=self.request.class_link(PaymentCollection),
                     attrs={'class': 'payments'}
                 ),
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=(
                         Link(
-                            text=_("Stripe Connect"),
+                            text=_('Datatrans'),
+                            url=self.request.class_link(
+                                PaymentProviderCollection,
+                                name='new-datatrans'
+                            ),
+                            attrs={'class': 'new-datatrans'}
+                        ),
+                        Link(
+                            text=_('Stripe Connect'),
                             url=self.request.class_link(
                                 PaymentProviderCollection,
                                 name='stripe-connect-oauth'
                             ),
                             attrs={'class': 'new-stripe-connect'}
+                        ),
+                        Link(
+                            text=_('Worldline Saferpay'),
+                            url=self.request.class_link(
+                                PaymentProviderCollection,
+                                name='new-saferpay'
+                            ),
+                            attrs={'class': 'new-worldline-saferpay'}
                         ),
                     )
                 )
@@ -2821,9 +3373,9 @@ class PaymentCollectionLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Payments"), self.request.class_link(
-                PaymentProviderCollection
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Payments'), self.request.class_link(
+                PaymentCollection
             ))
         ]
 
@@ -2835,7 +3387,7 @@ class PaymentCollectionLayout(DefaultLayout):
             if self.request.is_admin:
                 links.append(
                     Link(
-                        text=_("Payment Provider"),
+                        text=_('Payment Provider'),
                         url=self.request.class_link(PaymentProviderCollection),
                         attrs={'class': 'payment-provider'}
                     )
@@ -2843,17 +3395,16 @@ class PaymentCollectionLayout(DefaultLayout):
 
             links.append(
                 Link(
-                    text=_("Synchronise"),
+                    text=_('Synchronise'),
                     url=self.request.class_link(
                         PaymentProviderCollection, name='sync'
                     ),
                     attrs={'class': 'sync'}
                 )
             )
-
             links.append(
                 Link(
-                    text=_("Export"),
+                    text=_('Export'),
                     url=self.request.class_link(OrgExport, {'id': 'payments'}),
                     attrs={'class': 'export-link'}
                 )
@@ -2862,27 +3413,58 @@ class PaymentCollectionLayout(DefaultLayout):
         return links
 
 
+class TicketInvoiceCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Invoices'), self.request.class_link(
+                TicketInvoiceCollection
+            ))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
+
+        if self.request.is_manager_for_model(self.model):
+
+            links.append(
+                Link(
+                    text=_('Export Bill run as PDF'),
+                    url=self.request.link(
+                        self.model,
+                        query_params={'format': 'pdf'}
+                    ),
+                    attrs={'class': 'ticket-pdf'}
+                )
+            )
+
+        return links
+
+
 class MessageCollectionLayout(DefaultLayout):
-    def __init__(self, model: Any, request: 'OrgRequest') -> None:
+    def __init__(self, model: Any, request: OrgRequest) -> None:
         super().__init__(model, request)
         self.request.include('timeline')
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Timeline"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Timeline'), '#')
         ]
 
 
 class DirectoryCollectionLayout(DefaultLayout):
 
-    model: 'DirectoryCollection[Any] | DirectoryEntryCollection[Any]'
+    model: DirectoryCollection[Any] | DirectoryEntryCollection[Any]
 
     def __init__(
         self,
-        model: 'DirectoryCollection[Any] | DirectoryEntryCollection[Any]',
-        request: 'OrgRequest'
+        model: DirectoryCollection[Any] | DirectoryEntryCollection[Any],
+        request: OrgRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -2892,13 +3474,13 @@ class DirectoryCollectionLayout(DefaultLayout):
 
     @property
     def og_description(self) -> str:
-        return self.request.translate(_("Directories"))
+        return self.request.translate(_('Directories'))
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Directories"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Directories'), '#')
         ]
 
     @cached_property
@@ -2906,10 +3488,10 @@ class DirectoryCollectionLayout(DefaultLayout):
         if self.request.is_admin:
             return [
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Directory"),
+                            text=_('Directory'),
                             url=self.request.link(
                                 self.model,
                                 name='+new'
@@ -2924,8 +3506,8 @@ class DirectoryCollectionLayout(DefaultLayout):
 
 class DirectoryEntryMixin:
 
-    request: 'OrgRequest'
-    model: 'ExtendedDirectoryEntry | ExtendedDirectoryEntryCollection'
+    request: OrgRequest
+    model: ExtendedDirectoryEntry | ExtendedDirectoryEntryCollection
     custom_body_attributes: dict[str, Any]
 
     def init_markers(self) -> None:
@@ -2939,7 +3521,7 @@ class DirectoryEntryMixin:
                 self.directory.marker_icon.encode('unicode-escape')[2:])
 
     @property
-    def directory(self) -> 'ExtendedDirectory':
+    def directory(self) -> ExtendedDirectory:
         return self.model.directory
 
     @cached_property
@@ -2948,19 +3530,19 @@ class DirectoryEntryMixin:
             return as_internal_id(thumbnail)
         return None
 
-    def thumbnail_file_id(self, entry: 'ExtendedDirectoryEntry') -> str | None:
+    def thumbnail_file_id(self, entry: ExtendedDirectoryEntry) -> str | None:
         thumbnail = self.thumbnail_field_id
         if not thumbnail:
             return None
         return (entry.values.get(thumbnail) or {}).get('data', '').lstrip('@')
 
-    def thumbnail_link(self, entry: 'ExtendedDirectoryEntry') -> str | None:
+    def thumbnail_link(self, entry: ExtendedDirectoryEntry) -> str | None:
         file_id = self.thumbnail_file_id(entry)
         return self.request.class_link(
             File, {'id': file_id}, name='thumbnail'
         ) if file_id else None
 
-    def thumbnail_file(self, entry: 'ExtendedDirectoryEntry') -> File | None:
+    def thumbnail_file(self, entry: ExtendedDirectoryEntry) -> File | None:
         file_id = self.thumbnail_file_id(entry)
         if not file_id:
             return None
@@ -2969,13 +3551,13 @@ class DirectoryEntryMixin:
 
 class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
 
-    request: 'OrgRequest'
+    request: OrgRequest
     model: ExtendedDirectoryEntryCollection
 
     def __init__(
         self,
         model: ExtendedDirectoryEntryCollection,
-        request: 'OrgRequest'
+        request: OrgRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -2989,8 +3571,8 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Directories"), self.request.class_link(
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Directories'), self.request.class_link(
                 DirectoryCollection
             )),
             Link(_(self.model.directory.title), self.request.class_link(
@@ -3004,16 +3586,16 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
     def editbar_links(self) -> list[Link | LinkGroup]:
 
         export_link = Link(
-            text=_("Export"),
+            text=_('Export'),
             url=self.request.link(self.model, name='+export'),
             attrs={'class': 'export-link'}
         )
 
-        def links() -> 'Iterator[Link | LinkGroup]':
+        def links() -> Iterator[Link | LinkGroup]:
             qr_link = None
             if self.request.is_admin:
                 yield Link(
-                    text=_("Configure"),
+                    text=_('Configure'),
                     url=self.request.link(self.model, '+edit'),
                     attrs={'class': 'edit-link'}
                 )
@@ -3022,7 +3604,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
                 yield export_link
 
                 yield Link(
-                    text=_("Import"),
+                    text=_('Import'),
                     url=self.request.class_link(
                         ExtendedDirectoryEntryCollection, {
                             'directory_name': self.model.directory_name
@@ -3032,20 +3614,20 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
                 )
 
                 qr_link = QrCodeLink(
-                    text=_("QR"),
+                    text=_('QR'),
                     url=self.request.link(self.model),
                     attrs={'class': 'qr-code-link'}
                 )
 
                 yield IFrameLink(
-                    text=_("iFrame"),
+                    text=_('iFrame'),
                     url=self.request.link(self.model),
                     attrs={'class': 'new-iframe'}
                 )
 
             if self.request.is_admin:
                 yield Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -3058,9 +3640,9 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
                                     'title': self.model.directory.title
                                 }
                             ),
-                            _("All entries will be deleted as well!"),
-                            _("Delete directory"),
-                            _("Cancel")
+                            _('All entries will be deleted as well!'),
+                            _('Delete directory'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -3071,7 +3653,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
                     )
                 )
                 yield Link(
-                    text=self.request.translate(_("Change URL")),
+                    text=self.request.translate(_('Change URL')),
                     url=self.request.link(
                         self.model.directory,
                         'change-url'),
@@ -3080,10 +3662,10 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
 
             if self.request.is_manager:
                 yield LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Entry"),
+                            text=_('Entry'),
                             url=self.request.link(
                                 self.model,
                                 name='+new'
@@ -3111,7 +3693,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
         classes = []
         if filter:
             filter_data[filter] = True
-            if toggle_active and filter in self.request.params:
+            if toggle_active and self.request.params.get(filter) == '1':
                 classes.append('active')
 
         return Link(
@@ -3129,18 +3711,18 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
             return {}
         if self.request.is_manager:
             return {
-                'published_only': _("Published"),
-                'upcoming_only': _("Upcoming"),
-                'past_only': _("Past"),
+                'published_only': _('Published'),
+                'upcoming_only': _('Upcoming'),
+                'past_only': _('Past'),
             }
         return {
-            'published_only': _("Published"),
-            'past_only': _("Past"),
+            'published_only': _('Published'),
+            'past_only': _('Past'),
         }
 
     @property
     def publication_filter_title(self) -> str:
-        default_title = self.request.translate(_("Publication"))
+        default_title = self.request.translate(_('Publication'))
         for filter in self.publication_filters:
             if filter in self.request.params:
                 applied_title = self.request.translate(
@@ -3149,7 +3731,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
         return f'{default_title}: {self.request.translate(_("Choose filter"))}'
 
     @property
-    def publication_links(self) -> 'Iterator[Link]':
+    def publication_links(self) -> Iterator[Link]:
         return (
             self.get_pub_link(text, filter_kw)
             for filter_kw, text in self.publication_filters.items()
@@ -3157,19 +3739,19 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
 
 
 class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
-    request: 'OrgRequest'
-    model: 'ExtendedDirectoryEntry'
+    request: OrgRequest
+    model: ExtendedDirectoryEntry
 
     def __init__(
         self,
-        model: 'ExtendedDirectoryEntry',
-        request: 'OrgRequest'
+        model: ExtendedDirectoryEntry,
+        request: OrgRequest
     ) -> None:
 
         super().__init__(model, request)
         self.init_markers()
 
-    def show_label(self, field: 'Field') -> bool:
+    def show_label(self, field: Field) -> bool:
         return field.id not in self.model.hidden_label_fields
 
     @cached_property
@@ -3190,7 +3772,7 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
 
     def field_download_link(
         self,
-        field: 'Field'
+        field: Field
     ) -> list[str | None] | str | None:
 
         url = super().field_download_link(field)
@@ -3203,8 +3785,8 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Directories"), self.request.class_link(
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Directories'), self.request.class_link(
                 DirectoryCollection
             )),
             Link(_(self.model.directory.title), self.request.class_link(
@@ -3216,25 +3798,26 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
         ]
 
     @overload
-    def linkify(self, text: None) -> None: ...
+    def linkify(self, text: str) -> Markup: ...
     @overload
-    def linkify(self, text: str) -> str: ...
+    def linkify(self, text: None) -> None: ...
 
-    def linkify(self, text: str | None) -> str | None:
+    def linkify(self, text: str | None) -> Markup | None:
         linkified = super().linkify(text)
-        return linkified.replace('\\n', '<br>') if linkified else linkified
+        return linkified.replace(
+            '\\n', Markup('<br>')) if linkified else linkified
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, '+edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -3247,9 +3830,9 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
                                     'title': self.model.title
                                 }
                             ),
-                            _("This cannot be undone."),
-                            _("Delete entry"),
-                            _("Cancel")
+                            _('This cannot be undone.'),
+                            _('Delete entry'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -3261,7 +3844,7 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
                     )
                 ),
                 QrCodeLink(
-                    text=_("QR"),
+                    text=_('QR'),
                     url=self.request.link(self.model),
                     attrs={'class': 'qr-code-link'}
                 )
@@ -3271,15 +3854,15 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
 
 class PublicationLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'OrgRequest') -> None:
+    def __init__(self, model: Any, request: OrgRequest) -> None:
         super().__init__(model, request)
         self.request.include('filedigest')
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Publications"), self.request.class_link(
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Publications'), self.request.class_link(
                 PublicationCollection
             ))
         ]
@@ -3290,13 +3873,13 @@ class DashboardLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Dashboard"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Overview'), '#')
         ]
 
 
 class GeneralFileCollectionLayout(DefaultLayout):
-    def __init__(self, model: Any, request: 'OrgRequest') -> None:
+    def __init__(self, model: Any, request: OrgRequest) -> None:
         request.include('common')
         request.include('upload')
         request.include('prompt')
@@ -3305,7 +3888,7 @@ class GeneralFileCollectionLayout(DefaultLayout):
 
 class ImageFileCollectionLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'OrgRequest') -> None:
+    def __init__(self, model: Any, request: OrgRequest) -> None:
         request.include('common')
         request.include('upload')
         request.include('editalttext')
@@ -3321,14 +3904,14 @@ class ExternalLinkLayout(DefaultLayout):
 
         return [
             Link(
-                _("Delete"),
+                _('Delete'),
                 self.csrf_protected_url(self.request.link(self.model)),
                 traits=(
                     Confirm(
-                        _("Do you really want to delete this external link?"),
-                        _("This cannot be undone."),
-                        _("Delete external link"),
-                        _("Cancel")
+                        _('Do you really want to delete this external link?'),
+                        _('This cannot be undone.'),
+                        _('Delete external link'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='DELETE',
@@ -3349,17 +3932,17 @@ class HomepageLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    _("Edit"),
+                    _('Edit'),
                     self.request.link(self.model, 'homepage-settings'),
                     attrs={'class': ('edit-link')}
                 ),
                 Link(
-                    _("Sort"),
+                    _('Sort'),
                     self.request.link(self.model, 'sort'),
                     attrs={'class': ('sort-link')}
                 ),
                 Link(
-                    _("Add"),
+                    _('Add'),
                     self.request.link(Editor('new-root', self.model, 'page')),
                     attrs={'class': ('new-page')},
                     classes=(

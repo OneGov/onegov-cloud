@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath.request import Response
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
@@ -26,15 +28,15 @@ if TYPE_CHECKING:
 )
 def subscribe_email(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmailSubscriptionForm
-) -> 'RenderData':
+) -> RenderData:
     """ Initiate the email notification subscription. """
 
     layout = DefaultLayout(self, request)
     message: str = _(
-        "You will receive an email as soon as new results have been "
-        "published. You can unsubscribe at any time."
+        'You will receive an email as soon as new results have been '
+        'published. You can unsubscribe at any time.'
     )
     callout = None
     if form.submitted(request):
@@ -47,18 +49,18 @@ def subscribe_email(
             request
         )
         callout = _(
-            "You will shortly receive an email to confirm your email."
+            'You will shortly receive an email to confirm your email.'
         )
         message = ''
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("Get email alerts"),
+        'title': _('Get email alerts'),
         'message': message,
         'cancel': layout.homepage_link,
         'callout': callout,
-        'show_form': False if callout else True
+        'show_form': not callout
     }
 
 
@@ -71,12 +73,12 @@ def subscribe_email(
 )
 def optin_email(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmailSubscriptionForm
-) -> 'RenderData':
+) -> RenderData:
     """ Confirm the email used for the subscription. """
 
-    callout = _("Subscription failed, the link is invalid.")
+    callout = _('Subscription failed, the link is invalid.')
     try:
         raw_data = request.params.get('opaque')
         assert isinstance(raw_data, str)
@@ -97,14 +99,14 @@ def optin_email(
         )
         if result:
             callout = _(
-                "Successfully subscribed to the email service. You will "
-                "receive an email every time new results are published."
+                'Successfully subscribed to the email service. You will '
+                'receive an email every time new results are published.'
             )
 
     return {
         'layout': DefaultLayout(self, request),
         'form': form,
-        'title': _("Get email alerts"),
+        'title': _('Get email alerts'),
         'callout': callout,
         'show_form': False
     }
@@ -119,9 +121,9 @@ def optin_email(
 )
 def unsubscribe_email(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmailSubscriptionForm
-) -> 'RenderData':
+) -> RenderData:
     """ Initiates the email notification unsubscription. """
 
     layout = DefaultLayout(self, request)
@@ -136,16 +138,16 @@ def unsubscribe_email(
             request
         )
         callout = _(
-            "You will shortly receive an email to confirm your unsubscription."
+            'You will shortly receive an email to confirm your unsubscription.'
         )
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("Stop email subscription"),
+        'title': _('Stop email subscription'),
         'cancel': layout.homepage_link,
         'callout': callout,
-        'show_form': False if callout else True
+        'show_form': not callout
     }
 
 
@@ -158,9 +160,9 @@ def unsubscribe_email(
 )
 def optout_email(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmailSubscriptionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Deactivates the email subscription.
 
     Allows one-click unsubscription as defined by RFC-8058:
@@ -168,7 +170,7 @@ def optout_email(
 
     """
 
-    callout = _("Unsubscription failed, the link is invalid.")
+    callout = _('Unsubscription failed, the link is invalid.')
     try:
         raw_data = request.params.get('opaque')
         assert isinstance(raw_data, str)
@@ -190,14 +192,14 @@ def optout_email(
             return Response()
         if result:
             callout = _(
-                "Successfully unsubscribed from the email services. You will "
-                "no longer receive an email when new results are published."
+                'Successfully unsubscribed from the email services. You will '
+                'no longer receive an email when new results are published.'
             )
 
     return {
         'layout': DefaultLayout(self, request),
         'form': form,
-        'title': _("Stop email subscription"),
+        'title': _('Stop email subscription'),
         'callout': callout,
         'show_form': False
     }
@@ -212,9 +214,9 @@ def optout_email(
 )
 def subscribe_sms(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: SmsSubscriptionForm
-) -> 'RenderData':
+) -> RenderData:
     """ Adds the given phone number to the SMS subscribers."""
 
     layout = DefaultLayout(self, request)
@@ -231,22 +233,22 @@ def subscribe_sms(
             request
         )
         callout = _(
-            "Successfully subscribed to the SMS service. You will receive a "
-            "SMS every time new results are published."
+            'Successfully subscribed to the SMS service. You will receive a '
+            'SMS every time new results are published.'
         )
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("Get SMS alerts"),
+        'title': _('Get SMS alerts'),
         'message': _(
-            "You will receive a SMS as soon as new results have been "
-            "published. The SMS service is free of charge. You can "
-            "unsubscribe at any time."
+            'You will receive a SMS as soon as new results have been '
+            'published. The SMS service is free of charge. You can '
+            'unsubscribe at any time.'
         ),
         'cancel': layout.homepage_link,
         'callout': callout,
-        'show_form': False if callout else True
+        'show_form': not callout
     }
 
 
@@ -259,9 +261,9 @@ def subscribe_sms(
 )
 def unsubscribe_sms(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: SmsSubscriptionForm
-) -> 'RenderData':
+) -> RenderData:
     """ Removes the given phone number from the SMS subscribers."""
 
     layout = DefaultLayout(self, request)
@@ -278,15 +280,15 @@ def unsubscribe_sms(
             request
         )
         callout = _(
-            "Successfully unsubscribed from the SMS services. You will no "
-            "longer receive SMS when new results are published."
+            'Successfully unsubscribed from the SMS services. You will no '
+            'longer receive SMS when new results are published.'
         )
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("Stop SMS subscription"),
+        'title': _('Stop SMS subscription'),
         'cancel': layout.homepage_link,
         'callout': callout,
-        'show_form': False if callout else True
+        'show_form': not callout
     }

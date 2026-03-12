@@ -1,9 +1,9 @@
+# TODO: Get rid of this config file, once nobody is using it anymore
 rules:
   no-css-comments: 0
   indentation:
     - 2
-    -
-      size: 4
+    - size: 4
   force-pseudo-nesting: 0
   no-ids: 0
   force-element-nesting: 0

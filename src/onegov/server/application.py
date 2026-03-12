@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 import re
 
 from onegov.server import errors
 
 
-from typing import Any, Pattern, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed.wsgi import WSGIEnvironment, StartResponse
     from collections.abc import Iterable
+    from re import Pattern
 
 
 class Application:
@@ -33,9 +36,9 @@ class Application:
 
     def __call__(
         self,
-        environ: 'WSGIEnvironment',
-        start_respnose: 'StartResponse'
-    ) -> 'Iterable[bytes]':
+        environ: WSGIEnvironment,
+        start_respnose: StartResponse
+    ) -> Iterable[bytes]:
         raise NotImplementedError
 
     def configure_application(self, **configuration: Any) -> None:
@@ -50,7 +53,7 @@ class Application:
 
         """
         assert hasattr(self, 'namespace'), (
-            "namespace must be set before calling configure_application")
+            'namespace must be set before calling configure_application')
 
         self.configuration = configuration
 
@@ -186,9 +189,9 @@ class Application:
     def handle_exception(
         self,
         exception: BaseException,
-        environ: 'WSGIEnvironment',
-        start_response: 'StartResponse'
-    ) -> 'Iterable[bytes]':
+        environ: WSGIEnvironment,
+        start_response: StartResponse
+    ) -> Iterable[bytes]:
         """ Default exception handling - this can be used to return a different
         response when an unhandled exception occurs inside a request or before
         a request is handled by the application (when any of the above methods

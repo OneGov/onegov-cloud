@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from sedate import utcnow, to_timezone
 
@@ -6,14 +8,16 @@ from onegov.form.extensions import FormExtension
 from onegov.form.fields import HoneyPotField
 from onegov.form.fields import TimezoneDateTimeField
 from onegov.form.fields import UploadField
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.submissions import prepare_for_submission
 from onegov.form.validators import StrictOptional, ValidPhoneNumber
 from onegov.gis import CoordinatesField
 from onegov.org import _
+from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.validators import DataRequired, InputRequired
+from wtforms.validators import DataRequired, InputRequired, ValidationError
 
 
 from typing import TypeVar, TYPE_CHECKING
@@ -32,11 +36,11 @@ class CoordinatesFormExtension(FormExtension[FormT], name='coordinates'):
     def create(self) -> type[FormT]:
         class CoordinatesForm(self.form_class):  # type:ignore
             coordinates = CoordinatesField(
-                label=_("Coordinates"),
+                label=_('Coordinates'),
                 description=_(
-                    "The marker can be moved by dragging it with the mouse"
+                    'The marker can be moved by dragging it with the mouse'
                 ),
-                fieldset=_("Map"),
+                fieldset=_('Map'),
                 render_kw={'data-map-type': 'marker'}
             )
 
@@ -49,33 +53,33 @@ class SubmitterFormExtension(FormExtension[FormT], name='submitter'):
         class SubmitterForm(self.form_class):  # type:ignore
 
             submitter = EmailField(
-                label=_("E-Mail"),
-                fieldset=_("Submitter"),
+                label=_('E-Mail'),
+                fieldset=_('Submitter'),
                 validators=[DataRequired()]
             )
 
             submitter_name = StringField(
                 label=_('Name'),
-                fieldset=_("Submitter"),
+                fieldset=_('Submitter'),
                 validators=[InputRequired()]
             )
 
             submitter_address = StringField(
                 label=_('Address'),
-                fieldset=_("Submitter"),
+                fieldset=_('Submitter'),
                 validators=[InputRequired()]
             )
 
             submitter_phone = StringField(
                 label=_('Phone'),
-                fieldset=_("Submitter"),
+                fieldset=_('Submitter'),
                 validators=[InputRequired(), ValidPhoneNumber()]
             )
 
             def on_request(self) -> None:
-                """ This is not an optimal solution defining this on a form
-                extension. However, this is the first of it's kind.
-                Don't forget to call super for the next one. =) """
+                # This is not an optimal solution defining this on a form
+                # extension. However, this is the first of it's kind.
+                # Don't forget to call super for the next one. =)
                 if hasattr(super(), 'on_request'):
                     super().on_request()
 
@@ -108,8 +112,8 @@ class CommentFormExtension(FormExtension[FormT], name='comment'):
     def create(self) -> type[FormT]:
         class CommentForm(self.form_class):  # type:ignore
             comment = TextAreaField(
-                label=_("Comment"),
-                fieldset=_("Submitter"),
+                label=_('Comment'),
+                fieldset=_('Submitter'),
                 render_kw={'rows': 7}
             )
 
@@ -142,7 +146,7 @@ class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
                     .first()
                 )
 
-            def is_different(self, field: 'Field') -> bool:
+            def is_different(self, field: Field) -> bool:
                 # if the target has been removed, stop
                 if not self.target:
                     return True
@@ -178,9 +182,9 @@ class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
 
             def render_original(
                 self,
-                field: 'Field',
+                field: Field,
                 from_model: bool = False
-            ) -> 'Markup':
+            ) -> Markup:
 
                 prev = field.data
 
@@ -198,7 +202,7 @@ class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
                 finally:
                     field.data = prev
 
-            def render_display(self, field: 'Field') -> 'Markup | None':
+            def render_display(self, field: Field) -> Markup | None:
                 if self.is_different(field):
                     proposed = super().render_display(field)
 
@@ -234,7 +238,7 @@ class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
                     if name == 'csrf_token':
                         continue
                     field.errors.append(
-                        _("Please provide at least one change")
+                        _('Please provide at least one change')
                     )
 
                 return False
@@ -270,21 +274,91 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
                 end = self.publication_end
                 if not start or not end:
                     return None
+
+                # Check if publication end is in the future
                 if end.data and to_timezone(end.data, 'UTC') <= utcnow():
                     assert isinstance(self.publication_end.errors, list)
                     self.publication_end.errors.append(
-                        _("Publication end must be in the future"))
+                        _('Publication end must be in the future'))
                     return False
+
+                # Check if start is before end
                 if not start.data or not end.data:
                     return None
-
                 if end.data <= start.data:
                     for field_name in ('publication_start', 'publication_end'):
                         field = getattr(self, field_name)
                         field.errors.append(
-                            _("Publication start must be prior to end"))
+                            _('Publication start must be prior to end'))
                     return False
+
                 return None
+
+        return PublicationForm
+
+
+class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
+    """ Assumes to be used in conjunction with PublicationFormExtension. """
+
+    def create(self, timezone: str = 'Europe/Zurich') -> type[FormT]:
+
+        class PublicationForm(self.form_class):  # type:ignore
+
+            send_push_notifications_to_app = BooleanField(
+                label=_('Send push notifications to app'),
+                fieldset=_('Publication'),
+                validators=[StrictOptional()],
+                render_kw={'disabled': 'disabled'},
+            )
+
+            push_notifications = MultiCheckboxField(
+                label=('Topics'),
+                choices=[],
+                fieldset=_('Publication'),
+                depends_on=('send_push_notifications_to_app', 'y'),
+                validators=[StrictOptional()],
+                render_kw={'class_': 'indent-form-field'},
+            )
+
+            def on_request(self) -> None:
+                # This is not an optimal solution defining this on a form
+                # extension. However, this is the first of it's kind.
+                # Don't forget to call super for the next one. =)
+                if hasattr(super(), 'on_request'):
+                    super().on_request()
+
+                if not self.request.app.org.firebase_adminsdk_credential:
+                    self.delete_field('send_push_notifications_to_app')
+                    self.delete_field('push_notifications')
+                    return None
+
+                # Don't show any choices for this
+                if not hasattr(self, 'send_push_notifications_to_app'):
+                    return None
+
+                default_topic = [[self.request.app.schema, 'News']]
+                id_topic_pairs = self.request.app.org.meta.get(
+                    'selectable_push_notification_options',
+                    default_topic
+                )
+                # Format choices to show both ID and value
+                self.push_notifications.choices = [
+                    (id, f'{id} ↔ {value}') for id, value in id_topic_pairs
+                ]
+
+            def validate_send_push_notifications_to_app(
+                self, field: BooleanField
+            ) -> None:
+                if not self.publication_start.data:
+                    raise ValidationError(
+                        _('You must set a publication start date first.')
+                    )
+                if field.data and not self.push_notifications.data:
+                    raise ValidationError(
+                        _('Please select at least one topic '
+                          'for push notifications.'
+                          )
+                    )
 
         return PublicationForm
 
@@ -297,6 +371,11 @@ class HoneyPotFormExtension(FormExtension[FormT], name='honeypot'):
             duplicate_of = HoneyPotField()
 
             def on_request(self) -> None:
+                # This is not an optimal solution defining this on a form
+                # extension.
+                # Don't forget to call super for the next one. =)
+                if hasattr(super(), 'on_request'):
+                    super().on_request()
                 if self.model and not getattr(self.model, 'honeypot', False):
                     self.delete_field('duplicate_of')
 

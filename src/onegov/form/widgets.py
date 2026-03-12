@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import humanize
 
 from contextlib import suppress
@@ -13,6 +15,7 @@ from wtforms.widgets import DateInput
 from wtforms.widgets import DateTimeLocalInput
 from wtforms.widgets import FileInput
 from wtforms.widgets import ListWidget
+from wtforms.widgets import NumberInput
 from wtforms.widgets import Select
 from wtforms.widgets import TextArea
 from wtforms.widgets import TextInput
@@ -24,8 +27,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.chat import TextModule
     from onegov.form.fields import (
-        PanelField, PreviewField, UploadField, UploadMultipleField,
-        TypeAheadField
+        DurationField, PanelField, PreviewField, UploadField,
+        UploadMultipleField, TypeAheadField
     )
     from wtforms import Field, StringField
     from wtforms.fields.choices import SelectFieldBase
@@ -37,7 +40,7 @@ class OrderedListWidget(ListWidget):
 
     """
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
 
         # ListWidget expects a field internally, but it will only use
         # its id property and __iter__ method, so we can get away
@@ -55,7 +58,7 @@ class OrderedListWidget(ListWidget):
 
             id = field.id
 
-            def __iter__(self) -> 'Iterator[Field]':
+            def __iter__(self) -> Iterator[Field]:
                 return iter(ordered)
 
         return super().__call__(FakeField(), **kwargs)  # type:ignore[arg-type]
@@ -67,10 +70,19 @@ class MultiCheckboxWidget(ListWidget):
     def __init__(self, html_tag: Literal['ul', 'ol'] = 'ul'):
         super().__init__(html_tag=html_tag, prefix_label=False)
 
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
+        if hasattr(field.meta, 'request'):
+            field.meta.request.include('multicheckbox')
+        return super().__call__(field, **kwargs)
+
 
 class OrderedMultiCheckboxWidget(MultiCheckboxWidget, OrderedListWidget):
     """ The sorted list widget with the label behind the checkbox. """
-    pass
+
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
+        if hasattr(field.meta, 'request'):
+            field.meta.request.include('multicheckbox')
+        return super().__call__(field, **kwargs)
 
 
 class CoordinateWidget(TextInput):
@@ -82,7 +94,7 @@ class CoordinateWidget(TextInput):
 
     """
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
         kwargs['class_'] = (kwargs.get('class_', '') + ' coordinate').strip()
         return super().__call__(field, **kwargs)
 
@@ -113,7 +125,7 @@ class UploadWidget(FileInput):
 
             {preview}
 
-            <ul>
+            <ul class="upload-options">
                 <li>
                     <input type="radio" id="{name}-0" name="{name}"
                            value="keep" checked="">
@@ -143,7 +155,7 @@ class UploadWidget(FileInput):
         </div>
     """)
 
-    def image_source(self, field: 'UploadField') -> str | None:
+    def image_source(self, field: UploadField) -> str | None:
         """ Returns the image source url if the field points to an image and
         if it can be done (it looks like it's possible, but I'm not super
         sure this is always possible).
@@ -156,7 +168,7 @@ class UploadWidget(FileInput):
         if not field.data:
             return None
 
-        if not field.data.get('mimetype', None) in IMAGE_MIME_TYPES_AND_SVG:
+        if field.data.get('mimetype', None) not in IMAGE_MIME_TYPES_AND_SVG:
             return None
 
         if not hasattr(field, 'object_data'):
@@ -171,7 +183,7 @@ class UploadWidget(FileInput):
 
     def template_data(
         self,
-        field: 'UploadField',
+        field: UploadField,
         force_simple: bool,
         resend_upload: bool,
         wrapper_css_class: str,
@@ -217,9 +229,7 @@ class UploadWidget(FileInput):
             'previous': previous,
             'filesize': display_size,
             'filename': field.data['filename'],
-            'wrapper_css_class': wrapper_css_class,
             'name': field.id,
-            'input_html': input_html,
             'existing_file_label': field.gettext(_('Uploaded file')),
             'keep_label': field.gettext(_('Keep file')),
             'delete_label': field.gettext(_('Delete file')),
@@ -228,7 +238,7 @@ class UploadWidget(FileInput):
 
     def __call__(
         self,
-        field: 'UploadField',  # type:ignore[override]
+        field: UploadField,  # type:ignore[override]
         **kwargs: Any
     ) -> Markup:
 
@@ -274,14 +284,14 @@ class UploadMultipleWidget(FileInput):
 
     def render_input(
         self,
-        field: 'UploadMultipleField',
+        field: UploadMultipleField,
         **kwargs: Any
     ) -> Markup:
         return super().__call__(field, **kwargs)
 
     def __call__(
         self,
-        field: 'UploadMultipleField',  # type:ignore[override]
+        field: UploadMultipleField,  # type:ignore[override]
         **kwargs: Any
     ) -> Markup:
 
@@ -295,7 +305,10 @@ class UploadMultipleWidget(FileInput):
         """)
 
         if force_simple or len(field) == 0:
-            return simple_template.format(input_html)
+            return simple_template.format(input_html) + Markup('\n').join(
+                Markup('<small class="error">{}</small>').format(error)
+                for error in field.errors
+            )
         else:
             existing_html = Markup('').join(
                 subfield(
@@ -319,8 +332,8 @@ class UploadMultipleWidget(FileInput):
 
 class TextAreaWithTextModules(TextArea):
     """An extension of a regular textarea with a button that lets
-       you select and insert text modules. If no text modules have
-       been defined this will be no different from textarea.
+    you select and insert text modules. If no text modules have
+    been defined this will be no different from textarea.
     """
     template = PageTemplate("""
         <div class="textarea-widget">
@@ -349,7 +362,7 @@ class TextAreaWithTextModules(TextArea):
         </div>
     """)
 
-    def text_modules(self, field: 'StringField') -> list['TextModule']:
+    def text_modules(self, field: StringField) -> list[TextModule]:
         if not hasattr(field.meta, 'request'):
             # we depend on the field containing a reference to
             # the current request, which should be passed from
@@ -360,14 +373,14 @@ class TextAreaWithTextModules(TextArea):
         collection = TextModuleCollection(request.session)
         return collection.query().all()
 
-    def __call__(self, field: 'StringField', **kwargs: Any) -> Markup:
+    def __call__(self, field: StringField, **kwargs: Any) -> Markup:
         input_html = super().__call__(field, **kwargs)
         text_modules = self.text_modules(field)
         if not text_modules:
             return input_html
 
         field.meta.request.include('text-module-picker')
-        return Markup(self.template.render(  # noqa: MS001
+        return Markup(self.template.render(  # nosec: B704
             id=field.id,
             label=field.gettext(_('Text modules')),
             text_modules=text_modules,
@@ -435,7 +448,7 @@ class IconWidget(TextInput):
         </div>
     """)
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
         iconfont = kwargs.pop('iconfont', self.iconfont)
         icons = kwargs.pop('icons', self.icons[iconfont])
 
@@ -451,7 +464,7 @@ class IconWidget(TextInput):
             'data-depends-on', False) if field.render_kw else False
         depends_on = {'data-depends-on': depends_on} if depends_on else {}
 
-        return Markup(self.template.render(  # noqa: MS001
+        return Markup(self.template.render(  # nosec: B704
             iconfont=iconfont,
             icons=icons,
             id=field.id,
@@ -463,18 +476,36 @@ class IconWidget(TextInput):
 
 class ChosenSelectWidget(Select):
 
-    def __call__(self, field: 'SelectFieldBase', **kwargs: Any) -> Markup:
+    def __call__(self, field: SelectFieldBase, **kwargs: Any) -> Markup:
         kwargs['class_'] = '{} chosen-select'.format(
             kwargs.get('class_', '')
         ).strip()
-        kwargs['data-placeholder'] = field.gettext(_("Select an Option"))
-        kwargs['data-no_results_text'] = field.gettext(_("No results match"))
+        kwargs['data-placeholder'] = field.gettext(_('Select an Option'))
+        kwargs['data-no_results_text'] = field.gettext(_('No results match'))
         if self.multiple:
             kwargs['data-placeholder'] = field.gettext(
-                _("Select Some Options")
+                _('Select Some Options')
             )
 
-        return super(ChosenSelectWidget, self).__call__(field, **kwargs)
+        return super().__call__(field, **kwargs)
+
+
+class TreeSelectWidget(Select):
+
+    def __call__(self, field: SelectFieldBase, **kwargs: Any) -> Markup:
+        field.meta.request.include('treeselect')
+
+        kwargs['class_'] = '{} treeselect'.format(
+            kwargs.get('class_', '')
+        ).strip()
+        kwargs['data-placeholder'] = field.gettext(_('Select an Option'))
+        kwargs['data-no_results_text'] = field.gettext(_('No results match'))
+        if self.multiple:
+            kwargs['data-placeholder'] = field.gettext(
+                _('Select Some Options')
+            )
+
+        return super().__call__(field, **kwargs)
 
 
 class PreviewWidget:
@@ -492,7 +523,7 @@ class PreviewWidget:
         </div>
     """)
 
-    def __call__(self, field: 'PreviewField', **kwargs: Any) -> Markup:
+    def __call__(self, field: PreviewField, **kwargs: Any) -> Markup:
         field.meta.request.include('preview-widget-handler')
 
         if callable(field.url):
@@ -511,9 +542,9 @@ class PreviewWidget:
 class PanelWidget:
     """ A widget that displays the field's text as panel (no input). """
 
-    def __call__(self, field: 'PanelField', **kwargs: Any) -> Markup:
+    def __call__(self, field: PanelField, **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
-        return Markup(  # noqa: MS001
+        return Markup(  # nosec: B704
             f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
             '{text}</div>'
         ).format(
@@ -522,10 +553,25 @@ class PanelWidget:
         )
 
 
+class LinkPanelWidget(PanelWidget):
+    """ A widget that displays a clickable link as panel (no input). """
+
+    def __call__(self, field: PanelField, **kwargs: Any) -> Markup:
+        text = escape(field.meta.request.translate(field.text))
+        return Markup(  # nosec: B704
+            f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
+            '<a href="{link}">{text}</a></div>'
+        ).format(
+            kind=field.kind,
+            text=text.replace('\n', Markup('<br>')),
+            link=field.text
+        )
+
+
 class HoneyPotWidget(TextInput):
     """ A widget that displays the input normally not visible to the user. """
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
         field.meta.request.include('lazy-wolves')
         kwargs['class_'] = (kwargs.get('class_', '') + ' lazy-wolves').strip()
         return super().__call__(field, **kwargs)
@@ -559,7 +605,7 @@ class DateRangeInput(DateRangeMixin, DateInput):
     supported in some browsers based on a date or relativedelta.
     """
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
         min_date = self.min_date
         if min_date is not None:
             kwargs.setdefault('min', min_date.isoformat())
@@ -576,7 +622,7 @@ class DateTimeLocalRangeInput(DateRangeMixin, DateTimeLocalInput):
     are supported in some browsers based on a date or relativedelta.
     """
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
         min_date = self.min_date
         if min_date is not None:
             kwargs.setdefault('min', min_date.isoformat() + 'T00:00')
@@ -588,12 +634,43 @@ class DateTimeLocalRangeInput(DateRangeMixin, DateTimeLocalInput):
         return super().__call__(field, **kwargs)
 
 
+class DurationInput:
+
+    minutes_widget = NumberInput(step=5, min=0, max=60)
+    hours_widget = NumberInput(step=1, min=0, max=24)
+
+    def __call__(self, field: DurationField, **kwargs: Any) -> Markup:
+        if field.data is None:
+            hours = '0'
+            minutes = '0'
+        else:
+            _minutes, _seconds = divmod(int(field.data.total_seconds()), 60)
+            _hours, _minutes = divmod(_minutes, 60)
+            hours = str(_hours)
+            minutes = str(_minutes)
+        return Markup("""
+            <div class="duration-widget">
+            <label>{hours_input} {hours_label}</label>
+            <label>{minutes_input} {minutes_label}</label>
+            </div>
+        """).format(
+            hours_label=field.gettext(_('hours')),
+            minutes_label=field.gettext(_('minutes')),
+            hours_input=self.hours_widget(
+                field, value=hours, size=2, **kwargs
+            ),
+            minutes_input=self.minutes_widget(
+                field, value=minutes, size=2, **kwargs
+            ),
+        )
+
+
 class TypeAheadInput(TextInput):
     """ A widget with typeahead. """
 
     def __call__(
         self,
-        field: 'TypeAheadField',  # type:ignore[override]
+        field: TypeAheadField,  # type:ignore[override]
         **kwargs: Any
     ) -> Markup:
         field.meta.request.include('typeahead-standalone')

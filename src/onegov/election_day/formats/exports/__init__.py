@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.formats.exports.election import \
     export_election_internal
 from onegov.election_day.formats.exports.election import \
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
 
 def export_internal(
     item: Election | ElectionCompound | Vote,
-    locales: 'Collection[str]'
+    locales: Collection[str]
 ) -> list[dict[str, Any]]:
 
     if isinstance(item, Vote):

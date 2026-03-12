@@ -68,7 +68,33 @@
 
             <div class="mission-report-legend" tal:condition="legend">
                 <h2 i18n:translate>Legend</h2>
-                <tal:b tal:replace="structure legend" />
+                <tal:b tal:replace="legend" />
+            </div>
+
+            <div class="mission-report-open-data">
+                <h2>Open Data</h2>
+                <p>Die Rohdaten sind in den folgenden Formaten verfügbar:</p>
+                <ol>
+                    <li>
+                        <a href="mission-reports/json">JSON</a>
+                    </li>
+                    <li>
+                        <a href="mission-reports/csv">CSV</a>
+                    </li>
+                </ol>
+
+                <p>
+                    <span>Das Datenformat ist hier beschrieben:</span> <a href="https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/winterthur/static/docs/api/open_data_de.md"><span>Formatbeschreibung</span></a>
+                </p>
+
+                <h3>Nutzungsbedingungen</h3>
+                <p>Freie Nutzung. Quellenangabe ist Pflicht.</p>
+                <ul>
+                    <li>Sie dürfen diesen Datensatz für nicht kommerzielle Zwecke nutzen. </li>
+                    <li>Sie dürfen diesen Datensatz für kommerzielle Zwecke nutzen. </li>
+                    <li> Eine Quellenangabe ist Pflicht (Autor, Titel und Link zum Datensatz). </li>
+                </ul>
+                <p><a href="https://opendata.swiss/de/terms-of-use"><img width="0100" height="80" src="https://wp.opendata.swiss/wp-content/uploads/2021/02/terms_by.png" alt="Nutzungsbedingungen"></a></p>
             </div>
         </tal:b>
     </tal:b>

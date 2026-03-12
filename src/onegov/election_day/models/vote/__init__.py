@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.models.vote.ballot import Ballot
 from onegov.election_day.models.vote.ballot import BallotResult
 from onegov.election_day.models.vote.complex_vote import ComplexVote

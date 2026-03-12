@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from babel import Locale
 from decimal import Decimal
 from decimal import ROUND_HALF_UP
@@ -27,14 +29,14 @@ if TYPE_CHECKING:
 
 class DefaultLayout(ChameleonLayout):
 
-    app: 'SwissvotesApp'
-    request: 'SwissvotesRequest'
+    app: SwissvotesApp
+    request: SwissvotesRequest
 
     day_long_format = 'skeleton:MMMMd'
     date_long_format = 'long'
     datetime_long_format = 'medium'
 
-    def __init__(self, model: Any, request: 'SwissvotesRequest') -> None:
+    def __init__(self, model: Any, request: SwissvotesRequest) -> None:
         super().__init__(model, request)
         self.request.include('frameworks')
         self.request.include('chosen')
@@ -46,20 +48,20 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def title(self) -> str:
-        return ""
+        return ''
 
     @cached_property
     def top_navigation(self) -> list[Link]:
-        result = [Link(_("Votes"), self.votes_url)]
-        for page in self.pages.query():
-            if page.id not in self.request.app.static_content_pages:
-                result.append(
-                    Link(
-                        page.title,
-                        self.request.link(page),
-                        sortable_id=page.id,
-                    )
-                )
+        result = [
+            Link(
+                page.title,
+                self.request.link(page),
+                sortable_id=page.id,
+            )
+            for page in self.pages.query()
+            if page.id not in self.request.app.static_content_pages
+        ]
+        result.insert(0, Link(_('Votes'), self.votes_url))
         return result
 
     @cached_property
@@ -68,7 +70,7 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
-        return [Link(_("Homepage"), self.homepage_url)]
+        return [Link(_('Homepage'), self.homepage_url)]
 
     @cached_property
     def static_path(self) -> str:
@@ -150,16 +152,16 @@ class DefaultLayout(ChameleonLayout):
             ))
         return result
 
-    def format_policy_areas(self, vote: 'SwissVote') -> Markup:
+    def format_policy_areas(self, vote: SwissVote) -> Markup:
         paths: dict[str, list[list[str]]] = {}
         for path in (area.label_path for area in vote.policy_areas):
             paths.setdefault(path[0], []).append(path)
 
         translate = self.request.translate
-        return Markup(",<br>").join(
-            Markup("<span title=\"{}\">{}</span>").format(
-                Markup(" &#10;&#10;").join(
-                    Markup(" &gt; ").join(translate(part) for part in title)
+        return Markup(',<br>').join(
+            Markup('<span title="{}">{}</span>').format(
+                Markup(' &#10;&#10;').join(
+                    Markup(' &gt; ').join(translate(part) for part in title)
                     for title in titles
                 ),
                 translate(value)
@@ -178,9 +180,9 @@ class DefaultLayout(ChameleonLayout):
 
     def format_number(
         self,
-        number: Number | Decimal | float | None,
+        number: Number | Decimal | float | str | None,
         decimal_places: int | None = None,
-        padding: str = ''
+        padding: str | int = ''
     ) -> str:
         """ Takes the given numer and formats it according to locale.
 

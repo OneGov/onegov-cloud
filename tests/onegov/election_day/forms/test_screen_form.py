@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.election_day.forms import ScreenForm
 from onegov.election_day.models import ComplexVote
@@ -11,7 +13,13 @@ from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_screen_form_validate(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
+def test_screen_form_validate(election_day_app_zg: TestApp) -> None:
     session = election_day_app_zg.session()
 
     assert not ScreenForm().validate()
@@ -28,7 +36,7 @@ def test_screen_form_validate(election_day_app_zg):
             'css': ''
         })
     )
-    form.request = DummyRequest(app=election_day_app_zg, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)  # type: ignore[assignment]
     form.majorz_election.choices = [('election', 'Election')]
     assert form.validate()
 
@@ -44,7 +52,7 @@ def test_screen_form_validate(election_day_app_zg):
             'css': ''
         })
     )
-    form.request = DummyRequest(app=election_day_app_zg, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)  # type: ignore[assignment]
     form.majorz_election.choices = [('election', 'Election')]
     assert not form.validate()
     assert form.errors == {'structure': ['error parsing attribute name']}
@@ -61,13 +69,13 @@ def test_screen_form_validate(election_day_app_zg):
             'css': ''
         })
     )
-    form.request = DummyRequest(app=election_day_app_zg, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)  # type: ignore[assignment]
     form.majorz_election.choices = [('election', 'Election')]
     assert not form.validate()
     assert form.errors == {'structure': ["Invalid element '<fancy-stuff>'"]}
 
 
-def test_screen_form_update_apply(session):
+def test_screen_form_update_apply(session: Session) -> None:
     simple = Vote(
         title='Simple',
         domain='federation',
@@ -194,6 +202,8 @@ def test_screen_form_update_apply(session):
     form.update_model(model)
     session.flush()
     session.expire(model)
+    # undo mypy narrowing
+    model = model
     assert model.type == 'election_compound'
     assert model.vote_id is None
     assert model.election_id is None
@@ -235,6 +245,8 @@ def test_screen_form_update_apply(session):
     assert model.domain_segment == 'segment'
     form = ScreenForm()
     form.apply_model(model)
+    # undo mypy narrowing
+    model = model
     assert form.type.data == 'election_compound'
     assert form.simple_vote.data == ''
     assert form.complex_vote.data == ''
@@ -255,6 +267,8 @@ def test_screen_form_update_apply(session):
     form.update_model(model)
     session.flush()
     session.expire(model)
+    # undo mypy narrowing
+    model = model
     assert model.type == 'simple_vote'
     assert model.vote_id == simple.id
     assert model.election_id is None
@@ -304,7 +318,7 @@ def test_screen_form_update_apply(session):
     assert form.domain_segment.data is None
 
 
-def test_screen_form_populate(election_day_app_zg):
+def test_screen_form_populate(election_day_app_zg: TestApp) -> None:
     session = election_day_app_zg.session()
     session.add(
         Vote(
@@ -371,7 +385,7 @@ def test_screen_form_populate(election_day_app_zg):
     session.flush()
 
     form = ScreenForm()
-    form.request = DummyRequest(app=election_day_app_zg, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)  # type: ignore[assignment]
     form.on_request()
     assert form.simple_vote.choices == [
         ('simple-2', 'Simple 2 [2001-01-01]'),

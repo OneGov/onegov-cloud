@@ -1,6 +1,9 @@
+from __future__ import annotations
+
+from decimal import Decimal
 from io import BytesIO
-from onegov.file import File
 from morepath import redirect
+from datetime import datetime
 from morepath.request import Response
 from sedate import utcnow
 from onegov.core.custom import json
@@ -9,16 +12,23 @@ from onegov.core.templates import render_template
 from onegov.file.integration import get_file
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import GeneralFileCollection
+from onegov.org.models import GeneralFile, GeneralFileCollection
 from onegov.org.models import TicketMessage
+from onegov.org.utils import emails_for_new_ticket
 from onegov.ticket import TicketCollection
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
+from onegov.translator_directory.utils import (
+    get_accountant_emails_for_finanzstelle
+)
 from onegov.translator_directory.constants import (
     PROFESSIONAL_GUILDS, INTERPRETING_TYPES, ADMISSIONS, GENDERS, GENDER_MAP)
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
+from onegov.translator_directory.forms.time_report import (
+    TranslatorTimeReportForm,
+)
 from onegov.translator_directory.forms.translator import (
     TranslatorForm, TranslatorSearchForm,
     EditorTranslatorForm, MailTemplatesForm)
@@ -26,12 +36,21 @@ from onegov.translator_directory.generate_docx import (
     fill_docx_with_variables, signature_for_mail_templates,
     parse_from_filename, get_ticket_nr_of_translator)
 from onegov.translator_directory.layout import (
-    AddTranslatorLayout, TranslatorCollectionLayout, TranslatorLayout,
-    EditTranslatorLayout, ReportTranslatorChangesLayout, MailTemplatesLayout)
+    AddTranslatorLayout,
+    TranslatorCollectionLayout,
+    TranslatorLayout,
+    EditTranslatorLayout,
+    ReportTranslatorChangesLayout,
+    MailTemplatesLayout,
+)
+from onegov.translator_directory.models.time_report import TranslatorTimeReport
 from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.utils import country_code_to_name
+
 from uuid import uuid4
 from xlsxwriter import Workbook
 from docx.image.exceptions import UnrecognizedImageError
+from webob.exc import HTTPForbidden
 
 
 from typing import TYPE_CHECKING
@@ -57,9 +76,9 @@ if TYPE_CHECKING:
 )
 def add_new_translator(
     self: TranslatorCollection,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: TranslatorForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     form.delete_field('date_of_decision')
     form.delete_field('for_admins_only')
@@ -90,6 +109,8 @@ def add_new_translator(
         return request.redirect(request.link(translator))
 
     layout = AddTranslatorLayout(self, request)
+    layout.edit_mode = True
+
     return {
         'layout': layout,
         'model': self,
@@ -106,9 +127,9 @@ def add_new_translator(
 )
 def view_translators(
     self: TranslatorCollection,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: TranslatorSearchForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     layout = TranslatorCollectionLayout(self, request)
 
@@ -136,94 +157,99 @@ def view_translators(
 )
 def export_translator_directory(
     self: TranslatorCollection,
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 ) -> Response:
 
     output = BytesIO()
     workbook = Workbook(output)
 
-    def format_date(dt: 'datetime | date | None') -> str:
+    def format_date(dt: datetime | date | None) -> str:
         if not dt:
             return ''
         return dt.strftime('%Y-%m-%d')
 
-    def format_iterable(listlike: 'Iterable[str]') -> str:
-        return "|".join(listlike) if listlike else ''
+    def format_iterable(listlike: Iterable[str]) -> str:
+        return '|'.join(listlike) if listlike else ''
 
     def format_languages(
-        langs: 'Iterable[Language | LanguageCertificate]'
+        langs: Iterable[Language | LanguageCertificate]
     ) -> str:
-        return format_iterable((la.name for la in langs))
+        return format_iterable(la.name for la in langs)
 
-    def format_guilds(guilds: 'Iterable[str]') -> str:
+    def format_guilds(guilds: Iterable[str]) -> str:
         return format_iterable(
-            (
-                request.translate(PROFESSIONAL_GUILDS[s])
-                if s in PROFESSIONAL_GUILDS else s
-                for s in guilds
-            )
+            request.translate(PROFESSIONAL_GUILDS[s])
+            if s in PROFESSIONAL_GUILDS else s
+            for s in guilds
         )
 
-    def format_interpreting_types(types: 'Iterable[InterpretingType]') -> str:
+    def format_interpreting_types(types: Iterable[InterpretingType]) -> str:
         return format_iterable(
-            (request.translate(INTERPRETING_TYPES[t]) for t in types)
+            request.translate(INTERPRETING_TYPES[t]) for t in types
         )
 
-    def format_admission(admission: 'AdmissionState | None') -> str:
+    def format_admission(admission: AdmissionState | None) -> str:
         if not admission:
             return ''
         return request.translate(ADMISSIONS[admission])
 
-    def format_gender(gender: 'Gender | None') -> str:
+    def format_gender(gender: Gender | None) -> str:
         if not gender:
             return ''
         return request.translate(GENDERS[gender])
 
-    worksheet = workbook.add_worksheet()
-    worksheet.name = request.translate(_("Translator directory"))
+    def format_nationalities(nationalities: list[str] | None) -> str:
+        mapping = country_code_to_name(request.locale)
+        if not nationalities:
+            return ''
+        return ', '.join(mapping[n] for n in nationalities)
+
+    worksheet = workbook.add_worksheet(
+        request.translate(_('Translator directory'))
+    )
     worksheet.write_row(0, 0, (
-        request.translate(_("Personal ID")),
-        request.translate(_("Admission")),
-        request.translate(_("Withholding tax")),
-        request.translate(_("Self-employed")),
-        request.translate(_("Last name")),
-        request.translate(_("First name")),
-        request.translate(_("Gender")),
-        request.translate(_("Date of birth")),
-        request.translate(_("Nationality")),
-        request.translate(_("Location")),
-        request.translate(_("Address")),
-        request.translate(_("Zip Code")),
-        request.translate(_("City")),
-        request.translate(_("Drive distance")),
-        request.translate(_("Swiss social security number")),
-        request.translate(_("Bank name")),
-        request.translate(_("Bank address")),
-        request.translate(_("Account owner")),
-        request.translate(_("IBAN")),
-        request.translate(_("Email")),
-        request.translate(_("Private Phone Number")),
-        request.translate(_("Mobile Phone Number")),
-        request.translate(_("Office Phone Number")),
-        request.translate(_("Availability")),
-        request.translate(_("Comments on possible field of application")),
-        request.translate(_("Name reveal confirmation")),
-        request.translate(_("Date of application")),
-        request.translate(_("Date of decision")),
-        request.translate(_("Mother tongues")),
-        request.translate(_("Spoken languages")),
-        request.translate(_("Written languages")),
-        request.translate(_("Monitoring languages")),
-        request.translate(_("Learned profession")),
-        request.translate(_("Current professional activity")),
-        request.translate(_("Expertise by professional guild")),
-        request.translate(_("Expertise by interpreting type")),
-        request.translate(_("Proof of preconditions")),
-        request.translate(_("Agency references")),
-        request.translate(_("Education as interpreter")),
-        request.translate(_("Certificates")),
-        request.translate(_("Comments")),
-        request.translate(_("Hidden")),
+        request.translate(_('Personal ID')),
+        request.translate(_('Admission')),
+        request.translate(_('Withholding tax')),
+        request.translate(_('Self-employed')),
+        request.translate(_('Last name')),
+        request.translate(_('First name')),
+        request.translate(_('Gender')),
+        request.translate(_('Date of birth')),
+        request.translate(_('Nationality(ies)')),
+        request.translate(_('Location')),
+        request.translate(_('Address')),
+        request.translate(_('Zip Code')),
+        request.translate(_('City')),
+        request.translate(_('Drive distance')),
+        request.translate(_('Swiss social security number')),
+        request.translate(_('Bank name')),
+        request.translate(_('Bank address')),
+        request.translate(_('Account owner')),
+        request.translate(_('IBAN')),
+        request.translate(_('Email')),
+        request.translate(_('Private Phone Number')),
+        request.translate(_('Mobile Phone Number')),
+        request.translate(_('Office Phone Number')),
+        request.translate(_('Availability')),
+        request.translate(_('Comments on possible field of application')),
+        request.translate(_('Name reveal confirmation')),
+        request.translate(_('Date of application')),
+        request.translate(_('Date of decision')),
+        request.translate(_('Mother tongues')),
+        request.translate(_('Spoken languages')),
+        request.translate(_('Written languages')),
+        request.translate(_('Monitoring languages')),
+        request.translate(_('Learned profession')),
+        request.translate(_('Current professional activity')),
+        request.translate(_('Expertise by professional guild')),
+        request.translate(_('Expertise by interpreting type')),
+        request.translate(_('Proof of preconditions')),
+        request.translate(_('Agency references')),
+        request.translate(_('Education as interpreter')),
+        request.translate(_('Certificates')),
+        request.translate(_('Comments')),
+        request.translate(_('Hidden')),
     ))
 
     for ix, trs in enumerate(self.query()):
@@ -236,7 +262,7 @@ def export_translator_directory(
             trs.first_name,
             format_gender(trs.gender),
             format_date(trs.date_of_birth),
-            trs.nationality or '',
+            format_nationalities(trs.nationalities),
             json.dumps(trs.coordinates),
             trs.address or '',
             trs.zip_code or '',
@@ -280,7 +306,7 @@ def export_translator_directory(
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
-        request.translate(_("Translator directory")).lower(),
+        request.translate(_('Translator directory')).lower(),
         utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()
@@ -295,9 +321,13 @@ def export_translator_directory(
 )
 def view_translator(
     self: Translator,
-    request: 'TranslatorAppRequest'
-) -> 'RenderData':
+    request: TranslatorAppRequest
+) -> RenderData:
     layout = TranslatorLayout(self, request)
+    if layout.translator_data_outdated():
+        request.warning(_(
+            'Is your information still up do date? Please check and either '
+            'modify or confirm using the buttons above.'))
 
     return {
         'layout': layout,
@@ -315,13 +345,13 @@ def view_translator(
 )
 def edit_translator(
     self: Translator,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: TranslatorForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         form.update_model(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
     if not form.errors:
         form.process(
@@ -332,6 +362,7 @@ def edit_translator(
             }
         )
     layout = EditTranslatorLayout(self, request)
+    layout.edit_mode = True
 
     if not self.coordinates:
         request.warning(
@@ -355,16 +386,16 @@ def edit_translator(
 )
 def edit_translator_as_editor(
     self: Translator,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: EditorTranslatorForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if request.is_admin:
         return request.redirect(request.link(self, name='edit'))
 
     if form.submitted(request):
         form.update_model(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
     if not form.errors:
         form.process(obj=self)
@@ -384,7 +415,7 @@ def edit_translator_as_editor(
 )
 def delete_translator(
     self: Translator,
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -401,13 +432,25 @@ def delete_translator(
 )
 def report_translator_change(
     self: Translator,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: TranslatorMutationForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
+
+    if request.is_member:
+        raise HTTPForbidden()
 
     if form.submitted(request):
         assert request.current_username is not None
         session = request.session
+
+        # Get uploaded files from the form
+        uploaded_files = form.get_files()
+        file_ids: list[str] = []
+        if uploaded_files:
+            self.files.extend(uploaded_files)
+            session.flush()
+            file_ids = [f.id for f in uploaded_files]
+
         with session.no_autoflush:
             ticket = TicketCollection(session).open_ticket(
                 handler_code='TRN',
@@ -416,30 +459,29 @@ def report_translator_change(
                     'id': str(self.id),
                     'submitter_email': request.current_username,
                     'submitter_message': form.submitter_message.data,
-                    'proposed_changes': form.proposed_changes
-                }
+                    'proposed_changes': form.proposed_changes,
+                    'file_ids': file_ids,
+                },
             )
-            TicketMessage.create(ticket, request, 'opened')
+            TicketMessage.create(ticket, request, 'opened', 'external')
             ticket.create_snapshot(request)
 
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened.pt',
-            subject=_("Your ticket has been opened"),
+            subject=_('Your ticket has been opened'),
             receivers=(request.current_username, ),
             ticket=ticket,
             send_self=True
         )
-        if request.email_for_new_tickets:
+        for email in emails_for_new_ticket(request, ticket):
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened_info.pt',
-                subject=_("New ticket"),
+                subject=_('New ticket'),
                 ticket=ticket,
-                receivers=(request.email_for_new_tickets, ),
-                content={
-                    'model': ticket
-                }
+                receivers=(email, ),
+                content={'model': ticket},
             )
 
         request.app.send_websocket(
@@ -448,10 +490,11 @@ def report_translator_change(
                 'event': 'browser-notification',
                 'title': request.translate(_('New ticket')),
                 'created': ticket.created.isoformat()
-            }
+            },
+            groupids=request.app.groupids_for_ticket(ticket),
         )
 
-        request.success(_("Thank you for your submission!"))
+        request.success(_('Thank you for your submission!'))
         return redirect(request.link(ticket, 'status'))
 
     layout = ReportTranslatorChangesLayout(self, request)
@@ -460,6 +503,145 @@ def report_translator_change(
         'layout': layout,
         'title': layout.title,
         'form': form
+    }
+
+
+@TranslatorDirectoryApp.view(
+    model=Translator,
+    name='confirm-current-data',
+    permission=Personal,
+)
+def confirm_current_data(
+    self: Translator,
+    request: TranslatorAppRequest
+) -> BaseResponse:
+
+    TranslatorCollection(request.app).confirm_current_data(self)
+    request.success(_('Your data has been confirmed'))
+    return redirect(request.link(self))
+
+
+@TranslatorDirectoryApp.form(
+    model=Translator,
+    template='form.pt',
+    name='add-time-report',
+    form=TranslatorTimeReportForm,
+    permission=Personal,
+)
+def add_time_report(
+    self: Translator,
+    request: TranslatorAppRequest,
+    form: TranslatorTimeReportForm,
+) -> RenderData | BaseResponse:
+
+    if form.submitted(request):
+
+        session = request.session
+        current_user = request.current_user
+
+        try:
+            accountant_emails = set(
+                get_accountant_emails_for_finanzstelle(
+                    request, form.finanzstelle.data
+                )
+            )
+        except ValueError as e:
+            request.warning(str(e))
+            return redirect(request.link(self))
+
+        report = TranslatorTimeReport(
+            translator=self,
+            created_by=current_user,
+            total_compensation=Decimal('0'),
+        )
+        form.update_model(report)
+        session.add(report)
+        session.flush()
+
+        assert request.current_username is not None
+
+        with session.no_autoflush:
+            ticket = TicketCollection(session).open_ticket(
+                handler_code='TRP',
+                handler_id=uuid4().hex,
+                handler_data={
+                    'translator_id': str(self.id),
+                    'submitter_email': request.current_username,
+                    'time_report_id': str(report.id),
+                },
+            )
+            TicketMessage.create(ticket, request, 'opened', 'external')
+            ticket.create_snapshot(request)
+
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_('Your ticket has been opened'),
+            receivers=(request.current_username,),
+            ticket=ticket,
+            send_self=True,
+        )
+
+        if self.email:
+            send_ticket_mail(
+                request=request,
+                template='mail_time_report_created_for_translator.pt',
+                subject=_('A time report has been submitted for you'),
+                receivers=(self.email,),
+                ticket=ticket,
+                content={
+                    'model': ticket,
+                    'translator': self,
+                    'time_report': report,
+                    'accountant_emails': list(accountant_emails),
+                },
+            )
+
+        for email in emails_for_new_ticket(request, ticket):
+            if email in accountant_emails:
+                send_ticket_mail(
+                    request=request,
+                    template='mail_ticket_opened_info.pt',
+                    subject=_('New ticket'),
+                    ticket=ticket,
+                    receivers=(email,),
+                    content={'model': ticket},
+                )
+        for accountant_email in accountant_emails:
+            send_ticket_mail(
+                request=request,
+                template='mail_time_report_created_for_accountant.pt',
+                subject=_('New time report for review'),
+                ticket=ticket,
+                receivers=(accountant_email,),
+                content={
+                    'model': ticket,
+                    'translator': self,
+                    'time_report': report,
+                },
+            )
+
+        request.app.send_websocket(
+            channel=request.app.websockets_private_channel,
+            message={
+                'event': 'browser-notification',
+                'title': request.translate(_('New ticket')),
+                'created': ticket.created.isoformat(),
+            },
+            groupids=request.app.groupids_for_ticket(ticket),
+        )
+
+        request.success(_('Time report submitted for review'))
+        return redirect(request.link(ticket, 'status'))
+
+    layout = TranslatorLayout(self, request)
+
+    return {
+        'layout': layout,
+        'model': self,
+        'form': form,
+        'title': _('Add Time Report'),
+        'button_text': request.translate(_('Submit Time Report')),
     }
 
 
@@ -472,9 +654,9 @@ def report_translator_change(
 )
 def view_mail_templates(
     self: Translator,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: MailTemplatesForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     layout = MailTemplatesLayout(self, request)
     if form.submitted(request):
@@ -532,9 +714,9 @@ def view_mail_templates(
         docx_template_id = (
             GeneralFileCollection(request.session)
             .query()
-            .filter(File.name == template_name)
-            .with_entities(File.id)
-            .first()
+            .filter(GeneralFile.name == template_name)
+            .with_entities(GeneralFile.id)
+            .scalar()
         )
         docx_f = get_file(request.app, docx_template_id)
         assert docx_f is not None

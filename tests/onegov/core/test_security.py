@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 import onegov.core.security
 
@@ -7,7 +9,13 @@ from onegov.core.security import forget, remembered
 from webtest import TestApp as Client
 
 
-def spawn_basic_permissions_app(redis_url):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from webob import Response
+
+
+def spawn_basic_permissions_app(redis_url: str) -> Framework:
 
     class App(Framework):
         pass
@@ -16,7 +24,7 @@ def spawn_basic_permissions_app(redis_url):
         pass
 
     @App.path(path='', model=Root)
-    def get_root():
+    def get_root() -> Root:
         return Root()
 
     @App.path(path='/hidden')
@@ -24,23 +32,23 @@ def spawn_basic_permissions_app(redis_url):
         access = 'private'
 
     @App.view(model=Root, name='public', permission=Public)
-    def public_view(self, request):
+    def public_view(self: Root, request: CoreRequest) -> str:
         return 'public'
 
     @App.view(model=Root, name='private', permission=Private)
-    def private_view(self, request):
+    def private_view(self: Root, request: CoreRequest) -> str:
         return 'private'
 
     @App.view(model=Root, name='personal', permission=Personal)
-    def personal_view(self, request):
+    def personal_view(self: Root, request: CoreRequest) -> str:
         return 'personal'
 
     @App.view(model=Root, name='secret', permission=Secret)
-    def secret_view(self, request):
+    def secret_view(self: Root, request: CoreRequest) -> str:
         return 'secret'
 
     @App.view(model=HiddenFromPublic, permission=Public)
-    def hidden_from_public_view(self, request):
+    def hidden_from_public_view(self: Root, request: CoreRequest) -> str:
         return 'hidden'
 
     @App.view(
@@ -49,24 +57,24 @@ def spawn_basic_permissions_app(redis_url):
         permission=Public,
         request_method='POST'
     )
-    def login(self, request):
+    def login(self: Root, request: CoreRequest) -> None:
         userid = request.params.get('userid')
         uid = request.params.get('userid')
         groupid = request.params.get('groupid')
         role = request.params.get('role')
         identity = request.app.application_bound_identity(
-            userid, uid, groupid, role
+            userid, uid, groupid, role  # type: ignore[arg-type]
         )
 
         @request.after
-        def remember(response):
+        def remember(response: Response) -> None:
             request.app.remember_identity(response, request, identity)
 
     @App.view(model=Root, name='logout', permission=Private)
-    def logout(self, request):
+    def logout(self: Root, request: CoreRequest) -> None:
 
         @request.after
-        def forget(response):
+        def forget(response: Response) -> None:
             request.app.forget_identity(response, request)
 
     # the scan is required (happens automatically if using onegov.server)
@@ -80,7 +88,7 @@ def spawn_basic_permissions_app(redis_url):
     return app
 
 
-def test_anonymous_access(redis_url):
+def test_anonymous_access(redis_url: str) -> None:
     client = Client(spawn_basic_permissions_app(redis_url))
 
     assert client.get('/public').text == 'public'
@@ -91,7 +99,7 @@ def test_anonymous_access(redis_url):
     assert client.get('/hidden', expect_errors=True).status_code == 403
 
 
-def test_personal_access(redis_url):
+def test_personal_access(redis_url: str) -> None:
     client = Client(spawn_basic_permissions_app(redis_url))
     # use the userid 'admin' to be sure that we don't let it matter
     client.post(
@@ -107,7 +115,7 @@ def test_personal_access(redis_url):
     assert client.get('/hidden', expect_errors=True).status_code == 403
 
 
-def test_private_access(redis_url):
+def test_private_access(redis_url: str) -> None:
     client = Client(spawn_basic_permissions_app(redis_url))
     # use the userid 'admin' to be sure that we don't let it matter
     client.post(
@@ -131,7 +139,7 @@ def test_private_access(redis_url):
     assert client.get('/hidden', expect_errors=True).status_code == 403
 
 
-def test_secret_access(redis_url):
+def test_secret_access(redis_url: str) -> None:
     client = Client(spawn_basic_permissions_app(redis_url))
     # use the userid 'editor' to be sure that we don't let it matter
     client.post(
@@ -155,7 +163,7 @@ def test_secret_access(redis_url):
     assert client.get('/hidden', expect_errors=True).status_code == 403
 
 
-def test_secure_cookie(redis_url):
+def test_secure_cookie(redis_url: str) -> None:
     app = spawn_basic_permissions_app(redis_url)
     app.identity_secure = True
 
@@ -171,11 +179,11 @@ def test_secure_cookie(redis_url):
         extra_environ={'wsgi.url_scheme': 'http'}
     )
 
-    cookie = client.cookiejar._cookies['localhost.local']['/']['session_id']
+    cookie = client.cookiejar._cookies['localhost.local']['/']['session_id']  # type: ignore[attr-defined]
     assert cookie.secure
 
 
-def test_forget(redis_url):
+def test_forget(redis_url: str) -> None:
     app = spawn_basic_permissions_app(redis_url)
     client = Client(app)
     response = client.post(
@@ -184,6 +192,7 @@ def test_forget(redis_url):
     )
 
     session_id = app.unsign(response.request.cookies['session_id'])
+    assert session_id is not None
     assert remembered(app, session_id)
 
     assert client.get('/public').text == 'public'

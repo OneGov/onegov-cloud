@@ -1,17 +1,22 @@
+from __future__ import annotations
+
 import morepath
+import transaction
 
 from onegov.core.security import Public
+from onegov.core.templates import render_macro
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout
+from onegov.org.forms import SearchForm
 from onegov.org.models import Search
 from onegov.search import SearchOfflineError
+from sqlalchemy.exc import InternalError
 from webob import exc
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.orm import Base
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
     from webob import Response
@@ -19,28 +24,40 @@ if TYPE_CHECKING:
 
 @OrgApp.html(model=Search, template='search.pt', permission=Public)
 def search(
-    self: Search['Base'],
-    request: 'OrgRequest',
-    layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
-
+    self: Search,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None,
+    search_form_class: type[SearchForm] | None = None,
+) -> RenderData | Response:
     layout = layout or DefaultLayout(self, request)
     assert isinstance(layout.breadcrumbs, list)
-    layout.breadcrumbs.append(Link(_("Search"), '#'))
+    layout.breadcrumbs.append(Link(_('Search'), '#'))
 
     try:
-        searchlabel = _("Search through ${count} indexed documents", mapping={
+        searchlabel = _('Search through ${count} indexed documents', mapping={
             'count': self.available_documents
-        })
-        resultslabel = _("${count} Results", mapping={
-            'count': self.subset_count
         })
     except SearchOfflineError:
         return {
-            'title': _("Search Unavailable"),
+            'title': _('Search Unavailable'),
             'layout': layout,
             'connection': False
         }
+    try:
+        available_results = self.available_results
+    except InternalError:
+        # reset transaction machinery so our transaction is no longer doomed
+        transaction.abort()
+        transaction.begin()
+        # probably some malicious search term, that tried to burn CPU cycles
+        # we just pretend we succeeded but return no results
+        available_results = self.__dict__['available_results'] = 0
+        self.__dict__['subset_count'] = 0
+        self.__dict__['batch'] = ()
+
+    resultslabel = _('${count} Results', mapping={
+        'count': available_results
+    })
 
     if 'lucky' in request.GET:
         url = self.feeling_lucky()
@@ -48,19 +65,41 @@ def search(
         if url:
             return morepath.redirect(url)
 
+    form = request.get_form(
+        search_form_class or SearchForm,
+        formdata=request.params,
+        model=self,
+        pass_model=True,
+        csrf_support=False,
+    )
+
+    if self.batch:
+        results_html = self.highlight_results(render_macro(
+            layout.macros['search_results'],
+            request,
+            {
+                'model': self,
+                'layout': layout,
+            }
+        ))
+    else:
+        results_html = ''  # type: ignore[assignment]
+
     return {
-        'title': _("Search"),
+        'title': _('Search'),
+        'form': form,
         'model': self,
         'layout': layout,
         'hide_search_header': True,
         'searchlabel': searchlabel,
         'resultslabel': resultslabel,
-        'connection': True
+        'connection': True,
+        'results_html': results_html
     }
 
 
 @OrgApp.json(model=Search, name='suggest', permission=Public)
-def suggestions(self: Search['Base'], request: 'OrgRequest') -> 'JSON_ro':
+def suggestions(self: Search, request: OrgRequest) -> JSON_ro:
     try:
         return self.suggestions()
     except SearchOfflineError as exception:

@@ -1,38 +1,82 @@
 /*
     Dashboard
 */
-.boardlet-group {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+
+.boardlet-group .cell {
+    flex-grow: 1;
 }
 
 .boardlet {
-    background: $gray-pastel;
-    border-top: 10px solid $green-light;
+    background: $white-smoke;
+    border-top: 5px solid $primary_color;
     margin-bottom: 1.5rem;
-    padding: .5rem 1rem 1rem;
-    width: calc((100% / 3) - 1rem);
+    padding: 1rem;
+    border-radius: .7rem;
+    height: calc(100% - 2rem);
 
-    h2 {
-        font-size: 1.3rem;
-        font-weight: bold;
-        text-align: center;
-        word-wrap: break-word;
+    h2.h4 {
+        margin-bottom: 1rem;
+        margin-top: -.2rem;
     }
 
-    li {
-        font-size: .9rem;
+    table{
+        margin-bottom: 0;
     }
 
-    &.boardlet-warning {
-        border-top-color: $yellow-light;
-    }
+    tr {
+        &.boardlet-failure {
+            border-top-color: $red-light;
+        }
 
-    &.boardlet-failure {
-        border-top-color: $red-light;
+        h2.h4 {
+            padding: .5rem;
+            background: $white;
+            text-align: center;
+            border-radius: .7rem;
+        }
+
+        .title {
+            font-weight: normal;
+        }
+
+        .facts {
+            width: 100%;
+            table-layout: auto;
+            border-collapse: collapse;
+
+            tbody {
+                background: transparent;
+            }
+
+            td:first-child {
+                white-space: nowrap;
+                width: 1%;
+            }
+        }
+
+        .fact-number,
+        .fact-icon {
+            padding: .5rem;
+            border-radius: .2rem;
+            text-align: right;
+        }
+
+        .fact-icon {
+            text-align: center;
+        }
+
+        .fact-visibility-icon {
+            padding-left: .3rem;
+            color: $primary-color;
+        }
+
+        .fact-text {
+            margin-left: .5rem;
+            width: 100%;
+        }
     }
 }
+
 
 @include breakpoint(medium only) {
     .boardlet {

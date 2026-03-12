@@ -1,9 +1,15 @@
-from webtest import Upload
+from __future__ import annotations
 
+from webtest import Upload
 from tests.shared.utils import create_image, get_meta
 
 
-def test_view_images(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_view_images(client: Client) -> None:
     assert client.get('/images', expect_errors=True).status_code == 403
 
     client.login_admin()
@@ -12,10 +18,10 @@ def test_view_images(client):
 
     assert "Noch keine Bilder hochgeladen" in images_page
 
-    images_page.form['file'] = Upload('Test.txt', b'File content')
+    images_page.form['file'] = [Upload('Test.txt', b'File content')]
     assert images_page.form.submit(expect_errors=True).status_code == 415
 
-    images_page.form['file'] = Upload('Test.jpg', create_image().read())
+    images_page.form['file'] = [Upload('Test.jpg', create_image().read())]
     images_page.form.submit()
 
     images_page = client.get('/images')

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sqlalchemy_utils.observer
 from dectate.tool import resolve_dotted_name
 from functools import wraps
@@ -28,11 +30,10 @@ class ScopedPropertyObserver(sqlalchemy_utils.observer.PropertyObserver):
     or not.
     """
 
-    _global_observer: ClassVar['ScopedPropertyObserver']
-    _scoped_observers: ClassVar[dict[str, 'ScopedPropertyObserver']]
-    _scoped_observers = {}
+    _global_observer: ClassVar[ScopedPropertyObserver]
+    _scoped_observers: ClassVar[dict[str, ScopedPropertyObserver]] = {}
 
-    def __new__(cls, dotted_name: str | None) -> 'ScopedPropertyObserver':
+    def __new__(cls, dotted_name: str | None) -> ScopedPropertyObserver:  # noqa: PYI034
 
         # special case global scope
         if dotted_name is None:
@@ -97,7 +98,7 @@ class ScopedPropertyObserver(sqlalchemy_utils.observer.PropertyObserver):
 
     def update_generator_registry(
         self,
-        mapper: 'Mapper',
+        mapper: Mapper[Any],
         class_: type[Any]
     ) -> None:
 
@@ -113,7 +114,7 @@ class ScopedPropertyObserver(sqlalchemy_utils.observer.PropertyObserver):
                 )
 
     @classmethod
-    def enter_scope(cls, application: 'Framework') -> None:
+    def enter_scope(cls, application: Framework) -> None:
         for observer in cls._scoped_observers.values():
             if isinstance(application, observer.scope):
                 observer.activate()
@@ -121,7 +122,7 @@ class ScopedPropertyObserver(sqlalchemy_utils.observer.PropertyObserver):
                 observer.deactivate()
 
     @classmethod
-    def enter_class_scope(cls, application_cls: type['Framework']) -> None:
+    def enter_class_scope(cls, application_cls: type[Framework]) -> None:
         for observer in cls._scoped_observers.values():
             if issubclass(application_cls, observer.scope):
                 observer.activate()
@@ -135,12 +136,12 @@ class ScopedPropertyObserver(sqlalchemy_utils.observer.PropertyObserver):
 def observes(
     *paths: str,
     scope: str | None = None
-) -> 'Callable[[_F], _F]':
+) -> Callable[[_F], _F]:
 
     observer = ScopedPropertyObserver(scope)
     observer.register_listeners()
 
-    def decorator(func: '_F') -> '_F':
+    def decorator(func: _F) -> _F:
         @wraps(func)
         def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
             return func(self, *args, **kwargs)

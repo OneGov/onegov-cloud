@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from functools import cached_property
-from onegov.activity import Invoice
+from onegov.activity import BookingPeriodInvoice
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
@@ -17,23 +19,22 @@ from wtforms.validators import InputRequired
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from decimal import Decimal
-    from sqlalchemy.orm import Query
 
 
 class BillingForm(Form):
 
     confirm = RadioField(
-        label=_("Confirm billing:"),
+        label=_('Confirm billing:'),
         default='no',
         choices=[
-            ('no', _("No, preview only")),
-            ('yes', _("Yes, confirm billing"))
+            ('no', _('No, preview only')),
+            ('yes', _('Yes, confirm billing'))
         ]
     )
 
     sure = BooleanField(
         label=_(
-            "I know that after confirmation, bills are made visible to users."
+            'I know that after confirmation, bills are made visible to users.'
         ),
         default=False,
         depends_on=('confirm', 'yes')
@@ -47,51 +48,51 @@ class BillingForm(Form):
 class ManualBookingForm(Form):
 
     target = RadioField(
-        label=_("Target"),
+        label=_('Target'),
         choices=()
     )
 
     tags = MultiCheckboxField(
-        label=_("Tags"),
+        label=_('Tags'),
         validators=(InputRequired(), ),
         depends_on=('target', 'for-users-with-tags'),
         choices=()
     )
 
     username = SelectField(
-        label=_("User"),
+        label=_('User'),
         validators=(InputRequired(), ),
         depends_on=('target', 'for-user'),
     )
 
     booking_text = StringField(
-        label=_("Booking Text"),
+        label=_('Booking Text'),
         validators=(InputRequired(), )
     )
 
     kind = RadioField(
-        label=_("Kind"),
+        label=_('Kind'),
         default='discount',
         choices=(
-            ('discount', _("Discount")),
-            ('surcharge', _("Surcharge"))
+            ('discount', _('Discount')),
+            ('surcharge', _('Surcharge'))
         )
     )
 
     discount = DecimalField(
-        label=_("Discount"),
+        label=_('Discount'),
         validators=(InputRequired(), ),
         depends_on=('kind', 'discount')
     )
 
     surcharge = DecimalField(
-        label=_("Surcharge"),
+        label=_('Surcharge'),
         validators=(InputRequired(), ),
         depends_on=('kind', 'surcharge')
     )
 
     @property
-    def amount(self) -> 'Decimal':
+    def amount(self) -> Decimal:
         if self.kind.data == 'discount':
             assert self.discount.data is not None
             return -self.discount.data
@@ -105,12 +106,13 @@ class ManualBookingForm(Form):
     def text(self) -> str | None:
         return self.booking_text.data
 
-    @property
-    def available_usernames(self) -> 'Query[tuple[str, str]]':
-        return (
-            self.usercollection.query()
+    @cached_property
+    def available_usernames(self) -> tuple[tuple[str, str], ...]:
+        return tuple(
+            (username, realname)
+            for username, realname in self.usercollection.query()
             .with_entities(User.username, User.realname)
-            .filter(func.trim(func.coalesce(User.realname, "")) != "")
+            .filter(func.trim(func.coalesce(User.realname, '')) != '')
             .filter(User.active == True)
             .order_by(func.unaccent(func.lower(User.realname)))
         )
@@ -132,8 +134,8 @@ class ManualBookingForm(Form):
 
     def on_request(self) -> None:
         self.target.choices = [
-            ('all', _("All")),
-            ('for-user', _("For a specific user"))
+            ('all', _('All')),
+            ('for-user', _('For a specific user'))
         ]
 
         self.load_usernames()
@@ -141,7 +143,7 @@ class ManualBookingForm(Form):
 
         if self.tags.choices:
             self.target.choices.append(
-                ('for-users-with-tags', _("For users with tags")))
+                ('for-users-with-tags', _('For users with tags')))
 
         if (self.request.params.get('for-user')
                 and not self.target.data):
@@ -157,27 +159,27 @@ class ManualBookingForm(Form):
         self.tags.choices = [(t, t) for t in self.usercollection.tags]
 
     def load_usernames(self) -> None:
-        self.username.choices = [(n, r) for n, r in self.available_usernames]
+        self.username.choices = list(self.available_usernames)
 
 
 class PaymentWithDateForm(Form):
 
     payment_date = DateField(
-        label=_("Payment date"),
+        label=_('Payment date'),
         validators=(InputRequired(), ),
     )
 
     target = RadioField(
         validators=(InputRequired(), ),
-        label=_("Target"),
+        label=_('Target'),
         choices=(
-            ('all', _("Whole invoice")),
-            ('specific', _("Only for specific items"))
+            ('all', _('Whole invoice')),
+            ('specific', _('Only for specific items'))
         ),
     )
 
     items = MultiCheckboxField(
-        label=_("Items"),
+        label=_('Items'),
         validators=(InputRequired(), ),
         depends_on=('target', 'specific'),
         choices=()
@@ -213,6 +215,6 @@ class PaymentWithDateForm(Form):
                 self.items.data = [i.id.hex for i in self.invoice.items]
 
     @cached_property
-    def invoice(self) -> Invoice:
+    def invoice(self) -> BookingPeriodInvoice:
         return self.request.session.query(
-            Invoice).filter_by(id=self.request.params['invoice-id']).one()
+            BookingPeriodInvoice).filter_by(id=self.request.params['invoice-id']).one()

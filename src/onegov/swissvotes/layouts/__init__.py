@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.swissvotes.layouts.default import DefaultLayout
 from onegov.swissvotes.layouts.mail import MailLayout
 from onegov.swissvotes.layouts.page import AddPageLayout
@@ -38,7 +40,6 @@ __all__ = (
     'ManageCampaingMaterialYeaLayout',
     'ManagePageAttachmentsLayout',
     'ManagePageSliderImagesLayout',
-    'PageAttachmentsLayout',
     'PageLayout',
     'UpdateExternalResourcesLayout',
     'UpdateMetadataLayout',

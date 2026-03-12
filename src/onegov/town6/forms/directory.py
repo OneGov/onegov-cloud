@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org.forms.directory import (
     DirectoryBaseForm as OrgDirectoryBaseForm)
 from onegov.town6.theme import user_options

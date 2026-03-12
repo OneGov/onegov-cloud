@@ -1,25 +1,33 @@
-import json
+from __future__ import annotations
 
+import json
+from babel import Locale
+from requests.exceptions import JSONDecodeError
+
+from onegov.user import UserGroup, UserGroupCollection
+from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
 from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests, outside_bbox
 from onegov.translator_directory import log
-from onegov.translator_directory.models.translator import Translator
-from requests.exceptions import JSONDecodeError
+from onegov.translator_directory import _
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import requests
+    from wtforms.fields.choices import _Choice
     from collections.abc import Collection
-    from onegov.gis.models.coordinates import RealCoordinates
+    from onegov.gis.models.coordinates import AnyCoordinates, RealCoordinates
+    from onegov.org.request import OrgRequest
     from onegov.translator_directory.request import TranslatorAppRequest
+    from onegov.translator_directory.models.translator import Translator
 
 
-def to_tuple(coordinate: 'RealCoordinates') -> tuple[float, float]:
+def to_tuple(coordinate: RealCoordinates) -> tuple[float, float]:
     return coordinate.lat, coordinate.lon
 
 
-def found_route(response: 'requests.Response') -> bool:
+def found_route(response: requests.Response) -> bool:
     try:
         found = response.status_code == 200 and response.json()['code'] == 'Ok'
         if not found:
@@ -58,11 +66,11 @@ def out_of_tolerance(
 
 
 def validate_geocode_result(
-    response: 'requests.Response',
+    response: requests.Response,
     zip_code: str | int | None,
     zoom: int | None = None,
-    bbox: 'Collection[RealCoordinates] | None' = None
-) -> 'RealCoordinates | None':
+    bbox: Collection[RealCoordinates] | None = None
+) -> RealCoordinates | None:
 
     if response.status_code != 200:
         return None
@@ -86,7 +94,7 @@ def validate_geocode_result(
     return None
 
 
-def parse_directions_result(response: 'requests.Response') -> float:
+def parse_directions_result(response: requests.Response) -> float:
     assert response.status_code == 200
     data = response.json()
     km = round(data['routes'][0]['distance'] / 1000, 1)
@@ -98,17 +106,20 @@ def same_coords(this: Coordinates, other: Coordinates) -> bool:
 
 
 def update_drive_distances(
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     only_empty: bool,
     tolerance_factor: float = 0.1,
     max_tolerance: float | None = None,
     max_distance: float | None = None
-) -> tuple[int, int, int, list[Translator], list[tuple[Translator, float]]]:
+) -> (tuple[int, int, int, list[Translator],
+      list[tuple[Translator, float]]]):
     """
     Handles updating Translator.driving_distance. Can be used in a cli or view.
 
     """
-    assert request.app.coordinates, "Requires home coordinates to be set"
+    from onegov.translator_directory.models.translator import Translator
+
+    assert request.app.coordinates, 'Requires home coordinates to be set'
 
     no_routes = []
     tol_failed = []
@@ -137,9 +148,8 @@ def update_drive_distances(
             routes_found += 1
             dist = parse_directions_result(response)
             if out_of_tolerance(
-                    trs.drive_distance, dist, tolerance_factor, max_tolerance):
-                tol_failed.append((trs, dist))
-            elif max_distance and dist > max_distance:
+                trs.drive_distance, dist, tolerance_factor, max_tolerance
+            ) or (max_distance and dist > max_distance):
                 tol_failed.append((trs, dist))
             else:
                 trs.drive_distance = dist
@@ -149,11 +159,73 @@ def update_drive_distances(
     return total, routes_found, distance_changed, no_routes, tol_failed
 
 
+def calculate_distance_to_location(
+    request: TranslatorAppRequest,
+    translator_coordinates: AnyCoordinates,
+    location_key: str,
+    custom_address: str | None = None,
+) -> float | None:
+
+    if not translator_coordinates:
+        return None
+
+    if custom_address:
+        address = custom_address
+    elif location_key in ASSIGNMENT_LOCATIONS:
+        _, address = ASSIGNMENT_LOCATIONS[location_key]
+    else:
+        return None
+
+    geocoding_api = MapboxRequests(
+        request.app.mapbox_token,
+        endpoint='geocoding'
+    )
+
+    try:
+        geocode_response = geocoding_api.geocode(
+            text=address,
+            ctry='Schweiz'
+        )
+
+        if geocode_response.status_code != 200:
+            return None
+
+        data = geocode_response.json()
+        if not data.get('features'):
+            return None
+
+        # Get coordinates of the assignment location
+        location_coords = data['features'][0]['geometry']['coordinates']
+
+        # Calculate driving distance
+        directions_api = MapboxRequests(
+            request.app.mapbox_token,
+            endpoint='directions',
+            profile='driving'
+        )
+
+        response = directions_api.directions([
+            to_tuple(translator_coordinates),
+            # lat, lon (GeoJSON returns [lon, lat])
+            (location_coords[1], location_coords[0])
+        ])
+
+        if found_route(response):
+            return parse_directions_result(response)
+
+        return None
+
+    except Exception:
+        # Log error in production; for now return None
+        return None
+
+
 def geocode_translator_addresses(
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     only_empty: bool,
-    bbox: 'Collection[RealCoordinates] | None' = None
+    bbox: Collection[RealCoordinates] | None = None
 ) -> tuple[int, int, int, int, list[Translator]]:
+    from onegov.translator_directory.models.translator import Translator
 
     api = MapboxRequests(request.app.mapbox_token)
     total = 0
@@ -201,3 +273,82 @@ def geocode_translator_addresses(
             coords_not_found.append(trs)
 
     return trs_total, total, geocoded, skipped, coords_not_found
+
+
+def nationality_choices(locale: str | None) -> list[_Choice]:
+    assert locale
+
+    country_names = country_code_to_name(locale)
+    pinned = ('CH', 'DE', 'FR', 'IT', 'AT', 'LI')
+    nationalities: list[_Choice]
+    nationalities = [(code, name) for code, name in
+                     country_names.items() if code not in pinned]
+    # pin common countries on top of the list
+    nationalities.insert(0, ('', '------'))  # add divider
+    for code in reversed(pinned):
+        nationalities.insert(0, (code, country_names.get(code, code)))
+    nationalities.insert(0, ('', ''))  # add empty choices
+
+    return nationalities
+
+
+def country_code_to_name(locale: str | None) -> dict[str, str]:
+    """
+    Returns a dict of country codes mapped to its country names according
+    the given locale.
+
+    Example:
+        {'CH': 'Switzerland', 'DE': 'Germany, ...}
+
+    """
+    assert locale
+    _locale = Locale.parse(locale)
+    assert _locale
+    mapping = {str(code): str(_locale.territories.get(code)) for code in
+               _locale.territories if len(str(code)) == 2}
+
+    return mapping
+
+
+def get_custom_text(request: OrgRequest, key: str) -> str:
+    """ Returns a custom text from the app's custom_texts dict. """
+    custom_texts = request.app.custom_texts
+
+    if not custom_texts:
+        return _('Error: No custom texts found')
+
+    return custom_texts.get(
+        key, _(f"Error: No custom text found for '{key}'"))
+
+
+def get_accountant_emails_for_finanzstelle(
+    request: TranslatorAppRequest, finanzstelle_key: str | None
+) -> set[str]:
+    if not finanzstelle_key:
+        raise ValueError(_('No Finanzstelle specified'))
+
+    groups = (
+        request.session.query(UserGroup)
+        .filter(UserGroup.meta['finanzstelle'].astext == finanzstelle_key)
+        .all()
+    )
+
+    emails = set()
+    for group in groups:
+        emails.update(group.meta.get('accountant_emails', []))
+
+    if not emails:
+        raise ValueError(
+            request.translate(
+                _(
+                    'No accountant emails configured for Finanzstelle '
+                    '"${fs}". Please configure user groups: ${url}',
+                    mapping={
+                        'fs': finanzstelle_key,
+                        'url': request.class_link(UserGroupCollection),
+                    },
+                )
+            )
+        )
+
+    return emails

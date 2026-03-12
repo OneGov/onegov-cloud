@@ -2,6 +2,9 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
+from __future__ import annotations
+
 import multiprocessing
 
 from concurrent.futures import ThreadPoolExecutor
@@ -32,14 +35,14 @@ if TYPE_CHECKING:
 
 
 @upgrade_task('Add checksum column')
-def add_checksum_column(context: 'UpgradeContext') -> None:
+def add_checksum_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'files', Column('checksum', Text, nullable=True, index=True)
     )
 
 
 @upgrade_task('Add image size 3')
-def add_image_size(context: 'UpgradeContext') -> None:
+def add_image_size(context: UpgradeContext) -> None:
     images: FileCollection[Any] = FileCollection(context.session, type='image')
 
     for image in images.query():
@@ -74,18 +77,18 @@ def add_image_size(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add files by type and name index')
-def add_files_by_type_and_name_index(context: 'UpgradeContext') -> None:
+def add_files_by_type_and_name_index(context: UpgradeContext) -> None:
     context.operations.create_index(
         'files_by_type_and_name', 'files', ['type', 'name'])
 
 
 @upgrade_task('Migrate file metadata to JSONB')
-def migrate_file_metadata_to_jsonb(context: 'UpgradeContext') -> None:
-    context.session.execute("""
+def migrate_file_metadata_to_jsonb(context: UpgradeContext) -> None:
+    context.session.execute(text("""
         ALTER TABLE files
         ALTER COLUMN reference
         TYPE JSONB USING reference::jsonb
-    """)
+    """))
 
     context.operations.drop_index('files_by_type_and_name')
 
@@ -99,7 +102,7 @@ def migrate_file_metadata_to_jsonb(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add thumbnails to PDFs')
-def add_thumbnails_to_pdfs(context: 'UpgradeContext') -> None:
+def add_thumbnails_to_pdfs(context: UpgradeContext) -> None:
 
     if not isinstance(context.app, DepotApp):
         return False  # type:ignore[return-value]
@@ -122,7 +125,7 @@ def add_thumbnails_to_pdfs(context: 'UpgradeContext') -> None:
 
     def chunks(
         size: int = max_workers
-    ) -> 'Iterator[list[tuple[File, StoredFile]]]':
+    ) -> Iterator[list[tuple[File, StoredFile]]]:
         while True:
             chunk = []
 
@@ -157,7 +160,7 @@ def add_thumbnails_to_pdfs(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add publication dates')
-def add_publication_dates(context: 'UpgradeContext') -> None:
+def add_publication_dates(context: UpgradeContext) -> None:
     context.operations.add_column(
         'files', Column('publish_date', UTCDateTime, nullable=True))
 
@@ -168,14 +171,14 @@ def add_publication_dates(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Publication end dates')
-def add_publication_end_dates(context: 'UpgradeContext') -> None:
+def add_publication_end_dates(context: UpgradeContext) -> None:
     if not (context.has_column('files', 'publish_end_date')):
         context.operations.add_column(
             'files', Column('publish_end_date', UTCDateTime, nullable=True))
 
 
 @upgrade_task('Add signed property')
-def add_signed_property(context: 'UpgradeContext') -> None:
+def add_signed_property(context: UpgradeContext) -> None:
     context.add_column_with_defaults(
         table='files',
         column=Column('signed', Boolean, nullable=False),
@@ -183,13 +186,13 @@ def add_signed_property(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Reclassify office documents')
-def reclassify_office_documents(context: 'UpgradeContext') -> None:
+def reclassify_office_documents(context: UpgradeContext) -> None:
     if not isinstance(context.app, DepotApp):
         return False  # type:ignore[return-value]
 
     files = (
         FileCollection(context.session).query()
-        .options(load_only('reference'))
+        .options(load_only(File.reference))
     )
 
     with context.stop_search_updates():
@@ -201,7 +204,7 @@ def reclassify_office_documents(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add extract and pages column')
-def add_extract_and_pages_column(context: 'UpgradeContext') -> None:
+def add_extract_and_pages_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'files', Column('extract', Text, nullable=True))
 
@@ -215,7 +218,7 @@ def add_extract_and_pages_column(context: 'UpgradeContext') -> None:
 #        it along. Generally it's better to steer clear of using Models
 #        inside upgrade tasks, it should generally use raw queries.
 @upgrade_task('Extract pdf text of existing files')
-def extract_pdf_text_of_existing_files(context: 'UpgradeContext') -> None:
+def extract_pdf_text_of_existing_files(context: UpgradeContext) -> None:
     pdfs = FileCollection(context.session).by_content_type('application/pdf')
 
     for pdf in pdfs:
@@ -232,13 +235,13 @@ def extract_pdf_text_of_existing_files(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add signature_metadata column')
-def add_signature_metadata_column(context: 'UpgradeContext') -> None:
+def add_signature_metadata_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'files', Column('signature_metadata', JSON, nullable=True))
 
 
 @upgrade_task('Add stats column')
-def add_stats_column(context: 'UpgradeContext') -> None:
+def add_stats_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'files', Column('stats', JSON, nullable=True))
 
@@ -252,7 +255,7 @@ def add_stats_column(context: 'UpgradeContext') -> None:
 
     pages = {
         f.id: f.pages for f in context.session.execute(
-            select(selectable.c)
+            select(*selectable.c)
         )
     }
 
@@ -269,7 +272,7 @@ def add_stats_column(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add publication column')
-def add_publication_column(context: 'UpgradeContext') -> None:
+def add_publication_column(context: UpgradeContext) -> None:
     if not context.has_column('files', 'publication'):
         context.operations.add_column(
             'files',
@@ -284,7 +287,7 @@ def add_publication_column(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add language column')
-def add_language_column(context: 'UpgradeContext') -> None:
+def add_language_column(context: UpgradeContext) -> None:
     if not context.has_column('files', 'language'):
         context.operations.add_column(
             'files',
@@ -294,7 +297,7 @@ def add_language_column(context: 'UpgradeContext') -> None:
 
 @upgrade_task('Make file models polymorphic type non-nullable')
 def make_file_models_polymorphic_type_non_nullable(
-    context: 'UpgradeContext'
+    context: UpgradeContext
 ) -> None:
     for table in ('files', 'filesets'):
         if context.has_table(table):
@@ -306,7 +309,7 @@ def make_file_models_polymorphic_type_non_nullable(
 
 
 @upgrade_task('Add meta column')
-def add_meta_column(context: 'UpgradeContext') -> None:
+def add_meta_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'files', Column(
             'meta',

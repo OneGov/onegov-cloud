@@ -1,6 +1,9 @@
+from __future__ import annotations
+
+import pytest
+import os
 import sedate
 import transaction
-import pytest
 
 from depot.manager import DepotManager
 from io import BytesIO
@@ -8,15 +11,20 @@ from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.utils import module_path
 from onegov.file import File, FileSet, AssociatedFiles, NamedFile
+from onegov.file.filters import WithPDFThumbnailFilter
 from onegov.file.models.fileset import file_to_set_associations
 from tests.shared.utils import create_image
 from pathlib import Path
 from onegov.file.utils import as_fileintent
 from PIL import Image
-from sqlalchemy import Column
-from sqlalchemy import Integer
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column, Mapped
 from unittest.mock import Mock
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pathlib import Path
+    from sqlalchemy.orm import Session
 
 
 class PolymorphicFile(File):
@@ -26,8 +34,8 @@ class PolymorphicFile(File):
 class Blogpost(Base, AssociatedFiles):
     __tablename__ = 'blogposts'
 
-    id = Column(Integer, primary_key=True)
-    text = Column(Text, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    text: Mapped[str]
 
 
 class MediaItemFile(File):
@@ -37,18 +45,18 @@ class MediaItemFile(File):
 class MediaItem(Base):
     __tablename__ = 'media_items'
 
-    id = Column(Integer, primary_key=True)
-    description = Column(Text, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    description: Mapped[str]
     content = associated(MediaItemFile, 'content', 'one-to-one')
 
 
 @pytest.mark.parametrize('cls', [File, PolymorphicFile])
-def test_store_file_from_string(session, cls):
+def test_store_file_from_string(session: Session, cls: type[File]) -> None:
     session.add(cls(name='readme.txt', reference=b'README\n======'))
     transaction.commit()
 
     readme = session.query(cls).first()
-
+    assert readme is not None
     assert readme.reference.file.content_length == 13
     assert readme.reference.file.content_type == 'application/octet-stream'
     assert readme.reference.file.read() == b'README\n======'
@@ -56,7 +64,11 @@ def test_store_file_from_string(session, cls):
 
 
 @pytest.mark.parametrize('cls', [File, PolymorphicFile])
-def test_store_file_from_path(session, temporary_path, cls):
+def test_store_file_from_path(
+    session: Session,
+    temporary_path: Path,
+    cls: type[File]
+) -> None:
 
     with (temporary_path / 'readme.txt').open('w') as f:
         f.write('README\n======')
@@ -67,7 +79,7 @@ def test_store_file_from_path(session, temporary_path, cls):
     transaction.commit()
 
     readme = session.query(cls).first()
-
+    assert readme is not None
     assert readme.reference.file.content_length == 13
     assert readme.reference.file.content_type == 'text/plain'
     assert readme.reference.file.read() == b'README\n======'
@@ -75,7 +87,7 @@ def test_store_file_from_path(session, temporary_path, cls):
 
 
 @pytest.mark.parametrize('cls', [File, PolymorphicFile])
-def test_store_file_from_bytes_io(session, cls):
+def test_store_file_from_bytes_io(session: Session, cls: type[File]) -> None:
 
     f = BytesIO(b'README\n======')
     session.add(cls(name='readme.txt', reference=f))
@@ -83,14 +95,14 @@ def test_store_file_from_bytes_io(session, cls):
     transaction.commit()
 
     readme = session.query(cls).first()
-
+    assert readme is not None
     assert readme.reference.file.content_length == 13
     assert readme.reference.file.content_type == 'application/octet-stream'
     assert readme.reference.file.read() == b'README\n======'
     assert readme.reference.file.name == 'unnamed'
 
 
-def test_associate_files_with_sets(session):
+def test_associate_files_with_sets(session: Session) -> None:
     session.add(File(name='readme.txt', reference=b'README'))
     session.add(File(name='manual.txt', reference=b'MANUAL'))
     session.add(FileSet(title='Textfiles'))
@@ -134,7 +146,7 @@ def test_associate_files_with_sets(session):
     assert len(documents.files) == 1
 
 
-def test_thumbnail_creation(session):
+def test_thumbnail_creation(session: Session) -> None:
     session.add(File(name='large.png', reference=create_image(1024, 1024)))
     session.add(File(name='small.png', reference=create_image(32, 32)))
 
@@ -146,7 +158,7 @@ def test_thumbnail_creation(session):
     assert 'thumbnail_small' in small.reference
 
 
-def test_save_png_zipbomb(session):
+def test_save_png_zipbomb(session: Session) -> None:
     path = module_path('tests.onegov.file', 'fixtures/bomb.png')
 
     with open(path, 'rb') as f:
@@ -158,7 +170,10 @@ def test_save_png_zipbomb(session):
     assert file.reference.content_type == 'application/malicious'
 
 
-def test_save_image_internal_exception(session, monkeypatch):
+def test_save_image_internal_exception(
+    session: Session,
+    monkeypatch: pytest.MonkeyPatch
+) -> None:
     # simulate internal error in Pillow
     mock_open = Mock(side_effect=ValueError)
     monkeypatch.setattr('PIL.Image.open', mock_open)
@@ -171,7 +186,7 @@ def test_save_image_internal_exception(session, monkeypatch):
     assert file.reference.content_type == 'application/unidentified-image'
 
 
-def test_strip_image_exif(session):
+def test_strip_image_exif(session: Session) -> None:
     path = module_path('tests.onegov.file', 'fixtures/exif.jpg')
 
     with open(path, 'rb') as f:
@@ -184,7 +199,7 @@ def test_strip_image_exif(session):
     assert not image.getexif()
 
 
-def test_pdf_preview_creation(session):
+def test_pdf_preview_creation(session: Session) -> None:
     path = module_path('tests.onegov.file', 'fixtures/example.pdf')
 
     with open(path, 'rb') as f:
@@ -193,15 +208,15 @@ def test_pdf_preview_creation(session):
     transaction.commit()
 
     pdf = session.query(File).one()
-    pdf.reference['thumbnail_medium']
+    assert pdf.reference.get('thumbnail_medium', None) is not None
 
     # our example file contains a blue backgorund so we can verify that
     # the thumbnail for the pdf is generated correctly
 
-    thumb = DepotManager.get().get(pdf.reference['thumbnail_medium']['id'])
+    thumb = DepotManager.get().get(pdf.reference['thumbnail_medium']['id'])  # type: ignore[union-attr]
     image = Image.open(thumb)
 
-    assert (0, 91, 161, 255) in set(image.getdata())
+    assert (0, 91, 161, 255) in set(image.get_flattened_data())
 
     w, h = image.size
     assert h == 512
@@ -212,7 +227,45 @@ def test_pdf_preview_creation(session):
     assert w in (362, 396)
 
 
-def test_max_image_size(session):
+def test_pdf_preview_creation_with_erroneous_pdf(
+    session: Session,
+    monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # There was a pdf which made ghostscript fail with stderr: "circular
+    # reference to indirect object".
+    # However, we can't upload the original pdf due to sensitive information.
+    # So we have to kind of mock the error here.
+    mock = Mock(side_effect=ValueError)
+    monkeypatch.setattr(
+        WithPDFThumbnailFilter,
+        'generate_preview',
+       mock
+    )
+
+    filname = 'example.pdf'
+    path = module_path('tests.onegov.file', f'fixtures/{filname}')
+
+    with open(path, 'rb') as f:
+        session.add(File(name=f'{filname}', reference=f))
+    transaction.commit()
+    pdf = session.query(File).one()
+    assert pdf.reference.get('thumbnail_medium', None) is not None
+    thumb = DepotManager.get().get(pdf.reference['thumbnail_medium']['id'])  # type: ignore[union-attr]
+
+    # expect to be the default one
+
+    thumbnail_medium_pdf_preview_fallback = BytesIO(
+        Path(
+            module_path('onegov.org', 'static/pdf_preview')
+            + os.sep
+            + 'thumbnail_medium_pdf_preview_fallback.png'
+        ).read_bytes()
+    )
+
+    assert thumb.read() == thumbnail_medium_pdf_preview_fallback.read()
+
+
+def test_max_image_size(session: Session) -> None:
     session.add(File(name='unchanged.png', reference=create_image(2048, 2048)))
     session.add(File(name='limited.png', reference=create_image(2049, 2048)))
 
@@ -231,21 +284,21 @@ def test_max_image_size(session):
     assert limited.reference.thumbnail_small['size'][1] in ['512px', '511px']
 
 
-def test_checksum(session):
+def test_checksum(session: Session) -> None:
     session.add(File(name='readme.txt', reference=b'README'))
     transaction.commit()
 
     readme = session.query(File).one()
     assert readme.checksum == 'c47c7c7383225ab55ff591cb59c41e6b'
 
-    readme.reference = b'LIESMICH'
+    readme.reference = b'LIESMICH'  # type: ignore[assignment]
     transaction.commit()
 
     readme = session.query(File).one()
     assert readme.checksum == 'c122d482328c0e832610dd2c8d65db8b'
 
 
-def test_determine_svg_size(session, temporary_path):
+def test_determine_svg_size(session: Session, temporary_path: Path) -> None:
     with (temporary_path / 'logo.svg').open('wb') as f:
         f.write((
             b'<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
@@ -264,7 +317,10 @@ def test_determine_svg_size(session, temporary_path):
     assert logo.reference.size == ['281px', '99px']
 
 
-def test_determine_unknown_svg_size(session, temporary_path):
+def test_determine_unknown_svg_size(
+    session: Session,
+    temporary_path: Path
+) -> None:
     with (temporary_path / 'logo.svg').open('wb') as f:
         f.write((
             b'<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
@@ -283,7 +339,7 @@ def test_determine_unknown_svg_size(session, temporary_path):
     assert logo.reference.size == ['2048px', '2048px']
 
 
-def test_associated_files(session):
+def test_associated_files(session: Session) -> None:
     post = Blogpost(
         text="My interview at <company>",
         files=[File(name='frowney.png', reference=create_image(2048, 2048))]
@@ -296,12 +352,12 @@ def test_associated_files(session):
     assert post.files[0].name == 'frowney.png'
     assert post.files[0].reference.size == ('2048px', '2048px')
 
-    folder = Path(post.files[0].reference.file._metadata_path).parent.parent
+    folder = Path(post.files[0].reference.file._metadata_path).parent.parent  # type: ignore[attr-defined]
 
     # 1 image + 1 thumbnail
     assert sum(1 for p in folder.iterdir()) == 2
 
-    assert session.query(File).one().linked_blogposts == [post]
+    assert session.query(File).one().linked_blogposts == [post]  # type: ignore[attr-defined]
     assert session.query(File).one().links.all() == (post, )
 
     session.delete(post)
@@ -315,12 +371,12 @@ def test_associated_files(session):
     assert sum(1 for p in folder.iterdir()) == 0
 
 
-def test_update_metadata(session):
+def test_update_metadata(session: Session) -> None:
     # note that the name is only stored on the database, not the metadata
     session.add(File(name='readme.txt', reference=b'README'))
     transaction.commit()
 
-    def get_file():
+    def get_file() -> File:
         return session.query(File).one()
 
     assert get_file().reference.file.filename == 'unnamed'
@@ -350,7 +406,7 @@ def test_update_metadata(session):
     assert get_file().reference.file.content_type == 'text/plain'
 
 
-def test_pdf_text_extraction(session):
+def test_pdf_text_extraction(session: Session) -> None:
     path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
 
     with open(path, 'rb') as f:
@@ -359,12 +415,14 @@ def test_pdf_text_extraction(session):
     transaction.commit()
 
     pdf = session.query(File).one()
+    assert pdf.extract is not None
     assert 'Adobe® Portable Document Format (PDF)' in pdf.extract
+    assert pdf.stats is not None
     assert pdf.stats['pages'] == 1
     assert pdf.stats['words'] > 20
 
 
-def test_signature_timestamp(session):
+def test_signature_timestamp(session: Session) -> None:
     path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
     time = sedate.utcnow()
 
@@ -377,44 +435,43 @@ def test_signature_timestamp(session):
 
     # if unsinged, the timestamp is ignored
     assert session.query(File).one().signature_timestamp is None
-    assert session.query(File).with_entities(File.signature_timestamp).one()\
-        .signature_timestamp is None
+    assert session.query(File).with_entities(File.signature_timestamp
+        ).one().signature_timestamp is None
 
     # if signed the timestamp is in UTC (not timezone-aware)
     session.query(File).one().signed = True
     transaction.commit()
 
     assert session.query(File).one().signature_timestamp == time
-    assert session.query(File).with_entities(File.signature_timestamp).one()\
-        .signature_timestamp == time
+    assert session.query(File).with_entities(File.signature_timestamp
+        ).one().signature_timestamp == time
 
     # make sure we can filter by time
     assert session.query(File).filter_by(signature_timestamp=time).first()
 
     # make sure we get utc for both
-    assert session.query(File).one()\
-        .signature_timestamp.tzinfo.zone == 'UTC'
-    assert session.query(File).with_entities(File.signature_timestamp).one()\
-        .signature_timestamp.tzinfo.zone == 'UTC'
+    assert session.query(File).one().signature_timestamp.tzinfo.zone == 'UTC'  # type: ignore[union-attr]
+    assert session.query(File).with_entities(File.signature_timestamp
+        ).one().signature_timestamp.tzinfo.zone == 'UTC'
 
 
-def test_file_cleanup(session):
+def test_file_cleanup(session: Session) -> None:
     session.add(File(name='readme.txt', reference=b'foo'))
     transaction.commit()
 
     readme = session.query(File).first()
-
-    folder = Path(readme.reference.file._metadata_path).parent.parent
+    assert readme is not None
+    folder = Path(readme.reference.file._metadata_path).parent.parent  # type: ignore[attr-defined]
     assert sum(1 for f in folder.iterdir()) == 1
 
     readme.reference = as_fileintent(b'bar', 'readme.txt')
     transaction.commit()
 
     assert sum(1 for f in folder.iterdir()) == 1
-    assert session.query(File).first().reference.file.read() == b'bar'
+    assert session.query(File).first().reference.file.read() == b'bar'  # type: ignore[union-attr]
 
 
-def test_associated_files_cleanup(session):
+def test_associated_files_cleanup(session: Session) -> None:
     post = Blogpost(
         text="Foo",
         files=[
@@ -426,12 +483,12 @@ def test_associated_files_cleanup(session):
     session.add(post)
     session.flush()
 
-    post = session.query(Blogpost).first()
-    folder = Path(post.files[0].reference.file._metadata_path).parent.parent
+    post = session.query(Blogpost).one()
+    folder = Path(post.files[0].reference.file._metadata_path).parent.parent  # type: ignore[attr-defined]
     assert session.query(File).count() == 2
     assert sum(1 for p in folder.iterdir()) == 2
 
-    post = session.query(Blogpost).first()
+    post = session.query(Blogpost).one()
     post.files = [File(name='bar.txt', reference=b'bar')]
 
     session.flush()
@@ -450,7 +507,7 @@ def test_associated_files_cleanup(session):
     assert sum(1 for p in folder.iterdir()) == 1
 
 
-def test_1n1_associated_file_cleanup(session):
+def test_1n1_associated_file_cleanup(session: Session) -> None:
 
     item = MediaItem(description="Foo")
     item.content = MediaItemFile(id='abcd', name='bar')
@@ -461,9 +518,9 @@ def test_1n1_associated_file_cleanup(session):
 
     item = session.query(MediaItem).one()
 
-    folder = Path(item.content.reference.file._metadata_path).parent.parent
+    folder = Path(item.content.reference.file._metadata_path).parent.parent  # type: ignore[union-attr]
     assert session.query(File).count() == 1
-    assert item.content.reference.file.read() == b'bar'
+    assert item.content.reference.file.read() == b'bar'  # type: ignore[union-attr]
     assert sum(1 for p in folder.iterdir()) == 1
 
     item.content = MediaItemFile(id='abcd', name='baz')
@@ -477,19 +534,21 @@ def test_1n1_associated_file_cleanup(session):
     assert sum(1 for p in folder.iterdir()) == 1  # 2
 
 
-def test_named_file():
+def test_named_file() -> None:
 
     class MyFile(File):
-        pass
+        __mapper_args__ = {'polymorphic_identity': 'my_file'}
 
     class CustomBlogPost(Blogpost):
         x = NamedFile(cls=MyFile)
         y = NamedFile()
 
     post = CustomBlogPost(text="My interview at <company>")
+    # avoid narrowing of post.x/post.y
+    post2 = post
 
-    assert post.x is None
-    assert post.y is None
+    assert post2.x is None
+    assert post2.y is None
 
     del post.x
     del post.y
@@ -501,17 +560,17 @@ def test_named_file():
     x.seek(0)
     y.seek(0)
     assert len(post.files) == 2
+    assert isinstance(post.x, MyFile)
     assert post.x.name == 'x'
     assert post.x.reference.filename == 'x.png'
     assert post.x.reference.file.read() == x.read()
-    assert isinstance(post.x, MyFile)
+    assert isinstance(post.y, File)
+    assert not isinstance(post.y, MyFile)
     assert post.y.name == 'y'
     assert post.y.reference.filename == 'y.png'
     assert post.y.reference.file.read() == y.read()
-    assert isinstance(post.y, File)
-    assert not isinstance(post.y, MyFile)
 
     del post.x
     assert len(post.files) == 1
-    assert post.x is None
+    assert post2.x is None
     assert post.y

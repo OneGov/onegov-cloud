@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from datetime import date, datetime
 from dateutil.easter import easter
@@ -65,8 +67,8 @@ class SwissHolidays:
 
     def __init__(
         self,
-        cantons: 'Iterable[str]' = (),
-        other: 'Iterable[tuple[int, int, str]]' = (),
+        cantons: Iterable[str] = (),
+        other: Iterable[tuple[int, int, str]] = (),
         timezone: str = 'Europe/Zurich'
     ) -> None:
 
@@ -95,7 +97,7 @@ class SwissHolidays:
 
     def __contains__(self, dt: date | datetime) -> bool:
         if not isinstance(dt, date) or isinstance(dt, datetime):
-            raise ValueError(f"Unsupported type: {type(dt)}")
+            raise TypeError(f'Unsupported type: {type(dt)}')
 
         if (dt.month, dt.day) in self._other:
             return True
@@ -150,7 +152,7 @@ class SwissHolidays:
             #        tested this more than two years?
             years = (start.year, end.year)
 
-        def generate() -> 'Iterator[tuple[date, list[str]]]':
+        def generate() -> Iterator[tuple[date, list[str]]]:
             for year in years:
                 for dt, descriptions in self.all(year):
                     if start <= dt and dt <= end:
@@ -158,13 +160,13 @@ class SwissHolidays:
 
         return list(generate())
 
-    def other(self, year: int) -> 'Iterator[tuple[date, set[str]]]':
+    def other(self, year: int) -> Iterator[tuple[date, set[str]]]:
         """ Returns all custom defined holidays for the given year. """
 
         for month, day in self._other:
             yield date(year, month, day), self._other[(month, day)]
 
-    def official(self, year: int) -> 'Iterator[tuple[date, tuple[str, ...]]]':
+    def official(self, year: int) -> Iterator[tuple[date, tuple[str, ...]]]:
         """ Like :meth:`all`, but only includes the official holidays,
         not the custom defined ones.
 
@@ -180,90 +182,90 @@ class SwissHolidays:
         if not self._cantons:
             return
 
-        yield date(year, 1, 1), (_("Neujahrestag"), )
+        yield date(year, 1, 1), (_('Neujahrestag'), )
 
         if self._cantons & {'AG', 'BE', 'FR', 'GE', 'GL', 'GR', 'JU', 'LU',
                             'NE', 'OW', 'SH', 'SO', 'TG', 'VD', 'ZG', 'ZH'}:
 
-            yield date(year, 1, 2), (_("Berchtoldstag"), )
+            yield date(year, 1, 2), (_('Berchtoldstag'), )
 
         if self._cantons & {'SZ', 'TI', 'UR'}:
-            yield date(year, 1, 6), (_("Heilige Drei Könige"), )
+            yield date(year, 1, 6), (_('Heilige Drei Könige'), )
 
         if self._cantons & {'NE'}:
             yield date(year, 3, 1), (
-                _("Jahrestag der Ausrufung der Republik"), )
+                _('Jahrestag der Ausrufung der Republik'), )
 
         if self._cantons & {'NW', 'SZ', 'TI', 'UR', 'VS'}:
-            yield date(year, 3, 19), (_("Josefstag"), )
+            yield date(year, 3, 19), (_('Josefstag'), )
 
         if self._cantons & {'GL'} and year >= 1835:
 
             # First Thursday in April but not in Holy Week
             if date(year, 4, 1) + rd(weekday=FR) != easter(year) - rd(days=2):
                 yield date(year, 4, 1) + rd(weekday=TH), (
-                    _("Näfelser Fahrt"), )
+                    _('Näfelser Fahrt'), )
             else:
                 yield date(year, 4, 8) + rd(weekday=TH), (
-                    _("Näfelser Fahrt"), )
+                    _('Näfelser Fahrt'), )
 
-        yield easter(year), (_("Ostern"), )
+        yield easter(year), (_('Ostern'), )
 
         # Good Friday is celebrated if we have a canton other than TI, VS
         if self._cantons > {'TI', 'VS'}:
-            yield easter(year) - rd(days=2), (_("Karfreitag"), )
+            yield easter(year) - rd(days=2), (_('Karfreitag'), )
 
         # Easter Monday is celebrated if we have a canton other than VS
         if self._cantons > {'VS'}:
-            yield easter(year) + rd(weekday=MO), (_("Ostermontag"), )
+            yield easter(year) + rd(weekday=MO), (_('Ostermontag'), )
 
         if self._cantons & {
                 'BL', 'BS', 'JU', 'NE', 'SH', 'SO', 'TG', 'TI', 'ZH'}:
-            yield date(year, 5, 1), (_("Tag der Arbeit"), )
+            yield date(year, 5, 1), (_('Tag der Arbeit'), )
 
-        yield easter(year) + rd(days=39), (_("Auffahrt"), )
-        yield easter(year) + rd(days=49), (_("Pfingsten"), )
-        yield easter(year) + rd(days=50), (_("Pfingstmontag"), )
+        yield easter(year) + rd(days=39), (_('Auffahrt'), )
+        yield easter(year) + rd(days=49), (_('Pfingsten'), )
+        yield easter(year) + rd(days=50), (_('Pfingstmontag'), )
 
         if self._cantons & {
                 'AI', 'JU', 'LU', 'NW', 'OW', 'SZ', 'TI', 'UR', 'VS', 'ZG'}:
-            yield easter(year) + rd(days=60), (_("Fronleichnam"), )
+            yield easter(year) + rd(days=60), (_('Fronleichnam'), )
 
         if self._cantons & {'JU'}:
-            yield date(year, 6, 23), (_("Fest der Unabhängigkeit"), )
+            yield date(year, 6, 23), (_('Fest der Unabhängigkeit'), )
 
         if self._cantons & {'TI'}:
-            yield date(year, 6, 29), (_("Peter und Paul"), )
+            yield date(year, 6, 29), (_('Peter und Paul'), )
 
         if year >= 1994:
-            yield date(year, 8, 1), (_("Nationalfeiertag"), )
+            yield date(year, 8, 1), (_('Nationalfeiertag'), )
 
         if self._cantons & {
                 'AI', 'JU', 'LU', 'NW', 'OW', 'SZ', 'TI', 'UR', 'VS', 'ZG'}:
-            yield date(year, 8, 15), (_("Mariä Himmelfahrt"), )
+            yield date(year, 8, 15), (_('Mariä Himmelfahrt'), )
 
         if self._cantons & {'OW'}:
-            yield date(year, 9, 25), (_("Bruder Klaus"), )
+            yield date(year, 9, 25), (_('Bruder Klaus'), )
 
         if self._cantons & {
                 'AI', 'GL', 'JU', 'LU', 'NW', 'OW', 'SG', 'SZ', 'TI', 'UR',
                 'VS', 'ZG'}:
-            yield date(year, 11, 1), (_("Allerheiligen"), )
+            yield date(year, 11, 1), (_('Allerheiligen'), )
 
         if self._cantons & {
                 'AI', 'LU', 'NW', 'OW', 'SZ', 'TI', 'UR', 'VS', 'ZG'}:
-            yield date(year, 12, 8), (_("Mariä Empfängnis"), )
+            yield date(year, 12, 8), (_('Mariä Empfängnis'), )
 
         if self._cantons & {'GE'}:
-            yield date(year, 12, 12), (_("Escalade de Genève"), )
+            yield date(year, 12, 12), (_('Escalade de Genève'), )
 
-        yield date(year, 12, 25), (_("Weihnachten"), )
+        yield date(year, 12, 25), (_('Weihnachten'), )
 
         if self._cantons & {
                 'AG', 'AR', 'AI', 'BL', 'BS', 'BE', 'FR', 'GL', 'GR', 'LU',
                 'NE', 'NW', 'OW', 'SG', 'SH', 'SZ', 'SO', 'TG', 'TI', 'UR',
                 'ZG', 'ZH'}:
-            yield date(year, 12, 26), (_("Stephanstag"), )
+            yield date(year, 12, 26), (_('Stephanstag'), )
 
         if self._cantons & {'GE'}:
-            yield date(year, 12, 31), (_("Wiederherstellung der Republik"), )
+            yield date(year, 12, 31), (_('Wiederherstellung der Republik'), )

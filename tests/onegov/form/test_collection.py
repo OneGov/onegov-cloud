@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from datetime import timedelta
@@ -11,18 +13,23 @@ from onegov.form.errors import UnableToComplete
 from onegov.form.utils import hash_definition
 from sedate import utcnow
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import FlushError
 from textwrap import dedent
 from webob.multidict import MultiDict
 from werkzeug.datastructures import FileMultiDict
 from wtforms.csrf.core import CSRF
 
 
-def test_form_checksum():
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_form_checksum() -> None:
     assert hash_definition('abc') == '900150983cd24fb0d6963f7d28e17f72'
 
 
-def test_add_form(session):
+@pytest.mark.filterwarnings('ignore:.*conflicts with persistent instance.*')
+def test_add_form(session: Session) -> None:
     collection = FormCollection(session)
 
     form = collection.definitions.add('Tax Form', definition=dedent("""
@@ -31,14 +38,16 @@ def test_add_form(session):
     """))
 
     assert form.name == 'tax-form'
+    assert hasattr(form.form_class, '_source')
     assert form.form_class._source == form.definition
 
-    form = collection.definitions.by_name('tax-form')
+    form = collection.definitions.by_name('tax-form')  # type: ignore[assignment]
 
     assert form.name == 'tax-form'
+    assert hasattr(form.form_class, '_source')
     assert form.form_class._source == form.definition
 
-    with pytest.raises(FlushError):
+    with pytest.raises(IntegrityError):
         form = collection.definitions.add('Tax Form', definition=dedent("""
             First Name * = ___
             Last Name * = ___
@@ -47,7 +56,7 @@ def test_add_form(session):
     assert form.checksum and form.checksum == hash_definition(form.definition)
 
 
-def test_submit_form(session):
+def test_submit_form(session: Session) -> None:
     collection = FormCollection(session)
 
     form = collection.definitions.add('TPS Report', definition=dedent("""
@@ -65,7 +74,7 @@ def test_submit_form(session):
     submitted_form = form.form_class(data)
     collection.submissions.add('tps-report', submitted_form, state='complete')
 
-    form = collection.definitions.by_name('tps-report')
+    form = collection.definitions.by_name('tps-report')  # type: ignore[assignment]
     submission = form.submissions[0]
 
     assert submission.checksum and submission.checksum == hash_definition(
@@ -76,7 +85,7 @@ def test_submit_form(session):
     assert submitted_form.data == stored_form.data
 
 
-def test_submission_extra_data(session):
+def test_submission_extra_data(session: Session) -> None:
     collection = FormCollection(session)
 
     form = collection.definitions.add('TPS Report', definition=dedent("""
@@ -101,7 +110,7 @@ def test_submission_extra_data(session):
     assert submission.email == 'bill.lumbergh@initech.com'
 
 
-def test_submission_update(session):
+def test_submission_update(session: Session) -> None:
     collection = FormCollection(session)
 
     form = collection.definitions.add('Whatever', definition=dedent("""
@@ -124,12 +133,12 @@ def test_submission_update(session):
     assert submission.title == 'Bill, Gate.'
 
     edited_form = submitted_form
-    edited_form.last_name.data = 'Gates'
+    edited_form['last_name'].data = 'Gates'
     collection.submissions.update(submission, edited_form)
     assert submission.title == 'Bill, Gates'
 
 
-def test_definitions_with_submissions_count(session):
+def test_definitions_with_submissions_count(session: Session) -> None:
     collection = FormCollection(session)
 
     form = collection.definitions.add('Newsletter', definition="E-Mail = @@@")
@@ -142,26 +151,26 @@ def test_definitions_with_submissions_count(session):
         'newsletter', form.form_class(data), state='complete')
 
     form = next(collection.get_definitions_with_submission_count())
-    assert form.submissions_count == 1
+    assert form.submissions_count == 1  # type: ignore[attr-defined]
 
     s2 = collection.submissions.add(
         'newsletter', form.form_class(data), state='complete')
 
     form = next(collection.get_definitions_with_submission_count())
-    assert form.submissions_count == 2
+    assert form.submissions_count == 2  # type: ignore[attr-defined]
 
     collection.submissions.delete(s1)
 
     form = next(collection.get_definitions_with_submission_count())
-    assert form.submissions_count == 1
+    assert form.submissions_count == 1  # type: ignore[attr-defined]
 
     collection.submissions.delete(s2)
 
     form = next(collection.get_definitions_with_submission_count())
-    assert form.submissions_count == 0
+    assert form.submissions_count == 0  # type: ignore[attr-defined]
 
 
-def test_submit_pending(session):
+def test_submit_pending(session: Session) -> None:
     collection = FormCollection(session)
 
     form = collection.definitions.add('tweet', definition=dedent("""
@@ -195,12 +204,12 @@ def test_submit_pending(session):
     submission.data['tweet'] = "Nevermind, it didn't work #mybad"
     collection.submissions.complete_submission(submission)
 
-    submission = collection.submissions.by_state('complete').first()
+    submission = collection.submissions.by_state('complete').first()  # type: ignore[assignment]
     assert submission.state == 'complete'
-    assert submission.__class__ == CompleteFormSubmission
+    assert submission.__class__ is CompleteFormSubmission  # type: ignore[comparison-overlap]
 
 
-def test_remove_old_pending_submissions(session):
+def test_remove_old_pending_submissions(session: Session) -> None:
     collection = FormCollection(session)
 
     signup = collection.definitions.add('Signup', definition="E-Mail = @@@")
@@ -224,12 +233,12 @@ def test_remove_old_pending_submissions(session):
     assert collection.submissions.query().count() == 1
 
 
-def test_no_store_csrf_token(session):
+def test_no_store_csrf_token(session: Session) -> None:
     collection = FormCollection(session)
 
     class MockCSRF(CSRF):
 
-        def generate_csrf_token(self, csrf_token_field):
+        def generate_csrf_token(self, csrf_token_field: object) -> str:
             return '0xdeadbeef'
 
     signup = collection.definitions.add('Signup', definition="E-Mail = @@@")
@@ -246,7 +255,7 @@ def test_no_store_csrf_token(session):
     assert 'csrf_token' not in submission.data
 
 
-def test_delete_without_submissions(session):
+def test_delete_without_submissions(session: Session) -> None:
     collection = FormCollection(session)
 
     form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
@@ -259,7 +268,7 @@ def test_delete_without_submissions(session):
         collection.definitions.delete('newsletter')
 
 
-def test_delete_with_submissions(session):
+def test_delete_with_submissions(session: Session) -> None:
     collection = FormCollection(session)
 
     form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
@@ -273,7 +282,7 @@ def test_delete_with_submissions(session):
     assert collection.definitions.query().count() == 0
 
 
-def test_delete_with_pending_submissions(session):
+def test_delete_with_pending_submissions(session: Session) -> None:
     collection = FormCollection(session)
 
     form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
@@ -287,7 +296,7 @@ def test_delete_with_pending_submissions(session):
     assert collection.definitions.query().count() == 0
 
 
-def test_delete_fail_with_submissions(session):
+def test_delete_fail_with_submissions(session: Session) -> None:
     collection = FormCollection(session)
 
     form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
@@ -300,13 +309,13 @@ def test_delete_fail_with_submissions(session):
         collection.definitions.delete('newsletter', with_submissions=False)
 
 
-def test_file_submissions_update(session):
+def test_file_submissions_update(session: Session) -> None:
     collection = FormCollection(session)
 
     # upload a new file
     definition = collection.definitions.add('File', definition="File = *.txt")
 
-    data = FileMultiDict()
+    data: Any = FileMultiDict()
     data.add_file('file', BytesIO(b'foobar'), filename='foobar.txt')
 
     submission = collection.submissions.add(
@@ -358,7 +367,7 @@ def test_file_submissions_update(session):
     assert len(submission.files) == 0
 
 
-def test_multiple_file_submissions_update(session):
+def test_multiple_file_submissions_update(session: Session) -> None:
     collection = FormCollection(session)
 
     # upload a new file
@@ -366,13 +375,14 @@ def test_multiple_file_submissions_update(session):
         'File', definition="File = *.txt (multiple)"
     )
 
-    data = FileMultiDict()
+    data: Any = FileMultiDict()
     data.add_file('file', BytesIO(b'foobar'), filename='foobar.txt')
 
     submission = collection.submissions.add(
         'file', definition.form_class(data), state='pending')
 
     assert len(submission.files) == 1
+    assert submission.files[0].note is not None
     assert submission.files[0].note.endswith(':0')
     assert submission.files[0].checksum == '3858f62230ac3c915f300c664312c63f'
 
@@ -383,7 +393,7 @@ def test_multiple_file_submissions_update(session):
     data = FileMultiDict()
     data.add('file-0', 'replace')
     data.add_file('file-0', BytesIO(b'barfoo'), filename='foobar.txt')
-    data.add_file('file', BytesIO(b'baz'), filename='baz.txt')
+    data.add_file('file', BytesIO(b'baz'), filename='zab.txt')
 
     collection.submissions.update(submission, definition.form_class(data))
     session.flush()
@@ -392,7 +402,9 @@ def test_multiple_file_submissions_update(session):
     assert len(submission.files) == 2
     assert previous_file.id != submission.files[0].id
     assert previous_file.checksum != submission.files[0].checksum
+    assert submission.files[0].note is not None
     assert submission.files[0].note.endswith(':0')
+    assert submission.files[1].note is not None
     assert submission.files[1].note.endswith(':1')
     assert submission.files[1].checksum == '73feffa4b7f6bb68e44cf984c85f6e88'
 
@@ -418,14 +430,14 @@ def test_multiple_file_submissions_update(session):
     assert submission.files[0].note.endswith(':0')
 
 
-def test_file_submissions_cascade(session):
+def test_file_submissions_cascade(session: Session) -> None:
 
     collection = FormCollection(session)
 
     # upload a new file
     definition = collection.definitions.add('File', definition="File = *.txt")
 
-    data = FileMultiDict()
+    data: Any = FileMultiDict()
     data.add_file('file', BytesIO(b'foobar'), filename='foobar.txt')
 
     collection.submissions.add(
@@ -442,7 +454,7 @@ def test_file_submissions_cascade(session):
     assert session.query(File).count() == 0
 
 
-def test_get_current(session):
+def test_get_current(session: Session) -> None:
     collection = FormCollection(session)
 
     form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
@@ -457,7 +469,7 @@ def test_get_current(session):
     assert collection.submissions.by_id(submission.id, current_only=False)
 
 
-def test_add_externally_defined_submission(session):
+def test_add_externally_defined_submission(session: Session) -> None:
     collection = FormCollection(session)
 
     form_class = parse_form("E-Mail *= @@@")
@@ -470,8 +482,8 @@ def test_add_externally_defined_submission(session):
 
     stored_form = submission.form_class(data=submission.data)
 
-    assert stored_form.e_mail.data == 'info@example.org'
-    assert stored_form.e_mail.data == form.e_mail.data
+    assert stored_form['e_mail'].data == 'info@example.org'
+    assert stored_form['e_mail'].data == form['e_mail'].data
 
     # externally defined submission are not automatically removed
     date = utcnow() + timedelta(seconds=60)

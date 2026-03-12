@@ -1,8 +1,8 @@
+from __future__ import annotations
+
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import AttendenceCollection
-from onegov.pas.collections import CommissionCollection
-from onegov.pas.collections import ParliamentarianCollection
+from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.layouts import DefaultLayout
 from onegov.org.models import Organisation
 from onegov.core.security import Private
@@ -17,38 +17,33 @@ if TYPE_CHECKING:
 @PasApp.html(
     model=Organisation,
     name='pas',
-    template='dashboard.pt',
+    template='pas_dashboard.pt',
     permission=Private
 )
 def view_dashboard(
     self: Organisation,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
+
     layout = DefaultLayout(self, request)
 
     shortcuts = [
         {
-            'name': 'attendences',
-            'title': _('Attendences'),
-            'link': request.class_link(AttendenceCollection),
-            'icon': 'fa-clock'
-        },
-        {
-            'name': 'parliamentarians',
-            'title': _('Parliamentarians'),
-            'link': request.class_link(ParliamentarianCollection),
-            'icon': 'fa-user-tie'
-        },
-        {
             'name': 'commissions',
             'title': _('Commissions'),
-            'link': request.class_link(CommissionCollection),
+            'link': request.class_link(PASCommissionCollection),
             'icon': 'fa-user-friends'
+        },
+        {
+            'name': 'pas-import',
+            'title': _('Data Import (JSON)'),
+            'link': request.link(self, 'pas-import'),
+            'icon': 'fa-file-import',
         }
     ]
 
     return {
         'layout': layout,
-        'title': _("Dashboard"),
+        'title': _('Overview'),
         'shortcuts': shortcuts
     }

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from email.headerregistry import Address
 from onegov.core.collection import Pagination
 from onegov.core.templates import render_template
@@ -6,6 +8,7 @@ from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import SmsSubscriber
 from onegov.election_day.models import Subscriber
+from sedate import utcnow
 from sqlalchemy import func
 
 
@@ -18,7 +21,7 @@ if TYPE_CHECKING:
     from onegov.election_day.request import ElectionDayRequest
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
@@ -30,8 +33,8 @@ class SubscriberCollection(Pagination[_S]):
     page: int
 
     def __init__(
-        self: 'SubscriberCollection[Subscriber]',
-        session: 'Session',
+        self: SubscriberCollection[Subscriber],
+        session: Session,
         page: int = 0,
         term: str | None = None,
         active_only: bool | None = True
@@ -53,17 +56,17 @@ class SubscriberCollection(Pagination[_S]):
             and self.active_only == other.active_only
         )
 
-    def subset(self) -> 'Query[_S]':
+    def subset(self) -> Query[_S]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(self.session, index)
 
-    def for_active_only(self, active_only: bool) -> 'Self':
+    def for_active_only(self, active_only: bool) -> Self:
         return self.__class__(self.session, 0, self.term, active_only)
 
     def add(
@@ -85,7 +88,7 @@ class SubscriberCollection(Pagination[_S]):
         self.session.flush()
         return subscriber
 
-    def query(self, active_only: bool | None = None) -> 'Query[_S]':
+    def query(self, active_only: bool | None = None) -> Query[_S]:
         query = self.session.query(self.model_class)
 
         active_only = self.active_only if active_only is None else active_only
@@ -100,7 +103,7 @@ class SubscriberCollection(Pagination[_S]):
 
         return query
 
-    def by_id(self, id: 'UUID') -> _S | None:
+    def by_id(self, id: UUID) -> _S | None:
         """ Returns the subscriber by its id. """
 
         query = self.query(active_only=False)
@@ -128,7 +131,7 @@ class SubscriberCollection(Pagination[_S]):
         address: str,
         domain: str | None,
         domain_segment: str | None,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> _S:
         """ Initiate the subscription process.
 
@@ -153,7 +156,7 @@ class SubscriberCollection(Pagination[_S]):
         subscriber: _S,
         domain: str | None,
         domain_segment: str | None,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Send the subscriber a request to confirm the subscription. """
 
@@ -164,7 +167,7 @@ class SubscriberCollection(Pagination[_S]):
         address: str,
         domain: str | None,
         domain_segment: str | None,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Initiate the unsubscription process. """
 
@@ -175,7 +178,7 @@ class SubscriberCollection(Pagination[_S]):
     def handle_unsubscription(
         self,
         subscriber: _S,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Send the subscriber a request to confirm the unsubscription. """
 
@@ -190,7 +193,9 @@ class SubscriberCollection(Pagination[_S]):
                 'domain': subscriber.domain,
                 'domain_segment': subscriber.domain_segment,
                 'locale': subscriber.locale,
-                'active': subscriber.active
+                'active_since': subscriber.active_since,
+                'inactive_since': subscriber.inactive_since,
+                'active': subscriber.active,
             }
             for subscriber in self.query()
         ]
@@ -200,7 +205,7 @@ class SubscriberCollection(Pagination[_S]):
         file: IO[bytes],
         mimetype: str,
         delete: bool
-    ) -> tuple[list['FileImportError'], int]:
+    ) -> tuple[list[FileImportError], int]:
         """ Disables or deletes the subscribers in the given CSV.
 
         Ignores domain and domain segment, as this is inteded to cleanup
@@ -239,7 +244,7 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
         subscriber: EmailSubscriber,
         domain: str | None,
         domain_segment: str | None,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Send the (new) subscriber a request to confirm the subscription.
 
@@ -261,7 +266,7 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
         # even though this is technically a transactional e-mail we send
         # it as marketing, since the actual subscription is sent as
         # a marketing e-mail as well
-        title = request.translate(_("Please confirm your email"))
+        title = request.translate(_('Please confirm your email'))
         request.app.send_marketing_email(
             subject=title,
             receivers=(subscriber.address, ),
@@ -298,6 +303,9 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
 
         subscriber = self.by_address(address, domain, domain_segment)
         if subscriber:
+            if not subscriber.active:
+                subscriber.active_since = utcnow()
+                subscriber.inactive_since = None
             subscriber.active = True
             subscriber.locale = locale
             return True
@@ -306,7 +314,7 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
     def handle_unsubscription(
         self,
         subscriber: EmailSubscriber,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Send the subscriber a request to confirm the unsubscription.
         """
@@ -324,7 +332,7 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
         # even though this is technically a transactional e-mail we send
         # it as marketing, since the actual subscription is sent as
         # a marketing e-mail as well
-        title = request.translate(_("Please confirm your unsubscription"))
+        title = request.translate(_('Please confirm your unsubscription'))
         request.app.send_marketing_email(
             subject=title,
             receivers=(subscriber.address, ),
@@ -359,6 +367,8 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
 
         subscriber = self.by_address(address, domain, domain_segment)
         if subscriber:
+            if subscriber.active:
+                subscriber.inactive_since = utcnow()
             subscriber.active = False
             return True
         return False
@@ -375,7 +385,7 @@ class SmsSubscriberCollection(SubscriberCollection[SmsSubscriber]):
         subscriber: SmsSubscriber,
         domain: str | None,
         domain_segment: str | None,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Confirm the subscription by sending an SMS (if not already
         subscribed). There is no double-opt-in for SMS subscribers.
@@ -384,21 +394,26 @@ class SmsSubscriberCollection(SubscriberCollection[SmsSubscriber]):
 
         if not subscriber.active or subscriber.locale != request.locale:
             assert request.locale is not None
+            if not subscriber.active:
+                subscriber.active_since = utcnow()
+                subscriber.inactive_since = None
             subscriber.locale = request.locale
             subscriber.active = True
             content = request.translate(_(
-                "Successfully subscribed to the SMS service. You will"
-                " receive a SMS every time new results are published."
+                'Successfully subscribed to the SMS service. You will'
+                ' receive a SMS every time new results are published.'
             ))
             request.app.send_sms(subscriber.address, content)
 
     def handle_unsubscription(
         self,
         subscriber: SmsSubscriber,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Deactivate the subscriber. There is no double-opt-out for SMS
         subscribers.
 
         """
+        if subscriber.active:
+            subscriber.inactive_since = utcnow()
         subscriber.active = False

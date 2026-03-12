@@ -7,7 +7,7 @@ $success-icon: '\f058';
 $warning-icon: '\f071';
 
 #alert-boxes {
-    .alert-box {
+    .alert-box, .callout {
         margin-top: 1rem;
 
         &:last-child {

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 from onegov.foundation import BaseTheme
@@ -38,7 +40,7 @@ class OrgTheme(BaseTheme):
         return user_options
 
     @property
-    def foundation_components(self) -> 'Sequence[str]':
+    def foundation_components(self) -> Sequence[str]:
         return (
             'grid',
             'accordion',
@@ -66,23 +68,22 @@ class OrgTheme(BaseTheme):
             'tooltips',
             'top-bar',
             'type',
-            'visibility',
+            'visibility'
         )
 
     @property
     def pre_imports(self) -> list[str]:
-        imports = [
+        return [
             'foundation-mods',
+            *self.additional_font_families
         ]
-        for font_family in self.additional_font_families:
-            imports.append(font_family)
-        return imports
 
     @property
     def post_imports(self) -> list[str]:
         return [
             'org',
-            'chosen'
+            'chosen',
+            'bar-graph'
         ]
 
     @property

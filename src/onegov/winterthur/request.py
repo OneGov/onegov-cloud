@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org.request import OrgRequest
 
 
@@ -8,4 +10,4 @@ if TYPE_CHECKING:
 
 # NOTE: This is currently only used for type checking
 class WinterthurRequest(OrgRequest):
-    app: 'WinterthurApp'
+    app: WinterthurApp

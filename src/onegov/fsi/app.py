@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 from onegov.core import utils
 from onegov.fsi.initial_content import create_new_organisation
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.request import FsiRequest
 from onegov.fsi.theme import FsiTheme
-from onegov.org import OrgApp
-from onegov.org.app import get_common_asset as default_common_asset
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.town6 import TownApp
+from onegov.town6.app import get_common_asset as default_common_asset
+from onegov.town6.app import get_i18n_localedirs as get_town6_i18n_localedirs
 
 
 from typing import Any, TYPE_CHECKING
@@ -16,7 +18,7 @@ if TYPE_CHECKING:
     from onegov.user import User
 
 
-class FsiApp(OrgApp):
+class FsiApp(TownApp):
 
     request_class = FsiRequest
 
@@ -24,7 +26,7 @@ class FsiApp(OrgApp):
     # ticket statistics.
     send_ticket_statistics = False
 
-    def es_may_use_private_search(
+    def fts_may_use_private_search(
         self,
         request: FsiRequest  # type:ignore[override]
     ) -> bool:
@@ -45,7 +47,7 @@ class FsiApp(OrgApp):
             **cfg
         )
 
-    def on_login(self, request: 'CoreRequest', user: 'User') -> None:
+    def on_login(self, request: CoreRequest, user: User) -> None:
         assert hasattr(user, 'attendee')
         if not user.attendee:
             user.attendee = CourseAttendee()
@@ -56,7 +58,7 @@ def get_template_directory() -> str:
     return 'templates'
 
 
-@OrgApp.static_directory()
+@TownApp.static_directory()
 def get_static_directory() -> str:
     return 'static'
 
@@ -68,14 +70,20 @@ def get_theme() -> FsiTheme:
 
 @FsiApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[FsiApp, str], Organisation]':
+) -> Callable[[FsiApp, str], Organisation]:
     return create_new_organisation
+
+
+# NOTE: Fsi doesn't need a citizen login
+@FsiApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False
 
 
 @FsiApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.fsi', 'locale')
-    return [mine] + get_org_i18n_localedirs()
+    return [mine, *get_town6_i18n_localedirs()]
 
 
 @FsiApp.webasset_path()
@@ -89,6 +97,6 @@ def get_webasset_output() -> str:
 
 
 @FsiApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield from default_common_asset()
     yield 'fsi.js'

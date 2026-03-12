@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dateutil.rrule import rrulestr
 from sedate import standardize_date
 from datetime import date

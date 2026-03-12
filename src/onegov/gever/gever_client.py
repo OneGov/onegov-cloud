@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import requests
 from base64 import b64encode
 
@@ -7,9 +9,9 @@ from typing import Any
 
 class GeverClientCAS:
     """ Gever Client that uses CAS for authenticating.
-        Its purpose is to permit a user to access multiple applications
-        while providing their credentials (such as user ID and password)
-        only once.
+    Its purpose is to permit a user to access multiple applications
+    while providing their credentials (such as user ID and password)
+    only once.
     """
 
     def __init__(self, username: str, password: str, service_url: str):

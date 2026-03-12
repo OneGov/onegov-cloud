@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import datetime
 from decimal import Decimal
@@ -6,14 +8,19 @@ from onegov.swissvotes.collections import SwissVoteCollection
 from pytz import utc
 
 
-def test_app(swissvotes_app):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import TestApp
+
+
+def test_app(swissvotes_app: TestApp) -> None:
     assert swissvotes_app.principal
     assert swissvotes_app.static_content_pages == {
         'home', 'disclaimer', 'imprint', 'data-protection'
     }
 
 
-def test_app_dataset_caches(swissvotes_app):
+def test_app_dataset_caches(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
 
     csv = [swissvotes_app.get_cached_dataset('csv')]
@@ -51,6 +58,7 @@ def test_app_dataset_caches(swissvotes_app):
 
     assert len(csv) == len(set(csv))
     assert len(xlsx) == len(set(xlsx))
+    assert swissvotes_app.filestorage is not None
     assert set(swissvotes_app.filestorage.listdir('.')) == {
         'dataset-.csv',
         'dataset-.xlsx',

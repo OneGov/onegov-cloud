@@ -1,33 +1,52 @@
+from __future__ import annotations
+
 import json
 from base64 import b64encode
-
-from collection_json import Collection
+from collection_json import Collection, Template  # type: ignore[import-untyped]
 from freezegun import freeze_time
+from tests.onegov.api.test_views import patch_collection_json  # noqa: F401
+from unittest.mock import patch
 
 
-def get_base64_encoded_json_string(data):
-    data = json.dumps(data)
-    data = b64encode(data.encode('ascii'))
-    data = data.decode('ascii')
-    return data
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency import AgencyApp
+    from tests.shared.client import Client
+    from unittest.mock import MagicMock
 
 
-def test_view_api(client):
+def get_base64_encoded_json_string(data: Any) -> str:
+    return b64encode(json.dumps(data).encode('ascii')).decode('ascii')
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.broadcast')
+@patch('onegov.websockets.integration.authenticate')
+def test_view_api(
+    authenticate: MagicMock,
+    broadcast: MagicMock,
+    connect: MagicMock,
+    client: Client[AgencyApp]
+) -> None:
+
     client.login_admin()  # prevent rate limit
 
-    def collection(url):
+    def collection(url: str) -> Collection:
         return Collection.from_json(client.get(url).body)
 
-    def data(item):
+    def data(item: Any) -> Any:
         return {x.name: x.value for x in item.data}
 
-    def links(item):
+    def links(item: Any) -> Any:
         return {x.rel: x.href for x in item.links}
+
+    def template(item: Any) -> Any:
+        return {x.name for x in item.template.data}
 
     # Endpoints with query hints
     endpoints = collection('/api')
     assert endpoints.queries[0].rel == 'agencies'
-    assert endpoints.queries[0].href == 'http://localhost/api/agencies'
+    assert endpoints.queries[0].href == 'http://localhost/api/agencies?page=0'
     assert data(endpoints.queries[0]) == {
         'parent': None,
         'title': None,
@@ -38,7 +57,7 @@ def test_view_api(client):
         'updated_lt': None,
     }
     assert endpoints.queries[1].rel == 'people'
-    assert endpoints.queries[1].href == 'http://localhost/api/people'
+    assert endpoints.queries[1].href == 'http://localhost/api/people?page=0'
     assert data(endpoints.queries[1]) == {
         'first_name': None,
         'last_name': None,
@@ -49,7 +68,9 @@ def test_view_api(client):
         'updated_lt': None
     }
     assert endpoints.queries[2].rel == 'memberships'
-    assert endpoints.queries[2].href == 'http://localhost/api/memberships'
+    assert endpoints.queries[2].href == (
+        'http://localhost/api/memberships?page=0'
+    )
     assert data(endpoints.queries[2]) == {
         'agency': None,
         'person': None,
@@ -344,13 +365,23 @@ def test_view_api(client):
     assert set(agencies) == {'Hospital', 'School', 'School Board'}
 
     # People
+    people_collection = collection('/api/people')
     people = {
         data(item)['title']: item.href
-        for item in collection('/api/people').items
+        for item in people_collection.items
     }
     assert set(people) == {'Krabappel Edna', 'Rivera Nick'}
+    assert template(people_collection) >= {
+        'submitter_email',
+        'submitter_message',
+        'academic_title',
+        'salutation',
+        'first_name',
+        'last_name'
+    }
 
-    nick = collection(people['Rivera Nick']).items[0]
+    nick_collection = collection(people['Rivera Nick'])
+    nick = nick_collection.items[0]
     assert data(nick) == {
         'academic_title': 'Dr.',
         'location_address': '',
@@ -379,8 +410,17 @@ def test_view_api(client):
         'title': 'Doctor',
         'modified': '2023-05-08T01:02:00+00:00',
     }
+    assert template(nick_collection) >= {
+        'submitter_email',
+        'submitter_message',
+        'academic_title',
+        'salutation',
+        'first_name',
+        'last_name'
+    }
 
-    edna = collection(people['Krabappel Edna']).items[0]
+    edna_collection = collection(people['Krabappel Edna'])
+    edna = edna_collection.items[0]
     assert data(edna) == {
         'academic_title': '',
         'born': '',
@@ -409,6 +449,42 @@ def test_view_api(client):
         'title': 'Teacher',
         'modified': '2023-05-08T01:07:00+00:00',
     }
+    assert template(edna_collection) >= {
+        'submitter_email',
+        'submitter_message',
+        'academic_title',
+        'salutation',
+        'first_name',
+        'last_name'
+    }
+
+    # test submitting an invalid change (missing fields)
+    payload = Template(data=[
+        {'name': 'last_name', 'value': 'Riviera'}
+    ]).to_dict()
+    response = client.put_json(
+        people['Rivera Nick'],
+        payload,
+        expect_errors=True
+    )
+    assert response.status_code == 400
+    parsed = Collection.from_json(response.text)
+    assert 'submitter_email: Das ist ein Pflichtfeld' in parsed.error.message
+
+    # test submitting a valid change
+    payload = Template(data=[
+        {'name': 'submitter_email', 'value': 'submitter@example.org'},
+        {'name': 'last_name', 'value': 'Riviera'}
+    ]).to_dict()
+    response = client.put_json(people['Rivera Nick'], payload)
+    assert response.status_code == 200
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     # test 'first_name' url filter
     people = {

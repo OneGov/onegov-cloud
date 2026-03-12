@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from itertools import chain
 from onegov.election_day.formats.exports.election import (
@@ -12,8 +14,8 @@ if TYPE_CHECKING:
 
 
 def export_election_compound_internal(
-    compound: 'ElectionCompound',
-    locales: 'Collection[str]'
+    compound: ElectionCompound,
+    locales: Collection[str]
 ) -> list[dict[str, Any]]:
     """ Returns all data connected to this election compound as list with
     dicts.

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.formats.imports.election.ech import (
     import_elections_ech)
 from onegov.election_day.formats.imports.election.internal_majorz import (
@@ -16,5 +18,4 @@ __all__ = (
     'import_election_wabstic_majorz',
     'import_election_wabstic_proporz',
     'import_elections_ech',
-    'import_party_results_internal',
 )

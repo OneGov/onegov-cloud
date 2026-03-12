@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from io import BytesIO
 from onegov.core.csv import convert_list_of_dicts_to_csv
@@ -5,17 +7,24 @@ from onegov.election_day.formats import export_election_internal_majorz
 from onegov.election_day.formats import import_election_internal_majorz
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Election
-
 from tests.onegov.election_day.common import create_principal
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from tests.onegov.election_day.conftest import ImportTestDatasets
+
+
 def test_import_internal_majorz_cantonal_zg(
-        session, import_test_datasets):
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
 
     # - cantonal results from ZG from the 18.10.2015
     principal = 'zg'
 
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         principal,
@@ -26,6 +35,8 @@ def test_import_internal_majorz_cantonal_zg(
         dataset_name='staenderatswahl-2015',
         has_expats=False
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
     assert election.last_result_change
     assert election.completed
@@ -70,13 +81,15 @@ def test_import_internal_majorz_cantonal_zg(
     ]
 
 
-def test_import_internal_majorz_regional_zg(session, import_test_datasets):
+def test_import_internal_majorz_regional_zg(
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
 
     # - regional results form Zug from the 24.06.2012
-
     principal = 'zg'
 
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         principal,
@@ -88,6 +101,8 @@ def test_import_internal_majorz_regional_zg(session, import_test_datasets):
         dataset_name='friedensrichter-2012-06-24',
         has_expats=False
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
     assert election.last_result_change
     assert election.completed
@@ -123,14 +138,16 @@ def test_import_internal_majorz_regional_zg(session, import_test_datasets):
 
 
 def test_import_internal_majorz_municipality_bern(
-        session, import_test_datasets):
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
     # Test communal election without quarters
     # - communal results from Bern from the 25.11.2015
 
     principal = 'bern'
     municipality = '1059'
 
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         principal,
@@ -142,6 +159,8 @@ def test_import_internal_majorz_municipality_bern(
         has_expats=False,
         municipality=municipality
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
     assert election.last_result_change
     assert election.completed
@@ -182,7 +201,9 @@ def test_import_internal_majorz_municipality_bern(
 
 
 def test_import_internal_majorz_municipality_kriens(
-        session, import_test_datasets):
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
 
     # Test communal election with quarters
     # communal results from Kriens from the 23.08.2015
@@ -190,7 +211,7 @@ def test_import_internal_majorz_municipality_kriens(
     principal = 'kriens'
     municipality = '351'
 
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         principal,
@@ -202,6 +223,8 @@ def test_import_internal_majorz_municipality_kriens(
         has_expats=False,
         municipality=municipality
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
     assert election.last_result_change
     assert election.completed
@@ -241,7 +264,7 @@ def test_import_internal_majorz_municipality_kriens(
     assert sorted(election.elected_candidates) == [('Tschäppät', 'Alexander')]
 
 
-def test_import_internal_majorz_missing_headers(session):
+def test_import_internal_majorz_missing_headers(session: Session) -> None:
     session.add(
         Election(
             title='election',
@@ -278,12 +301,12 @@ def test_import_internal_majorz_missing_headers(session):
             ))
         ).encode('utf-8')), 'text/plain',
     )
-    assert [(e.error.interpolate()) for e in errors] == [
+    assert [(e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         ("Missing columns: 'candidate_elected'")
     ]
 
 
-def test_import_internal_majorz_invalid_values(session):
+def test_import_internal_majorz_invalid_values(session: Session) -> None:
     session.add(
         Election(
             title='election',
@@ -413,8 +436,7 @@ def test_import_internal_majorz_invalid_values(session):
             ))
         ).encode('utf-8')), 'text/plain',
     )
-    errors = sorted([(e.line, e.error.interpolate()) for e in errors])
-    assert errors == [
+    assert sorted((e.line, e.error.interpolate()) for e in errors) == [  # type: ignore[attr-defined]
         (2, 'Invalid integer: candidate_id'),
         (2, 'Invalid integer: candidate_votes'),
         (2, 'Invalid integer: election_absolute_majority'),
@@ -428,7 +450,7 @@ def test_import_internal_majorz_invalid_values(session):
     ]
 
 
-def test_import_internal_majorz_expats(session):
+def test_import_internal_majorz_expats(session: Session) -> None:
     session.add(
         Election(
             title='election',
@@ -444,7 +466,7 @@ def test_import_internal_majorz_expats(session):
     for has_expats in (False, True):
         election.has_expats = has_expats
         for entity_id in (9170, 0):
-            errors = import_election_internal_majorz(
+            raw_errors = import_election_internal_majorz(
                 election, principal,
                 BytesIO((
                     '\n'.join((
@@ -487,19 +509,20 @@ def test_import_internal_majorz_expats(session):
                     ))
                 ).encode('utf-8')), 'text/plain',
             )
-            errors = [(e.line, e.error.interpolate()) for e in errors]
+            errors = [(e.line, e.error.interpolate()) for e in raw_errors]  # type: ignore[attr-defined]
             result = next(
                 (r for r in election.results if r.entity_id == 0), None
             )
             if has_expats:
                 assert errors == []
+                assert result is not None
                 assert result.invalid_votes == 1
             else:
                 assert errors == [(None, 'No data found')]
                 assert result is None
 
 
-def test_import_internal_majorz_temporary_results(session):
+def test_import_internal_majorz_temporary_results(session: Session) -> None:
     session.add(
         Election(
             title='election',
@@ -586,9 +609,11 @@ def test_import_internal_majorz_temporary_results(session):
     assert election.candidates[0].votes == 1
 
 
-def test_import_internal_majorz_regional(session):
+def test_import_internal_majorz_regional(session: Session) -> None:
 
-    def create_csv(results):
+    def create_csv(
+        results: tuple[tuple[int, bool], ...]
+    ) -> tuple[BytesIO, str]:
         lines = []
         lines.append((
             'election_absolute_majority',
@@ -653,7 +678,7 @@ def test_import_internal_majorz_regional(session):
         election, principal,
         *create_csv(((1701, False), (1702, False)))
     )
-    assert [(e.error.interpolate()) for e in errors] == [
+    assert [(e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         '1702 is not part of this business'
     ]
 
@@ -683,7 +708,7 @@ def test_import_internal_majorz_regional(session):
         election, principal,
         *create_csv(((3271, False), (3201, False)))
     )
-    assert [(e.error.interpolate()) for e in errors] == [
+    assert [(e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         '3201 is not part of Werdenberg'
     ]
 
@@ -716,7 +741,7 @@ def test_import_internal_majorz_regional(session):
         election, principal,
         *create_csv(((3572, True), (3513, False)))
     )
-    assert [(e.error.interpolate()) for e in errors] == [
+    assert [(e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         '3513 is not part of Ilanz'
     ]
 
@@ -742,7 +767,7 @@ def test_import_internal_majorz_regional(session):
     assert election.progress == (1, 2)
 
 
-def test_import_internal_majorz_optional_columns(session):
+def test_import_internal_majorz_optional_columns(session: Session) -> None:
     session.add(
         Election(
             title='election',

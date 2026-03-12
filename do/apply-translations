@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import annotations
+
 import os
 import re
 
@@ -8,51 +10,59 @@ import click
 base = os.path.join(os.getcwd(), 'src', 'onegov')
 
 
-def locale_file(module, lang):
+def locale_file(module: str, lang: str) -> str:
     return f'{base}/{module}/locale/{lang}/LC_MESSAGES/onegov.{module}.po'
 
 
-def open_file(path, mode='r'):
+def open_file(path: str, mode: str = 'r') -> str:
     with open(path, mode) as f:
         file = f.read()
     return file
 
 
-def parse_entry(block):
-    parts = block.split('msgstr ')
-    return parts[0].replace('msgid ', ''), parts[1]
+def parse_entry(block: str) -> tuple[str, str, str]:
+    head, msgstr = block.split('msgstr ', 1)
+    comments, msgid = head.split('msgid ', 1)
+    return comments, msgid, msgstr
 
 
-def blocks_from_file(src, lang):
+def blocks_from_file(src: str, lang: str) -> list[str]:
     return re.split(r'\n\n', open_file(locale_file(src, lang)))
 
 
-def parse_file(src, lang):
+def parse_file(src: str, lang: str) -> dict[str, str]:
     src_dict = {}
     for block in blocks_from_file(src, lang):
-        id_, value = parse_entry(block)
+        _, id_, value = parse_entry(block)
         src_dict[id_] = value
     return src_dict
 
 
-def emtpy_value(value):
+def emtpy_value(value: str) -> bool:
     return value == '""'
 
 
-def fusion_po(src, target, lang, dry_run=False, overwrite=False):
+def fusion_po(
+    src: str,
+    target: str,
+    lang: str,
+    dry_run: bool = False,
+    overwrite: bool = False
+) -> None:
+
     src_parsed = parse_file(src, lang)
 
     new_blocks = []
     for block in blocks_from_file(target, lang):
-        ID, value = parse_entry(block)
-        new_val = src_parsed.get(ID)
+        comments, msgid, value = parse_entry(block)
+        new_val = src_parsed.get(msgid)
 
         if not new_val or emtpy_value(new_val):
             new_blocks.append(block)
             continue
 
         if emtpy_value(value) or overwrite:
-            new_blocks.append(f'msgid {ID}msgstr {new_val}')
+            new_blocks.append(f'{comments}msgid {msgid}msgstr {new_val}')
         else:
             new_blocks.append(block)
 
@@ -68,7 +78,12 @@ def fusion_po(src, target, lang, dry_run=False, overwrite=False):
 @click.argument('target')
 @click.option('--overwrite', is_flag=True, default=False)
 @click.option('--dry-run', is_flag=True, default=False)
-def apply_translations(source, target, overwrite, dry_run):
+def apply_translations(
+    source: str,
+    target: str,
+    overwrite: bool,
+    dry_run: bool
+) -> None:
     """
     Use the source and target names of onegov modules to transfer
     translations that appear in both.

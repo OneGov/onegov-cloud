@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from bleach.linkifier import LinkifyFilter
 from bleach.sanitizer import Cleaner
 from copy import deepcopy
+from contextlib import contextmanager
 from functools import partial
-from html5lib.filters.whitespace import Filter as whitespace_filter
+from html5lib.filters.whitespace import Filter as WhitespaceFilter
 from io import StringIO
 from lxml import etree
 from onegov.core.utils import module_path
@@ -20,6 +23,7 @@ from reportlab.lib.enums import TA_RIGHT
 from reportlab.lib.units import cm
 from reportlab.platypus import Frame
 from reportlab.platypus import Image
+from reportlab.platypus import KeepTogether
 from reportlab.platypus import ListFlowable
 from reportlab.platypus import NextPageTemplate
 from reportlab.platypus import PageTemplate
@@ -33,17 +37,15 @@ from uuid import uuid4
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath, SupportsRead
+    from bleach.callbacks import _HTMLAttrs
     from bleach.sanitizer import _Filter
-    from collections.abc import Iterable, MutableMapping, Sequence
-    from reportlab.lib.styles import ParagraphStyle
-    from reportlab.platypus.doctemplate import _PageCallback, BaseDocTemplate
+    from collections.abc import Iterable, Iterator, Sequence
+    from reportlab.lib.styles import PropertySet
+    from reportlab.platypus.doctemplate import _PageCallback
     from reportlab.platypus.tables import _TableCommand
-    from typing import TypeVar
-
-    _DocT = TypeVar('_DocT', bound=BaseDocTemplate, contravariant=True)
 
 
-TABLE_CELL_CHAR_LIMIT = 2000
+TABLE_CELL_CHAR_LIMIT = 4000
 
 
 class Pdf(PDFDocument):
@@ -52,6 +54,7 @@ class Pdf(PDFDocument):
     default_link_color = '#00538c'
     toc: TableOfContents | None
     toc_numbering: dict[int, int]
+    doc: Template
 
     def __init__(
         self,
@@ -62,6 +65,7 @@ class Pdf(PDFDocument):
         link_color: str | None = None,
         underline_links: bool = False,
         underline_width: float | str = 0.5,
+        skip_numbering: bool = False,
         **kwargs: Any
     ):
         link_color = link_color or self.default_link_color
@@ -72,8 +76,8 @@ class Pdf(PDFDocument):
 
         self.doc = Template(*args, **kwargs)
         self.doc.PDFDocument = self
-        self.doc.created = created
-        self.doc.logo = logo
+        self.doc.created = created  # type:ignore[attr-defined]
+        self.doc.logo = logo  # type:ignore[attr-defined]
 
         self.toc = None
         self.toc_numbering = {}
@@ -81,6 +85,8 @@ class Pdf(PDFDocument):
         self.link_color = link_color
         self.underline_links = underline_links
         self.underline_width = underline_width
+        # hierarchical numbering for headings
+        self.skip_numbering = skip_numbering
 
         # Use Source Sans 3 instead of Helvetica to support more special
         # characters; https://github.com/adobe-fonts/source-sans
@@ -95,8 +101,8 @@ class Pdf(PDFDocument):
 
     def init_a4_portrait(
         self,
-        page_fn: '_PageCallback' = empty_page_fn,
-        page_fn_later: '_PageCallback | None ' = None,
+        page_fn: _PageCallback = empty_page_fn,
+        page_fn_later: _PageCallback | None = None,
         *,
         font_size: int = 10,
         margin_left: float = 2.5 * cm,
@@ -235,10 +241,31 @@ class Pdf(PDFDocument):
             ('LINEBELOW', (0, 0), (-1, 0), 0.2, colors.black),
         )
 
+    @contextmanager
+    def keep_together(self) -> Iterator[None]:
+        """ Keeps anything added during the lifetime of this contextmanager
+        together.
+
+        Example::
+
+            pdf = Pdf(file, author='OneGov')
+            with pdf.keep_together():
+                pdf.h1('Title')
+                pdf.table([[...]])
+            pdf.generate()
+
+        """
+        complete_story, self.story = self.story, []
+        try:
+            yield
+        finally:
+            complete_story.append(KeepTogether(self.story))
+            self.story = complete_story
+
     def table_of_contents(self) -> None:
         """ Adds a table of contents.
 
-        The entries are added automatically when adding headers. Example:
+        The entries are added automatically when adding headers. Example::
 
             pdf = Pdf(file, author='OneGov', toc_levels=2)
             pdf.init_a4_portrait(page_fn=draw_header)
@@ -273,7 +300,7 @@ class Pdf(PDFDocument):
     def _add_toc_heading(
         self,
         text: str,
-        style: 'ParagraphStyle',
+        style: PropertySet,
         level: int
     ) -> None:
         """ Adds a heading with automatically adding an entry to the table of
@@ -289,12 +316,13 @@ class Pdf(PDFDocument):
             for idx in range(level + 1, max(self.toc_numbering.keys()) + 1):
                 self.toc_numbering[idx] = 0
 
-            # create and prepend the prefix
-            prefix = '.'.join([
-                str(self.toc_numbering.get(idx)) or ''
-                for idx in range(level + 1)
-            ])
-            text = f'{prefix} {text}'
+            if not self.skip_numbering:
+                # create and prepend the prefix
+                prefix = '.'.join(
+                    str(self.toc_numbering.get(idx)) or ''
+                    for idx in range(level + 1)
+                )
+                text = f'{prefix} {text}'
 
             # create a link
             bookmark = uuid4().hex
@@ -304,35 +332,35 @@ class Pdf(PDFDocument):
 
         # add the toc entry
         if self.toc is not None and level < self.toc_levels:
-            self.story[-1].toc_level = level
-            self.story[-1].bookmark = bookmark
+            self.story[-1].toc_level = level  # type:ignore[attr-defined]
+            self.story[-1].bookmark = bookmark  # type:ignore[attr-defined]
 
-    def h1(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h1(self, title: str, style: PropertySet | None = None) -> None:
         if title:
             style = style or self.style.heading1
             self._add_toc_heading(title, style, 0)
 
-    def h2(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h2(self, title: str, style: PropertySet | None = None) -> None:
         if title:
             style = style or self.style.heading2
             self._add_toc_heading(title, style, 1)
 
-    def h3(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h3(self, title: str, style: PropertySet | None = None) -> None:
         if title:
             style = style or self.style.heading3
             self._add_toc_heading(title, style, 2)
 
-    def h4(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h4(self, title: str, style: PropertySet | None = None) -> None:
         if title:
             style = style or self.style.heading4
             self._add_toc_heading(title, style, 3)
 
-    def h5(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h5(self, title: str, style: PropertySet | None = None) -> None:
         if title:
             style = style or self.style.heading5
             self._add_toc_heading(title, style, 4)
 
-    def h6(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h6(self, title: str, style: PropertySet | None = None) -> None:
         if title:
             style = style or self.style.heading6
             self._add_toc_heading(title, style, 5)
@@ -380,7 +408,7 @@ class Pdf(PDFDocument):
         self,
         # this may be too lax, but a short look at the source suggests
         # that read might be enough for this to work...
-        filelike: 'StrOrBytesPath | SupportsRead[bytes]',
+        filelike: StrOrBytesPath | SupportsRead[bytes],
         factor: float = 1.0
     ) -> None:
         """ Adds an image and fits it to the page. """
@@ -392,7 +420,7 @@ class Pdf(PDFDocument):
 
     def pdf(
         self,
-        filelike: 'StrOrBytesPath | SupportsRead[bytes]',
+        filelike: StrOrBytesPath | SupportsRead[bytes],
         factor: float = 1.0
     ) -> None:
         """ Adds a PDF and fits it to the page. """
@@ -407,21 +435,21 @@ class Pdf(PDFDocument):
 
             self.story.append(pdf)
 
-    @overload
+    @overload  # type:ignore[override]
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        data: Sequence[Sequence[str | Paragraph]],
+        columns: Literal['even'] | Sequence[float | None] | None,
+        style: TableStyle | Iterable[_TableCommand] | None = None,
         ratios: Literal[False] = False
     ) -> None: ...
 
     @overload
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: Literal["even"] | list[float] | None,
-        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        data: Sequence[Sequence[str | Paragraph]],
+        columns: Literal['even'] | list[float] | None,
+        style: TableStyle | Iterable[_TableCommand] | None = None,
         *,
         ratios: Literal[True]
     ) -> None: ...
@@ -429,26 +457,26 @@ class Pdf(PDFDocument):
     @overload
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: Literal["even"] | list[float] | None,
-        style: 'TableStyle | Iterable[_TableCommand] | None',
+        data: Sequence[Sequence[str | Paragraph]],
+        columns: Literal['even'] | list[float] | None,
+        style: TableStyle | Iterable[_TableCommand] | None,
         ratios: Literal[True]
     ) -> None: ...
 
     @overload
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        data: Sequence[Sequence[str | Paragraph]],
+        columns: Literal['even'] | Sequence[float | None] | None,
+        style: TableStyle | Iterable[_TableCommand] | None = None,
         ratios: bool = False
     ) -> None: ...
 
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        data: Sequence[Sequence[str | Paragraph]],
+        columns: Literal['even'] | Sequence[float | None] | None,
+        style: TableStyle | Iterable[_TableCommand] | None = None,
         ratios: bool = False
     ) -> None:
         """ Adds a table where every cell is wrapped in a paragraph so that
@@ -465,7 +493,10 @@ class Pdf(PDFDocument):
 
         if ratios and columns:
             total = sum(columns)  # type:ignore[arg-type]
-            columns = [self.doc.width * p / total for p in columns]
+            columns = [
+                self.doc.width * p / total  # type:ignore
+                for p in columns
+            ]
 
         tdata = [
             [
@@ -484,7 +515,7 @@ class Pdf(PDFDocument):
                 return value + 1
             return value
 
-        alignments = {
+        alignments: dict[str, Literal[0, 1, 2]] = {
             'CENTER': TA_CENTER,
             'LEFT': TA_LEFT,
             'RIGHT': TA_RIGHT,
@@ -507,7 +538,7 @@ class Pdf(PDFDocument):
     def figcaption(
         self,
         text: str,
-        style: 'ParagraphStyle | None' = None
+        style: PropertySet | None = None
     ) -> None:
         """ Adds a figure caption. """
 
@@ -527,13 +558,13 @@ class Pdf(PDFDocument):
         return prefix + text.strip() + postfix
 
     @staticmethod
-    def inner_html(element: 'etree._Element') -> str:
+    def inner_html(element: etree._Element) -> str:
         return '{}{}{}'.format(
             Pdf.strip(element.text or ''),
-            ''.join((
+            ''.join(
                 Pdf.strip(etree.tostring(child, encoding='unicode'))
                 for child in element
-            )),
+            ),
             Pdf.strip(element.tail or '')
         )
 
@@ -554,7 +585,7 @@ class Pdf(PDFDocument):
         # Remove unwanted markup
         tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
         attributes = {}
-        filters: list[_Filter] = [whitespace_filter]
+        filters: list[_Filter] = [WhitespaceFilter]
 
         if linkify:
             link_color = self.link_color
@@ -562,17 +593,19 @@ class Pdf(PDFDocument):
             underline_width = self.underline_width
 
             def colorize(
-                attrs: 'MutableMapping[tuple[str | None, str], str]',
+                attrs: _HTMLAttrs,
                 new: bool = False
-            ) -> 'MutableMapping[tuple[str | None, str], str] | None':
+            ) -> _HTMLAttrs:
                 # phone numbers appear here but are escaped, skip...
                 if not attrs.get((None, 'href')):
-                    return None
-                attrs[(None, u'color')] = link_color
+                    # FIXME: bleach stubs seem to be incorrect here
+                    #        but we may be able to just return attrs
+                    return None  # type:ignore[return-value]
+                attrs[(None, 'color')] = link_color
                 if underline_links:
-                    attrs[(None, u'underline')] = '1'
-                    attrs[('a', u'underlineColor')] = link_color
-                    attrs[('a', u'underlineWidth')] = underline_width
+                    attrs[(None, 'underline')] = '1'
+                    attrs[('a', 'underlineColor')] = link_color
+                    attrs[('a', 'underlineWidth')] = underline_width
                 return attrs
 
             tags.append('a')
@@ -596,10 +629,13 @@ class Pdf(PDFDocument):
         if body is None:
             return
 
+        if body.text and body.text.strip():
+            self.p(body.text, self.style.paragraph)
+
         for element in body:
             if element.tag == 'p':
                 self.p_markup(self.inner_html(element), self.style.paragraph)
-            elif element.tag in 'ol':
+            elif element.tag == 'ol':
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ol.leftIndent
                 items = [
@@ -638,3 +674,10 @@ class Pdf(PDFDocument):
                         )
                     )
                 )
+
+            # FIXME: Currently we test against exclusion of intermediary
+            #        non-paragraph nodes in the body, I'm not sure if this
+            #        was intentional, but for now we'll leave it like that
+            #        for backwards compatibility
+            # if element.tail and element.tail.strip():
+            #     self.p(element.tail, self.style.paragraph)

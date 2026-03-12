@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import tempfile
 import textwrap
 import pytest
@@ -7,7 +9,7 @@ from onegov.server.application import Application
 from onegov.server.config import Config, ApplicationConfig
 
 
-def test_static_application_config():
+def test_static_application_config() -> None:
     cfg = ApplicationConfig({
         'path': '/application/',
         'application': 'onegov.server.application.Application',
@@ -21,7 +23,7 @@ def test_static_application_config():
     assert cfg.is_static
 
 
-def test_wildcard_application_config():
+def test_wildcard_application_config() -> None:
     cfg = ApplicationConfig({
         'path': '/application/*',
         'application': 'onegov.server.application.Application',
@@ -38,7 +40,7 @@ def test_wildcard_application_config():
     assert not cfg.is_static
 
 
-def test_config_from_yaml():
+def test_config_from_yaml() -> None:
     yaml = textwrap.dedent("""
         applications:
           - path: /static
@@ -73,7 +75,7 @@ def test_config_from_yaml():
     assert config.applications[1].configuration == {'bar': 'foo'}
 
 
-def test_unique_namespace():
+def test_unique_namespace() -> None:
     with pytest.raises(errors.ApplicationConflictError):
         Config({
             'applications': [

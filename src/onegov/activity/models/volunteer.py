@@ -1,24 +1,23 @@
+from __future__ import annotations
+
+from datetime import date
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import UUID
-from sqlalchemy import Column, Text, Date, Enum, ForeignKey
-from sqlalchemy.orm import relationship
-from uuid import uuid4
+from sqlalchemy import Enum, ForeignKey
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 
-from typing import TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from datetime import date
     from onegov.activity.models import OccasionNeed
-    from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
-    VolunteerState: TypeAlias = Literal[
-        'open',
-        'contacted',
-        'confirmed',
-    ]
+VolunteerState: TypeAlias = Literal[
+    'open',
+    'contacted',
+    'confirmed',
+]
 
 
 class Volunteer(Base, ContentMixin, TimestampMixin):
@@ -30,66 +29,53 @@ class Volunteer(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'volunteers'
 
     #: The id of the record, may be used publicly
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The state of the volunteer
-    state: 'Column[VolunteerState]' = Column(
-        Enum(  # type:ignore[arg-type]
+    state: Mapped[VolunteerState] = mapped_column(
+        Enum(
             'open',
             'contacted',
             'confirmed',
             name='volunteer_state'
         ),
-        nullable=False,
         default='open'
     )
 
     #: The need the volunteer signed up for
-    need_id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('occasion_needs.id'),
-        nullable=False
-    )
-    need: 'relationship[OccasionNeed]' = relationship(
-        'OccasionNeed',
-        back_populates='volunteers'
-    )
+    need_id: Mapped[UUID] = mapped_column(ForeignKey('occasion_needs.id'))
+    need: Mapped[OccasionNeed] = relationship(back_populates='volunteers')
 
     #: A token linking multiple volunteer records (volunteers sign up for
     #: multiple needs at once, and are then multiplexed here)
-    token: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
-        nullable=False,
-        default=uuid4
-    )
+    token: Mapped[UUID] = mapped_column(default=uuid4)
 
     #: The first name of the volunteer
-    first_name: 'Column[str]' = Column(Text, nullable=False)
+    first_name: Mapped[str]
 
     #: The last name of the volunteer
-    last_name: 'Column[str]' = Column(Text, nullable=False)
+    last_name: Mapped[str]
 
     #: The address of the volunteer
-    address: 'Column[str]' = Column(Text, nullable=False)
+    address: Mapped[str]
 
     #: The zip code of the volunteer
-    zip_code: 'Column[str]' = Column(Text, nullable=False)
+    zip_code: Mapped[str]
 
     #: The place of the volunteer
-    place: 'Column[str]' = Column(Text, nullable=False)
+    place: Mapped[str]
 
     #: The organisation of the volunteer
-    organisation: 'Column[str | None]' = Column(Text, nullable=True)
+    organisation: Mapped[str | None]
 
     #: The birth_date of the volunteer
-    birth_date: 'Column[date]' = Column(Date, nullable=False)
+    birth_date: Mapped[date]
 
     #: The e-mail address of the volunteer
-    email: 'Column[str]' = Column(Text, nullable=False)
+    email: Mapped[str]
 
     #: The phone number of the volunteer
-    phone: 'Column[str]' = Column(Text, nullable=False)
+    phone: Mapped[str]

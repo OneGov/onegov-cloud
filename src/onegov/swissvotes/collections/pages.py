@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.collection import GenericCollection
 from onegov.core.orm.abstract import MoveDirection
 from onegov.swissvotes.app import get_i18n_used_locales
@@ -28,7 +30,7 @@ class TranslatablePageCollection(GenericCollection[TranslatablePage]):
             order=-1
         )
 
-    def query(self) -> 'Query[TranslatablePage]':
+    def query(self) -> Query[TranslatablePage]:
         return super().query().order_by(TranslatablePage.order)
 
     def add(self, **kwargs: Any) -> TranslatablePage:
@@ -66,7 +68,7 @@ class TranslatablePageCollection(GenericCollection[TranslatablePage]):
 
         siblings = target.siblings.all()
 
-        def new_order() -> 'Iterator[TranslatablePage]':
+        def new_order() -> Iterator[TranslatablePage]:
             for sibling in siblings:
                 if sibling == subject:
                     continue

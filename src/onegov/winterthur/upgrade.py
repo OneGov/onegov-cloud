@@ -2,13 +2,14 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
+from __future__ import annotations
 
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.org.models import Organisation
-from sqlalchemy import Column, Integer, Enum
-from onegov.core.orm.types import UTCDateTime
-
 from onegov.winterthur.models.mission_report import MISSION_TYPES
+from sqlalchemy import Column, Integer, Enum
 
 
 @upgrade_task('Change the default geo provider')
@@ -19,7 +20,7 @@ def change_default_geo_provider(context: UpgradeContext) -> bool | None:
     if org is None:
         return False
 
-    if "Strassenverzeichnis" not in org.meta['homepage_structure']:
+    if 'Strassenverzeichnis' not in org.meta['homepage_structure']:
         return False
 
     org.meta['geo_provider'] = 'geo-vermessungsamt-winterthur'
@@ -35,7 +36,7 @@ def add_mission_count_and_type_to_reports(context: UpgradeContext) -> None:
                 'mission_type',
                 Enum(*MISSION_TYPES, name='mission_type'),
                 default='single'),
-            default=lambda x: 'single'
+            default=lambda x: 'single'  # type: ignore
         )
 
     if not context.has_column('mission_reports', 'mission_count'):

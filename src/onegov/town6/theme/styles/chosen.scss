@@ -1,5 +1,6 @@
 // Todo: Make the chosen select fields look like the others
-.field-type-chosenselectfield .chosen-select {
+.field-type-chosenselectfield .chosen-select,
+.field-type-peoplefield .people-select {
     display: none !important;
 }
 
@@ -21,6 +22,7 @@
     font-family: $input-font-family !important;
     font-size: $input-font-size !important;
     height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1)) !important;
+    padding: ($form-spacing / 3) ($form-spacing / 2) !important;
 }
 
 .chosen-drop {

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org import OrgApp
 from onegov.core.redirect import Redirect
 

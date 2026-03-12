@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 ALLOWED_MIME_TYPES = {
     'application/excel',
@@ -10,8 +11,8 @@ ALLOWED_MIME_TYPES = {
     'text/csv'
 }
 ALLOWED_MIME_TYPES_XML = {
-    'application/xml',
-    'text/xml',
+    'application/xml',  # official, standard
+    'text/xml',  # deprecated MIME type for XML content
     'text/plain'
 }
 

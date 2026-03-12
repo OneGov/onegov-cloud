@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import groupbylist
 from onegov.election_day.models import Candidate
 from onegov.election_day.models import Election
@@ -34,14 +36,14 @@ if TYPE_CHECKING:
 
 
 def get_elected_candidates(
-    election_compound: 'ElectionCompound | ElectionCompoundPart',
-    session: 'Session'
-) -> 'Query[ElectedCandidateRow]':
+    election_compound: ElectionCompound | ElectionCompoundPart,
+    session: Session
+) -> Query[ElectedCandidateRow]:
     """ Returns the elected candidates of an election compound. """
 
     election_ids = [election.id for election in election_compound.elections]
 
-    elected = session.query(
+    elected: Query[ElectedCandidateRow] = session.query(  # type: ignore[assignment]
         Candidate.family_name,
         Candidate.first_name,
         Candidate.party,
@@ -66,19 +68,20 @@ def get_elected_candidates(
 
 
 def get_candidate_statistics(
-    election_compound: 'ElectionCompound | ElectionCompoundPart',
-    elected_candidates: 'Iterable[ElectedCandidateRow] | None' = None
-) -> dict[str, 'CandidateStatistics']:
+    election_compound: ElectionCompound | ElectionCompoundPart,
+    elected_candidates: Iterable[ElectedCandidateRow] | None = None
+) -> dict[str, CandidateStatistics]:
 
     if elected_candidates is None:
         session = object_session(election_compound)
+        assert session is not None
         elected_candidates = get_elected_candidates(election_compound, session)
 
     year = election_compound.date.year
 
     def statistics(
-        values: list[tuple['Gender', int | None]]
-    ) -> 'CandidateStatistics':
+        values: list[tuple[Gender, int | None]]
+    ) -> CandidateStatistics:
 
         birth_years = [
             birth_year

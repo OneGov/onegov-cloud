@@ -1,16 +1,13 @@
-from onegov.core.collection import GenericCollection
-from onegov.pas.models import ParliamentarianRole
+from __future__ import annotations
 
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Query
+from onegov.parliament.collections import ParliamentarianRoleCollection
+from onegov.pas.models import PASParliamentarianRole
 
 
-class ParliamentarianRoleCollection(GenericCollection[ParliamentarianRole]):
+class PASParliamentarianRoleCollection(
+    ParliamentarianRoleCollection[PASParliamentarianRole]
+):
 
     @property
-    def model_class(self) -> type[ParliamentarianRole]:
-        return ParliamentarianRole
-
-    def query(self) -> 'Query[ParliamentarianRole]':
-        return super().query()
+    def model_class(self) -> type[PASParliamentarianRole]:
+        return PASParliamentarianRole

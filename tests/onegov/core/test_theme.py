@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.framework import Framework
@@ -5,19 +7,27 @@ from onegov.core.theme import get_filename
 from webtest import TestApp as Client
 
 
-class MockTheme:
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.theme import Theme
+else:
+    Theme = object
 
-    def __init__(self, name, version, result=''):
-        self.name = name
+
+class MockTheme(Theme):
+
+    def __init__(self, name: str, version: str, result: str = '') -> None:
+        self.name = name  # type: ignore[misc]
         self.version = version
         self.result = result
-        self.default_options = {}
+        self.default_options: dict[str, Any] = {}
 
-    def compile(self, options):
-        return self.result.format(**options)
+    def compile(self, options: dict[str, Any] | None = None) -> str:
+        return self.result.format(**(options or self.default_options))
 
 
-def test_get_filename():
+def test_get_filename() -> None:
     theme = MockTheme('test', '1.0')
 
     assert get_filename(theme).endswith('.css')
@@ -29,7 +39,7 @@ def test_get_filename():
     assert get_filename(theme, {'x': 1}) != get_filename(theme, {'x': 2})
 
 
-def test_theme_application(temporary_directory, redis_url):
+def test_theme_application(temporary_directory: str, redis_url: str) -> None:
 
     class App(Framework):
         theme_options = {
@@ -41,11 +51,11 @@ def test_theme_application(temporary_directory, redis_url):
         pass
 
     @App.setting(section='core', name='theme')
-    def get_theme():
+    def get_theme() -> MockTheme:
         return MockTheme('test', '1.0', 'body {{ background: {color} }}')
 
     @App.view(model=Model)
-    def view_file(self, request):
+    def view_file(self: Model, request: CoreRequest) -> str:
         return request.theme_link
 
     import onegov.core

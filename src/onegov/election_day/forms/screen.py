@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from lxml.etree import XMLSyntaxError
 from onegov.core.widgets import transform_structure
 from onegov.election_day import _
@@ -211,7 +213,7 @@ class ScreenForm(Form):
         render_kw={'rows': 10},
     )
 
-    def get_widgets(self, type_: str) -> dict[str, 'ScreenWidget']:
+    def get_widgets(self, type_: str) -> dict[str, ScreenWidget]:
         registry = self.request.app.config.screen_widget_registry
         return registry.by_categories(ScreenType(type_).categories)
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict, Counter
 from onegov.activity import Activity, Attendee, Occasion, OccasionCollection
 from onegov.user import User
@@ -5,10 +7,9 @@ from onegov.user import User
 
 from typing import NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.activity.models import Period
+    from onegov.activity.models import BookingPeriod, BookingPeriodMeta
     from sqlalchemy.orm import Query, Session
-    from typing import TypedDict
-    from typing_extensions import Self
+    from typing import TypedDict, Self
     from uuid import UUID
 
     class ContactInfo(TypedDict):
@@ -19,7 +20,7 @@ if TYPE_CHECKING:
 
 class OccasionAttendee(NamedTuple):
     attendee: Attendee
-    info: 'ContactInfo'
+    info: ContactInfo
     group_code: str | None
 
 
@@ -27,8 +28,8 @@ class OccasionAttendeeCollection(OccasionCollection):
 
     def __init__(
         self,
-        session: 'Session',
-        period: 'Period',
+        session: Session,
+        period: BookingPeriod | BookingPeriodMeta,
         activity: Activity,
         username: str | None = None
     ) -> None:
@@ -38,18 +39,18 @@ class OccasionAttendeeCollection(OccasionCollection):
         self.activity = activity
 
     @property
-    def period_id(self) -> 'UUID':
+    def period_id(self) -> UUID:
         return self.period.id
 
     @property
     def activity_name(self) -> str:
         return self.activity.name
 
-    def for_period(self, period: 'Period') -> 'Self':
+    def for_period(self, period: BookingPeriod | BookingPeriodMeta) -> Self:
         return self.__class__(
             self.session, period, self.activity, self.username)
 
-    def query(self) -> 'Query[Occasion]':
+    def query(self) -> Query[Occasion]:
         q = super().query()
         q = q.join(Occasion.activity)
 

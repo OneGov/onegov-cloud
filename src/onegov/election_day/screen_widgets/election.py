@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.screen_widgets.generic import ChartWidget
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget
@@ -34,7 +36,7 @@ class ElectionCandidatesTableWidget(ModelBoundWidget['Election']):
     """
     usage = '<election-candidates-table class="" lists=","/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         session = layout.request.session
         candidates = get_candidates_results(model, session).all()
@@ -61,7 +63,7 @@ class ElectionCandidatesByEntityTableWidget(ModelBoundWidget['Election']):
     """
     usage = '<election-candidates-by-entity-table class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         candidates_by_entites = get_candidates_results_by_entity(
             model, sort_by_votes=True
@@ -89,7 +91,7 @@ class ElectionListsTableWidget(ModelBoundWidget['ProporzElection']):
     """
     usage = '<election-lists-table class="" names=","/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         lists = get_list_results(model).all()
         return {
@@ -115,7 +117,7 @@ class ElectionPartyStrengthsTableWidget(ModelBoundWidget['ProporzElection']):
     """
     usage = '<election-party-strengths-table year="" class=""/>'
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         model = self.model or layout.model
         party_years, parties = get_party_results(model)
         party_deltas, party_results = get_party_results_deltas(

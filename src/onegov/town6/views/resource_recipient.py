@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.org.views.resource_recipient import (
     view_resource_recipients, handle_new_resource_recipient,
@@ -24,8 +26,8 @@ if TYPE_CHECKING:
 )
 def town_view_resource_recipients(
     self: ResourceRecipientCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_resource_recipients(
         self, request, ResourceRecipientsLayout(self, request))
 
@@ -39,10 +41,10 @@ def town_view_resource_recipients(
 )
 def town_handle_new_resource_recipient(
     self: ResourceRecipientCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ResourceRecipientForm
-) -> 'RenderData | Response':
-    title = _("New Recipient")
+) -> RenderData | Response:
+    title = _('New Recipient')
     return handle_new_resource_recipient(
         self, request, form,
         ResourceRecipientsFormLayout(self, request, title)
@@ -58,10 +60,10 @@ def town_handle_new_resource_recipient(
 )
 def town_handle_edit_resource_recipient(
     self: ResourceRecipient,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ResourceRecipientForm
-) -> 'RenderData | Response':
-    title = _("Edit Recipient")
+) -> RenderData | Response:
+    title = _('Edit Recipient')
     return handle_edit_resource_recipient(
         self, request, form,
         ResourceRecipientsFormLayout(self, request, title)

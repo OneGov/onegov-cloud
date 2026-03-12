@@ -1,11 +1,19 @@
-from datetime import timedelta
+from __future__ import annotations
 
 import pytest
-from pytz import UTC
-from sedate import utcnow, to_timezone
 
+from datetime import timedelta
 from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+from pytz import UTC
+from sedate import utcnow, to_timezone
+from sqlalchemy import text
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.models.directory import ExtendedDirectory
+    from sqlalchemy.orm import Session
 
 
 @pytest.mark.parametrize('start_offset,end_offset,is_published', [
@@ -16,7 +24,11 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
     (None, timedelta(minutes=-40), False),
 ])
 def test_extended_directory_entry_collection(
-        session, start_offset, end_offset, is_published):
+    session: Session,
+    start_offset: timedelta | None,
+    end_offset: timedelta | None,
+    is_published: bool
+) -> None:
     """
     Test hybrid_properties and postgres setup at the same time
     """
@@ -26,6 +38,7 @@ def test_extended_directory_entry_collection(
     start = now + start_offset if start_offset else None
     end = now + end_offset if end_offset else None
 
+    directories: DirectoryCollection[ExtendedDirectory]
     directories = DirectoryCollection(session, type='extended')
     directory = directories.add(
         title="Sample",
@@ -51,6 +64,7 @@ def test_extended_directory_entry_collection(
     assert collection.query().count() == 1
     collection.published_only = True
     if end_offset:
+        assert entry.publication_end is not None
         # why on earth are CET values returned?
         assert entry.publication_end.tzinfo == UTC
 
@@ -61,5 +75,5 @@ def test_extended_directory_entry_collection(
     assert entry.published == is_published
 
     # Test the hybrid_property expressions on class per query
-    session.execute("SET TIME ZONE 'GMT';")
+    session.execute(text("SET TIME ZONE 'GMT';"))
     assert collection.query().count() == (1 if is_published else 0)

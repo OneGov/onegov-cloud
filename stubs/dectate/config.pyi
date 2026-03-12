@@ -1,15 +1,13 @@
 import abc
-from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterable, Iterator
 from types import FrameType, TracebackType
 from typing import Any, ClassVar, TypeVar
-from typing_extensions import ParamSpec
 
 from .app import App, Config
 from .sentinel import Sentinel
 
 _T = TypeVar('_T')
 _F = TypeVar('_F', bound=Callable[..., Any])
-_P = ParamSpec('_P')
 
 order_count: int
 
@@ -81,8 +79,7 @@ class Directive:
     args: tuple[Any, ...]
     kw: dict[str, Any]
     argument_info: tuple[tuple[Any, ...], dict[str, Any]]
-    # FIXME: ParamSpec might be too strict for optional parameters
-    def __init__(self, action_factory: Callable[_P, Action], code_info: CodeInfo, app_class: type[App], args: _P.args, kw: _P.kwargs) -> None: ...
+    def __init__(self, action_factory: Callable[..., Action], code_info: CodeInfo, app_class: type[App], args: tuple[Any, ...], kw: dict[str, Any]) -> None: ...
     @property
     def directive_name(self) -> str: ...
     def action(self) -> Action: ...

@@ -1,0 +1,75 @@
+#
+# French translations for OneGov Cloud package
+# Copyright (C) 2025 Seantis GmbH
+# This file is distributed under the same license as the OneGov Cloud package.
+# David Salvisberg <david@seantis-dave>, 2025.
+msgid ""
+msgstr ""
+"Project-Id-Version: OneGov Cloud 1.0\n"
+"POT-Creation-Date: 2025-08-14 07:32+0200\n"
+"PO-Revision-Date: 2025-07-15 16:51+0200\n"
+"Last-Translator: David Salvisberg <david@seantis-dave>\n"
+"Language-Team: French <traduc@traduc.org>\n"
+"Language: fr_CH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "normal"
+msgstr "normal"
+
+msgid "intercantonal"
+msgstr "intercantonal"
+
+msgid "official mission"
+msgstr "mission officielle"
+
+msgid "Guest"
+msgstr "Invité"
+
+msgid "Member"
+msgstr "Membres"
+
+msgid "Extended Member"
+msgstr "Membre élargi"
+
+msgid "President"
+msgstr "Président/e"
+
+msgid "male"
+msgstr "homme"
+
+msgid "female"
+msgstr "femelle"
+
+msgid "A mail"
+msgstr "Courrier A"
+
+msgid "A mail plus"
+msgstr "Courrier A Plus"
+
+msgid "registered"
+msgstr "Recommandé"
+
+msgid "confidential"
+msgstr "confidentiel"
+
+msgid "personal / confidential"
+msgstr "personnel / confidentiel"
+
+msgid "none"
+msgstr "aucun"
+
+msgid "Vote counter"
+msgstr "Scrutateur/e"
+
+msgid "Vice president"
+msgstr "Vice-président/e"
+
+msgid "Media Manager"
+msgstr "Directeur des médias et des campagnes"
+
+msgid "President of the parliamentary group"
+msgstr "Président/e du groupe parlementaire"

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import OccasionNeed
 from onegov.activity.types import BoundedIntegerRange
 from onegov.feriennet import _
@@ -12,18 +14,18 @@ from wtforms.validators import InputRequired, NumberRange, ValidationError
 class OccasionNeedForm(Form):
 
     name = StringField(
-        label=_("Name"),
-        description=_("Chaperones, Cars, Meals"),
+        label=_('Name'),
+        description=_('Chaperones, Cars, Meals'),
         validators=[InputRequired()]
     )
 
     description = TextAreaField(
-        label=_("Description"),
+        label=_('Description'),
         render_kw={'rows': 6}
     )
 
     min_number = IntegerField(
-        label=_("Need at least"),
+        label=_('Need at least'),
         validators=[
             InputRequired(),
             NumberRange(0, 10000)
@@ -31,7 +33,7 @@ class OccasionNeedForm(Form):
     )
 
     max_number = IntegerField(
-        label=_("Need up to"),
+        label=_('Need up to'),
         validators=[
             InputRequired(),
             NumberRange(0, 10000)
@@ -39,9 +41,9 @@ class OccasionNeedForm(Form):
     )
 
     accept_signups = BooleanField(
-        label=_("Accept signups by volunteers"),
+        label=_('Accept signups by volunteers'),
         description=_(
-            "Only relevant if the experimental volunteer feature is used"
+            'Only relevant if the experimental volunteer feature is used'
         )
     )
 
@@ -69,7 +71,7 @@ class OccasionNeedForm(Form):
         if lower > upper:
             assert isinstance(self.min_number.errors, list)
             self.min_number.errors.append(_(
-                "Minimum is larger than maximum"
+                'Minimum is larger than maximum'
             ))
             return False
         return True
@@ -87,7 +89,7 @@ class OccasionNeedForm(Form):
 
         if self.request.session.query(exists).scalar():
             raise ValidationError(
-                _("This name has already been used for this occasion")
+                _('This name has already been used for this occasion')
             )
 
     def populate_obj(self, model: OccasionNeed) -> None:  # type:ignore

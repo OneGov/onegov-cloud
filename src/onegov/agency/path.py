@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency.app import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
@@ -7,16 +9,20 @@ from onegov.agency.models import AgencyMove
 from onegov.agency.models import AgencyMutation
 from onegov.agency.models import AgencyProxy
 from onegov.agency.models import PersonMutation
+from onegov.core.converters import LiteralConverter
 from onegov.core.orm.abstract import MoveDirection
 from onegov.people import Agency
 from onegov.people import AgencyMembership
 from onegov.people import AgencyMembershipCollection
+from onegov.ticket import TicketCollection
+from onegov.ticket.collection import ArchivedTicketCollection
 from uuid import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.agency.models import ExtendedAgency
+    from onegov.ticket.collection import ExtendedTicketState
 
 
 @AgencyApp.path(
@@ -52,7 +58,7 @@ def get_agencies(
     path='/organization',
     absorb=True
 )
-def get_agency(app: AgencyApp, absorb: str) -> 'ExtendedAgency | None':
+def get_agency(app: AgencyApp, absorb: str) -> ExtendedAgency | None:
     collection = ExtendedAgencyCollection(app.session())
     return collection.by_path(absorb)
 
@@ -62,7 +68,7 @@ def get_agency(app: AgencyApp, absorb: str) -> 'ExtendedAgency | None':
     path='/agency/{id}',
     converters={'id': int}
 )
-def get_agency_proxy(app: AgencyApp, id: int) -> 'ExtendedAgency | None':
+def get_agency_proxy(app: AgencyApp, id: int) -> ExtendedAgency | None:
     return ExtendedAgencyCollection(app.session()).by_id(id)
 
 
@@ -163,3 +169,77 @@ def get_person_mutation(
     ticket_id: UUID
 ) -> PersonMutation:
     return PersonMutation(app.session(), target_id, ticket_id)
+
+
+@AgencyApp.path(
+    model=TicketCollection,
+    path='/tickets/{handler}/{state}',
+    converters={'page': int, 'state': LiteralConverter(
+        'open',
+        'pending',
+        'closed',
+        'archived',
+        'all',
+        'unfinished'
+    )}
+)
+def get_tickets(
+    app: AgencyApp,
+    handler: str = 'ALL',
+    state: ExtendedTicketState | None = 'open',
+    page: int = 0,
+    group: str | None = None,
+    owner: str | None = None,
+    submitter: str | None = None,
+    q: str | None = None,
+    extra_parameters: dict[str, str] | None = None
+) -> TicketCollection | None:
+
+    if state is None:
+        return None
+
+    # NOTE: agency has its own ticket filterting that's different
+    #       from org's, eventually we probably want to implement this
+    #       logic into the query as well
+    return TicketCollection(
+        app.session(),
+        handler=handler,
+        state=state,
+        page=page,
+        group=group,
+        owner=owner or '*',
+        submitter=submitter or '*',
+        term=q,
+        extra_parameters=extra_parameters,
+    )
+
+
+@AgencyApp.path(
+    model=ArchivedTicketCollection,
+    path='/tickets-archive/{handler}',
+    converters={'page': int}
+)
+def get_archived_tickets(
+    app: AgencyApp,
+    handler: str = 'ALL',
+    page: int = 0,
+    group: str | None = None,
+    owner: str | None = None,
+    submitter: str | None = None,
+    q: str | None = None,
+    extra_parameters: dict[str, str] | None = None
+) -> ArchivedTicketCollection:
+    # NOTE: agency has its own ticket filterting that's different
+    #       from org's, eventually we probably want to implement this
+    #       logic into the query as well
+    return ArchivedTicketCollection(
+        app.session(),
+        handler=handler,
+        state='archived',
+        page=page,
+        group=group,
+        owner=owner or '*',
+        submitter=submitter or '*',
+        term=q,
+        extra_parameters=extra_parameters,
+    )

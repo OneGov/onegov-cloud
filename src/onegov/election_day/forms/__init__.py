@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.forms.archive import ArchiveSearchFormElection
 from onegov.election_day.forms.archive import ArchiveSearchFormVote
 from onegov.election_day.forms.common import ClearResultsForm
@@ -33,7 +35,6 @@ __all__ = (
     'ElectionCompoundForm',
     'ElectionForm',
     'EmailSubscriptionForm',
-    'EmptyForm',
     'EmptyForm',
     'ScreenForm',
     'SmsSubscriptionForm',

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.activity import OccasionNeed, Volunteer
 from onegov.feriennet import FeriennetApp, _
@@ -18,17 +20,17 @@ if TYPE_CHECKING:
     permission=Private)
 def view_occasion_attendees(
     self: OccasionAttendeeCollection,
-    request: 'FeriennetRequest'
-) -> 'RenderData':
+    request: FeriennetRequest
+) -> RenderData:
 
-    def occasion_volunteers(occasion: 'Occasion') -> tuple[Volunteer, ...]:
+    def occasion_volunteers(occasion: Occasion) -> tuple[Volunteer, ...]:
         return tuple(request.session.query(Volunteer).join(OccasionNeed).
                      filter(OccasionNeed.occasion_id == occasion.id).
                      filter(Volunteer.state == 'confirmed').
                      order_by(Volunteer.first_name, Volunteer.last_name))
     return {
         'layout': OccasionAttendeeLayout(self, request),
-        'title': _("Attendees for ${period}", mapping={
+        'title': _('Attendees for ${period}', mapping={
             'period': self.period.title
         }),
         'occasions': self.occasions(),

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
@@ -17,12 +19,12 @@ if TYPE_CHECKING:
 
 class VoteLayout(DetailLayout):
 
-    model: 'Vote'
+    model: Vote
 
     def __init__(
         self,
-        model: 'Vote',
-        request: 'ElectionDayRequest',
+        model: Vote,
+        request: ElectionDayRequest,
         tab: str = 'entities'
     ) -> None:
         super().__init__(model, request)
@@ -70,15 +72,15 @@ class VoteLayout(DetailLayout):
         if tab == 'districts':
             return self.app.principal.label('districts')
         if tab == 'statistics':
-            return _("Statistics")
+            return _('Statistics')
         if tab.startswith('proposal'):
-            return _("Proposal")
+            return _('Proposal')
         if tab.startswith('counter-proposal'):
-            return self.label("Counter Proposal")
+            return self.label('Counter Proposal')
         if tab.startswith('tie-breaker'):
-            return _("Tie-Breaker")
+            return _('Tie-Breaker')
         if tab == 'data':
-            return _("Downloads")
+            return _('Downloads')
 
         return ''
 
@@ -90,7 +92,7 @@ class VoteLayout(DetailLayout):
         if tab.endswith('-districts'):
             return self.app.principal.label('districts')
         if tab.endswith('-statistics'):
-            return _("Statistics")
+            return _('Statistics')
 
         return ''
 
@@ -188,7 +190,7 @@ class VoteLayout(DetailLayout):
         return None
 
     @cached_property
-    def ballot(self) -> 'Ballot':
+    def ballot(self) -> Ballot:
         if self.type == 'complex' and 'counter' in self.tab:
             return self.model.counter_proposal  # type:ignore[attr-defined]
         if self.type == 'complex' and 'tie-breaker' in self.tab:
@@ -275,14 +277,14 @@ class VoteLayout(DetailLayout):
         return self.model.direct
 
     @cached_property
-    def menu(self) -> 'NestedMenu':
+    def menu(self) -> NestedMenu:
         if self.type == 'complex':
             result: NestedMenu = []
 
             for title, prefix in (
-                (_("Proposal"), 'proposal'),
-                (self.label("Counter Proposal"), 'counter-proposal'),
-                (_("Tie-Breaker"), 'tie-breaker')
+                (_('Proposal'), 'proposal'),
+                (self.label('Counter Proposal'), 'counter-proposal'),
+                (_('Tie-Breaker'), 'tie-breaker')
             ):
                 submenu: NestedMenu = [
                     (

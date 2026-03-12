@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.hidden_by_principal import \
@@ -18,11 +20,11 @@ if TYPE_CHECKING:
 
 
 def candidate_options(
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     election: Election
 ) -> list[tuple[str, str]]:
 
-    elected = request.translate(_("Elected")).lower()
+    elected = request.translate(_('Elected')).lower()
     completed = election.completed
 
     def ordering(candidate: Candidate) -> tuple[str, str]:
@@ -58,8 +60,8 @@ def candidate_options(
 )
 def view_candidate_by_district(
     self: Candidate,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" View the candidate by district as JSON. """
 
     return self.percentage_by_district  # type:ignore[return-value]
@@ -73,8 +75,8 @@ def view_candidate_by_district(
 )
 def view_election_candidate_by_district(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the candidate as heatmap by district. """
 
     layout = ElectionLayout(self, request, 'candidate-by-district')
@@ -114,12 +116,12 @@ def view_election_candidate_by_district(
 )
 def view_election_candidate_by_district_chart(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" Embed the heatmap. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     options = candidate_options(request, self)

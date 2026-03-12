@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import load_csv
@@ -36,10 +38,10 @@ ELECTION_PARTY_HEADERS = (
 
 
 def parse_domain(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
-    election: 'ProporzElection | ElectionCompound',
-    principal: 'Canton | Municipality',
+    election: ProporzElection | ElectionCompound,
+    principal: Canton | Municipality,
     election_year: int
 ) -> tuple[bool, str | None, str | None]:
     """ Parse domain and domain segment. Also indicate, if line should be
@@ -62,7 +64,7 @@ def parse_domain(
             if domain_segment not in principal.get_superregions(election_year):
                 errors.append(
                     _(
-                        "Invalid domain_segment: ${domain_segment}",
+                        'Invalid domain_segment: ${domain_segment}',
                         mapping={'domain_segment': domain_segment}
                     )
                 )
@@ -81,13 +83,13 @@ def parse_domain(
 
 
 def parse_party_result(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     party_results: dict[str, PartyResult],
     totals: dict[int, dict[tuple[str | None, str | None], int | None]],
     parties: set[str],
     election_year: int,
-    locales: 'Collection[str]',
+    locales: Collection[str],
     default_locale: str,
     colors: dict[str, str],
     domain: str | None,
@@ -136,7 +138,7 @@ def parse_party_result(
     except ValueError as e:
         errors.append(e.args[0])
     except AssertionError:
-        errors.append(_("Invalid values"))
+        errors.append(_('Invalid values'))
     else:
         key = f'{domain}/{domain_segment}/{year}/{party_id}'
         totals[year][totals_key] = total_votes
@@ -144,7 +146,7 @@ def parse_party_result(
             parties.add(party_id)
 
         if key in party_results:
-            errors.append(_("${name} was found twice", mapping={'name': key}))
+            errors.append(_('${name} was found twice', mapping={'name': key}))
         else:
             party_results[key] = PartyResult(
                 id=uuid4(),
@@ -164,7 +166,7 @@ def parse_party_result(
                     colors[name] = color
 
 
-def parse_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
+def parse_panachage_headers(csv: DefaultCSVFile) -> dict[str, str]:
     headers = {}
     for header in csv.headers:
         if not header.startswith('panachage_votes_from_'):
@@ -176,7 +178,7 @@ def parse_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
 
 
 def parse_panachage_results(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     results: dict[str, dict[str, int]],
     headers: dict[str, str],
@@ -198,11 +200,11 @@ def parse_panachage_results(
 
 
 def import_party_results_internal(
-    election: 'ProporzElection | ElectionCompound',
-    principal: 'Canton | Municipality',
+    election: ProporzElection | ElectionCompound,
+    principal: Canton | Municipality,
     file: IO[bytes],
     mimetype: str,
-    locales: 'Collection[str]',
+    locales: Collection[str],
     default_locale: str
 ) -> list[FileImportError]:
     """ Tries to import the given file.
@@ -266,16 +268,16 @@ def import_party_results_internal(
     if not parties:
         errors.append(FileImportError(
             _(
-                "No party results for year ${year}",
+                'No party results for year ${year}',
                 mapping={'year': election.date.year}
             )
         ))
 
     if panachage_headers and parties:
         for list_id in panachage_headers.values():
-            if not list_id == '999' and list_id not in parties:
+            if list_id != '999' and list_id not in parties:
                 errors.append(FileImportError(
-                    _("Panachage results ids and id not consistent"))
+                    _('Panachage results ids and id not consistent'))
                 )
                 break
 

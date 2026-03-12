@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity.matching.score import PreferAdminChildren
 from onegov.activity.matching.score import PreferOrganiserChildren
 from onegov.activity.matching.score import PreferGroups
@@ -15,31 +17,31 @@ if TYPE_CHECKING:
 class MatchForm(Form):
 
     prefer_organiser = BooleanField(
-        label=_("Children of organisers"),
-        fieldset=_("Prefer the following children:"),
+        label=_('Children of organisers'),
+        fieldset=_('Prefer the following children:'),
         default=False)
 
     prefer_admins = BooleanField(
-        label=_("Children of administrators"),
-        fieldset=_("Prefer the following children:"),
+        label=_('Children of administrators'),
+        fieldset=_('Prefer the following children:'),
         default=False)
 
     confirm = RadioField(
-        label=_("Confirm matching:"),
+        label=_('Confirm matching:'),
         default='no',
         choices=[
-            ('no', _("No, preview only")),
-            ('yes', _("Yes, confirm matching"))
+            ('no', _('No, preview only')),
+            ('yes', _('Yes, confirm matching'))
         ]
     )
 
     sure = BooleanField(
-        label=_("I know the wishlist-phase ends as a result."),
+        label=_('I know the wishlist-phase ends as a result.'),
         default=False,
         depends_on=('confirm', 'yes')
     )
 
-    def scoring(self, session: 'Session') -> Scoring:
+    def scoring(self, session: Session) -> Scoring:
         scoring = Scoring()
 
         # always prefer groups

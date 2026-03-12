@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from itertools import groupby
 from unidecode import unidecode
@@ -14,7 +16,7 @@ _T = TypeVar('_T')
 
 class AtoZ(Generic[_T]):
 
-    def __init__(self, request: 'OrgRequest') -> None:
+    def __init__(self, request: OrgRequest) -> None:
         self.request = request
 
     def sortkey(self, item: _T) -> str:
@@ -33,5 +35,5 @@ class AtoZ(Generic[_T]):
     def get_title(self, item: _T) -> str:
         raise NotImplementedError
 
-    def get_items(self) -> 'Sequence[_T]':
+    def get_items(self) -> Sequence[_T]:
         raise NotImplementedError

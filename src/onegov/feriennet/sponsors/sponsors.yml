@@ -19,13 +19,13 @@
 
 - name: CONCORDIA
   logo_url:
-    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=logo-fnlogo-2023-0-projuventute-de'
-    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=logo-fnlogo-2023-0-projuventute-fr'
-    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=logo-fnlogo-2023-0-projuventute-it'
+      de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-de'
+      fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-fr'
+      it: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-it'
   mail_url:
-    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-fnbannmails-2023-0-projuventute-de'
-    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fnbannmails-2023-0-projuventute-fr'
-    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-fnbannmails-2023-0-projuventute-it'
+      de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-de'
+      fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-fr'
+      it: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-it'
   logo: sponsors/CON_Logo_RGB_pos.jpg
   background: '#fff'
   banners:
@@ -33,10 +33,14 @@
       de: sponsors/concordia-banner-de.jpg
       fr: sponsors/concordia-banner-fr.jpg
       it: sponsors/concordia-banner-it.jpg
+    narrow:
+      de: sponsors/concordia-banner-narrow-de.jpg
+      fr: sponsors/concordia-banner-narrow-fr.jpg
+      it: sponsors/concordia-banner-narrow-it.jpg
     url:
-      de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-fnangebotue-2023-0-projuventute-de'
-      fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fnangebotue-2023-0-projuventute-fr'
-      it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-fnangebotue-2023-0-projuventute-it'
+      de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-de'
+      fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-fr'
+      it: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-it'
     info:
       de: 'Partner von Pro Juventute'
       fr: 'Partenaire Pro Juventute'
@@ -48,7 +52,7 @@
 - name: ProJuventute
   banners:
     src:
-      de: sponsors/V2_Werbebanner_Feriennet_2022_670x210_150_DPI.jpg
+      de: sponsors/1_Werbebanner_Feriennet_2025_605x605.jpg
       fr:
       it:
     url:
@@ -58,17 +62,7 @@
 - name: ProJuventute
   banners:
     src:
-      de: sponsors/V2_Werbebanner_Feriennet_2022_670x210_150_DPI3.jpg
-      fr:
-      it:
-    url:
-      de: 'https://www.projuventute.ch/de/eltern/schule-ausbildung/freizeitaktivitaeten-ideen?utm_source=Feriennet&utm_medium=Banner&utm_campaign=Freizeit'
-      fr:
-      it:
-- name: ProJuventute
-  banners:
-    src:
-      de: sponsors/V2_Werbebanner_Feriennet_2022_670x210_150_DPI3.jpg
+      de: sponsors/3_Werbebanner_Feriennet_2025_605x605.jpg
       fr:
       it:
     url:
@@ -78,9 +72,9 @@
 - name: ProJuventute
   banners:
     src:
-      de: sponsors/E-Banner_Informationen_NL-Anmeldung_Eltern_DE.png
-      fr: sponsors/E-Banner_Informationen_NL-Anmeldung_Eltern_FR.png
-      it: sponsors/E-Banner_Informationen_NL-Anmeldung_Eltern_IT.png
+      de: sponsors/DT_2_Werbebanner_Feriennet_2025_605x605.jpg
+      fr: sponsors/FR_2_Werbebanner_Feriennet_2025_605x605.jpg
+      it: sponsors/IT_2_Werbebanner_Feriennet_2025_605x605.jpg
     url:
       de: 'https://cloud.go.projuventute.ch/newsletter?qs=6a6a5aa7efcc3be57a1b3021cf8515b2a3231fe3c5c881c4e639c7d18417bc82f9e50d5a81ef05aa9f83366e24940a5e7742188dd5e3f8e8297a461c840ceaa101da529ecda82f44b0a63f7aaa789d18&topic=eltern-newsletter&language=de&origin=e-banner-enl-anmeldung-ferienplausch'
       fr: 'https://cloud.go.projuventute.ch/newsletter?qs=6a6a5aa7efcc3be57a1b3021cf8515b2a3231fe3c5c881c4e639c7d18417bc82f9e50d5a81ef05aa9f83366e24940a5e7742188dd5e3f8e8297a461c840ceaa101da529ecda82f44b0a63f7aaa789d18&topic=eltern-newsletter&language=fr&origin=e-banner-enl-anmeldung-ferienplausch'

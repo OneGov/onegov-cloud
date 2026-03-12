@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from datetime import date
+
 from depot.io.utils import FileIntent
 from functools import cached_property
 from io import BytesIO
@@ -11,12 +14,11 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import PanelField
 from onegov.form.fields import TagsField
 from onegov.form.fields import UploadField
-from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import FileSizeLimit, MIME_TYPES_PDF
 from onegov.form.validators import Stdnum
 from onegov.form.validators import StrictOptional
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.validators import ValidSwissSocialSecurityNumber
-from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.translator_directory import _
 from onegov.translator_directory.collections.language import LanguageCollection
@@ -41,6 +43,10 @@ from wtforms.validators import ValidationError
 
 
 from typing import Any, TYPE_CHECKING
+
+from onegov.translator_directory.utils import (nationality_choices,
+                                               get_custom_text)
+
 if TYPE_CHECKING:
     from onegov.translator_directory.models.language import Language
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -49,7 +55,7 @@ if TYPE_CHECKING:
 
 class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 
     callout = _(
         'Make sure you have all information and scans of the required '
@@ -87,9 +93,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         validators=[InputRequired()],
     )
 
-    nationality = StringField(
-        label=_('Nationality'),
+    nationalities = ChosenSelectMultipleField(
+        label=_('Nationality(ies)'),
         fieldset=_('Personal Information'),
+        choices=[],  # will be set in on_request
         validators=[InputRequired()],
     )
 
@@ -153,7 +160,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
-        validators=[ValidSwissSocialSecurityNumber()],
+        validators=[ValidSwissSocialSecurityNumber(), Optional()],
         fieldset=_('Identification / Bank details'),
     )
 
@@ -211,7 +218,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     tel_mobile = StringField(
         label=_('Mobile Number'),
-        validators=[ValidPhoneNumber()],
+        validators=[ValidPhoneNumber(), InputRequired()],
         fieldset=_('Contact'),
     )
 
@@ -226,10 +233,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     )
 
     confirm_name_reveal = BooleanField(
-        label=_(
-            'Do you agree to the disclosure of your name to other persons '
-            'and authorities within and outside the Canton of Zug?'
-        ),
+        label='',  # will be set in on_request
         fieldset=_('Legal')
     )
 
@@ -329,34 +333,21 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     )
 
     admission_course_agreement = BooleanField(
-        label=_(
-            "I agree to attend the admission course of the high court of the "
-            "Canton of Zürich at my own expense CHF 1'100.00."
-        ),
+        label='',  # will be set in on_request
         fieldset=_('Admission course'),
         default=False,
         depends_on=('admission_course_completed', '!y'),
     )
 
     admission_hint = PanelField(
-        text=_(
-            'If a German C2 certificate is required, an additional CHF '
-            '100.00 will be charged. The admission course is a basic '
-            'requirement for an application. Administration is carried out by '
-            'the Translation Coordination Office of the Zug authorities and '
-            'courts.'
-        ),
+        text='',  # will be set in on_request
         kind='',
         fieldset=_('Admission course'),
         depends_on=('admission_course_completed', '!y'),
     )
 
     documents_hint = PanelField(
-        text=_(
-            'In order for your application for inclusion in the directory to '
-            'be processed, a complete application must be submitted. '
-            'This includes the following documents:'
-        ),
+        text='',  # will be set in on_request
         kind='',
         fieldset=_('Documents')
     )
@@ -364,10 +355,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     declaration_of_authorization = UploadField(
         label=_('Signed declaration of authorization (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
@@ -375,10 +366,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     letter_of_motivation = UploadField(
         label=_('Short letter of motivation (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
@@ -386,10 +377,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     resume = UploadField(
         label=_('Resume (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
@@ -401,10 +392,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             'level C2 are mandatory for non-native speakers.'
         ),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
@@ -412,10 +403,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     social_security_card = UploadField(
         label=_('Social security card (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
@@ -423,10 +414,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     passport = UploadField(
         label=_('Identity card, passport or foreigner identity card (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
@@ -434,10 +425,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     passport_photo = UploadField(
         label=_('Current passport photo (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
@@ -446,10 +437,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         label=_('Current extract from the debt collection register (PDF)'),
         description=_('Maximum 6 months since issue.'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
@@ -461,10 +452,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             'www.strafregister.admin.ch'
         ),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
@@ -473,10 +464,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         label=_('Certificate of Capability (PDF)'),
         description=_('Available from the municipal or city administration.'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
@@ -487,10 +478,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             'self-employment'
         ),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        allowed_mimetypes=MIME_TYPES_PDF,
         render_kw={'resend_upload': True},
         depends_on=('self_employed', 'y'),
         fieldset=_('Documents')
@@ -533,31 +524,15 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 _('Please confirm the correctness of the above data.')
             )
 
-    def ensure_at_least_on_phone_number(self) -> bool:
-        if not (
-            self.tel_private.data
-            or self.tel_office.data
-            or self.tel_mobile.data
-        ):
-            error = _('Please provide at least one phone number.')
-            assert isinstance(self.tel_private.errors, list)
-            assert isinstance(self.tel_office.errors, list)
-            assert isinstance(self.tel_mobile.errors, list)
-            self.tel_private.errors.append(error)
-            self.tel_office.errors.append(error)
-            self.tel_mobile.errors.append(error)
-            return False
-        return True
-
     @cached_property
-    def gender_choices(self) -> list['_Choice']:
+    def gender_choices(self) -> list[_Choice]:
         return [
             (id_, self.request.translate(choice))
             for id_, choice in GENDERS.items()
         ]
 
     @cached_property
-    def language_choices(self) -> list['_Choice']:
+    def language_choices(self) -> list[_Choice]:
         languages = LanguageCollection(self.request.session)
         return [
             (str(language.id), language.name)
@@ -565,21 +540,21 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         ]
 
     @cached_property
-    def expertise_professional_guilds_choices(self) -> list['_Choice']:
+    def expertise_professional_guilds_choices(self) -> list[_Choice]:
         return [
             (id_, self.request.translate(choice))
             for id_, choice in PROFESSIONAL_GUILDS.items()
         ]
 
     @cached_property
-    def expertise_interpreting_types_choices(self) -> list['_Choice']:
+    def expertise_interpreting_types_choices(self) -> list[_Choice]:
         return [
             (id_, self.request.translate(choice))
             for id_, choice in INTERPRETING_TYPES.items()
         ]
 
     @property
-    def mother_tongues(self) -> list['Language']:
+    def mother_tongues(self) -> list[Language]:
         if not self.mother_tongues_ids.data:
             return []
 
@@ -587,7 +562,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         return languages.by_ids(self.mother_tongues_ids.data)
 
     @property
-    def spoken_languages(self) -> list['Language']:
+    def spoken_languages(self) -> list[Language]:
         if not self.spoken_languages_ids.data:
             return []
 
@@ -595,7 +570,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         return languages.by_ids(self.spoken_languages_ids.data)
 
     @property
-    def written_languages(self) -> list['Language']:
+    def written_languages(self) -> list[Language]:
         if not self.written_languages_ids.data:
             return []
 
@@ -603,7 +578,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         return languages.by_ids(self.written_languages_ids.data)
 
     @property
-    def monitoring_languages(self) -> list['Language']:
+    def monitoring_languages(self) -> list[Language]:
         if not self.monitoring_languages_ids.data:
             return []
 
@@ -614,6 +589,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         self.request.include('tags-input')
 
         self.gender.choices = self.gender_choices
+        self.nationalities.choices = nationality_choices(self.request.locale)
         self.mother_tongues_ids.choices = self.language_choices
         self.spoken_languages_ids.choices = self.language_choices
         self.written_languages_ids.choices = self.language_choices
@@ -629,6 +605,28 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
         self.hide(self.drive_distance)
 
+        # populate custom texts
+        locale = self.request.locale.split('_')[0] if (
+            self.request.locale) else None
+        locale = 'de' if locale == 'de' else 'en'
+
+        self.admission_course_agreement.label.text = get_custom_text(
+            self.request,
+            f'({locale}) Custom admission course agreement'
+        )
+        self.confirm_name_reveal.label.text = get_custom_text(
+            self.request,
+            f'({locale}) Custom confirm name reveal'
+        )
+        self.admission_hint.text = get_custom_text(
+            self.request,
+            f'({locale}) Custom documents hint'
+        )
+        self.documents_hint.text = get_custom_text(
+            self.request,
+            f'({locale}) Custom documents hint'
+        )
+
     def get_translator_data(self) -> dict[str, Any]:
         data = self.get_useful_data()
         result = {
@@ -637,7 +635,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 'first_name',
                 'gender',
                 'date_of_birth',
-                'nationality',
+                'nationalities',
                 'coordinates',
                 'address',
                 'zip_code',
@@ -682,7 +680,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             name = self.request.translate(field.label.text)
             name = name.replace(' (PDF)', '')
             if field.data:
-                return File(  # type:ignore[misc]
+                return File(
                     id=random_token(),
                     name=f'{name}.pdf',
                     note=category,

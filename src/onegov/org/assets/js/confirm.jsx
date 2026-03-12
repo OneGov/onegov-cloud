@@ -22,15 +22,110 @@
     as options (those are the texts for the respective elements).
 */
 var Confirmation = React.createClass({
+    getInitialState: function() {
+        return {
+            hasScrolledToBottom: false,
+            listNeedsScrolling: false,
+            mounted: false
+        };
+    },
+
+    componentDidMount: function() {
+        this.setState({ mounted: true });
+
+        $(document).on('opened.fndtn.reveal', '[data-reveal]', this.checkScrollableContentOnReveal);
+
+        setTimeout(() => {
+            if (this.isMounted()) {
+                this.checkScrollableContent();
+            }
+        }, 200);
+    },
+
+    componentWillUnmount: function() {
+        var confirmList = $(ReactDOM.findDOMNode(this)).find('.confirm-list');
+        confirmList.off('scroll', this.checkScrollPosition);
+        $(document).off('opened.fndtn.reveal', this.checkScrollableContentOnReveal);
+    },
+
+    checkScrollableContentOnReveal: function(event) {
+        var currentModal = $(ReactDOM.findDOMNode(this));
+        if ($(event.target).is(currentModal)) {
+            setTimeout(() => {
+                if (this.isMounted()) {
+                    this.checkScrollableContent();
+                }
+            }, 50);
+        }
+    },
+
+    checkScrollableContent: function() {
+        var confirmList = $(ReactDOM.findDOMNode(this)).find('.confirm-list');
+        if (confirmList.length) {
+            confirmList[0].getBoundingClientRect();
+
+            var scrollHeight = confirmList[0].scrollHeight;
+            var clientHeight = confirmList[0].clientHeight;
+
+            var needsScrolling = scrollHeight > clientHeight + 5;
+
+            this.setState({
+                listNeedsScrolling: needsScrolling,
+                hasScrolledToBottom: !needsScrolling
+            });
+
+            if (needsScrolling) {
+                confirmList.off('scroll').on('scroll', this.checkScrollPosition);
+                confirmList.addClass('requires-scroll');
+            } else {
+                confirmList.off('scroll');
+                confirmList.removeClass('requires-scroll');
+            }
+        } else {
+            this.setState({
+                hasScrolledToBottom: true,
+                listNeedsScrolling: false
+            });
+        }
+    },
+
+    checkScrollPosition: function(e) {
+        var list = e.currentTarget;
+
+        // Check if scrolled to bottom (or very close to it)
+        var isAtBottom =
+            Math.abs((list.scrollHeight - list.scrollTop) - list.clientHeight) < 5;
+
+        if (isAtBottom !== this.state.hasScrolledToBottom) {
+            this.setState({ hasScrolledToBottom: isAtBottom });
+        }
+    },
+
     render: function() {
         return (
             <div className="reveal-modal medium dialog" data-reveal role="dialog">
                 <h2>{this.props.question}</h2>
-                <p>{this.props.extra}</p>
+                <p className="full-text-width">{this.props.extra}</p>
+                {this.props.items &&
+                    <div className="confirm-list" style={{
+                        border: (this.state.listNeedsScrolling && !this.state.hasScrolledToBottom) ?
+                            '1px solid #8e1c26' : '1px solid #ccc',
+                        display: 'block',
+                        visibility: 'visible'
+                    }}>
+                        {this.props.items}
+                    </div>
+                }
+                {(this.state.listNeedsScrolling && !this.state.hasScrolledToBottom) &&
+                    <p className="scroll-hint full-text-width">
+                        {this.props.scrollHint}
+                    </p>
+                }
                 <a tabIndex="2" className="button secondary no">
                     {this.props.no}
                 </a>
-                <a tabIndex="1" className="button alert yes">
+                <a tabIndex="1" className={!this.state.listNeedsScrolling || this.state.hasScrolledToBottom ?
+                    "button alert yes" : "button alert yes disabled"}>
                     {this.props.yes}
                 </a>
             </div>
@@ -64,7 +159,8 @@ var DenyConfirmation = React.createClass({
     When 'yes' is clicked, the window closes and the handle_yes function
     is invoked.
 */
-var show_confirmation = function(question, yes, no, extra, handle_yes) {
+var show_confirmation = function(question, yes, no, extra, items, scrollHint,
+    handle_yes) {
     var el = $("<div class='confirm row'>");
 
     $('body').append(el);
@@ -80,6 +176,7 @@ var show_confirmation = function(question, yes, no, extra, handle_yes) {
         confirm = ReactDOM.render(
             <Confirmation
                 question={question} yes={yes} no={no} extra={extra}
+                items={items} scrollHint={scrollHint}
             />,
             el.get(0)
         );
@@ -89,10 +186,15 @@ var show_confirmation = function(question, yes, no, extra, handle_yes) {
     confirm_el.find('a.no').click(function() {
         confirm_el.foundation('reveal', 'close');
     });
+
     confirm_el.find('a.yes').click(function() {
-        handle_yes();
-        confirm_el.foundation('reveal', 'close');
+        // Only call handle_yes if the button is not disabled
+        if (!$(this).hasClass('disabled')) {
+            handle_yes();
+            confirm_el.foundation('reveal', 'close');
+        }
     });
+
     confirm_el.foundation('reveal', 'open');
     confirm_el.focus();
 };
@@ -140,13 +242,29 @@ var intercept = function(element, event, handler) {
     el.data('is-intercepted', true);
 };
 
-// focus the yes button upon opening
+// focus the yes button upon opening - modified to check if it's not disabled
 $(document).on('opened.fndtn.reveal', '[data-reveal]', function() {
     var modal = $(this);
     _.defer(function() {
-        modal.find('a.yes').focus();
+        var yesButton = modal.find('a.yes');
+        yesButton.focus();
     });
 });
+
+
+function renderList(nodes) {
+    if (!nodes || !nodes.length) return null;
+    return (
+        <ul>
+            {nodes.map((node, idx) => (
+                <li key={idx}>
+                    {node.title}
+                    {renderList(node.children)}
+                </li>
+            ))}
+        </ul>
+    );
+}
 
 // handles the click on the link (or other elements)
 var handle_confirmation = function(e, on_confirm) {
@@ -154,8 +272,11 @@ var handle_confirmation = function(e, on_confirm) {
     var yes = $(this).data('confirm-yes');
     var no = $(this).data('confirm-no');
     var extra = $(this).data('confirm-extra');
+    var items = $(this).data('confirm-items');
+    items = renderList(items);
+    var scrollHint = $(this).data('scroll-hint');
 
-    show_confirmation(question, yes, no, extra, on_confirm);
+    show_confirmation(question, yes, no, extra, items, scrollHint, on_confirm);
 
     e.preventDefault();
 };

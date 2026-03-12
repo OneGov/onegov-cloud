@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
 from onegov.election_day.layouts import ElectionCompoundLayout
@@ -11,14 +13,19 @@ from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
 
 
-def test_election_compound_layout_general(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_election_compound_layout_general(session: Session) -> None:
     date_ = date(2011, 1, 1)
     election = ProporzElection(title="election", domain='region', date=date_)
     session.add(election)
     session.add(ElectionCompound(title="e", domain='canton', date=date_))
     session.flush()
     compound = session.query(ElectionCompound).one()
-    request = DummyRequest()
+    request: Any = DummyRequest()
     layout = ElectionCompoundLayout(compound, request)
     assert layout.all_tabs == (
         'seat-allocation',
@@ -58,7 +65,7 @@ def test_election_compound_layout_general(session):
             eligible_voters=500,
         )
     )
-    layout = ElectionCompoundLayout(compound, DummyRequest())
+    layout = ElectionCompoundLayout(compound, DummyRequest())  # type: ignore[arg-type]
     assert layout.has_results
 
     # test party results
@@ -183,11 +190,11 @@ def test_election_compound_layout_general(session):
         ('statistics', 'ElectionCompound/statistics-table'),
         ('data', None)
     ):
-        layout = ElectionCompoundLayout(compound, DummyRequest(), tab=tab)
+        layout = ElectionCompoundLayout(compound, DummyRequest(), tab=tab)  # type: ignore[arg-type]
         assert not expected or f'{expected}?locale=de' == layout.table_link()
 
 
-def test_election_compound_layout_menu(session):
+def test_election_compound_layout_menu(session: Session) -> None:
     election = ProporzElection(
         title="Election",
         domain='region',
@@ -204,7 +211,7 @@ def test_election_compound_layout_menu(session):
     compound.elections = [election]
 
     # No results yet
-    request = DummyRequest()
+    request: Any = DummyRequest()
     assert ElectionCompoundLayout(compound, request).menu == []
     assert ElectionCompoundLayout(compound, request, 'data').menu == []
 

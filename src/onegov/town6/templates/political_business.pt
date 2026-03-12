@@ -1,0 +1,81 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <tal:b metal:use-macro="layout.macros.page_content"
+            tal:define="lead None; text None; people None; coordinates None; contact None; files files; show_side_panel True;">
+            <tal:b metal:fill-slot="before-panels">
+                <div class="side-panel">
+                    <dl class="field-display">
+                        <h2 class="h3" i18n:translate>Information</h2>
+                        <div tal:condition="business.number">
+                            <dt i18n:translate>Number</dt>
+                            <dd><div tal:content="business.number"></div></dd>
+                        </div>
+                        <div tal:condition="business.political_business_type">
+                            <dt i18n:translate>Business Type</dt>
+                            <dd><div tal:content="type_map[business.political_business_type]"></div></dd>
+                        </div>
+                        <div tal:condition="business.status">
+                            <dt i18n:translate>Status</dt>
+                            <dd><div tal:content="status_map[business.status]"> </div></dd>
+                        </div>
+                        <div tal:condition="business.entry_date">
+                            <dt i18n:translate>Submission/publication date</dt>
+                            <dd><div tal:content="layout.format_date(business.entry_date, 'date')"></div></dd>
+                        </div>
+                    </dl>
+                </div>
+            </tal:b>
+            <tal:b metal:fill-slot="after-panels">
+            </tal:b>
+        </tal:b>
+    </tal:b>
+    <tal:b metal:fill-slot="after-text">
+        <div tal:condition="participations">
+            <h2 class="h3" i18n:translate>Participants</h2>
+            <ul class="more-list">
+                <li tal:repeat="participation participations">
+                    <a tal:attributes="href request.link(participation.parliamentarian)" class="list-link">
+                        <span class="list-title">
+                            ${participation.parliamentarian.title}
+                        </span>
+                    </a>
+                    <span tal:condition="participation.participant_type" class="list-lead preview">
+                        <span i18n:translate>${participation.participant_type}</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+        <div tal:condition="political_groups">
+            <h2 class="h3" i18n:translate>Parliamentary Group(s)</h2>
+            <ul class="more-list">
+                <li tal:repeat="group political_groups">
+                    <a tal:attributes="href request.link(group)" class="list-link">
+                        <span class="list-title">
+                            ${group.name}
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div tal:condition="business.meeting_items">
+            <h2 class="h3" i18n:translate>Meetings</h2>
+            <ul tal:repeat="meeting_item business.meeting_items" class="more-list">
+                <li>
+                    <a tal:attributes="href request.link(meeting_item.meeting)" class="list-link">
+                        <span class="list-title">
+                            ${meeting_item.meeting.title}
+                        </span>
+                    </a>
+                    <span tal:condition="meeting_item.meeting.start_datetime|None" class="list-lead preview">
+                        ${layout.format_date(meeting_item.meeting.start_datetime, 'datetime')}
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </tal:b>
+</div>

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath.request import Response
 from onegov.core.security import Private
 from onegov.core.security import Public
@@ -7,6 +9,7 @@ from onegov.swissvotes import _
 from onegov.swissvotes import SwissvotesApp
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.external_resources import MfgPosters
+from onegov.swissvotes.external_resources import BsPosters
 from onegov.swissvotes.external_resources import SaPosters
 from onegov.swissvotes.forms import SearchForm
 from onegov.swissvotes.forms import UpdateDatasetForm
@@ -35,9 +38,9 @@ if TYPE_CHECKING:
 )
 def view_votes(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: SearchForm
-) -> 'RenderData':
+) -> RenderData:
 
     form.submitted(request)
     if not form.errors:
@@ -58,9 +61,9 @@ def view_votes(
 )
 def update_votes(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: UpdateDatasetForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     self = self.default()
 
@@ -70,7 +73,7 @@ def update_votes(
         added, updated = self.update(form.dataset.data)
         request.message(
             _(
-                "Dataset updated (${added} added, ${updated} updated)",
+                'Dataset updated (${added} added, ${updated} updated)',
                 mapping={'added': added, 'updated': updated}
             ),
             'success'
@@ -87,7 +90,7 @@ def update_votes(
         if missing:
             request.message(
                 _(
-                    "The dataset contains unknown descriptors: ${items}.",
+                    'The dataset contains unknown descriptors: ${items}.',
                     mapping={'items': ', '.join(sorted(missing))}
                 ),
                 'warning'
@@ -99,7 +102,7 @@ def update_votes(
         'layout': layout,
         'form': form,
         'cancel': request.link(self),
-        'button_text': _("Update"),
+        'button_text': _('Update'),
     }
 
 
@@ -112,9 +115,9 @@ def update_votes(
 )
 def update_metadata(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: UpdateMetadataForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     self = self.default()
 
@@ -122,9 +125,10 @@ def update_metadata(
 
     if form.submitted(request):
         added, updated = self.update_metadata(form.metadata.data)
+
         request.message(
             _(
-                "Metadata updated (${added} added, ${updated} updated)",
+                'Metadata updated (${added} added, ${updated} updated)',
                 mapping={'added': added, 'updated': updated}
             ),
             'success'
@@ -136,7 +140,7 @@ def update_metadata(
         'layout': layout,
         'form': form,
         'cancel': request.link(self),
-        'button_text': _("Update"),
+        'button_text': _('Update'),
     }
 
 
@@ -149,9 +153,9 @@ def update_metadata(
 )
 def update_external_resources(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: UpdateExternalResourcesForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     self = self.default()
 
@@ -162,10 +166,13 @@ def update_external_resources(
         updated_total = 0
         removed_total = 0
         failed_total = set()
-        source: SaPosters | MfgPosters
+        source: SaPosters | BsPosters | MfgPosters
         for resource in form.resources.data or ():
             if resource == 'sa':
                 source = SaPosters()
+            elif resource == 'bs':
+                assert request.app.bs_api_token is not None
+                source = BsPosters(request.app.bs_api_token)
             elif resource == 'mfg':
                 assert request.app.mfg_api_token is not None
                 source = MfgPosters(request.app.mfg_api_token)
@@ -192,12 +199,23 @@ def update_external_resources(
         )
         if failed_total:
             failed_total_str = ', '.join(
-                layout.format_bfs_number(item) for item in sorted(failed_total)
+                layout.format_bfs_number(item[0]) for item in sorted(
+                    failed_total)
             )
             request.message(
                 _(
                     'Some external resources could not be updated: ${failed}',
                     mapping={'failed': failed_total_str}
+                ),
+                'warning'
+            )
+            details = ', '.join(
+                f'[{layout.format_bfs_number(item[0])}: obj {item[1]}]'
+                for item in sorted(failed_total)
+            )
+            request.message(
+                _(
+                    'Details ${details}', mapping={'details': details}
                 ),
                 'warning'
             )
@@ -208,7 +226,7 @@ def update_external_resources(
         'layout': layout,
         'form': form,
         'cancel': request.link(self),
-        'button_text': _("Update external sources for images"),
+        'button_text': _('Update external sources for images'),
     }
 
 
@@ -219,7 +237,7 @@ def update_external_resources(
 )
 def export_votes_csv(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest'
+    request: SwissvotesRequest
 ) -> Response:
     return Response(
         request.app.get_cached_dataset('csv'),
@@ -235,7 +253,7 @@ def export_votes_csv(
 )
 def export_votes_xlsx(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest'
+    request: SwissvotesRequest
 ) -> Response:
     return Response(
         request.app.get_cached_dataset('xlsx'),
@@ -255,9 +273,9 @@ def export_votes_xlsx(
 )
 def delete_votes(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: Form
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     self = self.default()
 
@@ -266,14 +284,14 @@ def delete_votes(
     if form.submitted(request):
         for vote in self.query():
             request.session.delete(vote)
-        request.message(_("All votes deleted"), 'success')
+        request.message(_('All votes deleted'), 'success')
         return request.redirect(layout.votes_url)
 
     return {
         'layout': layout,
         'form': form,
-        'message': _("Do you really want to delete all votes?!"),
-        'button_text': _("Delete"),
+        'message': _('Do you really want to delete all votes?!'),
+        'button_text': _('Delete'),
         'button_class': 'alert',
         'cancel': request.link(self)
     }

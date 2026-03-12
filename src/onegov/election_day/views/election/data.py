@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
@@ -29,8 +31,8 @@ if TYPE_CHECKING:
 )
 def view_election_data(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
     layout = ElectionLayout(self, request, 'data')
@@ -48,12 +50,12 @@ def view_election_data(
 )
 def view_election_data_as_json(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ View the raw data as JSON. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -69,12 +71,12 @@ def view_election_data_as_json(
 )
 def view_election_data_as_csv(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the raw data as CSV. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -90,8 +92,8 @@ def view_election_data_as_csv(
 )
 def view_election_parties_data_as_json(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ View the raw parties data as JSON. """
 
@@ -101,7 +103,7 @@ def view_election_parties_data_as_json(
     self = cast('ProporzElection', self)
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     assert request.app.default_locale
@@ -116,7 +118,7 @@ def view_election_parties_data_as_json(
         'name': normalize_for_url(
             '{}-{}'.format(
                 normalize_for_url(self.title[:50]) if self.title else '',
-                request.translate(_("Parties")).lower()
+                request.translate(_('Parties')).lower()
             )
         )
     }
@@ -129,8 +131,8 @@ def view_election_parties_data_as_json(
 )
 def view_election_parties_data_as_csv(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ View the raw parties data as CSV. """
 
@@ -140,7 +142,7 @@ def view_election_parties_data_as_csv(
     self = cast('ProporzElection', self)
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     assert request.app.default_locale
@@ -154,7 +156,7 @@ def view_election_parties_data_as_csv(
         'name': normalize_for_url(
             '{}-{}'.format(
                 normalize_for_url(self.title[:50]) if self.title else '',
-                request.translate(_("Parties")).lower()
+                request.translate(_('Parties')).lower()
             )
         )
     }
@@ -167,8 +169,8 @@ def view_election_parties_data_as_csv(
 )
 def view_election_aggregated_connections_data(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
 
     """" View the list connections as JSON. """
 

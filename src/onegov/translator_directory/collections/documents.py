@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from functools import cached_property
 from itertools import groupby
 
 from onegov.file import File, FileCollection
+from onegov.form.validators import WhitelistedMimeType
 from onegov.translator_directory.models.translator import Translator
 
 
@@ -27,15 +30,15 @@ DEFAULT_DOCUMENT_CATEGORIES = (
 
 class TranslatorDocumentCollection(FileCollection[File]):
 
-    supported_content_types = 'all'
+    supported_content_types = WhitelistedMimeType.whitelist
 
     def __init__(
         self,
-        session: 'Session',
-        translator_id: 'UUID',
+        session: Session,
+        translator_id: UUID,
         category: str | None
     ) -> None:
-        super().__init__(session, type="*", allow_duplicates=True)
+        super().__init__(session, type='*', allow_duplicates=True)
 
         self.translator_id = translator_id
         self.category = category or DEFAULT_DOCUMENT_CATEGORIES[0]

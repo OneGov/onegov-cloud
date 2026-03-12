@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.collection import GenericCollection
 from onegov.landsgemeinde.models import AgendaItem
@@ -18,8 +20,8 @@ class VotumCollection(GenericCollection[Votum]):
 
     def __init__(
         self,
-        session: 'Session',
-        date: 'date | None' = None,
+        session: Session,
+        date: date | None = None,
         agenda_item_number: int | None = None
     ) -> None:
         self.session = session
@@ -30,7 +32,7 @@ class VotumCollection(GenericCollection[Votum]):
     def model_class(self) -> type[Votum]:
         return Votum
 
-    def query(self) -> 'Query[Votum]':
+    def query(self) -> Query[Votum]:
         query = super().query()
         if self.date or self.agenda_item_number:
             query = query.join(Votum.agenda_item)
@@ -44,7 +46,7 @@ class VotumCollection(GenericCollection[Votum]):
 
     def by_id(
         self,
-        id: 'UUID'  # type:ignore[override]
+        id: UUID  # type:ignore[override]
     ) -> Votum | None:
         return super().query().filter(Votum.id == id).first()
 

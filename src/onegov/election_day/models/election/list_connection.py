@@ -1,21 +1,22 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.election_day.models.election.list import List
 from onegov.election_day.models.mixins import summarized_property
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import select
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import DynamicMapped
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
+from uuid import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from onegov.core.types import AppenderQuery
     from onegov.election_day.models import ProporzElection
     from sqlalchemy.sql import ColumnElement
 
@@ -27,53 +28,44 @@ class ListConnection(Base, TimestampMixin):
     __tablename__ = 'list_connections'
 
     #: internal id of the list
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: external id of the list
-    connection_id: 'Column[str]' = Column(Text, nullable=False)
+    connection_id: Mapped[str]
 
     #: the election id this result belongs to
-    election_id: 'Column[str | None]' = Column(
-        Text,
+    election_id: Mapped[str | None] = mapped_column(
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
-        nullable=True
     )
 
     #: the election this result belongs to
-    election: 'relationship[ProporzElection]' = relationship(
-        'ProporzElection',
+    election: Mapped[ProporzElection | None] = relationship(
         back_populates='list_connections'
     )
 
     #: ID of the parent list connection
-    parent_id: 'Column[uuid.UUID | None]' = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('list_connections.id'),
-        nullable=True
+    parent_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey('list_connections.id')
     )
 
     # the parent
-    parent: 'relationship[ListConnection]' = relationship(
-        'ListConnection',
+    parent: Mapped[ListConnection | None] = relationship(
         back_populates='children',
         remote_side='ListConnection.id'
     )
 
     #: a list connection contains n lists
-    lists: 'relationship[list[List]]' = relationship(
-        'List',
+    lists: Mapped[list[List]] = relationship(
         cascade='all, delete-orphan',
         back_populates='connection',
         order_by='List.list_id'
     )
 
     #: a list connection contains n sub-connection
-    children: 'relationship[AppenderQuery[ListConnection]]' = relationship(
-        'ListConnection',
+    children: DynamicMapped[ListConnection] = relationship(
         cascade='all, delete-orphan',
         back_populates='parent',
         order_by='ListConnection.connection_id'
@@ -108,17 +100,17 @@ class ListConnection(Base, TimestampMixin):
     def aggregate_results_expression(
         cls,
         attribute: str
-    ) -> 'ColumnElement[int]':
+    ) -> ColumnElement[int]:
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 
         """
 
-        expr = select([
+        expr = select(
             func.coalesce(
                 func.sum(getattr(List, attribute)),
                 0
             )
-        ])
+        )
         expr = expr.where(List.connection_id == cls.id)
         return expr.label(attribute)

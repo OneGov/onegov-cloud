@@ -13,14 +13,15 @@ templates directly is faster.
 This module should eventually replace the elements.py module.
 
 """
+from __future__ import annotations
 
-from markupsafe import Markup
 from onegov.core.templates import render_macro
 
 
 from typing import Any, ClassVar, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterable, Sequence
+    from markupsafe import Markup
 
     from .layout import ChameleonLayout
 
@@ -60,7 +61,7 @@ class Element:
         self,
         text: str | None = None,
         attrs: dict[str, Any] | None = None,
-        traits: 'Iterable[Trait] | Trait' = (),
+        traits: Iterable[Trait] | Trait = (),
         **props: Any
     ):
         self.text = text
@@ -97,15 +98,17 @@ class Element:
             and self.props == other.props)
 
     def __getattr__(self, name: str) -> Any:
+        # Handle special attributes that deepcopy looks for
+        if name.startswith('__') and name.endswith('__'):
+            raise AttributeError(name)
         if name in self.props:
             return self.props[name]
-
         raise AttributeError(name)
 
     def __call__(
         self,
-        layout: 'ChameleonLayout',
-        extra_classes: 'Iterable[str] | None' = None
+        layout: ChameleonLayout,
+        extra_classes: Iterable[str] | None = None
     ) -> Markup:
 
         assert self.id is not None
@@ -119,12 +122,11 @@ class Element:
         else:
             del self.attrs['class']
 
-        # FIXME: render_macro should output Markup
-        return Markup(render_macro(  # noqa: MS001
+        return render_macro(
             layout.elements[self.id],
             layout.request,
             {'e': self, 'layout': layout}
-        ))
+        )
 
 
 class AccessMixin:
@@ -162,7 +164,7 @@ class Link(Element, AccessMixin):
         text: str | None,
         url: str = '#',
         attrs: dict[str, Any] | None = None,
-        traits: 'Iterable[Trait] | Trait' = (),
+        traits: Iterable[Trait] | Trait = (),
         **props: Any
     ):
         # this is the only exception we permit where we don't use a trait
@@ -221,10 +223,10 @@ class LinkGroup(AccessMixin):
     def __init__(
         self,
         title: str,
-        links: 'Sequence[Link]',
+        links: Sequence[Link],
         model: Any | None = None,
         right_side: bool = True,
-        classes: 'Collection[str] | None' = None,
+        classes: Collection[str] | None = None,
         attributes: dict[str, Any] | None = None
     ):
         self.title = title
@@ -240,7 +242,7 @@ class Trait:
 
     __slots__ = ('apply', )
 
-    apply: 'Callable[[dict[str, Any]], dict[str, Any]]'
+    apply: Callable[[dict[str, Any]], dict[str, Any]]
 
     def __call__(
         self,
@@ -270,8 +272,10 @@ class Confirm(Trait):
         self,
         confirm: str,
         extra: str | None = None,
-        yes: str | None = "Yes",
-        no: str = "Cancel",
+        yes: str | None = 'Yes',
+        no: str = 'Cancel',
+        items: Sequence[str] | None = None,
+        scroll_hint: str | None = None,
         **ignored: Any
     ):
         def apply(attrs: dict[str, Any]) -> dict[str, Any]:
@@ -280,6 +284,9 @@ class Confirm(Trait):
             attrs['data-confirm-extra'] = extra
             attrs['data-confirm-yes'] = yes
             attrs['data-confirm-no'] = no
+            if items:
+                attrs['data-confirm-items'] = items
+                attrs['data-scroll-hint'] = scroll_hint
             return attrs
 
         self.apply = apply
@@ -294,7 +301,7 @@ class Block(Confirm):
         self,
         message: str,
         extra: str | None = None,
-        no: str = "Cancel",
+        no: str = 'Cancel',
         **ignored: Any
     ):
         super().__init__(message, extra, None, no)

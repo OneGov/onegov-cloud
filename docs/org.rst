@@ -91,7 +91,7 @@ Through Stripe we support payments in any module that supports formcode:
 * Reservations
 
 As Stripe is just a payment provider, we are able to add additional payment
-providers, though it is certainly a lot of work. 
+providers, though it is certainly a lot of work.
 
 User-Management
 ^^^^^^^^^^^^^^^

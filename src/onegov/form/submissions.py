@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from inspect import getmembers
 
 from wtforms.validators import DataRequired
@@ -10,7 +12,7 @@ from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterator
     from onegov.form import Form
-    from typing_extensions import TypeGuard
+    from typing import TypeGuard
     from wtforms.fields.core import UnboundField
 
 _FormT = TypeVar('_FormT', bound='Form')
@@ -24,7 +26,7 @@ def prepare_for_submission(
     # force all upload fields to be simple, we do not support the more
     # complex add/keep/replace widget, which is hard to properly support
     # and is not super useful in submissions
-    def is_upload(attribute: object) -> 'TypeGuard[UnboundField[UploadField]]':
+    def is_upload(attribute: object) -> TypeGuard[UnboundField[UploadField]]:
         if not hasattr(attribute, 'field_class'):
             return False
 
@@ -52,27 +54,27 @@ def prepare_for_submission(
 
 @overload
 def get_fields(
-    form_class: type['Form'],
+    form_class: type[Form],
     names_only: Literal[False] = False,
-    exclude: 'Collection[str] | None' = None
-) -> 'Iterator[tuple[str, UnboundField[Any]]]': ...
+    exclude: Collection[str] | None = None
+) -> Iterator[tuple[str, UnboundField[Any]]]: ...
 
 
 @overload
 def get_fields(
-    form_class: type['Form'],
+    form_class: type[Form],
     names_only: Literal[True],
-    exclude: 'Collection[str] | None' = None
-) -> 'Iterator[str]': ...
+    exclude: Collection[str] | None = None
+) -> Iterator[str]: ...
 
 
 def get_fields(
-    form_class: type['Form'],
+    form_class: type[Form],
     names_only: bool = False,
-    exclude: 'Collection[str] | None' = None
-) -> 'Iterator[str | tuple[str, UnboundField[Any]]]':
+    exclude: Collection[str] | None = None
+) -> Iterator[str | tuple[str, UnboundField[Any]]]:
     """ Takes an unbound form and returns the name of the fields """
-    def is_field(attribute: object) -> 'TypeGuard[UnboundField[Any]]':
+    def is_field(attribute: object) -> TypeGuard[UnboundField[Any]]:
         return hasattr(attribute, 'field_class')
 
     for name, field in getmembers(form_class, predicate=is_field):

@@ -3,7 +3,7 @@
 OneGov Cloud is a Swiss initiative to provide municipalities with open-source
 web-applications.
 
-[![Screenshot](docs/_static/govikon.png?raw=true)]()
+[![Screenshot](docs/_static/wil-sg.png?raw=true)]()
 
 ---
 
@@ -13,7 +13,7 @@ looking for, you might appreciate these links:
 - **[Marketing site](https://admin.digital)**
 <br>For an executive summary (in German)
 
-- **[Developer docs](https://docs.onegovcloud.ch)**
+- **[Developer docs](https://onegov.github.io/onegov-cloud/)**
 <br>For a technical overview and Python API docs
 
 - **[Changelog](CHANGES.md)**
@@ -23,7 +23,7 @@ looking for, you might appreciate these links:
 <br>Where you can start your own free instance of our solution for muncipalities
 
 ---
-[![Tests](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml) [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg)](https://buildkite.com/seantis/onegov-cloud) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit) [![Netlify Status](https://api.netlify.com/api/v1/badges/ac49d4ad-681d-499f-a3e5-b60c89d98c74/deploy-status)](https://app.netlify.com/sites/onegov-cloud-docs/deploys)
+[![Tests](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml) [![Build status](https://github.com/OneGov/onegov-cloud/actions/workflows/build-and-push.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/build-and-push.yml) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 ## Developing
 
@@ -128,12 +128,10 @@ To run OneGov Cloud locally, you must meet the following requirements:
 * Redis 5+
 * NodeJS 9+
 * Docker Compose
-* OpenJDK JRE 8 (for elasiticsearch setup)
-* ElasticSearch
 
 To install the requirements for Ubuntu do:
 
-    sudo apt install postgresql postgresql-contrib redis-server nodejs python3 docker-compose openjdk-8-jre-headless elasticsearch
+    sudo apt install postgresql postgresql-contrib redis-server nodejs python3 docker-compose
 
 ### Libraries
 
@@ -142,14 +140,15 @@ dependencies:
 
 #### MacOS
 ```shell
-brew install curl libffi libjpeg libpq libxml2 libxslt zlib libev poppler pv libxmlsec1
+brew install curl libffi libjpeg libpq libxml2 libxslt zlib libev poppler pv libxmlsec1 weasyprint
 ```
 
 #### Ubuntu
 ```shell
 sudo apt-get install libcurl4-openssl-dev libffi-dev libjpeg-dev libpq-dev \
 libxml2-dev libxslt1-dev zlib1g-dev libev-dev libgnutls28-dev libkrb5-dev \
-libpoppler-cpp-dev pv libzbar0 openssl libssl-dev xmlsec1 libxmlsec1-openssl
+libpoppler-cpp-dev pv libzbar0 openssl libssl-dev xmlsec1 libxmlsec1-openssl \
+weasyprint
 ```
 
 ## Installation
@@ -255,7 +254,7 @@ To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variabl
     export ONEGOV_DEVELOPMENT='1'
 
 **Optional**
-Run the elastic search cluster, D3renderer and the SMTP server: (for me sudo was required)
+Run the D3renderer and the SMTP server: (for me sudo was required)
 
     docker compose up -d
 

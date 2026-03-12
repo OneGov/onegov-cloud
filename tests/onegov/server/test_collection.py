@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from onegov.server import errors
@@ -5,26 +7,34 @@ from onegov.server.application import Application
 from onegov.server.collection import ApplicationCollection, CachedApplication
 
 
-def test_cached_application():
+from typing import Any
+
+
+def test_cached_application() -> None:
     cached = CachedApplication(Application, 'ns')
     assert cached.get() is cached.get()
 
 
-def test_collection():
+def test_collection() -> None:
 
     class MyApplication(Application):
 
-        def configure_application(self, foo):
+        def configure_application(
+            self,
+            *,
+            foo: str = '',
+            **configuration: Any
+        ) -> None:
             self.foo = foo
 
     collection = ApplicationCollection()
     collection.register('foo', MyApplication, 'test', {'foo': 'bar'})
 
     assert collection.get('foo') is collection.get('foo')
-    assert collection.get('foo').foo == 'bar'
+    assert collection.get('foo').foo == 'bar'  # type: ignore[union-attr]
 
 
-def test_collection_conflict():
+def test_collection_conflict() -> None:
     collection = ApplicationCollection()
     collection.register('foo', Application, 'ns1')
 
@@ -32,7 +42,7 @@ def test_collection_conflict():
         collection.register('foo', Application, 'ns2')
 
 
-def test_morepath_applications():
+def test_morepath_applications() -> None:
 
     from morepath.app import App as MorepathApplication
 

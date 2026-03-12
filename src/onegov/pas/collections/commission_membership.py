@@ -1,16 +1,13 @@
-from onegov.core.collection import GenericCollection
-from onegov.pas.models import CommissionMembership
+from __future__ import annotations
 
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Query
+from onegov.parliament.collections import CommissionMembershipCollection
+from onegov.pas.models import PASCommissionMembership
 
 
-class CommissionMembershipCollection(GenericCollection[CommissionMembership]):
+class PASCommissionMembershipCollection(
+    CommissionMembershipCollection[PASCommissionMembership]
+):
 
     @property
-    def model_class(self) -> type[CommissionMembership]:
-        return CommissionMembership
-
-    def query(self) -> 'Query[CommissionMembership]':
-        return super().query()
+    def model_class(self) -> type[PASCommissionMembership]:
+        return PASCommissionMembership

@@ -6,7 +6,7 @@ Please fill in the commit message below and work through the checklist. You can 
 
 <Optional Description>
 
-TYPE: <Feature|Bugfix>
+TYPE: <Feature|Performance|Bugfix>
 LINK: <Ticket-Number>
 HINT: <Optional upgrade hint>
 

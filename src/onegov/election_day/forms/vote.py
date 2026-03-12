@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
@@ -8,8 +10,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import PanelField
 from onegov.form.fields import UploadField
-from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
+from onegov.form.validators import FileSizeLimit, MIME_TYPES_PDF
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import RadioField
@@ -29,52 +30,52 @@ if TYPE_CHECKING:
 
 class VoteForm(Form):
 
-    request: 'ElectionDayRequest'
+    request: ElectionDayRequest
 
     id_hint = PanelField(
-        label=_("Identifier"),
-        fieldset=_("Identifier"),
+        label=_('Identifier'),
+        fieldset=_('Identifier'),
         kind='callout',
         text=_(
-            "The ID is used in the URL and might be used somewhere. "
-            "Changing the ID might break links on external sites!"
+            'The ID is used in the URL and might be used somewhere. '
+            'Changing the ID might break links on external sites!'
         )
     )
 
     id = StringField(
-        label=_("Identifier"),
-        fieldset=_("Identifier"),
+        label=_('Identifier'),
+        fieldset=_('Identifier'),
         validators=[
             InputRequired()
         ],
     )
 
     external_id = StringField(
-        label=_("External ID"),
-        fieldset=_("Identifier"),
-        render_kw={'long_description': _("Used for import if set.")},
+        label=_('External ID'),
+        fieldset=_('Identifier'),
+        render_kw={'long_description': _('Used for import if set.')},
     )
 
     external_id_counter_proposal = StringField(
-        label=_("External ID of counter proposal"),
-        fieldset=_("Identifier"),
-        render_kw={'long_description': _("Used for import if set.")},
+        label=_('External ID of counter proposal'),
+        fieldset=_('Identifier'),
+        render_kw={'long_description': _('Used for import if set.')},
         depends_on=('type', 'complex'),
     )
 
     external_id_tie_breaker = StringField(
-        label=_("External ID of tie breaker"),
-        fieldset=_("Identifier"),
-        render_kw={'long_description': _("Used for import if set.")},
+        label=_('External ID of tie breaker'),
+        fieldset=_('Identifier'),
+        render_kw={'long_description': _('Used for import if set.')},
         depends_on=('type', 'complex'),
     )
 
     type = RadioField(
-        label=_("Type"),
-        fieldset=_("Properties"),
+        label=_('Type'),
+        fieldset=_('Properties'),
         choices=[
-            ('simple', _("Simple Vote")),
-            ('complex', _("Vote with Counter-Proposal")),
+            ('simple', _('Simple Vote')),
+            ('complex', _('Vote with Counter-Proposal')),
         ],
         validators=[
             InputRequired()
@@ -83,11 +84,11 @@ class VoteForm(Form):
     )
 
     direct = RadioField(
-        label=_("Counter Proposal"),
-        fieldset=_("Properties"),
+        label=_('Counter Proposal'),
+        fieldset=_('Properties'),
         choices=[
-            ('direct', _("Direct (Counter Proposal)")),
-            ('indirect', _("Indirect (Counter Proposal)")),
+            ('direct', _('Direct (Counter Proposal)')),
+            ('indirect', _('Indirect (Counter Proposal)')),
         ],
         validators=[
             InputRequired()
@@ -97,16 +98,16 @@ class VoteForm(Form):
     )
 
     domain = RadioField(
-        label=_("Domain"),
-        fieldset=_("Properties"),
+        label=_('Domain'),
+        fieldset=_('Properties'),
         validators=[
             InputRequired()
         ]
     )
 
     municipality = ChosenSelectField(
-        label=_("Municipality"),
-        fieldset=_("Properties"),
+        label=_('Municipality'),
+        fieldset=_('Properties'),
         validators=[
             InputRequired()
         ],
@@ -114,41 +115,41 @@ class VoteForm(Form):
     )
 
     has_expats = BooleanField(
-        label=_("Expats are listed separately"),
-        fieldset=_("Properties"),
+        label=_('Expats are listed separately'),
+        fieldset=_('Properties'),
         description=_(
-            "Expats are uploaded and listed as a separate row in the results. "
-            "Changing this option requires a new upload of the data."
+            'Expats are uploaded and listed as a separate row in the results. '
+            'Changing this option requires a new upload of the data.'
         ),
         render_kw={'force_simple': True}
     )
 
     date = DateField(
-        label=_("Date"),
-        fieldset=_("Properties"),
+        label=_('Date'),
+        fieldset=_('Properties'),
         validators=[InputRequired()],
         default=date.today
     )
 
     shortcode = StringField(
-        label=_("Shortcode"),
-        fieldset=_("Properties"),
-        render_kw={'long_description': _("Used for sorting.")}
+        label=_('Shortcode'),
+        fieldset=_('Properties'),
+        render_kw={'long_description': _('Used for sorting.')}
     )
 
     tie_breaker_vocabulary = BooleanField(
-        label=_("Display as tie-breaker"),
-        fieldset=_("View options"),
+        label=_('Display as tie-breaker'),
+        fieldset=_('View options'),
         depends_on=('type', 'simple'),
         render_kw={'force_simple': True},
     )
 
     direct_vocabulary = RadioField(
-        label=_("Counter Proposal"),
-        fieldset=_("View options"),
+        label=_('Counter Proposal'),
+        fieldset=_('View options'),
         choices=[
-            ('direct', _("Direct (Counter Proposal)")),
-            ('indirect', _("Indirect (Counter Proposal)")),
+            ('direct', _('Direct (Counter Proposal)')),
+            ('indirect', _('Indirect (Counter Proposal)')),
         ],
         validators=[
             InputRequired()
@@ -158,130 +159,130 @@ class VoteForm(Form):
     )
 
     title_de = StringField(
-        label=_("German"),
-        fieldset=_("Title of the the vote/proposal"),
+        label=_('German'),
+        fieldset=_('Title of the the vote/proposal'),
         render_kw={'lang': 'de'}
     )
     title_fr = StringField(
-        label=_("French"),
-        fieldset=_("Title of the the vote/proposal"),
+        label=_('French'),
+        fieldset=_('Title of the the vote/proposal'),
         render_kw={'lang': 'fr'}
     )
     title_it = StringField(
-        label=_("Italian"),
-        fieldset=_("Title of the the vote/proposal"),
+        label=_('Italian'),
+        fieldset=_('Title of the the vote/proposal'),
         render_kw={'lang': 'it'}
     )
     title_rm = StringField(
-        label=_("Romansh"),
-        fieldset=_("Title of the the vote/proposal"),
+        label=_('Romansh'),
+        fieldset=_('Title of the the vote/proposal'),
         render_kw={'lang': 'rm'}
     )
 
     short_title_de = StringField(
-        label=_("German"),
-        fieldset=_("Short title of the the vote/proposal"),
+        label=_('German'),
+        fieldset=_('Short title of the the vote/proposal'),
         render_kw={'lang': 'de'}
     )
     short_title_fr = StringField(
-        label=_("French"),
-        fieldset=_("Short title of the the vote/proposal"),
+        label=_('French'),
+        fieldset=_('Short title of the the vote/proposal'),
         render_kw={'lang': 'fr'}
     )
     short_title_it = StringField(
-        label=_("Italian"),
-        fieldset=_("Short title of the the vote/proposal"),
+        label=_('Italian'),
+        fieldset=_('Short title of the the vote/proposal'),
         render_kw={'lang': 'it'}
     )
     short_title_rm = StringField(
-        label=_("Romansh"),
-        fieldset=_("Short title of the the vote/proposal"),
+        label=_('Romansh'),
+        fieldset=_('Short title of the the vote/proposal'),
         render_kw={'lang': 'rm'}
     )
 
     counter_proposal_title_de = StringField(
-        label=_("German"),
-        fieldset=_("Title of the counter proposal"),
+        label=_('German'),
+        fieldset=_('Title of the counter proposal'),
         render_kw={'lang': 'de'},
         depends_on=('type', 'complex')
     )
     counter_proposal_title_fr = StringField(
-        label=_("French"),
-        fieldset=_("Title of the counter proposal"),
+        label=_('French'),
+        fieldset=_('Title of the counter proposal'),
         render_kw={'lang': 'fr'},
         depends_on=('type', 'complex')
     )
     counter_proposal_title_it = StringField(
-        label=_("Italian"),
-        fieldset=_("Title of the counter proposal"),
+        label=_('Italian'),
+        fieldset=_('Title of the counter proposal'),
         render_kw={'lang': 'it'},
         depends_on=('type', 'complex')
     )
     counter_proposal_title_rm = StringField(
-        label=_("Romansh"),
-        fieldset=_("Title of the counter proposal"),
+        label=_('Romansh'),
+        fieldset=_('Title of the counter proposal'),
         render_kw={'lang': 'rm'},
         depends_on=('type', 'complex')
     )
 
     tie_breaker_title_de = StringField(
-        label=_("German"),
-        fieldset=_("Title of the tie breaker"),
+        label=_('German'),
+        fieldset=_('Title of the tie breaker'),
         render_kw={'lang': 'de'},
         depends_on=('type', 'complex')
     )
     tie_breaker_title_fr = StringField(
-        label=_("French"),
-        fieldset=_("Title of the tie breaker"),
+        label=_('French'),
+        fieldset=_('Title of the tie breaker'),
         render_kw={'lang': 'fr'},
         depends_on=('type', 'complex'),
     )
     tie_breaker_title_it = StringField(
-        label=_("Italian"),
-        fieldset=_("Title of the tie breaker"),
+        label=_('Italian'),
+        fieldset=_('Title of the tie breaker'),
         render_kw={'lang': 'it'},
         depends_on=('type', 'complex')
     )
     tie_breaker_title_rm = StringField(
-        label=_("Romansh"),
-        fieldset=_("Title of the tie breaker"),
+        label=_('Romansh'),
+        fieldset=_('Title of the tie breaker'),
         render_kw={'lang': 'rm'},
         depends_on=('type', 'complex')
     )
 
     related_link = URLField(
-        label=_("Link"),
-        fieldset=_("Related link"),
+        label=_('Link'),
+        fieldset=_('Related link'),
         validators=[URL(), Optional()]
     )
 
     related_link_label_de = StringField(
-        label=_("Link label german"),
-        fieldset=_("Related link"),
+        label=_('Link label german'),
+        fieldset=_('Related link'),
         render_kw={'lang': 'de'}
     )
     related_link_label_fr = StringField(
-        label=_("Link label french"),
-        fieldset=_("Related link"),
+        label=_('Link label french'),
+        fieldset=_('Related link'),
         render_kw={'lang': 'fr'}
     )
     related_link_label_it = StringField(
-        label=_("Link label italian"),
-        fieldset=_("Related link"),
+        label=_('Link label italian'),
+        fieldset=_('Related link'),
         render_kw={'lang': 'it'}
     )
     related_link_label_rm = StringField(
-        label=_("Link label romansh"),
-        fieldset=_("Related link"),
+        label=_('Link label romansh'),
+        fieldset=_('Related link'),
         render_kw={'lang': 'rm'}
     )
     explanations_pdf = UploadField(
-        label=_("Explanations (PDF)"),
+        label=_('Explanations (PDF)'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024)
         ],
-        fieldset=_("Related link")
+        allowed_mimetypes=MIME_TYPES_PDF,
+        fieldset=_('Related link')
     )
 
     def validate_id(self, field: StringField) -> None:
@@ -346,9 +347,7 @@ class VoteForm(Form):
             self.delete_field('tie_breaker_vocabulary')
             self.delete_field('direct_vocabulary')
 
-        self.domain.choices = [
-            (key, text) for key, text in principal.domains_vote.items()
-        ]
+        self.domain.choices = list(principal.domains_vote.items())
 
         municipalities = {
             municipality
@@ -517,7 +516,7 @@ class VoteForm(Form):
         if model.type == 'complex':
             model = cast('ComplexVote', model)
             self.type.choices = [
-                ('complex', _("Vote with Counter-Proposal"))
+                ('complex', _('Vote with Counter-Proposal'))
             ]
             self.type.data = 'complex'
 
@@ -538,7 +537,7 @@ class VoteForm(Form):
             self.tie_breaker_title_rm.data = titles.get('rm_CH')
 
         else:
-            self.type.choices = [('simple', _("Simple Vote"))]
+            self.type.choices = [('simple', _('Simple Vote'))]
             self.type.data = 'simple'
 
             for fieldset in self.fieldsets:

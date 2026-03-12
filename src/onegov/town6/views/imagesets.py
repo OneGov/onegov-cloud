@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public, Private
 from onegov.org.views.imagesets import (
     view_imagesets, select_images, handle_select_images, get_form_class,
@@ -22,8 +24,8 @@ if TYPE_CHECKING:
 )
 def town_view_imagesets(
     self: ImageSetCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_imagesets(
         self, request, ImageSetCollectionLayout(self, request))
 
@@ -35,7 +37,7 @@ def town_view_imagesets(
     permission=Private,
     request_method='GET'
 )
-def town_select_images(self: ImageSet, request: 'TownRequest') -> 'RenderData':
+def town_select_images(self: ImageSet, request: TownRequest) -> RenderData:
     return select_images(self, request, ImageSetLayout(self, request))
 
 
@@ -48,8 +50,8 @@ def town_select_images(self: ImageSet, request: 'TownRequest') -> 'RenderData':
 )
 def town_handle_select_images(
     self: ImageSet,
-    request: 'TownRequest'
-) -> 'Response':
+    request: TownRequest
+) -> Response:
     """ No layout passing needed, since it returns a redirect """
     return handle_select_images(self, request)
 
@@ -63,9 +65,9 @@ def town_handle_select_images(
 )
 def town_handle_new_imageset(
     self: ImageSetCollection,
-    request: 'TownRequest',
-    form: 'ImageSetForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: ImageSetForm
+) -> RenderData | Response:
     return handle_new_imageset(
         self, request, form, ImageSetCollectionLayout(self, request))
 
@@ -79,13 +81,13 @@ def town_handle_new_imageset(
 )
 def town_handle_edit_imageset(
     self: ImageSet,
-    request: 'TownRequest',
-    form: 'ImageSetForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: ImageSetForm
+) -> RenderData | Response:
     return handle_edit_imageset(
         self, request, form, ImageSetLayout(self, request))
 
 
 @TownApp.html(model=ImageSet, template='imageset.pt', permission=Public)
-def town_view_imageset(self: ImageSet, request: 'TownRequest') -> 'RenderData':
+def town_view_imageset(self: ImageSet, request: TownRequest) -> RenderData:
     return view_imageset(self, request, ImageSetLayout(self, request))

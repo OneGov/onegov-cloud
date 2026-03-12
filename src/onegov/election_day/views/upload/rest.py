@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import transaction
 
 from base64 import b64decode
@@ -22,6 +24,7 @@ from onegov.election_day.views.upload import set_locale
 from onegov.election_day.views.upload import translate_errors
 from onegov.election_day.views.upload import unsupported_year_error
 from sqlalchemy import or_
+from webob.compat import cgi_FieldStorage
 from webob.exc import HTTPUnauthorized
 
 
@@ -37,7 +40,7 @@ if TYPE_CHECKING:
     from webob.response import Response
 
 
-def authenticate(request: 'ElectionDayRequest') -> None:
+def authenticate(request: ElectionDayRequest) -> None:
     try:
         token = b64decode(
             request.authorization[1]  # type:ignore
@@ -55,9 +58,9 @@ def authenticate(request: 'ElectionDayRequest') -> None:
     request_method='POST'
 )
 def view_upload_rest(
-    self: 'Canton | Municipality',
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    self: Canton | Municipality,
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Upload election or vote results via REST using the internal format.
 
@@ -77,14 +80,33 @@ def view_upload_rest(
     status_code: int | None = None
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         if status_code is not None:
             response.status_code = status_code
 
     errors: dict[str, list[FileImportError | str]] = {}
 
     form = request.get_form(UploadRestForm, model=self, csrf_support=False)
-    if not form.validate():
+    try:
+        valid = form.validate()
+    except TypeError as ex:
+        valid = False
+
+        if isinstance(request.POST.get('type'), cgi_FieldStorage):
+            form.type.errors = [*form.type.errors, _(
+                'A file was submitted instead of a string. '
+                'Use --form "type=xml" instead of --form "type=@file"'
+            )]
+        else:
+            form.form_errors = [
+                *form.errors, f'Form validation type error: {ex}'
+            ]
+
+    except Exception as ex:
+        valid = False
+        form.form_errors = [*form.errors, f'Form validation error: {ex}']
+
+    if not valid:
         status_code = 400
         return {
             'status': 'error',
@@ -105,7 +127,7 @@ def view_upload_rest(
             )
         ).first()
         if item is None:
-            errors.setdefault('id', []).append(_("Invalid id"))
+            errors.setdefault('id', []).append(_('Invalid id'))
     elif form.type.data in ('election', 'parties'):
         item = session.query(ElectionCompound).filter(
             or_(
@@ -121,16 +143,13 @@ def view_upload_rest(
                 )
             ).first()
         if item is None:
-            errors.setdefault('id', []).append(_("Invalid id"))
+            errors.setdefault('id', []).append(_('Invalid id'))
 
     # Check the type
     if item is not None and form.type.data == 'parties':
-        if not (
-            isinstance(item, ElectionCompound)
-            or isinstance(item, ProporzElection)
-        ):
+        if not isinstance(item, (ElectionCompound, ProporzElection)):
             errors.setdefault('id', []).append(
-                _("Use an election based on proportional representation")
+                _('Use an election based on proportional representation')
             )
 
     # Check if the year is supported
@@ -189,6 +208,8 @@ def view_upload_rest(
                 session,
                 request.app.default_locale
             )
+        else:
+            err = ['Invalid type. Valid are vote, election, parties and xml.']  # type: ignore[list-item]
         if err:
             errors.setdefault('results', []).extend(err)
 

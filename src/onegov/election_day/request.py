@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.request import CoreRequest
 
 
@@ -10,4 +12,4 @@ if TYPE_CHECKING:
 #       in our election day app have the election day app available
 class ElectionDayRequest(CoreRequest):
     if TYPE_CHECKING:
-        app: 'ElectionDayApp'
+        app: ElectionDayApp

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import ExtendedPerson
@@ -17,7 +19,7 @@ if TYPE_CHECKING:
     _T = TypeVar('_T')
 
 
-def duplicates(iterable: 'Iterable[_T]') -> set['_T']:
+def duplicates(iterable: Iterable[_T]) -> set[_T]:
     items = set()
     duplicates = set()
     for item in iterable:
@@ -31,14 +33,14 @@ class MembershipForm(Form):
     """ Form to edit memberships of an organization. """
 
     title = StringField(
-        label=_("Title"),
+        label=_('Title'),
         validators=[
             InputRequired()
         ],
     )
 
     person_id = ChosenSelectField(
-        label=_("Person"),
+        label=_('Person'),
         choices=[],
         validators=[
             InputRequired()
@@ -46,24 +48,24 @@ class MembershipForm(Form):
     )
 
     since = StringField(
-        label=_("Since"),
+        label=_('Since'),
     )
 
     note = StringField(
-        label=_("Note"),
+        label=_('Note'),
     )
 
     addition = StringField(
-        label=_("Addition"),
+        label=_('Addition'),
     )
 
     prefix = StringField(
-        label=_("Prefix"),
+        label=_('Prefix'),
     )
 
     def validate_title(self, field: StringField) -> None:
         if field.data and not field.data.strip():
-            raise ValidationError(_("This field is required."))
+            raise ValidationError(_('This field is required.'))
 
     def on_request(self) -> None:
         self.request.include('common')
@@ -86,10 +88,10 @@ class MembershipForm(Form):
                     or person.postal_address
                 )
                 if info:
-                    return f"{person.title} ({info})"
+                    return f'{person.title} ({info})'
                 memberships = person.memberships_by_agency
                 if memberships:
-                    return f"{person.title} ({memberships[0].agency.title})"
+                    return f'{person.title} ({memberships[0].agency.title})'
 
             return person.title
 

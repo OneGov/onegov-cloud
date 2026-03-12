@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.election_day.models import Candidate
 from onegov.election_day.models import CandidateResult
@@ -8,7 +10,12 @@ from onegov.election_day.models import ProporzElection
 from uuid import uuid4
 
 
-def test_candidate(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_candidate(session: Session) -> None:
     election = ProporzElection(
         title='Election',
         domain='federation',
@@ -259,15 +266,15 @@ def test_candidate(session):
 
     # Test hybrid properties
     assert candidate_1.votes == 90
-    assert session.query(Candidate.votes).\
-        filter(Candidate.id == candidate_1.id).scalar()
+    assert session.query(Candidate.votes).filter(
+        Candidate.id == candidate_1.id).scalar()
 
     # Test percentages
-    def round_(n, z):
+    def round_(n: int, z: int) -> float:
         return round(100 * n / z, 2)
 
-    tot = {t.entity_id: t.votes for t in election.votes_by_entity.all()}
-    tot_d = {t.district: t.votes for t in election.votes_by_district.all()}
+    tot = {t.entity_id: t.votes for t in election.votes_by_entity}
+    tot_d = {t.district: t.votes for t in election.votes_by_district}
 
     assert candidate_1.percentage_by_entity == {
         1: {'votes': 50, 'counted': True, 'percentage': round_(50, tot[1])},

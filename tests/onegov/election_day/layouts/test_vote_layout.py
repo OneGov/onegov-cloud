@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
 from onegov.election_day.layouts import VoteLayout
@@ -8,9 +10,14 @@ from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
 
 
-def test_vote_layout_general(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
-    layout = VoteLayout(Vote(date=date(2021, 1, 1)), DummyRequest())
+
+def test_vote_layout_general(session: Session) -> None:
+
+    layout = VoteLayout(Vote(date=date(2021, 1, 1)), DummyRequest())  # type: ignore[arg-type]
 
     assert layout.all_tabs == (
         'entities',
@@ -64,19 +71,19 @@ def test_vote_layout_general(session):
     assert layout.subtitle('tie-breaker-statistics') == 'Statistics'
     assert layout.subtitle('data') == ''
 
-    layout = VoteLayout(Vote(), DummyRequest())
+    layout = VoteLayout(Vote(), DummyRequest())  # type: ignore[arg-type]
     assert layout.type == 'simple'
     assert layout.main_view == 'Vote/entities'
     assert layout.ballot.type == 'proposal'
     assert layout.map_link == 'Vote/proposal-by-entities-map?locale=de'
     assert layout.table_link() == 'Vote/proposal-by-entities-table?locale=de'
 
-    layout = VoteLayout(Vote(), DummyRequest(), tab='districts')
+    layout = VoteLayout(Vote(), DummyRequest(), tab='districts')  # type: ignore[arg-type]
     assert layout.map_link == 'Vote/proposal-by-districts-map?locale=de'
     assert layout.table_link() == 'Vote/proposal-by-districts-table?locale=de'
 
     layout = VoteLayout(
-        ComplexVote(), DummyRequest(), tab='tie-breaker-entities'
+        ComplexVote(), DummyRequest(), tab='tie-breaker-entities'  # type: ignore[arg-type]
     )
     assert layout.type == 'complex'
     assert layout.main_view == 'ComplexVote/proposal-entities'
@@ -89,7 +96,7 @@ def test_vote_layout_general(session):
     )
 
     layout = VoteLayout(
-        ComplexVote(), DummyRequest(), tab='tie-breaker-districts'
+        ComplexVote(), DummyRequest(), tab='tie-breaker-districts'  # type: ignore[arg-type]
     )
     assert layout.map_link == (
         'ComplexVote/tie-breaker-by-districts-map?locale=de'
@@ -114,7 +121,7 @@ def test_vote_layout_general(session):
         hc = vote.counter_proposal.id
         ht = vote.tie_breaker.id
 
-        request = DummyRequest()
+        request: Any = DummyRequest()
         request.app.filestorage = Mock()
 
         layout = VoteLayout(vote, request)
@@ -198,17 +205,17 @@ def test_vote_layout_general(session):
         )
 
 
-def test_vote_layout_menu(session):
+def test_vote_layout_menu(session: Session) -> None:
     vote = Vote(title='Vote', date=date(2000, 1, 1), domain='federation')
     session.add(vote)
     session.flush()
 
-    request = DummyRequest()
+    request: Any = DummyRequest()
     assert VoteLayout(vote, request).menu == []
     assert VoteLayout(vote, request, 'data').menu == []
 
     vote.proposal.results.append(
-        BallotResult(entity_id='1', name=1, counted=True)
+        BallotResult(entity_id=1, name='1', counted=True)
     )
     assert VoteLayout(vote, request).menu == [
         ('__entities', 'Vote/entities', True, []),
@@ -230,19 +237,19 @@ def test_vote_layout_menu(session):
     ]
 
 
-def test_vote_layout_menu_complex(session):
+def test_vote_layout_menu_complex(session: Session) -> None:
     vote = ComplexVote(
         title='Vote', date=date(2000, 1, 1), domain='federation'
     )
     session.add(vote)
     session.flush()
 
-    request = DummyRequest()
+    request: Any = DummyRequest()
     assert VoteLayout(vote, request).menu == []
     assert VoteLayout(vote, request, 'data').menu == []
 
     vote.proposal.results.append(
-        BallotResult(entity_id='1', name=1, counted=True)
+        BallotResult(entity_id=1, name='1', counted=True)
     )
     assert VoteLayout(vote, request).menu == [
         (
@@ -317,9 +324,8 @@ def test_vote_layout_menu_complex(session):
     ]
 
 
-def test_vote_layout_table_links():
+def test_vote_layout_table_links() -> None:
     vote = Vote(date=date(2000, 1, 1), domain='federation')
-    assert vote.ballot
     for tab, expected in (
         ('entities', 'Vote/proposal-by-entities-table'),
         ('proposal-entities', 'Vote/proposal-by-entities-table'),
@@ -330,5 +336,5 @@ def test_vote_layout_table_links():
         ('tie-breaker-districts', 'Vote/proposal-by-districts-table'),
         ('data', None)
     ):
-        layout = VoteLayout(vote, DummyRequest(), tab=tab)
+        layout = VoteLayout(vote, DummyRequest(), tab=tab)  # type: ignore[arg-type]
         assert not expected or f'{expected}?locale=de' == layout.table_link()

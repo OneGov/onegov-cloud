@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 log = logging.getLogger('onegov.election_day')
 log.addHandler(logging.NullHandler())

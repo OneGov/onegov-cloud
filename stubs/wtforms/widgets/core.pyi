@@ -2,7 +2,8 @@ from decimal import Decimal
 from typing import Any, Literal
 
 from markupsafe import Markup
-from wtforms.fields import Field, FormField, SelectFieldBase, StringField
+from wtforms.fields import Field, FormField, StringField
+from wtforms.fields.choices import SelectFieldBase, _Option
 
 __all__ = (
     "CheckboxInput",
@@ -86,7 +87,7 @@ class Select:
     def render_option(cls, value: object, label: str, selected: bool, **kwargs: object) -> Markup: ...
 
 class Option:
-    def __call__(self, field: SelectFieldBase._Option, **kwargs: object) -> Markup: ...
+    def __call__(self, field: _Option, **kwargs: object) -> Markup: ...
 
 class SearchInput(Input): ...
 class TelInput(Input): ...

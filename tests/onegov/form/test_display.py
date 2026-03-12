@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime, time
 from markupsafe import Markup
 
@@ -5,12 +7,26 @@ from onegov.form import render_field
 from onegov.form.display import VideoURLFieldRenderer
 
 
-class MockField:
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from wtforms import Field
+    from wtforms.fields.choices import _Choice
+else:
+    Field = object
 
-    def __init__(self, type, data, choices=None):
+
+class MockField(Field):
+
+    def __init__(
+        self,
+        type: str,
+        data: Any,
+        choices: list[_Choice] | None = None
+    ) -> None:
+
         self.type = type
         self.data = data
-        self.render_kw = None
+        self.render_kw = None  # type: ignore[assignment]
 
         if choices is not None:
             self.choices = choices
@@ -21,39 +37,40 @@ class MockField:
                 self.choices = [(c, c) for c in data]
 
 
-def test_render_textfields():
+def test_render_textfields() -> None:
     assert render_field(MockField('StringField', 'asdf')) == 'asdf'
     assert render_field(MockField('StringField', '<b>')) == '&lt;b&gt;'
 
     assert render_field(MockField('TextAreaField', 'asdf')) == 'asdf'
     assert render_field(MockField('TextAreaField', '<b>')) == '&lt;b&gt;'
     assert render_field(
-        MockField('TextAreaField',
-                  '<script>alert(document.cookie)</script>')) == \
-           '&lt;script&gt;alert(document.cookie)&lt;/script&gt;'
+        MockField('TextAreaField', '<script>alert(document.cookie)</script>')
+    ) == '&lt;script&gt;alert(document.cookie)&lt;/script&gt;'
 
 
-def test_render_password():
+def test_render_password() -> None:
     assert render_field(MockField('PasswordField', '123')) == '***'
     assert render_field(MockField('PasswordField', '1234')) == '****'
     assert render_field(MockField('PasswordField', '12345')) == '*****'
 
 
-def test_render_date_field():
-    assert render_field(MockField('DateField', datetime(1984, 4, 6)))\
-        == '06.04.1984'
-    assert render_field(MockField('DateTimeLocalField', datetime(1984, 4, 6)))\
-        == '06.04.1984 00:00'
+def test_render_date_field() -> None:
+    assert render_field(
+        MockField('DateField', datetime(1984, 4, 6))
+    ) == '06.04.1984'
+    assert render_field(
+        MockField('DateTimeLocalField', datetime(1984, 4, 6))
+    ) == '06.04.1984 00:00'
     assert render_field(MockField('TimeField', time(10, 0))) == '10:00'
 
 
-def test_render_upload_field():
+def test_render_upload_field() -> None:
     assert render_field(MockField('UploadField', {
         'filename': '<b.txt>', 'size': 1000
     })) == '&lt;b.txt&gt; (1.0 kB)'
 
 
-def test_render_upload_multiple_field():
+def test_render_upload_multiple_field() -> None:
     icon_html = '<i class="far fa-file-pdf"></i>'
     assert (
         render_field(
@@ -72,23 +89,26 @@ def test_render_upload_multiple_field():
     )
 
 
-def test_render_radio_field():
+def test_render_radio_field() -> None:
     assert render_field(MockField('RadioField', 'selected')) == '✓ selected'
 
 
-def test_render_multi_checkbox_field():
+def test_render_multi_checkbox_field() -> None:
     assert render_field(MockField('MultiCheckboxField', [])) == ''
-    assert render_field(MockField('MultiCheckboxField', ['a', 'b']))\
-        == '✓ a<br>✓ b'
-    assert render_field(MockField('MultiCheckboxField', ['c'], [('a', 'a')]))\
-        == '✓ ? (c)'
+    assert render_field(
+        MockField('MultiCheckboxField', ['a', 'b'])
+    ) == '✓ a<br>✓ b'
+    assert render_field(
+        MockField('MultiCheckboxField', ['c'], [('a', 'a')])
+    ) == '✓ ? (c)'
 
 
-def test_render_video_url_field():
+def test_render_video_url_field() -> None:
     # youtube
     url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    expected_url = Markup.escape('https://www.youtube.com/embed/dQw4w9WgXcQ'
-                                 '?rel=0&autoplay=0&mute=1')
+    expected_url: str = Markup.escape(
+        'https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&autoplay=0&mute=1'
+    )
     result = render_field(MockField('VideoURLField', url))
     assert isinstance(result, Markup)
     assert result == VideoURLFieldRenderer.video_template.format(
@@ -117,7 +137,7 @@ def test_render_video_url_field():
     assert result == Markup('')
 
 
-def test_video_url_field_renderer_youtube_regex():
+def test_video_url_field_renderer_youtube_regex() -> None:
     renderer = VideoURLFieldRenderer()
 
     valid_urls = [
@@ -172,7 +192,7 @@ def test_video_url_field_renderer_youtube_regex():
         assert result is None
 
 
-def test_video_url_field_renderer_vimeo_regex():
+def test_video_url_field_renderer_vimeo_regex() -> None:
 
     renderer = VideoURLFieldRenderer()
 

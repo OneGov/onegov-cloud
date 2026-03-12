@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundPartLayout
 from onegov.election_day.models import ElectionCompoundPart
@@ -24,8 +26,8 @@ if TYPE_CHECKING:
 )
 def view_election_compound_part_party_strengths_data(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ Retuns the data used for the grouped bar diagram showing the party
     results.
 
@@ -43,12 +45,12 @@ def view_election_compound_part_party_strengths_data(
 )
 def view_election_compound_part_party_strengths_chart(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the party strengths as grouped bar chart. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -67,12 +69,12 @@ def view_election_compound_part_party_strengths_chart(
 )
 def view_election_compound_party_strengths_table(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the party strengths as table. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     party_years, parties = get_party_results(self)
@@ -100,8 +102,8 @@ def view_election_compound_party_strengths_table(
 )
 def view_election_compound_part_party_strengths(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
     layout = ElectionCompoundPartLayout(self, request, 'party-strengths')
@@ -127,8 +129,8 @@ def view_election_compound_part_party_strengths(
 )
 def view_election_compound_part_party_strengths_svg(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the party strengths as SVG. """
 
     layout = ElectionCompoundPartLayout(self, request, 'party-strengths')

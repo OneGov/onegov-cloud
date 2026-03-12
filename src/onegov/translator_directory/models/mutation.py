@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.gis import Coordinates
 from onegov.translator_directory import _
@@ -30,22 +32,22 @@ class TranslatorMutation:
 
     def __init__(
         self,
-        session: 'Session',
-        target_id: 'UUID',
-        ticket_id: 'UUID'
+        session: Session,
+        target_id: UUID,
+        ticket_id: UUID
     ) -> None:
         self.session = session
         self.target_id = target_id
         self.ticket_id = ticket_id
 
     @cached_property
-    def language_collection(self) -> 'LanguageCollection':
+    def language_collection(self) -> LanguageCollection:
         from onegov.translator_directory.collections.language import (
             LanguageCollection)
         return LanguageCollection(self.session)
 
     @cached_property
-    def certificate_collection(self) -> 'LanguageCertificateCollection':
+    def certificate_collection(self) -> LanguageCertificateCollection:
         from onegov.translator_directory.collections.certificate import (
             LanguageCertificateCollection)
         return LanguageCertificateCollection(self.session)
@@ -59,7 +61,7 @@ class TranslatorMutation:
         ).first()
 
     @cached_property
-    def ticket(self) -> 'Ticket | None':
+    def ticket(self) -> Ticket | None:
         from onegov.ticket import TicketCollection
         return TicketCollection(self.session).by_id(self.ticket_id)
 
@@ -72,7 +74,7 @@ class TranslatorMutation:
 
     def translated(
         self,
-        request: 'TranslatorAppRequest',
+        request: TranslatorAppRequest,
         changes: dict[str, Any] | None = None
     ) -> dict[str, tuple[str, Any, Any]]:
 
@@ -112,16 +114,16 @@ class TranslatorMutation:
         return dict(result)
 
     @cached_property
-    def translations(self) -> dict[str, 'Mapping[Any, str]']:
-        LANGUAGES = {
+    def translations(self) -> dict[str, Mapping[Any, str]]:
+        LANGUAGES = {  # noqa: N806
             str(language.id): language.name
             for language in self.language_collection.query()
         }
-        CERTIFICATES = {
+        CERTIFICATES = {  # noqa: N806
             str(cert.id): cert.name
             for cert in self.certificate_collection.query()
         }
-        BOOLS = {True: _('Yes'), False: _('No')}
+        BOOLS = {True: _('Yes'), False: _('No')}  # noqa: N806
 
         return {
             'admission': ADMISSIONS,
@@ -139,7 +141,7 @@ class TranslatorMutation:
             'certificates': CERTIFICATES
         }
 
-    labels: ClassVar['Mapping[str, TranslationString]'] = {
+    labels: ClassVar[Mapping[str, TranslationString]] = {
         'first_name': _('First name'),
         'last_name': _('Last name'),
         'pers_id': _('Personal ID'),
@@ -148,8 +150,8 @@ class TranslatorMutation:
         'self_employed': _('Self-employed'),
         'gender': _('Gender'),
         'date_of_birth': _('Date of birth'),
-        'nationality': _('Nationality'),
-        'coordinates': _("Location"),
+        'nationalities': _('Nationality(ies)'),
+        'coordinates': _('Location'),
         'address': _('Street and house number'),
         'zip_code': _('Zip Code'),
         'city': _('City'),
@@ -192,7 +194,7 @@ class TranslatorMutation:
         'comments': _('Comments'),
     }
 
-    def apply(self, items: 'Iterable[str]') -> None:
+    def apply(self, items: Iterable[str]) -> None:
         assert self.ticket is not None
         self.ticket.handler_data['state'] = 'applied'
         for item in items:

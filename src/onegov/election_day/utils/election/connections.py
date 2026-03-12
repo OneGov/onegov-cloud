@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from itertools import groupby
 from onegov.core.orm import as_selectable_from_path
@@ -16,9 +18,8 @@ if TYPE_CHECKING:
     from onegov.core.types import JSONObject
     from onegov.core.types import JSONObject_ro
     from onegov.election_day.models import Election
-    from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from uuid import UUID
 
     Sublist: TypeAlias = tuple[str, int, str]
@@ -34,9 +35,9 @@ def to_int(value: str) -> int | str:
 
 
 def get_connection_results_api(
-    election: 'Election',
-    session: 'Session'
-) -> 'JSONObject_ro':
+    election: Election,
+    session: Session
+) -> JSONObject_ro:
 
     connection_query = as_selectable_from_path(
         module_path(
@@ -44,7 +45,7 @@ def get_connection_results_api(
         )
     )
     conn_query = connection_query.c
-    query = select(conn_query).where(conn_query.election_id == election.id)
+    query = select(*conn_query).where(conn_query.election_id == election.id)
     results = session.execute(query)
 
     data: dict[str, Any] = LastUpdatedOrderedDict({})
@@ -77,15 +78,15 @@ def get_connection_results_api(
 
 
 def get_connection_results(
-    election: 'Election',
-    session: 'Session'
-) -> list['Connection']:
+    election: Election,
+    session: Session
+) -> list[Connection]:
     """ Returns the aggregated list connection results as list. """
 
     if election.type != 'proporz':
         return []
 
-    parents: Query[tuple[UUID, str, int]] = session.query(
+    parents = session.query(
         ListConnection.id,
         ListConnection.connection_id,
         ListConnection.votes
@@ -96,7 +97,6 @@ def get_connection_results(
     )
     parents = parents.order_by(ListConnection.connection_id)
 
-    children_query: Query[tuple[UUID | None, str, int, UUID]]
     children_query = session.query(
         ListConnection.parent_id,
         ListConnection.connection_id,
@@ -113,7 +113,7 @@ def get_connection_results(
     )
     children = dict(groupbylist(children_query, lambda x: str(x[0])))
 
-    sublists_query: Query[tuple[UUID, str, int, str]] = session.query(
+    sublists_query = session.query(
         List.connection_id,
         List.name,
         List.votes,
@@ -151,8 +151,8 @@ def get_connection_results(
 
 
 def get_connections_data(
-    election: 'Election',
-) -> 'JSONObject_ro':
+    election: Election,
+) -> JSONObject_ro:
     """" View the list connections as JSON. Used to for the connection sankey
     chart. """
 

@@ -1,12 +1,18 @@
+from __future__ import annotations
+
 import re
 
 from bleach.sanitizer import Cleaner
 from html2text import HTML2Text
+from markupsafe import Markup
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
+
+
+_StrT = TypeVar('_StrT', bound=str)
 
 
 # html tags allowed by bleach
@@ -50,7 +56,8 @@ SANE_HTML_ATTRS = {
     'a': ['href', 'title'],
     'abbr': ['title', ],
     'acronym': ['title', ],
-    'img': ['src', 'alt', 'title']
+    'img': ['src', 'alt', 'title'],
+    'p': ['class']
 }
 
 # lines without these plaintext characters are excluded in html_to_text
@@ -68,7 +75,7 @@ VALID_PLAINTEXT_CHARACTERS = re.compile(r"""
 """, re.VERBOSE)
 
 # match empty link expressions
-EMPTY_LINK = re.compile(r"\[\]\([^)]+\)")
+EMPTY_LINK = re.compile(r'\[\]\([^)]+\)')
 
 
 cleaner = Cleaner(
@@ -77,16 +84,16 @@ cleaner = Cleaner(
 )
 
 
-def sanitize_html(html: str | None) -> str:
+def sanitize_html(html: str | None) -> Markup:
     """ Takes the given html and strips all but a whitelisted number of tags
     from it.
 
     """
 
-    return cleaner.clean(html or '')
+    return Markup(cleaner.clean(html or ''))  # nosec: B704
 
 
-def sanitize_svg(svg: str) -> str:
+def sanitize_svg(svg: _StrT) -> _StrT:
     """ I couldn't find a good svg sanitiser function yet, so for now
     this function will be a no-op, though it will try to detect
     svg files which are harmful.
@@ -100,7 +107,7 @@ def sanitize_svg(svg: str) -> str:
 
     assert 'javascript:' not in svg
     assert 'CDATA' not in svg
-    assert '<script>' not in svg
+    assert Markup('<script>') not in svg
     assert 'Set-Cookie' not in svg
 
     return svg

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 
 from onegov.core.orm.abstract import associated
@@ -5,7 +7,7 @@ from onegov.pay.models.payment import Payment
 from sqlalchemy import inspect
 
 
-from typing import ClassVar, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 
 def hash_primary_key(text: str) -> str:
@@ -20,7 +22,7 @@ class PayableBase:
 
     if TYPE_CHECKING:
         # forward declare this attribute
-        __tablename__: ClassVar[str]
+        __tablename__: str
 
     @property
     def payable_reference(self) -> str:
@@ -38,8 +40,8 @@ class PayableBase:
 
         tablename = self.__tablename__
 
-        keys = inspect(self.__class__).primary_key
-        values = '/'.join((str(getattr(self, key.name, None)) for key in keys))
+        keys = inspect(self.__class__).primary_key  # type: ignore[union-attr]
+        values = '/'.join(str(getattr(self, key.name, None)) for key in keys)
 
         return f'{tablename}/{hash_primary_key(values)}'
 

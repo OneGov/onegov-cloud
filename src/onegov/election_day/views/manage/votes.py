@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
@@ -27,8 +29,8 @@ if TYPE_CHECKING:
 )
 def view_votes(
     self: VoteCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View a list of all votes. """
 
     years = [
@@ -37,12 +39,12 @@ def view_votes(
             year == self.year,
             request.link(self.for_year(year))
         )
-        for year in [None] + self.get_years()
+        for year in [None, *self.get_years()]
     ]
 
     return {
         'layout': ManageVotesLayout(self, request),
-        'title': _("Votes"),
+        'title': _('Votes'),
         'groups': groupbylist(self.batch, key=lambda vote: vote.date),
         'new_vote': request.link(self, 'new-vote'),
         'redirect_filters': {_('Year'): years},
@@ -56,9 +58,9 @@ def view_votes(
 )
 def create_vote(
     self: VoteCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: VoteForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Create a new vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -71,13 +73,13 @@ def create_vote(
         vote = Vote.get_polymorphic_class(form.type.data, Vote)()
         form.update_model(vote)
         archive.add(vote, request)
-        request.message(_("Vote added."), 'success')
+        request.message(_('Vote added.'), 'success')
         return redirect(layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New vote"),
+        'title': _('New vote'),
         'cancel': layout.manage_model_link
     }
 
@@ -89,9 +91,9 @@ def create_vote(
 )
 def edit_vote(
     self: Vote,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: VoteForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Edit an existing vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -101,7 +103,7 @@ def edit_vote(
         old = request.link(self)
         form.update_model(self)
         archive.update(self, request, old=old)
-        request.message(_("Vote modified."), 'success')
+        request.message(_('Vote modified.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -113,7 +115,7 @@ def edit_vote(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Edit vote"),
+        'subtitle': _('Edit vote'),
         'cancel': layout.manage_model_link
     }
 
@@ -125,9 +127,9 @@ def edit_vote(
 )
 def clear_vote(
     self: Vote,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ClearResultsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Clear the results of a vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -135,7 +137,7 @@ def clear_vote(
 
     if form.submitted(request):
         archive.clear_results(self, request, form.clear_all.data)
-        request.message(_("Results deleted."), 'success')
+        request.message(_('Results deleted.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -150,8 +152,8 @@ def clear_vote(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Clear results"),
-        'button_text': _("Clear results"),
+        'subtitle': _('Clear results'),
+        'button_text': _('Clear results'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -163,9 +165,9 @@ def clear_vote(
 )
 def clear_election_media(
     self: Vote,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Deletes alls SVGs and PDFs of this vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -195,8 +197,8 @@ def clear_election_media(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Clear media"),
-        'button_text': _("Clear media"),
+        'subtitle': _('Clear media'),
+        'button_text': _('Clear media'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -208,9 +210,9 @@ def clear_election_media(
 )
 def delete_vote(
     self: Vote,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Delete an existing vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -218,7 +220,7 @@ def delete_vote(
 
     if form.submitted(request):
         archive.delete(self, request)
-        request.message(_("Vote deleted."), 'success')
+        request.message(_('Vote deleted.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -233,8 +235,8 @@ def delete_vote(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Delete vote"),
-        'button_text': _("Delete vote"),
+        'subtitle': _('Delete vote'),
+        'button_text': _('Delete vote'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -248,9 +250,9 @@ def delete_vote(
 )
 def trigger_vote(
     self: Vote,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: TriggerNotificationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Trigger the notifications related to a vote. """
 
     session = request.session
@@ -260,23 +262,23 @@ def trigger_vote(
     if form.submitted(request):
         assert form.notifications.data is not None
         notifications.trigger(request, self, form.notifications.data)
-        request.message(_("Notifications triggered."), 'success')
+        request.message(_('Notifications triggered.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
     callout = None
     message = ''
-    title = _("Trigger notifications")
+    title = _('Trigger notifications')
     button_class = 'primary'
     subject = MailLayout(None, request).subject(self)
 
     if notifications.by_model(self):
         callout = _(
-            "There are no changes since the last time the notifications "
-            "have been triggered!"
+            'There are no changes since the last time the notifications '
+            'have been triggered!'
         )
         message = _(
-            "Do you really want to retrigger the notfications?",
+            'Do you really want to retrigger the notfications?',
         )
         button_class = 'alert'
 

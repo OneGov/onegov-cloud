@@ -42,7 +42,7 @@ There are two different types of rows, `<row-wide> </row-wide>` and `<row> </row
 </title>
 ```
 | Attribute Name | Description                                | Value if left empty | Possible Values        |
-| ------------- | ------------------------------------------ | ------------------- | ---------------------- |   
+| ------------- | ------------------------------------------ | ------------------- | ---------------------- |
 | `class`       | Custom classes                             | -                   | Any class name         |
 
 
@@ -64,6 +64,8 @@ There are two different types of rows, `<row-wide> </row-wide>` and `<row> </row
 <slider
     height-m="30vw"
     height-d="55vh"
+    searchbox="true"
+    searchbox-position="top"
 ></slider>
 ```
 
@@ -71,6 +73,8 @@ There are two different types of rows, `<row-wide> </row-wide>` and `<row> </row
 | ------------- | ------------------------------------------ | ------------------- | ---------------------- |
 | `height-m`    | The height of the slider on mobile devices. Images will center themselves and cover the available space. | 40vw                | 30vw, 40vh, 100px, ... |
 | `height-d`    | The height of the slider on desktop devices. Images will center themselves and cover the available space.| 40vw                | 30vw, 40vh, 100px, ... |
+| `searchbox`    | If there should be a searchbox in the slider.| false                | true, false |
+| `searchbox-position`    | The position of the searchbox.| bottom                | top, bottom |
 
 #### Additional Info:
 The images for the slider are defined via photoalbums. You can find the "show on homepage"-Option in the settings of each album.
@@ -79,31 +83,39 @@ The images for the slider are defined via photoalbums. You can find the "show on
 ## Autoplay Video(s)
 [![Autoplay Video](docs/_static/homepage_widgets//autoplay_video.png?raw=true)]()
 ```
-    <autoplay_video 
-        max-height="100vh"
-        text="Text on video"
-        link_mp4="/storage/..."
-        link_mp4_low_res="/storage/..."
-        link_webm="/storage/..."
-        link_webm_low_res="/storage/..."
-    />
+<autoplay_video
+    max-height="100vh"
+    text="Text on video"
+    button_url="https://..."
+    button_text="Button Text"
+    link_mp4="/storage/..."
+    link_mp4_low_res="/storage/..."
+    link_webm="/storage/..."
+    link_webm_low_res="/storage/..."
+    searchbox="true"
+    searchbox-position="top"
+/>
 ```
 | Attribute Name | Description                                | Value if left empty | Possible Values        |
 | ------------- | ------------------------------------------ | ------------------- | ---------------------- |
 | `max-height` | The *maximum* height of the video. Can for example be used for fullscreen videos on desktop. The video will center itself in the available space. | Video height                  | 30vw, 40vh, 100px, ... |
 | `text`       | Text to be shown atop of the video | -                   | Any text         |
+| `button_url`       | Adds a button linked to the url | -                   | https://...         |
+| `button_text`       | Text used as the label of the button. Button only appears if there is a button_url. | "Show more"                   | Any text         |
 | `link_mp4_low_res`  | Link to the video in the mp4 format with reduced size uploaded in the files-section. Will be shown for mobile devices instead of the full sized video. | -                   | /storage/...         |
 | `link_mp4`       | Link to the full sized video in the mp4 format uploaded in the files-section. Will be shown for desktop and mobile, if no smaller size is available. | -                   | /storage/...         |
 | `link_webm_low_res`  | Link to the video in the webm format with reduced size uploaded in the files-section. Will be shown for mobile devices instead of the full sized video. | -                   | /storage/...         |
 | `link_webm`       | Link to the full sized video in the webm format uploaded in the files-section. Will be shown for desktop and mobile, if no smaller size is available. | -                   | /storage/...         |
+| `searchbox`    | If there should be a searchbox in the video.| false                | true, false |
+| `searchbox-position`    | The position of the searchbox.| bottom                | top, bottom |
 
 #### Additional Info:
 You can add multiple videos and wrap them with `<random_videos> </random_videos>` to display one of the videos at random each time the page gets refreshed. Like this:
 ```
 <random_videos>
-    <autoplay_video 
+    <autoplay_video
         link_mp4="/storage/video_1" />
-    <autoplay_video 
+    <autoplay_video
         link_mp4="/storage/video_2" />
 
 </random_videos>
@@ -113,8 +125,8 @@ You can add multiple videos and wrap them with `<random_videos> </random_videos>
 ## Icon Links
 [![Icon Links](docs/_static/homepage_widgets//icon_links.png?raw=true)]()
 ```
-<icon_link 
-    icon="fa-concierge-bell" 
+<icon_link
+    icon="fa-concierge-bell"
     title="Online-Schalter"
     link="/forms"
     text="Nehmen Sie online bequem Dienstleistungen in Anspruch"
@@ -127,7 +139,7 @@ You can add multiple videos and wrap them with `<random_videos> </random_videos>
 | `title`       | Title of the icon link widget  | **Cannot** be left empty *     | Any text         |
 | `text`       | Text of the icon link widget               | -         | Any text         |
 | `text`       | Where the icon link widget is linked to     | -         | https://...         |
-| `text`       | Inverts the colors of the icon link widget (white turns to primary color and vice versa).                 | false         | true, false         |
+| `invert`       | Inverts the colors of the icon link widget (white turns to primary color and vice versa).                 | false         | true, false         |
 | `class`       | Custom classes                             | -                   | Any class name         |
 
 \* Icon link widget will not be displayed if this value is missing
@@ -177,7 +189,7 @@ You can adjust the number of displayed events in the homepage-settings form.
 
 ## Partners
 [![Partners](docs/_static/homepage_widgets//partners.png?raw=true)]()
-``` 
+```
 <partners />
 ```
 | Attribute Name | Description      | Value if left empty | Possible Values        |
@@ -210,13 +222,13 @@ The label and visibility of the services can be edited in the homepage settings.
 
 ## Contacts
 [![Contacts](docs/_static/homepage_widgets/people.png?raw=true)]()
-``` 
+```
 <contacts_and_albums/>
 ```
 
 ## Directories
 [![Directories](docs/_static/homepage_widgets/directories.png?raw=true)]()
-``` 
+```
 <directories/>
 ```
 
@@ -290,7 +302,7 @@ The label and visibility of the services can be edited in the homepage settings.
 
 ## Jobs
 [![Jobs](docs/_static/homepage_widgets//jobs.png?raw=true)]()
-``` 
+```
 <jobs
     rss_feed="https://www.publicjobs.ch/rss/~search1576049765b9fb8a630d17ec5dfcce06841a6e"
     jobs_card_title="Looking for ..."

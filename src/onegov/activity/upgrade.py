@@ -2,218 +2,40 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-import hashlib
+# pragma: exclude file
+from __future__ import annotations
+
 import string
 
 from itertools import chain
 from onegov.activity import ActivityCollection
+from onegov.activity import ActivityInvoiceItem
 from onegov.activity import Attendee
-from onegov.activity import Booking
-from onegov.activity import Invoice
-from onegov.activity import InvoiceCollection
-from onegov.activity import InvoiceItem
-from onegov.activity import InvoiceReference
+from onegov.activity import BookingPeriod
+from onegov.activity import BookingPeriodCollection
+from onegov.activity import BookingPeriodInvoice
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.activity import Occasion
 from onegov.activity import OccasionNeed
-from onegov.activity import Period
-from onegov.activity import PeriodCollection
-from onegov.user import User
 from onegov.core.crypto import random_token
 from onegov.core.orm.sql import as_selectable
-from onegov.core.orm.types import UUID, JSON
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.core.utils import Bunch
+from onegov.pay import InvoiceReference
+from onegov.user import User
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
-from sqlalchemy import desc
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import select
+from sqlalchemy import text
 from sqlalchemy import Text
+from sqlalchemy import UUID
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.orm import joinedload
-
-
-@upgrade_task('Rebuild bookings')
-def rebuild_bookings(context: UpgradeContext) -> None:
-    # having not created any bookings yet, we can rebuild them
-    context.operations.drop_table('bookings')
-
-
-@upgrade_task('Add period_id to bookings')
-def add_period_id_to_bookings(context: UpgradeContext) -> None:
-
-    context.operations.add_column('bookings', Column(
-        'period_id', UUID, ForeignKey("periods.id"), nullable=True
-    ))
-
-    bookings = context.session.query(Booking)
-    bookings = bookings.options(joinedload(Booking.occasion))
-
-    for booking in bookings:
-        booking.period_id = booking.occasion.period_id
-
-    context.session.flush()
-    context.operations.alter_column('bookings', 'period_id', nullable=False)
-
-
-@upgrade_task('Change booking states')
-def change_booking_states(context: UpgradeContext) -> None:
-
-    new_type = Enum(
-        'open',
-        'blocked',
-        'accepted',
-        'denied',
-        'cancelled',
-        name='booking_state'
-    )
-
-    op = context.operations
-
-    op.execute("""
-        ALTER TABLE bookings ALTER COLUMN state TYPE Text;
-        UPDATE bookings SET state = 'open' WHERE state = 'unconfirmed';
-        DROP TYPE booking_state;
-    """)
-
-    new_type.create(op.get_bind())
-
-    op.execute("""
-        ALTER TABLE bookings ALTER COLUMN state
-        TYPE booking_state USING state::text::booking_state;
-    """)
-
-
-@upgrade_task('Add confirmed flag to period')
-def add_confirmed_flag_to_period(context: UpgradeContext) -> None:
-    context.operations.add_column('periods', Column(
-        'confirmed', Boolean, nullable=True, default=False
-    ))
-
-    for period in context.session.query(Period):
-        period.confirmed = False
-
-    context.session.flush()
-    context.operations.alter_column('periods', 'confirmed', nullable=False)
-
-
-@upgrade_task('Add data column to period')
-def add_data_column_to_period(context: UpgradeContext) -> None:
-    context.operations.add_column('periods', Column(
-        'data', JSON, nullable=True, default=dict
-    ))
-
-    for period in context.session.query(Period):
-        period.data = {}
-
-    context.session.flush()
-    context.operations.alter_column('periods', 'data', nullable=False)
-
-
-@upgrade_task('Add attendee_count column to occasion')
-def add_attendee_count_column_to_occasion(context: UpgradeContext) -> None:
-    context.operations.add_column('occasions', Column(
-        'attendee_count', Integer, nullable=True, default=0
-    ))
-
-    for occasion in context.session.query(Occasion):
-        occasion.attendee_count = len(occasion.accepted)
-
-    context.session.flush()
-    context.operations.alter_column(
-        'occasions', 'attendee_count', nullable=False)
-
-
-@upgrade_task('Add finalized flag to period')
-def add_finalized_flag_to_period(context: UpgradeContext) -> None:
-    context.operations.add_column('periods', Column(
-        'finalized', Boolean, nullable=True, default=False
-    ))
-
-    for period in context.session.query(Period):
-        period.finalized = False
-
-    context.session.flush()
-    context.operations.alter_column('periods', 'finalized', nullable=False)
-
-
-@upgrade_task('Add payment model columns')
-def add_payment_model_columns(context: UpgradeContext) -> None:
-    context.operations.add_column('periods', Column(
-        'max_bookings_per_attendee', Integer, nullable=True
-    ))
-
-    context.operations.add_column('periods', Column(
-        'booking_cost', Numeric(precision=8, scale=2), nullable=True
-    ))
-
-    context.operations.add_column('periods', Column(
-        'all_inclusive', Boolean, nullable=True
-    ))
-
-    for period in context.session.query(Period):
-        period.all_inclusive = False
-
-    context.session.flush()
-    context.operations.alter_column('periods', 'all_inclusive', nullable=False)
-
-    context.operations.add_column('occasions', Column(
-        'cost', Numeric(precision=8, scale=2), nullable=True
-    ))
-
-    context.operations.add_column('bookings', Column(
-        'cost', Numeric(precision=8, scale=2), nullable=True
-    ))
-
-
-@upgrade_task('Add cancelled flag to occasion')
-def add_cancelled_flag_to_occasion(context: UpgradeContext) -> None:
-    context.operations.add_column('occasions', Column(
-        'cancelled', Boolean, nullable=True
-    ))
-
-    for occasion in context.session.query(Occasion):
-        occasion.cancelled = False
-
-    context.session.flush()
-    context.operations.alter_column('occasions', 'cancelled', nullable=False)
-
-
-@upgrade_task('Add code field to invoice items')
-def add_code_field_to_invoice_items(context: UpgradeContext) -> None:
-    context.operations.add_column('invoice_items', Column(
-        'code', Text, nullable=True
-    ))
-
-    for i in context.session.query(InvoiceItem):
-        i.code = 'q' + ''.join((  # type:ignore[attr-defined]
-            hashlib.new(
-                'sha1',
-                (i.invoice + i.username).encode('utf-8'),  # type:ignore
-                usedforsecurity=False
-            ).hexdigest()[:5],
-            hashlib.new(
-                'sha1',
-                i.username.encode('utf-8'),  # type:ignore[attr-defined]
-                usedforsecurity=False
-            ).hexdigest()[:5]
-        ))
-
-    context.session.flush()
-    context.operations.alter_column('invoice_items', 'code', nullable=False)
-
-
-@upgrade_task('Add source field to invoice items')
-def add_source_field_to_invoice_items(context: UpgradeContext) -> None:
-    if not context.has_column('invoice_items', 'source'):
-        context.operations.add_column('invoice_items', Column(
-            'source', Text, nullable=True
-        ))
 
 
 @upgrade_task('Add gender/notes fields to attendees')
@@ -235,14 +57,14 @@ def support_multiple_dates_per_occasion(context: UpgradeContext) -> None:
 
     for name in ('durations', 'order'):
         context.operations.add_column(
-            'occasions', Column(name, Integer, server_default="0"))
+            'occasions', Column(name, Integer, server_default='0'))
         context.operations.alter_column(
             'occasions', name, server_default=None)
 
-    context.session.execute("""
+    context.session.execute(text("""
         INSERT INTO occasion_dates ("timezone", "start", "end", "occasion_id")
         SELECT "timezone", "start", "end", "id" FROM occasions
-    """)
+    """))
 
     context.session.flush()
 
@@ -310,12 +132,12 @@ def add_active_days(context: UpgradeContext) -> None:
 
     # This will be removed in an upgrade step further down again and is not
     # compatible with postgres 13- and 14+.
-    # context.session.execute(
+    # context.session.execute(text(
     #     'CREATE AGGREGATE "{}".array_cat_agg(anyarray) '
     #     '(SFUNC=array_cat, STYPE=anyarray)'.format(
     #         context.schema
     #     )
-    # )
+    # ))
 
     context.operations.add_column('activities', Column(
         'active_days', ARRAY(Integer), nullable=True
@@ -353,18 +175,18 @@ def remove_denied_activity_state(context: UpgradeContext) -> None:
 
     op = context.operations
 
-    op.execute("""
+    op.execute(text("""
         ALTER TABLE activities ALTER COLUMN state TYPE Text;
         UPDATE activities SET state = 'archived' WHERE state = 'denied';
         DROP TYPE activity_state;
-    """)
+    """))
 
     new_type.create(op.get_bind())
 
-    op.execute("""
+    op.execute(text("""
         ALTER TABLE activities ALTER COLUMN state
         TYPE activity_state USING state::text::activity_state;
-    """)
+    """))
 
 
 @upgrade_task('Add weekdays')
@@ -409,13 +231,16 @@ def retroactively_create_publication_requests(context: UpgradeContext) -> None:
     if not activities.count():
         return
 
-    periods = PeriodCollection(context.session)
+    periods = BookingPeriodCollection(context.session)
 
     pq = periods.query()
-    pq = pq.order_by(desc(Period.active), desc(Period.execution_start))
+    pq = pq.order_by(
+        BookingPeriod.active.desc(),
+        BookingPeriod.execution_start.desc()
+    )
     p = pq.first()
 
-    assert p, "an active period is required"
+    assert p, 'an active period is required'
 
     for activity in activities:
         activity.create_publication_request(p, id=activity.id)
@@ -427,7 +252,7 @@ def add_archived_flag_to_period(context: UpgradeContext) -> None:
         'archived', Boolean, nullable=True, default=False
     ))
 
-    for period in context.session.query(Period):
+    for period in context.session.query(BookingPeriod):
         period.archived = False
 
     context.session.flush()
@@ -526,11 +351,11 @@ def add_invoices(context: UpgradeContext) -> None:
         LEFT JOIN users ON invoice_items.username = users.username
     """)
 
-    invoices = InvoiceCollection(context.session)
+    invoices = BookingPeriodInvoiceCollection(context.session)
 
     mapping = {
         r.id: Bunch(record=r, invoice=None)
-        for r in context.session.execute(select(stmt.c))
+        for r in context.session.execute(select(*stmt.c))
     }
 
     created = {}  # type:ignore[var-annotated]
@@ -569,7 +394,7 @@ def add_invoice_references(context: UpgradeContext) -> None:
         return
 
     # legacy functions obsolete after this migration
-    CODE_TO_ESR_MAPPING = {
+    CODE_TO_ESR_MAPPING = {  # noqa: N806
         character: '{:02d}'.format(value) for value, character in chain(
             enumerate(string.digits, start=1),
             enumerate(string.ascii_lowercase, start=11)
@@ -599,7 +424,7 @@ def add_invoice_references(context: UpgradeContext) -> None:
                 blocks.append(CODE_TO_ESR_MAPPING[char])
             else:
                 raise RuntimeError(
-                    "Invalid character {} in {}".format(char, code))
+                    'Invalid character {} in {}'.format(char, code))
 
         return append_checksum('{:0>26}'.format(''.join(blocks)))
 
@@ -610,11 +435,11 @@ def add_invoice_references(context: UpgradeContext) -> None:
         FROM invoices
     """)
 
-    invoices = context.session.execute(select(stmt.c))
+    invoices = context.session.execute(select(*stmt.c))
 
     # the references might have been created already in the previous upgrade
     # step, if it was executed with the latest release
-    context.session.execute('DELETE FROM invoice_references')
+    context.session.execute(text('DELETE FROM invoice_references'))
 
     for invoice in invoices:
         context.session.add(
@@ -675,7 +500,7 @@ def make_group_code_nullable(context: UpgradeContext) -> None:
     context.operations.alter_column('bookings', 'group_code', nullable=True)
 
     # nobody uses groups yet, so we can safely reset it all to NULL
-    context.operations.execute("UPDATE bookings SET group_code = NULL")
+    context.operations.execute(text('UPDATE bookings SET group_code = NULL'))
 
 
 @upgrade_task('Adds exempt_from_booking_limit to occasion')
@@ -759,32 +584,32 @@ def improve_period_dates_constraint(context: UpgradeContext) -> None:
     context.operations.create_check_constraint(
         'period_date_order',
         'periods',
-        ' AND '.join((
+        (
             # ranges should be valid
-            'prebooking_start <= prebooking_end',
-            'booking_start <= booking_end',
-            'execution_start <= execution_end',
+            'prebooking_start <= prebooking_end AND '
+            'booking_start <= booking_end AND '
+            'execution_start <= execution_end AND '
 
             # pre-booking must happen before booking and execution
-            'prebooking_end <= booking_start',
-            'prebooking_end <= execution_start',
+            'prebooking_end <= booking_start AND '
+            'prebooking_end <= execution_start AND '
 
             # booking and execution may overlap, but the execution cannot
             # start before booking begins
-            'booking_start <= execution_start',
-            'booking_end <= execution_end',
-        )),
+            'booking_start <= execution_start AND '
+            'booking_end <= execution_end'
+        ),
     )
 
 
 @upgrade_task('Drop deadline_date')
 def drop_deadline_date(context: UpgradeContext) -> None:
-    context.session.execute("""
+    context.session.execute(text("""
             UPDATE periods SET booking_end = deadline_date
             WHERE deadline_date IS NOT NULL
               AND execution_start <= deadline_date
               AND deadline_date <= execution_end
-        """)
+        """))
 
     context.operations.drop_column('periods', 'deadline_date')
 
@@ -846,18 +671,18 @@ def make_activity_polymorphic_type_non_nullable(
     context: UpgradeContext
 ) -> None:
     if context.has_table('activities'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE activities SET type = 'generic' WHERE type IS NULL;
-        """)
+        """))
 
         context.operations.alter_column('activities', 'type', nullable=False)
 
 
 @upgrade_task('Cleanup activity aggregates')
 def cleanup_activity_aggregates(context: UpgradeContext) -> None:
-    context.operations.execute(f"""
+    context.operations.execute(text(f"""
         DROP AGGREGATE IF EXISTS "{context.schema}".array_cat_agg(anyarray);
-    """)
+    """))
 
 
 @upgrade_task('Add differing attendee address')
@@ -902,18 +727,102 @@ def add_invoice_item_organizer(context: UpgradeContext) -> None:
 def add_attendee_id_to_invoice_item(context: UpgradeContext) -> None:
     if not context.has_column('invoice_items', 'attendee_id'):
         context.operations.add_column('invoice_items', Column(
-            'attendee_id', UUID, ForeignKey("attendees.id"), nullable=True
+            'attendee_id', UUID, ForeignKey('attendees.id'), nullable=True
         ))
 
 
 @upgrade_task('Fill in attendee ids')
 def fill_in_attendee_ids_1(context: UpgradeContext) -> None:
-    q = context.session.query(InvoiceItem, Attendee).join(Invoice).join(User)
-    q = q.join(Attendee,
-               func.lower(InvoiceItem.group) == func.lower(Attendee.name))
+    q = context.session.query(
+        ActivityInvoiceItem, Attendee
+    ).join(BookingPeriodInvoice).join(User)
+    q = q.join(
+        Attendee,
+        func.lower(ActivityInvoiceItem.group) == func.lower(Attendee.name)
+    )
     q = q.filter(User.username == Attendee.username)
-    q = q.filter(User.id == Invoice.user_id)
-    q = q.filter(InvoiceItem.attendee_id.is_(None))
+    q = q.filter(User.id == BookingPeriodInvoice.user_id)
+    q = q.filter(ActivityInvoiceItem.attendee_id.is_(None))
 
-    for item, attendee in q.all():
+    for item, attendee in q:
         item.attendee_id = attendee.id
+
+
+@upgrade_task('Add siwsspass id column to attendee')
+def add_swisspass_id_column_to_attendee(context: UpgradeContext) -> None:
+    if not context.has_column('attendees', 'swisspass'):
+        context.operations.add_column(
+            'attendees',
+            column=Column('swisspass', Text, nullable=True)
+        )
+
+
+@upgrade_task('Update invoice tables for polymorphism')
+def update_invoice_tables_for_polymorphism(context: UpgradeContext) -> None:
+    if not context.has_column('invoices', 'type'):
+        context.operations.add_column('invoices', Column(
+            'type',
+            Text,
+            nullable=False,
+            server_default='booking_period'
+        ))
+        context.operations.alter_column(
+            'invoices',
+            'type',
+            server_default=None
+        )
+        # make existing columns nullable
+        context.operations.alter_column(
+            'invoices',
+            'period_id',
+            nullable=True
+        )
+        context.operations.alter_column(
+            'invoices',
+            'user_id',
+            nullable=True
+        )
+        # but add a check constraint enforcing the same invariant
+        if not context.has_constraint(
+            'invoices',
+            'ck_booking_period_required_columns',
+            'CHECK'
+        ):
+            context.operations.create_check_constraint(
+                'ck_booking_period_required_columns',
+                'invoices',
+                '(period_id IS NOT NULL AND user_id IS NOT NULL)'
+                "OR type != 'booking_period'"
+            )
+    if not context.has_column('invoice_items', 'type'):
+        context.operations.add_column('invoice_items', Column(
+            'type',
+            Text,
+            nullable=False,
+            server_default='activity'
+        ))
+        context.operations.alter_column(
+            'invoice_items',
+            'type',
+            server_default=None
+        )
+
+
+@upgrade_task('Add ON UPDATE CASCADE to username FOREIGN KEY constraints')
+def add_on_update_cascade_to_username_fks(context: UpgradeContext) -> None:
+    for table_name in ('activities', 'attendees', 'bookings'):
+        constraint_name = f'{table_name}_username_fkey'
+        if context.has_constraint(table_name, constraint_name, 'FOREIGN KEY'):
+            context.operations.drop_constraint(
+                constraint_name,
+                table_name,
+                type_='foreignkey'
+            )
+            context.operations.create_foreign_key(
+                constraint_name,
+                table_name,
+                'users',
+                ['username'],
+                ['username'],
+                onupdate='CASCADE'
+            )

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from base64 import b64encode
 from datetime import date
 from onegov.election_day import _
@@ -10,12 +12,17 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 
-def test_d3_renderer_scripts(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_d3_renderer_scripts(election_day_app_zg: TestApp) -> None:
     generator = D3Renderer(election_day_app_zg)
     assert len(generator.scripts)
 
 
-def test_d3_renderer_translatation(election_day_app_zg):
+def test_d3_renderer_translatation(election_day_app_zg: TestApp) -> None:
     generator = D3Renderer(election_day_app_zg)
 
     assert generator.translate(_('Election'), 'de_CH') == 'Wahl'
@@ -24,7 +31,7 @@ def test_d3_renderer_translatation(election_day_app_zg):
     assert generator.translate(_('Election'), 'rm_CH') == 'Elecziun'
 
 
-def test_d3_renderer_get_chart(election_day_app_zg):
+def test_d3_renderer_get_chart(election_day_app_zg: TestApp) -> None:
     d3 = D3Renderer(election_day_app_zg)
 
     with patch('onegov.election_day.utils.d3_renderer.post',
@@ -123,18 +130,18 @@ def test_d3_renderer_get_chart(election_day_app_zg):
         assert d3.get_chart('bar', 'pdf', data).read().decode() == 'PDF'
         assert d3.get_chart('grouped', 'pdf', data).read().decode() == 'PDF'
         assert d3.get_chart('sankey', 'pdf', data).read().decode() == 'PDF'
-        assert d3.get_chart('entities-map', 'pdf', data).read().decode() \
-            == 'PDF'
-        assert d3.get_chart('districts-map', 'pdf', data).read().decode() \
-            == 'PDF'
-        assert d3.get_map('entities', 'pdf', data, 2015).read().decode() \
-            == 'PDF'
-        assert d3.get_map('districts', 'pdf', data, 2015).read().decode() \
-            == 'PDF'
+        assert d3.get_chart('entities-map', 'pdf', data
+            ).read().decode() == 'PDF'
+        assert d3.get_chart('districts-map', 'pdf', data
+            ).read().decode() == 'PDF'
+        assert d3.get_map('entities', 'pdf', data, 2015
+            ).read().decode() == 'PDF'
+        assert d3.get_map('districts', 'pdf', data, 2015
+            ).read().decode() == 'PDF'
         assert post.call_args[0] == ('http://localhost:1337/d3/pdf',)
 
 
-def test_d3_renderer_get_charts(election_day_app_zg):
+def test_d3_renderer_get_charts(election_day_app_zg: TestApp) -> None:
     election = Election(
         title="Election",
         domain='federation',
@@ -202,14 +209,14 @@ def test_d3_renderer_get_charts(election_day_app_zg):
     assert d3.get_parties_panachage_chart(vote, 'svg') is None
     assert d3.get_parties_panachage_chart(vote.proposal, 'svg') is None
 
-    assert d3.get_entities_map(election, 'svg', None) is None
-    assert d3.get_entities_map(compound, 'svg', None) is None
-    assert d3.get_entities_map(part, 'svg', None) is None
-    assert d3.get_entities_map(vote, 'svg', None) is None
-    assert d3.get_entities_map(vote.proposal, 'svg', None) is None
+    assert d3.get_entities_map(election, 'svg', None) is None  # type: ignore[call-overload]
+    assert d3.get_entities_map(compound, 'svg', None) is None  # type: ignore[call-overload]
+    assert d3.get_entities_map(part, 'svg', None) is None  # type: ignore[call-overload]
+    assert d3.get_entities_map(vote, 'svg', None) is None  # type: ignore[call-overload]
+    assert d3.get_entities_map(vote.proposal, 'svg', None) is None  # type: ignore[call-overload]
 
-    assert d3.get_districts_map(election, 'svg', None) is None
-    assert d3.get_districts_map(compound, 'svg', None) is None
-    assert d3.get_districts_map(part, 'svg', None) is None
-    assert d3.get_districts_map(vote, 'svg', None) is None
-    assert d3.get_districts_map(vote.proposal, 'svg', None) is None
+    assert d3.get_districts_map(election, 'svg', None) is None  # type: ignore[call-overload]
+    assert d3.get_districts_map(compound, 'svg', None) is None  # type: ignore[call-overload]
+    assert d3.get_districts_map(part, 'svg', None) is None  # type: ignore[call-overload]
+    assert d3.get_districts_map(vote, 'svg', None) is None  # type: ignore[call-overload]
+    assert d3.get_districts_map(vote.proposal, 'svg', None) is None  # type: ignore[call-overload]

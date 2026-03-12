@@ -2,7 +2,10 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from onegov.core.orm.types import UTCDateTime
+# pragma: exclude file
+from __future__ import annotations
+
+from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.directory import Directory
 from sqlalchemy import Column, Integer
@@ -67,3 +70,17 @@ def make_directory_models_polymorphic_type_non_nullable(
             """)
 
             context.operations.alter_column(table, 'type', nullable=False)
+
+
+@upgrade_task('Add meta and content columns to entry recipients')
+def add_meta_data_and_content_columns_to_entry_recipients(
+    context:
+    UpgradeContext
+) -> None:
+    if not context.has_column('entry_recipients', 'meta'):
+        context.operations.add_column('entry_recipients',
+                                      Column('meta', JSON()))
+
+    if not context.has_column('entry_recipients', 'content'):
+        context.operations.add_column('entry_recipients',
+                                      Column('content', JSON))

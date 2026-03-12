@@ -13,14 +13,14 @@
                 <hr />
             </p>
             <p>
-                <a href="${sponsors[0].mail_url}" style="margin-bottom: 0; display: flex;">
-                    <img src="${sponsors[0].banners.src}">
+                <a href="${sponsors[0].mail_url}" style="margin-bottom: 0; display: flex;" class="banner-mail">
+                    <img src="${sponsors[0].banners.narrow}">
                 </a>
             </p>
             <p style="margin-bottom: 0;">
                 <span i18n:translate>Pro Juventute FERIENNET is supported by:</span>
                 <tal:b tal:repeat="sponsor sponsors">
-                    <a href="${sponsor.mail_url}">${sponsor.name}</a><span tal:condition="sponsor != sponsors[-1]">, </span> 
+                    <a href="${sponsor.mail_url}" class="sponsor-mail">${sponsor.name}</a><span tal:condition="sponsor != sponsors[-1]">, </span>
                 </tal:b>
             </p>
         </div>

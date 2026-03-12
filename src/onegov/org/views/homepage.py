@@ -1,4 +1,5 @@
 """ The onegov organisation homepage. """
+from __future__ import annotations
 
 from morepath import redirect
 from onegov.core.security import Public, Private
@@ -23,10 +24,10 @@ if TYPE_CHECKING:
 
 
 def redirect_to(
-    request: 'OrgRequest',
+    request: OrgRequest,
     target: str | None,
     path: str | None
-) -> 'Response | None':
+) -> Response | None:
     if target == 'directories':
         return redirect(request.class_link(DirectoryCollection))
 
@@ -51,9 +52,9 @@ def redirect_to(
 @OrgApp.html(model=Organisation, template='homepage.pt', permission=Public)
 def view_org(
     self: Organisation,
-    request: 'OrgRequest',
-    layout: 'Layout | None' = None
-) -> 'RenderData | Response':
+    request: OrgRequest,
+    layout: Layout | None = None
+) -> RenderData | Response:
     """ Renders the org's homepage. """
 
     # the homepage can optionally be used as a jump-pad to redirect to
@@ -87,14 +88,14 @@ def view_org(
 )
 def view_pages_sort(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: HomepageLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or HomepageLayout(self, request)
 
     return {
-        'title': _("Sort"),
+        'title': _('Sort'),
         'layout': layout,
         'page': self,
         'pages': layout.root_pages

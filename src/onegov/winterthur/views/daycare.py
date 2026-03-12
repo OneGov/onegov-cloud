@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.winterthur import WinterthurApp, _
 from onegov.winterthur.daycare import DaycareSubsidyCalculator
@@ -18,9 +20,9 @@ if TYPE_CHECKING:
     template='daycare.pt')
 def view_daycare_subsidy_calculator(
     self: DaycareSubsidyCalculator,
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     form: DaycareSubsidyCalculatorForm
-) -> 'RenderData':
+) -> RenderData:
 
     calculation = None
     if form.submitted(request):
@@ -36,11 +38,11 @@ def view_daycare_subsidy_calculator(
         )
 
     return {
-        'title': _("Daycare Subsidy Calculator"),
+        'title': _('Daycare Subsidy Calculator'),
         'layout': DaycareSubsidyCalculatorLayout(self, request),
         'form': form,
         'calculation': calculation,
-        'button_text': _("Calculate"),
+        'button_text': _('Calculate'),
         'settings': self.settings,
         'eligible': (
             calculation and calculation.city_share_per_month != '0.00'

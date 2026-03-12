@@ -1,4 +1,5 @@
 """ The manage subscription views. """
+from __future__ import annotations
 
 import morepath
 
@@ -23,13 +24,13 @@ if TYPE_CHECKING:
 )
 def view_upload_tokens(
     self: UploadTokenCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View all upload tokens as a list. """
 
     return {
         'layout': ManageUploadTokensLayout(self, request),
-        'title': _("Upload tokens"),
+        'title': _('Upload tokens'),
         'upload_tokens': self.query().all(),
         'new_token': request.link(self, 'create-token'),
     }
@@ -42,24 +43,24 @@ def view_upload_tokens(
 )
 def create_upload_token(
     self: UploadTokenCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmptyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Create a new upload token. """
 
     layout = ManageUploadTokensLayout(self, request)
 
     if form.submitted(request):
         self.create()
-        request.message(_("Upload token created."), 'success')
+        request.message(_('Upload token created.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
-        'message': _("Create a new upload token?"),
-        'button_text': _("Create"),
-        'title': _("Create token"),
+        'message': _('Create a new upload token?'),
+        'button_text': _('Create'),
+        'title': _('Create token'),
         'cancel': layout.manage_model_link
     }
 
@@ -70,9 +71,9 @@ def create_upload_token(
 )
 def delete_upload_token(
     self: UploadToken,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmptyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Delete the upload token item. """
 
     layout = ManageUploadTokensLayout(self, request)
@@ -80,7 +81,7 @@ def delete_upload_token(
     if form.submitted(request):
         upload_tokens = UploadTokenCollection(request.session)
         upload_tokens.delete(self)
-        request.message(_("Upload token deleted."), 'success')
+        request.message(_('Upload token deleted.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -91,8 +92,8 @@ def delete_upload_token(
         'layout': layout,
         'form': form,
         'title': self.token,
-        'subtitle': _("Delete upload token"),
-        'button_text': _("Delete upload token"),
+        'subtitle': _('Delete upload token'),
+        'button_text': _('Delete upload token'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }

@@ -1,0 +1,334 @@
+<!--!
+    This is the OneGov E-Mail template. Tested against https://litmus.com/
+    (same system used internally by Mailchimp).
+
+    The following rules apply:
+
+    * CSS styles must always be inlined.
+    * Content is always contained in tables.
+    * The template is based on https://github.com/leemunroe/responsive-html-email-template.
+    * Use 'background-color', not 'background'
+    * Use 'Margin', not 'margin' (uppercase helps with some Outlook versions).
+
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="${request.locale}"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    i18n:domain="onegov.org"
+    metal:define-macro="layout">
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title><div metal:define-slot="title"></div></title>
+    <!--! WARNING: Do not use comments in the styles below, some e-mail clients do not like it -->
+    <style tal:define="primary_color layout.primary_color">
+    * {
+        Margin: 0;
+        padding: 0;
+        font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+        font-size: 100%;
+        line-height: 1.6;
+    }
+
+    img {
+        max-width: 100%;
+    }
+
+    body {
+        -webkit-font-smoothing: antialiased;
+        -webkit-text-size-adjust: none;
+        -ms-text-size-adjust: none;
+        width: 100%!important;
+        height: 100%;
+        font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+    }
+
+    a {
+        color: <tal:b replace="primary_color" />;
+    }
+
+    a.hashtag {
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        text-decoration: none;
+        color: #FFF;
+        background-color: <tal:b replace="primary_color" />;
+        border: solid <tal:b replace="primary_color" />;
+        border-width: 10px 20px;
+        line-height: 2;
+        font-weight: bold;
+        Margin-right: 10px;
+        Margin-top: 10px;
+        text-align: center;
+        cursor: pointer;
+        display: inline-block;
+        border-radius: 5px;
+    }
+
+    .btn-secondary {
+        text-decoration: none;
+        color: #FFF;
+        background-color: #aaa;
+        border: solid #aaa;
+        border-width: 10px 20px;
+        line-height: 2;
+        font-weight: bold;
+        Margin-right: 10px;
+        text-align: center;
+        cursor: pointer;
+        display: inline-block;
+        border-radius: 5px;
+    }
+
+    .last {
+        Margin-bottom: 0;
+    }
+
+    .first {
+        Margin-top: 0;
+    }
+
+    .padding {
+        padding: 10px 0;
+    }
+
+    .ticket-number {
+        font-family: Consolas, "Liberation Mono", Courier, monospace;
+        font-weight: bold;
+    }
+
+    table {
+        width: 100% !important;
+    }
+
+    table.body-wrap {
+        width: 100%;
+        padding: 20px;
+    }
+
+    table.body-wrap .container {
+        border: 1px solid #f0f0f0;
+    }
+
+    table.footer-wrap {
+        width: 100%;
+        clear: both!important;
+    }
+
+    .footer-wrap .container p,
+    .footer-wrap .container a {
+        font-size: 12px;
+        color: #666;
+    }
+
+    table.footer-wrap a {
+        color: #999;
+    }
+
+    h1, h2, h3 {
+        font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+        color: #000;
+        Margin: 40px 0 10px;
+        line-height: 1.2;
+        font-weight: 200;
+    }
+
+    h1 {
+        font-size: 36px;
+    }
+    h2 {
+        font-size: 28px;
+    }
+    h3 {
+        font-size: 22px;
+    }
+
+    a, p, ul, ol, dt, dd {
+        Margin-bottom: 10px;
+        font-weight: normal;
+        font-size: 14px;
+    }
+
+    td {
+        font-size: 14px;
+    }
+
+    dt {
+        Margin-bottom: 0;
+        font-weight: bold;
+    }
+
+    .fieldset {
+        font-size: 14px;
+        font-weight: normal;
+        Margin-bottom: 10px;
+    }
+
+    .descreet {
+        color: #555;
+    }
+
+    ul li, ol li {
+        Margin-left: 5px;
+        list-style-position: inside;
+    }
+
+    ul.flat,
+    ul.flat li {
+        list-style: none;
+        Margin: 0;
+        padding: 0;
+    }
+
+    ul.flat {
+        Margin-bottom: 10px;
+    }
+
+    hr {
+        border: 1px solid #ddd;
+        border-width: 1px 0 0 0;
+        Margin-bottom: 20px;
+    }
+
+    hr.large {
+        Margin-top: 20px;
+    }
+
+    .reservation {
+        border: 1px solid #eee;
+        color: #222;
+        Margin-bottom: 10px;
+        padding: 0;
+    }
+
+    .header {
+        background-color: #eee;
+        padding: 5px 10px;
+    }
+
+    .body {
+        padding: 0 10px;
+    }
+
+    .inline-message {
+        padding: 10px 10px 5px;
+        background-color: #f5f5f5;
+        border-left: 4px solid #ddd;
+    }
+
+    .inline-message + br {
+        content: "";
+        height: 20px;
+        display: block;
+    }
+
+    .message-owner, .message-owner a {
+        font-size: .8rem;
+        color: #666;
+    }
+
+    .message-owner {
+        display: block;
+        position: relative;
+        top: -5px;
+    }
+
+    .previous-message {
+        border-left: 4px solid #ddd;
+    }
+
+    .current-message {
+        Margin-bottom: 10px;
+        border-left: 4px solid <tal:b replace="primary_color" />;
+    }
+
+    .inline-message p:last-child {
+        Margin-bottom: 5px;
+    }
+
+    .inline-message br {
+        line-height: 0.5;
+    }
+
+    .container {
+        display: block!important;
+        max-width: 600px!important;
+        Margin: 0 auto!important;
+        clear: both!important;
+    }
+
+    .body-wrap .container {
+        padding: 20px;
+    }
+
+    .content {
+        max-width: 600px;
+        Margin: 0 auto;
+        display: block;
+    }
+
+    .content table {
+        width: 100%;
+    }
+    </style>
+</head>
+<body bgcolor="#f6f6f6">
+
+    <!--! Body -->
+    <table class="body-wrap" bgcolor="#f6f6f6">
+        <tr>
+            <td></td>
+            <td class="container" bgcolor="#FFFFFF">
+
+                <!-- content -->
+                <div class="content">
+                    <table>
+                        <tr>
+                            <td>
+                                <div metal:define-slot="body"></div>
+                            </td>
+                        </tr>
+                        <tr tal:define="signature layout.macros['email_signature']|nothing" tal:condition="signature">
+                            <td>
+                                <metal:b use-macro="signature" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+
+    <!--! Footer -->
+    <table class="footer-wrap">
+        <tr>
+            <td></td>
+            <td class="container">
+                <div class="content">
+                    <table>
+                        <tr>
+                            <td align="center">
+                                <p metal:define-slot="above-footer"></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center">
+                                <p metal:define-slot="footer">
+                                    <tal:b replace="layout.contact_html|layout.org.title" />
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+</body>
+</html>

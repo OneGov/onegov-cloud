@@ -1,16 +1,15 @@
-from uuid import uuid4
+from __future__ import annotations
 
-from sqlalchemy import func, Index, Column, Text, Table, ForeignKey
-from sqlalchemy.orm import object_session, relationship
+from uuid import uuid4, UUID
+
+from sqlalchemy import func, Column, ForeignKey, Index, Table, UUID as UUIDType
+from sqlalchemy.orm import mapped_column, object_session, relationship, Mapped
 
 from onegov.core.orm import Base
-from onegov.core.orm.types import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-
     from .translator import Translator
 
 
@@ -19,10 +18,16 @@ spoken_association_table = Table(
     Base.metadata,
     Column(
         'translator_id',
-        UUID,
+        UUIDType(as_uuid=True),
         ForeignKey('translators.id'),
-        nullable=False),
-    Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
+        nullable=False
+    ),
+    Column(
+        'lang_id',
+        UUIDType(as_uuid=True),
+        ForeignKey('languages.id'),
+        nullable=False
+    )
 )
 
 written_association_table = Table(
@@ -30,10 +35,16 @@ written_association_table = Table(
     Base.metadata,
     Column(
         'translator_id',
-        UUID,
+        UUIDType(as_uuid=True),
         ForeignKey('translators.id'),
-        nullable=False),
-    Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
+        nullable=False
+    ),
+    Column(
+        'lang_id',
+        UUIDType(as_uuid=True),
+        ForeignKey('languages.id'),
+        nullable=False
+    )
 )
 
 monitoring_association_table = Table(
@@ -41,10 +52,16 @@ monitoring_association_table = Table(
     Base.metadata,
     Column(
         'translator_id',
-        UUID,
+        UUIDType(as_uuid=True),
         ForeignKey('translators.id'),
-        nullable=False),
-    Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
+        nullable=False
+    ),
+    Column(
+        'lang_id',
+        UUIDType(as_uuid=True),
+        ForeignKey('languages.id'),
+        nullable=False
+    )
 )
 
 mother_tongue_association_table = Table(
@@ -52,10 +69,16 @@ mother_tongue_association_table = Table(
     Base.metadata,
     Column(
         'translator_id',
-        UUID,
+        UUIDType(as_uuid=True),
         ForeignKey('translators.id'),
-        nullable=False),
-    Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
+        nullable=False
+    ),
+    Column(
+        'lang_id',
+        UUIDType(as_uuid=True),
+        ForeignKey('languages.id'),
+        nullable=False
+    )
 )
 
 
@@ -67,16 +90,16 @@ class Language(Base):
         Index('unique_name', 'name', unique=True),
     )
 
-    id: 'Column[uuid.UUID]' = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Mapped[str]
 
     @property
     def speakers_count(self) -> int:
         session = object_session(self)
+        assert session is not None
         return session.query(
             func.count(spoken_association_table.c.translator_id)
         ).filter(spoken_association_table.c.lang_id == self.id).scalar()
@@ -84,6 +107,7 @@ class Language(Base):
     @property
     def writers_count(self) -> int:
         session = object_session(self)
+        assert session is not None
         return session.query(
             func.count(written_association_table.c.translator_id)
         ).filter(written_association_table.c.lang_id == self.id).scalar()
@@ -91,6 +115,7 @@ class Language(Base):
     @property
     def monitors_count(self) -> int:
         session = object_session(self)
+        assert session is not None
         return session.query(
             func.count(monitoring_association_table.c.translator_id)
         ).filter(monitoring_association_table.c.lang_id == self.id).scalar()
@@ -98,6 +123,7 @@ class Language(Base):
     @property
     def native_speakers_count(self) -> int:
         session = object_session(self)
+        assert session is not None
         return session.query(
             func.count(mother_tongue_association_table.c.translator_id)
         ).filter(mother_tongue_association_table.c.lang_id == self.id).scalar()
@@ -114,23 +140,19 @@ class Language(Base):
             and self.monitors_count == 0
         )
 
-    mother_tongues: 'relationship[list[Translator]]' = relationship(
-        "Translator",
+    mother_tongues: Mapped[list[Translator]] = relationship(
         secondary=mother_tongue_association_table,
         back_populates='mother_tongues'
     )
-    speakers: 'relationship[list[Translator]]' = relationship(
-        "Translator",
+    speakers: Mapped[list[Translator]] = relationship(
         secondary=spoken_association_table,
         back_populates='spoken_languages'
     )
-    writers: 'relationship[list[Translator]]' = relationship(
-        "Translator",
+    writers: Mapped[list[Translator]] = relationship(
         secondary=written_association_table,
         back_populates='written_languages'
     )
-    monitors: 'relationship[list[Translator]]' = relationship(
-        "Translator",
+    monitors: Mapped[list[Translator]] = relationship(
         secondary=monitoring_association_table,
         back_populates='monitoring_languages'
     )

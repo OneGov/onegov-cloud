@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
@@ -8,20 +10,21 @@ from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
 
+from typing import Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from datetime import datetime
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import TypedDict
-    from typing_extensions import Self
     from typing_extensions import Unpack
 
     class FilterParams(TypedDict, total=False):
-        updated_gt: str | None
-        updated_ge: str | None
-        updated_eq: str | None
-        updated_le: str | None
-        updated_lt: str | None
+        updated_gt: datetime | str | None
+        updated_ge: datetime | str | None
+        updated_eq: datetime | str | None
+        updated_le: datetime | str | None
+        updated_lt: datetime | str | None
 
 
 class PaginatedMembershipCollection(
@@ -31,15 +34,15 @@ class PaginatedMembershipCollection(
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
         agency: str | None = None,
         person: str | None = None,
-        updated_gt: str | None = None,
-        updated_ge: str | None = None,
-        updated_eq: str | None = None,
-        updated_le: str | None = None,
-        updated_lt: str | None = None,
+        updated_gt: datetime | str | None = None,
+        updated_ge: datetime | str | None = None,
+        updated_eq: datetime | str | None = None,
+        updated_le: datetime | str | None = None,
+        updated_lt: datetime | str | None = None,
         exclude_hidden: bool = True
     ) -> None:
         super().__init__(session)
@@ -67,14 +70,14 @@ class PaginatedMembershipCollection(
             and other.person == self.person
         )
 
-    def subset(self) -> 'Query[ExtendedAgencyMembership]':
+    def subset(self) -> Query[ExtendedAgencyMembership]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -85,7 +88,7 @@ class PaginatedMembershipCollection(
             updated_lt=self.updated_lt,
         )
 
-    def for_filter(self, **kwargs: 'Unpack[FilterParams]') -> 'Self':
+    def for_filter(self, **kwargs: Unpack[FilterParams]) -> Self:
         return self.__class__(
             session=self.session,
             updated_gt=kwargs.get('updated_gt', self.updated_gt),
@@ -95,7 +98,7 @@ class PaginatedMembershipCollection(
             updated_lt=kwargs.get('updated_lt', self.updated_lt),
         )
 
-    def query(self) -> 'Query[ExtendedAgencyMembership]':
+    def query(self) -> Query[ExtendedAgencyMembership]:
         query = super().query()
 
         if self.exclude_hidden:

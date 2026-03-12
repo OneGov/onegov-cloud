@@ -1,10 +1,17 @@
-from onegov.org import OrgApp
+from __future__ import annotations
 
-
+from onegov.town6 import TownApp
 from typing import Any
+from typing import TYPE_CHECKING
+from onegov.town6.custom import get_global_tools
 
 
-class IntranetApp(OrgApp):
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.town6.request import TownRequest
+
+
+class IntranetApp(TownApp):
 
     def configure_organisation(
         self,
@@ -21,3 +28,17 @@ class IntranetApp(OrgApp):
             disable_password_reset=disable_password_reset,
             **cfg
         )
+
+
+@IntranetApp.template_variables()
+def get_template_variables(request: TownRequest) -> RenderData:
+    return {
+        'global_tools': tuple(get_global_tools(request)),
+        'hide_search_header': not request.is_logged_in
+    }
+
+
+# NOTE: Intranet doesn't need a citizen login
+@IntranetApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False

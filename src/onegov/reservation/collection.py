@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import enum
+
 from onegov.core.utils import normalize_for_url
 from onegov.reservation.models import Resource
 from uuid import uuid4, UUID
@@ -8,9 +11,11 @@ from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from libres.context.core import Context
-    from libres.db.models import Allocation, Reservation
-    from sqlalchemy.orm import Query
-    from typing_extensions import TypeAlias
+    from libres.db.models import Allocation, Reservation, ReservationBlocker
+    from libres.db.scheduler import Scheduler
+
+    from sqlalchemy.orm import Query, Session
+    from typing import TypeAlias
 
 
 _R = TypeVar('_R', bound=Resource)
@@ -20,7 +25,7 @@ class _Marker(enum.Enum):
     any_type = enum.auto()
 
 
-any_type_t: 'TypeAlias' = Literal[_Marker.any_type]
+any_type_t: TypeAlias = Literal[_Marker.any_type]  # noqa: PYI042
 any_type: any_type_t = _Marker.any_type
 
 
@@ -28,7 +33,7 @@ class ResourceCollection:
     """ Manages a list of resources.
 
     """
-    def __init__(self, libres_context: 'Context'):
+    def __init__(self, libres_context: Context):
         assert hasattr(libres_context, 'get_service'), """
             The ResourceCollection expected the libres_contex, not the session.
         """
@@ -36,7 +41,7 @@ class ResourceCollection:
         self.libres_context = libres_context
         self.session = libres_context.get_service('session_provider').session()
 
-    def query(self) -> 'Query[Resource]':
+    def query(self) -> Query[Resource]:
         return self.session.query(Resource)
 
     def add(
@@ -48,7 +53,8 @@ class ResourceCollection:
         meta: dict[str, Any] | None = None,
         content: dict[str, Any] | None = None,
         definition: str | None = None,
-        group: str | None = None
+        group: str | None = None,
+        subgroup: str | None = None,
     ) -> Resource:
 
         if type is None:
@@ -67,6 +73,7 @@ class ResourceCollection:
         resource.content = content or {}
         resource.definition = definition
         resource.group = group
+        resource.subgroup = subgroup
         resource.renew_access_token()
 
         self.session.add(resource)
@@ -94,7 +101,7 @@ class ResourceCollection:
         query = self.query().filter(Resource.id == id)
 
         if ensure_type is not any_type:
-            query = query.filter(Resource.type == type)
+            query = query.filter(Resource.type == ensure_type)
 
         return self.bind(query.first())
 
@@ -107,36 +114,46 @@ class ResourceCollection:
         query = self.query().filter(Resource.name == name)
 
         if ensure_type is not any_type:
-            query = query.filter(Resource.type == type)
+            query = query.filter(Resource.type == ensure_type)
 
         return self.bind(query.first())
 
-    def by_allocation(self, allocation: 'Allocation') -> Resource | None:
+    def by_allocation(self, allocation: Allocation) -> Resource | None:
         return self.by_id(allocation.resource)
 
-    def by_reservation(self, reservation: 'Reservation') -> Resource | None:
+    def by_reservation(self, reservation: Reservation) -> Resource | None:
         return self.by_id(reservation.resource)
+
+    def by_blocker(self, blocker: ReservationBlocker) -> Resource | None:
+        return self.by_id(blocker.resource)
+
+    def ordered_by_type(self) -> Query[Resource]:
+        return self.query().order_by(Resource.type, Resource.title)
 
     def delete(
         self,
         resource: Resource,
         including_reservations: bool = False,
-        handle_reservation: 'Callable[[Reservation], Any] | None' = None
+        handle_linked_objects: (
+            Callable[[Scheduler, Session], Any] | None
+        ) = None,
     ) -> None:
 
         scheduler = resource.get_scheduler(self.libres_context)
 
+        session_manager = self.libres_context.get_service('session_provider')
         if not including_reservations:
             assert not scheduler.managed_reserved_slots().first()
             assert not scheduler.managed_reservations().first()
 
-            scheduler.managed_allocations().delete('fetch')
+            with session_manager.ignore_bulk_deletes():
+                scheduler.managed_allocations().delete('fetch')
         else:
-            if callable(handle_reservation):
-                for res in scheduler.managed_reservations():
-                    # e.g. create a ticket snapshot
-                    handle_reservation(res)
-            scheduler.extinguish_managed_records()
+            if callable(handle_linked_objects):
+                handle_linked_objects(scheduler, self.session)
+
+            with session_manager.ignore_bulk_deletes():
+                scheduler.extinguish_managed_records()
 
         if resource.files:
             # unlink any linked files

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from onegov.form import Form
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
 
 class CourseEventForm(Form):
 
-    request: 'FsiRequest'
+    request: FsiRequest
 
     course_id = ChosenSelectField(
         label=_('Course'),
@@ -49,12 +51,12 @@ class CourseEventForm(Form):
     )
 
     hidden_from_public = BooleanField(
-        label=_("Hidden"),
+        label=_('Hidden'),
         default=False,
     )
 
     locked_for_subscriptions = BooleanField(
-        label=_("Locked for Subscriptions"),
+        label=_('Locked for Subscriptions'),
         default=False,
     )
 
@@ -101,11 +103,10 @@ class CourseEventForm(Form):
     )
 
     def ensure_start_before_end(self) -> bool:
-        assert self.start.data is not None
-        assert self.end.data is not None
-        if self.start.data >= self.end.data:
-            self.start.errors = [_("Please use a start prior to the end")]
-            return False
+        if (self.start.data is not None and self.end.data is not None):
+            if self.start.data >= self.end.data:
+                self.start.errors = [_('Please use a start prior to the end')]
+                return False
         return True
 
     def ensure_no_duplicates(self) -> bool:
@@ -142,7 +143,7 @@ class CourseEventForm(Form):
         self.status.default = 'created'
 
     @staticmethod
-    def fix_utc_to_local_time(db_time: 'datetime | None') -> 'datetime | None':
+    def fix_utc_to_local_time(db_time: datetime | None) -> datetime | None:
         # Todo: TimezoneDateTimeField.process_data is not called when applying
         # the date from the database in apply model
         return db_time and sedate.to_timezone(

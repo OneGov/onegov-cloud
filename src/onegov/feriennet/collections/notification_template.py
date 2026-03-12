@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.collection import GenericCollection
 
@@ -12,7 +14,7 @@ class NotificationTemplateCollection(
 ):
 
     @cached_property
-    def model_class(self) -> type['NotificationTemplate']:
+    def model_class(self) -> type[NotificationTemplate]:
 
         # XXX circular import
         from onegov.feriennet.models import NotificationTemplate

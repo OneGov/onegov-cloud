@@ -1,0 +1,35 @@
+<tal:b i18n:domain="onegov.org">
+    <metal:b use-macro="layout.macros['generic_message']">
+        <metal:b fill-slot="title">
+            <a href="${link}">${model.channel_id}</a> - ${model.meta.group}
+        </metal:b>
+        <metal:b fill-slot="text">
+            <tal:b i18n:translate>1 reservation adjusted:</tal:b>
+            <div class="reservation-adjustment">
+                <div tal:define="start model.meta.old_start; end model.meta.old_end" class="reservation-details old">
+                    <strong>
+                        ${layout.format_date(start, 'weekday_long')},
+                        ${layout.format_date(start, 'date_long')}
+                    </strong>
+                    <!--! simple whole day check: -->
+                    <span tal:condition="start.time() != end.time()">
+                        <br>
+                        ${layout.format_time_range(start, end)}
+                    </span>
+                </div>
+                <div class="fa fa-arrow-right"></div>
+                <div tal:define="start model.meta.new_start; end model.meta.new_end" class="reservation-details new">
+                    <strong>
+                        ${layout.format_date(start, 'weekday_long')},
+                        ${layout.format_date(start, 'date_long')}
+                    </strong>
+                    <!--! simple whole day check: -->
+                    <span tal:condition="start.time() != end.time()">
+                        <br>
+                        ${layout.format_time_range(start, end)}
+                    </span>
+                </div>
+            </div>
+        </metal:b>
+    </metal:b>
+</tal:b>

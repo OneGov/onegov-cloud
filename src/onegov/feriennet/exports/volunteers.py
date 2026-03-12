@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import Occasion, OccasionNeed
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
@@ -9,7 +11,7 @@ from sqlalchemy.orm import joinedload, undefer
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.activity.models import Period, Volunteer
+    from onegov.activity.models import BookingPeriod, Volunteer
     from sqlalchemy.orm import Query, Session
 
 
@@ -17,31 +19,31 @@ if TYPE_CHECKING:
     id='helfer',
     form_class=PeriodExportForm,
     permission=Secret,
-    title=_("Volunteers"),
-    explanation=_("Exports volunteers in the given period."),
+    title=_('Volunteers'),
+    explanation=_('Exports volunteers in the given period.'),
 )
 class VolunteerExport(FeriennetExport):
 
     def run(
         self,
         form: PeriodExportForm,  # type:ignore[override]
-        session: 'Session'
-    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+        session: Session
+    ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         assert form.selected_period is not None
         return self.rows(session, form.selected_period)
 
     def query(
         self,
-        session: 'Session',
-        period: 'Period'
-    ) -> 'Query[OccasionNeed]':
+        session: Session,
+        period: BookingPeriod
+    ) -> Query[OccasionNeed]:
 
         q = session.query(OccasionNeed)
         q = q.filter(OccasionNeed.occasion_id.in_(
             session.query(Occasion.id)
             .filter(Occasion.period_id == period.id)
-            .subquery()
+            .scalar_subquery()
         ))
         q = q.join(Occasion)
         q = q.options(
@@ -59,14 +61,14 @@ class VolunteerExport(FeriennetExport):
 
     def rows(
         self,
-        session: 'Session',
-        period: 'Period'
-    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+        session: Session,
+        period: BookingPeriod
+    ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         for need in self.query(session, period):
             for volunteer in need.volunteers:
                 yield ((k, v) for k, v in self.fields(volunteer))
 
-    def fields(self, volunteer: 'Volunteer') -> 'Iterator[tuple[str, Any]]':
+    def fields(self, volunteer: Volunteer) -> Iterator[tuple[str, Any]]:
 
         yield from self.volunteer_fields(volunteer)

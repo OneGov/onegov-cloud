@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 from datetime import datetime
 from freezegun import freeze_time
 
 
-def test_news(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_news(client: Client) -> None:
     client.login_admin().follow()
 
     with freeze_time("2021-12-30 8:00"):
@@ -156,7 +163,7 @@ def test_news(client):
     assert 'News created 2.1.2022, published 1.1.2022' not in page
 
 
-def test_hide_news(client):
+def test_hide_news(client: Client) -> None:
     client.login_editor()
 
     new_page = client.get('/news').click('Nachricht')
@@ -177,7 +184,7 @@ def test_hide_news(client):
     assert response.status_code == 200
 
 
-def test_news_overview_detail(client):
+def test_news_overview_detail(client: Client) -> None:
     client.login_admin()
 
     news_list = client.get('/news')
@@ -193,19 +200,19 @@ def test_news_overview_detail(client):
     page.form['title'] = "Bar"
     page.form['lead'] = "Lorem"
     page.form['publication_start'] = '2020-04-01T00:00'
-    page.form.submit()
+    page.form.submit().follow()
 
     page = news_list.click('Nachricht')
     page.form['title'] = "Zap"
     page.form['lead'] = "Lorem"
     page.form['publication_start'] = '2020-03-01T00:00'
-    page.form.submit()
+    page.form.submit().follow()
 
     page = news_list.click('Nachricht')
     page.form['title'] = "One"
     page.form['lead'] = "Lorem"
     page.form['publication_start'] = '2020-02-01T00:00'
-    page.form.submit()
+    page.form.submit().follow()
 
     news_list = client.get('/news')
     news_detail = news_list.click('Foo')

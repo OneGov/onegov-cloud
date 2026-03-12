@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from csv import DictReader
@@ -16,7 +18,14 @@ from pytz import utc
 from tests.shared.utils import use_locale
 
 
-def test_pages(session):
+from typing import Any, IO, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.swissvotes.models import SwissVoteFile
+    from sqlalchemy.orm import Session
+    from .conftest import TestApp
+
+
+def test_pages(session: Session) -> None:
     pages = TranslatablePageCollection(session)
 
     # setdefault
@@ -60,7 +69,7 @@ def test_pages(session):
     ]
 
 
-def test_votes(swissvotes_app):
+def test_votes(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
     assert votes.last_modified is None
 
@@ -92,36 +101,36 @@ def test_votes(swissvotes_app):
     assert votes.by_bfs_number(Decimal('100.1')) == vote
 
 
-def test_votes_default(swissvotes_app):
+def test_votes_default(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(
         swissvotes_app,
         page=2,
-        from_date=3,
-        to_date=4,
-        legal_form=5,
-        result=6,
-        policy_area=7,
-        term=8,
-        full_text=9,
-        position_federal_council=10,
-        position_national_council=11,
-        position_council_of_states=12,
-        sort_by=13,
-        sort_order=14
+        from_date=3,  # type: ignore[arg-type]
+        to_date=4,  # type: ignore[arg-type]
+        legal_form=5,  # type: ignore[arg-type]
+        result=6,  # type: ignore[arg-type]
+        policy_area=7,  # type: ignore[arg-type]
+        term=8,  # type: ignore[arg-type]
+        full_text=9,  # type: ignore[arg-type]
+        position_federal_council=10,  # type: ignore[arg-type]
+        position_national_council=11,  # type: ignore[arg-type]
+        position_council_of_states=12,  # type: ignore[arg-type]
+        sort_by=13,  # type: ignore[arg-type]
+        sort_order=14  # type: ignore[arg-type]
     )
     assert votes.page == 2
     assert votes.from_date == 3
     assert votes.to_date == 4
-    assert votes.legal_form == 5
-    assert votes.result == 6
-    assert votes.policy_area == 7
-    assert votes.term == 8
+    assert votes.legal_form == 5  # type: ignore[comparison-overlap]
+    assert votes.result == 6  # type: ignore[comparison-overlap]
+    assert votes.policy_area == 7  # type: ignore[comparison-overlap]
+    assert votes.term == 8  # type: ignore[comparison-overlap]
     assert votes.full_text == 9
-    assert votes.position_federal_council == 10
-    assert votes.position_national_council == 11
-    assert votes.position_council_of_states == 12
-    assert votes.sort_by == 13
-    assert votes.sort_order == 14
+    assert votes.position_federal_council == 10  # type: ignore[comparison-overlap]
+    assert votes.position_national_council == 11  # type: ignore[comparison-overlap]
+    assert votes.position_council_of_states == 12  # type: ignore[comparison-overlap]
+    assert votes.sort_by == 13  # type: ignore[comparison-overlap]
+    assert votes.sort_order == 14  # type: ignore[comparison-overlap]
 
     votes = votes.default()
     assert votes.page == 0
@@ -139,7 +148,7 @@ def test_votes_default(swissvotes_app):
     assert votes.sort_order is None
 
 
-def test_votes_pagination(swissvotes_app):
+def test_votes_pagination(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
 
     assert votes.pages_count == 0
@@ -179,7 +188,7 @@ def test_votes_pagination(swissvotes_app):
     assert votes.next.previous == votes
 
 
-def test_votes_pagination_negative_page_index(swissvotes_app):
+def test_votes_pagination_negative_page_index(swissvotes_app: TestApp) -> None:
     swissvotes = SwissVoteCollection(swissvotes_app, page=-9)
     assert swissvotes.page == 0
     assert swissvotes.page_index == 0
@@ -187,16 +196,16 @@ def test_votes_pagination_negative_page_index(swissvotes_app):
     assert swissvotes.page_by_index(-3).page_index == 0
 
     with pytest.raises(AssertionError):
-        SwissVoteCollection(swissvotes_app, page=None)
+        SwissVoteCollection(swissvotes_app, page=None)  # type: ignore[arg-type]
 
 
-def test_votes_term_filter(swissvotes_app):
+def test_votes_term_filter(swissvotes_app: TestApp) -> None:
     assert SwissVoteCollection(swissvotes_app).term_filter == []
     assert SwissVoteCollection(swissvotes_app, term='').term_filter == []
     assert SwissVoteCollection(swissvotes_app, term='', full_text=True)\
         .term_filter == []
 
-    def compiled(**kwargs):
+    def compiled(**kwargs: Any) -> list[str]:
         list_ = SwissVoteCollection(swissvotes_app, **kwargs).term_filter
         return [
             str(statement.compile(compile_kwargs={"literal_binds": True}))
@@ -344,7 +353,7 @@ def test_votes_term_filter(swissvotes_app):
     ]
 
 
-def test_votes_query(swissvotes_app):
+def test_votes_query(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
     vote_1 = votes.add(
         id=1,
@@ -413,7 +422,7 @@ def test_votes_query(swissvotes_app):
         _result=2
     )
 
-    def count(**kwargs):
+    def count(**kwargs: Any) -> int:
         return SwissVoteCollection(swissvotes_app, **kwargs).query().count()
 
     assert count() == 3
@@ -522,8 +531,11 @@ def test_votes_query(swissvotes_app):
     assert count(legal_form=[5], position_national_council=[9]) == 1
 
 
-def test_votes_query_attachments(swissvotes_app, attachments,
-                                 postgres_version, campaign_material):
+def test_votes_query_attachments(
+    swissvotes_app: TestApp,
+    attachments: dict[str, SwissVoteFile],
+    campaign_material: dict[str, SwissVoteFile]
+) -> None:
     votes = SwissVoteCollection(swissvotes_app)
     votes.add(
         id=1,
@@ -568,7 +580,7 @@ def test_votes_query_attachments(swissvotes_app, attachments,
     vote.files.append(campaign_material['campaign_material_other-leaflet.pdf'])
     votes.session.flush()
 
-    def count(**kwargs):
+    def count(**kwargs: Any) -> int:
         return SwissVoteCollection(swissvotes_app, **kwargs).query().count()
 
     assert count() == 3
@@ -586,7 +598,7 @@ def test_votes_query_attachments(swissvotes_app, attachments,
     assert count(term='Volantini', full_text=True) == 1
 
 
-def test_votes_order(swissvotes_app):
+def test_votes_order(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
 
     for index, title in enumerate(('Firsţ', 'Śecond', 'Thirḓ'), start=1):
@@ -730,7 +742,7 @@ def test_votes_order(swissvotes_app):
     assert votes.current_sort_order == 'descending'
 
 
-def test_votes_available_descriptors(swissvotes_app):
+def test_votes_available_descriptors(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
     assert votes.available_descriptors == [set(), set(), set()]
 
@@ -792,7 +804,7 @@ def test_votes_available_descriptors(swissvotes_app):
     ]
 
 
-def test_votes_update(swissvotes_app):
+def test_votes_update(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
 
     added, updated = votes.update([
@@ -850,10 +862,10 @@ def test_votes_update(swissvotes_app):
     ])
     assert added == 0
     assert updated == 1
-    assert votes.by_bfs_number(Decimal('1')).title == 'First vote'
+    assert votes.by_bfs_number(Decimal('1')).title == 'First vote'  # type: ignore[union-attr]
 
 
-def test_votes_update_metadata(swissvotes_app):
+def test_votes_update_metadata(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
     vote_1 = votes.add(
         bfs_number=Decimal('1'),
@@ -913,7 +925,7 @@ def test_votes_update_metadata(swissvotes_app):
     }
 
 
-def test_votes_export(swissvotes_app):
+def test_votes_export(swissvotes_app: TestApp) -> None:
     votes = SwissVoteCollection(swissvotes_app)
     vote = votes.add(
         bfs_number=Decimal('100.1'),
@@ -1560,6 +1572,14 @@ def test_votes_export(swissvotes_app):
         'https://museum.ch/objects/3 '
         'https://museum.ch/objects/4'
     )
+    vote.posters_bs_yea = (
+        'https://plakatsammlungbasel.ch/objects/1 '
+        'https://plakatsammlungbasel.ch/objects/2'
+    )
+    vote.posters_bs_nay = (
+        'https://plakatsammlungbasel.ch/objects/3 '
+        'https://plakatsammlungbasel.ch/objects/4'
+    )
     vote.posters_sa_yea = (
         'https://sozialarchiv.ch/objects/1 '
         'https://sozialarchiv.ch/objects/2'
@@ -1587,13 +1607,13 @@ def test_votes_export(swissvotes_app):
     votes.session.flush()
     votes.session.expire_all()
 
-    file = StringIO()
+    file: IO[Any] = StringIO()
     votes.export_csv(file)
     file.seek(0)
     rows = list(DictReader(file))
     assert len(rows) == 1
     csv = dict(rows[0])
-    expected = {
+    expected: dict[str, Any] = {
         'anr': '100,1',
         'datum': '02.06.1990',
         'titel_off_d': 'Vote DE',
@@ -2221,6 +2241,14 @@ def test_votes_export(swissvotes_app):
             'https://museum.ch/objects/3 '
             'https://museum.ch/objects/4'
         ),
+        'poster_ja_bs': (
+            'https://plakatsammlungbasel.ch/objects/1 '
+            'https://plakatsammlungbasel.ch/objects/2'
+        ),
+        'poster_nein_bs': (
+            'https://plakatsammlungbasel.ch/objects/3 '
+            'https://plakatsammlungbasel.ch/objects/4'
+        ),
         'poster_ja_sa': (
             'https://sozialarchiv.ch/objects/1 '
             'https://sozialarchiv.ch/objects/2'
@@ -2381,7 +2409,6 @@ def test_votes_export(swissvotes_app):
         'p-sbv': 3.0,
         'p-sgb': 3.0,
         'p-travs': 3.0,
-        'p-vsa': 9999.0,
         'p-vsa': 9999.0,
         'p-vpod': 9999.0,
         'p-ssv': 9999.0,
@@ -2898,6 +2925,14 @@ def test_votes_export(swissvotes_app):
         'poster_nein_mfg': (
             'https://museum.ch/objects/3 '
             'https://museum.ch/objects/4'
+        ),
+        'poster_ja_bs': (
+            'https://plakatsammlungbasel.ch/objects/1 '
+            'https://plakatsammlungbasel.ch/objects/2'
+        ),
+        'poster_nein_bs': (
+            'https://plakatsammlungbasel.ch/objects/3 '
+            'https://plakatsammlungbasel.ch/objects/4'
         ),
         'poster_ja_sa': (
             'https://sozialarchiv.ch/objects/1 '

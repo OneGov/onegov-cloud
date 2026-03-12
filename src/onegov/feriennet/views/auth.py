@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.feriennet import FeriennetApp, _
-from onegov.org.views.auth import handle_registration
+from onegov.town6.views.auth import town_handle_registration
 from onegov.user import Auth
 from onegov.user.forms import RegistrationForm
 
@@ -18,13 +20,13 @@ if TYPE_CHECKING:
 )
 def custom_handle_registration(
     self: Auth,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: RegistrationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if request.app.org.meta.get('require_full_age_for_registration', False):
         form.callout = _(  # type:ignore[attr-defined]
-            "The user account must be opened by a parent or guardian of "
-            "full age."
+            'The user account must be opened by a parent or guardian of '
+            'full age.'
         )
-    return handle_registration(self, request, form)
+    return town_handle_registration(self, request, form)

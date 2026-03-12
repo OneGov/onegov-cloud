@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.page import Page, PageCollection
 
 
@@ -14,14 +16,14 @@ _L = TypeVar('_L', bound='AdjacencyList')
 class AdjacencyListMove(Generic[_L]):
     """ Represents a single move of an adjacency list item. """
 
-    __collection__: type['AdjacencyListCollection[_L]']
+    __collection__: type[AdjacencyListCollection[_L]]
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         subject: _L,
         target: _L,
-        direction: 'MoveDirection'
+        direction: MoveDirection
     ) -> None:
         self.session = session
         self.subject = subject

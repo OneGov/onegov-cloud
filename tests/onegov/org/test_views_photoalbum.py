@@ -1,11 +1,17 @@
+from __future__ import annotations
+
 import re
 
+from tests.shared.utils import create_image
 from webtest import Upload
 
-from tests.shared.utils import create_image
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
 
 
-def test_manage_album(client):
+def test_manage_album(client: Client) -> None:
     client.login_editor()
 
     albums = client.get('/photoalbums')
@@ -23,7 +29,7 @@ def test_manage_album(client):
     assert "noch keine Bilder" in album
 
     images = albums.click("Bilder verwalten")
-    images.form['file'] = Upload('test.jpg', create_image().read())
+    images.form['file'] = [Upload('test.jpg', create_image().read())]
     images.form.submit()
 
     select = album.click("Bilder auswählen")
@@ -35,8 +41,16 @@ def test_manage_album(client):
 
     images = albums.click("Bilder verwalten")
 
-    url = re.search(r'data-note-update-url="([^"]+)"', images.text).group(1)
+    url = re.search(r'data-note-update-url="([^"]+)"', images.text).group(1)  # type: ignore[union-attr]
     client.post(url, {'note': "This is an alt text"})
+
+    album = albums.click("Comicon 2016")
+    assert "This is an alt text" in album
+
+    # switch to grid mode
+    settings = album.click("Bearbeiten")
+    settings.form['view'] = 'grid'
+    settings.form.submit()
 
     album = albums.click("Comicon 2016")
     assert "This is an alt text" in album

@@ -15,11 +15,11 @@
             </div>
             <div tal:condition="party.portrait">
                 <dt i18n:translate>Portrait</dt>
-                <dd><div tal:content="structure party.portrait"></div></dd>
+                <dd><div tal:content="party.portrait"></div></dd>
             </div>
             <div tal:condition="party.description">
                 <dt i18n:translate>Description</dt>
-                <dd><div tal:content="structure party.description"></div></dd>
+                <dd><div tal:content="party.description"></div></dd>
             </div>
             <div tal:condition="party.roles">
                 <dt i18n:translate>Parliamentarians</dt>

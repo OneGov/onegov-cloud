@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 log = logging.getLogger('onegov.agency')
 log.addHandler(logging.NullHandler())

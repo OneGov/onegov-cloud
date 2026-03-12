@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from onegov.core.utils import append_query_param
 from onegov.election_day import _
@@ -12,20 +14,19 @@ from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
-    from onegov.core.types import AppenderQuery
     from onegov.election_day.models import ArchivedResult
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Election
     from onegov.election_day.models import Municipality
     from onegov.election_day.models import Notification
     from onegov.election_day.request import ElectionDayRequest
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import DynamicMapped
     from sqlalchemy.orm import Session
     from typing import Protocol
     from webob.response import Response
 
     class HasNotifications(Protocol):
-        notifications: relationship[AppenderQuery[Notification]]
+        notifications: DynamicMapped[Notification]
 
 _T = TypeVar('_T')
 _KT = TypeVar('_KT')
@@ -56,28 +57,28 @@ class LastUpdatedOrderedDict(OrderedDict[_KT, _VT]):
 
 
 def add_last_modified_header(
-    response: 'Response',
-    last_modified: 'datetime | None'
+    response: Response,
+    last_modified: datetime | None
 ) -> None:
     """ Adds the give date to the response as Last-Modified header. """
 
     if last_modified:
         response.headers.add(
             'Last-Modified',
-            last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            last_modified.strftime('%a, %d %b %Y %H:%M:%S GMT')
         )
 
 
-def add_cors_header(response: 'Response') -> None:
+def add_cors_header(response: Response) -> None:
     """ Adds a header allowing the response being used in scripts. """
     response.headers.add('Access-Control-Allow-Origin', '*')
 
 
 def add_local_results(
-    source: 'ArchivedResult',
-    target: 'ArchivedResult',
-    principal: 'Canton | Municipality',
-    session: 'Session'
+    source: ArchivedResult,
+    target: ArchivedResult,
+    principal: Canton | Municipality,
+    session: Session
 ) -> None:
     """ Adds the result of the principal.
 
@@ -147,7 +148,7 @@ def add_local_results(
 
 
 def get_parameter(
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     name: str,
     type_: type[_ParamT],
     default: _T
@@ -183,14 +184,14 @@ def get_parameter(
 
 
 def get_entity_filter(
-    request: 'ElectionDayRequest',
-    item: 'Election',
+    request: ElectionDayRequest,
+    item: Election,
     view: str,
     selected: str | None
 ) -> list[tuple[str, bool, str]]:
 
     url = request.link(item, view)
-    result = sorted((
+    result = sorted(
         (
             entity,
             entity == selected,
@@ -198,7 +199,7 @@ def get_entity_filter(
         )
         for result in item.results
         if (entity := result.name)
-    ))
+    )
     result.insert(0, (_('All'), not selected, url))
     return result
 

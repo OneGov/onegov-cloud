@@ -1,3 +1,8 @@
+from __future__ import annotations
+from datetime import datetime
+
+import pytz
+
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TimeField
 from onegov.form.fields import TypeAheadField
@@ -26,11 +31,12 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.landsgemeinde.request import LandsgemeindeRequest
+    from wtforms.fields.choices import _Choice
 
 
 class VotumForm(NamedFileForm):
 
-    request: 'LandsgemeindeRequest'
+    request: LandsgemeindeRequest
 
     number = IntegerField(
         label=_('Number'),
@@ -44,7 +50,7 @@ class VotumForm(NamedFileForm):
         validators=[
             InputRequired()
         ],
-        default=list(STATES.keys())[0]
+        default=next(iter(STATES.keys()))
     )
 
     person_choices = ChosenSelectField(
@@ -112,15 +118,6 @@ class VotumForm(NamedFileForm):
     calculated_timestamp = StringField(
         label=_('Calculated video timestamp'),
         fieldset=_('Progress'),
-        render_kw={
-            'long_description': _(
-                'Calculated automatically based on the start time of the '
-                'votum and the start time of of the livestream of the assembly'
-                '.'
-            ),
-            'readonly': True,
-            'step': 1
-        },
         validators=[
             Optional()
         ],
@@ -164,11 +161,11 @@ class VotumForm(NamedFileForm):
 
     def populate_person_choices(self) -> None:
         people = PersonCollection(self.request.session).query()
-        people_choices = [(
+        people_choices: list[_Choice] = [(
             (
-                f'{p.first_name} {p.last_name}, {p.function}, '
+                (f'{p.first_name} {p.last_name}, {p.function}, '
                 f'{p.political_party}, {p.location_code_city}, '
-                f'{p.picture_url}',
+                f'{p.picture_url}'),
                 f'{p.first_name} ' + ', '.join(filter(None, [
                     p.last_name,
                     p.function,
@@ -176,17 +173,24 @@ class VotumForm(NamedFileForm):
                     p.location_code_city])))
         ) for p in people]
         people_choices.insert(0, (', , , , ', '...'))
-        self.person_choices.choices = [
-            (v, c) for v, c in people_choices
-        ]
+        self.person_choices.choices = people_choices
 
     def on_request(self) -> None:
-        DefaultLayout(self.model, self.request)
+        layout = DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
         self.request.include('person_votum')
-        self.request.include('start_time')
         self.populate_person_choices()
+        self.calculated_timestamp.render_kw = {
+            'long_description': _(
+                'Calculated automatically based on the start time of the '
+                'votum and the start time of of the livestream of the '
+                '${assembly_type}.',
+                mapping={'assembly_type': layout.assembly_type}
+            ),
+            'readonly': True,
+            'step': 1
+        }
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         data = super().get_useful_data(exclude={
@@ -214,3 +218,7 @@ class VotumForm(NamedFileForm):
 
     def populate_obj(self, obj: Votum) -> None:  # type:ignore[override]
         super().populate_obj(obj, exclude={'calculated_timestamp'})
+        if not obj.start_time and self.state.data == 'ongoing':
+            tz = pytz.timezone('Europe/Zurich')
+            now = datetime.now(tz=tz).time()
+            obj.start_time = now

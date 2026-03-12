@@ -1,12 +1,15 @@
 from _typeshed import SupportsItems
 from collections.abc import Iterable, Iterator, Mapping, Sequence
-from typing import Any, ClassVar, Protocol, overload
+from typing import Any, Protocol, TypeVar, overload
 from typing_extensions import TypeAlias
 
 from wtforms.fields.core import Field, UnboundField
 from wtforms.meta import DefaultMeta, _MultiDictLike
 
-_FormErrors: TypeAlias = dict[str | None, Sequence[str] | _FormErrors]
+__all__ = ("BaseForm", "Form")
+
+_T = TypeVar("_T")
+_FormErrors: TypeAlias = dict[str, Sequence[str] | _FormErrors]
 
 # _unbound_fields will always be a list on an instance, but on a
 # class it might be None, if it never has been instantiated, or
@@ -17,13 +20,13 @@ class _UnboundFields(Protocol):
     @overload
     def __get__(self, obj: object, owner: type[object] | None = None) -> list[tuple[str, UnboundField[Any]]]: ...
 
-
 class BaseForm:
     meta: DefaultMeta
     form_errors: list[str]
     # we document this, because it's the only efficient way to introspect
     # the field names of the form, it also seems to be stable API-wise
     _fields: dict[str, Field]
+    _prefix: str
     def __init__(
         self,
         fields: SupportsItems[str, UnboundField[Any]] | Iterable[tuple[str, UnboundField[Any]]],
@@ -55,7 +58,7 @@ class BaseForm:
 
 class FormMeta(type):
     def __init__(cls, name: str, bases: Sequence[type[object]], attrs: Mapping[str, Any]) -> None: ...
-    def __call__(cls, *args: Any, **kwargs: Any) -> Any: ...
+    def __call__(cls: type[_T], *args: Any, **kwargs: Any) -> _T: ...
     def __setattr__(cls, name: str, value: object) -> None: ...
     def __delattr__(cls, name: str) -> None: ...
 

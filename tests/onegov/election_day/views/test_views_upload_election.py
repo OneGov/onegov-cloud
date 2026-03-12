@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_majorz_election
 from tests.onegov.election_day.common import upload_proporz_election
@@ -7,7 +9,14 @@ from webtest import TestApp as Client
 from webtest.forms import Upload
 
 
-def test_upload_election_year_unavailable(election_day_app_gr):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_upload_election_year_unavailable(
+    election_day_app_gr: TestApp
+) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -47,7 +56,9 @@ def test_upload_election_year_unavailable(election_day_app_gr):
     assert "Das Jahr 1990 wird noch nicht unterstützt" in upload
 
 
-def test_upload_election_invalidate_cache(election_day_app_gr):
+def test_upload_election_invalidate_cache(
+    election_day_app_gr: TestApp
+) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -64,11 +75,12 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
 
     for slug in ('majorz', 'proporz'):
         csv = anonymous.get(f'/election/{slug}-election/data-csv').text
-        csv = csv.replace('56', '58').encode('utf-8')
+        csv = csv.replace('56', '58')
 
         upload = client.get(f'/election/{slug}-election/upload').follow()
         upload.form['file_format'] = 'internal'
-        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        upload.form['results'] = Upload(
+            'data.csv', csv.encode('utf-8'), 'text/plain')
         upload = upload.form.submit()
         assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
@@ -78,7 +90,7 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
     assert ">58<" in anonymous.get('/election/proporz-election').follow()
 
 
-def test_upload_election_notify_zulip(election_day_app_zg):
+def test_upload_election_notify_zulip(election_day_app_zg: TestApp) -> None:
 
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
@@ -97,11 +109,12 @@ def test_upload_election_notify_zulip(election_day_app_zg):
         election_day_app_zg.zulip_key = 'aabbcc'
         upload_majorz_election(client, canton='zg')
         sleep(5)
+        urlopen = urlopen  # undo mypy narrowing
         assert urlopen.called
         assert 'zulipchat.com' in urlopen.call_args[0][0].get_full_url()
 
 
-def test_upload_election_submit(election_day_app_zg):
+def test_upload_election_submit(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 

@@ -1,14 +1,15 @@
-from typing import NamedTuple
+from __future__ import annotations
 
+
+from typing import NamedTuple
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.models import Election
-    from sqlalchemy import Column
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import Mapped
     from sqlalchemy.orm import Session
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
-    Elections: TypeAlias = relationship[list[Election]] | list['Election']
+    Elections: TypeAlias = Mapped[list[Election]] | list[Election]
 
 
 class ResultRow(NamedTuple):
@@ -50,8 +51,8 @@ class DerivedAttributesMixin:
         def session(self) -> Session: ...
         @property
         def elections(self) -> Elections: ...
-        completes_manually: Column[bool]
-        manually_completed: Column[bool]
+        completes_manually: Mapped[bool]
+        manually_completed: Mapped[bool]
 
     @property
     def number_of_mandates(self) -> int:
@@ -127,7 +128,7 @@ class DerivedAttributesMixin:
         results = [r for r in self.results if r.counted]
 
         def _sum(attr: str) -> int:
-            return sum((getattr(r, attr) for r in results)) or 0
+            return sum(getattr(r, attr) for r in results) or 0
 
         eligible_voters = _sum('eligible_voters')
         received_ballots = _sum('received_ballots')

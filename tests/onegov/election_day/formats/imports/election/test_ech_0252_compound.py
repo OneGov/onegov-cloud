@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from io import BytesIO
 from onegov.election_day.formats import import_ech
 from onegov.election_day.models import Canton
@@ -15,7 +17,16 @@ from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.models.datatype import XmlDate
 
 
-def create_delivery(compounds, elections):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def create_delivery(
+    compounds: list[str],
+    elections: list[tuple[str, str | None]]
+) -> Delivery:
+
     ElectionGroup = ElectionGroupInfoType.ElectionGroup
     ElectionDesc = ElectionDescriptionInformationType
     ElectionInfo = ElectionDesc.ElectionDescriptionInfo
@@ -66,7 +77,7 @@ def create_delivery(compounds, elections):
     )
 
 
-def test_import_ech_compound(session):
+def test_import_ech_compound(session: Session) -> None:
     principal = Canton(canton='zg')
     serializer = XmlSerializer(config=SerializerConfig())
 
@@ -75,7 +86,7 @@ def test_import_ech_compound(session):
         ['c-1', 'c-2', 'c-3'],
         [('e-1', 'c-1'), ('e-2', 'c-1'), ('e-3', 'c-2'), ('e-4', None)]
     )
-    errors, updated, deleted = import_ech(
+    errors, updated_set, deleted = import_ech(
         principal,
         BytesIO(serializer.render(delivery).encode()),
         session,
@@ -85,8 +96,8 @@ def test_import_ech_compound(session):
     session.expire_all()
     assert not errors
     assert not deleted
-    assert len(updated) == 7
-    updated = {item.id: item for item in updated}
+    assert len(updated_set) == 7
+    updated: dict[str, Any] = {item.id: item for item in updated_set}
     assert updated['c-1'].domain == 'canton'
     assert set(updated['c-1'].elections) == {updated['e-1'], updated['e-2']}
     assert updated['c-2'].domain == 'canton'
@@ -103,7 +114,7 @@ def test_import_ech_compound(session):
         ['c-1', 'c-3'],
         [('e-1', 'c-1'), ('e-2', 'c-3')]
     )
-    errors, updated, deleted = import_ech(
+    errors, updated_set, deleted = import_ech(
         principal,
         BytesIO(serializer.render(delivery).encode()),
         session,
@@ -114,7 +125,7 @@ def test_import_ech_compound(session):
     assert not errors
     assert len(deleted) == 3
     assert {item.id for item in deleted} == {'c-2', 'e-3', 'e-4'}
-    assert len(updated) == 4
-    updated = {item.id: item for item in updated}
+    assert len(updated_set) == 4
+    updated = {item.id: item for item in updated_set}
     assert updated['c-1'].elections == [updated['e-1']]
     assert updated['c-3'].elections == [updated['e-2']]

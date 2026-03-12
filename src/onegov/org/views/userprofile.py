@@ -1,4 +1,5 @@
 """ The settings of the logged in user. """
+from __future__ import annotations
 
 from morepath.request import Response
 from onegov.core.security import Personal, Public
@@ -25,10 +26,10 @@ if TYPE_CHECKING:
     permission=Personal, form=UserProfileForm)
 def handle_user_profile(
     self: Organisation,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     layout: DefaultLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Handles the GET and POST login requests. """
 
     layout = layout or DefaultLayout(self, request)
@@ -38,7 +39,7 @@ def handle_user_profile(
 
     if form.submitted(request):
         form.populate_obj(user)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         if 'return-to' in request.GET:
             return request.redirect(request.link(self, 'userprofile'))
@@ -47,13 +48,13 @@ def handle_user_profile(
         form.process(obj=user)
 
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("User Profile"), request.link(self))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('User Profile'), request.link(self))
     ]
 
     return {
         'layout': layout,
-        'title': _("User Profile"),
+        'title': _('User Profile'),
         'form': form,
         'username': user.username,
         'initials': user.initials,
@@ -61,7 +62,7 @@ def handle_user_profile(
     }
 
 
-def unsubscribe(request: 'OrgRequest') -> bool:
+def unsubscribe(request: OrgRequest) -> bool:
     """ Unsubscribe a user from all *regular* e-mails.
 
     Returns True, if the request was valid.
@@ -95,9 +96,9 @@ def unsubscribe(request: 'OrgRequest') -> bool:
              permission=Public)
 def handle_unsubscribe(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DefaultLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Unsubscribes a user from all *regular* e-mails.
 
     To be able to use this method, an url has to be created like this::
@@ -124,7 +125,7 @@ def handle_unsubscribe(
              request_method='POST')
 def handle_unsubscribe_rfc8058(
     self: Organisation,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> Response:
     # it doesn't really make sense to check for success here
     # since this is an automated action without verficiation

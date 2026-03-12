@@ -1,81 +1,41 @@
+from __future__ import annotations
+
 import os
 import pytz
-from onegov.core.utils import normalize_for_url
-from onegov.reservation import ResourceCollection
 import textwrap
-from webtest import Upload
+import transaction
+
+from datetime import datetime
+from onegov.core.utils import normalize_for_url
+from onegov.core.utils import Bunch
 from onegov.file import FileCollection
 from onegov.form import FormCollection, FormSubmissionCollection
 from onegov.org.models.ticket import FormSubmissionHandler
-import transaction
-from datetime import datetime
-from onegov.core.utils import Bunch
-from onegov.ticket import TicketCollection, Handler, Ticket
+from onegov.reservation import ResourceCollection
+from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
 from sedate import ensure_timezone
-from tests.shared import Client as BaseClient
+from tests.onegov.org.common import register_echo_handler
+from webtest import Upload
 
 
-class Client(BaseClient):
-    skip_n_forms = 1
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from libres.context.core import Context
+    from onegov.ticket.handler import HandlerRegistry
+    from sedate.types import TzInfo
+    from sqlalchemy.orm import Session
+    from .conftest import _ReserveFunc, Client, TestOrgApp
 
 
-class TicketDeletionMixin:
-
-    @property
-    def ticket_deletable(self):
-        return self.ticket.state == 'archived'
-
-    def prepare_delete_ticket(self):
-        """The handler knows best what to do when a ticket is called for
-        deletion. """
-        assert self.ticket_deletable
-        pass
-
-
-class EchoHandler(Handler, TicketDeletionMixin):
-    handler_title = "Echo"
-
-    @property
-    def deleted(self):
-        return False
-
-    @property
-    def email(self):
-        return self.data.get('email')
-
-    @property
-    def title(self):
-        return self.data.get('title')
-
-    @property
-    def subtitle(self):
-        return self.data.get('subtitle')
-
-    @property
-    def group(self):
-        return self.data.get('group')
-
-    def get_summary(self, request):
-        return self.data.get('summary')
-
-    def get_links(self, request):
-        return self.data.get('links')
-
-
-# This is used implicitly to check for polymorphic identity
-class EchoTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'ECH'}
-    es_type_name = 'frr_tickets'
-
-
-def register_echo_handler(handlers):
-    handlers.register('ECH', EchoHandler)
-
-
-def archive_all_tickets(session, tickets, tz):
-    request = Bunch(client_addr='127.0.0.1')
-    UserCollection(session).register('b', 'p@ssw0rd', request, role='admin')
+def archive_all_tickets(
+    session: Session,
+    tickets: Iterable[Ticket],
+    tz: TzInfo
+) -> None:
+    request: Any = Bunch(client_addr='127.0.0.1')
+    UserCollection(session).register('b', 'p@ssw0rd12', request, role='admin')
     users = UserCollection(session).query().all()
     user = users[0]
     for t in tickets:
@@ -86,21 +46,24 @@ def archive_all_tickets(session, tickets, tz):
         t.modified = datetime(2016, 1, 2, 10, tzinfo=tz)
 
 
-def test_delete_ticket_without_submission(org_app, handlers):
+def test_delete_ticket_without_submission(
+    client: Client[TestOrgApp],
+    handlers: HandlerRegistry
+) -> None:
+
     register_echo_handler(handlers)
 
-    client = Client(org_app)
     tz = ensure_timezone('Europe/Zurich')
 
     transaction.begin()
 
-    session = org_app.session()
+    session = client.app.session()
     collection = TicketCollection(session)
 
     tickets = [
         collection.open_ticket(
             handler_id='1',
-            handler_code='ECH',
+            handler_code='EHO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -108,7 +71,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
         ),
         collection.open_ticket(
             handler_id='2',
-            handler_code='ECH',
+            handler_code='EHO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -127,7 +90,9 @@ def test_delete_ticket_without_submission(org_app, handlers):
     assert session.query(Ticket).filter_by(state='archived').count() == 0
 
 
-def test_files_from_ticket_form_submission_are_deleted(client):
+def test_files_from_ticket_form_submission_are_deleted(
+    client: Client[TestOrgApp]
+) -> None:
 
     form_submission_collection = FormCollection(client.app.session())
     form_submission_collection.definitions.add(
@@ -186,11 +151,13 @@ def test_files_from_ticket_form_submission_are_deleted(client):
     files = FileCollection(session).query().all()
     assert len(files) == 0
 
-    form_submission = FormSubmissionCollection(session).by_id(handler_id)
+    form_submission = FormSubmissionCollection(session).by_id(handler_id)  # type: ignore[arg-type]
     assert form_submission is None
 
 
-def test_ticket_deleted_submission_is_resilient(client):
+def test_ticket_deleted_submission_is_resilient(
+    client: Client[TestOrgApp]
+) -> None:
     # it so happened that the ticket.handler.submission was None
     # Viewing a ticket should not break this if that is the case.
 
@@ -215,7 +182,7 @@ def test_ticket_deleted_submission_is_resilient(client):
 
     ticket_url = ticket_page.request.path
 
-    _, _, found_attrs = ticket_page._find_element(
+    _, _, found_attrs = ticket_page._find_element(  # type: ignore[attr-defined]
         tag='a',
         href_attr='href',
         href_extract=None,
@@ -240,10 +207,13 @@ def test_ticket_deleted_submission_is_resilient(client):
     session = client.app.session()
 
     ticket = session.query(Ticket).first()
+    assert ticket is not None
+    assert hasattr(ticket.handler, 'submission')
     session.delete(ticket.handler.submission)
 
     transaction.commit()
     ticket = session.query(Ticket).first()
+    assert ticket is not None
 
     # monkey patch the property
     ticket.handler.__dict__['deleted'] = True
@@ -252,33 +222,45 @@ def test_ticket_deleted_submission_is_resilient(client):
     transaction.commit()
 
     ticket = session.query(Ticket).first()
+    assert ticket is not None
+    assert isinstance(ticket.handler, FormSubmissionHandler)
     assert ticket.handler.submission is None
     assert ticket.handler.deleted
-    assert isinstance(ticket.handler, FormSubmissionHandler)
 
     # now navigate to ticket submission is None
     ticket_url = ticket_close_url[:-6]
     assert client.get(ticket_url).status_code == 200
 
 
-def test_has_future_reservations(client):
+def test_has_future_reservations(client: Client[TestOrgApp]) -> None:
     def setup_resource(
-        name, title, definition, dates, whole_day, ctx, client
-    ):
+        name: str,
+        title: str,
+        definition: str,
+        dates: tuple[datetime, datetime],
+        whole_day: bool,
+        ctx: Context,
+        client: Client[TestOrgApp]
+    ) -> _ReserveFunc:
         res = ResourceCollection(ctx).by_name(name)
+        assert res is not None
         res.definition, res.title = definition, title
         alloc = res.get_scheduler(ctx).allocate(
             dates=dates, whole_day=whole_day
         )
         return client.bound_reserve(alloc[0])
 
-    def fill_and_submit_form(client, resource_name, form_data):
+    def fill_and_submit_form(
+        client: Client[TestOrgApp],
+        resource_name: str,
+        form_data: dict[str, Any]
+    ) -> None:
         formular = client.get(f'/resource/{resource_name}/form')
         for key, value in form_data.items():
             formular.form[key] = value
         formular.form.submit().follow().form.submit()
 
-    def accept_all_reservations(client):
+    def accept_all_reservations(client: Client[TestOrgApp]) -> None:
         ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
         ticket.click('Alle Reservationen annehmen')
 
@@ -338,7 +320,7 @@ def test_has_future_reservations(client):
 
     session = client.app.session()
     handlers = [h.handler for h in session.query(Ticket)]
-    assert all(h.has_future_reservation for h in handlers)
+    assert all(h.has_future_reservation for h in handlers)  # type: ignore[attr-defined]
 
     # now setup a reservation which is in the past
     transaction.begin()
@@ -382,15 +364,16 @@ def test_has_future_reservations(client):
             Ticket.title == '28.08.2009 12:00 - 13:00'
         )
     ][0]
-    assert not handler.has_future_reservation
+    assert not handler.has_future_reservation  # type: ignore[attr-defined]
 
 
-def test_most_future_reservation(client):
+def test_most_future_reservation(client: Client[TestOrgApp]) -> None:
     client.login_admin()
 
     transaction.begin()
 
     resource = client.app.libres_resources.by_name('tageskarte')
+    assert resource is not None
     thursday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
         whole_day=True
@@ -410,15 +393,15 @@ def test_most_future_reservation(client):
     formular.form['email'] = "info@example.org"
     confirmation = formular.form.submit().follow()
     confirmation.form.submit().follow()
-    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket_page = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
     # accept it
-    ticket.click('Alle Reservationen annehmen')
+    ticket_page.click('Alle Reservationen annehmen')
 
     query = client.app.session().query(Ticket)
     assert query.count() == 1
     # 1 ticket with multiple allocations
     ticket = query.one()
-    assert ticket.handler.most_future_reservation.start == datetime(
+    assert ticket.handler.most_future_reservation.start == datetime(  # type: ignore[attr-defined]
         2024, 4, 28, 22, 0, tzinfo=pytz.utc
     )

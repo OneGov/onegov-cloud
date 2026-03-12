@@ -1,4 +1,5 @@
 """ Metadata about the instance, available through HTTP. """
+from __future__ import annotations
 
 import hashlib
 import inspect
@@ -34,11 +35,11 @@ if TYPE_CHECKING:
     public_property = secret_property = property  # noqa: TC009
 
 else:
-    def public_property(fn: 'Callable[[Any], Any]') -> property:
+    def public_property(fn: Callable[[Any], Any]) -> property:
         fn.audience = 'public'
         return property(fn)
 
-    def secret_property(fn: 'Callable[[Any], Any]') -> property:
+    def secret_property(fn: Callable[[Any], Any]) -> property:
         fn.audience = 'secret'
         return property(fn)
 
@@ -58,7 +59,7 @@ class Metadata:
 
         def pick(
             properties: list[tuple[str, Any]]
-        ) -> 'Iterator[tuple[str, Any]]':
+        ) -> Iterator[tuple[str, Any]]:
 
             for name, prop in properties:
                 if not hasattr(prop, 'fget'):
@@ -123,7 +124,7 @@ def get_private_metadata(app: Framework, absorb: str) -> SecretMetadata:
 @Framework.json(model=PublicMetadata, permission=Public)
 def view_public_metadata(
     self: PublicMetadata,
-    request: 'CoreRequest'
+    request: CoreRequest
 ) -> morepath.Response:
     return render_metadata(self, request)
 
@@ -131,14 +132,14 @@ def view_public_metadata(
 @Framework.json(model=SecretMetadata, permission=Secret)
 def view_secret_metadata(
     self: PublicMetadata,
-    request: 'CoreRequest'
+    request: CoreRequest
 ) -> morepath.Response:
     return render_metadata(self, request)
 
 
 def render_metadata(
     self: PublicMetadata | SecretMetadata,
-    request: 'CoreRequest'
+    request: CoreRequest
 ) -> morepath.Response:
 
     data = self.as_dict()

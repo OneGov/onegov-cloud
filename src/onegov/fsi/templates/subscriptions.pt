@@ -3,65 +3,59 @@
         ${layout.title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="row">
-            <div class="columns small-12">
-                <div class="row">
-                    <div class="columns small-12" tal:define="has_course layout.model.course_event_id">
 
-                        <p tal:condition="not: subscriptions"><strong i18n:translate="">No entries found</strong></p>
-                        <p tal:condition="request.is_editor and not layout.for_himself" i18n:translate="">You can only see subscriptions from attendees fitting your permissions.</p>
+        <tal: tal:define="has_course layout.model.course_event_id">
 
-                        <tal:b tal:condition="subscriptions|nothing">
-                                <table class="subscription-table fullwidth">
-                                    <thead>
-                                        <th tal:condition="not:layout.for_himself" i18n:translate>Attendee</th>
-                                        <th tal:condition="not:layout.for_himself" i18n:translate>Shortcode</th>
-                                        <th i18n:translate tal:condition="not: has_course">Course Name</th>
-                                        <th i18n:translate tal:condition="not: has_course">Date</th>
-                                        <th i18n:translate>Course Status</th>
-                                        <th i18n:translate>Course attended</th>
-                                        <th i18n:translate>Last info mail</th>
-                                        <th tal:condition="request.is_admin" i18n:translate="" class="hide-for-print">Manage</th>
-                                    </thead>
-                                    <tbody>
-                                        <tal:b tal:repeat="subscription subscriptions">
-                                            <tr>
-                                                <td tal:condition="not: layout.for_himself"><a href="${layout.link(subscription)}">${str(subscription)}</a></td>
-                                                <td tal:condition="not: layout.for_himself">
-                                                    <tal:b tal:condition="subscription.attendee and subscription.attendee.user">
-                                                        ${subscription.attendee.source_id}
-                                                    </tal:b>
-                                                </td>
-                                                <td tal:condition="not: has_course"><a href="${request.link(subscription.course_event)}">${subscription.course_event.name}</a></td>
-                                                <td tal:condition="not: has_course">${layout.format_date(subscription.course_event.start, 'datetime')}</td>
-                                                <td>${layout.format_status(subscription.course_event.status)}</td>
+            <p tal:condition="not: subscriptions"><strong i18n:translate="">No entries found</strong></p>
+            <p tal:condition="request.is_editor and not layout.for_himself" i18n:translate="">You can only see subscriptions from attendees fitting your permissions.</p>
 
-                                            <td>
-                                                <tal:b metal:use-macro="layout.macros['confirmation_slider']" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.subscription.number); url layout.confirmation_link(subscription)" />
-                                            </td>
+            <tal:b tal:condition="subscriptions|nothing">
+                    <table class="subscription-table fullwidth">
+                        <thead>
+                            <th tal:condition="not:layout.for_himself" i18n:translate>Attendee</th>
+                            <th tal:condition="not:layout.for_himself" i18n:translate>Shortcode</th>
+                            <th i18n:translate tal:condition="not: has_course">Course Name</th>
+                            <th i18n:translate tal:condition="not: has_course">Date</th>
+                            <th i18n:translate>Course Status</th>
+                            <th i18n:translate>Course attended</th>
+                            <th i18n:translate>Last info mail</th>
+                            <th tal:condition="request.is_admin" i18n:translate="" class="hide-for-print">Manage</th>
+                        </thead>
+                        <tbody>
+                            <tal:b tal:repeat="subscription subscriptions">
+                                <tr>
+                                    <td tal:condition="not: layout.for_himself"><a href="${layout.link(subscription)}">${str(subscription)}</a></td>
+                                    <td tal:condition="not: layout.for_himself">
+                                        <tal:b tal:condition="subscription.attendee and subscription.attendee.user">
+                                            ${subscription.attendee.source_id}
+                                        </tal:b>
+                                    </td>
+                                    <td tal:condition="not: has_course"><a href="${request.link(subscription.course_event)}">${subscription.course_event.name}</a></td>
+                                    <td tal:condition="not: has_course">${layout.format_date(subscription.course_event.start, 'datetime')}</td>
+                                    <td>${layout.format_status(subscription.course_event.status)}</td>
+
+                                <td>
+                                    <tal:b metal:use-macro="layout.macros['confirmation_slider']" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.subscription.number); url layout.confirmation_link(subscription)" />
+                                </td>
 
 
-                                                <td tal:define="sent subscription.course_event.info_template.last_sent">${layout.format_date(sent, 'date') if sent else ''}</td>
-                                                <td tal:condition="request.is_admin" class="hide-for-print">
-                                                    <!--?  Delete Button -->
-                                                    <metal:b tal:condition="request.is_admin" tal:define="item subscription" use-macro="layout.macros['intercooler_btn_for_item']"/>
-                                                    <a tal:condition="subscription.is_placeholder" href="${request.link(subscription, name='edit-placeholder')}" class="button tiny secondary" i18n:translate="">Edit</a>
+                                    <td tal:define="sent subscription.course_event.info_template.last_sent">${layout.format_date(sent, 'date') if sent else ''}</td>
+                                    <td tal:condition="request.is_admin" class="hide-for-print">
+                                        <!--?  Delete Button -->
+                                        <metal:b tal:condition="request.is_admin" tal:define="item subscription" use-macro="layout.macros['intercooler_btn_for_item']"/>
+                                        <a tal:condition="subscription.is_placeholder" href="${request.link(subscription, name='edit-placeholder')}" class="button tiny secondary" i18n:translate="">Edit</a>
 
-                                            </td>
-                                        </tr>
-                                    </tal:b>
-                                </tbody>
-                            </table>
-                            <tal:b tal:condition="request.is_admin and layout.show_send_info_mail_button">
-                                <a href="${layout.preview_info_mail_url}" class="button success hide-for-print" i18n:translate="">Send Info Mail</a>
-                            </tal:b>
-                            <div class="pagination-centered">
-                                <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model;" />
-                            </div>
+                                </td>
+                            </tr>
                         </tal:b>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </tbody>
+                </table>
+                <tal:b tal:condition="request.is_admin and layout.show_send_info_mail_button">
+                    <a href="${layout.preview_info_mail_url}" class="button success hide-for-print" i18n:translate="">Send Info Mail</a>
+                </tal:b>
+                <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model; pagination_centered True" />
+            </tal:b>
+        </tal:>
+
     </tal:b>
 </div>

@@ -1,12 +1,13 @@
 """
-    Send E-Mail through Postmark
+Send E-Mail through Postmark
 
-    Adapted from repoze.sendmail: https://github.com/repoze/repoze.sendmail
+Adapted from `repoze.sendmail<https://github.com/repoze/repoze.sendmail>`_.
 
-    Usage:
-        qp = PostmarkQueueProcessor(token, maildir, maildir, ..., limit=x)
-        qp.send_messages()
+Usage::
+    qp = PostmarkQueueProcessor(token, maildir, maildir, ..., limit=x)
+    qp.send_messages()
 """
+from __future__ import annotations
 
 import json
 import pycurl
@@ -44,7 +45,7 @@ class PostmarkMailQueueProcessor(MailQueueProcessor):
         code, body = self.send_request(payload)
 
         if 400 <= code < 600:
-            raise RuntimeError(f"{code} calling {self.url}: {body}")
+            raise RuntimeError(f'{code} calling {self.url}: {body}')
 
         result = json.loads(body)
 

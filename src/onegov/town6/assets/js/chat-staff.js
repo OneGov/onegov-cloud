@@ -13,115 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var requestList = document.getElementById('request-list');
 
     if (endpoint && schema && token) {
-        // NOTE: Includes schema with the WebSocket URL because the chat
-        // requires the schema on initiation. This should be already done when
-        // setting the data-websocket-endpoint. That however requires modifying
-        // WebsocketsApp.
-        const chatEndpoint = `${endpoint}/chats?schema=${schema}&token=${token}`;
-
-        const socket = openWebsocket(
-            chatEndpoint,
-            schema,
-            null,
-            onWebsocketNotification,
-            onWebsocketError,
-            'staff_chat'
-        );
-
-        function browserNotification(message) {
-            if (!("Notification" in window)) {
-                // Check if the browser supports notifications
-                alert("This browser does not support desktop notification");
-            } else if (Notification.permission === "granted") {
-                // Check whether notification permissions have already been granted;
-                // if so, create a notification
-                const notification = new Notification(message);
-            } else if (Notification.permission !== "denied") {
-                // We need to ask the user for permission
-                Notification.requestPermission().then((permission) => {
-                    // If the user accepts, let's create a notification
-                    if (permission === "granted") {
-                        const notification = new Notification(message);
-                    }
-                });
-            }
-        }
-
-        function onWebsocketNotification(message, websocket) {
-            message = JSON.parse(message);
-            if (message.type == 'request') {
-            // browserNotification(message.notification)
-                var requestElement = document.getElementById('new-request');
-                var newRequest = requestElement.cloneNode(true);
-
-                newRequest.id = 'request-' + message.channel;
-                newRequest.style.display = 'block';
-                var userText = document.createTextNode(message.user);
-                newRequest.children[0].appendChild(userText);
-                var topicText = document.createTextNode(message.topic);
-                newRequest.children[1].appendChild(topicText);
-
-                noRequestText.style.display = 'none';
-                requestList.appendChild(newRequest);
-
-                // Click on new request
-                newRequest.addEventListener("click", () => {
-                    acceptRequest(message.channel, message.user, websocket);
-                });
-
-            } else if (message.type == 'message') {
-                if (chatArea.dataset.chatId == message.channel) {
-                    createChatBubble(message, message.userId == staffId);
-                    var message_area = document.getElementById('message-area');
-                    message_area.scrollTop = message_area.scrollHeight;
-                } else {
-                    const chatBlob = getChatBlobFor(message.channel);
-
-                    if (chatBlob) {
-                        showElement(chatBlob);
-                    }
-                }
-            } else if (message.type == 'hide-request') {
-                var request = document.getElementById('request-' + message.channel);
-                request.remove();
-                if (requestList.children.length < 2) {
-                    noRequestText.style.display = 'block';
-                }
-
-            } else if (message.type == 'chat-history') {
-            // Display chat history
-                removePreviousChat();
-                chatArea.dataset.chatId = message.channel;
-                document.getElementById('chat_id').value = message.channel;
-
-                var messages = message.history;
-                messages.forEach((m) => {
-                    var no_chat_open = document.getElementById('no-chat-open');
-                    no_chat_open.style.display = 'none';
-                    var message_area = document.getElementById("message-area");
-                    message_area.style.display = 'block';
-                    var chat_form = document.getElementById('chat-form');
-                    chat_form.style.display = 'flex';
-                    createChatBubble(m, m.userId == staffId);
-                });
-                aceptedNotification.style.display = 'block';
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('chat-actions').style.display = 'block';
-                if (requestList.children.length < 2) {
-                    noRequestText.style.display = 'block';
-                }
-                noActiveChatsText.style.display = 'none';
-
-                const chatBlob = getChatBlobFor(message.channel);
-                if (chatBlob) {
-                    hideElement(chatBlob);
-                }
-                var message_area = document.getElementById('message-area');
-                message_area.scrollTop = message_area.scrollHeight;
-            } else {
-                console.log('unkown messaage type', message);
-            }
-        }
+        const chatEndpoint = `${endpoint}/chats?token=${token}`;
 
         function showElement(element, display = 'block') { element.style.display = display; }
         function hideElement(element) { element.style.display = 'none'; }
@@ -131,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const blob = document.getElementById(selector).children[0].children[0];
 
             if (!blob) {
+                // eslint-disable-next-line no-console
                 console.error("Unable to find chat blob for chat: " + chatId);
                 return null;
             }
@@ -138,14 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return blob;
         }
 
-        function onWebsocketError(_event, websocket) {
-            websocket.close();
-        }
-
-        function getCurrentChatId() {
-            return chatArea.dataset.chatId || null;
-        }
-
+        // eslint-disable-next-line consistent-this
         function createChatBubble(message, self) {
             var chatCard = document.getElementsByClassName('chat-card')[0].cloneNode(true);
             chatCard.style.display = 'block';
@@ -163,6 +49,37 @@ document.addEventListener("DOMContentLoaded", function() {
                 m.remove();
             });
             chatArea.appendChild(templateMessage);
+        }
+
+        function requestHistory(chat) {
+            var channel = chat.dataset.chatId;
+            chat.addEventListener("click", () => {
+                // eslint-disable-next-line no-console
+                console.log('open chat with id' + channel);
+                chatArea.style.display = 'block';
+                document.getElementById('loading').style.display = 'block';
+
+                var payload = JSON.stringify({
+                    type: 'request-chat-history',
+                    channel: channel
+                });
+
+                // eslint-disable-next-line no-use-before-define
+                socket.send(payload);
+            });
+        }
+
+        function addActiveChat(channel, user) {
+            var activeChatElement = document.getElementById('new-active-chat');
+            var newActiveChatElement = activeChatElement.cloneNode(true);
+            var activeChatList = document.getElementById('active-chat-list');
+            newActiveChatElement.id = 'active-chat-' + channel;
+            newActiveChatElement.dataset.chatId = channel;
+            newActiveChatElement.style.display = 'block';
+            userText = document.createTextNode(user);
+            newActiveChatElement.children[0].children[1].appendChild(userText);
+            activeChatList.appendChild(newActiveChatElement);
+            requestHistory(newActiveChatElement);
         }
 
         function acceptRequest(channel, user, websocket) {
@@ -187,38 +104,100 @@ document.addEventListener("DOMContentLoaded", function() {
             websocket.send(payload);
         }
 
-        function addActiveChat(channel, user) {
-            var activeChatElement = document.getElementById('new-active-chat');
-            var newActiveChatElement = activeChatElement.cloneNode(true);
-            var activeChatList = document.getElementById('active-chat-list');
-            newActiveChatElement.id = 'active-chat-' + channel;
-            newActiveChatElement.dataset.chatId = channel;
-            newActiveChatElement.style.display = 'block';
-            userText = document.createTextNode(user);
-            newActiveChatElement.children[0].children[1].appendChild(userText);
-            activeChatList.appendChild(newActiveChatElement);
-            requestHistory(newActiveChatElement);
-        }
+        function onWebsocketNotification(message, websocket) {
+            message = JSON.parse(message);
+            if (message.type === 'request') {
+            // browserNotification(message.notification)
+                var requestElement = document.getElementById('new-request');
+                var newRequest = requestElement.cloneNode(true);
 
-        function requestHistory(chat) {
-            var channel = chat.dataset.chatId;
-            chat.addEventListener("click", () => {
-                console.log('open chat with id' + channel);
-                chatArea.style.display = 'block';
-                document.getElementById('loading').style.display = 'block';
+                newRequest.id = 'request-' + message.channel;
+                newRequest.style.display = 'block';
+                var userText = document.createTextNode(message.user);
+                newRequest.children[0].appendChild(userText);
+                var topicText = document.createTextNode(message.topic);
+                newRequest.children[1].appendChild(topicText);
 
-                var payload = JSON.stringify({
-                    type: 'request-chat-history',
-                    channel: channel
+                noRequestText.style.display = 'none';
+                requestList.appendChild(newRequest);
+
+                // Click on new request
+                newRequest.addEventListener("click", () => {
+                    acceptRequest(message.channel, message.user, websocket);
                 });
 
-                socket.send(payload);
-            });
+            } else if (message.type === 'message') {
+                if (chatArea.dataset.chatId === message.channel) {
+                    createChatBubble(message, message.userId === staffId);
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                } else {
+                    const chatBlob = getChatBlobFor(message.channel);
+
+                    if (chatBlob) {
+                        showElement(chatBlob);
+                    }
+                }
+            } else if (message.type === 'hide-request') {
+                var request = document.getElementById('request-' + message.channel);
+                request.remove();
+                if (requestList.children.length < 2) {
+                    noRequestText.style.display = 'block';
+                }
+
+            } else if (message.type === 'chat-history') {
+            // Display chat history
+                removePreviousChat();
+                chatArea.dataset.chatId = message.channel;
+                document.getElementById('chat_id').value = message.channel;
+
+                var messages = message.history;
+                messages.forEach((m) => {
+                    var no_chat_open = document.getElementById('no-chat-open');
+                    no_chat_open.style.display = 'none';
+                    chatArea.style.display = 'block';
+                    var chat_form = document.getElementById('chat-form');
+                    chat_form.style.display = 'flex';
+                    createChatBubble(m, m.userId === staffId);
+                });
+                aceptedNotification.style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('chat-actions').style.display = 'block';
+                if (requestList.children.length < 2) {
+                    noRequestText.style.display = 'block';
+                }
+                noActiveChatsText.style.display = 'none';
+
+                const chatBlob = getChatBlobFor(message.channel);
+                if (chatBlob) {
+                    hideElement(chatBlob);
+                }
+                chatArea.scrollTop = chatArea.scrollHeight;
+            } else {
+                // eslint-disable-next-line no-console
+                console.log('unkown messaage type', message);
+            }
+        }
+
+        function onWebsocketError(_event, websocket) {
+            websocket.close();
+        }
+
+        const socket = openWebsocket(
+            chatEndpoint,
+            schema,
+            null,
+            onWebsocketNotification,
+            onWebsocketError,
+            'staff_chat'
+        );
+
+        function getCurrentChatId() {
+            return chatArea.dataset.chatId || null;
         }
 
         // Run function when websocket is ready.
         function websocketReady(fn) {
-            if (socket.readyState == WebSocket.OPEN) {
+            if (socket.readyState === WebSocket.OPEN) {
                 fn();
             } else {
                 socket.addEventListener("open", fn);
@@ -238,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function() {
         websocketReady(function() {
         // Active Chats
             activeChats.forEach((chat) => {
-                if (chat.id != 'new-active-chat') {
+                if (chat.id !== 'new-active-chat') {
                     var channel = chat.dataset.chatId;
                     var payloadReconnect = JSON.stringify({
                         type: 'reconnect',
@@ -253,6 +232,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         websocketReady(function() {
+            // eslint-disable-next-line no-console
             console.debug("websocket is established");
         });
 
@@ -260,6 +240,7 @@ document.addEventListener("DOMContentLoaded", function() {
         var chatActions = document.getElementById('chat-actions');
         chatActions.addEventListener("submit", () => {
             var chatId = chatArea.dataset.chatId;
+            // eslint-disable-next-line no-console
             console.log('ending chat');
             var no_chat_open = document.getElementById('no-chat-open');
             no_chat_open.style.display = 'flex';
@@ -284,6 +265,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const chatMessage = chatWindow.value;
 
             if (isEmpty(chatMessage)) {
+                // eslint-disable-next-line no-console
                 console.debug("Not sending empty message.");
                 return;
             }

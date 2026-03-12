@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import BALLOT_TYPES
 from onegov.election_day.formats.imports.common import EXPATS
@@ -38,8 +40,8 @@ INTERNAL_VOTE_HEADERS = (
 
 
 def import_vote_internal(
-    vote: 'Vote',
-    principal: 'Canton | Municipality',
+    vote: Vote,
+    principal: Canton | Municipality,
     file: IO[bytes],
     mimetype: str
 ) -> list[FileImportError]:
@@ -68,11 +70,11 @@ def import_vote_internal(
 
         status = line.status or 'unknown'
         if status not in STATI:
-            line_errors.append(_("Invalid status"))
+            line_errors.append(_('Invalid status'))
 
         ballot_type = line.type
         if ballot_type not in BALLOT_TYPES:
-            line_errors.append(_("Invalid ballot type"))
+            line_errors.append(_('Invalid ballot type'))
         if vote.type == 'simple':
             ballot_type = 'proposal'
 
@@ -93,17 +95,17 @@ def import_vote_internal(
 
             if entity_id in added_entity_ids[ballot_type]:
                 line_errors.append(
-                    _("${name} was found twice", mapping={
+                    _('${name} was found twice', mapping={
                         'name': entity_id
                     }))
 
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={
+                    _('${name} is unknown', mapping={
                         'name': entity_id
                     }))
             else:
-                name, district, superregion = get_entity_and_district(
+                name, district, _superregion = get_entity_and_district(
                     entity_id, entities, vote, principal, line_errors
                 )
 
@@ -161,10 +163,10 @@ def import_vote_internal(
         if counted:
             try:
                 if not eligible_voters:
-                    line_errors.append(_("No eligible voters"))
+                    line_errors.append(_('No eligible voters'))
                 if (yeas + nays + empty + invalid) > eligible_voters:
                     line_errors.append(
-                        _("More cast votes than eligible voters")
+                        _('More cast votes than eligible voters')
                     )
             except UnboundLocalError:
                 pass
@@ -198,7 +200,7 @@ def import_vote_internal(
         return errors
 
     if not any(ballot_results.values()):
-        return [FileImportError(_("No data found"))]
+        return [FileImportError(_('No data found'))]
 
     # if there were no errors we know we have a valid status and ballot_types
     status = cast('Status', status)
@@ -211,7 +213,7 @@ def import_vote_internal(
             remaining.add(0)
         remaining -= added_entity_ids[ballot_type]
         for entity_id in remaining:
-            name, district, superregion = get_entity_and_district(
+            name, district, _superregion = get_entity_and_district(
                 entity_id, entities, vote, principal
             )
             if vote.domain == 'none':

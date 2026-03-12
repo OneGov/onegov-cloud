@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency.api import AgencyApiEndpoint
 from onegov.agency.api import MembershipApiEndpoint
 from onegov.agency.api import PersonApiEndpoint
@@ -5,7 +7,7 @@ from onegov.agency.custom import get_global_tools
 from onegov.agency.custom import get_top_navigation
 from onegov.agency.forms import UserGroupForm
 from onegov.agency.initial_content import create_new_organisation
-from onegov.agency.pdf import AgencyPdfAr, AgencyPdfBs
+from onegov.agency.pdf import AgencyPdfAr, AgencyPdfBs, AgencyPdfLu
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
 from onegov.agency.request import AgencyRequest
@@ -51,13 +53,13 @@ class AgencyApp(OrgApp, ApiApp):
         return self.filestorage.exists('people.xlsx')
 
     @property
-    def root_pdf_modified(self) -> 'datetime | None':
+    def root_pdf_modified(self) -> datetime | None:
         if self.root_pdf_exists:
             return self.filestorage.getdetails('root.pdf').modified
         return None
 
     @property
-    def people_xlsx_modified(self) -> 'datetime | None':
+    def people_xlsx_modified(self) -> datetime | None:
         if self.people_xlsx:
             return self.filestorage.getdetails('people.xlsx').modified
         return None
@@ -73,7 +75,7 @@ class AgencyApp(OrgApp, ApiApp):
 
     # FIXME: asymmetric property
     @root_pdf.setter
-    def root_pdf(self, value: 'SupportsRead[bytes] | bytes') -> None:
+    def root_pdf(self, value: SupportsRead[bytes] | bytes) -> None:
         with self.filestorage.open('root.pdf', 'wb') as file:
             if hasattr(value, 'read'):
                 value = value.read()
@@ -91,7 +93,7 @@ class AgencyApp(OrgApp, ApiApp):
 
     # FIXME: asymmetric property
     @people_xlsx.setter
-    def people_xlsx(self, value: 'SupportsRead[bytes] | bytes') -> None:
+    def people_xlsx(self, value: SupportsRead[bytes] | bytes) -> None:
         with self.filestorage.open('people.xlsx', 'wb') as file:
             if hasattr(value, 'read'):
                 value = value.read()
@@ -107,6 +109,8 @@ class AgencyApp(OrgApp, ApiApp):
             return AgencyPdfZg
         if pdf_layout == 'bs':
             return AgencyPdfBs
+        if pdf_layout == 'lu':
+            return AgencyPdfLu
         return AgencyPdfDefault
 
     @property
@@ -120,7 +124,7 @@ class AgencyApp(OrgApp, ApiApp):
 
 @AgencyApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[AgencyApp, str], Organisation]':
+) -> Callable[[AgencyApp, str], Organisation]:
     return create_new_organisation
 
 
@@ -130,7 +134,7 @@ def get_template_directory() -> str:
 
 
 @AgencyApp.template_variables()
-def get_template_variables(request: AgencyRequest) -> 'RenderData':
+def get_template_variables(request: AgencyRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
@@ -150,7 +154,7 @@ def get_usergroup_form_class() -> type[UserGroupForm]:
 @AgencyApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.agency', 'locale')
-    return [mine] + get_org_i18n_localedirs()
+    return [mine, *get_org_i18n_localedirs()]
 
 
 @AgencyApp.setting(section='org', name='ticket_manager_roles')
@@ -161,6 +165,14 @@ def get_ticket_manager_roles() -> tuple[str, ...]:
 @AgencyApp.setting(section='org', name='disabled_extensions')
 def get_disabled_extensions() -> tuple[str, ...]:
     return ('PersonLinkExtension', )
+
+
+# NOTE: A citizen login doesn't make a ton of sense here, given the
+#       simplicity of the tickets processed in this system, but we
+#       can think about enabling it in the future.
+@AgencyApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False
 
 
 @AgencyApp.webasset_output()
@@ -174,31 +186,38 @@ def get_js_path() -> str:
 
 
 @AgencyApp.webasset('people-select')
-def get_people_select_asset() -> 'Iterator[str]':
+def get_people_select_asset() -> Iterator[str]:
     yield 'people-select.js'
 
 
 @AgencyApp.webasset('sortable-multi-checkbox')
-def get_sortable_multi_checkbox_asset() -> 'Iterator[str]':
+def get_sortable_multi_checkbox_asset() -> Iterator[str]:
     yield 'jquery.js'
     yield 'sortable.js'
     yield 'sortable-multi-checkbox.js'
 
 
 @AgencyApp.webasset('redactor', filters={'js': None})
-def get_redactor_asserts() -> 'Iterator[str]':
+def get_redactor_asserts() -> Iterator[str]:
     yield from redactor_assets()
 
 
 @AgencyApp.webasset('editor')
-def get_editor_assets() -> 'Iterator[str]':
+def get_editor_assets() -> Iterator[str]:
     yield from editor_assets()
 
 
 @AgencyApp.setting(section='api', name='endpoints')
-def get_api_endpoints() -> list[type['ApiEndpoint[Any]']]:
-    return [
-        AgencyApiEndpoint,
-        PersonApiEndpoint,
-        MembershipApiEndpoint
-    ]
+def get_api_endpoints_handler(
+) -> Callable[[AgencyRequest], Iterator[ApiEndpoint[Any]]]:
+
+    def get_api_endpoints(
+            request: AgencyRequest,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
+    ) -> Iterator[ApiEndpoint[Any]]:
+        yield AgencyApiEndpoint(request, extra_parameters, page)
+        yield PersonApiEndpoint(request, extra_parameters, page)
+        yield MembershipApiEndpoint(request, extra_parameters, page)
+
+    return get_api_endpoints

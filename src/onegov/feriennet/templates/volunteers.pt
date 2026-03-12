@@ -3,201 +3,208 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="row volunteers-list">
-            <div class="columns small-12 medium-8">
+        <div class="grid-x grid-padding-x volunteers-list occasion-list">
+            <div class="cell small-12 medium-8">
                 <div class="panel" i18n:translate tal:condition="not:has_needs">
                     No activities needing volunteers found.
                 </div>
 
+
                 <tal:b repeat="activity_group grouped(records, 'activity_id')">
-                    <h2><a href="${activity_link(activity_group[0].activity_name)}">${activity_group[0].activity_title}</a></h2>
+                    <div class="occasion">
+                        <h2 class="title">
+                            <a href="${activity_link(activity_group[0].activity_name)}">${activity_group[0].activity_title}</a>
+                        </h2>
 
-                    <tal:b repeat="occasion_group sorted(grouped(activity_group, 'occasion_id'), key=lambda x:x[0].occasion_number)">
-                        <h3 id="${occasion_group[0].occasion_id.hex}">
-                            ${occasion_group[0].occasion_number}.
-                            <tal:b i18n:translate>Occasion</tal:b>
-                            <span class="right-aligned">${layout.format_datetime_range(*occasion_group[0].dates[0])}</span>
-                        </h3>
+                        <tal:b repeat="occasion_group sorted(grouped(activity_group, 'occasion_id'), key=lambda x:x[0].occasion_number)">
+                            <b id="${occasion_group[0].occasion_id.hex}" class="occasion-title">
+                                ${occasion_group[0].occasion_number}.
+                                <tal:b i18n:translate>Occasion</tal:b>
+                                <span class="right-aligned">${layout.format_datetime_range(*occasion_group[0].dates[0])}</span>
+                            </b>
 
-                        <div tal:repeat="need_group grouped(occasion_group, 'need_id')" id="${need_group[0].need_id.hex}">
+                            <div tal:repeat="need_group grouped(occasion_group, 'need_id')" id="${need_group[0].need_id.hex}">
 
-                            <div class="progress ${int(need_group[0].confirmed) >= int(need_group[0].min_required) and 'success' or 'alert'}">
+                                <div class="progress ${int(need_group[0].confirmed) >= int(need_group[0].min_required) and 'success' or 'alert'}">
 
-                                <span class="meter" tal:condition="need_group[0].min_required" style="width: ${min(int(need_group[0].confirmed) / int(
-                                    need_group[0].min_required), 1) * 100}%"></span>
-                                <span class="meter" tal:condition="not:need_group[0].min_required" style="width: 100%"></span>
-                                <span class="meter-text">
-                                    <strong>${need_group[0].need_name}</strong>,
-                                    <span i18n:translate>
-                                        <span i18n:name="count">
-                                            ${need_group[0].confirmed}
-                                        </span>
-                                        of
-                                        <span i18n:name="total">
-                                            <tal:b switch="need_group[0].min_required == need_group[0].max_required">
-                                                <tal:b case="True">
-                                                    ${need_group[0].min_required}
+                                    <span class="meter" tal:condition="need_group[0].min_required" style="width: ${min(int(need_group[0].confirmed) / int(
+                                        need_group[0].min_required), 1) * 100}%"></span>
+                                    <span class="meter" tal:condition="not:need_group[0].min_required" style="width: 100%"></span>
+                                    <span class="meter-text">
+                                        <strong>${need_group[0].need_name}</strong>,
+                                        <span i18n:translate>
+                                            <span i18n:name="count">
+                                                ${need_group[0].confirmed}
+                                            </span>
+                                            of
+                                            <span i18n:name="total">
+                                                <tal:b switch="need_group[0].min_required == need_group[0].max_required">
+                                                    <tal:b case="True">
+                                                        ${need_group[0].min_required}
+                                                    </tal:b>
+                                                    <tal:b case="False">
+                                                        ${need_group[0].min_required}-${need_group[0].max_required}
+                                                    </tal:b>
                                                 </tal:b>
-                                                <tal:b case="False">
-                                                    ${need_group[0].min_required}-${need_group[0].max_required}
-                                                </tal:b>
-                                            </tal:b>
+                                            </span>
                                         </span>
                                     </span>
-                                </span>
-                            </div>
+                                </div>
 
-                            <table tal:condition="need_group[-1].volunteer_id">
-                                <thead>
-                                    <tr>
-                                        <th i18n:translate>First name</th>
-                                        <th i18n:translate>Last name</th>
-                                        <th i18n:translate>Age</th>
-                                        <th i18n:translate>Organisation</th>
-                                        <th i18n:translate>Place</th>
-                                        <th i18n:translate colspan="2">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tal:b tal:repeat="record need_group">
-                                        <tr class="volunteer-${record.state}">
-                                            <td>${record.first_name}</td>
-                                            <td>${record.last_name}</td>
-                                            <td>${int(record.age)}</td>
-                                            <td>${record.organisation}</td>
-                                            <td>${record.place}</td>
-                                            <td class="state-cell">
-                                                <tal:b switch="record.state">
-                                                    <tal:b case="'open'" i18n:translate>
-                                                        Open
-                                                    </tal:b>
-                                                    <tal:b case="'contacted'" i18n:translate>
-                                                        Contacted
-                                                    </tal:b>
-                                                    <tal:b case="'confirmed'" i18n:translate>
-                                                        Confirmed
-                                                    </tal:b>
-                                                    <tal:b case="'denied'" i18n:translate>
-                                                        Denied
-                                                    </tal:b>
-                                                </tal:b>
-                                            </td>
-                                            <td>
-                                                <button href="#" data-dropdown="dropdown-${record.volunteer_id.hex}" aria-controls="dropdown-${record.volunteer_id.hex}" aria-expanded="false" class="button tiny actions-button">
-                                                    <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-                                                    <span i18n:translate class="show-for-sr">
-                                                        Actions
-                                                    </span>
-                                                </button>
-                                                <ul id="dropdown-${record.volunteer_id.hex}" data-dropdown-content class="f-dropdown volunteer-actions" aria-hidden="true">
-                                                    <li>
-                                                        <a href="mailto:${record.email}">
-                                                            <i class="fa fa-fw fa-envelope-o" aria-hidden="true"></i>
-                                                            <tal:b i18n:translate>
-                                                                Contact by e-mail
-                                                            </tal:b>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="tel:${record.phone}">
-                                                            <i class="fa fa-fw fa-phone-square" aria-hidden="true"></i>
-                                                            <tal:b i18n:translate>
-                                                                Contact by phone
-                                                            </tal:b>
-                                                        </a>
-                                                    </li>
-                                                    <li class="show-details">
-                                                        <a data-toggle="#details-for-${record.volunteer_id.hex}" data-prevent-default="false" data-alt-text="Hide Details" i18n:attributes="data-alt-text" i18n:translate>
-                                                            Show Details
-                                                        </a>
-                                                    </li>
-                                                    <li class="state-transitions" tal:condition="record.state != 'open'">
-                                                        <a ic-post-to="${state_change(record, 'open')}"
-                                                           ic-target="#${need_group[0].need_id.hex}"
-                                                           ic-select-from-response="#${need_group[0].need_id.hex}">
-                                                            <i class="fa fa-fw fa-circle-o" aria-hidden="true"></i>
-                                                            <tal:b i18n:translate>
-                                                                Mark as open
-                                                            </tal:b>
-                                                        </a>
-                                                    </li>
-                                                    <li class="state-transitions" tal:condition="record.state != 'contacted'">
-                                                        <a ic-post-to="${state_change(record, 'contacted')}"
-                                                           ic-target="#${need_group[0].need_id.hex}"
-                                                           ic-select-from-response="#${need_group[0].need_id.hex}">
-                                                            <i class="fa fa-fw fa-circle" aria-hidden="true"></i>
-                                                            <tal:b i18n:translate>
-                                                                Mark as contacted
-                                                            </tal:b>
-                                                        </a>
-                                                    </li>
-                                                    <li class="state-transitions" tal:condition="record.state != 'confirmed'">
-                                                        <a ic-post-to="${state_change(record, 'confirmed')}"
-                                                           ic-target="#${need_group[0].need_id.hex}"
-                                                           ic-select-from-response="#${need_group[0].need_id.hex}">
-                                                            <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i>
-                                                            <tal:b i18n:translate>
-                                                                Mark as confirmed
-                                                            </tal:b>
-                                                        </a>
-                                                    </li>
-                                                    <li class="state-transitions">
-                                                        <a class="confirm"
-                                                           ic-post-to="${state_change(record, 'remove')}"
-                                                           ic-target="#${need_group[0].need_id.hex}"
-                                                           ic-select-from-response="#${need_group[0].need_id.hex}"
-                                                           data-confirm="Do you really want to remove this volunteer?"
-                                                           data-confirm-extra="${record.first_name} ${record.last_name}"
-                                                           data-confirm-yes="Remove volunteer"
-                                                           data-confirm-no="Cancel"
-                                                           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">
-                                                            <i class="fa fa-fw fa-ban" aria-hidden="true"></i>
-                                                            <tal:b i18n:translate>
-                                                                Remove
-                                                            </tal:b>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </td>
+                                <table tal:condition="need_group[-1].volunteer_id">
+                                    <thead>
+                                        <tr>
+                                            <th i18n:translate>First name</th>
+                                            <th i18n:translate>Last name</th>
+                                            <th i18n:translate>Age</th>
+                                            <th i18n:translate>Organisation</th>
+                                            <th i18n:translate>Place</th>
+                                            <th i18n:translate colspan="2">Status</th>
                                         </tr>
-                                        <tr id="details-for-${record.volunteer_id.hex}" style="display: none;" class="volunteer-details">
-                                            <td colspan="7">
-                                                <dl class="field-display">
-                                                    <div>
-                                                        <dt i18n:translate>Birthdate</dt>
-                                                        <dd>${layout.format_date(record.birth_date, 'date')}</dd>
-                                                    </div>
-                                                    <div>
-                                                        <dt i18n:translate>Address</dt>
-                                                        <dd>
-                                                            ${record.address}<br>
-                                                            ${record.zip_code} ${record.place}
-                                                        </dd>
-                                                    </div>
-                                                    <div>
-                                                        <dt i18n:translate>E-Mail</dt>
-                                                        <dd>
-                                                            <a href="mailto:${record.email}">${record.email}</a>
-                                                        </dd>
-                                                    </div>
-                                                    <div>
-                                                        <dt i18n:translate>Phone</dt>
-                                                        <dd>
-                                                            <a href="tel:${record.phone}">${record.phone}</a>
-                                                        </dd>
-                                                    </div>
-                                                </dl>
-                                            </td>
-                                        </tr>
-                                    </tal:b>
-                                </tbody>
-                            </table>
-                        </div>
-                    </tal:b>
+                                    </thead>
+                                    <tbody>
+                                        <tal:b tal:repeat="record need_group">
+                                            <tr class="volunteer-${record.state}">
+                                                <td>${record.first_name}</td>
+                                                <td>${record.last_name}</td>
+                                                <td>${int(record.age)}</td>
+                                                <td>${record.organisation}</td>
+                                                <td>${record.place}</td>
+                                                <td class="state-cell">
+                                                    <tal:b switch="record.state">
+                                                        <tal:b case="'open'" i18n:translate>
+                                                            Open
+                                                        </tal:b>
+                                                        <tal:b case="'contacted'" i18n:translate>
+                                                            Contacted
+                                                        </tal:b>
+                                                        <tal:b case="'confirmed'" i18n:translate>
+                                                            Confirmed
+                                                        </tal:b>
+                                                        <tal:b case="'denied'" i18n:translate>
+                                                            Denied
+                                                        </tal:b>
+                                                    </tal:b>
+                                                </td>
+                                                <td>
+                                                    <button type="button" data-toggle="dropdown-${record.volunteer_id.hex}" aria-controls="dropdown-${record.volunteer_id.hex}" aria-expanded="false" class="button tiny actions-button">
+                                                        <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                                                        <span i18n:translate class="show-for-sr">
+                                                            Actions
+                                                        </span>
+                                                    </button>
+                                                    <ul id="dropdown-${record.volunteer_id.hex}" data-position="bottom" data-alignment="right" data-auto-focus="true" class="dropdown-pane dropdown-options volunteer-actions" aria-hidden="true" data-close-on-click="true" data-dropdown>
+                                                        <li>
+                                                            <a href="mailto:${record.email}">
+                                                                <i class="fa fa-fw fa-envelope" aria-hidden="true"></i>
+                                                                <tal:b i18n:translate>
+                                                                    Contact by e-mail
+                                                                </tal:b>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="tel:${record.phone}">
+                                                                <i class="fa fa-fw fa-phone-square" aria-hidden="true"></i>
+                                                                <tal:b i18n:translate>
+                                                                    Contact by phone
+                                                                </tal:b>
+                                                            </a>
+                                                        </li>
+                                                        <li class="show-details">
+                                                            <a data-ogc-toggle="#details-${record.volunteer_id.hex}" data-toggle="dropdown-${record.volunteer_id.hex}" id="button-${record.volunteer_id.hex}" data-prevent-default="false" data-alt-text="Hide Details" i18n:attributes="data-alt-text" i18n:translate>
+                                                                Show Details
+                                                            </a>
+                                                        </li>
+                                                        <li class="state-transitions" tal:condition="record.state != 'open'">
+                                                            <a ic-post-to="${state_change(record, 'open')}"
+                                                            ic-target="#${need_group[0].need_id.hex}"
+                                                            ic-select-from-response="#${need_group[0].need_id.hex}">
+                                                                <i class="far fa-fw fa-circle" aria-hidden="true"></i>
+                                                                <tal:b i18n:translate>
+                                                                    Mark as open
+                                                                </tal:b>
+                                                            </a>
+                                                        </li>
+                                                        <li class="state-transitions" tal:condition="record.state != 'contacted'">
+                                                            <a ic-post-to="${state_change(record, 'contacted')}"
+                                                            ic-target="#${need_group[0].need_id.hex}"
+                                                            ic-select-from-response="#${need_group[0].need_id.hex}">
+                                                                <i class="fa fa-fw fa-circle" aria-hidden="true"></i>
+                                                                <tal:b i18n:translate>
+                                                                    Mark as contacted
+                                                                </tal:b>
+                                                            </a>
+                                                        </li>
+                                                        <li class="state-transitions" tal:condition="record.state != 'confirmed'">
+                                                            <a ic-post-to="${state_change(record, 'confirmed')}"
+                                                            ic-target="#${need_group[0].need_id.hex}"
+                                                            ic-select-from-response="#${need_group[0].need_id.hex}">
+                                                                <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i>
+                                                                <tal:b i18n:translate>
+                                                                    Mark as confirmed
+                                                                </tal:b>
+                                                            </a>
+                                                        </li>
+                                                        <li class="state-transitions">
+                                                            <a class="confirm"
+                                                            ic-post-to="${state_change(record, 'remove')}"
+                                                            ic-target="#${need_group[0].need_id.hex}"
+                                                            ic-select-from-response="#${need_group[0].need_id.hex}"
+                                                            data-confirm="Do you really want to remove this volunteer?"
+                                                            data-confirm-extra="${record.first_name} ${record.last_name}"
+                                                            data-confirm-yes="Remove volunteer"
+                                                            data-confirm-no="Cancel"
+                                                            i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">
+                                                                <i class="fa fa-fw fa-ban" aria-hidden="true"></i>
+                                                                <tal:b i18n:translate>
+                                                                    Remove
+                                                                </tal:b>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                            <tr id="details-${record.volunteer_id.hex}" class="volunteer-details hidden">
+                                                <td colspan="7">
+                                                    <dl class="field-display">
+                                                        <div>
+                                                            <dt i18n:translate>Birthdate</dt>
+                                                            <dd>${layout.format_date(record.birth_date, 'date')}</dd>
+                                                        </div>
+                                                        <div>
+                                                            <dt i18n:translate>Address</dt>
+                                                            <dd>
+                                                                ${record.address}<br>
+                                                                ${record.zip_code} ${record.place}
+                                                            </dd>
+                                                        </div>
+                                                        <div>
+                                                            <dt i18n:translate>E-Mail</dt>
+                                                            <dd>
+                                                                <a href="mailto:${record.email}">${record.email}</a>
+                                                            </dd>
+                                                        </div>
+                                                        <div>
+                                                            <dt i18n:translate>Phone</dt>
+                                                            <dd>
+                                                                <a href="tel:${record.phone}">${record.phone}</a>
+                                                            </dd>
+                                                        </div>
+                                                    </dl>
+                                                </td>
+                                            </tr>
+                                        </tal:b>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </tal:b>
+                    </div>
                 </tal:b>
             </div>
-            <div class="columns small-12 medium-4">
-                <tal:b metal:use-macro="layout.macros.periods" />
+            <div class="cell small-12 medium-4 sidebar">
+                <div class="sidebar-wrapper">
+                    <tal:b metal:use-macro="layout.macros.periods" />
+                </div>
             </div>
         </div>
     </tal:b>

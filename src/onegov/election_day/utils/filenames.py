@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from hashlib import sha256
 from onegov.election_day.models import Ballot
 from onegov.election_day.models import Election
@@ -26,9 +28,11 @@ def filename_prefix(item: object) -> str:
 def pdf_filename(
     item: Ballot | Vote | Election | ElectionCompound | ElectionCompoundPart,
     locale: str,
-    last_modified: 'datetime | None' = None
+    last_modified: datetime | None = None
 ) -> str:
     """ Generates a filename from an election or vote:
+
+    .. code-block:: plain
 
         ['election' or 'vote']-[hash of id].[timestamp].[locale].pdf
 
@@ -50,9 +54,11 @@ def svg_filename(
     item: Ballot | Vote | Election | ElectionCompound | ElectionCompoundPart,
     type_: str | None,
     locale: str,
-    last_modified: 'datetime | None' = None
+    last_modified: datetime | None = None
 ) -> str:
-    """ Generates a filename from an election, ballot or vote::
+    """ Generates a filename from an election, ballot or vote:
+
+    .. code-block:: plain
 
         ['election' or 'vote']-[hash of id].[type_].[timestamp].[locale].svg
 

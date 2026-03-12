@@ -1,29 +1,23 @@
-from psycopg2.extras import NumericRange
+from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from sqlalchemy.dialects.postgresql import Range
+
+from typing import Literal, TYPE_CHECKING
+
+
 if TYPE_CHECKING:
-    class BoundedIntegerRange(NumericRange):
+    class BoundedIntegerRange(Range[int]):
         def __init__(
             self,
             lower: int,
             upper: int,
-            bounds: str = '[)'
+            *,
+            bounds: Literal['()', '[)', '(]', '[]'] = '[)',
+            empty: bool = False,
         ) -> None: ...
         @property
         def upper(self) -> int: ...
         @property
         def lower(self) -> int: ...
 else:
-    # NOTE: We can probably get rid of this once we upgrade to SQLAlchemy 2.0
-    #       since they provide their own Range value types that we can inherit
-    #       from (if even necessary at that point).
-    def BoundedIntegerRange(
-        lower: int,
-        upper: int,
-        bounds: str = '[)'
-    ) -> NumericRange:
-        """
-        A NumericRange which can't be empty or have unbounded edges.
-        """
-        assert lower is not None and upper is not None
-        return NumericRange(lower, upper, bounds)
+    BoundedIntegerRange = Range[int]

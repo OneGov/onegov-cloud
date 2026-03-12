@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 from onegov.agency.utils import get_html_paragraph_with_line_breaks
+from onegov.core.orm.mixins import dict_property, meta_property
+from onegov.core.utils import generate_fts_phonenumbers
 from onegov.org.models import Organisation
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PublicationExtension
@@ -11,8 +15,7 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.agency.models import ExtendedAgencyMembership
     from onegov.agency.request import AgencyRequest
-    from onegov.core.types import AppenderQuery
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import DynamicMapped
 
 
 class ExtendedPerson(Person, AccessExtension, PublicationExtension):
@@ -20,22 +23,18 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
-    es_type_name = 'extended_person'
-
-    @property
-    def es_public(self) -> bool:  # type:ignore[override]
-        return self.access == 'public' and self.published
-
-    es_properties = {
-        'title': {'type': 'text'},
-        'function': {'type': 'localized'},
-        'email': {'type': 'text'},
-        'phone_internal': {'type': 'text'},
-        'phone_es': {'type': 'text'}
+    fts_public = True
+    fts_title_property = 'title'
+    fts_properties = {
+        'title': {'type': 'text', 'weight': 'A'},
+        'function': {'type': 'localized', 'weight': 'B'},
+        'email': {'type': 'text', 'weight': 'A'},
+        'phone_internal': {'type': 'text', 'weight': 'A'},
+        'phone_fts': {'type': 'text', 'weight': 'A'}
     }
 
     @property
-    def es_suggestion(self) -> tuple[str, ...]:
+    def fts_suggestion(self) -> tuple[str, ...]:
         suffix = f' ({self.function})' if self.function else ''
         result = {
             f'{self.last_name} {self.first_name}{suffix}',
@@ -44,44 +43,43 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         }
         return tuple(result)
 
+    external_user_id: dict_property[str | None] = meta_property()
+
+    # miscField50
+    staff_number: dict_property[str | None] = meta_property()
+
     if TYPE_CHECKING:
         # we only allow ExtendedAgencyMembership memberships
-        memberships: relationship[  # type:ignore[assignment]
-            AppenderQuery[ExtendedAgencyMembership]
-        ]
+        memberships: DynamicMapped[ExtendedAgencyMembership]  # type: ignore[assignment]
 
     @property
     def phone_internal(self) -> str:
-        org = object_session(self).query(Organisation).one()
+        session = object_session(self)
+        assert session is not None
+        org = session.query(Organisation).one()
         number = getattr(self, org.agency_phone_internal_field)
         digits = org.agency_phone_internal_digits
         return number.replace(' ', '')[-digits:] if number and digits else ''
 
     @property
-    def phone_es(self) -> list[str]:
-        result = [self.phone_internal]
-        for number in (self.phone, self.phone_direct):
-            if number:
-                number = number.replace(' ', '')
-                result.append(number)
-                result.append(number[-7:])
-                result.append(number[-9:])
-                result.append('0' + number[-9:])
-        return [r for r in result if r]
+    def phone_fts(self) -> list[str]:
+        numbers = generate_fts_phonenumbers((self.phone, self.phone_direct))
+        numbers.insert(0, self.phone_internal)
+        return numbers
 
     @property
-    def location_address_html(self) -> 'Markup':
+    def location_address_html(self) -> Markup:
         return get_html_paragraph_with_line_breaks(self.location_address)
 
     @property
-    def postal_address_html(self) -> 'Markup':
+    def postal_address_html(self) -> Markup:
         return get_html_paragraph_with_line_breaks(self.postal_address)
 
     @property
-    def notes_html(self) -> 'Markup':
+    def notes_html(self) -> Markup:
         return get_html_paragraph_with_line_breaks(self.notes)
 
-    def deletable(self, request: 'AgencyRequest') -> bool:
+    def deletable(self, request: AgencyRequest) -> bool:
         if request.is_admin:
             return True
         if self.memberships.first():

@@ -2,9 +2,12 @@
 macros.
 
 """
+from __future__ import annotations
+
 from random import choice
 
 from lxml.html import builder, tostring
+from markupsafe import Markup
 
 from onegov.core.elements import AccessMixin, LinkGroup
 from onegov.core.elements import Link as BaseLink
@@ -46,7 +49,7 @@ class Link(_Base):
         self,
         text: str,
         url: str,
-        classes: 'Collection[str] | None' = None,
+        classes: Collection[str] | None = None,
         request_method: str = 'GET',
         attributes: dict[str, Any] | None = None,
         active: bool = False,
@@ -86,12 +89,11 @@ class Link(_Base):
                 return False
         return True
 
-    # FIXME: Are we actually getting bytes? This seems a bit sus
-    def __call__(  # type:ignore[override]
+    def __call__(
         self,
-        request: 'ChameleonLayout | CoreRequest',
-        extra_classes: 'Iterable[str] | None' = None
-    ) -> bytes:
+        request: ChameleonLayout | CoreRequest,
+        extra_classes: Iterable[str] | None = None
+    ) -> Markup:
         """ Renders the element. """
 
         # compatibility shim for new elements
@@ -125,7 +127,7 @@ class Link(_Base):
             # This snippet is duplicated in the access-hint macro!
             hint = builder.I()
             hint.attrib['class'] = 'private-hint'
-            hint.attrib['title'] = request.translate(_("This site is private"))
+            hint.attrib['title'] = request.translate(_('This site is private'))
 
             a.append(builder.I(' '))
             a.append(hint)
@@ -135,7 +137,7 @@ class Link(_Base):
             # This snippet is duplicated in the access-hint macro!
             hint = builder.I()
             hint.attrib['class'] = 'secret-hint'
-            hint.attrib['title'] = request.translate(_("This site is secret"))
+            hint.attrib['title'] = request.translate(_('This site is secret'))
 
             a.append(builder.I(' '))
             a.append(hint)
@@ -143,13 +145,16 @@ class Link(_Base):
         for key, value in self.attributes.items():
             a.attrib[key] = request.translate(value)
 
-        return tostring(a)
+        return Markup(tostring(a, encoding=str))  # nosec: B704
+
+    def __repr__(self) -> str:
+        return f'<Link {self.text}>'
 
 
 class QrCodeLink(BaseLink):
     """ Implements a qr code link that shows a modal with the QrCode.
-        Thu url is sent to the qr endpoint url which generates the image
-        and sends it back.
+    Thu url is sent to the qr endpoint url which generates the image
+    and sends it back.
     """
 
     id = 'qr_code_link'
@@ -169,7 +174,7 @@ class QrCodeLink(BaseLink):
         url: str,
         title: str | None = None,
         attrs: dict[str, Any] | None = None,
-        traits: 'Iterable[Trait] | Trait' = (),
+        traits: Iterable[Trait] | Trait = (),
         **props: Any
     ) -> None:
 
@@ -201,8 +206,10 @@ class DeleteLink(Link):
         extra_information: str | None = None,
         redirect_after: str | None = None,
         request_method: str = 'DELETE',
-        classes: 'Collection[str]' = ('confirm', 'delete-link'),
-        target: str | None = None
+        classes: Collection[str] = ('confirm', 'delete-link'),
+        target: str | None = None,
+        items: str | None = None,
+        scroll_hint: str | None = None,
     ) -> None:
 
         attr = {
@@ -218,7 +225,7 @@ class DeleteLink(Link):
         if no_button_text:
             attr['data-confirm-no'] = no_button_text
         else:
-            attr['data-confirm-no'] = _("Cancel")
+            attr['data-confirm-no'] = _('Cancel')
 
         if redirect_after:
             attr['redirect-after'] = redirect_after
@@ -236,6 +243,10 @@ class DeleteLink(Link):
             pass
         else:
             raise NotImplementedError
+
+        if items:
+            attr['data-confirm-items'] = items
+            attr['data-scroll-hint'] = scroll_hint or ''
 
         super().__init__(
             text=text,
@@ -260,7 +271,7 @@ class ConfirmLink(DeleteLink):
         extra_information: str | None = None,
         redirect_after: str | None = None,
         request_method: str = 'POST',
-        classes: 'Collection[str]' = ('confirm', )
+        classes: Collection[str] = ('confirm', )
     ) -> None:
 
         super().__init__(
@@ -280,8 +291,8 @@ __all__ = (
 
 class IFrameLink(BaseLink):
     """ Implements an iframe link that shows a modal with the iframe.
-        The url is sent to the iframe endpoint url which generates the iframe
-        and sends it back.
+    The url is sent to the iframe endpoint url which generates the iframe
+    and sends it back.
     """
 
     id = 'iframe_link'
@@ -301,7 +312,7 @@ class IFrameLink(BaseLink):
         url: str,
         title: str | None = None,
         attrs: dict[str, Any] | None = None,
-        traits: 'Iterable[Trait] | Trait' = (),
+        traits: Iterable[Trait] | Trait = (),
         **props: Any
     ) -> None:
 

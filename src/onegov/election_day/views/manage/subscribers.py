@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Private
 from onegov.election_day import _
@@ -24,14 +26,14 @@ if TYPE_CHECKING:
 )
 def view_sms_subscribers(
     self: SmsSubscriberCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View a list with all SMS subscribers. """
 
     return {
         'layout': ManageSubscribersLayout(self, request),
-        'title': _("SMS subscribers"),
-        'address_title': _("Phone number"),
+        'title': _('SMS subscribers'),
+        'address_title': _('Phone number'),
         'count': self.query().count(),
         'subscribers': self.batch,
         'term': self.term,
@@ -44,14 +46,14 @@ def view_sms_subscribers(
 )
 def view_email_subscribers(
     self: EmailSubscriberCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View a list with all email subscribers. """
 
     return {
         'layout': ManageSubscribersLayout(self, request),
-        'title': _("Email subscribers"),
-        'address_title': _("Email"),
+        'title': _('Email subscribers'),
+        'address_title': _('Email'),
         'count': self.query().count(),
         'subscribers': self.batch,
         'term': self.term
@@ -65,8 +67,8 @@ def view_email_subscribers(
 )
 def export_sms_subscribers(
     self: SmsSubscriberCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Export all SMS subscribers as a CSV. """
 
@@ -83,8 +85,8 @@ def export_sms_subscribers(
 )
 def export_email_subscribers(
     self: EmailSubscriberCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Export all email subscribers as a CSV. """
 
@@ -96,9 +98,9 @@ def export_email_subscribers(
 
 def handle_cleanup_subscribers(
     collection: EmailSubscriberCollection | SmsSubscriberCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: SubscribersCleanupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = ManageSubscribersLayout(collection, request)
 
@@ -137,9 +139,9 @@ def handle_cleanup_subscribers(
 )
 def cleanup_sms_subscribers(
     self: SmsSubscriberCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: SubscribersCleanupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     """ Deletes a list of SMS subscribers. """
 
@@ -153,9 +155,9 @@ def cleanup_sms_subscribers(
 )
 def cleanup_email_subscribers(
     self: EmailSubscriberCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: SubscribersCleanupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     """ Deletes a list of email subscribers. """
 
@@ -168,9 +170,9 @@ def cleanup_email_subscribers(
 )
 def delete_subscriber(
     self: Subscriber,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
 
     """ Delete a single subscriber. """
 
@@ -178,7 +180,7 @@ def delete_subscriber(
 
     if form.submitted(request):
         request.session.delete(self)
-        request.message(_("Subscriber deleted."), 'success')
+        request.message(_('Subscriber deleted.'), 'success')
         return redirect(layout.manage_model_link)
 
     return {
@@ -191,8 +193,8 @@ def delete_subscriber(
         'layout': layout,
         'form': form,
         'title': self.address,
-        'subtitle': _("Delete subscriber"),
-        'button_text': _("Delete subscriber"),
+        'subtitle': _('Delete subscriber'),
+        'button_text': _('Delete subscriber'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -204,9 +206,9 @@ def delete_subscriber(
 )
 def activate_subscriber(
     self: Subscriber,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
 
     """ Activate a single subscriber. """
 
@@ -214,7 +216,7 @@ def activate_subscriber(
 
     if form.submitted(request):
         self.active = True
-        request.message(_("Subscriber activated."), 'success')
+        request.message(_('Subscriber activated.'), 'success')
         return redirect(layout.manage_model_link)
 
     return {
@@ -227,8 +229,8 @@ def activate_subscriber(
         'layout': layout,
         'form': form,
         'title': self.address,
-        'subtitle': _("Activate subscriber"),
-        'button_text': _("Activate subscriber"),
+        'subtitle': _('Activate subscriber'),
+        'button_text': _('Activate subscriber'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -240,9 +242,9 @@ def activate_subscriber(
 )
 def deactivate_subscriber(
     self: Subscriber,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
 
     """ Deactivate a single subscriber. """
 
@@ -250,7 +252,7 @@ def deactivate_subscriber(
 
     if form.submitted(request):
         self.active = False
-        request.message(_("Subscriber deactivated."), 'success')
+        request.message(_('Subscriber deactivated.'), 'success')
         return redirect(layout.manage_model_link)
 
     return {
@@ -263,8 +265,8 @@ def deactivate_subscriber(
         'layout': layout,
         'form': form,
         'title': self.address,
-        'subtitle': _("Deactivate subscriber"),
-        'button_text': _("Deactivate subscriber"),
+        'subtitle': _('Deactivate subscriber'),
+        'button_text': _('Deactivate subscriber'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
