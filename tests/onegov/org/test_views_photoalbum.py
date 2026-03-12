@@ -69,10 +69,11 @@ def test_image_selection(client: Client) -> None:
     new.form.submit()
 
     album = client.get('/photoalbums').click('Vacation Destinations 2026')
-    for i in range(number_of_images):
-        images = albums.click("Bilder verwalten")
-        images.form['file'] = [Upload(f'image_{i}.jpg', create_image().read())]
-        images.form.submit()
+    for idx in range(number_of_images):
+        select = albums.click("Bilder verwalten")
+        select.form['file'] = [
+            Upload(f'image_{idx}.jpg', create_image().read())]
+        select.form.submit()
 
     # select all images
     select = album.click('Bilder auswählen')
@@ -81,12 +82,12 @@ def test_image_selection(client: Client) -> None:
     select.form[tuple(select.form.fields.keys())[3]] = True
     select.form.submit()
 
-    images = ImageFileCollection(client.app.session()).query().all()
-    assert len(images) == number_of_images
-    images = {(i.id, i.name) for i in images}
+    collection = ImageFileCollection(client.app.session()).query()
+    assert collection.count() == number_of_images
+    images = {(img.id, img.name) for img in collection.all()}
     album = client.get('/photoalbums').click('Vacation Destinations 2026')
-    for i in images:
-        assert i[0] in album, '{} not found in album'.format(i)
+    for img in images:
+        assert img[0] in album, '{} not found in album'.format(img)
 
     # switch to grid mode
     settings = album.click('Bearbeiten')
@@ -94,5 +95,5 @@ def test_image_selection(client: Client) -> None:
     settings.form.submit()
 
     album = client.get('/photoalbums').click('Vacation Destinations 2026')
-    for i in images:
-        assert i[0] in album, '{} not found in album'.format(i)
+    for img in images:
+        assert img[0] in album, '{} not found in album'.format(img)
