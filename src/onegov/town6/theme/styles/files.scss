@@ -126,6 +126,16 @@ section#content .files {
         a[id^="button"] {
             cursor: pointer;
         }
+
+        &:target,
+        &:has(:target) {
+            background-color: rgba($primary-color, 0.2);
+            transition: background-color 0.5s ease;
+        }
+    }
+
+    tr.file-info[id] {
+        scroll-margin-top: calc(100vh / 2.5);  // 40%
     }
 
     .file-info + tr {
