@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-12-10 15:02+0100\n"
+"POT-Creation-Date: 2026-03-12 09:52+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -12,6 +12,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 3.0\n"
+
+msgid "Google Analytics (Global site tag)"
+msgstr "Google Analytics (Global site tag)"
 
 msgid "No active period"
 msgstr "Nessun periodo attivo"
@@ -132,6 +135,12 @@ msgstr "Fatture"
 
 msgid "Wishlist"
 msgstr "Lista dei desideri"
+
+msgid "Contact"
+msgstr "Contatto"
+
+msgid "Photo Albums"
+msgstr "Album fotografico"
 
 msgid "Activity Title"
 msgstr "Titolo dell'attività"
@@ -877,6 +886,9 @@ msgstr "Me stesso"
 msgid "Organisers with an occasion"
 msgstr "Organizzatori con eventi"
 
+msgid "Organisers without an occasion"
+msgstr "Organizzatori senza eventi"
+
 msgid "Users of a given role"
 msgstr "Utente con un ruolo specifico"
 
@@ -885,6 +897,9 @@ msgstr "Utenti con desideri"
 
 msgid "Users with accepted bookings"
 msgstr "Utenti con prenotazioni accettate"
+
+msgid "Users with attendees that without wishes or bookings"
+msgstr "Utenti con partecipanti senza desideri o prenotazioni"
 
 msgid "Users with unpaid bills"
 msgstr "Utenti con fatture non pagate"
@@ -1508,6 +1523,9 @@ msgstr "Registrazione come aiutante"
 msgid "Sort"
 msgstr "Tipo"
 
+msgid "Change username"
+msgstr "Cambiare nome utente"
+
 msgid "Delete"
 msgstr "Cancellare"
 
@@ -1846,9 +1864,6 @@ msgstr "Genitore"
 
 msgid "Children"
 msgstr "Bambini"
-
-msgid "Contact"
-msgstr "Contatto"
 
 msgid "E-Mail ${name}"
 msgstr "Scrivere a ${name}"
@@ -3260,6 +3275,9 @@ msgstr "Prenotazioni ${period}"
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
 
+msgid "Admin accounts cannot be deleted."
+msgstr "Gli account amministratore non possono essere cancellati."
+
 msgid ""
 "The user cannot be deleted because they are organizers of existing "
 "activities."
@@ -3273,8 +3291,8 @@ msgid ""
 "bookings first."
 msgstr ""
 "L'account non può essere cancellato perché ci sono partecipanti con "
-"prenotazioni esistenti nel periodo corrente. Attendere la fine del periodo "
-"o cancellare prima le prenotazioni."
+"prenotazioni esistenti nel periodo corrente. Attendere la fine del periodo o "
+"cancellare prima le prenotazioni."
 
 msgid ""
 "The account cannot be deleted because there are unpaid invoices associated "
@@ -3288,9 +3306,9 @@ msgstr ""
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} è stato cancellato, inclusi tutti i dati associati."
 
-msgid "Could not delete account; try again or contact an administrator."
-msgstr ""
-"Impossibile cancellare l'account; riprovi o contatti un amministratore."
+#~ msgid "Could not delete account; try again or contact an administrator."
+#~ msgstr ""
+#~ "Impossibile cancellare l'account; riprovi o contatti un amministratore."
 
 #~ msgid "Parents can see the contacts of other parents in the same activity"
 #~ msgstr ""
