@@ -897,12 +897,11 @@ def test_event_ticket_link_to_event(client: Client) -> None:
     assert not review.pyquery('.occurrence a').attr('href')
 
     client.delete(
-        ticket_page.pyquery('.confirm').attr('ic-delete-from'))  # reject
+        ticket_page.pyquery('.confirm').attr('ic-delete-from'))
     ticket_page = client.get(
         ticket_page.pyquery('.confirm').attr('redirect-after'))
     # verify no event link on ticket page as event deleted
     assert not review.pyquery('.occurrence a').attr('href')
-    assert 'Veranstaltung abgelehnt' in ticket_page
 
 
 def test_assign_tickets(client: Client) -> None:

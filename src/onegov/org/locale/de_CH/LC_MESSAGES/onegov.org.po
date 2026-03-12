@@ -5461,6 +5461,9 @@ msgstr "${event} veröffentlicht."
 msgid "Event deleted."
 msgstr "Veranstaltung gelöscht."
 
+msgid "Event rejected."
+msgstr "Veranstaltung abgelehnt."
+
 msgid "Event withdrawn."
 msgstr "Veranstaltung zurückgezogen."
 
