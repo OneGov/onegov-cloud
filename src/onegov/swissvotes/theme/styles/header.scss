@@ -1,6 +1,37 @@
 header {
     margin-bottom: .75rem;
 
+    a {
+        text-decoration: none;
+    }
+
+    .top-header,
+    .main-header {
+        li {
+            border-bottom: 3px solid transparent;
+            transition: all linear .2s;
+
+            &:hover {
+                border-bottom: 3px solid $primary-color;
+                transition: all linear .2s;
+
+                a {
+                    color: $primary-color !important;
+                }
+            }
+
+            a {
+                color: $primary-color;
+                font-weight: normal;
+                text-decoration: none;
+
+                :hover {
+                    color: $primary-color !important;
+                }
+            }
+        }
+    }
+
     .top-header {
         border-bottom: 1px solid $primary-color;
 
@@ -9,18 +40,46 @@ header {
         }
 
         li {
+            border-bottom: 3px solid transparent;
             font-size: .875rem;
             padding: .5rem 0;
+
+            &:not(.has-dropdown):hover {
+                border-bottom: 3px solid $primary-color;
+            }
+
+            a {
+                font-size: .88rem !important;
+            }
         }
 
-        a {
-            text-decoration: none;
-            color: $primary-color;
+        .has-dropdown {
+            border: 1px solid $primary-color;
+            border-bottom: 0;
+            border-right: 0;
+            padding: 0;
+
+
+            li {
+                padding: 0;
+            }
+        }
+
+        .top-bar-section {
+            .right,
+            .right .dropdown {
+                border-top: 0 !important;
+                margin-right: 0;
+
+                a {
+                    padding-right: 1rem !important;
+                }
+            }
         }
 
     }
 
-    .title {
+    .main-header {
         border-bottom: 1px solid $primary-color;
 
         img {
@@ -36,19 +95,11 @@ header {
             display: flex;
         }
 
-    }
+        .main-navigation {
+            background-color: transparent;
+            margin-bottom: .2rem;
+            min-height: 3rem;
 
-    * {
-        background-color: transparent !important;
-    }
-
-    .main-navigation {
-        background-color: $topbar-bg-color;
-        margin-bottom: .2rem;
-        min-height: 3rem;
-
-
-        .top-bar {
             .top-bar-section {
                 display: flex;
                 justify-content: center;
@@ -59,9 +110,12 @@ header {
             }
 
             ul li {
+                background-color: transparent;
+
                 a {
+                    background-color: transparent !important;
                     color: $primary-color;
-                    font-size: 1.1rem;
+                    font-size: 1rem;
                     font-weight: bold;
 
                     @media #{$medium-up} {
@@ -69,13 +123,42 @@ header {
 
                     }
                 }
+            }
+        }
+    }
 
-                &:hover {
-                    border-bottom: 3px solid $primary-color;
+    .top-header.mobile {
+        background: $primary-color;
+        * {
+            color: $white;
+        }
 
-                    a {
-                        color: $primary-color;
-                    }
+        li {
+            border-bottom: 1px solid $white;
+        }
+    }
+
+    .top-bar {
+        background-color: transparent;
+
+        .top-bar-section {
+            li {
+                background-color: transparent !important;
+            }
+
+            a {
+                background-color: transparent !important;
+                color: $primary-color;
+                font-weight: normal;
+            }
+
+            .dropdown {
+                background-color: $white;
+                border: 1px solid $primary-color;
+
+                a {
+                    color: $primary-color !important;
+                    font-weight: normal;
                 }
             }
         }
@@ -199,7 +282,7 @@ header {
 
 @media print {
     .languages,
-    .title .columns:not(:first-child),
+    .main-header .columns:not(:first-child),
     .main-navigation,
     .top-bar,
     .breadcrumbs {

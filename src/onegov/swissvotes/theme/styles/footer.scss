@@ -1,16 +1,56 @@
 footer {
-    background-color: $primary-color;
-    color: $white;
     font-size: .75rem;
-    margin-top: 3.5rem;
-    padding: 2.5rem 0 3.5rem;
 
-    .links {
-        padding: .5em 1.2rem;
+    .top-part {
+        border-top: 1px solid $primary-color;
+        color: $primary-color;
+        padding: 2rem 0;
+
+        a {
+            text-decoration: underline;
+        }
     }
 
-    a {
+    .bottom-part {
+        background-color: $primary-color;
+        border-top: 1px solid $white;
         color: $white;
+
+        a {
+            color: $white;
+        }
+
+        .border-right {
+            border-right: 1px solid $white;
+        }
+
+        > .columns > * {
+            padding: .5rem 0;
+        }
+
+        &.copyright-social .columns {
+            padding-right: 0;
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+
+            & > div {
+                display: flex;
+                align-items: center;
+            }
+
+            .social-media-links {
+                font-weight: bold;
+                padding: 0;
+
+                a {
+                    color: $primary-color;
+                    background: $white;
+                    height: 2.2rem;
+                    width: 2.2rem;
+                }
+            }
+        }
     }
 }
 

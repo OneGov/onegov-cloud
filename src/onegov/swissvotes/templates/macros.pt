@@ -8,14 +8,6 @@
     <metal:navigation define-macro="top_navigation">
         <div class="main-navigation" tal:define="links top_navigation|layout.top_navigation">
             <nav class="top-bar" data-topbar role="navigation" tal:condition="links">
-                <ul class="title-area">
-                    <!--! this section needs to be included (even though it's empty),
-                    or the responsive menu bar icon won't be rendered -->
-                    <li class="name" style="width: 0;"></li>
-                    <li class="toggle-topbar menu-icon">
-                        <a href="#"><span>Menu</span></a>
-                    </li>
-                </ul>
                 <section class="top-bar-section">
                     <ul class="left" data-sortable data-sortable-url="${layout.move_page_url_template}">
                         <tal:block repeat="link links">
@@ -30,6 +22,8 @@
             <div class="clearfix"></div>
         </div>
     </metal:navigation>
+
+
 
     <metal:editbar define-macro="editbar">
         <div class="row" tal:condition="layout.editbar_links">

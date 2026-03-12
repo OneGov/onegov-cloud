@@ -37,7 +37,6 @@
 </head>
 <body tal:attributes="layout.custom_body_attributes|{}">
     <header>
-
         <div class="nav-header show-for-medium-up">
             <div class="top-header">
                 <nav class="top-bar" data-topbar="" role="navigation" data-options="is_hover: false">
@@ -76,7 +75,7 @@
                     </section>
                 </nav>
             </div>
-            
+
             <div class="main-header">
                 <div class="row row-wide">
                     <div class="columns hide-for-small medium-2">
@@ -89,12 +88,6 @@
                         </div>
                     </div>
                 </div>
-        </div>
-
-        <div class="nav-header show-for-small-only">
-            <div class="top-header">
-                
-            </div>
         </div>
 
         <div class="row">
