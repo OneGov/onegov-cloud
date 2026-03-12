@@ -65,6 +65,11 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v6
 
+    # TEMPORARY: Use the python installed in the app venv again
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
     # TEMPORARY: Use the uv installed in the app venv again
     - name: Install uv
       uses: astral-sh/setup-uv@v7
@@ -184,6 +189,11 @@ jobs:
       run: |
         echo "CODECOV_BRANCH=$(echo ${GITHUB_HEAD_REF} | tr / -)" \
              >> $GITHUB_ENV
+
+    # TEMPORARY: Use the python installed in the app venv again
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
 
     # TEMPORARY: Use the uv installed in the app venv again
     - name: Install uv
