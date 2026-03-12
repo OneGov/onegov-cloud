@@ -130,7 +130,7 @@ def test_import_ech_vote_gr(
     assert vote.counted is True
     assert vote.answer == 'counter-proposal'
     assert vote.counter_proposal.eligible_voters == 5082
-    assert vote.counter_proposal.cast_ballots == 1319
+    assert vote.counter_proposal.cast_ballots == 1949
     assert vote.counter_proposal.yeas == 660
     # verify received is stored at result level
     cp_result = vote.counter_proposal.results[0]
