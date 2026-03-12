@@ -26,7 +26,6 @@ from onegov.form.errors import (
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
-from onegov.form.types import BaseFormT, FieldT
 from stdnum.exceptions import (
     ValidationError as StdnumValidationError)
 from wtforms import DateField, DateTimeLocalField, RadioField, TimeField, Field
@@ -40,8 +39,7 @@ from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 
 
-from typing import Generic, TYPE_CHECKING
-
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
     from onegov.form import Form
@@ -58,21 +56,21 @@ if TYPE_CHECKING:
 types_map.setdefault('.mp3', 'audio/mpeg')
 
 
-class If(Generic[BaseFormT, FieldT]):
+class If[FormT: BaseForm, FieldT: Field]:
     """ Wraps a single validator or a list of validators, which will
     only be executed if the supplied condition callback returns `True`.
 
     """
     def __init__(
         self,
-        condition: FieldCondition[BaseFormT, FieldT],
-        *validators: BaseValidator[BaseFormT, FieldT]
+        condition: FieldCondition[FormT, FieldT],
+        *validators: BaseValidator[FormT, FieldT]
     ):
         assert len(validators) > 0, 'Need to supply at least one validator'
         self.condition = condition
         self.validators = validators
 
-    def __call__(self, form: BaseFormT, field: FieldT) -> None:
+    def __call__(self, form: FormT, field: FieldT) -> None:
         if not self.condition(form, field):
             return
 

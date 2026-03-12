@@ -554,8 +554,8 @@ def add_time_report(
             created_by=current_user,
             total_compensation=Decimal('0'),
         )
-        form.update_model(report)
         session.add(report)
+        form.update_model(report)
         session.flush()
 
         assert request.current_username is not None
