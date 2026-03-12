@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-02-26 13:35+0100\n"
+"POT-Creation-Date: 2026-03-12 09:18+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1829,6 +1829,9 @@ msgstr "${event} pubblicato."
 msgid "Event deleted."
 msgstr "Evento eliminato."
 
+msgid "Event rejected."
+msgstr "Evento rifiutato."
+
 msgid "Event withdrawn."
 msgstr "Evento ritirato."
 
@@ -2080,9 +2083,6 @@ msgstr "Numero del personale"
 
 msgid "Contract number"
 msgstr "Numero del contratto"
-
-msgid "Party"
-msgstr "Partito"
 
 msgid "Private address"
 msgstr "Indirizzo privato"
@@ -2891,6 +2891,9 @@ msgstr "Sistema di informazione sui ratti (RIS)"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Party"
+#~ msgstr "Partito"
 
 #~ msgid "Parties"
 #~ msgstr "Partiti"
