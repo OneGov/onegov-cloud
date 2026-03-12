@@ -55,7 +55,7 @@ class Endpoint(ApiEndpoint[Bunch]):  # type: ignore[type-var]
     def __init__(
         self,
         app: App,
-        extra_parameters: dict[str, str | None] | None = None,
+        extra_parameters: dict[str, list[str]] | None = None,
         page: int | None = None
     ) -> None:
 
@@ -92,7 +92,7 @@ def get_api_endpoints_handler(
     def get_api_endpoints(
             request: pytest.FixtureRequest,
             page: int = 0,
-            extra_parameters: dict[str, Any] | None = None
+            extra_parameters: dict[str, list[str]] | None = None
     ) -> Iterator[ApiEndpoint[Any]]:
         yield Endpoint(
             request, extra_parameters, page)  # type: ignore[arg-type]

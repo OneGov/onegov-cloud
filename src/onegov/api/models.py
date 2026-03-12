@@ -24,7 +24,7 @@ from wtforms import HiddenField
 
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, NoReturn, overload
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Iterator, Mapping
     from onegov.core import Framework
     from onegov.core.collection import PKType
     from onegov.core.request import CoreRequest
@@ -181,13 +181,12 @@ class ApiEndpoint(Generic[_M]):
     """
 
     endpoint: str = ''
-    filters: ClassVar[set[str]] = set()
     form_class: ClassVar[type[Form] | None] = None
 
     def __init__(
         self,
         request: CoreRequest,
-        extra_parameters: dict[str, str | None] | None = None,
+        extra_parameters: dict[str, list[str]] | None = None,
         page: int | None = None,
     ):
         self.request = request
@@ -195,6 +194,17 @@ class ApiEndpoint(Generic[_M]):
         self.extra_parameters = extra_parameters or {}
         self.page = int(page) if page else page
         self.batch_size = 100
+
+    @cached_property
+    def filters(self) -> Mapping[str, str | None]:
+        """ A mapping of the available filter params to their corresponding
+        description.
+
+        The description is optional and should only be used for non-trivial
+        filters that don't just accept arbitrary strings.
+
+        """
+        return {}
 
     @property
     def title(self) -> str | None:
@@ -214,7 +224,7 @@ class ApiEndpoint(Generic[_M]):
 
         return self.__class__(self.request, self.extra_parameters, page)
 
-    def for_filter(self, **filters: Any) -> Self:
+    def for_filter(self, **filters: list[str]) -> Self:
         """ Return a new endpoint instance with the given filters while
         discarding the current filters and page.
 
@@ -239,9 +249,9 @@ class ApiEndpoint(Generic[_M]):
     @overload
     def for_item_id(self, item_id: None) -> None: ...
     @overload
-    def for_item_id(self, item_id: Any) -> ApiEndpointItem[Any]: ...
+    def for_item_id(self, item_id: Any) -> ApiEndpointItem[_M]: ...
 
-    def for_item_id(self, item_id: Any | None) -> ApiEndpointItem[Any] | None:
+    def for_item_id(self, item_id: Any | None) -> ApiEndpointItem[_M] | None:
         """ Return a new endpoint item instance with the given item id. """
 
         if not item_id:
@@ -249,6 +259,23 @@ class ApiEndpoint(Generic[_M]):
 
         target = getattr(item_id, 'hex', str(item_id))
         return ApiEndpointItem(self.request, self.endpoint, target)
+
+    def scalarize_value(
+        self,
+        name: str,
+        values: list[str] | None = None
+    ) -> str | None:
+        if values is None:
+            values = self.extra_parameters.get(name)
+
+        if not values:
+            return None
+
+        if len(values) > 1:
+            raise ApiInvalidParamException(
+                f'Url parameter {name!r} may only be specified once.'
+            )
+        return values[0]
 
     @overload
     def get_filter(
@@ -290,11 +317,11 @@ class ApiEndpoint(Generic[_M]):
         empty: Any | None = None
     ) -> Any | None:
 
-        """Returns the filter value with the given name."""
+        """Returns the scalar filter value with the given name."""
 
         if name not in self.extra_parameters:
             return default
-        return self.extra_parameters[name] or empty
+        return self.scalarize_value(name) or empty
 
     def by_id(self, id: PKType) -> _M | None:
         """ Return the item with the given ID from the collection. """
@@ -460,7 +487,7 @@ class ApiEndpoint(Generic[_M]):
     def assert_valid_filter(self, param: str) -> None:
         if param not in self.filters:
             raise ApiInvalidParamException(
-                f"Invalid url parameter '{param}'. Valid params are: "
+                f'Invalid url parameter {param!r}. Valid params are: '
                 f'{", ".join(sorted(self.filters))}')
 
 
@@ -484,7 +511,7 @@ class ApiEndpointCollection:
             self,
             name: str,
             page: int = 0,
-            extra_parameters: dict[str, Any] | None = None
+            extra_parameters: dict[str, list[str]] | None = None
     ) -> ApiEndpoint[Any] | None:
         endpoints = self.app.config.setting_registry.api.endpoints(
             request=self.request,
