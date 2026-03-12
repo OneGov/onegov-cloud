@@ -27,7 +27,7 @@
     -->
 
     <link rel="stylesheet" type="text/css" href="${layout.static_path}/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="${layout.static_path}/apercu/css/apercu.css">
+    <link rel="stylesheet" type="text/css" href="${layout.static_path}/hk-grotesk/css/hk-grotesk.css">
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="apple-touch-icon" sizes="57x57" href="${layout.static_path}/images/apple-icon-57x57.png">
     <link rel="icon" type="image/png" sizes="16x16" href="${layout.static_path}/images/favicon-16x16.png">
@@ -37,39 +37,72 @@
 </head>
 <body tal:attributes="layout.custom_body_attributes|{}">
     <header>
-        <div class="top-header">
-            <div class="row row-wide">
-                <div class="columns">
-                    <nav role="navigation" class="right">
-                        <ul class="inline-list">
+
+        <div class="nav-header show-for-medium-up">
+            <div class="top-header">
+                <nav class="top-bar" data-topbar="" role="navigation" data-options="is_hover: false">
+                    <section class="top-bar-section">
+                        <ul class="left">
+                            <li>
+                                <a i18n:translate>Publications</a>
+                            </li>
+                            <li i18n:translate>
+                                <a i18n:translate>Downloads</a>
+                            </li>
+                            <li i18n:translate>
+                                <a i18n:translate>Media</a>
+                            </li>
                             <tal:block tal:repeat="(locale, lang, title, href) layout.locales">
                                 <li tal:condition="request.locale != locale">
-                                    <a rel="alternate" href="${href}" lang="${lang}" hreflang="${lang}">${lang}</a>
+                                    <a rel="alternate" href="${href}" lang="${lang}" hreflang="${lang}">${title}</a>
                                 </li>
                             </tal:block>
                         </ul>
-                    </nav>
+                    </section>
+
+                    <section class="top-bar-section">
+                        <!-- Right Nav Section -->
+                        <ul class="right" tal:define="current_locale_title [title for locale, lang, title, href in layout.locales if locale == request.locale][0]">
+                            <li class="has-dropdown"><a class="">${current_locale_title} <i class="fa fa-chevron-down rotate"></i></a>
+                                <ul class="dropdown">
+                                    <tal:block tal:repeat="(locale, lang, title, href) layout.locales">
+                                        <li tal:condition="request.locale != locale">
+                                            <a rel="alternate" href="${href}" lang="${lang}" hreflang="${lang}">${title}</a>
+                                        </li>
+                                    </tal:block>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+                </nav>
+            </div>
+            
+            <div class="main-header">
+                <div class="row row-wide">
+                    <div class="columns hide-for-small medium-2">
+                        <a href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
+                        </div>
+                        <div class="columns small-12 medium-8">
+                            <div metal:use-macro="layout.macros['top_navigation']"></div>
+                        </div>
+                        <div class="columns hide-for-small medium-2">
+                        </div>
+                    </div>
                 </div>
+        </div>
+
+        <div class="nav-header show-for-small-only">
+            <div class="top-header">
+                
             </div>
         </div>
-        <div class="title">
-            <div class="row row-wide">
-                <div class="columns hide-for-small medium-2">
-                    <a href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="columns small-12 medium-8">
-                    <div metal:use-macro="layout.macros['top_navigation']"></div>
-                </div>
-                <div class="columns hide-for-small medium-2">
-                </div>
-            </div>
-        </div>
+
         <div class="row">
             <div class="columns small-12">
                 <div metal:use-macro="layout.macros['editbar']"></div>
             </div>
         </div>
+
         <div class="row">
             <div class="columns small-12">
                 <div metal:use-macro="layout.macros['breadcrumbs']"></div>
@@ -101,25 +134,71 @@
     </main>
 
     <footer>
-        <div class="row">
+        <div class="row row-wide top-part">
+            <div class="columns small-12 medium-3">
+                <p>
+                    <span i18n:translate>A project of</span><br></br>
+                <a href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
+                </p>
+                <p>
+                <b>Année politique suisse</b><br />
+                    Universität Bern<br />
+                    Institut für Politikwissenschaft<br />
+                    Fabrikstrasse 8<br />
+                    3012 Bern
+                </p>
+                <p>
+                    T <a href="tel:+41316318411">+41 31 631 84 11</a><br />
+                    M <a href="mailto:info@anneepolitique.swiss">info@anneepolitique.swiss</a>
+                </p>
+            </div>
+            <div class="columns small-12 medium-9">
+                    <div class="small-12 columns small-only-text-center medium-text-right manage-links">
+                        <a tal:condition="layout.logout_url" href="${layout.logout_url}" i18n:translate>Logout</a>
+                    </div>
+            </div>
+        </div>
+        <div class="row row-wide bottom-part">
+            <div class="columns small-12 medium-3 border-right">
+                <div class="row">
+                    <div class="columns small-12">
+                        Ongoing projects by Année politique suisse
+                    </div>
+                    <div class="columns small-6">
+                        Logo
+                    </div>
+                    <div class="columns small-6">
+                        Logo
+                    </div>
+                </div>
+            </div>
+            <div class="columns small-12 medium-9">
+                <div class="row">
+                    <div class="columns small-12">
+                        Supported by
+                    </div>
+                    <div class="columns small-6">
+                        Logo
+                    </div>
+                    <div class="columns small-6">
+                        Logo
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row row-wide bottom-part copyright-social">
             <div class="columns small-12">
-                <div class="links">
-                     <div class="row">
-                        <div class="small-12 medium-4 columns small-only-text-center">
-                            <tal:block replace="layout.disclaimer_link(layout)" />
-                        </div>
-                        <div class="small-12 medium-4 columns text-center">
-                            <tal:block replace="layout.imprint_link(layout)" />
-                        </div>
-                        <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
-                            <tal:block replace="layout.data_protection_link(layout)" />
-                        </div>
-                    </div>
-                     <div class="row">
-                        <div class="small-12 columns small-only-text-center medium-text-right manage-links">
-                            <a tal:condition="layout.logout_url" href="${layout.logout_url}" i18n:translate>Logout</a>
-                        </div>
-                    </div>
+                <div>
+                    <span>Copyright APS 2024</span>
+                    <tal:block replace="layout.disclaimer_link(layout)" />
+                    <tal:block replace="layout.imprint_link(layout)" />
+                    <tal:block replace="layout.data_protection_link(layout)" />
+                </div>
+                <div class="social-media-links">
+                    <span>Follow us</span>
+                    <a href="https://www.facebook.com/anneepolitique.swiss" title="Facebook"><i class="fa fa-facebook"></i></a>
+                    <a href="https://twitter.com/anneepolitique" title="Twitter"><i class="fa fa-twitter"></i></a>
+                    <a href="https://www.linkedin.com/company/anneepolitique" title="LinkedIn"><i class="fa fa-linkedin"></i></a>
                 </div>
             </div>
         </div>
