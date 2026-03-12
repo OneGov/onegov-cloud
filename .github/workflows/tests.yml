@@ -60,15 +60,14 @@ jobs:
           libxshmfence1 \
           libxss1 \
           libxt-dev \
-          xdg-utils
+          xdg-utils \
+          python3.12 \
+          python3.12-dev \
+          python3.12-pip \
+          python3.12-venv
 
     - name: Checkout repo
       uses: actions/checkout@v6
-
-    # TEMPORARY: Use the python installed in the app venv again
-    - uses: actions/setup-python@v6
-      with:
-        python-version: '3.12'
 
     # TEMPORARY: Use the uv installed in the app venv again
     - name: Install uv
@@ -166,7 +165,11 @@ jobs:
           libxss1 \
           libxt-dev \
           unzip \
-          xdg-utils
+          xdg-utils \
+          python3.12 \
+          python3.12-dev \
+          python3.12-pip \
+          python3.12-venv
 
     - name: Install Chrome
       uses: browser-actions/setup-chrome@v1
@@ -189,11 +192,6 @@ jobs:
       run: |
         echo "CODECOV_BRANCH=$(echo ${GITHUB_HEAD_REF} | tr / -)" \
              >> $GITHUB_ENV
-
-    # TEMPORARY: Use the python installed in the app venv again
-    - uses: actions/setup-python@v6
-      with:
-        python-version: '3.12'
 
     # TEMPORARY: Use the uv installed in the app venv again
     - name: Install uv

@@ -38,10 +38,10 @@ RUN apt -qq update \
     nodejs \
     openssl \
     pkg-config \
-    python3-pip \
-    python3 \
-    python3-dev \
-    python3-venv \
+    python3.12 \
+    python3.12-dev \
+    python3.12-pip \
+    python3.12-venv \
     tzdata \
     weasyprint \
     xmlsec1 \
