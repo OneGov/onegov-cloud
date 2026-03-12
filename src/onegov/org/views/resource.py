@@ -1932,7 +1932,10 @@ def run_export(
 
     query: Query[ReservationExportRow]
     query = resource.reservations_with_tickets_query(start, end)  # type:ignore
-    query = query.join(FormSubmission, Reservation.token == FormSubmission.id)
+    # FormSubmission is optional
+    query = query.outerjoin(
+        FormSubmission, Reservation.token == FormSubmission.id
+    )
     query = query.with_entities(
         Reservation.start,
         Reservation.end,

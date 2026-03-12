@@ -64,18 +64,20 @@ class FileCollection(Generic[FileT]):
         self.type = type
         self.allow_duplicates = allow_duplicates
 
+    @property
+    def model_class(self) -> type[FileT]:
+        return File.get_polymorphic_class(self.type, File)  # type: ignore[arg-type, return-value]
+
     def query(self) -> Query[FileT]:
         if self.type != '*':
-            model_class = File.get_polymorphic_class(self.type, File)
-
+            model_class = self.model_class
             # FIXME: this is a weird singularity, which happens to not cause
             #        any issues since our inheritance structure never inherits
             #        from a subclass of File, we should be consistent about
             #        what filterting by type means, does it mean exactly that
             #        type or does it also allow subclasses?
             if model_class is File:
-                return self.session.query(  # type:ignore[return-value]
-                    File).filter_by(type=self.type)
+                return self.session.query(File).filter_by(type=self.type)  # type:ignore[return-value]
 
             return self.session.query(model_class)
 
@@ -277,7 +279,7 @@ class FileCollection(Generic[FileT]):
         """
 
         match = self.by_signature_digest(digest).with_entities(
-            File.signature_metadata).first()
+            self.model_class.signature_metadata).first()
 
         if match:
             return match.signature_metadata
@@ -313,14 +315,17 @@ class FileSetCollection(Generic[FileSetT]):
         self.session = session
         self.type = type
 
+    @property
+    def model_class(self) -> type[FileSetT]:
+        return FileSet.get_polymorphic_class(self.type, FileSet)  # type: ignore[arg-type, return-value]
+
     def query(self) -> Query[FileSetT]:
         if self.type != '*':
-            model_class = FileSet.get_polymorphic_class(self.type, FileSet)
+            model_class = self.model_class
 
             # FIXME: Same weird sigularity as with FileCollection
             if model_class is FileSet:
-                return self.session.query(  # type:ignore[return-value]
-                    FileSet).filter_by(type=self.type)
+                return self.session.query(FileSet).filter_by(type=self.type)  # type: ignore[return-value]
 
             return self.session.query(model_class)
 

@@ -59,6 +59,8 @@ class DateInterval(NamedTuple):
 class GroupFilesByDateMixin(Generic[FileT]):
 
     if TYPE_CHECKING:
+        @property
+        def model_class(self) -> type[FileT]: ...
         def query(self) -> Query[FileT]: ...
 
     def get_date_intervals(
@@ -161,7 +163,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
         process: Callable[[Any], Any] | None = None
     ) -> Iterator[tuple[str, Any]]:
 
-        base_query = self.query().order_by(desc(File.created))
+        base_query = self.query().order_by(File.created.desc())
 
         if before_filter:
             base_query = before_filter(base_query)
@@ -170,7 +172,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
             query = base_query.filter(File.created >= interval.start)
             query = query.filter(File.created <= interval.end)
 
-            for result in query.all():
+            for result in query:
                 if process is not None:
                     yield interval.name, process(result)
 
@@ -212,10 +214,13 @@ class GroupFilesByDateMixin(Generic[FileT]):
 
         intervals = tuple(self.get_date_intervals(today or utcnow()))
 
+        model_class = self.model_class
         files: Iterator[tuple[str, str | FileT]]
         if id_only:
             def before_filter(query: Query[FileT]) -> Query[IdRow]:
-                return query.with_entities(File.id)
+                # NOTE: We need to use model_class.id here, otherwise we
+                #       remove the polymorphic filter on the query
+                return query.with_entities(model_class.id)
 
             def process(result: IdRow) -> str:
                 return result.id
@@ -340,6 +345,10 @@ class GeneralFileCollection(
 
         self._last_interval: DateInterval | None = None
 
+    @property
+    def model_class(self) -> type[GeneralFile]:
+        return GeneralFile
+
     def for_order(self, order: str) -> Self:
         return self.__class__(self.session, order_by=order)
 
@@ -424,3 +433,7 @@ class ImageFileCollection(BaseImageFileCollection[ImageFile]):
 
     def __init__(self, session: Session) -> None:
         super().__init__(session, type='image', allow_duplicates=False)
+
+    @property
+    def model_class(self) -> type[ImageFile]:
+        return ImageFile

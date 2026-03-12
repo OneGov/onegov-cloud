@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from decimal import Decimal
 from io import BytesIO
-from onegov.file import File
 from morepath import redirect
 from datetime import datetime
 from morepath.request import Response
@@ -13,7 +12,7 @@ from onegov.core.templates import render_template
 from onegov.file.integration import get_file
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import GeneralFileCollection
+from onegov.org.models import GeneralFile, GeneralFileCollection
 from onegov.org.models import TicketMessage
 from onegov.org.utils import emails_for_new_ticket
 from onegov.ticket import TicketCollection
@@ -715,8 +714,8 @@ def view_mail_templates(
         docx_template_id = (
             GeneralFileCollection(request.session)
             .query()
-            .filter(File.name == template_name)
-            .with_entities(File.id)
+            .filter(GeneralFile.name == template_name)
+            .with_entities(GeneralFile.id)
             .scalar()
         )
         docx_f = get_file(request.app, docx_template_id)

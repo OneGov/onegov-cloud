@@ -399,7 +399,9 @@ def view_get_file_collection_json(
             'title': name
         }
         for id, name in self.query().with_entities(
-            File.id, File.name).order_by(File.name).all()
+            GeneralFile.id,
+            GeneralFile.name
+        ).order_by(GeneralFile.name)
     ]
 
 
