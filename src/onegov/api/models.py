@@ -490,6 +490,23 @@ class ApiEndpoint(Generic[_M]):
                 f'Invalid url parameter {param!r}. Valid params are: '
                 f'{", ".join(sorted(self.filters))}')
 
+    # HACK: This gets around the fact that extra_parameters only
+    #       supports scalar values, but we want to support lists
+    #       of values for extra_parameters.
+    def __link_alias__(self) -> str:
+        return self.request.class_link(
+            self.__class__,
+            {
+                'endpoint': self.endpoint,
+                'page': self.page,
+            },
+            query_params=MultiDict(
+                (key, value)
+                for key, values in self.extra_parameters.items()
+                for value in values
+            )
+        )
+
 
 class ApiEndpointCollection:
     """ A collection of all available API endpoints. """
