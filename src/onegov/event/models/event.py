@@ -51,7 +51,8 @@ EventState: TypeAlias = Literal[
     'initiated',
     'submitted',
     'published',
-    'withdrawn'
+    'withdrawn',
+    'deleted'
 ]
 
 
@@ -84,7 +85,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     #: State of the event
     state: Mapped[EventState] = mapped_column(
         Enum(
-            'initiated', 'submitted', 'published', 'withdrawn',
+            'initiated', 'submitted', 'published', 'withdrawn', 'deleted',
             name='event_state'
         ),
         default='initiated'
@@ -489,6 +490,15 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         assert self.state in ('submitted', 'published')
         self.state = 'withdrawn'
+
+    def delete(self) -> None:
+        """ Delete the event.
+
+        Deleting the event will delete the occurrences."""
+
+        assert self.state in (
+            'initiated', 'submitted', 'published', 'withdrawn')
+        self.state = 'deleted'
 
     def get_ical_vevents(self, url: str | None = None) -> Iterator[vEvent]:
         """ Returns the event and all its occurrences as icalendar objects.

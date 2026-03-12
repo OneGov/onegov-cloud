@@ -582,6 +582,10 @@ def handle_delete_event(self: Event, request: OrgRequest) -> None:
     ticket = tickets.by_handler_id(self.id.hex)
 
     if ticket:
+        # update event state prior taking snapshot
+        self.delete()
+        request.session.flush()
+
         ticket.create_snapshot(request)
 
         send_ticket_mail(

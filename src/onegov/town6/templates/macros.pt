@@ -1416,7 +1416,8 @@
         <dd tal:content="escape(event.description).replace('\n', Markup('<br>'))" />
 
         <dt i18n:translate>List Preview</dt>
-        <dd tal:define="occurrence event.latest_occurrence or event.virtual_occurrence">
+        <dd tal:define="occurrence event.latest_occurrence or event.virtual_occurrence;
+                         published event.state == 'published'">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
         </dd>
 
@@ -1564,9 +1565,9 @@
 </metal:occurrences>
 
 <metal:occurrence_list_view define-macro="occurrence_list_view" i18n:domain="onegov.town6">
-    <div class="occurrence subpage-cards medium-12 small-12 cell" tal:define="use_links use_links|True">
+    <div class="occurrence subpage-cards medium-12 small-12 cell" tal:define="published published|True">
         <div class="card">
-            <a href="${use_links and request.link(occurrence)}">
+            <a tal:attributes="href request.link(occurrence) if published else None">
                 <div class="show-for-small-only" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: contain; background-position: center center; background-repeat: no-repeat;"></div>
                 <div class="grid-x align-middle">
                     <div class="cell medium-7 card-section">
@@ -1627,7 +1628,7 @@
                     </div>
                     <div class="cell medium-5 align-self-top">
                         <div class="show-for-medium" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: contain; background-position: center center; background-repeat: no-repeat; border-radius: 0 .7rem;"></div>
-                        <span class="button hollow event-more-link" style="margin: 1.5rem 1rem 1.5rem 0.7rem; display: block;" i18n:translate="">Learn more</span>
+                        <span class="button hollow event-more-link" style="margin: 1.5rem 1rem 1.5rem 0.7rem; display: block;" tal:condition="published" i18n:translate="">Learn more</span>
                     </div>
                 </div>
             </a>

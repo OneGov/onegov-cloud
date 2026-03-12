@@ -1096,7 +1096,8 @@
         <dd tal:content="escape(event.description).replace('\n', Markup('<br>'))" />
 
         <dt i18n:translate>List Preview</dt>
-        <dd tal:define="occurrence event.latest_occurrence or event.virtual_occurrence">
+        <dd tal:define="occurrence event.latest_occurrence or event.virtual_occurrence;
+                         published event.state == 'published'">
             <div class="row">
                 <metal:b use-macro="layout.macros['occurrence_list_view']" />
             </div>
@@ -1245,7 +1246,7 @@
 </metal:occurrences>
 
 <metal:occurrence_list_view define-macro="occurrence_list_view">
-    <div class="occurrence" tal:define="use_links use_links|True">
+    <div class="occurrence" tal:define="published published|True">
         <div class="large-3 medium-4 small-5 columns calendar-day-column">
             <metal:b
                 tal:define="
@@ -1258,7 +1259,7 @@
         </div>
         <div class="large-9 medium-8 small-7 columns calendar-text-column">
             <h3>
-                <a href="${use_links and request.link(occurrence)}">${occurrence.title}</a>
+                <a href="${published and request.link(occurrence)}">${occurrence.title}</a>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
             </h3>
             <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>
