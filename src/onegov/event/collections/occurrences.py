@@ -76,6 +76,10 @@ class _Sentinel(Enum):
 
 
 MISSING = _Sentinel.MISSING
+_clean_search_term = str.maketrans(dict.fromkeys(
+    '()[]{},;"\'.',
+    None
+))
 
 
 class OccurrenceCollection(Pagination[Occurrence]):
@@ -585,7 +589,9 @@ class OccurrenceCollection(Pagination[Occurrence]):
         if self.locations:
             query = query.filter(
                 or_(*[
-                    Occurrence.location.op('~')(rf'\y{re.escape(loc)}\y')
+                    Occurrence.location.op('~')(
+                        rf'\y{re.escape(loc.translate(_clean_search_term))}\y'
+                    )
                     for loc in self.locations
                 ])
             )

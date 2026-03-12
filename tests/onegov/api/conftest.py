@@ -17,6 +17,7 @@ from wtforms.validators import InputRequired
 from typing import Any, TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from collections.abc import Iterator
+    from onegov.core.request import CoreRequest
 
 
 class App(Framework, ApiApp):
@@ -54,13 +55,12 @@ class Endpoint(ApiEndpoint[Bunch]):  # type: ignore[type-var]
 
     def __init__(
         self,
-        app: App,
+        request: CoreRequest,
         extra_parameters: dict[str, list[str]] | None = None,
         page: int | None = None
     ) -> None:
 
         self._collection = Collection()
-        request: Any = Bunch(app=app)
         super().__init__(request, extra_parameters, page)
 
     @property
@@ -87,17 +87,15 @@ class Endpoint(ApiEndpoint[Bunch]):  # type: ignore[type-var]
 
 @App.setting(section='api', name='endpoints')
 def get_api_endpoints_handler(
-) -> Callable[[pytest.FixtureRequest], Iterator[ApiEndpoint[Any]]]:
+) -> Callable[[CoreRequest], Iterator[ApiEndpoint[Any]]]:
 
     def get_api_endpoints(
-            request: pytest.FixtureRequest,
+            request: CoreRequest,
             page: int = 0,
             extra_parameters: dict[str, list[str]] | None = None
     ) -> Iterator[ApiEndpoint[Any]]:
-        yield Endpoint(
-            request, extra_parameters, page)  # type: ignore[arg-type]
-        yield PersonApiEndpoint(
-            request, extra_parameters, page)  # type: ignore[arg-type]
+        yield Endpoint(request, extra_parameters, page)
+        yield PersonApiEndpoint(request, extra_parameters, page)
 
     return get_api_endpoints
 
