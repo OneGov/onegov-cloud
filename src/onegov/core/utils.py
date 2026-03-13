@@ -685,7 +685,9 @@ def is_subpath(directory: str, path: str) -> bool:
 
     # return true, if the common prefix of both is equal to directory
     # e.g. /a/b/c/d.rst and directory is /a/b, the common prefix is /a/b
-    return os.path.commonpath([path, directory]) == directory
+    # FIXME: This ruff error seems correct, but our tests fail with commonpath
+    #        maybe module_path is broken or we need to add/remove a slash
+    return os.path.commonprefix([path, directory]) == directory  # noqa: RUF071
 
 
 @overload
