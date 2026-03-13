@@ -11,9 +11,8 @@ from uuid import uuid4, UUID
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.activity.models import OccasionNeed
-    from typing import TypeAlias
 
-VolunteerState: TypeAlias = Literal[
+type VolunteerState = Literal[
     'open',
     'contacted',
     'confirmed',

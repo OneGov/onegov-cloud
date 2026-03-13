@@ -33,9 +33,8 @@ if TYPE_CHECKING:
     from onegov.pay import (
         InvoiceDiscountMeta, Payment, PaymentError, PaymentProvider)
     from onegov.pay.types import PaymentMethod
-    from typing import TypeAlias
 
-    DeadlineUnit: TypeAlias = Literal['d', 'h']
+    type DeadlineUnit = Literal['d', 'h']
 
     # HACK: We pass a UUID as a name and have a custom uuid_generator
     #       which directly uses it, so in order to get the correct

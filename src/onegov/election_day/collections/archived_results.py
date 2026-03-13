@@ -43,69 +43,60 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from sqlalchemy.sql import ColumnElement
     from sqlalchemy.sql.elements import SQLCoreOperations
-    from typing import TypeVar
     from typing import Self
 
-    _T1 = TypeVar('_T1')
-    _T2 = TypeVar('_T2')
-    _T3 = TypeVar('_T3')
-    _TSupportsRichComparison = TypeVar(
-        '_TSupportsRichComparison',
-        bound='SupportsRichComparison'
-    )
-
 
 @overload
-def groupbydict(
-    items: Iterable[_T1],
-    keyfunc: Callable[[_T1], _TSupportsRichComparison],
+def groupbydict[T, TSupportsRichComparison: SupportsRichComparison](
+    items: Iterable[T],
+    keyfunc: Callable[[T], TSupportsRichComparison],
     sortfunc: None = None,
-    groupfunc: Callable[[Iterable[_T1]], list[_T1]] = list,
-) -> dict[_TSupportsRichComparison, list[_T1]]: ...
+    groupfunc: Callable[[Iterable[T]], list[T]] = list,
+) -> dict[TSupportsRichComparison, list[T]]: ...
 
 
 @overload
-def groupbydict(
-    items: Iterable[_T1],
-    keyfunc: Callable[[_T1], _T2],
-    sortfunc: Callable[[_T1], SupportsRichComparison],
-    groupfunc: Callable[[Iterable[_T1]], list[_T1]] = list,
-) -> dict[_T2, list[_T1]]: ...
+def groupbydict[T1, T2](
+    items: Iterable[T1],
+    keyfunc: Callable[[T1], T2],
+    sortfunc: Callable[[T1], SupportsRichComparison],
+    groupfunc: Callable[[Iterable[T1]], list[T1]] = list,
+) -> dict[T2, list[T1]]: ...
 
 
 @overload
-def groupbydict(
-    items: Iterable[_T1],
-    keyfunc: Callable[[_T1], _TSupportsRichComparison],
+def groupbydict[T1, T2, TSupportsRichComparison: SupportsRichComparison](
+    items: Iterable[T1],
+    keyfunc: Callable[[T1], TSupportsRichComparison],
     sortfunc: None = None,
     *,
-    groupfunc: Callable[[Iterable[_T1]], _T2],
-) -> dict[_TSupportsRichComparison, _T2]: ...
+    groupfunc: Callable[[Iterable[T1]], T2],
+) -> dict[TSupportsRichComparison, T2]: ...
 
 
 @overload
-def groupbydict(
-    items: Iterable[_T1],
-    keyfunc: Callable[[_T1], _TSupportsRichComparison],
+def groupbydict[T1, T2, TSupportsRichComparison: SupportsRichComparison](
+    items: Iterable[T1],
+    keyfunc: Callable[[T1], TSupportsRichComparison],
     sortfunc: None,
-    groupfunc: Callable[[Iterable[_T1]], _T2],
-) -> dict[_TSupportsRichComparison, _T2]: ...
+    groupfunc: Callable[[Iterable[T1]], T2],
+) -> dict[TSupportsRichComparison, T2]: ...
 
 
 @overload
-def groupbydict(
-    items: Iterable[_T1],
-    keyfunc: Callable[[_T1], _T2],
-    sortfunc: Callable[[_T1], SupportsRichComparison],
-    groupfunc: Callable[[Iterable[_T1]], _T3],
-) -> dict[_T2, _T3]: ...
+def groupbydict[T1, T2, T3](
+    items: Iterable[T1],
+    keyfunc: Callable[[T1], T2],
+    sortfunc: Callable[[T1], SupportsRichComparison],
+    groupfunc: Callable[[Iterable[T1]], T3],
+) -> dict[T2, T3]: ...
 
 
-def groupbydict(
-    items: Iterable[_T1],
-    keyfunc: Callable[[_T1], Any],
-    sortfunc: Callable[[_T1], Any] | None = None,
-    groupfunc: Callable[[Iterable[_T1]], Any] = list
+def groupbydict[T1](
+    items: Iterable[T1],
+    keyfunc: Callable[[T1], Any],
+    sortfunc: Callable[[T1], Any] | None = None,
+    groupfunc: Callable[[Iterable[T1]], Any] = list
 ) -> dict[Any, Any]:
 
     return OrderedDict(

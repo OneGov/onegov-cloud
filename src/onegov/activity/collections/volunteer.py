@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from uuid import UUID
     from typing import NamedTuple
-    from typing import Self, TypeAlias
+    from typing import Self
 
     class ReportRowWithVolunteer(NamedTuple):
         activity_id: UUID
@@ -71,7 +71,7 @@ if TYPE_CHECKING:
         state: None
         dates: Sequence[datetime]
 
-    ReportRow: TypeAlias = ReportRowWithVolunteer | ReportRowWithoutVolunteer
+    type ReportRow = ReportRowWithVolunteer | ReportRowWithoutVolunteer
 
 
 class VolunteerCollection(GenericCollection[Volunteer]):

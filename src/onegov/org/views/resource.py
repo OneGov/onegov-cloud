@@ -58,14 +58,12 @@ if TYPE_CHECKING:
     from onegov.reservation import Allocation
     from sedate.types import DateLike
     from sqlalchemy.orm import Query
-    from typing import TypeAlias, TypedDict, TypeVar
+    from typing import TypedDict
     from uuid import UUID
     from webob import Response as BaseResponse
 
-    T = TypeVar('T')
-    KT = TypeVar('KT')
-    RoomSlots: TypeAlias = dict[UUID, list[utils.FindYourSpotEventInfo]]
-    ReservationTicketRow: TypeAlias = tuple[
+    type RoomSlots = dict[UUID, list[utils.FindYourSpotEventInfo]]
+    type ReservationTicketRow = tuple[
         datetime,               # Reservation.start
         datetime,               # Reservation.end
         int,                    # Reservation.quota
@@ -73,7 +71,7 @@ if TYPE_CHECKING:
         str | None,             # Ticket.subtitle
         UUID                    # Ticket.id
     ]
-    ReservationExportRow: TypeAlias = tuple[
+    type ReservationExportRow = tuple[
         datetime,       # Reservation.start
         datetime,       # Reservation.end
         int,            # Reservation.quota
@@ -120,7 +118,7 @@ RESOURCE_TYPES: dict[str, ResourceDict] = {
 
 # NOTE: This function is inherently not type safe since we modify the original
 #       items that have been passed in, but this way is more memory efficient
-def combine_grouped(
+def combine_grouped[KT, T](
     items: dict[KT, list[T]],
     external_links: dict[KT, list[ExternalLink]],
     sort: Callable[[T | ExternalLink], SupportsRichComparison] | None = None

@@ -21,9 +21,8 @@ if TYPE_CHECKING:
     from onegov.activity.models import Attendee, OccasionDate, BookingPeriod
     from onegov.user import User
     from sqlalchemy.sql import ColumnElement
-    from typing import TypeAlias
 
-BookingState: TypeAlias = Literal[
+type BookingState = Literal[
     'open',
     'blocked',
     'accepted',
@@ -32,9 +31,7 @@ BookingState: TypeAlias = Literal[
 ]
 
 # NOTE: Workaround to help with inference in case of tuple arguments
-BookingStates: TypeAlias = (
-    'tuple[BookingState, ...] | Collection[BookingState]'
-)
+type BookingStates = tuple[BookingState, ...] | Collection[BookingState]
 
 
 class Booking(Base, TimestampMixin):

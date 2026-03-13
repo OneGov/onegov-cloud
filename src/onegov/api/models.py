@@ -6,7 +6,6 @@ from functools import cached_property
 from json import JSONDecodeError
 from logging import getLogger
 from logging import NullHandler
-from onegov.core.collection import _M
 from onegov.core.orm import Base
 from onegov.form.fields import HoneyPotField
 from onegov.form.utils import get_fields_from_class
@@ -22,30 +21,29 @@ from webob.multidict import MultiDict
 from wtforms import HiddenField
 
 
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, NoReturn, overload
+from typing import TYPE_CHECKING, Any, ClassVar, NoReturn, Self, overload
 if TYPE_CHECKING:
     from collections.abc import Iterator, Mapping
     from onegov.core import Framework
     from onegov.core.collection import PKType
     from onegov.core.request import CoreRequest
     from onegov.form import Form
-    from sqlalchemy.orm import Query, Session
-    from typing import Protocol, Self, TypeVar
+    from sqlalchemy.orm import DeclarativeBase, Query, Session
+    from typing import Protocol
     from webob.request import _FieldStorageWithFile
 
-    _DefaultT = TypeVar('_DefaultT')
-    _EmptyT = TypeVar('_EmptyT')
-    _IdT = TypeVar('_IdT', bound=UUID | str | int, contravariant=True)
-
-    class PaginationWithById(Protocol[_M, _IdT]):
-        def by_id(self, id: _IdT) -> _M | None: ...
+    class PaginationWithById[
+        M: DeclarativeBase,
+        IdT: UUID | str | int
+    ](Protocol):
+        def by_id(self, id: IdT) -> M | None: ...
 
         # Pagination:
         batch_size: int
 
-        def subset(self) -> Query[_M]: ...
+        def subset(self) -> Query[M]: ...
         @property
-        def cached_subset(self) -> Query[_M]: ...
+        def cached_subset(self) -> Query[M]: ...
         @property
         def page(self) -> int | None: ...
         @property
@@ -54,7 +52,7 @@ if TYPE_CHECKING:
         @property
         def subset_count(self) -> int: ...
         @property
-        def batch(self) -> tuple[_M, ...]: ...
+        def batch(self) -> tuple[M, ...]: ...
         @property
         def offset(self) -> int: ...
         @property
@@ -123,7 +121,7 @@ class ApiInvalidParamException(ApiException):
         self.status_code = status_code
 
 
-class ApiEndpointItem(Generic[_M]):
+class ApiEndpointItem[M: DeclarativeBase]:
     """ A single instance of an item of a specific endpoint.
 
     Passes all functionality to the specific API endpoint and is mainly used
@@ -138,13 +136,13 @@ class ApiEndpointItem(Generic[_M]):
         self.id = id
 
     @cached_property
-    def api_endpoint(self) -> ApiEndpoint[_M] | None:
+    def api_endpoint(self) -> ApiEndpoint[M] | None:
         endpoint = ApiEndpointCollection(
             self.request).endpoints.get(self.endpoint)
         return endpoint if endpoint else None
 
     @cached_property
-    def item(self) -> _M | None:
+    def item(self) -> M | None:
         if self.api_endpoint:
             return self.api_endpoint.by_id(self.id)  # for. ex. ExtendedAgency
         return None
@@ -168,7 +166,7 @@ class ApiEndpointItem(Generic[_M]):
         return None
 
 
-class ApiEndpoint(Generic[_M]):
+class ApiEndpoint[M: DeclarativeBase]:
     """ An API endpoint.
 
     API endpoints wrap collection and do some filter mapping.
@@ -235,9 +233,9 @@ class ApiEndpoint(Generic[_M]):
     @overload
     def for_item(self, item: None) -> None: ...
     @overload
-    def for_item(self, item: _M) -> ApiEndpointItem[_M]: ...
+    def for_item(self, item: M) -> ApiEndpointItem[M]: ...
 
-    def for_item(self, item: _M | None) -> ApiEndpointItem[_M] | None:
+    def for_item(self, item: M | None) -> ApiEndpointItem[M] | None:
         """ Return a new endpoint item instance with the given item. """
 
         if not item:
@@ -278,29 +276,29 @@ class ApiEndpoint(Generic[_M]):
         return values[0]
 
     @overload
-    def get_filter(
+    def get_filter[T1, T2](
         self,
         name: str,
-        default: _DefaultT,
-        empty: _EmptyT
-    ) -> str | _DefaultT | _EmptyT: ...
+        default: T1,
+        empty: T2
+    ) -> str | T1 | T2: ...
 
     @overload
-    def get_filter(
+    def get_filter[T](
         self,
         name: str,
-        default: _DefaultT,
+        default: T,
         empty: None = None
-    ) -> str | _DefaultT | None: ...
+    ) -> str | T | None: ...
 
     @overload
-    def get_filter(
+    def get_filter[T](
         self,
         name: str,
         default: None = None,
         *,
-        empty: _EmptyT
-    ) -> str | _EmptyT | None: ...
+        empty: T
+    ) -> str | T | None: ...
 
     @overload
     def get_filter(
@@ -323,7 +321,7 @@ class ApiEndpoint(Generic[_M]):
             return default
         return self.scalarize_value(name) or empty
 
-    def by_id(self, id: PKType) -> _M | None:
+    def by_id(self, id: PKType) -> M | None:
         """ Return the item with the given ID from the collection. """
 
         try:
@@ -350,7 +348,7 @@ class ApiEndpoint(Generic[_M]):
         return result
 
     @property
-    def batch(self) -> dict[ApiEndpointItem[_M], _M]:
+    def batch(self) -> dict[ApiEndpointItem[M], M]:
         """ Returns a dictionary with endpoint item instances and their
         titles.
 
@@ -360,7 +358,7 @@ class ApiEndpoint(Generic[_M]):
             for item in self.collection.batch
         }
 
-    def item_data(self, item: _M) -> dict[str, Any]:
+    def item_data(self, item: M) -> dict[str, Any]:
         """ Return the data properties of the collection item as a dictionary.
 
         For example::
@@ -374,7 +372,7 @@ class ApiEndpoint(Generic[_M]):
 
         raise NotImplementedError()
 
-    def item_links(self, item: _M) -> dict[str, Any]:
+    def item_links(self, item: M) -> dict[str, Any]:
         """ Return the link properties of the collection item as a dictionary.
         Links can either be string or a linkable object.
 
@@ -392,7 +390,7 @@ class ApiEndpoint(Generic[_M]):
 
     def form(
         self,
-        item: _M | None,
+        item: M | None,
         request: CoreRequest
     ) -> Form | None:
         """ Return a form for editing items of this collection. """
@@ -472,13 +470,13 @@ class ApiEndpoint(Generic[_M]):
             model=item
         )
 
-    def apply_changes(self, item: _M, form: Any) -> None:
+    def apply_changes(self, item: M, form: Any) -> None:
         """ Apply the changes to the item based on the given form data. """
 
         raise NotImplementedError()
 
     @property
-    def collection(self) -> PaginationWithById[_M, Any]:
+    def collection(self) -> PaginationWithById[M, Any]:
         """ Return an instance of the collection with filters and page set.
         """
 

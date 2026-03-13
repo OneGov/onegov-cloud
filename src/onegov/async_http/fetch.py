@@ -7,21 +7,23 @@ from aiohttp import ClientSession, ClientTimeout
 from typing import overload, Any, Never, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable, Sequence
-    from typing import Protocol, TypeVar, TypeAlias
+    from typing import Protocol, TypeAlias, TypeVar
 
     class HasUrl(Protocol):
         url: str
 
+    type UrlType = str | HasUrl
+    type UrlAndResult = tuple[UrlType, Any]
+
     _T = TypeVar('_T')
-    UrlType: TypeAlias = str | HasUrl
-    UrlAndResult: TypeAlias = tuple[UrlType, Any]
     _UrlTypeT = TypeVar('_UrlTypeT', bound=UrlType, default=UrlType)
     _RT = TypeVar('_RT', default=UrlAndResult)
-    ErrFunc: TypeAlias = Callable[[_UrlTypeT, Exception], _RT]
-    HandleExceptionType: TypeAlias = (
+    # FIXME: Switch to PEP-695/PEP-696 generic for Python 3.13
+    ErrFunc: TypeAlias = Callable[[_UrlTypeT, Exception], _RT]  # noqa: UP040
+    HandleExceptionType: TypeAlias = (  # noqa: UP040
         ErrFunc[_UrlTypeT, _RT] | Sequence[ErrFunc[_UrlTypeT, _RT]])
-    FetchCallback: TypeAlias = Callable[[_UrlTypeT, Any], _RT]
-    FetchFunc: TypeAlias = Callable[[
+    FetchCallback: TypeAlias = Callable[[_UrlTypeT, Any], _RT]  # noqa: UP040
+    FetchFunc: TypeAlias = Callable[[  # noqa: UP040
         UrlType,
         ClientSession,
         str,

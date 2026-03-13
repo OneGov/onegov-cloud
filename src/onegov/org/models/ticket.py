@@ -41,13 +41,11 @@ if TYPE_CHECKING:
     from onegov.form import Form, FormSubmission
     from onegov.org.request import OrgRequest
     from onegov.pay import InvoiceItem, InvoiceItemMeta, Payment
-    from onegov.ticket.handler import _Q
     from onegov.ticket.collection import ExtendedTicketState
     from sqlalchemy.orm import Mapped, Query, Session
-    from typing import TypeAlias
     from uuid import UUID
 
-    DateRange: TypeAlias = tuple[datetime, datetime]
+    type DateRange = tuple[datetime, datetime]
 
 
 def ticket_submitter(ticket: Ticket) -> str | None:
@@ -858,12 +856,12 @@ class ReservationHandler(Handler):
         return self.resource.title if self.resource else None
 
     @classmethod
-    def handle_extra_parameters(
+    def handle_extra_parameters[T: Query[Any]](
         cls,
         session: Session,
-        query: _Q,
+        query: T,
         extra_parameters: dict[str, Any]
-    ) -> _Q:
+    ) -> T:
 
         if 'allocation_id' in extra_parameters:
             allocations = session.query(Allocation.group)
@@ -1774,11 +1772,11 @@ class ChatHandler(Handler):
         return []
 
 
-def apply_ticket_permissions(
-    query: _Q,
+def apply_ticket_permissions[T: Query[Any]](
+    query: T,
     filtered_handler: str,
     request: OrgRequest | None,
-) -> _Q:
+) -> T:
     if request is None or request.is_manager:
         return query
 
@@ -1860,11 +1858,11 @@ def apply_ticket_permissions(
     ))
 
 
-def apply_search_term(
-    query: _Q,
+def apply_search_term[T: Query[Any]](
+    query: T,
     term: str | None,
     request: OrgRequest | None,
-) -> _Q:
+) -> T:
     if request is None or not term:
         return query
 

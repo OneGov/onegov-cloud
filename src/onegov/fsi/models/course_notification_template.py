@@ -15,11 +15,11 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.fsi.request import FsiRequest
-    from typing import Self, TypeAlias
+    from typing import Self
     from .course_event import CourseEvent
 
 
-NotificationType: TypeAlias = Literal[
+type NotificationType = Literal[
     'info', 'reservation', 'reminder', 'cancellation',
 ]
 
