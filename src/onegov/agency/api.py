@@ -249,6 +249,7 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
 
     def item_links(self, item: ExtendedAgency) -> dict[str, Any]:
         return {
+            'html': item,
             'organigram': item.organigram,
             'parent': self.for_item_id(item.parent_id),
             'children': self.for_filter(parent=str(item.id)),
