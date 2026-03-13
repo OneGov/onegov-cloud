@@ -173,17 +173,24 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
         return data
 
     def item_links(self, item: ExtendedPerson) -> dict[str, Any]:
-        result = {
-            attribute: getattr(item, attribute, None)
-            for attribute in (
-                'picture_url',
-                'website',
-            )
-            if attribute not in self.app.org.hidden_people_fields
-        }
-        result['memberships'] = self.membership_api.for_filter(
-            person=item.id.hex
+        picture_url = (
+            item.picture_url
+            if 'picture_url' not in self.app.org.hidden_people_fields
+            else None
         )
+        website = (
+            item.website
+            if 'website' not in self.app.org.hidden_people_fields
+            else None
+        )
+        result = {
+            'html': item,
+            'picture_url': picture_url,
+            'website': website,
+            'memberships': self.membership_api.for_filter(
+                person=str(item.id.hex)
+            )
+        }
         return result
 
     def apply_changes(
