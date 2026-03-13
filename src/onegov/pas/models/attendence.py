@@ -19,9 +19,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.pas.models import PASCommission
     from onegov.pas.models import PASParliamentarian
-    from typing import TypeAlias
 
-AttendenceType: TypeAlias = Literal[
+type AttendenceType = Literal[
     'plenary',
     'commission',
     'study',

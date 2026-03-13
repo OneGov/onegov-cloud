@@ -8,18 +8,17 @@ from sqlalchemy import func, and_
 from uuid import uuid4, UUID
 
 
-from typing import overload, Any, Literal, Generic, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import ColumnElement
     from sqlalchemy.sql.selectable import ScalarSelect
 
 
-InvoiceT = TypeVar('InvoiceT', bound=Invoice)
-ItemT = TypeVar('ItemT', bound=InvoiceItem)
-
-
-class InvoiceCollection(GenericCollection[InvoiceT], Generic[InvoiceT, ItemT]):
+class InvoiceCollection[
+    InvoiceT: Invoice,
+    ItemT: InvoiceItem
+](GenericCollection[InvoiceT]):
 
     @overload
     def __init__(

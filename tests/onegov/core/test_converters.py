@@ -67,4 +67,8 @@ def test_literal_converter() -> None:
         LiteralConverter(Literal[0, 1])
 
     converter2 = LiteralConverter('asc', 'desc')
-    assert converter2.allowed_values == converter2.allowed_values
+    assert converter2.allowed_values == converter.allowed_values
+
+    type Direction = Literal['asc', 'desc']
+    converter3 = LiteralConverter(Direction)
+    assert converter3.allowed_values == converter.allowed_values

@@ -17,16 +17,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 
-from typing import (
-    Any,
-    Any as Incomplete,
-    TypeVar,
-    BinaryIO,
-    cast,
-    Protocol,
-    ParamSpec,
-    Self,
-)
+from typing import cast, Any, Any as Incomplete, IO, Protocol, Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
@@ -77,9 +68,6 @@ if TYPE_CHECKING:
         webseite: str
         zusatzinformationen: str
 
-T = TypeVar('T')
-P = ParamSpec('P')
-
 # For commission import, Callable keys on the Row object of CSV files.
 EXPECTED_HEADERS = [
     'adress_anrede', 'akademischer_titel', 'anrede', 'austritt_kommission',
@@ -98,7 +86,7 @@ EXPECTED_HEADERS = [
 class ImportFile:
     """Provides a unified interface for both CSV and Excel files."""
 
-    def __init__(self, file: BinaryIO) -> None:
+    def __init__(self, file: IO[bytes]) -> None:
         self.ENCODINGS = ['utf-8', 'iso-8859-1']
         self.file = file
         self._detect_type()
@@ -301,7 +289,7 @@ def match_expected_headers_or_fail(
             raise ValueError('\n'.join(error_msg))
 
 
-def with_open_excel_or_csv(
+def with_open_excel_or_csv[T](
     func: Callable[..., T]
 ) -> Callable[..., T]:
     """

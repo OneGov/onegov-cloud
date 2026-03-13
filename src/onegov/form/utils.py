@@ -13,10 +13,10 @@ from typing import cast, overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from bs4 import NavigableString, Tag
     from onegov.form import Form
-    from typing import Self, TypeAlias
+    from typing import Self
     from wtforms.fields.core import UnboundField
 
-    _TagOrString: TypeAlias = NavigableString | Tag
+    type _TagOrString = NavigableString | Tag
 
 
 _unwanted_characters = re.compile(r'[^a-zA-Z0-9]+')

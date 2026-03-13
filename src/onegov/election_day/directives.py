@@ -21,14 +21,10 @@ if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable
     from collections.abc import Iterable
-    from onegov.core.directives import _RequestT
     from onegov.core.request import CoreRequest
     from typing import Protocol
-    from typing import TypeAlias
     from webob import Response as BaseResponse
     from wtforms import Form
-
-    FormCallable: TypeAlias = Callable[[Any, _RequestT], type[Form]]
 
     class InputScreenWidget(Protocol):
         @property
@@ -49,12 +45,12 @@ class ManageHtmlAction(HtmlAction):
 
     """
 
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        render: Callable[[Any, _RequestT], BaseResponse] | str | None = None,
+        render: Callable[[Any, RequestT], BaseResponse] | str | None = None,
         template: StrOrBytesPath | None = None,
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str | None = None,
         internal: bool = False,
         **predicates: Any,
@@ -78,13 +74,13 @@ class ManageFormAction(HtmlHandleFormAction):
 
     """
 
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        form: type[Form] | FormCallable[_RequestT] = EmptyForm,
-        render: Callable[[Any, _RequestT], BaseResponse] | str | None = None,
+        form: type[Form] | Callable[[Any, RequestT], type[Form]] = EmptyForm,
+        render: Callable[[Any, RequestT], BaseResponse] | str | None = None,
         template: StrOrBytesPath = 'form.pt',
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str | None = None,
         internal: bool = False,
         **predicates: Any,
@@ -164,10 +160,10 @@ class SvgFileViewAction(ViewAction):
     """ View directive for viewing SVG files from filestorage. The SVGs
     are created using a cronjob and might not be available. """
 
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str = Public,
         internal: bool = False,
         **predicates: Any,
@@ -189,10 +185,10 @@ class PdfFileViewAction(ViewAction):
     """ View directive for viewing PDF files from filestorage. The PDFs
     are created using a cronjob and might not be available. """
 
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str = Public,
         internal: bool = False,
         **predicates: Any,
@@ -213,10 +209,10 @@ class JsonFileAction(ViewAction):
 
     """ View directive for viewing JSON data as file. """
 
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str = Public,
         internal: bool = False,
         **predicates: Any,
@@ -237,10 +233,10 @@ class CsvFileAction(ViewAction):
 
     """ View directive for viewing CSV data as file. """
 
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str = Public,
         internal: bool = False,
         **predicates: Any,

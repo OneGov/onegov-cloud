@@ -34,14 +34,12 @@ from wtforms.validators import Regexp
 from wtforms.validators import URL
 
 
-from typing import overload, Any, Generic, TypeVar, TYPE_CHECKING
+from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.form.parser.core import ParsedField
     from onegov.form.types import PricingRules, Validator, Widget
     from wtforms import Field as WTField
-
-_FormT = TypeVar('_FormT', bound=Form)
 
 
 MEGABYTE = 1000 ** 2
@@ -49,20 +47,20 @@ DEFAULT_UPLOAD_LIMIT = 100 * MEGABYTE
 
 
 @overload
-def parse_form(
+def parse_form[T: Form](
     text: str,
     enable_edit_checks: bool,
-    base_class: type[_FormT]
-) -> type[_FormT]: ...
+    base_class: type[T]
+) -> type[T]: ...
 
 
 @overload
-def parse_form(
+def parse_form[T: Form](
     text: str,
     enable_edit_checks: bool = False,
     *,
-    base_class: type[_FormT]
-) -> type[_FormT]: ...
+    base_class: type[T]
+) -> type[T]: ...
 
 
 @overload
@@ -384,7 +382,7 @@ def handle_field(
                     handle_field(builder, choice_field, dependency)
 
 
-class WTFormsClassBuilder(Generic[_FormT]):
+class WTFormsClassBuilder[FormT: Form]:
     """ Helps dynamically build a wtforms class from parsed blocks.
 
     For example::
@@ -395,10 +393,10 @@ class WTFormsClassBuilder(Generic[_FormT]):
         MyForm = builder.form_class
     """
 
-    form_class: type[_FormT]
+    form_class: type[FormT]
     current_fieldset: str | None
 
-    def __init__(self, base_class: type[_FormT]):
+    def __init__(self, base_class: type[FormT]):
 
         class DynamicForm(base_class):  # type:ignore
             # NOTE: The way we build field dependencies is not quite

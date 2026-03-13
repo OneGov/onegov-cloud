@@ -14,8 +14,7 @@ if TYPE_CHECKING:
     from onegov.core.mail import Attachment
     from onegov.core.types import SequenceOrScalar
     from onegov.org.request import OrgRequest
-    from typing import TypedDict, Required
-    from typing_extensions import Unpack
+    from typing import Required, TypedDict, Unpack
 
     class TicketEmailExtraArguments(TypedDict, total=False):
         reply_to: Address | str | None

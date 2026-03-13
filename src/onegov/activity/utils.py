@@ -15,22 +15,10 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsGetItem, SupportsRichComparison
     from collections.abc import Iterable
-    from typing import TypeAlias, TypeVar, TypeGuard
+    from typing import TypeGuard
 
-    SupportsRichComparisonT = TypeVar(
-        'SupportsRichComparisonT',
-        bound=SupportsRichComparison
-    )
-    SupportsRichComparisonT_co = TypeVar(
-        'SupportsRichComparisonT_co',
-        bound=SupportsRichComparison,
-        covariant=True
-    )
-    RangeLike: TypeAlias = SupportsGetItem[int, SupportsRichComparisonT_co]
-    RangeTuple: TypeAlias = tuple[
-        SupportsRichComparisonT_co,
-        SupportsRichComparisonT_co
-    ]
+    type RangeLike[T: SupportsRichComparison] = SupportsGetItem[int, T]
+    type RangeTuple[T: SupportsRichComparison] = tuple[T, T]
 
 INTERNAL_IMAGE_EX = re.compile(r'.*/storage/[0-9a-z]{64}')
 
@@ -61,17 +49,17 @@ def is_valid_group_code(code: str) -> bool:
     return True if GROUP_CODE_EX.match(code) else False
 
 
-def overlaps(
-    range_a: RangeLike[SupportsRichComparisonT],
-    range_b: RangeLike[SupportsRichComparisonT]
+def overlaps[T: SupportsRichComparison](
+    range_a: RangeLike[T],
+    range_b: RangeLike[T]
 ) -> bool:
     return (range_b[0] <= range_a[0] <= range_b[1]) or (  # type:ignore
         range_a[0] <= range_b[0] <= range_a[1])  # type:ignore[operator]
 
 
-def merge_ranges(
-    ranges: Iterable[RangeTuple[SupportsRichComparisonT]]
-) -> list[RangeTuple[SupportsRichComparisonT]]:
+def merge_ranges[T: SupportsRichComparison](
+    ranges: Iterable[RangeTuple[T]]
+) -> list[RangeTuple[T]]:
     """ Merges the given list of ranges into a list of ranges including only
     exclusive ranges. The ranges are turned into tuples to make them
     hashable.
