@@ -9,31 +9,7 @@ import click
 import yaml
 
 
-schedule_config = """
-schedule:
-  - date: Next Tuesday at 12:00
-    nodes:
-      - loxo
-      - pherusa
-      - tyche
-  - date: Next Tuesday at 14:00
-    nodes:
-      - aether
-      - alecto
-      - theros
-      - arete
-      - calais
-  - date: Next Tuesday at 15:00
-    nodes:
-      - caicias
-      - caicinus
-      - caicus
-      - carcinus
-  - date: Next Monday +7 days at 7:00
-    nodes:
-      - ister
-      - istrus
-"""
+schedule_config_file = 'maintenance-schedule.yml'
 
 
 def parse_schedule_config(cfg: str):
@@ -118,6 +94,14 @@ def schedule_rollout_announcements(dry_run: bool) -> None:
       python3 do/schedule-rollout-announcements.py --dry-run
       python3 do/schedule-rollout-announcements.py
     """
+
+    try:
+        with open(schedule_config_file) as f:
+            schedule_config = f.read()
+    except FileNotFoundError:
+        click.echo(f'Error: schedule configuration file '
+                   f'"{schedule_config_file}" not found.')
+        return
 
     try:
         parsed = parse_schedule_config(schedule_config)
