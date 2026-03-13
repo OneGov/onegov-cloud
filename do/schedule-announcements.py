@@ -2,17 +2,18 @@
 
 from __future__ import annotations
 
+import click
+import shlex
 import subprocess
 import time
-import shlex
-import click
 import yaml
 
+from collections.abc import Sequence
 
 schedule_config_file = 'maintenance-schedule.yml'
 
 
-def parse_schedule_config(cfg: str):
+def parse_schedule_config(cfg: str) -> list[tuple[str, list[str]]]:
     """Parse and validate the YAML schedule configuration.
 
     Returns a list of (date, nodes) tuples. Raises ValueError on invalid
@@ -80,7 +81,13 @@ def schedule_announcement(date_string, node, dry_run):
 
 @click.command()
 @click.option('--dry-run', is_flag=True, default=False)
-def schedule_rollout_announcements(dry_run: bool) -> None:
+@click.option('--select', multiple=True)
+@click.option('--unselect', multiple=True)
+def schedule_rollout_announcements(
+    dry_run: bool,
+    select: Sequence[str] = (),
+    unselect: Sequence[str] = (),
+) -> None:
     """
     Schedule regularly by-weekly rollout announcements in a semi-automatic
     way. Read the configuration, execute the announcement
@@ -93,6 +100,12 @@ def schedule_rollout_announcements(dry_run: bool) -> None:
       python3 do/schedule-rollout-announcements.py --help
       python3 do/schedule-rollout-announcements.py --dry-run
       python3 do/schedule-rollout-announcements.py
+
+      only schedule nodes A and B:
+      python3 do/schedule-rollout-announcements.py --select A --select B
+
+      schedule all except nodes C and D:
+      python3 do/schedule-rollout-announcements.py --unselect C --unselect D
     """
 
     try:
@@ -108,6 +121,27 @@ def schedule_rollout_announcements(dry_run: bool) -> None:
     except Exception as e:
         click.echo(f'Invalid schedule configuration: {e}')
         return
+
+    if select and unselect:
+        click.echo('Error: --select and --unselect options cannot be '
+                   'used together.')
+        return
+
+    if select:
+        selected: list[tuple[str, list[str]]] = []
+        for date_string, nodes in parsed:
+            selected_nodes = [n for n in nodes if n in select]
+            if selected_nodes:
+                selected.append((date_string, selected_nodes))
+        parsed = selected
+
+    if unselect:
+        unselected: list[tuple[str, list[str]]] = []
+        for date_string, nodes in parsed:
+            unselected_nodes = [n for n in nodes if n not in unselect]
+            if unselected_nodes:
+                unselected.append((date_string, unselected_nodes))
+        parsed = unselected
 
     click.secho('Summary of scheduled announcements:', fg='cyan')
     for date_string, nodes in parsed:
