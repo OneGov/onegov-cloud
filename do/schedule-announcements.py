@@ -22,13 +22,13 @@ schedule:
       - alecto
       - theros
       - arete
-      # - calais
-  # - date: Next Tuesday at 15:00
-  #   nodes:
-  #     - caicias
-  #     - caicinus
-  #     - caicus
-  #     - carcinus
+      - calais
+  - date: Next Tuesday at 15:00
+    nodes:
+      - caicias
+      - caicinus
+      - caicus
+      - carcinus
   - date: Next Monday +7 days at 7:00
     nodes:
       - ister
