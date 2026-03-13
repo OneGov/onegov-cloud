@@ -208,7 +208,7 @@ def publish_event_from_ticket(
 ) -> RenderData | BaseResponse:
 
     event = self.handler.event
-    if event is None or event.state != 'submitted':
+    if event is None or event.state not in ('submitted', 'withdrawn'):
         raise exc.HTTPNotFound()
 
     return publish_event(
