@@ -253,7 +253,7 @@ class LiteralConverter(LiteralConverterBase):
             if isinstance(_literal, TypeAliasType):
                 _literal = _literal.__value__
             if get_origin(_literal) is Literal:
-                literals = get_args(literals[0])
+                literals = get_args(_literal)
 
         if not all(isinstance(v, str) for v in literals):
             # TODO: Consider supporting float/int literals via their
