@@ -39,11 +39,10 @@ if TYPE_CHECKING:
     from onegov.activity.models.activity import ActivityState
     from onegov.user import User
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import TypedDict, Unpack
-    from typing import Self, TypeAlias
+    from typing import TypedDict, Unpack, Self
 
-    AvailabilityType: TypeAlias = Literal['none', 'few', 'many']
-    FilterKey: TypeAlias = Literal[
+    type AvailabilityType = Literal['none', 'few', 'many']
+    type FilterKey = Literal[
         'age_ranges',
         'available',
         'price_ranges',

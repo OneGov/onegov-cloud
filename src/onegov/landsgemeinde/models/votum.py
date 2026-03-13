@@ -30,10 +30,9 @@ if TYPE_CHECKING:
     from onegov.landsgemeinde.models import AgendaItem
     from onegov.landsgemeinde.models import Assembly
     from translationstring import TranslationString
-    from typing import TypeAlias
 
 
-VotumState: TypeAlias = Literal[
+type VotumState = Literal[
     'draft', 'scheduled', 'ongoing', 'completed'
 ]
 

@@ -22,9 +22,8 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
-    from typing import TypeAlias
 
-    SortKey: TypeAlias = Callable[
+    type SortKey = Callable[
         [FormDefinition | ExternalLink | FormDocument],
         SupportsRichComparison
     ]

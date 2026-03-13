@@ -5,35 +5,33 @@ import sqlalchemy
 from sqlalchemy_utils import QueryChain as QueryChainBase
 
 
-from typing import TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from typing import Self
 
-    _T = TypeVar('_T')
-
     # we have to forward declare the implementation, since QueryChainBase
     # is only generic in our stub and not at runtime
-    class QueryChain(QueryChainBase[_T]):
+    class QueryChain[T](QueryChainBase[T]):
         def slice(self, start: int | None, end: int | None) -> Self: ...
-        def first(self) -> _T | None: ...
-        def all(self) -> tuple[_T, ...]: ...
+        def first(self) -> T | None: ...
+        def all(self) -> tuple[T, ...]: ...
 
 
-class QueryChain(QueryChainBase):  # type:ignore
+class QueryChain[T](QueryChainBase):  # type:ignore
     """ Extends SQLAlchemy Utils' QueryChain with some extra methods. """
 
     def slice(self, start: int | None, end: int | None) -> Self:
         return self[start:end]
 
-    def first(self) -> _T | None:
+    def first(self) -> T | None:
         return next((o for o in self), None)
 
-    def all(self) -> tuple[_T, ...]:
+    def all(self) -> tuple[T, ...]:
         return tuple(self)
 
 
-def maybe_merge(session: Session, obj: _T) -> _T:
+def maybe_merge[T](session: Session, obj: T) -> T:
     """ Merges the given obj into the given session, *if* this is possible.
     That is it acts like more forgiving session.merge().
     """

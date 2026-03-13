@@ -8,7 +8,7 @@ FieldT = TypeVar('FieldT', bound='Field', contravariant=True)
 
 if TYPE_CHECKING:
     from onegov.form import Form
-    from typing import Any, Protocol, TypeAlias
+    from typing import Any, Protocol
     from webob.request import _FieldStorageWithFile
     from wtforms.fields.core import _Filter, _Validator, _Widget, Field
     from wtforms.form import BaseForm
@@ -16,18 +16,24 @@ if TYPE_CHECKING:
     class FieldCondition(Protocol[BaseFormT, FieldT]):
         def __call__(self, form: BaseFormT, field: FieldT, /) -> bool: ...
 
-    Widget: TypeAlias = _Widget
-    Filter: TypeAlias = _Filter
-    BaseValidator: TypeAlias = _Validator
+    type Widget[T: Field] = _Widget[T]
+    type Filter = _Filter
+    type BaseValidator[
+        FormT: BaseForm,
+        FieldT: Field
+    ] = _Validator[FormT, FieldT]
     # validator is slightly more specific in that it expects our Form type
-    Validator: TypeAlias = _Validator[FormT, FieldT]
-    Validators: TypeAlias = tuple[_Validator[FormT, FieldT], ...] | list[Any]
-    RawPricing: TypeAlias = tuple[float, str] | tuple[float, str, bool]
-    PricingRules: TypeAlias = dict[str | range, RawPricing]
+    type Validator[FormT: Form, FieldT: Field] = _Validator[FormT, FieldT]
+    type Validators[
+        FormT: Form,
+        FieldT: Field
+    ] = tuple[_Validator[FormT, FieldT], ...] | list[Any]
+    type RawPricing = tuple[float, str] | tuple[float, str, bool]
+    type PricingRules = dict[str | range, RawPricing]
     # this matches what webob.request.POST returns as value type
-    RawFormValue: TypeAlias = str | _FieldStorageWithFile
+    type RawFormValue = str | _FieldStorageWithFile
 
-SubmissionState: TypeAlias = Literal['pending', 'complete']
-RegistrationState: TypeAlias = Literal[
+type SubmissionState = Literal['pending', 'complete']
+type RegistrationState = Literal[
     'open', 'cancelled', 'confirmed', 'partial'
 ]

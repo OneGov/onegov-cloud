@@ -147,6 +147,14 @@ def import_vote_internal(
         except ValueError as e:
             line_errors.append(e.args[0])
 
+        # the received votes
+        try:
+            received = validate_integer(
+                line, 'received', optional=True, default=None
+            )
+        except ValueError as e:
+            line_errors.append(e.args[0])
+
         # the empty votes
         try:
             empty = validate_integer(line, 'empty')
@@ -192,7 +200,8 @@ def import_vote_internal(
                     'eligible_voters': eligible_voters if counted else 0,
                     'expats': expats if counted else 0,
                     'empty': empty if counted else 0,
-                    'invalid': invalid if counted else 0
+                    'invalid': invalid if counted else 0,
+                    'received': received if counted else None,
                 }
             )
 
@@ -234,7 +243,8 @@ def import_vote_internal(
                     'eligible_voters': 0,
                     'expats': None,
                     'empty': 0,
-                    'invalid': 0
+                    'invalid': 0,
+                    'received': None,
                 }
             )
 

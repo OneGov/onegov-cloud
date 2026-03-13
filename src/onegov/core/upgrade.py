@@ -18,7 +18,7 @@ from sqlalchemy.pool import StaticPool
 from toposort import toposort
 
 
-from typing import cast, overload, Any, TypeVar, TYPE_CHECKING
+from typing import cast, overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import (
@@ -29,15 +29,11 @@ if TYPE_CHECKING:
     from sqlalchemy.engine import Connection
     from sqlalchemy.orm import Query, Session
     from types import CodeType, ModuleType
-    from typing import ParamSpec, Protocol, TypeAlias, TypeGuard
+    from typing import Protocol, TypeGuard
 
     from .request import CoreRequest
 
-    _T = TypeVar('_T')
-    _T_co = TypeVar('_T_co', covariant=True)
-    _P = ParamSpec('_P')
-
-    class _Task(Protocol[_P, _T_co]):
+    class _Task[**P, T_co](Protocol):
         __name__: str
         __code__: CodeType
         task_name: str
@@ -45,13 +41,13 @@ if TYPE_CHECKING:
         requires: str | None
         raw: bool
 
-        def __call__(self, *args: _P.args, **kwargs: _P.kwargs) -> _T_co: ...
+        def __call__(self, *args: P.args, **kwargs: P.kwargs) -> T_co: ...
 
-    RawFunc: TypeAlias = Callable[[Connection, Sequence[str]], Any]
-    UpgradeFunc: TypeAlias = Callable[['UpgradeContext'], Any]
-    RawTask: TypeAlias = _Task[[Connection, Sequence[str]], Any]
-    UpgradeTask: TypeAlias = _Task[['UpgradeContext'], Any]
-    TaskCallback: TypeAlias = Callable[[_Task[..., Any]], Any]
+    type RawFunc = Callable[[Connection, Sequence[str]], Any]
+    type UpgradeFunc = Callable[[UpgradeContext], Any]
+    type RawTask = _Task[[Connection, Sequence[str]], Any]
+    type UpgradeTask = _Task[[UpgradeContext], Any]
+    type TaskCallback = Callable[[_Task[..., Any]], Any]
 
 
 class UpgradeState(Base, TimestampMixin):
@@ -238,8 +234,8 @@ class upgrade_task:  # noqa: N801
     @overload
     def __call__(self, fn: RawFunc) -> RawTask: ...
 
-    def __call__(self, fn: Callable[_P, _T]) -> _Task[_P, _T]:
-        fn = cast('_Task[_P, _T]', fn)
+    def __call__[**P, T](self, fn: Callable[P, T]) -> _Task[P, T]:
+        fn = cast('_Task[P, T]', fn)
         fn.task_name = self.name
         fn.always_run = self.always_run
         fn.requires = self.requires
@@ -247,7 +243,7 @@ class upgrade_task:  # noqa: N801
         return fn
 
 
-def is_task(function: Callable[_P, _T]) -> TypeGuard[_Task[_P, _T]]:
+def is_task[**P, T](function: Callable[P, T]) -> TypeGuard[_Task[P, T]]:
     """ Returns True if the given function is an uprade task. """
     if not (isfunction(function) or ismethod(function)):
         return False
@@ -586,12 +582,12 @@ class UpgradeContext:
     ) -> Iterator[Any]:
 
         if columns is None:
-            def filter_columns(model: type[_T], q: Query[_T]) -> Query[_T]:
+            def filter_columns[T](model: type[T], q: Query[T]) -> Query[T]:
                 return q
         else:
             column_names = tuple(c.name for c in columns)
 
-            def filter_columns(model: type[_T], q: Query[_T]) -> Query[_T]:
+            def filter_columns[T](model: type[T], q: Query[T]) -> Query[T]:
                 return q.options(load_only(*(
                     getattr(model, name)
                     for name in column_names
@@ -616,11 +612,11 @@ class UpgradeContext:
             f'SELECT * FROM {table} LIMIT 1')).rowcount == 0
 
     # FIXME: Get rid of this and any tasks that use it
-    def add_column_with_defaults(
+    def add_column_with_defaults[T](
         self,
         table: str,
-        column: Column[_T],
-        default: _T | Callable[[Any], _T]
+        column: Column[T],
+        default: T | Callable[[Any], T]
     ) -> None:
         # XXX while adding default values we shouldn't reindex the data
         # since this is what the default add_column code does and will be

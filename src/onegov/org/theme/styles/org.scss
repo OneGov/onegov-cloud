@@ -5378,9 +5378,16 @@ h2 + div.timeline {
     text-align: right;
 }
 
+.formcoder-trigger {
+    float: right;
+    padding: 0;
+    margin: 0;
+}
+
 .formcode-toolbar-element {
     color: $body-font-color;
     position: relative;
+    clear: both;
 
     > span {
         display: inline-block;

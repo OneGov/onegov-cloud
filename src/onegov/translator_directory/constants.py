@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from decimal import Decimal
 from typing import NamedTuple
-from typing import TypeAlias
 from onegov.translator_directory import _
 
 full_text_max_chars = 25
@@ -171,7 +170,7 @@ LOHNART_EXPENSES = '8102'
 
 TRANSLATOR_FA_ICON = 'translator'
 
-LocationMapping: TypeAlias = tuple[str, str]
+type LocationMapping = tuple[str, str]
 
 
 class Finanzstelle(NamedTuple):

@@ -199,6 +199,7 @@ def import_votes_ech(
             ballot_result.empty = 0
             ballot_result.yeas = 0
             ballot_result.nays = 0
+            ballot_result.received = None
             if (
                 circle_info.result_data
                 and circle_info.result_data.fully_counted_true
@@ -228,6 +229,7 @@ def import_votes_ech(
                 )
                 ballot_result.yeas = result_data.count_of_yes_votes or 0
                 ballot_result.nays = result_data.count_of_no_votes or 0
+                ballot_result.received = result_data.received_votes
 
         # add missing the missing entitites
         remaining = set(entities.keys())

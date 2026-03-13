@@ -6,20 +6,14 @@ from onegov.qrcode import QrCode
 
 
 from typing import Any
-from typing import Generic
-from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.layouts import DefaultLayout
     from onegov.election_day.models import Election
     from onegov.election_day.models import ElectionCompound
     from onegov.election_day.models import Vote
-    from typing import TypeAlias
 
-    Entity: TypeAlias = Election | ElectionCompound | Vote
-
-
-_E = TypeVar('_E', bound='Entity')
+    type Entity = Election | ElectionCompound | Vote
 
 
 @ElectionDayApp.screen_widget(tag='h1', category='generic')
@@ -156,9 +150,9 @@ class QrCodeWidget:
         return {'qr_code': self.qr_code}
 
 
-class ModelBoundWidget(Generic[_E]):
+class ModelBoundWidget[E: Entity]:
 
-    def __init__(self, model: _E | None = None) -> None:
+    def __init__(self, model: E | None = None) -> None:
         self.model = model
 
     def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
@@ -242,7 +236,7 @@ class CountedEntitiesWidget(ModelBoundWidget['Entity']):
         }
 
 
-class ChartWidget(ModelBoundWidget[_E]):
+class ChartWidget[E: Entity](ModelBoundWidget[E]):
 
     def get_variables(self, layout: DefaultLayout) -> dict[str, Any]:
         return {

@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import re
+
+import requests
 import yaml
 
 import morepath
@@ -40,8 +42,8 @@ from types import MethodType
 from webob import Response
 from webob.exc import WSGIHTTPException
 
-
 from typing import Any, Literal, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from collections.abc import (
@@ -137,13 +139,24 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         self.plausible_api_token = plausible_api_token
 
     def configure_stadt_wil_azizi_api_token(
-            self,
-            *,
-            azizi_api_token: str = '',
-            ** cfg: Any
+        self,
+        *,
+        azizi_api_token: str = '',
+        ** cfg: Any
     ) -> None:
 
         self.azizi_api_token = azizi_api_token
+
+    def configure_infomaniak_api_token(
+        self,
+        *,
+        infomaniak_api_token: str | None = None,
+        infomaniak_product_id: str | None = None,
+        **cfg: Any
+    ) -> None:
+
+        self.infomaniak_api_token = infomaniak_api_token
+        self.infomaniak_product_id = infomaniak_product_id
 
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
@@ -399,6 +412,37 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
 
         with fs.open('eventsettings.yml', 'r') as f:
             return yaml.safe_load(f).get('event_form_lead', None)
+
+    def load_formcode_specification(self) -> str:
+        response = requests.get(
+            'https://raw.githubusercontent.com/seantis/docs-admin-digital'
+            '/refs/heads/main/content/module/formulare/index.md',
+            timeout=(5, 10)
+        )
+        if not response.ok:
+            # Fallback to our docstring
+            import onegov.form.parser.core as parser
+            return parser.__doc__
+
+        specification = response.text
+
+        # try to extend specification with examples
+        response = requests.get(
+            'https://raw.githubusercontent.com/seantis/docs-admin-digital'
+            '/refs/heads/main/content/module/formulare/beispiele.md',
+            timeout=(5, 10)
+        )
+        if not response.ok:
+            return specification
+        return f'{specification}\n\n{response.text}'
+
+    @property
+    def formcode_specification(self) -> str:
+        return self.cache.get_or_create(
+            'formcode_specification',
+            self.load_formcode_specification,
+            expiration_time=86400
+        )
 
     def checkout_button(
         self,
@@ -895,6 +939,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'notifications.js'
     yield 'foundation.accordion.js'
     yield 'chosen_select_hierarchy.js'
+    yield 'ai_formcoder.js'
 
 
 @OrgApp.webasset('fontpreview')

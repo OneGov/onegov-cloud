@@ -36,14 +36,14 @@ if TYPE_CHECKING:
         ParliamentaryGroupRole, PartyRole, Role)
     from collections.abc import Sequence
     from sqlalchemy.orm import Session
-    from typing import TypeAlias, TypedDict
+    from typing import TypedDict
 
     class ImportCategoryResult(TypedDict):
         created: list[Any]
         updated: list[Any]
         processed: int
 
-    RoleKey: TypeAlias = tuple[
+    type RoleKey = tuple[
         UUID,
         UUID | None,
         UUID | None,

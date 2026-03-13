@@ -52,6 +52,7 @@ Num|Descripziun
 `empty`|Il dumber da las vuschs vidas.
 `eligible_voters`|Il dumber da las persunas cun dretg da votar.
 `expats`|Dumber da las persunas da l'unitad che vivan a l'exteriur. Opziunal.
+`received`|Dumber da las cedels da votar arrivadas. Opziunal.
 
 
 #### Resultats temporars

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-01-27 10:35+0100\n"
+"POT-Creation-Date: 2026-02-26 13:35+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -16,6 +16,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Events"
+msgstr "Veranstaltungen"
+
+msgid "Latest news"
+msgstr "Aktuelles"
+
+msgid "Topics"
+msgstr "Themen"
 
 msgid "Chats"
 msgstr "Chats"
@@ -683,14 +692,14 @@ msgstr "Erweiterung"
 msgid "Upload Date"
 msgstr "Hochlade-Datum"
 
+msgid "Published until"
+msgstr "Publiziert bis"
+
 msgid "All Files"
 msgstr "Alle Dateien"
 
 msgid "No files uploaded yet"
 msgstr "Noch keine Dateien hochgeladen"
-
-msgid "Published until"
-msgstr "Publiziert bis"
 
 msgid "You are trying to open a page for which you are not authorized."
 msgstr "Ihnen fehlt die nötige Berechtigung um diese Seite zu öffnen."
@@ -720,6 +729,9 @@ msgstr "Noch keine Bilder hochgeladen"
 
 msgid "This album does not contain any images yet."
 msgstr "Dieses Fotoalbum enthält noch keine Bilder."
+
+msgid "Cannot display"
+msgstr "Kann nicht anzeigen"
 
 msgid "No photo albums defined yet."
 msgstr "Noch keine Fotoalben erstellt."

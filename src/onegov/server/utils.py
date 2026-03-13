@@ -3,13 +3,11 @@ from __future__ import annotations
 import inspect
 import importlib
 
-from typing import overload, Any, TypeVar
-
-_T = TypeVar('_T')
+from typing import overload, Any
 
 
 @overload
-def load_class(cls: type[_T]) -> type[_T]: ...
+def load_class[T: type[object]](cls: T) -> T: ...
 @overload
 def load_class(cls: str) -> type[Any] | None: ...
 

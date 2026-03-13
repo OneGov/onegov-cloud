@@ -15,6 +15,7 @@ from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
 from sqlalchemy import Text
 
 
@@ -342,3 +343,12 @@ def add_complex_vote_to_archived_result_type(context: UpgradeContext) -> None:
     ))
 
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
+
+
+@upgrade_task('Add received to ballot results')
+def add_received_to_ballot_results(context: UpgradeContext) -> None:
+    if not context.has_column('ballot_results', 'received'):
+        context.operations.add_column(
+            'ballot_results',
+            Column('received', Integer, nullable=True)
+        )

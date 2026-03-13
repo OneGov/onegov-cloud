@@ -22,47 +22,34 @@ from itertools import chain
 from onegov.core.cache.instance_cache import instance_lru_cache
 
 
-from typing import (
-    overload,
-    Any,
-    ClassVar,
-    Generic,
-    Literal,
-    TypeVar,
-    TypeAlias,
-    TYPE_CHECKING,
-)
+from typing import overload, Any, ClassVar, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRead, SupportsWrite
     from collections.abc import Callable, Collection, Iterator, Iterable
 
     from onegov.core.types import JSON_ro, JSONObject_ro
 
-    AnySerializer: TypeAlias = (
-        'PrefixSerializer[_T] | DictionarySerializer[_T]')
-
-_T = TypeVar('_T')
-_ST = TypeVar('_ST', bound='JSON_ro')
+    type AnySerializer[T] = PrefixSerializer[T] | DictionarySerializer[T]
 
 
-class Serializer(Generic[_T, _ST]):
+class Serializer[T, ST: JSON_ro]:
     """ Provides a way to encode all objects of a given class or its
     subclasses to and from json.
 
     """
 
-    def __init__(self, target: type[_T]):
+    def __init__(self, target: type[T]):
         assert isinstance(target, type), 'expects a class'
         self.target = target
 
-    def encode(self, obj: _T) -> _ST:
+    def encode(self, obj: T) -> ST:
         raise NotImplementedError
 
-    def decode(self, value: _ST) -> _T:
+    def decode(self, value: ST) -> T:
         raise NotImplementedError
 
 
-class PrefixSerializer(Serializer[_T, str]):
+class PrefixSerializer[T](Serializer[T, str]):
     """ Serializes objects to a string with a prefix.
 
     Resulting json values take the form of __prefix__@<value>, where <value>
@@ -80,10 +67,10 @@ class PrefixSerializer(Serializer[_T, str]):
 
     def __init__(
         self,
-        target: type[_T],
+        target: type[T],
         prefix: str,
-        encode: Callable[[_T], str],
-        decode: Callable[[str], _T],
+        encode: Callable[[T], str],
+        decode: Callable[[str], T],
     ):
         super().__init__(target)
 
@@ -94,14 +81,14 @@ class PrefixSerializer(Serializer[_T, str]):
         self._encode = encode
         self._decode = decode
 
-    def encode(self, obj: _T) -> str:
+    def encode(self, obj: T) -> str:
         return '__{}__@{}'.format(self.prefix, self._encode(obj))
 
-    def decode(self, string: str) -> _T:
+    def decode(self, string: str) -> T:
         return self._decode(string[self.prefix_length:])
 
 
-class DictionarySerializer(Serializer[_T, 'JSONObject_ro']):
+class DictionarySerializer[T](Serializer[T, 'JSONObject_ro']):
     """ Serialises objects that can be built with keyword arguments.
 
     For example::
@@ -133,15 +120,15 @@ class DictionarySerializer(Serializer[_T, 'JSONObject_ro']):
 
     """
 
-    def __init__(self, target: type[_T], keys: Iterable[str]):
+    def __init__(self, target: type[T], keys: Iterable[str]):
         super().__init__(target)
 
         self.keys = frozenset(keys)
 
-    def encode(self, obj: _T) -> JSONObject_ro:
+    def encode(self, obj: T) -> JSONObject_ro:
         return {k: getattr(obj, k) for k in self.keys}
 
-    def decode(self, dictionary: JSONObject_ro) -> _T:
+    def decode(self, dictionary: JSONObject_ro) -> T:
         return self.target(**dictionary)
 
 
@@ -218,10 +205,10 @@ class Serializers:
         return self.by_keys.get(frozenset(dictionary.keys()))
 
     @instance_lru_cache(maxsize=16)
-    def serializer_for_class(
+    def serializer_for_class[T](
         self,
-        cls: type[_T]
-    ) -> AnySerializer[_T] | None:
+        cls: type[T]
+    ) -> AnySerializer[T] | None:
         matches = (s for s in self.registered if issubclass(cls, s.target))
         return next(matches, None)
 

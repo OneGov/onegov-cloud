@@ -60,7 +60,7 @@ class DummyRequest(BaseRequest):
         self.locale = 'de_CH'
         self.time_zone = 'Europe/Zurich'
         self.permissions = permissions or {}
-        self.current_user = current_user
+        self.current_user = current_user  # type: ignore[misc]
         self.client_addr = '1.1.1.1'  # type: ignore[misc]
 
     def is_private(self, model: object) -> bool:
