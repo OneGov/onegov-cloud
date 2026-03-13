@@ -3032,7 +3032,7 @@
     <tal:b tal:repeat="step steps">
         <li tal:define="complete step.position < layout.step_position; current step.position == layout.step_position"
                 tal:attributes="data-step step.position if show_number else ''" class="${'is-current' if current else '' + 'is-complete' if complete else ''}">
-            <span tal:condition="show_title">${request.translate(step.title)}</span>
+            <span class="show-for-large" tal:condition="show_title">${request.translate(step.title)}</span>
         </li>
     </tal:b>
 </ol>

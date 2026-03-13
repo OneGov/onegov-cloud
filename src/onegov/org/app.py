@@ -1,12 +1,11 @@
 """ Contains the base application used by other applications. """
 from __future__ import annotations
 
+import morepath
 import re
-
 import requests
 import yaml
 
-import morepath
 from dectate import directive
 from email.headerregistry import Address
 from functools import wraps
@@ -41,8 +40,8 @@ from types import MethodType
 from webob import Response
 from webob.exc import WSGIHTTPException
 
-from typing import Any, Literal, TYPE_CHECKING
 
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from collections.abc import (
@@ -60,6 +59,7 @@ if TYPE_CHECKING:
 class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
              DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
 
+    localizeable = False
     serve_static_files = True
     request_class = OrgRequest
 

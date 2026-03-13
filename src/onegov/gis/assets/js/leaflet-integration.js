@@ -716,4 +716,8 @@ $(document).ready(function() {
     $('input.coordinates').mapboxInput();
     $('.marker-map').mapboxMarkerMap();
     $('.geojson-map').mapboxGeojsonMap();
+}).on('process-common-nodes', function(_e, elements) {
+    $(elements).find('input.coordinates').mapboxInput();
+    $(elements).find('.marker-map').mapboxMarkerMap();
+    $(elements).find('.geojson-map').mapboxGeojsonMap();
 });
