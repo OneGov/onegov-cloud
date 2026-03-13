@@ -305,6 +305,7 @@ class MembershipApiEndpoint(
 
     def item_links(self, item: ExtendedAgencyMembership) -> dict[str, Any]:
         return {
+            'html': item,
             'agency': self.agency_api.for_item_id(item.agency_id),
             'person': self.person_api.for_item_id(item.person_id)
         }
