@@ -57,3 +57,11 @@ def add_meta_data_and_content_columns_to_occurrences(
 
     if not context.has_column(table, 'content'):
         context.operations.add_column(table, Column('content', JSON()))
+
+
+@upgrade_task('Add deleted state to events')
+def add_deleted_state_to_events(context: UpgradeContext) -> None:
+    """Adds the 'deleted' value to the database enum for event states."""
+
+    if context.has_table('events'):
+        context.update_enum_values('event_state', ['deleted'])

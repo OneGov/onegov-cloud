@@ -15,6 +15,9 @@
                 <tal:b case="'deleted'" i18n:translate>
                     Event deleted.
                 </tal:b>
+                <tal:b case="'rejected'" i18n:translate>
+                    Event rejected.
+                </tal:b>
                 <tal:b case="'withdrawn'" i18n:translate>
                     Event withdrawn.
                 </tal:b>

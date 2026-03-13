@@ -15,8 +15,8 @@ from onegov.reservation import ResourceCollection
 from textwrap import dedent
 from webtest import Upload
 
-
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from tests.shared.client import ExtendedResponse
     from .conftest import Client
@@ -853,6 +853,55 @@ def test_disable_tickets(client: Client) -> None:
     assert ticket_number in page
     assert 'hans.maulwurf@simpsons.com' in page.pyquery('.ticket-group').text()
     assert 'hans.maulwurf@simpsons.com' in page.click('Annehmen').follow()
+
+
+def test_event_ticket_link_to_event(client: Client) -> None:
+    # enable submit events
+    client.login_admin()
+    settings = client.get('/event-settings')
+    settings.form['submit_events_visible'] = True
+    settings.form.submit()
+
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    new_event = client.get('/events').click('Veranstaltung erfassen')
+    new_event.form['title'] = 'Bicycle Day'
+    new_event.form['location'] = 'Around the Lake'
+    new_event.form['organizer'] = 'Pro Bicycle'
+    new_event.form['start_date'] = tomorrow
+    new_event.form['start_time'] = '11:00'
+    new_event.form['end_time'] = '17:00'
+    review = new_event.form.submit().follow()
+    # verify no event link on review page as event not yet published
+    assert not review.pyquery('.occurrence a').attr('href')
+
+    page = review.form.submit().follow()
+    ticket_number = page.pyquery('.ticket-number').text()
+    ticket_page = client.get('/tickets/ALL/open')
+    ticket_page = ticket_page.click(ticket_number)
+    # verify no event link on ticket page as event not yet published
+    assert not review.pyquery('.occurrence a').attr('href')
+
+    ticket_page = ticket_page.click('Ticket annehmen').follow()
+    assert not ticket_page.pyquery('.occurrence a').attr('href')
+    ticket_page = ticket_page.click('Veranstaltung annehmen').follow()
+    # verify link to ticket on ticket view as it is now published
+    links = [a.attr('href') for a in
+             ticket_page.pyquery('.occurrence a[href]').items()]
+    assert f'http://localhost/event/bicycle-day-{tomorrow}' in links
+    ticket_page.click('Ticket abschliessen')
+
+    # reopen and reject
+    ticket_page = client.get(ticket_page.request.path)
+    ticket_page = ticket_page.click('Ticket wieder öffnen').follow()
+    # verify no event link on ticket page as event not published
+    assert not review.pyquery('.occurrence a').attr('href')
+
+    client.delete(
+        ticket_page.pyquery('.confirm').attr('ic-delete-from'))
+    ticket_page = client.get(
+        ticket_page.pyquery('.confirm').attr('redirect-after'))
+    # verify no event link on ticket page as event deleted
+    assert not review.pyquery('.occurrence a').attr('href')
 
 
 def test_assign_tickets(client: Client) -> None:

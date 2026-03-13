@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-02-26 13:35+0100\n"
+"POT-Creation-Date: 2026-03-12 09:18+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1836,6 +1836,9 @@ msgstr "${event} veröffentlicht."
 msgid "Event deleted."
 msgstr "Veranstaltung gelöscht."
 
+msgid "Event rejected."
+msgstr "Veranstaltung abgelehnt."
+
 msgid "Event withdrawn."
 msgstr "Veranstaltung zurückgezogen."
 
@@ -2086,9 +2089,6 @@ msgstr "Personalnummer"
 
 msgid "Contract number"
 msgstr "Vertragsnummer"
-
-msgid "Party"
-msgstr "Party"
 
 msgid "Private address"
 msgstr "Privatadresse"
@@ -2890,3 +2890,6 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Party"
+#~ msgstr "Party"
