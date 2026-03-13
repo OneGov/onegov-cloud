@@ -685,7 +685,7 @@ def is_subpath(directory: str, path: str) -> bool:
 
     # return true, if the common prefix of both is equal to directory
     # e.g. /a/b/c/d.rst and directory is /a/b, the common prefix is /a/b
-    return os.path.commonprefix([path, directory]) == directory
+    return os.path.commonpath([path, directory]) == directory
 
 
 @overload
