@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import sentry_sdk
 import transaction
 
 from base64 import b64decode
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
+from onegov.election_day import log
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_ech
 from onegov.election_day.formats import import_election_compound_internal
@@ -75,7 +77,43 @@ def view_upload_rest(
 
     """
     set_locale(request)
-    authenticate(request)
+
+    status_code: int | None = None
+
+    @request.after
+    def set_status_code(response: Response) -> None:
+        if status_code is not None:
+            response.status_code = status_code
+
+    try:
+        authenticate(request)
+    except HTTPUnauthorized:
+        status_code = 401
+        return {
+            'status': 'error',
+            'errors': {
+                'authorization': [{'message': 'Unauthorized'}]
+            }
+        }
+
+    try:
+        return _handle_upload(self, request)
+    except Exception:
+        log.exception('Internal server error in REST upload')
+        sentry_sdk.capture_exception()
+        status_code = 500
+        return {
+            'status': 'error',
+            'errors': {
+                'internal': [{'message': 'Internal Server Error'}]
+            }
+        }
+
+
+def _handle_upload(
+    self: Canton | Municipality,
+    request: ElectionDayRequest
+) -> RenderData:
 
     status_code: int | None = None
 
