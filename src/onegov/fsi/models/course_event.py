@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Query
-    from typing import Self, TypeAlias
+    from typing import Self
     from wtforms.fields.choices import _Choice
     from .course import Course
     from .course_notification_template import (
@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     )
 
 
-EventStatusType: TypeAlias = Literal[
+type EventStatusType = Literal[
     'created', 'confirmed', 'canceled', 'planned'
 ]
 

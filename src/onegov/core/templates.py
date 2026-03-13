@@ -49,15 +49,13 @@ from markupsafe import escape, Markup
 from onegov.core.framework import Framework
 
 
-from typing import Any, Literal, TypeVar, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from chameleon.zpt.template import Macro
     from collections.abc import Callable, Iterable, Mapping
 
     from .request import CoreRequest
-
-_T = TypeVar('_T')
 
 
 AUTO_RELOAD = os.environ.get('ONEGOV_DEVELOPMENT') == '1'
@@ -205,11 +203,11 @@ def get_template_loader(
 
 
 @Framework.template_render(extension='.pt')
-def get_chameleon_render(
+def get_chameleon_render[T](
     loader: TemplateLoader,
     name: str,
-    original_render: Callable[[str, CoreRequest], _T]
-) -> Callable[[dict[str, Any], CoreRequest], _T]:
+    original_render: Callable[[str, CoreRequest], T]
+) -> Callable[[dict[str, Any], CoreRequest], T]:
     """ Returns the Chameleon template renderer for the required template.
 
     """

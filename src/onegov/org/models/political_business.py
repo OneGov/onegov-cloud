@@ -20,7 +20,7 @@ from onegov.search import ORMSearchable, SearchIndex
 from onegov.search.utils import language_from_locale
 
 
-from typing import Literal, Self, TypeAlias, TYPE_CHECKING
+from typing import Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from sqlalchemy.orm import Query, Session
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from onegov.org.models import RISParliamentaryGroup
     from onegov.org.request import OrgRequest
 
-PoliticalBusinessType: TypeAlias = Literal[
+type PoliticalBusinessType = Literal[
     'inquiry',  # Anfrage
     'report and proposal',  # Bericht und Antrag
     'urgent interpellation',  # Dringliche Interpellation
@@ -46,7 +46,7 @@ PoliticalBusinessType: TypeAlias = Literal[
     'miscellaneous',  # Verschiedenes
 ]
 
-PoliticalBusinessStatus: TypeAlias = Literal[
+type PoliticalBusinessStatus = Literal[
     'abgeschrieben',
     'beantwortet',
     'erheblich_erklaert',

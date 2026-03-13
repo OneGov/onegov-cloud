@@ -28,10 +28,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
-    from typing import TypeVar
     from webob import Response
-
-    FormT = TypeVar('FormT', bound=Form)
 
 
 @OrgApp.html(model=UserCollection, template='usermanagement.pt',
@@ -207,11 +204,11 @@ def get_manage_user_form(
 
 
 @overload
-def get_manage_user_form(
+def get_manage_user_form[T: Form](
     self: User,
     request: OrgRequest,
-    base: type[FormT]
-) -> type[FormT]: ...
+    base: type[T]
+) -> type[T]: ...
 
 
 def get_manage_user_form(

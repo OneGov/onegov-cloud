@@ -6,9 +6,8 @@ from onegov.core.custom import json
 from typing import overload, Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Mapped
-    from typing import TypeAlias
 
-    AnyCoordinates: TypeAlias = 'RealCoordinates | NullCoordinates'
+    type AnyCoordinates = RealCoordinates | NullCoordinates
 
 
 class Coordinates(json.Serializable, keys=('lon', 'lat', 'zoom')):

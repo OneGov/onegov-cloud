@@ -13,12 +13,12 @@ from uuid import uuid4
 from uuid import UUID
 
 
-from typing import Literal, TypeAlias, TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.parliament.models import Parliamentarian
     from onegov.parliament.models import ParliamentaryGroup
 
-Role: TypeAlias = Literal[
+type Role = Literal[
     'none',
     'member',
     'vote_counter',
@@ -26,7 +26,7 @@ Role: TypeAlias = Literal[
     'president',
 ]
 
-PartyRole: TypeAlias = Literal[
+type PartyRole = Literal[
     'none',
     'member',
     'media_manager',
@@ -35,7 +35,7 @@ PartyRole: TypeAlias = Literal[
     'president',
 ]
 
-ParliamentaryGroupRole: TypeAlias = Literal[
+type ParliamentaryGroupRole = Literal[
     'none',
     'member',
     'vote_counter',

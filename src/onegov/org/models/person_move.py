@@ -6,7 +6,7 @@ from onegov.form import FormDefinition
 from onegov.reservation import Resource
 
 
-from typing import Any, Generic, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm.abstract import MoveDirection
     from onegov.org.models import (  # noqa: F401
@@ -18,16 +18,13 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-_OwnerT = TypeVar('_OwnerT', bound='PersonLinkExtension')
-
-
-class PersonMove(Generic[_OwnerT]):
+class PersonMove[OwnerT: PersonLinkExtension]:
     """ Represents a single move of a linked person. """
 
     def __init__(
         self,
         session: Session,
-        obj: _OwnerT,
+        obj: OwnerT,
         subject: str,
         target: str,
         direction: MoveDirection

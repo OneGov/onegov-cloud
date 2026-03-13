@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from decimal import Decimal
     from onegov.core.orm import Base
     from onegov.pay.models import Payable, PayableManyTimes
-    from typing import type_check_only, Protocol, TypeAlias, TypedDict
+    from typing import type_check_only, Protocol, TypedDict
 
     class PriceDict(TypedDict):
         amount: float
@@ -29,8 +29,8 @@ if TYPE_CHECKING:
     class PayableManyTimesBase(Base, PayableManyTimes):
         pass
 
-    AnyPayableBase: TypeAlias = PayableBase | PayableManyTimesBase
+    type AnyPayableBase = PayableBase | PayableManyTimesBase
 
-PaymentMethod: TypeAlias = Literal['free', 'cc', 'manual']
-PaymentState: TypeAlias = Literal[
+type PaymentMethod = Literal['free', 'cc', 'manual']
+type PaymentState = Literal[
 'open', 'paid', 'failed', 'cancelled', 'invoiced']

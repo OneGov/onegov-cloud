@@ -19,8 +19,8 @@ from onegov.org.models.form import submission_deletable
 from webob import exc
 from webob import Response
 
-from typing import TypeVar, TYPE_CHECKING
 
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.layout import Layout
@@ -28,8 +28,6 @@ if TYPE_CHECKING:
     from onegov.form import Form, FormSubmission
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Session
-
-    FormDefinitionT = TypeVar('FormDefinitionT', bound=FormDefinition)
 
 
 FORMCODE_PROMPT = """\
@@ -111,11 +109,11 @@ def get_hints(
                 })
 
 
-def handle_form_change_name(
-    form: FormDefinitionT,
+def handle_form_change_name[T: FormDefinition](
+    form: T,
     session: Session,
     new_name: str
-) -> FormDefinitionT:
+) -> T:
 
     new_form = form.for_new_name(new_name)
     session.add(new_form)

@@ -21,17 +21,13 @@ from operator import attrgetter, itemgetter
 from sedate import standardize_date, utcnow
 from sqlalchemy import asc, desc, select, nullslast
 
-from typing import (
-    overload, Any, Generic, Literal, NamedTuple, TypeVar, TYPE_CHECKING)
+from typing import overload, Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from sqlalchemy.engine import Result
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import Select
     from typing import Self
-
-    _T = TypeVar('_T')
-    _RowT = TypeVar('_RowT')
 
     class IdRow(NamedTuple):
         id: str
@@ -47,16 +43,13 @@ if TYPE_CHECKING:
         content_type: str
 
 
-FileT = TypeVar('FileT', bound=File)
-
-
 class DateInterval(NamedTuple):
     name: str
     start: datetime
     end: datetime
 
 
-class GroupFilesByDateMixin(Generic[FileT]):
+class GroupFilesByDateMixin[FileT: File]:
 
     if TYPE_CHECKING:
         @property
@@ -124,29 +117,29 @@ class GroupFilesByDateMixin(Generic[FileT]):
             end=older_end)
 
     @overload
-    def query_intervals(
+    def query_intervals[T, RowT](
         self,
         intervals: Iterable[DateInterval],
-        before_filter: Callable[[Query[FileT]], Query[_RowT]],
-        process: Callable[[_RowT], _T]
-    ) -> Iterator[tuple[str, _T]]: ...
+        before_filter: Callable[[Query[FileT]], Query[RowT]],
+        process: Callable[[RowT], T]
+    ) -> Iterator[tuple[str, T]]: ...
 
     @overload
-    def query_intervals(
+    def query_intervals[T](
         self,
         intervals: Iterable[DateInterval],
         before_filter: None,
-        process: Callable[[FileT], _T]
-    ) -> Iterator[tuple[str, _T]]: ...
+        process: Callable[[FileT], T]
+    ) -> Iterator[tuple[str, T]]: ...
 
     @overload
-    def query_intervals(
+    def query_intervals[T](
         self,
         intervals: Iterable[DateInterval],
         before_filter: None = None,
         *,
-        process: Callable[[FileT], _T]
-    ) -> Iterator[tuple[str, _T]]: ...
+        process: Callable[[FileT], T]
+    ) -> Iterator[tuple[str, T]]: ...
 
     @overload
     def query_intervals(
@@ -421,7 +414,7 @@ class GeneralFileCollection(
             return get_first_character(record)
 
 
-class BaseImageFileCollection(
+class BaseImageFileCollection[FileT: File](
     FileCollection[FileT],
     GroupFilesByDateMixin[FileT]
 ):

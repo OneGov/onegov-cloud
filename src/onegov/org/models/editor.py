@@ -4,15 +4,15 @@ from __future__ import annotations
 
 from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import TypeAlias, TypeGuard
+    from typing import TypeGuard
 
     from .traitinfo import TraitInfo
 
-    PageActionWithoutPage: TypeAlias = Literal['new', 'new-root']
-    PageActionWithPage: TypeAlias = Literal[
+    type PageActionWithoutPage = Literal['new', 'new-root']
+    type PageActionWithPage = Literal[
         'edit', 'delete', 'paste', 'change-url', 'sort', 'move'
     ]
-    PageAction: TypeAlias = PageActionWithoutPage | PageActionWithPage
+    type PageAction = PageActionWithoutPage | PageActionWithPage
 
 
 class Editor:

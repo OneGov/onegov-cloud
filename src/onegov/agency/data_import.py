@@ -17,8 +17,6 @@ from onegov.core.utils import linkify
 
 
 from typing import Any
-from typing import TypeVar
-from typing import TypeVarTuple
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
@@ -33,11 +31,8 @@ if TYPE_CHECKING:
     from onegov.people import AgencyMembership
     from sqlalchemy.orm import Session
 
-T = TypeVar('T')
-Ts = TypeVarTuple('Ts')
 
-
-def with_open(
+def with_open[*Ts, T](
     func: Callable[[CSVFile[DefaultRow], *Ts], T]
 ) -> Callable[[StrOrBytesPath, *Ts], T]:
 
@@ -59,7 +54,7 @@ def v_(string: str | None) -> str | None:
     return string.strip()
 
 
-def cleaned(
+def cleaned[T](
     func: Callable[[str], T]
 ) -> Callable[[str | None], T | None]:
 
