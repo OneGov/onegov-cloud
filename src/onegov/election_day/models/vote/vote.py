@@ -229,6 +229,9 @@ class Vote(
     #: the total eligible voters
     eligible_voters = summarized_property('eligible_voters')
 
+    #: the total cast ballots (uses received when available)
+    cast_ballots = summarized_property('cast_ballots')
+
     #: the total expats
     expats = summarized_property('expats')
 
