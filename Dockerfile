@@ -89,7 +89,7 @@ COPY .git /app/.git
 WORKDIR /app
 RUN git rev-parse --short HEAD > .commit \
     && git rev-parse HEAD > .commit-long \
-    && python3 -m venv . > /dev/null \
+    && python3.12 -m venv . > /dev/null \
     && mkdir -p /var/cache/wheels \
     && mkdir -p /var/cache/pip \
     && bin/pip install --cache-dir /var/cache/pip --upgrade pip setuptools wheel --quiet \
