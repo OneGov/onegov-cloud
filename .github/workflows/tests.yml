@@ -81,8 +81,6 @@ jobs:
         source .venv/bin/activate
         uv pip compile setup.cfg -U \
         | uv pip install .[mypy,lint] -r /dev/stdin
-        # TEMPORARY: Uninstall types-urllib3, since we don't use v1
-        uv pip uninstall types-urllib3
 
     - name: Linting
       run: |
