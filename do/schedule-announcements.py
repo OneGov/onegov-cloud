@@ -94,18 +94,17 @@ def schedule_rollout_announcements(
     and manually confirm with y/n for each server.
 
     :param dry_run: run the command without actually scheduling the
-    announcements and sending out emails
+    announcements and sending out emails\n
+    :param select: only schedule announcements for the specified nodes\n
+    :param unselect: schedule announcements for all nodes except the
+    specified ones
 
-    Examples:
-      python3 do/schedule-rollout-announcements.py --help
-      python3 do/schedule-rollout-announcements.py --dry-run
-      python3 do/schedule-rollout-announcements.py
-
-      only schedule nodes A and B:
-      python3 do/schedule-rollout-announcements.py --select A --select B
-
-      schedule all except nodes C and D:
-      python3 do/schedule-rollout-announcements.py --unselect C --unselect D
+    Examples:\n
+      python3 do/schedule-rollout-announcements.py --help\n
+      python3 do/schedule-rollout-announcements.py --dry-run\n
+      python3 do/schedule-rollout-announcements.py\n
+      python3 do/schedule-rollout-announcements.py --select A --select B\n
+      python3 do/schedule-rollout-announcements.py --unselect C --unselect D\n
     """
 
     try:
