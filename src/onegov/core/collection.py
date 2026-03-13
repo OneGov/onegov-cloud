@@ -7,7 +7,7 @@ from sqlalchemy import func, literal_column, or_
 from sqlalchemy.inspection import inspect
 
 
-from typing import Any, Generic, Literal, TypeVar, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsItems
     from abc import abstractmethod
@@ -16,14 +16,13 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import DeclarativeBase, Query, Session
     from typing import Protocol
     from typing import Self
-    from typing import TypeAlias
     from uuid import UUID
 
     # TODO: Maybe PKType should be generic as well? Or if we always
     #       use the same kind of primary key, then we can reduce
     #       this type union to something more specific
-    PKType: TypeAlias = UUID | str | int
-    TextColumn: TypeAlias = ColumnElement[str] | ColumnElement[str | None]
+    type PKType = UUID | str | int
+    type TextColumn = ColumnElement[str] | ColumnElement[str | None]
 
     # NOTE: To avoid referencing onegov.form from onegov.core and
     #       introducing a cross-dependency, we use a Protocol to
@@ -34,16 +33,13 @@ if TYPE_CHECKING:
         def get_useful_data(self) -> SupportsItems[str, Any]: ...
 
 
-_M = TypeVar('_M', bound='DeclarativeBase')
-
-
-class GenericCollection(Generic[_M]):
+class GenericCollection[M: DeclarativeBase]:
 
     def __init__(self, session: Session, **kwargs: Any):
         self.session = session
 
     @property
-    def model_class(self) -> type[_M]:
+    def model_class(self) -> type[M]:
         raise NotImplementedError
 
     @cached_property
@@ -54,13 +50,13 @@ class GenericCollection(Generic[_M]):
     ):
         return inspect(self.model_class).primary_key[0]
 
-    def query(self) -> Query[_M]:
+    def query(self) -> Query[M]:
         return self.session.query(self.model_class)
 
-    def by_id(self, id: PKType) -> _M | None:
+    def by_id(self, id: PKType) -> M | None:
         return self.query().filter(self.primary_key == id).first()
 
-    def by_ids(self, ids: Collection[PKType]) -> list[_M]:
+    def by_ids(self, ids: Collection[PKType]) -> list[M]:
         return self.query().filter(
             self.primary_key.in_(ids)
         ).all() if ids else []
@@ -70,7 +66,7 @@ class GenericCollection(Generic[_M]):
     #       subclasses also set kwargs to Never at that point
     #       so we get an error if we use an argument that doesn't
     #       exist for the given model
-    def add(self, **kwargs: Any) -> _M:
+    def add(self, **kwargs: Any) -> M:
         item = self.model_class(**kwargs)
 
         self.session.add(item)
@@ -82,7 +78,7 @@ class GenericCollection(Generic[_M]):
         self,
         form: _FormThatSupportsGetUsefulData,
         properties: Iterable[str] | None = None
-    ) -> _M:
+    ) -> M:
 
         cls = self.model_class
         return self.add(**{
@@ -93,12 +89,12 @@ class GenericCollection(Generic[_M]):
             k: getattr(form, k) for k in properties or ()
         })
 
-    def delete(self, item: _M) -> None:
+    def delete(self, item: M) -> None:
         self.session.delete(item)
         self.session.flush()
 
 
-class SearcheableCollection(GenericCollection[_M]):
+class SearcheableCollection[M: DeclarativeBase](GenericCollection[M]):
 
     """
     Requires a self.locale and self.term
@@ -200,7 +196,7 @@ class SearcheableCollection(GenericCollection[_M]):
             for col in self.term_filter_cols
         )
 
-    def query(self) -> Query[_M]:
+    def query(self) -> Query[M]:
         if not self.term or not self.locale:
             return super().query()
         return super().query().filter(or_(*self.term_filter))
@@ -210,7 +206,7 @@ class SearcheableCollection(GenericCollection[_M]):
 #        and what's a mixin and how we use it downstream, we should
 #        probably try to clean that up a bit, so we always do it the
 #        same way...
-class Pagination(Generic[_M]):
+class Pagination[M: DeclarativeBase]:
     """ Provides collections with pagination, if they implement a few
     documented properties and methods.
 
@@ -231,7 +227,7 @@ class Pagination(Generic[_M]):
         """
         raise NotImplementedError
 
-    def subset(self) -> Query[_M]:
+    def subset(self) -> Query[M]:
         """ Returns an SQLAlchemy query containing all records that should
         be considered for pagination.
 
@@ -239,7 +235,7 @@ class Pagination(Generic[_M]):
         raise NotImplementedError
 
     @cached_property
-    def cached_subset(self) -> Query[_M]:
+    def cached_subset(self) -> Query[M]:
         return self.subset()
 
     if TYPE_CHECKING:
@@ -261,7 +257,7 @@ class Pagination(Generic[_M]):
         """
         raise NotImplementedError
 
-    def transform_batch_query(self, query: Query[_M]) -> Query[_M]:
+    def transform_batch_query(self, query: Query[M]) -> Query[M]:
         """ Allows subclasses to transform the given query before it is
         used to retrieve the batch. This is a good place to add additional
         loading that should only apply to the batch (say joining other
@@ -281,7 +277,7 @@ class Pagination(Generic[_M]):
         return self.cached_subset.order_by(None).count()
 
     @cached_property
-    def batch(self) -> tuple[_M, ...]:
+    def batch(self) -> tuple[M, ...]:
         """ Returns the elements on the current page. """
         query = self.cached_subset.slice(
             self.offset, self.offset + self.batch_size
@@ -327,7 +323,7 @@ class Pagination(Generic[_M]):
         return None
 
 
-class RangedPagination(Generic[_M]):
+class RangedPagination[M: DeclarativeBase]:
     """ Provides a pagination that supports loading multiple pages at once.
 
     This is useful in a context where a single button is used to 'load more'
@@ -343,7 +339,7 @@ class RangedPagination(Generic[_M]):
     # may be clipped by using `limit_range`.
     range_limit = 5
 
-    def subset(self) -> Query[_M]:
+    def subset(self) -> Query[M]:
         """ Returns an SQLAlchemy query containing all records that should
         be considered for pagination.
 
@@ -351,7 +347,7 @@ class RangedPagination(Generic[_M]):
         raise NotImplementedError
 
     @cached_property
-    def cached_subset(self) -> Query[_M]:
+    def cached_subset(self) -> Query[M]:
         return self.subset()
 
     @property
@@ -397,7 +393,7 @@ class RangedPagination(Generic[_M]):
 
         return (s, e)
 
-    def transform_batch_query(self, query: Query[_M]) -> Query[_M]:
+    def transform_batch_query(self, query: Query[M]) -> Query[M]:
         """ Allows subclasses to transform the given query before it is
         used to retrieve the batch. This is a good place to add additional
         loading that should only apply to the batch (say joining other
@@ -417,7 +413,7 @@ class RangedPagination(Generic[_M]):
         return self.cached_subset.order_by(None).count()
 
     @cached_property
-    def batch(self) -> tuple[_M, ...]:
+    def batch(self) -> tuple[M, ...]:
         """ Returns the elements on the current page range. """
         s, e = self.page_range
 

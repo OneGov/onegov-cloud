@@ -39,10 +39,9 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from genshi.core import StreamEventKind
-    from typing import TypeAlias
 
-    Position: TypeAlias = tuple[str | None, int, int]
-    StreamEvent: TypeAlias = tuple[StreamEventKind, Any, Position]
+    type Position = tuple[str | None, int, int]
+    type StreamEvent = tuple[StreamEventKind, Any, Position]
 
 
 _leading_space_re = re.compile(r'^(\s+)')

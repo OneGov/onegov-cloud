@@ -23,9 +23,6 @@ if TYPE_CHECKING:
     from onegov.agency.models import ExtendedPerson
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
-    from typing import TypeVar
-
-    T = TypeVar('T')
 
 
 UPDATE_FILTER_PARAMS = frozenset((
@@ -37,7 +34,7 @@ UPDATE_FILTER_PARAMS = frozenset((
 ))
 
 
-def filter_for_updated(
+def filter_for_updated[T](
     filter_operation: str,
     filter_value: str | None,
     result: T

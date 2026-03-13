@@ -26,7 +26,8 @@ else:
     _P = TypeVar('_P', bound=Payment)
 
 
-class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
+# FIXME: Switch to PEP-695/PEP-696 after 3.13 upgrade
+class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):  # noqa: UP046
     """ Represents a payment provider. """
 
     __tablename__ = 'payment_providers'

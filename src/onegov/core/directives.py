@@ -10,7 +10,7 @@ from morepath.settings import SettingRegistry, SettingSection
 from onegov.core.utils import Bunch
 
 
-from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
+from typing import Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable, Mapping
@@ -19,11 +19,6 @@ if TYPE_CHECKING:
 
     from .analytics import AnalyticsProvider
     from .request import CoreRequest
-
-
-_T = TypeVar('_T')
-_FormT = TypeVar('_FormT', bound='Form')
-_RequestT = TypeVar('_RequestT', bound='CoreRequest')
 
 
 class HtmlHandleFormAction(HtmlAction):
@@ -55,13 +50,13 @@ class HtmlHandleFormAction(HtmlAction):
             return {}  # template variables
 
     """
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        form: type[Form] | Callable[[Any, _RequestT], type[Form]],
-        render: Callable[[Any, _RequestT], Response] | str | None = None,
+        form: type[Form] | Callable[[Any, RequestT], type[Form]],
+        render: Callable[[Any, RequestT], Response] | str | None = None,
         template: StrOrBytesPath | None = None,
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str | None = None,
         internal: bool = False,
         pass_model: bool = False,
@@ -72,9 +67,9 @@ class HtmlHandleFormAction(HtmlAction):
         super().__init__(model, render, template, load, permission, internal,
                          **predicates)
 
-    def perform(
+    def perform[RequestT: CoreRequest](
         self,
-        obj: Callable[[Any, _RequestT, Any], Any],
+        obj: Callable[[Any, RequestT, Any], Any],
         *args: Any,
         **kwargs: Any
     ) -> None:
@@ -101,11 +96,11 @@ class HtmlHandleFormAction(HtmlAction):
         self.predicates = predicates
 
 
-def fetch_form_class(
-    form_class: type[_FormT] | Callable[[Any, _RequestT], type[_FormT]],
+def fetch_form_class[FormT: Form, RequestT: CoreRequest](
+    form_class: type[FormT] | Callable[[Any, RequestT], type[FormT]],
     model: object,
-    request: _RequestT
-) -> type[_FormT]:
+    request: RequestT
+) -> type[FormT]:
     """ Given the form_class defined with the form action, together with
     model and request, this function returns the actual class to be used.
 
@@ -118,7 +113,7 @@ def fetch_form_class(
 
 
 def query_form_class(
-    request: _RequestT,
+    request: CoreRequest,
     model: object,
     name: str | None = None
 ) -> type[Form] | None:
@@ -151,11 +146,11 @@ def query_form_class(
     return None
 
 
-def wrap_with_generic_form_handler(
-    obj: Callable[[_T, _RequestT, _FormT], Any],
-    form_class: type[_FormT] | Callable[[_T, _RequestT], type[_FormT]],
+def wrap_with_generic_form_handler[T, RequestT: CoreRequest, FormT: Form](
+    obj: Callable[[T, RequestT, FormT], Any],
+    form_class: type[FormT] | Callable[[T, RequestT], type[FormT]],
     pass_model: bool,
-) -> Callable[[_T, _RequestT], Any]:
+) -> Callable[[T, RequestT], Any]:
     """ Wraps a view handler with generic form handling.
 
     This includes instantiating the form with translations/csrf protection
@@ -163,7 +158,7 @@ def wrap_with_generic_form_handler(
 
     """
 
-    def handle_form(self: _T, request: _RequestT) -> Any:
+    def handle_form(self: T, request: RequestT) -> Any:
 
         _class = fetch_form_class(form_class, self, request)
 

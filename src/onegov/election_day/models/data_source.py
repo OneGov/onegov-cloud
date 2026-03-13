@@ -20,10 +20,9 @@ from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
-    from typing import TypeAlias
 
 
-UploadType: TypeAlias = Literal['vote', 'proporz', 'majorz']
+type UploadType = Literal['vote', 'proporz', 'majorz']
 
 UPLOAD_TYPE_LABELS = (
     ('vote', _('Vote')),

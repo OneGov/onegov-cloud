@@ -432,27 +432,24 @@ from onegov.form.parser.grammar import video_url
 from onegov.form.utils import as_internal_id
 
 
-from typing import final, Any, ClassVar, Literal, Self, TypeVar, TYPE_CHECKING
+from typing import final, Any, ClassVar, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from onegov.form.types import PricingRules
     from onegov.form.utils import decimal_range
     from pyparsing import ParseResults
     from re import Pattern
-    from typing import TypeAlias
     from yaml.nodes import ScalarNode
 
     # tagged unions so we can type narrow by type field
-    BasicParsedField: TypeAlias = (
-        'PasswordField | EmailField | UrlField | VideoURLField | DateField | '
-        'DatetimeField | TimeField | StringField | TextAreaField | '
-        'CodeField | StdnumField | IntegerRangeField | '
-        'DecimalRangeField | RadioField | CheckboxField | ChipNrField'
+    type BasicParsedField = (
+        PasswordField | EmailField | UrlField | VideoURLField | DateField
+        | DatetimeField | TimeField | StringField | TextAreaField
+        | CodeField | StdnumField | IntegerRangeField | DecimalRangeField
+        | RadioField | CheckboxField | ChipNrField
     )
-    FileParsedField: TypeAlias = 'FileinputField | MultipleFileinputField'
-    ParsedField: TypeAlias = BasicParsedField | FileParsedField
-
-_FieldT = TypeVar('_FieldT', bound='ParsedField')
+    type FileParsedField = FileinputField | MultipleFileinputField
+    type ParsedField = BasicParsedField | FileParsedField
 
 
 # cache the parser elements
@@ -810,14 +807,14 @@ class Field:
         return self._human_id
 
     @classmethod
-    def create(  # type:ignore[misc]
-        cls: type[_FieldT],
+    def create[T: ParsedField](  # type:ignore[misc]
+        cls: type[T],
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> _FieldT:
+    ) -> T:
 
         return cls(  # type:ignore[return-value]
             label=identifier.label,
@@ -1103,14 +1100,14 @@ class FileinputBase:
     extensions: list[str]
 
     @classmethod
-    def create(  # type:ignore[misc]
-        cls: type[_FieldT],
+    def create[T: ParsedField](  # type:ignore[misc]
+        cls: type[T],
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> _FieldT:
+    ) -> T:
         return cls(  # type:ignore[return-value]
             label=identifier.label,
             required=identifier.required,
@@ -1137,14 +1134,14 @@ class OptionsField:
     discount: dict[str, float]
 
     @classmethod
-    def create(  # type:ignore[misc]
-        cls: type[_FieldT],
+    def create[T: ParsedField](  # type:ignore[misc]
+        cls: type[T],
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> _FieldT:
+    ) -> T:
 
         choices = [
             Choice(
@@ -1485,7 +1482,7 @@ def translate_to_yaml(
             yield '{indent}"{identifier}": \'{message}\''.format(
                 indent=indent + 2 * ' ',
                 identifier='field_help',
-                message=parse_result.message
+                message=escape_single(parse_result.message)
             )
             identifier_indent_stack = handle_indent_stack(
                 identifier_indent_stack, ix, len_indent, enable_edit_checks

@@ -46,12 +46,11 @@ if TYPE_CHECKING:
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import Mapped, Query, Session
     from typing import type_check_only
-    from typing import TypeAlias
     from uuid import UUID
     from wtforms import EmailField, Field, StringField, TextAreaField
 
-    ExtendedDirectorySearchWidget: TypeAlias = DirectorySearchWidget[
-        'ExtendedDirectoryEntry'
+    type ExtendedDirectorySearchWidget = DirectorySearchWidget[
+        ExtendedDirectoryEntry
     ]
 
     # we extend this manually with all the form extensions

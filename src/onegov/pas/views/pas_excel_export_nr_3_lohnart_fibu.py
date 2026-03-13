@@ -38,18 +38,18 @@ NEW_LOHNART_MAPPING = {
 }
 
 """
-Hier noch die Infos bezüglich den FibU-Konten:
-    3000.2 für Plenarsitzungen
-    3000.3 für Kommissionsitzungen & Aktenstudium
-    3000.3 amtlichen Missionen Kantonsratspräsidiums
+    FibU-Konten:
+    3000.20 für Plenarsitzungen
+    3000.30 für Kommissionsitzungen & Aktenstudium
+    3000.30 amtlichen Missionen Kantonsratspräsidiums
     3170.1 Fahr- und Verpflegungsspesen
 """
 
 FIBU_KONTEN_MAPPING = {
-    'plenary': '3000.2',
-    'commission': '3000.3',
-    'study': '3000.3',
-    'shortest': '3000.3',
+    'plenary': '3000.20',
+    'commission': '3000.30',
+    'study': '3000.30',
+    'shortest': '3000.30',
     # Note: 3170.1 for Fahr- und Verpflegungsspesen would need to be mapped
     # to a specific attendance type. But Spesen (expenses) not yet implemented
 }

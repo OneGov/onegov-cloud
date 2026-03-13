@@ -98,13 +98,10 @@ if TYPE_CHECKING:
     from onegov.ticket import Ticket
     from onegov.user import User, UserGroup
     from sedate.types import TzInfoOrName
-    from typing import TypeAlias, TypeVar
     from webob import Response
     from wtforms import Field
 
-    _T = TypeVar('_T')
-
-    AnyFormDefinitionOrCollection: TypeAlias = (
+    type AnyFormDefinitionOrCollection = (
         FormDefinition | FormCollection | SurveyCollection | SurveyDefinition
         | FormDocumentCollection | FormDocument)
 
@@ -871,7 +868,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
         """ Returns the breadcrumbs for the current page. """
         return [Link(_('Homepage'), self.homepage_url)]
 
-    def exclude_invisible(self, items: Iterable[_T]) -> Sequence[_T]:
+    def exclude_invisible[T](self, items: Iterable[T]) -> Sequence[T]:
         items = self.request.exclude_invisible(items)
         if not self.request.is_manager:
             return tuple(i for i in items if getattr(i, 'published', True))
@@ -1808,26 +1805,29 @@ class TicketLayout(DefaultLayout):
                 ))
 
             elif self.model.state == 'pending':
-                traits: Sequence[Trait] = ()
+                if self.model.handler_code != 'TRP':
+                    traits: Sequence[Trait] = ()
 
-                if self.model.handler.undecided:
-                    traits = (
-                        Block(
-                            _("This ticket can't be closed."),
-                            _(
-                                'This ticket requires a decision, but no '
-                                'decision has been made yet.'
+                    if self.model.handler.undecided:
+                        traits = (
+                            Block(
+                                _("This ticket can't be closed."),
+                                _(
+                                    'This ticket requires a decision, '
+                                    'but no decision has been made yet.'
+                                ),
+                                _('Cancel'),
                             ),
-                            _('Cancel')
-                        ),
-                    )
+                        )
 
-                links.append(Link(
-                    text=_('Close ticket'),
-                    url=self.request.link(self.model, 'close'),
-                    attrs={'class': ('ticket-button', 'ticket-close')},
-                    traits=traits
-                ))
+                    links.append(
+                        Link(
+                            text=_('Close ticket'),
+                            url=self.request.link(self.model, 'close'),
+                            attrs={'class': ('ticket-button', 'ticket-close')},
+                            traits=traits,
+                        )
+                    )
 
             elif self.model.state == 'closed':
                 links.append(Link(

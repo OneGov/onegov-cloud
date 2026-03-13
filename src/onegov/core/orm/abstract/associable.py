@@ -69,16 +69,13 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import backref, relationship, Mapped
 
 
-from typing import overload, Any, Literal, NamedTuple, TypeVar
+from typing import overload, Any, Literal, NamedTuple
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from .. import Base
 
-    Cardinality = Literal['one-to-many', 'one-to-one', 'many-to-many']
-
-
-_M = TypeVar('_M', bound='Associable')
+    type Cardinality = Literal['one-to-many', 'one-to-one', 'many-to-many']
 
 
 class RegisteredLink(NamedTuple):
@@ -94,8 +91,8 @@ class RegisteredLink(NamedTuple):
 
 
 @overload
-def associated(
-    associated_cls: type[_M],
+def associated[M: Associable](
+    associated_cls: type[M],
     attribute_name: str,
     cardinality: Literal['one-to-many', 'many-to-many'] = ...,
     *,
@@ -103,12 +100,12 @@ def associated(
     backref_suffix: str = ...,
     onupdate: str | None = ...,
     order_by: str | Literal[False] = ...
-) -> declared_attr[list[_M]]: ...
+) -> declared_attr[list[M]]: ...
 
 
 @overload
-def associated(
-    associated_cls: type[_M],
+def associated[M: Associable](
+    associated_cls: type[M],
     attribute_name: str,
     cardinality: Literal['one-to-one'],
     *,
@@ -116,12 +113,12 @@ def associated(
     backref_suffix: str = ...,
     onupdate: str | None = ...,
     order_by: str | Literal[False] = ...
-) -> declared_attr[_M | None]: ...
+) -> declared_attr[M | None]: ...
 
 
 @overload
-def associated(
-    associated_cls: type[_M],
+def associated[M: Associable](
+    associated_cls: type[M],
     attribute_name: str,
     cardinality: Cardinality = ...,
     *,
@@ -129,12 +126,12 @@ def associated(
     backref_suffix: str = ...,
     onupdate: str | None = ...,
     order_by: str | Literal[False] = ...
-) -> declared_attr[list[_M]]: ...
+) -> declared_attr[list[M]]: ...
 
 
 @overload
-def associated(
-    associated_cls: type[_M],
+def associated[M: Associable](
+    associated_cls: type[M],
     attribute_name: str,
     cardinality: Cardinality = ...,
     *,
@@ -142,11 +139,11 @@ def associated(
     backref_suffix: str = ...,
     onupdate: str | None = ...,
     order_by: str | Literal[False] = ...
-) -> declared_attr[_M | None]: ...
+) -> declared_attr[M | None]: ...
 
 
-def associated(
-    associated_cls: type[_M],
+def associated[M: Associable](
+    associated_cls: type[M],
     attribute_name: str,
     cardinality: Cardinality = 'one-to-many',
     uselist: Literal['auto'] | bool = 'auto',
@@ -208,7 +205,7 @@ def associated(
     if uselist == 'auto':
         uselist = not cardinality.endswith('to-one')
 
-    def descriptor(cls: type[Base]) -> Mapped[list[_M]] | Mapped[_M | None]:
+    def descriptor(cls: type[Base]) -> Mapped[list[M]] | Mapped[M | None]:
         # HACK: forms is one of the only tables which doesn't use id as
         #       its primary key, we probably should just use id everywhere
         #       consistently
