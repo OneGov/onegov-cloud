@@ -973,7 +973,6 @@ def test_price_submission_vat_not_set(client: Client[TestOrgApp]) -> None:
     expected_values = [
         'abbafan@swisscom.ch',
         '1',
-        'Stück(e)',
         'Totalbetrag',
         '128.00 CHF',
     ]
@@ -1017,7 +1016,6 @@ def test_price_submission_vat_set(client: Client[TestOrgApp]) -> None:
     expected_values = [
         'black@bear.ch',
         '1',
-        'Stück(e)',
         'Totalbetrag',
         '99.00 CHF'
     ]

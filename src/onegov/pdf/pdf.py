@@ -45,7 +45,7 @@ if TYPE_CHECKING:
     from reportlab.platypus.tables import _TableCommand
 
 
-TABLE_CELL_CHAR_LIMIT = 2000
+TABLE_CELL_CHAR_LIMIT = 4000
 
 
 class Pdf(PDFDocument):

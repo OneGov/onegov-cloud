@@ -18,12 +18,11 @@ from sqlalchemy.orm import Mapped
 from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import TypeAlias
 
     from onegov.parliament.models import CommissionMembership
 
 
-CommissionType: TypeAlias = Literal[
+type CommissionType = Literal[
     'normal',
     'intercantonal',
     'official',

@@ -30,15 +30,14 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Municipality
     from onegov.election_day.types import Gender
     from sqlalchemy.orm import Session
-    from typing import TypeAlias
     from xsdata_ech.e_ch_0252_2_0 import Delivery
     from xsdata_ech.e_ch_0252_2_0 import ElectedType
     from xsdata_ech.e_ch_0252_2_0 import ElectionResultType
     from xsdata_ech.e_ch_0252_2_0 import EventElectionInformationDeliveryType
     from xsdata_ech.e_ch_0252_2_0 import EventElectionResultDeliveryType
 
-    MajoralElected: TypeAlias = ElectedType.MajoralElection.ElectedCandidate
-    ProportionalElected: TypeAlias = (
+    type MajoralElected = ElectedType.MajoralElection.ElectedCandidate
+    type ProportionalElected = (
         ElectedType.ProportionalElection.ListType.ElectedCandidate)
 
 

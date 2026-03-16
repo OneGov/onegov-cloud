@@ -23,7 +23,7 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, DataRequired
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
@@ -41,8 +41,6 @@ if TYPE_CHECKING:
         raw_choice: object
         invert: bool
         choice: object
-
-_FormT = TypeVar('_FormT', bound='Form')
 
 
 class Form(BaseForm):
@@ -1066,7 +1064,7 @@ class Pricing:
 # TODO: We should create a mypy plugin that properly infers the return-type
 #       this will also take care of dynamic base class errors. For now we
 #       forward the type of the first form that was passed in
-def merge_forms(form: type[_FormT], /, *forms: type[Form]) -> type[_FormT]:
+def merge_forms[T: Form](form: type[T], /, *forms: type[Form]) -> type[T]:
     """ Takes a list of forms and merges them.
 
     In doing so, a new class is created which inherits from all the forms in
@@ -1100,10 +1098,10 @@ def merge_forms(form: type[_FormT], /, *forms: type[Form]) -> type[_FormT]:
     return enforce_order(MergedForm, fields_in_order)
 
 
-def enforce_order(
-    form_class: type[_FormT],
+def enforce_order[T: Form](
+    form_class: type[T],
     fields_in_order: Iterable[str]
-) -> type[_FormT]:
+) -> type[T]:
     """ Takes a list of fields used in a form_class and enforces the
     order of those fields.
 
@@ -1131,12 +1129,12 @@ def enforce_order(
     return EnforcedOrderForm
 
 
-def move_fields(
-    form_class: type[_FormT],
+def move_fields[T: Form](
+    form_class: type[T],
     fields: Collection[str],
     after: str | None = None,
     before: str | None = None,
-) -> type[_FormT]:
+) -> type[T]:
     """ Reorders the given fields (given by name) by inserting them directly
     after the given field.
 

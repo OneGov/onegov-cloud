@@ -22,11 +22,10 @@ from uuid import UUID
 from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import TypeAlias
 
     from onegov.town6.request import TownRequest
 
-Action: TypeAlias = Literal[
+type Action = Literal[
     'add',
     'edit',
     'delete'

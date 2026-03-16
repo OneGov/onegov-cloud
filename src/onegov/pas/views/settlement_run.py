@@ -52,17 +52,17 @@ from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
         generate_fibu_export_rows)
 
 
-from typing import Any, Literal, TypeAlias, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from datetime import date
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
 
-    SettlementDataRow: TypeAlias = tuple[
-        'date', PASParliamentarian, str, Decimal, Decimal, Decimal
+    type SettlementDataRow = tuple[
+        date, PASParliamentarian, str, Decimal, Decimal, Decimal
     ]
-    TotalRow: TypeAlias = tuple[
+    type TotalRow = tuple[
         str, Decimal, Decimal, Decimal, Decimal, Decimal
     ]
 

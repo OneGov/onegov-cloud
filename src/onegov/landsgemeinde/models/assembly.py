@@ -32,10 +32,9 @@ if TYPE_CHECKING:
     from onegov.file.models.file import File
     from onegov.landsgemeinde.request import LandsgemeindeRequest
     from translationstring import TranslationString
-    from typing import TypeAlias
 
 
-AssemblyState: TypeAlias = Literal[
+type AssemblyState = Literal[
     'draft', 'scheduled', 'ongoing', 'completed'
 ]
 

@@ -15,26 +15,22 @@ from onegov.user.errors import (
 from sqlalchemy import or_, exists, text
 
 
-from typing import overload, Any, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from onegov.core.request import CoreRequest
     from onegov.user import UserGroup
     from sqlalchemy.orm import Query, Session
-    from typing import Self
     from uuid import UUID
-
-
-_T = TypeVar('_T')
 
 
 MIN_PASSWORD_LENGTH = 10
 
 
 @overload
-def as_set(value: Iterable[_T]) -> set[_T]: ...
+def as_set[T](value: Iterable[T]) -> set[T]: ...
 @overload
-def as_set(value: _T) -> set[_T]: ...
+def as_set[T](value: T) -> set[T]: ...
 
 
 def as_set(value: Any) -> set[Any]:
@@ -49,9 +45,9 @@ def as_set(value: Any) -> set[Any]:
 
 
 @overload
-def as_dictionary_of_sets(
-    d: Mapping[str, _T | Iterable[_T] | None]
-) -> dict[str, set[_T]]: ...
+def as_dictionary_of_sets[T](
+    d: Mapping[str, T | Iterable[T] | None]
+) -> dict[str, set[T]]: ...
 
 
 @overload

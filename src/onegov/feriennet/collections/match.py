@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from onegov.activity.models import BookingPeriod, BookingPeriodMeta
     from sqlalchemy.orm import Session
     from sqlalchemy.sql import Subquery
-    from typing import Self, TypeAlias
+    from typing import Self
     from uuid import UUID
 
     class OccasionByStateRow(NamedTuple):
@@ -35,7 +35,7 @@ if TYPE_CHECKING:
         total_bookings: int
         period_id: UUID
 
-OccasionState: TypeAlias = Literal[
+type OccasionState = Literal[
     'cancelled',
     'overfull',
     'empty',

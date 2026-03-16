@@ -8,9 +8,9 @@ from sqlalchemy.orm import mapped_column, Mapped
 from uuid import uuid4, UUID
 
 
-from typing import Literal, TypeAlias
+from typing import Literal
 
-Medium: TypeAlias = Literal['phone', 'email', 'http']
+type Medium = Literal['phone', 'email', 'http']
 
 
 class GenericRecipient(Base, ContentMixin, TimestampMixin):
