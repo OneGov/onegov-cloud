@@ -198,9 +198,17 @@ def import_information_delivery(
             group.domain_of_influence, principal, entities
         )
         if not supported:
+            doi = group.domain_of_influence
+            doi_value = getattr(
+                doi.domain_of_influence_type, 'value', None
+            )
             errors.add(
                 FileImportError(
-                    _('Domain not supported'),
+                    _(
+                        'Domain not supported: ${doi_type}'
+                        ' (supported: CH, CT, BZ, MU, AN)',
+                        mapping={'doi_type': doi_value}
+                    ),
                     filename=group.election_group_identification
                 )
             )

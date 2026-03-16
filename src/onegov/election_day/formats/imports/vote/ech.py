@@ -133,9 +133,17 @@ def import_votes_ech(
                 vote_info.vote.domain_of_influence, principal, entities
             )
             if not supported:
+                doi = vote_info.vote.domain_of_influence
+                doi_value = getattr(
+                    doi.domain_of_influence_type, 'value', None
+                )
                 errors.append(
                     FileImportError(
-                        _('Domain not supported'),
+                        _(
+                            'Domain not supported: ${doi_type}'
+                            ' (supported: CH, CT, BZ, MU, AN)',
+                            mapping={'doi_type': doi_value}
+                        ),
                         filename=identification
                     )
                 )
