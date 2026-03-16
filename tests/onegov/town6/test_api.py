@@ -4,7 +4,7 @@ import pytest
 
 from typing import Any
 from unittest.mock import MagicMock, patch
-from collection_json import Collection
+from collection_json import Collection  # type: ignore[import-untyped]
 from freezegun import freeze_time
 
 from onegov.town6 import TownApp
