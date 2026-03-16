@@ -24,6 +24,7 @@ h4,
 h5,
 h6 {
     @include prefix(hyphens, auto);
+    color: $body-font-color;
 }
 
 /*
@@ -433,6 +434,11 @@ $modal-padding-md: 70px;
         -webkit-transform: rotate(180deg);
         transform: rotate(180deg);
     }
+}
+
+.newsletter label {
+    font-size: 2rem;
+    font-weight: bold;
 }
 
 // .right-off-canvas-menu {

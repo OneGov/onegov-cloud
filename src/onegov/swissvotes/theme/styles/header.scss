@@ -41,11 +41,14 @@ header {
 
         li {
             border-bottom: 3px solid transparent;
+            border-top: 1px solid transparent;
             font-size: .875rem;
             padding: .5rem 0;
+            padding-bottom: calc(.5rem - 3px);
 
-            &:not(.has-dropdown):hover {
-                border-bottom: 3px solid $primary-color;
+
+            &:not(.has-form) a:not(.button) {
+                line-height: inherit;
             }
 
             a {
@@ -57,11 +60,32 @@ header {
             border: 1px solid $primary-color;
             border-bottom: 0;
             border-right: 0;
-            padding: 0;
+            padding-bottom: .5rem;
 
+            &:hover {
+                border-bottom: 0 !important;
+            }
 
             li {
                 padding: 0;
+
+                &:hover {
+                    border-bottom: 0;
+                }
+            }
+
+            .dropdown {
+                margin-top: .5rem;
+                margin-left: -.5px;
+
+                li {
+                    padding: .5rem 0 !important;
+                    border-bottom: 3px solid transparent;
+
+                    &:hover {
+                        border-bottom: 3px solid $primary-color;
+                    }
+                }
             }
         }
 
@@ -97,7 +121,6 @@ header {
 
         .main-navigation {
             background-color: transparent;
-            margin-bottom: .2rem;
             min-height: 3rem;
 
             .top-bar-section {
@@ -129,6 +152,7 @@ header {
 
     .top-header.mobile {
         background: $primary-color;
+
         * {
             color: $white;
         }
@@ -140,6 +164,7 @@ header {
 
     .top-bar {
         background-color: transparent;
+        height: auto;
 
         .top-bar-section {
             li {
