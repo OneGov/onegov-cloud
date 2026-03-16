@@ -1808,26 +1808,29 @@ class TicketLayout(DefaultLayout):
                 ))
 
             elif self.model.state == 'pending':
-                traits: Sequence[Trait] = ()
+                if self.model.handler_code != 'TRP':
+                    traits: Sequence[Trait] = ()
 
-                if self.model.handler.undecided:
-                    traits = (
-                        Block(
-                            _("This ticket can't be closed."),
-                            _(
-                                'This ticket requires a decision, but no '
-                                'decision has been made yet.'
+                    if self.model.handler.undecided:
+                        traits = (
+                            Block(
+                                _("This ticket can't be closed."),
+                                _(
+                                    'This ticket requires a decision, '
+                                    'but no decision has been made yet.'
+                                ),
+                                _('Cancel'),
                             ),
-                            _('Cancel')
-                        ),
-                    )
+                        )
 
-                links.append(Link(
-                    text=_('Close ticket'),
-                    url=self.request.link(self.model, 'close'),
-                    attrs={'class': ('ticket-button', 'ticket-close')},
-                    traits=traits
-                ))
+                    links.append(
+                        Link(
+                            text=_('Close ticket'),
+                            url=self.request.link(self.model, 'close'),
+                            attrs={'class': ('ticket-button', 'ticket-close')},
+                            traits=traits,
+                        )
+                    )
 
             elif self.model.state == 'closed':
                 links.append(Link(

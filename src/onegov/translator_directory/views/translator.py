@@ -4,7 +4,6 @@ from decimal import Decimal
 from io import BytesIO
 from onegov.file import File
 from morepath import redirect
-from sedate import replace_timezone
 from datetime import datetime
 from morepath.request import Response
 from sedate import utcnow
@@ -541,34 +540,6 @@ def add_time_report(
         session = request.session
         current_user = request.current_user
 
-        duration_hours = form.get_duration_hours()
-        duration_minutes = int(float(duration_hours) * 60)
-
-        hourly_rate = form.get_hourly_rate(self)
-        surcharge_types = form.get_surcharge_types()
-        travel_comp, travel_distance = form.calculate_travel_details(
-            self, request
-        )
-
-        start_dt, end_dt = form.get_datetime_range()
-        start_dt = replace_timezone(start_dt, 'Europe/Zurich')
-        end_dt = replace_timezone(end_dt, 'Europe/Zurich')
-
-        # Calculate break time in minutes
-        break_minutes = 0
-        if form.break_time.data:
-            break_minutes = (
-                form.break_time.data.hour * 60 + form.break_time.data.minute
-            )
-
-        # Calculate night hours (in minutes)
-        night_hours = form.calculate_night_hours()
-        night_minutes = int(float(night_hours) * 60)
-
-        # Calculate weekend/holiday hours
-        weekend_holiday_hours = form.calculate_weekend_holiday_hours()
-        weekend_holiday_minutes = int(float(weekend_holiday_hours) * 60)
-
         try:
             accountant_emails = set(
                 get_accountant_emails_for_finanzstelle(
@@ -579,43 +550,12 @@ def add_time_report(
             request.warning(str(e))
             return redirect(request.link(self))
 
-        # Create report with all fields except total_compensation
-        assert form.assignment_type.data is not None
-
-        if form.assignment_type.data == 'on-site':
-            location = (
-                form.assignment_location_override.data
-                or form.assignment_location.data
-            )
-        else:
-            location = None
-
         report = TranslatorTimeReport(
             translator=self,
             created_by=current_user,
-            assignment_type=form.assignment_type.data,
-            assignment_location=location,
-            finanzstelle=form.finanzstelle.data,
-            duration=duration_minutes,
-            break_time=break_minutes,
-            night_minutes=night_minutes,
-            weekend_holiday_minutes=weekend_holiday_minutes,
-            case_number=form.case_number.data or None,
-            assignment_date=start_dt.date(),
-            start=start_dt,
-            end=end_dt,
-            hourly_rate=hourly_rate,
-            surcharge_types=surcharge_types if surcharge_types else None,
-            travel_compensation=travel_comp,
-            travel_distance=travel_distance,
-            # Temporary, will be calculated next
             total_compensation=Decimal('0'),
-            notes=form.notes.data or None,
         )
-
-        # Use centralized calculation from model
-        breakdown = report.calculate_compensation_breakdown()
-        report.total_compensation = breakdown['total']
+        form.update_model(report)
         session.add(report)
         session.flush()
 

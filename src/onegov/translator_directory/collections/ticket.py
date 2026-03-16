@@ -28,7 +28,9 @@ class TimeReportTicketFilterMixin:
         self, query: Query[Ticket]
     ) -> Query[Ticket]:
         """Filter TimeReportTickets by finanzstelle, leave other tickets
-        unaffected.
+        unaffected. Applies to all users including admins: if a user belongs
+        to a finanzstelle group (as accountant or group member), they only
+        see tickets for that finanzstelle.
         """
         user_finanzstelles = []
         groups = (
@@ -37,13 +39,14 @@ class TimeReportTicketFilterMixin:
             .all()
         )
 
+        current_user = self.request.current_user
+        user_group_ids = {g.id for g in current_user.groups}
+
         for group in groups:
             accountant_emails = group.meta.get('accountant_emails', [])
-            if (
-                self.request
-                and self.request.current_user
-                and self.request.current_user.username in accountant_emails
-            ):
+            is_accountant = current_user.username in accountant_emails
+            in_group = group.id in user_group_ids
+            if is_accountant or in_group:
                 finanzstelle = group.meta.get('finanzstelle')
                 if finanzstelle:
                     user_finanzstelles.append(finanzstelle)

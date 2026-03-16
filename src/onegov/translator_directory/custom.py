@@ -144,18 +144,6 @@ def get_global_tools(
                     ),
                 ),
             )
-        elif request.is_accountant:
-            yield LinkGroup(
-                _('Management'),
-                classes=('management',),
-                links=(
-                    Link(
-                        _('Time Reports'),
-                        request.class_link(TimeReportCollection),
-                        attrs={'class': 'time-reports'},
-                    ),
-                ),
-            )
 
         # Tickets
         if request.is_admin or request.is_editor:

@@ -1143,7 +1143,7 @@ def view_settlement_run_all_export(
                             '\n' in str_value):
                         str_value = f'"{str_value}"'
                     row_strings.append(str_value)
-            csv_string += ','.join(row_strings) + '\n'
+            csv_string += ';'.join(row_strings) + '\n'
 
         # Encode to bytes with BOM for Excel compatibility
         csv_bytes = '\ufeff'.encode('utf-8') + csv_string.encode('utf-8')

@@ -346,3 +346,14 @@ def add_export_tracking_to_time_reports(context: UpgradeContext) -> None:
             'translator_time_reports',
             Column('export_batch_id', UUID, nullable=True),
         )
+
+
+@upgrade_task('Add pages column to time reports')
+def add_pages_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'pages'):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column('pages', Integer, nullable=True),
+        )

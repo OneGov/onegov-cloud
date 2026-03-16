@@ -98,6 +98,8 @@ class TranslatorTimeReport(Base, TimestampMixin):
 
     notes: Mapped[str | None]
 
+    pages: Mapped[int | None]
+
     status: Mapped[TimeReportStatus] = mapped_column(
         Enum('pending', 'confirmed', name='time_report_status'),
         default='pending',
@@ -167,6 +169,24 @@ class TranslatorTimeReport(Base, TimestampMixin):
         - meal: Meal allowance
         - total: Final total compensation (including break deduction)
         """
+        if self.assignment_type == 'schriftlich':
+            total = Decimal(self.pages or 0) * self.hourly_rate
+            zero = Decimal('0')
+            return {
+                'day_pay': total,
+                'night_pay': zero,
+                'night_surcharge': zero,
+                'weekend_surcharge': zero,
+                'urgent_surcharge': zero,
+                'total_surcharges': zero,
+                'subtotal': total,
+                'break_deduction': zero,
+                'adjusted_subtotal': total,
+                'travel': zero,
+                'meal': zero,
+                'total': total,
+            }
+
         hourly_rate = self.hourly_rate
         total_hours = self.duration_hours
         night_hours = self.night_hours_decimal
@@ -238,6 +258,8 @@ class TranslatorTimeReport(Base, TimestampMixin):
     @property
     def meal_allowance(self) -> Decimal:
         """Return meal allowance if duration >= 6 hours."""
+        if self.assignment_type == 'schriftlich':
+            return Decimal('0')
         return Decimal('30.0') if self.duration_hours >= 6 else Decimal('0')
 
     @property

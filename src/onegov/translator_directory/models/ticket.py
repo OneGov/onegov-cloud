@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from functools import cached_property
 from markupsafe import Markup, escape
 from onegov.translator_directory.models.time_report import TranslatorTimeReport
@@ -327,11 +328,22 @@ class TimeReportHandler(Handler):
             "<dl class='field-display'>",
             f"<dt>{request.translate(_('Translator'))}</dt>",
             f'<dd>{translator_link}</dd>',
-            f"<dt>{request.translate(_('Time'))}</dt>",
-            f'<dd>{time_range}</dd>',
-            f"<dt>{request.translate(_('Assignment Date'))}</dt>",
-            f'<dd>{assignment_date_formatted}</dd>',
         ]
+
+        if report.assignment_type != 'schriftlich':
+            summary_parts.extend(
+                [
+                    f"<dt>{request.translate(_('Time'))}</dt>",
+                    f'<dd>{time_range}</dd>',
+                ]
+            )
+
+        summary_parts.extend(
+            [
+                f"<dt>{request.translate(_('Assignment Date'))}</dt>",
+                f'<dd>{assignment_date_formatted}</dd>',
+            ]
+        )
 
         # Display assignment location if available
         if report.assignment_location:
@@ -381,6 +393,26 @@ class TimeReportHandler(Handler):
                     f'<dd>{notes_html}</dd>',
                 ]
             )
+
+        if report.assignment_type == 'schriftlich':
+            pages = report.pages or 0
+            total = Decimal(pages) * report.hourly_rate
+            summary_parts.extend(
+                [
+                    f"<dt>{request.translate(_('Per-page rate'))}</dt>",
+                    f'<dd>{layout.format_currency(report.hourly_rate)}</dd>',
+                    f"<dt>{request.translate(_('Pages'))}</dt>",
+                    f'<dd>{pages}</dd>',
+                    (
+                        f"<dt><strong>{request.translate(_('Total'))}</strong>"
+                        f" ({layout.format_currency(report.hourly_rate)}"
+                        f" \u00d7 {pages})</dt>"
+                    ),
+                    f'<dd><strong>{layout.format_currency(total)}</strong></dd>',
+                    '</dl>',
+                ]
+            )
+            return Markup(''.join(summary_parts))  # nosec: B704
 
         summary_parts.extend(
             [

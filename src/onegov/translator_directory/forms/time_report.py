@@ -23,6 +23,7 @@ from onegov.translator_directory.models.translator import Translator
 from sedate import replace_timezone, to_timezone
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
+from wtforms.fields import IntegerField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
@@ -54,19 +55,14 @@ class TranslatorTimeReportForm(Form):
         depends_on=('assignment_type', 'on-site'),
     )
 
-    # Used only in edit mode - hidden when creating new reports
-    # If assignment_location_override is set, assignment_location
-    # should be ignored. This allows for the possibility of setting
-    # a location which differs from pre-determined set of possible
-    # locations.
+    # Only shown when assignment_location == 'other'. When set,
+    # the override is stored as assignment_location on the model
+    # instead of the dropdown key.
     assignment_location_override = StringField(
-        label=_('Location Override (manual entry)'),
+        label=_('Different place'),
         validators=[Optional()],
-        description=_(
-            'Enter a custom location address. Travel compensation '
-            'will be calculated based on the geocoded location. '
-            'Example: Beckenstube 1, 8200 Schaffhausen'
-        ),
+        description=_('Enter the address of the assignment location'),
+        depends_on=('assignment_location', 'other'),
     )
 
     finanzstelle = ChosenSelectField(
@@ -83,18 +79,18 @@ class TranslatorTimeReportForm(Form):
 
     start_time = TimeField(
         label=_('Start time'),
-        validators=[InputRequired()],
+        validators=[Optional()],
     )
 
     end_date = DateField(
         label=_('End date'),
-        validators=[InputRequired()],
+        validators=[Optional()],
         default=date.today,
     )
 
     end_time = TimeField(
         label=_('End time'),
-        validators=[InputRequired()],
+        validators=[Optional()],
     )
 
     break_time = TimeField(
@@ -103,13 +99,22 @@ class TranslatorTimeReportForm(Form):
         default=time(0, 0),
     )
 
+    pages = IntegerField(
+        label=_('Pages'),
+        validators=[Optional()],
+        depends_on=('assignment_type', 'schriftlich'),
+    )
+
     case_number = StringField(
         label=_('Case Number'),
         validators=[InputRequired()],
     )
 
     is_urgent = BooleanField(
-        label=_('Exceptionally urgent'),
+        label=_(
+            'Exceptionally urgent (only for assignments '
+            'with less than 4 hours advance notice)'
+        ),
         description=_('25% surcharge'),
         default=False,
     )
@@ -131,7 +136,23 @@ class TranslatorTimeReportForm(Form):
         if not field.data:
             raise ValidationError(_('Please select a location'))
 
+    def validate_pages(self, field: IntegerField) -> None:
+        if self.assignment_type.data != 'schriftlich':
+            return
+        if not field.data or field.data < 1:
+            raise ValidationError(_('This field is required'))
+
+    def validate_end_date(self, field: DateField) -> None:
+        if self.assignment_type.data == 'schriftlich':
+            return
+        if not field.data:
+            raise ValidationError(_('This field is required'))
+
     def validate_end_time(self, field: TimeField) -> None:
+        if self.assignment_type.data == 'schriftlich':
+            return
+        if not field.data:
+            raise ValidationError(_('This field is required'))
         if not all(
             [
                 self.start_date.data,
@@ -154,6 +175,10 @@ class TranslatorTimeReportForm(Form):
             raise ValidationError(_('End time must be after start time'))
 
     def validate_start_time(self, field: TimeField) -> None:
+        if self.assignment_type.data == 'schriftlich':
+            return
+        if not field.data:
+            raise ValidationError(_('This field is required'))
         if not all([self.start_date.data, field.data]):
             return
         if not hasattr(self, 'model'):
@@ -208,6 +233,14 @@ class TranslatorTimeReportForm(Form):
             for key, (name, _) in ASSIGNMENT_LOCATIONS.items()
         ]
         choices.insert(0, ('', ''))
+        choices.append(
+            (
+                'other',
+                self.request.translate(
+                    _('Other location (please enter address in next field)')
+                ),
+            )
+        )
         finanzstelle_choices = self.finanzstelle.choices = [
             (key, fs.name) for key, fs in FINANZSTELLE.items()
         ]
@@ -472,7 +505,11 @@ class TranslatorTimeReportForm(Form):
                     if location in ASSIGNMENT_LOCATIONS:
                         self.assignment_location.data = location
                     else:
+                        self.assignment_location.data = 'other'
                         self.assignment_location_override.data = location
+
+            if hasattr(obj, 'pages') and obj.pages is not None:
+                self.pages.data = obj.pages
 
     def get_surcharge_types(self) -> list[str]:
         """Get list of active surcharge types from form based on actual
@@ -552,6 +589,32 @@ class TranslatorTimeReportForm(Form):
 
     def update_model(self, model: TranslatorTimeReport) -> None:
         """Update the time report model with form data."""
+        assert self.assignment_type.data is not None
+        model.assignment_type = self.assignment_type.data
+        model.finanzstelle = self.finanzstelle.data
+        model.case_number = self.case_number.data or None
+        model.notes = self.notes.data or None
+        assert self.start_date.data is not None
+        model.assignment_date = self.start_date.data
+        model.hourly_rate = self.get_hourly_rate(model.translator)
+
+        if self.assignment_type.data == 'schriftlich':
+            # written has no date or time, as it only depends on pages
+            model.pages = self.pages.data
+            model.duration = 0
+            model.break_time = 0
+            model.night_minutes = 0
+            model.weekend_holiday_minutes = 0
+            model.assignment_location = None
+            model.start = None
+            model.end = None
+            model.surcharge_types = None
+            model.travel_compensation = Decimal('0')
+            model.travel_distance = None
+            breakdown = model.calculate_compensation_breakdown()
+            model.total_compensation = breakdown['total']
+            return
+
         assert self.start_date.data is not None
         assert self.start_time.data is not None
         assert self.end_date.data is not None
@@ -563,9 +626,9 @@ class TranslatorTimeReportForm(Form):
 
         # Only on-site has a location
         if self.assignment_type.data == 'on-site':
-            if self.assignment_location_override.data:
+            if self.assignment_location.data == 'other':
                 model.assignment_location = (
-                    self.assignment_location_override.data
+                    self.assignment_location_override.data or None
                 )
             else:
                 model.assignment_location = (
@@ -594,17 +657,10 @@ class TranslatorTimeReportForm(Form):
         weekend_holiday_hours = self.calculate_weekend_holiday_hours()
         model.weekend_holiday_minutes = int(float(weekend_holiday_hours) * 60)
 
-        model.case_number = self.case_number.data or None
-        model.assignment_date = self.start_date.data
-
         start_dt = datetime.combine(self.start_date.data, self.start_time.data)
         end_dt = datetime.combine(self.end_date.data, self.end_time.data)
         model.start = replace_timezone(start_dt, 'Europe/Zurich')
         model.end = replace_timezone(end_dt, 'Europe/Zurich')
-        model.notes = self.notes.data or None
-
-        hourly_rate = self.get_hourly_rate(model.translator)
-        model.hourly_rate = hourly_rate
 
         surcharge_types = self.get_surcharge_types()
         model.surcharge_types = surcharge_types if surcharge_types else None
