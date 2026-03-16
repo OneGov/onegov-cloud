@@ -4,7 +4,7 @@ import pytest
 
 from onegov.swissvotes.models import TranslatablePage
 from transaction import commit
-from webtest import TestApp as Client
+from .conftest import Client
 from webtest.forms import Upload
 
 

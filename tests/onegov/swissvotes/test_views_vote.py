@@ -10,7 +10,7 @@ from re import findall
 from tests.shared.utils import use_locale
 from transaction import commit
 from translationstring import TranslationString
-from webtest import TestApp as Client
+from .conftest import Client
 from webtest.forms import Upload
 
 

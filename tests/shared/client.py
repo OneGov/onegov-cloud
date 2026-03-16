@@ -43,7 +43,7 @@ EXTRACT_HREF = re.compile(
 
 
 class Client(TestApp[_AppT]):
-    skip_n_forms = 0
+    skip_n_forms = -1
     use_intercooler = False
 
     def spawn(self) -> Self:
@@ -141,7 +141,7 @@ class Client(TestApp[_AppT]):
         """
         bases: list[type[object]] = [GenericResponseExtension]
 
-        if self.skip_n_forms:
+        if self.skip_n_forms >= 0:
             bases.append(type(
                 "SkipNForms",
                 (SkipNFormsExtension, ),

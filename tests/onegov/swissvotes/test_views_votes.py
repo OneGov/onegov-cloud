@@ -11,7 +11,7 @@ from onegov.swissvotes.external_resources.posters import MfgPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import SwissVote
-from tests.shared import Client
+from .conftest import Client
 from transaction import commit
 from unittest.mock import patch
 from webtest.forms import Upload

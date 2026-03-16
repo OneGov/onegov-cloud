@@ -2,7 +2,12 @@ footer {
 
     .top-part {
         border-top: 1px solid $primary-color;
-        padding: 2rem 0;
+
+        > .columns {
+            padding: 2rem .9375rem;
+            border-bottom: 1px solid $primary-color;
+        }
+
         @media #{$medium-up} {
             display: flex;
             align-items: end;
