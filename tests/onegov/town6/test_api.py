@@ -128,17 +128,17 @@ def test_event_api(
 
         assert collection('/api/news').items
 
-        news = {
+        topics = {
             item.data[0].value: item.href
             for item in collection('/api/news').items
         }
 
-        assert set(news) == {
+        assert set(topics) == {
             'Wir haben eine neue Webseite!',
         }
 
-        articel = collection(news['Wir haben eine neue Webseite!']).items[0]
-        party_data = data(articel)
+        article = collection(topics['Wir haben eine neue Webseite!']).items[0]
+        party_data = data(article)
         assert party_data.pop('created') is not None
         assert party_data.pop('modified') is not None
         assert party_data == {
@@ -176,9 +176,46 @@ def test_event_api(
             'publication_end': None,
         }
 
-        assert links(articel) == {
+        assert links(article) == {
             'html': 'http://localhost/news/wir-haben-eine-neue-webseite',
             'image': None,
         }
 
     # topics
+    with freeze_time('2026-02-16 15:30'):
+        endpoints = collection('/api')
+        assert endpoints.queries[2].rel == 'topics'
+        assert endpoints.queries[2].href == 'http://localhost/api/topics?page=0'
+
+        assert collection('/api/topics').items
+
+        topics = {
+            item.data[0].value: item.href
+            for item in collection('/api/topics').items
+        }
+
+        assert set(topics) == {
+            'Kontakt',
+            'Organisation',
+            'Themen',
+        }
+
+        topic = collection('/api/topics').items[0]
+        topic_data = data(topic)
+        assert topic_data.pop('created') is not None
+        assert topic_data.pop('modified') is not None
+        assert topic_data.pop('text').startswith('<p>\n  Weit hinten')
+        assert topic_data == {
+            'title': 'Kontakt',
+            'lead': 'In diesem Bereich der Website wird beschrieben wie '
+                    'die Organisation zu erreichen ist.\n',
+            'publication_start': None,
+            'publication_end': None,
+        }
+
+        assert links(topic) == {
+            'html': 'http://localhost/topics/kontakt',
+            'image': None,
+            'parent': None
+        }
+
