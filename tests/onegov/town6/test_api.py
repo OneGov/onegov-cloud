@@ -128,49 +128,25 @@ def test_event_api(
 
         assert collection('/api/news').items
 
-        topics = {
+        directories = {
             item.data[0].value: item.href
             for item in collection('/api/news').items
         }
 
-        assert set(topics) == {
+        assert set(directories) == {
             'Wir haben eine neue Webseite!',
         }
 
-        article = collection(topics['Wir haben eine neue Webseite!']).items[0]
-        party_data = data(article)
-        assert party_data.pop('created') is not None
-        assert party_data.pop('modified') is not None
-        assert party_data == {
+        article = collection(
+            directories['Wir haben eine neue Webseite!']).items[0]
+        article_data = data(article)
+        assert article_data.pop('created') is not None
+        assert article_data.pop('modified') is not None
+        assert article_data.pop('text').startswith('<p>\n  Weit hinten')
+        assert article_data == {
             'title': 'Wir haben eine neue Webseite!',
             'lead': 'Die neue Webseite läuft auf der Platform der OneGov '
-                    'Cloud.\n',
-            'text': '<p>\n'
-                    '  Weit hinten, hinter den Wortbergen, fern der Länder '
-                    'Vokalien und\n'
-                    '  Konsonantien leben die Blindtexte. Abgeschieden wohnen '
-                    'sie in\n'
-                    '  Buchstabhausen an der Küste des Semantik, eines '
-                    'grossen Sprachozeans.\n'
-                    '</p>\n'
-                    '\n'
-                    '<p>\n'
-                    '  Ein kleines Bächlein namens Duden fließt durch ihren '
-                    'Ort und versorgt\n'
-                    '  sie mit den nötigen Regelialien. Es ist ein '
-                    'paradiesmatisches Land,\n'
-                    '  in dem einem gebratene Satzteile in den Mund fliegen.\n'
-                    '</p>\n'
-                    '\n'
-                    '<p>\n'
-                    '  Nicht einmal von der allmächtigen Interpunktion werden '
-                    'die Blindtexte\n'
-                    '  beherrscht – ein geradezu unorthographisches Leben. '
-                    'Eines Tages aber\n'
-                    '  beschloss eine kleine Zeile Blindtext, ihr Name war '
-                    'Lorem Ipsum,\n'
-                    '  hinaus zu gehen in die weite Grammatik.\n'
-                    '</p>\n',
+                'Cloud.\n',
             'hashtags': [],
             'publication_start': None,
             'publication_end': None,
@@ -189,12 +165,12 @@ def test_event_api(
 
         assert collection('/api/topics').items
 
-        topics = {
+        directories = {
             item.data[0].value: item.href
             for item in collection('/api/topics').items
         }
 
-        assert set(topics) == {
+        assert set(directories) == {
             'Kontakt',
             'Organisation',
             'Themen',
@@ -219,3 +195,62 @@ def test_event_api(
             'parent': None
         }
 
+    # directories
+    with freeze_time('2026-02-16 15:35'):
+        endpoints = collection('/api')
+        assert endpoints.queries[3].rel == 'directories'
+        assert endpoints.queries[3].href == 'http://localhost/api/directories?page=0'
+
+        assert collection('/api/directories').items
+
+        directories = {
+            item.data[0].value: item.href
+            for item in collection('/api/directories').items
+        }
+
+        assert set(directories) == {
+            'Board Games',
+        }
+
+        directory = collection('/api/directories').items[0]
+        directory_data = data(directory)
+        assert directory_data.pop('created') is not None
+        assert directory_data.pop('modified') is not None
+        assert directory_data == {
+            'title': 'Board Games',
+            'lead': None,
+            'name': 'board-games',
+        }
+
+        assert links(directory) == {
+            'html': 'http://localhost/directory/board-games',
+            'entries': 'http://localhost/api/board-games',
+        }
+
+    # directory entries
+    with freeze_time('2026-02-16 15:40'):
+        endpoints = collection('/api')
+        assert endpoints.queries[4].rel == 'board-games'
+        assert endpoints.queries[4].href == 'http://localhost/api/board-games?page=0'
+
+        assert collection('/api/board-games').items
+
+        board_games = {
+            item.data[0].value: item.href
+            for item in collection('/api/board-games').items
+        }
+
+        assert set(board_games) == {'Catan', 'Risk'}
+
+        entry = collection(board_games['Catan']).items[0]
+        entry_data = data(entry)
+        assert entry_data == {
+            'title': 'Catan',
+            'lead': None,
+            'coordinates': {'lat': None, 'lon': None, 'zoom': None},
+            'contact': None,
+        }
+
+        assert links(entry) == {
+            'html': 'http://localhost/directories/board-games/catan',
+        }

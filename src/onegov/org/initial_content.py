@@ -7,6 +7,8 @@ import yaml
 from datetime import datetime, timedelta
 from functools import lru_cache
 from onegov.core.utils import module_path
+from onegov.directory import DirectoryCollection
+from onegov.directory import DirectoryConfiguration
 from onegov.event import EventCollection
 from onegov.file import FileSetCollection, FileCollection
 from onegov.form import FormCollection
@@ -24,6 +26,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from libres.context.core import Context as LibresContext
     from onegov.org.app import OrgApp
+    from onegov.org.models.directory import ExtendedDirectory
     from sqlalchemy.orm import Session
     from translationstring import TranslationString
 
@@ -317,3 +320,35 @@ def add_events(
 
     event.submit()
     event.publish()
+
+
+def add_directories(session: Session) -> None:
+
+    directories: DirectoryCollection[ExtendedDirectory] = (
+        DirectoryCollection(session, type='extended'))
+
+    directory = directories.add(
+        title='Board Games',
+        structure="""
+            Title *= ___
+            Genre = ___
+            Year = 1900..2100
+        """,
+        configuration=DirectoryConfiguration(
+            title='[title]',
+            order=['Title', 'Year'],
+            keywords=['Title', 'Genre']
+        ),
+    )
+
+    directory.add(values={
+        'title': 'Catan',
+        'genre': 'Settling',
+        'year': 1995
+    })
+
+    directory.add(values={
+        'title': 'Risk',
+        'genre': 'Strategy',
+        'year': 1991
+    })

@@ -6,6 +6,7 @@ from copy import copy
 from datetime import timedelta
 from functools import cached_property
 from markupsafe import Markup
+from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm.mixins import (
     content_property, dict_markup_property, dict_property, meta_property)
 from onegov.core.utils import linkify
@@ -514,6 +515,33 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
 
         for submission in submissions:
             session.delete(submission)
+
+
+class ExtendedDirectoryCollection(
+    GenericCollection['ExtendedDirectory'],
+    Pagination['ExtendedDirectory']
+):
+
+    def __init__(self, session: Session, page: int = 0) -> None:
+        super().__init__(session)
+        self.page = page
+
+    @property
+    def model_class(self) -> type[ExtendedDirectory]:
+        return ExtendedDirectory
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, self.__class__) and other.page == self.page
+
+    def subset(self) -> Query[ExtendedDirectory]:
+        return self.query()
+
+    @property
+    def page_index(self) -> int:
+        return self.page
+
+    def page_by_index(self, index: int) -> ExtendedDirectoryCollection:
+        return self.__class__(self.session, page=index)
 
 
 class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,

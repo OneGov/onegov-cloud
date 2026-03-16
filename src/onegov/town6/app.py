@@ -16,7 +16,7 @@ from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.org.models.directory import ExtendedDirectory
 from onegov.town6.api import (
     EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint,
-    DirectoryEntryApiEndpoint)
+    DirectoryApiEndpoint, DirectoryEntryApiEndpoint)
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
 from onegov.town6.theme import TownTheme
@@ -237,6 +237,7 @@ def get_api_endpoints_handler(
         yield EventApiEndpoint(request, extra_parameters, page)
         yield NewsApiEndpoint(request, extra_parameters, page)
         yield TopicApiEndpoint(request, extra_parameters, page)
+        yield DirectoryApiEndpoint(request, extra_parameters, page)
         directories = request.exclude_invisible(
             request.session.query(ExtendedDirectory).all())
         for directory in directories:

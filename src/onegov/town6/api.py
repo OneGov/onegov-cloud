@@ -6,8 +6,9 @@ from onegov.event.collections import OccurrenceCollection
 from onegov.gis import Coordinates
 from onegov.org.models.directory import (
     ExtendedDirectory, ExtendedDirectoryEntry,
-    ExtendedDirectoryEntryCollection)
-from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
+    ExtendedDirectoryEntryCollection, ExtendedDirectoryCollection)
+from onegov.org.models.page import News, NewsCollection
+from onegov.org.models.page import Topic, TopicCollection
 from onegov.town6 import _
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -185,6 +186,43 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
             'parent': ApiEndpointItem(
                 self.request, self.endpoint, str(item.parent_id)
             ) if item.parent_id is not None else None,
+        }
+
+
+class DirectoryApiEndpoint(ApiEndpoint[ExtendedDirectory]):
+    request: TownRequest
+    app: TownApp
+    endpoint = 'directories'
+    filters = set()
+
+    @property
+    def title(self) -> str:
+        return self.request.translate(_('Directories'))
+
+    @property
+    def collection(self) -> Any:
+        result = ExtendedDirectoryCollection(
+            self.session,
+            page=self.page or 0,
+        )
+        result.batch_size = 25
+        return result
+
+    def item_data(self, item: ExtendedDirectory) -> dict[str, Any]:
+        return {
+            'title': item.title,
+            'lead': item.lead,
+            'name': item.name,
+            'created': item.created.isoformat(),
+            'modified': get_modified_iso_format(item),
+        }
+
+    def item_links(self, item: ExtendedDirectory) -> dict[str, Any]:
+        return {
+            'html': item,
+            'entries': DirectoryEntryApiEndpoint(
+                self.request, item.name
+            ),
         }
 
 

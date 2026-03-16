@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from onegov.core.utils import module_path
 from onegov.reservation import ResourceCollection
-from onegov.org.initial_content import add_builtin_forms
+from onegov.org.initial_content import add_builtin_forms, add_directories
 from onegov.org.initial_content import builtin_form_definitions
 from onegov.org.initial_content import add_filesets, add_pages, load_content
 from onegov.org.initial_content import add_events
@@ -68,6 +68,7 @@ def create_new_organisation(
     assert hasattr(app, 'libres_context')
     add_resources(app.libres_context)
     add_events(session, name, translate, create_files)
+    add_directories(session)
 
     if create_files:
         add_filesets(session, name, path)
