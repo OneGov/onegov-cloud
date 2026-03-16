@@ -1,7 +1,9 @@
-from typing import TYPE_CHECKING, Any
-from unittest.mock import MagicMock, patch
+from __future__ import annotations
 
 import pytest
+
+from typing import Any
+from unittest.mock import MagicMock, patch
 from collection_json import Collection
 from freezegun import freeze_time
 
@@ -72,6 +74,7 @@ def test_event_api(
     def links(item: Any) -> Any:
         return {x.rel: x.href for x in item.links}
 
+    # events
     with freeze_time('2026-02-16 15:20'):
         endpoints = collection('/api')
         assert endpoints.queries[0].rel == 'events'
@@ -116,3 +119,66 @@ def test_event_api(
             'image': None,
             'pdf': None
         }
+
+    # news
+    with freeze_time('2026-02-16 15:25'):
+        endpoints = collection('/api')
+        assert endpoints.queries[1].rel == 'news'
+        assert endpoints.queries[1].href == 'http://localhost/api/news?page=0'
+
+        assert collection('/api/news').items
+
+        news = {
+            item.data[0].value: item.href
+            for item in collection('/api/news').items
+        }
+
+        assert set(news) == {
+            'Wir haben eine neue Webseite!',
+        }
+
+        articel = collection(news['Wir haben eine neue Webseite!']).items[0]
+        party_data = data(articel)
+        assert party_data.pop('created') is not None
+        assert party_data.pop('modified') is not None
+        assert party_data == {
+            'title': 'Wir haben eine neue Webseite!',
+            'lead': 'Die neue Webseite läuft auf der Platform der OneGov '
+                    'Cloud.\n',
+            'text': '<p>\n'
+                    '  Weit hinten, hinter den Wortbergen, fern der Länder '
+                    'Vokalien und\n'
+                    '  Konsonantien leben die Blindtexte. Abgeschieden wohnen '
+                    'sie in\n'
+                    '  Buchstabhausen an der Küste des Semantik, eines '
+                    'grossen Sprachozeans.\n'
+                    '</p>\n'
+                    '\n'
+                    '<p>\n'
+                    '  Ein kleines Bächlein namens Duden fließt durch ihren '
+                    'Ort und versorgt\n'
+                    '  sie mit den nötigen Regelialien. Es ist ein '
+                    'paradiesmatisches Land,\n'
+                    '  in dem einem gebratene Satzteile in den Mund fliegen.\n'
+                    '</p>\n'
+                    '\n'
+                    '<p>\n'
+                    '  Nicht einmal von der allmächtigen Interpunktion werden '
+                    'die Blindtexte\n'
+                    '  beherrscht – ein geradezu unorthographisches Leben. '
+                    'Eines Tages aber\n'
+                    '  beschloss eine kleine Zeile Blindtext, ihr Name war '
+                    'Lorem Ipsum,\n'
+                    '  hinaus zu gehen in die weite Grammatik.\n'
+                    '</p>\n',
+            'hashtags': [],
+            'publication_start': None,
+            'publication_end': None,
+        }
+
+        assert links(articel) == {
+            'html': 'http://localhost/news/wir-haben-eine-neue-webseite',
+            'image': None,
+        }
+
+    # topics
