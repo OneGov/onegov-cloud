@@ -86,7 +86,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
         return {
             'html': item,
             'image': item.event.image,
-            'pfd': item.event.pdf
+            'pdf': item.event.pdf
         }
 
 
