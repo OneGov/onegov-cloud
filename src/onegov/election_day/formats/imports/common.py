@@ -561,5 +561,8 @@ def convert_ech_domain(
         return True, 'municipality', name
     if doi_type == 'AN':
         return True, 'none', ''
+    if doi_type == 'SK':
+        # TODO: add proper support for Stadtkreis (SK)
+        return True, 'none', ''
 
     return False, 'none', ''
