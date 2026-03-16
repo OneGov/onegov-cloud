@@ -335,9 +335,10 @@ def add_directories(session: Session) -> None:
             Year = 1900..2100
         """,
         configuration=DirectoryConfiguration(
-            title='[title]',
+            title='[Title]',
             order=['Title', 'Year'],
-            keywords=['Title', 'Genre']
+            keywords=['Title', 'Genre'],
+            searchable=['Title', 'Year', 'Genre']
         ),
     )
 
