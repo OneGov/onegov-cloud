@@ -3,15 +3,19 @@ from __future__ import annotations
 from io import BytesIO
 from onegov.election_day.formats import import_ech
 from onegov.election_day.models import Canton
-from xsdata_ech.e_ch_0155_5_0 import ElectionDescriptionInformationType
-from xsdata_ech.e_ch_0155_5_0 import TypeOfElectionType
+from xsdata_ech.e_ch_0155_5_2 import ElectionDescriptionInformationType
+from xsdata_ech.e_ch_0155_5_2 import TypeOfElectionType
 from xsdata_ech.e_ch_0252_2_0 import Delivery
 from xsdata_ech.e_ch_0252_2_0 import DomainOfInfluenceType
 from xsdata_ech.e_ch_0252_2_0 import DomainOfInfluenceTypeType
+from xsdata_ech.e_ch_0252_2_0 import (
+    ElectionAssociationDescriptionInformationType,
+)
 from xsdata_ech.e_ch_0252_2_0 import ElectionAssociationType
 from xsdata_ech.e_ch_0252_2_0 import ElectionGroupInfoType
 from xsdata_ech.e_ch_0252_2_0 import ElectionType
 from xsdata_ech.e_ch_0252_2_0 import EventElectionInformationDeliveryType
+from xsdata_ech.e_ch_0058_5_0 import HeaderType
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.models.datatype import XmlDate
@@ -32,22 +36,29 @@ def create_delivery(
     ElectionInfo = ElectionDesc.ElectionDescriptionInfo
 
     return Delivery(
+        delivery_header=HeaderType(),
         election_information_delivery=EventElectionInformationDeliveryType(
+            canton_id=9,
             polling_day=XmlDate(2023, 1, 1),
+            number_of_entries=len(elections),
             election_association=[
                 ElectionAssociationType(
                     election_association_id=identification,
-                    election_association_name=identification
+                    election_association_description=[
+                        ElectionAssociationDescriptionInformationType(
+                            language='de',
+                            election_association_description=identification
+                        )
+                    ]
                 ) for identification in compounds
             ],
             election_group_info=[
                 ElectionGroupInfoType(
                     election_group=ElectionGroup(
                         domain_of_influence=DomainOfInfluenceType(
-                            domain_of_influence_type=DomainOfInfluenceTypeType(
-                                DomainOfInfluenceTypeType.MU
-                            ),
-                            domain_of_influence_identification='1701'
+                            domain_of_influence_type=DomainOfInfluenceTypeType.MU,
+                            domain_of_influence_identification='1701',
+                            domain_of_influence_name='Test'
                         ),
                         election_information=[
                             ElectionGroup.ElectionInformation(

@@ -202,7 +202,12 @@ def import_votes_ech(
             ballot_result.received = None
             if (
                 circle_info.result_data
-                and circle_info.result_data.fully_counted_true
+                and (
+                    getattr(circle_info.result_data, 'is_fully_counted', None)
+                    or getattr(
+                        circle_info.result_data, 'fully_counted_true', None
+                    )
+                )
             ):
                 ballot_result.counted = True
                 result_data = circle_info.result_data

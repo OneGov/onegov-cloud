@@ -12,8 +12,12 @@ from onegov.core.errors import MissingColumnsError
 from onegov.election_day import _
 from onegov.election_day.models import Municipality
 from re import match
-from xsdata_ech.e_ch_0252_1_0 import DomainOfInfluenceType
-from xsdata_ech.e_ch_0252_1_0 import DomainOfInfluenceTypeType
+from xsdata_ech.e_ch_0155_5_0 import (  # noqa: TC002
+    DomainOfInfluenceType as DomainOfInfluenceTypeV1,
+)
+from xsdata_ech.e_ch_0155_5_2 import (  # noqa: TC002
+    DomainOfInfluenceType as DomainOfInfluenceTypeV2,
+)
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
 
@@ -521,7 +525,7 @@ def validate_color(line: DefaultRow, col: str) -> str:
 
 
 def convert_ech_domain(
-    domain: DomainOfInfluenceType,
+    domain: DomainOfInfluenceTypeV1 | DomainOfInfluenceTypeV2,
     principal: Canton | Municipality,
     entities: dict[int, dict[str, str]],
 ) -> tuple[bool, DomainOfInfluence, str]:
@@ -532,11 +536,12 @@ def convert_ech_domain(
     principal.
 
     """
-    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.CH:
+    doi_type = getattr(domain.domain_of_influence_type, 'value', None)
+    if doi_type == 'CH':
         return True, 'federation', ''
-    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.CT:
+    if doi_type == 'CT':
         return True, 'canton', ''
-    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.BZ:
+    if doi_type == 'BZ':
         # BZ might refer to different domains. This might be for example
         # DomainOfInfluenceMixin.region, DomainOfInfluenceMixin.district
         # or even a different domain we don't know (yet) - such as a court
@@ -546,7 +551,7 @@ def convert_ech_domain(
         # We therefore set the domain to "none" and rely on all the results
         # (one for each municipality) being present, even if not counted yet.
         return True, 'none', ''
-    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.MU:
+    if doi_type == 'MU':
         if isinstance(principal, Municipality):
             return True, 'municipality', ''
         assert domain.domain_of_influence_identification is not None
@@ -554,7 +559,7 @@ def convert_ech_domain(
             int(domain.domain_of_influence_identification), {}
         ).get('name', '')
         return True, 'municipality', name
-    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.AN:
+    if doi_type == 'AN':
         return True, 'none', ''
 
     return False, 'none', ''
