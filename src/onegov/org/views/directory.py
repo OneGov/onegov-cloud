@@ -9,6 +9,7 @@ from collections import defaultdict
 from decimal import Decimal
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private, Secret
+from onegov.core.utils import add_cors_header
 from onegov.core.templates import render_template
 from onegov.core.utils import render_file
 from onegov.directory import Directory
@@ -554,6 +555,10 @@ def view_geojson(
     self: ExtendedDirectoryEntryCollection,
     request: OrgRequest
 ) -> JSON_ro:
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
 
     q = self.query().with_entities(
         DirectoryEntry.id,

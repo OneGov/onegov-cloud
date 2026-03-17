@@ -8,6 +8,7 @@ from libres.db.models import ReservedSlot
 from libres.modules.errors import LibresError
 
 from onegov.core.security import Public, Private, Secret
+from onegov.core.utils import add_cors_header
 from onegov.core.utils import is_uuid
 from onegov.form import merge_forms
 from onegov.org import OrgApp, utils, _
@@ -62,6 +63,10 @@ def view_allocations_json(self: Resource, request: OrgRequest) -> JSON_ro:
     more information.
 
     """
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
 
     start, end = utils.parse_fullcalendar_request(request, self.timezone)
 

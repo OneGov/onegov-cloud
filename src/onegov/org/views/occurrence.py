@@ -7,6 +7,7 @@ from markupsafe import Markup
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Public, Private, Secret
+from onegov.core.utils import add_cors_header
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.form import as_internal_id
@@ -394,8 +395,8 @@ def json_export_occurences(
     """
 
     @request.after
-    def cors(response: BaseResponse) -> None:
-        response.headers.add('Access-Control-Allow-Origin', '*')
+    def add_headers(response: BaseResponse) -> None:
+        add_cors_header(response)
 
     query = self.for_filter(
         tags=request.params.getall('cat1'),  # type:ignore[arg-type]

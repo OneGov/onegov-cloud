@@ -16,6 +16,7 @@ from libres.modules.errors import LibresError
 from math import isclose
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
+from onegov.core.utils import add_cors_header
 from onegov.core.utils import module_path, Bunch
 from onegov.core.orm import as_selectable_from_path
 from onegov.form import as_internal_id, FormSubmission
@@ -808,6 +809,10 @@ def view_resources_json(
     request: OrgRequest
 ) -> JSON_ro:
 
+    @request.after
+    def add_headers(response: BaseResponse) -> None:
+        add_cors_header(response)
+
     view = request.GET.get('view', '')
     is_occupancy = view == 'occupancy'
     if is_occupancy and not request.is_logged_in:
@@ -1330,6 +1335,10 @@ def view_my_reservations_json(
     more information.
 
     """
+    @request.after
+    def add_headers(response: BaseResponse) -> None:
+        add_cors_header(response)
+
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
