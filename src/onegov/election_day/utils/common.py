@@ -63,11 +63,6 @@ def add_last_modified_header(
         )
 
 
-def add_cors_header(response: Response) -> None:
-    """ Adds a header allowing the response being used in scripts. """
-    response.headers.add('Access-Control-Allow-Origin', '*')
-
-
 def add_local_results(
     source: ArchivedResult,
     target: ArchivedResult,

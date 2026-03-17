@@ -1295,3 +1295,8 @@ def generate_fts_phonenumbers(numbers: Iterable[str | None]) -> list[str]:
                 result.append(partial)
 
     return result
+
+
+def add_cors_header(response: Response) -> None:
+    """ Adds a header allowing the response being used in scripts. """
+    response.headers.add('Access-Control-Allow-Origin', '*')

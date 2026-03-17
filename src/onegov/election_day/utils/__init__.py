@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.election_day.utils.common import add_cors_header
+from onegov.core.utils import add_cors_header
 from onegov.election_day.utils.common import add_last_modified_header
 from onegov.election_day.utils.common import add_local_results
 from onegov.election_day.utils.common import get_entity_filter
