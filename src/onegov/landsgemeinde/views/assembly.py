@@ -4,6 +4,7 @@ from morepath import redirect
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.utils import add_cors_header
 from onegov.core.templates import render_macro
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
@@ -275,6 +276,10 @@ def view_assembly_json(
     self: Assembly,
     request: LandsgemeindeRequest
 ) -> RenderData:
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
 
     agenda_items = (
         AgendaItemCollection(request.session)
