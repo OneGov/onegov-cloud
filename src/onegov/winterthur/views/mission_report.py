@@ -5,6 +5,7 @@ import csv
 from datetime import date
 from io import StringIO
 from onegov.core.elements import Link
+from onegov.core.utils import add_cors_header
 from onegov.core.security import Public, Private
 from onegov.form import FieldDependency, WTFormsClassBuilder, move_fields
 from onegov.org.views.files import view_get_image_collection
@@ -184,6 +185,10 @@ def view_mission_reports_as_json(
     request: WinterthurRequest
 ) -> JSON_ro:
 
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
+
     query = self.query()
     if request.params.get('all', False):
         query = self.query_all()
@@ -279,6 +284,7 @@ def view_mission_reports_as_csv(
     response = Response(content_type='text/csv')
     response.text = output.getvalue()
     response.content_disposition = 'attachment; filename="mission_reports.csv"'
+    add_cors_header(response)
     return response
 
 
