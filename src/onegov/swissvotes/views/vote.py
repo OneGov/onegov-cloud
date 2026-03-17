@@ -5,6 +5,7 @@ from onegov.core.crypto import random_token
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.static import StaticFile
+from onegov.core.utils import add_cors_header
 from onegov.core.utils import normalize_for_url
 from onegov.file.integration import render_depot_file
 from onegov.file.utils import as_fileintent
@@ -91,6 +92,10 @@ def view_vote_percentages(
     self: SwissVote,
     request: SwissvotesRequest
 ) -> JSON_ro:
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
 
     def create(
         text: str,
