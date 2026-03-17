@@ -186,3 +186,5 @@ def test_view_api(
         data(item)['title']
         for item in collection('/api/topics').items
     } == {'Organisation', 'Themen', 'Kontakt'}
+
+# TODO: Test directory API
