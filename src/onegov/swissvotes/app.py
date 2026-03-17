@@ -192,6 +192,8 @@ def get_common_asset() -> Iterator[str]:
     yield 'common.js'
     yield 'policy-selector.jsx'
     yield 'image-gallery.js'
+    yield 'mailchimp-validate.js'
+    yield 'mailchimp.js'
 
 
 @SwissvotesApp.webasset('mastodon')
