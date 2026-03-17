@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 from functools import cached_property
+from uuid import UUID
+
 from onegov.api.models import ApiEndpoint, ApiEndpointItem
-from onegov.core.collection import GenericCollection, Pagination
+from onegov.core.collection import Pagination
 from onegov.event.collections import OccurrenceCollection
+from onegov.form import FormCollection
 from onegov.form.models import FormDefinition
 from onegov.gis import Coordinates
 from onegov.org.models.directory import (
     ExtendedDirectory, ExtendedDirectoryEntry,
     ExtendedDirectoryEntryCollection)
 from onegov.org.models.external_link import (
-    ExternalFormLink, ExternalResourceLink)
+    ExternalFormLink, ExternalLinkCollection, ExternalResourceLink)
 from onegov.org.models.meeting import Meeting, MeetingCollection
 from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
 from onegov.org.models.parliament import (
@@ -24,21 +27,28 @@ from onegov.people.collections import PersonCollection
 from onegov.reservation.collection import ResourceCollection
 from onegov.reservation.models import Resource
 from onegov.town6 import _
+from sqlalchemy import or_
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.inspection import inspect as sa_inspect
 
-from typing import Any, Self
+from typing import Any, Generic, Self, TypeAlias
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
     from onegov.event.models import Occurrence
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
-    from typing import TypeVar
+    from typing import Protocol, TypeVar
     from onegov.core.collection import PKType
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.orm import Query
 
     T = TypeVar('T')
+
+    class SupportsQueryAndById(Protocol[T]):
+        def query(self) -> Query[T]: ...
+        def by_id(self, id: PKType) -> T | None: ...
 
 
 def get_geo_location(item: ContentMixin) -> dict[str, Any]:
@@ -56,216 +66,219 @@ def get_modified_iso_format(item: TimestampMixin) -> str:
     return item.last_change.isoformat()
 
 
-class PaginatedFormDefinitionCollection(
-    GenericCollection[FormDefinition],
-    Pagination[FormDefinition]
-):
-
-    def __init__(self, session: Session, page: int = 0) -> None:
-        super().__init__(session)
-        self.page = page
-        self.batch_size = 25
-
-    @property
-    def model_class(self) -> type[FormDefinition]:
-        return FormDefinition
-
-    def subset(self) -> Query[FormDefinition]:
-        return self.query()
-
-    def page_by_index(self, index: int) -> Self:
-        return self.__class__(self.session, page=index)
-
-    @property
-    def page_index(self) -> int:
-        return self.page
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, self.__class__) and self.page == other.page
+API_BATCH_SIZE = 25
+MANAGER_ROLES = {'admin', 'editor'}
+LISTING_ACCESSES = {
+    'member': ('member', 'mtan', 'public'),
+}
 
 
-class PaginatedResourceCollection:
+def role_for_request(request: TownRequest) -> str:
+    return getattr(request.identity, 'role', 'anonymous')
+
+
+def available_accesses(request: TownRequest) -> tuple[str, ...]:
+    role = role_for_request(request)
+    if role in MANAGER_ROLES:
+        return ()
+    return LISTING_ACCESSES.get(role, ('mtan', 'public'))
+
+
+def apply_visibility_filters(
+    request: TownRequest,
+    query: Query[T],
+    model_class: Any,
+) -> Query[T]:
+    accesses = available_accesses(request)
+    if accesses and hasattr(model_class, 'access'):
+        query = query.filter(or_(
+            *(
+                model_class.meta['access'].astext == access
+                for access in accesses
+            ),
+            model_class.meta['access'].is_(None)
+        ))
+
+    if (
+        role_for_request(request) not in MANAGER_ROLES
+        and hasattr(model_class, 'publication_started')
+        and hasattr(model_class, 'publication_ended')
+    ):
+        query = query.filter(
+            model_class.publication_started == True,
+            model_class.publication_ended == False
+        )
+
+    return query
+
+
+class FilteredCollection(Generic[T]):
 
     def __init__(
         self,
-        resource_collection: ResourceCollection,
-        page: int = 0
+        request: TownRequest,
+        collection: Any,
+        model_class: type[T],
+        query_transform: Callable[[Query[T]], Query[T]],
     ) -> None:
-        self.resource_collection = resource_collection
-        self.session = resource_collection.session
+        self.request = request
+        self.collection = collection
+        self.model_class = model_class
+        self.query_transform = query_transform
+
+    def query(self) -> Query[T]:
+        return self.query_transform(self.collection.query())
+
+    def by_id(self, id: PKType) -> T | None:
+        try:
+            if callable(getattr(self.collection, 'by_id', None)):
+                item = self.collection.by_id(id)
+                if item is not None:
+                    return item if self.request.is_visible(item) else None
+
+            primary_key = sa_inspect(self.model_class).primary_key[0]
+            return self.query().filter(
+                primary_key == self._normalize_id(id)
+            ).first()
+        except SQLAlchemyError:
+            return None
+
+    @staticmethod
+    def _normalize_id(id: PKType) -> PKType:
+        if isinstance(id, str):
+            try:
+                return UUID(id)
+            except ValueError:
+                return id
+        return id
+
+
+class PaginatedCollection(Pagination[T], Generic[T]):
+
+    def __init__(
+        self,
+        collection: SupportsQueryAndById[T],
+        page: int = 0,
+        batch_size: int = API_BATCH_SIZE,
+    ) -> None:
+        self.collection = collection
         self.page = page
-        self.batch_size = 25
+        self.batch_size = batch_size
 
-    def by_id(self, id: PKType) -> Resource | None:
-        return self.resource_collection.by_id(id)  # type: ignore
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, self.__class__)
+            and self.collection is other.collection
+            and self.page == other.page
+        )
 
-    def subset(self) -> Query[Resource]:
-        return self.resource_collection.query().order_by(Resource.title)
+    def by_id(self, id: PKType) -> T | None:
+        return self.collection.by_id(id)
+
+    def subset(self) -> Query[T]:
+        return self.collection.query()
+
+    def page_by_index(self, index: int) -> PaginatedCollection[T]:
+        return self.__class__(
+            self.collection,
+            page=index,
+            batch_size=self.batch_size,
+        )
+
+    @property
+    def page_index(self) -> int:
+        return self.page
+
+
+class PaginatedSumCollection(Pagination[T], Generic[T]):
+
+    def __init__(
+        self,
+        collections: Sequence[SupportsQueryAndById[T]],
+        page: int = 0,
+        batch_size: int = API_BATCH_SIZE,
+    ) -> None:
+        self.collections = tuple(collections)
+        self.page = page
+        self.batch_size = batch_size
+
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, self.__class__)
+            and self.collections == other.collections
+            and self.page == other.page
+        )
+
+    def by_id(self, id: PKType) -> T | None:
+        for collection in self.collections:
+            item = collection.by_id(id)
+            if item is not None:
+                return item
+        return None
+
+    def subset(self) -> Query[T]:
+        raise NotImplementedError(
+            'PaginatedSumCollection does not expose a single subset query'
+        )
 
     @cached_property
-    def cached_subset(self) -> Query[Resource]:
-        return self.subset()
-
-    @property
-    def page_index(self) -> int:
-        return self.page
-
-    def page_by_index(self, index: int) -> Self:
-        return self.__class__(
-            self.resource_collection, page=index
-        )
-
-    @property
-    def subset_count(self) -> int:
-        return self.cached_subset.count()
-
-    @property
-    def offset(self) -> int:
-        return self.page * self.batch_size
-
-    @property
-    def pages_count(self) -> int:
-        if not self.subset_count:
-            return 0
-        return max(1, -(-self.subset_count // self.batch_size))
-
-    @property
-    def batch(self) -> tuple[Resource, ...]:
+    def counts(self) -> tuple[int, ...]:
         return tuple(
-            self.cached_subset.offset(self.offset).limit(self.batch_size)
+            collection.query().order_by(None).count()
+            for collection in self.collections
+        )
+
+    @cached_property
+    def subset_count(self) -> int:
+        return sum(self.counts)
+
+    @cached_property
+    def batch(self) -> tuple[T, ...]:
+        offset = self.offset
+        remaining = self.batch_size
+        items: list[T] = []
+
+        for collection, count in zip(self.collections, self.counts):
+            if remaining <= 0:
+                break
+            if offset >= count:
+                offset -= count
+                continue
+
+            query = collection.query().offset(offset).limit(remaining)
+            batch = tuple(query)
+            items.extend(batch)
+            remaining -= len(batch)
+            offset = 0
+
+        return tuple(items)
+
+    def page_by_index(self, index: int) -> PaginatedSumCollection[T]:
+        return self.__class__(
+            self.collections,
+            page=index,
+            batch_size=self.batch_size,
         )
 
     @property
-    def previous(self) -> Self | None:
-        if self.page > 0:
-            return self.page_by_index(self.page - 1)
-        return None
-
-    @property
-    def next(self) -> Self | None:
-        if self.page < self.pages_count - 1:
-            return self.page_by_index(self.page + 1)
-        return None
-
-
-class PaginatedPersonCollection(
-    PersonCollection,
-    Pagination[Person]
-):
-
-    def __init__(self, session: Session, page: int = 0) -> None:
-        PersonCollection.__init__(self, session)
-        self.page = page
-        self.batch_size = 25
-
-    def subset(self) -> Query[Person]:
-        return self.query()
-
-    def page_by_index(self, index: int) -> Self:
-        return self.__class__(self.session, page=index)
-
-    @property
     def page_index(self) -> int:
         return self.page
 
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, self.__class__) and self.page == other.page
 
+def visible_collection(
+    request: TownRequest,
+    collection: Any,
+    model_class: type[T],
+    *,
+    order_by: Any | None = None,
+) -> FilteredCollection[T]:
+    def transform(query: Query[T]) -> Query[T]:
+        query = apply_visibility_filters(request, query, model_class)
+        if order_by is not None:
+            query = query.order_by(order_by)
+        return query
 
-class PaginatedMeetingCollection(
-    MeetingCollection,
-    Pagination[Meeting]
-):
-
-    def __init__(self, session: Session, page: int = 0) -> None:
-        MeetingCollection.__init__(self, session)
-        self.page = page
-        self.batch_size = 25
-
-    def subset(self) -> Query[Meeting]:
-        return self.query()
-
-    def page_by_index(self, index: int) -> Self:
-        return self.__class__(self.session, page=index)
-
-    @property
-    def page_index(self) -> int:
-        return self.page
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, self.__class__) and self.page == other.page
-
-
-class PaginatedParliamentarianCollection(
-    RISParliamentarianCollection,
-    Pagination[RISParliamentarian]
-):
-
-    def __init__(self, session: Session, page: int = 0) -> None:
-        RISParliamentarianCollection.__init__(self, session)
-        self.page = page
-        self.batch_size = 25
-
-    def subset(self) -> Query[RISParliamentarian]:
-        return self.query()
-
-    def page_by_index(self, index: int) -> Self:
-        return self.__class__(self.session, page=index)
-
-    @property
-    def page_index(self) -> int:
-        return self.page
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, self.__class__) and self.page == other.page
-
-
-class PaginatedCommissionCollection(
-    RISCommissionCollection,
-    Pagination[RISCommission]
-):
-
-    def __init__(self, session: Session, page: int = 0) -> None:
-        RISCommissionCollection.__init__(self, session)
-        self.page = page
-        self.batch_size = 25
-
-    def subset(self) -> Query[RISCommission]:
-        return self.query()
-
-    def page_by_index(self, index: int) -> Self:
-        return self.__class__(self.session, page=index)
-
-    @property
-    def page_index(self) -> int:
-        return self.page
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, self.__class__) and self.page == other.page
-
-
-class PaginatedParliamentaryGroupCollection(
-    RISParliamentaryGroupCollection,
-    Pagination[RISParliamentaryGroup]
-):
-
-    def __init__(self, session: Session, page: int = 0) -> None:
-        RISParliamentaryGroupCollection.__init__(self, session)
-        self.page = page
-        self.batch_size = 25
-
-    def subset(self) -> Query[RISParliamentaryGroup]:
-        return self.query()
-
-    def page_by_index(self, index: int) -> Self:
-        return self.__class__(self.session, page=index)
-
-    @property
-    def page_index(self) -> int:
-        return self.page
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, self.__class__) and self.page == other.page
+    return FilteredCollection(request, collection, model_class, transform)
 
 
 class EventApiEndpoint(ApiEndpoint['Occurrence']):
@@ -530,8 +543,8 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
         return data
 
 
-FormOrExternalLink = FormDefinition | ExternalFormLink
-ResourceOrExternalLink = Resource | ExternalResourceLink
+FormOrExternalLink: TypeAlias = FormDefinition | ExternalFormLink
+ResourceOrExternalLink: TypeAlias = Resource | ExternalResourceLink
 
 
 class FormApiEndpoint(ApiEndpoint[FormOrExternalLink]):
@@ -544,35 +557,29 @@ class FormApiEndpoint(ApiEndpoint[FormOrExternalLink]):
 
     @property
     def collection(self) -> Any:
-        return PaginatedFormDefinitionCollection(
-            self.session, page=self.page or 0
+        return PaginatedSumCollection(
+            (
+                visible_collection(
+                    self.request,
+                    FormCollection(self.session).definitions,
+                    FormDefinition,
+                    order_by=FormDefinition.order,
+                ),
+                visible_collection(
+                    self.request,
+                    ExternalLinkCollection.for_model(
+                        self.session, FormCollection
+                    ),
+                    ExternalFormLink,
+                    order_by=ExternalFormLink.order,
+                ),
+            ),
+            page=self.page or 0,
+            batch_size=API_BATCH_SIZE,
         )
 
-    @property
-    def batch(self) -> dict[ApiEndpointItem[FormOrExternalLink],
-                            FormOrExternalLink]:
-        result: dict[ApiEndpointItem[FormOrExternalLink],
-                     FormOrExternalLink] = {}
-        for item in self.collection.batch:
-            endpoint_item = self.for_item(item)
-            if endpoint_item:
-                result[endpoint_item] = item
-        for ext in self.session.query(ExternalFormLink).all():
-            endpoint_item = self.for_item(ext)
-            if endpoint_item:
-                result[endpoint_item] = ext
-        return result
-
     def by_id(self, id: PKType) -> FormOrExternalLink | None:
-        try:
-            item = self.session.query(FormDefinition).filter_by(
-                name=id
-            ).first()
-            if item:
-                return item
-            return self.session.query(ExternalFormLink).get(id)
-        except SQLAlchemyError:
-            return None
+        return self.collection.by_id(id)
 
     def item_data(self, item: FormOrExternalLink) -> dict[str, Any]:
         if isinstance(item, ExternalFormLink):
@@ -607,35 +614,29 @@ class ResourceApiEndpoint(ApiEndpoint[ResourceOrExternalLink]):
 
     @property
     def collection(self) -> Any:
-        resource_collection = ResourceCollection(self.app.libres_context)
-        return PaginatedResourceCollection(
-            resource_collection, page=self.page or 0
+        return PaginatedSumCollection(
+            (
+                visible_collection(
+                    self.request,
+                    ResourceCollection(self.app.libres_context),
+                    Resource,
+                    order_by=Resource.title,
+                ),
+                visible_collection(
+                    self.request,
+                    ExternalLinkCollection.for_model(
+                        self.session, ResourceCollection
+                    ),
+                    ExternalResourceLink,
+                    order_by=ExternalResourceLink.order,
+                ),
+            ),
+            page=self.page or 0,
+            batch_size=API_BATCH_SIZE,
         )
 
-    @property
-    def batch(self) -> dict[ApiEndpointItem[ResourceOrExternalLink],
-                            ResourceOrExternalLink]:
-        result: dict[ApiEndpointItem[ResourceOrExternalLink],
-                     ResourceOrExternalLink] = {}
-        for item in self.collection.batch:
-            endpoint_item = self.for_item(item)
-            if endpoint_item:
-                result[endpoint_item] = item
-        for ext in self.session.query(ExternalResourceLink).all():
-            endpoint_item = self.for_item(ext)
-            if endpoint_item:
-                result[endpoint_item] = ext
-        return result
-
     def by_id(self, id: PKType) -> ResourceOrExternalLink | None:
-        try:
-            resource_collection = ResourceCollection(self.app.libres_context)
-            item = resource_collection.by_id(id)  # type: ignore
-            if item:
-                return item
-            return self.session.query(ExternalResourceLink).get(id)
-        except SQLAlchemyError:
-            return None
+        return self.collection.by_id(id)
 
     def item_data(
         self, item: ResourceOrExternalLink
@@ -697,8 +698,14 @@ class PersonApiEndpoint(ApiEndpoint[Person]):
 
     @property
     def collection(self) -> Any:
-        return PaginatedPersonCollection(
-            self.session, page=self.page or 0
+        return PaginatedCollection(
+            visible_collection(
+                self.request,
+                PersonCollection(self.session),
+                Person,
+            ),
+            page=self.page or 0,
+            batch_size=API_BATCH_SIZE,
         )
 
     def item_data(self, item: Person) -> dict[str, Any]:
@@ -731,8 +738,14 @@ class MeetingApiEndpoint(ApiEndpoint[Meeting]):
 
     @property
     def collection(self) -> Any:
-        return PaginatedMeetingCollection(
-            self.session, page=self.page or 0
+        return PaginatedCollection(
+            visible_collection(
+                self.request,
+                MeetingCollection(self.session),
+                Meeting,
+            ),
+            page=self.page or 0,
+            batch_size=API_BATCH_SIZE,
         )
 
     def item_data(self, item: Meeting) -> dict[str, Any]:
@@ -766,8 +779,14 @@ class PoliticalBusinessApiEndpoint(ApiEndpoint[PoliticalBusiness]):
 
     @property
     def collection(self) -> Any:
-        return PoliticalBusinessCollection(
-            self.request, page=self.page or 0
+        return PaginatedCollection(
+            visible_collection(
+                self.request,
+                PoliticalBusinessCollection(self.request),
+                PoliticalBusiness,
+            ),
+            page=self.page or 0,
+            batch_size=API_BATCH_SIZE,
         )
 
     def item_data(self, item: PoliticalBusiness) -> dict[str, Any]:
@@ -796,8 +815,10 @@ class RISParliamentarianApiEndpoint(ApiEndpoint[RISParliamentarian]):
 
     @property
     def collection(self) -> Any:
-        return PaginatedParliamentarianCollection(
-            self.session, page=self.page or 0
+        return PaginatedCollection(
+            RISParliamentarianCollection(self.session),
+            page=self.page or 0,
+            batch_size=API_BATCH_SIZE,
         )
 
     def item_data(self, item: RISParliamentarian) -> dict[str, Any]:
@@ -826,8 +847,10 @@ class RISCommissionApiEndpoint(ApiEndpoint[RISCommission]):
 
     @property
     def collection(self) -> Any:
-        return PaginatedCommissionCollection(
-            self.session, page=self.page or 0
+        return PaginatedCollection(
+            RISCommissionCollection(self.session),
+            page=self.page or 0,
+            batch_size=API_BATCH_SIZE,
         )
 
     def item_data(self, item: RISCommission) -> dict[str, Any]:
@@ -850,8 +873,10 @@ class RISParliamentaryGroupApiEndpoint(ApiEndpoint[RISParliamentaryGroup]):
 
     @property
     def collection(self) -> Any:
-        return PaginatedParliamentaryGroupCollection(
-            self.session, page=self.page or 0
+        return PaginatedCollection(
+            RISParliamentaryGroupCollection(self.session),
+            page=self.page or 0,
+            batch_size=API_BATCH_SIZE,
         )
 
     def item_data(self, item: RISParliamentaryGroup) -> dict[str, Any]:
