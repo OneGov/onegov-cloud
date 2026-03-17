@@ -145,6 +145,10 @@ class SAML2Client:
     primary: bool = attrib()
     """ Whether or not this is the primary login provider """
 
+    authentication_only: bool = attrib(default=False)
+    """ When true, skip group/role mapping and only
+    authenticate pre-existing users. """
+
     slo_enabled: bool = attrib(default=True)
     """ Whether or not to enable the SLO service """
 
@@ -210,8 +214,12 @@ class SAML2Client:
                             'required_attributes': [
                                 self.attributes.source_id,
                                 self.attributes.username,
-                                self.attributes.groups
-                            ],
+                            ]
+                            + (
+                                []
+                                if self.authentication_only
+                                else [self.attributes.groups]
+                            ),
                             'optional_attributes': [
                                 self.attributes.first_name,
                                 self.attributes.last_name,
@@ -444,6 +452,7 @@ class SAML2Connections:
                 attributes=SAML2Attributes.from_cfg(
                     cfg.get('attributes', {})),
                 primary=cfg.get('primary', False),
+                authentication_only=cfg.get('authentication_only', False),
                 slo_enabled=cfg.get('slo_enabled', True),
                 client_key_file=cfg.get('client_key_file', None),
                 client_cert_file=cfg.get('client_cert_file', None),

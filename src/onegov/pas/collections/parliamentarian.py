@@ -158,13 +158,21 @@ class PASParliamentarianCollection(
                 if self._is_current_commission_president(item)
                 else 'parliamentarian'
             )
-            corrections = {
-                'username': new_email,
-                'role': role,
-                'active': True,
-                'source': None,
-                'source_id': None,
-            }
+            saml_sources = {'saml2', 'ldap'}
+            if enable.source in saml_sources:
+                corrections = {
+                    'username': new_email,
+                    'role': role,
+                    'active': True,
+                }
+            else:
+                corrections = {
+                    'username': new_email,
+                    'role': role,
+                    'active': True,
+                    'source': None,
+                    'source_id': None,
+                }
             corrections = {
                 attribute: value
                 for attribute, value in corrections.items()

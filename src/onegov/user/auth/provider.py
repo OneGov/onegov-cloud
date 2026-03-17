@@ -1166,18 +1166,21 @@ class SAML2Provider(
 
         app = request.app
         client = self.tenants.client(app)
-        roles = self.roles.app_specific(app)
-
-        if not roles:
-            # Considered as a misconfiguration of the app
-            log.error(f'No role map for {app.application_id}')
-            return Failure(_('Authorisation failed due to an error'))
 
         if not client:
             # Considered as a misconfiguration of the app
             log.error(f'No saml2 client found for '
                       f'{app.application_id} or {app.namespace}')
             return Failure(_('Authorisation failed due to an error'))
+
+        if not client.authentication_only:
+            roles = self.roles.app_specific(app)
+            if not roles:
+                # Considered as a misconfiguration of the app
+                log.error(f'No role map for {app.application_id}')
+                return Failure(
+                    _('Authorisation failed due to an error')
+                )
 
         # currently we only support redirect binding
         conn = client.connection(self, request)
@@ -1211,7 +1214,6 @@ class SAML2Provider(
         app = request.app
 
         client = self.tenants.client(app)
-        roles = self.roles.app_specific(app)
 
         if 'SAMLResponse' not in request.params:
             log.warning('SAMLResponse missing from authorisation request')
@@ -1252,7 +1254,6 @@ class SAML2Provider(
         username = ava.get(client.attributes.username, [None])[0]
         first_name = ava.get(client.attributes.first_name, [None])[0]
         last_name = ava.get(client.attributes.last_name, [None])[0]
-        groups = ava.get(client.attributes.groups)
 
         if not username:
             log.info('No username found in authorisation step')
@@ -1262,31 +1263,59 @@ class SAML2Provider(
             log.info(f'No source_id found for {username}')
             return Failure(_('Authorisation failed due to an error'))
 
-        if not groups:
-            log.info(f'No groups found for {username}')
-            return Failure(_("Can't login because your user has no groups. "
-                             "Contact your SAML2 system administrator"))
+        source = 'ldap' if client.treat_as_ldap else self.name
 
-        role = self.roles.match(roles, groups)  # type:ignore[arg-type]
-
-        if not role:
-            log.info(f"No authorized group for {username}, "
-                     f"having groups: {', '.join(groups)}")
-            return Failure(_('Authorisation failed due to an error'))
-
-        if first_name and last_name:
-            realname = f'{first_name} {last_name}'
+        if client.authentication_only:
+            users = UserCollection(request.session)
+            user = users.by_username(username)
+            if not user:
+                log.info(f'Auth-only: no user for {username}')
+                return Failure(_('Authorisation failed due to an error'))
+            if not user.active:
+                log.info(f'Auth-only: user {username} inactive')
+                return Failure(_('Authorisation failed due to an error'))
+            user.source = source
+            user.source_id = source_id
+            if first_name and last_name:
+                user.realname = f'{first_name} {last_name}'
         else:
-            realname = None
+            groups = ava.get(client.attributes.groups)
 
-        user = ensure_user(
-            source='ldap' if client.treat_as_ldap else self.name,
-            source_id=source_id,
-            session=request.session,
-            username=username,
-            role=role,
-            realname=realname
-        )
+            if not groups:
+                log.info(f'No groups found for {username}')
+                return Failure(_(
+                    "Can't login because your user has no"
+                    " groups. Contact your SAML2 system"
+                    " administrator"
+                ))
+
+            roles = self.roles.app_specific(app)
+            role = self.roles.match(
+                roles, groups  # type:ignore[arg-type]
+            )
+
+            if not role:
+                log.info(
+                    f"No authorized group for {username},"
+                    f" having groups: {', '.join(groups)}"
+                )
+                return Failure(
+                    _('Authorisation failed due to an error')
+                )
+
+            if first_name and last_name:
+                realname = f'{first_name} {last_name}'
+            else:
+                realname = None
+
+            user = ensure_user(
+                source=source,
+                source_id=source_id,
+                session=request.session,
+                username=username,
+                role=role,
+                realname=realname,
+            )
 
         # remember the transient id
         data = user.data or {}
@@ -1298,9 +1327,10 @@ class SAML2Provider(
         redirects = client.get_redirects(request.app)
         self.to = redirects.pop(session_id, '/')
 
-        return Success(user, _('Successfully logged in as «${user}»', mapping={
-            'user': user.username
-        }))
+        return Success(user, _(
+            'Successfully logged in as «${user}»',
+            mapping={'user': user.username}
+        ))
 
     def is_primary(self, app: UserApp) -> bool:
         client = self.tenants.client(app)
