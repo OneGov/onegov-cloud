@@ -1984,8 +1984,9 @@
         <ul class="breadcrumbs search-breadcrumbs">
             <tal:b repeat="link links">
                 <li class="breadcrumb-item">
-                    ${link(layout).replace(Markup('href="#"'), Markup('href="{}"').format(request.link(result))}
+                    ${link(layout).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
                 </li>
+            </tal:b>
         </ul>
     </tal:b>
 </metal:search_breadcrumbs>
