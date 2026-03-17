@@ -8,6 +8,7 @@ from onegov.api.models import ApiEndpointItem
 from onegov.api.token import get_token
 from onegov.api.utils import authenticate, check_rate_limit
 from onegov.core.security import Public
+from onegov.core.utils import add_cors_header
 from onegov.form.fields import HoneyPotField
 from webob.exc import HTTPMethodNotAllowed, HTTPNotFound, HTTPUnauthorized
 from wtforms import HiddenField
@@ -28,6 +29,7 @@ def handle_exception(
 
     @request.after
     def add_headers(response: Response) -> None:
+        add_cors_header(response)
         response.status_code = self.status_code
         response.headers['Content-Type'] = 'application/vnd.collection+json'
         for name, value in self.headers.items():
@@ -51,6 +53,7 @@ def view_api_endpoints(
 ) -> dict[str, Any]:
     @request.after
     def add_headers(response: Response) -> None:
+        add_cors_header(response)
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     return {
@@ -86,6 +89,7 @@ def view_api_endpoint(
 
     @request.after
     def add_headers(response: Response) -> None:
+        add_cors_header(response)
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     with ApiException.capture_exceptions(headers=headers):
@@ -152,6 +156,7 @@ def view_api_endpoint_item(
 
     @request.after
     def add_headers(response: Response) -> None:
+        add_cors_header(response)
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     with ApiException.capture_exceptions(headers=headers):
@@ -216,6 +221,10 @@ def edit_api_endpoint_item(
     self: ApiEndpointItem[Any], request: CoreRequest
 ) -> None:
 
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
+
     with ApiException.capture_exceptions():
         endpoint = self.api_endpoint
         assert endpoint is not None
@@ -265,6 +274,11 @@ def edit_api_endpoint_item(
 def get_time_restricted_token(
     self: AuthEndpoint, request: CoreRequest
 ) -> dict[str, str]:
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
+
     with ApiException.capture_exceptions():
         if request.authorization is None:
             raise HTTPUnauthorized()
