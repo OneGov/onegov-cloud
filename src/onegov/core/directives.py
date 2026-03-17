@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import os.path
 
-from dectate import Action, Query
+from dectate import Action, Query, convert_dotted_name
 from itertools import count
 from morepath.directive import HtmlAction
+from morepath.directive import isbaseclass
+from morepath.directive import PredicateAction
+from morepath.directive import PredicateFallbackAction
 from morepath.directive import SettingAction
 from morepath.settings import SettingRegistry, SettingSection
-from reg import RegistrationError
 
 from onegov.core.utils import Bunch
 
@@ -401,6 +403,9 @@ class Layout(Action):
     """
 
     app_class_arg = True
+    depends = [PredicateFallbackAction, PredicateAction]
+    filter_convert = {'model': convert_dotted_name}
+    filter_compare = {'model': isbaseclass}
 
     def __init__(self, model: type) -> None:
         self.model = model
@@ -418,13 +423,7 @@ class Layout(Action):
     ) -> None:
 
         layout_class = obj
-
-        try:
-            # `lambda self, obj` is required to match the signature
-            app_class.get_layout.register(  # type:ignore[attr-defined]
-                lambda self, obj, request: layout_class(obj, request),
-                model=self.model)
-        except RegistrationError as e:
-            # ignore `already have registration for key` error
-            if 'Already have registration for key' not in str(e):
-                raise
+        # `lambda self, obj, request` is required to match the signature
+        app_class.get_layout.register(  # type:ignore[attr-defined]
+            lambda self, obj, request: layout_class(obj, request),
+            model=self.model)
