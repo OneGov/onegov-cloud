@@ -210,10 +210,11 @@
             </div>
             <div class="columns small-12 medium-6 social-media-links">
                     <span i18n:translate>Follow us</span>
-                    <a href="https://www.instagram.com/annee_politique_suisse" title="Instagram"><i class="fa fa-instagram"></i></a>
-                    <a href="https://www.facebook.com/anneepolitiquesuisse" title="Facebook"><i class="fa fa-facebook"></i></a>
-                    <a href="https://ch.linkedin.com/company/ann%C3%A9e-politique-suisse" title="LinkedIn"><i class="fa fa-linkedin"></i></a>
-                    <a href="https://bsky.app/profile/anneepolitique.bsky.social" title="Bluesky"><i class="fa fa-hashtag"></i></a>
+                    <a href="https://mstdn.social/@swissvotes" title="Mastodon"><img src="${layout.static_path}/images/Icons/mastodon.svg" alt="Mastodon"></a>
+                    <a href="https://www.instagram.com/annee_politique_suisse" title="Instagram"><img src="${layout.static_path}/images/Icons/instagram.svg" alt="Instagram"></a>
+                    <a href="https://www.facebook.com/anneepolitiquesuisse" title="Facebook"><img src="${layout.static_path}/images/Icons/facebook.svg" alt="Facebook"></a>
+                    <a href="https://ch.linkedin.com/company/ann%C3%A9e-politique-suisse" title="LinkedIn"><img src="${layout.static_path}/images/Icons/linkedIn.svg" alt="LinkedIn"></a>
+                    <a href="https://bsky.app/profile/anneepolitique.bsky.social" title="Bluesky"><img src="${layout.static_path}/images/Icons/blueSky.svg" alt="Bluesky"></a> 
             </div>
         </div>
     </footer>
