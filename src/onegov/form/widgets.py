@@ -338,7 +338,7 @@ class TextAreaWithTextModules(TextArea):
     template = PageTemplate("""
         <div class="textarea-widget">
             <div class="text-module-picker">
-                <span class="text-module-picker-label"
+                <span class="text-module-picker-label button narrow hollow"
                       title="Ctrl+i"
                       role="button"
                       aria-expanded="false"

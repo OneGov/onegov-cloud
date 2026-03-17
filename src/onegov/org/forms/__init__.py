@@ -43,11 +43,11 @@ from onegov.org.forms.resource_recipient import ResourceRecipientForm
 from onegov.org.forms.search import SearchForm
 from onegov.org.forms.settings import AnalyticsSettingsForm
 from onegov.org.forms.settings import FooterSettingsForm
-from onegov.org.forms.settings import GeneralSettingsForm
+from onegov.org.forms.settings import AppearanceSettingsForm
 from onegov.org.forms.settings import HolidaySettingsForm
 from onegov.org.forms.settings import HomepageSettingsForm
 from onegov.org.forms.settings import MapSettingsForm
-from onegov.org.forms.settings import ModuleSettingsForm
+from onegov.org.forms.settings import AccessSettingsForm
 from onegov.org.forms.signup import SignupForm
 from onegov.org.forms.survey_submission import SurveySubmissionWindowForm
 from onegov.org.forms.text_module import TextModuleForm
@@ -83,7 +83,7 @@ __all__ = (
     'FormDefinitionForm',
     'FormRegistrationWindowForm',
     'FormSubmissionsExport',
-    'GeneralSettingsForm',
+    'AppearanceSettingsForm',
     'HolidaySettingsForm',
     'HomepageSettingsForm',
     'IframeForm',
@@ -97,7 +97,7 @@ __all__ = (
     'ManualInvoiceItemForm',
     'MapSettingsForm',
     'MeetingForm',
-    'ModuleSettingsForm',
+    'AccessSettingsForm',
     'NewsletterForm',
     'NewsletterSendForm',
     'NewsletterTestForm',

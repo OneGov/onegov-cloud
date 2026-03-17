@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.chat import MessageCollection, TextModuleCollection
+from onegov.chat import MessageCollection
 from onegov.core.elements import Link, LinkGroup
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
@@ -270,14 +270,6 @@ def get_global_tools(
                 )
             )
 
-        links.append(
-            Link(
-                _('Text modules (Tickets)'), request.class_link(
-                    TextModuleCollection),
-                attrs={'class': 'text-modules'}
-            )
-        )
-
         if request.is_admin:
             links.append(
                 Link(
@@ -286,6 +278,15 @@ def get_global_tools(
                     attrs={'class': 'link-check'}
                 )
             )
+
+            # Currently hidden, it doesn't work as it should
+            # links.append(
+            #     Link(
+            #         _('Link Migration'),
+            #         request.class_link(Organisation, name='link-check'),
+            #         attrs={'class': 'migrate-links'}
+            #     )
+            # )
 
         yield LinkGroup(_('Management'), classes=('management', ), links=links)
 

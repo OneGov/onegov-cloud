@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-27 10:29+0100\n"
+"POT-Creation-Date: 2026-03-16 16:22+0100\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -17,57 +17,62 @@ msgstr ""
 "X-Generator: Poedit 2.0.2\n"
 
 msgid "Invalid number of hours"
-msgstr ""
+msgstr "Numer d'uras nunvalaivel"
 
 msgid "Invalid number of minutes"
-msgstr ""
+msgstr "Numer di minuts nunvalaivel"
+
+msgid "Files of this type are not supported."
+msgstr "I file di questo tipo naun èn supportads."
 
 msgid "Not a valid email"
-msgstr ""
+msgstr "Betg in e-mail valida"
 
 msgid "Not a valid color."
-msgstr ""
+msgstr "Betg in color valido."
 
 msgid "Required"
-msgstr ""
+msgstr "Obligatori"
 
 msgid "Optional"
-msgstr ""
+msgstr "Opzional"
 
 msgid ""
 "Place the field comment beneath the field or choices, always using the same "
 "indentation"
 msgstr ""
+"Plazza il commentari (Markdown) dal champ sut il champ u las scumondas, "
+"adoperond adina la medema indentaziun"
 
 msgid "General"
-msgstr ""
+msgstr "General"
 
 msgid "Title"
-msgstr ""
+msgstr "Titel"
 
 msgid "E-Mail"
-msgstr ""
+msgstr "E-Mail"
 
 msgid "Website"
-msgstr ""
+msgstr "Sito internet"
 
 msgid "Video Link"
-msgstr ""
+msgstr "Video Link"
 
 msgid "Text fields"
-msgstr ""
+msgstr "Campi da text"
 
 msgid "Text"
-msgstr ""
+msgstr "Text"
 
 msgid "Limited text"
-msgstr ""
+msgstr "Text limitat"
 
 msgid "Multiline with optional number of rows"
-msgstr ""
+msgstr "Multilinea cun numer opzional di linias"
 
 msgid "Numbers-only textfield (regex)"
-msgstr ""
+msgstr "Campo da text cun numer (regex)"
 
 msgid "Comment"
 msgstr "Commentar"
@@ -76,107 +81,111 @@ msgid "Example Comment"
 msgstr "Commentar Exaimpel"
 
 msgid "Date and time"
-msgstr ""
+msgstr "Data e ura"
 
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 msgid "Time"
-msgstr ""
+msgstr "Ura"
 
 msgid "Choices"
-msgstr ""
+msgstr "Scumondas"
 
 msgid "Choice"
-msgstr ""
+msgstr "Scumonda"
 
 msgid "Multiple Choice"
-msgstr ""
+msgstr "Scumonda multipla"
 
 msgid "Subfields depending on choice"
-msgstr ""
+msgstr "Sutfields dependents da scumonda"
 
 msgid "Files"
-msgstr ""
+msgstr "Files"
 
 msgid "Image"
-msgstr ""
+msgstr "Image"
 
 msgid "Document"
-msgstr ""
+msgstr "Document"
 
 msgid "Documents (Multiple upload)"
-msgstr ""
+msgstr "Documents (Upload multipel)"
 
 msgid "Numbers"
-msgstr ""
+msgstr "Numeros"
 
 msgid "Age"
-msgstr ""
+msgstr "Etad"
 
 msgid "Percentage"
-msgstr ""
+msgstr "Percentual"
 
 msgid "Amount with Price"
-msgstr ""
+msgstr "Quantitad cun prezi"
 
 msgid "Extended"
-msgstr ""
+msgstr "Extendì"
 
 msgid "IBAN"
-msgstr ""
+msgstr "IBAN"
 
 msgid "Swiss social security number"
-msgstr ""
+msgstr "Numer da la segirezza sociala svizra"
 
 msgid "Swiss business identifier"
-msgstr ""
+msgstr "Identificatur da fatschenta svizzer"
 
 msgid "Swiss vat number"
-msgstr ""
+msgstr "Numer TVA svizzer"
 
 msgid "Animal identification number (Microchip-Nr.)"
-msgstr ""
+msgstr "Numer d'identificaziun d'animal (Microchip-Nr.)"
 
 msgid "Password"
-msgstr ""
+msgstr "Pled-clav"
 
 msgid "Markdown"
-msgstr ""
+msgstr "Markdown"
 
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
-msgstr ""
-
-msgid "Files of this type are not supported."
-msgstr ""
+msgstr "Il file è memia grond, per plaschair furnescha in file pli pitschen che {}."
 
 msgid ""
 "The password you wanted to use was found on list of commonly used passwords, "
 "please use a more secure password."
 msgstr ""
+"Il pled-clav che ti vulevas duvrar vegnà retschertgà sin la glista dals "
+"pled-clav bler dovrats, per plaschair duvra in pled-clav pli segir."
 
 msgid "The form could not be parsed."
-msgstr ""
+msgstr "Il formular na posseda betg vegnir parsà."
 
 msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
-msgstr ""
+msgstr "Definischa almain in champ d'e-mail obligatori ('E-Mail * = @@@')"
 
 #, python-format
 msgid "The syntax on line {line} is not valid."
-msgstr ""
+msgstr "La sintaxis sin la linha {line} n'è betg valaivla."
 
 #, python-format
 msgid ""
 "The indentation on line {line} is not valid. Please use a multiple of 4 "
 "spaces"
 msgstr ""
+"L'indentaziun sin la linha {line} n'è betg valaivla. Per plaschair duvrar in "
+"multiplicativ da 4 spazis."
 
 #, python-format
 msgid ""
 "The indentation on line {line} is not valid. Comments must be indented to "
 "the same level as the field definition (`=`) they belong to."
 msgstr ""
+"L'indentaziun sin la linha {line} n'è betg valaivla. Ils commentaris ston "
+"esser indentads al medem nivel sco la definiziun dal champ (`=`) a la quala "
+"els appatgnan."
 
 #, python-format
 msgid ""
@@ -184,52 +193,68 @@ msgid ""
 "description must be placed below the field definition (`=`) and with the "
 "same indentation."
 msgstr ""
+"Posiziun sbagliada da la descripziun dal champ sin la linha {line}. La "
+"descripziun sto star sut la definiziun dal champ (`=`) e cun la medema "
+"indentaziun."
 
 #, python-format
 msgid "The field '{label}' exists more than once."
-msgstr ""
+msgstr "Il champ '{label}' exista pliras giadas."
 
 #, python-format
 msgid "'{label}' is a reserved name. Please use a different name."
-msgstr ""
+msgstr "'{label}' è in num reservà. Per plaschair duvra in auter num."
 
 msgid "Define at least one required field"
-msgstr ""
+msgstr "Definischa almain in champ obligatori"
 
 #, python-format
 msgid ""
 "The field '{label}' contains a price that requires a credit card payment. "
 "This is only allowed if credit card payments are optional."
 msgstr ""
+"Il champ '{label}' cuntegna in prezi che basegns pgiaments cun carta da "
+"credit. Quai è be pussaivel sch'ils pgiaments cun carta da credit èn "
+"opzional."
 
 msgid ""
 "A minimum price total can only be set if at least one priced field is "
 "defined."
 msgstr ""
+"In total da prezi minimal po vegnir definì be sch'almain in champ cun prezi "
+"è definì."
 
 #, python-format
 msgid ""
 "The '{label}' group is empty and will not be visible. Either remove the "
 "empty group or add fields to it."
 msgstr ""
+"Il grupp '{label}' è vid e na vegn betg mussà. Elimina il grupp vid ni "
+"agiunta champs."
 
 #, python-format
 msgid ""
 "${fields}: New fields cannot be required initially. Require them in a "
 "separate migration step."
 msgstr ""
+"${fields}: Novs champs na pon betg vegnir obligatg en l'inizial. Oblitg'els "
+"en in pass da migraziun separat."
 
 #, python-format
 msgid ""
 "Invalid field type for field '{label}'. For filters only 'select' or "
 "'multiple select' fields are allowed."
 msgstr ""
+"Tip da champ invalid per il champ '{label}'. Per filters èn mo 'select' u "
+"'multiple select' pussaivels."
 
 #, python-format
 msgid ""
 "Invalid field type for field '${label}'. Please use the plus-icon to add "
 "allowed field types."
 msgstr ""
+"Tip da champ invalid per il champ '${label}'. Per plaschair dovra l'icon "
+"plus per agiuntar tips da champs permess."
 
 msgid "Not a valid phone number."
 msgstr "Numer da telefon nunvalaivel."
@@ -238,52 +263,52 @@ msgid "Not a valid swiss social security number."
 msgstr ""
 
 msgid "This value already exists."
-msgstr ""
+msgstr "Questa valur exista gia."
 
 #, python-format
 msgid "Needs to be between {min_date} and {max_date}."
-msgstr ""
+msgstr "Sto esser tranter {min_date} e {max_date}."
 
 #, python-format
 msgid "Needs to be on or after {date}."
-msgstr ""
+msgstr "Sto esser ils u suenter {date}."
 
 #, python-format
 msgid "Needs to be on or before {date}."
-msgstr ""
+msgstr "Sto esser ils u avant {date}."
 
 msgid "Not a valid domain."
-msgstr ""
+msgstr "Na è betg in domini valid."
 
 msgid "Uploaded file"
-msgstr ""
+msgstr "File chargà"
 
 msgid "Keep file"
-msgstr ""
+msgstr "Mantgna file"
 
 msgid "Delete file"
-msgstr ""
+msgstr "Smanatga file"
 
 msgid "Replace file"
-msgstr ""
+msgstr "Replazza file"
 
 msgid "Upload additional files"
-msgstr ""
+msgstr "Chargia ulteriurs files"
 
 msgid "Text modules"
-msgstr ""
+msgstr "Moduls da text"
 
 msgid "Select an Option"
-msgstr ""
+msgstr "Tscherna ina opziun"
 
 msgid "No results match"
-msgstr ""
+msgstr "Nagins resultads correspundan"
 
 msgid "Select Some Options"
-msgstr ""
+msgstr "Tscherna intginas opziuns"
 
 msgid "hours"
-msgstr ""
+msgstr "oras"
 
 msgid "minutes"
-msgstr ""
+msgstr "minuts"

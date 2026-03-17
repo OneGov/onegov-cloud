@@ -81,8 +81,7 @@ ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 COLOR_RE = re.compile(r'^#?(?:[0-9a-fA-F]{3}){1,2}$')
 
 
-class GeneralSettingsForm(Form):
-    """ Defines the settings form for onegov org. """
+class OrganisationProfileSettingsForm(Form):
 
     if TYPE_CHECKING:
         request: OrgRequest
@@ -90,6 +89,16 @@ class GeneralSettingsForm(Form):
     name = StringField(
         label=_('Name'),
         validators=[InputRequired()])
+
+    reply_to = EmailField(
+        _('E-Mail Reply Address (Reply-To)'), [InputRequired()],
+        description=_('Replies to automated e-mails go to this address.'))
+
+
+class AppearanceSettingsForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     logo_url = StringField(
         label=_('Logo'),
@@ -101,9 +110,37 @@ class GeneralSettingsForm(Form):
         description=_('URL pointing to the logo'),
         render_kw={'class_': 'image-url'})
 
-    reply_to = EmailField(
-        _('E-Mail Reply Address (Reply-To)'), [InputRequired()],
-        description=_('Replies to automated e-mails go to this address.'))
+    favicon_win_url = StringField(
+        label=_('Icon 16x16 PNG (Windows)'),
+        description=_('URL pointing to the icon'),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_mac_url = StringField(
+        label=_('Icon 32x32 PNG (Mac)'),
+        description=_('URL pointing to the icon'),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_apple_touch_url = StringField(
+        label=_('Icon 57x57 PNG (iPhone, iPod, iPad)'),
+        description=_('URL pointing to the icon'),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_pinned_tab_safari_url = StringField(
+        label=_('Icon SVG 20x20 (Safari)'),
+        description=_('URL pointing to the icon'),
+        render_kw={'class_': 'image-url'},
+    )
+
+    og_logo_default = StringField(
+        label=_('Image'),
+        description=_('Default social media preview image for rich link '
+                      'previews. Optimal size is 1200:630 px.'),
+        fieldset='OpenGraph',
+        render_kw={'class_': 'image-url'}
+    )
 
     primary_color = ColorField(
         label=_('Primary Color'))
@@ -470,43 +507,6 @@ class FooterSettingsForm(Form):
         return None
 
 
-class SocialMediaSettingsForm(Form):
-    og_logo_default = StringField(
-        label=_('Image'),
-        description=_('Default social media preview image for rich link '
-                      'previews. Optimal size is 1200:630 px.'),
-        fieldset='OpenGraph',
-        render_kw={'class_': 'image-url'}
-    )
-
-
-class FaviconSettingsForm(Form):
-
-    favicon_win_url = StringField(
-        label=_('Icon 16x16 PNG (Windows)'),
-        description=_('URL pointing to the icon'),
-        render_kw={'class_': 'image-url'},
-    )
-
-    favicon_mac_url = StringField(
-        label=_('Icon 32x32 PNG (Mac)'),
-        description=_('URL pointing to the icon'),
-        render_kw={'class_': 'image-url'},
-    )
-
-    favicon_apple_touch_url = StringField(
-        label=_('Icon 57x57 PNG (iPhone, iPod, iPad)'),
-        description=_('URL pointing to the icon'),
-        render_kw={'class_': 'image-url'},
-    )
-
-    favicon_pinned_tab_safari_url = StringField(
-        label=_('Icon SVG 20x20 (Safari)'),
-        description=_('URL pointing to the icon'),
-        render_kw={'class_': 'image-url'},
-    )
-
-
 class LinksSettingsForm(Form):
     disable_page_refs = BooleanField(
         label=_('Disable page references'),
@@ -751,7 +751,7 @@ class HomepageSettingsForm(Form):
                 raise ValidationError(correct_msg) from exception
 
 
-class ModuleSettingsForm(Form):
+class AccessSettingsForm(Form):
 
     mtan_session_duration_seconds = IntegerField(
         label=_('Duration of mTAN session'),
@@ -785,6 +785,11 @@ class MapSettingsForm(Form):
 
     default_map_view = CoordinatesField(
         label=_('The default map view. This should show the whole town'),
+        description=_("Wherever there's an option to choose a location on a "
+                      "map, this will be the default view. You can change the "
+                      "view by dragging the map and zooming in or out. The "
+                      "coordinates of the center of the map and the zoom "
+                      "level will then be saved as the default view."),
         render_kw={
             'data-map-type': 'crosshair'
         })
@@ -1467,14 +1472,6 @@ class OrgTicketSettingsForm(Form):
 
 
 class NewsletterSettingsForm(Form):
-
-    show_newsletter = BooleanField(
-        label=_('Enable newsletter'),
-        description=_('Enables the newsletter module for admins and show a '
-                      '"Subscribe to newsletter" option for the users on the '
-                      'news page.'),
-        default=False
-    )
 
     secret_content_allowed = BooleanField(
         label=_('Allow secret content in newsletter'),
@@ -2384,9 +2381,19 @@ class VATSettingsForm(Form):
     )
 
 
-class CitizenLoginSettingsForm(Form):
+class ModuleActivationSettingsForm(Form):
+    show_newsletter = BooleanField(
+        label=_('Enable newsletter'),
+        description=_('Enables the newsletter module for admins and show a '
+                      '"Subscribe to newsletter" option for the users on the '
+                      'news page.'),
+        default=False
+    )
 
     citizen_login_enabled = BooleanField(
         label=_('Enable Citizen Login'),
+        description=_('Enables the citizen login. This will show a "citizen '
+        'login" link in the footer, where users can view their reservations '
+        'using their email-address.'),
         default=False,
     )

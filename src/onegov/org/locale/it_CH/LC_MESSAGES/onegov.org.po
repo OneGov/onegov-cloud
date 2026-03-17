@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-03-03 15:37+0100\n"
+"POT-Creation-Date: 2026-03-17 08:49+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -288,9 +288,6 @@ msgstr "Gruppi di utenti"
 
 msgid "Settings"
 msgstr "Impostazioni"
-
-msgid "Text modules (Tickets)"
-msgstr "Moduli di testo (Biglietti)"
 
 msgid "Link Check"
 msgstr "Controllo del collegamento"
@@ -1979,6 +1976,28 @@ msgstr "URL che punta al logo"
 msgid "Logo (Square)"
 msgstr "Logo (quadrato)"
 
+msgid "Icon 16x16 PNG (Windows)"
+msgstr "Icona 16x16 PNG (Windows)"
+
+msgid "URL pointing to the icon"
+msgstr "URL che punta all'icona"
+
+msgid "Icon 32x32 PNG (Mac)"
+msgstr "Icona 32x32 PNG (Mac)"
+
+msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
+msgstr "Icona 57x57 PNG (iPhone, iPod, iPad)"
+
+msgid "Icon SVG 20x20 (Safari)"
+msgstr "Icona SVG 20x20 (Safari)"
+
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Immagine di anteprima dei social media predefinita per le anteprime dei "
+"collegamenti avanzati. La dimensione ottimale è 1200x630 px."
+
 msgid "Primary Color"
 msgstr "Colore primario"
 
@@ -2172,28 +2191,6 @@ msgstr "La larghezza della colonna deve essere maggiore di 0"
 msgid "The sum of all the footer columns must be equal to 12"
 msgstr "La somma di tutte le colonne del piè di pagina deve essere pari a 12"
 
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Immagine di anteprima dei social media predefinita per le anteprime dei "
-"collegamenti avanzati. La dimensione ottimale è 1200x630 px."
-
-msgid "Icon 16x16 PNG (Windows)"
-msgstr "Icona 16x16 PNG (Windows)"
-
-msgid "URL pointing to the icon"
-msgstr "URL che punta all'icona"
-
-msgid "Icon 32x32 PNG (Mac)"
-msgstr "Icona 32x32 PNG (Mac)"
-
-msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
-msgstr "Icona 57x57 PNG (iPhone, iPod, iPad)"
-
-msgid "Icon SVG 20x20 (Safari)"
-msgstr "Icona SVG 20x20 (Safari)"
-
 msgid "Disable page references"
 msgstr "Disabilita i riferimenti alle pagine"
 
@@ -2320,6 +2317,18 @@ msgid "The default map view. This should show the whole town"
 msgstr ""
 "La visualizzazione predefinita della mappa. Questo dovrebbe mostrare "
 "l'intera città"
+
+msgid ""
+"Wherever there's an option to choose a location on a map, this will be the "
+"default view. You can change the view by dragging the map and zooming in or "
+"out. The coordinates of the center of the map and the zoom level will then "
+"be saved as the default view."
+msgstr ""
+"Dovunque ci sia un'opzione per scegliere una posizione su una mappa, questa "
+"sarà la visualizzazione predefinita. È possibile modificare la "
+"visualizzazione trascinando la mappa e zoomando in o out. Le coordinate del "
+"centro della mappa e il livello di zoom verranno quindi salvati come "
+"visualizzazione predefinita."
 
 msgid "Geo provider"
 msgstr "Fornitore di dati geografici"
@@ -2620,17 +2629,6 @@ msgid ""
 msgstr ""
 "Colore non valido \"{color}\", deve essere un codice esadecimale di 3 o 6 "
 "cifre, ad esempio \"ff9000\" per l'arancione. Se si usa il prefisso "
-
-# ", assicurarsi di racchiudere il valore tra virgolette."
-msgid "Enable newsletter"
-msgstr "Attiva la newsletter"
-
-msgid ""
-"Enables the newsletter module for admins and show a \"Subscribe to "
-"newsletter\" option for the users on the news page."
-msgstr ""
-"Abilita il modulo newsletter per gli amministratori e mostra l'opzione "
-"\"Iscriviti alla newsletter\" agli utenti nella pagina delle notizie."
 
 msgid "Allow secret content in newsletter"
 msgstr "Consentire contenuti segreti nella newsletter"
@@ -2956,8 +2954,27 @@ msgstr ""
 "Si tratta del tasso di IVA in percentuale. Il tasso di IVA si applicherà a "
 "tutti i prezzi nei moduli."
 
+# ", assicurarsi di racchiudere il valore tra virgolette."
+msgid "Enable newsletter"
+msgstr "Attiva la newsletter"
+
+msgid ""
+"Enables the newsletter module for admins and show a \"Subscribe to "
+"newsletter\" option for the users on the news page."
+msgstr ""
+"Abilita il modulo newsletter per gli amministratori e mostra l'opzione "
+"\"Iscriviti alla newsletter\" agli utenti nella pagina delle notizie."
+
 msgid "Enable Citizen Login"
 msgstr "Abilitare l'accesso del cliente"
+
+msgid ""
+"Enables the citizen login. This will show a \"citizen login\" link in the "
+"footer, where users can view their reservations using their email-address."
+msgstr ""
+"Abilita l'accesso del cliente. Questo mostrerà un link \"accesso del "
+"cliente\" nel piè di pagina, dove gli utenti possono visualizzare le loro "
+"prenotazioni utilizzando il loro indirizzo e-mail."
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -3381,7 +3398,7 @@ msgid "Discount / Surcharge"
 msgstr "Deduzione / Supplemento"
 
 msgid "Text modules"
-msgstr "Moduli di testo"
+msgstr "Moduli di testo (Biglietti)"
 
 msgid "Text module"
 msgstr "Modulo di testo"
@@ -4576,9 +4593,6 @@ msgstr "Migrazione dei link"
 
 msgid "Straight to ..."
 msgstr "Direttamente a ..."
-
-msgid "User manual"
-msgstr "Manuale utente"
 
 msgid "Back to the homepage"
 msgstr "Torna alla pagina principale"
@@ -7431,8 +7445,14 @@ msgstr "Ricerca non disponibile"
 msgid "${count} Results"
 msgstr "${count} risultati"
 
-msgid "Favicon"
-msgstr "Favicon"
+msgid "Advanced Settings"
+msgstr "Impostazioni avanzate"
+
+msgid "Organisation Profile"
+msgstr "Profilo dell'organizzazione"
+
+msgid "Appearance"
+msgstr "Aspetto"
 
 msgid "Header"
 msgstr "Intestazione"
@@ -7440,8 +7460,27 @@ msgstr "Intestazione"
 msgid "Footer"
 msgstr "Piè di pagina"
 
+msgid "Data Retention Policy"
+msgstr "Politica di Conservazione dei Dati"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
+"irrevocabilmente cancellati."
+
+msgid "Access (mTAN)"
+msgstr "Accesso (mTAN)"
+
 msgid "Analytics"
 msgstr "Analitica"
+
+msgid "People directory"
+msgstr "Elenco persone"
+
+msgid "Chat"
+msgstr "Chat"
 
 msgid "Holidays"
 msgstr "Festività / Vacanze scolastiche"
@@ -7481,19 +7520,6 @@ msgstr "Questa azione non può essere annullata."
 
 msgid "ApiKey deleted."
 msgstr "Chiave API eliminata."
-
-msgid "Data Retention Policy"
-msgstr "Politica di Conservazione dei Dati"
-
-msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
-msgstr ""
-"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
-"irrevocabilmente cancellati."
-
-msgid "Chat"
-msgstr "Chat"
 
 #, python-format
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
@@ -7833,6 +7859,12 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "User manual"
+#~ msgstr "Manuale utente"
+
+#~ msgid "Favicon"
+#~ msgstr "Favicon"
 
 #~ msgid "Analytics Code"
 #~ msgstr "Codice Analytics"

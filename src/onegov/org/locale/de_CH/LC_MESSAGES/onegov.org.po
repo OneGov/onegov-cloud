@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-03 15:37+0100\n"
+"POT-Creation-Date: 2026-03-17 08:49+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -287,9 +287,6 @@ msgstr "Benutzergruppen"
 
 msgid "Settings"
 msgstr "Einstellungen"
-
-msgid "Text modules (Tickets)"
-msgstr "Textbausteine (Tickets)"
 
 msgid "Link Check"
 msgstr "Link-Prüfung"
@@ -1978,6 +1975,28 @@ msgstr "Link zum Logo"
 msgid "Logo (Square)"
 msgstr "Logo (Quadratisch)"
 
+msgid "Icon 16x16 PNG (Windows)"
+msgstr "Icon 16x16 PNG (Windows)"
+
+msgid "URL pointing to the icon"
+msgstr "Link zum Icon"
+
+msgid "Icon 32x32 PNG (Mac)"
+msgstr "Icon 32x32 PNG (Mac)"
+
+msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
+msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
+
+msgid "Icon SVG 20x20 (Safari)"
+msgstr "Icon SVG 20x20 (Safari)"
+
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale "
+"Grösse beträgt 1200:630px."
+
 msgid "Primary Color"
 msgstr "Primärfarbe"
 
@@ -2169,28 +2188,6 @@ msgstr "Die Breite der Kolonne muss grösser sein als 0"
 msgid "The sum of all the footer columns must be equal to 12"
 msgstr "Die Summe aller Breiten der Fusszeilenkolonnen muss 12 sein."
 
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale "
-"Grösse beträgt 1200:630px."
-
-msgid "Icon 16x16 PNG (Windows)"
-msgstr "Icon 16x16 PNG (Windows)"
-
-msgid "URL pointing to the icon"
-msgstr "Link zum Icon"
-
-msgid "Icon 32x32 PNG (Mac)"
-msgstr "Icon 32x32 PNG (Mac)"
-
-msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
-msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
-
-msgid "Icon SVG 20x20 (Safari)"
-msgstr "Icon SVG 20x20 (Safari)"
-
 msgid "Disable page references"
 msgstr "Seitenreferenzen deaktivieren"
 
@@ -2315,6 +2312,18 @@ msgstr ""
 
 msgid "The default map view. This should show the whole town"
 msgstr "Die Standard Kartenansicht. Diese sollte die ganze Gemeinde zeigen."
+
+msgid ""
+"Wherever there's an option to choose a location on a map, this will be the "
+"default view. You can change the view by dragging the map and zooming in or "
+"out. The coordinates of the center of the map and the zoom level will then "
+"be saved as the default view."
+msgstr ""
+"Überall, wo es eine Option gibt, einen Standort auf einer Karte auszuwählen, "
+"wird dies die Standardansicht sein. Sie können die Ansicht ändern, indem Sie "
+"die Karte ziehen und hinein- oder herauszoomen. Die Koordinaten des "
+"Kartenmittelpunkts und die Zoomstufe werden dann als Standardansicht "
+"gespeichert."
 
 msgid "Geo provider"
 msgstr "Geo Anbieter"
@@ -2611,16 +2620,6 @@ msgstr ""
 "Ungültige Farbe \"${color}\", es muss eine 3- bis 6-stellige hexadezimal "
 "Zahl sein, z.B. \"ff9000\" für Orange. Wenn Sie \"#\" als Präfix verwenden, "
 "stellen Sie sicher, den Wert in Anführungszeichen einzuschliessen."
-
-msgid "Enable newsletter"
-msgstr "Newsletter aktivieren"
-
-msgid ""
-"Enables the newsletter module for admins and show a \"Subscribe to "
-"newsletter\" option for the users on the news page."
-msgstr ""
-"Aktiviert das Newsletter-Modul für Administratoren und zeigt den Benutzern "
-"auf der Nachrichtenseite die Option \"Newsletter abonnieren\" an."
 
 msgid "Allow secret content in newsletter"
 msgstr "Geheimen Inhalt im Newsletter erlauben"
@@ -2945,8 +2944,26 @@ msgstr ""
 "Mehrwertsteuersatz in Prozent. Der Mehrwertsteuersatz wird auf alle Preise "
 "in den Formularen angewendet."
 
+msgid "Enable newsletter"
+msgstr "Newsletter aktivieren"
+
+msgid ""
+"Enables the newsletter module for admins and show a \"Subscribe to "
+"newsletter\" option for the users on the news page."
+msgstr ""
+"Aktiviert das Newsletter-Modul für Administratoren und zeigt den Benutzern "
+"auf der Nachrichtenseite die Option \"Newsletter abonnieren\" an."
+
 msgid "Enable Citizen Login"
 msgstr "Kunden-Login aktivieren"
+
+msgid ""
+"Enables the citizen login. This will show a \"citizen login\" link in the "
+"footer, where users can view their reservations using their email-address."
+msgstr ""
+"Aktiviert den Kunden-Login. Es wird ein Link \"Kunden-Login\" in der "
+"Fußzeile angezeigt, über den Benutzer ihre Reservierungen mit ihrer E-Mail-"
+"Adresse einsehen können."
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -4577,9 +4594,6 @@ msgstr "Navigation überspringen"
 
 msgid "Straight to ..."
 msgstr "Direkt zu ..."
-
-msgid "User manual"
-msgstr "Benutzerhandbuch"
 
 msgid "Back to the homepage"
 msgstr "Zurück zur Startseite"
@@ -7448,8 +7462,14 @@ msgstr "Suche Nicht Verfügbar"
 msgid "${count} Results"
 msgstr "${count} Resultate"
 
-msgid "Favicon"
-msgstr "Favicon"
+msgid "Advanced Settings"
+msgstr "Erweiterte Einstellungen"
+
+msgid "Organisation Profile"
+msgstr "Organisationsprofil"
+
+msgid "Appearance"
+msgstr "Erscheinungsbild"
 
 msgid "Header"
 msgstr "Kopfzeile"
@@ -7457,8 +7477,27 @@ msgstr "Kopfzeile"
 msgid "Footer"
 msgstr "Fusszeile"
 
+msgid "Data Retention Policy"
+msgstr "Datensparsamkeit"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
+"unwiderruflich gelöscht werden."
+
+msgid "Access (mTAN)"
+msgstr "Zugriff (mTAN)"
+
 msgid "Analytics"
 msgstr "Web-Statistik"
+
+msgid "People directory"
+msgstr "Personenverzeichnis"
+
+msgid "Chat"
+msgstr "Chat"
 
 msgid "Holidays"
 msgstr "Feiertage / Schulferien"
@@ -7497,19 +7536,6 @@ msgstr "Diese Aktion kann nicht rückgängig gemacht werden"
 
 msgid "ApiKey deleted."
 msgstr "ApiKey gelöscht."
-
-msgid "Data Retention Policy"
-msgstr "Datensparsamkeit"
-
-msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
-msgstr ""
-"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
-"unwiderruflich gelöscht werden."
-
-msgid "Chat"
-msgstr "Chat"
 
 #, python-format
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
@@ -7854,6 +7880,12 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "User manual"
+#~ msgstr "Benutzerhandbuch"
+
+#~ msgid "Favicon"
+#~ msgstr "Favicon"
 
 #~ msgid ""
 #~ "Enables the newsletter module for admins and show a \"Subscribe to "

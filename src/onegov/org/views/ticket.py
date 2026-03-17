@@ -9,7 +9,7 @@ from email_validator import validate_email, EmailNotValidError
 from io import BytesIO
 from markupsafe import Markup
 from morepath import Response
-from onegov.chat import Message, MessageCollection
+from onegov.chat import Message, MessageCollection, TextModuleCollection
 from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.html import html_to_text
@@ -1740,7 +1740,12 @@ def view_tickets(
             request.class_link(
                 ArchivedTicketCollection, {'handler': 'ALL'}),
             attrs={'class': 'ticket-archive'}
-        )
+        ),
+        Link(
+                _('Text modules'), request.class_link(
+                    TextModuleCollection),
+                attrs={'class': 'text-modules'}
+            )
     ]
 
     def archive_link(ticket: Ticket) -> str:

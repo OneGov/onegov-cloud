@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-27 10:29+0100\n"
+"POT-Creation-Date: 2026-03-16 16:22+0100\n"
 "PO-Revision-Date: 2022-03-07 13:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -24,6 +24,9 @@ msgstr "Ungültige Anzahl Stunden"
 
 msgid "Invalid number of minutes"
 msgstr "Ungültige Anzahl Minuten"
+
+msgid "Files of this type are not supported."
+msgstr "Dateien dieses Typs werden nicht unterstützt."
 
 msgid "Not a valid email"
 msgstr "Keine gültige Email"
@@ -153,9 +156,6 @@ msgstr "Markdown"
 msgid "The file is too large, please provide a file smaller than {}."
 msgstr "Die Datei ist zu gross, bitte senden Sie eine Datei kleiner als {}."
 
-msgid "Files of this type are not supported."
-msgstr "Dateien dieses Typs werden nicht unterstützt."
-
 msgid ""
 "The password you wanted to use was found on list of commonly used passwords, "
 "please use a more secure password."
@@ -187,6 +187,9 @@ msgid ""
 "The indentation on line {line} is not valid. Comments must be indented to "
 "the same level as the field definition (`=`) they belong to."
 msgstr ""
+"Die Einrückung in Zeile {line} ist nicht gültig. Kommentare müssen auf der "
+"gleichen Ebene wie die Felddefinition (`=`) eingerückt sein, zu der sie "
+"gehören."
 
 #, python-format
 msgid ""
@@ -255,6 +258,8 @@ msgid ""
 "Invalid field type for field '${label}'. Please use the plus-icon to add "
 "allowed field types."
 msgstr ""
+"Ungültiger Feldtyp für Feld '${label}'. Bitte verwenden Sie das Plus-"
+"Symbol um erlaubte Feldtypen hinzuzufügen."
 
 msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."
