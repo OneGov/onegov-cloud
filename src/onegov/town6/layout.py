@@ -1252,7 +1252,8 @@ class MeetingItemLayout(DefaultLayout):
             ),
             Link(
                 title,
-                self.request.link(self.model, fragment=self.model.title))
+                self.request.link(self.model.meeting,
+                                  fragment=self.model.title))
         ]
 
 
