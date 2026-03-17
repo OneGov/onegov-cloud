@@ -35,7 +35,8 @@ def test_token_generation_bearer(session: Session) -> None:
     authorization.authtype = 'Bearer'
     authorization.params = str(key.key)
     request: Any = Bunch(
-        identity_secret='secret',
+        # NOTE: Avoids minimum length warning
+        identity_secret='deadbeef' * 8,
         session=session,
         authorization=authorization,
     )
@@ -66,7 +67,8 @@ def test_token_generation_basic(session: Session) -> None:
     authorization.authtype = 'Basic'
     authorization.params = b64encode(auth.encode('utf-8')).decode()
     request: Any = Bunch(
-        identity_secret='secret',
+        # NOTE: Avoids minimum length warning
+        identity_secret='deadbeef' * 8,
         session=session,
         authorization=authorization,
     )

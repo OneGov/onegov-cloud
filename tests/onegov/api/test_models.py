@@ -92,38 +92,38 @@ def test_api_endpoint(app: App, endpoint_class: type[Endpoint]) -> None:
     assert new.page == 1
     assert new.extra_parameters == {}
 
-    new = ApiEndpoint(request, {'a': '1'}, 4).for_page(5)
+    new = ApiEndpoint(request, {'a': ['1']}, 4).for_page(5)
     assert new is not None
     assert new.page == 5
-    assert new.extra_parameters == {'a': '1'}
+    assert new.extra_parameters == {'a': ['1']}
 
     new = ApiEndpoint(request).for_page(1)
     assert new is not None
-    new = new.for_filter(a='1')
+    new = new.for_filter(a=['1'])
     assert new.page is None
-    assert new.extra_parameters == {'a': '1'}
+    assert new.extra_parameters == {'a': ['1']}
 
     # ... for_filter
     new = ApiEndpoint(request).for_filter()
     assert new.page is None
     assert new.extra_parameters == {}
 
-    new = ApiEndpoint(request).for_filter(a='1')
+    new = ApiEndpoint(request).for_filter(a=['1'])
     assert new.page is None
-    assert new.extra_parameters == {'a': '1'}
+    assert new.extra_parameters == {'a': ['1']}
 
-    new = ApiEndpoint(request, {'a': '1'}, 4).for_filter(b='2')
+    new = ApiEndpoint(request, {'a': ['1']}, 4).for_filter(b=['2'])
     assert new.page is None
-    assert new.extra_parameters == {'b': '2'}
+    assert new.extra_parameters == {'b': ['2']}
 
-    new = ApiEndpoint(request).for_filter(a='1').for_filter(b='2')
+    new = ApiEndpoint(request).for_filter(a=['1']).for_filter(b=['2'])
     assert new.page is None
-    assert new.extra_parameters == {'b': '2'}
+    assert new.extra_parameters == {'b': ['2']}
 
-    new = ApiEndpoint(request).for_filter(a='1').for_page(1)
+    new = ApiEndpoint(request).for_filter(a=['1']).for_page(1)
     assert new is not None
     assert new.page == 1
-    assert new.extra_parameters == {'a': '1'}
+    assert new.extra_parameters == {'a': ['1']}
 
     # ... for_item
     assert ApiEndpoint(request).for_item(None) is None
@@ -134,7 +134,7 @@ def test_api_endpoint(app: App, endpoint_class: type[Endpoint]) -> None:
 
     # ... get_filter
     assert ApiEndpoint(request).get_filter('a') is None
-    assert ApiEndpoint(request, {'a': '1'}).get_filter('a') == '1'
+    assert ApiEndpoint(request, {'a': ['1']}).get_filter('a') == '1'
 
     # ... by_id
     assert endpoint_class(request).by_id(1).id == 1  # type: ignore[union-attr]
