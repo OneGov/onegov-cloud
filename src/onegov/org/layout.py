@@ -1383,7 +1383,7 @@ class FormDefinitionLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(_('Forms'), self.forms_url),
-            Link(self.model.title, self.request.link(self.model))
+            Link(self.model.title, '#')
         ]
 
 
@@ -3531,9 +3531,7 @@ class DirectoryCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Directories'), self.request.class_link(
-                DirectoryCollection
-            )),
+            Link(_('Directories'), '#'),
         ]
 
     @cached_property
@@ -3567,7 +3565,7 @@ class DirectoryLayout(DefaultLayout):
             Link(_('Directories'), self.request.class_link(
                 DirectoryCollection
             )),
-            Link(self.model.title, self.request.link(self.model))
+            Link(self.model.title, '#')
         ]
 
 

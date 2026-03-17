@@ -1189,7 +1189,7 @@ class MeetingLayout(DefaultLayout):
             Link(_('Homepage'), self.homepage_url),
             Link(_('RIS Settings'), self.ris_overview_url),
             Link(_('Meetings'), self.request.class_link(MeetingCollection)),
-            Link(title, self.request.link(self.model)),
+            Link(title, '#'),
         ]
 
     @cached_property
