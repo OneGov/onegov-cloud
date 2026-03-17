@@ -247,9 +247,9 @@ class ApiEndpoint[M: DeclarativeBase]:
     @overload
     def for_item_id(self, item_id: None) -> None: ...
     @overload
-    def for_item_id(self, item_id: Any) -> ApiEndpointItem[_M]: ...
+    def for_item_id(self, item_id: Any) -> ApiEndpointItem[M]: ...
 
-    def for_item_id(self, item_id: Any | None) -> ApiEndpointItem[_M] | None:
+    def for_item_id(self, item_id: Any | None) -> ApiEndpointItem[M] | None:
         """ Return a new endpoint item instance with the given item id. """
 
         if not item_id:
