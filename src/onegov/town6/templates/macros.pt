@@ -1983,15 +1983,9 @@
     <tal:b tal:condition="layout and len(layout.breadcrumbs) > 1" tal:define="links layout.breadcrumbs">
         <ul class="breadcrumbs search-breadcrumbs">
             <tal:b repeat="link links">
-                <tal:b tal:define="replace_hash python:result and link.attrs.get('href') == '#'">
-                    <tal:b tal:condition="replace_hash">
-                        <li class="breadcrumb-item"><a tal:attributes="href request.link(result)" tal:content="link.text"></a></li>
-                    </tal:b>
-                    <tal:b tal:condition="not:replace_hash">
-                        <li class="breadcrumb-item" tal:content="link(layout)"></li>
-                    </tal:b>
-                </tal:b>
-            </tal:b>
+                <li class="breadcrumb-item">
+                    ${link(layout).replace(Markup('href="#"'), Markup('href="{}"').format(request.link(result))}
+                </li>
         </ul>
     </tal:b>
 </metal:search_breadcrumbs>
