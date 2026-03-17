@@ -8,6 +8,7 @@ from onegov.election_day.formats import export_parties_internal
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.models import Election
 from onegov.election_day.security import MaybePublic
+from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_connection_results_api
 from webob.exc import HTTPNotFound
@@ -55,7 +56,8 @@ def view_election_data_as_json(
     """ View the raw data as JSON. """
 
     @request.after
-    def add_last_modified(response: Response) -> None:
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -76,7 +78,8 @@ def view_election_data_as_csv(
     """ View the raw data as CSV. """
 
     @request.after
-    def add_last_modified(response: Response) -> None:
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -103,7 +106,8 @@ def view_election_parties_data_as_json(
     self = cast('ProporzElection', self)
 
     @request.after
-    def add_last_modified(response: Response) -> None:
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     assert request.app.default_locale
@@ -142,7 +146,8 @@ def view_election_parties_data_as_csv(
     self = cast('ProporzElection', self)
 
     @request.after
-    def add_last_modified(response: Response) -> None:
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     assert request.app.default_locale
@@ -173,5 +178,9 @@ def view_election_aggregated_connections_data(
 ) -> JSON_ro:
 
     """" View the list connections as JSON. """
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
 
     return get_connection_results_api(self, request.session)

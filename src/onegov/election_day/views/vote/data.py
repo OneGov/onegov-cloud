@@ -6,6 +6,7 @@ from onegov.election_day.formats import export_vote_internal
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.models import Vote
 from onegov.election_day.security import MaybePublic
+from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 
 
@@ -49,7 +50,8 @@ def view_vote_data_as_json(
     """ View the raw data as JSON. """
 
     @request.after
-    def add_last_modified(response: Response) -> None:
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -70,7 +72,8 @@ def view_vote_data_as_csv(
     """ View the raw data as CSV. """
 
     @request.after
-    def add_last_modified(response: Response) -> None:
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     return {

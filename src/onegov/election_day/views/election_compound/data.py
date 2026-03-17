@@ -8,6 +8,7 @@ from onegov.election_day.formats import export_parties_internal
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.models import ElectionCompound
 from onegov.election_day.security import MaybePublic
+from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 
 
@@ -51,7 +52,8 @@ def view_election_compound_data_as_json(
     """ View the raw data as JSON. """
 
     @request.after
-    def add_last_modified(response: Response) -> None:
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -74,7 +76,8 @@ def view_election_compound_data_as_csv(
     """ View the raw data as CSV. """
 
     @request.after
-    def add_last_modified(response: Response) -> None:
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -97,7 +100,8 @@ def view_election_compound_parties_data_as_json(
     """ View the raw parties data as JSON. """
 
     @request.after
-    def add_last_modified(response: Response) -> None:
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     assert request.app.default_locale
@@ -128,7 +132,8 @@ def view_election_compound_parties_data_as_csv(
     """ View the raw parties data as CSV. """
 
     @request.after
-    def add_last_modified(response: Response) -> None:
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     assert request.app.default_locale
