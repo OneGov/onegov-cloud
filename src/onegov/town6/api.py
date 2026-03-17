@@ -139,6 +139,8 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
                 result = result.for_filter(end=value)
             elif key == 'tags':
                 result = result.for_filter(tags=values)
+            elif key == 'sources':
+                result = result.for_filter(sources=values)
             elif key == 'locations':
                 result = result.for_filter(locations=values)
             else:

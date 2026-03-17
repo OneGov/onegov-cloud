@@ -238,7 +238,7 @@ def get_api_endpoints_handler(
         yield NewsApiEndpoint(request, extra_parameters, page)
         yield TopicApiEndpoint(request, extra_parameters, page)
         directories = request.exclude_invisible(
-            request.session.query(ExtendedDirectory).all())
+            request.session.query(ExtendedDirectory))
         for directory in directories:
             yield DirectoryEntryApiEndpoint(
                 request=request,
