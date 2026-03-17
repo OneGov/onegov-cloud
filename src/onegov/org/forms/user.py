@@ -1,17 +1,20 @@
 from __future__ import annotations
 
 import re
+
+from functools import cached_property
 from onegov.core.utils import is_valid_yubikey_format
 from onegov.directory.models.directory import Directory
 from onegov.form import Form, merge_forms
 from onegov.form import FormDefinition
 from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import PanelField
 from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
-from onegov.org import _
+from onegov.org import _, log
 from onegov.reservation import Resource
 from onegov.ticket import handlers, Ticket, TicketPermission
-from onegov.user import User, UserCollection, UserGroup
+from onegov.user import Auth, User, UserCollection, UserGroup
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
@@ -21,10 +24,13 @@ from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
     from onegov.org.request import OrgRequest
+    from onegov.user.auth.second_factor import AnySecondFactor
     from wtforms.fields.choices import _Choice
+    from wtforms.meta import _MultiDictLike
 
 
 AVAILABLE_ROLES = [
@@ -135,6 +141,123 @@ class ManageUserForm(Form):
                     'username': user.username
                 })
             )
+
+
+class ChangeUsernameForm(Form):
+    """ Defines the change username form. """
+
+    if TYPE_CHECKING:
+        model: User
+        request: OrgRequest
+
+    old_username = PanelField(
+        label=_('Current E-Mail'),
+        text='',
+        kind='',
+        hide_label=False,
+    )
+
+    new_username = EmailField(
+        label=_('New E-Mail'),
+        validators=[InputRequired(), Email()]
+    )
+
+    yubikey = StringField(
+        label=_('Yubikey'),
+        fieldset=_('Confirm action via your second factor'),
+        description=_('Plug your YubiKey into a USB slot and press it.'),
+        validators=[InputRequired()],
+        render_kw={'autocomplete': 'off'}
+    )
+
+    totp = StringField(
+        label=_('Code'),
+        fieldset=_('Confirm action via your second factor'),
+        description=_('Enter the six digit code from your authenticator app.'),
+        validators=[InputRequired()],
+        render_kw={'autocomplete': 'one-time-code'}
+    )
+
+    def process(
+        self,
+        formdata: _MultiDictLike | None = None,
+        obj: object | None = None,
+        data: Mapping[str, Any] | None = None,
+        extra_filters: Mapping[str, Sequence[Any]] | None = None,
+        **kwargs: Any
+    ) -> None:
+
+        # NOTE: We only pass on formdata, since
+        super().process(
+            formdata=formdata,
+            obj=None,
+            data=None,
+            extra_filters=extra_filters,
+        )
+
+        if isinstance(obj, User):
+            self.model = obj
+            self.old_username.text = obj.username
+
+    def populate_obj(self, obj: User) -> None:  # type: ignore[override]
+        assert self.new_username.data is not None
+        request = self.request
+        obj.logout_all_sessions(request.app)
+        obj.username = self.new_username.data
+        # Run application-specific callback
+        request.app.settings.user.change_username_callback(obj, request)
+
+    def on_request(self) -> None:
+        user = self.request.current_user
+        assert user is not None
+        if (user.second_factor or {}).get('type') == 'yubikey':
+            self.delete_field('totp')
+        else:
+            self.delete_field('yubikey')
+
+    def validate_new_username(self, field: EmailField) -> None:
+        assert field.data is not None
+        if self.model.username == field.data.lower():
+            raise ValidationError(_(
+                'The new username must be different from the old username '
+                '(the username is case-insensitive)'
+            ))
+        if UserCollection(self.request.session).by_username(field.data):
+            raise ValidationError(
+                _('A user with this e-mail address exists already'))
+
+    @cached_property
+    def factors(self) -> dict[str, AnySecondFactor]:
+        return Auth.from_request(self.request).factors
+
+    def check_factor(self, factor: AnySecondFactor, value: str) -> bool:
+        assert hasattr(factor, 'is_valid')
+        user = self.request.current_user
+        assert user is not None
+        try:
+            return factor.is_valid(self.request, user, value)
+        except Exception:
+            log.info(
+                f'Second factor exception for user {user.username}:',
+                exc_info=True
+            )
+            return False
+
+    def validate_yubikey(self, field: StringField) -> None:
+        assert field.data is not None
+        factor = self.factors['yubikey']
+        if not self.check_factor(factor, field.data):
+            client = self.request.client_addr or 'unknown'
+            log.info(f'Failed login by {client} (Yubikey change-username)')
+            raise ValidationError(_('Wrong yubikey.'))
+
+    def validate_totp(self, field: StringField) -> None:
+        assert field.data is not None
+        factor = self.factors['totp']
+        if not self.check_factor(factor, field.data):
+            client = self.request.client_addr or 'unknown'
+            log.info(f'Failed login by {client} (TOTP change-username)')
+            raise ValidationError(_('Invalid or expired TOTP provided.'))
 
 
 class PartialNewUserForm(Form):

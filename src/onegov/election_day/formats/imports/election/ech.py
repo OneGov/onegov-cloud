@@ -30,15 +30,14 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Municipality
     from onegov.election_day.types import Gender
     from sqlalchemy.orm import Session
-    from typing import TypeAlias
     from xsdata_ech.e_ch_0252_2_0 import Delivery
     from xsdata_ech.e_ch_0252_2_0 import ElectedType
     from xsdata_ech.e_ch_0252_2_0 import ElectionResultType
     from xsdata_ech.e_ch_0252_2_0 import EventElectionInformationDeliveryType
     from xsdata_ech.e_ch_0252_2_0 import EventElectionResultDeliveryType
 
-    MajoralElected: TypeAlias = ElectedType.MajoralElection.ElectedCandidate
-    ProportionalElected: TypeAlias = (
+    type MajoralElected = ElectedType.MajoralElection.ElectedCandidate
+    type ProportionalElected = (
         ElectedType.ProportionalElection.ListType.ElectedCandidate)
 
 
@@ -134,12 +133,20 @@ def import_information_delivery(
     """ Import an election information delivery. """
 
     assert delivery is not None
+    errors = set()
 
     # get polling date and entities
     assert delivery.polling_day is not None
     polling_day = delivery.polling_day.to_date()
-    entities = principal.entities[polling_day.year]
-    errors = set()
+    if polling_day.year not in principal.entities:
+        errors.add(
+            FileImportError(
+                _('Cannot import election information. '
+                  'Year ${year} does not exist.',
+                  mapping={'year': polling_day.year}),
+            ))
+        return polling_day, [], [], set(), errors
+    entities = principal.entities[polling_day.year]  # tschupre
 
     # query existing compounds
     existing_compounds = session.query(ElectionCompound).filter(
@@ -385,6 +392,15 @@ def import_result_delivery(
     errors: set[FileImportError]
 ) -> None:
     """ Import an election result delivery. """
+
+    if polling_day.year not in principal.entities:
+        errors.add(
+            FileImportError(
+                _('Cannot import election results. '
+                  'Year ${year} does not exist.',
+                  mapping={'year': polling_day.year}),
+            ))
+        return
 
     entities = principal.entities[polling_day.year]
 

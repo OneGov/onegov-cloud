@@ -22,27 +22,30 @@ from markupsafe import escape, Markup
 from math import isclose
 from onegov.core.layout import Layout
 from onegov.core.mail import coerce_address
-from onegov.file import File, FileCollection
+from onegov.core.security import Secret
+from onegov.file import FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
 from onegov.pay import InvoiceItemMeta, Price
 from onegov.reservation import Resource
 from onegov.ticket import Ticket, TicketCollection, TicketPermission
-from onegov.user import User, UserGroup
+from onegov.user import Auth, User, UserGroup
 from operator import add, attrgetter
 from sqlalchemy import case, nullsfirst
 from webob.exc import HTTPBadRequest
 
 
-from typing import overload, Any, Literal, TYPE_CHECKING
+from typing import overload, Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
-    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import (
+        Callable, Collection, Iterable, Iterator, Sequence)
     from libres.db.models import ReservationBlocker
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
     from onegov.form import Form, FormSubmission
+    from onegov.org.models import ImageFile
     from onegov.org.request import OrgRequest
     from onegov.pay import InvoiceItem
     from onegov.pay.types import PriceDict
@@ -50,16 +53,10 @@ if TYPE_CHECKING:
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
     from sqlalchemy.orm import InstrumentedAttribute, Query
     from sqlalchemy.sql.elements import ColumnElement
-    from typing import Self, TypeAlias, TypeVar
     from uuid import UUID
 
-    _T = TypeVar('_T')
-    _DeltaT = TypeVar('_DeltaT')
-    _SortT = TypeVar('_SortT', bound='SupportsRichComparison')
-    _TransformedT = TypeVar('_TransformedT')
-    _ItemT = TypeVar('_ItemT', bound=InvoiceItem | InvoiceItemMeta)
-    TzInfo: TypeAlias = DstTzInfo | StaticTzInfo
-    DateRange: TypeAlias = tuple[datetime, datetime]
+    type TzInfo = DstTzInfo | StaticTzInfo
+    type DateRange = tuple[datetime, datetime]
 
 
 # for our empty paragraphs approach we don't need a full-blown xml parser
@@ -268,11 +265,13 @@ def set_image_sizes(
     }
 
     if images_dict:
-
+        collection: FileCollection[ImageFile]
+        collection = FileCollection(request.session, type='image')
+        model_class = collection.model_class
         uploaded_files = dict(
-            FileCollection(request.session, type='image').query()
-            .with_entities(File.id, File.reference)
-            .filter(File.id.in_(images_dict))
+            collection.query()
+            .with_entities(model_class.id, model_class.reference)
+            .filter(model_class.id.in_(images_dict))
             .tuples()
         )
 
@@ -528,7 +527,7 @@ class AllocationEventInfo:
 
     @property
     def outside_booking_window(self) -> bool:
-        return self.request.is_manager and (
+        return not self.request.is_manager and (
             self.resource.is_past_deadline(
                 # for partly available allocations we use the end of the
                 # allocation, since some small sliver of the allocation
@@ -1415,37 +1414,37 @@ def predict_next_daterange(
 #       to a protocol which implements subtraction and addition, but
 #       __add__ vs __radd__ and __sub__ vs __rsub__ makes this difficult
 @overload
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T](
+    values: Sequence[T],
     min_probability: float = 0.8,
-) -> _T | None: ...
+) -> T | None: ...
 
 
 @overload
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T, DeltaT](
+    values: Sequence[T],
     min_probability: float,
-    compute_delta: Callable[[_T, _T], _DeltaT],
-    add_delta: Callable[[_T, _DeltaT], _T | None]
-) -> _T | None: ...
+    compute_delta: Callable[[T, T], DeltaT],
+    add_delta: Callable[[T, DeltaT], T | None]
+) -> T | None: ...
 
 
 @overload
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T, DeltaT](
+    values: Sequence[T],
     min_probability: float = 0.8,
     *,
-    compute_delta: Callable[[_T, _T], _DeltaT],
-    add_delta: Callable[[_T, _DeltaT], _T | None]
-) -> _T | None: ...
+    compute_delta: Callable[[T, T], DeltaT],
+    add_delta: Callable[[T, DeltaT], T | None]
+) -> T | None: ...
 
 
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T](
+    values: Sequence[T],
     min_probability: float = 0.8,
     compute_delta: Callable[[Any, Any], Any] = lambda x, y: y - x,
     add_delta: Callable[[Any, Any], Any | None] = add
-) -> _T | None:
+) -> T | None:
     """ Takes a list of values and tries to predict the next value in the
     series.
 
@@ -1503,44 +1502,44 @@ def predict_next_value(
 
 
 @overload
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison](
     request: OrgRequest,
-    query: Query[_T],
+    query: Query[T],
     group_column: InstrumentedAttribute[str | None],
-    sort_column: InstrumentedAttribute[_SortT],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None = None,
-    transform: Callable[[_T], _T] | None = None
-) -> dict[str, list[_T]]: ...
+    transform: Callable[[T], T] | None = None
+) -> dict[str, list[T]]: ...
 
 
 @overload
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison, TransformedT](
     request: OrgRequest,
-    query: Query[_T],
+    query: Query[T],
     group_column: InstrumentedAttribute[str | None],
-    sort_column: InstrumentedAttribute[_SortT],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None,
-    transform: Callable[[_T], _TransformedT]
-) -> dict[str, list[_TransformedT]]: ...
+    transform: Callable[[T], TransformedT]
+) -> dict[str, list[TransformedT]]: ...
 
 
 @overload
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison, TransformedT](
     request: OrgRequest,
-    query: Query[_T],
+    query: Query[T],
     group_column: InstrumentedAttribute[str | None],
-    sort_column: InstrumentedAttribute[_SortT],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None = None,
     *,
-    transform: Callable[[_T], _TransformedT]
-) -> dict[str, list[_TransformedT]]: ...
+    transform: Callable[[T], TransformedT]
+) -> dict[str, list[TransformedT]]: ...
 
 
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison](
     request: OrgRequest,
-    query: Query[_T],
+    query: Query[T],
     group_column: InstrumentedAttribute[str | None],
-    sort_column: InstrumentedAttribute[_SortT],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None = None,
     transform: Callable[[Any], Any] | None = None
 ) -> dict[str, list[Any]]:
@@ -1574,10 +1573,10 @@ def group_by_column(
 
     grouped = OrderedDict()
 
-    def group_key(record: _T) -> str:
+    def group_key(record: T) -> str:
         return getattr(record, group_column.name) or default_group
 
-    def sort_key(record: _T) -> _SortT:
+    def sort_key(record: T) -> SortT:
         return getattr(record, sort_column.name)
 
     transform = transform or (lambda v: v)
@@ -1881,11 +1880,11 @@ def currency_for_submission(form: Form, submission: FormSubmission) -> str:
     return 'CHF'
 
 
-def group_invoice_items(
-    invoice_items: Iterable[_ItemT]
-) -> dict[str, list[_ItemT]]:
+def group_invoice_items[T: InvoiceItem | InvoiceItemMeta](
+    invoice_items: Iterable[T]
+) -> dict[str, list[T]]:
 
-    def sort_key(item: _ItemT) -> tuple[int, str]:
+    def sort_key(item: T) -> tuple[int, str]:
         match item.group:
             case 'submission' | 'reservation' | 'migration':
                 return 0, item.group
@@ -1903,3 +1902,30 @@ def group_invoice_items(
             key=sort_key
         )
     }
+
+
+def can_change_username(
+    user: User,
+    request: OrgRequest,
+    configured_factors: Collection[str] | None = None
+) -> bool:
+    if not request.has_permission(user, Secret):
+        return False
+
+    if user.source:
+        return False
+
+    if user.role not in request.app.settings.user.change_username_roles:
+        return False
+
+    assert request.current_user is not None
+    second_factor = (request.current_user.second_factor or {}).get('type')
+    # NOTE: For now we only allow second factors that don't require multiple
+    #       steps, so we can do it all in a single form
+    if second_factor not in ('yubikey', 'totp'):
+        return False
+
+    if configured_factors is None:
+        configured_factors = Auth.from_request(request).factors
+
+    return second_factor in configured_factors

@@ -30,7 +30,6 @@ from onegov.form import as_internal_id
 from typing import assert_never
 from typing import Any
 from typing import Literal
-from typing import TypeVar
 from typing import Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -44,7 +43,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Protocol
-    from typing import TypeAlias
 
     class OccurenceSearchWidget(Protocol):
         @property
@@ -57,8 +55,7 @@ if TYPE_CHECKING:
             query: Query[Occurrence]
         ) -> Query[Occurrence]: ...
 
-    T = TypeVar('T')
-    MissingType: TypeAlias = 'Literal[_Sentinel.MISSING]'
+    type MissingType = Literal[_Sentinel.MISSING]
 
 DateRange = Literal[
     'today',
@@ -397,7 +394,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         self.event_filter_fields = fields or ()
 
-    def valid_keywords(
+    def valid_keywords[T](
         self,
         parameters: Mapping[str, T]
     ) -> dict[str, T]:

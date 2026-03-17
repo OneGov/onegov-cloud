@@ -26,10 +26,10 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.activity.collections import PublicationRequestCollection
     from onegov.activity.models import BookingPeriodMeta, PublicationRequest
-    from typing import Self, TypeAlias
+    from typing import Self
 
 
-ActivityState: TypeAlias = Literal[
+type ActivityState = Literal[
     'preview',
     'proposed',
     'accepted',
@@ -87,7 +87,9 @@ class Activity(Base, ContentMixin, TimestampMixin):
     )
 
     #: The user to which this activity belongs to (organiser)
-    username: Mapped[str] = mapped_column(ForeignKey(User.username))
+    username: Mapped[str] = mapped_column(
+        ForeignKey(User.username, onupdate='CASCADE')
+    )
 
     #: The user which initially reported this activity (same as username, but
     #: this value may not change after initialisation)

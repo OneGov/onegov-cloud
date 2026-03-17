@@ -33,11 +33,10 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Iterator
     from depot.io.interfaces import StoredFile
-    from typing import TypeAlias
     from uuid import UUID
 
-    AgencySortKey: TypeAlias = Callable[['Agency'], SupportsRichComparison]
-    AgencyMembershipSortKey: TypeAlias = Callable[
+    type AgencySortKey = Callable[[Agency], SupportsRichComparison]
+    type AgencyMembershipSortKey = Callable[
         [AgencyMembership],
         SupportsRichComparison
     ]

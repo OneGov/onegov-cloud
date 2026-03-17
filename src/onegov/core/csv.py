@@ -33,25 +33,18 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Sequence)
     from csv import Dialect
     from openpyxl.worksheet.worksheet import Worksheet
-    from typing import Protocol, TypeAlias
+    from typing import Protocol
 
-    _T = TypeVar('_T')
-    _T_co = TypeVar('_T_co', covariant=True)
-    _SupportsRichComparisonT = TypeVar(
-        '_SupportsRichComparisonT',
-        bound=SupportsRichComparison
-    )
-
-    class _RowType(Protocol[_T_co]):
-        def __call__(self, *, rownumber: int, **kwargs: str) -> _T_co: ...
+    class _RowType[T_co](Protocol):
+        def __call__(self, *, rownumber: int, **kwargs: str) -> T_co: ...
 
     class DefaultRow(Protocol):
         @property
         def rownumber(self) -> int: ...
         def __getattr__(self, name: str) -> str: ...
 
-    KeyFunc: TypeAlias = Callable[[_T], SupportsRichComparison]
-    DefaultCSVFile: TypeAlias = 'CSVFile[DefaultRow]'
+    type KeyFunc[T] = Callable[[T], SupportsRichComparison]
+    type DefaultCSVFile = CSVFile[DefaultRow]
     _RowT = TypeVar('_RowT', default=DefaultRow)
 else:
     _RowT = TypeVar('_RowT')
@@ -67,7 +60,8 @@ large_chars = 'GHMWQ_'
 max_width = 75
 
 
-class CSVFile(Generic[_RowT]):
+# FIXME: Switch to PEP-695/PEP-696 generic for Python 3.13
+class CSVFile(Generic[_RowT]):  # noqa: UP046
     """ Provides access to a csv file.
 
     :param csvfile:
@@ -493,19 +487,19 @@ def estimate_width(text: str) -> float:
 
 
 @overload
-def get_keys_from_list_of_dicts(
-    rows: Iterable[dict[_SupportsRichComparisonT, Any]],
+def get_keys_from_list_of_dicts[T: SupportsRichComparison](
+    rows: Iterable[dict[T, Any]],
     key: None = None,
     reverse: bool = False
-) -> tuple[_SupportsRichComparisonT, ...]: ...
+) -> tuple[T, ...]: ...
 
 
 @overload
-def get_keys_from_list_of_dicts(
-    rows: Iterable[dict[_T, Any]],
-    key: KeyFunc[_T],
+def get_keys_from_list_of_dicts[T](
+    rows: Iterable[dict[T, Any]],
+    key: KeyFunc[T],
     reverse: bool = False
-) -> tuple[_T, ...]: ...
+) -> tuple[T, ...]: ...
 
 
 def get_keys_from_list_of_dicts(

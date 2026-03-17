@@ -733,6 +733,9 @@ msgstr "Aucune image téléchargée pour le moment"
 msgid "This album does not contain any images yet."
 msgstr "Cet album ne contient pas encore d'images."
 
+msgid "Cannot display"
+msgstr "Impossible d'afficher"
+
 msgid "No photo albums defined yet."
 msgstr "Aucun album photo défini pour le moment."
 

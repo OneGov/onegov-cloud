@@ -75,6 +75,7 @@ def test_parse_text() -> None:
         First name * = ___
         << Fill in all in UPPER case >>
         Last name = ___
+        << Don't use your maiden name >>
         Country = ___[50]
         Comment = ...[8]
         Zipcode = ___[4]/[0-9]*
@@ -96,6 +97,7 @@ def test_parse_text() -> None:
 
     assert isinstance(form['last_name'], StringField)
     assert form['last_name'].label.text == 'Last name'
+    assert form['last_name'].description == "Don't use your maiden name"
     assert len(form['last_name'].validators) == 1
     assert isinstance(form['last_name'].validators[0], Optional)
 
@@ -1510,6 +1512,20 @@ def test_help_location_error() -> None:
         Terms of Use / User Agreement *=
             ( ) I accept the Terms of Use / User Agreement
         << Please find the terms attached below .. >>
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        Lieferung * =
+            (x) Pickup
+            ( ) Delivery
+                Address * = ___
+                Zip Code * = ___[4]/^[0-9]+$
+                City * = ___
+                Delivery time * = HH:MM
+        << Select delivery or pickup. >>
         """
     )
     assert parse_formcode(text, enable_edit_checks=True)

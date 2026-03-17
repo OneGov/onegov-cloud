@@ -24,9 +24,9 @@ if TYPE_CHECKING:
     from sedate.types import Direction, TzInfo
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.elements import SQLColumnExpression
-    from typing import TypeAlias, TypedDict
+    from typing import TypedDict
 
-    ExtendedTicketState: TypeAlias = TicketState | Literal['all', 'unfinished']
+    type ExtendedTicketState = TicketState | Literal['all', 'unfinished']
 
     class StateCountDict(TypedDict, total=False):
         open: int

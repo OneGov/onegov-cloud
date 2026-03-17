@@ -17,6 +17,7 @@ filterwarnings = [
     # specific modules, but we should be covered by Ruff for our own code
     '''ignore:invalid escape sequence '[^']+':::''',
     '''ignore:'crypt':DeprecationWarning:passlib.*:''',
+    '''ignore:datetime.datetime.utcnow() is deprecated:DeprecationWarning:depot''',
     # fixed upstream
     '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:pyasn1.*:''',
     '''ignore:'cgi':DeprecationWarning:webob.*:''',
@@ -44,7 +45,7 @@ exclude_lines = [
 ]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 follow_imports = "silent"
 namespace_packages = true
 explicit_package_bases = true
@@ -52,7 +53,7 @@ strict = true
 implicit_reexport = true
 warn_unreachable = true
 warn_return_any = false
-untyped_calls_exclude = "pycurl,selenium.webdriver.chrome.webdriver"
+untyped_calls_exclude = "icalendar,pycurl,selenium.webdriver.chrome.webdriver"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
 [[tool.mypy.overrides]]
@@ -123,7 +124,7 @@ include = [
 ]
 line-length = 79
 indent-width = 4
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = [

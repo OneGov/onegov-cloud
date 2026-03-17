@@ -61,7 +61,8 @@ from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.open_graph import OpenGraphMixin
 from onegov.org.theme.org_theme import user_options
-from onegov.org.utils import IMG_URLS, get_current_tickets_url
+from onegov.org.utils import can_change_username, get_current_tickets_url
+from onegov.org.utils import IMG_URLS
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
@@ -97,13 +98,10 @@ if TYPE_CHECKING:
     from onegov.ticket import Ticket
     from onegov.user import User, UserGroup
     from sedate.types import TzInfoOrName
-    from typing import TypeAlias, TypeVar
     from webob import Response
     from wtforms import Field
 
-    _T = TypeVar('_T')
-
-    AnyFormDefinitionOrCollection: TypeAlias = (
+    type AnyFormDefinitionOrCollection = (
         FormDefinition | FormCollection | SurveyCollection | SurveyDefinition
         | FormDocumentCollection | FormDocument)
 
@@ -870,7 +868,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
         """ Returns the breadcrumbs for the current page. """
         return [Link(_('Homepage'), self.homepage_url)]
 
-    def exclude_invisible(self, items: Iterable[_T]) -> Sequence[_T]:
+    def exclude_invisible[T](self, items: Iterable[T]) -> Sequence[T]:
         items = self.request.exclude_invisible(items)
         if not self.request.is_manager:
             return tuple(i for i in items if getattr(i, 'published', True))
@@ -1807,26 +1805,29 @@ class TicketLayout(DefaultLayout):
                 ))
 
             elif self.model.state == 'pending':
-                traits: Sequence[Trait] = ()
+                if self.model.handler_code != 'TRP':
+                    traits: Sequence[Trait] = ()
 
-                if self.model.handler.undecided:
-                    traits = (
-                        Block(
-                            _("This ticket can't be closed."),
-                            _(
-                                'This ticket requires a decision, but no '
-                                'decision has been made yet.'
+                    if self.model.handler.undecided:
+                        traits = (
+                            Block(
+                                _("This ticket can't be closed."),
+                                _(
+                                    'This ticket requires a decision, '
+                                    'but no decision has been made yet.'
+                                ),
+                                _('Cancel'),
                             ),
-                            _('Cancel')
-                        ),
-                    )
+                        )
 
-                links.append(Link(
-                    text=_('Close ticket'),
-                    url=self.request.link(self.model, 'close'),
-                    attrs={'class': ('ticket-button', 'ticket-close')},
-                    traits=traits
-                ))
+                    links.append(
+                        Link(
+                            text=_('Close ticket'),
+                            url=self.request.link(self.model, 'close'),
+                            attrs={'class': ('ticket-button', 'ticket-close')},
+                            traits=traits,
+                        )
+                    )
 
             elif self.model.state == 'closed':
                 links.append(Link(
@@ -3199,16 +3200,25 @@ class UserLayout(DefaultLayout):
         ]
 
     @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup] | None:
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
         if self.request.is_admin and not self.model.source:
-            return [
+            links.append(
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 )
-            ]
-        return None
+            )
+        if can_change_username(self.model, self.request):
+            links.append(
+                Link(
+                    text=_('Change username'),
+                    url=self.request.link(self.model, 'change-username'),
+                    attrs={'class': 'edit-link'}
+                )
+            )
+        return links
 
 
 class UserGroupCollectionLayout(DefaultLayout):

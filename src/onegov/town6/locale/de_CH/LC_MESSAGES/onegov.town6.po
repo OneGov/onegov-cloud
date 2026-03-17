@@ -730,6 +730,9 @@ msgstr "Noch keine Bilder hochgeladen"
 msgid "This album does not contain any images yet."
 msgstr "Dieses Fotoalbum enthält noch keine Bilder."
 
+msgid "Cannot display"
+msgstr "Kann nicht anzeigen"
+
 msgid "No photo albums defined yet."
 msgstr "Noch keine Fotoalben erstellt."
 

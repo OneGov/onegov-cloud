@@ -12,9 +12,8 @@ if TYPE_CHECKING:
     from onegov.core.types import JSONObject_ro
     from onegov.election_day.models import ElectionCompoundPart
     from onegov.election_day.request import ElectionDayRequest
-    from typing import TypeAlias
 
-    ElectionCompoundOrPart: TypeAlias = ElectionCompound | ElectionCompoundPart
+    type ElectionCompoundOrPart = ElectionCompound | ElectionCompoundPart
 
 
 def get_election_summary(

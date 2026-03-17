@@ -15,6 +15,7 @@ from onegov.pas.collections import (AttendenceCollection,
 from onegov.pas.custom import (
     validate_attendance_date,
     has_user_set_abschluss_for_settlement_run,
+    notify_admins_finalized,
 )
 from onegov.pas.forms import AttendenceAddCommissionBulkForm, AttendenceAddForm
 from onegov.pas.forms import AttendenceAddPlenaryForm
@@ -219,6 +220,7 @@ def add_bulk_attendence(
             # Remove static field; choices are set dynamically via JS
             data.pop('parliamentarian_id', None)
             bulk_edit_id = uuid.uuid4()
+            notify_attendence = None
             for parliamentarian_id in raw_parl_ids:
                 attendence = self.add(
                     parliamentarian_id=parliamentarian_id, **data
@@ -228,6 +230,10 @@ def add_bulk_attendence(
                 # members in raw_parl_ids will be immediately blocked from
                 # adding new attendances in this settlement run
                 Change.add(request, 'add', attendence)
+                if attendence.abschluss and notify_attendence is None:
+                    notify_attendence = attendence
+            if notify_attendence is not None:
+                notify_admins_finalized(request, notify_attendence)
         else:
             request.warning(_('No parliamentarians selected'))
             return request.redirect(request.class_link(AttendenceCollection))
@@ -448,19 +454,31 @@ def edit_commission_bulk_attendence(
                     Change.add(request, 'delete', attendence)
                     collection.delete(attendence)
 
+            notify_attendence = None
             for parliamentarian_id in raw_parl_ids:
                 attendence = collection.query().filter(
                         Attendence.parliamentarian_id == parliamentarian_id,
                         Attendence.bulk_edit_id == form.bulk_edit_id.data,
                     ).first()
                 if attendence:
+                    was_abschluss = attendence.abschluss
                     form.populate_obj(attendence)
                     Change.add(request, 'edit', attendence)
+                    if (
+                        attendence.abschluss
+                        and not was_abschluss
+                        and notify_attendence is None
+                    ):
+                        notify_attendence = attendence
                 else:
                     attendence = collection.add(
                         parliamentarian_id=parliamentarian_id, **data
                     )
                     Change.add(request, 'add', attendence)
+                    if attendence.abschluss and notify_attendence is None:
+                        notify_attendence = attendence
+            if notify_attendence is not None:
+                notify_admins_finalized(request, notify_attendence)
 
         request.success(_('Edited attendences'))
 
@@ -631,8 +649,11 @@ def edit_attendence(
                         'form_width': 'large',
                     }
 
+        was_abschluss = self.abschluss
         form.populate_obj(self)
         Change.add(request, 'edit', self)
+        if self.abschluss and not was_abschluss:
+            notify_admins_finalized(request, self)
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 

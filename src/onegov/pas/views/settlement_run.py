@@ -52,17 +52,17 @@ from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
         generate_fibu_export_rows)
 
 
-from typing import Any, Literal, TypeAlias, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from datetime import date
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
 
-    SettlementDataRow: TypeAlias = tuple[
-        'date', PASParliamentarian, str, Decimal, Decimal, Decimal
+    type SettlementDataRow = tuple[
+        date, PASParliamentarian, str, Decimal, Decimal, Decimal
     ]
-    TotalRow: TypeAlias = tuple[
+    type TotalRow = tuple[
         str, Decimal, Decimal, Decimal, Decimal, Decimal
     ]
 
@@ -1143,7 +1143,7 @@ def view_settlement_run_all_export(
                             '\n' in str_value):
                         str_value = f'"{str_value}"'
                     row_strings.append(str_value)
-            csv_string += ','.join(row_strings) + '\n'
+            csv_string += ';'.join(row_strings) + '\n'
 
         # Encode to bytes with BOM for Excel compatibility
         csv_bytes = '\ufeff'.encode('utf-8') + csv_string.encode('utf-8')
@@ -1181,7 +1181,8 @@ def view_settlement_run_export(
             entity_type='party',
             entity=self.entity,
         )
-        filename = normalize_for_filename(f'Partei_{self.entity.name}')
+        name = self.entity.name.replace(',', ' ').replace('+', ' ')
+        filename = normalize_for_filename(f'Partei_{name}')
 
     elif self.category == 'commission':
         assert isinstance(self.entity, PASCommission)
@@ -1192,16 +1193,17 @@ def view_settlement_run_export(
             entity_type='commission',
             entity=self.entity,
         )
-        filename = normalize_for_filename(f'commission_{self.entity.name}')
+        name = self.entity.name.replace(',', ' ').replace('+', ' ')
+        filename = normalize_for_filename(f'commission_{name}')
 
     elif self.category == 'parliamentarian':
         assert isinstance(self.entity, PASParliamentarian)
-        # PASParliamentarian specific export has it's own rendering function
         pdf_bytes = generate_parliamentarian_settlement_pdf(
             self.settlement_run, request, self.entity
         )
+        name = f'{self.entity.last_name}_{self.entity.first_name}'
         filename = normalize_for_filename(
-            f'Parlamentarier_{self.entity.last_name}_{self.entity.first_name}'
+            'Parlamentarier_' + name.replace(',', ' ').replace('+', ' ')
         )
         return Response(
             pdf_bytes,

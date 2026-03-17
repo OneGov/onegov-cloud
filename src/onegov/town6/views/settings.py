@@ -37,22 +37,19 @@ from onegov.town6.forms.settings import (
 from onegov.town6.layout import SettingsLayout, DefaultLayout
 
 
-from typing import overload, TypeVar, TYPE_CHECKING
+from typing import overload, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
     from webob import Response
 
 
-FormT = TypeVar('FormT', bound=Form)
-
-
 @overload
-def get_custom_settings_form(
+def get_custom_settings_form[T: Form](
     model: Organisation,
     request: TownRequest,
-    homepage_settings_form: type[FormT]
-) -> type[FormT]: ...
+    homepage_settings_form: type[T]
+) -> type[T]: ...
 
 
 @overload

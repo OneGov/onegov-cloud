@@ -23,9 +23,6 @@ if TYPE_CHECKING:
     from onegov.agency.models import ExtendedPerson
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
-    from typing import TypeVar
-
-    T = TypeVar('T')
 
 
 UPDATE_FILTER_PARAMS = frozenset((
@@ -37,7 +34,7 @@ UPDATE_FILTER_PARAMS = frozenset((
 ))
 
 
-def filter_for_updated(
+def filter_for_updated[T](
     filter_operation: str,
     filter_value: str | None,
     result: T
@@ -176,17 +173,24 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
         return data
 
     def item_links(self, item: ExtendedPerson) -> dict[str, Any]:
-        result = {
-            attribute: getattr(item, attribute, None)
-            for attribute in (
-                'picture_url',
-                'website',
-            )
-            if attribute not in self.app.org.hidden_people_fields
-        }
-        result['memberships'] = self.membership_api.for_filter(
-            person=item.id.hex
+        picture_url = (
+            item.picture_url
+            if 'picture_url' not in self.app.org.hidden_people_fields
+            else None
         )
+        website = (
+            item.website
+            if 'website' not in self.app.org.hidden_people_fields
+            else None
+        )
+        result = {
+            'html': item,
+            'picture_url': picture_url,
+            'website': website,
+            'memberships': self.membership_api.for_filter(
+                person=str(item.id.hex)
+            )
+        }
         return result
 
     def apply_changes(
@@ -252,6 +256,7 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
 
     def item_links(self, item: ExtendedAgency) -> dict[str, Any]:
         return {
+            'html': item,
             'organigram': item.organigram,
             'parent': self.for_item_id(item.parent_id),
             'children': self.for_filter(parent=str(item.id)),
@@ -300,6 +305,7 @@ class MembershipApiEndpoint(
 
     def item_links(self, item: ExtendedAgencyMembership) -> dict[str, Any]:
         return {
+            'html': item,
             'agency': self.agency_api.for_item_id(item.agency_id),
             'person': self.person_api.for_item_id(item.person_id)
         }

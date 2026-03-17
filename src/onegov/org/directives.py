@@ -14,19 +14,18 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.user import User
     from sqlalchemy.orm import Query
-    from typing import Protocol, TypeAlias, TypeVar, TypedDict
+    from typing import Protocol, TypedDict
 
-    DirectoryEntryT = TypeVar('DirectoryEntryT', bound=DirectoryEntry)
-    DirectorySearchWidgetRegistry: TypeAlias = dict[
+    type DirectorySearchWidgetRegistry = dict[
         str,
-        type['RegisteredDirectorySearchWidget[Any]']
+        type[RegisteredDirectorySearchWidget[Any]]
     ]
-    EventSearchWidgetRegistry: TypeAlias = dict[
+    type EventSearchWidgetRegistry = dict[
         str,
-        type['RegisteredEventSearchWidget']
+        type[RegisteredEventSearchWidget]
     ]
-    LinkGroupFactory: TypeAlias = Callable[[OrgRequest, User], LinkGroup]
-    BoardletKind: TypeAlias = Literal['user', 'citizen']
+    type LinkGroupFactory = Callable[[OrgRequest, User], LinkGroup]
+    type BoardletKind = Literal['user', 'citizen']
 
     class HomepageWidget(Protocol):
         @property
@@ -35,18 +34,18 @@ if TYPE_CHECKING:
     class RegisteredHomepageWidget(HomepageWidget, Protocol):
         tag: str
 
-    class DirectorySearchWidget(Protocol[DirectoryEntryT]):
+    class DirectorySearchWidget[EntryT: DirectoryEntry](Protocol):
         @property
-        def search_query(self) -> Query[DirectoryEntryT]: ...
+        def search_query(self) -> Query[EntryT]: ...
 
         def adapt(
             self,
-            query: Query[DirectoryEntryT]
-        ) -> Query[DirectoryEntryT]: ...
+            query: Query[EntryT]
+        ) -> Query[EntryT]: ...
 
-    class RegisteredDirectorySearchWidget(
-        DirectorySearchWidget[DirectoryEntryT],
-        Protocol[DirectoryEntryT]
+    class RegisteredDirectorySearchWidget[EntryT: DirectoryEntry](
+        DirectorySearchWidget[EntryT],
+        Protocol
     ):
         name: str
 
