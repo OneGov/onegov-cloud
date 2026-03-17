@@ -6,15 +6,18 @@ import transaction
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from sedate import utcnow, ensure_timezone
+from webtest import Upload
+
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.form import FormCollection
 from onegov.org.models.page import News, Page
-from sedate import utcnow
-from webtest import Upload
-
+from onegov.ticket import TicketCollection, HandlerRegistry
+from tests.onegov.org.common import register_echo_handler
 
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from .conftest import Client
 
@@ -347,3 +350,44 @@ def test_search_future_events_are_sorted_by_occurrence_date(
             'Fourth Concert', 'Third Concert', 'Second Concert',
             'First Concert', 'Not sorted Concert'
         ]
+
+def test_search_result_with_breadcrumbs(
+    client_with_fts: Client,
+    handlers: HandlerRegistry
+) -> None:
+    client = client_with_fts
+    register_echo_handler(handlers)
+
+    # search breadcrumb news
+    search_page = client.get('/search?q=webseite')
+    hrefs = [link.attr('href') for link in search_page.pyquery('.breadcrumb-item a').items()]
+    assert hrefs == [
+        'http://localhost/',
+        'http://localhost/news',
+        'http://localhost/news/wir-haben-eine-neue-webseite'
+    ]
+
+    # create ticket
+    transaction.begin()
+    tz = ensure_timezone('Europe/Zurich')
+    ticket = TicketCollection(client.app.session()).open_ticket(
+        handler_id='1',
+        handler_code='EHO',
+        title="Title",
+        group="Group",
+        email="test@example.org",
+        created=datetime(2016, 1, 2, 10, tzinfo=tz),
+    )
+    ticket_number = ticket.number
+    ticket_id = ticket.id.hex
+    transaction.commit()
+
+    # search breadcrumbs ticket
+    client.login_admin()
+    search_page = client.get(f'/search?q={ticket_number}')
+    hrefs = [link.attr('href') for link in search_page.pyquery('.breadcrumb-item a').items()]
+    assert hrefs == [
+        'http://localhost/',
+        'http://localhost/tickets/ALL/open?page=0',
+        f'http://localhost/ticket/EHO/{ticket_id}'
+    ]
