@@ -403,12 +403,39 @@ class TimeReportHandler(Handler):
                     f'<dd>{layout.format_currency(report.hourly_rate)}</dd>',
                     f"<dt>{request.translate(_('Pages'))}</dt>",
                     f'<dd>{pages}</dd>',
+                ]
+            )
+            # TODO: remove once schriftlich data is cleaned up
+            if report.duration:
+                summary_parts.extend([
+                    f"<dt>{request.translate(_('Duration'))}</dt>",
+                    (f'<dd>{report.duration_hours} h'
+                     f' ({report.duration} min)</dd>'),
+                ])
+            if report.start and report.end:
+                start = escape(
+                    layout.format_date(report.start, 'datetime')
+                )
+                end = escape(
+                    layout.format_date(report.end, 'datetime')
+                )
+                summary_parts.extend([
+                    f"<dt>{request.translate(_('Time'))}</dt>",
+                    f'<dd>{start} - {end}</dd>',
+                ])
+            summary_parts.extend(
+                [
                     (
-                        f"<dt><strong>{request.translate(_('Total'))}</strong>"
+                        f"<dt><strong>"
+                        f"{request.translate(_('Total'))}</strong>"
                         f" ({layout.format_currency(report.hourly_rate)}"
                         f" \u00d7 {pages})</dt>"
                     ),
-                    f'<dd><strong>{layout.format_currency(total)}</strong></dd>',
+                    (
+                        f'<dd><strong>'
+                        f'{layout.format_currency(total)}'
+                        f'</strong></dd>'
+                    ),
                     '</dl>',
                 ]
             )
