@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import psycopg2
+import psycopg
 
 from datetime import datetime
 from markupsafe import escape, Markup
@@ -39,8 +39,8 @@ MISSING = object()
 DB_CONNECTION_ERRORS = (
     OperationalError,
     InterfaceError,
-    psycopg2.OperationalError,
-    psycopg2.InterfaceError,
+    psycopg.OperationalError,
+    psycopg.InterfaceError,
 )
 
 

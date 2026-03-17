@@ -60,7 +60,7 @@ from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class
 from operator import itemgetter
-from psycopg2.extensions import TransactionRollbackError
+from psycopg import OperationalError as PostgresOperationalError
 from purl import URL
 from sqlalchemy.exc import OperationalError
 from urllib.parse import urlencode
@@ -1741,7 +1741,13 @@ def http_conflict_tween_factory(
             if not hasattr(e, 'orig'):
                 raise
 
-            if not isinstance(e.orig, TransactionRollbackError):
+            # Error Class 40: Transaction Rollback, for details
+            # see https://www.psycopg.org/psycopg3/docs/api/errors.html
+            if not (
+                isinstance(e.orig, PostgresOperationalError)
+                and e.orig.sqlstate
+                and e.orig.sqlstate.startswith('40')
+            ):
                 raise
 
             log.warning('A transaction failed because there was a conflict')

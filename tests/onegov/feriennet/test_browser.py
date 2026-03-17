@@ -5,7 +5,7 @@ import json
 import pytest
 
 from datetime import timedelta
-from psycopg2.extras import NumericRange
+from onegov.activity.types import BoundedIntegerRange
 from pytest import mark
 from sedate import as_datetime, replace_timezone
 
@@ -274,7 +274,10 @@ def test_volunteers_export(
     scenario.add_user(username='member@example.org', role='member')
     scenario.add_occasion(age=(0, 10), spots=(0, 2), cost=100)
     scenario.add_need(
-        name="Begleiter", number=NumericRange(1, 4), accept_signups=True)
+        name="Begleiter",
+        number=BoundedIntegerRange(1, 4),
+        accept_signups=True
+    )
     scenario.add_attendee(name="Dustin")
     scenario.add_booking(
         username='admin@example.org',

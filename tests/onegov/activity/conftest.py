@@ -17,11 +17,11 @@ from onegov.activity import Occasion
 from onegov.activity import OccasionDate
 from onegov.activity import OccasionNeed
 from onegov.activity import OccasionCollection
+from onegov.activity.types import BoundedIntegerRange
 from onegov.core.utils import module_path, normalize_for_url
 from onegov.pay import PaymentProviderCollection
 from onegov.user import User
 from onegov.user import UserCollection
-from psycopg2.extras import NumericRange
 from sedate import standardize_date, utcnow
 from sqlalchemy import inspect
 from tests.shared.scenario import BaseScenario
@@ -332,7 +332,7 @@ class Scenario(BaseScenario, Generic[ActivityT]):
     def add_need(self, **columns: Any) -> OccasionNeed:
         columns.setdefault('occasion', self.latest_occasion)
         columns.setdefault('name', self.faker.name())
-        columns.setdefault('number', NumericRange(1, 5))
+        columns.setdefault('number', BoundedIntegerRange(1, 5))
 
         need = self.add(model=OccasionNeed, **columns)
         self.needs.append(need)

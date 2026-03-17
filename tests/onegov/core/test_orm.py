@@ -30,7 +30,7 @@ from onegov.core.orm.types import HSTORE, JSON, UTCDateTime
 from onegov.core.orm.types import LowercaseText, MarkupText
 from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
-from psycopg2.extensions import TransactionRollbackError
+from psycopg import OperationalError as PostgresOperationalError
 from pytz import timezone
 from sedate import utcnow
 from sqlalchemy import and_, func, inspect, select, text, ForeignKey, Integer
@@ -859,7 +859,10 @@ def test_serialization_failure(postgres_dsn: str) -> None:
     # one will have failed with a rollback error
     rollbacks = [e for e in exceptions if e]
     assert len(rollbacks) == 1
-    assert isinstance(rollbacks[0].orig, TransactionRollbackError)  # type: ignore[attr-defined]
+    assert hasattr(rollbacks[0], 'orig')
+    assert isinstance(rollbacks[0].orig, PostgresOperationalError)
+    assert rollbacks[0].orig.sqlstate
+    assert rollbacks[0].orig.sqlstate.startswith('40')
 
 
 @pytest.mark.flaky(reruns=3, only_rerun=None)
@@ -932,7 +935,13 @@ def test_application_retries(
         if not hasattr(self, 'orig'):
             return
 
-        if not isinstance(self.orig, TransactionRollbackError):
+        if not isinstance(self.orig, PostgresOperationalError):
+            return
+
+        if not self.orig.sqlstate:
+            return
+
+        if not self.orig.sqlstate.startswith('40'):
             return
 
         raise HTTPConflict()

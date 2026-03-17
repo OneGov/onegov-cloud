@@ -32,7 +32,7 @@ from splinter import Browser
 from sqlalchemy import create_engine, exc, text
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared.browser import ExtendedBrowser
-from tests.shared.postgresql import Postgresql
+from tests.shared.postgresql import Postgresql as BasePostgresql
 from threading import Thread
 from uuid import uuid4
 from webdriver_manager.chrome import ChromeDriverManager
@@ -52,6 +52,16 @@ redis_server = redis_proc(host='127.0.0.1', executable=redis_path)
 logging.getLogger('faker').setLevel(logging.INFO)
 logging.getLogger('txn').setLevel(logging.INFO)
 logging.getLogger('morepath').setLevel(logging.INFO)
+
+
+# HACK: Force use of psycopg over psycopg2, can be removed once
+#       we upgrade to SQLAlchemy 2.1
+class Postgresql(BasePostgresql):
+    def url(self, **kwargs: Any) -> str:
+        return super().url(**kwargs).replace(
+            'postgresql://',
+            'postgresql+psycopg://'
+        )
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -179,7 +189,7 @@ def postgres_dsn(
 
     """
     if pytestconfig.getoption('nopg'):
-        yield 'postgresql://postgres:postgres@127.0.0.1:55432/postgres'
+        yield 'postgresql+psycopg://postgres:postgres@127.0.0.1:55432/postgres'
         return
 
     assert postgres is not None

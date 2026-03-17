@@ -11,6 +11,7 @@ from datetime import datetime, timedelta, date, time
 from freezegun import freeze_time
 from onegov.activity import Booking, BookingPeriodInvoice, ActivityInvoiceItem
 from onegov.activity import Activity
+from onegov.activity.types import BoundedIntegerRange
 from onegov.activity.utils import generate_xml
 from onegov.core.custom import json
 from onegov.feriennet.utils import NAME_SEPARATOR
@@ -18,7 +19,6 @@ from onegov.file import FileCollection
 from onegov.gis import Coordinates
 from onegov.pay import Payment
 from onegov.user import User
-from psycopg2.extras import NumericRange
 from sedate import utcnow
 from tests.shared import utils
 from unittest.mock import patch
@@ -532,7 +532,7 @@ def test_activity_filter_age_ranges(
 
     # change the meeting age
     with scenario.update():
-        scenario.occasions[1].age = NumericRange(15, 20)  # type: ignore[assignment]
+        scenario.occasions[1].age = BoundedIntegerRange(15, 20)
 
     preschool = client.get('/activities?filter=age_ranges%3A5-5')
 
@@ -1248,7 +1248,7 @@ def test_confirmed_booking_view(client: Client, scenario: Scenario) -> None:
         scenario.latest_period.confirmed = True
         scenario.latest_booking.state = 'accepted'
         assert scenario.latest_occasion is not None
-        scenario.latest_occasion.spots = NumericRange(2, 5)  # type: ignore[assignment]
+        scenario.latest_occasion.spots = BoundedIntegerRange(2, 5)
 
     page = client.get('/my-bookings')
     assert "nicht genügend Anmeldungen" in page
@@ -3482,7 +3482,10 @@ def test_view_volunteer_activities(
     scenario.add_activity(title="Pet Zoo", state='accepted')
     scenario.add_occasion(cost=200)
     scenario.add_need(
-        name="Begleiter", number=NumericRange(1, 2), accept_signups=True)
+        name="Begleiter",
+        number=BoundedIntegerRange(1, 2),
+        accept_signups=True
+    )
 
     scenario.commit()
 
