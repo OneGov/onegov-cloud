@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import pytest
 
+from onegov.agency.collections import ExtendedPersonCollection
 from onegov.api import ApiApp
 from onegov.api import ApiEndpoint
 from onegov.core import Framework
 from onegov.agency.api import PersonApiEndpoint
+from onegov.agency.models import ExtendedPerson
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from tests.shared.client import Client
 from tests.shared.utils import create_app
+from uuid import UUID
 from wtforms import StringField
 from wtforms.validators import InputRequired
 
@@ -109,6 +112,11 @@ def has_item_permission(
     permission: object
 ) -> bool:
     return getattr(model, 'hidden', False) is False
+
+
+@App.path(model=ExtendedPerson, path='/person/{id}', converters={'id': UUID})
+def get_person(app: App, id: UUID) -> ExtendedPerson | None:
+    return ExtendedPersonCollection(app.session()).by_id(id)
 
 
 @pytest.fixture(scope='function')

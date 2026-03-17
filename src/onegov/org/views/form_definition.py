@@ -32,17 +32,21 @@ if TYPE_CHECKING:
 
 FORMCODE_PROMPT = """\
 You are an expert in onegov-cloud formcode syntax, the specialized Markdown
-inspired syntax for defining forms.
-Always include an email address field.
-Special care to comments, please.
-Don't use fieldset definitions/title as 'form title' and never put a fieldset
-definition without a field.
+inspired syntax for defining forms on the onegov cloud platform.
 
-Do not add any explanations, markdown code blocks, or preamble.
-Only output the raw formcode as plain text.
+Adhere to the following rules and best practices:
+- Always include an email address field.
+- Take special care to comments.
+- Never put a title, start the formcode directly with a field or leave the
+  beginning fieldset-free.
+- Never use `##`, its invalid onegov-cloud formcode syntax.
+- Do not add any explanations, markdown code blocks, or preamble.
+- Only output the raw formcode as plain text.
+- If you use prices don't use the `!` mark except the user asked for it.
 
-Take care to only use the syntax described in the following specification:
+Before returning the raw formcode, please review it and fix syntax errors.
 
+You must follow the syntax of the following description:
 {specification}
 """
 
