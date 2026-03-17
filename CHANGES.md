@@ -1,8 +1,32 @@
 # Changes
 
+## 2026.14
+
+`2026-03-17` | [6ea1066d5b...94219e1eb3](https://github.com/OneGov/onegov-cloud/compare/6ea1066d5b^...94219e1eb3)
+
+### Agency
+
+##### New UI
+
+New UI using foundation 6.
+
+`Feature` | [OGC-2853](https://linear.app/onegovcloud/issue/OGC-2853) | [94219e1eb3](https://github.com/onegov/onegov-cloud/commit/94219e1eb32f30d5e4e276423b9bc2df91c3d4c1)
+
+### Api
+
+##### Adds html link to person, agency and memebership
+
+`Feature` | [OGC-2989](https://linear.app/onegovcloud/issue/OGC-2989) | [312ae338e4](https://github.com/onegov/onegov-cloud/commit/312ae338e44a44a9e228ef508933700f5a0a15c7)
+
+### Form
+
+##### Improve `formcoder` prompt
+
+`Feature` | [OGC-2974](https://linear.app/onegovcloud/issue/OGC-2974) | [cf2d9f6198](https://github.com/onegov/onegov-cloud/commit/cf2d9f619821ca91123f532f065e2ee023c5f3c5)
+
 ## 2026.13
 
-`2026-03-13` | [926add3838...78c0845418](https://github.com/OneGov/onegov-cloud/compare/926add3838^...78c0845418)
+`2026-03-13` | [926add3838...bcc04abfb1](https://github.com/OneGov/onegov-cloud/compare/926add3838^...bcc04abfb1)
 
 ### Core
 
@@ -2144,38 +2168,4 @@ File upload for additional files
 Add anchor links to headings in main content
 
 `Feature` | [OGC-2267](https://linear.app/onegovcloud/issue/OGC-2267) | [e35d58b11f](https://github.com/onegov/onegov-cloud/commit/e35d58b11f2caff4ad33732dbd1e00cae98ae7de)
-
-## 2025.45
-
-`2025-09-01` | [313087dab3...6fc92791b8](https://github.com/OneGov/onegov-cloud/compare/313087dab3^...6fc92791b8)
-
-**Upgrade hints**
-- onegov-org --select /onegov_town6/wil ris-make-imported-files-general-file
-### Pas
-
-##### Remove Legislative, Add '/files' entry.
-
-`Bugfix` | [OGC-2402](https://linear.app/onegovcloud/issue/OGC-2402) | [87ed8854c2](https://github.com/onegov/onegov-cloud/commit/87ed8854c2a0f2517a4935b915b8b79bff59b613)
-
-### Ris
-
-##### Make imported files from type general
-
-`Feature` | [OGC-2550](https://linear.app/onegovcloud/issue/OGC-2550) | [313087dab3](https://github.com/onegov/onegov-cloud/commit/313087dab35246dcd0578997076d8ab47a11a294)
-
-##### Don't show access field for meeting and political business
-
-All RIS information is public
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [d2b375cc04](https://github.com/onegov/onegov-cloud/commit/d2b375cc0400f10effc8f3c2ae861bd89b44de0d)
-
-##### Enhance layout for all views
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [b87bae8692](https://github.com/onegov/onegov-cloud/commit/b87bae86928666803a3fea2ff2f6da1d92dc05af)
-
-### User
-
-##### Fixes crash in `User.get_initials` related to dots in the username
-
-`Bugfix` | [4163ae4783](https://github.com/onegov/onegov-cloud/commit/4163ae47838f5a252b333b89e59e00cad197d971)
 
