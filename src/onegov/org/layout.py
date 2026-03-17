@@ -1821,8 +1821,7 @@ class TicketLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(_('Tickets'), get_current_tickets_url(self.request)),
-            Link(self.model.number, self.request.link(
-                TicketCollection(self.request.session).by_id(self.model.id)))
+            Link(self.model.number, '#')
         ]
 
     @cached_property
