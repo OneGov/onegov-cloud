@@ -1,8 +1,18 @@
 # Changes
 
+## 2026.15
+
+`2026-03-17` | [97194afd57...97194afd57](https://github.com/OneGov/onegov-cloud/compare/97194afd57^...97194afd57)
+
+### Org
+
+##### Extends events API endpoint with filters
+
+`Feature` | [OGC-3021](https://linear.app/onegovcloud/issue/OGC-3021) | [97194afd57](https://github.com/onegov/onegov-cloud/commit/97194afd578684e3eb5b3d04515714a22fdc8146)
+
 ## 2026.14
 
-`2026-03-17` | [6ea1066d5b...94219e1eb3](https://github.com/OneGov/onegov-cloud/compare/6ea1066d5b^...94219e1eb3)
+`2026-03-17` | [6ea1066d5b...1ada718257](https://github.com/OneGov/onegov-cloud/compare/6ea1066d5b^...1ada718257)
 
 ### Agency
 
@@ -2130,42 +2140,4 @@ Only show content sidebar if there are more than 2 subtitles
 File upload for additional files
 
 `Feature` | [OGC-2269](https://linear.app/onegovcloud/issue/OGC-2269) | [850949b51c](https://github.com/onegov/onegov-cloud/commit/850949b51cd78b467d6eab82acc6431b25c631c5)
-
-## 2025.46
-
-`2025-09-02` | [c01adb76b6...57240da96f](https://github.com/OneGov/onegov-cloud/compare/c01adb76b6^...57240da96f)
-
-**Upgrade hints**
-- onegov-org --select /onegov_town6/wil ris-wil-meetings-fix-audio-links
-### Pas
-
-##### Bulk add commission attendances.
-
-`Feature` | [OGC-2489](https://linear.app/onegovcloud/issue/OGC-2489) | [56a3fe9f49](https://github.com/onegov/onegov-cloud/commit/56a3fe9f49731e4a40f94aa2cd616a90793357de)
-
-### Ris
-
-##### Show audio and video links for meetings
-
-`Feature` | [OGC-2522](https://linear.app/onegovcloud/issue/OGC-2522) | [c01adb76b6](https://github.com/onegov/onegov-cloud/commit/c01adb76b6336ff441bfa0621fd00ffb07ea671a)
-
-##### Adds export view to meeting in order to download related meeting item documents
-
-`Feature` | [OGC-2297](https://linear.app/onegovcloud/issue/OGC-2297) | [d2a37ed20f](https://github.com/onegov/onegov-cloud/commit/d2a37ed20f4732e4ec37f0a9a85b2f7c88ccab15)
-
-### Town6
-
-##### Fix more-list
-
-`Feature` | [015b897a87](https://github.com/onegov/onegov-cloud/commit/015b897a87ca1986f20770c27c1b2ec153b34518)
-
-##### List Corrections
-
-`Feature` | [aaf293052b](https://github.com/onegov/onegov-cloud/commit/aaf293052bf8ea579dfc70970eb728d873af653c)
-
-##### Anchor links
-
-Add anchor links to headings in main content
-
-`Feature` | [OGC-2267](https://linear.app/onegovcloud/issue/OGC-2267) | [e35d58b11f](https://github.com/onegov/onegov-cloud/commit/e35d58b11f2caff4ad33732dbd1e00cae98ae7de)
 
