@@ -52,7 +52,6 @@ class Votum(
     __tablename__ = 'landsgemeinde_vota'
 
     fts_type_title = _('Vota')
-    fts_public = True
     fts_title_property = None
     fts_properties = {
         'text': {'type': 'localized', 'weight': 'A'},
@@ -63,6 +62,10 @@ class Votum(
         'person_place': {'type': 'text', 'weight': 'D'},
         'person_political_affiliation': {'type': 'text', 'weight': 'C'},
     }
+
+    @property
+    def fts_public(self) -> bool:
+        return self.state != 'draft'
 
     @property
     def fts_last_change(self) -> datetime:
@@ -157,16 +160,30 @@ class Votum(
         )
         return ', '.join(d for d in details if d)
 
-    @observes('files', 'agenda_item.assembly.date')
-    def update_assembly_date(self, files: list[File], date: date_t) -> None:
+    @observes('files', 'state', 'agenda_item.assembly.date')
+    def update_fts_last_change_and_linked_files_meta(
+        self,
+        files: list[File],
+        state: VotumState,
+        date: date_t
+    ) -> None:
         # NOTE: Makes sure we will get reindexed, it doesn't really
         #       matter what we flag as modified, we just pick something.
         flag_modified(self, 'number')
-        if not files or date is None:
+        if not files:
             # nothing else to do
             return
 
+        public = self.fts_public
+
         for file in files:
-            if file.meta.get('assembly_date') != date:
+            if file.meta is None:
+                file.meta = {}  # type: ignore[unreachable]
+
+            if date is not None and file.meta.get('assembly_date') != date:
                 file.meta['assembly_date'] = date
+                flag_modified(file, 'meta')
+
+            if file.meta.get('fts_public') is not public:
+                file.meta['fts_public'] = public
                 flag_modified(file, 'meta')
