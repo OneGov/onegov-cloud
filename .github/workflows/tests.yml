@@ -204,7 +204,7 @@ jobs:
         # TEMPORARY: Switch back to the app venv once it is 3.12
         # source /app/bin/activate
         # python -m pip install --upgrade uv
-        uv venv --python 3.12
+        uv venv --python 3.13
         source .venv/bin/activate
         uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
         # TEMPORARY: editable build so we don't need a path-fix in codecov
