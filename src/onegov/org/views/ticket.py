@@ -1192,12 +1192,10 @@ def view_ticket_files(self: Ticket, request: OrgRequest) -> BaseResponse:
     not_existing = []
     with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for f in form_submission.files:
+            file = None
             try:
                 file = f.reference.file
-                if hasattr(file, '_file_path'):
-                    zipf.write(file._file_path, arcname=f.name)
-                else:
-                    zipf.writestr(f.name, file.read())
+                zipf.writestr(f.name, file.read())
             except OSError:
                 not_existing.append(f.name)
 

@@ -19,7 +19,6 @@ from typing import overload, Any, Literal, NoReturn, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
     from sqlalchemy.engine import Dialect
-    from typing import Self
 
 # XXX i18n
 SAFE_FORMAT_TRANSLATORS: dict[type[object], Callable[[Any], str]] = {
