@@ -984,6 +984,33 @@ class DashboardLayout(OrgDashboardLayout, DefaultLayout):
 
 
 @TownApp.layout(model=GeneralFile)
+class GeneralFileLayout(DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
+
+    @cached_property
+    def breadcrumbs(self) -> Sequence[Link]:
+        name = self.model.name[:40]
+        if len(name) == 40:
+            name = name[:37] + '...'
+
+        links = [Link(_('Homepage'), self.homepage_url)]
+        if self.request.is_manager:
+            links.append(Link(_('Files'), self.files_url))
+
+        if (
+            self.model.published
+            and self.model.publication
+            and self.model.claimed_extension == 'pdf'
+        ):
+            year = self.model.created.strftime('%Y')
+            links.append(Link(_('Publications'), self.publications_url(year)))
+
+        links.append(Link(name, '#'))
+        return links
+
+
 class GeneralFileCollectionLayout(DefaultLayout):
 
     def __init__(self, model: Any, request: TownRequest) -> None:
@@ -995,18 +1022,6 @@ class GeneralFileCollectionLayout(DefaultLayout):
         super().__init__(model, request)
         request.include('upload')
         request.include('prompt')
-
-    @cached_property
-    def breadcrumbs(self) -> Sequence[Link]:
-        name = self.model.name[:40]
-        if len(name) == 40:
-            name = name[:37] + '...'
-
-        return [
-            Link(_('Homepage'), self.homepage_url),
-            Link(_('Files'), self.files_url),
-            Link(name, self.files_url_with_anchor(self.model)),
-        ]
 
 
 class ImageFileCollectionLayout(DefaultLayout):

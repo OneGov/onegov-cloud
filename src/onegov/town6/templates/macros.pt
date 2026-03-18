@@ -2025,7 +2025,7 @@
             </span>
         </div>
     </a>
-    <div tal:condition="request.get_layout(result) and request.is_manager">
+    <div tal:condition="request.get_layout(result)">
         <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
     </div>
 </metal:search_result_files>

@@ -404,6 +404,15 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def newsletter_url(self) -> str:
         return self.request.class_link(NewsletterCollection)
 
+    def publications_url(self, year=None) -> str:
+        if year:
+            return self.request.class_link(
+                PublicationCollection,
+                variables={'year': str(year)},
+            )
+
+        return self.request.class_link(PublicationCollection)
+
     @cached_property
     def vat_rate(self) -> Decimal:
         return Decimal(self.app.org.vat_rate or 0.0)
@@ -3945,6 +3954,30 @@ class DashboardLayout(DefaultLayout):
 
 
 @OrgApp.layout(model=GeneralFile)
+class GeneralFileLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> Sequence[Link]:
+        name = self.model.name[:40]
+        if len(name) == 40:
+            name = name[:37] + '...'
+
+        links = [Link(_('Homepage'), self.homepage_url)]
+        if self.request.is_manager:
+            links.append(Link(_('Files'), self.files_url))
+
+        if (
+            self.model.published
+            and self.model.publication
+            and self.model.claimed_extension == 'pdf'
+        ):
+            year = self.model.created.strftime('%Y')
+            links.append(Link(_('Publications'), self.publications_url(year)))
+
+        links.append(Link(name, '#'))
+        return links
+
+
 class GeneralFileCollectionLayout(DefaultLayout):
     def __init__(self, model: Any, request: OrgRequest) -> None:
         request.include('common')
