@@ -17,9 +17,6 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from lxml.etree import _Element, _ElementTree
     from onegov.gis.models.coordinates import RealCoordinates
-    from typing import TypeVar
-
-    _T = TypeVar('_T')
 
 
 class GuidleBase:
@@ -57,22 +54,22 @@ class GuidleBase:
     ) -> str: ...
 
     @overload
-    def get(
+    def get[T](
         self,
         path: str,
         root: _Element | None = None,
         joiner: str = ' ',
         *,
-        parser: Callable[[str], _T]
-    ) -> _T | None: ...
+        parser: Callable[[str], T]
+    ) -> T | None: ...
 
-    def get(
+    def get[T](
         self,
         path: str,
         root: _Element | None = None,
         joiner: str = ' ',
-        parser: Callable[[str], _T] | None = None
-    ) -> _T | str | None:
+        parser: Callable[[str], T] | None = None
+    ) -> T | str | None:
         """ Returns the text of the elements with the given path.
 
         Allows to specifiy a joining character and optionally a parser. If no

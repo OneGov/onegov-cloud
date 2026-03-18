@@ -17,15 +17,12 @@ from onegov.org.layout import (FormEditorLayout,
                                SurveySubmissionLayout)
 
 
-from typing import TypeVar, TYPE_CHECKING
-
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.form import Form
     from onegov.org.request import OrgRequest
     from webob import Response
-
-    SurveyDefinitionT = TypeVar('SurveyDefinitionT', bound=SurveyDefinition)
 
 
 @OrgApp.form(

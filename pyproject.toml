@@ -45,7 +45,7 @@ exclude_lines = [
 ]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.13"
 follow_imports = "silent"
 namespace_packages = true
 explicit_package_bases = true
@@ -124,7 +124,7 @@ include = [
 ]
 line-length = 79
 indent-width = 4
-target-version = "py312"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = [

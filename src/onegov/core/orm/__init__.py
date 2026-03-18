@@ -30,8 +30,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.hybrid import hybrid_property
     from sqlalchemy.orm import Mapped
     from sqlalchemy_utils.i18n import _TranslatableColumn
-    from typing import Self, TypeGuard
-    from typing_extensions import TypeIs
+    from typing import Self, TypeGuard, TypeIs
 
 
 MISSING = object()

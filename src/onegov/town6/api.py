@@ -14,19 +14,16 @@ from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
 from onegov.town6 import _
 from sqlalchemy.exc import SQLAlchemyError
 
-from typing import Any, Self
-from typing import TYPE_CHECKING
+
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
     from onegov.event.models import Occurrence
+    from onegov.core.collection import PKType
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
-    from typing import TypeVar
-    from onegov.core.collection import PKType
-
-    T = TypeVar('T')
 
 
 def get_geo_location(item: ContentMixin) -> dict[str, Any]:

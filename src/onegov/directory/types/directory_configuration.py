@@ -15,16 +15,11 @@ from sqlalchemy_utils.types.scalar_coercible import ScalarCoercible
 from urllib.parse import quote_plus
 
 
-from typing import overload, Any, Literal, NoReturn, TYPE_CHECKING
+from typing import overload, Any, Literal, NoReturn, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
     from sqlalchemy.engine import Dialect
-    from typing import Self, TypeVar
-
-    _Base = TypeDecorator['DirectoryConfiguration']
-    _MutableT = TypeVar('_MutableT', bound=Mutable)
-else:
-    _Base = TypeDecorator
+    from typing import Self
 
 # XXX i18n
 SAFE_FORMAT_TRANSLATORS: dict[type[object], Callable[[Any], str]] = {
@@ -51,37 +46,6 @@ def pad_numbers_in_chunks(text: str, padding: int = 8) -> str:
         part.rjust(padding, '0') if part.isdigit() else part
         for part in number_chunks.split(text)
     )
-
-
-class DirectoryConfigurationStorage(_Base, ScalarCoercible):
-
-    impl = TEXT
-
-    @property
-    def python_type(self) -> type[DirectoryConfiguration]:
-        return DirectoryConfiguration
-
-    def process_bind_param(
-        self,
-        value: DirectoryConfiguration | None,
-        dialect: Dialect
-    ) -> str | None:
-
-        if value is None:
-            return None
-
-        return value.to_json()
-
-    def process_result_value(
-        self,
-        value: str | None,
-        dialect: Dialect
-    ) -> DirectoryConfiguration | None:
-
-        if value is None:
-            return None
-
-        return DirectoryConfiguration.from_json(value)
 
 
 class StoredConfiguration:
@@ -210,9 +174,9 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
     @overload
     @classmethod
-    def coerce(  # type:ignore[overload-overlap]
-        cls, key: str, value: _MutableT
-    ) -> _MutableT: ...
+    def coerce[T: Mutable](  # type:ignore[overload-overlap]
+        cls, key: str, value: T
+    ) -> T: ...
     @overload
     @classmethod
     def coerce(cls, key: str, value: object) -> NoReturn: ...
@@ -308,6 +272,41 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
                     keywords.add(f'{key}:{value}')
 
         return keywords
+
+
+class DirectoryConfigurationStorage(
+    TypeDecorator[DirectoryConfiguration],
+    ScalarCoercible
+):
+
+    # FIXME: Switch to JSONB
+    impl = TEXT
+
+    @property
+    def python_type(self) -> type[DirectoryConfiguration]:
+        return DirectoryConfiguration
+
+    def process_bind_param(
+        self,
+        value: DirectoryConfiguration | None,
+        dialect: Dialect
+    ) -> str | None:
+
+        if value is None:
+            return None
+
+        return value.to_json()
+
+    def process_result_value(
+        self,
+        value: str | None,
+        dialect: Dialect
+    ) -> DirectoryConfiguration | None:
+
+        if value is None:
+            return None
+
+        return DirectoryConfiguration.from_json(value)
 
 
 DirectoryConfiguration.associate_with(DirectoryConfigurationStorage)
