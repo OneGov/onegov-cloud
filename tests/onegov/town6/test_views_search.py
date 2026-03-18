@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import textwrap
+from io import BytesIO
+
 import transaction
 
 from datetime import date
@@ -10,8 +12,9 @@ from sedate import utcnow, ensure_timezone
 from webtest import Upload
 
 from onegov.core.utils import module_path
-from onegov.file import FileCollection
 from onegov.form import FormCollection
+from onegov.file import FileCollection
+from onegov.org.models import GeneralFileCollection
 from onegov.org.models.page import News, Page
 from onegov.ticket import TicketCollection, HandlerRegistry
 from tests.onegov.org.common import register_echo_handler
@@ -20,6 +23,7 @@ from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .conftest import Client
+    from tests.shared.client import ExtendedResponse
 
 
 def test_basic_search(client_with_fts: Client) -> None:
@@ -355,17 +359,61 @@ def test_search_result_with_breadcrumbs(
     client_with_fts: Client,
     handlers: HandlerRegistry
 ) -> None:
+
+    def extract_hrefs(page: ExtendedResponse) -> list[str]:
+        return [
+            link.attr("href")
+            for link in page.pyquery(".breadcrumb-item a").items()
+        ]
+
+    def verify_news_breadcrumbs(client: Client) -> None:
+        search_page = client.get('/search?q=webseite')
+        assert extract_hrefs(search_page) == [
+            'http://localhost/',
+            'http://localhost/news',
+            'http://localhost/news/wir-haben-eine-neue-webseite'
+        ]
+
+    def verify_files_breadcrumbs(
+        client: Client,
+        file_id: str,
+        is_manager: bool
+    ) -> None:
+        search_page = client.get('/search?q=publication.pdf')
+        assert '1 Resultate' in search_page
+
+        hrefs = extract_hrefs(search_page)
+        if is_manager:
+            assert hrefs[0] == 'http://localhost/'
+            assert hrefs[1].startswith('http://localhost/files')
+            assert hrefs[2] == f'http://localhost/storage/{file_id}'
+        else:
+            assert hrefs == [
+                'http://localhost/',
+                f'http://localhost/publications?year={date.today().year}',
+                f'http://localhost/storage/{file_id}',
+            ]
+
+    def verify_ticket_breadcrumbs(
+        client: Client,
+        ticket_id: str,
+        is_manager: bool
+    ) -> None:
+        search_page = client.get(f'/search?q={ticket_number}')
+        if not is_manager:
+            assert '0 Resultate' in search_page
+
+        if is_manager:
+            assert '1 Resultate' in search_page
+            hrefs = extract_hrefs(search_page)
+            assert hrefs == [
+                'http://localhost/',
+                'http://localhost/tickets/ALL/open?page=0',
+                f'http://localhost/ticket/EHO/{ticket_id}'
+            ]
+
     client = client_with_fts
     register_echo_handler(handlers)
-
-    # search breadcrumb news
-    search_page = client.get('/search?q=webseite')
-    hrefs = [link.attr('href') for link in search_page.pyquery('.breadcrumb-item a').items()]
-    assert hrefs == [
-        'http://localhost/',
-        'http://localhost/news',
-        'http://localhost/news/wir-haben-eine-neue-webseite'
-    ]
 
     # create ticket
     transaction.begin()
@@ -382,12 +430,25 @@ def test_search_result_with_breadcrumbs(
     ticket_id = ticket.id.hex
     transaction.commit()
 
-    # search breadcrumbs ticket
+    # Add file
+    transaction.begin()
+    files = GeneralFileCollection(client.app.session())
+    file = files.add(
+        filename='publication.pdf',
+        content=BytesIO(b'Publication'),
+        published=True,
+    )
+    file.publication = True
+    file_id = file.id
+    transaction.commit()
+
+    # test logged-out user
+    verify_news_breadcrumbs(client)
+    verify_files_breadcrumbs(client, file_id, is_manager=False)
+    verify_ticket_breadcrumbs(client, ticket_id, is_manager=False)
+
+    # test as admin
     client.login_admin()
-    search_page = client.get(f'/search?q={ticket_number}')
-    hrefs = [link.attr('href') for link in search_page.pyquery('.breadcrumb-item a').items()]
-    assert hrefs == [
-        'http://localhost/',
-        'http://localhost/tickets/ALL/open?page=0',
-        f'http://localhost/ticket/EHO/{ticket_id}'
-    ]
+    verify_news_breadcrumbs(client)
+    verify_files_breadcrumbs(client, file_id, is_manager=True)
+    verify_ticket_breadcrumbs(client, ticket_id, is_manager=True)
