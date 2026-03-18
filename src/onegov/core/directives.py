@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import os.path
 
-from dectate import Action, Query
+from dectate import Action, Query, convert_dotted_name  # type:ignore[attr-defined]
 from itertools import count
 from morepath.directive import HtmlAction
+from morepath.directive import isbaseclass
+from morepath.directive import PredicateAction
+from morepath.directive import PredicateFallbackAction
 from morepath.directive import SettingAction
 from morepath.settings import SettingRegistry, SettingSection
-from onegov.core.utils import Bunch
 
+from onegov.core.utils import Bunch
 
 from typing import Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -18,7 +21,9 @@ if TYPE_CHECKING:
     from wtforms import Form
 
     from .analytics import AnalyticsProvider
-    from .request import CoreRequest
+    from onegov.core import Framework
+    from onegov.core.layout import Layout as CoreLayout
+    from onegov.core.request import CoreRequest
 
 
 class HtmlHandleFormAction(HtmlAction):
@@ -383,3 +388,36 @@ class ReplaceSettingAction(SettingAction):
     """
 
     depends = [ReplaceSettingSectionAction]
+
+
+class Layout(Action):
+    """
+    Registers a layout for a model. This is used to show breadcrumbs
+    for search results.
+    """
+
+    app_class_arg = True
+    depends = [PredicateFallbackAction, PredicateAction]
+    filter_convert = {'model': convert_dotted_name}
+    filter_compare = {'model': isbaseclass}
+
+    def __init__(self, model: type) -> None:
+        self.model = model
+
+    def identifier(  # type:ignore[override]
+        self,
+        app_class: type[Framework]
+    ) -> str:
+        return str(self.model)
+
+    def perform(  # type:ignore[override]
+        self,
+        obj: type[CoreLayout],
+        app_class: type[Framework]
+    ) -> None:
+
+        layout_class = obj
+        # `lambda self, obj, request` is required to match the signature
+        app_class.get_layout.register(  # type:ignore[attr-defined]
+            lambda self, obj, request: layout_class(obj, request),
+            model=self.model)
