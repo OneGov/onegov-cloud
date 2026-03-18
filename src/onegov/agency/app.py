@@ -14,14 +14,14 @@ from onegov.agency.request import AgencyRequest
 from onegov.agency.theme import AgencyTheme
 from onegov.api import ApiApp
 from onegov.core import utils
-from onegov.org import OrgApp
-from onegov.org.app import get_editor_asset as editor_assets
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
-from onegov.org.app import get_redactor_asset as redactor_assets
+from onegov.town6 import TownApp
+from onegov.town6.app import get_editor_asset as editor_assets
+from onegov.town6.app import get_i18n_localedirs as get_org_i18n_localedirs
 
 
 from typing import Any
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import SupportsRead
     from collections.abc import Callable
@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from onegov.org.models import Organisation
 
 
-class AgencyApp(OrgApp, ApiApp):
+class AgencyApp(TownApp, ApiApp):
 
     request_class = AgencyRequest
 
@@ -121,6 +121,21 @@ class AgencyApp(OrgApp, ApiApp):
     def enable_yubikey(self, value: bool) -> None:
         self._enable_yubikey = value
 
+    def configure_organisation(
+        self,
+        *,
+        enable_user_registration: bool = False,
+        enable_yubikey: bool = False,
+        disable_password_reset: bool = False,
+        **cfg: Any
+    ) -> None:
+        super().configure_organisation(
+            enable_user_registration=enable_user_registration,
+            enable_yubikey=enable_yubikey,
+            disable_password_reset=disable_password_reset,
+            **cfg
+        )
+
 
 @AgencyApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
@@ -192,14 +207,8 @@ def get_people_select_asset() -> Iterator[str]:
 
 @AgencyApp.webasset('sortable-multi-checkbox')
 def get_sortable_multi_checkbox_asset() -> Iterator[str]:
-    yield 'jquery.js'
     yield 'sortable.js'
     yield 'sortable-multi-checkbox.js'
-
-
-@AgencyApp.webasset('redactor', filters={'js': None})
-def get_redactor_asserts() -> Iterator[str]:
-    yield from redactor_assets()
 
 
 @AgencyApp.webasset('editor')
