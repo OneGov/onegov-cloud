@@ -5,19 +5,18 @@ import pytest
 from datetime import date
 from decimal import Decimal
 from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.request import SwissvotesRequest
 from onegov.swissvotes.views.vote import view_vote_percentages
 from re import findall
 from tests.shared.utils import use_locale
 from transaction import commit
-from translationstring import TranslationString
 from webtest import TestApp as Client
 from webtest.forms import Upload
 
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.swissvotes.models import SwissVoteFile
-    from sqlalchemy.orm import Session
     from .conftest import TestApp
 
 
@@ -318,12 +317,16 @@ def test_vote_upload(
         assert page.content_disposition.startswith('inline; filename=100.1')
 
 
-def test_view_vote_chart(session: Session) -> None:
-    class Request:
-        def translate(self, text: str) -> str:
-            if isinstance(text, TranslationString):
-                return text.interpolate()
-            return text
+def test_view_vote_chart(swissvotes_app: 'TestApp') -> None:
+    environ = {
+        'REQUEST_METHOD': 'GET',
+        'PATH_INFO': '/',
+        'SERVER_NAME': 'localhost',
+        'SERVER_PORT': '80',
+        'SERVER_PROTOCOL': 'HTTP/1.1',
+        'HTTP_COOKIE': 'locale=en_US',
+    }
+    request = SwissvotesRequest(environ, swissvotes_app)
 
     empty = {
         'empty': True, 'text': '', 'text_label': '',
@@ -333,7 +336,6 @@ def test_view_vote_chart(session: Session) -> None:
     }
 
     model = SwissVote()
-    request: Any = Request()
     assert view_vote_percentages(model, request) == {
         'results': [empty],
         'title': None
@@ -363,14 +365,14 @@ def test_view_vote_chart(session: Session) -> None:
         'text': 'Cantons', 'text_label': '',
         'yea': 0.0, 'yea_label': '',
         'none': True,
-        'none_label': 'Majority of the cantons not necessary',
+        'none_label': 'Majority of the cantons not required',
         'nay': 0.0, 'nay_label': '',
     }
     assert results[2] == empty
     assert results[3] == {
         'empty': False,
         'text': 'National Council', 'text_label': '',
-        'yea': True, 'yea_label': 'Accepting',
+        'yea': True, 'yea_label': 'Accept',
         'none': 0.0, 'none_label': '',
         'nay': 0.0, 'nay_label': '',
     }
@@ -379,7 +381,7 @@ def test_view_vote_chart(session: Session) -> None:
         'text': 'Council of States', 'text_label': '',
         'yea': 0.0, 'yea_label': '',
         'none': 0.0, 'none_label': '',
-        'nay': True, 'nay_label': 'Rejecting',
+        'nay': True, 'nay_label': 'Reject',
     }
     assert data['title'] == 'Vote DE'
 
@@ -427,7 +429,7 @@ def test_view_vote_chart(session: Session) -> None:
     }
     assert results[5] == {
         'empty': False,
-        'text': 'Party slogans',
+        'text': 'Parties',
         'text_label': 'Recommendations by political parties',
         'yea': 1.0,
         'yea_label': (
@@ -483,7 +485,7 @@ def test_view_vote_chart(session: Session) -> None:
     }
     assert results[5] == {
         'empty': False,
-        'text': 'Party slogans',
+        'text': 'Parties',
         'text_label': 'Recommendations by political parties',
         'yea': 1.0,
         'yea_label': (
