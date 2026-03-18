@@ -54,7 +54,10 @@ def parse_schedule_config(cfg: str) -> list[tuple[str, list[str]]]:
 
 
 def schedule_announcement(date_string, node, dry_run):
-    # Inform about the scheduling action
+    """
+    Execute the `schedule-maintenance` command, optionally in
+    `dry-run` mode.
+    """
     click.secho(
         f"\nScheduling maintenance for {node} on {date_string} "
         f"{'(DRY-RUN)' if dry_run else ''}", fg='cyan')
@@ -90,7 +93,7 @@ def schedule_rollout_announcements(
 ) -> None:
     """
     Schedule regularly by-weekly rollout announcements in a semi-automatic
-    way. Read the configuration, execute the announcement
+    way. Read the configuration, execute the `schedule-maintenance`
     and manually confirm with y/n for each server.
 
     :param dry_run: run the command without actually scheduling the
