@@ -998,12 +998,12 @@ class GeneralFileLayout(DefaultLayout):
         if self.request.is_manager:
             links.append(Link(_('Files'), self.files_url))
 
-        if (
+        elif (
             self.model.published
             and self.model.publication
             and self.model.claimed_extension == 'pdf'
         ):
-            year = self.model.created.strftime('%Y')
+            year = self.model.created.year
             links.append(Link(_('Publications'), self.publications_url(year)))
 
         links.append(Link(name, '#'))
