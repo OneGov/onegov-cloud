@@ -17,10 +17,10 @@ filterwarnings = [
     # specific modules, but we should be covered by Ruff for our own code
     '''ignore:invalid escape sequence '[^']+':::''',
     '''ignore:'crypt':DeprecationWarning:passlib.*:''',
-    '''ignore:datetime.datetime.utcnow() is deprecated:DeprecationWarning:depot''',
+    # See: https://github.com/amol-/depot/issues/90
+    '''ignore:datetime.datetime.utcnow\(\) is deprecated:DeprecationWarning:depot.*:''',
     # fixed upstream
     '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:ldap3.*:''',
-    '''ignore:'cgi':DeprecationWarning:webob.*:''',
 ]
 
 [tool.coverage.run]
