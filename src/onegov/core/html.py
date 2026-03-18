@@ -7,12 +7,9 @@ from html2text import HTML2Text
 from markupsafe import Markup
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
-
-
-_StrT = TypeVar('_StrT', bound=str)
 
 
 # html tags allowed by bleach
@@ -93,7 +90,7 @@ def sanitize_html(html: str | None) -> Markup:
     return Markup(cleaner.clean(html or ''))  # nosec: B704
 
 
-def sanitize_svg(svg: _StrT) -> _StrT:
+def sanitize_svg[T: str](svg: T) -> T:
     """ I couldn't find a good svg sanitiser function yet, so for now
     this function will be a no-op, though it will try to detect
     svg files which are harmful.

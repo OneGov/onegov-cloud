@@ -40,15 +40,14 @@ if TYPE_CHECKING:
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Query
-    from typing import TypeAlias
     from webob import Response
 
-    AllocationForm: TypeAlias = (
+    type AllocationForm = (
         DaypassAllocationForm
         | RoomAllocationForm
         | DailyItemAllocationForm
     )
-    AllocationEditForm: TypeAlias = (
+    type AllocationEditForm = (
         DaypassAllocationEditForm
         | RoomAllocationEditForm
         | DailyItemAllocationEditForm

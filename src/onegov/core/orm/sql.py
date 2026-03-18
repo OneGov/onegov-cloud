@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-import pglast  # type:ignore[import-untyped]
+import pglast
 import re
 
 from functools import lru_cache
@@ -14,7 +14,7 @@ from uuid import uuid4
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from pglast.ast import RawStmt  # type:ignore[import-untyped]
+    from pglast.ast import RawStmt
     from sqlalchemy.sql import Subquery
     from sqlalchemy.types import TypeEngine
 

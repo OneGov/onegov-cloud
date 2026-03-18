@@ -22,7 +22,8 @@ else:
     BookingT = TypeVar('BookingT', bound='Booking | MatchableBooking')
 
 
-class Scoring(Generic[BookingT]):
+# FIXME: Switch to PEP-695/PEP-696 generic for Python 3.13
+class Scoring(Generic[BookingT]):  # noqa: UP046
     """ Provides scoring based on a number of criteria.
 
     A criteria is a callable which takes a booking and returns a score.

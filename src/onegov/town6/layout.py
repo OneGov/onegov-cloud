@@ -115,12 +115,11 @@ if TYPE_CHECKING:
     from onegov.org.request import PageMeta
     from onegov.page import Page
     from onegov.town6.request import TownRequest
-    from typing import TypeAlias
 
-    NavigationEntry: TypeAlias = tuple[
+    type NavigationEntry = tuple[
         PageMeta,
         Link,
-        tuple['NavigationEntry', ...]
+        tuple[NavigationEntry, ...]
     ]
 
 T = TypeVar('T')

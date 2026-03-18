@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from libres.db.scheduler import Scheduler
 
     from sqlalchemy.orm import Query, Session
-    from typing import TypeAlias
 
 
 _R = TypeVar('_R', bound=Resource)
@@ -25,7 +24,7 @@ class _Marker(enum.Enum):
     any_type = enum.auto()
 
 
-any_type_t: TypeAlias = Literal[_Marker.any_type]  # noqa: PYI042
+type any_type_t = Literal[_Marker.any_type]  # noqa: PYI042
 any_type: any_type_t = _Marker.any_type
 
 

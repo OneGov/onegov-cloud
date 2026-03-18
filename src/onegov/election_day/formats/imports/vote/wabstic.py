@@ -220,6 +220,14 @@ def import_vote_wabstic(
         except ValueError as e:
             line_errors.append(e.args[0])
 
+        # Parse the received votes (optional)
+        try:
+            received = validate_integer(
+                line, 'stmabgegeben', optional=True, default=None
+            )
+        except ValueError as e:
+            line_errors.append(e.args[0])
+
         # Parse the yeas
         yeas = {}
         try:
@@ -273,7 +281,8 @@ def import_vote_wabstic(
                         'invalid': invalid,
                         'yeas': yeas[ballot_type],
                         'nays': nays[ballot_type],
-                        'empty': empty[ballot_type]
+                        'empty': empty[ballot_type],
+                        'received': received,
                     }
                 )
 

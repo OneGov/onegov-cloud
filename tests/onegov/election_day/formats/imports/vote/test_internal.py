@@ -453,6 +453,49 @@ def test_import_internal_vote_optional_columns(session: Session) -> None:
     assert not errors
     result = next((r for r in vote.proposal.results if r.entity_id == 1701))
     assert result.expats == 30
+    assert result.received is None
+    # Without received, cast_ballots falls back to calculation
+    assert result.cast_ballots == 30  # 20 + 10 + 0 + 0
+
+    # Test with received column
+    errors = import_vote_internal(
+        vote, principal,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'status',
+                    'type',
+                    'entity_id',
+                    'counted',
+                    'yeas',
+                    'nays',
+                    'invalid',
+                    'empty',
+                    'eligible_voters',
+                    'expats',
+                    'received',
+                )),
+                ','.join((
+                    'unknown',  # status
+                    'proposal',  # type
+                    '1701',  # entity_id
+                    'true',  # counted
+                    '20',  # yeas
+                    '10',  # nays
+                    '0',  # invalid
+                    '0',  # empty
+                    '100',  # eligible_voters
+                    '30',  # expats
+                    '35',  # received
+                )),
+            ))
+        ).encode('utf-8')),
+        'text/plain'
+    )
+    assert not errors
+    result = next((r for r in vote.proposal.results if r.entity_id == 1701))
+    assert result.received == 35
+    assert result.cast_ballots == 35  # Uses stored value
 
 
 def test_import_internal_vote_regional(session: Session) -> None:

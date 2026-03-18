@@ -51,6 +51,7 @@ Nom|Description
 `empty`|Nombre de votes blancs
 `eligible_voters`|Nombre de personne aptes à voter.
 `expats`|Nombre d'expatriés. Facultatif.
+`received`|Nombre de bulletins de vote reçus. Facultatif.
 
 
 #### Résultats temporaires

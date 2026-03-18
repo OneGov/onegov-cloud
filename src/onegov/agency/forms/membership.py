@@ -14,12 +14,9 @@ from wtforms.validators import ValidationError
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from typing import TypeVar
-
-    _T = TypeVar('_T')
 
 
-def duplicates(iterable: Iterable[_T]) -> set[_T]:
+def duplicates[T](iterable: Iterable[T]) -> set[T]:
     items = set()
     duplicates = set()
     for item in iterable:

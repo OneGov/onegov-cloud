@@ -13,9 +13,9 @@ from sqlalchemy.orm import mapped_column, relationship, Mapped
 from uuid import uuid4, UUID
 
 
-from typing import Literal, TypeAlias
+from typing import Literal
 
-MissionType: TypeAlias = Literal['single', 'multi']
+type MissionType = Literal['single', 'multi']
 MISSION_TYPES: tuple[MissionType, ...] = ('single', 'multi')
 
 

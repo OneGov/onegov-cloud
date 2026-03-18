@@ -293,7 +293,7 @@ class AgendaItemUploadForm(Form):
                                             class_='Einfacher-Textrahmen')
             for textframe in textframes[1:] if textframes else []:
                 for p_tag in textframe.find_all('p'):
-                    p_class = ' '.join(p_tag.get('class', []))
+                    p_class = ' '.join(p_tag.get('class') or ())
                     spans_text = []
                     parent = p_tag.find_parent()
 

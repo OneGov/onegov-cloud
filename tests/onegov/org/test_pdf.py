@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import transaction
+
 from datetime import datetime, date
+from io import BytesIO
 from onegov.core.utils import Bunch
 from onegov.form import FormCollection
 from onegov.org.models.ticket import ReservationTicket
@@ -10,6 +13,7 @@ from onegov.pdf.utils import extract_pdf_info
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from tests.onegov.pdf.test_pdf import LONGEST_TABLE_CELL_TEXT
+from textwrap import dedent
 from webob.multidict import MultiDict
 
 
@@ -21,7 +25,7 @@ if TYPE_CHECKING:
     from onegov.ticket import Ticket
     from sqlalchemy.orm import Session
     from uuid import UUID
-    from .conftest import TestOrgApp
+    from .conftest import Client, TestOrgApp
 
 
 def open_ticket(
@@ -164,7 +168,7 @@ def test_ticket_pdf(org_app: TestOrgApp) -> None:
     add_ticket_message(request, ticket, LONGEST_TABLE_CELL_TEXT)
 
     # We have to mitigate the case but its hard since we deal with html
-    # add_ticket_message(request, ticket, 2 * LONGEST_TABLE_CELL_TEXT)
+    add_ticket_message(request, ticket, 2 * LONGEST_TABLE_CELL_TEXT)
 
     assert ticket.handler.resource
 
@@ -200,3 +204,42 @@ def test_ticket_pdf(org_app: TestOrgApp) -> None:
 
     for title in titles:
         assert title in page
+
+
+def test_ticket_pdf_long_message(client: Client) -> None:
+    """PDF generation must not fail when a ticket message is long:
+
+    https://reportlab-users.reportlab.narkive.com/4eO58iDH/
+    flowable-too-large-how-to-keeptogether
+    """
+
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Contact', definition=dedent("""
+        Name * = ___
+        E-Mail * = @@@
+    """), type='custom')
+    transaction.commit()
+
+    client.login_admin()
+
+    page = client.get('/forms').click('Contact')
+    page.form['name'] = 'John'
+    page.form['e_mail'] = 'john@example.org'
+    page = page.form.submit().follow().form.submit().follow()
+    assert 'FRM-' in page
+
+    ticket_page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket_url = ticket_page.request.url
+
+    # This should work with 4000 chars. (customer explicitly asked for it)
+    # TABLE_CELL_CHAR_LIMIT
+    long_message = 'word ' * (4000 // 5 - 1)
+    assert len(long_message) < 4000
+    note_page = ticket_page.click('Neue Notiz')
+    note_page.form['text'] = long_message
+    res = note_page.form.submit().follow()
+
+    pdf = client.get(ticket_url + '/pdf')
+    assert pdf.content_type == 'application/pdf'
+    _, page_text = extract_pdf_info(BytesIO(pdf.body))
+    assert 'John' in page_text

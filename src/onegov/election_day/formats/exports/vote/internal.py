@@ -57,6 +57,8 @@ def export_vote_internal(
             row['empty'] = result.empty
             row['eligible_voters'] = result.eligible_voters
             row['expats'] = result.expats or ''
+            received = result.received
+            row['received'] = received if received is not None else ''
 
             rows.append(row)
 

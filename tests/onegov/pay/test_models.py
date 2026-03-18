@@ -81,8 +81,8 @@ def test_payment_referential_integrity(postgres_dsn: str) -> None:
     class MyBase(DeclarativeBase):
         registry = registry()
 
-    class Order(MyBase, Payable):
-        __tablename__ = 'orders'
+    class GroceryOrder(MyBase, Payable):
+        __tablename__ = 'grocery_orders'
 
         id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
         title: Mapped[str | None]
@@ -98,7 +98,7 @@ def test_payment_referential_integrity(postgres_dsn: str) -> None:
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
-    apple = Order(
+    apple = GroceryOrder(
         title="Apple",
         payment=PaymentProvider().payment(amount=Decimal(100))
     )
@@ -114,26 +114,26 @@ def test_payment_referential_integrity(postgres_dsn: str) -> None:
     # as a precaution we only allow deletion of elements after the payment
     # has been explicitly deleted
     with pytest.raises(IntegrityError):
-        session.delete(session.query(Order).one())
+        session.delete(session.query(GroceryOrder).one())
         session.flush()
 
     transaction.abort()
 
     with pytest.raises(IntegrityError):
-        session.delete(session.query(Order).one())
+        session.delete(session.query(GroceryOrder).one())
         session.delete(session.query(Payment).one())
         session.flush()
 
     transaction.abort()
 
     session.delete(session.query(Payment).one())
-    session.delete(session.query(Order).one())
+    session.delete(session.query(GroceryOrder).one())
     transaction.commit()
 
-    assert not list(session.execute(text("select * from orders")))
+    assert not list(session.execute(text("select * from grocery_orders")))
     assert not list(session.execute(text("select * from payments")))
     assert not list(session.execute(text(
-        "select * from payments_for_orders_payment"
+        "select * from payments_for_grocery_orders_payment"
     )))
 
     mgr.dispose()
