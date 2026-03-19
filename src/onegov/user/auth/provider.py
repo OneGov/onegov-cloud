@@ -29,7 +29,6 @@ if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from onegov.core.request import CoreRequest
     from onegov.user import User, UserApp
-    from sqlalchemy.orm import Session
     from translationstring import TranslationString
     from typing import Protocol
 
@@ -265,19 +264,21 @@ def spawn_ldap_client(
 
 
 def ensure_user(
+    request: CoreRequest,
     source: str | None,
     source_id: str | None,
-    session: Session,
     username: str,
     role: str,
     force_role: bool = True,
     realname: str | None = None,
     force_active: bool = False
-) -> User:
+) -> User | None:
     """ Creates the given user if it doesn't already exist. Ensures the
     role is set to the given role in all cases.
     """
 
+    app = request.app
+    session = request.session
     users = UserCollection(session)
 
     # find the user by source
@@ -289,6 +290,20 @@ def ensure_user(
     # fall back to the username
     user = user or users.by_username(username)
 
+    # run the application specific callback
+    result = app.settings.user.ensure_user_callback(
+        user,
+        request,
+        source_id=source_id,
+        username=username,
+        role=role,
+        realname=realname,
+        force_role=force_role,
+        force_active=force_active
+    )
+    if result is not True:
+        return result
+
     if not user:
         log.info(f'Adding user {username} from {source}:{source_id}')
         user = users.add(
@@ -299,13 +314,17 @@ def ensure_user(
     elif force_active and not user.active:
         user.active = True
 
-    # update the username
-    if user.username != username:
+    # update the username (if allowed)
+    if (
+        user.role in app.settings.user.change_username_roles
+        and user.username != username
+    ):
         # ensure the new username is available
         if users.by_username(username) is not None:
             log.error(f'Cannot rename user {user.username} to {username}')
         else:
             user.username = username
+            app.settings.user.change_username_callback(user, request)
 
     # update the role even if the user exists already
     if force_role:
@@ -572,9 +591,9 @@ class LDAPProvider(
             return None
 
         return ensure_user(
+            request,
             source=self.name,
             source_id=uid,
-            session=request.session,
             username=username,
             role=role)
 
@@ -731,9 +750,9 @@ class LDAPKerberosProvider(
             return None
 
         return ensure_user(
+            request,
             source=self.name,
             source_id=username,
-            session=request.session,
             username=mails[0],
             role=role)
 
@@ -1031,13 +1050,15 @@ class AzureADProvider(
             realname = preferred_username
 
         user = ensure_user(
+            request,
             source=self.name,
             source_id=source_id,
-            session=request.session,
             username=username,
             role=role,
             realname=realname
         )
+        if user is None:
+            return Failure(_('Authorisation failed due to an error'))
 
         # We set the path we wanted to go when starting the oauth flow
         self.to = request.browser_session.pop('login_to', '/')
@@ -1280,13 +1301,15 @@ class SAML2Provider(
             realname = None
 
         user = ensure_user(
+            request,
             source='ldap' if client.treat_as_ldap else self.name,
             source_id=source_id,
-            session=request.session,
             username=username,
             role=role,
             realname=realname
         )
+        if user is None:
+            return Failure(_('Authorisation failed due to an error'))
 
         # remember the transient id
         data = user.data or {}
@@ -1553,13 +1576,15 @@ class OIDCProvider(
             return Failure(_('Authorisation failed due to an error'))
 
         user = ensure_user(
+            request,
             source=self.name,
             source_id=source_id,
-            session=request.session,
             username=username,
             role=role,
             realname=realname
         )
+        if user is None:
+            return Failure(_('Authorisation failed due to an error'))
 
         # retrieve the redirect target from the state
         if redirect_to := data.get('to'):
