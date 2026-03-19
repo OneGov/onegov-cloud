@@ -73,6 +73,7 @@ def create_parliamentarian_with_user(
     assert user is not None
     user.role = role
     user.password = password
+    user.active = True
 
     return parl, user
 
