@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-12 09:52+0100\n"
+"POT-Creation-Date: 2026-03-19 09:40+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -881,7 +881,7 @@ msgstr "Mich selbst"
 msgid "Organisers with an occasion"
 msgstr "Veranstaltende mit Durchführungen"
 
-msgid "Organisers without an occasion"
+msgid "Organisers without occasions"
 msgstr "Veranstaltende ohne Durchführungen"
 
 msgid "Users of a given role"
@@ -893,8 +893,8 @@ msgstr "Benutzer mit Wünschen"
 msgid "Users with accepted bookings"
 msgstr "Benutzer mit angenommenen Buchungen"
 
-msgid "Users with attendees that without wishes or bookings"
-msgstr "Benutzer mit Teilnehmenden ohne Wünsche oder Buchungen"
+msgid "Users with attendees that have no wishes or bookings"
+msgstr "Benutzer mit Teilnehmenden, welche keine Wünsche oder Buchungen haben"
 
 msgid "Users with unpaid bills"
 msgstr "Benutzer mit unbezahlten Rechnungen"
@@ -3309,6 +3309,12 @@ msgstr ""
 #, python-format
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} wurde gelöscht, inklusive aller damit verbundenen Daten."
+
+#~ msgid "Organisers without an occasion"
+#~ msgstr "Veranstaltende ohne Durchführungen"
+
+#~ msgid "Users with attendees that without wishes or bookings"
+#~ msgstr "Benutzer mit Teilnehmenden ohne Wünsche oder Buchungen"
 
 #~ msgid "Could not delete account; try again or contact an administrator."
 #~ msgstr ""

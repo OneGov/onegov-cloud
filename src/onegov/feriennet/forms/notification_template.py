@@ -72,7 +72,7 @@ class NotificationTemplateSendForm(Form):
                 'Organisers with an occasion'
             )),
             ('inactive_organisers', _(
-                'Organisers without an occasion'
+                'Organisers without occasions'
             )),
             ('by_role', _(
                 'Users of a given role'
@@ -84,7 +84,7 @@ class NotificationTemplateSendForm(Form):
                 'Users with accepted bookings'
             )),
             ('with_no_wishes_or_bookings', _(
-                'Users with attendees that without wishes or bookings'
+                'Users with attendees that have no wishes or bookings'
             )),
             ('with_unpaid_bills', _(
                 'Users with unpaid bills'
