@@ -2496,10 +2496,15 @@ def test_reservation_export_all_view(client: Client) -> None:
     export.form['end'] = date(2023, 8, 28)
 
     response = export.form.submit()
+
     with tempfile.NamedTemporaryFile(suffix='.xlsx') as tmp:
         tmp.write(response.body)
+        # NOTE: Python 3.14 has optimizations for re-using open file-handles
+        #       so if we don't seek back to the start of the file, openpyxl
+        #       will fail to read it properly.
+        tmp.seek(0)
 
-        wb = load_workbook(Path(tmp.name))
+        wb = load_workbook(tmp.name)
 
         daypass_sheet_name = wb.sheetnames[1]
         daypass_sheet = wb[daypass_sheet_name]
@@ -2616,6 +2621,10 @@ def test_reservation_export_all_view_normalizes_sheet_names(
 
     with tempfile.NamedTemporaryFile(suffix='.xlsx') as tmp:
         tmp.write(response.body)
+        # NOTE: Python 3.14 has optimizations for re-using open file-handles
+        #       so if we don't seek back to the start of the file, openpyxl
+        #       will fail to read it properly.
+        tmp.seek(0)
         wb = load_workbook(Path(tmp.name))
         actual_sheet_name_room = wb.sheetnames[0]
         actual_sheet_name_daypass = wb.sheetnames[1]

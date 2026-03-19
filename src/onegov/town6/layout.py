@@ -104,8 +104,7 @@ from onegov.town6.theme import user_options
 from onegov.town6 import TownApp
 
 
-from typing import Any, NamedTuple, TypeVar, TYPE_CHECKING
-
+from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from onegov.form import FormSubmission
@@ -121,8 +120,6 @@ if TYPE_CHECKING:
         Link,
         tuple[NavigationEntry, ...]
     ]
-
-T = TypeVar('T')
 
 
 class PartnerCard(NamedTuple):

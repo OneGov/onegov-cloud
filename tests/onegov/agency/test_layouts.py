@@ -18,9 +18,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.elements import Link, LinkGroup
     from sqlalchemy.orm import Session
-    from typing import TypeVar
-
-    _T = TypeVar('_T')
 
 
 class DummyOrg:
@@ -70,7 +67,7 @@ class DummyRequest:
     ) -> str:
         return f'{model.__name__}{variables or ""}/{name}'
 
-    def exclude_invisible(self, objects: _T) -> _T:
+    def exclude_invisible[T](self, objects: T) -> T:
         return objects
 
     def new_csrf_token(self) -> str:

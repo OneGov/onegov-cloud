@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import RenderData
     from onegov.feriennet.request import FeriennetRequest
-    from typing_extensions import TypeIs
+    from typing import TypeIs
     from webob import Response
 
 

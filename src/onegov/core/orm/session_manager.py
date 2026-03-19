@@ -21,7 +21,7 @@ from sqlalchemy.sql import Delete, Update
 from sqlalchemy_utils.aggregates import manager as aggregates_manager
 
 
-from typing import Any, Self, TypeVar, TYPE_CHECKING
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.engine import Connection, Engine, Result
@@ -30,11 +30,7 @@ if TYPE_CHECKING:
     from types import FrameType
 
 
-_T = TypeVar('_T')
-_S = TypeVar('_S', bound='Session')
-
-
-class ForceFetchQueryClass(Query[_T]):
+class ForceFetchQueryClass[T](Query[T]):
     """ Alters the builtin query class, ensuring that the delete query
     always fetches the data first, which is important for the bulk delete
     events to get the actual objects affected by the change.
@@ -766,7 +762,7 @@ class SessionManager:
         if not self.is_schema_found_on_database(schema):
             self.create_schema(schema, validate)
 
-    def bind_session(self, session: _S) -> _S:
+    def bind_session[T: Session](self, session: T) -> T:
         """ Bind the session to the current schema. """
         session.info['schema'] = self.current_schema
         session.connection().info['session'] = weakref.proxy(session)
