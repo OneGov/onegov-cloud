@@ -150,6 +150,10 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
         return result
 
     def item_data(self, item: Occurrence) -> dict[str, Any]:
+        source = item.event.source
+        if source:
+            # Only include the source prefix
+            source = '-'.join(source.split('-', 2)[:2])
         data: dict[str, Any] = {
             'title': item.title,
             'description': item.event.description,
@@ -162,7 +166,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
             'start': item.start.isoformat(),
             'end': item.end.isoformat(),
             'location': item.location,
-            'source': item.event.source,
+            'source': source,
             'coordinates': get_geo_location(item),
         }
 
