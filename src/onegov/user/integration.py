@@ -13,7 +13,7 @@ from webob.exc import HTTPNotFound, HTTPUnauthorized
 from webob.response import Response
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator, Mapping
     from functools import cached_property
@@ -24,12 +24,40 @@ if TYPE_CHECKING:
         IntegratedAuthenticationProvider, OauthProvider,
         SeparateAuthenticationProvider)
     from sqlalchemy.orm import Session
+    from typing import Protocol
 
     # NOTE: In order for mypy to be able to type narrow to these more
     #       specific authentication providers we return a type union
     #       instead of the base type
     type _AuthenticationProvider = (
         SeparateAuthenticationProvider | IntegratedAuthenticationProvider)
+    type AnyRequest = Any
+
+    class EnsureUserCallback(Protocol):
+        """ Provides a hook into the ensure_user function for changing
+        the desired outcome.
+
+        By returning `True` you can return control to the original
+        function. By returning anything else you terminate the function
+        early by returning what you returned instead.
+        """
+        def __call__(
+            self,
+            # the existing user object
+            user: User | None,
+            request: AnyRequest,
+            /,
+            *,
+            # the desired user attributes
+            source: str | None,
+            source_id: str | None,
+            username: str,
+            role: str,
+            realname: str | None,
+            # the desired behaviors
+            force_role: bool,
+            force_active: bool
+        ) -> User | Literal[True] | None: ...
 
 
 class UserApp(WebassetsApp):
@@ -129,6 +157,27 @@ def get_change_username_callback() -> Callable[[User, CoreRequest], None]:
         """ The default username change callback doesn't do anything """
 
     return on_change_username
+
+
+@UserApp.setting(section='user', name='ensure_user_callback')
+def get_ensure_user_callback() -> EnsureUserCallback:
+    """ Returns a function that will be called when a user changes username """
+
+    def on_ensure_user(
+        user: User | None,
+        request: CoreRequest,
+        source: str | None,
+        source_id: str | None,
+        username: str,
+        role: str,
+        realname: str | None,
+        force_role: bool,
+        force_active: bool
+    ) -> Literal[True]:
+        """ The default callback doesn't do anything """
+        return True
+
+    return on_ensure_user
 
 
 @UserApp.path(

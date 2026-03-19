@@ -799,6 +799,12 @@ msgstr "Stundenansatz"
 msgid "Pages"
 msgstr "Seiten"
 
+msgid "Written translation without page count"
+msgstr "Schriftliche Übersetzung ohne Seitenangabe"
+
+msgid "Written translations without page count:"
+msgstr "Schriftliche Übersetzungen ohne Seitenangabe:"
+
 msgid "Per-page rate"
 msgstr "Seitenansatz"
 
@@ -995,6 +1001,9 @@ msgstr "Zeiterfassungen anzeigen für:"
 
 msgid "Note: Export will only include confirmed reports."
 msgstr "Hinweis: Export enthält nur bestätigte Zeiterfassungen."
+
+msgid "Showing ${count} export batches. The latest export is highlighted in yellow."
+msgstr "${count} Exporte angezeigt. Der letzte Export ist gelb hervorgehoben."
 
 msgid "No time reports found"
 msgstr "Keine Zeiterfassungen gefunden"

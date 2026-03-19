@@ -6,10 +6,10 @@ repos:
       - id: mixed-line-ending
       - id: check-merge-conflict
       - id: check-ast
-        language_version: python3.12
+        language_version: python3.14
       - id: debug-statements
         exclude: '^src/onegov/server/core.py$'
-        language_version: python3.12
+        language_version: python3.14
   - repo: https://github.com/seantis/pre-commit-hooks
     rev: v1.1.0
     hooks:
