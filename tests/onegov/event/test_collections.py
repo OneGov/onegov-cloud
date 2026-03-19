@@ -258,7 +258,7 @@ def test_occurrence_collection_query(session: Session) -> None:
         timezone='Europe/Zurich',
         location='Squirrel Park',
         tags=['fun', 'park', 'animals'],
-        source='School',
+        source='fetch-school-squirrel-park-visit',
         recurrence=(
             'RRULE:FREQ=WEEKLY;'
             'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
@@ -274,7 +274,7 @@ def test_occurrence_collection_query(session: Session) -> None:
         timezone='Europe/Zurich',
         location='Squirrel Park Visitor Center',
         tags=['history'],
-        source='Council'
+        source='fetch-council-squirrel-park-visitor-center'
     )
     event.submit()
     event.publish()
@@ -302,9 +302,11 @@ def test_occurrence_collection_query(session: Session) -> None:
     assert query(outdated=True, locations=['squirrel', 'park']).count() == 0
     assert query(outdated=True, locations=[]).count() == 5
 
-    assert query(outdated=True, sources=['School']).count() == 4
-    assert query(outdated=True, sources=['Council']).count() == 1
-    assert query(outdated=True, sources=['School', 'Council']).count() == 5
+    assert query(outdated=True, sources=['fetch-school']).count() == 4
+    assert query(outdated=True, sources=['fetch-council']).count() == 1
+    assert query(
+        outdated=True, sources=['fetch-school', 'fetch-council']
+    ).count() == 5
 
     assert query(outdated=True, start=date(2015, 6, 17)).count() == 4
     assert query(outdated=True, start=date(2015, 6, 18)).count() == 3
