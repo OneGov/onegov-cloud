@@ -1,0 +1,54 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <tal:b condition="president">
+                    <p>
+                        <strong i18n:translate="">President</strong>:
+                        ${president.first_name} ${president.last_name}
+                        (CHF ${president_quarterly} / <span i18n:translate="">Quarter</span>)
+                    </p>
+                </tal:b>
+                <tal:b condition="vice_president">
+                    <p>
+                        <strong i18n:translate="">Vice president</strong>:
+                        ${vice_president.first_name} ${vice_president.last_name}
+                        (CHF ${vice_president_quarterly} / <span i18n:translate="">Quarter</span>)
+                    </p>
+                </tal:b>
+
+                <a class="button" href="${add_link}" i18n:translate="">
+                    Add quarterly allowance
+                </a>
+
+                <table tal:condition="allowances" class="hover stackable">
+                    <thead>
+                        <tr>
+                            <th i18n:translate="">Year</th>
+                            <th i18n:translate="">Role</th>
+                            <th i18n:translate="">Person</th>
+                            <th i18n:translate="">Amount (CHF)</th>
+                            <th i18n:translate="">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:repeat="allowance allowances">
+                            <td>${allowance.year}</td>
+                            <td>${layout.request.translate(allowance.role_label)}</td>
+                            <td>${allowance.parliamentarian.first_name} ${allowance.parliamentarian.last_name}</td>
+                            <td>${allowance.amount}</td>
+                            <td>${layout.format_date(allowance.created, 'date')}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p tal:condition="not allowances" i18n:translate="">
+                    No allowances have been recorded yet.
+                </p>
+            </div>
+        </div>
+    </tal:b>
+</div>

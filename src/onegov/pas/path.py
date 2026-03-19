@@ -11,6 +11,7 @@ from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections import PASParliamentarianRoleCollection
 from onegov.pas.collections import PASParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import PresidentialAllowanceCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.models import Attendence
@@ -23,6 +24,7 @@ from onegov.pas.models import PASParliamentarian
 from onegov.pas.models import PASParliamentarianRole
 from onegov.pas.models import PASParliamentaryGroup
 from onegov.pas.models import Party
+from onegov.pas.models import PresidentialAllowance
 from onegov.pas.models import RateSet
 from onegov.pas.models import SettlementRun
 from uuid import UUID
@@ -293,6 +295,29 @@ def get_rate_set(
     id: UUID
 ) -> RateSet | None:
     return RateSetCollection(app.session()).by_id(id)
+
+
+@PasApp.path(
+    model=PresidentialAllowanceCollection,
+    path='/presidential-allowances',
+    converters={'year': int},
+)
+def get_presidential_allowances(
+    app: PasApp,
+    year: int | None = None,
+) -> PresidentialAllowanceCollection:
+    return PresidentialAllowanceCollection(app.session(), year)
+
+
+@PasApp.path(
+    model=PresidentialAllowance,
+    path='/presidential-allowance/{id}',
+    converters={'id': UUID},
+)
+def get_presidential_allowance(
+    app: PasApp, id: UUID
+) -> PresidentialAllowance | None:
+    return PresidentialAllowanceCollection(app.session()).by_id(id)
 
 
 @PasApp.path(

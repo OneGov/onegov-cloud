@@ -1020,6 +1020,39 @@ msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
 
+msgid "Presidential allowances"
+msgstr "Präsidialzulagen"
+
+msgid "Add quarterly allowance"
+msgstr "Quartalszulage hinzufügen"
+
+msgid "Quarterly allowance added"
+msgstr "Quartalszulage hinzugefügt"
+
+msgid "No president or vice president found"
+msgstr "Kein Präsident oder Vizepräsident gefunden"
+
+msgid "Maximum of 4 allowances per year already reached"
+msgstr "Maximum von 4 Zulagen pro Jahr bereits erreicht"
+
+msgid "President: ${name} (CHF ${amount})"
+msgstr "Präsident/in: ${name} (CHF ${amount})"
+
+msgid "Vice president: ${name} (CHF ${amount})"
+msgstr "Vizepräsident/in: ${name} (CHF ${amount})"
+
+msgid "No allowances have been recorded yet."
+msgstr "Es wurden noch keine Zulagen erfasst."
+
+msgid "Quarter"
+msgstr "Quartal"
+
+msgid "Amount (CHF)"
+msgstr "Betrag (CHF)"
+
+msgid "Date"
+msgstr "Datum"
+
 #~ msgid "Commission meeting (bulk)"
 #~ msgstr "Massenbuchung Kommissionssitzung"
 
