@@ -1,8 +1,18 @@
 # Changes
 
+## 2026.16
+
+`2026-03-18` | [f6448a504b...2d2f7e1f80](https://github.com/OneGov/onegov-cloud/compare/f6448a504b^...2d2f7e1f80)
+
+### Landsgemeinde
+
+##### Fixes drafts being publicly visible and accessible
+
+`Bugfix` | [OGC-3040](https://linear.app/onegovcloud/issue/OGC-3040) | [2d2f7e1f80](https://github.com/onegov/onegov-cloud/commit/2d2f7e1f80b6dffb4efdae87a32685691d580b2d)
+
 ## 2026.15
 
-`2026-03-17` | [97194afd57...97194afd57](https://github.com/OneGov/onegov-cloud/compare/97194afd57^...97194afd57)
+`2026-03-17` | [97194afd57...36363b5db9](https://github.com/OneGov/onegov-cloud/compare/97194afd57^...36363b5db9)
 
 ### Org
 
@@ -2100,44 +2110,4 @@ reserve the allocation.
 ##### Create new meeting using form method
 
 `Bugfix` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [46fa5e87ef](https://github.com/onegov/onegov-cloud/commit/46fa5e87efdcd3b8bd5ff23c6e54bbb2d463ce2d)
-
-## 2025.47
-
-`2025-09-04` | [acdb4252ef...e22d88493c](https://github.com/OneGov/onegov-cloud/compare/acdb4252ef^...e22d88493c)
-
-### Org
-
-##### Improves robustness of Kaba key revocation
-
-Previously it was possible for a `KeyError` to be emitted, which would
-have been caught by the views, since they do a `clients[site_id]`, even
-though it definitely should not have been caught.
-
-`Bugfix` | [OGC-2579](https://linear.app/onegovcloud/issue/OGC-2579) | [acdb4252ef](https://github.com/onegov/onegov-cloud/commit/acdb4252efccdbaab6351f2818a527a2fea5cffb)
-
-### Pas
-
-##### Adds default start date for commission.
-
-`Feature` | [OGC-2591](https://linear.app/onegovcloud/issue/OGC-2591) | [20a477612e](https://github.com/onegov/onegov-cloud/commit/20a477612e4bb5b7f302e9479824c7e355036e1d)
-
-### Town6
-
-##### Table
-
-Add scroll to tables wider than the content, remove margin from p in table
-
-`Feature` | [OGC-2270](https://linear.app/onegovcloud/issue/OGC-2270) | [f5a9883bd0](https://github.com/onegov/onegov-cloud/commit/f5a9883bd0dc47a2e7ed0567e4070d9f64d01850)
-
-##### Content-sidebar
-
-Only show content sidebar if there are more than 2 subtitles
-
-`Feature` | [1398ba2dd0](https://github.com/onegov/onegov-cloud/commit/1398ba2dd07d466d7b069392547befef62b342e0)
-
-##### Agenda item files
-
-File upload for additional files
-
-`Feature` | [OGC-2269](https://linear.app/onegovcloud/issue/OGC-2269) | [850949b51c](https://github.com/onegov/onegov-cloud/commit/850949b51cd78b467d6eab82acc6431b25c631c5)
 

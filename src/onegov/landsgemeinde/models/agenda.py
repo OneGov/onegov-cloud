@@ -59,7 +59,6 @@ class AgendaItem(
     __tablename__ = 'landsgemeinde_agenda_items'
 
     fts_type_title = _('Agenda items')
-    fts_public = True
     fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
@@ -67,6 +66,10 @@ class AgendaItem(
         'text': {'type': 'localized', 'weight': 'C'},
         'resolution': {'type': 'localized', 'weight': 'C'},
     }
+
+    @property
+    def fts_public(self) -> bool:
+        return self.state != 'draft'
 
     @property
     def fts_last_change(self) -> datetime:
@@ -193,16 +196,30 @@ class AgendaItem(
         else:
             self.files = value
 
-    @observes('files', 'assembly.date')
-    def update_assembly_date(self, files: list[File], date: date_t) -> None:
+    @observes('files', 'state', 'assembly.date')
+    def update_fts_last_change_and_linked_files_meta(
+        self,
+        files: list[File],
+        state: AgendaItemState,
+        date: date_t
+    ) -> None:
         # NOTE: Makes sure we will get reindexed, it doesn't really
         #       matter what we flag as modified, we just pick something.
         flag_modified(self, 'number')
-        if not files or date is None:
+        if not files:
             # nothing else to do
             return
 
+        public = self.fts_public
+
         for file in files:
-            if file.meta.get('assembly_date') != date:
+            if file.meta is None:
+                file.meta = {}  # type: ignore[unreachable]
+
+            if date is not None and file.meta.get('assembly_date') != date:
                 file.meta['assembly_date'] = date
+                flag_modified(file, 'meta')
+
+            if file.meta.get('fts_public') is not public:
+                file.meta['fts_public'] = public
                 flag_modified(file, 'meta')

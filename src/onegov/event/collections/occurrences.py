@@ -384,15 +384,15 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     @cached_property
     def used_sources(self) -> list[str]:
-        """ Returns a list of all the sources used by the events. """
+        """ Returns a list of all the source prefixes used by the events. """
 
-        return [
-            source
+        return sorted({
+            '-'.join(source.split('-', 2)[:2])
             for source, in self.session.query(
                 distinct(Event.meta['source'].astext)
             )
             if source
-        ]
+        })
 
     @cached_property
     def tag_counts(self) -> dict[str, int]:
@@ -594,7 +594,10 @@ class OccurrenceCollection(Pagination[Occurrence]):
             )
 
         if self.sources:
-            query = query.filter(Event.source.in_(self.sources))
+            query = query.filter(or_(*(
+                Event.source.astext.startswith(f'{source}-')
+                for source in self.sources
+            )))
 
         if self.range == 'past':
             # reverse order for past events: most recent event on top

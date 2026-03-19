@@ -26,7 +26,7 @@ from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
 
 
-from typing import cast, overload, Any, NamedTuple, TypeVar, TYPE_CHECKING
+from typing import cast, overload, Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from dectate import Sentinel
@@ -80,9 +80,6 @@ if TYPE_CHECKING:
 
 else:
     _BaseRequest = object
-
-_T = TypeVar('_T')
-_F = TypeVar('_F', bound='Form')
 
 
 @msgpack.make_serializable(tag=11)
@@ -264,15 +261,15 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     ) -> None: ...
 
     @overload
-    def link(
+    def link[T](
         self,
         obj: None,
         name: str,
-        default: _T,
+        default: T,
         app: Framework | Sentinel = ...,
         query_params: SupportsIterableStrItems | None = ...,
         fragment: str | None = ...,
-    ) -> _T: ...
+    ) -> T: ...
 
     @overload
     def link(
@@ -285,15 +282,15 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         fragment: str | None = ...,
     ) -> str: ...
 
-    def link(
+    def link[T](
         self,
         obj: object,
         name: str = '',
-        default: _T | None = None,
+        default: T | None = None,
         app: Framework | Sentinel = SAME_APP,
         query_params: SupportsIterableStrItems | None = None,
         fragment: str | None = None,
-    ) -> str | _T | None:
+    ) -> str | T | None:
         """ Extends the default link generating function of Morepath. """
         query_params = query_params or {}
         if hasattr(obj, '__link_alias__'):
@@ -452,16 +449,16 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             on_dirty=on_dirty
         )
 
-    def get_form(
+    def get_form[T: Form](
         self,
-        form_class: type[_F],
+        form_class: type[T],
         i18n_support: bool = True,
         csrf_support: bool = True,
         data: dict[str, Any] | None = None,
         model: object = None,
         formdata: MultiDict[str, str | _FieldStorageWithFile] | None = None,
         pass_model: bool = False,
-    ) -> _F:
+    ) -> T:
         """ Returns an instance of the given form class, set up with the
         correct translator and with CSRF protection enabled (the latter
         doesn't work yet).
@@ -712,7 +709,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         permission = self.app.permission_by_view(obj, view_name)
         return self.has_permission(obj, permission)
 
-    def exclude_invisible(self, models: Iterable[_T]) -> list[_T]:
+    def exclude_invisible[T](self, models: Iterable[T]) -> list[T]:
         """ Excludes models invisble to the current user from the list. """
         return [m for m in models if self.is_visible(m)]
 

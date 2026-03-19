@@ -304,8 +304,7 @@ def fetch_users_cli(
             app.es_orm_events.stopped = True
 
         fetch_users(
-            app,
-            request.session,
+            request,
             ldap_server,
             ldap_username,
             ldap_password,
@@ -320,8 +319,7 @@ def fetch_users_cli(
 
 
 def fetch_users(
-    app: FsiApp,
-    session: Session,
+    request: FsiRequest,
     ldap_server: str,
     ldap_username: str,
     ldap_password: str,
@@ -334,6 +332,7 @@ def fetch_users(
 ) -> None:
     """ Implements the fetch-users cli command. """
 
+    session = request.session
     admin_group = admin_group.lower()
     editor_group = editor_group.lower()
     sources = ZugUserSource.factory(verbose=verbose)
@@ -395,14 +394,16 @@ def fetch_users(
             raise NotImplementedError()
 
         user = ensure_user(
+            request,
             source=source,
             source_id=source_id,
-            session=session,
             username=data['mail'],
             role=data['role'],
             force_role=force_role,
             force_active=True
         )
+        if user is None:
+            continue
 
         synced_users.append(user.id)
 

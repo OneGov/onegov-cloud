@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import overload, Any, TypeVar, TYPE_CHECKING
+from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Mapping, Sequence
     from ldap3 import Entry
@@ -13,9 +13,6 @@ if TYPE_CHECKING:
         filters: NotRequired[Sequence[str]]
         user_type: NotRequired[str]
         default_filter: NotRequired[str]
-
-
-_T = TypeVar('_T')
 
 
 # FIXME: Should we use `click.echo` or `log.info` instead of `print`?
@@ -51,7 +48,7 @@ class UserSource:
     def scalar(value: list[str] | str | None, default: str = '') -> str: ...
     @overload
     @staticmethod
-    def scalar(value: list[_T] | _T | None, default: _T) -> _T: ...
+    def scalar[T](value: list[T] | T | None, default: T) -> T: ...
 
     @staticmethod
     def scalar(value: list[Any] | Any | None, default: Any = '') -> Any:
