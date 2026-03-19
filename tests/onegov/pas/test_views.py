@@ -10,7 +10,11 @@ from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections.commission_membership import (
     PASCommissionMembershipCollection
 )
+from onegov.pas.collections.presidential_allowance import (
+    PresidentialAllowanceCollection,
+)
 from onegov.pas.models import PASCommissionMembership
+from onegov.pas.models import PASParliamentarianRole
 from onegov.pas.models import SettlementRun
 from onegov.user import UserCollection
 from uuid import UUID
@@ -981,3 +985,80 @@ def test_bulk_commission_add_abschluss_notifies_admins(
     assert len(os.listdir(client.app.maildir)) == 1
     recipients = {client.get_email(i)['To'] for i in range(1)}
     assert 'admin@example.org' in recipients
+
+
+def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
+    client.login_admin()
+
+    # Step 1: PAS settings shows the Präsidialzulagen card
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    assert 'Präsidialzulagen' in settings
+
+    # Step 2: Set up a parliamentarian + president role directly in DB
+    session = client.app.session()
+    parliamentarians = PASParliamentarianCollection(client.app)
+    president = parliamentarians.add(
+        first_name='Hans',
+        last_name='Präsident',
+        email_primary='hans.praesident@example.org',
+    )
+    session.flush()
+    president_id = president.id
+
+    vice = parliamentarians.add(
+        first_name='Lisa',
+        last_name='Vizepräsidentin',
+        email_primary='lisa.vize@example.org',
+    )
+    session.flush()
+
+    session.add(
+        PASParliamentarianRole(
+            parliamentarian_id=president_id,
+            role='president',
+        )
+    )
+    session.add(
+        PASParliamentarianRole(
+            parliamentarian_id=vice.id,
+            role='vice_president',
+        )
+    )
+    transaction.commit()
+
+    # Step 3: Navigate to the new-allowance form and submit
+    current_year = datetime.date.today().year
+    page = client.get('/presidential-allowances/new')
+    assert 'Quartalszulage hinzufügen' in page
+    page.form['year'] = current_year
+    page = page.form.submit().follow()
+
+    assert 'Quartalszulage hinzugefügt' in page
+    assert 'Hans Präsident' in page
+    assert 'Lisa Vizepräsidentin' in page
+
+    # Step 4: Verify allowances appear in the list
+    list_page = client.get('/presidential-allowances')
+    assert 'Präsidialzulagen' in list_page
+    assert 'Hans Präsident' in list_page
+    assert 'Lisa Vizepräsidentin' in list_page
+
+    # Step 5: Enforce the max-4-per-year limit.
+    # First submit created 2 entries (president + VP). Submit 3 more
+    # times -> 4 × 2 = 8 total entries -> can_add returns False.
+    for _ in range(3):
+        page = client.get('/presidential-allowances/new')
+        page.form['year'] = current_year
+        page = page.form.submit().follow()
+        assert 'Quartalszulage hinzugefügt' in page
+
+    session = client.app.session()
+    collection = PresidentialAllowanceCollection(session)
+    assert not collection.can_add(current_year)
+
+    # 5th submit should show error
+    page = client.get('/presidential-allowances/new')
+    page.form['year'] = current_year
+    result = page.form.submit()
+    assert result.status_code == 200
+    assert 'Maximum von 4 Zulagen pro Jahr bereits erreicht' in result

@@ -9,6 +9,9 @@ from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (
     AttendenceCollection,
 )
+from onegov.pas.collections.presidential_allowance import (
+    PresidentialAllowanceCollection,
+)
 from onegov.pas.custom import get_current_rate_set
 from onegov.pas.utils import (
     get_parliamentarians_with_settlements,
@@ -112,6 +115,7 @@ def get_abschlussliste_data(
             'study_compensation': Decimal('0'),
             'shortest_duration': Decimal('0'),
             'shortest_compensation': Decimal('0'),
+            'presidential_allowance': Decimal('0'),
             'expenses': Decimal('0'),
         }
     )
@@ -147,6 +151,16 @@ def get_abschlussliste_data(
         elif att.type == 'shortest':
             data['shortest_duration'] += Decimal(att.duration)
             data['shortest_compensation'] += Decimal(str(compensation))
+
+    # Add presidential allowances for this settlement run
+    allowances = PresidentialAllowanceCollection(
+        session, settlement_run_id=settlement_run.id
+    ).query()
+    for allowance in allowances:
+        pid = str(allowance.parliamentarian_id)
+        parl_data[pid]['presidential_allowance'] += Decimal(
+            str(allowance.amount)
+        )
 
     result = []
     for p in parliamentarians:
@@ -190,7 +204,8 @@ def generate_abschlussliste_xlsx(
         'Name', 'Vorname', 'Partei', 'Fraktion',
         'Plenum Zeit', 'Plenum Entschädigung',
         'Kommissionen Zeit', 'Kommissionen Entschädigung',
-        'Spesen'
+        'Präsidialzulage',
+        'Spesen',
     ]
     for col, header in enumerate(overview_headers):
         overview_ws.write(0, col, header, header_format)
@@ -265,7 +280,8 @@ def generate_abschlussliste_xlsx(
             row_data['commission_duration'] + row_data['shortest_duration'],
             row_data['commission_compensation']
             + row_data['shortest_compensation'],
-            row_data['expenses']
+            row_data['presidential_allowance'],
+            row_data['expenses'],
         ]
         for col, value in enumerate(overview_row):
             overview_ws.write(row_num, col, value, cell_format)
@@ -367,6 +383,25 @@ def generate_buchungen_abrechnungslauf_xlsx(
 
     # Sort by date, then by person name
     data_rows.sort(key=itemgetter('date', 'person'))
+
+    # Add presidential allowances for this settlement run
+    allowances = PresidentialAllowanceCollection(
+        session, settlement_run_id=settlement_run.id
+    ).query()
+    for allowance in allowances:
+        p = allowance.parliamentarian
+        data_rows.append(
+            {
+                'date': settlement_run.end,
+                'person': f'{p.first_name} {p.last_name}',
+                'party': '',
+                'wahlkreis': p.district or '',
+                'booking_type': 'Jahreszulage KR-Präsidium',
+                'value': Decimal('0'),
+                'chf': Decimal(str(allowance.amount)),
+                'chf_with_cola': Decimal(str(allowance.amount)),
+            }
+        )
 
     # Create Excel file
     output = BytesIO()

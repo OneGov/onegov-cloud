@@ -6,6 +6,7 @@ from onegov.pas import _
 from onegov.pas.collections.presidential_allowance import (
     PresidentialAllowanceCollection,
 )
+from onegov.pas.models import SettlementRun
 from wtforms.fields import IntegerField
 from wtforms.validators import InputRequired
 
@@ -25,8 +26,18 @@ class PresidentialAllowanceForm(Form):
     )
 
     def on_request(self) -> None:
-        if not self.is_submitted():
+        if not self.submitted(self.request):
             self.year.data = self.year.data or date.today().year
+
+    @property
+    def current_settlement_run(self) -> SettlementRun | None:
+        """Return the most recent open settlement run."""
+        return (
+            self.request.session.query(SettlementRun)
+            .filter(SettlementRun.closed.is_(False))
+            .order_by(SettlementRun.end.desc())
+            .first()
+        )
 
     def validate(
         self,

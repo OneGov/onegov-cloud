@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from onegov.pas.models import PASParliamentarian
+    from onegov.pas.models import SettlementRun
 
 
 PRESIDENT_YEARLY_ALLOWANCE = 20_000
@@ -27,6 +28,12 @@ ALLOWANCE_ROLES: dict[str, str] = {
     'president': _('President'),
     'vice_president': _('Vice president'),
 }
+
+# FiBu account for presidential allowances
+# (amtliche Missionen Kantonsratspräsidiums)
+FIBU_KONTO_ALLOWANCE = '3000.30'
+LOHNART_ALLOWANCE_NR = '2400'
+LOHNART_ALLOWANCE_TEXT = 'Jahreszulage KR-Präsidium'
 
 
 class PresidentialAllowance(Base, TimestampMixin):
@@ -54,6 +61,15 @@ class PresidentialAllowance(Base, TimestampMixin):
 
     #: The parliamentarian
     parliamentarian: Mapped[PASParliamentarian] = relationship()
+
+    #: Optional link to the settlement run this belongs to
+    settlement_run_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey('pas_settlements.id'),
+        nullable=True,
+    )
+
+    #: The settlement run
+    settlement_run: Mapped[SettlementRun | None] = relationship()
 
     @property
     def role_label(self) -> str:

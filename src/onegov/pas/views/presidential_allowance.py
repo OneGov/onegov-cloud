@@ -16,13 +16,13 @@ from onegov.pas.models.presidential_allowance import (
     VICE_PRESIDENT_QUARTERLY,
     PresidentialAllowance,
 )
-from webob import Response
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.pas.request import PasRequest
+    from webob import Response
 
 
 def get_current_role_holder(
@@ -96,6 +96,7 @@ def add_presidential_allowance(
 
     if form.submitted(request):
         year = form.year.data
+        settlement_run = form.current_settlement_run
 
         president_role = get_current_role_holder(request, 'president')
         vice_president_role = get_current_role_holder(
@@ -109,6 +110,9 @@ def add_presidential_allowance(
                 role='president',
                 amount=PRESIDENT_QUARTERLY,
                 parliamentarian_id=(president_role.parliamentarian_id),
+                settlement_run_id=(
+                    settlement_run.id if settlement_run else None
+                ),
             )
             added += 1
 
@@ -118,6 +122,9 @@ def add_presidential_allowance(
                 role='vice_president',
                 amount=VICE_PRESIDENT_QUARTERLY,
                 parliamentarian_id=(vice_president_role.parliamentarian_id),
+                settlement_run_id=(
+                    settlement_run.id if settlement_run else None
+                ),
             )
             added += 1
 
