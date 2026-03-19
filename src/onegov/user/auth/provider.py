@@ -294,6 +294,7 @@ def ensure_user(
     result = app.settings.user.ensure_user_callback(
         user,
         request,
+        source=source,
         source_id=source_id,
         username=username,
         role=role,
