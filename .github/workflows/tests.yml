@@ -36,9 +36,6 @@ jobs:
     - name: Install packages
       run: |
         apt-get update
-        # TEMPORARY: Remove once the PPA is part of the container again
-        apt-get install -y software-properties-common gpg-agent
-        add-apt-repository ppa:deadsnakes/ppa -y
         apt-get install -y \
           wget \
           apparmor \
@@ -63,42 +60,28 @@ jobs:
           libxshmfence1 \
           libxss1 \
           libxt-dev \
-          xdg-utils \
-          python3.14 \
-          python3.14-dev \
-          python3.14-venv
+          xdg-utils
 
     - name: Checkout repo
       uses: actions/checkout@v6
 
-    # TEMPORARY: Use the uv installed in the app venv again
-    - name: Install uv
-      uses: astral-sh/setup-uv@v7
-
     - name: Install dependencies
       run: |
-        # TEMPORARY: Switch back to the app venv once it is 3.14
-        # source /app/bin/activate
-        # python -m pip install --upgrade uv
-        uv venv --python 3.14
-        source .venv/bin/activate
+        source /app/bin/activate
+        python -m pip install --upgrade uv
         uv pip compile setup.cfg -U \
         | uv pip install .[mypy,lint] -r /dev/stdin
 
     - name: Linting
       run: |
-        # TEMPORARY: Switch back to the app venv once it is 3.14
-        source .venv/bin/activate
-        ruff check src/ tests/ stubs/ --output-format github
-        flake8 \
+        /app/bin/ruff check src/ tests/ stubs/ --output-format github
+        /app/bin/flake8 \
         --format '::error file=%(path)s,line=%(row)s,col=%(col)s,title=Flake8 (%(code)s)::%(text)s' \
         src/
 
     - name: Check security issues
       run: |
-        # TEMPORARY: Switch back to the app venv once it is 3.14
-        source .venv/bin/activate
-        bandit \
+        /app/bin/bandit \
         --quiet \
         --recursive \
         --configfile pyproject.toml \
@@ -108,8 +91,7 @@ jobs:
 
     - name: Static type checking
       run: |
-        # TEMPORARY: Switch back to the app venv once it is 3.14
-        source .venv/bin/activate
+        source /app/bin/activate
         bash mypy.sh
 
   test:
@@ -139,9 +121,6 @@ jobs:
     - name: Install packages
       run: |
         apt-get update
-        # TEMPORARY: Remove once the PPA is part of the container again
-        apt-get install -y software-properties-common gpg-agent
-        add-apt-repository ppa:deadsnakes/ppa -y
         apt-get install -y \
           wget \
           apparmor \
@@ -168,10 +147,7 @@ jobs:
           libxss1 \
           libxt-dev \
           unzip \
-          xdg-utils \
-          python3.14 \
-          python3.14-dev \
-          python3.14-venv
+          xdg-utils
 
     - name: Install Chrome
       uses: browser-actions/setup-chrome@v1
@@ -195,17 +171,10 @@ jobs:
         echo "CODECOV_BRANCH=$(echo ${GITHUB_HEAD_REF} | tr / -)" \
              >> $GITHUB_ENV
 
-    # TEMPORARY: Use the uv installed in the app venv again
-    - name: Install uv
-      uses: astral-sh/setup-uv@v7
-
     - name: Install dependencies
       run: |
-        # TEMPORARY: Switch back to the app venv once it is 3.14
-        # source /app/bin/activate
-        # python -m pip install --upgrade uv
-        uv venv --python 3.14
-        source .venv/bin/activate
+        source /app/bin/activate
+        python -m pip install --upgrade uv
         uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
         # TEMPORARY: editable build so we don't need a path-fix in codecov
         uv pip compile setup.cfg -U \
@@ -229,8 +198,7 @@ jobs:
 
     - name: Run tests
       run: |
-        # TEMPORARY: Switch back to the app venv once it is 3.14
-        run-as "$(id -u test)":test .venv/bin/pytest \
+        run-as "$(id -u test)":test /app/bin/pytest \
           -n logical \
           -o cache_dir=/tmp/pytest \
           -r fER \
