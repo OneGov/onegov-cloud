@@ -90,6 +90,7 @@ header {
         }
 
         .top-bar-section {
+
             .right,
             .right .dropdown {
                 border-top: 0 !important;
@@ -100,7 +101,6 @@ header {
                 }
             }
         }
-
     }
 
     .main-header {
@@ -114,9 +114,11 @@ header {
             }
         }
 
-        .row {
-            align-items: end;
-            display: flex;
+        .row.show-for-medium-up {
+            @media #{$medium-up} {
+                align-items: end;
+                display: flex !important;
+            }
         }
 
         .main-navigation {
@@ -148,19 +150,37 @@ header {
                 }
             }
         }
+
+        .show-for-small-only {
+            background: $primary-color;
+
+            .mobile-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .logo img {
+                    height: 5rem;
+                }
+
+                .button {
+                    background-color: $white;
+                    margin-bottom: 0;
+                    padding: .8rem 1rem;
+                    border-radius: .2rem;
+
+                    i {
+                        color: $primary-color;
+                    }
+                }
+
+                * {
+                    color: $white;
+                }
+            }
+        }
     }
 
-    .top-header.mobile {
-        background: $primary-color;
-
-        * {
-            color: $white;
-        }
-
-        li {
-            border-bottom: 1px solid $white;
-        }
-    }
 
     .top-bar {
         background-color: transparent;
@@ -233,7 +253,7 @@ header {
             }
         }
 
-        > a {
+        >a {
             margin-bottom: 0;
         }
 
@@ -248,12 +268,29 @@ header {
             width: 15px;
         }
 
-        .delete-icon::before { @include icon('\f014'); }
-        .edit-icon::before { @include icon('\f040'); }
-        .export-icon::before { @include icon('\f019'); }
-        .page-icon::before { @include icon('\f0f6'); }
-        .upload-icon::before { @include icon('\f0ee'); }
-        .update-icon::before { @include icon('\f021'); }
+        .delete-icon::before {
+            @include icon('\f014');
+        }
+
+        .edit-icon::before {
+            @include icon('\f040');
+        }
+
+        .export-icon::before {
+            @include icon('\f019');
+        }
+
+        .page-icon::before {
+            @include icon('\f0f6');
+        }
+
+        .upload-icon::before {
+            @include icon('\f0ee');
+        }
+
+        .update-icon::before {
+            @include icon('\f021');
+        }
     }
 
     .breadcrumbs {
@@ -287,7 +324,7 @@ header {
                 float: none;
                 padding-left: 0;
 
-                + li {
+                +li {
                     margin-top: .5rem;
                 }
 
@@ -304,6 +341,97 @@ header {
     }
 }
 
+#mobileMenu {
+    background: $primary-color;
+
+    .menu {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 3.75rem);
+
+        ul {
+            list-style: none;
+
+            li {
+                color: $white;
+            }
+        }
+
+        * {
+            color: $white;
+            text-decoration: none;
+        }
+
+        .button {
+            background-color: $white;
+            margin-bottom: 0;
+            position: relative;
+            padding: .8rem 1rem;
+            height: fit-content;
+            width: fit-content;
+            align-self: flex-end;
+            top: auto;
+            font-size: 1rem;
+            right: auto;
+            border-radius: .2rem;
+
+            i {
+                color: $primary-color;
+            }
+        }
+
+        .main-navigation {
+            ul {
+                margin-left: -1.875rem;
+                margin-right: -1.875rem;
+                margin-top: 3rem;
+
+                li {
+                    border-bottom: 1px solid $white;
+                    padding: 1.875rem;
+                    padding-bottom: 1rem;
+                    padding-top: 1.5rem;
+                    font-size: 2rem;
+                    font-weight: bold;
+
+                    &:first-child {
+                        border-top: 1px solid $white;
+                    }
+                }
+            }
+        }
+
+        .top-header-menu {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            flex-grow: 2;
+
+            ul {
+                margin-left: 0;
+                margin-bottom: 0;
+            }
+
+            .top-bar {
+                height: fit-content;
+                background-color: transparent;
+
+                * {
+                    background-color: transparent !important;
+                }
+
+                li a {
+                    padding-left: 0;
+                }
+            }
+        }
+    }
+}
+
+
+.top-bar-section .has-dropdown > a::after {
+    border: 0;
+}
 
 @media print {
     .languages,

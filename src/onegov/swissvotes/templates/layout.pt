@@ -37,57 +37,58 @@
 </head>
 <body tal:attributes="layout.custom_body_attributes|{}">
     <header>
-        <div class="nav-header show-for-medium-up">
+        <div class="nav-header">
             <div class="top-header">
-                <nav class="top-bar" data-topbar="" role="navigation" data-options="is_hover: false">
+                <nav class="top-bar show-for-medium-up" data-topbar="" role="navigation" data-options="is_hover: false">
                     <section class="top-bar-section">
-                        <ul class="left">
-                            <li>
-                                <a i18n:translate>Publications</a>
-                            </li>
-                            <li i18n:translate>
-                                <a i18n:translate>Downloads</a>
-                            </li>
-                            <li i18n:translate>
-                                <a i18n:translate>Media</a>
-                            </li>
-                            <tal:block tal:repeat="(locale, lang, title, href) layout.locales">
-                                <li tal:condition="request.locale != locale">
-                                    <a rel="alternate" href="${href}" lang="${lang}" hreflang="${lang}">${title}</a>
-                                </li>
-                            </tal:block>
-                        </ul>
+                        <div metal:use-macro="layout.macros['top_header_navigation']"></div>
                     </section>
 
                     <section class="top-bar-section">
                         <!-- Right Nav Section -->
-                        <ul class="right" tal:define="current_locale_title [title for locale, lang, title, href in layout.locales if locale == request.locale][0]">
-                            <li class="has-dropdown"><a class="">${current_locale_title} <i class="fa fa-chevron-down rotate"></i></a>
-                                <ul class="dropdown">
-                                    <tal:block tal:repeat="(locale, lang, title, href) layout.locales">
-                                        <li tal:condition="request.locale != locale">
-                                            <a rel="alternate" href="${href}" lang="${lang}" hreflang="${lang}">${title}</a>
-                                        </li>
-                                    </tal:block>
-                                </ul>
-                            </li>
-                        </ul>
+                        <div metal:use-macro="layout.macros['lang_navigation']"></div>
                     </section>
                 </nav>
             </div>
 
             <div class="main-header">
-                <div class="row row-wide">
-                    <div class="columns hide-for-small medium-2">
+                <div class="row row-wide show-for-medium-up">
+                    <div class="columns medium-2">
                         <a href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
-                        </div>
-                        <div class="columns small-12 medium-8">
-                            <div metal:use-macro="layout.macros['top_navigation']"></div>
-                        </div>
-                        <div class="columns hide-for-small medium-2">
-                        </div>
+                    </div>
+                    <div class="columns small-12 medium-8">
+                        <div metal:use-macro="layout.macros['top_navigation']"></div>
+                    </div>
+                    <div class="columns medium-2">
                     </div>
                 </div>
+                <div class="row show-for-small-only">
+                    <div class="columns medium-12 mobile-header">
+                        <a class="logo" href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/APS/weiss/Logo_annee-politique-suisse_weiss.svg" height="100" alt="année politique suisse"></a>
+                            <a class="button" href="#" data-reveal-id="mobileMenu"><i class="fa fa-bars"></i></a>
+
+                            <div id="mobileMenu" class="reveal-modal why" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+                            <div class="menu">
+                                <a class="close-reveal-modal button" aria-label="Close"><i class="fa fa-times"></i></a>
+                                <div metal:use-macro="layout.macros['mobile_top_navigation']"></div>
+                                <div class="top-header-menu">
+                                    <nav class="top-bar" data-topbar="" role="navigation" data-options="is_hover: false">
+                                        <section class="top-bar-section">
+                                            <div metal:use-macro="layout.macros['top_header_navigation']"></div>
+                                        </section>
+                                    </nav>
+
+                                    <nav class="top-bar" data-topbar="" role="navigation" data-options="is_hover: false">
+                                        <section class="top-bar-section">
+                                            <div metal:use-macro="layout.macros['lang_navigation']"></div>
+                                        </section>
+                                    </nav>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="row">
@@ -102,7 +103,6 @@
             </div>
         </div>
     </header>
-
     <main class="row">
         <div class="columns small-12">
             <div class="row">
@@ -173,7 +173,7 @@
                         </form>
                     </div>
             </div>
-            <div class="columns small-12 medium-3"></div>
+            <div class="columns small-12 medium-3 show-for-medium-up"></div>
         </div>
         <div class="row row-wide bottom-part">
             <div class="columns small-12 medium-3 main-projects">

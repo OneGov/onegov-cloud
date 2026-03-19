@@ -13,7 +13,7 @@
                         <tal:block repeat="link links">
                             <li tal:attributes="data-sortable-id link.sortable_id|None;
                                                 class python: 'draggable' if getattr(link, 'sortable_id', None) else None">
-                                <tal:b replace="link(layout)" />
+                                <a href="${link.attrs['href']}">${link.text}</a>
                             </li>
                         </tal:block>
                     </ul>
@@ -21,6 +21,49 @@
             </nav>
             <div class="clearfix"></div>
         </div>
+    </metal:navigation>
+
+    <metal:navigation define-macro="mobile_top_navigation">
+        <div class="main-navigation" tal:define="links top_navigation|layout.top_navigation">
+            <nav role="navigation" tal:condition="links">
+                    <ul>
+                        <tal:block repeat="link links">
+                            <li>
+                                <a href="${link.attrs['href']}">${link.text}</a>
+                            </li>
+                        </tal:block>
+                    </ul>
+            </nav>
+            <div class="clearfix"></div>
+        </div>
+    </metal:navigation>
+
+    <metal:navigation define-macro="top_header_navigation">
+        <ul class="left">
+            <li>
+                <a i18n:translate>Publications</a>
+            </li>
+            <li i18n:translate>
+                <a i18n:translate>Downloads</a>
+            </li>
+            <li i18n:translate>
+                <a i18n:translate>Media</a>
+            </li>
+        </ul>
+    </metal:navigation>
+
+    <metal:navigation define-macro="lang_navigation">
+        <ul class="right" tal:define="current_locale_title [title for locale, lang, title, href in layout.locales if locale == request.locale][0]">
+            <li class="has-dropdown"><a class="">${current_locale_title} <i class="fa fa-chevron-down rotate"></i></a>
+                <ul class="dropdown">
+                    <tal:block tal:repeat="(locale, lang, title, href) layout.locales">
+                        <li tal:condition="request.locale != locale">
+                            <a rel="alternate" href="${href}" lang="${lang}" hreflang="${lang}">${title}</a>
+                        </li>
+                    </tal:block>
+                </ul>
+            </li>
+        </ul>
     </metal:navigation>
 
 
