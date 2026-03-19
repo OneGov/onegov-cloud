@@ -6,7 +6,7 @@ install: ensure_uv
 	uv pip install -e . --config-settings editable_mode=compat
 
 	# enable pre-commit
-	pre-commit install
+	prek install -f
 
 	# ensure required folder structure
 	mkdir -p ./profiles
@@ -41,7 +41,7 @@ update: ensure_uv
 	uv pip compile setup.cfg -U --all-extras | uv pip install -U -r /dev/stdin
 
 	# update the pre-commit hooks
-	pre-commit autoupdate
+	prek autoupdate
 
 	# apply install step to avoid deviations
 	make install
