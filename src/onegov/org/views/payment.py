@@ -248,7 +248,7 @@ def handle_batch_set(
     invoices_query = self.session.query(TicketInvoice).filter(
         TicketInvoice.id.in_(invoice_ids)
     ).options(
-        joinedload(TicketInvoice.items)
+        joinedload(TicketInvoice.items.of_type(TicketInvoiceItem))
         .selectinload(TicketInvoiceItem.payments)
     )
     updated_count = 0

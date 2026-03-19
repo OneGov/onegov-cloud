@@ -30,10 +30,9 @@ if TYPE_CHECKING:
     from builtins import type as _type
     from onegov.election_day.request import ElectionDayRequest
     from typing import Self
-    from typing import TypeAlias
 
 
-ResultType: TypeAlias = Literal[
+type ResultType = Literal[
     'election', 'election_compound', 'complex_vote', 'vote'
 ]
 

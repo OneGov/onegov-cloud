@@ -7,9 +7,8 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Election
     from sqlalchemy.orm import Mapped
     from sqlalchemy.orm import Session
-    from typing import TypeAlias
 
-    Elections: TypeAlias = Mapped[list[Election]] | list[Election]
+    type Elections = Mapped[list[Election]] | list[Election]
 
 
 class ResultRow(NamedTuple):

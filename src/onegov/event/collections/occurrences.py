@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from datetime import date, timedelta, datetime
 
@@ -30,7 +31,6 @@ from onegov.form import as_internal_id
 from typing import assert_never
 from typing import Any
 from typing import Literal
-from typing import TypeVar
 from typing import Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -44,7 +44,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Protocol
-    from typing import TypeAlias
 
     class OccurenceSearchWidget(Protocol):
         @property
@@ -57,8 +56,7 @@ if TYPE_CHECKING:
             query: Query[Occurrence]
         ) -> Query[Occurrence]: ...
 
-    T = TypeVar('T')
-    MissingType: TypeAlias = 'Literal[_Sentinel.MISSING]'
+    type MissingType = Literal[_Sentinel.MISSING]
 
 DateRange = Literal[
     'today',
@@ -75,6 +73,10 @@ class _Sentinel(Enum):
 
 
 MISSING = _Sentinel.MISSING
+_clean_search_term = str.maketrans(dict.fromkeys(
+    '()[]{},;"\'.',
+    None
+))
 
 
 class OccurrenceCollection(Pagination[Occurrence]):
@@ -114,6 +116,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         tags: Sequence[str] | None = None,
         filter_keywords: Mapping[str, list[str] | str] | None = None,
         locations: Sequence[str] | None = None,
+        sources: Sequence[str] | None = None,
         only_public: bool = False,
         search_widget: OccurenceSearchWidget | None = None,
         event_filter_configuration: dict[str, Any] | None = None,
@@ -128,6 +131,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self.tags = tags if tags else []
         self.filter_keywords = filter_keywords or {}
         self.locations = locations if locations else []
+        self.sources = sources if sources else []
         self.only_public = only_public
         self.search_widget = search_widget
         self.event_filter_configuration = event_filter_configuration or {}
@@ -162,6 +166,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             tags=self.tags,
             filter_keywords=self.filter_keywords,
             locations=self.locations,
+            sources=self.sources,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -219,7 +224,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     def for_keywords(
         self,
-        singular: bool = False,
         **keywords: list[str]
     ) -> Self:
 
@@ -233,6 +237,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             tags=self.tags,
             filter_keywords=keywords,
             locations=self.locations,
+            sources=self.sources,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -270,6 +275,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             tags=self.tags,
             filter_keywords=parameters,
             locations=self.locations,
+            sources=self.sources,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -287,6 +293,8 @@ class OccurrenceCollection(Pagination[Occurrence]):
         tag: str | None = None,
         locations: Sequence[str] | None = None,
         location: str | None = None,
+        sources: Sequence[str] | None = None,
+        source: str | None = None,
     ) -> Self:
         """ Returns a new instance of the collection with the given filters
         and copies the current filters if not specified.
@@ -324,6 +332,13 @@ class OccurrenceCollection(Pagination[Occurrence]):
             else:
                 locations.append(location)
 
+        sources = list(self.sources if sources is None else sources)
+        if source is not None:
+            if source in sources:
+                sources.remove(source)
+            else:
+                sources.append(source)
+
         return self.__class__(
             self.session,
             page=0,
@@ -334,6 +349,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             tags=tags,
             filter_keywords=self.filter_keywords,
             locations=locations,
+            sources=sources,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -351,6 +367,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             tags=None,
             filter_keywords=None,
             locations=self.locations,
+            sources=self.sources,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -363,6 +380,18 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         return [
             tz for tz, in self.session.query(distinct(Occurrence.timezone))
+        ]
+
+    @cached_property
+    def used_sources(self) -> list[str]:
+        """ Returns a list of all the sources used by the events. """
+
+        return [
+            source
+            for source, in self.session.query(
+                distinct(Event.meta['source'].astext)
+            )
+            if source
         ]
 
     @cached_property
@@ -397,7 +426,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         self.event_filter_fields = fields or ()
 
-    def valid_keywords(
+    def valid_keywords[T](
         self,
         parameters: Mapping[str, T]
     ) -> dict[str, T]:
@@ -555,19 +584,17 @@ class OccurrenceCollection(Pagination[Occurrence]):
                 query = query.filter(and_(*value_filters))
 
         if self.locations:
-
-            def escape(qstring: str) -> str:
-                purge = "\\(),\"'."
-                for s in purge:
-                    qstring = qstring.replace(s, '')
-                return qstring
-
             query = query.filter(
                 or_(*[
-                    Occurrence.location.op('~')(f'\\y{escape(loc)}\\y')
+                    Occurrence.location.op('~')(
+                        rf'\y{re.escape(loc.translate(_clean_search_term))}\y'
+                    )
                     for loc in self.locations
                 ])
             )
+
+        if self.sources:
+            query = query.filter(Event.source.in_(self.sources))
 
         if self.range == 'past':
             # reverse order for past events: most recent event on top

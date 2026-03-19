@@ -26,10 +26,10 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.activity.collections import PublicationRequestCollection
     from onegov.activity.models import BookingPeriodMeta, PublicationRequest
-    from typing import Self, TypeAlias
+    from typing import Self
 
 
-ActivityState: TypeAlias = Literal[
+type ActivityState = Literal[
     'preview',
     'proposed',
     'accepted',

@@ -130,8 +130,11 @@ def test_import_ech_vote_gr(
     assert vote.counted is True
     assert vote.answer == 'counter-proposal'
     assert vote.counter_proposal.eligible_voters == 5082
-    assert vote.counter_proposal.cast_ballots == 1319
+    assert vote.counter_proposal.cast_ballots == 1949
     assert vote.counter_proposal.yeas == 660
+    # verify received is stored at result level
+    cp_result = vote.counter_proposal.results[0]
+    assert cp_result.received is not None
 
     # ... test simple federal
     vote = next(u for u in updated if u.id == 'ipq50')
@@ -142,6 +145,11 @@ def test_import_ech_vote_gr(
     assert vote.eligible_voters == 19188
     assert vote.cast_ballots == 11855
     assert vote.yeas == 8457
+    # verify received is stored on counted results
+    counted_results = [r for r in vote.proposal.results if r.counted]
+    assert all(r.received is not None for r in counted_results)
+    uncounted_results = [r for r in vote.proposal.results if not r.counted]
+    assert all(r.received is None for r in uncounted_results)
 
     # re-import of results
     results = import_test_datasets(

@@ -20,7 +20,6 @@ from xsdata.formats.dataclass.parsers import XmlParser
 from typing import overload
 from typing import Any
 from typing import IO
-from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -36,13 +35,11 @@ if TYPE_CHECKING:
     from onegov.election_day.types import Gender
     from onegov.election_day.types import Status
 
-    ECHImportResultType = tuple[
-        list['FileImportError'],
+    type ECHImportResultType = tuple[
+        list[FileImportError],
         set[ElectionCompound | Election | Vote],
         set[ElectionCompound | Election | Vote]
     ]
-
-_T = TypeVar('_T')
 
 
 EXPATS = (
@@ -325,33 +322,33 @@ def validate_integer(
 
 
 @overload
-def validate_integer(
+def validate_integer[T](
     line: DefaultRow,
     col: str,
     treat_none_as_default: bool,
-    default: _T,
+    default: T,
     optional: bool = False
-) -> int | _T: ...
+) -> int | T: ...
 
 
 @overload
-def validate_integer(
+def validate_integer[T](
     line: DefaultRow,
     col: str,
     treat_none_as_default: bool = True,
     *,
-    default: _T,
+    default: T,
     optional: bool = False
-) -> int | _T: ...
+) -> int | T: ...
 
 
-def validate_integer(
+def validate_integer[T](
     line: DefaultRow,
     col: str,
     treat_none_as_default: bool = True,
-    default: int | _T = 0,
+    default: int | T = 0,
     optional: bool = False
-) -> int | _T:
+) -> int | T:
     """
     Checks line of a csv file for a valid integer.
     Raises an error if the attribute is not there.
@@ -392,39 +389,39 @@ def validate_numeric(
 
 
 @overload
-def validate_numeric(
+def validate_numeric[T](
     line: DefaultRow,
     col: str,
     precision: int,
     scale: int,
     treat_none_as_default: bool,
-    default: _T,
+    default: T,
     optional: bool = False
-) -> Decimal | _T: ...
+) -> Decimal | T: ...
 
 
 @overload
-def validate_numeric(
+def validate_numeric[T](
     line: DefaultRow,
     col: str,
     precision: int,
     scale: int,
     treat_none_as_default: bool = True,
     *,
-    default: _T,
+    default: T,
     optional: bool = False
-) -> Decimal | _T: ...
+) -> Decimal | T: ...
 
 
-def validate_numeric(
+def validate_numeric[T](
     line: DefaultRow,
     col: str,
     precision: int,
     scale: int,
     treat_none_as_default: bool = True,
-    default: Decimal | _T = Decimal(0),
+    default: Decimal | T = Decimal(0),
     optional: bool = False
-) -> Decimal | _T:
+) -> Decimal | T:
     """
     Checks line of a csv file for a valid numeric number.
     Raises an error if the attribute is not there.
@@ -465,30 +462,30 @@ def validate_list_id(
 
 
 @overload
-def validate_list_id(
+def validate_list_id[T](
     line: DefaultRow,
     col: str,
     treat_empty_as_default: bool,
-    default: _T
-) -> str | _T: ...
+    default: T
+) -> str | T: ...
 
 
 @overload
-def validate_list_id(
+def validate_list_id[T](
     line: DefaultRow,
     col: str,
     treat_empty_as_default: bool = True,
     *,
-    default: _T
-) -> str | _T: ...
+    default: T
+) -> str | T: ...
 
 
-def validate_list_id(
+def validate_list_id[T](
     line: DefaultRow,
     col: str,
     treat_empty_as_default: bool = True,
-    default: str | _T = '0'
-) -> str | _T:
+    default: str | T = '0'
+) -> str | T:
     """ Used to validate list_id that can also be alphanumeric.
     Example: 03B.04
     Previously, the list_id was also 0 if it was empty.

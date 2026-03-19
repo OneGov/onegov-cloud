@@ -1524,7 +1524,7 @@ msgid "Sort"
 msgstr "Sortieren"
 
 msgid "Change username"
-msgstr "Benutzername ändern"
+msgstr "Benutzernamen ändern"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -1857,6 +1857,12 @@ msgstr "Kostenlos"
 
 msgid "This occasion does not have enough attendees yet."
 msgstr "Diese Durchführung hat noch nicht genügend Anmeldungen."
+
+msgid "carpool"
+msgstr "Fahrgemeinschaft bilden"
+
+msgid "The following persons can be asked to form carpools."
+msgstr "Folgende Personen können für Fahrgemeinschaften angefragt werden."
 
 msgid "Parent"
 msgstr "Elternteil"
@@ -3309,12 +3315,6 @@ msgstr ""
 #, python-format
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} wurde gelöscht, inklusive aller damit verbundenen Daten."
-
-#~ msgid "Organisers without an occasion"
-#~ msgstr "Veranstaltende ohne Durchführungen"
-
-#~ msgid "Users with attendees that without wishes or bookings"
-#~ msgstr "Benutzer mit Teilnehmenden ohne Wünsche oder Buchungen"
 
 #~ msgid "Could not delete account; try again or contact an administrator."
 #~ msgstr ""

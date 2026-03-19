@@ -18,7 +18,7 @@ from uuid import uuid4
 from uuid import UUID
 
 
-from typing import Any, Literal, TypeAlias, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.parliament.models import (
         CommissionMembership,
@@ -26,11 +26,11 @@ if TYPE_CHECKING:
     )
     from sqlalchemy.sql import ColumnElement
 
-Gender: TypeAlias = Literal[
+type Gender = Literal[
     'male',
     'female',
 ]
-ShippingMethod: TypeAlias = Literal[
+type ShippingMethod = Literal[
     'a',
     'plus',
     'registered',

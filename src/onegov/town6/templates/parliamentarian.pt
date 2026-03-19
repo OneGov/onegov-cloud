@@ -125,7 +125,7 @@
                 <!--?                <dd>${parliamentarian.gender_label}</dd>-->
                 <!--?            </div>-->
                             <div tal:condition="parliamentarian.party">
-                                <dt i18n:translate>Party</dt>
+                                <dt i18n:translate>Political Party</dt>
                                 <dd>${parliamentarian.party}</dd>
                             </div>
                             <div tal:condition="parliamentarian.private_address">

@@ -1859,6 +1859,14 @@ msgstr "Gratuito"
 msgid "This occasion does not have enough attendees yet."
 msgstr "Questo evento non ha ancora abbastanza partecipanti."
 
+msgid "carpool"
+msgstr "condivisione dell'auto"
+
+msgid "The following persons can be asked to form carpools."
+msgstr ""
+"Le seguenti persone possono essere contattate per richieste di tragitti "
+"condivisi."
+
 msgid "Parent"
 msgstr "Genitore"
 
@@ -3305,12 +3313,6 @@ msgstr ""
 #, python-format
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} è stato cancellato, inclusi tutti i dati associati."
-
-#~ msgid "Organisers without an occasion"
-#~ msgstr "Organizzatori senza eventi"
-
-#~ msgid "Users with attendees that without wishes or bookings"
-#~ msgstr "Utenti con partecipanti senza desideri o prenotazioni"
 
 #~ msgid "Could not delete account; try again or contact an administrator."
 #~ msgstr ""

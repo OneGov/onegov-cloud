@@ -238,7 +238,7 @@ def get_api_endpoints_handler(
         yield NewsApiEndpoint(request, extra_parameters, page)
         yield TopicApiEndpoint(request, extra_parameters, page)
         directories = request.exclude_invisible(
-            request.session.query(ExtendedDirectory).all())
+            request.session.query(ExtendedDirectory))
         for directory in directories:
             yield DirectoryEntryApiEndpoint(
                 request=request,
@@ -315,6 +315,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'foundation-intercooler.js'
     yield 'chosen_select_hierarchy.js'
     yield 'iframe_request_parameters.js'
+    yield 'ai_formcoder.js'
 
 
 @TownApp.webasset('editor')
@@ -356,3 +357,11 @@ def get_staff_chat_asset() -> Iterator[str]:
 def get_staff_client_asset() -> Iterator[str]:
     yield 'chat-shared.js'
     yield 'chat-client.js'
+
+
+@TownApp.webasset('d3-charts')
+def get_d3_chart_assets() -> Iterator[str]:
+    yield 'd3.v7.min.js'
+    yield 'd3-flextree.js'
+    yield 'd3-org-chart.js'
+    yield 'd3-display.js'
