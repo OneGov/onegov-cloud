@@ -179,8 +179,8 @@ msgstr "Sa"
 msgid "Su"
 msgstr "Di"
 
-msgid "Enable RIS"
-msgstr "Activer RIS"
+msgid "Enable Ratsinformationssystem (RIS)"
+msgstr "Activer Ratsinformationssystem (RIS)"
 
 msgid "Enables the RIS integration for this organisation."
 msgstr "Active l'intégration RIS pour cette organisation."

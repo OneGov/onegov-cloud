@@ -127,7 +127,7 @@ def get_modules(request: OrgRequest) -> LinkGroup:
         links.append(
             Link(
                 _('RIS Settings'),
-                request.link(request.app.org, 'ris-settings'),
+                request.link(request.app.org, 'ris-overview'),
                 attrs={'class': 'ris-settings'}
             ),
         )

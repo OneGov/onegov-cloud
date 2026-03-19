@@ -388,7 +388,7 @@ def town_handle_chat_settings(
 
 
 @TownApp.form(
-    model=Organisation, name='ris-enable', template='form.pt',
+    model=Organisation, name='ris-settings', template='form.pt',
     permission=Secret, form=RISSettingsForm,
     setting=_('Ratsinformationssystem'), icon='fa-landmark', order=500,
     category=_('Modules')

@@ -318,7 +318,7 @@ class RISSettingsForm(Form):
 
 class ModuleActivationSettingsForm(OrgModuleActivationSettingsForm):
     ris_enabled = BooleanField(
-        label=_('Enable RIS'),
+        label=_('Enable Ratsinformationssystem (RIS)'),
         description=_('Enables the RIS integration for this organisation.'),
         default=False
     )

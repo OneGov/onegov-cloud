@@ -89,6 +89,18 @@ def view_settings(
                     and not request.app.settings.org.citizen_login_enabled
                 ):
                     continue
+
+                if (
+                    setting['name'] == 'newsletter-settings'
+                    and not request.app.org.show_newsletter
+                ):
+                    continue
+
+                if (
+                    setting['name'] == 'ris-settings'
+                    and not request.app.org.ris_enabled | False
+                ):
+                    continue
                 setting['title'] = setting['setting']
                 setting['link'] = request.link(self, name=setting['name'])
 
