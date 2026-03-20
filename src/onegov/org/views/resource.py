@@ -736,6 +736,10 @@ def get_find_your_spot_reservations(
     request: OrgRequest
 ) -> JSON_ro:
 
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
+
     reservations = sorted(
         (utils.ReservationInfo(resource, reservation, request).as_dict()
             for resource in request.exclude_invisible(self.query())
@@ -766,6 +770,10 @@ def delete_all_find_your_spot_reservations(
     self: FindYourSpotCollection,
     request: OrgRequest
 ) -> JSON_ro:
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
 
     # anonymous users do not get a csrf token (it's bound to the identity)
     # therefore we can't check for it -> this is not a problem since
@@ -1197,6 +1205,11 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     more information.
 
     """
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
+
     assert_visible_by_members(self, request)
 
     start, end = utils.parse_fullcalendar_request(request, self.timezone)
@@ -1254,6 +1267,11 @@ def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns stats for the selected date range.
 
     """
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
+
     assert_visible_by_members(self, request)
 
     start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')

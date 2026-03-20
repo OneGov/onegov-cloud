@@ -29,7 +29,7 @@ from onegov.core.orm import orm_cached, request_cached
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime
 from onegov.core.orm.types import LowercaseText, MarkupText
 from onegov.core.security import Private
-from onegov.core.utils import scan_morepath_modules
+from onegov.core.utils import scan_morepath_modules, add_cors_header
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
 from sedate import utcnow
@@ -276,6 +276,11 @@ def test_orm_scenario(postgres_dsn: str, redis_url: str) -> None:
         self: DocumentCollection,
         request: CoreRequest
     ) -> JSON_ro:
+
+        @request.after
+        def add_headers(response: Response) -> None:
+            add_cors_header(response)
+
         return {str(d.id): d.title for d in self.all()}
 
     @App.json(model=DocumentCollection, name='add', request_method='POST')

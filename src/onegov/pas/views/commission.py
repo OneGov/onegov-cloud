@@ -3,6 +3,7 @@ from itertools import groupby
 
 from onegov.core.elements import Link
 from onegov.core.security import Private, Public
+from onegov.core.utils import add_cors_header
 from onegov.org.forms.commission_membership import CommissionMembershipAddForm
 from onegov.town6.views.commission import (
     view_commissions,
@@ -259,6 +260,11 @@ def commissions_parliamentarians_json(
     self: PASCommissionCollection, request: TownRequest
 ) -> JSON_ro:
     """Returns all commissions with their parliamentarians."""
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
+
     # TODO: Should we consider all that have been active in
     # current settlement run to be more precise?
     # It might happen that some have been active just recently

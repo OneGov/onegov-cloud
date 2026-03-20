@@ -14,6 +14,7 @@ from itertools import groupby
 from onegov.core.filestorage import view_filestorage_file
 from onegov.core.security import Private, Public
 from onegov.core.templates import render_macro
+from onegov.core.utils import add_cors_header
 from onegov.directory.models.directory import DirectoryFile
 from onegov.file import File, FileCollection
 from onegov.file.integration import (
@@ -390,6 +391,11 @@ def view_get_file_collection_json(
     self: GeneralFileCollection,
     request: OrgRequest
 ) -> JSON_ro:
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
+
     return [
         {
             'link': request.class_link(File, {'id': id}),

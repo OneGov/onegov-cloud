@@ -5,6 +5,7 @@ import transaction
 
 from onegov.core.security import Public
 from onegov.core.templates import render_macro
+from onegov.core.utils import add_cors_header
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout
@@ -100,6 +101,11 @@ def search(
 
 @OrgApp.json(model=Search, name='suggest', permission=Public)
 def suggestions(self: Search, request: OrgRequest) -> JSON_ro:
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
+
     try:
         return self.suggestions()
     except SearchOfflineError as exception:
