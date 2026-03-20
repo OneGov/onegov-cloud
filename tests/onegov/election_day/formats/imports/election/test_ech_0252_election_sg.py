@@ -286,3 +286,78 @@ def test_import_ech_election_sg_proportional_combined(
     )
     # Muster: 1730, Fischer: 1440
     assert total_candidate_votes == 3170
+
+
+def test_import_ech_election_sg_multi_combined(
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+    # A single delivery containing both a majority and a proportional
+    # election with only 3 counting circles
+    results = import_test_datasets(
+        api_format='ech',
+        principal='sg',
+        dataset_name='multi_combined'
+    )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
+    assert not errors
+
+    # Should create both elections
+    majority_elections = [
+        u for u in updated
+        if isinstance(u, Election) and not isinstance(u, ProporzElection)
+    ]
+    proporz_elections = [u for u in updated if isinstance(u, ProporzElection)]
+
+    assert len(majority_elections) == 1
+    assert len(proporz_elections) == 1
+
+    # Verify majority election
+    maj = majority_elections[0]
+    assert maj.date == date(2027, 10, 11)
+    assert maj.number_of_mandates == 2
+    assert len(maj.candidates) == 2
+    assert maj.has_results is True
+    # 2 counted (Altstätten, Amden), 1 uncounted (Andwil)
+    assert maj.status == 'interim'
+    maj_counted = [r for r in maj.results if r.counted]
+    assert len(maj_counted) == 2
+
+    total_eligible = sum(r.eligible_voters for r in maj_counted)
+    assert total_eligible == 7000  # 5000 + 2000
+    total_received = sum(r.received_ballots for r in maj_counted)
+    assert total_received == 4000  # 3000 + 1000
+
+    total_maj_candidate_votes = sum(
+        cr.votes for r in maj_counted
+        for cr in r.candidate_results
+    )
+    # Muster: 1500+500=2000, Fischer: 1200+400=1600
+    assert total_maj_candidate_votes == 3600
+
+    # Verify proportional election
+    prop = proporz_elections[0]
+    assert prop.date == date(2027, 10, 11)
+    assert prop.number_of_mandates == 2
+    assert len(prop.candidates) == 2
+    assert len(prop.lists) == 3
+    assert prop.has_results is True
+    # 1 counted (Altstätten), 2 uncounted (Amden, Andwil)
+    assert prop.status == 'interim'
+    prop_counted = [r for r in prop.results if r.counted]
+    assert len(prop_counted) == 1
+
+    total_prop_candidate_votes = sum(
+        cr.votes for r in prop_counted
+        for cr in r.candidate_results
+    )
+    # Muster: 200+800=1000, Fischer: 150+700=850
+    assert total_prop_candidate_votes == 1850
+
+    list_votes = sum(
+        lr.votes for r in prop_counted
+        for lr in r.list_results
+    )
+    # Liste 1: 900, Liste 2: 750, Empty: 0
+    assert list_votes == 1650
