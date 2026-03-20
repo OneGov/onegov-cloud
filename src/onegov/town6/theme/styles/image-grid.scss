@@ -13,11 +13,10 @@
 
     .image-container {
         box-sizing: border-box;
-        margin-bottom: .5rem;
+        margin-bottom: 1rem;
 
         img {
             cursor: pointer;
-            margin-bottom: .25rem;
             transition: .2s;
 
         }
@@ -42,7 +41,6 @@
 
 // old .image-box in org
 .image-container {
-
     position: relative;
 
     .delete {
@@ -69,6 +67,12 @@
 .image-select {
     .image-container {
         @include grayscale;
+        display: flex;
+        flex-direction: column;
+
+        img {
+            margin-bottom: .25rem;
+        }
 
         &:hover {
             img {

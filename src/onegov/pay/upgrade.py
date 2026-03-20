@@ -2,11 +2,12 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
-
 
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import false
+from sqlalchemy import text
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Text
@@ -30,16 +31,16 @@ def make_payment_models_polymorphic_type_non_nullable(
     context: UpgradeContext
 ) -> None:
     if context.has_table('payments'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE payments SET source = 'generic' WHERE source IS NULL;
-        """)
+        """))
 
         context.operations.alter_column('payments', 'source', nullable=False)
 
     if context.has_table('payment_providers'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE payment_providers SET type = 'generic' WHERE type IS NULL;
-        """)
+        """))
 
         context.operations.alter_column('payment_providers', 'type',
                                         nullable=False)
@@ -63,14 +64,14 @@ def add_invoiced_state_to_payments(context: UpgradeContext) -> None:
         # before altering the type
 
         # End current transaction
-        context.operations.execute('COMMIT')
+        context.operations.execute(text('COMMIT'))
 
-        context.operations.execute(
+        context.operations.execute(text(
             "ALTER TYPE payment_state ADD VALUE IF NOT EXISTS 'invoiced'"
-        )
+        ))
 
         # Start new transaction
-        context.operations.execute('BEGIN')
+        context.operations.execute(text('BEGIN'))
 
 
 @upgrade_task('Add invoiced column to invoices')
@@ -90,7 +91,7 @@ def add_invoiced_state_to_invoices(context: UpgradeContext) -> None:
             )
         )
 
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE invoices
                SET invoiced = TRUE
              WHERE id IN (
@@ -102,7 +103,7 @@ def add_invoiced_state_to_invoices(context: UpgradeContext) -> None:
                     ON payments.id = link.payment_id
                  WHERE payments.state = 'invoiced'
             )
-        """)
+        """))
 
 
 @upgrade_task('Add invoicing party and cost object column to invoices')

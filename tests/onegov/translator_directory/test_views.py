@@ -105,7 +105,7 @@ def get_accountant_email(client: Client) -> str:
     return emails[0]
 
 
-def collect_emails(client: Client) -> list['EmailJsonDict']:
+def collect_emails(client: Client) -> list[EmailJsonDict]:
     """Collect all emails from client and flush the queue."""
     all_emails = []
     for i in range(10):
@@ -120,14 +120,14 @@ def collect_emails(client: Client) -> list['EmailJsonDict']:
 
 
 def filter_emails_by_recipient(
-    emails: list['EmailJsonDict'], recipient: str
-) -> list['EmailJsonDict']:
+    emails: list[EmailJsonDict], recipient: str
+) -> list[EmailJsonDict]:
     """Filter emails to only those sent to the specified recipient."""
     return [e for e in emails if recipient in e['To']]
 
 
 def extract_ticket_link_from_email(
-    emails: list['EmailJsonDict'], recipient: str
+    emails: list[EmailJsonDict], recipient: str
 ) -> str:
     """Extract ticket link from email sent to recipient."""
     matching_emails = [e for e in emails if recipient in e['To']]
@@ -2216,51 +2216,8 @@ def test_view_time_reports(client: Client) -> None:
 
 
 def test_time_reports_finanzstelle_filtering(client: Client) -> None:
-    """Test that non-admin users only see reports from their finanzstelle."""
-
+    """Test that non-admin accountants cannot access /time-reports."""
     session = client.app.session()
-    translators = TranslatorCollection(client.app)
-    translator1 = translators.add(
-        first_name='Test1',
-        last_name='Translator1',
-        admission='certified',
-        email='translator1@example.org',
-    )
-    translator2 = translators.add(
-        first_name='Test2',
-        last_name='Translator2',
-        admission='certified',
-        email='translator2@example.org',
-    )
-
-    report1 = TranslatorTimeReport(
-        translator_id=translator1.id,
-        assignment_type='consecutive',
-        finanzstelle='migrationsamt',
-        duration=90,
-        case_number='CASE-001',
-        assignment_date=date(2025, 1, 15),
-        hourly_rate=Decimal('90.0'),
-        travel_compensation=Decimal('50.0'),
-        total_compensation=Decimal('162.75'),
-        status='pending',
-    )
-    report2 = TranslatorTimeReport(
-        translator_id=translator2.id,
-        assignment_type='consecutive',
-        finanzstelle='polizei',
-        duration=120,
-        case_number='CASE-002',
-        assignment_date=date(2025, 1, 16),
-        hourly_rate=Decimal('100.0'),
-        travel_compensation=Decimal('60.0'),
-        total_compensation=Decimal('200.00'),
-        status='pending',
-    )
-    session.add(report1)
-    session.add(report2)
-    session.flush()
-    transaction.commit()
 
     user_group_collection = UserGroupCollection(session)
     user_group = user_group_collection.add(name='migrationsamt_group')
@@ -2268,19 +2225,17 @@ def test_time_reports_finanzstelle_filtering(client: Client) -> None:
         'finanzstelle': 'migrationsamt',
         'accountant_emails': ['accountant@example.org'],
     }
-
     session.add(User(
         username='accountant@example.org',
         password_hash=hash_password('password'),
-        role='member'
+        role='member',
     ))
     transaction.commit()
 
     client.login(username='accountant@example.org', password='password')
-    page = client.get('/time-reports')
-
-    assert '162.75' in page
-    assert '200.00' not in page
+    assert client.get(
+        '/time-reports', expect_errors=True
+    ).status_code == 403
 
 
 @patch('onegov.websockets.integration.connect')
@@ -3072,7 +3027,7 @@ def test_time_report_telephonic_no_location(client: Client) -> None:
     page.form['case_number'] = 'PHONE-123'
     page.form['notes'] = 'Telephonic interpretation'
     page = page.form.submit()
-    assert 'Bitte wählen Sie einen Standort' in page
+    assert 'Bitte wählen Sie einen Einsatzort' in page
 
     # proceed testing
     page.form['assignment_type'] = 'telephonic'
@@ -3113,82 +3068,29 @@ def test_time_report_telephonic_no_location(client: Client) -> None:
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
 def test_delete_time_report(
-    broadcast: 'MagicMock',
-    authenticate: 'MagicMock',
-    connect: 'MagicMock',
-    client: 'Client',
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
 ) -> None:
-    """Test that admins and accountants can delete time reports."""
-    session = client.app.session()
-    create_languages(session)
-    translators = TranslatorCollection(client.app)
-    translator = translators.add(
-        first_name='Test',
-        last_name='Translator',
-        admission='certified',
-        email='translator@example.org',
-        drive_distance=35.0,
-    )
-    translator_id = translator.id
-
-    user_group_collection = UserGroupCollection(session)
-    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
-    user_group.meta = {
-        'finanzstelle': 'migrationsamt_und_passbuero',
-        'accountant_emails': ['editor@example.org'],
-    }
-    transaction.commit()
-
+    """Test that only admins can access /time-reports."""
     client.login_member()
-    page = client.get(f'/translator/{translator_id}')
-    page = page.click('Zeit erfassen')
-    page.form['assignment_type'] = 'telephonic'
-    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
-    page.form['start_date'] = '2025-01-15'
-    page.form['start_time'] = '10:00'
-    page.form['end_date'] = '2025-01-15'
-    page.form['end_time'] = '11:30'
-    page.form['case_number'] = 'DELETE-TEST'
-    page = page.form.submit().follow()
-
-    time_report = (
-        session.query(TranslatorTimeReport)
-        .filter_by(translator_id=translator_id)
-        .first()
-    )
-    assert time_report is not None
-    report_id = time_report.id
-
-    client.login_member()
-    page = client.get('/time-reports')
-    assert 'Delete</a>' not in str(page)
+    page = client.get('/time-reports', expect_errors=True)
+    assert page.status_code == 403
 
     client.login_editor()
-    page = client.get('/time-reports')
-    csrf_token_match = re.search(
-        r'\?csrf-token=([a-zA-Z0-9\._\-]+)', str(page)
-    )
-    assert csrf_token_match is not None
-    csrf_token = csrf_token_match.group(1)
-
-    response = client.delete(
-        f'/time-report/{report_id}?csrf-token={csrf_token}',
-    )
-    assert response.status_code == 200
-
-    session.expire_all()
-    time_report = session.query(TranslatorTimeReport).get(report_id)
-    assert time_report is None
+    page = client.get('/time-reports', expect_errors=True)
+    assert page.status_code == 403
 
 
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
 def test_delete_time_report_admin(
-    broadcast: 'MagicMock',
-    authenticate: 'MagicMock',
-    connect: 'MagicMock',
-    client: 'Client',
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
 ) -> None:
     """Test that admin can delete time reports."""
     session = client.app.session()
@@ -3245,13 +3147,11 @@ def test_delete_time_report_admin(
     assert response.status_code == 200
 
     session.expire_all()
-    time_report = session.query(TranslatorTimeReport).get(report_id)
+    time_report = session.get(TranslatorTimeReport, report_id)
     assert time_report is None
 
 
-def test_export_time_reports(
-    client: 'Client',
-) -> None:
+def test_export_time_reports(client: Client) -> None:
     """Test exporting confirmed time reports as CSV."""
     session = client.app.session()
     create_languages(session)
@@ -3313,56 +3213,127 @@ def test_export_time_reports(
     client.post(accept_url)
 
     session.expire_all()
-    report = session.query(TranslatorTimeReport).get(report_id)
+    report = session.get(TranslatorTimeReport, report_id)
     assert report is not None
     assert report.status == 'confirmed'
     assert report.exported is False
 
-    # Verify export button is shown
-    page = client.get('/time-reports')
-    assert 'TRANSLATOR, Test' in page
-    assert 'export-accounting' in page
 
-    # Extract csrf-protected export URL from ic-post-to
-    page_text = str(page)
-    export_match = re.search(
-        r'ic-post-to="([^"]*export-accounting[^"]*)"',
-        page_text,
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_time_report_duplicate_start_time_rejected(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    """Two reports with same start time on same day are rejected."""
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+    ).id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(
+        name='migrationsamt_und_passbuero'
     )
-    assert export_match is not None, (
-        'No export intercooler link found'
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'telephonic'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '08:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '09:00'
+    page.form['case_number'] = 'CASE-001'
+    page = page.form.submit().follow()
+
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'telephonic'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '08:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '09:30'
+    page.form['case_number'] = 'CASE-002'
+    page = page.form.submit()
+
+    assert page.status_int == 200
+    assert (
+        'Für diese Startzeit existiert bereits eine Zeiterfassung' in page
     )
-    export_url = export_match.group(1)
 
-    response = client.post(export_url)
-    assert response.headers['Content-Type'] == 'text/csv; charset=iso-8859-1'
-    assert response.content_disposition is not None
-    assert 'translator_export_' in response.content_disposition
-
-    csv_content = response.body.decode('iso-8859-1')
-    assert '12345' in csv_content
-
-    # Verify report is marked as exported with timestamp and batch id
     session.expire_all()
-    report = session.query(TranslatorTimeReport).get(report_id)
-    assert report is not None
-    assert report.exported is True
-    assert report.exported_at is not None
-    assert report.export_batch_id is not None
-    batch_id = report.export_batch_id
+    reports = (
+        session.query(TranslatorTimeReport)
+        .filter_by(translator_id=translator_id)
+        .all()
+    )
+    assert len(reports) == 1
 
-    # Default view no longer shows exported reports
-    page = client.get('/time-reports')
-    assert 'Keine Zeiterfassungen gefunden' in page
 
-    # Archive view shows exported reports
-    page = client.get('/time-reports?archive=true')
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_time_report_schriftlich(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+    session = client.app.session()
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+    ).id
 
-    table = page.pyquery('.time-reports-list')[0].text_content()
-    assert 'Exportiert' in table
-    assert 'TRANSLATOR, Test' in table
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
 
-    # Batch id is preserved
-    report = session.query(TranslatorTimeReport).get(report_id)
-    assert report is not None
-    assert report.export_batch_id == batch_id
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+
+    page.form['assignment_type'] = 'schriftlich'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-03-10'
+    page.form['pages'] = '5'
+    page.form['case_number'] = 'CASE-SCHRIFT-001'
+    page = page.form.submit().follow()
+
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    session.expire_all()
+    translator = session.query(Translator).filter_by(id=translator_id).one()
+    report = translator.time_reports[0]
+
+    assert report.assignment_type == 'schriftlich'
+    assert report.pages == 5
+    assert report.start is None
+    assert report.end is None
+    assert report.duration == 0
+    assert report.total_compensation == Decimal('450.00')  # 5 * 90

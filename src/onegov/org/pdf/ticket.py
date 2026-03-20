@@ -4,6 +4,7 @@ from copy import deepcopy
 from datetime import date
 from functools import partial
 from io import BytesIO, StringIO
+from math import isclose
 
 from bleach import Cleaner
 from bleach.linkifier import LinkifyFilter
@@ -225,7 +226,10 @@ class TicketPdf(OrgPdf):
             return
 
         show_cost_object = any(item.cost_object for item in invoice.items)
-        show_quantity = any(item.quantity != 1.0 for item in invoice.items)
+        show_quantity = any(
+            not isclose(item.quantity, 1.0)
+            for item in invoice.items
+        )
         show_vat = any(item.vat for item in invoice.items)
         item_groups = group_invoice_items(invoice.items)
         headers = [_('Booking Text')]
@@ -385,6 +389,9 @@ class TicketPdf(OrgPdf):
             row = self.extract_feed_info(msg['html'])
             if row is None:
                 continue
+
+            if row[1] and len(row[1]) > 2000:
+                row[1] = row[1][:2000] + '...'
 
             table.append(row)
 

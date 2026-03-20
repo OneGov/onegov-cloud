@@ -109,7 +109,7 @@ def test_election_compound_part_widgets(
     # Empty
     session = election_day_app_bl.session()
     session.add(
-        ElectionCompound(  # type: ignore[misc]
+        ElectionCompound(
             title='Compound', domain='canton', date=date(2019, 3, 31),
             completes_manually=True, voters_counts=True,
         )

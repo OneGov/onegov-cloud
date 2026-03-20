@@ -245,6 +245,12 @@ pre {
     transform: scale(1.1);
 }
 
+ul#parliamentarian_id {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+}
+
 #parliamentarian_id li.animate-in {
     animation: bubble-in 0.4s ease forwards;
 }
@@ -487,4 +493,16 @@ pre {
     flex: 1;
     line-height: 1.4;
     overflow-wrap: break-word;
+}
+
+.abschluss-badge {
+    display: inline-block;
+    padding: 4px 16px;
+    background-color: #2e7d32;
+    color: #fff;
+    border-radius: 999px;
+    font-size: 0.8em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin-top: 10px;
 }

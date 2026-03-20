@@ -111,7 +111,7 @@ def view_person(
 ) -> RenderData:
 
     query = request.session.query(Topic)
-    query = query.options(undefer('content'))
+    query = query.options(undefer(Topic.content))
     org_to_func = person_functions_by_organization(self, query, request)
     return {
         'title': self.title,

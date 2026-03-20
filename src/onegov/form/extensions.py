@@ -1,17 +1,15 @@
 from __future__ import annotations
 
-from typing import Any, Generic, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from onegov.form import Form
-
-_FormT = TypeVar('_FormT', bound='Form')
 
 
 form_extensions: dict[str, type[FormExtension[Any]]] = {}
 
 
-class FormExtension(Generic[_FormT]):
+class FormExtension[FormT: Form]:
     """ Enables the extension of form definitions/submissions.
 
     When either of those models create a form class they will take the
@@ -48,7 +46,7 @@ class FormExtension(Generic[_FormT]):
 
     """
 
-    def __init__(self, form_class: type[_FormT]):
+    def __init__(self, form_class: type[FormT]):
         self.form_class = form_class
 
     def __init_subclass__(cls, name: str, **kwargs: object):
@@ -60,7 +58,7 @@ class FormExtension(Generic[_FormT]):
 
         form_extensions[name] = cls
 
-    def create(self) -> type[_FormT]:
+    def create(self) -> type[FormT]:
         raise NotImplementedError
 
 
@@ -71,11 +69,11 @@ class Extendable:
 
     """
 
-    def extend_form_class(
+    def extend_form_class[T: Form](
         self,
-        form_class: type[_FormT],
+        form_class: type[T],
         extensions: Collection[str]
-    ) -> type[_FormT]:
+    ) -> type[T]:
         if not extensions:
             return form_class
 

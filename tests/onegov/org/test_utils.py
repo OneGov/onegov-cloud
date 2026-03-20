@@ -223,7 +223,7 @@ def test_emails_for_new_ticket(session: Session) -> None:
         role='admin'
     )
 
-    group1.users = [user1, user_with_bogus_username]  # type: ignore[assignment]
+    group1.users = [user1, user_with_bogus_username]
 
     session.add(user1)
     session.add(user2)
@@ -267,7 +267,7 @@ def test_emails_for_new_ticket(session: Session) -> None:
         immediate_notification=True,
     )
 
-    group2.users = [user3]  # type: ignore[assignment]
+    group2.users = [user3]
 
     session.add(user3)
     session.add(group2)

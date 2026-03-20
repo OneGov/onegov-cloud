@@ -48,6 +48,7 @@ class DummyApp:
 
 def test_auth_login(session: Session) -> None:
     UserCollection(session).add('AzureDiamond', 'hunter2', 'irc-user')
+    session.expire_all()
     auth = Auth(DummyApp(session))  # type: ignore[arg-type]
 
     request: Any = None

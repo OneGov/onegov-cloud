@@ -23,7 +23,7 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 )
 
 from onegov.core.elements import Confirm, Intercooler, Link
-from onegov.core.security import Private, Personal
+from onegov.core.security import Secret, Private, Personal
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.org.cli import close_ticket
 from onegov.org.mail import send_ticket_mail
@@ -55,7 +55,7 @@ from onegov.translator_directory.utils import (
     get_accountant_emails_for_finanzstelle,
 )
 from onegov.org.models.message import TimeReportMessage
-from onegov.user import User, UserGroup
+from onegov.user import User
 from sqlalchemy import func
 
 
@@ -71,13 +71,14 @@ if TYPE_CHECKING:
 @TranslatorDirectoryApp.html(
     model=TimeReportCollection,
     template='time_reports.pt',
-    permission=Personal,
+    permission=Secret,
 )
 def view_time_reports(
     self: TimeReportCollection,
     request: TranslatorAppRequest,
 ) -> RenderData:
 
+    reports = list(self.query())
     layout = TimeReportCollectionLayout(self, request)
 
     if self.archive:
@@ -115,34 +116,8 @@ def view_time_reports(
                     _('Export'),
                     _('Cancel'),
                 ),
-                Intercooler(
-                    request_method='POST',
-                    redirect_after=request.link(self),
-                ),
             ),
         )
-
-    reports = list(self.batch)
-
-    if not request.is_admin and request.current_user:
-        groups = (
-            request.session.query(UserGroup)
-            .filter(UserGroup.meta['finanzstelle'].astext.isnot(None))
-            .all()
-        )
-
-        user_finanzstelles = []
-        for group in groups:
-            accountant_emails = group.meta.get('accountant_emails', [])
-            if request.current_user.username in accountant_emails:
-                finanzstelle = group.meta.get('finanzstelle')
-                if finanzstelle:
-                    user_finanzstelles.append(finanzstelle)
-
-        if user_finanzstelles:
-            reports = [
-                r for r in reports if r.finanzstelle in user_finanzstelles
-            ]
 
     report_ids = [str(report.id) for report in reports]
     tickets = (
@@ -182,6 +157,10 @@ def view_time_reports(
                 ),
             )
 
+    pages_missing_hint = request.translate(
+        _('Written translation without page count')
+    )
+
     return {
         'layout': layout,
         'model': self,
@@ -193,6 +172,7 @@ def view_time_reports(
         'archive': self.archive,
         'archive_toggle_url': archive_toggle_url,
         'archive_toggle_text': archive_toggle_text,
+        'pages_missing_hint': pages_missing_hint,
     }
 
 
@@ -401,6 +381,10 @@ def calculate_accounting_values(
     The recalculated_subtotal should match breakdown['adjusted_subtotal']
     within rounding tolerance.
     """
+    if report.assignment_type == 'schriftlich':
+        pages = Decimal(report.pages or 0)
+        return pages, report.hourly_rate, pages * report.hourly_rate
+
     breakdown = report.calculate_compensation_breakdown()
     duration_hours = report.duration_hours
     assert duration_hours > 0
@@ -434,7 +418,8 @@ def generate_accounting_export_rows(
             raise ValueError(f'Unknown finanzstelle: {report.finanzstelle}')
         kostenstelle = finanzstelle_info.kostenstelle
 
-        row_2603 = [
+        # row 2603
+        yield [
             'L001',
             pers_nr,
             date_str,
@@ -468,10 +453,10 @@ def generate_accounting_export_rows(
             '',
             'L001',
         ]
-        yield row_2603
 
         if report.travel_compensation > 0:
-            row_8102_travel = [
+            # row 8102 travel
+            yield [
                 'L001',
                 pers_nr,
                 date_str,
@@ -505,10 +490,10 @@ def generate_accounting_export_rows(
                 '',
                 'L001',
             ]
-            yield row_8102_travel
 
         if report.meal_allowance > 0:
-            row_8102_meal = [
+            # row 8102 meal
+            yield [
                 'L001',
                 pers_nr,
                 date_str,
@@ -542,14 +527,12 @@ def generate_accounting_export_rows(
                 '',
                 'L001',
             ]
-            yield row_8102_meal
 
 
 @TranslatorDirectoryApp.view(
     model=TimeReportCollection,
     name='export-accounting',
-    permission=Personal,
-    request_method='POST',
+    permission=Secret,
 )
 def export_accounting_csv(
     self: TimeReportCollection,
@@ -820,208 +803,32 @@ def generate_time_report_pdf_bytes(
             </div>
     """
 
-    html_content += f"""
+    breakdown = time_report.calculate_compensation_breakdown()
+
+    if time_report.assignment_type == 'schriftlich':
+        pages = time_report.pages or 0
+        html_content += f"""
             <div class="compensation">
                 <table class="compensation-table">
                     <tr>
                         <td class="label">
-                            {request.translate(_('Hourly Rate'))}:
+                            {request.translate(_('Per-page rate'))}:
                         </td>
                         <td class="amount">
                             {layout.format_currency(time_report.hourly_rate)}
                         </td>
                     </tr>
-    """
-
-    # Use centralized calculation from model
-    breakdown = time_report.calculate_compensation_breakdown()
-
-    # Show day/night hours breakdown if there are night hours
-    if time_report.night_minutes > 0:
-        day_hours = time_report.day_hours_decimal
-        night_hours = time_report.night_hours_decimal
-
-        day_hours_text = (
-            f'{day_hours} Stunde' if day_hours == 1
-            else f'{day_hours} Stunden'
-        )
-        night_hours_text = (
-            f'{night_hours} Stunde' if night_hours == 1
-            else f'{night_hours} Stunden'
-        )
-
-        day_rate = layout.format_currency(time_report.hourly_rate)
-        night_rate = layout.format_currency(
-            time_report.night_hourly_rate
-        )
-        html_content += f"""
                     <tr>
                         <td class="label">
-                            Tagstunden ({day_rate}
-                            × {day_hours_text}):
+                            {request.translate(_('Pages'))}:
                         </td>
-                        <td class="amount">
-                            {layout.format_currency(breakdown['day_pay'])}
-                        </td>
+                        <td class="amount">{pages}</td>
                     </tr>
-                    <tr>
-                        <td class="label">
-                            Nachtstunden 20-06 Uhr ({night_rate}
-                            × {night_hours_text}, +50%):
-                        </td>
-                        <td class="amount">
-                            {layout.format_currency(breakdown['night_pay'])}
-                        </td>
-                    </tr>
-        """
-    else:
-        # No night hours, show simple day pay
-        html_content += f"""
-                    <tr>
-                        <td class="label">
-                            {request.translate(_('Base pay'))}
-                            ({layout.format_currency(time_report.hourly_rate)}
-                            × {duration_text}):
-                        </td>
-                        <td class="amount">
-                            {layout.format_currency(breakdown['day_pay'])}
-                        </td>
-                    </tr>
-        """
-
-    # Show weekend surcharge if applicable
-    if breakdown['weekend_surcharge'] > 0:
-        # Calculate actual weekend hours that get the surcharge (non-night)
-        weekend_holiday_hours = time_report.weekend_holiday_hours_decimal
-        night_hours = time_report.night_hours_decimal
-        weekend_non_night_hours = weekend_holiday_hours - min(
-            weekend_holiday_hours, night_hours
-        )
-        weekend_hours_text = (
-            f'{weekend_non_night_hours} Stunde'
-            if weekend_non_night_hours == 1
-            else f'{weekend_non_night_hours} Stunden'
-        )
-        html_content += f"""
-                    <tr>
-                        <td class="label">
-                            Zuschlag WE ({weekend_hours_text}, +25%):
-                        </td>
-                        <td class="amount">
-                            {layout.format_currency(breakdown['weekend_surcharge'])}
-                        </td>
-                    </tr>
-        """
-
-    # Show urgent surcharge if applicable
-    if breakdown['urgent_surcharge'] > 0:
-        urgent_label = request.translate(_('Exceptionally urgent'))
-        html_content += f"""
-                    <tr>
-                        <td class="label">
-                            {urgent_label} (+25%):
-                        </td>
-                        <td class="amount">
-                            {layout.format_currency(breakdown['urgent_surcharge'])}
-                        </td>
-                    </tr>
-        """
-
-    # Show break time deduction if applicable
-    if breakdown['break_deduction'] > 0:
-        break_hours = time_report.break_time_hours
-        html_content += f"""
-                    <tr>
-                        <td class="label">
-                            Pausenzeit (
-                            {layout.format_currency(time_report.hourly_rate)}
-                            × -{break_hours} Stunden):
-                        </td>
-                        <td class="amount">
-                            -{layout.format_currency(breakdown['break_deduction'])}
-                        </td>
-                    </tr>
-        """
-
-    html_content += f"""
-                    <tr class="subtotal">
-                        <td class="label">
-                            <strong>
-                                {request.translate(
-                                    _('Subtotal (work compensation)')
-                                )}:
-                            </strong>
-                        </td>
-                        <td class="amount">
-                            <strong>
-                                {layout.format_currency(breakdown['adjusted_subtotal'])}
-                            </strong>
-                        </td>
-                    </tr>
-    """
-
-    travel_label = request.translate(_('Travel'))
-    if time_report.assignment_location:
-        location_name, _address = ASSIGNMENT_LOCATIONS.get(
-            time_report.assignment_location,
-            (time_report.assignment_location, '')
-        )
-        translator_address = (
-            f'{translator.address}, '
-            f'{translator.zip_code} {translator.city}'
-        )
-        if time_report.travel_distance:
-            travel_label = (
-                f"{request.translate(_('Travel'))} "
-                f"({request.translate(_('from'))} {translator_address} "
-                f"{request.translate(_('to'))} {location_name}, "
-                f"{time_report.travel_distance} km)"
-            )
-        else:
-            travel_label = (
-                f"{request.translate(_('Travel'))} "
-                f"({request.translate(_('from'))} {translator_address} "
-                f"{request.translate(_('to'))} {location_name})"
-            )
-    elif translator.drive_distance:
-        translator_address = (
-            f'{translator.address}, '
-            f'{translator.zip_code} {translator.city}'
-        )
-        travel_label = (
-            f"{request.translate(_('Travel'))} "
-            f"({request.translate(_('from'))} {translator_address}, "
-            f"{translator.drive_distance} km)"
-        )
-
-    html_content += f"""
-                    <tr>
-                        <td class="label">{travel_label}:</td>
-                        <td class="amount">
-                            {layout.format_currency(
-                                time_report.travel_compensation
-                            )}
-                        </td>
-                    </tr>
-    """
-
-    if time_report.meal_allowance:
-        meal_label = request.translate(_('Meal Allowance (6+ hours)'))
-        html_content += f"""
-                    <tr>
-                        <td class="label">
-                            {meal_label}:
-                        </td>
-                        <td class="amount">
-                            {layout.format_currency(time_report.meal_allowance)}
-                        </td>
-                    </tr>
-        """
-
-    html_content += f"""
                     <tr class="total">
                         <td class="label">
-                            <strong>{request.translate(_('Total'))}</strong>:
+                            <strong>
+                                {request.translate(_('Total'))}
+                            </strong>:
                         </td>
                         <td class="amount">
                             <strong>
@@ -1031,7 +838,237 @@ def generate_time_report_pdf_bytes(
                     </tr>
                 </table>
             </div>
-    """
+        """
+    else:
+        html_content += f"""
+                <div class="compensation">
+                    <table class="compensation-table">
+                        <tr>
+                            <td class="label">
+                                {request.translate(_('Hourly Rate'))}:
+                            </td>
+                            <td class="amount">
+                                {layout.format_currency(
+                                    time_report.hourly_rate
+                                )}
+                            </td>
+                        </tr>
+        """
+
+        if time_report.night_minutes > 0:
+            day_hours = time_report.day_hours_decimal
+            night_hours = time_report.night_hours_decimal
+            day_hours_text = (
+                f'{day_hours} Stunde'
+                if day_hours == 1
+                else f'{day_hours} Stunden'
+            )
+            night_hours_text = (
+                f'{night_hours} Stunde'
+                if night_hours == 1
+                else f'{night_hours} Stunden'
+            )
+            day_rate = layout.format_currency(time_report.hourly_rate)
+            night_rate = layout.format_currency(time_report.night_hourly_rate)
+            html_content += f"""
+                        <tr>
+                            <td class="label">
+                                Tagstunden ({day_rate}
+                                × {day_hours_text}):
+                            </td>
+                            <td class="amount">
+                                {layout.format_currency(
+                                    breakdown['day_pay']
+                                )}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">
+                                Nachtstunden 20-06 Uhr ({night_rate}
+                                × {night_hours_text}, +50%):
+                            </td>
+                            <td class="amount">
+                                {layout.format_currency(
+                                    breakdown['night_pay']
+                                )}
+                            </td>
+                        </tr>
+            """
+        else:
+            html_content += f"""
+                        <tr>
+                            <td class="label">
+                                {request.translate(_('Base pay'))}
+                                ({layout.format_currency(
+                                    time_report.hourly_rate
+                                )}
+                                × {duration_text}):
+                            </td>
+                            <td class="amount">
+                                {layout.format_currency(
+                                    breakdown['day_pay']
+                                )}
+                            </td>
+                        </tr>
+            """
+
+        if breakdown['weekend_surcharge'] > 0:
+            weekend_holiday_hours = time_report.weekend_holiday_hours_decimal
+            night_hours = time_report.night_hours_decimal
+            weekend_non_night_hours = weekend_holiday_hours - min(
+                weekend_holiday_hours, night_hours
+            )
+            weekend_hours_text = (
+                f'{weekend_non_night_hours} Stunde'
+                if weekend_non_night_hours == 1
+                else f'{weekend_non_night_hours} Stunden'
+            )
+            html_content += f"""
+                        <tr>
+                            <td class="label">
+                                Zuschlag WE ({weekend_hours_text}, +25%):
+                            </td>
+                            <td class="amount">
+                                {layout.format_currency(
+                                    breakdown['weekend_surcharge']
+                                )}
+                            </td>
+                        </tr>
+            """
+
+        if breakdown['urgent_surcharge'] > 0:
+            urgent_label = request.translate(_('Exceptionally urgent'))
+            html_content += f"""
+                        <tr>
+                            <td class="label">
+                                {urgent_label} (+25%):
+                            </td>
+                            <td class="amount">
+                                {layout.format_currency(
+                                    breakdown['urgent_surcharge']
+                                )}
+                            </td>
+                        </tr>
+            """
+
+        if breakdown['break_deduction'] > 0:
+            break_hours = time_report.break_time_hours
+            html_content += f"""
+                        <tr>
+                            <td class="label">
+                                Pausenzeit (
+                                {layout.format_currency(
+                                    time_report.hourly_rate
+                                )}
+                                × -{break_hours} Stunden):
+                            </td>
+                            <td class="amount">
+                                -{layout.format_currency(
+                                    breakdown['break_deduction']
+                                )}
+                            </td>
+                        </tr>
+            """
+
+        html_content += f"""
+                        <tr class="subtotal">
+                            <td class="label">
+                                <strong>
+                                    {request.translate(
+                                        _('Subtotal (work compensation)')
+                                    )}:
+                                </strong>
+                            </td>
+                            <td class="amount">
+                                <strong>
+                                    {layout.format_currency(
+                                        breakdown['adjusted_subtotal']
+                                    )}
+                                </strong>
+                            </td>
+                        </tr>
+        """
+
+        travel_label = request.translate(_('Travel'))
+        if time_report.assignment_location:
+            location_name, _address = ASSIGNMENT_LOCATIONS.get(
+                time_report.assignment_location,
+                (time_report.assignment_location, ''),
+            )
+            translator_address = (
+                f'{translator.address}, '
+                f'{translator.zip_code} {translator.city}'
+            )
+            if time_report.travel_distance:
+                travel_label = (
+                    f"{request.translate(_('Travel'))} "
+                    f"({request.translate(_('from'))} "
+                    f"{translator_address} "
+                    f"{request.translate(_('to'))} {location_name}, "
+                    f"{time_report.travel_distance} km)"
+                )
+            else:
+                travel_label = (
+                    f"{request.translate(_('Travel'))} "
+                    f"({request.translate(_('from'))} "
+                    f"{translator_address} "
+                    f"{request.translate(_('to'))} {location_name})"
+                )
+        elif translator.drive_distance:
+            translator_address = (
+                f'{translator.address}, '
+                f'{translator.zip_code} {translator.city}'
+            )
+            travel_label = (
+                f"{request.translate(_('Travel'))} "
+                f"({request.translate(_('from'))} {translator_address},"
+                f" {translator.drive_distance} km)"
+            )
+
+        html_content += f"""
+                        <tr>
+                            <td class="label">{travel_label}:</td>
+                            <td class="amount">
+                                {layout.format_currency(
+                                    time_report.travel_compensation
+                                )}
+                            </td>
+                        </tr>
+        """
+
+        if time_report.meal_allowance:
+            meal_label = request.translate(_('Meal Allowance (6+ hours)'))
+            html_content += f"""
+                        <tr>
+                            <td class="label">
+                                {meal_label}:
+                            </td>
+                            <td class="amount">
+                                {layout.format_currency(
+                                    time_report.meal_allowance
+                                )}
+                            </td>
+                        </tr>
+            """
+
+        html_content += f"""
+                        <tr class="total">
+                            <td class="label">
+                                <strong>
+                                    {request.translate(_('Total'))}
+                                </strong>:
+                            </td>
+                            <td class="amount">
+                                <strong>
+                                    {layout.format_currency(
+                                        breakdown['total']
+                                    )}
+                                </strong>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+        """
 
     accountant_name = ''
     try:

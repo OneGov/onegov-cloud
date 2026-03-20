@@ -1302,7 +1302,7 @@
 </metal:ticket_callout>
 
 <metal:pagination define-macro="pagination" i18n:domain="onegov.town6">
-    <nav  aria-label="Pagination" tal:define="centered pagination_centered|False; name collection.name_of_view">
+    <nav aria-label="Pagination" tal:define="centered pagination_centered|False; name collection.name_of_view">
         <ul class="pagination ${'text-center' if centered else ''}" tal:condition="collection.pages_count > 1">
             <tal:b repeat="page collection.pages">
                 <tal:b define="
@@ -1753,31 +1753,55 @@
 </metal:photoswipe>
 
 <metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
-    <div tal:condition="link_mp4 or link_webm" class="homepage-video" data-max-height="${max_height if max_height else '100vh'}"
-    >
-        <video id="autoplay-video" autoplay playsinline loop muted
-            data-link-mp4="${link_mp4}"
-            data-link-mp4-low-res="${link_mp4_low_res}"
-            data-link-webm="${link_webm}"
-            data-link-webm-low-res="${link_webm_low_res}"
-        >
-            Your browser does not support the video tag.
-        </video>
-        <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer">
-            <div class="dark-overlay" tal:condition="text"></div>
-            <div class="grid-container" tal:condition="text">
-                <div class="text">
-                    <p tal:condition="text and button_url">
-                        <tal:b >
-                            <span>${text}</span>
-                        </tal:b>
-                    </p>
-                    <tal:b tal:condition="text and not button_url">
-                        <span>${text}</span>
-                    </tal:b>
-                    <tal:b tal:condition="button_url|False">
-                        <a class="button" href="${button_url}">${button_text}<tal:b condition="not: button_text" i18n:translate="">Show more</tal:b></a>
-                    </tal:b>
+    <div class="homepage-video-container">
+        <div tal:condition="link_mp4 or link_webm" class="homepage-video" data-max-height="${max_height if max_height else '100vh'}" tal:define="searchbox searchbox|'true';">
+            <video id="autoplay-video" autoplay playsinline loop muted
+                data-link-mp4="${link_mp4}"
+                data-link-mp4-low-res="${link_mp4_low_res}"
+                data-link-webm="${link_webm}"
+                data-link-webm-low-res="${link_webm_low_res}"
+            >
+                Your browser does not support the video tag.
+            </video>
+            <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer">
+                <div class="dark-overlay" tal:condition="text">
+                    <div class="grid-container text-container" tal:condition="text">
+                        <div class="text">
+                            <p tal:condition="text and button_url">
+                                <tal:b >
+                                    <span>${text}</span>
+                                </tal:b>
+                            </p>
+                            <tal:b tal:condition="text and not button_url">
+                                <span>${text}</span>
+                            </tal:b>
+                            <tal:b tal:condition="button_url|False">
+                                <a class="button" href="${button_url}">${button_text}<tal:b condition="not: button_text" i18n:translate="">Show more</tal:b></a>
+                            </tal:b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="homepage-searchbox-wrapper ${searchbox_position|''}" tal:condition="not searchbox == 'false'|True">
+            <div class="grid-container">
+                <div class="grid-x grid-padding-x">
+                    <div class="cell small-12 medium-6 large-5">
+                        <form class="searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                            <div class="input-group">
+                                <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
+                                <div class="typeahead">
+                                    <div class="cell small-12" data-typeahead-container>
+                                    </div>
+                                </div>
+                                <div class="input-group-button">
+                                    <button class="button" type="submit">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1815,8 +1839,8 @@
         </div>
 </metal:icon_links>
 
-<metal:slider define-macro="slider" i18n:domain="onegov.town6">
-    <div tal:condition="images" class="orbit slider homepage-image-slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200" tal:define="height height|None;">
+<metal:slider define-macro="slider" i18n:domain="onegov.town6" tal:define="searchbox searchbox|'true';">
+    <div tal:condition="images" class="orbit slider homepage-image-slider ${'' if searchbox == 'false' else 'with-searchbox'}" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200" tal:define="height height|None;">
         <div class="orbit-wrapper">
             <div tal:condition="images and len(images) > 1" class="orbit-controls show-for-medium">
                 <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
@@ -1827,11 +1851,11 @@
                     <figure class="orbit-figure">
                         <div class="orbit-image" style="background-image:url(${image.src})" data-image-url="${image.src}"></div>
                         <div class="dark-overlay" tal:condition="image.note"></div>
-                        <div class="grid-container" tal:condition="image.note">
+                        <div class="grid-container text-container" tal:condition="image.note">
                             <div class="text">
                                 <span>${image.note}</span>
                             </div>
-                        </div>
+                      </div>
                     </figure>
                 </li>
             </ul>
@@ -1844,6 +1868,28 @@
                 This space holds images from your photo-albums. To show photos add a few
                 photos to an album and mark it as available for the homepage.
             </tal:b>
+        </div>
+    </div>
+    <div class="homepage-searchbox-wrapper" tal:condition="len(images) and not searchbox == 'false'|True">
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x">
+                <div class="cell small-12 medium-6 large-7">
+                    <form class="searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                        <div class="input-group">
+                            <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
+                            <div class="typeahead">
+                                <div class="cell small-12" data-typeahead-container>
+                                </div>
+                            </div>
+                            <div class="input-group-button">
+                                <button class="button" type="submit">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </metal:slider>
@@ -1933,15 +1979,29 @@
     </ul>
 </metal:search_results>
 
+<metal:search_breadcrumbs define-macro="search_breadcrumbs" i18n:domain="onegov.town6">
+    <tal:b tal:condition="layout and len(layout.breadcrumbs) > 1" tal:define="links layout.breadcrumbs">
+        <ul class="breadcrumbs search-breadcrumbs">
+            <tal:b repeat="link links">
+                <li class="breadcrumb-item">
+                    ${link(layout).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
+                </li>
+            </tal:b>
+        </ul>
+    </tal:b>
+</metal:search_breadcrumbs>
+
 <metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.town6">
     <a href="${request.return_here(request.link(result))}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
-    <p class="search-preview">
+    <div class="search-preview">
         ${translate(result.role.capitalize())}
-    </p>
+    </div>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_users>
-
 
 <metal:search_result_files define-macro="search_result_files" i18n:domain="onegov.town6">
     <a class="list-link" href="${request.return_here(request.link(result))}">
@@ -1950,7 +2010,7 @@
         </h5>
     </a>
     <a href="${request.return_here(request.link(result))}">
-        <p class="search-preview">
+        <div class="search-preview">
             <tal:b condition="result.signed">
                 <span i18n:translate>Has a digital seal</span>,
             </tal:b>
@@ -1963,10 +2023,12 @@
                     <tal:b i18n:name="count">${result.stats.get('pages', 0)}</tal:b> pages
                 </tal:b>
             </span>
-        </p>
+        </div>
     </a>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_files>
-
 
 <metal:search_result_tickets define-macro="search_result_tickets" i18n:domain="onegov.town6">
     <a class="list-link" href="${request.link(result)}">
@@ -1982,6 +2044,9 @@
             <tal:b tal:content="result.subtitle"></tal:b>
         </p>
     </a>
+    <div tal:condition="request.get_layout(result) and request.is_manager">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_tickets>
 
 
@@ -2026,6 +2091,9 @@
                 </div></li>
         </ul>
     </tal:b>
+    <div tal:condition="request.get_layout(result.latest_occurrence)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result.latest_occurrence)" />
+    </div>
 </metal:search_result_events>
 
 
@@ -2033,9 +2101,61 @@
     <a href="${request.link(result)}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
-        <p class="search-preview" tal:condition="result.function|nothing">${result.function}</p>
-        <p class="search-preview" tal:condition="not:result.function|nothing" i18n:translate>People</p>
+    <div class="search-preview" tal:condition="result.organisation_texts|nothing" tal:repeat="org result.organisation_texts">
+        ${org}
+    </div>
+    <div class="search-preview" tal:condition="result.function|nothing"><i>${result.function}</i></div>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_people>
+
+
+<metal:search_result_par_parliamentarians define-macro="search_result_par_parliamentarians" i18n:domain="onegov.town6">
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <div class="search-preview" tal:condition="result.function|nothing">${result.function}</div>
+    <div class="search-preview" tal:condition="not:result.active|nothing" i18n:translate>Former member or parliament</div>
+    <div class="search-preview" tal:condition="result.roles|nothing" tal:repeat="role result.roles">
+        <div class="search-preview" tal:condition="role.role_label">
+            <span>${role.role_label}</span> <span i18n:translate>Parliament</span>
+        </div>
+        <div tal:condition="role.parliamentary_group">
+            ${role.parliamentary_group_role_label}
+            <span i18n:translate>Parliamentary Group</span>
+            ${role.parliamentary_group.title}
+        </div>
+    </div>
+    <div class="search-preview" tal:condition="result.commission_memberships|nothing" tal:repeat="role result.commission_memberships">
+        <span>${role.role_label}</span> <span>${role.commission.title}
+    </div>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
+</metal:search_result_par_parliamentarians>
+
+
+<metal:search_result_par_political_businesses define-macro="search_result_par_political_businesses" i18n:domain="onegov.town6">
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <div class="search-preview" tal:condition="result.number|nothing">
+        <span i18n:translate>Number:</span>
+        <span>${result.number}</span>
+    </div>
+    <div class="search-preview" tal:condition="result.entry_date|nothing">
+        <span i18n:translate>Entry Date:</span>
+        <span>${layout.format_date(result.entry_date, 'date')}</span>
+    </div>
+    <div class="search-preview" tal:condition="result.status|nothing">
+        <span i18n:translate>Status:</span>
+        <span>${result.status.capitalize()}</span>
+    </div>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
+</metal:search_result_par_political_businesses>
 
 
 <metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.town6">
@@ -2056,10 +2176,13 @@
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
     <a tal:condition="result.lead|None" href="${request.link(result)}">
-        <p class="search-preview">
-            ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
-        </p>
+        <div class="search-preview">
+            ${result.lead[:260]}<tal:b condition="len(result.lead) > 260">…</tal:b>
+        </div>
     </a>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_default>
 
 
@@ -2762,7 +2885,7 @@
         file_upload file.upload_date|file.created;
         file_publish_end file.publish_end_date|None;
     ">
-        <tr class="file-info ${'signed' if file.signed else ''}">
+        <tr class="file-info ${'signed' if file.signed else ''}" id="${file.name}">
             <td>
                 ${file.name}
             </td>

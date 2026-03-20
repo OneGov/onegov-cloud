@@ -9,12 +9,15 @@ from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
+from onegov.form import FormDefinition
 from onegov.org.custom import get_global_tools as get_base_tools
 from onegov.core.elements import LinkGroup, Link
 from onegov.org.models import Dashboard, ExportCollection
 
 
 from typing import TYPE_CHECKING
+
+from onegov.org.models.file import ImageSetCollection
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -225,6 +228,7 @@ def get_personal_tools(
 def get_top_navigation(
         request: FeriennetRequest) -> Iterator[NavigationEntry]:
     # inject an activites link in front of all top navigation links
+    form = request.session.query(FormDefinition).first()
     yield (  # type:ignore[misc]
         Bunch(id=-1, access='public', published=True),
         Link(
@@ -233,6 +237,33 @@ def get_top_navigation(
         ),
         ()
     )
+    yield (  # type:ignore[misc]
+        Bunch(id=1, access='public', published=True),
+        Link(
+            text=_('Contact'),
+            url=request.link(form)
+        ),
+        ()
+    )
+    yield (  # type:ignore[misc]
+        Bunch(id=2, access='public', published=True),
+        Link(
+            text=_('Photo Albums'),
+            url=request.class_link(ImageSetCollection)
+        ),
+        ()
+    )
+    if request.app.show_volunteers(request):
+        yield (  # type:ignore[misc]
+            Bunch(id=3, access='public', published=True),
+            Link(
+                text=_('Help us'),
+                url=request.class_link(
+                    VacationActivityCollection, name='volunteer'
+                )
+            ),
+            ()
+        )
 
     layout = DefaultLayout(request.app.org, request)
     yield from layout.top_navigation or ()

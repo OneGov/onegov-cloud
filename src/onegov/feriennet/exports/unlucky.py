@@ -42,11 +42,11 @@ class UnluckyExport(FeriennetExport):
     ) -> Query[Attendee]:
 
         with_any_bookings = session.query(Booking.attendee_id).filter(
-            Booking.period_id == period.id).scalar_subquery()  # type: ignore[attr-defined]
+            Booking.period_id == period.id).scalar_subquery()
 
         with_accepted_bookings = session.query(Booking.attendee_id).filter(
             Booking.state == 'accepted',
-            Booking.period_id == period.id).scalar_subquery()  # type: ignore[attr-defined]
+            Booking.period_id == period.id).scalar_subquery()
 
         return AttendeeCollection(session).query().filter(
             and_(

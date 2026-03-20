@@ -506,7 +506,7 @@ def test_election_results(session: Session) -> None:
     assert election.number_of_mandates == election.allocated_mandates
     assert election.elected_candidates == [('Joe', 'Quimby')]
 
-    assert election.votes_by_district.all() == [  # type: ignore[comparison-overlap]
+    assert election.votes_by_district.outerjoin(Election.results).all() == [  # type: ignore[comparison-overlap]
         ('election', None, [1, 2], True, 534)
     ]
 

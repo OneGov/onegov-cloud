@@ -28,7 +28,6 @@ from wtforms.csrf.session import SessionCSRF
 
 from typing import cast, overload, Any, NamedTuple, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from _typeshed import SupportsItems
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from dectate import Sentinel
     from gettext import GNUTranslations
@@ -40,8 +39,7 @@ if TYPE_CHECKING:
     from onegov.core.i18n.translation_string import TranslationMarkup
     from onegov.core.security.permissions import Intent
     from onegov.core.types import MessageType
-    from sqlalchemy import Column
-    from sqlalchemy.orm import relationship, Session
+    from sqlalchemy.orm import Mapped, Session
     from translationstring import _ChameleonTranslate
     from typing import Literal, Protocol, TypeGuard
     from webob import Response
@@ -60,22 +58,25 @@ if TYPE_CHECKING:
     #       to be present on a user.
     class GroupLike(Protocol):
         @property
-        def id(self) -> UUID | Column[UUID]: ...
+        def id(self) -> Mapped[UUID] | UUID: ...
         @property
-        def name(self) -> str | Column[str | None] | None: ...
+        def name(self) -> Mapped[str | None] | str | None: ...
 
     class UserLike(Protocol):
         @property
-        def id(self) -> UUID | Column[UUID]: ...
+        def id(self) -> Mapped[UUID] | UUID: ...
         @property
-        def username(self) -> str | Column[str]: ...
+        def username(self) -> Mapped[str] | str: ...
         @property
         def groups(self) -> (
-            Sequence[GroupLike]
-            | relationship[Sequence[GroupLike]]
+            Mapped[Sequence[GroupLike]]
+            | Sequence[GroupLike]
         ): ...
         @property
-        def role(self) -> str | Column[str]: ...
+        def role(self) -> Mapped[str] | str: ...
+
+    class SupportsIterableStrItems(Protocol):
+        def items(self) -> Iterable[tuple[str, str]]: ...
 
 else:
     _BaseRequest = object
@@ -258,7 +259,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         name: str = ...,
         default: None = ...,
         app: Framework | Sentinel = ...,
-        query_params: SupportsItems[str, str] | None = ...,
+        query_params: SupportsIterableStrItems | None = ...,
         fragment: str | None = ...,
     ) -> None: ...
 
@@ -269,7 +270,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         name: str,
         default: _T,
         app: Framework | Sentinel = ...,
-        query_params: SupportsItems[str, str] | None = ...,
+        query_params: SupportsIterableStrItems | None = ...,
         fragment: str | None = ...,
     ) -> _T: ...
 
@@ -280,7 +281,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         name: str = ...,
         default: Any = ...,
         app: Framework | Sentinel = ...,
-        query_params: SupportsItems[str, str] | None = ...,
+        query_params: SupportsIterableStrItems | None = ...,
         fragment: str | None = ...,
     ) -> str: ...
 
@@ -290,7 +291,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         name: str = '',
         default: _T | None = None,
         app: Framework | Sentinel = SAME_APP,
-        query_params: SupportsItems[str, str] | None = None,
+        query_params: SupportsIterableStrItems | None = None,
         fragment: str | None = None,
     ) -> str | _T | None:
         """ Extends the default link generating function of Morepath. """
@@ -313,7 +314,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         variables: dict[str, Any] | None = None,
         name: str = '',
         app: Framework | Sentinel = SAME_APP,
-        query_params: SupportsItems[str, str] | None = None,
+        query_params: SupportsIterableStrItems | None = None,
         fragment: str | None = None,
     ) -> str:
         """ Extends the default class link generating function of Morepath. """

@@ -6,6 +6,7 @@ import pytest
 import re
 import transaction
 
+from collections.abc import Collection, Mapping
 from markupsafe import Markup
 from onegov.core import utils
 from onegov.core.custom import json
@@ -13,18 +14,14 @@ from onegov.core.errors import AlreadyLockedError
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import HSTORE
 from onegov.core.utils import Bunch, linkify_phone, _phone_ch, to_html_ul
-from sqlalchemy import Column, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
 from unittest.mock import patch
 from urlextract import URLExtract
 from uuid import uuid4
 from yubico_client import Yubico  # type: ignore[import-untyped]
 
-from typing import Any, TYPE_CHECKING
-
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Collection, Mapping
-    from onegov.core.orm import Base  # noqa: F401
     from sqlalchemy.orm import Session
 
 
@@ -333,15 +330,14 @@ def test_is_sorted() -> None:
 
 
 def test_get_unique_hstore_keys(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class Document(Base):
         __tablename__ = 'documents'
 
-        id: Column[int] = Column(Integer, primary_key=True)
-        _tags: Column[Mapping[str, Any] | None] = Column(HSTORE, nullable=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        _tags: Mapped[Mapping[str, str] | None] = mapped_column(HSTORE)
 
         @property
         def tags(self) -> set[str]:
@@ -356,9 +352,9 @@ def test_get_unique_hstore_keys(postgres_dsn: str) -> None:
 
     assert utils.get_unique_hstore_keys(mgr.session(), Document._tags) == set()
 
-    mgr.session().add(Document(tags=None))  # type: ignore[misc]
-    mgr.session().add(Document(tags=['foo', 'bar']))  # type: ignore[misc]
-    mgr.session().add(Document(tags=['foo', 'baz']))  # type: ignore[misc]
+    mgr.session().add(Document(tags=None))
+    mgr.session().add(Document(tags=['foo', 'bar']))
+    mgr.session().add(Document(tags=['foo', 'baz']))
 
     transaction.commit()
 

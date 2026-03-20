@@ -26,7 +26,7 @@ def test_datatrans_fee_policy() -> None:
 
 def test_datatrans_settle_good_tx() -> None:
     mock_session = mock.Mock()
-    provider = DatatransProvider(merchant_id='foo')  # type: ignore[misc]
+    provider = DatatransProvider(merchant_id='foo')
     client = provider.client
     client.session = mock_session
     tx = DatatransTransaction(  # type: ignore[call-arg]
@@ -56,7 +56,7 @@ def test_datatrans_settle_good_tx() -> None:
 
 def test_datatrans_settle_bad_tx(caplog: pytest.LogCaptureFixture) -> None:
     mock_session = mock.Mock()
-    provider = DatatransProvider(merchant_id='foo')  # type: ignore[misc]
+    provider = DatatransProvider(merchant_id='foo')
     client = provider.client
     client.session = mock_session
     tx = DatatransTransaction(  # type: ignore[call-arg]
@@ -84,7 +84,7 @@ def test_datatrans_settle_bad_tx(caplog: pytest.LogCaptureFixture) -> None:
 
 def test_datatrans_settle_negative_vote() -> None:
     mock_session = mock.Mock()
-    provider = DatatransProvider(merchant_id='foo')  # type: ignore[misc]
+    provider = DatatransProvider(merchant_id='foo')
     client = provider.client
     client.session = mock_session
     tx = DatatransTransaction(  # type: ignore[call-arg]

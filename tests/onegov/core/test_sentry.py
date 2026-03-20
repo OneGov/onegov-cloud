@@ -255,7 +255,7 @@ def test_view_db_connection_exception(
 
     # a db connection error should not raise, but it will
     # cause a 500 response
-    mock_view.side_effect = InterfaceError('', '', '')
+    mock_view.side_effect = InterfaceError('', '', Exception())
     sentry_client.get('/test', expect_errors=True)
 
     # it should also not be recorded by sentry

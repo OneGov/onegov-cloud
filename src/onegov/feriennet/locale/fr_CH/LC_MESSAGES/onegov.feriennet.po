@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-10 15:02+0100\n"
+"POT-Creation-Date: 2026-03-03 08:17+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -13,6 +13,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 3.0\n"
+
+msgid "Google Analytics (Global site tag)"
+msgstr "Google Analytics (Global site tag)"
 
 msgid "No active period"
 msgstr "Pas de période active"
@@ -133,6 +136,12 @@ msgstr "Factures"
 
 msgid "Wishlist"
 msgstr "Liste des souhaits"
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Photo Albums"
+msgstr "Albums photos"
 
 msgid "Activity Title"
 msgstr "Titre activité"
@@ -1517,6 +1526,9 @@ msgstr "Inscrivez-vous comme bénévole"
 msgid "Sort"
 msgstr "Trier"
 
+msgid "Change username"
+msgstr "Changer le nom d'utilisateur·trice"
+
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -1854,14 +1866,17 @@ msgstr "Inclus ou gratuit"
 msgid "This occasion does not have enough attendees yet."
 msgstr "Cet événement n'a pas encore assez de participant·e·s."
 
+msgid "carpool"
+msgstr "faire du covoiturage"
+
+msgid "The following persons can be asked to form carpools."
+msgstr "Les personnes suivantes peuvent être sollicitées pour du covoiturage."
+
 msgid "Parent"
 msgstr "Parent"
 
 msgid "Children"
 msgstr "Enfants"
-
-msgid "Contact"
-msgstr "Contact"
 
 msgid "E-Mail ${name}"
 msgstr " Écrire à ${name}"
@@ -3283,13 +3298,15 @@ msgstr "Réservations pour ${period}"
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
 
+msgid "Admin accounts cannot be deleted."
+msgstr "Les comptes d'administrateurs·trices ne peuvent pas être supprimés."
+
 msgid ""
 "The user cannot be deleted because they are organizers of existing "
 "activities."
 msgstr ""
 "L'utilisateur·trice ne peut pas être supprimé·e car il/elle est prestataire "
 "d'activités existantes."
-
 
 msgid ""
 "The account cannot be deleted because there are attendees with existing "
@@ -3312,10 +3329,10 @@ msgstr ""
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} a été supprimé·e, y compris toutes les données associées."
 
-msgid "Could not delete account; try again or contact an administrator."
-msgstr ""
-"Impossible de supprimer le compte; essayez à nouveau ou contactez un·e "
-"administrateur·trice."
+#~ msgid "Could not delete account; try again or contact an administrator."
+#~ msgstr ""
+#~ "Impossible de supprimer le compte; essayez à nouveau ou contactez un·e "
+#~ "administrateur·trice."
 
 #~ msgid "Parents can see the contacts of other parents in the same activity"
 #~ msgstr ""

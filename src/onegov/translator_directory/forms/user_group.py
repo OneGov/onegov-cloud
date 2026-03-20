@@ -70,13 +70,13 @@ class TranslatorUserGroupForm(ManageUserGroupForm):
         non_editor_query = (
             session.query(User)
             .filter(User.username.in_(emails))
-            .filter(User.role != 'editor')
+            .filter(User.role.notin_(['editor', 'admin']))
         )
 
         if session.query(non_editor_query.exists()).scalar():
             assert isinstance(self.accountant_emails.errors, list)
             self.accountant_emails.errors.append(
-                _('All accountant users must have the editor role')
+                _('All accountant users must have the editor or admin role')
             )
             return False
         return True

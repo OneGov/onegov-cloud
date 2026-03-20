@@ -13,13 +13,11 @@ if TYPE_CHECKING:
     from onegov.pay import InvoiceItemMeta, Payment
     from onegov.ticket.models import Ticket
     from sqlalchemy.orm import Query, Session
-    from typing import TypeAlias
     from uuid import UUID
 
-    _LinkOrCallback: TypeAlias = tuple[str, str] | Callable[[CoreRequest], str]
+    type _LinkOrCallback = tuple[str, str] | Callable[[CoreRequest], str]
 
 _H = TypeVar('_H', bound='Handler')
-_Q = TypeVar('_Q', bound='Query[Any]')
 
 
 class Handler:
@@ -56,7 +54,9 @@ class Handler:
 
     @property
     def session(self) -> Session:
-        return object_session(self.ticket)
+        session = object_session(self.ticket)
+        assert session is not None
+        return session
 
     def refresh(self) -> None:
         """ Updates the current ticket with the latest data from the handler.
@@ -264,12 +264,12 @@ class Handler:
         return None
 
     @classmethod
-    def handle_extra_parameters(
+    def handle_extra_parameters[T: Query[Any]](
         cls,
         session: Session,
-        query: _Q,
+        query: T,
         extra_parameters: dict[str, Any]
-    ) -> _Q:
+    ) -> T:
         """ Takes a dictionary of extra parameters and uses it to optionally
         modifiy the query used for the collection.
 

@@ -33,6 +33,7 @@ from uuid import uuid4
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from datetime import datetime
     from onegov.chat.models import Chat
     from onegov.core.request import CoreRequest
@@ -40,14 +41,11 @@ if TYPE_CHECKING:
     from onegov.form import Form, FormSubmission
     from onegov.org.request import OrgRequest
     from onegov.pay import InvoiceItem, InvoiceItemMeta, Payment
-    from onegov.ticket.handler import _Q
     from onegov.ticket.collection import ExtendedTicketState
-    from sqlalchemy import Column
-    from sqlalchemy.orm import Query, Session
-    from typing import TypeAlias
+    from sqlalchemy.orm import Mapped, Query, Session
     from uuid import UUID
 
-    DateRange: TypeAlias = tuple[datetime, datetime]
+    type DateRange = tuple[datetime, datetime]
 
 
 def ticket_submitter(ticket: Ticket) -> str | None:
@@ -214,8 +212,8 @@ class OrgTicketMixin:
     """
 
     if TYPE_CHECKING:
-        number: Column[str]
-        group: Column[str]
+        number: Mapped[str]
+        group: Mapped[str]
 
     def reference(self, request: OrgRequest) -> str:
         """ Returns the reference which should be used wherever we talk about
@@ -248,7 +246,9 @@ class OrgTicketMixin:
         # we should advise them to enter a meaningful note with the file
         # instead.
         #
-        q = object_session(self).query(Message)
+        session = object_session(self)
+        assert session is not None
+        q = session.query(Message)
         q = q.filter_by(channel_id=self.number)
         q = q.filter(Message.type.in_(('ticket_note', 'ticket_chat')))
         q = q.with_entities(Message.text)
@@ -267,21 +267,21 @@ class OrgTicketMixin:
 
 
 class FormSubmissionTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FRM'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'FRM'}
 
     if TYPE_CHECKING:
         handler: FormSubmissionHandler
 
 
 class ReservationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'RSV'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'RSV'}
 
     if TYPE_CHECKING:
         handler: ReservationHandler
 
 
 class EventSubmissionTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'EVN'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'EVN'}
 
     if TYPE_CHECKING:
         handler: EventSubmissionHandler
@@ -308,7 +308,7 @@ class EventSubmissionTicket(OrgTicketMixin, Ticket):
 
 
 class DirectoryEntryTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'DIR'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'DIR'}
 
     if TYPE_CHECKING:
         handler: DirectoryEntryHandler
@@ -856,12 +856,12 @@ class ReservationHandler(Handler):
         return self.resource.title if self.resource else None
 
     @classmethod
-    def handle_extra_parameters(
+    def handle_extra_parameters[T: Query[Any]](
         cls,
         session: Session,
-        query: _Q,
+        query: T,
         extra_parameters: dict[str, Any]
-    ) -> _Q:
+    ) -> T:
 
         if 'allocation_id' in extra_parameters:
             allocations = session.query(Allocation.group)
@@ -870,14 +870,14 @@ class ReservationHandler(Handler):
 
             tokens = session.query(Reservation.token)
             tokens = tokens.filter(
-                Reservation.target.in_(allocations.scalar_subquery()))  # type: ignore[attr-defined]
+                Reservation.target.in_(allocations.scalar_subquery()))
 
             handler_ids = tuple(t[0].hex for t in tokens)
 
             if handler_ids:
                 query = query.filter(Ticket.handler_id.in_(handler_ids))
             else:
-                query = query.filter(False)
+                query = query.filter(text('1 = 0'))
 
         return query
 
@@ -1709,7 +1709,7 @@ class DirectoryEntryHandler(Handler):
 
 
 class ChatTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'CHT'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'CHT'}
 
     def reference_group(self, request: OrgRequest) -> str:
         return self.handler.title
@@ -1772,11 +1772,11 @@ class ChatHandler(Handler):
         return []
 
 
-def apply_ticket_permissions(
-    query: _Q,
+def apply_ticket_permissions[T: Query[Any]](
+    query: T,
     filtered_handler: str,
     request: OrgRequest | None,
-) -> _Q:
+) -> T:
     if request is None or request.is_manager:
         return query
 
@@ -1858,11 +1858,11 @@ def apply_ticket_permissions(
     ))
 
 
-def apply_search_term(
-    query: _Q,
+def apply_search_term[T: Query[Any]](
+    query: T,
     term: str | None,
     request: OrgRequest | None,
-) -> _Q:
+) -> T:
     if request is None or not term:
         return query
 
@@ -1870,7 +1870,7 @@ def apply_search_term(
     if language_from_locale(language) == 'simple':
         language = 'simple'
 
-    query = query.join(SearchIndex, SearchIndex.owner_id_uuid == Ticket.id)  # type: ignore[no-untyped-call]
+    query = query.join(SearchIndex, SearchIndex.owner_id_uuid == Ticket.id)
     query = query.filter(SearchIndex.data_vector.op('@@')(
         func.websearch_to_tsquery(language, term)
     ))
@@ -1919,7 +1919,7 @@ class FilteredTicketCollection(TicketCollection):
             self.request
         ), self.term, self.request)
 
-    def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
+    def groups_by_handler_code(self) -> Query[tuple[str, Sequence[str]]]:
         return apply_ticket_permissions(
             super().groups_by_handler_code(),
             'ALL',
@@ -1969,7 +1969,7 @@ class FilteredArchivedTicketCollection(ArchivedTicketCollection):
             self.request
         ), self.term, self.request)
 
-    def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
+    def groups_by_handler_code(self) -> Query[tuple[str, Sequence[str]]]:
         return apply_ticket_permissions(
             super().groups_by_handler_code(),
             'ALL',

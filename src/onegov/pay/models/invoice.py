@@ -3,25 +3,21 @@ from __future__ import annotations
 from decimal import Decimal
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.pay.constants import SCALE
 from onegov.pay.models.invoice_item import InvoiceItem
 from onegov.pay.utils import Price
 from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import select
-from sqlalchemy import Boolean
 from sqlalchemy import CheckConstraint
-from sqlalchemy import Column
-from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import object_session, relationship, joinedload
-from uuid import uuid4
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from sqlalchemy.orm import joinedload, object_session
+from uuid import uuid4, UUID
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterable
     from onegov.pay.models import InvoiceReference
     from sqlalchemy.sql import ColumnElement
@@ -57,11 +53,7 @@ class Invoice(Base, TimestampMixin):
     __tablename__ = 'invoices'
 
     #: the polymorphic type of the invoice
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -69,32 +61,25 @@ class Invoice(Base, TimestampMixin):
     }
 
     #: the public id of the invoice
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the entity the invoice is created for
-    invoicing_party: Column[str | None] = Column(Text, nullable=True)
+    invoicing_party: Mapped[str | None]
 
     #: true if invoiced
-    invoiced: Column[bool] = Column(
-        Boolean,
-        nullable=False,
+    invoiced: Mapped[bool] = mapped_column(
         default=False,
         index=True,
     )
 
     #: the specific items linked with this invoice
-    items: relationship[list[InvoiceItem]] = relationship(
-        InvoiceItem,
-        back_populates='invoice'
-    )
+    items: Mapped[list[InvoiceItem]] = relationship(back_populates='invoice')
 
     #: the references pointing to this invoice
-    references: relationship[list[InvoiceReference]] = relationship(
-        'InvoiceReference',
+    references: Mapped[list[InvoiceReference]] = relationship(
         back_populates='invoice',
         cascade='all, delete-orphan'
     )
@@ -122,7 +107,9 @@ class Invoice(Base, TimestampMixin):
         return None
 
     def sync(self, capture: bool = True) -> None:
-        items = object_session(self).query(InvoiceItem).filter(and_(
+        session = object_session(self)
+        assert session is not None
+        items = session.query(InvoiceItem).filter(and_(
             InvoiceItem.source != None,
             InvoiceItem.source != 'xml'
         )).options(joinedload(InvoiceItem.payments))
@@ -161,34 +148,31 @@ class Invoice(Base, TimestampMixin):
         self.items.append(item)
 
         if flush:
-            object_session(self).flush()
+            session = object_session(self)
+            assert session is not None
+            session.flush()
 
         return item
 
-    if TYPE_CHECKING:
-        paid: Column[bool]
-        total_amount: Column[Decimal]
-        outstanding_amount: Column[Decimal]
-        paid_amount: Column[Decimal]
-
     # paid or not
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def paid(self) -> bool:
         return self.outstanding_amount <= 0
 
     # paid + unpaid
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def total_amount(self) -> Decimal:
         return self.outstanding_amount + self.paid_amount
 
-    @total_amount.expression  # type:ignore[no-redef]
-    def total_amount(cls) -> ColumnElement[Decimal]:
-        return select([func.sum(InvoiceItem.amount)]).where(
+    @total_amount.inplace.expression
+    @classmethod
+    def _total_amount_expression(cls) -> ColumnElement[Decimal]:
+        return select(func.sum(InvoiceItem.amount)).where(
             InvoiceItem.invoice_id == cls.id
         ).label('total_amount')
 
     # paid only
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def outstanding_amount(self) -> Decimal:
         return round(
             sum(
@@ -198,9 +182,10 @@ class Invoice(Base, TimestampMixin):
             SCALE
         )
 
-    @outstanding_amount.expression  # type:ignore[no-redef]
-    def outstanding_amount(cls) -> ColumnElement[Decimal]:
-        return select([func.sum(InvoiceItem.amount)]).where(
+    @outstanding_amount.inplace.expression
+    @classmethod
+    def _outstanding_amount_expression(cls) -> ColumnElement[Decimal]:
+        return select(func.sum(InvoiceItem.amount)).where(
             and_(
                 InvoiceItem.invoice_id == cls.id,
                 InvoiceItem.paid == False
@@ -208,7 +193,7 @@ class Invoice(Base, TimestampMixin):
         ).label('outstanding_amount')
 
     # unpaid only
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def paid_amount(self) -> Decimal:
         return round(
             sum(
@@ -218,9 +203,10 @@ class Invoice(Base, TimestampMixin):
             SCALE
         )
 
-    @paid_amount.expression  # type:ignore[no-redef]
-    def paid_amount(cls) -> ColumnElement[Decimal]:
-        return select([func.sum(InvoiceItem.amount)]).where(
+    @paid_amount.inplace.expression
+    @classmethod
+    def _paid_amount_expression(cls) -> ColumnElement[Decimal]:
+        return select(func.sum(InvoiceItem.amount)).where(
             and_(
                 InvoiceItem.invoice_id == cls.id,
                 InvoiceItem.paid == True

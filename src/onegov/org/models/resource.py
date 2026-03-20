@@ -8,7 +8,6 @@ from libres.db.models import ReservedSlot
 
 from onegov.core.orm.mixins import (
     dict_markup_property, dict_property, meta_property)
-from onegov.core.orm.types import UUID
 from onegov.form.models import FormSubmission
 from onegov.org.i18n import _
 from onegov.org.models.extensions import (
@@ -20,19 +19,18 @@ from onegov.org.models.extensions import PersonLinkExtension
 from onegov.reservation import Resource, ResourceCollection, Reservation
 from onegov.search import SearchableContent
 from onegov.ticket import Ticket
+from sqlalchemy import UUID as UUIDType
 from sqlalchemy.orm import undefer
 from sqlalchemy.sql.expression import cast
-from uuid import uuid4, uuid5
+from uuid import uuid4, uuid5, UUID
 
 
 from typing import ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from libres.context.core import Context
     from libres.db.scheduler import Scheduler
     from onegov.org.request import OrgRequest
-    from sqlalchemy import Column
-    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Mapped, Query
 
 
 class FindYourSpotCollection(ResourceCollection):
@@ -61,11 +59,11 @@ class SharedMethods:
 
     if TYPE_CHECKING:
         title_template: ClassVar[str]
-        id: Column[uuid.UUID]
+        id: Mapped[UUID]
         libres_context: Context
         date: date | None
         view: str | None
-        timezone: Column[str]
+        timezone: Mapped[str]
 
         @property
         def scheduler(self) -> Scheduler: ...
@@ -186,9 +184,9 @@ class SharedMethods:
         if with_data:
             res = res.options(undefer(Reservation.data))
 
-        return res
+        return res  # type: ignore[return-value]
 
-    def bound_session_id(self, request: OrgRequest) -> uuid.UUID:
+    def bound_session_id(self, request: OrgRequest) -> UUID:
         """ The session id associated with this resource and user. """
         if not request.browser_session.has('libres_session_id'):
             request.browser_session.libres_session_id = uuid4()
@@ -212,7 +210,7 @@ class SharedMethods:
             query = query.filter(Reservation.end <= end)
 
         query = query.join(
-            Ticket, Reservation.token == cast(Ticket.handler_id, UUID))
+            Ticket, Reservation.token == cast(Ticket.handler_id, UUIDType))
 
         query = query.order_by(Reservation.start)
         query = query.order_by(Ticket.subtitle)
@@ -220,7 +218,7 @@ class SharedMethods:
         if exclude_pending:
             query = query.filter(Reservation.data['accepted'] == True)
 
-        return query
+        return query  # type: ignore[return-value]
 
     def reservation_title(self, reservation: Reservation) -> str:
         title = self.title_template.format(

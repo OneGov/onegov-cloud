@@ -13,11 +13,11 @@ from isodate import parse_date, ISO8601Error
 from itertools import islice
 from libres.db.models import ReservationBlocker
 from libres.modules.errors import LibresError
+from math import isclose
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
 from onegov.core.utils import module_path, Bunch
 from onegov.core.orm import as_selectable_from_path
-from onegov.core.orm.types import UUID as UUIDType
 from onegov.form import as_internal_id, FormSubmission
 from onegov.org.cli import close_ticket
 from onegov.org.forms.resource import AllResourcesExportForm
@@ -41,7 +41,8 @@ from onegov.ticket import Ticket, TicketInvoice
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
-from sqlalchemy import and_, cast as sa_cast, func, or_, select, Boolean
+from sqlalchemy import and_, cast as sa_cast, func, or_, select
+from sqlalchemy import Boolean, UUID as UUIDType
 from sqlalchemy.orm import undefer, joinedload, Session
 from webob import exc
 
@@ -57,14 +58,12 @@ if TYPE_CHECKING:
     from onegov.reservation import Allocation
     from sedate.types import DateLike
     from sqlalchemy.orm import Query
-    from typing import TypeAlias, TypedDict, TypeVar
+    from typing import TypedDict
     from uuid import UUID
     from webob import Response as BaseResponse
 
-    T = TypeVar('T')
-    KT = TypeVar('KT')
-    RoomSlots: TypeAlias = dict[UUID, list[utils.FindYourSpotEventInfo]]
-    ReservationTicketRow: TypeAlias = tuple[
+    type RoomSlots = dict[UUID, list[utils.FindYourSpotEventInfo]]
+    type ReservationTicketRow = tuple[
         datetime,               # Reservation.start
         datetime,               # Reservation.end
         int,                    # Reservation.quota
@@ -72,7 +71,7 @@ if TYPE_CHECKING:
         str | None,             # Ticket.subtitle
         UUID                    # Ticket.id
     ]
-    ReservationExportRow: TypeAlias = tuple[
+    type ReservationExportRow = tuple[
         datetime,       # Reservation.start
         datetime,       # Reservation.end
         int,            # Reservation.quota
@@ -119,7 +118,7 @@ RESOURCE_TYPES: dict[str, ResourceDict] = {
 
 # NOTE: This function is inherently not type safe since we modify the original
 #       items that have been passed in, but this way is more memory efficient
-def combine_grouped(
+def combine_grouped[KT, T](
     items: dict[KT, list[T]],
     external_links: dict[KT, list[ExternalLink]],
     sort: Callable[[T | ExternalLink], SupportsRichComparison] | None = None
@@ -658,7 +657,7 @@ def view_find_your_spot(
                         continue
 
                     for slot in slots:
-                        if slot.availability == 100.0:
+                        if isclose(slot.availability, 100.0, abs_tol=.005):
                             try:
                                 room = rooms_dict[room_id]
                                 assert hasattr(room, 'bound_session_id')
@@ -1273,6 +1272,7 @@ def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
         ))
         .group_by(accepted)
         .with_entities(accepted, func.count(Reservation.id))
+        .tuples()
     )
 
     layout = DefaultLayout(self, request)
@@ -1344,7 +1344,7 @@ def view_my_reservations_json(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(stmt.c).where(and_(
+    records = request.session.execute(select(*stmt.c).where(and_(
         func.lower(stmt.c.email) == request.authenticated_email.lower(),
         start <= stmt.c.start,
         stmt.c.start <= end
@@ -1402,7 +1402,7 @@ def view_my_reservations_pdf(
     if request.GET.get('accepted') == '1':
         conditions.append(stmt.c.accepted.is_(True))
 
-    records = request.session.execute(select(stmt.c).where(and_(*conditions)))
+    records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
     content = MyReservationsPdf.from_reservations(request, [
         utils.MyReservationEventInfo(
@@ -1589,7 +1589,7 @@ def view_my_reservations_ical(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(stmt.c).where(and_(
+    records = request.session.execute(select(*stmt.c).where(and_(
         func.lower(stmt.c.email) == email.lower(),
         s <= stmt.c.start, stmt.c.start <= e,
         # only include accepted reservations in ICS file
@@ -1930,7 +1930,10 @@ def run_export(
 
     query: Query[ReservationExportRow]
     query = resource.reservations_with_tickets_query(start, end)  # type:ignore
-    query = query.join(FormSubmission, Reservation.token == FormSubmission.id)
+    # FormSubmission is optional
+    query = query.outerjoin(
+        FormSubmission, Reservation.token == FormSubmission.id
+    )
     query = query.with_entities(
         Reservation.start,
         Reservation.end,

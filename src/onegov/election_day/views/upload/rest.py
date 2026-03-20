@@ -24,6 +24,7 @@ from onegov.election_day.views.upload import set_locale
 from onegov.election_day.views.upload import translate_errors
 from onegov.election_day.views.upload import unsupported_year_error
 from sqlalchemy import or_
+from webob.compat import cgi_FieldStorage
 from webob.exc import HTTPUnauthorized
 
 
@@ -86,7 +87,26 @@ def view_upload_rest(
     errors: dict[str, list[FileImportError | str]] = {}
 
     form = request.get_form(UploadRestForm, model=self, csrf_support=False)
-    if not form.validate():
+    try:
+        valid = form.validate()
+    except TypeError as ex:
+        valid = False
+
+        if isinstance(request.POST.get('type'), cgi_FieldStorage):
+            form.type.errors = [*form.type.errors, _(
+                'A file was submitted instead of a string. '
+                'Use --form "type=xml" instead of --form "type=@file"'
+            )]
+        else:
+            form.form_errors = [
+                *form.errors, f'Form validation type error: {ex}'
+            ]
+
+    except Exception as ex:
+        valid = False
+        form.form_errors = [*form.errors, f'Form validation error: {ex}']
+
+    if not valid:
         status_code = 400
         return {
             'status': 'error',
@@ -188,6 +208,8 @@ def view_upload_rest(
                 session,
                 request.app.default_locale
             )
+        else:
+            err = ['Invalid type. Valid are vote, election, parties and xml.']  # type: ignore[list-item]
         if err:
             errors.setdefault('results', []).extend(err)
 

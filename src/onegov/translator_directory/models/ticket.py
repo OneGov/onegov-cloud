@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from functools import cached_property
 from markupsafe import Markup, escape
 from onegov.translator_directory.models.time_report import TranslatorTimeReport
@@ -41,7 +42,7 @@ if TYPE_CHECKING:
 
 
 class TranslatorMutationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'TRN'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'TRN'}
 
     if TYPE_CHECKING:
         handler: TranslatorMutationHandler
@@ -183,7 +184,7 @@ class TranslatorMutationHandler(Handler):
 
 
 class TimeReportTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'TRP'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'TRP'}
     es_type_name = 'translator_time_reports'
 
     def reference_group(self, request: OrgRequest) -> str:
@@ -327,11 +328,22 @@ class TimeReportHandler(Handler):
             "<dl class='field-display'>",
             f"<dt>{request.translate(_('Translator'))}</dt>",
             f'<dd>{translator_link}</dd>',
-            f"<dt>{request.translate(_('Time'))}</dt>",
-            f'<dd>{time_range}</dd>',
-            f"<dt>{request.translate(_('Assignment Date'))}</dt>",
-            f'<dd>{assignment_date_formatted}</dd>',
         ]
+
+        if report.assignment_type != 'schriftlich':
+            summary_parts.extend(
+                [
+                    f"<dt>{request.translate(_('Time'))}</dt>",
+                    f'<dd>{time_range}</dd>',
+                ]
+            )
+
+        summary_parts.extend(
+            [
+                f"<dt>{request.translate(_('Assignment Date'))}</dt>",
+                f'<dd>{assignment_date_formatted}</dd>',
+            ]
+        )
 
         # Display assignment location if available
         if report.assignment_location:
@@ -381,6 +393,53 @@ class TimeReportHandler(Handler):
                     f'<dd>{notes_html}</dd>',
                 ]
             )
+
+        if report.assignment_type == 'schriftlich':
+            pages = report.pages or 0
+            total = Decimal(pages) * report.hourly_rate
+            summary_parts.extend(
+                [
+                    f"<dt>{request.translate(_('Per-page rate'))}</dt>",
+                    f'<dd>{layout.format_currency(report.hourly_rate)}</dd>',
+                    f"<dt>{request.translate(_('Pages'))}</dt>",
+                    f'<dd>{pages}</dd>',
+                ]
+            )
+            # TODO: remove once schriftlich data is cleaned up
+            if report.duration:
+                summary_parts.extend([
+                    f"<dt>{request.translate(_('Duration'))}</dt>",
+                    (f'<dd>{report.duration_hours} h'
+                     f' ({report.duration} min)</dd>'),
+                ])
+            if report.start and report.end:
+                start = escape(
+                    layout.format_date(report.start, 'datetime')
+                )
+                end = escape(
+                    layout.format_date(report.end, 'datetime')
+                )
+                summary_parts.extend([
+                    f"<dt>{request.translate(_('Time'))}</dt>",
+                    f'<dd>{start} - {end}</dd>',
+                ])
+            summary_parts.extend(
+                [
+                    (
+                        f"<dt><strong>"
+                        f"{request.translate(_('Total'))}</strong>"
+                        f" ({layout.format_currency(report.hourly_rate)}"
+                        f" \u00d7 {pages})</dt>"
+                    ),
+                    (
+                        f'<dd><strong>'
+                        f'{layout.format_currency(total)}'
+                        f'</strong></dd>'
+                    ),
+                    '</dl>',
+                ]
+            )
+            return Markup(''.join(summary_parts))  # nosec: B704
 
         summary_parts.extend(
             [
@@ -681,7 +740,7 @@ class TimeReportHandler(Handler):
 
 
 class AccreditationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'AKK'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'AKK'}
 
     if TYPE_CHECKING:
         handler: AccreditationHandler

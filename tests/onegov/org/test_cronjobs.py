@@ -2092,7 +2092,7 @@ def _create_news_hierarchy(
         #       so SQLAlchemy will use that if you set it to `None`, we
         #       shouldn't really rely on this behavior too much, but we
         #       still want to test it works correctly.
-        item = News(  # type: ignore[misc]
+        item = News(
             title=title,
             name=name,
             type='news',

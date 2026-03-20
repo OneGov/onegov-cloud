@@ -13,6 +13,7 @@ from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from mimetypes import types_map
 
+from onegov.file.utils import get_supported_image_mime_types
 from onegov.form import _
 from onegov.form.errors import (
     DuplicateLabelError,
@@ -25,10 +26,9 @@ from onegov.form.errors import (
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
-from onegov.form.types import BaseFormT, FieldT
 from stdnum.exceptions import (
     ValidationError as StdnumValidationError)
-from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
+from wtforms import DateField, DateTimeLocalField, RadioField, TimeField, Field
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
@@ -39,12 +39,12 @@ from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 
 
-from typing import Generic, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
-    from onegov.core.orm import Base
     from onegov.form import Form
     from onegov.form.types import BaseValidator, FieldCondition
+    from sqlalchemy.orm import DeclarativeBase
     from wtforms import Field, StringField
     from wtforms.form import BaseForm
 
@@ -56,21 +56,21 @@ if TYPE_CHECKING:
 types_map.setdefault('.mp3', 'audio/mpeg')
 
 
-class If(Generic[BaseFormT, FieldT]):
+class If[FormT: BaseForm, FieldT: Field]:
     """ Wraps a single validator or a list of validators, which will
     only be executed if the supplied condition callback returns `True`.
 
     """
     def __init__(
         self,
-        condition: FieldCondition[BaseFormT, FieldT],
-        *validators: BaseValidator[BaseFormT, FieldT]
+        condition: FieldCondition[FormT, FieldT],
+        *validators: BaseValidator[FormT, FieldT]
     ):
         assert len(validators) > 0, 'Need to supply at least one validator'
         self.condition = condition
         self.validators = validators
 
-    def __call__(self, form: BaseFormT, field: FieldT) -> None:
+    def __call__(self, form: FormT, field: FieldT) -> None:
         if not self.condition(form, field):
             return
 
@@ -122,11 +122,87 @@ class FileSizeLimit:
         if not field.data:
             return
 
+        if isinstance(field.data, list):  # UploadMultipleField
+            for data in field.data:
+                if not data:
+                    continue  # in case of file deletion
         if field.data.get('size', 0) > self.max_bytes:
             message = field.gettext(self.message).format(
                 humanize.naturalsize(self.max_bytes)
             )
             raise ValidationError(message)
+
+
+MIME_TYPES_PDF = {
+    'application/pdf',
+}
+
+# for now not allowed by default
+MIME_TYPES_JSON = {
+    'application/json',
+}
+
+MIME_TYPES_DOCUMENT = {
+    'application/msword',  # doc
+    'application/rtf',
+    *MIME_TYPES_PDF,
+    'application/excel',
+    'application/vnd.ms-excel',  # xls
+    ('application/vnd.openxmlformats-officedocument.'
+     'presentationml.presentation'),  # pptx
+    ('application/vnd.openxmlformats-officedocument.'
+     'spreadsheetml.sheet'),  # xlsx
+    ('application/vnd.openxmlformats-officedocument.'
+     'wordprocessingml.document'),  # docx
+    'application/vnd.ms-office',
+    'application/CDFV2',  # old ms office docs
+    'application/x-ole-storage',  # old ms office docs
+    'application/CDFV2-unknown'  # old ms office docs
+}
+
+MIME_TYPES_EXCEL = {
+    'application/excel',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-office',
+    'application/octet-stream',
+    'application/x-ole-storage',
+}
+
+MIME_TYPES_XML = {
+    'application/xml',
+}
+
+MIME_TYPES_ARCHIVE = {
+    'application/zip',
+}
+
+MIME_TYPES_TEXT_DATA = {
+    'text/csv',
+    'text/plain',
+}
+
+MIME_TYPES_IMAGE = {
+    # allowed types based on PIL
+    *get_supported_image_mime_types(),
+    'image/svg+xml',
+}
+
+MIME_TYPES_AUDIO = {
+    'audio/mp4',
+    'audio/mpeg',
+    'audio/wav',
+    'audio/webm',  # weba
+}
+
+MIME_TYPES_VIDEO = {
+    'video/mp4',
+    'video/mpeg',  # mpg, mpeg
+    'video/ogg',
+    'video/quicktime',  # mov
+    'video/webm',  # webm
+    'video/x-msvideo',  # avi
+}
 
 
 class WhitelistedMimeType:
@@ -137,17 +213,13 @@ class WhitelistedMimeType:
     """
 
     whitelist: Collection[str] = {
-        'application/excel',
-        'application/vnd.ms-excel',
-        'application/msword',
-        'application/pdf',
-        'application/zip',
-        'image/gif',
-        'image/jpeg',
-        'image/png',
-        'image/x-ms-bmp',
-        'text/plain',
-        'text/csv'
+        *MIME_TYPES_DOCUMENT,
+        *MIME_TYPES_XML,
+        *MIME_TYPES_ARCHIVE,
+        *MIME_TYPES_TEXT_DATA,
+        *MIME_TYPES_IMAGE,
+        *MIME_TYPES_AUDIO,
+        *MIME_TYPES_VIDEO,
     }
 
     message = _('Files of this type are not supported.')
@@ -595,11 +667,11 @@ class UniqueColumnValue:
 
     """
 
-    def __init__(self, table: type[Base]):
+    def __init__(self, table: type[DeclarativeBase]):
         self.table = table
 
     def __call__(self, form: Form, field: Field) -> None:
-        if field.name not in self.table.__table__.columns:  # type:ignore
+        if field.name not in self.table.__table__.columns:
             raise RuntimeError('The field name must match a column!')
 
         if hasattr(form, 'model'):

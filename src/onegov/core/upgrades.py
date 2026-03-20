@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
 
 from inspect import isabstract
@@ -13,7 +14,6 @@ from onegov.core.orm import Base, find_models
 from onegov.core.orm.abstract import Associable
 from onegov.core.orm.types import JSON
 from sqlalchemy import inspect, text
-
 from sqlalchemy import Numeric
 from sqlalchemy.exc import NoInspectionAvailable
 
@@ -40,9 +40,9 @@ def drop_primary_key_from_associated_tables(context: UpgradeContext) -> None:
             if context.has_table(link.table.name):
 
                 # XXX do not use this kind of statement outside upgrades!
-                command = """
+                command = text("""
                     ALTER TABLE {table} DROP CONSTRAINT IF EXISTS {table}_pkey
-                """.format(table=link.table.name)
+                """.format(table=link.table.name))
 
                 context.operations.execute(command)
 
@@ -62,17 +62,16 @@ def migrate_to_jsonb(
         except NoInspectionAvailable:
             pass
 
-    classes = list(find_models(Base, is_match=lambda cls: True))
+    classes: list[type[Base | ORMBase]] = list(
+        find_models(Base, is_match=lambda cls: True)
+    )
 
     # XXX onegov.libres (but not libres itself) uses json with a different orm
     # base - so we need to included it manually
     try:
         from libres.db.models import ORMBase
         classes.extend(find_models(
-            # TODO: we should change find_models to operate on
-            #       sqlalchemy.orm.DeclarativeBase once we upgrade
-            #       to SQLAlchemy 2.0
-            ORMBase,  # type: ignore[arg-type]
+            ORMBase,
             is_match=lambda cls: True)
         )
     except ImportError:
@@ -91,7 +90,10 @@ def migrate_to_jsonb(
              WHERE data_type != 'jsonb'
                AND table_schema IN :schemas
                AND column_name IN :names
-        """), schemas=tuple(schemas), names=tuple(c.name for c in columns))
+        """), {
+            'schemas': tuple(schemas),
+            'names': tuple(c.name for c in columns)
+        })
     ]
 
     for schema in schemas:
@@ -102,7 +104,7 @@ def migrate_to_jsonb(
                 continue
 
             # XXX do not use this kind of statement outside upgrades!
-            connection.execute("""
+            connection.execute(text("""
                 ALTER TABLE "{schema}".{table}
                 ALTER COLUMN {column}
                 TYPE JSONB USING {column}::jsonb
@@ -110,7 +112,7 @@ def migrate_to_jsonb(
                 schema=schema,
                 table=column.table.name,
                 column=column.name
-            ))
+            )))
 
             # commits/rolls back the current transaction (to keep the number
             # of required locks to a minimum)
@@ -135,8 +137,8 @@ def rename_associated_tables(context: UpgradeContext) -> None:
                 # We expect that the ORM already created the new tables at this
                 # point while still having the old one - we therefore drop the
                 # newly created table (which should be empty at this time).
-                sql = f'SELECT count(*) FROM {new_name}'
-                assert context.session.execute(sql).fetchone().count == 0, f"""
+                sql = text(f'SELECT count(*) FROM {new_name}')
+                assert context.session.execute(sql).scalar_one() == 0, f"""
                     Can not rename the associated table "{old_name}" to
                     "{new_name}", the new table "{new_name}" already exists
                     and contains values.
@@ -166,32 +168,32 @@ def remove_redundant_page_to_general_file_links(
 
     duplicate_pairs = [
         {'file_id': file_id, 'pages_id': pages_id}
-        for file_id, pages_id in context.session.execute("""
+        for file_id, pages_id in context.session.execute(text("""
             SELECT file_id, pages_id FROM (
                 SELECT COUNT(*) as cnt, file_id, pages_id
                   FROM files_for_pages_files
                  GROUP BY file_id, pages_id
             ) AS t
             WHERE t.cnt > 1
-        """)
+        """))
     ]
 
     if not duplicate_pairs:
         return
 
     # delete all the links with duplicate entries
-    context.session.execute("""
+    context.session.execute(text("""
         DELETE
           FROM files_for_pages_files
          WHERE file_id = :file_id
            AND pages_id = :pages_id
-    """, duplicate_pairs)
+    """), duplicate_pairs)
 
     # then reinsert a single link per duplicate entry
-    context.session.execute("""
+    context.session.execute(text("""
         INSERT INTO files_for_pages_files (file_id, pages_id)
         VALUES (:file_id, :pages_id)
-    """, duplicate_pairs)
+    """), duplicate_pairs)
 
 
 @upgrade_task('Add unique constraint to association tables')
@@ -212,11 +214,11 @@ def unique_constraint_in_association_tables(context: UpgradeContext) -> None:
                 # NOTE: We can't use operations.create_index
                 #       because we want to emit IF NOT EXISTS
                 #       and we're currently on SQLAlchemy <1.4
-                context.operations.execute(f"""
+                context.operations.execute(text(f"""
                     CREATE UNIQUE INDEX
                     IF NOT EXISTS "uq_assoc_{table}"
                     ON "{table}" ("{key}", "{association_key}")
-                """)
+                """))
 
 
 @upgrade_task(
@@ -231,7 +233,7 @@ def change_adjacency_list_order_to_numeric(context: UpgradeContext) -> None:
         )
 
     table_names: set[str] = {
-        cls.__tablename__  # type: ignore[attr-defined]
+        cls.__tablename__
         for cls in chain(
             find_models(Base, is_concrete_subclass),
             find_models(ORMBase, is_concrete_subclass),

@@ -19,7 +19,6 @@ from wtforms.validators import InputRequired
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from decimal import Decimal
-    from sqlalchemy.orm import Query
 
 
 class BillingForm(Form):
@@ -107,10 +106,11 @@ class ManualBookingForm(Form):
     def text(self) -> str | None:
         return self.booking_text.data
 
-    @property
-    def available_usernames(self) -> Query[tuple[str, str]]:
-        return (
-            self.usercollection.query()
+    @cached_property
+    def available_usernames(self) -> tuple[tuple[str, str], ...]:
+        return tuple(
+            (username, realname)
+            for username, realname in self.usercollection.query()
             .with_entities(User.username, User.realname)
             .filter(func.trim(func.coalesce(User.realname, '')) != '')
             .filter(User.active == True)

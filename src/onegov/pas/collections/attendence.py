@@ -54,7 +54,8 @@ class AttendenceCollection(GenericCollection[Attendence]):
         )
 
         if self.settlement_run_id:
-            settlement_run = self.session.query(SettlementRun).get(
+            settlement_run = self.session.get(
+                SettlementRun,
                 self.settlement_run_id
             )
             if settlement_run:

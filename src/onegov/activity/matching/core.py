@@ -15,7 +15,7 @@ from sortedcontainers import SortedSet
 from sqlalchemy.orm import joinedload, defer
 
 
-from typing import Any, Literal, Generic, NamedTuple, TypeVar, TYPE_CHECKING
+from typing import Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterable, Sequence
     from decimal import Decimal
@@ -23,17 +23,14 @@ if TYPE_CHECKING:
     from onegov.activity.matching.interfaces import MatchableOccasion
     from onegov.activity.models.booking import BookingState
     from sqlalchemy.orm import Session
-    from typing import TypeAlias
     from uuid import UUID
 
-    ScoreFunction: TypeAlias = Callable[['BookingT'], Decimal]
+    type ScoreFunction[
+        BookingT: Booking | MatchableBooking
+    ] = Callable[[BookingT], Decimal]
 
 
-BookingT = TypeVar('BookingT', bound='Booking | MatchableBooking')
-OccasionT = TypeVar('OccasionT', bound='Occasion | MatchableOccasion')
-
-
-class AttendeeAgent(HashableID, Generic[BookingT]):
+class AttendeeAgent[BookingT: Booking | MatchableBooking](HashableID):
     """ Acts on behalf of the attendee with the goal to get a stable booking
     with an occasion.
 
@@ -118,7 +115,10 @@ class AttendeeAgent(HashableID, Generic[BookingT]):
         return True
 
 
-class OccasionAgent(HashableID, Generic[OccasionT, BookingT]):
+class OccasionAgent[
+    OccasionT: Occasion | MatchableOccasion,
+    BookingT: Booking | MatchableBooking
+](HashableID):
     """ Represents the other side of the Attendee/Occasion pair.
 
     While the attende agent will try to get the best possible occasion
@@ -207,13 +207,18 @@ class OccasionAgent(HashableID, Generic[OccasionT, BookingT]):
         return False
 
 
-class DeferredAcceptanceResult(NamedTuple, Generic[BookingT]):
+class DeferredAcceptanceResult[
+    BookingT: Booking | MatchableBooking
+](NamedTuple):
     open: set[BookingT]
     accepted: set[BookingT]
     blocked: set[BookingT]
 
 
-def deferred_acceptance(
+def deferred_acceptance[
+    BookingT: Booking | MatchableBooking,
+    OccasionT: Occasion | MatchableOccasion
+](
     bookings: Sequence[BookingT],
     occasions: Iterable[OccasionT],
     score_function: ScoreFunction[BookingT] | None = None,
@@ -388,9 +393,9 @@ def deferred_acceptance_from_database(
     o = session.query(Occasion)
     o = o.filter(Occasion.period_id == period_id)
     o = o.options(
-        defer('meeting_point'),
-        defer('note'),
-        defer('cost')
+        defer(Occasion.meeting_point),
+        defer(Occasion.note),
+        defer(Occasion.cost)
     )
 
     if period.max_bookings_per_attendee:
@@ -436,7 +441,7 @@ def deferred_acceptance_from_database(
         update_bookings(results.blocked, 'blocked')
 
 
-def is_stable(
+def is_stable[BookingT: Booking | MatchableBooking](
     attendees: Iterable[AttendeeAgent[BookingT]],
     occasions: Collection[OccasionAgent[Any, BookingT]]
 ) -> bool:

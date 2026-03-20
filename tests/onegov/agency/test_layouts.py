@@ -148,7 +148,7 @@ def test_agency_layout(session: Session) -> None:
         "'target_id': '{target_id}', "
         "'direction': '{direction}'}"
         "/?csrf-token=x")
-    assert layout.move_membership_within_agency_url_template == (
+    assert layout.move_membership_url_template == (
         "AgencyMembershipMoveWithinAgency{"
         "'subject_id': '{subject_id}', "
         "'target_id': '{target_id}', "
@@ -210,8 +210,8 @@ def test_extended_person_collection_layout() -> None:
     ]
 
     # AgencyPathMixin
-    root = ExtendedAgency('Root')  # type: ignore[call-arg]
-    child = ExtendedAgency('Child', parent=root)  # type: ignore[call-arg]
+    root = ExtendedAgency('Root')
+    child = ExtendedAgency('Child', parent=root)
     assert layout.agency_path(root) == 'Root'
     assert layout.agency_path(child) == 'Root > Child'
 
@@ -241,7 +241,7 @@ def test_extended_person_layout(session: Session) -> None:
     ]
 
     # AgencyPathMixin
-    root = ExtendedAgency('Root')  # type: ignore[call-arg]
-    child = ExtendedAgency('Child', parent=root)  # type: ignore[call-arg]
+    root = ExtendedAgency('Root')
+    child = ExtendedAgency('Child', parent=root)
     assert layout.agency_path(root) == 'Root'
     assert layout.agency_path(child) == 'Root > Child'

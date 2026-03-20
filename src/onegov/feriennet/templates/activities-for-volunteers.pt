@@ -3,13 +3,14 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="grid-x grid-padding-x content">
-            <div class="cell small-12 medium-9">
-                <tal:b metal:use-macro="layout.macros['filters']" />
-            </div>
-            <div class="cell small-12 medium-3">
-                <tal:b metal:use-macro="layout.macros['volunteer-cart']" tal:define="is_dropdown True"/>
-            </div>
+        <div id="activities-page">
+            <div class="grid-x grid-padding-x content" >
+                <div class="cell small-12 medium-9">
+                    <tal:b metal:use-macro="layout.macros['filters']" />
+                </div>
+                <div class="cell small-12 medium-3">
+                    <tal:b metal:use-macro="layout.macros['volunteer-cart']" tal:define="is_dropdown True"/>
+                </div>
 
             <div class="small-12 cell content">
                 <div class="panel">
@@ -67,16 +68,16 @@
                         </div>
                     </tal:b>
                 </div>
-                <div class="grid-x grid-padding-x">
+                <div id="show-more-target" class="grid-x grid-padding-x">
                     <div class="cell small-12">
-                        <div id="click-to-load-target"></div>
 
                         <div class="show-more" tal:condition="activities">
-                            <tal:b define="next_page layout.model.next" condition="next_page">
-                                <a class="click-to-load button" id="click-to-load"
+                            <tal:b define="next_page layout.model.by_page_range((0, (layout.model.page_range[1] + 1)))" condition="layout.model.next">
+                                <a class="button"
                                     href="${request.link(next_page)}"
-                                    data-source="${request.link(next_page, name='volunteer')} .activities-list"
-                                    data-target="#click-to-load-target"
+                                    ic-get-from="${request.link(next_page, name='volunteer')}"
+                                    ic-select-from-response="#content"
+                                    ic-target="#content"
                                     i18n:translate>
                                         Show more
                                 </a>
@@ -88,16 +89,17 @@
                                 ><i class="fa fa-chevron-up"></i> <span i18n:translate>Navigate up</span></a>
                         </div>
                     </div>
-
+                </div>
+                <div class="grid-x grid-padding-x">
                     <div class="cell small-12" tal:condition="not:activities">
                         <p i18n:translate>No activities found.</p>
                         <b><a class="button hollow" tal:condition="filtered" href="${request.class_link(layout.model.__class__)}/volunteer" i18n:translate>Reset filter.</a></b>
                     </div>
                 </div>
-                <div id="click-to-load-target"></div>
 
             </div>
 
+        </div>
         </div>
     </tal:b>
 </div>

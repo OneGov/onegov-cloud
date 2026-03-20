@@ -23,9 +23,6 @@ if TYPE_CHECKING:
     from onegov.agency.models import ExtendedPerson
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
-    from typing import TypeVar
-
-    T = TypeVar('T')
 
 
 UPDATE_FILTER_PARAMS = frozenset((
@@ -35,9 +32,10 @@ UPDATE_FILTER_PARAMS = frozenset((
     'updated_ge',
     'updated_le'
 ))
+UPDATE_FILTER_PROMPT = 'ISO-8601 encoded datetime'
 
 
-def filter_for_updated(
+def filter_for_updated[T](
     filter_operation: str,
     filter_value: str | None,
     result: T
@@ -59,11 +57,12 @@ def filter_for_updated(
 
     try:
         # only parse including hours and minutes
-        isoparse(filter_value[:16])
+        parsed = isoparse(filter_value[:16])
     except Exception as ex:
-        raise ApiInvalidParamException(f'Invalid iso timestamp for parameter'
-                                       f"'{filter_operation}': {ex}") from ex
-    return result.for_filter(**{filter_operation: filter_value[:16]})
+        raise ApiInvalidParamException(
+            f'Invalid ISO-8601 datetime for parameter {filter_operation!r}'
+        ) from ex
+    return result.for_filter(**{filter_operation: parsed})
 
 
 class ApisMixin:
@@ -102,7 +101,10 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
     request: CoreRequest
     app: AgencyApp
     endpoint = 'people'
-    filters = {'first_name', 'last_name'} | UPDATE_FILTER_PARAMS
+    filters = {
+        'first_name': None,
+        'last_name': None
+    } | dict.fromkeys(UPDATE_FILTER_PARAMS, UPDATE_FILTER_PROMPT)
     form_class = AuthenticatedPersonMutationForm
 
     @property
@@ -116,8 +118,10 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
             page=self.page or 0
         )
 
-        for key, value in self.extra_parameters.items():
+        for key, values in self.extra_parameters.items():
             self.assert_valid_filter(key)
+            # scalarize the value since all our filters are scalar
+            value = self.scalarize_value(key, values)
 
             # apply different filters
             if key == 'first_name':
@@ -176,17 +180,24 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
         return data
 
     def item_links(self, item: ExtendedPerson) -> dict[str, Any]:
-        result = {
-            attribute: getattr(item, attribute, None)
-            for attribute in (
-                'picture_url',
-                'website',
-            )
-            if attribute not in self.app.org.hidden_people_fields
-        }
-        result['memberships'] = self.membership_api.for_filter(
-            person=item.id.hex
+        picture_url = (
+            item.picture_url
+            if 'picture_url' not in self.app.org.hidden_people_fields
+            else None
         )
+        website = (
+            item.website
+            if 'website' not in self.app.org.hidden_people_fields
+            else None
+        )
+        result = {
+            'html': item,
+            'picture_url': picture_url,
+            'website': website,
+            'memberships': self.membership_api.for_filter(
+                person=[item.id.hex]
+            )
+        }
         return result
 
     def apply_changes(
@@ -204,7 +215,10 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
     request: CoreRequest
     app: AgencyApp
     endpoint = 'agencies'
-    filters = {'parent', 'title'} | UPDATE_FILTER_PARAMS
+    filters = {
+        'parent': None,
+        'title': None
+    } | dict.fromkeys(UPDATE_FILTER_PARAMS, UPDATE_FILTER_PROMPT)
 
     @property
     def title(self) -> str:
@@ -220,8 +234,10 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
             undefer=['content']
         )
 
-        for key, value in self.extra_parameters.items():
+        for key, values in self.extra_parameters.items():
             self.assert_valid_filter(key)
+            # scalarize the value since all our filters are scalar
+            value = self.scalarize_value(key, values)
             # apply different filters
             if key == 'title':
                 result = result.for_filter(title=value)
@@ -252,11 +268,12 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
 
     def item_links(self, item: ExtendedAgency) -> dict[str, Any]:
         return {
+            'html': item,
             'organigram': item.organigram,
             'parent': self.for_item_id(item.parent_id),
-            'children': self.for_filter(parent=str(item.id)),
+            'children': self.for_filter(parent=[str(item.id)]),
             'memberships': self.membership_api.for_filter(
-                agency=str(item.id)
+                agency=[str(item.id)]
             )
         }
 
@@ -269,7 +286,10 @@ class MembershipApiEndpoint(
     request: CoreRequest
     app: AgencyApp
     endpoint = 'memberships'
-    filters = {'agency', 'person'} | UPDATE_FILTER_PARAMS
+    filters = {
+        'agency': None,
+        'person': None
+    } | dict.fromkeys(UPDATE_FILTER_PARAMS, UPDATE_FILTER_PROMPT)
 
     @property
     def collection(self) -> PaginatedMembershipCollection:
@@ -280,8 +300,10 @@ class MembershipApiEndpoint(
             person=self.get_filter('person'),
         )
 
-        for key, value in self.extra_parameters.items():
+        for key, values in self.extra_parameters.items():
             self.assert_valid_filter(key)
+            # scalarize the value since all our filters are scalar
+            value = self.scalarize_value(key, values)
 
             # apply different filters
             if key in UPDATE_FILTER_PARAMS:
@@ -300,6 +322,7 @@ class MembershipApiEndpoint(
 
     def item_links(self, item: ExtendedAgencyMembership) -> dict[str, Any]:
         return {
+            'html': item,
             'agency': self.agency_api.for_item_id(item.agency_id),
             'person': self.person_api.for_item_id(item.person_id)
         }

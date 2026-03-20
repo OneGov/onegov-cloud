@@ -7,6 +7,7 @@ from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from pytz import UTC
 from sedate import utcnow, to_timezone
+from sqlalchemy import text
 
 
 from typing import TYPE_CHECKING
@@ -74,5 +75,5 @@ def test_extended_directory_entry_collection(
     assert entry.published == is_published
 
     # Test the hybrid_property expressions on class per query
-    session.execute("SET TIME ZONE 'GMT';")
+    session.execute(text("SET TIME ZONE 'GMT';"))
     assert collection.query().count() == (1 if is_published else 0)

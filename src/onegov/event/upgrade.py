@@ -2,12 +2,13 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
 
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.event import EventCollection
-from sqlalchemy import Column
+from sqlalchemy import text, Column
 
 
 @upgrade_task('Add coordinates column')
@@ -26,7 +27,7 @@ def drop_coordinates_column(context: UpgradeContext) -> None:
 def migrate_coordinates_column(context: UpgradeContext) -> None:
     # merge the separate coordinates column into the content column
     # (gotta love postgres' json support!)
-    context.session.execute("""
+    context.session.execute(text("""
         UPDATE events
         SET "content" = (
             "content" || (
@@ -34,7 +35,7 @@ def migrate_coordinates_column(context: UpgradeContext) -> None:
             )::jsonb
         )
         WHERE coordinates IS NOT NULL
-    """)
+    """))
 
     context.operations.drop_column('events', 'coordinates')
 

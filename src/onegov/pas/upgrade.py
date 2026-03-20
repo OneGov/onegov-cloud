@@ -2,11 +2,11 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-
+# pragma: exclude file
 from __future__ import annotations
 
-from sqlalchemy import Boolean, Column, Text
-from onegov.core.orm.types import UUID, JSON
+from sqlalchemy import Boolean, Column, Text, UUID
+from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 
 
@@ -68,7 +68,7 @@ def add_district_column_to_pas_parliamentarians(
             context.add_column_with_defaults(
                 'par_parliamentarians',
                 Column('district', Text),
-                default=None
+                default=None  # type: ignore[arg-type]
             )
 
 

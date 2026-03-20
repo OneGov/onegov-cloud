@@ -15,6 +15,7 @@ from onegov.org.models.extensions import (
     InlinePhotoAlbumExtension, SidebarContactLinkExtension,
 )
 from onegov.people import Person
+from sqlalchemy import text
 from tempfile import TemporaryDirectory
 from tests.shared.utils import create_pdf
 from uuid import UUID
@@ -626,12 +627,12 @@ def test_general_file_link_extension_deduplication(
         pages_id = topic.id
         file_id = topic.files[0].id
 
-        count, = session.execute("""
+        count = session.execute(text("""
             SELECT COUNT(*)
               FROM files_for_pages_files
              WHERE pages_id = :pages_id
                AND file_id = :file_id
-        """, {'pages_id': pages_id, 'file_id': file_id}).fetchone()
+        """), {'pages_id': pages_id, 'file_id': file_id}).scalar()
         assert count == 1
 
 

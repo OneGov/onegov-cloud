@@ -4,19 +4,19 @@ import inspect
 import time
 
 
-from typing import overload, Any, TypeVar, TYPE_CHECKING
+from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.request import CoreRequest
     from onegov.form import Form
     from onegov.onboarding.app import OnboardingApp
-    from typing import Self, TypeAlias
+    from typing import Self, TypeVar
 
     _T = TypeVar('_T')
     _F = TypeVar('_F', bound='Callable[..., Any]')
     _ViewF = TypeVar('_ViewF', bound='Callable[[Any, CoreRequest], Any]')
-    _FormT = TypeVar('_FormT', bound='Form')
-    _FormView: TypeAlias = Callable[[Any, CoreRequest, _FormT], _T]
+
+    type _FormView[FormT: Form, T] = Callable[[Any, CoreRequest, FormT], T]
 
 
 class Assistant:
@@ -73,10 +73,10 @@ class Assistant:
 
     @overload
     @classmethod
-    def step(
+    def step[FormT: Form](
         cls,
-        form: type[_FormT]
-    ) -> Callable[[_FormView[_FormT, _T]], _FormView[_FormT, _T]]: ...
+        form: type[FormT]
+    ) -> Callable[[_FormView[FormT, _T]], _FormView[FormT, _T]]: ...
 
     @classmethod
     def step(cls, form: type[Form] | None = None) -> Callable[[_F], _F]:

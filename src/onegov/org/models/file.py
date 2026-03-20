@@ -12,24 +12,22 @@ from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
 from onegov.file import SearchableFile
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
+from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
 from operator import attrgetter, itemgetter
 from sedate import standardize_date, utcnow
-from sqlalchemy import asc, desc, select, nullslast  # type: ignore
+from sqlalchemy import asc, desc, select, nullslast
 
-from typing import (
-    overload, Any, Generic, Literal, NamedTuple, TypeVar, TYPE_CHECKING)
+from typing import overload, Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
+    from sqlalchemy.engine import Result
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import Select
     from typing import Self
-
-    _T = TypeVar('_T')
-    _RowT = TypeVar('_RowT')
 
     class IdRow(NamedTuple):
         id: str
@@ -45,18 +43,17 @@ if TYPE_CHECKING:
         content_type: str
 
 
-FileT = TypeVar('FileT', bound=File)
-
-
 class DateInterval(NamedTuple):
     name: str
     start: datetime
     end: datetime
 
 
-class GroupFilesByDateMixin(Generic[FileT]):
+class GroupFilesByDateMixin[FileT: File]:
 
     if TYPE_CHECKING:
+        @property
+        def model_class(self) -> type[FileT]: ...
         def query(self) -> Query[FileT]: ...
 
     def get_date_intervals(
@@ -120,29 +117,29 @@ class GroupFilesByDateMixin(Generic[FileT]):
             end=older_end)
 
     @overload
-    def query_intervals(
+    def query_intervals[T, RowT](
         self,
         intervals: Iterable[DateInterval],
-        before_filter: Callable[[Query[FileT]], Query[_RowT]],
-        process: Callable[[_RowT], _T]
-    ) -> Iterator[tuple[str, _T]]: ...
+        before_filter: Callable[[Query[FileT]], Query[RowT]],
+        process: Callable[[RowT], T]
+    ) -> Iterator[tuple[str, T]]: ...
 
     @overload
-    def query_intervals(
+    def query_intervals[T](
         self,
         intervals: Iterable[DateInterval],
         before_filter: None,
-        process: Callable[[FileT], _T]
-    ) -> Iterator[tuple[str, _T]]: ...
+        process: Callable[[FileT], T]
+    ) -> Iterator[tuple[str, T]]: ...
 
     @overload
-    def query_intervals(
+    def query_intervals[T](
         self,
         intervals: Iterable[DateInterval],
         before_filter: None = None,
         *,
-        process: Callable[[FileT], _T]
-    ) -> Iterator[tuple[str, _T]]: ...
+        process: Callable[[FileT], T]
+    ) -> Iterator[tuple[str, T]]: ...
 
     @overload
     def query_intervals(
@@ -159,7 +156,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
         process: Callable[[Any], Any] | None = None
     ) -> Iterator[tuple[str, Any]]:
 
-        base_query = self.query().order_by(desc(File.created))
+        base_query = self.query().order_by(File.created.desc())
 
         if before_filter:
             base_query = before_filter(base_query)
@@ -168,7 +165,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
             query = base_query.filter(File.created >= interval.start)
             query = query.filter(File.created <= interval.end)
 
-            for result in query.all():
+            for result in query:
                 if process is not None:
                     yield interval.name, process(result)
 
@@ -210,10 +207,13 @@ class GroupFilesByDateMixin(Generic[FileT]):
 
         intervals = tuple(self.get_date_intervals(today or utcnow()))
 
+        model_class = self.model_class
         files: Iterator[tuple[str, str | FileT]]
         if id_only:
             def before_filter(query: Query[FileT]) -> Query[IdRow]:
-                return query.with_entities(File.id)
+                # NOTE: We need to use model_class.id here, otherwise we
+                #       remove the polymorphic filter on the query
+                return query.with_entities(model_class.id)
 
             def process(result: IdRow) -> str:
                 return result.id
@@ -313,7 +313,7 @@ class GeneralFileCollection(
     GroupFilesByDateMixin[GeneralFile]
 ):
 
-    supported_content_types = 'all'
+    supported_content_types = WhitelistedMimeType.whitelist
 
     file_list = as_selectable("""
         SELECT
@@ -338,6 +338,10 @@ class GeneralFileCollection(
 
         self._last_interval: DateInterval | None = None
 
+    @property
+    def model_class(self) -> type[GeneralFile]:
+        return GeneralFile
+
     def for_order(self, order: str) -> Self:
         return self.__class__(self.session, order_by=order)
 
@@ -346,8 +350,8 @@ class GeneralFileCollection(
         return tuple(self.get_date_intervals(today=sedate.utcnow()))
 
     @property
-    def statement(self) -> Select:
-        stmt = select(self.file_list.c)
+    def statement(self) -> Select[FileRow]:
+        stmt = select(*self.file_list.c)
 
         if self.order_by == 'name':
             order = self.file_list.c.order
@@ -363,7 +367,7 @@ class GeneralFileCollection(
         return stmt.order_by(nullslast(direction(order)))
 
     @property
-    def files(self) -> Query[FileRow]:
+    def files(self) -> Result[FileRow]:
         return self.session.execute(self.statement)
 
     def group(self, record: FileRow) -> str:
@@ -410,7 +414,7 @@ class GeneralFileCollection(
             return get_first_character(record)
 
 
-class BaseImageFileCollection(
+class BaseImageFileCollection[FileT: File](
     FileCollection[FileT],
     GroupFilesByDateMixin[FileT]
 ):
@@ -422,3 +426,7 @@ class ImageFileCollection(BaseImageFileCollection[ImageFile]):
 
     def __init__(self, session: Session) -> None:
         super().__init__(session, type='image', allow_duplicates=False)
+
+    @property
+    def model_class(self) -> type[ImageFile]:
+        return ImageFile

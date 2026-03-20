@@ -63,7 +63,7 @@ jobs:
           xdg-utils
 
     - name: Checkout repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Install dependencies
       run: |
@@ -71,8 +71,6 @@ jobs:
         python -m pip install --upgrade uv
         uv pip compile setup.cfg -U \
         | uv pip install .[mypy,lint] -r /dev/stdin
-        # TEMPORARY: Uninstall types-urllib3, since we don't use v1
-        uv pip uninstall types-urllib3
 
     - name: Linting
       run: |
@@ -159,7 +157,7 @@ jobs:
         install-chromedriver: true
 
     - name: Checkout repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Get branch name (merge)
       if: github.event_name != 'pull_request'

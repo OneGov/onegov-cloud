@@ -1,9 +1,11 @@
 # Error: is inconsistent
 # ======================
-# sqlalchemy_stubs is not quite in line with the version of SQLAlchemy
-# we are using, we will be able to get rid of these ignores once we
-# upgrade to SQLAlchemy 2.0 and have inline stubs
+# The way sqlalchemy_stubs is rewriting these functions makes some of the
+# arguments keyword-only, but it doesn't seem worth it to make the stubs
+# reflect that limitation
+sqlalchemy_utils.operators.CaseInsensitiveComparator.endswith
 sqlalchemy_utils.operators.CaseInsensitiveComparator.ilike
 sqlalchemy_utils.operators.CaseInsensitiveComparator.like
 sqlalchemy_utils.operators.CaseInsensitiveComparator.notilike
 sqlalchemy_utils.operators.CaseInsensitiveComparator.notlike
+sqlalchemy_utils.operators.CaseInsensitiveComparator.startswith

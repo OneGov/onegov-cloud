@@ -5,7 +5,7 @@ from onegov.activity.models import Attendee, Booking, Occasion, BookingPeriod
 from onegov.activity.utils import random_group_code
 from onegov.user import User
 from sqlalchemy import func, or_
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager, joinedload
 
 
 from typing import TYPE_CHECKING
@@ -64,14 +64,16 @@ class GroupInvite:
 
         return (
             self.session.query(Booking)
-            .options(joinedload(Booking.attendee))
-            .options(joinedload(Booking.occasion))
-            .options(joinedload(Booking.period))
-            .filter_by(group_code=self.group_code)
+            .filter(Booking.group_code == self.group_code)
+            .join(Booking.period)
             .filter(or_(
                 Booking.state.in_(('open', 'accepted')),
                 BookingPeriod.confirmed == False
             ))
+            .join(Booking.attendee)
+            .options(contains_eager(Booking.attendee))
+            .options(contains_eager(Booking.period))
+            .options(joinedload(Booking.occasion).selectinload(Occasion.dates))
         )
 
     @cached_property
@@ -93,13 +95,11 @@ class GroupInvite:
     @cached_property
     def attendees(self) -> tuple[tuple[Attendee, Booking], ...]:
         """ Returns the attendees linked to this invite. """
-
         return tuple(
-            (booking.attendee, booking) for booking in self.bookings()
-            # FIXME: Why is this an outerjoin? attendee_id is not nullable
-            #        so a regular join should work just fine
-            .outerjoin(Attendee)
-            .order_by(func.unaccent(Attendee.name))
+            (booking.attendee, booking)
+            for booking in self.bookings().order_by(
+                func.unaccent(Attendee.name)
+            )
         )
 
     def prospects(

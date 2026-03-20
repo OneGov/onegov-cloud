@@ -19,25 +19,28 @@ from libres.modules import errors as libres_errors
 from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
 from markupsafe import escape, Markup
+from math import isclose
 from onegov.core.layout import Layout
 from onegov.core.mail import coerce_address
-from onegov.file import File, FileCollection
+from onegov.core.security import Secret
+from onegov.file import FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
 from onegov.pay import InvoiceItemMeta, Price
 from onegov.reservation import Resource
 from onegov.ticket import Ticket, TicketCollection, TicketPermission
-from onegov.user import User, UserGroup
+from onegov.user import Auth, User, UserGroup
 from operator import add, attrgetter
-from sqlalchemy import case, nullsfirst  # type:ignore[attr-defined]
+from sqlalchemy import case, nullsfirst
 from webob.exc import HTTPBadRequest
 
 
-from typing import overload, Any, Literal, TYPE_CHECKING
+from typing import overload, Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
-    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import (
+        Callable, Collection, Iterable, Iterator, Sequence)
     from libres.db.models import ReservationBlocker
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
@@ -48,18 +51,12 @@ if TYPE_CHECKING:
     from onegov.pay.types import PriceDict
     from onegov.reservation import Allocation, Reservation
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
-    from sqlalchemy.orm import Query
-    from sqlalchemy import Column
-    from typing import Self, TypeAlias, TypeVar
+    from sqlalchemy.orm import InstrumentedAttribute, Query
+    from sqlalchemy.sql.elements import ColumnElement
     from uuid import UUID
 
-    _T = TypeVar('_T')
-    _DeltaT = TypeVar('_DeltaT')
-    _SortT = TypeVar('_SortT', bound='SupportsRichComparison')
-    _TransformedT = TypeVar('_TransformedT')
-    _ItemT = TypeVar('_ItemT', bound=InvoiceItem | InvoiceItemMeta)
-    TzInfo: TypeAlias = DstTzInfo | StaticTzInfo
-    DateRange: TypeAlias = tuple[datetime, datetime]
+    type TzInfo = DstTzInfo | StaticTzInfo
+    type DateRange = tuple[datetime, datetime]
 
 
 # for our empty paragraphs approach we don't need a full-blown xml parser
@@ -261,21 +258,28 @@ def set_image_sizes(
             return match.group(1)
         return None
 
-    images_dict = {get_image_id(img): img for img in images}
+    images_dict = {
+        image_id: img
+        for img in images
+        if (image_id := get_image_id(img)) is not None
+    }
 
     if images_dict:
-        q: Query[ImageFile]
-        q = FileCollection(request.session, type='image').query()
-        q = q.with_entities(File.id, File.reference)
-        q = q.filter(File.id.in_(images_dict))
+        collection: FileCollection[ImageFile]
+        collection = FileCollection(request.session, type='image')
+        model_class = collection.model_class
+        uploaded_files = dict(
+            collection.query()
+            .with_entities(model_class.id, model_class.reference)
+            .filter(model_class.id.in_(images_dict))
+            .tuples()
+        )
 
-        sizes = {i.id: i.reference for i in q}
-
-        for id, image in images_dict.items():
-            if id in sizes:
+        for image_id, image in images_dict.items():
+            if (uploaded := uploaded_files.get(image_id)) is not None:
                 with suppress(AttributeError):
-                    image.set('width', sizes[id].size[0])
-                    image.set('height', sizes[id].size[1])
+                    image.set('width', uploaded.size[0])
+                    image.set('height', uploaded.size[1])
 
 
 def parse_fullcalendar_request(
@@ -518,7 +522,34 @@ class AllocationEventInfo:
         return int(self.quota * self.availability / 100)
 
     @property
+    def in_past(self) -> bool:
+        return self.allocation.end < sedate.utcnow()
+
+    @property
+    def outside_booking_window(self) -> bool:
+        return not self.request.is_manager and (
+            self.resource.is_past_deadline(
+                # for partly available allocations we use the end of the
+                # allocation, since some small sliver of the allocation
+                # may still be before the deadline, we could get a slightly
+                # more accurate result by subtracting the raster, but it
+                # doesn't seem worth the extra CPU cycles.
+                self.allocation.end
+                if self.allocation.partly_available
+                else self.allocation.start
+            ) or self.resource.is_before_lead_time(
+                self.allocation.start
+            )
+        )
+
+    @property
     def event_title(self) -> str:
+        if self.in_past or self.outside_booking_window:
+            # NOTE: Only show the time slot, since the information for
+            #       why this slot cannot be reserved still/yet is too
+            #       complex to summarize in a single word/short sentence.
+            return self.event_time
+
         if self.allocation.partly_available:
             available = self.translate(_('${percent}% Available', mapping={
                 'percent': int(self.availability)
@@ -547,23 +578,10 @@ class AllocationEventInfo:
 
     @property
     def event_classes(self) -> Iterator[str]:
-        if self.allocation.end < sedate.utcnow():
+        if self.in_past:
             yield 'event-in-past'
 
-        elif not self.request.is_manager and (
-            self.resource.is_past_deadline(
-                # for partly available allocations we use the end of the
-                # allocation, since some small sliver of the allocation
-                # may still be before the deadline, we could get a slightly
-                # more accurate result by subtracting the raster, but it
-                # doesn't seem worth the extra CPU cycles.
-                self.allocation.end
-                if self.allocation.partly_available
-                else self.allocation.start
-            ) or self.resource.is_before_lead_time(
-                self.allocation.start
-            )
-        ):
+        elif self.outside_booking_window:
             yield 'event-outside-booking-window'
 
         if self.quota > 1:
@@ -613,7 +631,7 @@ class AllocationEventInfo:
                 )),
             )
 
-            if self.availability == 100.0:
+            if isclose(self.availability, 100.0, abs_tol=.005):
                 yield DeleteLink(
                     _('Delete'),
                     self.request.link(self.allocation),
@@ -735,7 +753,11 @@ class AvailabilityEventInfo:
                 self.request.link(self.allocation, name='add-blocker')
             ) if blockable else None,
             'partlyAvailable': self.allocation.partly_available,
-            'fullyAvailable': self.allocation.availability == 100.0,
+            'fullyAvailable': isclose(
+                self.allocation.availability,
+                100.0,
+                abs_tol=.005
+            ),
             'wholeDay': self.allocation.whole_day,
             'kind': 'allocation',
         }
@@ -1213,7 +1235,7 @@ class FindYourSpotEventInfo:
             else:
                 yield 'event-unavailable'
         else:
-            if self.availability == 100.0 or (
+            if isclose(self.availability, 100.0, abs_tol=.005) or (
                 self.availability > 100.0 and self.adjustable
             ):
                 yield 'event-available'
@@ -1392,37 +1414,37 @@ def predict_next_daterange(
 #       to a protocol which implements subtraction and addition, but
 #       __add__ vs __radd__ and __sub__ vs __rsub__ makes this difficult
 @overload
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T](
+    values: Sequence[T],
     min_probability: float = 0.8,
-) -> _T | None: ...
+) -> T | None: ...
 
 
 @overload
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T, DeltaT](
+    values: Sequence[T],
     min_probability: float,
-    compute_delta: Callable[[_T, _T], _DeltaT],
-    add_delta: Callable[[_T, _DeltaT], _T | None]
-) -> _T | None: ...
+    compute_delta: Callable[[T, T], DeltaT],
+    add_delta: Callable[[T, DeltaT], T | None]
+) -> T | None: ...
 
 
 @overload
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T, DeltaT](
+    values: Sequence[T],
     min_probability: float = 0.8,
     *,
-    compute_delta: Callable[[_T, _T], _DeltaT],
-    add_delta: Callable[[_T, _DeltaT], _T | None]
-) -> _T | None: ...
+    compute_delta: Callable[[T, T], DeltaT],
+    add_delta: Callable[[T, DeltaT], T | None]
+) -> T | None: ...
 
 
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T](
+    values: Sequence[T],
     min_probability: float = 0.8,
     compute_delta: Callable[[Any, Any], Any] = lambda x, y: y - x,
     add_delta: Callable[[Any, Any], Any | None] = add
-) -> _T | None:
+) -> T | None:
     """ Takes a list of values and tries to predict the next value in the
     series.
 
@@ -1480,44 +1502,44 @@ def predict_next_value(
 
 
 @overload
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison](
     request: OrgRequest,
-    query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    query: Query[T],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None = None,
-    transform: Callable[[_T], _T] | None = None
-) -> dict[str, list[_T]]: ...
+    transform: Callable[[T], T] | None = None
+) -> dict[str, list[T]]: ...
 
 
 @overload
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison, TransformedT](
     request: OrgRequest,
-    query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    query: Query[T],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None,
-    transform: Callable[[_T], _TransformedT]
-) -> dict[str, list[_TransformedT]]: ...
+    transform: Callable[[T], TransformedT]
+) -> dict[str, list[TransformedT]]: ...
 
 
 @overload
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison, TransformedT](
     request: OrgRequest,
-    query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    query: Query[T],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None = None,
     *,
-    transform: Callable[[_T], _TransformedT]
-) -> dict[str, list[_TransformedT]]: ...
+    transform: Callable[[T], TransformedT]
+) -> dict[str, list[TransformedT]]: ...
 
 
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison](
     request: OrgRequest,
-    query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    query: Query[T],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None = None,
     transform: Callable[[Any], Any] | None = None
 ) -> dict[str, list[Any]]:
@@ -1551,10 +1573,10 @@ def group_by_column(
 
     grouped = OrderedDict()
 
-    def group_key(record: _T) -> str:
+    def group_key(record: T) -> str:
         return getattr(record, group_column.name) or default_group
 
-    def sort_key(record: _T) -> _SortT:
+    def sort_key(record: T) -> SortT:
         return getattr(record, sort_column.name)
 
     transform = transform or (lambda v: v)
@@ -1640,7 +1662,7 @@ def emails_for_new_ticket(
     # then there can't be any exclusive permissions for any
     # specific group we're not a part of, since then we won't
     # have permission to access the ticket
-    general_condition = TicketPermission.group.is_(None)
+    general_condition: ColumnElement[bool] = TicketPermission.group.is_(None)
     if exclusive_group_ids:
         general_condition &= UserGroup.id.in_(exclusive_group_ids)
     query = query.filter(
@@ -1648,14 +1670,14 @@ def emails_for_new_ticket(
     )
 
     for email, name in query.join(UserGroup.users).with_entities(
-        case([(
+        case((
             UserGroup.meta['shared_email'].isnot(None),
-            UserGroup.meta['shared_email'].astext,
-        )], else_=User.username),
-        case([(
+            UserGroup.meta['shared_email'].astext
+        ), else_=User.username),
+        case((
             UserGroup.meta['shared_email'].isnot(None),
             UserGroup.name,
-        )], else_=User.realname),
+        ), else_=User.realname),
     ).distinct():
 
         if email in seen:
@@ -1858,11 +1880,11 @@ def currency_for_submission(form: Form, submission: FormSubmission) -> str:
     return 'CHF'
 
 
-def group_invoice_items(
-    invoice_items: Iterable[_ItemT]
-) -> dict[str, list[_ItemT]]:
+def group_invoice_items[T: InvoiceItem | InvoiceItemMeta](
+    invoice_items: Iterable[T]
+) -> dict[str, list[T]]:
 
-    def sort_key(item: _ItemT) -> tuple[int, str]:
+    def sort_key(item: T) -> tuple[int, str]:
         match item.group:
             case 'submission' | 'reservation' | 'migration':
                 return 0, item.group
@@ -1880,3 +1902,30 @@ def group_invoice_items(
             key=sort_key
         )
     }
+
+
+def can_change_username(
+    user: User,
+    request: OrgRequest,
+    configured_factors: Collection[str] | None = None
+) -> bool:
+    if not request.has_permission(user, Secret):
+        return False
+
+    if user.source:
+        return False
+
+    if user.role not in request.app.settings.user.change_username_roles:
+        return False
+
+    assert request.current_user is not None
+    second_factor = (request.current_user.second_factor or {}).get('type')
+    # NOTE: For now we only allow second factors that don't require multiple
+    #       steps, so we can do it all in a single form
+    if second_factor not in ('yubikey', 'totp'):
+        return False
+
+    if configured_factors is None:
+        configured_factors = Auth.from_request(request).factors
+
+    return second_factor in configured_factors

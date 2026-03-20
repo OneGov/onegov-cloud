@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from onegov.activity import ActivityCollection
 from onegov.feriennet.policy import ActivityQueryPolicy
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import selectinload
 
 
 from typing import TYPE_CHECKING
@@ -42,7 +42,7 @@ class VacationActivityCollection(ActivityCollection['VacationActivity']):
         return ActivityQueryPolicy.for_identity(self.identity)
 
     def transform_batch_query(self, query: Query[T]) -> Query[T]:
-        return query.options(joinedload('occasions'))
+        return query.options(selectinload(self.model_class.occasions))
 
     def query_base(self) -> Query[VacationActivity]:
         return self.policy.granted_subset(self.session.query(self.model_class))

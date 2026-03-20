@@ -5,10 +5,8 @@ from onegov.core.collection import GenericCollection
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models import Votum
-from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
-from sqlalchemy.orm import defaultload
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import selectinload
 from sqlalchemy.orm import undefer
 
 
@@ -63,13 +61,12 @@ class AgendaItemCollection(GenericCollection[AgendaItem]):
         query = self.session.query(AgendaItem)
         query = query.outerjoin(AgendaItem.vota)
         query = query.filter(AgendaItem.assembly_id == assembly.id)
-        query = query.order_by(desc(AgendaItem.number))
+        query = query.order_by(AgendaItem.number.desc())
         query = query.options(
-            contains_eager(AgendaItem.vota),
-            joinedload(AgendaItem.vota),
-            joinedload(AgendaItem.files),
-            joinedload(AgendaItem.vota, Votum.files),
+            contains_eager(AgendaItem.vota)
+                .undefer(Votum.content)
+                .selectinload(Votum.files),
+            selectinload(AgendaItem.files),
             undefer(AgendaItem.content),
-            defaultload(AgendaItem.vota).undefer(Votum.content)
         )
         return query

@@ -17,15 +17,16 @@ filterwarnings = [
     # specific modules, but we should be covered by Ruff for our own code
     '''ignore:invalid escape sequence '[^']+':::''',
     '''ignore:'crypt':DeprecationWarning:passlib.*:''',
+    '''ignore:datetime.datetime.utcnow() is deprecated:DeprecationWarning:depot''',
     # fixed upstream
-    '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:pyasn1.*:''',
+    '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:ldap3.*:''',
     '''ignore:'cgi':DeprecationWarning:webob.*:''',
 ]
 
 [tool.coverage.run]
 data_file = "/tmp/.coverage"
 include = ["*/onegov/*"]
-omit = ["*/tests/*", "**/upgrade.py"]
+omit = ["*/tests/*"]
 
 [tool.coverage.report]
 ignore_errors = true
@@ -39,11 +40,12 @@ exclude_lines = [
     "raise NotImplementedError",
     "raise AssertionError[(].unreachable.[)]",
     "if TYPE_CHECKING:",
-    "if __name__ == .__main__."
+    "if __name__ == .__main__.",
+    '''\A(?s:.*# pragma: exclude file.*)\Z'''
 ]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 follow_imports = "silent"
 namespace_packages = true
 explicit_package_bases = true
@@ -51,9 +53,7 @@ strict = true
 implicit_reexport = true
 warn_unreachable = true
 warn_return_any = false
-# FIXME: remove sqlalchemy when upgrading to SQlAlchemy 2.0
-untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types,selenium.webdriver.chrome.webdriver"
-plugins = "sqlmypy"
+untyped_calls_exclude = "icalendar,pycurl,selenium.webdriver.chrome.webdriver"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
 [[tool.mypy.overrides]]
@@ -124,7 +124,7 @@ include = [
 ]
 line-length = 79
 indent-width = 4
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = [

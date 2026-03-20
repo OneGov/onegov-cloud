@@ -58,7 +58,7 @@ class RowWidgetWide:
 class ColumnWidget:
     template = """
         <xsl:template match="column">
-            <div class="small-12 medium-{@span} cell">
+            <div class="small-12 medium-{@span} cell {@class}">
                 <xsl:apply-templates select="node()"/>
             </div>
         </xsl:template>
@@ -85,8 +85,7 @@ class AutoplayVideoWidget:
             link_mp4_low_res '{@link_mp4_low_res}';
             link_webm '{@link_webm}'; button_url '{@button_url}';
             link_webm_low_res '{@link_webm_low_res}'; text '{@text}';
-            button_text '{@button_text}';
-            "
+            button_text '{@button_text}'; searchbox '{@searchbox}';"
             />
         </xsl:template>
     """

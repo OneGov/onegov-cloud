@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection, Callable, Iterator, Mapping
     from onegov.core.request import CoreRequest
     from onegov.pay.types import FeePolicy
-    from sqlalchemy.orm import relationship, Query, Session
+    from sqlalchemy.orm import Mapped, Query, Session
     from transaction.interfaces import ITransaction
     from typing_extensions import ParamSpec
 
@@ -139,7 +139,7 @@ class StripePayment(Payment):
         # our provider should always be StripeConnect, we could
         # assert if we really wanted to make sure, but it would
         # add a lot of assertions...
-        provider: relationship[StripeConnect]
+        provider: Mapped[StripeConnect]
 
     @property
     def fee(self) -> Decimal:
@@ -315,6 +315,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
     ) -> StripePayment:
 
         session = object_session(self)
+        assert session is not None
         payment = self.payment(
             id=uuid5(STRIPE_NAMESPACE, token),
             amount=amount,
@@ -484,6 +485,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
     def sync(self) -> None:
         session = object_session(self)
+        assert session is not None
         self.sync_payment_states(session)
         self.sync_payouts(session)
 

@@ -18,23 +18,23 @@ if TYPE_CHECKING:
 
 
 class ABCTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'ABC'}  # type: ignore[dict-item]
+    __mapper_args__ = {'polymorphic_identity': 'ABC'}
 
 
 class FooTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FOO'}  # type: ignore[dict-item]
+    __mapper_args__ = {'polymorphic_identity': 'FOO'}
 
 
 class BarTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'BAR'}  # type: ignore[dict-item]
+    __mapper_args__ = {'polymorphic_identity': 'BAR'}
 
 
 class EcoTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'ECO'}  # type: ignore[dict-item]
+    __mapper_args__ = {'polymorphic_identity': 'ECO'}
 
 
 class LtdTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'LTD'}  # type: ignore[dict-item]
+    __mapper_args__ = {'polymorphic_identity': 'LTD'}
 
 
 def test_random_number() -> None:

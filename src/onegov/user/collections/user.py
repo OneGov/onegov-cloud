@@ -12,29 +12,25 @@ from onegov.user.errors import (
     InvalidActivationTokenError,
     UnknownUserError,
 )
-from sqlalchemy import sql, or_
+from sqlalchemy import or_, exists, text
 
 
-from typing import overload, Any, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from onegov.core.request import CoreRequest
     from onegov.user import UserGroup
     from sqlalchemy.orm import Query, Session
-    from typing import Self
     from uuid import UUID
-
-
-_T = TypeVar('_T')
 
 
 MIN_PASSWORD_LENGTH = 10
 
 
 @overload
-def as_set(value: Iterable[_T]) -> set[_T]: ...
+def as_set[T](value: Iterable[T]) -> set[T]: ...
 @overload
-def as_set(value: _T) -> set[_T]: ...
+def as_set[T](value: T) -> set[T]: ...
 
 
 def as_set(value: Any) -> set[Any]:
@@ -49,9 +45,9 @@ def as_set(value: Any) -> set[Any]:
 
 
 @overload
-def as_dictionary_of_sets(
-    d: Mapping[str, _T | Iterable[_T] | None]
-) -> dict[str, set[_T]]: ...
+def as_dictionary_of_sets[T](
+    d: Mapping[str, T | Iterable[T] | None]
+) -> dict[str, set[T]]: ...
 
 
 @overload
@@ -167,7 +163,7 @@ class UserCollection:
         #        like phone_number, for SQLAlchemy 2.0 we will probably do
         #        that transformation anyways unless we want to switch all
         #        the models to being dataclasses
-        user = User(  # type:ignore[misc]
+        user = User(
             username=username,
             password=password,
             role=role,
@@ -188,14 +184,14 @@ class UserCollection:
     @property
     def tags(self) -> tuple[str, ...]:
         """ All available tags. """
-        records = self.session.execute("""
+        records = self.session.execute(text("""
             SELECT DISTINCT tags FROM (
                 SELECT jsonb_array_elements(data->'tags') AS tags
                 FROM users
             ) AS elements ORDER BY tags
-        """)
+        """))
 
-        return tuple(r[0] for r in records)
+        return tuple(tag for tag, in records)
 
     @property
     def sources(self) -> tuple[str, ...]:
@@ -205,17 +201,17 @@ class UserCollection:
         records = records.filter(User.source.isnot(None))
         records = records.order_by(User.source).distinct()
 
-        return tuple(r[0] for r in records)
+        return tuple(source for source, in records)
 
     @property
     def usernames(self) -> tuple[tuple[str, str], ...]:
         """ All available usernames. """
-        records = self.session.execute("""
+        records = self.session.execute(text("""
             SELECT username, initcap(realname)
             FROM users ORDER BY COALESCE(initcap(realname), username)
-        """)
+        """))
 
-        return tuple((r[0], r[1]) for r in records)
+        return tuple((username, realname) for username, realname in records)
 
     def usernames_by_tags(self, tags: list[str]) -> tuple[str, ...]:
         """ All usernames where the user's tags match at least one tag
@@ -223,12 +219,12 @@ class UserCollection:
 
         """
 
-        records = self.session.execute("""
+        records = self.session.execute(text("""
             SELECT username FROM users
             WHERE data->'tags' ?| :tags
-        """, {'tags': tags})
+        """), {'tags': tags})
 
-        return tuple(r.username for r in records)
+        return tuple(username for username, in records)
 
     def exists(self, username: str) -> bool:
         """ Returns True if the given username exists.
@@ -238,7 +234,7 @@ class UserCollection:
         care about finding out anything about the user.
 
         """
-        query = self.session.query(sql.exists().where(
+        query = self.session.query(exists().where(
             User.username == username))
 
         return query.scalar()

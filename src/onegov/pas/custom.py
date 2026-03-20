@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from datetime import date
 from onegov.core.elements import Link
-from sqlalchemy import exists
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
+from onegov.org.mail import send_transactional_html_mail
 from onegov.pas import _
 from onegov.org.models import GeneralFileCollection
 from onegov.pas.collections import AttendenceCollection
@@ -12,13 +12,15 @@ from onegov.pas.collections import ChangeCollection
 from onegov.pas.collections import ImportLogCollection
 from onegov.pas.models import Attendence
 from onegov.pas.models import SettlementRun, RateSet
-from onegov.user import Auth
+from onegov.user import Auth, User
+from sqlalchemy import exists
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.pas.request import PasRequest
+    from onegov.town6.request import TownRequest
     from sqlalchemy.orm import Session
 
 
@@ -248,3 +250,59 @@ def get_current_rate_set(session: Session, run: SettlementRun) -> RateSet:
     if rat_set is None:
         raise ValueError('No rate set found for the current year')
     return rat_set
+
+
+def notify_admins_finalized(
+    request: TownRequest, attendence: Attendence
+) -> None:
+    """Send email notification to all admins if for one specific commission,"""
+    admin_emails = [
+        user.username
+        for user in request.session.query(User).filter_by(role='admin')
+        if user.username and '@' in user.username
+    ]
+
+    if not admin_emails:
+        return
+
+    parliamentarian_name = (
+        attendence.parliamentarian.title if attendence.parliamentarian else ''
+    )
+    commission_name = (
+        attendence.commission.title if attendence.commission else ''
+    )
+    user_name = request.current_user.title if request.current_user else ''
+    settlement_run = (
+        request.session.query(SettlementRun)
+        .filter(
+            SettlementRun.start <= attendence.date,
+            SettlementRun.end >= attendence.date,
+        )
+        .first()
+    )
+    settlement_run_name = settlement_run.name if settlement_run else ''
+    settlement_run_start = (
+        settlement_run.start if settlement_run else None
+    )
+    settlement_run_end = (
+        settlement_run.end if settlement_run else None
+    )
+    send_transactional_html_mail(
+        request=request,
+        template='mail_abschluss_notification.pt',
+        subject=_(
+            'Abschluss set for ${name}', mapping={'name': parliamentarian_name}
+        ),
+        receivers=admin_emails,
+        content={
+            'model': attendence,
+            'title': request.translate(_('Abschluss Notification')),
+            'parliamentarian_name': parliamentarian_name,
+            'commission_name': commission_name,
+            'attendance_date': attendence.date,
+            'user_name': user_name,
+            'settlement_run_name': settlement_run_name,
+            'settlement_run_start': settlement_run_start,
+            'settlement_run_end': settlement_run_end,
+        },
+    )

@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from datetime import date
 from functools import cached_property
 from onegov.api.models import ApiEndpoint, ApiEndpointItem
+from onegov.api.models import ApiInvalidParamException
+from onegov.core.converters import extended_date_decode
 from onegov.event.collections import OccurrenceCollection
 from onegov.gis import Coordinates
 from onegov.org.models.directory import (
@@ -14,6 +17,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from typing import Any, Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Collection, Mapping
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
     from onegov.event.models import Occurrence
@@ -40,9 +44,41 @@ def get_modified_iso_format(item: TimestampMixin) -> str:
     return item.last_change.isoformat()
 
 
+def format_multiple_choice_prompt(
+    choices: Collection[str] | None
+) -> str | None:
+    if not choices:
+        return None
+    if len(choices) == 1:
+        choice, = choices
+        return f'Either {choice!r} or left unspecified'
+    formatted_choices = ', '.join(f'{choice!r}' for choice in choices)
+    return f'One of {formatted_choices} (Can be specified multiple times)'
+
+
 class EventApiEndpoint(ApiEndpoint['Occurrence']):
     app: TownApp
     endpoint = 'events'
+
+    @cached_property
+    def filters(self) -> Mapping[str, str | None]:
+        collection = self._base_collection
+        filters = {
+            'start': 'Earliest event date '
+                '(ISO-8601 encoded date: YYYY-MM-DD, defaults to today)',
+            'end': 'Latest event date (ISO-8601 encoded date: YYYY-MM-DD)',
+            'locations': 'Can be specified multiple times',
+            'sources': format_multiple_choice_prompt(collection.used_sources)
+        }
+
+        filter_type = self.app.org.event_filter_type
+        if filter_type in ('tags', 'tags_and_filters'):
+            filters['tags'] = format_multiple_choice_prompt(
+                collection.used_tags)
+
+        for name, __, choices in collection.available_filters():
+            filters[name] = format_multiple_choice_prompt(choices)
+        return filters
 
     @property
     def title(self) -> str:
@@ -52,19 +88,72 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
     def description(self) -> str | None:
         return self.app.org.event_header_html or self.app.org.event_footer_html
 
-    @property
-    def collection(self) -> Any:
+    # NOTE: Since we need the collection in order to determine which
+    #       filters are available we cannot call `assert_valid_filter`
+    #       in the same property that gets accessed by filters. So we
+    #       split creating the collection into two steps, since the first
+    #       step is sufficient for determining the filters.
+    @cached_property
+    def _base_collection(self) -> OccurrenceCollection:
         result = OccurrenceCollection(
             self.session,
             page=self.page or 0,
             only_public=True
         )
 
+        filter_type = self.app.org.event_filter_type
+        filter_config = self.app.org.event_filter_configuration
+        if (
+            filter_type in ('filters', 'tags_and_filters')
+            and filter_config.get('keywords', None)
+        ):
+            result.set_event_filter_configuration(filter_config)
+            result.set_event_filter_fields(self.app.org.event_filter_fields)
+        return result
+
+    def get_date_filter(self, key: str, values: list[str]) -> date | None:
+        value = self.scalarize_value(key, values)
+        if value is None:
+            return None
+        try:
+            return extended_date_decode(value)
+        except Exception:
+            raise ApiInvalidParamException(
+                f'Invalid ISO-8601 date for parameter {key!r}'
+            ) from None
+
+    @property
+    def collection(self) -> OccurrenceCollection:
+        result = self._base_collection
+        filter_keywords = {}
+        for key, values in self.extra_parameters.items():
+            self.assert_valid_filter(key)
+            if key == 'start':
+                value = self.get_date_filter(key, values)
+                result = result.for_filter(
+                    start=value,
+                    outdated=value < date.today() if value else False,
+                )
+            elif key == 'end':
+                value = self.get_date_filter(key, values)
+                result = result.for_filter(end=value)
+            elif key == 'tags':
+                result = result.for_filter(tags=values)
+            elif key == 'sources':
+                result = result.for_filter(sources=values)
+            elif key == 'locations':
+                result = result.for_filter(locations=values)
+            else:
+                filter_keywords[key] = values
+
+        if filter_keywords:
+            result = result.for_keywords(**filter_keywords)
+
         result.batch_size = self.batch_size
         return result
 
     def item_data(self, item: Occurrence) -> dict[str, Any]:
-        return {
+        data: dict[str, Any] = {
             'title': item.title,
             'description': item.event.description,
             'organizer': item.event.organizer,
@@ -73,27 +162,35 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
             'external_event_url': item.event.external_event_url,
             'event_registration_url': item.event.event_registration_url,
             'price': item.event.price,
-            'tags': item.event.tags,
             'start': item.start.isoformat(),
             'end': item.end.isoformat(),
             'location': item.location,
+            'source': item.event.source,
             'coordinates': get_geo_location(item),
-            'created': item.created.isoformat(),
-            'modified': get_modified_iso_format(item),
         }
+
+        filter_type = self.app.org.event_filter_type
+        if filter_type in ('tags', 'tags_and_filters'):
+            data['tags'] = item.event.tags
+
+        if filter_type in ('filters', 'tags_and_filters'):
+            data.update(item.event.filter_keywords)
+
+        data['created'] = item.created.isoformat()
+        data['modified'] = get_modified_iso_format(item)
+        return data
 
     def item_links(self, item: Occurrence) -> dict[str, Any]:
         return {
             'html': item,
             'image': item.event.image,
-            'pfd': item.event.pdf
+            'pdf': item.event.pdf
         }
 
 
 class NewsApiEndpoint(ApiEndpoint[News]):
     app: TownApp
     endpoint = 'news'
-    filters = set()
 
     @property
     def title(self) -> str:
@@ -141,7 +238,6 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
     request: TownRequest
     app: TownApp
     endpoint = 'topics'
-    filters = set()
 
     @property
     def title(self) -> str:
@@ -191,14 +287,13 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
 class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
     request: TownRequest
     app: TownApp
-    filters = set()
     endpoint: str
 
     def __init__(
         self,
         request: TownRequest,
         name: str,
-        extra_parameters: dict[str, str | None] | None = None,
+        extra_parameters: dict[str, list[str]] | None = None,
         page: int | None = None,
     ):
         super().__init__(request, extra_parameters, page)

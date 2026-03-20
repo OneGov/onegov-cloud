@@ -533,7 +533,6 @@ def test_votes_query(swissvotes_app: TestApp) -> None:
 
 def test_votes_query_attachments(
     swissvotes_app: TestApp,
-    postgres_version: str,
     attachments: dict[str, SwissVoteFile],
     campaign_material: dict[str, SwissVoteFile]
 ) -> None:

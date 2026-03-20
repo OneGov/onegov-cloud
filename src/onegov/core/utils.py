@@ -45,22 +45,17 @@ from yubico_client.yubico_exceptions import (  # type:ignore[import-untyped]
     SignatureVerificationError, StatusCodeError)
 
 
-from typing import overload, Any, TypeVar, TYPE_CHECKING
+from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Collection, Iterator, Mapping
     from fs.base import FS, SubFS
     from re import Match
-    from sqlalchemy import Column
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import InstrumentedAttribute, Session
     from types import ModuleType
     from webob import Response
     from .request import CoreRequest
     from .types import FileDict, LaxFileDict
-
-
-_T = TypeVar('_T')
-_KT = TypeVar('_KT')
 
 
 # http://stackoverflow.com/a/13500078
@@ -385,23 +380,23 @@ def hash_dictionary(dictionary: dict[str, Any]) -> str:
 
 
 @overload
-def groupbylist(
-    iterable: Iterable[_T],
+def groupbylist[T](
+    iterable: Iterable[T],
     key: None = ...
-) -> list[tuple[_T, list[_T]]]: ...
+) -> list[tuple[T, list[T]]]: ...
 
 
 @overload
-def groupbylist(
-    iterable: Iterable[_T],
-    key: Callable[[_T], _KT]
-) -> list[tuple[_KT, list[_T]]]: ...
+def groupbylist[T, KT](
+    iterable: Iterable[T],
+    key: Callable[[T], KT]
+) -> list[tuple[KT, list[T]]]: ...
 
 
-def groupbylist(
-    iterable: Iterable[_T],
-    key: Callable[[_T], Any] | None = None
-) -> list[tuple[Any, list[_T]]]:
+def groupbylist[T](
+    iterable: Iterable[T],
+    key: Callable[[T], Any] | None = None
+) -> list[tuple[Any, list[T]]]:
     """ Works just like Python's ``itertools.groupby`` function, but instead
     of returning generators, it returns lists.
 
@@ -690,21 +685,23 @@ def is_subpath(directory: str, path: str) -> bool:
 
     # return true, if the common prefix of both is equal to directory
     # e.g. /a/b/c/d.rst and directory is /a/b, the common prefix is /a/b
-    return os.path.commonprefix([path, directory]) == directory
+    # FIXME: This ruff error seems correct, but our tests fail with commonpath
+    #        maybe module_path is broken or we need to add/remove a slash
+    return os.path.commonprefix([path, directory]) == directory  # noqa: RUF071
 
 
 @overload
-def is_sorted(
-    iterable: Iterable[SupportsRichComparison],
-    key: Callable[[SupportsRichComparison], SupportsRichComparison] = ...,
+def is_sorted[T: SupportsRichComparison](
+    iterable: Iterable[T],
+    key: Callable[[T], SupportsRichComparison] = ...,
     reverse: bool = ...
 ) -> bool: ...
 
 
 @overload
-def is_sorted(
-    iterable: Iterable[_T],
-    key: Callable[[_T], SupportsRichComparison],
+def is_sorted[T](
+    iterable: Iterable[T],
+    key: Callable[[T], SupportsRichComparison],
     reverse: bool = ...
 ) -> bool: ...
 
@@ -768,21 +765,19 @@ def scan_morepath_modules(cls: type[morepath.App]) -> None:
 
 def get_unique_hstore_keys(
     session: Session,
-    column: Column[dict[str, Any]] | Column[dict[str, Any] | None] |
-            Column[Mapping[str, Any]] | Column[Mapping[str, Any] | None]
+    column: InstrumentedAttribute[Mapping[str, Any] | None]
 ) -> set[str]:
     """ Returns a set of keys found in an hstore column over all records
     of its table.
 
     """
 
-    base = session.query(column.keys()).with_entities(  # type:ignore
+    base = session.query(column.keys()).with_entities(
         sqlalchemy.func.skeys(column).label('keys'))
 
-    query = sqlalchemy.select(
-        [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
-        distinct=True
-    ).select_from(base.subquery())
+    query = sqlalchemy.select(  # type: ignore[var-annotated]
+        sqlalchemy.func.array_agg(sqlalchemy.column('keys'))
+    ).select_from(base.subquery()).distinct()
 
     keys = session.execute(query).scalar()
     return set(keys) if keys else set()
@@ -864,7 +859,7 @@ class PostThread(Thread):
             )
 
 
-def toggle(collection: set[_T], item: _T | None) -> set[_T]:
+def toggle[T](collection: set[T], item: T | None) -> set[T]:
     """ Returns a new set where the item has been toggled. """
 
     if item is None:
@@ -931,10 +926,10 @@ def safe_format(
 
 
 @overload
-def safe_format(
+def safe_format[T](
     format: str,
-    dictionary: dict[str, _T],
-    types: set[type[_T]] = ...,
+    dictionary: dict[str, T],
+    types: set[type[T]] = ...,
     adapt: Callable[[str], str] | None = ...,
     raise_on_missing: bool = ...
 ) -> str: ...
@@ -1161,7 +1156,7 @@ def yubikey_public_id(otp: str) -> str:
     return otp[:12]
 
 
-def dict_path(dictionary: dict[str, _T], path: str) -> _T:
+def dict_path[T](dictionary: dict[str, T], path: str) -> T:
     """ Gets the value of the given dictionary at the given path.
 
     For example::
@@ -1220,37 +1215,37 @@ def safe_move(src: str, dst: str, tmp_dst: str | None = None) -> None:
 
 
 @overload
-def batched(
-    iterable: Iterable[_T],
+def batched[T](
+    iterable: Iterable[T],
     batch_size: int,
     container_factory: type[tuple] = ...  # type:ignore[type-arg]
-) -> Iterator[tuple[_T, ...]]: ...
+) -> Iterator[tuple[T, ...]]: ...
 
 
 @overload
-def batched(
-    iterable: Iterable[_T],
+def batched[T](
+    iterable: Iterable[T],
     batch_size: int,
     container_factory: type[list]  # type:ignore[type-arg]
-) -> Iterator[list[_T]]: ...
+) -> Iterator[list[T]]: ...
 
 
 # NOTE: If there were higher order TypeVars, we could properly infer
 #       the type of the Container, for now we just add overloads for
 #       two of the most common container_factories
 @overload
-def batched(
-    iterable: Iterable[_T],
+def batched[T](
+    iterable: Iterable[T],
     batch_size: int,
-    container_factory: Callable[[Iterator[_T]], Collection[_T]]
-) -> Iterator[Collection[_T]]: ...
+    container_factory: Callable[[Iterator[T]], Collection[T]]
+) -> Iterator[Collection[T]]: ...
 
 
-def batched(
-    iterable: Iterable[_T],
+def batched[T](
+    iterable: Iterable[T],
     batch_size: int,
-    container_factory: Callable[[Iterator[_T]], Collection[_T]] = tuple
-) -> Iterator[Collection[_T]]:
+    container_factory: Callable[[Iterator[T]], Collection[T]] = tuple
+) -> Iterator[Collection[T]]:
     """ Splits an iterable into batches of batch_size and puts them
     inside a given collection (tuple by default).
 

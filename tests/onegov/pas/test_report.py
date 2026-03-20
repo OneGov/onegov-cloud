@@ -32,7 +32,7 @@ def test_generate_parliamentarian_export(session: Session) -> None:
     session.add(settlement_run)
 
     # Create rate set for 2023
-    rate_set = RateSet(  # type: ignore[misc]
+    rate_set = RateSet(
         year=2023,
         cost_of_living_adjustment=2.0,  # 2% adjustment
         plenary_none_member_halfday=400,  # 100/hour after /4

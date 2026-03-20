@@ -13,6 +13,7 @@ from onegov.pas.custom import get_current_rate_set
 from onegov.pas.utils import (
     get_parliamentarians_with_settlements,
     is_commission_president,
+    round_to_five_rappen,
 )
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from onegov.pas.models.party import Party
@@ -399,10 +400,23 @@ def generate_buchungen_abrechnungslauf_xlsx(
         worksheet.write(row_num, 2, row_data['party'], cell_format)
         worksheet.write(row_num, 3, row_data['wahlkreis'], cell_format)
         worksheet.write(row_num, 4, row_data['booking_type'], cell_format)
-        worksheet.write(row_num, 5, float(row_data['value']), cell_format)
-        worksheet.write(row_num, 6, float(row_data['chf']), cell_format)
         worksheet.write(
-            row_num, 7, float(row_data['chf_with_cola']), cell_format
+            row_num,
+            5,
+            float(round_to_five_rappen(row_data['value'])),
+            cell_format,
+        )
+        worksheet.write(
+            row_num,
+            6,
+            float(round_to_five_rappen(row_data['chf'])),
+            cell_format,
+        )
+        worksheet.write(
+            row_num,
+            7,
+            float(round_to_five_rappen(row_data['chf_with_cola'])),
+            cell_format,
         )
 
     # Auto-adjust column widths

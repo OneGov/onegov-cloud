@@ -258,6 +258,7 @@ def test_occurrence_collection_query(session: Session) -> None:
         timezone='Europe/Zurich',
         location='Squirrel Park',
         tags=['fun', 'park', 'animals'],
+        source='School',
         recurrence=(
             'RRULE:FREQ=WEEKLY;'
             'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
@@ -272,7 +273,8 @@ def test_occurrence_collection_query(session: Session) -> None:
         end=datetime(2015, 6, 18, 16, 00),
         timezone='Europe/Zurich',
         location='Squirrel Park Visitor Center',
-        tags=['history']
+        tags=['history'],
+        source='Council'
     )
     event.submit()
     event.publish()
@@ -299,6 +301,10 @@ def test_occurrence_collection_query(session: Session) -> None:
     assert query(outdated=True, locations=['Center']).count() == 1
     assert query(outdated=True, locations=['squirrel', 'park']).count() == 0
     assert query(outdated=True, locations=[]).count() == 5
+
+    assert query(outdated=True, sources=['School']).count() == 4
+    assert query(outdated=True, sources=['Council']).count() == 1
+    assert query(outdated=True, sources=['School', 'Council']).count() == 5
 
     assert query(outdated=True, start=date(2015, 6, 17)).count() == 4
     assert query(outdated=True, start=date(2015, 6, 18)).count() == 3
@@ -495,6 +501,7 @@ def test_occurrence_collection_for_filter(session: Session) -> None:
         end=date(2009, 6, 30),
         tags=['month-6'],
         locations=['Bar'],
+        sources=['External'],
         filter_keywords={'filter': ['Filter A']}
     )
     occurrences = occurrences.for_filter()
@@ -504,6 +511,7 @@ def test_occurrence_collection_for_filter(session: Session) -> None:
     assert occurrences.outdated is False
     assert occurrences.tags == ['month-6']
     assert occurrences.locations == ['Bar']
+    assert occurrences.sources == ['External']
 
     occurrences = occurrences.for_filter(start=date(2010, 5, 1))
     assert occurrences.range is None
@@ -512,6 +520,7 @@ def test_occurrence_collection_for_filter(session: Session) -> None:
     assert occurrences.outdated is False
     assert occurrences.tags == ['month-6']
     assert occurrences.locations == ['Bar']
+    assert occurrences.sources == ['External']
 
     occurrences = occurrences.for_filter(end=None, outdated=True)
     assert occurrences.range is None
@@ -520,32 +529,45 @@ def test_occurrence_collection_for_filter(session: Session) -> None:
     assert occurrences.outdated is True
     assert occurrences.tags == ['month-6']
     assert occurrences.locations == ['Bar']
+    assert occurrences.sources == ['External']
 
-    occurrences = occurrences.for_filter(tags=[], locations=[])
+    occurrences = occurrences.for_filter(tags=[], locations=[], sources=[])
     assert occurrences.range is None
     assert occurrences.start == date(2010, 5, 1)
     assert occurrences.end is None
     assert occurrences.outdated is True
     assert occurrences.tags == []
     assert occurrences.locations == []
+    assert occurrences.sources == []
 
-    occurrences = occurrences.for_filter(tags=['a', 'b'], locations=['A', 'B'])
+    occurrences = occurrences.for_filter(
+        tags=['a', 'b'],
+        locations=['A', 'B'],
+        sources=['X', 'Y']
+    )
     assert occurrences.range is None
     assert occurrences.start == date(2010, 5, 1)
     assert occurrences.end is None
     assert occurrences.outdated is True
     assert occurrences.tags == ['a', 'b']
     assert occurrences.locations == ['A', 'B']
+    assert occurrences.sources == ['X', 'Y']
 
-    occurrences = occurrences.for_filter(tag='c', location='C', range='today')
+    occurrences = occurrences.for_filter(
+        tag='c',
+        location='C',
+        source='Z',
+        range='today'
+    )
     assert occurrences.range == 'today'
     assert occurrences.start == date.today()
     assert occurrences.end == date.today()
     assert occurrences.outdated is True
     assert occurrences.tags == ['a', 'b', 'c']
     assert occurrences.locations == ['A', 'B', 'C']
+    assert occurrences.sources == ['X', 'Y', 'Z']
 
-    occurrences = occurrences.for_filter(tag='a', location='A')
+    occurrences = occurrences.for_filter(tag='a', location='A', source='X')
     assert occurrences.range == 'today'
     assert occurrences.start == date.today()
     assert occurrences.end == date.today()
@@ -560,6 +582,7 @@ def test_occurrence_collection_for_filter(session: Session) -> None:
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
+    assert occurrences.sources == ['Y', 'Z']
 
     occurrences = occurrences.for_filter(start=date(2010, 5, 1))
     assert occurrences.range is None
@@ -568,6 +591,7 @@ def test_occurrence_collection_for_filter(session: Session) -> None:
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
+    assert occurrences.sources == ['Y', 'Z']
 
     occurrences = occurrences.for_filter(range='-', end=date(2010, 5, 1))  # type: ignore[arg-type]
     assert occurrences.range is None
@@ -576,6 +600,7 @@ def test_occurrence_collection_for_filter(session: Session) -> None:
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
+    assert occurrences.sources == ['Y', 'Z']
 
 
 def test_occurrence_collection_outdated(session: Session) -> None:
@@ -942,7 +967,7 @@ def test_from_import(session: Session) -> None:
 
     added, updated, purged = events.from_import([
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title A',
                 location='Location A',
@@ -966,7 +991,7 @@ def test_from_import(session: Session) -> None:
             pdf_filename=None,
         ),
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title B',
                 location='Location B',
@@ -994,7 +1019,7 @@ def test_from_import(session: Session) -> None:
 
     def items() -> Iterator[EventImportItem]:
         yield EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title C',
                 location='Location C',
@@ -1024,7 +1049,7 @@ def test_from_import(session: Session) -> None:
     # Already imported
     assert events.from_import([
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title C',
                 location='Location C',
@@ -1052,7 +1077,7 @@ def test_from_import(session: Session) -> None:
     # Update and purge
     a, u, p = events.from_import([
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title',
                 location='Location A',
@@ -1087,7 +1112,7 @@ def test_from_import(session: Session) -> None:
     events.by_name('title-c').withdraw()  # type: ignore[union-attr]
     assert events.from_import([
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title C',
                 location='Location C',
@@ -1116,7 +1141,7 @@ def test_from_import(session: Session) -> None:
     # future only events option
     a, u, p = events.from_import([
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title D past',
                 location='Location D past',
@@ -1140,7 +1165,7 @@ def test_from_import(session: Session) -> None:
             pdf_filename=None,
         ),
         EventImportItem(
-            event=Event(  # type: ignore[misc]
+            event=Event(
                 state='initiated',
                 title='Title D future',
                 location='Location D future',

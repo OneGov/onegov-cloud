@@ -41,6 +41,7 @@ if TYPE_CHECKING:
     from .conftest import Client
 
 
+@freeze_time("2015-08-05", tick=True)
 def test_resource_slots(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.add("Foo", 'Europe/Zurich')
@@ -79,18 +80,18 @@ def test_resource_slots(client: Client) -> None:
     assert result[0]['start'] == '2015-08-04T00:00:00+02:00'
     assert result[0]['end'] == '2015-08-05T00:00:00+02:00'
     assert result[0]['classNames'] == ['event-in-past', 'event-available']
-    assert result[0]['title'] == "Ganztägig \nVerfügbar"
+    assert result[0]['title'] == "Ganztägig"
 
     assert result[1]['start'] == '2015-08-05T00:00:00+02:00'
     assert result[1]['end'] == '2015-08-06T00:00:00+02:00'
-    assert result[1]['classNames'] == ['event-in-past', 'event-available']
+    assert result[1]['classNames'] == ['event-available']
     assert result[1]['title'] == "Ganztägig \nVerfügbar"
 
     url = '/resource/foo/slots?start=2015-08-06&end=2015-08-06'
     result = client.get(url).json
 
     assert len(result) == 1
-    assert result[0]['classNames'] == ['event-in-past', 'event-unavailable']
+    assert result[0]['classNames'] == ['event-unavailable']
     assert result[0]['title'] == "12:00 - 16:00 \nBesetzt"
 
 
@@ -664,6 +665,7 @@ def test_reserved_resources_fields(client: Client) -> None:
     assert "Meeting Room" in room
 
 
+@freeze_time("2015-08-04", tick=True)
 def test_allocations(client: Client) -> None:
     client.login_admin()
     items = client.get('/resources').click('Gegenstand')
@@ -4093,14 +4095,14 @@ def test_allocation_rules_copy_paste(client: Client) -> None:
 
     # Copy the rule
     edit_page = client.get('/resource/room-1').click('Verfügbarkeitszeiträume')
-    copy_links = edit_page.html.find_all('a', string='Kopieren')
+    copy_links = edit_page.html.find_all('a', string='Kopieren')  # type: ignore[call-overload]
     client.post(copy_links[0].attrs['ic-post-to'])
     edit_page = client.get(edit_page.request.path)
     assert 'in die Zwischenablage kopiert' in edit_page
 
     # Paste the rule in the other room
     edit_page = client.get('/resource/room-2').click('Verfügbarkeitszeiträume')
-    paste_links = edit_page.html.find_all('a', string='Einfügen')
+    paste_links = edit_page.html.find_all('a', string='Einfügen')  # type: ignore[call-overload]
     client.post(paste_links[0].attrs['ic-post-to'])
     edit_page = client.get(edit_page.request.path)
     assert 'wurde eingefügt' in edit_page

@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 def test_election_compound_part_layout_general(session: Session) -> None:
     date_ = date(2011, 1, 1)
-    election = ProporzElection(  # type: ignore[misc]
+    election = ProporzElection(
         title="election",
         domain='region',
         domain_segment='Allschwil',
@@ -129,7 +129,7 @@ def test_election_compound_part_layout_general(session: Session) -> None:
 
 
 def test_election_compound_part_layout_menu(session: Session) -> None:
-    election = ProporzElection(  # type: ignore[misc]
+    election = ProporzElection(
         title="Election",
         domain='region',
         domain_segment='Allschwil',

@@ -17,9 +17,7 @@ from tests.shared.utils import create_image
 from pathlib import Path
 from onegov.file.utils import as_fileintent
 from PIL import Image
-from sqlalchemy import Column
-from sqlalchemy import Integer
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column, Mapped
 from unittest.mock import Mock
 
 
@@ -36,8 +34,8 @@ class PolymorphicFile(File):
 class Blogpost(Base, AssociatedFiles):
     __tablename__ = 'blogposts'
 
-    id: Column[int] = Column(Integer, primary_key=True)
-    text: Column[str] = Column(Text, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    text: Mapped[str]
 
 
 class MediaItemFile(File):
@@ -47,14 +45,14 @@ class MediaItemFile(File):
 class MediaItem(Base):
     __tablename__ = 'media_items'
 
-    id: Column[int] = Column(Integer, primary_key=True)
-    description: Column[str] = Column(Text, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    description: Mapped[str]
     content = associated(MediaItemFile, 'content', 'one-to-one')
 
 
 @pytest.mark.parametrize('cls', [File, PolymorphicFile])
 def test_store_file_from_string(session: Session, cls: type[File]) -> None:
-    session.add(cls(name='readme.txt', reference=b'README\n======'))  # type: ignore[misc]
+    session.add(cls(name='readme.txt', reference=b'README\n======'))
     transaction.commit()
 
     readme = session.query(cls).first()
@@ -76,7 +74,7 @@ def test_store_file_from_path(
         f.write('README\n======')
 
     with (temporary_path / 'readme.txt').open('rb') as f:
-        session.add(cls(name='readme.txt', reference=f))  # type: ignore[misc]
+        session.add(cls(name='readme.txt', reference=f))
 
     transaction.commit()
 
@@ -92,7 +90,7 @@ def test_store_file_from_path(
 def test_store_file_from_bytes_io(session: Session, cls: type[File]) -> None:
 
     f = BytesIO(b'README\n======')
-    session.add(cls(name='readme.txt', reference=f))  # type: ignore[misc]
+    session.add(cls(name='readme.txt', reference=f))
 
     transaction.commit()
 
@@ -105,8 +103,8 @@ def test_store_file_from_bytes_io(session: Session, cls: type[File]) -> None:
 
 
 def test_associate_files_with_sets(session: Session) -> None:
-    session.add(File(name='readme.txt', reference=b'README'))  # type: ignore[misc]
-    session.add(File(name='manual.txt', reference=b'MANUAL'))  # type: ignore[misc]
+    session.add(File(name='readme.txt', reference=b'README'))
+    session.add(File(name='manual.txt', reference=b'MANUAL'))
     session.add(FileSet(title='Textfiles'))
     session.add(FileSet(title='Documents'))
 
@@ -149,8 +147,8 @@ def test_associate_files_with_sets(session: Session) -> None:
 
 
 def test_thumbnail_creation(session: Session) -> None:
-    session.add(File(name='large.png', reference=create_image(1024, 1024)))  # type: ignore[misc]
-    session.add(File(name='small.png', reference=create_image(32, 32)))  # type: ignore[misc]
+    session.add(File(name='large.png', reference=create_image(1024, 1024)))
+    session.add(File(name='small.png', reference=create_image(32, 32)))
 
     transaction.commit()
 
@@ -164,7 +162,7 @@ def test_save_png_zipbomb(session: Session) -> None:
     path = module_path('tests.onegov.file', 'fixtures/bomb.png')
 
     with open(path, 'rb') as f:
-        session.add(File(name='zipbomb.png', reference=f))  # type: ignore[misc]
+        session.add(File(name='zipbomb.png', reference=f))
 
     transaction.commit()
     file = session.query(File).one()
@@ -180,7 +178,7 @@ def test_save_image_internal_exception(
     mock_open = Mock(side_effect=ValueError)
     monkeypatch.setattr('PIL.Image.open', mock_open)
 
-    session.add(File(name='causes-error.png', reference=create_image(32, 32)))  # type: ignore[misc]
+    session.add(File(name='causes-error.png', reference=create_image(32, 32)))
 
     transaction.commit()
     file = session.query(File).one()
@@ -192,7 +190,7 @@ def test_strip_image_exif(session: Session) -> None:
     path = module_path('tests.onegov.file', 'fixtures/exif.jpg')
 
     with open(path, 'rb') as f:
-        session.add(File(name='exif.jpg', reference=f))  # type: ignore[misc]
+        session.add(File(name='exif.jpg', reference=f))
 
     transaction.commit()
     file = session.query(File).one()
@@ -205,7 +203,7 @@ def test_pdf_preview_creation(session: Session) -> None:
     path = module_path('tests.onegov.file', 'fixtures/example.pdf')
 
     with open(path, 'rb') as f:
-        session.add(File(name='example.pdf', reference=f))  # type: ignore[misc]
+        session.add(File(name='example.pdf', reference=f))
 
     transaction.commit()
 
@@ -218,7 +216,7 @@ def test_pdf_preview_creation(session: Session) -> None:
     thumb = DepotManager.get().get(pdf.reference['thumbnail_medium']['id'])  # type: ignore[union-attr]
     image = Image.open(thumb)
 
-    assert (0, 91, 161, 255) in set(image.getdata())
+    assert (0, 91, 161, 255) in set(image.get_flattened_data())
 
     w, h = image.size
     assert h == 512
@@ -248,7 +246,7 @@ def test_pdf_preview_creation_with_erroneous_pdf(
     path = module_path('tests.onegov.file', f'fixtures/{filname}')
 
     with open(path, 'rb') as f:
-        session.add(File(name=f'{filname}', reference=f))  # type: ignore[misc]
+        session.add(File(name=f'{filname}', reference=f))
     transaction.commit()
     pdf = session.query(File).one()
     assert pdf.reference.get('thumbnail_medium', None) is not None
@@ -268,8 +266,8 @@ def test_pdf_preview_creation_with_erroneous_pdf(
 
 
 def test_max_image_size(session: Session) -> None:
-    session.add(File(name='unchanged.png', reference=create_image(2048, 2048)))  # type: ignore[misc]
-    session.add(File(name='limited.png', reference=create_image(2049, 2048)))  # type: ignore[misc]
+    session.add(File(name='unchanged.png', reference=create_image(2048, 2048)))
+    session.add(File(name='limited.png', reference=create_image(2049, 2048)))
 
     transaction.commit()
 
@@ -287,7 +285,7 @@ def test_max_image_size(session: Session) -> None:
 
 
 def test_checksum(session: Session) -> None:
-    session.add(File(name='readme.txt', reference=b'README'))  # type: ignore[misc]
+    session.add(File(name='readme.txt', reference=b'README'))
     transaction.commit()
 
     readme = session.query(File).one()
@@ -311,7 +309,7 @@ def test_determine_svg_size(session: Session, temporary_path: Path) -> None:
         ))
 
     with (temporary_path / 'logo.svg').open('rb') as f:
-        session.add(File(name='logo.svg', reference=f))  # type: ignore[misc]
+        session.add(File(name='logo.svg', reference=f))
 
     transaction.commit()
 
@@ -332,7 +330,7 @@ def test_determine_unknown_svg_size(
         ))
 
     with (temporary_path / 'logo.svg').open('rb') as f:
-        session.add(File(name='logo.svg', reference=f))  # type: ignore[misc]
+        session.add(File(name='logo.svg', reference=f))
 
     transaction.commit()
 
@@ -344,7 +342,7 @@ def test_determine_unknown_svg_size(
 def test_associated_files(session: Session) -> None:
     post = Blogpost(
         text="My interview at <company>",
-        files=[File(name='frowney.png', reference=create_image(2048, 2048))]  # type: ignore[misc]
+        files=[File(name='frowney.png', reference=create_image(2048, 2048))]
     )
 
     session.add(post)
@@ -375,7 +373,7 @@ def test_associated_files(session: Session) -> None:
 
 def test_update_metadata(session: Session) -> None:
     # note that the name is only stored on the database, not the metadata
-    session.add(File(name='readme.txt', reference=b'README'))  # type: ignore[misc]
+    session.add(File(name='readme.txt', reference=b'README'))
     transaction.commit()
 
     def get_file() -> File:
@@ -412,7 +410,7 @@ def test_pdf_text_extraction(session: Session) -> None:
     path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
 
     with open(path, 'rb') as f:
-        session.add(File(name='sample.pdf', reference=f))  # type: ignore[misc]
+        session.add(File(name='sample.pdf', reference=f))
 
     transaction.commit()
 
@@ -429,7 +427,7 @@ def test_signature_timestamp(session: Session) -> None:
     time = sedate.utcnow()
 
     with open(path, 'rb') as f:
-        session.add(File(name='sample.pdf', reference=f, signature_metadata={  # type: ignore[misc]
+        session.add(File(name='sample.pdf', reference=f, signature_metadata={
             'timestamp': time.isoformat()
         }))
 
@@ -452,13 +450,13 @@ def test_signature_timestamp(session: Session) -> None:
     assert session.query(File).filter_by(signature_timestamp=time).first()
 
     # make sure we get utc for both
-    assert session.query(File).one().signature_timestamp.tzinfo.zone == 'UTC'
+    assert session.query(File).one().signature_timestamp.tzinfo.zone == 'UTC'  # type: ignore[union-attr]
     assert session.query(File).with_entities(File.signature_timestamp
         ).one().signature_timestamp.tzinfo.zone == 'UTC'
 
 
 def test_file_cleanup(session: Session) -> None:
-    session.add(File(name='readme.txt', reference=b'foo'))  # type: ignore[misc]
+    session.add(File(name='readme.txt', reference=b'foo'))
     transaction.commit()
 
     readme = session.query(File).first()
@@ -477,8 +475,8 @@ def test_associated_files_cleanup(session: Session) -> None:
     post = Blogpost(
         text="Foo",
         files=[
-            File(name='foo.txt', reference=b'foo'),  # type: ignore[misc]
-            File(name='bar.txt', reference=b'bar')  # type: ignore[misc]
+            File(name='foo.txt', reference=b'foo'),
+            File(name='bar.txt', reference=b'bar')
         ]
     )
 
@@ -491,7 +489,7 @@ def test_associated_files_cleanup(session: Session) -> None:
     assert sum(1 for p in folder.iterdir()) == 2
 
     post = session.query(Blogpost).one()
-    post.files = [File(name='bar.txt', reference=b'bar')]  # type: ignore[misc]
+    post.files = [File(name='bar.txt', reference=b'bar')]
 
     session.flush()
     assert session.query(File).count() == 1
@@ -539,7 +537,7 @@ def test_1n1_associated_file_cleanup(session: Session) -> None:
 def test_named_file() -> None:
 
     class MyFile(File):
-        pass
+        __mapper_args__ = {'polymorphic_identity': 'my_file'}
 
     class CustomBlogPost(Blogpost):
         x = NamedFile(cls=MyFile)

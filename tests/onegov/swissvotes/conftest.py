@@ -25,7 +25,6 @@ from xlsxwriter.workbook import Workbook
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from sqlalchemy.orm import Session
 
 
 class TestApp(SwissvotesApp):
@@ -366,12 +365,6 @@ def page_attachment_urls() -> dict[str, dict[str, str]]:
             'REFERENCES': 'kurzbeschreibung-en.pdf',
         }
     }
-
-
-@pytest.fixture(scope="function")
-def postgres_version(session: Session) -> str:
-    connection = session.connection()
-    return connection.execute('show server_version;').fetchone()[0]
 
 
 @pytest.fixture(scope="function")

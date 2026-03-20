@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     handleBulkAddCommission();
     handleAttendanceFormSync();
+    handleParliamentarianCounter();
+    handleFilesAutoExpand();
 });
 
 
@@ -115,12 +117,54 @@ function handleBulkAddCommission() {
 }
 
 
+function handleParliamentarianCounter() {
+    if (!window.location.href.includes('/new-bulk')) {
+        return;
+    }
+
+    var $list = $('#parliamentarian_id');
+    if (!$list.length || !$list.is('ul')) {
+        return;
+    }
+
+    var $counter = $('<li><strong></strong></li>');
+    $list.prepend($counter);
+
+    function update() {
+        var $boxes = $list.find("input[type='checkbox']");
+        var total = $boxes.length;
+        var checked = $boxes.filter(':checked').length;
+        $counter.find('strong').text(checked + ' / ' + total);
+    }
+
+    update();
+    $list.on('change', 'input[type="checkbox"]', update);
+}
+
+
+function handleFilesAutoExpand() {
+    if (!window.location.pathname.endsWith('/files')) {
+        return;
+    }
+    document.querySelectorAll('[data-ogc-toggle]').forEach(function (btn) {
+        var targetSel = btn.getAttribute('data-ogc-toggle');
+        var target = document.querySelector(targetSel);
+        if (!target) { return; }
+        var loader = target.querySelector('[ic-get-from]');
+        if (!loader) { return; }
+        var url = loader.getAttribute('ic-get-from');
+        if (!url) { return; }
+        target.style.display = '';
+        target.classList.remove('hidden');
+        fetch(url)
+            .then(function (r) { return r.text(); })
+            .then(function (html) { loader.innerHTML = html; });
+    });
+}
+
+
 function handleAttendanceFormSync() {
-    // Pre-restrict interdependent dropdown values to prevent invalid
-    // combinations. When a user selects a commission or parliamentarian,
-    // the other dropdown dynamically filters to show only valid pairings.
-    // This improves UX by preventing form submissions with mismatched
-    // selections and making the valid options immediately clear.
+    // Prevent invalid combinations in dependent dropdowns
 
     // Applies to *single* attendance form only.
    if (!window.location.href.includes('attendences/new')) {

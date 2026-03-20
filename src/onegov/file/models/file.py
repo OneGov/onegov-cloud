@@ -7,7 +7,9 @@ import isodate
 
 from contextlib import contextmanager
 from collections import defaultdict
+from datetime import datetime
 from depot.fields.sqlalchemy import UploadedFileField as UploadedFileFieldBase
+from depot.fields.upload import UploadedFile
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, observes
 from onegov.core.orm.abstract import Associable
@@ -22,13 +24,13 @@ from onegov.file.models.fileset import file_to_set_associations
 from onegov.file.utils import extension_for_content_type
 from onegov.search import ORMSearchable
 from pathlib import Path
-from sqlalchemy import Boolean, Column, Index, Text
+from sqlalchemy import Index
 from sqlalchemy import case
 from sqlalchemy import event
 from sqlalchemy import text
 from sqlalchemy import type_coerce
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import deferred, relationship
+from sqlalchemy.orm import mapped_column, relationship, Mapped
 from sqlalchemy.orm import object_session, Session
 from sqlalchemy.orm.attributes import flag_modified
 from time import monotonic
@@ -38,23 +40,25 @@ from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from collections.abc import Iterator
-    from datetime import datetime
-    from depot.fields.upload import UploadedFile
     from depot.io.utils import FileIntent
     from onegov.file import FileSet
     from onegov.file.types import FileStats, SignatureMetadata
     from sqlalchemy.engine import Dialect
     from sqlalchemy.orm.session import SessionTransaction
+    from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
     from sqlalchemy.sql.type_api import TypeEngine
 
     # HACK: This column accepts FileIntent as an input, but when
     #       we ask for the value we always get an UploadedFile
-    class _UploadedFileColumn(Column[UploadedFile]):
+    class MappedUploadedFile(Mapped[UploadedFile]):
         def __set__(
             self,
             obj: object,
-            value: UploadedFile | FileIntent
+            value: SQLCoreOperations[UploadedFile] | UploadedFile | FileIntent
         ) -> None: ...
+else:
+    MappedUploadedFile = Mapped[UploadedFile]
+    FileStats = SignatureMetadata = dict[str, Any]
 
 
 class UploadedFileField(UploadedFileFieldBase):
@@ -67,14 +71,20 @@ class UploadedFileField(UploadedFileFieldBase):
     #       columns using this type, we may need to change some of the
     #       methods if we do that though
     # impl = JSON
+    # TODO: Check if caching this is maybe ok after all, we allow it for
+    #       JSON after all, but there is some metadata that's stored on
+    #       disk and potentially not synced, so maybe it's correct that
+    #       this is unsafe, but it's possible we could make this safe
+    #       by making some modifications to ProcessedUploadedFile
+    cache_ok = False
 
     def load_dialect_impl(
         self,
         dialect: Dialect
     ) -> TypeEngine[UploadedFile]:
-        return dialect.type_descriptor(JSON())
+        return dialect.type_descriptor(JSON())  # type: ignore[arg-type]
 
-    def process_bind_param(  # type:ignore[override]
+    def process_bind_param(
         self,
         value: UploadedFile | None,
         dialect: Dialect
@@ -110,8 +120,8 @@ class SearchableFile(ORMSearchable):
 
     if TYPE_CHECKING:
         # forward declare columns on File
-        name: Column[str]
-        published: Column[bool]
+        name: Mapped[str]
+        published: Mapped[bool]
 
     @property
     def fts_suggestion(self) -> str:
@@ -130,24 +140,22 @@ class File(Base, Associable, TimestampMixin):
     __tablename__ = 'files'
 
     #: the unique, public id of the file
-    id: Column[str] = Column(
-        Text,
-        nullable=False,
+    id: Mapped[str] = mapped_column(
         primary_key=True,
         default=random_token
     )
 
     #: the name of the file, incl. extension (not used for public links)
-    name: Column[str] = Column(Text, nullable=False)
+    name: Mapped[str]
 
     #: a short note about the file (for captions, other information)
-    note: Column[str | None] = Column(Text, nullable=True)
+    note: Mapped[str | None]
 
     #: the default order of files
-    order: Column[str] = Column(Text, nullable=False)
+    order: Mapped[str]
 
     #: true if published
-    published: Column[bool] = Column(Boolean, nullable=False, default=True)
+    published: Mapped[bool] = mapped_column(default=True)
 
     #: the date after which this file will be made public - this controls
     #: the visibility of the object through the ``access``
@@ -156,30 +164,20 @@ class File(Base, Associable, TimestampMixin):
     #: To get a file published, be sure to call
     #: :meth:`onegov.file.collection.FileCollection.publish_files` once an
     #: hour through a cronjob (see :mod:`onegov.core.cronjobs`)!
-    publish_date: Column[datetime | None] = Column(
-        UTCDateTime,
-        nullable=True
-    )
+    publish_date: Mapped[datetime | None]
 
     #: the date up to which the file is published
-    publish_end_date: Column[datetime | None] = Column(
-        UTCDateTime,
-        nullable=True
-    )
+    publish_end_date: Mapped[datetime | None]
 
     #: true if marked for publication
-    publication: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    publication: Mapped[bool] = mapped_column(default=False)
 
     #: true if the file was digitally signed in the onegov cloud
     #:
     #: (the file could be signed without this being true, but that would
     #: amount to a signature created outside of our platform, which is
     #: something we ignore)
-    signed: Column[bool] = Column(Boolean, nullable=False, default=False)
+    signed: Mapped[bool] = mapped_column(default=False)
 
     #: the metadata of the signature - this should include the following
     #: data::
@@ -190,8 +188,8 @@ class File(Base, Associable, TimestampMixin):
     #:  - timestamp: The time the document was signed in UTC
     #:  - request_id: A unique identifier by the signing service
     #:
-    signature_metadata: Column[SignatureMetadata | None] = deferred(
-        Column(JSON, nullable=True)
+    signature_metadata: Mapped[SignatureMetadata | None] = mapped_column(
+        deferred=True
     )
 
     #: the type of the file, this can be used to create custom polymorphic
@@ -200,15 +198,11 @@ class File(Base, Associable, TimestampMixin):
     #:
     #: not to be confused with the the actual filetype which is stored
     #: on the :attr:`reference`!
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     #: the reference to the actual file, uses depot to point to a file on
     #: the local file system or somewhere else (e.g. S3)
-    reference: _UploadedFileColumn = Column(UploadedFileField(  # type:ignore
+    reference: MappedUploadedFile = mapped_column(UploadedFileField(  # type: ignore[assignment]
         upload_type=ProcessedUploadedFile,
         filters=[
             OnlyIfImage(
@@ -224,7 +218,7 @@ class File(Base, Associable, TimestampMixin):
                 )
             )
         ]
-    ), nullable=False)
+    ))
 
     #: the md5 checksum of the file *before* it was processed by us, that is
     #: if the file was very large and we in turn made it smaller, it's the
@@ -233,26 +227,26 @@ class File(Base, Associable, TimestampMixin):
     #:
     #: note, this is not meant to be cryptographically secure - this is
     #: strictly a check of file duplicates, not protection against tampering
-    checksum: Column[str | None] = Column(Text, nullable=True, index=True)
+    checksum: Mapped[str | None] = mapped_column(index=True)
 
     #: the content of the given file as text, if it can be extracted
     #: (it is important that this column be loaded deferred by default, lest
     #: we load massive amounts of text on simple queries)
-    extract: Column[str | None] = deferred(Column(Text, nullable=True))
+    extract: Mapped[str | None] = mapped_column(deferred=True)
 
     #: the languge of the file
-    language: Column[str | None] = Column(Text, nullable=True)
+    language: Mapped[str | None]
 
     #: statistics around the extract (number of pages, words, etc.)
     #: those are usually set during file upload (as some information is
     #: lost afterwards)
-    stats: Column[FileStats | None] = deferred(Column(JSON, nullable=True))
+    stats: Mapped[FileStats | None] = mapped_column(deferred=True)
 
     #: arbitrary additional meta data, which can be used by subclasses to
     #: store additional information using e.g. `meta_property`
-    meta: Column[dict[str, Any]] = Column(JSON, nullable=False, default=dict)
+    meta: Mapped[dict[str, Any]] = mapped_column(default=dict)
 
-    filesets: relationship[list[FileSet]] = relationship(
+    filesets: Mapped[list[FileSet]] = relationship(
         'FileSet',
         secondary=file_to_set_associations,
         back_populates='files'
@@ -270,14 +264,16 @@ class File(Base, Associable, TimestampMixin):
     @hybrid_property
     def signature_timestamp(self) -> datetime | None:
         if self.signed:
+            assert self.signature_metadata is not None
             return sedate.replace_timezone(
                 isodate.parse_datetime(self.signature_metadata['timestamp']),
                 'UTC'
             )
         return None
 
-    @signature_timestamp.expression  # type:ignore[no-redef]
-    def signature_timestamp(cls):
+    @signature_timestamp.inplace.expression
+    @classmethod
+    def _signature_timestamp_expression(cls) -> ColumnElement[datetime | None]:
         return type_coerce(case(
             (
                 File.signed == True,
@@ -291,9 +287,9 @@ class File(Base, Associable, TimestampMixin):
                 """)
             ),
             else_=text('NULL')
-        ), UTCDateTime)
+        ), UTCDateTime)  # type: ignore[arg-type]
 
-    # NOTE: Technically we could scope these observes to DepotApp, but
+    # NOTE: Technically we could scope these observers to DepotApp, but
     #       then we would need to instantiate a DepotApp for testing
     #       which could get annoying
     @observes('reference')
@@ -371,8 +367,8 @@ class File(Base, Associable, TimestampMixin):
     ) -> None: ...
 
     def _update_metadata(self, **options: Any) -> None:
-        """ Updates the underlying metadata with the give values. This
-        operats on low-level interfaces of Depot and assumes local storage.
+        """ Updates the underlying metadata with the given values. This
+        operates on low-level interfaces of Depot and assumes local storage.
 
         You should have a good reason for using this.
 
@@ -389,6 +385,7 @@ class File(Base, Associable, TimestampMixin):
 
         # store the pending metadata on the session to commit them later
         session = object_session(self)
+        assert session is not None
 
         if 'pending_metadata_changes' not in session.info:
             session.info['pending_metadata_changes'] = defaultdict(dict)
@@ -425,7 +422,7 @@ def metadata_lock(
                 break
 
 
-@event.listens_for(Session, 'after_commit')  # type:ignore[untyped-decorator]
+@event.listens_for(Session, 'after_commit')
 def update_metadata_after_commit(session: Session) -> None:
     if 'pending_metadata_changes' not in session.info:
         return
@@ -457,7 +454,7 @@ def update_metadata_after_commit(session: Session) -> None:
     del session.info['pending_metadata_changes']
 
 
-@event.listens_for(Session, 'after_soft_rollback')  # type:ignore[untyped-decorator]
+@event.listens_for(Session, 'after_soft_rollback')
 def discard_metadata_on_rollback(
     session: Session,
     previous_transaction: SessionTransaction

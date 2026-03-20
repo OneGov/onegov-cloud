@@ -199,7 +199,7 @@ def test_extended_membership(session: Session) -> None:
     session.flush()
 
     session.add(
-        ExtendedAgencyMembership(  # type: ignore[misc]
+        ExtendedAgencyMembership(
             title="Director",
             order_within_agency=12,
             order_within_person=12,

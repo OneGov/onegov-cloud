@@ -148,7 +148,7 @@ def test_translator_mutation(session: Session) -> None:
     languages = create_languages(session)
     certificates = create_certificates(session)
 
-    translator = Translator(  # type: ignore[misc]
+    translator = Translator(
         first_name='Hugo',
         last_name='Benito',
         confirm_name_reveal=True,

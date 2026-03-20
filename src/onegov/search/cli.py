@@ -32,7 +32,7 @@ def psql_index_status(app: SearchApp) -> None:
     index_counts = dict(session.query(
         SearchIndex.owner_tablename,
         func.count(SearchIndex.id)
-    ).group_by(SearchIndex.owner_tablename))
+    ).group_by(SearchIndex.owner_tablename).tuples())
 
     click.echo(f'| Status | {"Tablename": <40} | Indexed | No. docs |')
     click.echo(f'|--------|-{"---------":-<40}-|---------|----------|')

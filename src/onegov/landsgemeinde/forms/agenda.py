@@ -19,8 +19,11 @@ from onegov.form.fields import TagsField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
-from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
+from onegov.form.validators import (
+    FileSizeLimit,
+    MIME_TYPES_PDF,
+    MIME_TYPES_ARCHIVE
+)
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem, LandsgemeindeFile
@@ -80,9 +83,9 @@ class AgendaItemForm(NamedFileForm):
         label=_('Excerpt from the Memorial (PDF)'),
         fieldset=_('Memorial'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=MIME_TYPES_PDF,
     )
 
     memorial_page = IntegerField(
@@ -226,9 +229,9 @@ class AgendaItemUploadForm(Form):
         label=_('Agenda Item ZIP'),
         fieldset=_('Import'),
         validators=[
-            WhitelistedMimeType({'application/zip'}),
             FileSizeLimit(100 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=MIME_TYPES_ARCHIVE,
     )
 
     def get_html_dir(self,
@@ -290,7 +293,7 @@ class AgendaItemUploadForm(Form):
                                             class_='Einfacher-Textrahmen')
             for textframe in textframes[1:] if textframes else []:
                 for p_tag in textframe.find_all('p'):
-                    p_class = ' '.join(p_tag.get('class', []))
+                    p_class = ' '.join(p_tag.get('class') or ())
                     spans_text = []
                     parent = p_tag.find_parent()
 

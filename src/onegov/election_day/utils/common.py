@@ -10,29 +10,22 @@ from urllib.parse import urlunsplit
 
 
 from typing import Any
-from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
-    from onegov.core.types import AppenderQuery
     from onegov.election_day.models import ArchivedResult
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Election
     from onegov.election_day.models import Municipality
     from onegov.election_day.models import Notification
     from onegov.election_day.request import ElectionDayRequest
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import DynamicMapped
     from sqlalchemy.orm import Session
     from typing import Protocol
     from webob.response import Response
 
     class HasNotifications(Protocol):
-        notifications: relationship[AppenderQuery[Notification]]
-
-_T = TypeVar('_T')
-_KT = TypeVar('_KT')
-_VT = TypeVar('_VT')
-_ParamT = TypeVar('_ParamT', int, bool, list[Any])
+        notifications: DynamicMapped[Notification]
 
 
 def sublist_name_from_connection_id(conn_name: str, subconn_name: str) -> str:
@@ -47,12 +40,12 @@ def sublist_name_from_connection_id(conn_name: str, subconn_name: str) -> str:
     return conn_name.replace(subconn_name, '', 1) or conn_name
 
 
-class LastUpdatedOrderedDict(OrderedDict[_KT, _VT]):
+class LastUpdatedOrderedDict[KT, VT](OrderedDict[KT, VT]):
     """
     Stores items in the order the keys were last added.
     """
 
-    def __setitem__(self, key: _KT, value: _VT) -> None:
+    def __setitem__(self, key: KT, value: VT) -> None:
         super().__setitem__(key, value)
         super().move_to_end(key)
 
@@ -148,36 +141,31 @@ def add_local_results(
                 target.local_nays_percentage = 100 - yeas_percentage
 
 
-def get_parameter(
+def get_parameter[T, ParamT: (int, bool, list[Any])](
     request: ElectionDayRequest,
     name: str,
-    type_: type[_ParamT],
-    default: _T
-) -> _ParamT | _T:
+    type_: type[ParamT],
+    default: T
+) -> ParamT | T:
 
-    # NOTE: unfortunately mypy doesn't type narrow with `x is type[y]`
-    #       it only narrows with issubclass which is ambiguous with bool/int
-    #       so we have two redundant checks, but we make the first check
-    #       the fast one, so this should still be almost as fast as the
-    #       original implementation
-    if type_ is bool and issubclass(type_, bool):
+    if type_ is bool:
         try:
             result = request.params[name].lower().strip()  # type:ignore
-            return result in ('true', '1') if result else default
+            return result in ('true', '1') if result else default  # type: ignore[return-value]
         except Exception:
             return default
 
-    elif type_ is int and issubclass(type_, int):
+    elif type_ is int:
         try:
             return int(request.params.get(name))  # type:ignore
         except Exception:
             return default
 
-    elif type_ is list and issubclass(type_, list):
+    elif type_ is list:
         try:
             result = request.params[name].split(',')  # type:ignore
             result = [item.strip() for item in result if item.strip()]
-            return result if result else default
+            return result if result else default  # type: ignore[return-value]
         except Exception:
             return default
 

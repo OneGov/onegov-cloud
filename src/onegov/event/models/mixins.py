@@ -1,22 +1,21 @@
 from __future__ import annotations
 
 from collections import OrderedDict
-
-from onegov.core.orm.mixins import content_property, ContentMixin
-from onegov.core.orm.types import UTCDateTime
+from datetime import datetime
+from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_property
+from onegov.core.orm.mixins import ContentMixin
 from sedate import to_timezone
-from sqlalchemy import Column
 from sqlalchemy import String
-from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from datetime import datetime
-    from onegov.core.orm.mixins import dict_property
 
 
 class OccurrenceMixin(ContentMixin):
@@ -30,18 +29,17 @@ class OccurrenceMixin(ContentMixin):
     """
 
     #: Title of the event
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: A nice id for the url, readable by humans
-    name: Column[str | None] = Column(Text)
+    name: Mapped[str | None]
 
     #: Description of the location of the event
-    location: Column[str | None] = Column(Text, nullable=True)
+    location: Mapped[str | None]
 
     #: Tags/Categories of the event
-    _tags: Column[dict[str, str] | None] = Column(  # type:ignore
-        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
-        nullable=True,
+    _tags: Mapped[dict[str, str] | None] = mapped_column(
+        MutableDict.as_mutable(HSTORE),
         name='tags'
     )
 
@@ -51,9 +49,6 @@ class OccurrenceMixin(ContentMixin):
 
         return list(self._tags.keys()) if self._tags else []
 
-    # FIXME: asymmetric properties are not supported, if we need to
-    #        be able to set this with arbitrary iterables we need
-    #        to define a custom descriptor
     @tags.setter
     def tags(self, value: Iterable[str]) -> None:
         self._tags = {key.strip(): '' for key in value}
@@ -64,10 +59,10 @@ class OccurrenceMixin(ContentMixin):
     )
 
     #: Timezone of the event
-    timezone: Column[str] = Column(String, nullable=False)
+    timezone: Mapped[str] = mapped_column(String)
 
     #: Start date and time of the event (of the first event if recurring)
-    start: Column[datetime] = Column(UTCDateTime, nullable=False)
+    start: Mapped[datetime]
 
     @property
     def localized_start(self) -> datetime:
@@ -76,7 +71,7 @@ class OccurrenceMixin(ContentMixin):
         return to_timezone(self.start, self.timezone)
 
     #: End date and time of the event (of the first event if recurring)
-    end: Column[datetime] = Column(UTCDateTime, nullable=False)
+    end: Mapped[datetime]
 
     @property
     def localized_end(self) -> datetime:

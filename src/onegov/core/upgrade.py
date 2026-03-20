@@ -11,34 +11,29 @@ from itertools import chain
 from onegov.core import LEVELS
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import JSON
-from sqlalchemy import Column, Text, text, bindparam
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.engine.reflection import Inspector
-from sqlalchemy.orm import load_only
+from sqlalchemy.orm import load_only, mapped_column, Mapped
 from sqlalchemy.pool import StaticPool
 from toposort import toposort
 
 
-from typing import cast, overload, Any, TypeVar, TYPE_CHECKING
+from typing import cast, overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
     # FIXME: Switch to importlib.resources
     from pkg_resources import Distribution, EntryPoint
+    from sqlalchemy import Column
     from sqlalchemy.engine import Connection
     from sqlalchemy.orm import Query, Session
     from types import CodeType, ModuleType
-    from typing import ParamSpec, Protocol, TypeAlias, TypeGuard
+    from typing import Protocol, TypeGuard
 
     from .request import CoreRequest
 
-    _T = TypeVar('_T')
-    _T_co = TypeVar('_T_co', covariant=True)
-    _P = ParamSpec('_P')
-
-    class _Task(Protocol[_P, _T_co]):
+    class _Task[**P, T_co](Protocol):
         __name__: str
         __code__: CodeType
         task_name: str
@@ -46,13 +41,13 @@ if TYPE_CHECKING:
         requires: str | None
         raw: bool
 
-        def __call__(self, *args: _P.args, **kwargs: _P.kwargs) -> _T_co: ...
+        def __call__(self, *args: P.args, **kwargs: P.kwargs) -> T_co: ...
 
-    RawFunc: TypeAlias = Callable[[Connection, Sequence[str]], Any]
-    UpgradeFunc: TypeAlias = Callable[['UpgradeContext'], Any]
-    RawTask: TypeAlias = _Task[[Connection, Sequence[str]], Any]
-    UpgradeTask: TypeAlias = _Task[['UpgradeContext'], Any]
-    TaskCallback: TypeAlias = Callable[[_Task[..., Any]], Any]
+    type RawFunc = Callable[[Connection, Sequence[str]], Any]
+    type UpgradeFunc = Callable[[UpgradeContext], Any]
+    type RawTask = _Task[[Connection, Sequence[str]], Any]
+    type UpgradeTask = _Task[[UpgradeContext], Any]
+    type TaskCallback = Callable[[_Task[..., Any]], Any]
 
 
 class UpgradeState(Base, TimestampMixin):
@@ -61,10 +56,10 @@ class UpgradeState(Base, TimestampMixin):
     __tablename__ = 'upgrades'
 
     # the name of the module (e.g. onegov.core)
-    module = Column(Text, primary_key=True)
+    module: Mapped[str] = mapped_column(primary_key=True)
 
     # a json holding the state of the upgrades
-    state = Column(JSON, nullable=False, default=dict)
+    state: Mapped[dict[str, Any]] = mapped_column(default=dict)
 
     @property
     def executed_tasks(self) -> set[str]:
@@ -239,8 +234,8 @@ class upgrade_task:  # noqa: N801
     @overload
     def __call__(self, fn: RawFunc) -> RawTask: ...
 
-    def __call__(self, fn: Callable[_P, _T]) -> _Task[_P, _T]:
-        fn = cast('_Task[_P, _T]', fn)
+    def __call__[**P, T](self, fn: Callable[P, T]) -> _Task[P, T]:
+        fn = cast('_Task[P, T]', fn)
         fn.task_name = self.name
         fn.always_run = self.always_run
         fn.requires = self.requires
@@ -248,7 +243,7 @@ class upgrade_task:  # noqa: N801
         return fn
 
 
-def is_task(function: Callable[_P, _T]) -> TypeGuard[_Task[_P, _T]]:
+def is_task[**P, T](function: Callable[P, T]) -> TypeGuard[_Task[P, T]]:
     """ Returns True if the given function is an uprade task. """
     if not (isfunction(function) or ismethod(function)):
         return False
@@ -407,7 +402,9 @@ class UpgradeTransaction:
     """
 
     def __init__(self, context: UpgradeContext):
-        self.operations_transaction = context.operations_connection.begin()
+        conn = context.operations_connection
+        tx = conn.begin_nested() if conn.in_transaction() else conn.begin()
+        self.operations_transaction = tx
         self.session = context.session
 
     def flush(self) -> None:
@@ -464,8 +461,8 @@ class UpgradeContext:
         #       http://docs.sqlalchemy.org/en/latest/core/pooling.html
         #       #sqlalchemy.pool.AssertionPool
         #
-        conn = session._connection_for_bind(  # type:ignore[attr-defined]
-            session.bind)
+        assert session.bind is not None
+        conn = session._connection_for_bind(session.bind)
         self.operations_connection: Connection = conn
         self.operations = Operations(
             MigrationContext.configure(self.operations_connection))
@@ -490,37 +487,41 @@ class UpgradeContext:
         WHERE table_name = 'table_name'
         AND constraint_name LIKE '%column_name%';
         """
-        return self.session.execute(text("""
-            SELECT EXISTS (
-                SELECT 1 FROM information_schema.table_constraints
-                WHERE table_schema = :schema
-                  AND table_name = :table_name
-                  AND constraint_type = :constraint_type
-                  AND constraint_name = :constraint_name
-            )
-        """
-            ).bindparams(
-                bindparam('schema', self.schema),
-                bindparam('table_name', table_name),
-                bindparam('constraint_name', constraint_name),
-                bindparam('constraint_type', constraint_type),
-        )
-        ).scalar()
+        return self.session.execute(
+            text("""
+                SELECT EXISTS (
+                    SELECT 1 FROM information_schema.table_constraints
+                    WHERE table_schema = :schema
+                      AND table_name = :table_name
+                      AND constraint_type = :constraint_type
+                      AND constraint_name = :constraint_name
+                )
+            """),
+            {
+                'schema': self.schema,
+                'table_name': table_name,
+                'constraint_name': constraint_name,
+                'constraint_type': constraint_type,
+            }
+        ).scalar_one()
 
     def has_enum(self, enum_name: str) -> bool:
-        return self.session.execute(text("""
-            SELECT EXISTS (
-                SELECT 1 FROM pg_type
-                WHERE typname = :enum_name
-                  AND typnamespace = (
-                    SELECT oid FROM pg_namespace
-                    WHERE nspname = :schema
-                  )
-            )
-        """).bindparams(
-            bindparam('schema', self.schema),
-            bindparam('enum_name', enum_name)
-        )).scalar()
+        return self.session.execute(
+            text("""
+                SELECT EXISTS (
+                    SELECT 1 FROM pg_type
+                    WHERE typname = :enum_name
+                      AND typnamespace = (
+                        SELECT oid FROM pg_namespace
+                        WHERE nspname = :schema
+                      )
+                )
+            """),
+            {
+                'schema': self.schema,
+                'enum_name': enum_name,
+            }
+        ).scalar_one()
 
     def has_table(self, table: str) -> bool:
         inspector = Inspector(self.operations_connection)
@@ -551,15 +552,15 @@ class UpgradeContext:
             return False
 
         # HACK: ALTER TYPE has to be run outside transaction
-        self.operations.execute('COMMIT')
+        self.operations.execute(text('COMMIT'))
         for value in missing:
             # NOTE: This should be safe just by virtue of naming
             #       restrictions on classes and enum members
-            self.operations.execute(
+            self.operations.execute(text(
                 f"ALTER TYPE {enum_name} ADD VALUE '{value}'"
-            )
+            ))
         # start a new transaction
-        self.operations.execute('BEGIN')
+        self.operations.execute(text('BEGIN'))
         return True
 
     def models(self, table: str) -> Iterator[Any]:
@@ -572,6 +573,8 @@ class UpgradeContext:
         for base in self.request.app.session_manager.bases:
             yield from find_models(base, has_matching_tablename)
 
+    # FIXME: We can probably get rid of this once we get rid of
+    #        `add_column_with_defaults`
     def records_per_table(
         self,
         table: str,
@@ -579,16 +582,19 @@ class UpgradeContext:
     ) -> Iterator[Any]:
 
         if columns is None:
-            def filter_columns(q: Query[Any]) -> Query[Any]:
+            def filter_columns[T](model: type[T], q: Query[T]) -> Query[T]:
                 return q
         else:
             column_names = tuple(c.name for c in columns)
 
-            def filter_columns(q: Query[Any]) -> Query[Any]:
-                return q.options(load_only(*column_names))
+            def filter_columns[T](model: type[T], q: Query[T]) -> Query[T]:
+                return q.options(load_only(*(
+                    getattr(model, name)
+                    for name in column_names
+                )))
 
         for model in self.models(table):
-            yield from filter_columns(self.session.query(model))
+            yield from filter_columns(model, self.session.query(model))
 
     @contextmanager
     def stop_search_updates(self) -> Iterator[None]:
@@ -602,14 +608,15 @@ class UpgradeContext:
             yield
 
     def is_empty_table(self, table: str) -> bool:
-        return self.operations_connection.execute(
-            f'SELECT * FROM {table} LIMIT 1').rowcount == 0
+        return self.operations_connection.execute(text(
+            f'SELECT * FROM {table} LIMIT 1')).rowcount == 0
 
-    def add_column_with_defaults(
+    # FIXME: Get rid of this and any tasks that use it
+    def add_column_with_defaults[T](
         self,
         table: str,
-        column: Column[_T],
-        default: _T | Callable[[Any], _T]
+        column: Column[T],
+        default: T | Callable[[Any], T]
     ) -> None:
         # XXX while adding default values we shouldn't reindex the data
         # since this is what the default add_column code does and will be
@@ -672,7 +679,7 @@ class RawUpgradeRunner:
         if not schemas:
             return 0
 
-        engine = create_engine(dsn, poolclass=StaticPool)
+        engine = create_engine(dsn, poolclass=StaticPool, future=True)
         connection = engine.connect()
         executions = 0
 
@@ -803,6 +810,7 @@ class UpgradeRunner:
                     upgrade.abort()
             finally:
                 context.session.invalidate()
-                context.engine.dispose()
+                if context.engine and hasattr(context.engine, 'dispose'):
+                    context.engine.dispose()
 
         return executed

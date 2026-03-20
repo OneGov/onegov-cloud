@@ -2,14 +2,9 @@ from __future__ import annotations
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
-from sqlalchemy import Column
-from uuid import uuid4
-
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    import uuid
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped
+from uuid import uuid4, UUID
 
 
 class UploadToken(Base, TimestampMixin):
@@ -18,16 +13,13 @@ class UploadToken(Base, TimestampMixin):
     __tablename__ = 'upload_tokens'
 
     #: Identifies the token
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: The token
-    token: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    token: Mapped[UUID] = mapped_column(
         unique=True,
-        default=uuid4,
-        nullable=False
+        default=uuid4
     )

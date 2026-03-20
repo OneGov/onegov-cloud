@@ -5,6 +5,15 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="cell small-12">
+                <div class="callout secondary"
+                     tal:condition="not: archive"
+                     style="margin-bottom: 1rem;">
+                    <p>
+                        <em i18n:translate="">
+                            Note: Export will only include confirmed reports.
+                        </em>
+                    </p>
+                </div>
                 <div style="display: flex; align-items: center;
                             gap: 0.5rem; margin-bottom: 1rem;
                             flex-wrap: wrap;">
@@ -18,6 +27,26 @@
                        >${archive_toggle_text}</a>
                     <tal:b condition="export_link"
                            replace="export_link(layout)" />
+                </div>
+                <div tal:define="error_reports python: [r for r in reports if r.assignment_type == 'schriftlich' and not r.pages]"
+                     tal:condition="error_reports"
+                     class="callout alert"
+                     style="margin-bottom: 1rem;">
+                    <p><strong i18n:translate="">Written translations without page count:</strong></p>
+                    <ul>
+                        <tal:b tal:repeat="r error_reports">
+                        <li tal:define="t report_tickets.get(str(r.id))">
+                            <a tal:condition="t"
+                               href="${request.link(t)}"
+                               >${t.number}</a>
+                            <span tal:condition="not: t">${r.id}</span>
+                            - ${r.translator.title if r.translator else '?'}
+                            (${layout.format_date(r.assignment_date, 'date')},
+                             ${r.duration} min,
+                             ${r.finanzstelle})
+                        </li>
+                        </tal:b>
+                    </ul>
                 </div>
                 <div class="time-reports-list">
                     <p tal:condition="python: not reports and not archive"
@@ -37,16 +66,25 @@
                             <th i18n:translate="">Duration</th>
                             <th i18n:translate="">Total</th>
                             <th i18n:translate="">Status</th>
+                            <th tal:condition="archive"
+                                i18n:translate="">Exported</th>
                             <th i18n:translate="">Ticket</th>
                             <th i18n:translate="">Actions</th>
                         </thead>
                         <tbody>
-                            <tr tal:repeat="report reports">
+                            <tal:b tal:repeat="report reports">
+                            <tr tal:define="has_error python: report.assignment_type == 'schriftlich' and not report.pages"
+                                style="${python: 'background-color: rgba(255,0,0,0.25)' if has_error else ''}"
+                                title="${python: pages_missing_hint if has_error else ''}"
+                                >
                                 <td>
                                     <a href="${request.link(report.translator)}"
                                        tal:condition="report.translator">
                                         ${report.translator.title}
                                     </a>
+                                    <small tal:condition="python: report.translator and report.translator.pers_id"
+                                           style="color: #888;"
+                                           >(${report.translator.pers_id})</small>
                                 </td>
                                 <td>
                                     ${layout.format_date(report.created, 'datetime')}
@@ -55,8 +93,20 @@
                                     ${layout.format_date(
                                         report.assignment_date, 'date')}
                                 </td>
-                                <td>${layout.format_interpreting_type(
-                                    report.assignment_type) if report.assignment_type else '-'}</td>
+                                <td tal:define="atype report.assignment_type">
+                                    <span tal:condition="python: atype == 'on-site'"
+                                          title="${layout.format_interpreting_type('on-site')}">
+                                        <i class="fa fa-map-marker"></i>
+                                    </span>
+                                    <span tal:condition="python: atype == 'telephonic'"
+                                          title="${layout.format_interpreting_type('telephonic')}">
+                                        <i class="fa fa-phone"></i>
+                                    </span>
+                                    <span tal:condition="python: atype == 'schriftlich'"
+                                          title="${layout.format_interpreting_type('schriftlich')}">
+                                        <i class="fa fa-edit"></i>
+                                    </span>
+                                </td>
                                 <td>${report.duration} min</td>
                                 <td>${layout.format_currency(
                                     report.total_compensation)}</td>
@@ -71,11 +121,14 @@
                                           class="label success"
                                           i18n:translate="">Exported</span>
                                 </td>
+                                <td tal:condition="archive">
+                                    ${layout.format_date(report.exported_at, 'date') if report.exported_at else '-'}
+                                </td>
                                 <td tal:define="ticket report_tickets.get(
                                     str(report.id))">
                                     <a href="${request.link(ticket)}"
                                        tal:condition="ticket"
-                                       i18n:translate="">View Ticket</a>
+                                       >${ticket.number}</a>
                                     <span tal:condition="not: ticket">-</span>
                                 </td>
                                 <td tal:define="delete_link delete_links.get(
@@ -85,12 +138,9 @@
                                     <span tal:condition="not: delete_link">-</span>
                                 </td>
                             </tr>
+                            </tal:b>
                         </tbody>
                     </table>
-                    <div class="pagination-centered">
-                        <div metal:use-macro="layout.macros['pagination']"
-                             tal:define="collection model; current_page model;" />
-                    </div>
                 </div>
             </div>
         </div>

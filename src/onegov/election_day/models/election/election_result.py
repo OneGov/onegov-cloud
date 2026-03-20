@@ -2,23 +2,20 @@ from __future__ import annotations
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.election_day.models.election.mixins import DerivedAttributesMixin
-from sqlalchemy import Boolean
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
 from sqlalchemy import select
 from sqlalchemy import text
-from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
 from uuid import uuid4
+from uuid import UUID
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import uuid
     from onegov.election_day.models import CandidatePanachageResult
     from onegov.election_day.models import CandidateResult
     from onegov.election_day.models import Election
@@ -32,93 +29,59 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     __tablename__ = 'election_results'
 
     #: identifies the result
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the election id this result belongs to
-    election_id: Column[str] = Column(
-        Text,
-        ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
-        nullable=False
+    election_id: Mapped[str] = mapped_column(
+        ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE')
     )
 
     #: the election this candidate belongs to
-    election: relationship[Election] = relationship(
-        'Election',
+    election: Mapped[Election] = relationship(
         back_populates='results'
     )
 
     #: entity id (e.g. a BFS number).
-    entity_id: Column[int] = Column(Integer, nullable=False)
+    entity_id: Mapped[int]
 
     #: the name of the entity
-    name: Column[str] = Column(Text, nullable=False)
+    name: Mapped[str]
 
     #: the district this entity belongs to
-    district: Column[str | None] = Column(Text, nullable=True)
+    district: Mapped[str | None]
 
     #: the superregion this entity belongs to
-    superregion: Column[str | None] = Column(Text, nullable=True)
+    superregion: Mapped[str | None]
 
     #: True if the result has been counted and no changes will be made anymore.
     #: If the result is definite, all the values below must be specified.
-    counted: Column[bool] = Column(Boolean, nullable=False)
+    counted: Mapped[bool]
 
     #: number of eligible voters
-    eligible_voters: Column[int] = Column(
-        Integer,
-        nullable=False,
-        default=lambda: 0
-    )
+    eligible_voters: Mapped[int] = mapped_column(default=lambda: 0)
 
     #: number of expats
-    expats: Column[int | None] = Column(
-        Integer,
-        nullable=True
-    )
+    expats: Mapped[int | None]
 
     #: number of received ballots
-    received_ballots: Column[int] = Column(
-        Integer,
-        nullable=False,
-        default=lambda: 0
-    )
+    received_ballots: Mapped[int] = mapped_column(default=lambda: 0)
 
     #: number of blank ballots
-    blank_ballots: Column[int] = Column(
-        Integer,
-        nullable=False,
-        default=lambda: 0
-    )
+    blank_ballots: Mapped[int] = mapped_column(default=lambda: 0)
 
     #: number of invalid ballots
-    invalid_ballots: Column[int] = Column(
-        Integer,
-        nullable=False,
-        default=lambda: 0
-    )
+    invalid_ballots: Mapped[int] = mapped_column(default=lambda: 0)
 
     #: number of blank votes
-    blank_votes: Column[int] = Column(
-        Integer,
-        nullable=False,
-        default=lambda: 0
-    )
+    blank_votes: Mapped[int] = mapped_column(default=lambda: 0)
 
     #: number of invalid votes
-    invalid_votes: Column[int] = Column(
-        Integer,
-        nullable=False,
-        default=lambda: 0
-    )
+    invalid_votes: Mapped[int] = mapped_column(default=lambda: 0)
 
-    if TYPE_CHECKING:
-        accounted_votes: Column[int]
-
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def accounted_votes(self) -> int:
         """ The number of accounted votes. """
 
@@ -128,41 +91,39 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
                 - self.invalid_votes
         )
 
-    @accounted_votes.expression  # type:ignore[no-redef]
-    def accounted_votes(cls) -> ColumnElement[int]:
+    @accounted_votes.inplace.expression
+    @classmethod
+    def _accounted_votes_expression(cls) -> ColumnElement[int]:
         """ The number of accounted votes. """
         from onegov.election_day.models import Election  # circular
 
         # A bit of a hack :|
         number_of_mandates = select(
-            [Election.number_of_mandates],
-            whereclause=text('elections.id = election_results.election_id')
-        ).scalar_subquery()
+            Election.number_of_mandates
+        ).where(text(
+            'elections.id = election_results.election_id'
+        )).scalar_subquery()
         return (
-                number_of_mandates * (
+            number_of_mandates * (
                 cls.received_ballots - cls.blank_ballots - cls.invalid_ballots
-        ) - cls.blank_votes - cls.invalid_votes
+            ) - cls.blank_votes - cls.invalid_votes
         )
 
     #: an election result may contain n list results
-    list_results: relationship[list[ListResult]] = relationship(
-        'ListResult',
+    list_results: Mapped[list[ListResult]] = relationship(
         cascade='all, delete-orphan',
         back_populates='election_result'
     )
 
     #: an election result contains n candidate results
-    candidate_results: relationship[list[CandidateResult]] = relationship(
-        'CandidateResult',
+    candidate_results: Mapped[list[CandidateResult]] = relationship(
         cascade='all, delete-orphan',
         back_populates='election_result'
     )
 
     #: an election result contains n candidate panachage results
-    candidate_panachage_results: (
-        relationship[list[CandidatePanachageResult]]) = (
+    candidate_panachage_results: Mapped[list[CandidatePanachageResult]] = (
         relationship(
-            'CandidatePanachageResult',
             cascade='all, delete-orphan',
             back_populates='election_result'
         )

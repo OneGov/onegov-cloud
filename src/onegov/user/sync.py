@@ -318,9 +318,7 @@ class ZugUserSource(UserSource):
                 continue
 
             count += 1
-            user = self.complete_entry(self.map_entry(e), **kwargs)
-
-            yield user
+            yield self.complete_entry(self.map_entry(e), **kwargs)
         if self.verbose:
             print(f'Base: {base}\t\tFilter: {sf}')  # noqa: T201
             print(f'- Total: {total}')  # noqa: T201

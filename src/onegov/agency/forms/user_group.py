@@ -47,7 +47,7 @@ class UserGroupForm(ManageUserGroupForm):
 
     def update_model(self, model: UserGroup) -> None:
         super().update_model(model)
-        model.role_mappings = [  # type:ignore[assignment]
+        model.role_mappings = [
             RoleMapping(
                 group_id=model.id,
                 content_type='agencies',

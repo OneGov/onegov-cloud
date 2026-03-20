@@ -24,7 +24,9 @@ class CustomReservation(Reservation, ModelBase, Payable):
 
     @property
     def resource_obj(self) -> Resource:
-        return object_session(self).query(
+        session = object_session(self)
+        assert session is not None
+        return session.query(
             Resource).filter_by(id=self.resource).one()
 
     @property
@@ -43,7 +45,9 @@ class CustomReservation(Reservation, ModelBase, Payable):
         if self.display_start() < utcnow():
             return False
 
-        return object_session(self).query(
+        session = object_session(self)
+        assert session is not None
+        return session.query(
             self
             ._target_allocations()
             .filter(Allocation.partly_available.is_(True))
