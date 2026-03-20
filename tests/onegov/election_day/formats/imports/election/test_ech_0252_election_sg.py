@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 from onegov.election_day.models import Election
+from onegov.election_day.models import ProporzElection
 
 from typing import TYPE_CHECKING
 
@@ -144,3 +145,144 @@ def test_import_ech_election_sg_majority_combined(
     )
     # Muster: 1500+500+400=2400, Fischer: 1200+400+350=1950
     assert total_candidate_votes == 4350
+
+
+def test_import_ech_election_sg_proportional(
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+    # The datasets contain proportional election information and results
+    # for the "SEANTIS Proporz" test election in the eCH-0252 format
+
+    # import election information
+    results = import_test_datasets(
+        api_format='ech',
+        principal='sg',
+        dataset_name='proportional_info'
+    )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
+    assert not errors
+    elections = [u for u in updated if isinstance(u, ProporzElection)]
+    assert len(elections) == 1
+    assert not deleted
+
+    election = elections[0]
+    assert election.domain == 'federation'
+    assert election.date == date(2027, 10, 12)
+    assert election.number_of_mandates == 2
+    assert len(election.candidates) == 2
+    assert len(election.lists) == 3
+
+    # re-import should be idempotent
+    results = import_test_datasets(
+        api_format='ech',
+        principal='sg',
+        dataset_name='proportional_info'
+    )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
+    assert not errors
+
+    # import results (info must be imported first)
+    results = import_test_datasets(
+        api_format='ech',
+        principal='sg',
+        dataset_name='proportional_result'
+    )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
+    assert not errors
+    assert len(updated) == 1
+    assert not deleted
+
+    updated_election = next(iter(updated))
+    assert isinstance(updated_election, ProporzElection)
+    assert updated_election.has_results is True
+    # 3 counted circles + remaining uncounted
+    assert updated_election.status == 'interim'
+    counted_results = [r for r in updated_election.results if r.counted]
+    assert len(counted_results) == 3
+
+    # verify aggregate vote counts across counted circles
+    total_eligible = sum(r.eligible_voters for r in counted_results)
+    assert total_eligible == 8500
+    total_received = sum(r.received_ballots for r in counted_results)
+    assert total_received == 4800
+    total_blank_ballots = sum(r.blank_ballots for r in counted_results)
+    assert total_blank_ballots == 18
+    total_invalid_ballots = sum(r.invalid_ballots for r in counted_results)
+    assert total_invalid_ballots == 33
+
+    # verify candidate vote totals
+    candidates = sorted(
+        updated_election.candidates, key=lambda c: c.family_name
+    )
+    assert candidates[0].family_name == 'Fischer'
+    assert candidates[1].family_name == 'Muster'
+
+    fischer_votes = sum(
+        cr.votes for r in counted_results
+        for cr in r.candidate_results
+        if cr.candidate.family_name == 'Fischer'
+    )
+    # Altstätten: 150+700, Amden: 80+250, Andwil: 60+200
+    assert fischer_votes == 1440
+
+    muster_votes = sum(
+        cr.votes for r in counted_results
+        for cr in r.candidate_results
+        if cr.candidate.family_name == 'Muster'
+    )
+    # Altstätten: 200+800, Amden: 100+300, Andwil: 80+250
+    assert muster_votes == 1730
+
+    # verify list vote totals (countOfCandidateVotes)
+    list_votes = sum(
+        lr.votes for r in counted_results
+        for lr in r.list_results
+    )
+    # Liste 1: 900+350+290=1540, Liste 2: 750+280+220=1250
+    assert list_votes == 2790
+
+
+def test_import_ech_election_sg_proportional_combined(
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+    # Test the combined delivery (info + results in a single file)
+    results = import_test_datasets(
+        api_format='ech',
+        principal='sg',
+        dataset_name='proportional_combined'
+    )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
+    assert not errors
+
+    elections = [u for u in updated if isinstance(u, ProporzElection)]
+    assert len(elections) == 1
+
+    election = elections[0]
+    assert election.date == date(2027, 10, 12)
+    assert election.number_of_mandates == 2
+    assert len(election.candidates) == 2
+    assert len(election.lists) == 3
+    assert election.has_results is True
+    assert election.status == 'interim'
+
+    counted_results = [r for r in election.results if r.counted]
+    assert len(counted_results) == 3
+
+    total_eligible = sum(r.eligible_voters for r in counted_results)
+    assert total_eligible == 8500
+    total_received = sum(r.received_ballots for r in counted_results)
+    assert total_received == 4800
+
+    # verify total candidate votes across counted circles
+    total_candidate_votes = sum(
+        cr.votes for r in counted_results
+        for cr in r.candidate_results
+    )
+    # Muster: 1730, Fischer: 1440
+    assert total_candidate_votes == 3170
