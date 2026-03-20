@@ -120,7 +120,7 @@ def test_import_ech_compound(session: Session) -> None:
     assert updated['e-3'].domain == 'municipality'
     assert updated['e-3'].domain == 'municipality'
 
-    # update
+    # update — only obsolete compounds are deleted, not elections
     delivery = create_delivery(
         ['c-1', 'c-3'],
         [('e-1', 'c-1'), ('e-2', 'c-3')]
@@ -134,8 +134,8 @@ def test_import_ech_compound(session: Session) -> None:
     session.flush()
     session.expire_all()
     assert not errors
-    assert len(deleted) == 3
-    assert {item.id for item in deleted} == {'c-2', 'e-3', 'e-4'}
+    assert len(deleted) == 1
+    assert {item.id for item in deleted} == {'c-2'}
     assert len(updated_set) == 4
     updated = {item.id: item for item in updated_set}
     assert updated['c-1'].elections == [updated['e-1']]

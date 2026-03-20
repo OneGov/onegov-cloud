@@ -61,7 +61,7 @@ def import_elections_ech(
 ) -> ECHImportResultType:
     """ Imports all elections in a given eCH-0252 delivery.
 
-    Deletes elections on the same day not appearing in the delivery.
+    Deletes elections only when the delivery action is 3 (recall).
 
     :return:
         A tuple consisting of a list with errors, a set with updated
@@ -416,15 +416,11 @@ def import_information_delivery(
                 connection.parent = parent
             election.list_connections = list(connections.values())
 
-    # delete obsolete compounds and elections
+    # delete obsolete compounds (but not standalone elections)
     deleted: set[ElectionCompound | Election] = set()
     deleted.update({
         compound for compound in existing_compounds
         if compound not in compounds.values()
-    })
-    deleted.update({
-        election for election in existing_elections
-        if election not in elections.values()
     })
 
     return (
