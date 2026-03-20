@@ -103,11 +103,11 @@ def schedule_rollout_announcements(
     specified ones
 
     Examples:\n
-      python3 do/schedule-rollout-announcements.py --help\n
-      python3 do/schedule-rollout-announcements.py --dry-run\n
-      python3 do/schedule-rollout-announcements.py\n
-      python3 do/schedule-rollout-announcements.py --select A --select B\n
-      python3 do/schedule-rollout-announcements.py --unselect C --unselect D\n
+      python3 do/schedule-announcements.py --help\n
+      python3 do/schedule-announcements.py --dry-run\n
+      python3 do/schedule-announcements.py\n
+      python3 do/schedule-announcements.py --select A --select B\n
+      python3 do/schedule-announcements.py --unselect C --unselect D\n
     """
 
     try:
