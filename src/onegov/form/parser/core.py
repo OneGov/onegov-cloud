@@ -1394,6 +1394,7 @@ def translate_to_yaml(
     expect_nested = False
     actual_fields = 0
     ix = 0
+    current_fieldset_indent = 0
     identifier_indent_stack: list[int] = []
     option_indent_stack: list[int] = []
     expect_option = False
@@ -1433,16 +1434,26 @@ def translate_to_yaml(
 
     for ix, line in lines:
         len_indent = len(line) - len(line.lstrip())
-        indent = ' ' * (4 + len_indent)
 
-        if enable_edit_checks and not validate_indent(indent):
-            raise errors.InvalidIndentSyntax(line=ix + 1)
-
-        # the top level are the fieldsets
+        # the top level are the fieldsets (prior indent adjustment)
         if match(ELEMENTS.fieldset_title, line):
+            current_fieldset_indent = len_indent
             yield '- "{}":'.format(escape_double(line.lstrip('# ').rstrip()))
             expect_nested = False
             continue
+
+        # indent adjustment
+        relative_indent = len_indent - current_fieldset_indent
+        if relative_indent < 0:
+            # emit synthetic indent reset if escaping from sub-fieldset
+            yield '- "":'
+            current_fieldset_indent = 0
+            relative_indent = len_indent
+
+        indent = ' ' * (4 + relative_indent)
+
+        if enable_edit_checks and not validate_indent(indent):
+            raise errors.InvalidIndentSyntax(line=ix + 1)
 
         # fields are nested lists of dictionaries
         try:
