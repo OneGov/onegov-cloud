@@ -564,6 +564,7 @@ class EventImportForm(Form):
             'tags': self.request.translate(_('Tags')),
             'start': self.request.translate(_('From')),
             'end': self.request.translate(_('To')),
+            'created': self.request.translate(_('Created')),
         }
 
     def custom_tags(self) -> list[str] | None:
