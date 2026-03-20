@@ -17,7 +17,7 @@ from xlsxwriter.workbook import Workbook
 
 from typing import Any
 from typing import IO
-from typing import TypeVar
+from typing import Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -25,9 +25,6 @@ if TYPE_CHECKING:
     from onegov.swissvotes.app import SwissvotesApp
     from sqlalchemy.orm import Query
     from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
-    from typing import Self
-
-T = TypeVar('T')
 
 
 class SwissVoteCollection(Pagination[SwissVote]):
@@ -355,7 +352,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
         query = self.session.query(SwissVote)
 
-        def in_or_none(
+        def in_or_none[T](
             column: SQLCoreOperations[T] | SQLCoreOperations[T | None],
             values: list[T],
             extra: dict[T, T] | None = None

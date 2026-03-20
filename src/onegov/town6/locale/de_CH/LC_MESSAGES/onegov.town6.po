@@ -321,6 +321,9 @@ msgstr "iFrame"
 msgid "Homepage"
 msgstr "Startseite"
 
+msgid "Files"
+msgstr "Dateien"
+
 msgid "Chat Archive"
 msgstr "Chat-Archiv"
 
@@ -1134,6 +1137,15 @@ msgstr "${count} Seiten"
 
 msgid "Further occurrences:"
 msgstr "Weitere Termine:"
+
+msgid "Former member or parliament"
+msgstr "Ehemaliges Parlamentsmitglied"
+
+msgid "Parliament"
+msgstr "Parlament"
+
+msgid "Parliamentary Group"
+msgstr "Fraktion"
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
@@ -2062,9 +2074,6 @@ msgstr "Veranstaltung erfassen"
 
 msgid "Functions"
 msgstr "Funktionen"
-
-msgid "Parliament"
-msgstr "Parlament"
 
 msgid "in"
 msgstr "der"

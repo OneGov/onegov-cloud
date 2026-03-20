@@ -177,11 +177,13 @@ class ExtendedAgencyForm(Form):
         self.opening_hours.data = model.opening_hours
         self.export_fields.data = model.export_fields
         if model.organigram_file:
-            fs = cast('_FieldStorageWithFile', FieldStorage())
+            fs = FieldStorage()
             fs.file = BytesIO(model.organigram_file.read())
             fs.type = model.organigram_file.content_type
             fs.filename = model.organigram_file.filename
-            self.organigram.data = self.organigram.process_fieldstorage(fs)
+            self.organigram.data = self.organigram.process_fieldstorage(
+                cast('_FieldStorageWithFile', fs)
+            )
         self.coordinates.data = model.coordinates
         if hasattr(self, 'access'):
             self.access.data = model.access
@@ -205,8 +207,6 @@ class MoveAgencyForm(Form):
     )
 
     def on_request(self) -> None:
-        self.request.include('common')
-        self.request.include('chosen')
 
         agencies = ExtendedAgencyCollection(self.request.session)
         self.parent_id.choices = [

@@ -13,9 +13,6 @@ if TYPE_CHECKING:
     from onegov.org.layout import DefaultLayout
     from onegov.winterthur.request import WinterthurRequest
     from sqlalchemy.orm import Query
-    from typing import TypeVar
-
-    T = TypeVar('T')
 
 
 @WinterthurApp.event_search_widget('inline')
@@ -49,7 +46,7 @@ class InlineEventSearch:
             )
         })
 
-    def adapt(self, query: Query[T]) -> Query[T]:
+    def adapt[T](self, query: Query[T]) -> Query[T]:
         """
         Adapt the query to search for words in the search term `self.term` in
         event search properties.

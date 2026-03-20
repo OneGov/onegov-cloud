@@ -33,11 +33,17 @@ def get_api_endpoint(
     app: Framework,
     endpoint: str,
     page: int = 0,
-    extra_parameters: dict[str, Any] | None = None,
 ) -> ApiEndpoint[Any] | AuthEndpoint:
 
     if endpoint == 'authenticate':
         return AuthEndpoint(app)
+
+    # NOTE: We manually retrieve extra_parameters, without going
+    #       through the converter path, so we can allow specifying
+    #       the same parameter multiple times, morepath's extra_parameters
+    #       only allows specifying each parameter once
+    extra_parameters = request.GET.dict_of_lists()
+    extra_parameters.pop('page', None)
 
     item = ApiEndpointCollection(request).get_endpoint(
         endpoint,

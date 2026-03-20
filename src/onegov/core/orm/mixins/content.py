@@ -7,7 +7,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, Mapped
 
 
-from typing import overload, Any, Protocol, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Protocol, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from sqlalchemy.ext.hybrid import _HybridClassLevelAccessor
@@ -28,60 +28,56 @@ if TYPE_CHECKING:
         ) -> dict_property[Any | None]: ...
 
         @overload
-        def __call__(
+        def __call__[T](
             self,
             key: str | None,
-            default: _T | Callable[[], _T],
+            default: T | Callable[[], T],
             value_type: None = None
-        ) -> dict_property[_T]: ...
+        ) -> dict_property[T]: ...
 
         @overload
-        def __call__(
+        def __call__[T](
             self,
             key: str | None = None,
             *,
-            default: _T | Callable[[], _T],
+            default: T | Callable[[], T],
             value_type: None = None
-        ) -> dict_property[_T]: ...
+        ) -> dict_property[T]: ...
 
         @overload
-        def __call__(
+        def __call__[T](
             self,
             key: str | None,
             default: None,
             *,
-            value_type: type[_T]
-        ) -> dict_property[_T]: ...
+            value_type: type[T]
+        ) -> dict_property[T]: ...
 
         @overload
-        def __call__(
+        def __call__[T](
             self,
             key: str | None = None,
             default: None = None,
             *,
-            value_type: type[_T]
-        ) -> dict_property[_T]: ...
+            value_type: type[T]
+        ) -> dict_property[T]: ...
 
         @overload
-        def __call__(
+        def __call__[T](
             self,
             key: str | None,
-            default: _T | Callable[[], _T],
-            value_type: type[_T]
-        ) -> dict_property[_T]: ...
+            default: T | Callable[[], T],
+            value_type: type[T]
+        ) -> dict_property[T]: ...
 
         @overload
-        def __call__(
+        def __call__[T](
             self,
             key: str | None = None,
             *,
-            default: _T | Callable[[], _T],
-            value_type: type[_T]
-        ) -> dict_property[_T]: ...
-
-
-_T = TypeVar('_T')
-_MarkupT = TypeVar('_MarkupT', Markup, Markup | None)
+            default: T | Callable[[], T],
+            value_type: type[T]
+        ) -> dict_property[T]: ...
 
 
 IMMUTABLE_TYPES = (int, float, complex, str, tuple, frozenset, bytes)
@@ -117,7 +113,7 @@ def is_valid_default(default: object | None) -> bool:
     return False
 
 
-class dict_property(hybrid_property[_T]):  # noqa: N801
+class dict_property[T](hybrid_property[T]):  # noqa: N801
     """ Enables access of dictionaries through properties.
 
     Usage::
@@ -204,9 +200,9 @@ class dict_property(hybrid_property[_T]):  # noqa: N801
 
     is_attribute = True
 
-    custom_getter: Callable[[Any], _T] | None
-    custom_expression: Callable[[type[Any]], ColumnElement[_T]] | None
-    custom_setter: Callable[[Any, _T], None] | None
+    custom_getter: Callable[[Any], T] | None
+    custom_expression: Callable[[type[Any]], ColumnElement[T]] | None
+    custom_setter: Callable[[Any, T], None] | None
     custom_deleter: Callable[[Any], None] | None
 
     @overload
@@ -222,60 +218,60 @@ class dict_property(hybrid_property[_T]):  # noqa: N801
 
     @overload
     def __init__(
-        self: dict_property[_T],
+        self: dict_property[T],
         attribute: str,
         key: str | None,
-        default: _T | Callable[[], _T],
+        default: T | Callable[[], T],
         value_type: None = None
     ): ...
 
     @overload
     def __init__(
-        self: dict_property[_T],
+        self: dict_property[T],
         attribute: str,
         key: str | None = None,
         *,
-        default: _T | Callable[[], _T],
+        default: T | Callable[[], T],
         value_type: None = None
     ): ...
 
     @overload
     def __init__(
-        self: dict_property[_T],
+        self: dict_property[T],
         attribute: str,
         key: str | None,
         default: None,
         *,
-        value_type: type[_T]
+        value_type: type[T]
     ): ...
 
     @overload
     def __init__(
-        self: dict_property[_T],
+        self: dict_property[T],
         attribute: str,
         key: str | None = None,
         default: None = None,
         *,
-        value_type: type[_T]
+        value_type: type[T]
     ): ...
 
     @overload
     def __init__(
-        self: dict_property[_T],
+        self: dict_property[T],
         attribute: str,
         key: str | None,
-        default: _T | Callable[[], _T],
-        value_type: type[_T]
+        default: T | Callable[[], T],
+        value_type: type[T]
     ): ...
 
     @overload
     def __init__(
-        self: dict_property[_T],
+        self: dict_property[T],
         attribute: str,
         key: str | None = None,
         *,
-        default: _T | Callable[[], _T],
-        value_type: type[_T]
+        default: T | Callable[[], T],
+        value_type: type[T]
     ): ...
 
     def __init__(
@@ -308,7 +304,7 @@ class dict_property(hybrid_property[_T]):  # noqa: N801
             expr=self._default_expr,
         )
 
-    def _default_getter(self, instance: object) -> _T:
+    def _default_getter(self, instance: object) -> T:
         # get the value in the dictionary
         data = getattr(instance, self.attribute, None)
 
@@ -318,13 +314,13 @@ class dict_property(hybrid_property[_T]):  # noqa: N801
         # fallback to the default
         return self.default() if callable(self.default) else self.default  # type: ignore[return-value]
 
-    def _default_setter(self, instance: object, value: _T) -> None:
+    def _default_setter(self, instance: object, value: T) -> None:
         getattr(instance, self.attribute)[self.key] = value
 
     def _default_deleter(self, instance: object) -> None:
         del getattr(instance, self.attribute)[self.key]
 
-    def _default_expr(self, owner: type[Any]) -> ColumnElement[_T]:
+    def _default_expr(self, owner: type[Any]) -> ColumnElement[T]:
         column: ColumnElement[dict[str, Any]] = getattr(owner, self.attribute)
         expr = column[self.key]
         if self.value_type is None:
@@ -351,7 +347,7 @@ class dict_property(hybrid_property[_T]):  # noqa: N801
     def __set__(
         self,
         instance: object,
-        value: SQLCoreOperations[_T] | _T
+        value: SQLCoreOperations[T] | T
     ) -> None:
 
         # create the dictionary if it does not exist yet
@@ -361,7 +357,9 @@ class dict_property(hybrid_property[_T]):  # noqa: N801
         super().__set__(instance, value)
 
 
-class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
+class dict_markup_property[MarkupT: (Markup, Markup | None)](  # noqa: N801
+    dict_property[MarkupT]
+):
 
     @overload
     def __init__(
@@ -401,7 +399,7 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
             Markup  # type:ignore[arg-type]
         )
 
-    def _default_expr(self, owner: type[Any]) -> ColumnElement[_MarkupT]:
+    def _default_expr(self, owner: type[Any]) -> ColumnElement[MarkupT]:
         return type_coerce(
             getattr(owner, self.attribute)[self.key].as_string(),
             MarkupText()  # type: ignore[arg-type]
@@ -415,16 +413,16 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
         self,
         instance: None,
         owner: type[object]
-    ) -> _HybridClassLevelAccessor[_MarkupT]: ...
+    ) -> _HybridClassLevelAccessor[MarkupT]: ...
 
     @overload
-    def __get__(self, instance: object, owner: type[object]) -> _MarkupT: ...
+    def __get__(self, instance: object, owner: type[object]) -> MarkupT: ...
 
     def __get__(
         self,
         instance: object | None,
         owner: type[object] | None
-    ) -> Self | _HybridClassLevelAccessor[_MarkupT] | _MarkupT:
+    ) -> Self | _HybridClassLevelAccessor[MarkupT] | MarkupT:
 
         value = super().__get__(instance, owner)
         if owner is None or instance is None or value is None:
@@ -440,7 +438,7 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
     def __set__(
         self,
         instance: object,
-        value: SQLCoreOperations[_MarkupT] | _MarkupT | str | HasHTML
+        value: SQLCoreOperations[MarkupT] | MarkupT | str | HasHTML
     ) -> None:
         super().__set__(
             instance,

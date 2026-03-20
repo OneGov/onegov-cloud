@@ -32,27 +32,20 @@ from urllib.parse import urlparse
 from urllib.parse import urlunparse
 
 from typing import Any
-from typing import Generic
 from typing import NamedTuple
 from typing import TYPE_CHECKING
-from typing_extensions import TypeVar
-
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.core.orm import SessionManager
     from onegov.swissvotes.request import SwissvotesRequest
     from typing import Protocol
 
-    T = TypeVar('T')
-
-    class HasCodes(Protocol[T]):
+    class HasCodes[T](Protocol):
         def codes(self, attribute: str, /) -> dict[int | None, T]: ...
 
     class HasSessionManager(Protocol):
         @property
         def session_manager(self) -> SessionManager | None: ...
-
-StrT = TypeVar('StrT', bound=str | None, default=str | None)
 
 
 class Poster(NamedTuple):
@@ -78,13 +71,13 @@ class encoded_property:  # noqa: N801
 
     """
 
-    def __set_name__(self, owner: type[HasCodes[T]], name: str) -> None:
+    def __set_name__(self, owner: type[HasCodes[Any]], name: str) -> None:
         self.name = name
         assert not hasattr(owner, f'_{name}'), (
             f'Attribute "_{name}" already defined')
         setattr(owner, f'_{name}', mapped_column(name=name))
 
-    def __get__(
+    def __get__[T](
             self,
             instance: HasCodes[T],
             owner: type[object]
@@ -93,7 +86,7 @@ class encoded_property:  # noqa: N801
         return instance.codes(self.name).get(value)
 
 
-class localized_property(Generic[StrT]):  # noqa: N801
+class localized_property[StrT: str | None = str | None]:  # noqa: N801
     """ A shorthand property to return a localized attribute. Requires at least
     a `xxx_de` attribute and falls back to this.
 
@@ -650,7 +643,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             if v != self.ORGANIZATION_NO_LONGER_EXISTS
         }
 
-    def group_recommendations(
+    def group_recommendations[T](
             self,
             recommendations: Iterable[tuple[T, int | None]],
             ignore_unknown: bool = False

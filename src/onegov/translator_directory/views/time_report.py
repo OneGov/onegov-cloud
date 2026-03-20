@@ -78,6 +78,7 @@ def view_time_reports(
     request: TranslatorAppRequest,
 ) -> RenderData:
 
+    reports = list(self.query())
     layout = TimeReportCollectionLayout(self, request)
 
     if self.archive:
@@ -90,8 +91,6 @@ def view_time_reports(
             TimeReportCollection(request.app, archive=True)
         )
         archive_toggle_text = _('Show archived (exported) reports')
-
-    reports = list(self.query())
 
     unexported_count = self.for_accounting_export().count()
     export_link = None
@@ -158,6 +157,10 @@ def view_time_reports(
                 ),
             )
 
+    pages_missing_hint = request.translate(
+        _('Written translation without page count')
+    )
+
     return {
         'layout': layout,
         'model': self,
@@ -169,6 +172,7 @@ def view_time_reports(
         'archive': self.archive,
         'archive_toggle_url': archive_toggle_url,
         'archive_toggle_text': archive_toggle_text,
+        'pages_missing_hint': pages_missing_hint,
     }
 
 

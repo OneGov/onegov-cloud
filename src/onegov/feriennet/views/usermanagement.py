@@ -14,11 +14,7 @@ from onegov.town6.views.usermanagement import town_view_user
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
-    from onegov.form import Form
     from onegov.feriennet.request import FeriennetRequest
-    from typing import TypeVar
-
-    FormT = TypeVar('FormT', bound=Form)
 
 
 @FeriennetApp.html(model=User, template='user.pt', permission=Secret)

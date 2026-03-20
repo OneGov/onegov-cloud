@@ -67,8 +67,11 @@ def view_api_endpoints(
                     'title': endpoint.title,
                     'description': endpoint.description,
                     'data': [
-                        {'name': name}
-                        for name in getattr(endpoint, 'filters', [])
+                        {
+                            'name': name,
+                            'prompt': prompt
+                        } if prompt else {'name': name}
+                        for name, prompt in endpoint.filters.items()
                     ]
                 }
                 for endpoint in self.endpoints.values()

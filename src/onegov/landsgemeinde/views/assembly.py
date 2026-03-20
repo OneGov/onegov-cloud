@@ -54,7 +54,7 @@ def view_assemblies(
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
-        'assemblies': self.query().all(),
+        'assemblies': request.exclude_invisible(self.query()),
         'title': layout.title,
     }
 
