@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.core.utils import add_cors_header
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.models import ElectionCompound
@@ -31,6 +32,10 @@ def view_election_compound_seat_allocation_data(
     allocation.
 
     """
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
 
     return get_party_results_vertical_data(self)
 

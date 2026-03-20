@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.core.utils import add_cors_header
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundPartLayout
 from onegov.election_day.models import ElectionCompoundPart
@@ -32,6 +33,10 @@ def view_election_compound_part_party_strengths_data(
     results.
 
     """
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
 
     horizontal = get_parameter(request, 'horizontal', bool, False)
     return get_party_results_data(self, horizontal)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.core.utils import add_cors_header
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
@@ -58,6 +59,10 @@ def view_list_by_entity(
     request: ElectionDayRequest
 ) -> JSON_ro:
     """" View the list by entity as JSON. """
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
 
     return self.percentage_by_entity  # type:ignore[return-value]
 

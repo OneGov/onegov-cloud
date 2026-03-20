@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.core.utils import add_cors_header
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.hidden_by_principal import (
     hide_connections_chart)
@@ -40,6 +41,11 @@ def view_election_connections_data(
     Used to for the connection sankey chart.
 
     """
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
+
     return get_connections_data(self)
 
 

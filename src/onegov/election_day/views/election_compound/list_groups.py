@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.core.utils import add_cors_header
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.models import ElectionCompound
@@ -27,6 +28,10 @@ def view_election_compound_list_groups_data(
     request: ElectionDayRequest
 ) -> JSON_ro:
     """" View the list groups as JSON. Used to for the lists bar chart. """
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
 
     return get_list_groups_data(self)
 

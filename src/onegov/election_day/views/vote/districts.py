@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from morepath import redirect
+
+from onegov.core.utils import add_cors_header
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.models import Ballot
@@ -278,6 +280,10 @@ def view_ballot_by_district(
     request: ElectionDayRequest
 ) -> JSON_ro:
     """ Returns the data for the ballot map. """
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
 
     return get_ballot_data_by_district(self)  # type:ignore[return-value]
 

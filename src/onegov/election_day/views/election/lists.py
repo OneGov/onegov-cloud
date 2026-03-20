@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.core.utils import add_cors_header
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.models import Election
@@ -29,6 +30,10 @@ def view_election_lists_data(
     request: ElectionDayRequest
 ) -> JSON_ro:
     """" View the lists as JSON. Used to for the lists bar chart. """
+
+    @request.after
+    def add_headers(response: Response) -> None:
+        add_cors_header(response)
 
     limit = get_parameter(request, 'limit', int, None)
     names = get_parameter(request, 'names', list, None)
