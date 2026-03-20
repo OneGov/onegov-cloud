@@ -58,7 +58,7 @@ class RowWidgetWide:
 class ColumnWidget:
     template = """
         <xsl:template match="column">
-            <div class="small-12 medium-{@span} cell">
+            <div class="small-12 medium-{@span} cell {@class}">
                 <xsl:apply-templates select="node()"/>
             </div>
         </xsl:template>

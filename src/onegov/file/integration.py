@@ -9,6 +9,8 @@ import yaml
 
 from blinker import ANY
 from contextlib import contextmanager
+from depot.io.interfaces import StoredFile
+from depot.io.local import LocalStoredFile
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 from depot.middleware import FileServeApp
@@ -50,6 +52,30 @@ SUPPORTED_STORAGE_BACKENDS = (
     'depot.io.local.LocalFileStorage',
     'depot.io.memory.MemoryFileStorage'
 )
+
+# HACK: Patch __repr__ so it works even if the file raises in __init__
+_StoredFile__repr__ = StoredFile.__repr__
+# HACK: Patch close so that it won't raise if the file doesn't exist
+_LocalStoredFile_close = LocalStoredFile.close
+
+
+def _safe_StoredFile__repr__(self: Any) -> str:  # noqa: N802
+    try:
+        return _StoredFile__repr__(self)
+    except Exception:
+        return f'<{self.__class__.__name__}>'
+
+
+def _safe_LocalStoredFile_close(self: LocalStoredFile) -> None:  # noqa: N802
+    try:
+        _LocalStoredFile_close(self)
+    except FileNotFoundError:
+        # NOTE: If the file doesn't exist, that's okay
+        pass
+
+
+StoredFile.__repr__ = _safe_StoredFile__repr__  # type: ignore[method-assign]
+LocalStoredFile.close = _safe_LocalStoredFile_close  # type: ignore[method-assign]
 
 
 class DepotApp(App):

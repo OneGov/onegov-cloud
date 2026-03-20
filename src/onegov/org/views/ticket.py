@@ -1192,8 +1192,10 @@ def view_ticket_files(self: Ticket, request: OrgRequest) -> BaseResponse:
     not_existing = []
     with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for f in form_submission.files:
+            file = None
             try:
-                zipf.writestr(f.name, f.reference.file.read())
+                file = f.reference.file
+                zipf.writestr(f.name, file.read())
             except OSError:
                 not_existing.append(f.name)
 

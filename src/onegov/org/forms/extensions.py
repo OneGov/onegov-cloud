@@ -20,7 +20,7 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
 
-from typing import TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from markupsafe import Markup
@@ -28,12 +28,9 @@ if TYPE_CHECKING:
     from wtforms import Field
 
 
-FormT = TypeVar('FormT', bound='Form')
+class CoordinatesFormExtension[T: Form](FormExtension[T], name='coordinates'):
 
-
-class CoordinatesFormExtension(FormExtension[FormT], name='coordinates'):
-
-    def create(self) -> type[FormT]:
+    def create(self) -> type[T]:
         class CoordinatesForm(self.form_class):  # type:ignore
             coordinates = CoordinatesField(
                 label=_('Coordinates'),
@@ -47,9 +44,9 @@ class CoordinatesFormExtension(FormExtension[FormT], name='coordinates'):
         return CoordinatesForm
 
 
-class SubmitterFormExtension(FormExtension[FormT], name='submitter'):
+class SubmitterFormExtension[T: Form](FormExtension[T], name='submitter'):
 
-    def create(self) -> type[FormT]:
+    def create(self) -> type[T]:
         class SubmitterForm(self.form_class):  # type:ignore
 
             submitter = EmailField(
@@ -107,9 +104,9 @@ class SubmitterFormExtension(FormExtension[FormT], name='submitter'):
         return SubmitterForm
 
 
-class CommentFormExtension(FormExtension[FormT], name='comment'):
+class CommentFormExtension[T: Form](FormExtension[T], name='comment'):
 
-    def create(self) -> type[FormT]:
+    def create(self) -> type[T]:
         class CommentForm(self.form_class):  # type:ignore
             comment = TextAreaField(
                 label=_('Comment'),
@@ -120,9 +117,11 @@ class CommentFormExtension(FormExtension[FormT], name='comment'):
         return CommentForm
 
 
-class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
+class ChangeRequestFormExtension[T: Form](
+    FormExtension[T], name='change-request'
+):
 
-    def create(self) -> type[FormT]:
+    def create(self) -> type[T]:
 
         # XXX circular import
         from onegov.org.models.directory import ExtendedDirectoryEntry
@@ -246,11 +245,11 @@ class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
         return ChangeRequestForm
 
 
-class PublicationFormExtension(FormExtension[FormT], name='publication'):
+class PublicationFormExtension[T: Form](FormExtension[T], name='publication'):
     """Can be used with TimezonePublicationMixin or UTCDateTime type decorator.
     """
 
-    def create(self, timezone: str = 'Europe/Zurich') -> type[FormT]:
+    def create(self, timezone: str = 'Europe/Zurich') -> type[T]:
         tz = timezone
 
         class PublicationForm(self.form_class):  # type:ignore
@@ -297,10 +296,10 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
         return PublicationForm
 
 
-class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
+class PushNotificationFormExtension[T: Form](FormExtension[T], name='publish'):
     """ Assumes to be used in conjunction with PublicationFormExtension. """
 
-    def create(self, timezone: str = 'Europe/Zurich') -> type[FormT]:
+    def create(self, timezone: str = 'Europe/Zurich') -> type[T]:
 
         class PublicationForm(self.form_class):  # type:ignore
 
@@ -363,9 +362,9 @@ class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
         return PublicationForm
 
 
-class HoneyPotFormExtension(FormExtension[FormT], name='honeypot'):
+class HoneyPotFormExtension[T: Form](FormExtension[T], name='honeypot'):
 
-    def create(self) -> type[FormT]:
+    def create(self) -> type[T]:
 
         class HoneyPotForm(self.form_class):  # type:ignore
             duplicate_of = HoneyPotField()

@@ -5,6 +5,8 @@ RUN sed -i 's+http://archive.ubuntu.com+http://ch.archive.ubuntu.com+g' /etc/apt
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt -qq update \
+    && apt -qq install -y software-properties-common gpg-agent \
+    && add-apt-repository ppa:deadsnakes/ppa -y \
     && apt -qq install -y --no-install-recommends \
     apt-utils \
     aria2 \
@@ -39,9 +41,9 @@ RUN apt -qq update \
     openssl \
     pkg-config \
     python3-pip \
-    python3.12 \
-    python3.12-dev \
-    python3.12-venv \
+    python3.14 \
+    python3.14-dev \
+    python3.14-venv \
     tzdata \
     weasyprint \
     xmlsec1 \
@@ -89,7 +91,7 @@ COPY .git /app/.git
 WORKDIR /app
 RUN git rev-parse --short HEAD > .commit \
     && git rev-parse HEAD > .commit-long \
-    && python3.12 -m venv . > /dev/null \
+    && python3.14 -m venv . > /dev/null \
     && mkdir -p /var/cache/wheels \
     && mkdir -p /var/cache/pip \
     && bin/pip install --cache-dir /var/cache/pip --upgrade pip setuptools wheel --quiet \

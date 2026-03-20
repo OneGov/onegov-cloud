@@ -295,30 +295,32 @@ def parse_fullcalendar_request(
 
     """
     start_str = request.params.get('start')
-    end_str = request.params.get('end')
-
-    if start_str and end_str:
-        if 'T' in start_str:
-            try:
-                start = parse_datetime(start_str)
-                end = parse_datetime(end_str)
-            except Exception:
-                raise HTTPBadRequest() from None
-        else:
-            try:
-                start_date = parse_date(start_str)
-                end_date = parse_date(end_str)
-            except Exception:
-                raise HTTPBadRequest() from None
-            start = datetime.combine(start_date, time(0, 0))
-            end = datetime.combine(end_date, time(23, 59, 59, 999999))
-
-        start = sedate.replace_timezone(start, timezone)
-        end = sedate.replace_timezone(end, timezone)
-
-        return start, end
-    else:
+    if not isinstance(start_str, str) or not start_str:
         return None, None
+
+    end_str = request.params.get('end')
+    if not isinstance(end_str, str) or not end_str:
+        return None, None
+
+    if 'T' in start_str:
+        try:
+            start = parse_datetime(start_str)
+            end = parse_datetime(end_str)
+        except Exception:
+            raise HTTPBadRequest() from None
+    else:
+        try:
+            start_date = parse_date(start_str)
+            end_date = parse_date(end_str)
+        except Exception:
+            raise HTTPBadRequest() from None
+        start = datetime.combine(start_date, time(0, 0))
+        end = datetime.combine(end_date, time(23, 59, 59, 999999))
+
+    start = sedate.replace_timezone(start, timezone)
+    end = sedate.replace_timezone(end, timezone)
+
+    return start, end
 
 
 def render_time_range(start: datetime | time, end: datetime | time) -> str:

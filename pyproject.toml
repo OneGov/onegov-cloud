@@ -15,12 +15,16 @@ filterwarnings = [
     # potential issue for future upgrades
     # unfortunately it's not possible to filter escape sequence warnings in
     # specific modules, but we should be covered by Ruff for our own code
-    '''ignore:invalid escape sequence '[^']+':::''',
+    '''ignore:"[^"]+" is an invalid escape sequence:::''',
     '''ignore:'crypt':DeprecationWarning:passlib.*:''',
-    '''ignore:datetime.datetime.utcnow() is deprecated:DeprecationWarning:depot''',
+    # Until pysaml2 is compatible with newer versions of xmlschema
+    # we are stuck with this DeprecationWarning
+    # See: https://github.com/IdentityPython/pysaml2/issues/947
+    '''ignore:pathlib\.PurePath\.as_uri\(\) is deprecated:DeprecationWarning:xmlschema.*:''',
+    # See: https://github.com/amol-/depot/issues/90
+    '''ignore:datetime\.datetime\.utcnow\(\) is deprecated:DeprecationWarning:depot.*:''',
     # fixed upstream
-    '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:pyasn1.*:''',
-    '''ignore:'cgi':DeprecationWarning:webob.*:''',
+    '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:ldap3.*:''',
 ]
 
 [tool.coverage.run]
@@ -45,7 +49,7 @@ exclude_lines = [
 ]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.14"
 follow_imports = "silent"
 namespace_packages = true
 explicit_package_bases = true
@@ -124,7 +128,7 @@ include = [
 ]
 line-length = 79
 indent-width = 4
-target-version = "py312"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = [

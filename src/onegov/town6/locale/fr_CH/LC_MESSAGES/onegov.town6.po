@@ -323,6 +323,9 @@ msgstr "iFrame"
 msgid "Homepage"
 msgstr "Page d'accueil"
 
+msgid "Files"
+msgstr "Fichiers"
+
 msgid "Chat Archive"
 msgstr "Archives des chats"
 
@@ -1136,6 +1139,15 @@ msgstr "${count} pages"
 
 msgid "Further occurrences:"
 msgstr "Autres dates:"
+
+msgid "Former member or parliament"
+msgstr "Ancien membre du parlement"
+
+msgid "Parliament"
+msgstr "Parlement"
+
+msgid "Parliamentary Group"
+msgstr "Groupe parlementaire"
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
@@ -2064,9 +2076,6 @@ msgstr "Soumettez votre événement"
 
 msgid "Functions"
 msgstr "Fonctions"
-
-msgid "Parliament"
-msgstr "Parlement"
 
 msgid "in"
 msgstr "de"

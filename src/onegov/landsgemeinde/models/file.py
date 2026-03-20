@@ -18,7 +18,10 @@ class LandsgemeindeFile(File, SearchableFile):
     __mapper_args__ = {'polymorphic_identity': 'landsgemeinde'}
 
     fts_type_title = _('Files')
-    fts_public = True
+
+    @property
+    def fts_public(self) -> bool:  # type: ignore[override]
+        return self.meta.get('fts_public', False)
 
     @property
     def fts_last_change(self) -> datetime | None:

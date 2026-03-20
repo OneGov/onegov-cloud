@@ -30,7 +30,7 @@ from sqlalchemy.dialects.postgresql import array
 from uuid import UUID
 
 
-from typing import overload, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable, Iterator
     from datetime import date
@@ -91,7 +91,6 @@ if TYPE_CHECKING:
         volunteer: bool
 
 
-ActivityT = TypeVar('ActivityT', bound=Activity)
 AVAILABILITY_VALUES: set[AvailabilityType] = {'none', 'few', 'many'}
 
 
@@ -259,7 +258,7 @@ class ActivityFilter:
         return self.contains_num_range(price_range, self.price_ranges)
 
 
-class ActivityCollection(RangedPagination[ActivityT]):
+class ActivityCollection[ActivityT: Activity](RangedPagination[ActivityT]):
 
     @overload
     def __init__(

@@ -26,7 +26,7 @@ from xlsxwriter.workbook import Workbook
 from onegov.core.utils import normalize_for_url
 
 
-from typing import overload, Any, Generic, IO, TypeVar, TYPE_CHECKING
+from typing import overload, Any, IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import (
@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from openpyxl.worksheet.worksheet import Worksheet
     from typing import Protocol
 
-    class _RowType[T_co](Protocol):
+    class _RowConstructor[T_co](Protocol):
         def __call__(self, *, rownumber: int, **kwargs: str) -> T_co: ...
 
     class DefaultRow(Protocol):
@@ -45,9 +45,6 @@ if TYPE_CHECKING:
 
     type KeyFunc[T] = Callable[[T], SupportsRichComparison]
     type DefaultCSVFile = CSVFile[DefaultRow]
-    _RowT = TypeVar('_RowT', default=DefaultRow)
-else:
-    _RowT = TypeVar('_RowT')
 
 
 VALID_CSV_DELIMITERS = ',;\t'
@@ -60,8 +57,7 @@ large_chars = 'GHMWQ_'
 max_width = 75
 
 
-# FIXME: Switch to PEP-695/PEP-696 generic for Python 3.13
-class CSVFile(Generic[_RowT]):  # noqa: UP046
+class CSVFile[RowT = DefaultRow]:
     """ Provides access to a csv file.
 
     :param csvfile:
@@ -120,30 +116,7 @@ class CSVFile(Generic[_RowT]):  # noqa: UP046
 
     """
 
-    rowtype: _RowType[_RowT]
-
-    @overload
-    def __init__(
-        self: DefaultCSVFile,
-        csvfile: IO[bytes],
-        expected_headers: Collection[str] | None = None,
-        dialect: type[Dialect] | Dialect | str | None = None,
-        encoding: str | None = None,
-        rename_duplicate_column_names: bool = False,
-        rowtype: None = None
-    ): ...
-
-    @overload
-    def __init__(
-        self: CSVFile[_RowT],
-        csvfile: IO[bytes],
-        expected_headers: Collection[str] | None = None,
-        dialect: type[Dialect] | Dialect | str | None = None,
-        encoding: str | None = None,
-        rename_duplicate_column_names: bool = False,
-        *,
-        rowtype: _RowType[_RowT]
-    ): ...
+    rowtype: _RowConstructor[RowT]
 
     def __init__(
         self,
@@ -152,8 +125,8 @@ class CSVFile(Generic[_RowT]):  # noqa: UP046
         dialect: type[Dialect] | Dialect | str | None = None,
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
-        rowtype: _RowType[_RowT] | None = None
-    ):
+        rowtype: _RowConstructor[RowT] | None = None
+    ) -> None:
 
         # guess the encoding if not already provided
         encoding = encoding or detect_encoding(csvfile)
@@ -210,11 +183,11 @@ class CSVFile(Generic[_RowT]):  # noqa: UP046
             result = result[1:]
         return result
 
-    def __iter__(self) -> Iterator[_RowT]:
+    def __iter__(self) -> Iterator[RowT]:
         yield from self.lines
 
     @property
-    def lines(self) -> Iterator[_RowT]:
+    def lines(self) -> Iterator[RowT]:
         self.csvfile.seek(0)
 
         encountered_empty_line = False

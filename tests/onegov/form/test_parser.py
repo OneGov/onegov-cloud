@@ -1518,6 +1518,20 @@ def test_help_location_error() -> None:
 
     text = dedent(
         """
+        Lieferung * =
+            (x) Pickup
+            ( ) Delivery
+                Address * = ___
+                Zip Code * = ___[4]/^[0-9]+$
+                City * = ___
+                Delivery time * = HH:MM
+        << Select delivery or pickup. >>
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
         # Comment
         << Put your personal email >>
         Email *= @@@

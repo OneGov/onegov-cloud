@@ -10,7 +10,7 @@ from sqlalchemy.orm import mapped_column, relationship, Mapped
 from uuid import uuid4, UUID
 
 
-from typing import Any, Generic, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     # we are shadowing type below
     from builtins import type as _type
@@ -21,13 +21,10 @@ if TYPE_CHECKING:
     from onegov.pay import Price
     from onegov.pay.types import PaymentState
 
-    _P = TypeVar('_P', bound=Payment, default=Payment)
-else:
-    _P = TypeVar('_P', bound=Payment)
 
-
-# FIXME: Switch to PEP-695/PEP-696 after 3.13 upgrade
-class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):  # noqa: UP046
+class PaymentProvider[PaymentT: Payment = Payment](
+    Base, TimestampMixin, ContentMixin
+):
     """ Represents a payment provider. """
 
     __tablename__ = 'payment_providers'
@@ -67,7 +64,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):  # noqa:
 
     if TYPE_CHECKING:
         @property
-        def payment_class(self) -> _type[_P]: ...
+        def payment_class(self) -> _type[PaymentT]: ...
     else:
         @property
         def payment_class(self) -> _type[Payment]:
@@ -85,7 +82,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):  # noqa:
         #        but we need to make sure, we don't use any other
         #        one somewhere first
         **kwargs: Any
-    ) -> _P:
+    ) -> PaymentT:
         """ Creates a new payment using the correct model. """
 
         payment = self.payment_class(

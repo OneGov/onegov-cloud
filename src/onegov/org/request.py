@@ -18,7 +18,9 @@ from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
     from onegov.core.analytics import AnalyticsProvider
+    from onegov.core.layout import Layout
     from onegov.org.app import OrgApp
+    from onegov.org.layout import DefaultLayout
     from onegov.ticket import Ticket
 
 
@@ -301,3 +303,13 @@ class OrgRequest(CoreRequest):
         if name := self.app.org.analytics_provider_name:
             return self.app.available_analytics_providers.get(name)
         return None
+
+    def get_layout(self, model: object) -> Layout | DefaultLayout:
+        """
+        Get the registered layout for a model instance.
+        """
+
+        layout = self.app.get_layout(model, self)
+        assert layout is not None
+
+        return layout
