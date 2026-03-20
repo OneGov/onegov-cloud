@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from onegov.election_day import _
+from onegov.election_day import log
 from onegov.election_day.formats.imports.common import convert_ech_domain
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -68,6 +69,8 @@ def import_elections_ech(
 
     """
 
+    log.info('eCH-0252 import started')
+
     polling_day = None
     compounds: list[ElectionCompound] = []
     elections: list[Election] = []
@@ -88,6 +91,17 @@ def import_elections_ech(
             information_delivery,
             session,
             default_locale,
+        )
+
+    if information_delivery:
+        log.info(
+            'eCH information delivery: polling_day=%s, '
+            '%d compound(s), %d election(s), %d deleted, %d error(s)',
+            polling_day,
+            len(compounds),
+            len(elections),
+            len(deleted),
+            len(errors),
         )
 
     # process election, candidate and list results
@@ -111,6 +125,13 @@ def import_elections_ech(
         import_result_delivery(
             principal, result_delivery, session, polling_day, elections, errors
         )
+
+    log.info(
+        'eCH-0252 import finished: %d error(s), %d updated, %d deleted',
+        len(errors),
+        len(compounds) + len(elections),
+        len(deleted),
+    )
 
     return (
         list(errors), compounds + elections, deleted
@@ -187,6 +208,11 @@ def import_information_delivery(
             )
             session.add(compound)
         compounds[identification] = compound
+        log.info(
+            'eCH compound: id=%s, titles=%s',
+            identification,
+            title_translations,
+        )
 
     # process elections
     elections: dict[str, Election] = {}
@@ -267,6 +293,20 @@ def import_information_delivery(
             if info.election_position is not None:
                 election.shortcode = str(info.election_position)
             election.number_of_mandates = info.number_of_mandates or 0
+            election_type = (
+                'proporz' if isinstance(election, ProporzElection)
+                else 'majorz'
+            )
+            log.info(
+                'eCH election: id=%s, type=%s, domain=%s, '
+                'mandates=%d, titles=%s, candidates=%d',
+                identification,
+                election_type,
+                domain,
+                info.number_of_mandates or 0,
+                title_translations,
+                len(information.candidate),
+            )
             compound_id = information.referenced_election_association_id
             if compound_id:
                 compound = compounds[compound_id]
@@ -438,6 +478,13 @@ def import_result_delivery(
                 )
                 continue
 
+            log.info(
+                'eCH result delivery: election=%s, '
+                'counting_circles=%d',
+                identification,
+                len(result.counting_circle_result or []),
+            )
+
             # get candidates and lists
             candidates = {c.candidate_id: c for c in election.candidates}
             lists = {}
@@ -475,6 +522,13 @@ def import_result_delivery(
                     result_data.is_fully_counted if result_data else False
                 )
                 election_result.counted = is_counted
+                log.debug(
+                    'eCH counting circle: entity_id=%d, name=%s, '
+                    'counted=%s',
+                    entity_id,
+                    name,
+                    is_counted,
+                )
                 election_result.name = name
                 election_result.district = district
                 election_result.superregion = superregion
@@ -556,6 +610,14 @@ def import_result_delivery(
             election.results = list(election_results.values())
             counted = all(result.counted for result in election.results)
             election.status = 'final' if counted else 'interim'
+            log.info(
+                'eCH election results: election=%s, status=%s, '
+                '%d result(s), %d counted',
+                identification,
+                election.status,
+                len(election.results),
+                sum(1 for r in election.results if r.counted),
+            )
             election.last_result_change = election.timestamp()
 
             # Aggregate candidate panachage to list panachage
@@ -610,6 +672,13 @@ def import_result_delivery(
                             list_v.elected_candidate
                         )
                         elected_candidates.extend(list_v.elected_candidate)
+
+            if elected_candidates:
+                log.info(
+                    'eCH elected candidates: election=%s, count=%d',
+                    identification,
+                    len(elected_candidates),
+                )
 
             for elected in elected_candidates:
                 candidate_id = getattr(
