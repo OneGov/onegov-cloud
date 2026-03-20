@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<delivery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ech.ch/xmlns/eCH-0252/2">
+  <deliveryHeader>
+    <senderId xmlns="http://www.ech.ch/xmlns/eCH-0058/5">ABX-VOTING</senderId>
+    <messageId xmlns="http://www.ech.ch/xmlns/eCH-0058/5">b81198c4f02a419a8b921e0152d003c7</messageId>
+    <messageType xmlns="http://www.ech.ch/xmlns/eCH-0058/5">1198</messageType>
+    <sendingApplication xmlns="http://www.ech.ch/xmlns/eCH-0058/5">
+      <manufacturer>Abraxas Informatik AG</manufacturer>
+      <product>Voting.Ausmittlung</product>
+      <productVersion>2.90.3+6f8</productVersion>
+    </sendingApplication>
+    <comment xmlns="http://www.ech.ch/xmlns/eCH-0058/5">STA / Testphase</comment>
+    <messageDate xmlns="http://www.ech.ch/xmlns/eCH-0058/5">2026-03-19T14:56:15.5531661Z</messageDate>
+    <action xmlns="http://www.ech.ch/xmlns/eCH-0058/5">1</action>
+    <testDeliveryFlag xmlns="http://www.ech.ch/xmlns/eCH-0058/5">true</testDeliveryFlag>
+  </deliveryHeader>
+  <electionInformationDelivery>
+    <cantonId>17</cantonId>
+    <pollingDay>2027-10-11</pollingDay>
+    <electionGroupInfo>
+      <electionGroup>
+        <electionGroupIdentification>3353b748-3246-4c86-b480-fd5a4bf7acaf</electionGroupIdentification>
+        <domainOfInfluence>
+          <domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">CH</domainOfInfluenceType>
+          <domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</domainOfInfluenceIdentification>
+          <domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Kanton St.Gallen eidgenössisch</domainOfInfluenceName>
+          <domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">CHSG</domainOfInfluenceShortname>
+        </domainOfInfluence>
+        <superiorAuthority>
+          <domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">CH</domainOfInfluenceType>
+          <domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</domainOfInfluenceIdentification>
+          <domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Kanton St.Gallen eidgenössisch</domainOfInfluenceName>
+          <domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">CHSG</domainOfInfluenceShortname>
+        </superiorAuthority>
+        <electionGroupPosition>1</electionGroupPosition>
+        <electionInformation>
+          <election>
+            <electionIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">3353b748-3246-4c86-b480-fd5a4bf7acaf</electionIdentification>
+            <typeOfElection xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</typeOfElection>
+            <electionDescription xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <electionDescriptionInfo>
+                <language>de</language>
+                <electionDescriptionShort>SEANTIS Majorz</electionDescriptionShort>
+                <electionDescription>SEANTIS Majorz</electionDescription>
+              </electionDescriptionInfo>
+            </electionDescription>
+            <numberOfMandates xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</numberOfMandates>
+          </election>
+          <candidate>
+            <candidateIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">919eaaa4-62b2-4525-adcb-884d7446ff23</candidateIdentification>
+            <familyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Muster</familyName>
+            <firstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Max</firstName>
+            <politicalFamilyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Muster</politicalFamilyName>
+            <politicalFirstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Max</politicalFirstName>
+            <callName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Max</callName>
+            <candidateText xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <candidateTextInfo>
+                <language>de</language>
+                <candidateText>1991, Aufrecht</candidateText>
+              </candidateTextInfo>
+            </candidateText>
+            <dateOfBirth xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1991-01-01</dateOfBirth>
+            <sex xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</sex>
+            <dwellingAddress xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <street xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <houseNumber xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <town xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <foreignZipCode xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <country xmlns="http://www.ech.ch/xmlns/eCH-0010/6">
+                <countryId>8100</countryId>
+                <countryIdISO2>CH</countryIdISO2>
+                <countryNameShort>Schweiz</countryNameShort>
+              </country>
+            </dwellingAddress>
+            <title xmlns="http://www.ech.ch/xmlns/eCH-0155/5"/>
+            <languageOfCorrespondence xmlns="http://www.ech.ch/xmlns/eCH-0155/5">de</languageOfCorrespondence>
+            <incumbentYesNo xmlns="http://www.ech.ch/xmlns/eCH-0155/5">false</incumbentYesNo>
+            <candidateReference xmlns="http://www.ech.ch/xmlns/eCH-0155/5">01</candidateReference>
+            <partyAffiliation xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <partyAffiliationInfo>
+                <language>de</language>
+                <partyAffiliationShort>Aufrecht</partyAffiliationShort>
+                <partyAffiliationLong>Aufrecht St.Gallen</partyAffiliationLong>
+              </partyAffiliationInfo>
+            </partyAffiliation>
+          </candidate>
+          <candidate>
+            <candidateIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">7c3482ac-3393-4607-bf8d-52891df35f8b</candidateIdentification>
+            <familyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Fischer</familyName>
+            <firstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Helene</firstName>
+            <politicalFamilyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Fischer</politicalFamilyName>
+            <politicalFirstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Helene</politicalFirstName>
+            <callName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Helene</callName>
+            <candidateText xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <candidateTextInfo>
+                <language>de</language>
+                <candidateText>1992, Mitte</candidateText>
+              </candidateTextInfo>
+            </candidateText>
+            <dateOfBirth xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1992-02-02</dateOfBirth>
+            <sex xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</sex>
+            <dwellingAddress xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <street xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <houseNumber xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <town xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <foreignZipCode xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <country xmlns="http://www.ech.ch/xmlns/eCH-0010/6">
+                <countryId>8100</countryId>
+                <countryIdISO2>CH</countryIdISO2>
+                <countryNameShort>Schweiz</countryNameShort>
+              </country>
+            </dwellingAddress>
+            <title xmlns="http://www.ech.ch/xmlns/eCH-0155/5"/>
+            <languageOfCorrespondence xmlns="http://www.ech.ch/xmlns/eCH-0155/5">de</languageOfCorrespondence>
+            <incumbentYesNo xmlns="http://www.ech.ch/xmlns/eCH-0155/5">false</incumbentYesNo>
+            <candidateReference xmlns="http://www.ech.ch/xmlns/eCH-0155/5">02</candidateReference>
+            <partyAffiliation xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <partyAffiliationInfo>
+                <language>de</language>
+                <partyAffiliationShort>Mitte</partyAffiliationShort>
+                <partyAffiliationLong>Die Mitte Kanton St.Gallen</partyAffiliationLong>
+              </partyAffiliationInfo>
+            </partyAffiliation>
+          </candidate>
+          <namedElement>
+            <elementName>decisiveMajority</elementName>
+            <text>absolute</text>
+          </namedElement>
+        </electionInformation>
+      </electionGroup>
+      <countingCircle>
+        <countingCircleId>3251</countingCircleId>
+        <countingCircleName>Altstätten</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3311</countingCircleId>
+        <countingCircleName>Amden</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3441</countingCircleId>
+        <countingCircleName>Andwil</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3231</countingCircleId>
+        <countingCircleName>Au SG</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>9170</countingCircleId>
+        <countingCircleName>Auslandschweizer SG</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3291</countingCircleId>
+        <countingCircleName>Bad Ragaz</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3232</countingCircleId>
+        <countingCircleName>Balgach</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3312</countingCircleId>
+        <countingCircleName>Benken</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3211</countingCircleId>
+        <countingCircleName>Berg SG</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3233</countingCircleId>
+        <countingCircleName>Berneck</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3271</countingCircleId>
+        <countingCircleName>Buchs SG</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3395</countingCircleId>
+        <countingCircleName>Bütschwil-Ganterschwil</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3401</countingCircleId>
+        <countingCircleName>Degersheim</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3234</countingCircleId>
+        <countingCircleName>Diepoldsau</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3352</countingCircleId>
+        <countingCircleName>Ebnat-Kappel</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3212</countingCircleId>
+        <countingCircleName>Eggersriet</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3252</countingCircleId>
+        <countingCircleName>Eichberg</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3342</countingCircleId>
+        <countingCircleName>Eschenbach SG</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+    </electionGroupInfo>
+    <numberOfEntries>1</numberOfEntries>
+  </electionInformationDelivery>
+</delivery>

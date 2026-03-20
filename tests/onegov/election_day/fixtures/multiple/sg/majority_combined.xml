@@ -1,0 +1,887 @@
+<?xml version="1.0" encoding="utf-8"?>
+<delivery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ech.ch/xmlns/eCH-0252/2">
+  <deliveryHeader>
+    <senderId xmlns="http://www.ech.ch/xmlns/eCH-0058/5">ABX-VOTING</senderId>
+    <messageId xmlns="http://www.ech.ch/xmlns/eCH-0058/5">496185bf8104406fa2c8632557a98b23</messageId>
+    <messageType xmlns="http://www.ech.ch/xmlns/eCH-0058/5">1198</messageType>
+    <sendingApplication xmlns="http://www.ech.ch/xmlns/eCH-0058/5">
+      <manufacturer>Abraxas Informatik AG</manufacturer>
+      <product>Voting.Ausmittlung</product>
+      <productVersion>2.90.3+6f8</productVersion>
+    </sendingApplication>
+    <comment xmlns="http://www.ech.ch/xmlns/eCH-0058/5">STA / Testphase</comment>
+    <messageDate xmlns="http://www.ech.ch/xmlns/eCH-0058/5">2026-03-19T14:47:37.2218645Z</messageDate>
+    <action xmlns="http://www.ech.ch/xmlns/eCH-0058/5">1</action>
+    <testDeliveryFlag xmlns="http://www.ech.ch/xmlns/eCH-0058/5">true</testDeliveryFlag>
+  </deliveryHeader>
+  <electionInformationDelivery>
+    <cantonId>17</cantonId>
+    <pollingDay>2027-10-11</pollingDay>
+    <electionGroupInfo>
+      <electionGroup>
+        <electionGroupIdentification>3353b748-3246-4c86-b480-fd5a4bf7acaf</electionGroupIdentification>
+        <domainOfInfluence>
+          <domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">CH</domainOfInfluenceType>
+          <domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</domainOfInfluenceIdentification>
+          <domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Kanton St.Gallen eidgenössisch</domainOfInfluenceName>
+          <domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">CHSG</domainOfInfluenceShortname>
+        </domainOfInfluence>
+        <superiorAuthority>
+          <domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">CH</domainOfInfluenceType>
+          <domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</domainOfInfluenceIdentification>
+          <domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Kanton St.Gallen eidgenössisch</domainOfInfluenceName>
+          <domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">CHSG</domainOfInfluenceShortname>
+        </superiorAuthority>
+        <electionGroupPosition>1</electionGroupPosition>
+        <electionInformation>
+          <election>
+            <electionIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">3353b748-3246-4c86-b480-fd5a4bf7acaf</electionIdentification>
+            <typeOfElection xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</typeOfElection>
+            <electionDescription xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <electionDescriptionInfo>
+                <language>de</language>
+                <electionDescriptionShort>SEANTIS Majorz</electionDescriptionShort>
+                <electionDescription>SEANTIS Majorz</electionDescription>
+              </electionDescriptionInfo>
+            </electionDescription>
+            <numberOfMandates xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</numberOfMandates>
+          </election>
+          <candidate>
+            <candidateIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">919eaaa4-62b2-4525-adcb-884d7446ff23</candidateIdentification>
+            <familyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Muster</familyName>
+            <firstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Max</firstName>
+            <politicalFamilyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Muster</politicalFamilyName>
+            <politicalFirstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Max</politicalFirstName>
+            <callName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Max</callName>
+            <candidateText xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <candidateTextInfo>
+                <language>de</language>
+                <candidateText>1991, Aufrecht</candidateText>
+              </candidateTextInfo>
+            </candidateText>
+            <dateOfBirth xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1991-01-01</dateOfBirth>
+            <sex xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</sex>
+            <dwellingAddress xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <street xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <houseNumber xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <town xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <foreignZipCode xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <country xmlns="http://www.ech.ch/xmlns/eCH-0010/6">
+                <countryId>8100</countryId>
+                <countryIdISO2>CH</countryIdISO2>
+                <countryNameShort>Schweiz</countryNameShort>
+              </country>
+            </dwellingAddress>
+            <title xmlns="http://www.ech.ch/xmlns/eCH-0155/5"/>
+            <languageOfCorrespondence xmlns="http://www.ech.ch/xmlns/eCH-0155/5">de</languageOfCorrespondence>
+            <incumbentYesNo xmlns="http://www.ech.ch/xmlns/eCH-0155/5">false</incumbentYesNo>
+            <candidateReference xmlns="http://www.ech.ch/xmlns/eCH-0155/5">01</candidateReference>
+            <partyAffiliation xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <partyAffiliationInfo>
+                <language>de</language>
+                <partyAffiliationShort>Aufrecht</partyAffiliationShort>
+                <partyAffiliationLong>Aufrecht St.Gallen</partyAffiliationLong>
+              </partyAffiliationInfo>
+            </partyAffiliation>
+          </candidate>
+          <candidate>
+            <candidateIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">7c3482ac-3393-4607-bf8d-52891df35f8b</candidateIdentification>
+            <familyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Fischer</familyName>
+            <firstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Helene</firstName>
+            <politicalFamilyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Fischer</politicalFamilyName>
+            <politicalFirstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Helene</politicalFirstName>
+            <callName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Helene</callName>
+            <candidateText xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <candidateTextInfo>
+                <language>de</language>
+                <candidateText>1992, Mitte</candidateText>
+              </candidateTextInfo>
+            </candidateText>
+            <dateOfBirth xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1992-02-02</dateOfBirth>
+            <sex xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</sex>
+            <dwellingAddress xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <street xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <houseNumber xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <town xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <foreignZipCode xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+              <country xmlns="http://www.ech.ch/xmlns/eCH-0010/6">
+                <countryId>8100</countryId>
+                <countryIdISO2>CH</countryIdISO2>
+                <countryNameShort>Schweiz</countryNameShort>
+              </country>
+            </dwellingAddress>
+            <title xmlns="http://www.ech.ch/xmlns/eCH-0155/5"/>
+            <languageOfCorrespondence xmlns="http://www.ech.ch/xmlns/eCH-0155/5">de</languageOfCorrespondence>
+            <incumbentYesNo xmlns="http://www.ech.ch/xmlns/eCH-0155/5">false</incumbentYesNo>
+            <candidateReference xmlns="http://www.ech.ch/xmlns/eCH-0155/5">02</candidateReference>
+            <partyAffiliation xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+              <partyAffiliationInfo>
+                <language>de</language>
+                <partyAffiliationShort>Mitte</partyAffiliationShort>
+                <partyAffiliationLong>Die Mitte Kanton St.Gallen</partyAffiliationLong>
+              </partyAffiliationInfo>
+            </partyAffiliation>
+          </candidate>
+          <namedElement>
+            <elementName>decisiveMajority</elementName>
+            <text>absolute</text>
+          </namedElement>
+        </electionInformation>
+      </electionGroup>
+      <countingCircle>
+        <countingCircleId>3251</countingCircleId>
+        <countingCircleName>Altstätten</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3311</countingCircleId>
+        <countingCircleName>Amden</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3441</countingCircleId>
+        <countingCircleName>Andwil</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3231</countingCircleId>
+        <countingCircleName>Au SG</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>9170</countingCircleId>
+        <countingCircleName>Auslandschweizer SG</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3291</countingCircleId>
+        <countingCircleName>Bad Ragaz</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3232</countingCircleId>
+        <countingCircleName>Balgach</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3312</countingCircleId>
+        <countingCircleName>Benken</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3211</countingCircleId>
+        <countingCircleName>Berg SG</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3233</countingCircleId>
+        <countingCircleName>Berneck</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3271</countingCircleId>
+        <countingCircleName>Buchs SG</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3395</countingCircleId>
+        <countingCircleName>Bütschwil-Ganterschwil</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3401</countingCircleId>
+        <countingCircleName>Degersheim</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3234</countingCircleId>
+        <countingCircleName>Diepoldsau</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3352</countingCircleId>
+        <countingCircleName>Ebnat-Kappel</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3212</countingCircleId>
+        <countingCircleName>Eggersriet</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3252</countingCircleId>
+        <countingCircleName>Eichberg</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+      <countingCircle>
+        <countingCircleId>3342</countingCircleId>
+        <countingCircleName>Eschenbach SG</countingCircleName>
+        <domainOfInfluenceType>MU</domainOfInfluenceType>
+      </countingCircle>
+    </electionGroupInfo>
+    <numberOfEntries>1</numberOfEntries>
+  </electionInformationDelivery>
+  <electionResultDelivery>
+    <cantonId>17</cantonId>
+    <pollingDay>2027-10-11</pollingDay>
+    <electionGroupResult>
+      <electionGroupIdentification>3353b748-3246-4c86-b480-fd5a4bf7acaf</electionGroupIdentification>
+      <electionResult>
+        <electionIdentification>3353b748-3246-4c86-b480-fd5a4bf7acaf</electionIdentification>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3251</countingCircleId>
+            <countingCircleName>Altstätten</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+          <resultData>
+            <countOfVotersInformation>
+              <countOfVotersTotal>5000</countOfVotersTotal>
+              <subtotalInfo>
+                <countOfVoters>2400</countOfVoters>
+                <voterType>1</voterType>
+                <sex>1</sex>
+              </subtotalInfo>
+              <subtotalInfo>
+                <countOfVoters>2600</countOfVoters>
+                <voterType>1</voterType>
+                <sex>2</sex>
+              </subtotalInfo>
+            </countOfVotersInformation>
+            <countOfReceivedBallots>3000</countOfReceivedBallots>
+            <countOfBlankBallots>10</countOfBlankBallots>
+            <countOfInvalidBallots>20</countOfInvalidBallots>
+            <countOfValidBallots>2970</countOfValidBallots>
+            <isFullyCounted>true</isFullyCounted>
+            <electionResult>
+              <electionIdentification>3353b748-3246-4c86-b480-fd5a4bf7acaf</electionIdentification>
+              <majorityElection>
+                <countOfInvalidVotesTotal>70</countOfInvalidVotesTotal>
+                <countOfBlankVotesTotal>200</countOfBlankVotesTotal>
+                <countOfIndividualVotesTotal>2970</countOfIndividualVotesTotal>
+                <candidateResult>
+                  <candidateOrWriteInCandidate>
+                    <candidateIdentification>919eaaa4-62b2-4525-adcb-884d7446ff23</candidateIdentification>
+                  </candidateOrWriteInCandidate>
+                  <countOfVotesTotal>1500</countOfVotesTotal>
+                </candidateResult>
+                <candidateResult>
+                  <candidateOrWriteInCandidate>
+                    <candidateIdentification>7c3482ac-3393-4607-bf8d-52891df35f8b</candidateIdentification>
+                  </candidateOrWriteInCandidate>
+                  <countOfVotesTotal>1200</countOfVotesTotal>
+                </candidateResult>
+              </majorityElection>
+            </electionResult>
+          </resultData>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3311</countingCircleId>
+            <countingCircleName>Amden</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+          <resultData>
+            <countOfVotersInformation>
+              <countOfVotersTotal>2000</countOfVotersTotal>
+              <subtotalInfo>
+                <countOfVoters>950</countOfVoters>
+                <voterType>1</voterType>
+                <sex>1</sex>
+              </subtotalInfo>
+              <subtotalInfo>
+                <countOfVoters>1050</countOfVoters>
+                <voterType>1</voterType>
+                <sex>2</sex>
+              </subtotalInfo>
+            </countOfVotersInformation>
+            <countOfReceivedBallots>1000</countOfReceivedBallots>
+            <countOfBlankBallots>5</countOfBlankBallots>
+            <countOfInvalidBallots>8</countOfInvalidBallots>
+            <countOfValidBallots>987</countOfValidBallots>
+            <isFullyCounted>true</isFullyCounted>
+            <electionResult>
+              <electionIdentification>3353b748-3246-4c86-b480-fd5a4bf7acaf</electionIdentification>
+              <majorityElection>
+                <countOfInvalidVotesTotal>42</countOfInvalidVotesTotal>
+                <countOfBlankVotesTotal>50</countOfBlankVotesTotal>
+                <countOfIndividualVotesTotal>992</countOfIndividualVotesTotal>
+                <candidateResult>
+                  <candidateOrWriteInCandidate>
+                    <candidateIdentification>919eaaa4-62b2-4525-adcb-884d7446ff23</candidateIdentification>
+                  </candidateOrWriteInCandidate>
+                  <countOfVotesTotal>500</countOfVotesTotal>
+                </candidateResult>
+                <candidateResult>
+                  <candidateOrWriteInCandidate>
+                    <candidateIdentification>7c3482ac-3393-4607-bf8d-52891df35f8b</candidateIdentification>
+                  </candidateOrWriteInCandidate>
+                  <countOfVotesTotal>400</countOfVotesTotal>
+                </candidateResult>
+              </majorityElection>
+            </electionResult>
+          </resultData>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3441</countingCircleId>
+            <countingCircleName>Andwil</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+          <resultData>
+            <countOfVotersInformation>
+              <countOfVotersTotal>1500</countOfVotersTotal>
+              <subtotalInfo>
+                <countOfVoters>720</countOfVoters>
+                <voterType>1</voterType>
+                <sex>1</sex>
+              </subtotalInfo>
+              <subtotalInfo>
+                <countOfVoters>780</countOfVoters>
+                <voterType>1</voterType>
+                <sex>2</sex>
+              </subtotalInfo>
+            </countOfVotersInformation>
+            <countOfReceivedBallots>800</countOfReceivedBallots>
+            <countOfBlankBallots>3</countOfBlankBallots>
+            <countOfInvalidBallots>5</countOfInvalidBallots>
+            <countOfValidBallots>792</countOfValidBallots>
+            <isFullyCounted>true</isFullyCounted>
+            <electionResult>
+              <electionIdentification>3353b748-3246-4c86-b480-fd5a4bf7acaf</electionIdentification>
+              <majorityElection>
+                <countOfInvalidVotesTotal>15</countOfInvalidVotesTotal>
+                <countOfBlankVotesTotal>30</countOfBlankVotesTotal>
+                <countOfIndividualVotesTotal>795</countOfIndividualVotesTotal>
+                <candidateResult>
+                  <candidateOrWriteInCandidate>
+                    <candidateIdentification>919eaaa4-62b2-4525-adcb-884d7446ff23</candidateIdentification>
+                  </candidateOrWriteInCandidate>
+                  <countOfVotesTotal>400</countOfVotesTotal>
+                </candidateResult>
+                <candidateResult>
+                  <candidateOrWriteInCandidate>
+                    <candidateIdentification>7c3482ac-3393-4607-bf8d-52891df35f8b</candidateIdentification>
+                  </candidateOrWriteInCandidate>
+                  <countOfVotesTotal>350</countOfVotesTotal>
+                </candidateResult>
+              </majorityElection>
+            </electionResult>
+          </resultData>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3231</countingCircleId>
+            <countingCircleName>Au SG</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>9170</countingCircleId>
+            <countingCircleName>Auslandschweizer SG</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3291</countingCircleId>
+            <countingCircleName>Bad Ragaz</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3232</countingCircleId>
+            <countingCircleName>Balgach</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3312</countingCircleId>
+            <countingCircleName>Benken</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3211</countingCircleId>
+            <countingCircleName>Berg SG</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3233</countingCircleId>
+            <countingCircleName>Berneck</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3271</countingCircleId>
+            <countingCircleName>Buchs SG</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3395</countingCircleId>
+            <countingCircleName>Bütschwil-Ganterschwil</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3401</countingCircleId>
+            <countingCircleName>Degersheim</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3234</countingCircleId>
+            <countingCircleName>Diepoldsau</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3352</countingCircleId>
+            <countingCircleName>Ebnat-Kappel</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3212</countingCircleId>
+            <countingCircleName>Eggersriet</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3252</countingCircleId>
+            <countingCircleName>Eichberg</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3342</countingCircleId>
+            <countingCircleName>Eschenbach SG</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId> 3402</countingCircleId>
+            <countingCircleName>Flawil</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3292</countingCircleId>
+            <countingCircleName>Flums</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3442</countingCircleId>
+            <countingCircleName>Gaiserwald</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3272</countingCircleId>
+            <countingCircleName>Gams</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3213</countingCircleId>
+            <countingCircleName>Goldach</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3341</countingCircleId>
+            <countingCircleName>Gommiswald</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3443</countingCircleId>
+            <countingCircleName>Gossau SG</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3273</countingCircleId>
+            <countingCircleName>Grabs</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3201</countingCircleId>
+            <countingCircleName>Häggenschwil</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3405</countingCircleId>
+            <countingCircleName>Jonschwil</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3313</countingCircleId>
+            <countingCircleName>Kaltbrunn</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3392</countingCircleId>
+            <countingCircleName>Kirchberg</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3374</countingCircleId>
+            <countingCircleName>Lichtensteig</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3393</countingCircleId>
+            <countingCircleName>Lütisburg</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3253</countingCircleId>
+            <countingCircleName>Marbach</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3293</countingCircleId>
+            <countingCircleName>Mels</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3214</countingCircleId>
+            <countingCircleName>Mörschwil</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3394</countingCircleId>
+            <countingCircleName>Mosnang</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3202</countingCircleId>
+            <countingCircleName>Muolen</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3396</countingCircleId>
+            <countingCircleName>Neckertal</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3360</countingCircleId>
+            <countingCircleName>Nesslau</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3422</countingCircleId>
+            <countingCircleName>Niederbüren</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3423</countingCircleId>
+            <countingCircleName>Niederhelfenschwil</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3424</countingCircleId>
+            <countingCircleName>Oberbüren</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3254</countingCircleId>
+            <countingCircleName>Oberriet</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3407</countingCircleId>
+            <countingCircleName>Oberuzwil</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3294</countingCircleId>
+            <countingCircleName>Pfäfers</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3295</countingCircleId>
+            <countingCircleName>Quarten</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3340</countingCircleId>
+            <countingCircleName>Rapperswil-Jona</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3255</countingCircleId>
+            <countingCircleName>Rebstein</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3235</countingCircleId>
+            <countingCircleName>Rheineck</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3215</countingCircleId>
+            <countingCircleName>Rorschach</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId> 3216</countingCircleId>
+            <countingCircleName>Rorschacherberg</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3256</countingCircleId>
+            <countingCircleName>Rüthi</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3296</countingCircleId>
+            <countingCircleName>Sargans</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3315</countingCircleId>
+            <countingCircleName>Schänis</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3338</countingCircleId>
+            <countingCircleName>Schmerikon</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3274</countingCircleId>
+            <countingCircleName>Sennwald</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3275</countingCircleId>
+            <countingCircleName>Sevelen</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3236</countingCircleId>
+            <countingCircleName>St. Margrethen</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3203</countingCircleId>
+            <countingCircleName>St.Gallen</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3217</countingCircleId>
+            <countingCircleName>Steinach</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3237</countingCircleId>
+            <countingCircleName>Thal</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3218</countingCircleId>
+            <countingCircleName>Tübach</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3219</countingCircleId>
+            <countingCircleName>Untereggen</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3339</countingCircleId>
+            <countingCircleName>Uznach</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3408</countingCircleId>
+            <countingCircleName>Uzwil</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3297</countingCircleId>
+            <countingCircleName>Vilters-Wangs</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3444</countingCircleId>
+            <countingCircleName>Waldkrich</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId> 3298</countingCircleId>
+            <countingCircleName>Walenstadt</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3276</countingCircleId>
+            <countingCircleName>Wartau</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3379</countingCircleId>
+            <countingCircleName>Wattwil</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3316</countingCircleId>
+            <countingCircleName>Weesen</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3238</countingCircleId>
+            <countingCircleName>Widnau</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3427</countingCircleId>
+            <countingCircleName>Wil SG</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3359</countingCircleId>
+            <countingCircleName>Wildhaus-Alt St. Johann</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3204</countingCircleId>
+            <countingCircleName>Wittenbach</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+        <countingCircleResult>
+          <countingCircle>
+            <countingCircleId>3426</countingCircleId>
+            <countingCircleName>Zuzwil</countingCircleName>
+            <domainOfInfluenceType>MU</domainOfInfluenceType>
+          </countingCircle>
+        </countingCircleResult>
+      </electionResult>
+    </electionGroupResult>
+    <numberOfEntries>1</numberOfEntries>
+  </electionResultDelivery>
+</delivery>
