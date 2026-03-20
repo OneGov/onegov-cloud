@@ -5,16 +5,11 @@ from onegov.parliament.models import ParliamentarianRole
 
 
 from typing import Any
-from typing_extensions import TypeVar
-
-RoleT = TypeVar(
-    'RoleT',
-    bound=ParliamentarianRole,
-    default=Any
-)
 
 
-class ParliamentarianRoleCollection(GenericCollection[RoleT]):
+class ParliamentarianRoleCollection[RoleT: ParliamentarianRole = Any](
+    GenericCollection[RoleT]
+):
 
     @property
     def model_class(self) -> type[RoleT]:

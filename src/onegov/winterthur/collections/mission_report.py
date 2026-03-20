@@ -16,10 +16,7 @@ if TYPE_CHECKING:
     from onegov.core.orm.abstract.associable import RegisteredLink
     from sqlalchemy.orm import Query, Session
     from typing import Self
-    from typing import TypeVar
     from uuid import UUID
-
-    T = TypeVar('T')
 
 
 class MissionReportFileCollection(BaseImageFileCollection[MissionReportFile]):
@@ -125,7 +122,7 @@ class MissionReportCollection(
     def page_by_index(self, index: int) -> Self:
         return self.__class__(self.session, page=index, year=self.year)
 
-    def filter_by_year(self, query: Query[T]) -> Query[T]:
+    def filter_by_year[T](self, query: Query[T]) -> Query[T]:
         timezone = 'Europe/Zurich'
 
         start = sedate.replace_timezone(datetime(self.year, 1, 1), timezone)

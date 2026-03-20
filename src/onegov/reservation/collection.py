@@ -7,17 +7,13 @@ from onegov.reservation.models import Resource
 from uuid import uuid4, UUID
 
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from libres.context.core import Context
     from libres.db.models import Allocation, Reservation, ReservationBlocker
     from libres.db.scheduler import Scheduler
-
     from sqlalchemy.orm import Query, Session
-
-
-_R = TypeVar('_R', bound=Resource)
 
 
 class _Marker(enum.Enum):
@@ -81,11 +77,11 @@ class ResourceCollection:
         return self.bind(resource)
 
     @overload
-    def bind(self, resource: _R) -> _R: ...
+    def bind[T: Resource](self, resource: T) -> T: ...
     @overload
     def bind(self, resource: None) -> None: ...
 
-    def bind(self, resource: _R | None) -> _R | None:
+    def bind[T: Resource](self, resource: T | None) -> T | None:
         if resource:
             resource.bind_to_libres_context(self.libres_context)
 

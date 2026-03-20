@@ -120,10 +120,7 @@ if TYPE_CHECKING:
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Session
     from typing import TypedDict, NotRequired
-    from typing_extensions import TypeVar
     from uuid import UUID
-
-    DefaultT = TypeVar('DefaultT', default=None)
 
     class SubscriptionDict(TypedDict):
         course_event_id: UUID
@@ -172,7 +169,7 @@ def parse_email(email: str) -> str | None:
     return email
 
 
-def parse_date(
+def parse_date[DefaultT = None](
     val: str | None,
     # NOTE: Seems like PEP-696 does not allow assigning a TypeVar to its
     #       default value yet, this should probably be allowed

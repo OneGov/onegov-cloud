@@ -10,21 +10,16 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import array
 
 
-from typing import overload, Any, Literal, Protocol, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, Protocol, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Mapping
     from markupsafe import Markup
     from onegov.directory.models import Directory
     from sqlalchemy.orm import Query
-    from typing import Self
 
 
-T = TypeVar('T')
-DirectoryEntryT = TypeVar('DirectoryEntryT', bound=DirectoryEntry)
-
-
-class DirectorySearchWidget(Protocol[DirectoryEntryT]):
+class DirectorySearchWidget[DirectoryEntryT: DirectoryEntry](Protocol):
     @property
     def name(self) -> str: ...
     @property
@@ -38,7 +33,7 @@ class DirectorySearchWidget(Protocol[DirectoryEntryT]):
     def html(self, layout: Any) -> Markup: ...
 
 
-class DirectoryEntryCollection(
+class DirectoryEntryCollection[DirectoryEntryT: DirectoryEntry](
     GenericCollection[DirectoryEntryT],
     Pagination[DirectoryEntryT]
 ):
@@ -158,7 +153,7 @@ class DirectoryEntryCollection(
 
         return query
 
-    def valid_keywords(
+    def valid_keywords[T](
         self,
         parameters: Mapping[str, T]
     ) -> dict[str, T]:
