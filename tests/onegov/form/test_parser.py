@@ -1617,11 +1617,62 @@ def test_empty_fieldset_error() -> None:
     assert e.value.field_name == 'Section 2'
 
 
-def test_fieldset_after_nesting_needs_fieldset_title() -> None:
-    """
-    ogc-3033 the resulting yaml has invalid indentation.
-    (Only field set title resets the yaml indentation)
-    """
+def test_top_level_fields_after_nested_sub_fieldset() -> None:
+    # no title field after escaping from sub-fieldset (bug)
+    text = dedent(
+        """
+        # Section 1
+        Field =
+            ( ) Option A
+            ( ) Option B
+
+                # Sub Section
+                Sub Field = ___
+
+        Top Field = ___
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    # fieldset title resets the yaml indent
+    text = dedent(
+        """
+        # Section 1
+        Field =
+            ( ) Option A
+            ( ) Option B
+
+                # Sub Section
+                Sub Field = ___
+
+        # Section 2
+        Top Field = ___
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    # two levels of deep nesting then top-level field
+    text = dedent(
+        """
+        # Section
+        Field =
+            ( ) Option A
+            ( ) Option B
+
+                # Sub Section
+                Sub Field =
+                    ( ) Sub A
+                    ( ) Sub B
+
+                        # Deep Section
+                        Deep Field = ___
+
+        Top Field = ___
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    # multiple top-level fields after synthetic reset
     text = dedent(
         """
         # Section
@@ -1632,7 +1683,34 @@ def test_fieldset_after_nesting_needs_fieldset_title() -> None:
                 # Sub Section
                 Sub Field = ___
 
+        Top Field 1 = ___
+        Top Field 2 = ___
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    # two separate nested cycles each followed by a top-level field
+    text = dedent(
+        """
+        # Section 1
+        Field =
+            ( ) Option A
+            ( ) Option B
+
+                # Sub Section 1
+                Sub Field = ___
+
         Top Field = ___
+
+        # Section 2
+        Other Field =
+            ( ) Option C
+            ( ) Option D
+
+                # Sub Section 2
+                Another Sub Field = ___
+
+        Top Field 2 = ___
         """
     )
     assert parse_formcode(text, enable_edit_checks=True)
