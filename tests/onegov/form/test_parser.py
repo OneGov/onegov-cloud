@@ -1615,3 +1615,24 @@ def test_empty_fieldset_error() -> None:
         )), enable_edit_checks=True)
 
     assert e.value.field_name == 'Section 2'
+
+
+def test_fieldset_after_nesting_needs_fieldset_title() -> None:
+    """
+    ogc-3033 the resulting yaml has invalid indentation.
+    (Only field set title resets the yaml indentation)
+    """
+    text = dedent(
+        """
+        # Section
+        Field =
+            ( ) Option A
+            ( ) Option B
+
+                # Sub Section
+                Sub Field = ___
+
+        Top Field = ___
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
