@@ -14,19 +14,16 @@ from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
 from onegov.town6 import _
 from sqlalchemy.exc import SQLAlchemyError
 
-from typing import Any, Self
-from typing import TYPE_CHECKING
+
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
     from onegov.event.models import Occurrence
+    from onegov.core.collection import PKType
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
-    from typing import TypeVar
-    from onegov.core.collection import PKType
-
-    T = TypeVar('T')
 
 
 def get_geo_location(item: ContentMixin) -> dict[str, Any]:
@@ -153,6 +150,10 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
         return result
 
     def item_data(self, item: Occurrence) -> dict[str, Any]:
+        source = item.event.source
+        if source:
+            # Only include the source prefix
+            source = '-'.join(source.split('-', 2)[:2])
         data: dict[str, Any] = {
             'title': item.title,
             'description': item.event.description,
@@ -165,7 +166,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
             'start': item.start.isoformat(),
             'end': item.end.isoformat(),
             'location': item.location,
-            'source': item.event.source,
+            'source': source,
             'coordinates': get_geo_location(item),
         }
 

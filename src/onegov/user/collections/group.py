@@ -4,14 +4,12 @@ from onegov.user.models import UserGroup
 from onegov.core.collection import GenericCollection
 
 
-from typing import overload, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
 
-_G = TypeVar('_G', bound=UserGroup)
 
-
-class UserGroupCollection(GenericCollection[_G]):
+class UserGroupCollection[T: UserGroup](GenericCollection[T]):
     """ Manages a list of user groups.
 
     Use it like this::
@@ -36,10 +34,10 @@ class UserGroupCollection(GenericCollection[_G]):
         self.type = type
 
     @property
-    def model_class(self) -> type[_G]:
+    def model_class(self) -> type[T]:
         return UserGroup.get_polymorphic_class(  # type:ignore[return-value]
             self.type, default=UserGroup)  # type:ignore[arg-type]
 
-    def query(self) -> Query[_G]:
+    def query(self) -> Query[T]:
         query = super().query()
         return query.order_by(self.model_class.name)

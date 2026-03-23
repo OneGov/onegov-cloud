@@ -1,11 +1,6 @@
 from __future__ import annotations
 
 from typing import Literal, TypeVar, TYPE_CHECKING
-
-BaseFormT = TypeVar('BaseFormT', bound='BaseForm', contravariant=True)
-FormT = TypeVar('FormT', bound='Form', contravariant=True)
-FieldT = TypeVar('FieldT', bound='Field', contravariant=True)
-
 if TYPE_CHECKING:
     from onegov.form import Form
     from typing import Any, Protocol
@@ -13,7 +8,7 @@ if TYPE_CHECKING:
     from wtforms.fields.core import _Filter, _Validator, _Widget, Field
     from wtforms.form import BaseForm
 
-    class FieldCondition(Protocol[BaseFormT, FieldT]):
+    class FieldCondition[BaseFormT: BaseForm, FieldT: Field](Protocol):
         def __call__(self, form: BaseFormT, field: FieldT, /) -> bool: ...
 
     type Widget[T: Field] = _Widget[T]
@@ -37,3 +32,6 @@ type SubmissionState = Literal['pending', 'complete']
 type RegistrationState = Literal[
     'open', 'cancelled', 'confirmed', 'partial'
 ]
+
+FormT = TypeVar('FormT', bound='Form', contravariant=True)
+FieldT = TypeVar('FieldT', bound='Field', contravariant=True)

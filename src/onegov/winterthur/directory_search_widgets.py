@@ -22,10 +22,7 @@ if TYPE_CHECKING:
     from onegov.org.models import ExtendedDirectory
     from onegov.winterthur.request import WinterthurRequest
     from sqlalchemy.orm import Query
-    from typing import TypeVar
     from uuid import UUID
-
-    T = TypeVar('T')
 
 
 def lines(value: str | tuple[str, ...] | list[str]) -> Iterator[str]:
@@ -137,7 +134,7 @@ class InlineDirectorySearch:
         # FIXME: Implement result highlighting using Postgres
         return None
 
-    def adapt(self, query: Query[T]) -> Query[T]:
+    def adapt[T](self, query: Query[T]) -> Query[T]:
         if not self.term:
             return query
 

@@ -11,6 +11,14 @@ webtest.compat
 webtest.lint
 webtest.utils
 
+# error: is not present at runtime
+# =========================================
+# We emulate a read-only attribute with a property, which isn't
+# quite accurate, but necessary for inferred covariance with
+# PEP-695 auto-variance
+webtest.app.TestApp.app
+webtest.TestApp.app
+
 # error: variable differs from runtime type
 # =========================================
 # Even though this can be `None`, it never should be during
