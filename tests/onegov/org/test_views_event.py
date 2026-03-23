@@ -817,7 +817,29 @@ def test_import_export_events(client: Client) -> None:
     }
 
 
-def test_export_events_json(client: Client) -> None:
+def test_export_events_json_xml_csv(client: Client) -> None:
+
+    def verify_event_fields(event_fields: dict[str, str | None]) -> None:
+        assert event_fields['Titel'] == 'Weihnachtssingen'
+        assert event_fields['Beschreibung'] == 'Das Govikoner Sinfonieorchester lädt ein.'
+        assert event_fields['Veranstaltungsort'] == 'Konzertsaal'
+        assert event_fields['Preis'] == 'CHF 75.-'
+        assert event_fields['Organisator'] == 'Sinfonieorchester'
+
+        if 'Organisator_E-Mail_Adresse' in event_fields:
+            assert event_fields['Organisator_E-Mail_Adresse'] == 'sinfonieorchester@govikon.org'
+        else:
+            assert event_fields['Organisator E-Mail Adresse'] == 'sinfonieorchester@govikon.org'
+
+        if 'Organisator_Telefonnummer' in event_fields:
+            assert event_fields['Organisator_Telefonnummer'] == '+41 41 123 45 67'
+        else:
+            assert event_fields['Organisator Telefonnummer'] == '+41 41 123 45 67'
+
+        assert event_fields['Schlagworte'] == 'Musik, Brauchtum'
+        assert event_fields['Erstellt'] == '23.03.2026 09:00'
+        assert event_fields['Von'] == '24.03.2026 18:00'
+        assert event_fields['Bis'] == '24.03.2026 22:00'
 
     with freeze_time('2026-03-23T08:00:00'):
         # patch send_mail to overcome 'file already exists' for
@@ -834,25 +856,19 @@ def test_export_events_json(client: Client) -> None:
         data = json.loads(page.body)
         assert len(data) == 1
         event = data[0]
-        created = event.pop('Erstellt')
-        assert created == '23.03.2026 09:00'
-        start = event.pop('Von')
-        assert start == '24.03.2026 18:00'
-        end = event.pop('Bis')
-        assert end == '24.03.2026 22:00'
+        verify_event_fields(event)
 
-        assert event == {
-            'Titel': 'Weihnachtssingen',
-            'Beschreibung': 'Das Govikoner Sinfonieorchester lädt ein.',
-            'Veranstaltungsort': 'Konzertsaal',
-            'Preis': 'CHF 75.-',
-            'Organisator': 'Sinfonieorchester',
-            'Organisator E-Mail Adresse': 'sinfonieorchester@govikon.org',
-            'Organisator Telefonnummer': '+41 41 123 45 67',
-            'Externe Event-URL': 'https://',
-            'Event Anmeldung URL': 'https://',
-            'Schlagworte': 'Musik, Brauchtum',
-        }
+        page = client.get('/events/export')
+        page.form['file_format'] = 'xml'
+        page = page.form.submit()
+        assert page.status_code == 200
+
+        root = ET.fromstring(page.body)
+        items = root.findall('item')
+        assert len(items) == 1
+        item = items[0]
+        event_fields = {child.tag: child.text for child in item}
+        verify_event_fields(event_fields)
 
 
 def test_import_export_events_with_custom_tags(client: Client) -> None:
