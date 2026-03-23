@@ -161,8 +161,10 @@ def get_ensure_user_callback() -> EnsureUserCallback:
         if not user.active:
             user.active = True
 
-        user.source = source
-        user.source_id = source_id
+        if user.source != source:
+            user.source = source
+        if user.source_id != source_id:
+            user.source_id = source_id
         return user
 
     return on_ensure_user
