@@ -848,7 +848,8 @@ def test_export_events_json_xml_csv(client: Client) -> None:
 
     with freeze_time('2026-03-23T08:00:00'):
         # patch send_mail to overcome 'file already exists' for
-        # the steps of submitting and accepting an event
+        # the steps of submitting and accepting an event which
+        # cause emails to be sent.
         with patch.object(client.app, 'send_email'):
             clear_submit_accept_single_event(client)
 
