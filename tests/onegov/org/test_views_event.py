@@ -9,6 +9,9 @@ import yaml
 import xml.etree.ElementTree as ET
 
 from datetime import datetime, date, timedelta
+
+from freezegun import freeze_time
+
 from onegov.event.models import Event
 from tempfile import TemporaryDirectory
 from tests.shared.utils import create_image, create_pdf
@@ -720,41 +723,51 @@ def test_delete_event(client: Client) -> None:
     assert "Generalversammlung" not in editor.get('/events')
 
 
-def test_import_export_events(client: Client) -> None:
+def clear_submit_accept_single_event(client: Client) -> Any:
     session = client.app.session()
     for event in session.query(Event):
         session.delete(event)
     transaction.commit()
 
     # Submit and publish an event
-    page = client.get('/events').click("Veranstaltung erfassen")
+    page = client.get('/events').click('Veranstaltung erfassen')
     event_date = date.today() + timedelta(days=1)
-    page.form['email'] = "sinfonieorchester@govikon.org"
-    page.form['title'] = "Weihnachtssingen"
-    page.form['description'] = "Das Govikoner Sinfonieorchester lädt ein."
-    page.form['location'] = "Konzertsaal"
-    page.form['price'] = "CHF 75.-"
-    page.form['organizer'] = "Sinfonieorchester"
-    page.form['organizer_email'] = "sinfonieorchester@govikon.org"
-    page.form['organizer_phone'] = "+41 41 123 45 67"
-    page.form['tags'] = ["Music", "Tradition"]
+    page.form['email'] = 'sinfonieorchester@govikon.org'
+    page.form['title'] = 'Weihnachtssingen'
+    page.form['description'] = 'Das Govikoner Sinfonieorchester lädt ein.'
+    page.form['location'] = 'Konzertsaal'
+    page.form['price'] = 'CHF 75.-'
+    page.form['organizer'] = 'Sinfonieorchester'
+    page.form['organizer_email'] = 'sinfonieorchester@govikon.org'
+    page.form['organizer_phone'] = '+41 41 123 45 67'
+    page.form['tags'] = ['Music', 'Tradition']
     page.form['start_date'] = event_date.isoformat()
-    page.form['start_time'] = "18:00"
-    page.form['end_time'] = "22:00"
+    page.form['start_time'] = '18:00'
+    page.form['end_time'] = '22:00'
     page.form['repeat'] = 'without'
     page.form.submit().follow().form.submit().follow()
 
     client.login_editor()
 
-    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
-    page = page.click("Veranstaltung annehmen").follow()
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    page.click('Veranstaltung annehmen').follow()
 
-    assert "Weihnachtssingen" in client.get('/events')
-    assert "Music" in client.get('/events')
-    assert "Tradition" in client.get('/events')
+    client.logout()
+
+
+def test_import_export_events(client: Client) -> None:
+    session = client.app.session()
+
+    clear_submit_accept_single_event(client)
+
+    assert 'Weihnachtssingen' in client.get('/events')
+    assert 'Music' in client.get('/events')
+    assert 'Tradition' in client.get('/events')
+
+    client.login_editor()
 
     # Export
-    page = client.get('/events').click("Export")
+    page = client.get('/events').click('Export')
     page.form['file_format'] = 'xlsx'
     page = page.form.submit()
 
@@ -765,7 +778,7 @@ def test_import_export_events(client: Client) -> None:
     )
 
     # Import (Dry run)
-    page = client.get('/events').click("Import")
+    page = client.get('/events').click('Import')
     page.form['dry_run'] = True
     page.form['file'] = file
     page = page.form.submit()
@@ -773,7 +786,7 @@ def test_import_export_events(client: Client) -> None:
     assert session.query(Event).count() == 1
 
     # Import
-    page = client.get('/events').click("Import")
+    page = client.get('/events').click('Import')
     page.form['file'] = file
     page = page.form.submit().follow()
     assert "1 Veranstaltungen importiert" in page
@@ -802,6 +815,44 @@ def test_import_export_events(client: Client) -> None:
     assert {event.meta['submitter_email'] for event in events} == {
         'sinfonieorchester@govikon.org', 'editor@example.org'
     }
+
+
+def test_export_events_json(client: Client) -> None:
+
+    with freeze_time('2026-03-23T08:00:00'):
+        # patch send_mail to overcome 'file already exists' for
+        # the steps of submitting and accepting an event
+        with patch.object(client.app, 'send_email'):
+            clear_submit_accept_single_event(client)
+
+        client.login_editor()
+        page = client.get('/events/export')
+        page.form['file_format'] = 'json'
+        page = page.form.submit()
+        assert page.status_code == 200
+
+        data = json.loads(page.body)
+        assert len(data) == 1
+        event = data[0]
+        created = event.pop('Erstellt')
+        assert created == '23.03.2026 09:00'
+        start = event.pop('Von')
+        assert start == '24.03.2026 18:00'
+        end = event.pop('Bis')
+        assert end == '24.03.2026 22:00'
+
+        assert event == {
+            'Titel': 'Weihnachtssingen',
+            'Beschreibung': 'Das Govikoner Sinfonieorchester lädt ein.',
+            'Veranstaltungsort': 'Konzertsaal',
+            'Preis': 'CHF 75.-',
+            'Organisator': 'Sinfonieorchester',
+            'Organisator E-Mail Adresse': 'sinfonieorchester@govikon.org',
+            'Organisator Telefonnummer': '+41 41 123 45 67',
+            'Externe Event-URL': 'https://',
+            'Event Anmeldung URL': 'https://',
+            'Schlagworte': 'Musik, Brauchtum',
+        }
 
 
 def test_import_export_events_with_custom_tags(client: Client) -> None:

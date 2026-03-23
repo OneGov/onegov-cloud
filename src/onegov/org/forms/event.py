@@ -581,6 +581,9 @@ class EventImportForm(Form):
                 getattr(occurrence, attribute, None)
                 or getattr(occurrence.event, attribute, None)
             )
+            if attribute == 'created' and isinstance(result, datetime):
+                result = to_timezone(
+                    result, occurrence.timezone or 'Europe/Zurich')
             if isinstance(result, datetime):
                 result = result.strftime('%d.%m.%Y %H:%M')
             if attribute == 'tags':
