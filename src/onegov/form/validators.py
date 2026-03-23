@@ -21,7 +21,8 @@ from onegov.form.errors import (
     EmptyFieldsetError,
     InvalidCommentIndentSyntax,
     InvalidCommentLocationSyntax,
-    RequiredFieldAddedError
+    RequiredFieldAddedError,
+    NestedFieldsetError
 )
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
@@ -315,6 +316,9 @@ class ValidFormDefinition:
     empty_fieldset = _(
         "The '{label}' group is empty and will not be visible. Either remove "
         "the empty group or add fields to it.")
+    nested_fieldsets = _(
+        'Nested fieldsets (`#`) are not supported, please remove line {line}.'
+    )
 
     def __init__(
         self,
@@ -364,6 +368,10 @@ class ValidFormDefinition:
         except (FieldCompileError, MixedTypeError) as exception:
             raise ValidationError(
                 exception.field_name
+            ) from exception
+        except NestedFieldsetError as exception:
+            raise ValidationError(
+                field.gettext(self.nested_fieldsets).format(line=exception.line)
             ) from exception
         except AttributeError as exception:
             raise ValidationError(
