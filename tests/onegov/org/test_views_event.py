@@ -889,44 +889,19 @@ def test_export_events_json_xml_csv(client: Client) -> None:
 
 def test_import_export_events_with_custom_tags(client: Client) -> None:
     session = client.app.session()
-    for event in session.query(Event):
-        session.delete(event)
-    transaction.commit()
 
     fs = client.app.filestorage
     assert fs is not None
-    data = {
-        'event_tags': ['Singing', 'Christmas']
-    }
     with fs.open('eventsettings.yml', 'w') as f:
-        yaml.dump(data, f)
+        yaml.dump({'event_tags': ['Music', 'Tradition']}, f)
 
-    # Submit and publish an event
-    page = client.get('/events').click("Veranstaltung erfassen")
-    event_date = date.today() + timedelta(days=1)
-    page.form['email'] = "sinfonieorchester@govikon.org"
-    page.form['title'] = "Weihnachtssingen"
-    page.form['description'] = "Das Govikoner Sinfonieorchester lädt ein."
-    page.form['location'] = "Konzertsaal"
-    page.form['price'] = "CHF 75.-"
-    page.form['organizer'] = "Sinfonieorchester"
-    page.form['organizer_email'] = "sinfonieorchester@govikon.org"
-    page.form['organizer_phone'] = "+41 41 123 45 67"
-    page.form['tags'] = ["Singing", "Christmas"]
-    page.form['start_date'] = event_date.isoformat()
-    page.form['start_time'] = "18:00"
-    page.form['end_time'] = "22:00"
-    page.form['repeat'] = 'without'
-    page.form.submit().follow().form.submit().follow()
+    clear_submit_accept_single_event(client)
 
     client.login_editor()
 
-    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
-    page = page.click("Veranstaltung annehmen").follow()
-
     assert "Weihnachtssingen" in client.get('/events')
-    assert "Singing" in client.get('/events')
-    assert "Christmas" in client.get('/events')
+    assert "Music" in client.get('/events')
+    assert "Tradition" in client.get('/events')
 
     # Export
     page = client.get('/events').click("Export")
