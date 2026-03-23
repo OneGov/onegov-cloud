@@ -821,20 +821,25 @@ def test_export_events_json_xml_csv(client: Client) -> None:
 
     def verify_event_fields(event_fields: dict[str, str | None]) -> None:
         assert event_fields['Titel'] == 'Weihnachtssingen'
-        assert event_fields['Beschreibung'] == 'Das Govikoner Sinfonieorchester lädt ein.'
+        assert (event_fields['Beschreibung'] ==
+                'Das Govikoner Sinfonieorchester lädt ein.')
         assert event_fields['Veranstaltungsort'] == 'Konzertsaal'
         assert event_fields['Preis'] == 'CHF 75.-'
         assert event_fields['Organisator'] == 'Sinfonieorchester'
 
         if 'Organisator_E-Mail_Adresse' in event_fields:
-            assert event_fields['Organisator_E-Mail_Adresse'] == 'sinfonieorchester@govikon.org'
+            assert (event_fields['Organisator_E-Mail_Adresse'] ==
+                    'sinfonieorchester@govikon.org')
         else:
-            assert event_fields['Organisator E-Mail Adresse'] == 'sinfonieorchester@govikon.org'
+            assert (event_fields['Organisator E-Mail Adresse'] ==
+                    'sinfonieorchester@govikon.org')
 
         if 'Organisator_Telefonnummer' in event_fields:
-            assert event_fields['Organisator_Telefonnummer'] == '+41 41 123 45 67'
+            assert (event_fields['Organisator_Telefonnummer'] ==
+                    '+41 41 123 45 67')
         else:
-            assert event_fields['Organisator Telefonnummer'] == '+41 41 123 45 67'
+            assert (event_fields['Organisator Telefonnummer'] ==
+                    '+41 41 123 45 67')
 
         assert event_fields['Schlagworte'] == 'Musik, Brauchtum'
         assert event_fields['Erstellt'] == '23.03.2026 09:00'
@@ -869,6 +874,17 @@ def test_export_events_json_xml_csv(client: Client) -> None:
         item = items[0]
         event_fields = {child.tag: child.text for child in item}
         verify_event_fields(event_fields)
+
+        page = client.get('/events/export')
+        page.form['file_format'] = 'csv'
+        page = page.form.submit()
+        assert page.status_code == 200
+
+        import csv
+        from io import StringIO
+        rows = list(csv.DictReader(StringIO(page.text)))
+        assert len(rows) == 1
+        verify_event_fields(rows[0])
 
 
 def test_import_export_events_with_custom_tags(client: Client) -> None:
