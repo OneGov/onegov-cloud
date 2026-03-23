@@ -742,6 +742,7 @@ def test_fetch_commissions_parliamentarians_json(
     assert user is not None
     user.role = 'commission_president'
     user.password = 'test'
+    user.active = True
 
     transaction.commit()
 
@@ -951,6 +952,7 @@ def test_bulk_commission_add_abschluss_notifies_admins(
     assert president_user is not None
     president_user.role = 'commission_president'
     president_user.password = 'test'
+    president_user.active = True
     transaction.commit()
 
     client.login('alice.president@example.org', 'test')

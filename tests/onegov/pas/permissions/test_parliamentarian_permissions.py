@@ -54,6 +54,7 @@ def test_view_dashboard_as_parliamentarian(client: Client[TestPasApp]) -> None:
     assert user is not None
     user.password = 'test'
     user.role = 'parliamentarian'
+    user.active = True
 
     transaction.commit()
 
@@ -97,6 +98,7 @@ def test_view_dashboard_as_commission_president(
     assert user is not None
     user.role = 'commission_president'
     user.password = 'test'
+    user.active = True
 
     transaction.commit()
 
@@ -128,6 +130,7 @@ def test_view_attendence_as_parliamentarian(
     user = users.by_username('bob.viewer@example.org')
     assert user is not None
     user.password = 'test'
+    user.active = True
 
     # Create commission and add parliamentarian to it
     commissions = PASCommissionCollection(session)
@@ -214,6 +217,7 @@ def test_parliamentarian_cannot_edit_others_attendence(
     assert alice_user is not None
     alice_user.password = 'test'
     alice_user.role = 'parliamentarian'
+    alice_user.active = True
 
     attendences = AttendenceCollection(session)
     alice_attendence = attendences.add(
@@ -276,6 +280,7 @@ def test_commission_president_has_private_access_to_commission(
     assert user is not None
     user.role = 'commission_president'
     user.password = 'test'
+    user.active = True
 
     # Get the commission ID before committing
     commission_id = commission.id
@@ -536,6 +541,7 @@ def test_view_files_collection(
     assert user is not None
     user.role = role
     user.password = 'test'
+    user.active = True
     transaction.commit()
 
     # Login as user
