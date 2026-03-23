@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-03 08:17+0100\n"
+"POT-Creation-Date: 2026-03-19 09:40+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -889,6 +889,9 @@ msgstr "Moi-même"
 msgid "Organisers with an occasion"
 msgstr "Prestataires proposant une activié"
 
+msgid "Organisers without occasions"
+msgstr "Prestataires sans activité"
+
 msgid "Users of a given role"
 msgstr "Utilisateurs·trices avec une fonction définie"
 
@@ -897,6 +900,10 @@ msgstr "Utilisateurs·trices avec liste de souhaits"
 
 msgid "Users with accepted bookings"
 msgstr "Utilisateurs·trices avec réservations confirmées"
+
+msgid "Users with attendees that have no wishes or bookings"
+msgstr ""
+"Utilisateurs·trices avec enfants inscrits sans souhaits ou réservations"
 
 msgid "Users with unpaid bills"
 msgstr "Utilisateurs·trices avec des factures impayées"

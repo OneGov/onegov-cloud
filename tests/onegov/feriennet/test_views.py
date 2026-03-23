@@ -3831,3 +3831,73 @@ def test_add_manual_booking(client: Client, scenario: Scenario) -> None:
     page = client.get(page_url)
     assert 'Tom' in page
     assert 'Discount for being nice to the admin' in page
+
+
+def test_send_message_to_different_recipients(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
+    scenario.add_period(title="2019", confirmed=True, finalized=False)
+
+    scenario.add_user(username='sue@example.org', role='editor',
+                      realname="Sue", phone="000 000 00 13",
+                      email="sue@example.org")
+
+    scenario.add_activity(title="Photography", state='accepted')
+    occasion = scenario.add_occasion(cost=100)
+
+    # Tom with Dustin has no bookings
+    scenario.add_user(username='tom@example.org', role='member',
+                      realname="Tom", phone="000 000 00 11",
+                      email="tom@example.org")
+
+    scenario.add_attendee(name="Dustin", birth_date=date(2000, 1, 1))
+
+    # Doc with Mike has a booking
+    doc = scenario.add_user(username='doc@example.org', role='member',
+                      realname="Doc", show_contact_data_to_others=True,
+                      phone="000 000 00 12", email="doc@example.org")
+
+    mike = scenario.add_attendee(name="Mike", birth_date=date(2000, 1, 1))
+
+    scenario.add_booking(
+        occasion=occasion,
+        user=doc,
+        attendee=mike
+    )
+
+    scenario.commit()
+
+    # Create notification
+    client.login_admin()
+    page = client.get('/usermanagement')
+    page = client.get('/notifications')
+    page = page.click('Neue Mitteilungs-Vorlage')
+    page.form['subject'] = 'with_no_wishes_or_bookings'
+    page.form['text'] = 'test'
+    page.form.submit()
+
+    # Send message to users with no wishes or booking
+    page = client.get('/notifications')
+    page = page.click('Vorlage verwenden')
+    page.form['send_to'] = 'with_no_wishes_or_bookings'
+    page.form['no_spam'] = 'y'
+    page.form.submit()
+
+    # Only Tom should get a message
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+    assert message['To'] == 'tom@example.org'
+
+    # Send message to organizers with no current occasions
+    page = client.get('/notifications')
+    page = page.click('Vorlage verwenden')
+    page.form['send_to'] = 'inactive_organisers'
+    page.form['no_spam'] = 'y'
+    page.form.submit()
+
+    # Sue shouldn't get a message since the has an activity
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(0)
+    assert message['To'] != 'sue@example.org'
