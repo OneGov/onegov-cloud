@@ -656,6 +656,7 @@ class EventImportForm(Form):
                     for attribute, column in columns.items()
                 }
                 kwargs['timezone'] = 'Europe/Zurich'
+                kwargs.pop('created')  # ignore created column
                 event = events.add(**kwargs)
                 event.meta['submitter_email'] = self.request.current_username
                 event.submit()
