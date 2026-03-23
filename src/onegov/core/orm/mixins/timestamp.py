@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from sedate import utcnow, to_timezone
+from sedate import utcnow
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, Mapped
@@ -30,12 +30,6 @@ class TimestampMixin:
         #        we need a migration for existing tables to fix this.
         nullable=True
     )
-
-    def localized_created(self, timezone: str = 'Europe/Zurich') -> datetime:
-        """ The localized version of the created date/time. """
-
-        return to_timezone(self.created, timezone)
-
     modified: Mapped[datetime | None] = mapped_column(onupdate=timestamp)
 
     def force_update(self) -> None:
