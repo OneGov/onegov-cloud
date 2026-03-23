@@ -233,6 +233,13 @@ msgstr ""
 
 #, python-format
 msgid ""
+"Nested fieldsets (`#`) are not supported, please remove line {line}."
+msgstr ""
+"I fieldset annidati (`#`) non sono supportati, si prega di rimuovere la riga "
+"{line}."
+
+#, python-format
+msgid ""
 "${fields}: New fields cannot be required initially. Require them in a "
 "separate migration step."
 msgstr ""
