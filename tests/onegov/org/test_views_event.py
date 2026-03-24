@@ -723,7 +723,10 @@ def test_delete_event(client: Client) -> None:
     assert "Generalversammlung" not in editor.get('/events')
 
 
-def clear_submit_accept_single_event(client: Client) -> Any:
+def clear_submit_accept_single_event(
+    client: Client,
+    custom_tags: list[str] | None = None,
+) -> Any:
     session = client.app.session()
     for event in session.query(Event):
         session.delete(event)
@@ -740,7 +743,7 @@ def clear_submit_accept_single_event(client: Client) -> Any:
     page.form['organizer'] = 'Sinfonieorchester'
     page.form['organizer_email'] = 'sinfonieorchester@govikon.org'
     page.form['organizer_phone'] = '+41 41 123 45 67'
-    page.form['tags'] = ['Music', 'Tradition']
+    page.form['tags'] = custom_tags if custom_tags else ['Music', 'Tradition']
     page.form['start_date'] = event_date.isoformat()
     page.form['start_time'] = '18:00'
     page.form['end_time'] = '22:00'
@@ -787,6 +790,74 @@ def test_import_export_events(client: Client) -> None:
 
     # Import
     page = client.get('/events').click('Import')
+    page.form['file'] = file
+    page = page.form.submit().follow()
+    assert "1 Veranstaltungen importiert" in page
+    assert session.query(Event).count() == 2
+
+    # Re-Import with clear
+    page = client.get('/events').click("Import")
+    page.form['file'] = file
+    page.form['clear'] = True
+    page = page.form.submit().follow()
+    assert "1 Veranstaltungen importiert" in page
+    assert session.query(Event).count() == 2
+
+    events = session.query(Event).all()
+    assert events[0].title == events[1].title
+    assert events[0].description == events[1].description
+    assert events[0].location == events[1].location
+    assert events[0].price == events[1].price
+    assert events[0].organizer == events[1].organizer
+    assert events[0].organizer_email == events[1].organizer_email
+    assert events[0].organizer_phone == events[1].organizer_phone
+    assert events[0].tags == events[1].tags
+    assert events[0].start == events[1].start
+    assert events[0].end == events[1].end
+    assert events[0].timezone == events[1].timezone
+    assert {event.meta['submitter_email'] for event in events} == {
+        'sinfonieorchester@govikon.org', 'editor@example.org'
+    }
+
+
+def test_import_export_events_with_custom_tags(client: Client) -> None:
+    session = client.app.session()
+
+    fs = client.app.filestorage
+    custom_tags = ['Singing', 'Christmas']
+    assert fs is not None
+    with fs.open('eventsettings.yml', 'w') as f:
+        yaml.dump({'event_tags': custom_tags}, f)
+
+    clear_submit_accept_single_event(client, custom_tags)
+
+    client.login_editor()
+
+    assert "Weihnachtssingen" in client.get('/events')
+    assert "Singing" in client.get('/events')
+    assert "Christmas" in client.get('/events')
+
+    # Export
+    page = client.get('/events').click("Export")
+    page.form['file_format'] = 'xlsx'
+    page = page.form.submit()
+
+    file = Upload(
+        'file',
+        page.body,
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+    # Import (Dry run)
+    page = client.get('/events').click("Import")
+    page.form['dry_run'] = True
+    page.form['file'] = file
+    page = page.form.submit()
+    assert "1 Veranstaltungen werden importiert" in page
+    assert session.query(Event).count() == 1
+
+    # Import
+    page = client.get('/events').click("Import")
     page.form['file'] = file
     page = page.form.submit().follow()
     assert "1 Veranstaltungen importiert" in page
@@ -886,73 +957,6 @@ def test_export_events_json_xml_csv(client: Client) -> None:
         rows = list(csv.DictReader(StringIO(page.text)))
         assert len(rows) == 1
         verify_event_fields(rows[0])
-
-
-def test_import_export_events_with_custom_tags(client: Client) -> None:
-    session = client.app.session()
-
-    fs = client.app.filestorage
-    assert fs is not None
-    with fs.open('eventsettings.yml', 'w') as f:
-        yaml.dump({'event_tags': ['Music', 'Tradition']}, f)
-
-    clear_submit_accept_single_event(client)
-
-    client.login_editor()
-
-    assert "Weihnachtssingen" in client.get('/events')
-    assert "Music" in client.get('/events')
-    assert "Tradition" in client.get('/events')
-
-    # Export
-    page = client.get('/events').click("Export")
-    page.form['file_format'] = 'xlsx'
-    page = page.form.submit()
-
-    file = Upload(
-        'file',
-        page.body,
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-
-    # Import (Dry run)
-    page = client.get('/events').click("Import")
-    page.form['dry_run'] = True
-    page.form['file'] = file
-    page = page.form.submit()
-    assert "1 Veranstaltungen werden importiert" in page
-    assert session.query(Event).count() == 1
-
-    # Import
-    page = client.get('/events').click("Import")
-    page.form['file'] = file
-    page = page.form.submit().follow()
-    assert "1 Veranstaltungen importiert" in page
-    assert session.query(Event).count() == 2
-
-    # Re-Import with clear
-    page = client.get('/events').click("Import")
-    page.form['file'] = file
-    page.form['clear'] = True
-    page = page.form.submit().follow()
-    assert "1 Veranstaltungen importiert" in page
-    assert session.query(Event).count() == 2
-
-    events = session.query(Event).all()
-    assert events[0].title == events[1].title
-    assert events[0].description == events[1].description
-    assert events[0].location == events[1].location
-    assert events[0].price == events[1].price
-    assert events[0].organizer == events[1].organizer
-    assert events[0].organizer_email == events[1].organizer_email
-    assert events[0].organizer_phone == events[1].organizer_phone
-    assert events[0].tags == events[1].tags
-    assert events[0].start == events[1].start
-    assert events[0].end == events[1].end
-    assert events[0].timezone == events[1].timezone
-    assert {event.meta['submitter_email'] for event in events} == {
-        'sinfonieorchester@govikon.org', 'editor@example.org'
-    }
 
 
 def test_event_form_with_custom_lead(client: Client) -> None:
