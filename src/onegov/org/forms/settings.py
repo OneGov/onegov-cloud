@@ -1576,9 +1576,12 @@ class NewsletterSettingsForm(Form):
                     for topic, sub_topic in item.items():
                         if not isinstance(sub_topic, list):
                             self.newsletter_categories.errors.append(
-                                _(f'Invalid format. Please define '
-                                  f"subtopic(s) for '{topic}' "
-                                  f"or remove the ':'.")
+                                _(
+                                    "Invalid format. Please define "
+                                    "subtopic(s) for '${topic}' "
+                                    "or remove the ':'.",
+                                    mapping={'topic': topic}
+                                )
                             )
                             return False
 
