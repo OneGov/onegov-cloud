@@ -4,6 +4,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.pas import _
 from sqlalchemy import ForeignKey
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Mapped
@@ -41,12 +42,16 @@ class PresidentialAllowance(Base, TimestampMixin):
     for the president and vice president of the Kantonsrat."""
 
     __tablename__ = 'pas_presidential_allowances'
+    __table_args__ = (UniqueConstraint('year', 'quarter', 'role'),)
 
     #: Internal ID
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 
     #: The year
     year: Mapped[int]
+
+    #: The quarter (1-4)
+    quarter: Mapped[int]
 
     #: The role: 'president' or 'vice_president'
     role: Mapped[str]
@@ -78,5 +83,5 @@ class PresidentialAllowance(Base, TimestampMixin):
     def __repr__(self) -> str:
         return (
             f'<PresidentialAllowance {self.year}'
-            f' {self.role} {self.amount}>'
+            f' Q{self.quarter} {self.role} {self.amount}>'
         )

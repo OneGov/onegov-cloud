@@ -13,6 +13,9 @@ from onegov.pas.collections.presidential_allowance import (
     PresidentialAllowanceCollection,
 )
 from onegov.pas.custom import get_current_rate_set
+from onegov.pas.models.presidential_allowance import (
+    LOHNART_ALLOWANCE_TEXT,
+)
 from onegov.pas.utils import (
     get_parliamentarians_with_settlements,
     is_commission_president,
@@ -385,18 +388,34 @@ def generate_buchungen_abrechnungslauf_xlsx(
     data_rows.sort(key=itemgetter('date', 'person'))
 
     # Add presidential allowances for this settlement run
-    allowances = PresidentialAllowanceCollection(
-        session, settlement_run_id=settlement_run.id
-    ).query()
+    allowances = (
+        PresidentialAllowanceCollection(
+            session, settlement_run_id=settlement_run.id
+        )
+        .query()
+        .all()
+    )
+    allowance_parl_ids = {str(a.parliamentarian_id) for a in allowances}
+    allowance_party_lookup = (
+        get_party_lookup(
+            session,
+            allowance_parl_ids,
+            settlement_run.start,
+            settlement_run.end,
+        )
+        if allowance_parl_ids
+        else {}
+    )
     for allowance in allowances:
         p = allowance.parliamentarian
+        party = allowance_party_lookup.get(str(allowance.parliamentarian_id))
         data_rows.append(
             {
                 'date': settlement_run.end,
                 'person': f'{p.first_name} {p.last_name}',
-                'party': '',
+                'party': party.name if party else '',
                 'wahlkreis': p.district or '',
-                'booking_type': 'Jahreszulage KR-Präsidium',
+                'booking_type': LOHNART_ALLOWANCE_TEXT,
                 'value': Decimal('0'),
                 'chf': Decimal(str(allowance.amount)),
                 'chf_with_cola': Decimal(str(allowance.amount)),

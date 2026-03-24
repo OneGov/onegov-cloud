@@ -994,7 +994,7 @@ def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
     settings = client.get('/').follow().click('PAS Einstellungen')
     assert 'Präsidialzulagen' in settings
 
-    # Step 2: Set up a parliamentarian + president role directly in DB
+    # Step 2: Create parliamentarians with president/VP roles
     session = client.app.session()
     parliamentarians = PASParliamentarianCollection(client.app)
     president = parliamentarians.add(
@@ -1002,63 +1002,59 @@ def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
         last_name='Präsident',
         email_primary='hans.praesident@example.org',
     )
-    session.flush()
-    president_id = president.id
-
     vice = parliamentarians.add(
         first_name='Lisa',
         last_name='Vizepräsidentin',
         email_primary='lisa.vize@example.org',
     )
     session.flush()
-
-    session.add(
-        PASParliamentarianRole(
-            parliamentarian_id=president_id,
-            role='president',
-        )
-    )
-    session.add(
-        PASParliamentarianRole(
-            parliamentarian_id=vice.id,
-            role='vice_president',
-        )
-    )
+    president_id = str(president.id)
+    vice_id = str(vice.id)
+    session.add(PASParliamentarianRole(
+        parliamentarian_id=president.id,
+        role='president',
+    ))
+    session.add(PASParliamentarianRole(
+        parliamentarian_id=vice.id,
+        role='vice_president',
+    ))
     transaction.commit()
 
-    # Step 3: Navigate to the new-allowance form and submit
+    # Step 3: Navigate to form, select via dropdowns, submit Q1
     current_year = datetime.date.today().year
     page = client.get('/presidential-allowances/new')
     assert 'Quartalszulage hinzufügen' in page
     page.form['year'] = current_year
+    page.form['quarter'] = 1
+    page.form['president_id'] = president_id
+    page.form['vice_president_id'] = vice_id
     page = page.form.submit().follow()
 
     assert 'Quartalszulage hinzugefügt' in page
     assert 'Hans Präsident' in page
     assert 'Lisa Vizepräsidentin' in page
+    assert 'Q1' in page
 
-    # Step 4: Verify allowances appear in the list
-    list_page = client.get('/presidential-allowances')
-    assert 'Präsidialzulagen' in list_page
-    assert 'Hans Präsident' in list_page
-    assert 'Lisa Vizepräsidentin' in list_page
-
-    # Step 5: Enforce the max-4-per-year limit.
-    # First submit created 2 entries (president + VP). Submit 3 more
-    # times -> 4 × 2 = 8 total entries -> can_add returns False.
-    for _ in range(3):
+    # Step 4: Submit Q2, Q3, Q4
+    for q in (2, 3, 4):
         page = client.get('/presidential-allowances/new')
         page.form['year'] = current_year
+        page.form['quarter'] = q
+        page.form['president_id'] = president_id
+        page.form['vice_president_id'] = vice_id
         page = page.form.submit().follow()
         assert 'Quartalszulage hinzugefügt' in page
 
+    # Step 5: All quarters filled — duplicate Q1 should fail
     session = client.app.session()
     collection = PresidentialAllowanceCollection(session)
-    assert not collection.can_add(current_year)
+    assert collection.next_quarter(current_year) is None
 
-    # 5th submit should show error
     page = client.get('/presidential-allowances/new')
     page.form['year'] = current_year
+    page.form['quarter'] = 1
+    page.form['president_id'] = president_id
+    page.form['vice_president_id'] = vice_id
     result = page.form.submit()
     assert result.status_code == 200
-    assert 'Maximum von 4 Zulagen pro Jahr bereits erreicht' in result
+    assert f'Q1 {current_year}' in result

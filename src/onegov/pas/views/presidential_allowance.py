@@ -9,11 +9,15 @@ from onegov.pas.collections.presidential_allowance import (
 from onegov.pas.forms.presidential_allowance import (
     PresidentialAllowanceForm,
 )
-from onegov.pas.layouts.default import DefaultLayout
-from onegov.pas.models import PASParliamentarianRole
+from onegov.pas.layouts.presidential_allowance import (
+    PresidentialAllowanceCollectionLayout,
+    PresidentialAllowanceFormLayout,
+)
 from onegov.pas.models.presidential_allowance import (
     PRESIDENT_QUARTERLY,
+    PRESIDENT_YEARLY_ALLOWANCE,
     VICE_PRESIDENT_QUARTERLY,
+    VICE_PRESIDENT_YEARLY_ALLOWANCE,
     PresidentialAllowance,
 )
 
@@ -23,29 +27,6 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.pas.request import PasRequest
     from webob import Response
-
-
-def get_current_role_holder(
-    request: PasRequest, role: str
-) -> PASParliamentarianRole | None:
-    from datetime import date
-
-    today = date.today()
-    return (
-        request.session.query(PASParliamentarianRole)
-        .filter(
-            PASParliamentarianRole.role == role,
-            (
-                PASParliamentarianRole.start.is_(None)
-                | (PASParliamentarianRole.start <= today)
-            ),
-            (
-                PASParliamentarianRole.end.is_(None)
-                | (PASParliamentarianRole.end >= today)
-            ),
-        )
-        .first()
-    )
 
 
 @PasApp.html(
@@ -58,26 +39,18 @@ def view_presidential_allowances(
     request: PasRequest,
 ) -> RenderData:
 
-    layout = DefaultLayout(self, request)
-
-    president_role = get_current_role_holder(request, 'president')
-    vice_president_role = get_current_role_holder(request, 'vice_president')
+    layout = PresidentialAllowanceCollectionLayout(self, request)
 
     return {
         'layout': layout,
-        'title': _('Presidential allowances'),
+        'title': layout.title,
         'allowances': self.query().all(),
         'add_link': request.link(self, name='new'),
-        'president': (
-            president_role.parliamentarian if president_role else None
-        ),
-        'vice_president': (
-            vice_president_role.parliamentarian
-            if vice_president_role
-            else None
-        ),
+        'president_yearly': PRESIDENT_YEARLY_ALLOWANCE,
         'president_quarterly': PRESIDENT_QUARTERLY,
+        'vice_president_yearly': VICE_PRESIDENT_YEARLY_ALLOWANCE,
         'vice_president_quarterly': VICE_PRESIDENT_QUARTERLY,
+        'collection_link': request.link(self),
     }
 
 
@@ -96,81 +69,36 @@ def add_presidential_allowance(
 
     if form.submitted(request):
         year = form.year.data
+        quarter = form.quarter.data
         settlement_run = form.current_settlement_run
+        run_id = settlement_run.id if settlement_run else None
 
-        president_role = get_current_role_holder(request, 'president')
-        vice_president_role = get_current_role_holder(
-            request, 'vice_president'
+        self.add(
+            year=year,
+            quarter=quarter,
+            role='president',
+            amount=PRESIDENT_QUARTERLY,
+            parliamentarian_id=form.president_uuid,
+            settlement_run_id=run_id,
+        )
+        self.add(
+            year=year,
+            quarter=quarter,
+            role='vice_president',
+            amount=VICE_PRESIDENT_QUARTERLY,
+            parliamentarian_id=form.vice_president_uuid,
+            settlement_run_id=run_id,
         )
 
-        added = 0
-        if president_role:
-            self.add(
-                year=year,
-                role='president',
-                amount=PRESIDENT_QUARTERLY,
-                parliamentarian_id=(president_role.parliamentarian_id),
-                settlement_run_id=(
-                    settlement_run.id if settlement_run else None
-                ),
-            )
-            added += 1
-
-        if vice_president_role:
-            self.add(
-                year=year,
-                role='vice_president',
-                amount=VICE_PRESIDENT_QUARTERLY,
-                parliamentarian_id=(vice_president_role.parliamentarian_id),
-                settlement_run_id=(
-                    settlement_run.id if settlement_run else None
-                ),
-            )
-            added += 1
-
-        if added:
-            request.success(_('Quarterly allowance added'))
-        else:
-            request.warning(_('No president or vice president found'))
-
+        request.success(_('Quarterly allowance added'))
         return request.redirect(request.link(self))
 
-    layout = DefaultLayout(self, request)
-
-    president_role = get_current_role_holder(request, 'president')
-    vice_president_role = get_current_role_holder(request, 'vice_president')
-
-    callout = ''
-    if president_role:
-        p = president_role.parliamentarian
-        callout += request.translate(
-            _(
-                'President: ${name} (CHF ${amount})',
-                mapping={
-                    'name': (f'{p.first_name} {p.last_name}'),
-                    'amount': str(PRESIDENT_QUARTERLY),
-                },
-            )
-        )
-    if vice_president_role:
-        vp = vice_president_role.parliamentarian
-        if callout:
-            callout += '<br>'
-        callout += request.translate(
-            _(
-                'Vice president: ${name} (CHF ${amount})',
-                mapping={
-                    'name': (f'{vp.first_name} {vp.last_name}'),
-                    'amount': str(VICE_PRESIDENT_QUARTERLY),
-                },
-            )
-        )
+    layout = PresidentialAllowanceFormLayout(self, request)
 
     return {
         'layout': layout,
-        'title': _('Add quarterly allowance'),
+        'title': layout.title,
         'form': form,
-        'callout': callout or None,
         'form_width': 'small',
     }
 

@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from datetime import date
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
 from onegov.pas import _
 from onegov.pas.collections.presidential_allowance import (
     PresidentialAllowanceCollection,
 )
-from onegov.pas.models import SettlementRun
+from onegov.pas.models import PASParliamentarianRole, SettlementRun
+from uuid import UUID
 from wtforms.fields import IntegerField
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, NumberRange
 
 from typing import TYPE_CHECKING
 
@@ -22,16 +24,74 @@ class PresidentialAllowanceForm(Form):
     year = IntegerField(
         label=_('Year'),
         validators=[InputRequired()],
-        default=date.today().year,
     )
 
+    quarter = IntegerField(
+        label=_('Quarter'),
+        validators=[
+            InputRequired(), NumberRange(min=1, max=4)
+        ],
+    )
+
+    president_id = ChosenSelectField(
+        label=_('President'),
+        validators=[InputRequired()],
+    )
+
+    vice_president_id = ChosenSelectField(
+        label=_('Vice president'),
+        validators=[InputRequired()],
+    )
+
+    def _role_holder_choices(
+        self, role: str
+    ) -> list[Any]:
+        today = date.today()
+        roles = (
+            self.request.session.query(PASParliamentarianRole)
+            .filter(
+                PASParliamentarianRole.role == role,
+                (
+                    PASParliamentarianRole.start.is_(None)
+                    | (PASParliamentarianRole.start <= today)
+                ),
+                (
+                    PASParliamentarianRole.end.is_(None)
+                    | (PASParliamentarianRole.end >= today)
+                ),
+            )
+            .order_by(PASParliamentarianRole.start.desc())
+            .all()
+        )
+        return [
+            (
+                str(r.parliamentarian_id),
+                r.parliamentarian.title,
+            )
+            for r in roles
+        ]
+
     def on_request(self) -> None:
-        if not self.submitted(self.request):
-            self.year.data = self.year.data or date.today().year
+        self.president_id.choices = (
+            self._role_holder_choices('president')
+        )
+        self.vice_president_id.choices = (
+            self._role_holder_choices('vice_president')
+        )
+
+        if self.submitted(self.request):
+            return
+
+        self.year.data = self.year.data or date.today().year
+
+        collection = PresidentialAllowanceCollection(
+            self.request.session
+        )
+        next_q = collection.next_quarter(self.year.data)
+        self.quarter.data = self.quarter.data or next_q or 1
 
     @property
     def current_settlement_run(self) -> SettlementRun | None:
-        """Return the most recent open settlement run."""
         return (
             self.request.session.query(SettlementRun)
             .filter(SettlementRun.closed.is_(False))
@@ -41,20 +101,42 @@ class PresidentialAllowanceForm(Form):
 
     def validate(
         self,
-        extra_validators: Mapping[str, Sequence[Any]] | None = None,
+        extra_validators: (
+            Mapping[str, Sequence[Any]] | None
+        ) = None,
     ) -> bool:
         result = super().validate(extra_validators)
         if not result:
             return False
 
-        collection = PresidentialAllowanceCollection(self.request.session)
-        if not collection.can_add(
-            self.year.data  # type:ignore[arg-type]
-        ):
-            assert isinstance(self.year.errors, list)
-            self.year.errors.append(
-                _('Maximum of 4 allowances per year already reached')
+        year = self.year.data
+        quarter = self.quarter.data
+        assert year is not None
+        assert quarter is not None
+
+        collection = PresidentialAllowanceCollection(
+            self.request.session
+        )
+        if collection.quarter_exists(year, quarter):
+            assert isinstance(self.quarter.errors, list)
+            self.quarter.errors.append(
+                _(
+                    'Allowance for Q${quarter} ${year}'
+                    ' already exists',
+                    mapping={
+                        'quarter': str(quarter),
+                        'year': str(year),
+                    },
+                )
             )
             return False
 
         return True
+
+    @property
+    def president_uuid(self) -> UUID:
+        return UUID(self.president_id.data)
+
+    @property
+    def vice_president_uuid(self) -> UUID:
+        return UUID(self.vice_president_id.data)

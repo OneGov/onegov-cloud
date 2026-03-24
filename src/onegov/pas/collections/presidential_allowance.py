@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from onegov.core.collection import GenericCollection
 from onegov.pas.models.presidential_allowance import PresidentialAllowance
+from sqlalchemy.orm import joinedload
 
 from typing import TYPE_CHECKING
 
@@ -30,7 +31,13 @@ class PresidentialAllowanceCollection(
         return PresidentialAllowance
 
     def query(self) -> Query[PresidentialAllowance]:
-        query = super().query()
+        query = (
+            super()
+            .query()
+            .options(
+                joinedload(PresidentialAllowance.parliamentarian),
+            )
+        )
         if self.year is not None:
             query = query.filter(PresidentialAllowance.year == self.year)
         if self.settlement_run_id is not None:
@@ -40,19 +47,34 @@ class PresidentialAllowanceCollection(
             )
         return query.order_by(
             PresidentialAllowance.year.desc(),
+            PresidentialAllowance.quarter,
             PresidentialAllowance.role,
         )
 
-    def count_for_year(self, year: int) -> int:
+    def quarter_exists(self, year: int, quarter: int) -> bool:
         return (
             self.session.query(PresidentialAllowance)
-            .filter(PresidentialAllowance.year == year)
-            .count()
+            .filter(
+                PresidentialAllowance.year == year,
+                PresidentialAllowance.quarter == quarter,
+            )
+            .first()
+            is not None
         )
 
-    def can_add(self, year: int) -> bool:
-        # 2 entries per "run" (president + vice_president), max 4 runs
-        return self.count_for_year(year) < 8
+    def next_quarter(self, year: int) -> int | None:
+        """Return the next quarter (1-4) that has no entries yet,
+        or None if all 4 quarters are filled."""
+        existing = {
+            q
+            for (q,) in self.session.query(PresidentialAllowance.quarter)
+            .filter(PresidentialAllowance.year == year)
+            .distinct()
+        }
+        for q in (1, 2, 3, 4):
+            if q not in existing:
+                return q
+        return None
 
     def for_settlement_run(
         self, settlement_run_id: UUID
