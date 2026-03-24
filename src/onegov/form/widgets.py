@@ -10,6 +10,7 @@ from morepath.error import LinkError
 from onegov.chat import TextModuleCollection
 from onegov.core.templates import PageTemplate
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
+from onegov.form import _
 from wtforms.widgets import DateInput
 from wtforms.widgets import DateTimeLocalInput
 from wtforms.widgets import FileInput
@@ -229,10 +230,10 @@ class UploadWidget(FileInput):
             'filesize': display_size,
             'filename': field.data['filename'],
             'name': field.id,
-            'existing_file_label': field.gettext('Uploaded file'),
-            'keep_label': field.gettext('Keep file'),
-            'delete_label': field.gettext('Delete file'),
-            'replace_label': field.gettext('Replace file'),
+            'existing_file_label': field.gettext(_('Uploaded file')),
+            'keep_label': field.gettext(_('Keep file')),
+            'delete_label': field.gettext(_('Delete file')),
+            'replace_label': field.gettext(_('Replace file')),
         }
 
     def __call__(
@@ -276,7 +277,7 @@ class UploadMultipleWidget(FileInput):
 
     """
 
-    additional_label = 'Upload additional files'
+    additional_label = _('Upload additional files')
 
     def __init__(self) -> None:
         self.multiple = True
@@ -323,7 +324,7 @@ class UploadMultipleWidget(FileInput):
             additional_html = Markup(
                 '<label>{label}: {input_html}</label>'
             ).format(
-                label=field.gettext('Upload additional files'),
+                label=field.gettext(self.additional_label),
                 input_html=input_html
             )
             return existing_html + simple_template.format(additional_html)
@@ -381,7 +382,7 @@ class TextAreaWithTextModules(TextArea):
         field.meta.request.include('text-module-picker')
         return Markup(self.template.render(  # nosec: B704
             id=field.id,
-            label=field.gettext('Text modules'),
+            label=field.gettext(_('Text modules')),
             text_modules=text_modules,
             input_html=input_html
         ))
@@ -479,10 +480,12 @@ class ChosenSelectWidget(Select):
         kwargs['class_'] = '{} chosen-select'.format(
             kwargs.get('class_', '')
         ).strip()
-        kwargs['data-placeholder'] = field.gettext('Select an Option')
-        kwargs['data-no_results_text'] = field.gettext('No results match')
+        kwargs['data-placeholder'] = field.gettext(_('Select an Option'))
+        kwargs['data-no_results_text'] = field.gettext(_('No results match'))
         if self.multiple:
-            kwargs['data-placeholder'] = field.gettext('Select Some Options')
+            kwargs['data-placeholder'] = field.gettext(
+                _('Select Some Options')
+            )
 
         return super().__call__(field, **kwargs)
 
@@ -495,10 +498,12 @@ class TreeSelectWidget(Select):
         kwargs['class_'] = '{} treeselect'.format(
             kwargs.get('class_', '')
         ).strip()
-        kwargs['data-placeholder'] = field.gettext('Select an Option')
-        kwargs['data-no_results_text'] = field.gettext('No results match')
+        kwargs['data-placeholder'] = field.gettext(_('Select an Option'))
+        kwargs['data-no_results_text'] = field.gettext(_('No results match'))
         if self.multiple:
-            kwargs['data-placeholder'] = field.gettext('Select Some Options')
+            kwargs['data-placeholder'] = field.gettext(
+                _('Select Some Options')
+            )
 
         return super().__call__(field, **kwargs)
 
@@ -649,8 +654,8 @@ class DurationInput:
             <label>{minutes_input} {minutes_label}</label>
             </div>
         """).format(
-            hours_label=field.gettext('hours'),
-            minutes_label=field.gettext('minutes'),
+            hours_label=field.gettext(_('hours')),
+            minutes_label=field.gettext(_('minutes')),
             hours_input=self.hours_widget(
                 field, value=hours, size=2, **kwargs
             ),

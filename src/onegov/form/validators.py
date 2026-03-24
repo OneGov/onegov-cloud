@@ -111,7 +111,9 @@ class FileSizeLimit:
 
     """
 
-    message = 'The file is too large, please provide a file smaller than {}.'
+    message = _(
+        'The file is too large, please provide a file smaller than {}.'
+    )
 
     def __init__(self, max_bytes: int):
         self.max_bytes = max_bytes
@@ -125,9 +127,9 @@ class FileSizeLimit:
                 if not data:
                     continue  # in case of file deletion
         if field.data.get('size', 0) > self.max_bytes:
-            message = field.gettext(
-                'The file is too large, please provide a file smaller than {}.'
-            ).format(humanize.naturalsize(self.max_bytes))
+            message = field.gettext(self.message).format(
+                humanize.naturalsize(self.max_bytes)
+            )
             raise ValidationError(message)
 
 
@@ -220,7 +222,7 @@ class WhitelistedMimeType:
         *MIME_TYPES_VIDEO,
     }
 
-    message = 'Files of this type are not supported.'
+    message = _('Files of this type are not supported.')
 
     def __init__(self, whitelist: Collection[str] | None = None):
         if whitelist is not None:
@@ -231,9 +233,7 @@ class WhitelistedMimeType:
             return
 
         if field.data['mimetype'] not in self.whitelist:
-            raise ValidationError(
-                field.gettext('Files of this type are not supported.')
-            )
+            raise ValidationError(field.gettext(self.message))
 
 
 class ExpectedExtensions(WhitelistedMimeType):
@@ -289,35 +289,32 @@ class ValidPassword(Length):
 class ValidFormDefinition:
     """ Makes sure the given text is a valid onegov.form definition. """
 
-    message = 'The form could not be parsed.'
-    email = "Define at least one required e-mail field ('E-Mail * = @@@')"
-    syntax = 'The syntax on line {line} is not valid.'
-    indent = ('The indentation on line {line} is not valid. '
-              'Please use a multiple of 4 spaces')
-    comment_indent = ('The indentation on line {line} is not valid. '
-                      'Comments must be indented to the same level as '
-                      'the field definition (`=`) they belong to.')
-    comment_location = ('Incorrect placement of the field description on '
-                        'line {line}. The field description must be placed '
-                        'below the field definition (`=`) and with the same '
-                        'indentation.')
-    duplicate = "The field '{label}' exists more than once."
-    reserved = "'{label}' is a reserved name. Please use a different name."
-    required = 'Define at least one required field'
-    payment_method = (
+    message = _('The form could not be parsed.')
+    email = _("Define at least one required e-mail field ('E-Mail * = @@@')")
+    syntax = _('The syntax on line {line} is not valid.')
+    indent = _('The indentation on line {line} is not valid. '
+               'Please use a multiple of 4 spaces')
+    comment_indent = _('The indentation on line {line} is not valid. '
+                       'Comments must be indented to the same level as '
+                       'the field definition (`=`) they belong to.')
+    comment_location = _('Incorrect placement of the field description on '
+                         'line {line}. The field description must be placed '
+                         'below the field definition (`=`) and with the same '
+                         'indentation.')
+    duplicate = _("The field '{label}' exists more than once.")
+    reserved = _("'{label}' is a reserved name. Please use a different name.")
+    required = _('Define at least one required field')
+    payment_method = _(
         "The field '{label}' contains a price that requires a credit card "
         "payment. This is only allowed if credit card payments are optional."
     )
-    minimum_price = (
+    minimum_price = _(
         'A minimum price total can only be set if at least one priced field '
         'is defined.'
     )
-    empty_fieldset = (
+    empty_fieldset = _(
         "The '{label}' group is empty and will not be visible. Either remove "
         "the empty group or add fields to it.")
-    nested_fieldsets = (
-        'Nested fieldsets (`#`) are not supported, please remove line {line}.'
-    )
 
     def __init__(
         self,
@@ -341,46 +338,28 @@ class ValidFormDefinition:
             field.render_kw = field.render_kw or {}
             field.render_kw['data-highlight-line'] = exception.line
             raise ValidationError(
-                field.gettext(
-                    'The syntax on line {line} is not valid.'
-                ).format(line=exception.line)
+                field.gettext(self.syntax).format(line=exception.line)
             ) from exception
         except InvalidIndentSyntax as exception:
             raise ValidationError(
-                field.gettext(
-                    'The indentation on line {line} is not valid. '
-                    'Please use a multiple of 4 spaces'
-                ).format(line=exception.line)
+                field.gettext(self.indent).format(line=exception.line)
             ) from exception
         except InvalidCommentIndentSyntax as exception:
             raise ValidationError(
-                field.gettext(
-                    'The indentation on line {line} is not valid. '
-                    'Comments must be indented to the same level as '
-                    'the field definition (`=`) they belong to.'
-                ).format(line=exception.line)
+                field.gettext(self.comment_indent).format(line=exception.line)
             ) from exception
         except InvalidCommentLocationSyntax as exception:
             raise ValidationError(
-                field.gettext(
-                    'Incorrect placement of the field description on '
-                    'line {line}. The field description must be placed '
-                    'below the field definition (`=`) and with the same '
-                    'indentation.'
-                ).format(line=exception.line)
+                field.gettext(self.comment_location).format(line=exception.line)
             ) from exception
         except EmptyFieldsetError as exception:
             raise ValidationError(
-                field.gettext(
-                    "The '{label}' group is empty and will not be visible. "
-                    "Either remove the empty group or add fields to it."
-                ).format(label=exception.field_name)
+                field.gettext(self.empty_fieldset).format(
+                    label=exception.field_name)
             ) from exception
         except DuplicateLabelError as exception:
             raise ValidationError(
-                field.gettext(
-                    "The field '{label}' exists more than once."
-                ).format(label=exception.label)
+                field.gettext(self.duplicate).format(label=exception.label)
             ) from exception
         except (FieldCompileError, MixedTypeError) as exception:
             raise ValidationError(
@@ -388,36 +367,35 @@ class ValidFormDefinition:
             ) from exception
         except AttributeError as exception:
             raise ValidationError(
-                field.gettext('The form could not be parsed.')
+                field.gettext(self.message)
             ) from exception
         except RequiredFieldAddedError as exception:
-            raise ValidationError(field.gettext(
+            message = _(
                 '${fields}: New fields cannot be required initially. '
-                'Require them in a separate migration step.'
-            ) % {
-                'fields': ', '.join(f'"{f}"' for f in exception.field_names)
-            }) from exception
+                'Require them in a separate migration step.', mapping={
+                    'fields': ', '.join(f'"{f}"' for f in
+                                        exception.field_names)
+                }
+            )
+            raise ValidationError(
+                field.gettext(message)
+            ) from exception
 
         if self.require_email_field:
             if not parsed_form.has_required_email_field:
-                raise ValidationError(field.gettext(
-                    "Define at least one required e-mail field "
-                    "('E-Mail * = @@@')"
-                ))
+                raise ValidationError(field.gettext(self.email))
 
         if self.require_title_fields and not parsed_form.title_fields:
-            raise ValidationError(
-                field.gettext('Define at least one required field')
-            )
+            raise ValidationError(field.gettext(self.required))
 
         if self.reserved_fields:
             for formfield_id, formfield in parsed_form._fields.items():
                 if formfield_id in self.reserved_fields:
+
                     raise ValidationError(
-                        field.gettext(
-                            "'{label}' is a reserved name. "
-                            "Please use a different name."
-                        ).format(label=formfield.label.text)
+                        field.gettext(self.reserved).format(
+                            label=formfield.label.text
+                        )
                     )
 
         if self.validate_prices and 'payment_method' in form:
@@ -433,11 +411,9 @@ class ValidFormDefinition:
                 #       has a payment_provider set.
                 if form['payment_method'].data != 'free':
                     # add the error message to both affected fields
-                    error = field.gettext(
-                        "The field '{label}' contains a price that requires "
-                        "a credit card payment. This is only allowed if "
-                        "credit card payments are optional."
-                    ).format(label=formfield.label.text)
+                    error = field.gettext(self.payment_method).format(
+                        label=formfield.label.text
+                    )
                     # if the payment_method field is below the form
                     # definition field, then validate will not have
                     # been run yet and we can only add process_errors
@@ -461,10 +437,7 @@ class ValidFormDefinition:
                 #        having a field like 'pricing_method' that
                 #        we can attach this error to. It doesn't
                 #        really make sense to show it on 'currency'
-                error = field.gettext(
-                    'A minimum price total can only be set if at least one '
-                    'priced field is defined.'
-                )
+                error = field.gettext(self.minimum_price)
                 # if the minimum_price_total field is below the form
                 # definition field, then validate will not have
                 # been run yet and we can only add process_errors
@@ -507,10 +480,8 @@ class ValidFilterFormDefinition(ValidFormDefinition):
         errors = None
         for field in parsed_form._fields.values():
             if not isinstance(field, (MultiCheckboxField, RadioField)):
-                error = field.gettext(
-                    "Invalid field type for field '{label}'. For filters "
-                    "only 'select' or 'multiple select' fields are allowed."
-                ).format(label=field.label.text)
+                error = field.gettext(self.invalid_field_type.format(
+                    label=field.label.text))
                 errors = form['definition'].errors
                 if not isinstance(errors, list):
                     errors = form['definition'].process_errors

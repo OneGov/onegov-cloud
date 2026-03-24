@@ -1073,7 +1073,7 @@ class ColorField(StringField):
                 value = name_to_hex(value)
             return normalize_hex(value)
         except ValueError:
-            msg = self.gettext('Not a valid color.')
+            msg = self.gettext(_('Not a valid color.'))
             raise ValueError(msg) from None
 
     def process_data(self, value: object) -> None:
