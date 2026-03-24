@@ -820,11 +820,18 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
     )
 
     if request.auto_accept(ticket):
+        # NOTE: If we encounter an error the transaction may go into
+        #       an invalid state, regardless we would also want to
+        #       revert any partial changes, so a savepoint makes sense
+        #       we flush first to make sure the savepoint is accurate
+        request.session.flush()
+        savepoint = transaction.savepoint()
         try:
             assert request.auto_accept_user is not None
             ticket.accept_ticket(request.auto_accept_user)
             request.view(reservations[0], name='accept')
         except Exception:
+            savepoint.rollback()
             request.warning(_('Your request could not be '
                               'accepted automatically!'))
         else:
