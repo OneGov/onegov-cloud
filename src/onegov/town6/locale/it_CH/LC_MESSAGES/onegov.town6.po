@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-02-26 13:35+0100\n"
+"POT-Creation-Date: 2026-03-24 15:31-0400\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -210,9 +210,6 @@ msgstr "Moduli e richieste"
 
 msgid "Publications"
 msgstr "Pubblicazioni"
-
-msgid "Official Documents"
-msgstr "Documenti ufficiali"
 
 msgid "Reservations"
 msgstr "Prenotazioni"
@@ -733,9 +730,6 @@ msgstr "Nessuna immagine caricata"
 msgid "This album does not contain any images yet."
 msgstr "Questo album non contiene ancora nessuna immagine."
 
-msgid "Cannot display"
-msgstr "Impossibile visualizzare"
-
 msgid "No photo albums defined yet."
 msgstr "Nessun album fotografico ancora definito."
 
@@ -1148,6 +1142,15 @@ msgstr "Parlamento"
 
 msgid "Parliamentary Group"
 msgstr "Gruppo parlamentare"
+
+msgid "Number:"
+msgstr ""
+
+msgid "Entry Date:"
+msgstr ""
+
+msgid "Status:"
+msgstr ""
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
@@ -2090,9 +2093,6 @@ msgstr "Numero del personale"
 msgid "Contract number"
 msgstr "Numero del contratto"
 
-msgid "Party"
-msgstr "Partito"
-
 msgid "Private address"
 msgstr "Indirizzo privato"
 
@@ -2812,6 +2812,9 @@ msgstr "Etichetta Pass giornaliero SBB"
 msgid "Publications Label"
 msgstr "Etichetta Pubblicazioni"
 
+msgid "Official Documents"
+msgstr "Documenti ufficiali"
+
 msgid "Hide Publications on Homepage"
 msgstr "Nascondi Pubblicazioni nella pagina iniziale"
 
@@ -2900,6 +2903,12 @@ msgstr "Sistema di informazione sui ratti (RIS)"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Cannot display"
+#~ msgstr "Impossibile visualizzare"
+
+#~ msgid "Party"
+#~ msgstr "Partito"
 
 #~ msgid "Parties"
 #~ msgstr "Partiti"
