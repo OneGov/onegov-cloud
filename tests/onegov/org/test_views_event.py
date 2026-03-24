@@ -918,7 +918,7 @@ def test_export_events_json_xml_csv(client: Client) -> None:
         assert event_fields['Bis'] == '24.03.2026 22:00'
 
     with freeze_time('2026-03-23T08:00:00'):
-        # patch send_mail to overcome 'file already exists' for
+        # patch send_email to overcome 'file already exists' for
         # the steps of submitting and accepting an event which
         # cause emails to be sent.
         with patch.object(client.app, 'send_email'):

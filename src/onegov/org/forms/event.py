@@ -606,6 +606,8 @@ class EventImportForm(Form):
 
     def run_import(self) -> tuple[int, list[str]]:
         headers = self.headers
+        expected_headers = headers.copy()
+        expected_headers.pop('created')  # not mandatory for the import
         session = self.request.session
         events = EventCollection(session)
         all_tags = chain(
@@ -628,7 +630,7 @@ class EventImportForm(Form):
         assert self.file.file is not None
         csvfile = convert_excel_to_csv(self.file.file)
         try:
-            csv = CSVFile(csvfile, expected_headers=headers.values())
+            csv = CSVFile(csvfile, expected_headers=expected_headers.values())
         except Exception:
             error_string = self.request.translate(
                 _('Expected header line with the following columns:')
@@ -659,7 +661,7 @@ class EventImportForm(Form):
                     for attribute, column in columns.items()
                 }
                 kwargs['timezone'] = 'Europe/Zurich'
-                kwargs.pop('created')  # ignore created column
+                kwargs.pop('created', None)  # ignore created column
                 event = events.add(**kwargs)
                 event.meta['submitter_email'] = self.request.current_username
                 event.submit()
