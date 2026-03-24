@@ -1375,14 +1375,19 @@ def reject_reservation(
             # flush, just in case, otherwise `remove_reservation` may fail
             request.session.flush()
 
-        if clients and (kaba := (reservation.data or {}).get('kaba')):
-            lead_delta = timedelta(
-                minutes=ticket.handler.data['key_code_lead_time']
-            )
+        if (
+            clients
+            and (kaba := (reservation.data or {}).get('kaba'))
+            and (visit_ids := kaba.get('visit_ids'))
+        ):
+            lead_delta = timedelta(minutes=ticket.handler.data.get(
+                'key_code_lead_time',
+                request.app.org.default_key_code_lead_time
+            ))
             start = reservation.display_start() - lead_delta
             # we can only revoke future visits
             if start > sedate.utcnow():
-                kaba_visits_to_revoke.extend(kaba['visit_ids'].items())
+                kaba_visits_to_revoke.extend(visit_ids.items())
         resource.scheduler.remove_reservation(token, reservation.id)
 
     if len(excluded) == 0 and submission:
@@ -1715,19 +1720,26 @@ def add_reservation(
         data['accepted'] = True
 
         clients = KabaClient.from_resource(resource, request.app)
-        if clients and (lead := timedelta(
-            minutes=ticket.handler.data['key_code_lead_time']
-        )) is not None and (
-            (start := reservation.display_start() - lead) > sedate.utcnow()
-        ):
+        if clients:
+            lead_delta = timedelta(minutes=ticket.handler.data.setdefault(
+                'key_code_lead_time',
+                request.app.org.default_key_code_lead_time
+            ))
+            start = reservation.display_start() - lead_delta
+        if clients and start > sedate.utcnow():
             # add visit
             components: dict[str, list[str]] = {}
             for site_id, component in resource.kaba_components:  # type: ignore[attr-defined]
                 components.setdefault(site_id, []).append(component)
 
-            code = ticket.handler.data['key_code']
-            lag = timedelta(minutes=ticket.handler.data['key_code_lag_time'])
-            end = reservation.display_end() + lag
+            code = ticket.handler.data.setdefault(
+                'key_code', next(iter(clients.values())).random_code()
+            )
+            lag_delta = timedelta(minutes=ticket.handler.data.setdefault(
+                'key_code_lag_time',
+                request.app.org.default_key_code_lag_time
+            ))
+            end = reservation.display_end() + lag_delta
             visit_ids = {}
             for site_id, group in components.items():
                 try:
@@ -1979,12 +1991,14 @@ def adjust_reservation(
             for site_id, component in resource.kaba_components:  # type: ignore[attr-defined]
                 components.setdefault(site_id, []).append(component)
 
-            lead_delta = timedelta(
-                minutes=ticket.handler.data['key_code_lead_time']
-            )
-            lag_delta = timedelta(
-                minutes=ticket.handler.data['key_code_lag_time']
-            )
+            lead_delta = timedelta(minutes=ticket.handler.data.get(
+                'key_code_lead_time',
+                request.app.org.default_key_code_lead_time
+            ))
+            lag_delta = timedelta(minutes=ticket.handler.data.get(
+                'key_code_lag_time',
+                request.app.org.default_key_code_lag_time
+            ))
             old_start = reservation.display_start() - lead_delta
             start = new_reservation.display_start() - lead_delta
             end = new_reservation.display_end() + lag_delta
@@ -2129,9 +2143,10 @@ def edit_kaba(
     for site_id, component in resource.kaba_components:  # type: ignore[attr-defined]
         components.setdefault(site_id, []).append(component)
 
-    old_lead_delta = timedelta(
-        minutes=ticket.handler.data.get('key_code_lead_time', 30)
-    )
+    old_lead_delta = timedelta(minutes=ticket.handler.data.setdefault(
+        'key_code_lead_time',
+        request.app.org.default_key_code_lead_time
+    ))
     now = sedate.utcnow()
     future_reservations = [
         reservation
@@ -2175,9 +2190,6 @@ def edit_kaba(
         for name in field_names
     }:
 
-        old_lead_delta = timedelta(
-            minutes=ticket.handler.data['key_code_lead_time']
-        )
         ticket.handler.data.update(form.data)
         ticket.handler.refresh()
 
