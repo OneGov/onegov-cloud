@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-24 15:31-0400\n"
+"POT-Creation-Date: 2026-03-24 20:26-0400\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2796,6 +2796,10 @@ msgid "Duplicate site ID ${site_id}"
 msgstr "ID der Anlage ${site_id} ist doppelt aufgeführt"
 
 #, python-format
+msgid "${field} for site ID ${site_id} is required"
+msgstr "${field} für ID ${site_id} muss ausgefüllt werden"
+
+#, python-format
 msgid "Invalid credentials for site ID ${site_id}"
 msgstr "Ungültige API Zugangsdaten für ID ${site_id}"
 
@@ -3173,6 +3177,18 @@ msgstr "2 Jahre"
 
 msgid "3 years"
 msgstr "3 Jahre"
+
+msgid "Linked file"
+msgstr "Verknüpfte Datei"
+
+msgid "Keep link"
+msgstr "Verknüpfung behalten"
+
+msgid "Delete link"
+msgstr "Verknüpfung löschen"
+
+msgid "Replace link"
+msgstr "Verknüpfung ersetzen"
 
 msgid "Link additional files"
 msgstr "Zusätzliche Dateien verknüpfen"
@@ -4153,9 +4169,6 @@ msgstr "Verknüpfung Verschieben"
 
 msgid "The link was deleted"
 msgstr "Die Verknüpfung wurde gelöscht"
-
-msgid "Delete link"
-msgstr "Verknüpfung löschen"
 
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
@@ -7866,25 +7879,12 @@ msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 
 #, python-format
-#~ msgid "${field} for site ID ${site_id} is required"
-#~ msgstr "${field} für ID ${site_id} muss ausgefüllt werden"
-
-#, python-format
 #~ msgid ""
 #~ "If there are any new news items since the last sending time you will "
 #~ "receive the newsletter at the following times: ${joined}:00."
 #~ msgstr ""
 #~ "Wenn es seit dem letzten Versand neue News-Einträge gibt, erhalten Sie "
 #~ "den Newsletter zu den folgenden Zeiten: ${joined}:00."
-
-#~ msgid "Linked file"
-#~ msgstr "Verknüpfte Datei"
-
-#~ msgid "Keep link"
-#~ msgstr "Verknüpfung behalten"
-
-#~ msgid "Replace link"
-#~ msgstr "Verknüpfung ersetzen"
 
 #~ msgid "Choose existing file"
 #~ msgstr "Existierende Datei auswählen"

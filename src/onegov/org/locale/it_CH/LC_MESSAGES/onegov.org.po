@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-03-24 15:31-0400\n"
+"POT-Creation-Date: 2026-03-24 20:26-0400\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2806,6 +2806,10 @@ msgid "Duplicate site ID ${site_id}"
 msgstr "ID sito duplicato ${site_id}"
 
 #, python-format
+msgid "${field} for site ID ${site_id} is required"
+msgstr "${field} per l'ID del sito ${site_id} è obbligatorio"
+
+#, python-format
 msgid "Invalid credentials for site ID ${site_id}"
 msgstr "Credenziali non valide per l'ID sito ${site_id}"
 
@@ -3183,6 +3187,18 @@ msgstr "2 anni"
 
 msgid "3 years"
 msgstr "3 anni"
+
+msgid "Linked file"
+msgstr "File collegato"
+
+msgid "Keep link"
+msgstr "Conservare collegamento"
+
+msgid "Delete link"
+msgstr "Elimina collegamento"
+
+msgid "Replace link"
+msgstr "Sostituire collegamento"
 
 msgid "Link additional files"
 msgstr "Collegare file aggiuntivi"
@@ -4156,9 +4172,6 @@ msgstr "Spostare il collegamento"
 
 msgid "The link was deleted"
 msgstr "Il collegamento è stato cancellato"
-
-msgid "Delete link"
-msgstr "Elimina collegamento"
 
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
@@ -7845,25 +7858,12 @@ msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 
 #, python-format
-#~ msgid "${field} for site ID ${site_id} is required"
-#~ msgstr "${field} per l'ID del sito ${site_id} è obbligatorio"
-
-#, python-format
 #~ msgid ""
 #~ "If there are any new news items since the last sending time you will "
 #~ "receive the newsletter at the following times: ${joined}:00."
 #~ msgstr ""
 #~ "Se ci sono nuovi articoli di notizie dall'ultimo invio, riceverai la "
 #~ "newsletter nei seguenti orari: ${joined}:00."
-
-#~ msgid "Linked file"
-#~ msgstr "File collegato"
-
-#~ msgid "Keep link"
-#~ msgstr "Conservare collegamento"
-
-#~ msgid "Replace link"
-#~ msgstr "Sostituire collegamento"
 
 #~ msgid "Choose existing file"
 #~ msgstr "Scegliere tra i file esistenti"

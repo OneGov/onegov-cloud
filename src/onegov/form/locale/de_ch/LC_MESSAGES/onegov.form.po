@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-24 14:49-0400\n"
+"POT-Creation-Date: 2026-03-24 19:31-0400\n"
 "PO-Revision-Date: 2022-03-07 13:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -30,6 +30,9 @@ msgstr "Dateien dieses Typs werden nicht unterstützt."
 
 msgid "Not a valid email"
 msgstr "Keine gültige Email"
+
+msgid "Not a valid color."
+msgstr "Ungültige Farbe."
 
 msgid "Required"
 msgstr "Pflicht"
@@ -280,47 +283,44 @@ msgstr "Muss am oder vor dem {date} sein."
 msgid "Not a valid domain."
 msgstr "Ungültige Domain."
 
+msgid "Uploaded file"
+msgstr "Hochgeladene Datei"
+
+msgid "Keep file"
+msgstr "Datei behalten"
+
+msgid "Delete file"
+msgstr "Datei löschen"
+
+msgid "Replace file"
+msgstr "Datei ersetzen"
+
 msgid "Upload additional files"
 msgstr "Zusätzliche Dateien hochladen"
 
-#~ msgid "Not a valid color."
-#~ msgstr "Ungültige Farbe."
+msgid "Text modules"
+msgstr "Textbausteine"
+
+msgid "Select an Option"
+msgstr "Eine Option auswählen"
+
+msgid "No results match"
+msgstr "Keine Ergebnisse gefunden:"
+
+msgid "Select Some Options"
+msgstr "Mehrere Optionen auswählen"
+
+msgid "hours"
+msgstr "Stunden"
+
+msgid "minutes"
+msgstr "Minuten"
 
 #, python-format
 #~ msgid "Nested fieldsets (`#`) are not supported, please remove line {line}."
 #~ msgstr ""
 #~ "Verschachtelte Fieldsets (`#`) werden nicht unterstützt, bitte entfernen "
 #~ "Sie die Zeile {line}."
-
-#~ msgid "Uploaded file"
-#~ msgstr "Hochgeladene Datei"
-
-#~ msgid "Keep file"
-#~ msgstr "Datei behalten"
-
-#~ msgid "Delete file"
-#~ msgstr "Datei löschen"
-
-#~ msgid "Replace file"
-#~ msgstr "Datei ersetzen"
-
-#~ msgid "Text modules"
-#~ msgstr "Textbausteine"
-
-#~ msgid "Select an Option"
-#~ msgstr "Eine Option auswählen"
-
-#~ msgid "No results match"
-#~ msgstr "Keine Ergebnisse gefunden:"
-
-#~ msgid "Select Some Options"
-#~ msgstr "Mehrere Optionen auswählen"
-
-#~ msgid "hours"
-#~ msgstr "Stunden"
-
-#~ msgid "minutes"
-#~ msgstr "Minuten"
 
 #~ msgid "Multiline"
 #~ msgstr "Mehrzeilig"

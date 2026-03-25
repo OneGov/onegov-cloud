@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-24 15:31-0400\n"
+"POT-Creation-Date: 2026-03-24 20:26-0400\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2802,6 +2802,10 @@ msgid "Duplicate site ID ${site_id}"
 msgstr "Duplicata de l'ID du site ${site_id}"
 
 #, python-format
+msgid "${field} for site ID ${site_id} is required"
+msgstr "${field} pour l'ID du site ${site_id} est obligatoire"
+
+#, python-format
 msgid "Invalid credentials for site ID ${site_id}"
 msgstr "Informations d'identification invalides pour l'ID du site ${site_id}"
 
@@ -3188,6 +3192,18 @@ msgstr "2 ans"
 
 msgid "3 years"
 msgstr "3 ans"
+
+msgid "Linked file"
+msgstr "Fichier lié"
+
+msgid "Keep link"
+msgstr "Conserver le lien"
+
+msgid "Delete link"
+msgstr "Supprimer le lien"
+
+msgid "Replace link"
+msgstr "Remplacer le lien"
 
 msgid "Link additional files"
 msgstr "Lier des fichiers supplémentaires"
@@ -4160,9 +4176,6 @@ msgstr "Déplacer le lien"
 
 msgid "The link was deleted"
 msgstr "Le lien a été supprimé"
-
-msgid "Delete link"
-msgstr "Supprimer le lien"
 
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
@@ -7878,25 +7891,12 @@ msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
 #, python-format
-#~ msgid "${field} for site ID ${site_id} is required"
-#~ msgstr "${field} pour l'ID du site ${site_id} est obligatoire"
-
-#, python-format
 #~ msgid ""
 #~ "If there are any new news items since the last sending time you will "
 #~ "receive the newsletter at the following times: ${joined}:00."
 #~ msgstr ""
 #~ "S'il y a de nouveaux articles d'actualité depuis le dernier envoi, vous "
 #~ "recevrez la newsletter aux heures suivantes : ${joined}:00."
-
-#~ msgid "Linked file"
-#~ msgstr "Fichier lié"
-
-#~ msgid "Keep link"
-#~ msgstr "Conserver le lien"
-
-#~ msgid "Replace link"
-#~ msgstr "Remplacer le lien"
 
 #~ msgid "Choose existing file"
 #~ msgstr "Choisir parmi des fichiers existants"

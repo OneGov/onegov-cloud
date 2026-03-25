@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-24 14:49-0400\n"
+"POT-Creation-Date: 2026-03-24 19:31-0400\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -26,6 +26,9 @@ msgid "Files of this type are not supported."
 msgstr ""
 
 msgid "Not a valid email"
+msgstr ""
+
+msgid "Not a valid color."
 msgstr ""
 
 msgid "Required"
@@ -255,5 +258,35 @@ msgstr ""
 msgid "Not a valid domain."
 msgstr ""
 
+msgid "Uploaded file"
+msgstr ""
+
+msgid "Keep file"
+msgstr ""
+
+msgid "Delete file"
+msgstr ""
+
+msgid "Replace file"
+msgstr ""
+
 msgid "Upload additional files"
+msgstr ""
+
+msgid "Text modules"
+msgstr ""
+
+msgid "Select an Option"
+msgstr ""
+
+msgid "No results match"
+msgstr ""
+
+msgid "Select Some Options"
+msgstr ""
+
+msgid "hours"
+msgstr ""
+
+msgid "minutes"
 msgstr ""

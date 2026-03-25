@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-24 14:49-0400\n"
+"POT-Creation-Date: 2026-03-24 19:31-0400\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -29,6 +29,9 @@ msgstr "Les fichiers de ce type ne sont pas pris en charge."
 
 msgid "Not a valid email"
 msgstr "L'adresse électronique n'est pas valide"
+
+msgid "Not a valid color."
+msgstr "Ce n'est pas une couleur valable."
 
 msgid "Required"
 msgstr "Requis"
@@ -278,47 +281,44 @@ msgstr "Doit avoir lieu le {date} ou avant."
 msgid "Not a valid domain."
 msgstr "Domaine non valide."
 
+msgid "Uploaded file"
+msgstr "Fichier téléchargé"
+
+msgid "Keep file"
+msgstr "Conserver le fichier"
+
+msgid "Delete file"
+msgstr "Supprimer le fichier"
+
+msgid "Replace file"
+msgstr "Remplacer le fichier"
+
 msgid "Upload additional files"
 msgstr "Télécharger des fichiers supplémentaires"
 
-#~ msgid "Not a valid color."
-#~ msgstr "Ce n'est pas une couleur valable."
+msgid "Text modules"
+msgstr "Modules de texte"
+
+msgid "Select an Option"
+msgstr "Sélectionnez une option"
+
+msgid "No results match"
+msgstr "Aucun résultat ne correspond"
+
+msgid "Select Some Options"
+msgstr "Sélectionner quelques options"
+
+msgid "hours"
+msgstr "heures"
+
+msgid "minutes"
+msgstr "minutes"
 
 #, python-format
 #~ msgid "Nested fieldsets (`#`) are not supported, please remove line {line}."
 #~ msgstr ""
 #~ "Les fieldsets imbriqués (`#`) ne sont pas pris en charge, veuillez "
 #~ "supprimer la ligne {line}."
-
-#~ msgid "Uploaded file"
-#~ msgstr "Fichier téléchargé"
-
-#~ msgid "Keep file"
-#~ msgstr "Conserver le fichier"
-
-#~ msgid "Delete file"
-#~ msgstr "Supprimer le fichier"
-
-#~ msgid "Replace file"
-#~ msgstr "Remplacer le fichier"
-
-#~ msgid "Text modules"
-#~ msgstr "Modules de texte"
-
-#~ msgid "Select an Option"
-#~ msgstr "Sélectionnez une option"
-
-#~ msgid "No results match"
-#~ msgstr "Aucun résultat ne correspond"
-
-#~ msgid "Select Some Options"
-#~ msgstr "Sélectionner quelques options"
-
-#~ msgid "hours"
-#~ msgstr "heures"
-
-#~ msgid "minutes"
-#~ msgstr "minutes"
 
 #~ msgid "Multiline"
 #~ msgstr "Multi-lignes"
