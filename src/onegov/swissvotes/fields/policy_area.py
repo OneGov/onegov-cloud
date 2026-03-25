@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from json import dumps
+from onegov.swissvotes import _
 from onegov.swissvotes.models import PolicyArea
 from wtforms.fields import SelectMultipleField
 from wtforms.widgets import Select
@@ -48,8 +49,10 @@ class PolicyAreaWidget(Select):
 
         kwargs['class_'] = 'policy-selector'
         kwargs['data-tree'] = dumps(field.tree)
-        kwargs['data-placehoder-text'] = field.gettext('Select Some Options')
-        kwargs['data-no-matches-text'] = field.gettext('No results match')
+        placeholder = _('Select Some Options')
+        no_matches = _('No results match')
+        kwargs['data-placehoder-text'] = field.gettext(placeholder)
+        kwargs['data-no-matches-text'] = field.gettext(no_matches)
         return super().__call__(field, **kwargs)
 
     @classmethod

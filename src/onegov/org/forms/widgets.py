@@ -44,10 +44,14 @@ class UploadOrLinkExistingFileWidget(UploadWidget):
             input_html=input_html,
             **kwargs
         )
-        data['existing_file_label'] = field.gettext('Linked file')
-        data['keep_label'] = field.gettext('Keep link')
-        data['delete_label'] = field.gettext('Delete link')
-        data['replace_label'] = field.gettext('Replace link')
+        existing_file_label = _('Linked file')
+        keep_label = _('Keep link')
+        delete_label = _('Delete link')
+        replace_label = _('Replace link')
+        data['existing_file_label'] = field.gettext(existing_file_label)
+        data['keep_label'] = field.gettext(keep_label)
+        data['delete_label'] = field.gettext(delete_label)
+        data['replace_label'] = field.gettext(replace_label)
         if is_simple is True:
             return is_simple, data
 

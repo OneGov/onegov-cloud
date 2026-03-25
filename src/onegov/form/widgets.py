@@ -221,6 +221,10 @@ class UploadWidget(FileInput):
         else:
             display_size = f' ({humanize.naturalsize(size)})'
 
+        existing_file_label = _('Uploaded file')
+        keep_label = _('Keep file')
+        delete_label = _('Delete file')
+        replace_label = _('Replace file')
         return False, {
             'wrapper_css_class': wrapper_css_class,
             'input_html': input_html,
@@ -230,10 +234,10 @@ class UploadWidget(FileInput):
             'filesize': display_size,
             'filename': field.data['filename'],
             'name': field.id,
-            'existing_file_label': field.gettext('Uploaded file'),
-            'keep_label': field.gettext('Keep file'),
-            'delete_label': field.gettext('Delete file'),
-            'replace_label': field.gettext('Replace file'),
+            'existing_file_label': field.gettext(existing_file_label),
+            'keep_label': field.gettext(keep_label),
+            'delete_label': field.gettext(delete_label),
+            'replace_label': field.gettext(replace_label),
         }
 
     def __call__(
@@ -380,9 +384,10 @@ class TextAreaWithTextModules(TextArea):
             return input_html
 
         field.meta.request.include('text-module-picker')
+        label = _('Text modules')
         return Markup(self.template.render(  # nosec: B704
             id=field.id,
-            label=field.gettext('Text modules'),
+            label=field.gettext(label),
             text_modules=text_modules,
             input_html=input_html
         ))
@@ -480,10 +485,13 @@ class ChosenSelectWidget(Select):
         kwargs['class_'] = '{} chosen-select'.format(
             kwargs.get('class_', '')
         ).strip()
-        kwargs['data-placeholder'] = field.gettext('Select an Option')
-        kwargs['data-no_results_text'] = field.gettext('No results match')
         if self.multiple:
-            kwargs['data-placeholder'] = field.gettext('Select Some Options')
+            placeholder = _('Select Some Options')
+        else:
+            placeholder = _('Select an Option')
+        no_results_label = _('No results match')
+        kwargs['data-placeholder'] = field.gettext(placeholder)
+        kwargs['data-no_results_text'] = field.gettext(no_results_label)
 
         return super().__call__(field, **kwargs)
 
@@ -496,10 +504,13 @@ class TreeSelectWidget(Select):
         kwargs['class_'] = '{} treeselect'.format(
             kwargs.get('class_', '')
         ).strip()
-        kwargs['data-placeholder'] = field.gettext('Select an Option')
-        kwargs['data-no_results_text'] = field.gettext('No results match')
         if self.multiple:
-            kwargs['data-placeholder'] = field.gettext('Select Some Options')
+            placeholder = _('Select Some Options')
+        else:
+            placeholder = _('Select an Option')
+        no_results_label = _('No results match')
+        kwargs['data-placeholder'] = field.gettext(placeholder)
+        kwargs['data-no_results_text'] = field.gettext(no_results_label)
 
         return super().__call__(field, **kwargs)
 
@@ -644,14 +655,16 @@ class DurationInput:
             _hours, _minutes = divmod(_minutes, 60)
             hours = str(_hours)
             minutes = str(_minutes)
+        hours_label = _('hours')
+        minutes_label = _('minutes')
         return Markup("""
             <div class="duration-widget">
             <label>{hours_input} {hours_label}</label>
             <label>{minutes_input} {minutes_label}</label>
             </div>
         """).format(
-            hours_label=field.gettext('hours'),
-            minutes_label=field.gettext('minutes'),
+            hours_label=field.gettext(hours_label),
+            minutes_label=field.gettext(minutes_label),
             hours_input=self.hours_widget(
                 field, value=hours, size=2, **kwargs
             ),
