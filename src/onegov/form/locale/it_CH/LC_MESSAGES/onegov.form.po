@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-24 19:31-0400\n"
+"POT-Creation-Date: 2026-03-25 09:27+0100\n"
 "PO-Revision-Date: 2022-03-07 13:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -198,6 +198,9 @@ msgid ""
 "description must be placed below the field definition (`=`) and with the "
 "same indentation."
 msgstr ""
+"Posizionamento errato della descrizione del campo alla riga {line}. La "
+"descrizione del campo deve essere inserita sotto la definizione del campo "
+"(`=`) e con lo stesso rientro."
 
 #, python-format
 msgid "The field '{label}' exists more than once."
@@ -255,6 +258,8 @@ msgid ""
 "Invalid field type for field '${label}'. Please use the plus-icon to add "
 "allowed field types."
 msgstr ""
+"Tipo di campo non valido per il campo '${label}'. Utilizza l'icona con il "
+"segno più per aggiungere i tipi di campo consentiti."
 
 msgid "Not a valid phone number."
 msgstr "Non è un numero di telefono valido."
@@ -298,26 +303,17 @@ msgstr "Caricare file aggiuntivi"
 msgid "Text modules"
 msgstr "Moduli di testo"
 
+msgid "Select Some Options"
+msgstr "Seleziona alcune opzioni"
+
 msgid "Select an Option"
 msgstr "Selezionare un'opzione"
 
 msgid "No results match"
 msgstr "Nessun risultato corrisponde"
 
-msgid "Select Some Options"
-msgstr "Seleziona alcune opzioni"
-
 msgid "hours"
 msgstr "ore"
 
 msgid "minutes"
 msgstr "minuti"
-
-#, python-format
-#~ msgid "Nested fieldsets (`#`) are not supported, please remove line {line}."
-#~ msgstr ""
-#~ "I fieldset annidati (`#`) non sono supportati, si prega di rimuovere la "
-#~ "riga {line}."
-
-#~ msgid "Multiline"
-#~ msgstr "Multilinea"

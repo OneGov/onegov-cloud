@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-03-24 20:26-0400\n"
+"POT-Creation-Date: 2026-03-25 11:20+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -198,8 +198,8 @@ msgstr "Newsletter giornaliera ${time}"
 msgid "${org} OneGov Cloud Status"
 msgstr "${org} OneGov Cloud Status"
 
-#.
 #. get the resource titles and ids
+#.
 msgid "General"
 msgstr "Generale"
 
@@ -1222,22 +1222,22 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number of attendees "
-"(${claimed_spots})"
+"The limit cannot be lower than the already confirmed number of attendees ($"
+"{claimed_spots})"
 msgstr ""
-"Il limite non può essere inferiore numero di partecipanti già confermato "
-"(${claimed_spots})"
+"Il limite non può essere inferiore numero di partecipanti già confermato ($"
+"{claimed_spots})"
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number attendees "
-"(${claimed_spots}) and the number of pending requests (${pending_requests}). "
+"The limit cannot be lower than the already confirmed number attendees ($"
+"{claimed_spots}) and the number of pending requests (${pending_requests}). "
 "Either enable the waiting list, process the pending requests or increase the "
 "limit. "
 msgstr ""
 "Il limite non può essere inferiore al numero di partecipanti già confermato "
-"(${claimed_spots}) e al numero di richieste in sospeso "
-"(${pending_requests}). Abilita la lista d'attesa, elabora le richieste in "
+"(${claimed_spots}) e al numero di richieste in sospeso ($"
+"{pending_requests}). Abilita la lista d'attesa, elabora le richieste in "
 "sospeso o aumenta il limite. "
 
 msgid "The end date must be later than the start date"
@@ -2725,6 +2725,8 @@ msgstr ""
 msgid ""
 "Invalid format. Please define subtopic(s) for '${topic}' or remove the ':'."
 msgstr ""
+"Formato non valido. Definisci uno o più sottoargomenti per '${topic}'' "
+"oppure rimuovi i due punti ':'."
 
 msgid ""
 "Invalid format. Only topics and subtopics are allowed - no deeper structures "
@@ -2993,6 +2995,14 @@ msgstr ""
 "Newsletter giornaliera per tutte le categorie (solo per gli articoli di "
 "notizie)"
 
+#, python-format
+msgid ""
+"If there are any new news items since the last sending time you will receive "
+"the newsletter at the following times: ${joined}:00."
+msgstr ""
+"Se ci sono nuovi articoli di notizie dall'ultimo invio, riceverai la "
+"newsletter nei seguenti orari: ${joined}:00."
+
 msgid "Submission Window"
 msgstr "Finestra di presentazione"
 
@@ -3073,22 +3083,19 @@ msgstr "Attivo"
 msgid "Inactive"
 msgstr "Inattivo"
 
-#, fuzzy
 msgid "Yubikey"
 msgstr "Yubikey"
 
 msgid "Plug your YubiKey into a USB slot and press it."
 msgstr "Collega il dispositivo YubiKey a una porta USB e premi."
 
-#, fuzzy
 msgid "Administrators and editors must use a Yubikey"
 msgstr "Gli amministratori e i redattori devono utilizzare una Yubikey"
 
-#, fuzzy
 msgid "Invalid Yubikey"
 msgstr "Yubikey non valida"
 
-#, fuzzy, python-format
+#, python-format
 msgid "This Yubikey is already used by ${username}"
 msgstr "Questa Yubikey è già utilizzata da ${username}"
 
@@ -3199,6 +3206,9 @@ msgstr "Elimina collegamento"
 
 msgid "Replace link"
 msgstr "Sostituire collegamento"
+
+msgid "Choose existing file"
+msgstr "Scegliere tra i file esistenti"
 
 msgid "Link additional files"
 msgstr "Collegare file aggiuntivi"
@@ -3566,8 +3576,8 @@ msgid "Copy"
 msgstr "Copia"
 
 #, python-format
-msgid "Do you really want to delete \"{}\"?"
-msgstr ""
+msgid "Do you really want to delete \"${title}\"?"
+msgstr "Desideri davvero eliminare \"${title}\"?"
 
 msgid "Delete newsletter"
 msgstr "Elimina newsletter"
@@ -3619,10 +3629,6 @@ msgstr "Esporta l'esecuzione della fattura come PDF"
 
 msgid "Directory"
 msgstr "Cartella"
-
-#, python-format
-msgid "Do you really want to delete \"${title}\"?"
-msgstr "Desideri davvero eliminare \"${title}\"?"
 
 msgid "All entries will be deleted as well!"
 msgstr "Anche tutti gli elementi verranno eliminati!"
@@ -4094,8 +4100,8 @@ msgstr "Rifiuta tutto con messaggio"
 msgid "Add reservation"
 msgstr "Aggiungi prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -4274,8 +4280,8 @@ msgstr ""
 "eliminare le pagine con sottopagine. Per eliminare questa pagina, elimina "
 "prima tutte le sottopagine o chiedi a un amministratore di farlo per te."
 
-#.
 #. Modification for the footer left on all pages
+#.
 msgid "Source"
 msgstr "Fonte"
 
@@ -5012,8 +5018,8 @@ msgstr "Ciao!"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su "
-"${homepage}."
+"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su $"
+"{homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Per attivare il tuo account, fai clic su conferma qui di seguito:"
@@ -5093,8 +5099,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -5106,9 +5112,9 @@ msgid "Have a great day!"
 msgstr "Ti auguro una buona giornata!"
 
 msgid ""
-"This is the notification for customer messages on reservations for ${request."
-"app.org.title}. If you no longer want to receive this e-mail please contact "
-"an administrator so they can remove you from the recipients list."
+"This is the notification for customer messages on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
 "Questa è la notifica relativa ai messaggi dei clienti sulle prenotazioni per "
 "${request.app.org.title}. Se non desideri più ricevere questa e-mail, "
@@ -5237,13 +5243,13 @@ msgid "New note in Ticket ${link}"
 msgstr "Nuova nota nel ticket ${link}"
 
 msgid ""
-"This is the notification for notes on reservations for ${request.app.org."
-"title}. If you no longer want to receive this e-mail please contact an "
-"administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Questa è la notifica per le note sulle prenotazioni per ${request.app.org."
-"title}. Se non si desidera più ricevere questo messaggio di posta "
-"elettronica si prega di contattare un amministratore in modo che possa "
+"Questa è la notifica per le note sulle prenotazioni per $"
+"{request.app.org.title}. Se non si desidera più ricevere questo messaggio di "
+"posta elettronica si prega di contattare un amministratore in modo che possa "
 "rimuovervi dall'elenco dei destinatari lista"
 
 msgid "Pending approval"
@@ -5301,7 +5307,6 @@ msgstr ""
 "Se il collegamento della password è scaduto, puoi richiedere una nuova "
 "password qui:"
 
-#, fuzzy
 msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
 "Per utilizzare il tuo account hai bisogno di Yubikey con il seriale ${number}"
@@ -5814,8 +5819,8 @@ msgstr "ore"
 #, python-format
 msgid "Reservations can only be made at most ${n} ${unit} in advance."
 msgstr ""
-"Le prenotazioni possono essere effettuate solo con un anticipo massimo di "
-"${n} ${unit}."
+"Le prenotazioni possono essere effettuate solo con un anticipo massimo di $"
+"{n} ${unit}."
 
 msgid ""
 "Reservations must be made at least ${n1} ${unit1} and at most ${n2} ${unit2} "
@@ -6104,6 +6109,10 @@ msgstr "mTAN"
 msgid "Identicon"
 msgstr "Icona identificativa"
 
+#. messages not translated by wtforms
+msgid "Not a valid choice"
+msgstr "Scelta non valida"
+
 msgid "CSRF failed."
 msgstr ""
 "CSRF non riuscito. Si prega di aggiornare la pagina. Se il problema "
@@ -6119,13 +6128,21 @@ msgstr ""
 "Token CSRF scaduto. Si prega di aggiornare la pagina. Se il problema "
 "persiste, disconnettersi, riconnettersi e riprovare."
 
-#. messages not translated by wtforms
-msgid "Not a valid choice"
-msgstr "Scelta non valida"
+#. messages defined in wtforms-components
+msgid "Not a valid color."
+msgstr "Colore non valido."
 
 #. Roles in plural form are not defined as translatable texts anywhere
 msgid "Admins"
 msgstr "Amministratori"
+
+#, python-format
+msgid ""
+"You can only reserve this allocation before ${date} if you live in the "
+"following zipcodes: ${zipcodes}"
+msgstr ""
+"Puoi prenotare questa allocazione prima del ${date} solo se la tua residenza "
+"rientra nei seguenti codici postali: ${zipcodes}"
 
 #, python-format
 msgid "${percent}% Available"
@@ -6242,8 +6259,8 @@ msgid "Delete availability period"
 msgstr "Elimina il periodo di disponibilità"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
@@ -6269,8 +6286,8 @@ msgid ""
 "Availability period updated. ${deleted} allocations removed, ${updated} "
 "allocations adjusted and ${created} new allocations created."
 msgstr ""
-"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, "
-"${updated} allocazioni modificate e ${created} nuove allocazioni create."
+"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, $"
+"{updated} allocazioni modificate e ${created} nuove allocazioni create."
 
 msgid "Availability period not found"
 msgstr "Periodo di disponibilità non trovato"
@@ -6311,7 +6328,6 @@ msgstr "Il tuo profilo utente è incompleto. Aggiornalo prima di proseguire."
 msgid "You have been logged in."
 msgstr "Hai effettuato l'accesso."
 
-#, fuzzy
 msgid "Wrong e-mail address, password or yubikey."
 msgstr "Indirizzo e-mail, password o Yubikey errati."
 
@@ -6360,6 +6376,14 @@ msgstr "Sei stato disconnesso."
 
 msgid "Password reset"
 msgstr "Ripristina password"
+
+#, python-format
+msgid ""
+"A password reset link has been sent to ${email}, provided an active account "
+"exists for this email address."
+msgstr ""
+"Il collegamento per reimpostare la password è stato inviato all'indirizzo $"
+"{email} (se si tratta di un account attivo esistente)."
 
 msgid "Password changed."
 msgstr "Password modificata."
@@ -6474,11 +6498,11 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Cannot convert field \"${field}\" from type \"${old_type}\" to "
-"\"${new_type}\"."
+"Cannot convert field \"${field}\" from type \"${old_type}\" to \"${new_type}"
+"\"."
 msgstr ""
-"Impossibile convertire il campo \"${field}\" dal tipo \"${old_type}\" a "
-"\"${new_type}\"."
+"Impossibile convertire il campo \"${field}\" dal tipo \"${old_type}\" a \"$"
+"{new_type}\"."
 
 msgid "The directory was deleted"
 msgstr "La cartella è stata cancellata"
@@ -6577,11 +6601,19 @@ msgstr "Nuovo destinatario"
 
 #, python-format
 msgid ""
-"Registration for notifications on new entries in the directory "
-"\"${directory}\""
+"Registration for notifications on new entries in the directory \"${directory}"
+"\""
 msgstr ""
-"Registrazione per le notifiche sui nuovi elementi nella cartella "
-"\"${directory}\""
+"Registrazione per le notifiche sui nuovi elementi nella cartella \"$"
+"{directory}\""
+
+#, python-format
+msgid ""
+"Success! We have sent a confirmation link to ${address}, if we didn't send "
+"you one already."
+msgstr ""
+"La richiesta ha avuto esito positivo! Abbiamo inviato un collegamento di "
+"conferma a ${address}, se non te ne abbiamo già inviato uno."
 
 msgid "Notification for new entries"
 msgstr "Notifica per nuovi elementi"
@@ -6719,22 +6751,18 @@ msgstr "Il nome del file è troppo lungo"
 msgid "The file cannot be processed"
 msgstr "Il file non può essere elaborato"
 
-#, fuzzy
 msgid "Please submit your yubikey"
 msgstr "Invia la tua Yubikey"
 
-#, fuzzy
 msgid "Your account is not linked to a Yubikey"
 msgstr "Il tuo account non è collegato a Yubikey"
 
-#, fuzzy
 msgid "The used Yubikey is not linked to your account"
 msgstr "La Yubikey usata non è collegata al tuo account"
 
 msgid "This file already has a digital seal"
 msgstr "Questo file include già un sigillo digitale"
 
-#, fuzzy
 msgid "Your Yubikey could not be validated"
 msgstr "Non è stato possibile convalidare la tua Yubikey"
 
@@ -6924,8 +6952,31 @@ msgid "Welcome to the ${org} Newsletter"
 msgstr "Benvenuto nella newsletter di ${org}"
 
 #, python-format
+msgid ""
+"Success! We have added ${address} to the list of recipients. Subscribed "
+"categories are ${subscribed}."
+msgstr ""
+"Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari. Le "
+"categorie sottoscritte sono ${subscribed}."
+
+#, python-format
 msgid "Success! We have added ${address} to the list of recipients."
 msgstr "Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari."
+
+#, python-format
+msgid ""
+"Success! We have sent a confirmation link to ${address}, if we didn't send "
+"you one already. Your subscribed categories are ${subscribed}."
+msgstr ""
+"La richiesta ha avuto esito positivo! Abbiamo inviato un collegamento di "
+"conferma a ${address}, se non te ne abbiamo già inviato uno. Le categorie "
+"sottoscritte sono ${subscribed}."
+
+# python-format
+#, python-format
+msgid "Success! We have updated your subscribed categories to ${subscribed}."
+msgstr ""
+"Successo! Abbiamo aggiornato le categorie sottoscritte a ${subscribed}."
 
 msgid "Update your newsletter subscription categories:"
 msgstr "Aggiorna le categorie del tuo abbonamento alla newsletter:"
@@ -7268,8 +7319,8 @@ msgid ""
 "Failed to create visits using the dormakaba API for site ID ${site_id} "
 "please make sure your credentials are still valid."
 msgstr ""
-"Impossibile creare visite con l'API di dormakaba per l'ID del sito "
-"${site_id}. Assicurarsi che le credenziali siano ancora valide."
+"Impossibile creare visite con l'API di dormakaba per l'ID del sito $"
+"{site_id}. Assicurarsi che le credenziali siano ancora valide."
 
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
@@ -7480,8 +7531,8 @@ msgstr "Totale di ${number} collegamenti trovati."
 msgid ""
 "Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
-"Migra i collegamenti dal dominio specificato al dominio corrente "
-"\"${domain}\"."
+"Migra i collegamenti dal dominio specificato al dominio corrente \"${domain}"
+"\"."
 
 msgid "OneGov API"
 msgstr "API OneGov"
@@ -7729,7 +7780,7 @@ msgstr "Il tuo messaggio è stato inviato"
 
 #, python-format
 msgid "${count} file(s) not found: ${files}"
-msgstr ""
+msgstr "${count} file non trovati: ${files}"
 
 msgid "Zip archive created successfully"
 msgstr "Archivio zip creato con successo"
@@ -7785,8 +7836,8 @@ msgstr "Si è verificato un errore durante il caricamento su Gever."
 
 #, python-format
 msgid ""
-"Encountered an error while uploading to Gever. Response status code is "
-"${status}."
+"Encountered an error while uploading to Gever. Response status code is $"
+"{status}."
 msgstr ""
 "Si è verificato un errore durante il caricamento su Gever.Il codice di stato "
 "della risposta è ${status}."
@@ -7856,68 +7907,6 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
-
-#, python-format
-#~ msgid ""
-#~ "If there are any new news items since the last sending time you will "
-#~ "receive the newsletter at the following times: ${joined}:00."
-#~ msgstr ""
-#~ "Se ci sono nuovi articoli di notizie dall'ultimo invio, riceverai la "
-#~ "newsletter nei seguenti orari: ${joined}:00."
-
-#~ msgid "Choose existing file"
-#~ msgstr "Scegliere tra i file esistenti"
-
-#~ msgid "Not a valid color."
-#~ msgstr "Colore non valido."
-
-#, python-format
-#~ msgid ""
-#~ "You can only reserve this allocation before ${date} if you live in the "
-#~ "following zipcodes: ${zipcodes}"
-#~ msgstr ""
-#~ "Puoi prenotare questa allocazione prima del ${date} solo se la tua "
-#~ "residenza rientra nei seguenti codici postali: ${zipcodes}"
-
-#, python-format
-#~ msgid ""
-#~ "A password reset link has been sent to ${email}, provided an active "
-#~ "account exists for this email address."
-#~ msgstr ""
-#~ "Il collegamento per reimpostare la password è stato inviato all'indirizzo "
-#~ "${email} (se si tratta di un account attivo esistente)."
-
-#, python-format
-#~ msgid ""
-#~ "Success! We have sent a confirmation link to ${address}, if we didn't "
-#~ "send you one already."
-#~ msgstr ""
-#~ "La richiesta ha avuto esito positivo! Abbiamo inviato un collegamento di "
-#~ "conferma a ${address}, se non te ne abbiamo già inviato uno."
-
-#, python-format
-#~ msgid ""
-#~ "Success! We have added ${address} to the list of recipients. Subscribed "
-#~ "categories are ${subscribed}."
-#~ msgstr ""
-#~ "Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari. Le "
-#~ "categorie sottoscritte sono ${subscribed}."
-
-#, python-format
-#~ msgid ""
-#~ "Success! We have sent a confirmation link to ${address}, if we didn't "
-#~ "send you one already. Your subscribed categories are ${subscribed}."
-#~ msgstr ""
-#~ "La richiesta ha avuto esito positivo! Abbiamo inviato un collegamento di "
-#~ "conferma a ${address}, se non te ne abbiamo già inviato uno. Le categorie "
-#~ "sottoscritte sono ${subscribed}."
-
-# python-format
-#, python-format
-#~ msgid ""
-#~ "Success! We have updated your subscribed categories to ${subscribed}."
-#~ msgstr ""
-#~ "Successo! Abbiamo aggiornato le categorie sottoscritte a ${subscribed}."
 
 #~ msgid "Analytics Code"
 #~ msgstr "Codice Analytics"

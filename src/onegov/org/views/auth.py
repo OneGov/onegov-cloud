@@ -332,9 +332,11 @@ def handle_password_reset_request(
 
         response = morepath.redirect(request.link(self, name='login'))
         request.success(
-            _(('A password reset link has been sent to ${email}, provided an '
-               'active account exists for this email address.'),
-              mapping={'email': form.email.data})
+            _(
+                'A password reset link has been sent to ${email}, provided an '
+                'active account exists for this email address.',
+                mapping={'email': form.email.data}
+            )
         )
         return response
 

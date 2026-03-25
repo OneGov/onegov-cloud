@@ -151,6 +151,7 @@ class UploadOrSelectExistingFileWidget(UploadOrLinkExistingFileWidget):
             input_html=input_html,
             **kwargs
         )
+        placeholder = _('Choose existing file')
 
         # this is pretty ugly, but implementing iter_choices on the file
         # field would not clean up things significantly
@@ -160,9 +161,7 @@ class UploadOrSelectExistingFileWidget(UploadOrLinkExistingFileWidget):
                 choices=field.choices,
                 render_kw={
                     'id': f'{field.name}-select',
-                    'data_placeholder': field.gettext(
-                        _('Choose existing file')
-                    ),
+                    'data_placeholder': field.gettext(placeholder),
                     'class_': 'chosen-select'
                 }
             )

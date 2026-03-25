@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-24 19:31-0400\n"
+"POT-Creation-Date: 2026-03-25 09:27+0100\n"
 "PO-Revision-Date: 2022-03-07 13:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -190,6 +190,8 @@ msgid ""
 "The indentation on line {line} is not valid. Comments must be indented to "
 "the same level as the field definition (`=`) they belong to."
 msgstr ""
+"Die Einrückung in Zeile {line} ist nicht gültig. Kommentare müssen mit dem "
+"gleichen Einzug als die dazugehörige Felddefinition (`=`) platziert werden."
 
 #, python-format
 msgid ""
@@ -258,6 +260,8 @@ msgid ""
 "Invalid field type for field '${label}'. Please use the plus-icon to add "
 "allowed field types."
 msgstr ""
+"Ungültiger Feldtyp für Feld '{label}'. Bitte verwenden Sie das Plus-Symbol "
+"um erlaubte Feldtypen hinzuzufügen."
 
 msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."
@@ -301,34 +305,17 @@ msgstr "Zusätzliche Dateien hochladen"
 msgid "Text modules"
 msgstr "Textbausteine"
 
+msgid "Select Some Options"
+msgstr "Mehrere Optionen auswählen"
+
 msgid "Select an Option"
 msgstr "Eine Option auswählen"
 
 msgid "No results match"
 msgstr "Keine Ergebnisse gefunden:"
 
-msgid "Select Some Options"
-msgstr "Mehrere Optionen auswählen"
-
 msgid "hours"
 msgstr "Stunden"
 
 msgid "minutes"
 msgstr "Minuten"
-
-#, python-format
-#~ msgid "Nested fieldsets (`#`) are not supported, please remove line {line}."
-#~ msgstr ""
-#~ "Verschachtelte Fieldsets (`#`) werden nicht unterstützt, bitte entfernen "
-#~ "Sie die Zeile {line}."
-
-#~ msgid "Multiline"
-#~ msgstr "Mehrzeilig"
-
-#, python-format
-#~ msgid ""
-#~ "Invalid field type for field '{label}'. Please use the plus-icon to add "
-#~ "allowed field types."
-#~ msgstr ""
-#~ "Ungültiger Feldtyp für Feld '{label}'. Bitte verwenden Sie das Plus-"
-#~ "Symbol um erlaubte Feldtypen hinzuzufügen."

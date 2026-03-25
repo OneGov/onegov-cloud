@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-19 09:40+0100\n"
+"POT-Creation-Date: 2026-03-25 09:45+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -32,6 +32,8 @@ msgstr "Réservation : ${dates}"
 msgid "Execution: ${dates}"
 msgstr "Réalisation : ${dates}"
 
+#.
+#. FIXME: This breadcrumb seems wrong for VacationActivity
 msgid "Activities"
 msgstr "Activités"
 
@@ -435,6 +437,8 @@ msgstr "Aperçu (pas soumis)"
 msgid "Proposed"
 msgstr "Soumis"
 
+#.
+#. users like the term 'Published' better
 msgid "Published"
 msgstr "Publié"
 
@@ -710,8 +714,8 @@ msgstr "Ignorer la restriction d'âge"
 msgid "Accept TOS"
 msgstr "Accepter les conditions de participation"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "Conditions de participation"
 
@@ -1745,8 +1749,8 @@ msgstr "État de paiement"
 msgid ""
 "No bank account defined. Please define a bank account in the ${link} first."
 msgstr ""
-"Aucun compte bancaire saisi. Veuillez d'abord saisir un compte bancaire sur "
-"${link}."
+"Aucun compte bancaire saisi. Veuillez d'abord saisir un compte bancaire sur $"
+"{link}."
 
 #. Used in sentence: "No bank account defined. Please define a bank account in
 #. the ${link} first."
@@ -2509,6 +2513,7 @@ msgstr "Prestataires"
 msgid "Only by privileged users"
 msgstr "Seulement pour administrateurs·trices"
 
+#. XXX hacky way of showing "Termine" instead of "Opening Hours"
 msgid "Opening Hours"
 msgstr "Dates"
 
@@ -2694,6 +2699,7 @@ msgstr ""
 "L'utilisateur·trice ne peut pas être supprimé·e car il·elle a des "
 "réservations dans la période en cours."
 
+#. type:ignore[attr-defined]
 msgid "The user account must be opened by a parent or guardian of full age."
 msgstr ""
 "Le compte utilisateur·trice doit être ouvert par un parent ou une personne "
@@ -2792,6 +2798,7 @@ msgstr "${count} paiements importés"
 msgid "No payments could be imported"
 msgstr "Aucun paiement n'a pu être importé"
 
+#. FIXME: Should we evict this from the browser session first?
 msgid "The submitted xml data could not be decoded"
 msgstr "Les données envoyées n'ont pas pu être décodées"
 
@@ -2892,8 +2899,8 @@ msgstr "retirer du groupe"
 msgid ""
 "Hi!\n"
 "\n"
-"${first_name} wants to take part in the \"${title}\" activity by "
-"${organisation} and would be thrilled to go with a mate.\n"
+"${first_name} wants to take part in the \"${title}\" activity by $"
+"{organisation} and would be thrilled to go with a mate.\n"
 "\n"
 "You can add the activity to the wishlist of your child through the following "
 "link, if you are interested. This way the children have a better chance of "

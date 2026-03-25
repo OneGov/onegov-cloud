@@ -764,15 +764,14 @@ def view_group_invite(
     first_name = decode_name(first_child.name)[0]
     subject = occasion.activity.title
     message = _(
-        (
-            'Hi!\n\n'
-            '${first_name} wants to take part in the "${title}" activity by '
-            '${organisation} and would be thrilled to go with a mate.\n\n'
-            'You can add the activity to the wishlist of your child through '
-            'the following link, if you are interested. This way the children '
-            'have a better chance of getting a spot together:\n\n'
-            '${link}'
-        ), mapping={
+        'Hi!\n\n'
+        '${first_name} wants to take part in the "${title}" activity by '
+        '${organisation} and would be thrilled to go with a mate.\n\n'
+        'You can add the activity to the wishlist of your child through '
+        'the following link, if you are interested. This way the children '
+        'have a better chance of getting a spot together:\n\n'
+        '${link}',
+        mapping={
             'first_name': first_name,
             'link': request.link(self.for_username(None)),
             'title': occasion.activity.title,

@@ -127,7 +127,8 @@ function main() {
         --output "${localepath}/${module}.pot" \
         --sort-by-file \
         --copyright-holder "Seantis GmbH" \
-        --package-name "OneGov Cloud"
+        --package-name "OneGov Cloud" \
+    2>&1 | sed '/Message argument must be a string/d'
 
     echo "Updating translations"
     for po in "${modulepath}"/locale/*/LC_MESSAGES/"$module".po; do
@@ -135,6 +136,8 @@ function main() {
             --no-location \
             --no-fuzzy-matching -o "${po}" "${po}" \
             "${localepath}/${module}.pot"
+        # print the stats for this language
+        $msgfmt --statistics -o /dev/null ${po}
     done
 }
 

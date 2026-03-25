@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-24 19:31-0400\n"
+"POT-Creation-Date: 2026-03-25 09:27+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -199,6 +199,9 @@ msgid ""
 "description must be placed below the field definition (`=`) and with the "
 "same indentation."
 msgstr ""
+"La description du champ est mal placée à la ligne {line}. La description du "
+"champ doit être placée sous la définition du champ (`=`) et avec le même "
+"niveau d'indentation."
 
 #, python-format
 msgid "The field '{label}' exists more than once."
@@ -256,6 +259,8 @@ msgid ""
 "Invalid field type for field '${label}'. Please use the plus-icon to add "
 "allowed field types."
 msgstr ""
+"Type de champ non valide pour le champ '${label}'. Veuillez utiliser l'icône "
+"plus pour ajouter les types de champs autorisés."
 
 msgid "Not a valid phone number."
 msgstr "N'est pas un numéro de téléphone valide."
@@ -299,14 +304,14 @@ msgstr "Télécharger des fichiers supplémentaires"
 msgid "Text modules"
 msgstr "Modules de texte"
 
+msgid "Select Some Options"
+msgstr "Sélectionner quelques options"
+
 msgid "Select an Option"
 msgstr "Sélectionnez une option"
 
 msgid "No results match"
 msgstr "Aucun résultat ne correspond"
-
-msgid "Select Some Options"
-msgstr "Sélectionner quelques options"
 
 msgid "hours"
 msgstr "heures"
