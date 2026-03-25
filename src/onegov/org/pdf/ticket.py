@@ -440,7 +440,12 @@ class TicketPdf(OrgPdf):
                     data[1] = TicketPdf.inner_html(el)
         return data
 
-    def add_ticket(self, ticket: Ticket, request: OrgRequest) -> None:
+    def add_ticket(
+        self,
+        ticket: Ticket,
+        request: OrgRequest,
+        for_customer: bool = False
+    ) -> None:
         """ Adds a ticket to the story. """
 
         layout = TicketLayout(ticket, request)
@@ -473,7 +478,7 @@ class TicketPdf(OrgPdf):
             request.session,
             channel_id=ticket.number
         )
-        if not request.is_manager:
+        if for_customer or not request.is_manager:
             messages.type = request.app.settings.org.public_ticket_messages
 
         self.h1(request.translate(_('Timeline')))
@@ -483,7 +488,8 @@ class TicketPdf(OrgPdf):
     def from_ticket(
         cls,
         request: OrgRequest,
-        ticket: Ticket
+        ticket: Ticket,
+        for_customer: bool = False,
     ) -> BytesIO:
         """
         Creates a PDF representation of the ticket. It is sensible to the
@@ -501,16 +507,14 @@ class TicketPdf(OrgPdf):
             author=request.host_url,
             translations=request.app.translations,
             locale=request.locale,
-            qr_payload=request.link(
-                ticket,
-                name='' if request.is_manager_for_model(ticket) else 'status'
-            )
+            qr_payload=request.link(ticket, name='' if not for_customer
+                and request.is_manager_for_model(ticket) else 'status')
         )
         pdf.init_a4_portrait(
             page_fn=pdf.page_fn,
             page_fn_later=pdf.page_fn_later
         )
-        pdf.add_ticket(ticket, request)
+        pdf.add_ticket(ticket, request, for_customer)
 
         pdf.generate()
         result.seek(0)
