@@ -1206,8 +1206,10 @@ def view_ticket_files(self: Ticket, request: OrgRequest) -> BaseResponse:
 
     if not_existing:
         count = len(not_existing)
-        request.alert(_(f"{count} file(s) not found:"
-                        f" {', '.join(not_existing)}"))
+        request.alert(_(
+            '${count} file(s) not found: ${files}',
+            mapping={'count': count, 'files': ', '.join(not_existing)}
+        ))
     else:
         request.info(_('Zip archive created successfully'))
 

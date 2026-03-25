@@ -54,6 +54,7 @@ repos:
     hooks:
       - id: untranslated-messages
         files: '\.po$'
+        language_version: python3.12
   - repo: local
     hooks:
       - id: system

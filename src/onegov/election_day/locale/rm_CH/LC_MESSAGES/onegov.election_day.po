@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-20 12:30+0100\n"
+"POT-Creation-Date: 2026-03-25 09:38+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -24,9 +24,15 @@ msgstr "Novs resultats disponibels"
 msgid "New results are available on ${url}"
 msgstr "Novs resultats disponibels sin ${url}"
 
+#. even though this is technically a transactional e-mail we send it as
+#. marketing, since the actual subscription is sent as a marketing e-mail as
+#. well
 msgid "Please confirm your email"
 msgstr "Confermai per plaschair Vossa adressa dad e-mail"
 
+#. even though this is technically a transactional e-mail we send it as
+#. marketing, since the actual subscription is sent as a marketing e-mail as
+#. well
 msgid "Please confirm your unsubscription"
 msgstr "Confermai per plaschair Vossa visada"
 
@@ -108,7 +114,9 @@ msgstr "Format da datoteca betg sustegnì"
 
 #, python-format
 msgid "Cannot import election information. Year ${year} does not exist."
-msgstr "Betg stà pussaivel da importar las infurmaziuns da l'elecziun. L'onn ${year} n'exista betg."
+msgstr ""
+"Betg stà pussaivel da importar las infurmaziuns da l'elecziun. L'onn ${year} "
+"n'exista betg."
 
 msgid "Domain not supported"
 msgstr "Domain betg supportà"
@@ -118,7 +126,9 @@ msgstr "La midada da tipas na vegn betg sustegnida"
 
 #, python-format
 msgid "Cannot import election results. Year ${year} does not exist."
-msgstr "Betg stà pussaivel da importar ils resultats da l'elecziun. L'onn ${year} n'exista betg."
+msgstr ""
+"Betg stà pussaivel da importar ils resultats da l'elecziun. L'onn ${year} "
+"n'exista betg."
 
 msgid "Election does not exist"
 msgstr "L'elecziun na datti betg"
@@ -223,7 +233,8 @@ msgstr "Inconsistenza tranter Panachage results ids ed id"
 
 #, python-format
 msgid "Cannot import votes. Year ${year} does not exist."
-msgstr "Betg stà pussaivel da importar las votaziuns. L'onn ${year} n'exista betg."
+msgstr ""
+"Betg stà pussaivel da importar las votaziuns. L'onn ${year} n'exista betg."
 
 msgid "Vote type not supported"
 msgstr "Tip da votaziun betg sustegnida"
@@ -269,6 +280,8 @@ msgstr "Resultat da l'elecziun"
 msgid "Accepted"
 msgstr "Acceptà"
 
+#.
+#. Answer
 msgid "Rejected"
 msgstr "Refusà"
 
@@ -711,6 +724,8 @@ msgstr "Candidatas e candidats"
 msgid "Parties"
 msgstr "Partidas"
 
+#.
+#. Statistics
 msgid "Election statistics"
 msgstr "Statistica electorala"
 
@@ -781,12 +796,17 @@ msgstr "Abunents"
 msgid "Mappings"
 msgstr "Attribuziuns"
 
+#.
+#. Statistics
 msgid "Statistics"
 msgstr "Statistica"
 
 msgid "Proposal"
 msgstr "Project da votaziun"
 
+#.
+#. type:ignore
+#. type:ignore
 msgid "Tie-Breaker"
 msgstr "Dumonda decisiva"
 
@@ -826,9 +846,6 @@ msgstr "Cuntraproposta %"
 #, python-format
 msgid "Regional (${on})"
 msgstr "Plaun regiunal (${on})"
-
-msgid "Other"
-msgstr "Auter"
 
 msgid "district_label_bl"
 msgstr "Circul electoral"
@@ -954,12 +971,12 @@ msgstr "Naginas candidaturas."
 msgid "Download diagram"
 msgstr "Telechargiar il diagram"
 
-#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
+#.
 msgid "figcaption_connections"
 msgstr ""
 "Il diagram mussa la repartiziun da las vuschs e dals mandats sin las "
@@ -984,11 +1001,11 @@ msgstr "Anc betg elegì ina candidata u in candidat."
 msgid "Note on the voters count"
 msgstr "Infurmaziun concernent il dumber d'electurs"
 
-#.
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
+#.
 msgid "figcaption_list_groups"
 msgstr ""
 "En in emprim pass – tar l'uschenumnada attribuziun superiura – vegnan "
@@ -1099,17 +1116,17 @@ msgstr "Vuschs vidas"
 msgid "Invalid votes"
 msgstr "Vuschs nunvalaivlas"
 
-#.
 #. Default: Turnout
 #. Default: Voter turnout
+#.
 msgid "turnout_vote"
 msgstr "Participaziun a la votaziun"
 
 msgid "List connection"
 msgstr "Colliaziun da glistas"
 
-#.
 #. Default: Votes
+#.
 msgid "single_votes"
 msgstr "Vuschs"
 
@@ -1255,6 +1272,8 @@ msgstr "Refusà l'iniziativa e la cuntraproposta"
 msgid "Proposal accepted"
 msgstr "Acceptà l'iniziativa"
 
+#.
+#. type:ignore[attr-defined]
 msgid "Tie breaker in favor of the proposal"
 msgstr "Dumonda decisiva a favur da l'iniziativa"
 
@@ -1316,10 +1335,10 @@ msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
 msgid "Line"
 msgstr "Lingia"
 
-#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
+#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Il diagram mussa las vuschs gudagnadas ed ils mandats da las partidas. Las "
@@ -1332,10 +1351,10 @@ msgstr "Onn"
 msgid "Difference"
 msgstr "Differenza"
 
-#.
 #. Default: The diagram shows the origin of votes won and lost by panache. On
 #. the left side are the lost votes, on the right side the won votes. The width
 #. of the bars and the connections is proportional to the number of votes.
+#.
 msgid "figcaption_panachage"
 msgstr ""
 "Il diagram mussa la derivanza da las vuschs gudagnadas e perdidas cun "
@@ -1431,6 +1450,9 @@ msgstr "Titel"
 
 msgid "New election"
 msgstr "Nova elecziun"
+
+msgid "Other"
+msgstr "Auter"
 
 msgid "New screen"
 msgstr "Nov screen"
@@ -1545,6 +1567,7 @@ msgstr "Resultats interm."
 msgid "Intermediate results: ${counted} of ${total} ${entities}"
 msgstr "resultats intermediars: ${counted} da ${total} ${entities}"
 
+#. type:ignore
 msgid "Wrong username or password"
 msgstr ""
 "Il num da l'utilisadra u da l'utilisader n'è betg enconuschent u il pled-"
@@ -1562,6 +1585,7 @@ msgstr "In e-mail è vegnì tramess a ${email} (sche l'adressa è valaivla)."
 msgid "Password changed."
 msgstr "Midà il pled-clav."
 
+#. type:ignore[attr-defined]
 msgid "Wrong username or password reset link not valid any more."
 msgstr "L'adressa è nunvalaivla u il link è nunvalaivel."
 
@@ -1646,8 +1670,8 @@ msgid ""
 "automatically cleared for new results and other updates. It is not normally "
 "necessary to clear the cache yourself."
 msgstr ""
-"Las elecziuns e las votaziuns vegnan arcunadas temporarmain per "
-"${expiration} secundas. Il cache vegn svidà automaticamain en cas da novs "
+"Las elecziuns e las votaziuns vegnan arcunadas temporarmain per $"
+"{expiration} secundas. Il cache vegn svidà automaticamain en cas da novs "
 "resultats e d'autras actualisaziuns. Normalmain na ston ins betg svidar sez "
 "il cache."
 
@@ -1838,24 +1862,24 @@ msgid ""
 "Final results of the cantonal vote \"${title}\", ${date}, ${principal}, "
 "broken down by municipalities."
 msgstr ""
-"Resultats finals da la votaziun chantunala \"${title}\", ${date}, "
-"${principal}, ordinà tenor vischnancas."
+"Resultats finals da la votaziun chantunala \"${title}\", ${date}, $"
+"{principal}, ordinà tenor vischnancas."
 
 #, python-format
 msgid ""
 "Final results of the federal vote \"${title}\", ${date}, ${principal}, "
 "broken down by municipalities."
 msgstr ""
-"Resultats finals da la votaziun federala \"${title}\", ${date}, "
-"${principal}, ordinà tenor vischnancas."
+"Resultats finals da la votaziun federala \"${title}\", ${date}, $"
+"{principal}, ordinà tenor vischnancas."
 
 #, python-format
 msgid ""
 "Final results of the cantonal election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Resultats finals da l'elecziun chantunala \"${title}\", ${date}, "
-"${principal}, resultats da tut las candidatas e da tut ils candidats tenor "
+"Resultats finals da l'elecziun chantunala \"${title}\", ${date}, $"
+"{principal}, resultats da tut las candidatas e da tut ils candidats tenor "
 "vischnancas."
 
 #, python-format
@@ -1863,8 +1887,8 @@ msgid ""
 "Final results of the regional election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Resultats finals da l'elecziun regiunala \"${title}\", ${date}, "
-"${principal}, resultats da tut las candidatas e da tut ils candidats tenor "
+"Resultats finals da l'elecziun regiunala \"${title}\", ${date}, $"
+"{principal}, resultats da tut las candidatas e da tut ils candidats tenor "
 "vischnancas."
 
 #, python-format
@@ -1927,6 +1951,13 @@ msgstr ""
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'onn ${year} na vegn anc betg sustegnì"
+
+msgid ""
+"A file was submitted instead of a string. Use --form \"type=xml\" instead of "
+"--form \"type=@file\""
+msgstr ""
+"Enstagl d’ina chadaina da segns è vegnida transmessa ina datoteca. Utilisai "
+"--form \"type=xml\" enstagl da --form \"type=@file\""
 
 msgid "Invalid id"
 msgstr "ID nunvalaivel"
