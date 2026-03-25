@@ -1765,10 +1765,7 @@ def view_tickets(
             if self.group is None
             else f'{self.handler}-sub-link ticket-group-filter'
         ),
-        'owner': owner,
-        # NOTE: Not all submitters will be valid for every filter so
-        #       if it's not valid we fallback to whatever we were given
-        #       there should be zero results, but that's fine
+        'owner': owner.text if owner else '-',
         'submitter': submitter.text if submitter else self.submitter,
         'action_link': archive_link
     }
@@ -1820,7 +1817,7 @@ def view_archived_tickets(
             if self.group is None
             else f'{self.handler}-sub-link ticket-group-filter'
         ),
-        'owner': owner,
+        'owner': owner.text if owner else '-',
         # NOTE: Not all submitters will be valid for every filter so
         #       if it's not valid we fallback to whatever we were given
         #       there should be zero results, but that's fine
