@@ -1906,13 +1906,13 @@ class KabaSettingsForm(Form):
             if not field.form.api_key.data:
                 assert isinstance(self.kaba_configurations.errors, list)
                 self.kaba_configurations.errors.append(
-                    self.kaba_configurations.gettext(_(
+                    self.kaba_configurations.gettext(
                         '${field} for site ID ${site_id} is required',
                         mapping={
                             'field': 'API_KEY',
                             'site_id': field.form.site_id.data
                         }
-                    ))
+                    )
                 )
                 return False
 
@@ -1921,13 +1921,13 @@ class KabaSettingsForm(Form):
             elif (cfg := self.model.get_kaba_configuration(site_id)) is None:
                 assert isinstance(self.kaba_configurations.errors, list)
                 self.kaba_configurations.errors.append(
-                    self.kaba_configurations.gettext(_(
+                    self.kaba_configurations.gettext(
                         '${field} for site ID ${site_id} is required',
                         mapping={
                             'field': 'API_SECRET',
                             'site_id': field.form.site_id.data
                         }
-                    ))
+                    )
                 )
                 return False
             elif cfg.api_key == field.form.api_key.data:
