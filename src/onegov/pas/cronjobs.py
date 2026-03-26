@@ -34,15 +34,11 @@ def trigger_kub_data_import(
     request: PasRequest, import_type: str
 ) -> dict[str, Any] | None:
     app = request.app
-    # FIXME: this is a bit crude, this will have to be
-    # a conditional statement in puppet
-    if not (kub_token := getattr(app, 'kub_test_api_token', None)):
-        if not (kub_token := getattr(app, 'kub_api_token', None)):
-            return None
+    if not (kub_token := getattr(app, 'kub_api_token', None)):
+        return None
 
-    if not (kub_base_url := getattr(app, 'kub_test_base_url', None)):
-        if not (kub_base_url := getattr(app, 'kub_base_url', None)):
-            raise ValueError('KUB base URL not configured')
+    if not (kub_base_url := getattr(app, 'kub_base_url', None)):
+        return None
 
     db_handler = DatabaseOutputHandler()
     log_handler = LogOutputHandler()
