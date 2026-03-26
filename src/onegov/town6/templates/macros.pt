@@ -1573,7 +1573,6 @@
                         <h5>${occurrence.title}</h5>
                         <tal:b tal:define="
                             date occurrence.localized_start;
-                            link use_links and request.link(occurrence)
                         ">
                             <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
 
