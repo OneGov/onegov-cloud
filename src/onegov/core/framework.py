@@ -37,6 +37,7 @@ from dectate import directive
 from functools import cached_property, wraps
 from itsdangerous import BadSignature, Signer
 from libres.db.models import ORMBase
+from morepath import dispatch_method
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
@@ -46,6 +47,8 @@ from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
+from reg import ClassIndex
+
 from onegov.core import cache, log, utils
 from onegov.core import directives
 from onegov.core.crypto import stored_random_token
@@ -67,7 +70,7 @@ from urllib.parse import urlencode
 from webob.exc import HTTPConflict, HTTPServiceUnavailable
 
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from _typeshed.wsgi import WSGIApplication, WSGIEnvironment, StartResponse
@@ -79,18 +82,14 @@ if TYPE_CHECKING:
     from morepath.settings import SettingRegistry
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
-    from typing_extensions import ParamSpec
     from webob import Response
 
     from .analytics import AnalyticsProvider
+    from .layout import Layout
     from .mail import Attachment
     from .metadata import Metadata
     from .security.permissions import Intent
     from .types import EmailJsonDict, SequenceOrScalar
-
-    _P = ParamSpec('_P')
-
-_T = TypeVar('_T')
 
 # Monkey patch
 # https://linear.app/onegovcloud/issue/OGC-853/404-navigation-js-fehler
@@ -129,6 +128,7 @@ class Framework(
     template_variables = directive(directives.TemplateVariablesAction)
     replace_setting = directive(directives.ReplaceSettingAction)
     replace_setting_section = directive(directives.ReplaceSettingSectionAction)
+    layout = directive(directives.Layout)
 
     #: sets the same-site cookie directive, (may need removal inside iframes)
     same_site_cookie_policy: str | None = 'Lax'
@@ -179,13 +179,13 @@ class Framework(
 
         return fn
 
-    def with_query_report(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
+    def with_query_report[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
         @wraps(fn)
         def with_query_report_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
 
             assert isinstance(self.sql_query_report, str)
             with debug.analyze_sql_queries(self.sql_query_report):
@@ -193,13 +193,13 @@ class Framework(
 
         return with_query_report_wrapper
 
-    def with_profiler(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
+    def with_profiler[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
         @wraps(fn)
         def with_profiler_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
             filename = '{:%Y-%m-%d %H:%M:%S}.profile'.format(datetime.now())
 
             with utils.profile(filename):
@@ -207,28 +207,28 @@ class Framework(
 
         return with_profiler_wrapper
 
-    def with_request_cache(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
+    def with_request_cache[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
         @wraps(fn)
         def with_request_cache_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
             self.clear_request_cache()
             return fn(*args, **kwargs)
 
         return with_request_cache_wrapper
 
-    def with_print_exceptions(
+    def with_print_exceptions[**P, T](
         self,
-        fn: Callable[_P, _T]
-    ) -> Callable[_P, _T]:
+        fn: Callable[P, T]
+    ) -> Callable[P, T]:
 
         @wraps(fn)
         def with_print_exceptions_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
             try:
                 return fn(*args, **kwargs)
             except Exception:
@@ -1551,6 +1551,28 @@ class Framework(
         return Fernet(
             self.hashed_identity_key
         ).decrypt(cyphertext).decode('utf-8')
+
+    @dispatch_method()
+    def get_layout(
+        self,
+        obj: object,
+        request: CoreRequest
+    ) -> Layout | None:
+        return None
+
+
+@Framework.predicate(
+    Framework.get_layout,
+    name='model',
+    default=None,
+    index=ClassIndex
+)
+def layout_predicate(
+    self: type[Framework],
+    obj: object,
+    request: CoreRequest
+) -> type[object]:
+    return obj.__class__
 
 
 @Framework.webasset_url()

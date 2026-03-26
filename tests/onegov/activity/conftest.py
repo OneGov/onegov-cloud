@@ -27,17 +27,13 @@ from sqlalchemy import inspect
 from tests.shared.scenario import BaseScenario
 
 
-from typing import overload, Any, Generic, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from sqlalchemy.orm import Session
 
-    ActivityT = TypeVar('ActivityT', bound=Activity, default=Activity)
-else:
-    ActivityT = TypeVar('ActivityT', bound=Activity)
 
-
-class Collections(Generic[ActivityT]):
+class Collections[ActivityT: Activity = Activity]:
 
     @overload
     def __init__(
@@ -82,7 +78,7 @@ class Collections(Generic[ActivityT]):
         return PaymentProviderCollection(self.session)
 
 
-class Scenario(BaseScenario, Generic[ActivityT]):
+class Scenario[ActivityT: Activity = Activity](BaseScenario):
     """ Helper class to ease the setup of testing fixtures for Feriennet.
 
     Feriennet has often repetitive steps to get to a test scenario. A period

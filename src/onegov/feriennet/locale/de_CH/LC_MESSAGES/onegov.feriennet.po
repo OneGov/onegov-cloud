@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-03 08:17+0100\n"
+"POT-Creation-Date: 2026-03-25 09:45+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -31,6 +31,8 @@ msgstr "Buchungsphase: ${dates}"
 msgid "Execution: ${dates}"
 msgstr "Durchführung: ${dates}"
 
+#.
+#. FIXME: This breadcrumb seems wrong for VacationActivity
 msgid "Activities"
 msgstr "Angebote"
 
@@ -433,6 +435,8 @@ msgstr "Vorschau"
 msgid "Proposed"
 msgstr "Beantragt"
 
+#.
+#. users like the term 'Published' better
 msgid "Published"
 msgstr "Veröffentlicht"
 
@@ -707,8 +711,8 @@ msgstr "Altersbeschränkung ignorieren"
 msgid "Accept TOS"
 msgstr "AGB akzeptieren"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "AGB"
 
@@ -881,6 +885,9 @@ msgstr "Mich selbst"
 msgid "Organisers with an occasion"
 msgstr "Veranstaltende mit Durchführungen"
 
+msgid "Organisers without occasions"
+msgstr "Veranstaltende ohne Durchführungen"
+
 msgid "Users of a given role"
 msgstr "Benutzer mit einer bestimmten Rolle"
 
@@ -889,6 +896,9 @@ msgstr "Benutzer mit Wünschen"
 
 msgid "Users with accepted bookings"
 msgstr "Benutzer mit angenommenen Buchungen"
+
+msgid "Users with attendees that have no wishes or bookings"
+msgstr "Benutzer mit Teilnehmenden, welche keine Wünsche oder Buchungen haben"
 
 msgid "Users with unpaid bills"
 msgstr "Benutzer mit unbezahlten Rechnungen"
@@ -2483,6 +2493,7 @@ msgstr "Veranstalter"
 msgid "Only by privileged users"
 msgstr "Beschränkt auf Administrierende"
 
+#. XXX hacky way of showing "Termine" instead of "Opening Hours"
 msgid "Opening Hours"
 msgstr "Termine"
 
@@ -2669,6 +2680,7 @@ msgstr ""
 "Der/die Teilnehmende kann nicht gelöscht werden, da es im aktuellen Zeitraum "
 "bestehende Buchungen gibt."
 
+#. type:ignore[attr-defined]
 msgid "The user account must be opened by a parent or guardian of full age."
 msgstr ""
 "Das Benutzerkonto muss durch eine erziehungsberechtigte, volljährige Person "
@@ -2768,6 +2780,7 @@ msgstr "${count} Zahlungen wurden importiert"
 msgid "No payments could be imported"
 msgstr "Es konnten keine Zahlungen importiert werden"
 
+#. FIXME: Should we evict this from the browser session first?
 msgid "The submitted xml data could not be decoded"
 msgstr "Die abgeschickten Daten konnten nicht dekodiert werden"
 
@@ -2867,8 +2880,8 @@ msgstr "aus Gruppe entfernen"
 msgid ""
 "Hi!\n"
 "\n"
-"${first_name} wants to take part in the \"${title}\" activity by "
-"${organisation} and would be thrilled to go with a mate.\n"
+"${first_name} wants to take part in the \"${title}\" activity by $"
+"{organisation} and would be thrilled to go with a mate.\n"
 "\n"
 "You can add the activity to the wishlist of your child through the following "
 "link, if you are interested. This way the children have a better chance of "

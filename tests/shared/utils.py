@@ -19,7 +19,7 @@ from uuid import uuid4
 from xml.etree.ElementTree import tostring
 
 
-from typing import overload, Any, IO, Protocol, TypeVar, TYPE_CHECKING
+from typing import overload, Any, IO, Protocol, TYPE_CHECKING
 if TYPE_CHECKING:
     import pytest
     from collections.abc import Callable, Iterator, Mapping
@@ -32,10 +32,6 @@ if TYPE_CHECKING:
     from tests.shared.client import Client
     from webob import Response
     from webtest.response import TestResponse
-
-    _AppT = TypeVar('_AppT', bound=Framework)
-    _ResourceT = TypeVar('_ResourceT', bound=Resource)
-    _BinaryIOT = TypeVar('_BinaryIOT', bound=IO[bytes])
 
     class HasSessionManager(Protocol):
         @property
@@ -104,19 +100,21 @@ def create_image(
     height: int = 50,
     output: None = None
 ) -> BytesIO: ...
+
 @overload
-def create_image(
+def create_image[T: IO[bytes]](
     width: int,
     height: int,
-    output: _BinaryIOT
-) -> _BinaryIOT: ...
+    output: T
+) -> T: ...
+
 @overload
-def create_image(
+def create_image[T: IO[bytes]](
     width: int = 50,
     height: int = 50,
     *,
-    output: _BinaryIOT
-) -> _BinaryIOT: ...
+    output: T
+) -> T: ...
 
 
 def create_image(
@@ -175,8 +173,8 @@ def random_namespace() -> str:
     return 'test_' + uuid4().hex
 
 
-def create_app(
-    app_class: type[_AppT],
+def create_app[AppT: Framework](
+    app_class: type[AppT],
     request: pytest.FixtureRequest,
     enable_search: bool = False,
     reuse_filestorage: bool = True,
@@ -185,7 +183,7 @@ def create_app(
     depot_backend: str = 'depot.io.local.LocalFileStorage',
     depot_storage_path: str | None = None,
     **kwargs: Any
-) -> _AppT:
+) -> AppT:
 
     # filestorage can be reused between tries as it is nowadays mainly (if not
     # exclusively) used by the theme compiler
@@ -286,8 +284,8 @@ def extract_filename_from_response(response: Response) -> str | None:
     return None
 
 
-def add_reservation(
-    resource: _ResourceT,
+def add_reservation[T: Resource](
+    resource: T,
     session: Session,
     start: datetime,
     end: datetime,
@@ -296,7 +294,7 @@ def add_reservation(
     reserve: bool = True,
     approve: bool = True,
     add_ticket: bool = True
-) -> _ResourceT:
+) -> T:
     if not email:
         email = f'{resource.name}@example.org'
 

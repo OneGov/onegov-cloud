@@ -49,10 +49,10 @@ class PolicyAreaWidget(Select):
 
         kwargs['class_'] = 'policy-selector'
         kwargs['data-tree'] = dumps(field.tree)
-        kwargs['data-placehoder-text'] = field.gettext(
-            _('Select Some Options')
-        )
-        kwargs['data-no-matches-text'] = field.gettext(_('No results match'))
+        placeholder = _('Select Some Options')
+        no_matches = _('No results match')
+        kwargs['data-placehoder-text'] = field.gettext(placeholder)
+        kwargs['data-no-matches-text'] = field.gettext(no_matches)
         return super().__call__(field, **kwargs)
 
     @classmethod

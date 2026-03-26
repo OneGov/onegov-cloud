@@ -25,7 +25,6 @@ if TYPE_CHECKING:
     from ldap3.core.connection import Connection as LDAPConnection
     from onegov.translator_directory.app import TranslatorDirectoryApp
     from onegov.translator_directory.request import TranslatorAppRequest
-    from sqlalchemy.orm import Session
     from uuid import UUID
 
 
@@ -33,8 +32,7 @@ cli = command_group()
 
 
 def fetch_users(
-    app: TranslatorDirectoryApp,
-    session: Session,
+    request: TranslatorAppRequest,
     ldap_server: str,
     ldap_username: str,
     ldap_password: str,
@@ -46,6 +44,8 @@ def fetch_users(
 ) -> None:
     """ Implements the fetch-users cli command. """
 
+    app = request.app
+    session = request.session
     admin_group = admin_group.lower()
     editor_group = editor_group.lower()
 
@@ -113,14 +113,16 @@ def fetch_users(
             raise NotImplementedError()
 
         user = ensure_user(
+            request,
             source=source,
             source_id=source_id,
-            session=session,
             username=data['mail'],
             role=data['role'],
             force_role=force_role,
             force_active=True
         )
+        if user is None:
+            continue
 
         synced_users.append(user.id)
 
@@ -178,8 +180,7 @@ def fetch_users_cli(
     ) -> None:
 
         fetch_users(
-            app,
-            request.session,
+            request,
             ldap_server,
             ldap_username,
             ldap_password,

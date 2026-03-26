@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-03-02 15:30+0100\n"
+"POT-Creation-Date: 2026-03-25 10:06+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -49,8 +49,9 @@ msgstr "Profil"
 
 msgid "Cannot create attendance in closed settlement run."
 msgstr ""
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt "
+"werden.Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt "
+"werden."
 
 msgid "Attendance date must be within a settlement run."
 msgstr "Anwesenheitsdatum muss innerhalb eines Abrechnungslaufs liegen."
@@ -92,6 +93,7 @@ msgstr "Keine Rolle für Benutzer gefunden."
 msgid "Insufficient permissions."
 msgstr "Unzureichende Berechtigungen."
 
+#. type: ignore[attr-defined]
 msgid "User has no parliamentarian record."
 msgstr "Benutzer hat keinen Parlamentarier:in-Datensatz."
 
@@ -147,22 +149,27 @@ msgstr ""
 "entsprechen.Überprüft ob die hochgeladenen JSON-Dateien der erwarteten "
 "Struktur entsprechen."
 
+#. type: ignore[attr-defined]
 #, python-format
 msgid "File ${name} is missing the \"results\" list."
 msgstr "Datei ${name} fehlt die \"results\"-Liste."
 
+#. type: ignore[attr-defined]
 #, python-format
 msgid "Item ${idx} in file ${name} is not an object."
 msgstr "Element ${idx} in Datei ${name} ist kein Objekt."
 
+#. type: ignore[attr-defined]
 #, python-format
 msgid "Item ${idx} in ${name} is missing keys ${keys}"
 msgstr "Element ${idx} in ${name} fehlen die Schlüssel ${keys}"
 
+#. type: ignore[attr-defined]
 #, python-format
 msgid "Error reading file ${name}: ${error}"
 msgstr "Fehler beim Lesen der Datei ${name}: ${error}"
 
+#. type: ignore[attr-defined]
 #, python-format
 msgid "Unexpected error processing file ${name}: ${error}"
 msgstr "Unerwarteter Fehler bei der Verarbeitung der Datei ${name}: ${error}"
@@ -530,6 +537,7 @@ msgstr "Anwesenheit bearbeitet"
 msgid "Attendence removed"
 msgstr "Anwesenheit gelöscht"
 
+#. Status translations for .po file extraction
 msgid "completed"
 msgstr "Abgeschlossen"
 
@@ -542,6 +550,7 @@ msgstr "Ausstehend"
 msgid "timeout"
 msgstr "Zeitüberschreitung"
 
+#. Import type translations for .po file extraction
 msgid "cli"
 msgstr "Manuell auf dem Server"
 
@@ -697,8 +706,8 @@ msgid "Hello!"
 msgstr "Hallo!"
 
 msgid ""
-"${user_name} has closed commission ${commission_name} for settlement run "
-"${settlement_run_name}."
+"${user_name} has closed commission ${commission_name} for settlement run $"
+"{settlement_run_name}."
 msgstr ""
 "${user_name} hat den Abschluss der Kommission ${commission_name} für den "
 "Abrechnungslauf ${settlement_run_name} gesetzt."
@@ -823,8 +832,8 @@ msgstr "Neue Massenbuchung Kommissionssitzung"
 #, python-format
 msgid "Cannot book attendance - abschluss already set for: ${names}"
 msgstr ""
-"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für: "
-"${names}"
+"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für: $"
+"{names}"
 
 msgid "No parliamentarians selected"
 msgstr "Keine Parlamentarier:innen ausgewählt"
@@ -857,8 +866,8 @@ msgstr "${type} bearbeiten"
 #, python-format
 msgid "Cannot edit attendance - abschluss already set for: ${names}"
 msgstr ""
-"Anwesenheit kann nicht bearbeitet werden - Abschluss bereits gesetzt für: "
-"${names}"
+"Anwesenheit kann nicht bearbeitet werden - Abschluss bereits gesetzt für: $"
+"{names}"
 
 msgid "You do not have permission to add plenary sessions."
 msgstr "Sie haben keine Berechtigung, Plenarsitzungen hinzuzufügen."
@@ -879,8 +888,9 @@ msgstr "Änderungen gespeichert"
 
 msgid "Cannot delete attendance in closed settlement run."
 msgstr ""
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht gelöscht werden."
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht gelöscht werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht gelöscht "
+"werden.Anwesenheit in geschlossenem Abrechnungslauf kann nicht gelöscht "
+"werden."
 
 #, python-format
 msgid "Deleted ${count} attendeces"

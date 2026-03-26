@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from onegov.core.utils import module_path
 from onegov.pas.content import create_new_organisation
 from onegov.pas.custom import get_global_tools
@@ -12,12 +14,16 @@ from purl import URL
 from onegov.org.models import Organisation
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from onegov.core.types import RenderData
     from morepath.authentication import NoIdentity
     from morepath.authentication import Identity
+    from onegov.user import User
+    from onegov.user.integration import EnsureUserCallback
+
+log = logging.getLogger('onegov.pas')
 
 
 class PasApp(TownApp):
@@ -119,3 +125,46 @@ def get_i18n_localedirs() -> list[str]:
 @PasApp.setting(section='core', name='theme')
 def get_theme() -> PasTheme:
     return PasTheme()
+
+
+@PasApp.setting(section='user', name='ensure_user_callback')
+def get_ensure_user_callback() -> EnsureUserCallback:
+
+    def on_ensure_user(
+        user: User | None,
+        request: Any,
+        /,
+        *,
+        source: str | None,
+        source_id: str | None,
+        username: str,
+        role: str,
+        realname: str | None,
+        force_role: bool,
+        force_active: bool,
+    ) -> User | Literal[True] | None:
+        if role != 'member':
+            return True
+
+        if not user:
+            log.info(f'SAML2: no existing user for {username}')
+            return None
+
+        parliamentarian_roles = {'parliamentarian', 'commission_president'}
+        if user.role not in parliamentarian_roles:
+            log.info(
+                f'SAML2: user {username} has unexpected role '
+                f'{user.role!r} for member SSO login'
+            )
+            return None
+
+        if not user.active:
+            user.active = True
+
+        if user.source != source:
+            user.source = source
+        if user.source_id != source_id:
+            user.source_id = source_id
+        return user
+
+    return on_ensure_user

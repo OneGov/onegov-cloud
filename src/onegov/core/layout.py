@@ -15,7 +15,7 @@ from onegov.core import utils
 from onegov.core.templates import PageTemplate
 from pytz import timezone
 
-from typing import overload, Any, TypeVar, TYPE_CHECKING
+from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from collections.abc import Callable, Collection, Iterable, Iterator
@@ -25,8 +25,6 @@ if TYPE_CHECKING:
     from .framework import Framework
     from .request import CoreRequest
     from .templates import MacrosLookup, TemplateLoader
-
-_T = TypeVar('_T')
 
 
 class Layout:
@@ -101,38 +99,38 @@ class Layout:
         return self.request.app
 
     @overload
-    def batched(
+    def batched[T](
         self,
-        iterable: Iterable[_T],
+        iterable: Iterable[T],
         batch_size: int,
         container_factory: type[tuple] = ...  # type:ignore[type-arg]
-    ) -> Iterator[tuple[_T, ...]]: ...
+    ) -> Iterator[tuple[T, ...]]: ...
 
     @overload
-    def batched(
+    def batched[T](
         self,
-        iterable: Iterable[_T],
+        iterable: Iterable[T],
         batch_size: int,
         container_factory: type[list]  # type:ignore[type-arg]
-    ) -> Iterator[list[_T]]: ...
+    ) -> Iterator[list[T]]: ...
 
     # NOTE: If there were higher order TypeVars, we could properly infer
     #       the type of the Container, for now we just add overloads for
     #       two of the most common container_factories
     @overload
-    def batched(
+    def batched[T](
         self,
-        iterable: Iterable[_T],
+        iterable: Iterable[T],
         batch_size: int,
-        container_factory: Callable[[Iterator[_T]], Collection[_T]]
-    ) -> Iterator[Collection[_T]]: ...
+        container_factory: Callable[[Iterator[T]], Collection[T]]
+    ) -> Iterator[Collection[T]]: ...
 
-    def batched(
+    def batched[T](
         self,
-        iterable: Iterable[_T],
+        iterable: Iterable[T],
         batch_size: int,
-        container_factory: Callable[[Iterator[_T]], Collection[_T]] = tuple
-    ) -> Iterator[Collection[_T]]:
+        container_factory: Callable[[Iterator[T]], Collection[T]] = tuple
+    ) -> Iterator[Collection[T]]:
         """ See :func:`onegov.core.utils.batched`. """
 
         return utils.batched(

@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import pytest
 
+from onegov.agency.collections import ExtendedPersonCollection
 from onegov.api import ApiApp
 from onegov.api import ApiEndpoint
 from onegov.core import Framework
 from onegov.agency.api import PersonApiEndpoint
+from onegov.agency.models import ExtendedPerson
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from tests.shared.client import Client
 from tests.shared.utils import create_app
+from uuid import UUID
 from wtforms import StringField
 from wtforms.validators import InputRequired
 
@@ -17,6 +20,7 @@ from wtforms.validators import InputRequired
 from typing import Any, TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from collections.abc import Iterator
+    from onegov.core.request import CoreRequest
 
 
 class App(Framework, ApiApp):
@@ -54,13 +58,12 @@ class Endpoint(ApiEndpoint[Bunch]):  # type: ignore[type-var]
 
     def __init__(
         self,
-        app: App,
-        extra_parameters: dict[str, str | None] | None = None,
+        request: CoreRequest,
+        extra_parameters: dict[str, list[str]] | None = None,
         page: int | None = None
     ) -> None:
 
         self._collection = Collection()
-        request: Any = Bunch(app=app)
         super().__init__(request, extra_parameters, page)
 
     @property
@@ -87,17 +90,15 @@ class Endpoint(ApiEndpoint[Bunch]):  # type: ignore[type-var]
 
 @App.setting(section='api', name='endpoints')
 def get_api_endpoints_handler(
-) -> Callable[[pytest.FixtureRequest], Iterator[ApiEndpoint[Any]]]:
+) -> Callable[[CoreRequest], Iterator[ApiEndpoint[Any]]]:
 
     def get_api_endpoints(
-            request: pytest.FixtureRequest,
+            request: CoreRequest,
             page: int = 0,
-            extra_parameters: dict[str, Any] | None = None
+            extra_parameters: dict[str, list[str]] | None = None
     ) -> Iterator[ApiEndpoint[Any]]:
-        yield Endpoint(
-            request, extra_parameters, page)  # type: ignore[arg-type]
-        yield PersonApiEndpoint(
-            request, extra_parameters, page)  # type: ignore[arg-type]
+        yield Endpoint(request, extra_parameters, page)
+        yield PersonApiEndpoint(request, extra_parameters, page)
 
     return get_api_endpoints
 
@@ -111,6 +112,11 @@ def has_item_permission(
     permission: object
 ) -> bool:
     return getattr(model, 'hidden', False) is False
+
+
+@App.path(model=ExtendedPerson, path='/person/{id}', converters={'id': UUID})
+def get_person(app: App, id: UUID) -> ExtendedPerson | None:
+    return ExtendedPersonCollection(app.session()).by_id(id)
 
 
 @pytest.fixture(scope='function')

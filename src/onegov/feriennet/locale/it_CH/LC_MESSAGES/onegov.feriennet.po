@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-03-03 08:17+0100\n"
+"POT-Creation-Date: 2026-03-25 09:45+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -31,6 +31,8 @@ msgstr "Periodo di prenotazione: ${dates}"
 msgid "Execution: ${dates}"
 msgstr "Evento: ${dates}"
 
+#.
+#. FIXME: This breadcrumb seems wrong for VacationActivity
 msgid "Activities"
 msgstr "Attività"
 
@@ -434,6 +436,8 @@ msgstr "Anteprima"
 msgid "Proposed"
 msgstr "Richiesto"
 
+#.
+#. users like the term 'Published' better
 msgid "Published"
 msgstr "Pubblicato"
 
@@ -707,8 +711,8 @@ msgstr "Ignorare restrizioni di età"
 msgid "Accept TOS"
 msgstr "Accettare CG"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "CG"
 
@@ -767,8 +771,8 @@ msgid ""
 "The attendee already has already reached the maximum number of ${count} "
 "bookings"
 msgstr ""
-"Il partecipante ha già raggiunto il numero massimo di prenotazioni di "
-"${count}"
+"Il partecipante ha già raggiunto il numero massimo di prenotazioni di $"
+"{count}"
 
 msgid "This occasion overlaps with another booking"
 msgstr "Questo evento si sovrappone a una prenotazione esistente"
@@ -886,6 +890,9 @@ msgstr "Me stesso"
 msgid "Organisers with an occasion"
 msgstr "Organizzatori con eventi"
 
+msgid "Organisers without occasions"
+msgstr "Organizzatori senza eventi"
+
 msgid "Users of a given role"
 msgstr "Utente con un ruolo specifico"
 
@@ -894,6 +901,9 @@ msgstr "Utenti con desideri"
 
 msgid "Users with accepted bookings"
 msgstr "Utenti con prenotazioni accettate"
+
+msgid "Users with attendees that have no wishes or bookings"
+msgstr "Utenti con partecipanti senza desideri o prenotazioni"
 
 msgid "Users with unpaid bills"
 msgstr "Utenti con fatture non pagate"
@@ -2482,6 +2492,7 @@ msgstr "Organizzatore"
 msgid "Only by privileged users"
 msgstr "Riservato agli amministratori"
 
+#. XXX hacky way of showing "Termine" instead of "Opening Hours"
 msgid "Opening Hours"
 msgstr "Date"
 
@@ -2667,6 +2678,7 @@ msgstr ""
 "L'attendente non può essere cancellato perché ci sono prenotazioni esistenti "
 "nel periodo attuale."
 
+#. type:ignore[attr-defined]
 msgid "The user account must be opened by a parent or guardian of full age."
 msgstr ""
 "L'account utente deve essere aperto da una persona maggiorenne con autorità "
@@ -2766,6 +2778,7 @@ msgstr "${count} I pagamenti sono stati importati"
 msgid "No payments could be imported"
 msgstr "Nessun pagamento può essere importato"
 
+#. FIXME: Should we evict this from the browser session first?
 msgid "The submitted xml data could not be decoded"
 msgstr "I dati inviati non possono essere decodificati"
 
@@ -2866,8 +2879,8 @@ msgstr "rimuovere dal gruppo"
 msgid ""
 "Hi!\n"
 "\n"
-"${first_name} wants to take part in the \"${title}\" activity by "
-"${organisation} and would be thrilled to go with a mate.\n"
+"${first_name} wants to take part in the \"${title}\" activity by $"
+"{organisation} and would be thrilled to go with a mate.\n"
 "\n"
 "You can add the activity to the wishlist of your child through the following "
 "link, if you are interested. This way the children have a better chance of "
