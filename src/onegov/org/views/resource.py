@@ -728,7 +728,8 @@ def view_find_your_spot(
 @OrgApp.json(
     model=FindYourSpotCollection,
     name='reservations',
-    permission=Public
+    permission=Public,
+    open_data=False,
 )
 def get_find_your_spot_reservations(
     self: FindYourSpotCollection,
@@ -1125,7 +1126,12 @@ def predict_next_reservation(
     }
 
 
-@OrgApp.json(model=Resource, name='reservations', permission=Public)
+@OrgApp.json(
+    model=Resource,
+    name='reservations',
+    permission=Public,
+    open_data=False
+)
 def get_reservations(self: Resource, request: OrgRequest) -> RenderData:
 
     # FIXME: Maybe we should move bound_reservations to the base
@@ -1318,7 +1324,8 @@ def view_occupancy(
 @OrgApp.json(
     model=ResourceCollection,
     name='my-reservations-json',
-    permission=Public
+    permission=Public,
+    open_data=False,
 )
 def view_my_reservations_json(
     self: ResourceCollection,
