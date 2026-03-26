@@ -146,6 +146,9 @@ def test_import_ech_election_sg_majority_combined(
     # Muster: 1500+500+400=2400, Fischer: 1200+400+350=1950
     assert total_candidate_votes == 4350
 
+    # flush must succeed
+    session.flush()
+
 
 def test_import_ech_election_sg_proportional(
     session: Session,

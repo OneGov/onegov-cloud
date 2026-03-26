@@ -719,7 +719,7 @@ def import_majority_election_result(
             return
         candidate_result = existing_candidate_results.get(candidate_id)
         if not candidate_result:
-            candidate_result = CandidateResult(candidate_id=candidate.id)
+            candidate_result = CandidateResult(candidate=candidate)
             session.add(candidate_result)
         candidate_results[candidate_id] = candidate_result
         candidate_result.votes = result.count_of_votes_total or 0
@@ -766,7 +766,7 @@ def import_proportional_election_result(
             return
         list_result = existing_list_results.get(list_id)
         if not list_result:
-            list_result = ListResult(list_id=list_.id)
+            list_result = ListResult(list=list_)
             session.add(list_result)
         list_results[list_id] = list_result
         list_result.votes = l_result.count_of_candidate_votes or 0
@@ -779,7 +779,7 @@ def import_proportional_election_result(
                 return
             candidate_result = existing_candidate_results.get(candidate_id)
             if not candidate_result:
-                candidate_result = CandidateResult(candidate_id=candidate.id)
+                candidate_result = CandidateResult(candidate=candidate)
                 session.add(candidate_result)
             candidate_results[candidate_id] = candidate_result
             candidate_result.votes = (
