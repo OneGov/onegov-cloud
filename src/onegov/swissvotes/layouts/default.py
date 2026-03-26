@@ -46,6 +46,10 @@ class DefaultLayout(ChameleonLayout):
 
         self.pages = TranslatablePageCollection(self.request.session)
 
+    @property
+    def on_homepage(self) -> bool:
+        return self.request.url == self.homepage_url
+
     @cached_property
     def title(self) -> str:
         return ''
@@ -151,6 +155,21 @@ class DefaultLayout(ChameleonLayout):
                 SiteLocale(locale_code).link(self.request, self.request.url)
             ))
         return result
+
+    @cached_property
+    def page_id(self) -> str:
+        """ Returns the unique page id of the rendered page. Used to have
+        a useful id in the body element for CSS/JS.
+
+        """
+        page_id = self.request.path_info
+        assert page_id is not None
+        page_id = page_id.lstrip('/')
+        page_id = page_id.replace('/', '-')
+        page_id = page_id.replace('+', '')
+        page_id = page_id.rstrip('-')
+
+        return 'page-' + (page_id or 'root')
 
     def format_policy_areas(self, vote: SwissVote) -> Markup:
         paths: dict[str, list[list[str]]] = {}

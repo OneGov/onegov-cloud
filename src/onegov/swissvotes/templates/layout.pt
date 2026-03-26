@@ -35,13 +35,12 @@
     <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/7.54.0/bundle.min.js" integrity="sha384-EmlJLN9Q0yu0/2UUCIYnEM88jpQ7xUhtNI2ZeXb/ci3cwoAoIQl350N4PQPlMbP5" crossorigin="anonymous"></script>
     <script tal:condition="layout.app.sentry_dsn" src="${layout.sentry_init_path}"></script>
 </head>
-<body tal:attributes="layout.custom_body_attributes|{}">
+<body id="${layout.page_id}" tal:attributes="layout.custom_body_attributes|{}">
     <header>
         <div class="nav-header">
             <div class="top-header">
                 <nav class="top-bar show-for-medium-up" data-topbar="" role="navigation" data-options="is_hover: false">
                     <section class="top-bar-section">
-                        <div metal:use-macro="layout.macros['top_header_navigation']"></div>
                     </section>
 
                     <section class="top-bar-section">
@@ -54,7 +53,17 @@
             <div class="main-header">
                 <div class="row row-wide show-for-medium-up">
                     <div class="columns medium-2">
-                        <a href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
+                        <a href="${layout.homepage_url}">
+                            <img class="logo" id="white_logo" src="${layout.static_path}/images/Swissvotes/weiss/Logo_swissvotes_weiss.svg" height="100" alt="année politique suisse">
+                            <img class="logo" id="red_logo" src="${layout.static_path}/images/Swissvotes/rot/Logo_swissvotes_rot.svg" height="100" alt="année politique suisse">
+                            </a>
+                            <div class="project-by">
+                                <span i18n:translate>A project by</span><br/>
+                                <a href="https://anneepolitique.swiss">
+                                    <img class="logo-small" id="white_logo" src="${layout.static_path}/images/APS/weiss/Logo_annee-politique-suisse_weiss.svg" height="100" alt="année politique suisse">
+                                    <img class="logo-small" id="red_logo" src="${layout.static_path}/images/APS/rot/Logo_annee-politique-suisse_rot.svg" height="100" alt="année politique suisse">
+                                </a>
+                            </div>
                     </div>
                     <div class="columns small-12 medium-8">
                         <div metal:use-macro="layout.macros['top_navigation']"></div>
@@ -64,7 +73,14 @@
                 </div>
                 <div class="row show-for-small-only">
                     <div class="columns medium-12 mobile-header">
-                        <a class="logo" href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/APS/weiss/Logo_annee-politique-suisse_weiss.svg" height="100" alt="année politique suisse"></a>
+                            <a class="logo" href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/Swissvotes/weiss/Logo_swissvotes_weiss.svg" height="100" alt="année politique suisse"></a>
+                            <div class="project-by">
+                                <span i18n:translate>A project by</span><br/>
+                                <a href="https://anneepolitique.swiss">
+                                    <img class="logo-small" src="${layout.static_path}/images/APS/weiss/Logo_annee-politique-suisse_weiss.svg" height="100" alt="année politique suisse">
+                                </a>
+                            </div>
+                            <a class="logo" href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
                             <a class="button" href="#" data-reveal-id="mobileMenu"><i class="fa fa-bars"></i></a>
 
                             <div id="mobileMenu" class="reveal-modal why" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
@@ -74,7 +90,6 @@
                                 <div class="top-header-menu">
                                     <nav class="top-bar" data-topbar="" role="navigation" data-options="is_hover: false">
                                         <section class="top-bar-section">
-                                            <div metal:use-macro="layout.macros['top_header_navigation']"></div>
                                         </section>
                                     </nav>
 
@@ -88,6 +103,11 @@
                     </div>
                 </div>
             </div>
+            <div class="row row-wide title-header">
+                <div class="columns small-12">
+                    <h1>${layout.title}</h1>
+                </div>
+            </div>
 
         </div>
 
@@ -96,7 +116,6 @@
                 <div metal:use-macro="layout.macros['editbar']"></div>
             </div>
         </div>
-
         <div class="row">
             <div class="columns small-12">
                 <div metal:use-macro="layout.macros['breadcrumbs']"></div>
@@ -131,7 +150,7 @@
             <div class="columns small-12 medium-3">
                 <p>
                     <span i18n:translate>A project by</span><br/>
-                <a href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
+                <a href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/APS/rot/Logo_annee-politique-suisse_rot.svg" height="100" alt="année politique suisse"></a>
                 </p>
                 <p>
                 <b>Année politique suisse</b><br />
@@ -182,7 +201,7 @@
                         <p i18n:translate>Main projects<br>by Année Politique Suisse</p>
                     </div>
                     <div class="columns small-12">
-                        <a href="https://politchronik.swiss"><img src="${layout.static_path}/images/Swissvotes/weiss/Logo_swissvotes_weiss.svg" height="100" alt="Swissvotes Logo"></a>
+                        <a href="${layout.homepage_url}"><img src="${layout.static_path}/images/Swissvotes/weiss/Logo_swissvotes_weiss.svg" height="100" alt="Swissvotes Logo"></a>
                         <a href="https://parteienatlas.swiss"><img src="${layout.static_path}/images/Parteienatlas/weiss/Logo_parteienatlas_weiss.svg" height="100" alt="Parteienatlas Logo"></a>
                     </div>
                 </div>
@@ -194,7 +213,9 @@
                     </div>
                     <div class="columns small-12">
                         <img src="${layout.static_path}/images/sagw.svg" height="100" alt="SAGW Logo"></img>
+                        <a href="https://www.unibe.ch/">
                         <img src="${layout.static_path}/images/unibern.svg" height="100" alt="Universität Bern Logo"></img>
+                        </a>
                     </div>
                 </div>
             </div>

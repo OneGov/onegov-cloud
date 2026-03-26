@@ -38,20 +38,6 @@
         </div>
     </metal:navigation>
 
-    <metal:navigation define-macro="top_header_navigation">
-        <ul class="left">
-            <li>
-                <a i18n:translate>Publications</a>
-            </li>
-            <li i18n:translate>
-                <a i18n:translate>Downloads</a>
-            </li>
-            <li i18n:translate>
-                <a i18n:translate>Media</a>
-            </li>
-        </ul>
-    </metal:navigation>
-
     <metal:navigation define-macro="lang_navigation">
         <ul class="right" tal:define="current_locale_title [title for locale, lang, title, href in layout.locales if locale == request.locale][0]">
             <li class="has-dropdown"><a class="">${current_locale_title} <i class="fa fa-chevron-down rotate"></i></a>

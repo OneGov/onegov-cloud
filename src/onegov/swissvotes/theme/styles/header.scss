@@ -106,13 +106,27 @@ header {
     .main-header {
         border-bottom: 1px solid $primary-color;
 
-        img {
-            margin: 1.75rem 0;
+        .logo {
+            max-width: 150px;
+        }
 
-            &.right {
-                margin-left: 1rem;
+        .project-by {
+            margin-top: .5rem;
+
+            span {
+                color: $primary-color;
+                margin-left: 11px;
+                font-size: .8rem;
+            }
+
+            .logo-small {
+                max-width: 80px;
+                margin-left: 6px;
+                margin-bottom: 1rem;
+                margin-top: -0.3rem;
             }
         }
+
 
         .row.show-for-medium-up {
             @media #{$medium-up} {
@@ -148,6 +162,19 @@ header {
 
                     }
                 }
+            }
+        }
+
+        .title-header {
+            border-top: 1px solid $primary-color;
+            padding-top: 2rem;
+            padding-bottom: 1.5rem;
+
+            h1 {
+                color: $primary-color;
+                margin: 0;
+                font-weight: bold;
+                text-align: center;
             }
         }
 
@@ -381,6 +408,11 @@ header {
         }
 
         .main-navigation {
+
+            .project-by span {
+                color: $white;
+            }
+
             ul {
                 margin-left: -1.875rem;
                 margin-right: -1.875rem;
@@ -440,5 +472,73 @@ header {
     .top-bar,
     .breadcrumbs {
         display: none;
+    }
+}
+
+#white_logo {
+    display: none;
+}
+
+#red_logo {
+    display: block;
+}
+
+#page-page-home {
+
+    .project-by span {
+        color: $white;
+    }
+
+    #white_logo {
+        display: block;
+    }
+
+    #red_logo {
+        display: none;
+    }
+
+    .has-dropdown,
+    .dropdown {
+        border-left: 1px solid $white;
+    }
+
+    .top-header,
+    .main-header,
+    .dropdown {
+        background: $primary-color;
+        border-bottom: 1px solid $white;
+
+        a {
+            color: $white !important;
+        }
+
+        li,
+        .has-dropdown {
+            border-bottom: 3px solid transparent;
+
+            &:hover {
+                border-bottom: 3px solid $white !important;
+
+                a {
+                    color: $white !important;
+                }
+            }
+
+            a {
+                color: $white;
+
+                &:hover {
+                    color: $white !important;
+                }
+            }
+        }
+    }
+
+    .title-header {
+        border-top: 1px solid $white;
+
+        h1 {
+            color: $white;
+        }
     }
 }

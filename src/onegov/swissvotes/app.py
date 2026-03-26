@@ -135,6 +135,7 @@ def swissvotes_content_security_policy() -> ContentSecurityPolicy:
     policy.connect_src.add('https://mstdn.social')
     policy.img_src.add('https://www.emuseum.ch')
     policy.script_src.add('https://stats.seantis.ch')
+    policy.script_src.add(' https://unibe.us16.list-manage.com')
     return policy
 
 

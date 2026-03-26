@@ -26,6 +26,11 @@ footer {
             margin-bottom: .5rem;
         }
 
+        img {
+            max-height: 5rem;
+            margin-left: -.3rem;
+        }
+
         input {
             border: 0;
             border-bottom: 1px solid $primary-color;
