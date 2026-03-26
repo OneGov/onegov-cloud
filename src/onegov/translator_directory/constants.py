@@ -43,7 +43,8 @@ editor_can_see = (
     'bank_name',
     'bank_address',
     'account_owner',
-    'iban'
+    'iban',
+    'operation_comments'
 )
 
 translator_can_see = (

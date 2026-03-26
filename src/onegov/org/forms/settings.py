@@ -1576,9 +1576,12 @@ class NewsletterSettingsForm(Form):
                     for topic, sub_topic in item.items():
                         if not isinstance(sub_topic, list):
                             self.newsletter_categories.errors.append(
-                                _(f'Invalid format. Please define '
-                                  f"subtopic(s) for '{topic}' "
-                                  f"or remove the ':'.")
+                                _(
+                                    "Invalid format. Please define "
+                                    "subtopic(s) for '${topic}' "
+                                    "or remove the ':'.",
+                                    mapping={'topic': topic}
+                                )
                             )
                             return False
 
@@ -1892,24 +1895,28 @@ class KabaSettingsForm(Form):
 
             if site_id in seen:
                 assert isinstance(self.kaba_configurations.errors, list)
-                self.kaba_configurations.errors.append(_(
+                msg = _(
                     'Duplicate site ID ${site_id}',
                     mapping={'site_id': site_id}
-                ))
+                )
+                self.kaba_configurations.errors.append(
+                    self.kaba_configurations.gettext(msg)
+                )
                 return False
 
             seen.add(site_id)
 
             if not field.form.api_key.data:
                 assert isinstance(self.kaba_configurations.errors, list)
+                msg = _(
+                    '${field} for site ID ${site_id} is required',
+                    mapping={
+                        'field': 'API_KEY',
+                        'site_id': field.form.site_id.data
+                    }
+                )
                 self.kaba_configurations.errors.append(
-                    self.kaba_configurations.gettext(_(
-                        '${field} for site ID ${site_id} is required',
-                        mapping={
-                            'field': 'API_KEY',
-                            'site_id': field.form.site_id.data
-                        }
-                    ))
+                    self.kaba_configurations.gettext(msg)
                 )
                 return False
 
@@ -1917,14 +1924,15 @@ class KabaSettingsForm(Form):
                 api_secret = field.form.api_secret.data
             elif (cfg := self.model.get_kaba_configuration(site_id)) is None:
                 assert isinstance(self.kaba_configurations.errors, list)
+                msg = _(
+                    '${field} for site ID ${site_id} is required',
+                    mapping={
+                        'field': 'API_SECRET',
+                        'site_id': field.form.site_id.data
+                    }
+                )
                 self.kaba_configurations.errors.append(
-                    self.kaba_configurations.gettext(_(
-                        '${field} for site ID ${site_id} is required',
-                        mapping={
-                            'field': 'API_SECRET',
-                            'site_id': field.form.site_id.data
-                        }
-                    ))
+                    self.kaba_configurations.gettext(msg)
                 )
                 return False
             elif cfg.api_key == field.form.api_key.data:
@@ -1944,11 +1952,13 @@ class KabaSettingsForm(Form):
                 client.site_name()
             except KabaApiError:
                 assert isinstance(self.kaba_configurations.errors, list)
-                error = _(
+                msg = _(
                     'Invalid credentials for site ID ${site_id}',
                     mapping={'site_id': site_id}
                 )
-                self.kaba_configurations.errors.append(error)
+                self.kaba_configurations.errors.append(
+                    self.kaba_configurations.gettext(msg)
+                )
                 return False
             except Exception:
                 self.request.alert(

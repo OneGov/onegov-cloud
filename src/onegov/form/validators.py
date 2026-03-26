@@ -525,8 +525,9 @@ class ValidSurveyDefinition(ValidFormDefinition):
         for field in parsed_form._fields.values():
             if isinstance(field, (UploadField, DateField, TimeField,
                                   DateTimeLocalField)):
-                error = field.gettext(self.invalid_field_type %
-                                      {'label': field.label.text})
+                message = self.invalid_field_type % {
+                    'label': field.label.text}
+                error = field.gettext(message)
                 errors = form['definition'].errors
                 if not isinstance(errors, list):
                     errors = form['definition'].process_errors

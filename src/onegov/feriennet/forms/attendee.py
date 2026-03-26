@@ -528,12 +528,11 @@ class AttendeeSignupForm(AttendeeBase):
 
             if count >= limit:
                 assert isinstance(self.attendee.errors, list)
-                self.attendee.errors.append(_((
+                self.attendee.errors.append(_(
                     'The attendee already has already reached the maximum '
-                    'number of ${count} bookings'
-                ), mapping={
-                    'count': limit
-                }))
+                    'number of ${count} bookings',
+                    mapping={'count': limit}
+                ))
 
                 return False
         return None

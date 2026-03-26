@@ -2141,15 +2141,15 @@
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
     <div class="search-preview" tal:condition="result.number|nothing">
-        <span i18n:translate>Number:</span>
+        <span><tal:b i18n:translate>Number</tal:b>:</span>
         <span>${result.number}</span>
     </div>
     <div class="search-preview" tal:condition="result.entry_date|nothing">
-        <span i18n:translate>Entry Date:</span>
+        <span><tal:b i18n:translate>Date</tal:b>:</span>
         <span>${layout.format_date(result.entry_date, 'date')}</span>
     </div>
     <div class="search-preview" tal:condition="result.status|nothing">
-        <span i18n:translate>Status:</span>
+        <span><tal:b i18n:translate>Status</tal:b>:</span>
         <span>${result.status.capitalize()}</span>
     </div>
     <div tal:condition="request.get_layout(result)">

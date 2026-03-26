@@ -382,10 +382,9 @@ class ReservationInfo:
             zipcodes = map(str, self.resource.zipcode_block['zipcode_list'])
 
             return self.request.translate(_(
-                (
-                    'You can only reserve this allocation before ${date} '
-                    'if you live in the following zipcodes: ${zipcodes}'
-                ), mapping={
+                'You can only reserve this allocation before ${date} '
+                'if you live in the following zipcodes: ${zipcodes}',
+                mapping={
                     'date': layout.format_date(date, 'date_long'),
                     'zipcodes': ', '.join(zipcodes),
                 }
