@@ -55,6 +55,10 @@ class DefaultLayout(ChameleonLayout):
         return ''
 
     @cached_property
+    def sub_title(self) -> str:
+        return ''
+
+    @cached_property
     def drilldown_back(self) -> str:
         back = self.request.translate(_('back'))
         return (

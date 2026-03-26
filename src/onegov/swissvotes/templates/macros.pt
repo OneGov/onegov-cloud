@@ -39,7 +39,7 @@
     </metal:navigation>
 
     <metal:navigation define-macro="lang_navigation">
-        <ul data-back-button="${layout.drilldown_back}"  class="right" tal:define="current_locale_title [title for locale, lang, title, href in layout.locales if locale == request.locale][0]">
+        <ul class="right" tal:define="current_locale_title [title for locale, lang, title, href in layout.locales if locale == request.locale][0]">
             <li class="has-dropdown"><a class="">${current_locale_title} <i class="fa fa-chevron-right"></i><i class="fa fa-chevron-down rotate"></i></a>
                 <ul class="dropdown">
                     <tal:block tal:repeat="(locale, lang, title, href) layout.locales">

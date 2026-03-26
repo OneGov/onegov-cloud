@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-03-26 13:18+0100\n"
+"POT-Creation-Date: 2026-03-26 15:38+0100\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -2146,6 +2146,9 @@ msgstr "Page not found"
 
 msgid "The page you are looking for could not be found."
 msgstr "The page you are looking for could not be found."
+
+msgid "The database on Swiss referendums"
+msgstr "The database on Swiss referendums"
 
 msgid "Page added."
 msgstr "Page added."

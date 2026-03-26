@@ -176,6 +176,15 @@ header {
                 font-weight: bold;
                 text-align: center;
             }
+
+            .main-title {
+                display: block;
+            }
+
+            .sub-title {
+                font-size: 2rem;
+                font-weight: normal;
+            }
         }
 
         .show-for-small-only {
@@ -248,7 +257,6 @@ header {
     .edit-bar {
         background-color: $editbar-bg-color;
         margin-bottom: 2px;
-        margin-top: -2px;
 
         .border {
             border-bottom: 1px dashed $iron;
@@ -542,7 +550,7 @@ header {
 
     .top-header,
     .main-header,
-    .dropdown {
+    .dropdown:not(.right-side) {
         background: $primary-color;
         border-bottom: 1px solid $white;
 
