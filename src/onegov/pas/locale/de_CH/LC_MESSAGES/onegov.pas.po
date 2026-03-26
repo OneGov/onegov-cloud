@@ -1048,8 +1048,14 @@ msgstr "Quartalszulage hinzugefügt"
 msgid "No president or vice president found"
 msgstr "Kein Präsident oder Vizepräsident gefunden"
 
-msgid "Allowance for Q${quarter} ${year} already exists"
-msgstr "Zulage für Q${quarter} ${year} existiert bereits"
+msgid "Allowance for Q${quarter} ${year} already exists for this role"
+msgstr "Zulage für Q${quarter} ${year} existiert bereits für diese Rolle"
+
+msgid "Yearly limit for ${role} is CHF ${limit}. Already allocated: CHF ${existing}. Remaining: CHF ${remaining}."
+msgstr "Jahreslimite für ${role} ist CHF ${limit}. Bereits vergeben: CHF ${existing}. Verbleibend: CHF ${remaining}."
+
+msgid "Recipient"
+msgstr "Empfänger/in"
 
 msgid "President: ${name} (CHF ${amount})"
 msgstr "Präsident/in: ${name} (CHF ${amount})"

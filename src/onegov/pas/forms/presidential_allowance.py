@@ -4,10 +4,15 @@ from datetime import date
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.pas import _
-from onegov.pas.collections.presidential_allowance import (
-    PresidentialAllowanceCollection,
-)
 from onegov.pas.models import PASParliamentarianRole, SettlementRun
+from onegov.pas.models.presidential_allowance import (
+    ALLOWANCE_ROLES,
+    PRESIDENT_QUARTERLY,
+    PRESIDENT_YEARLY_ALLOWANCE,
+    VICE_PRESIDENT_QUARTERLY,
+    VICE_PRESIDENT_YEARLY_ALLOWANCE,
+    PresidentialAllowance,
+)
 from uuid import UUID
 from wtforms.fields import IntegerField
 from wtforms.validators import InputRequired, NumberRange
@@ -17,6 +22,17 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
     from typing import Any
+
+
+YEARLY_LIMITS: dict[str, int] = {
+    'president': PRESIDENT_YEARLY_ALLOWANCE,
+    'vice_president': VICE_PRESIDENT_YEARLY_ALLOWANCE,
+}
+
+QUARTERLY_AMOUNTS: dict[str, int] = {
+    'president': PRESIDENT_QUARTERLY,
+    'vice_president': VICE_PRESIDENT_QUARTERLY,
+}
 
 
 class PresidentialAllowanceForm(Form):
@@ -33,71 +49,68 @@ class PresidentialAllowanceForm(Form):
         ],
     )
 
-    president_id = ChosenSelectField(
-        label=_('President'),
+    recipient = ChosenSelectField(
+        label=_('Recipient'),
         validators=[InputRequired()],
     )
 
-    vice_president_id = ChosenSelectField(
-        label=_('Vice president'),
-        validators=[InputRequired()],
-    )
-
-    def _role_holder_choices(
-        self, role: str
-    ) -> list[Any]:
+    def _role_holder_choices(self) -> list[Any]:
         today = date.today()
-        roles = (
-            self.request.session.query(PASParliamentarianRole)
-            .filter(
-                PASParliamentarianRole.role == role,
-                (
-                    PASParliamentarianRole.start.is_(None)
-                    | (PASParliamentarianRole.start <= today)
-                ),
-                (
-                    PASParliamentarianRole.end.is_(None)
-                    | (PASParliamentarianRole.end >= today)
-                ),
+        choices: list[tuple[str, str]] = []
+        for role_key, role_label in ALLOWANCE_ROLES.items():
+            roles = (
+                self.request.session.query(PASParliamentarianRole)
+                .filter(
+                    PASParliamentarianRole.role == role_key,
+                    (
+                        PASParliamentarianRole.start.is_(None)
+                        | (PASParliamentarianRole.start <= today)
+                    ),
+                    (
+                        PASParliamentarianRole.end.is_(None)
+                        | (PASParliamentarianRole.end >= today)
+                    ),
+                )
+                .order_by(PASParliamentarianRole.start.desc())
+                .all()
             )
-            .order_by(PASParliamentarianRole.start.desc())
-            .all()
-        )
-        return [
-            (
-                str(r.parliamentarian_id),
-                r.parliamentarian.title,
-            )
-            for r in roles
-        ]
+            translated = self.request.translate(role_label)
+            for r in roles:
+                value = f'{r.parliamentarian_id}:{role_key}'
+                label = f'{r.parliamentarian.title} ({translated})'
+                choices.append((value, label))
+        return choices
 
     def on_request(self) -> None:
-        self.president_id.choices = (
-            self._role_holder_choices('president')
-        )
-        self.vice_president_id.choices = (
-            self._role_holder_choices('vice_president')
-        )
+        self.recipient.choices = self._role_holder_choices()
 
         if self.submitted(self.request):
             return
 
         self.year.data = self.year.data or date.today().year
 
-        collection = PresidentialAllowanceCollection(
-            self.request.session
-        )
-        next_q = collection.next_quarter(self.year.data)
-        self.quarter.data = self.quarter.data or next_q or 1
-
     @property
-    def current_settlement_run(self) -> SettlementRun | None:
+    def current_settlement_run(
+        self,
+    ) -> SettlementRun | None:
         return (
             self.request.session.query(SettlementRun)
             .filter(SettlementRun.closed.is_(False))
             .order_by(SettlementRun.end.desc())
             .first()
         )
+
+    def _yearly_total(self, year: int, role: str) -> int:
+        total = (
+            self.request.session.query(PresidentialAllowance)
+            .filter(
+                PresidentialAllowance.year == year,
+                PresidentialAllowance.role == role,
+            )
+            .with_entities(PresidentialAllowance.amount)
+            .all()
+        )
+        return sum(row[0] for row in total)
 
     def validate(
         self,
@@ -114,15 +127,47 @@ class PresidentialAllowanceForm(Form):
         assert year is not None
         assert quarter is not None
 
-        collection = PresidentialAllowanceCollection(
-            self.request.session
+        _parl_id, role = self.parsed_recipient
+        amount = QUARTERLY_AMOUNTS[role]
+        limit = YEARLY_LIMITS[role]
+        existing = self._yearly_total(year, role)
+
+        if existing + amount > limit:
+            role_label = self.request.translate(ALLOWANCE_ROLES[role])
+            remaining = limit - existing
+            assert isinstance(self.recipient.errors, list)
+            self.recipient.errors.append(
+                _(
+                    'Yearly limit for ${role} is CHF'
+                    ' ${limit}. Already allocated:'
+                    ' CHF ${existing}. Remaining:'
+                    ' CHF ${remaining}.',
+                    mapping={
+                        'role': role_label,
+                        'limit': str(limit),
+                        'existing': str(existing),
+                        'remaining': str(remaining),
+                    },
+                )
+            )
+            return False
+
+        existing_quarter = (
+            self.request.session.query(PresidentialAllowance)
+            .filter(
+                PresidentialAllowance.year == year,
+                PresidentialAllowance.quarter == quarter,
+                PresidentialAllowance.role == role,
+            )
+            .first()
         )
-        if collection.quarter_exists(year, quarter):
+        if existing_quarter is not None:
             assert isinstance(self.quarter.errors, list)
             self.quarter.errors.append(
                 _(
-                    'Allowance for Q${quarter} ${year}'
-                    ' already exists',
+                    'Allowance for Q${quarter}'
+                    ' ${year} already exists'
+                    ' for this role',
                     mapping={
                         'quarter': str(quarter),
                         'year': str(year),
@@ -134,9 +179,7 @@ class PresidentialAllowanceForm(Form):
         return True
 
     @property
-    def president_uuid(self) -> UUID:
-        return UUID(self.president_id.data)
-
-    @property
-    def vice_president_uuid(self) -> UUID:
-        return UUID(self.vice_president_id.data)
+    def parsed_recipient(self) -> tuple[UUID, str]:
+        value = self.recipient.data
+        parl_id, role = value.rsplit(':', 1)
+        return UUID(parl_id), role

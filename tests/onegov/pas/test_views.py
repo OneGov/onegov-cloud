@@ -10,9 +10,6 @@ from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections.commission_membership import (
     PASCommissionMembershipCollection
 )
-from onegov.pas.collections.presidential_allowance import (
-    PresidentialAllowanceCollection,
-)
 from onegov.pas.models import PASCommissionMembership
 from onegov.pas.models import PASParliamentarianRole
 from onegov.pas.models import SettlementRun
@@ -1022,41 +1019,46 @@ def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
     ))
     transaction.commit()
 
-    # Step 3: Navigate to form, select via dropdowns, submit Q1
+    # Step 3: Single dropdown with both roles
     current_year = datetime.date.today().year
+    pres_value = f'{president_id}:president'
+    vice_value = f'{vice_id}:vice_president'
+
+    # Submit Q1 for president
     page = client.get('/presidential-allowances/new')
     assert 'Quartalszulage hinzufügen' in page
     page.form['year'] = current_year
     page.form['quarter'] = 1
-    page.form['president_id'] = president_id
-    page.form['vice_president_id'] = vice_id
+    page.form['recipient'] = pres_value
     page = page.form.submit().follow()
-
     assert 'Quartalszulage hinzugefügt' in page
     assert 'Hans Präsident' in page
-    assert 'Lisa Vizepräsidentin' in page
     assert 'Q1' in page
 
-    # Step 4: Submit Q2, Q3, Q4
-    for q in (2, 3, 4):
-        page = client.get('/presidential-allowances/new')
-        page.form['year'] = current_year
-        page.form['quarter'] = q
-        page.form['president_id'] = president_id
-        page.form['vice_president_id'] = vice_id
-        page = page.form.submit().follow()
-        assert 'Quartalszulage hinzugefügt' in page
-
-    # Step 5: All quarters filled — duplicate Q1 should fail
-    session = client.app.session()
-    collection = PresidentialAllowanceCollection(session)
-    assert collection.next_quarter(current_year) is None
-
+    # Submit Q1 for vice president
     page = client.get('/presidential-allowances/new')
     page.form['year'] = current_year
     page.form['quarter'] = 1
-    page.form['president_id'] = president_id
-    page.form['vice_president_id'] = vice_id
+    page.form['recipient'] = vice_value
+    page = page.form.submit().follow()
+    assert 'Quartalszulage hinzugefügt' in page
+    assert 'Lisa Vizepräsidentin' in page
+
+    # Submit Q2-Q4 for both roles
+    for q in (2, 3, 4):
+        for val in (pres_value, vice_value):
+            page = client.get('/presidential-allowances/new')
+            page.form['year'] = current_year
+            page.form['quarter'] = q
+            page.form['recipient'] = val
+            page = page.form.submit().follow()
+            assert 'Quartalszulage hinzugefügt' in page
+
+    # Step 4: Yearly limit reached — 5th entry should fail
+    page = client.get('/presidential-allowances/new')
+    page.form['year'] = current_year
+    page.form['quarter'] = 1
+    page.form['recipient'] = pres_value
     result = page.form.submit()
     assert result.status_code == 200
-    assert f'Q1 {current_year}' in result
+    assert 'CHF 20000' in result

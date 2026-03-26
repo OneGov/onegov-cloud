@@ -7,6 +7,7 @@ from onegov.pas.collections.presidential_allowance import (
     PresidentialAllowanceCollection,
 )
 from onegov.pas.forms.presidential_allowance import (
+    QUARTERLY_AMOUNTS,
     PresidentialAllowanceForm,
 )
 from onegov.pas.layouts.presidential_allowance import (
@@ -48,8 +49,8 @@ def view_presidential_allowances(
         'add_link': request.link(self, name='new'),
         'president_yearly': PRESIDENT_YEARLY_ALLOWANCE,
         'president_quarterly': PRESIDENT_QUARTERLY,
-        'vice_president_yearly': VICE_PRESIDENT_YEARLY_ALLOWANCE,
-        'vice_president_quarterly': VICE_PRESIDENT_QUARTERLY,
+        'vice_president_yearly': (VICE_PRESIDENT_YEARLY_ALLOWANCE),
+        'vice_president_quarterly': (VICE_PRESIDENT_QUARTERLY),
         'collection_link': request.link(self),
     }
 
@@ -72,21 +73,15 @@ def add_presidential_allowance(
         quarter = form.quarter.data
         settlement_run = form.current_settlement_run
         run_id = settlement_run.id if settlement_run else None
+        parl_id, role = form.parsed_recipient
+        amount = QUARTERLY_AMOUNTS[role]
 
         self.add(
             year=year,
             quarter=quarter,
-            role='president',
-            amount=PRESIDENT_QUARTERLY,
-            parliamentarian_id=form.president_uuid,
-            settlement_run_id=run_id,
-        )
-        self.add(
-            year=year,
-            quarter=quarter,
-            role='vice_president',
-            amount=VICE_PRESIDENT_QUARTERLY,
-            parliamentarian_id=form.vice_president_uuid,
+            role=role,
+            amount=amount,
+            parliamentarian_id=parl_id,
             settlement_run_id=run_id,
         )
 
