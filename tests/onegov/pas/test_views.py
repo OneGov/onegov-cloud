@@ -10,7 +10,11 @@ from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections.commission_membership import (
     PASCommissionMembershipCollection
 )
+from onegov.pas.collections.presidential_allowance import (
+    PresidentialAllowanceCollection,
+)
 from onegov.pas.models import PASCommissionMembership
+from onegov.pas.models import PASParliamentarianRole
 from onegov.pas.models import SettlementRun
 from onegov.user import UserCollection
 from uuid import UUID
@@ -983,3 +987,76 @@ def test_bulk_commission_add_abschluss_notifies_admins(
     assert len(os.listdir(client.app.maildir)) == 1
     recipients = {client.get_email(i)['To'] for i in range(1)}
     assert 'admin@example.org' in recipients
+
+
+def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
+    client.login_admin()
+
+    # Step 1: PAS settings shows the Präsidialzulagen card
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    assert 'Präsidialzulagen' in settings
+
+    # Step 2: Create parliamentarians with president/VP roles
+    session = client.app.session()
+    parliamentarians = PASParliamentarianCollection(client.app)
+    president = parliamentarians.add(
+        first_name='Hans',
+        last_name='Präsident',
+        email_primary='hans.praesident@example.org',
+    )
+    vice = parliamentarians.add(
+        first_name='Lisa',
+        last_name='Vizepräsidentin',
+        email_primary='lisa.vize@example.org',
+    )
+    session.flush()
+    president_id = str(president.id)
+    vice_id = str(vice.id)
+    session.add(PASParliamentarianRole(
+        parliamentarian_id=president.id,
+        role='president',
+    ))
+    session.add(PASParliamentarianRole(
+        parliamentarian_id=vice.id,
+        role='vice_president',
+    ))
+    transaction.commit()
+
+    # Step 3: Navigate to form, select via dropdowns, submit Q1
+    current_year = datetime.date.today().year
+    page = client.get('/presidential-allowances/new')
+    assert 'Quartalszulage hinzufügen' in page
+    page.form['year'] = current_year
+    page.form['quarter'] = 1
+    page.form['president_id'] = president_id
+    page.form['vice_president_id'] = vice_id
+    page = page.form.submit().follow()
+
+    assert 'Quartalszulage hinzugefügt' in page
+    assert 'Hans Präsident' in page
+    assert 'Lisa Vizepräsidentin' in page
+    assert 'Q1' in page
+
+    # Step 4: Submit Q2, Q3, Q4
+    for q in (2, 3, 4):
+        page = client.get('/presidential-allowances/new')
+        page.form['year'] = current_year
+        page.form['quarter'] = q
+        page.form['president_id'] = president_id
+        page.form['vice_president_id'] = vice_id
+        page = page.form.submit().follow()
+        assert 'Quartalszulage hinzugefügt' in page
+
+    # Step 5: All quarters filled — duplicate Q1 should fail
+    session = client.app.session()
+    collection = PresidentialAllowanceCollection(session)
+    assert collection.next_quarter(current_year) is None
+
+    page = client.get('/presidential-allowances/new')
+    page.form['year'] = current_year
+    page.form['quarter'] = 1
+    page.form['president_id'] = president_id
+    page.form['vice_president_id'] = vice_id
+    result = page.form.submit()
+    assert result.status_code == 200
+    assert f'Q1 {current_year}' in result

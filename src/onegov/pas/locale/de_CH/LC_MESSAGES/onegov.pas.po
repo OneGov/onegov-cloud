@@ -1030,6 +1030,45 @@ msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
 
+msgid "Presidential allowances"
+msgstr "Präsidialzulagen"
+
+msgid "Flat annual allowance per § 8 of the Nebenamtsgesetz for representing the canton at events. Paid in quarterly installments via settlement runs."
+msgstr "Pauschale Jahreszulage gemäss § 8 Nebenamtsgesetz für die Vertretung des Kantons an Anlässen. Auszahlung in vierteljährlichen Raten über Abrechnungsläufe."
+
+msgid "Year"
+msgstr "Jahr"
+
+msgid "Add quarterly allowance"
+msgstr "Quartalszulage hinzufügen"
+
+msgid "Quarterly allowance added"
+msgstr "Quartalszulage hinzugefügt"
+
+msgid "No president or vice president found"
+msgstr "Kein Präsident oder Vizepräsident gefunden"
+
+msgid "Allowance for Q${quarter} ${year} already exists"
+msgstr "Zulage für Q${quarter} ${year} existiert bereits"
+
+msgid "President: ${name} (CHF ${amount})"
+msgstr "Präsident/in: ${name} (CHF ${amount})"
+
+msgid "Vice president: ${name} (CHF ${amount})"
+msgstr "Vizepräsident/in: ${name} (CHF ${amount})"
+
+msgid "No allowances have been recorded yet."
+msgstr "Es wurden noch keine Zulagen erfasst."
+
+msgid "Quarter"
+msgstr "Quartal"
+
+msgid "Amount (CHF)"
+msgstr "Betrag (CHF)"
+
+msgid "Date"
+msgstr "Datum"
+
 #~ msgid "Commission meeting (bulk)"
 #~ msgstr "Massenbuchung Kommissionssitzung"
 
