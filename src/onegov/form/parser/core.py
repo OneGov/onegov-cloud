@@ -1440,6 +1440,8 @@ def translate_to_yaml(
 
         # the top level are the fieldsets
         if match(ELEMENTS.fieldset_title, line):
+            if enable_edit_checks and len_indent > 4:
+                raise errors.NestedFieldsetError(line=ix + 1)
             yield '- "{}":'.format(escape_double(line.lstrip('# ').rstrip()))
             expect_nested = False
             continue

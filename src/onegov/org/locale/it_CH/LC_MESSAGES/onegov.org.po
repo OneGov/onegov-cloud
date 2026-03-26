@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-02-19 15:13+0100\n"
+"POT-Creation-Date: 2026-03-25 11:20+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -198,6 +198,8 @@ msgstr "Newsletter giornaliera ${time}"
 msgid "${org} OneGov Cloud Status"
 msgstr "${org} OneGov Cloud Status"
 
+#. get the resource titles and ids
+#.
 msgid "General"
 msgstr "Generale"
 
@@ -898,24 +900,45 @@ msgstr "Giovane"
 msgid "Elderly"
 msgstr "Anziani"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Mo"
 msgstr "Lu"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Tu"
 msgstr "Ma"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "We"
 msgstr "Me"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Th"
 msgstr "Gi"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Fr"
 msgstr "Ve"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Sa"
 msgstr "Sa"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Su"
 msgstr "Do"
 
@@ -1034,6 +1057,9 @@ msgstr "Esecuzione del test"
 
 msgid "Do not actually import the events."
 msgstr "Gli eventi non vengono salvati."
+
+msgid "Created"
+msgstr "Creato"
 
 msgid "Expected header line with the following columns:"
 msgstr "La prima riga deve avere i seguenti nomi di colonna:"
@@ -1337,6 +1363,9 @@ msgstr "Osservazione finale"
 msgid "Closing remark at the end of the newsletter"
 msgstr "Osservazione finale alla fine della newsletter"
 
+#.
+#. FIXME: A plural form of News would probably be better, for now this label
+#. seems good enough
 msgid "Latest news"
 msgstr "Ultime notizie"
 
@@ -1648,6 +1677,7 @@ msgstr "Gruppo/i parlamentare/i"
 msgid "Participations"
 msgstr "Partecipanti"
 
+#. type:ignore[union-attr]
 msgid "No active parliamentary groups"
 msgstr "Nessun gruppo parlamentare attivo"
 
@@ -2691,6 +2721,13 @@ msgstr ""
 "Formato non valido. Definire gli argomenti e i sottoargomenti secondo "
 "l'esempio."
 
+#, python-format
+msgid ""
+"Invalid format. Please define subtopic(s) for '${topic}' or remove the ':'."
+msgstr ""
+"Formato non valido. Definisci uno o più sottoargomenti per '${topic}'' "
+"oppure rimuovi i due punti ':'."
+
 msgid ""
 "Invalid format. Only topics and subtopics are allowed - no deeper structures "
 "supported."
@@ -3046,22 +3083,19 @@ msgstr "Attivo"
 msgid "Inactive"
 msgstr "Inattivo"
 
-#, fuzzy
 msgid "Yubikey"
 msgstr "Yubikey"
 
 msgid "Plug your YubiKey into a USB slot and press it."
 msgstr "Collega il dispositivo YubiKey a una porta USB e premi."
 
-#, fuzzy
 msgid "Administrators and editors must use a Yubikey"
 msgstr "Gli amministratori e i redattori devono utilizzare una Yubikey"
 
-#, fuzzy
 msgid "Invalid Yubikey"
 msgstr "Yubikey non valida"
 
-#, fuzzy, python-format
+#, python-format
 msgid "This Yubikey is already used by ${username}"
 msgstr "Questa Yubikey è già utilizzata da ${username}"
 
@@ -3070,9 +3104,6 @@ msgstr "E-mail attuale"
 
 msgid "New E-Mail"
 msgstr "E-mail nuova"
-
-msgid "The users e-mail address (a.k.a. username)"
-msgstr "L'indirizzo e-mail dell'utente (noto anche come nome utente)"
 
 msgid "Confirm action via your second factor"
 msgstr "Conferma l'azione tramite il tuo secondo fattore"
@@ -3098,6 +3129,9 @@ msgstr "Yubikey sbagliato."
 
 msgid "Invalid or expired TOTP provided."
 msgstr "È stato fornito un TOTP non valido o scaduto."
+
+msgid "The users e-mail address (a.k.a. username)"
+msgstr "L'indirizzo e-mail dell'utente (noto anche come nome utente)"
 
 msgid "Send Activation E-Mail with Instructions"
 msgstr "Invia e-mail di attivazione con le istruzioni"
@@ -3419,6 +3453,12 @@ msgstr "Link a risorse esterne"
 msgid "New external resource"
 msgstr "Nuova risorsa esterna"
 
+#.
+#. FIXME: Why are we using ResouceLayout and not ResourcesLayout? this is a
+#. weird hack, if you want to be able to use the ResourceLayout with
+#. ResourceCollection, then make it work in the Layout, not by patching the
+#. collection...
+#. type:ignore
 msgid "Export All"
 msgstr "Esporta tutte"
 
@@ -3535,6 +3575,10 @@ msgstr "Test"
 msgid "Copy"
 msgstr "Copia"
 
+#, python-format
+msgid "Do you really want to delete \"${title}\"?"
+msgstr "Desideri davvero eliminare \"${title}\"?"
+
 msgid "Delete newsletter"
 msgstr "Elimina newsletter"
 
@@ -3585,10 +3629,6 @@ msgstr "Esporta l'esecuzione della fattura come PDF"
 
 msgid "Directory"
 msgstr "Cartella"
-
-#, python-format
-msgid "Do you really want to delete \"${title}\"?"
-msgstr "Desideri davvero eliminare \"${title}\"?"
 
 msgid "All entries will be deleted as well!"
 msgstr "Anche tutti gli elementi verranno eliminati!"
@@ -3677,6 +3717,7 @@ msgstr "Elementi della cartella"
 msgid "Through URL only (not listed)"
 msgstr "Solo tramite URL (non elencato)"
 
+#. allowing mtan restricted models makes only sense if we can deliver SMS
 msgid "Only by privileged users or after submitting a mTAN"
 msgstr "Solo da utenti autorizzati o dopo l'invio di un mTAN."
 
@@ -3837,6 +3878,8 @@ msgstr "Vuoi davvero eliminare questa nota?"
 msgid "Delete Note"
 msgstr "Elimina nota"
 
+#. clarify the intent of this particular flag on the news, as the effect is not
+#. entirely the same (news may be shown on the homepage anyway)
 msgid "Always visible on homepage"
 msgstr "Sempre visibile sulla pagina principale"
 
@@ -4237,6 +4280,8 @@ msgstr ""
 "eliminare le pagine con sottopagine. Per eliminare questa pagina, elimina "
 "prima tutte le sottopagine o chiedi a un amministratore di farlo per te."
 
+#. Modification for the footer left on all pages
+#.
 msgid "Source"
 msgstr "Fonte"
 
@@ -4245,9 +4290,6 @@ msgstr "Oggetto"
 
 msgid "Owner"
 msgstr "Proprietario"
-
-msgid "Created"
-msgstr "Creato"
 
 msgid "Reaction Time"
 msgstr "Tempo di reazione"
@@ -4270,6 +4312,8 @@ msgstr "Quantità"
 msgid "VAT"
 msgstr "IVA"
 
+#. credit card
+#.
 msgid "Payment"
 msgstr "Pagamento"
 
@@ -5263,7 +5307,6 @@ msgstr ""
 "Se il collegamento della password è scaduto, puoi richiedere una nuova "
 "password qui:"
 
-#, fuzzy
 msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
 "Per utilizzare il tuo account hai bisogno di Yubikey con il seriale ${number}"
@@ -6066,8 +6109,9 @@ msgstr "mTAN"
 msgid "Identicon"
 msgstr "Icona identificativa"
 
-msgid "Not a valid color."
-msgstr "Colore non valido."
+#. messages not translated by wtforms
+msgid "Not a valid choice"
+msgstr "Scelta non valida"
 
 msgid "CSRF failed."
 msgstr ""
@@ -6084,9 +6128,11 @@ msgstr ""
 "Token CSRF scaduto. Si prega di aggiornare la pagina. Se il problema "
 "persiste, disconnettersi, riconnettersi e riprovare."
 
-msgid "Not a valid choice"
-msgstr "Scelta non valida"
+#. messages defined in wtforms-components
+msgid "Not a valid color."
+msgstr "Colore non valido."
 
+#. Roles in plural form are not defined as translatable texts anywhere
 msgid "Admins"
 msgstr "Amministratori"
 
@@ -6212,6 +6258,9 @@ msgstr ""
 msgid "Delete availability period"
 msgstr "Elimina il periodo di disponibilità"
 
+#.
+#. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
@@ -6279,7 +6328,6 @@ msgstr "Il tuo profilo utente è incompleto. Aggiornalo prima di proseguire."
 msgid "You have been logged in."
 msgstr "Hai effettuato l'accesso."
 
-#, fuzzy
 msgid "Wrong e-mail address, password or yubikey."
 msgstr "Indirizzo e-mail, password o Yubikey errati."
 
@@ -6570,6 +6618,8 @@ msgstr ""
 msgid "Notification for new entries"
 msgstr "Notifica per nuovi elementi"
 
+#. i18n:attributes translations do not support variables, so we need to do this
+#. ourselves
 #, python-format
 msgid "Do you really want to unsubscribe \"{}\"?"
 msgstr "Vuoi davvero annullare l'iscrizione a \"{}\"?"
@@ -6642,6 +6692,7 @@ msgstr "Hai accettato l'evento ${title}"
 msgid "Your event was accepted"
 msgstr "Il tuo evento è stato accettato"
 
+#. type:ignore[attr-defined]
 msgid "Submit an event"
 msgstr "Invia un evento"
 
@@ -6657,6 +6708,7 @@ msgstr ""
 "eventi già pubblicati possono essere rimossi dalla pagina senza preavviso o "
 "motivo."
 
+#. type:ignore[attr-defined]
 msgid "Add event"
 msgstr "Aggiungi evento"
 
@@ -6699,22 +6751,18 @@ msgstr "Il nome del file è troppo lungo"
 msgid "The file cannot be processed"
 msgstr "Il file non può essere elaborato"
 
-#, fuzzy
 msgid "Please submit your yubikey"
 msgstr "Invia la tua Yubikey"
 
-#, fuzzy
 msgid "Your account is not linked to a Yubikey"
 msgstr "Il tuo account non è collegato a Yubikey"
 
-#, fuzzy
 msgid "The used Yubikey is not linked to your account"
 msgstr "La Yubikey usata non è collegata al tuo account"
 
 msgid "This file already has a digital seal"
 msgstr "Questo file include già un sigillo digitale"
 
-#, fuzzy
 msgid "Your Yubikey could not be validated"
 msgstr "Non è stato possibile convalidare la tua Yubikey"
 
@@ -7254,6 +7302,7 @@ msgstr "Nuove date per ${title}"
 msgid "Confirm your reservation"
 msgstr "Conferma la prenotazione"
 
+#. by default we will redirect to the created ticket
 msgid "Thank you for your reservation!"
 msgstr "Grazie per la tua prenotazione!"
 
@@ -7729,6 +7778,10 @@ msgstr "Il biglietto è già stato chiuso"
 msgid "Your message has been sent"
 msgstr "Il tuo messaggio è stato inviato"
 
+#, python-format
+msgid "${count} file(s) not found: ${files}"
+msgstr "${count} file non trovati: ${files}"
+
 msgid "Zip archive created successfully"
 msgstr "Archivio zip creato con successo"
 
@@ -7762,6 +7815,7 @@ msgstr "La tua richiesta è attualmente in sospeso"
 msgid "Your request has been processed"
 msgstr "La tua richiesta è stata elaborata"
 
+#. We adjust the wording for users that do not know what a ticket is
 msgid "Request Status"
 msgstr "Stato della richiesta"
 

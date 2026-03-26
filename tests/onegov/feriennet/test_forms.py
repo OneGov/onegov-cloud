@@ -323,7 +323,7 @@ def test_notification_template_send_form(session: Session) -> None:
 
     assert form.has_choices
     assert len(form.occasion.choices) == 2
-    assert len(form.send_to.choices) == 7
+    assert len(form.send_to.choices) == 9
 
     # if the period is not confirmed, we send to attendees wanting the occasion
     periods.query().one().confirmed = False

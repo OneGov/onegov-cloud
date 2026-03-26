@@ -3049,9 +3049,10 @@ class NewsletterLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _('Do you really want to delete "{}"?'.format(
-                                self.model.title
-                            )),
+                            _(
+                                'Do you really want to delete "${title}"?',
+                                mapping={'title': self.model.title}
+                            ),
                             _('This cannot be undone.'),
                             _('Delete newsletter'),
                             _('Cancel')
@@ -3179,9 +3180,10 @@ class ImageSetLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _('Do you really want to delete "{}"?'.format(
-                                self.model.title
-                            )),
+                            _(
+                                'Do you really want to delete "${title}"?',
+                                mapping={'title': self.model.title}
+                            ),
                             _('This cannot be undone.'),
                             _('Delete photo album'),
                             _('Cancel')

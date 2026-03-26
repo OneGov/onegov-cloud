@@ -9,6 +9,7 @@ from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import PresidentialAllowanceCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.collections.commission import PASCommissionCollection
@@ -84,6 +85,12 @@ def view_pas_settings(
                 'title': _('Parliamentarians'),
                 'link': request.class_link(PASParliamentarianCollection),
                 'icon': 'fa-user-tie'
+            },
+            {
+                'name': 'presidential-allowances',
+                'title': _('Presidential allowances'),
+                'link': request.class_link(PresidentialAllowanceCollection),
+                'icon': 'fa-award',
             },
             {
                 'name': 'import',

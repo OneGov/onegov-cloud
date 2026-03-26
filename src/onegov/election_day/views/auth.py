@@ -127,10 +127,8 @@ def handle_password_reset_request(
 
         show_form = False
         callout = _(
-            (
-                'A password reset link has been sent to ${email}, provided an '
-                'account exists for this email address.'
-            ),
+            'A password reset link has been sent to ${email}, provided an '
+            'account exists for this email address.',
             mapping={'email': form.email.data}
         )
 

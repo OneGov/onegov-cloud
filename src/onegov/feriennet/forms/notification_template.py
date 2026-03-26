@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import cached_property
 from markupsafe import Markup, escape
 
-from onegov.activity import Activity
+from onegov.activity import Activity, Attendee
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
 from onegov.core.orm import as_selectable_from_path
@@ -71,6 +71,9 @@ class NotificationTemplateSendForm(Form):
             ('active_organisers', _(
                 'Organisers with an occasion'
             )),
+            ('inactive_organisers', _(
+                'Organisers without occasions'
+            )),
             ('by_role', _(
                 'Users of a given role'
             )),
@@ -79,6 +82,9 @@ class NotificationTemplateSendForm(Form):
             )),
             ('with_accepted_bookings', _(
                 'Users with accepted bookings'
+            )),
+            ('with_no_wishes_or_bookings', _(
+                'Users with attendees that have no wishes or bookings'
             )),
             ('with_unpaid_bills', _(
                 'Users with unpaid bills'
@@ -160,8 +166,14 @@ class NotificationTemplateSendForm(Form):
         elif self.send_to.data == 'active_organisers':
             recipients = self.recipients_which_are_active_organisers()
 
+        elif self.send_to.data == 'inactive_organisers':
+            recipients = self.recipients_which_are_inactive_organisers()
+
         elif self.send_to.data == 'with_unpaid_bills':
             recipients = self.recipients_with_unpaid_bills()
+
+        elif self.send_to.data == 'with_no_wishes_or_bookings':
+            recipients = self.recipients_with_no_wishes_or_bookings()
 
         else:
             raise NotImplementedError
@@ -217,6 +229,23 @@ class NotificationTemplateSendForm(Form):
 
         return {b.username for b in q}
 
+    def recipients_with_no_wishes_or_bookings(self) -> set[str]:
+        session = self.request.session
+        bookings = BookingCollection(session)
+
+        # Usernames die Buchungen in dieser Period haben
+        q_with = bookings.query().order_by(None)
+        q_with = q_with.filter_by(period_id=self.period.id)
+        q_with = q_with.with_entities(
+            distinct(Booking.username).label('username'))
+        usernames_with = {b.username for b in q_with}
+
+        # Alle Usernames die mindestens einen Attendee haben
+        q_all = session.query(distinct(Attendee.username))
+        usernames_with_attendees = {row[0] for row in q_all}
+
+        return usernames_with_attendees - usernames_with
+
     def recipients_which_are_active_organisers(self) -> set[str]:
         occasions = OccasionCollection(self.request.session)
 
@@ -227,6 +256,15 @@ class NotificationTemplateSendForm(Form):
         uq = q.with_entities(distinct(Activity.username))
 
         return {username for username, in uq}
+
+    def recipients_which_are_inactive_organisers(self) -> set[str]:
+        organisers = UserCollection(self.request.session).query().filter_by(
+            role='editor'
+        ).with_entities(User.username)
+
+        active_organisers = self.recipients_which_are_active_organisers()
+
+        return {username for username, in organisers} - active_organisers
 
     def recipients_with_unpaid_bills(self) -> set[str]:
         billing = BillingCollection(self.request, period=self.period)
