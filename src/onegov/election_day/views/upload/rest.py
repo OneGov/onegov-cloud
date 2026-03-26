@@ -101,6 +101,7 @@ def view_upload_rest(
     except Exception:
         log.exception('Internal server error in REST upload')
         sentry_sdk.capture_exception()
+        transaction.abort()
         status_code = 500
         return {
             'status': 'error',
