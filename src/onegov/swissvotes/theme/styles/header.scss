@@ -186,6 +186,15 @@ header {
                 justify-content: space-between;
                 align-items: center;
 
+                .project-by {
+                    flex-grow: 2;
+
+                    span {
+                        color: $white;
+                    }
+                }
+
+
                 .logo img {
                     height: 5rem;
                 }
@@ -409,10 +418,6 @@ header {
 
         .main-navigation {
 
-            .project-by span {
-                color: $white;
-            }
-
             ul {
                 margin-left: -1.875rem;
                 margin-right: -1.875rem;
@@ -438,6 +443,38 @@ header {
             justify-content: space-between;
             align-items: end;
             flex-grow: 2;
+
+            .fa-chevron-down {
+                display: none;
+            }
+
+            .fa-chevron-right {
+                display: block;
+            }
+
+
+            .back.js-generated {
+                h5 {
+                    &::after {
+                        @include icon('\f053');
+                    }
+                }
+
+                a {
+                    opacity: 0;
+                }
+            }
+
+            .dropdown,
+            .has-dropdown {
+                border: 0;
+
+                i {
+                    float: inline-end;
+                    margin-left: .5rem;
+                    margin-top: .2rem;
+                }
+            }
 
             ul {
                 margin-left: 0;
@@ -475,7 +512,8 @@ header {
     }
 }
 
-#white_logo {
+#white_logo,
+.fa-chevron-right {
     display: none;
 }
 

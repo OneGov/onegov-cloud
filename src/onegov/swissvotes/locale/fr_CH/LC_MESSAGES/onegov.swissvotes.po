@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-10-08 08:58+0200\n"
+"POT-Creation-Date: 2026-03-26 13:18+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -149,14 +149,17 @@ msgstr "Ressource"
 msgid "eMuseum.ch"
 msgstr "eMuseum.ch"
 
+msgid "Plakatsammlung Basel"
+msgstr "Plakatsammlung Basel"
+
 msgid "Social Archives"
 msgstr "Archives Sociales"
 
-msgid "Basel Poster Collection"
-msgstr "Lien Plakatsammlung Basel"
-
 msgid "No eMuseum API key available."
 msgstr "Aucune clé API eMuseum n’est disponible."
+
+msgid "No Plakatsammlung API key available."
+msgstr "Aucune clé API Plakatsammlung n'est disponible"
 
 msgid "Title"
 msgstr "Titre"
@@ -1500,6 +1503,9 @@ msgstr "Italien"
 msgid "Rhaeto-Romanic"
 msgstr "Réto-roman"
 
+msgid "English"
+msgstr "Anglais"
+
 msgid "Other"
 msgstr "Autre"
 
@@ -1629,6 +1635,9 @@ msgstr ""
 "Le formulaire contient des erreurs. Veuillez vérifier les champs marqués en "
 "rouge."
 
+msgid "A project by"
+msgstr "Un projet de"
+
 msgid ""
 "This webpage is best viewed with a modern Browser. Consider to use Chrome, "
 "Firefox or Edge. <dynamic element>"
@@ -1636,8 +1645,26 @@ msgstr ""
 "Cette page Web est mieux vue avec un navigateur moderne. Envisagez "
 "d’utiliser Chrome, Firefox ou Edge. <dynamic element>"
 
+msgid "Want more context?"
+msgstr "Vous souhaitez en savoir plus ?"
+
+msgid "Subscribe to the APS newsletter"
+msgstr "Abonnez-vous à la newsletter APS"
+
+msgid "Main projects"
+msgstr "Projets principaux"
+
+msgid "by Année Politique Suisse"
+msgstr "d'Année Politique Suisse"
+
+msgid "Supported by"
+msgstr "Soutenu par"
+
 msgid "Logout"
 msgstr "Se déconnecter"
+
+msgid "Follow us"
+msgstr "Suivez-nous"
 
 msgid "Forgot your password?"
 msgstr "Mot de passe oublié?"
@@ -2029,6 +2056,7 @@ msgstr "Partici&shy;pation"
 msgid "Search results in the documents on this vote"
 msgstr "Résultats de recherche dans les documents de cette votation"
 
+#. type:ignore
 msgid "Wrong username or password"
 msgstr "Nom d'utilisateur ou mot de passe incorrect"
 
@@ -2051,6 +2079,7 @@ msgstr ""
 msgid "Password changed."
 msgstr "Le mot de passe a été changé."
 
+#. type:ignore[attr-defined]
 msgid "Wrong username or password reset link not valid any more."
 msgstr "E-Mail non valide ou expiration de la durée de validité du lien."
 
@@ -2212,11 +2241,18 @@ msgid "Some external resources could not be updated: ${failed}"
 msgstr ""
 "Certaines ressources externes n’ont pas pu être mises à jour : {failed}"
 
+#, python-format
+msgid "Details ${details}"
+msgstr "Details ${details}"
+
 msgid "All votes deleted"
 msgstr "Toutes les votations ont été supprimées"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Voulez-vous vraiment supprimer l'ensemble des votations?!"
+
+#~ msgid "Basel Poster Collection"
+#~ msgstr "Lien Plakatsammlung Basel"
 
 #~ msgid "Technical report"
 #~ msgstr "Rapport technique"

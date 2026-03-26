@@ -55,6 +55,14 @@ class DefaultLayout(ChameleonLayout):
         return ''
 
     @cached_property
+    def drilldown_back(self) -> str:
+        back = self.request.translate(_('back'))
+        return (
+            '<li class="js-drilldown-back">'
+            f'<a tabindex="0">{back}</a></li>'
+        )
+
+    @cached_property
     def top_navigation(self) -> list[Link]:
         result = [
             Link(

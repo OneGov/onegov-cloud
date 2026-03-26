@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-10-08 08:58+0200\n"
+"POT-Creation-Date: 2026-03-26 13:18+0100\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -147,14 +147,17 @@ msgstr "Resource"
 msgid "eMuseum.ch"
 msgstr "eMuseum.ch"
 
+msgid "Plakatsammlung Basel"
+msgstr "Plakatsammlung Basel"
+
 msgid "Social Archives"
 msgstr "Social Archives"
 
-msgid "Basel Poster Collection"
-msgstr "Basel Poster Collection"
-
 msgid "No eMuseum API key available."
 msgstr "No eMuseum API key available."
+
+msgid "No Plakatsammlung API key available."
+msgstr "No Plakatsammlung API key available."
 
 msgid "Title"
 msgstr "Title"
@@ -1542,6 +1545,9 @@ msgstr "Italian"
 msgid "Rhaeto-Romanic"
 msgstr "Rhaeto-Romanic"
 
+msgid "English"
+msgstr "English"
+
 msgid "Other"
 msgstr "Other"
 
@@ -1667,6 +1673,9 @@ msgstr ""
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr "The form contains errors. Please check the fields marked in red."
 
+msgid "A project by"
+msgstr "A project by"
+
 msgid ""
 "This webpage is best viewed with a modern Browser. Consider to use Chrome, "
 "Firefox or Edge. <dynamic element>"
@@ -1674,8 +1683,26 @@ msgstr ""
 "This webpage is best viewed with a modern Browser. Consider to use Chrome, "
 "Firefox or Edge. <dynamic element>"
 
+msgid "Want more context?"
+msgstr "Want more context?"
+
+msgid "Subscribe to the APS newsletter"
+msgstr "Subscribe to the APS newsletter"
+
+msgid "Main projects"
+msgstr "Main projects"
+
+msgid "by Année Politique Suisse"
+msgstr "by Année Politique Suisse"
+
+msgid "Supported by"
+msgstr "Supported by"
+
 msgid "Logout"
 msgstr "Logout"
+
+msgid "Follow us"
+msgstr "Follow us"
 
 msgid "Forgot your password?"
 msgstr "Forgot your password?"
@@ -2068,6 +2095,7 @@ msgstr "Turnout"
 msgid "Search results in the documents on this vote"
 msgstr "Search results in the documents on this vote"
 
+#. type:ignore
 msgid "Wrong username or password"
 msgstr "Wrong username or password"
 
@@ -2091,6 +2119,7 @@ msgstr ""
 msgid "Password changed."
 msgstr "Password changed."
 
+#. type:ignore[attr-defined]
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Wrong username or password reset link has expired."
 
@@ -2247,11 +2276,18 @@ msgstr ""
 msgid "Some external resources could not be updated: ${failed}"
 msgstr "Some external resources could not be updated: ${failed}"
 
+#, python-format
+msgid "Details ${details}"
+msgstr "Details ${details}"
+
 msgid "All votes deleted"
 msgstr "All votes have been deleted"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Do you really want to delete all votes?!"
+
+#~ msgid "Basel Poster Collection"
+#~ msgstr "Basel Poster Collection"
 
 #~ msgid "Technical report"
 #~ msgstr "Technical report"
