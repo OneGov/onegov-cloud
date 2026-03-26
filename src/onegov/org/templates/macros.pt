@@ -1251,14 +1251,13 @@
                 tal:define="
                     date occurrence.localized_start;
                     image occurrence.event.image;
-                    link use_links and request.link(occurrence)
                 "
                 use-macro="layout.macros['calendar-day']"
             />
         </div>
         <div class="large-9 medium-8 small-7 columns calendar-text-column">
             <h3>
-                <a href="${use_links and request.link(occurrence)}">${occurrence.title}</a>
+                <a tal:attributes="href request.link(occurrence) if use_links else None">${occurrence.title}</a>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
             </h3>
             <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>
