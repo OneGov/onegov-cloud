@@ -68,7 +68,6 @@ def view_vote_json(
 
     @request.after
     def add_headers(response: Response) -> None:
-        add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
     embed = defaultdict(list)
@@ -195,7 +194,6 @@ def view_vote_summary(
 
     @request.after
     def add_headers(response: Response) -> None:
-        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     return get_vote_summary(self, request)

@@ -68,7 +68,6 @@ def view_election_compound_part_json(
 
     @request.after
     def add_headers(response: Response) -> None:
-        add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
     session = request.app.session()
@@ -154,7 +153,6 @@ def view_election_compound_part_summary(
 
     @request.after
     def add_headers(response: Response) -> None:
-        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     return get_election_compound_summary(

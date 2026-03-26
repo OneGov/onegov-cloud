@@ -11,7 +11,6 @@ from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts.archive import ArchiveLayout
 from onegov.election_day.models import Principal
 from onegov.election_day.security import MaybePublic
-from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_summaries
 from webob.exc import HTTPNotFound
@@ -66,7 +65,6 @@ def view_archive_json(
 
     @request.after
     def add_headers(response: Response) -> None:
-        add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
     return {
@@ -124,7 +122,6 @@ def view_principal_json(
 
     @request.after
     def add_headers(response: Response) -> None:
-        add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
     return {

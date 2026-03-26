@@ -393,10 +393,6 @@ def json_export_occurences(
 
     """
 
-    @request.after
-    def cors(response: BaseResponse) -> None:
-        response.headers.add('Access-Control-Allow-Origin', '*')
-
     query = self.for_filter(
         tags=request.params.getall('cat1'),  # type:ignore[arg-type]
         locations=request.params.getall('cat2')  # type:ignore[arg-type]
