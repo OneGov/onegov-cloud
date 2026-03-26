@@ -1566,7 +1566,7 @@
 <metal:occurrence_list_view define-macro="occurrence_list_view" i18n:domain="onegov.town6">
     <div class="occurrence subpage-cards medium-12 small-12 cell" tal:define="use_links use_links|True">
         <div class="card">
-            <a href="${use_links and request.link(occurrence)}">
+            <a tal:attributes="href request.link(occurrence) if use_links else None">
                 <div class="show-for-small-only" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: contain; background-position: center center; background-repeat: no-repeat;"></div>
                 <div class="grid-x align-middle">
                     <div class="cell medium-7 card-section">
