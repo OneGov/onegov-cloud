@@ -1626,8 +1626,8 @@ def test_nested_fieldset_error() -> None:
             "Options *=",
             "    (x) Private",
             "    ( ) Business",
-            "        # Nested fieldset definition",
+            "        # Nested fieldset",
             "        Organisation = ___",
         )), enable_edit_checks=True)
-        assert e.value.line == 7
-        assert e.value.field_name == 'Personal information'
+
+    assert e.value.line == 7
