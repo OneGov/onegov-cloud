@@ -3265,16 +3265,14 @@ def check_forms(
         )
         data_to_parse.extend((x.title, x.structure) for x in directories.all())
 
-        # NOTE: the formcode for resources can be empty but causing
-        # an InvalidFormSyntax
-        # resources = (
-        #     ResourceCollection(app.libres_context)
-        #     .query()
-        #     .with_entities(Resource.title, Resource.definition)
-        # )
-        # data_to_parse.extend(
-        #     (x.title, x.definition) for x in resources.all()
-        # )
+        resources = (
+            ResourceCollection(app.libres_context)
+            .query()
+            .with_entities(Resource.title, Resource.definition)
+        )
+        data_to_parse.extend(
+            (x.title, x.definition) for x in resources.all() if x.definition
+        )
 
         click.echo(f'\nParsing formcode for "{app.org.name}"')
         count = len(data_to_parse)
