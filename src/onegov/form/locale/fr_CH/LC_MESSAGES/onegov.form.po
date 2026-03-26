@@ -245,6 +245,7 @@ msgstr ""
 "Les fieldsets imbriqués (`#`) ne sont pas pris en charge, veuillez supprimer "
 "la ligne {line}."
 
+msgid ""
 "${fields}: New fields cannot be required initially. Require them in a "
 "separate migration step."
 msgstr ""
