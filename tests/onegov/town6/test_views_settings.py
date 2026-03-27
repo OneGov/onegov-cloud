@@ -188,6 +188,7 @@ def test_migrate_links(client: Client) -> None:
     news.text = ('<p>Big news https://foo.ch/big-news and bigger news'
                  'can be found here https://foo.ch/bigger-news</p>')
     session.add(news)
+    news_text = news.text
 
     transaction.commit()
 
@@ -213,8 +214,11 @@ def test_migrate_links(client: Client) -> None:
     assert '3 Links migriert' in result
 
     topic_text_new = TopicCollection(session).by_title('Foo Topic').text
+    news_text_new = NewsCollection(request).by_title('Big News').text
     assert old_domain not in TopicCollection(session).by_title('Foo Topic').text
     assert old_domain not in NewsCollection(request).by_title('Big News').text
 
-    topic_text = topic_text.replace('foo.ch', 'localhost')
-    assert topic_text == topic_text_new
+    topic_text_replaced = topic_text.replace('foo.ch', 'localhost')
+    assert topic_text_replaced == topic_text_new
+    news_text_replaced = news_text.replace('foo.ch', 'localhost')
+    assert news_text_replaced == news_text_new

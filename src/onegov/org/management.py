@@ -6,6 +6,7 @@ from collections import defaultdict
 
 import transaction
 from aiohttp import ClientTimeout
+from markupsafe import Markup
 from sqlalchemy.orm import object_session
 from urlextract import URLExtract
 
@@ -99,6 +100,9 @@ class LinkMigration(ModelsWithLinksMixin):
 
                 id_count[field] += n
                 if not test:
+                    new_val = (
+                        Markup(new_val)
+                        if isinstance(value, Markup) else new_val)
                     setattr(
                         item,
                         field,
