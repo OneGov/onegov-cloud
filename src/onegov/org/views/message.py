@@ -69,7 +69,12 @@ class Owner(NamedTuple):
         return self.realname or self.username
 
 
-@OrgApp.json(model=MessageCollection, permission=Private, name='feed')
+@OrgApp.json(
+    model=MessageCollection,
+    permission=Private,
+    name='feed',
+    open_data=True
+)
 def view_messages_feed(
     self: MessageCollection[Message],
     request: OrgRequest,

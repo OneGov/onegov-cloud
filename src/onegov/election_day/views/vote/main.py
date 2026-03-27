@@ -55,7 +55,8 @@ def view_vote(
 @ElectionDayApp.json(
     model=Vote,
     name='json',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_vote_json(
     self: Vote,
@@ -184,7 +185,8 @@ def view_vote_json(
 @ElectionDayApp.json(
     model=Vote,
     name='summary',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_vote_summary(
     self: Vote,

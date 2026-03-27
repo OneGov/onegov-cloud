@@ -122,7 +122,8 @@ def respond_with_error(request: OrgRequest, error: str) -> JSON_ro:
     model=Allocation,
     name='reserve',
     request_method='POST',
-    permission=Public
+    permission=Public,
+    open_data=True
 )
 def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
     """ Adds a single reservation to the list of reservations bound to the
@@ -238,7 +239,12 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
         return respond_with_success(request)
 
 
-@OrgApp.json(model=Reservation, request_method='DELETE', permission=Public)
+@OrgApp.json(
+    model=Reservation,
+    request_method='DELETE',
+    permission=Public,
+    open_data=True
+)
 def delete_reservation(self: Reservation, request: OrgRequest) -> JSON_ro:
 
     # anonymous users do not get a csrf token (it's bound to the identity)

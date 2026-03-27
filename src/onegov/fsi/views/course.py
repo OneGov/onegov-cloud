@@ -180,7 +180,8 @@ def view_course_event(self: Course, request: FsiRequest) -> RenderData:
 @FsiApp.json(
     model=Course,
     permission=Personal,
-    name='content-json'
+    name='content-json',
+    open_data=True
 )
 def get_course_event_content(self: Course, request: FsiRequest) -> str:
     return self.description_html

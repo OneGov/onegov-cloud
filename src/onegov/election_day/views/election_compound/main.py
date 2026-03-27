@@ -58,7 +58,8 @@ def view_election_compound(
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='json',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_compound_json(
     self: ElectionCompound,
@@ -176,7 +177,8 @@ def view_election_compound_json(
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='summary',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_compound_summary(
     self: ElectionCompound,

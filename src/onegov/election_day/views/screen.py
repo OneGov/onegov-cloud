@@ -85,7 +85,8 @@ def view_screen_head(self: Screen, request: ElectionDayRequest) -> None:
 @ElectionDayApp.json(
     model=Screen,
     name='json',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_screen_json(self: Screen, request: ElectionDayRequest) -> JSON_ro:
     """ Get the last modification date. """

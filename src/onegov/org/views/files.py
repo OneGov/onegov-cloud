@@ -385,7 +385,12 @@ def view_get_image_collection(
     }
 
 
-@OrgApp.json(model=GeneralFileCollection, permission=Private, name='json')
+@OrgApp.json(
+    model=GeneralFileCollection,
+    permission=Private,
+    name='json',
+    open_data=True
+)
 def view_get_file_collection_json(
     self: GeneralFileCollection,
     request: OrgRequest
@@ -402,7 +407,12 @@ def view_get_file_collection_json(
     ]
 
 
-@OrgApp.json(model=ImageFileCollection, permission=Private, name='json')
+@OrgApp.json(
+    model=ImageFileCollection,
+    permission=Private,
+    name='json',
+    open_data=True
+)
 def view_get_image_collection_json(
     self: BaseImageFileCollection[Any],
     request: OrgRequest,
@@ -537,8 +547,13 @@ def view_upload_image_file(
     })
 
 
-@OrgApp.json(model=FileCollection, name='upload.json',
-             request_method='POST', permission=Private)
+@OrgApp.json(
+    model=FileCollection,
+    name='upload.json',
+    request_method='POST',
+    permission=Private,
+    open_data=True
+)
 def view_upload_file_by_json(
     self: FileCollection[Any],
     request: OrgRequest

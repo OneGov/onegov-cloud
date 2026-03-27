@@ -98,7 +98,12 @@ def search(
     }
 
 
-@OrgApp.json(model=Search, name='suggest', permission=Public)
+@OrgApp.json(
+    model=Search,
+    name='suggest',
+    permission=Public,
+    open_data=True
+)
 def suggestions(self: Search, request: OrgRequest) -> JSON_ro:
     try:
         return self.suggestions()

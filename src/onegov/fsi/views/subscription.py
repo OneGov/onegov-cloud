@@ -316,7 +316,8 @@ def view_delete_reservation(
     model=CourseSubscription,
     request_method='POST',
     permission=Secret,
-    name='toggle-confirm'
+    name='toggle-confirm',
+    open_data=True
 )
 def view_toggle_confirm_reservation(
     self: CourseSubscription,

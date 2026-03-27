@@ -760,7 +760,8 @@ def get_find_your_spot_reservations(
     model=FindYourSpotCollection,
     name='reservations',
     request_method='DELETE',
-    permission=Public
+    permission=Public,
+    open_data=False,
 )
 def delete_all_find_your_spot_reservations(
     self: FindYourSpotCollection,
@@ -803,7 +804,12 @@ def delete_all_find_your_spot_reservations(
     }
 
 
-@OrgApp.json(model=ResourceCollection, permission=Public, name='json')
+@OrgApp.json(
+    model=ResourceCollection,
+    permission=Public,
+    name='json',
+    open_data=True
+)
 def view_resources_json(
     self: ResourceCollection,
     request: OrgRequest
@@ -1190,7 +1196,12 @@ def assert_visible_by_members(self: Resource, request: OrgRequest) -> None:
         raise exc.HTTPForbidden()
 
 
-@OrgApp.json(model=Resource, name='occupancy-json', permission=Personal)
+@OrgApp.json(
+    model=Resource,
+    name='occupancy-json',
+    permission=Personal,
+    open_data=True
+)
 def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns the reservations in a fullcalendar compatible events feed.
 
@@ -1250,7 +1261,12 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     )
 
 
-@OrgApp.json(model=Resource, name='occupancy-stats', permission=Personal)
+@OrgApp.json(
+    model=Resource,
+    name='occupancy-stats',
+    permission=Personal,
+    open_data=True
+)
 def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns stats for the selected date range.
 

@@ -382,8 +382,13 @@ def export_occurrences(
     }
 
 
-@OrgApp.json(model=OccurrenceCollection, name='json', permission=Public)
-def json_export_occurences(
+@OrgApp.json(
+    model=OccurrenceCollection,
+    name='json',
+    permission=Public,
+    open_data=True
+)
+def json_export_occurrences(
     self: OccurrenceCollection,
     request: OrgRequest
 ) -> JSON_ro:

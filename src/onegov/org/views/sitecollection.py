@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
 
 
-@OrgApp.json(model=SiteCollection, permission=Private)
+@OrgApp.json(model=SiteCollection, permission=Private, open_data=True)
 def get_site_collection(
     self: SiteCollection,
     request: OrgRequest

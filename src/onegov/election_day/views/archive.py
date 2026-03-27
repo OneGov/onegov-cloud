@@ -50,7 +50,8 @@ def view_archive(
 @ElectionDayApp.json(
     model=ArchivedResultCollection,
     name='json',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_archive_json(
     self: ArchivedResultCollection,
@@ -106,7 +107,8 @@ def view_principal(
 @ElectionDayApp.json(
     model=Principal,
     name='json',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_principal_json(
     self: Principal,

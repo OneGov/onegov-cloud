@@ -121,7 +121,7 @@ def get_private_metadata(app: Framework, absorb: str) -> SecretMetadata:
     return SecretMetadata(app, absorb)
 
 
-@Framework.json(model=PublicMetadata, permission=Public)
+@Framework.json(model=PublicMetadata, permission=Public, open_data=True)
 def view_public_metadata(
     self: PublicMetadata,
     request: CoreRequest
@@ -129,7 +129,7 @@ def view_public_metadata(
     return render_metadata(self, request)
 
 
-@Framework.json(model=SecretMetadata, permission=Secret)
+@Framework.json(model=SecretMetadata, permission=Secret, open_data=True)
 def view_secret_metadata(
     self: PublicMetadata,
     request: CoreRequest

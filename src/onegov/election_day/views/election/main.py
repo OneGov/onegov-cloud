@@ -58,7 +58,8 @@ def view_election(
 @ElectionDayApp.json(
     model=Election,
     name='json',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_json(
     self: Election,
@@ -229,7 +230,8 @@ def view_election_json(
 @ElectionDayApp.json(
     model=Election,
     name='summary',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_summary(
     self: Election,
