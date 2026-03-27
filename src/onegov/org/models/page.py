@@ -336,7 +336,7 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
         )
 
     def by_title(self, title: str) -> Topic | None:
-        return self.session.query(Topic).filter_by(title=title).first()
+        return self.subset().filter(Topic.title == title).first()
 
 
 class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
