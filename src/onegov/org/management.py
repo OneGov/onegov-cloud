@@ -101,7 +101,7 @@ class LinkMigration(ModelsWithLinksMixin):
                 id_count[field] += n
                 if not test:
                     new_val = (
-                        Markup(new_val)
+                        Markup(new_val)  # nosec: B704
                         if isinstance(value, Markup) else new_val)
                     setattr(
                         item,
