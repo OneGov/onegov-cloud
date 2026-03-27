@@ -211,7 +211,6 @@ def test_migrate_links(client: Client) -> None:
     migrate_page.form['old_domain'] = old_domain
     migrate_page.form['test'] = False
     result = migrate_page.form.submit().follow()
-    print(result.pyquery('.callout'))
     assert '3 Links migriert' in result
 
     topic_text_new = TopicCollection(session).by_title('Foo Topic').text
