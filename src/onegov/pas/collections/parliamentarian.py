@@ -145,7 +145,8 @@ class PASParliamentarianCollection(
             log.info(f'Creating user {new_email} with role {role}')
             new_user_obj = users.add(
                 new_email, random_password(16), role=role,
-                realname=item.title
+                realname=item.title,
+                active=False,
             )
             if users_cache is not None:
                 users_cache[new_email.lower()] = new_user_obj
@@ -158,12 +159,16 @@ class PASParliamentarianCollection(
                 if self._is_current_commission_president(item)
                 else 'parliamentarian'
             )
+            saml_sources = {'saml2', 'ldap'}
             corrections = {
                 'username': new_email,
                 'role': role,
                 'active': True,
-                'source': None,
-                'source_id': None,
+                **(
+                    {}
+                    if enable.source in saml_sources
+                    else {'source': None, 'source_id': None}
+                ),
             }
             corrections = {
                 attribute: value

@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-27 10:29+0100\n"
+"POT-Creation-Date: 2026-03-25 09:27+0100\n"
 "PO-Revision-Date: 2022-03-07 13:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -21,6 +21,9 @@ msgstr "Numero di ore non valido"
 
 msgid "Invalid number of minutes"
 msgstr "Numero di minuti non valido"
+
+msgid "Files of this type are not supported."
+msgstr "I file di questo tipo non sono supportati."
 
 msgid "Not a valid email"
 msgstr "Non è un'email valida"
@@ -146,13 +149,13 @@ msgstr "Password"
 msgid "Markdown"
 msgstr "Markdown"
 
+msgid "Invalid input."
+msgstr "Input non valido."
+
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
 msgstr ""
 "Il file è troppo grande, si prega di fornire un file più piccolo di {}."
-
-msgid "Files of this type are not supported."
-msgstr "I file di questo tipo non sono supportati."
 
 msgid ""
 "The password you wanted to use was found on list of commonly used passwords, "
@@ -195,6 +198,9 @@ msgid ""
 "description must be placed below the field definition (`=`) and with the "
 "same indentation."
 msgstr ""
+"Posizionamento errato della descrizione del campo alla riga {line}. La "
+"descrizione del campo deve essere inserita sotto la definizione del campo "
+"(`=`) e con lo stesso rientro."
 
 #, python-format
 msgid "The field '{label}' exists more than once."
@@ -252,6 +258,8 @@ msgid ""
 "Invalid field type for field '${label}'. Please use the plus-icon to add "
 "allowed field types."
 msgstr ""
+"Tipo di campo non valido per il campo '${label}'. Utilizza l'icona con il "
+"segno più per aggiungere i tipi di campo consentiti."
 
 msgid "Not a valid phone number."
 msgstr "Non è un numero di telefono valido."
@@ -295,20 +303,17 @@ msgstr "Caricare file aggiuntivi"
 msgid "Text modules"
 msgstr "Moduli di testo"
 
+msgid "Select Some Options"
+msgstr "Seleziona alcune opzioni"
+
 msgid "Select an Option"
 msgstr "Selezionare un'opzione"
 
 msgid "No results match"
 msgstr "Nessun risultato corrisponde"
 
-msgid "Select Some Options"
-msgstr "Seleziona alcune opzioni"
-
 msgid "hours"
 msgstr "ore"
 
 msgid "minutes"
 msgstr "minuti"
-
-#~ msgid "Multiline"
-#~ msgstr "Multilinea"

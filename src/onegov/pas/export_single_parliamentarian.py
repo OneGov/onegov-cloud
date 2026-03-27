@@ -71,6 +71,17 @@ def generate_parliamentarian_settlement_pdf(
     )
     with open(css_path) as f:
         css = CSS(string=f.read())
+    logo_path = module_path('onegov.agency', 'static/logos/canton-zg-bw.svg')
+    logo_css = CSS(
+        string=f"""
+        @page {{
+            @top-left {{
+                content: url('file://{logo_path}');
+                width: 3cm;
+            }}
+        }}
+    """
+    )
 
     data = _get_parliamentarian_settlement_data(
         settlement_run, request, parliamentarian, rate_set
@@ -81,7 +92,7 @@ def generate_parliamentarian_settlement_pdf(
         <head><meta charset="utf-8"></head>
         <body>
             <div class="first-line">
-                <p>Staatskanzlei, Seestrasse 2, 6300 Zug</p><br>
+                Staatskanzlei, Seestrasse 2, 6300 Zug
             </div>
             <div class="address">
                 {parliamentarian.formal_greeting.split()[0]}<br>
@@ -196,7 +207,7 @@ def generate_parliamentarian_settlement_pdf(
     </html>
     """
     return HTML(string=html).write_pdf(
-        stylesheets=[css], font_config=font_config
+        stylesheets=[css, logo_css], font_config=font_config
     )
 
 

@@ -70,8 +70,7 @@ from urllib.parse import urlencode
 from webob.exc import HTTPConflict, HTTPServiceUnavailable
 
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
-
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from _typeshed.wsgi import WSGIApplication, WSGIEnvironment, StartResponse
@@ -83,7 +82,6 @@ if TYPE_CHECKING:
     from morepath.settings import SettingRegistry
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
-    from typing_extensions import ParamSpec
     from webob import Response
 
     from .analytics import AnalyticsProvider
@@ -92,10 +90,6 @@ if TYPE_CHECKING:
     from .metadata import Metadata
     from .security.permissions import Intent
     from .types import EmailJsonDict, SequenceOrScalar
-
-    _P = ParamSpec('_P')
-
-_T = TypeVar('_T')
 
 # Monkey patch
 # https://linear.app/onegovcloud/issue/OGC-853/404-navigation-js-fehler
@@ -185,13 +179,13 @@ class Framework(
 
         return fn
 
-    def with_query_report(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
+    def with_query_report[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
         @wraps(fn)
         def with_query_report_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
 
             assert isinstance(self.sql_query_report, str)
             with debug.analyze_sql_queries(self.sql_query_report):
@@ -199,13 +193,13 @@ class Framework(
 
         return with_query_report_wrapper
 
-    def with_profiler(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
+    def with_profiler[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
         @wraps(fn)
         def with_profiler_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
             filename = '{:%Y-%m-%d %H:%M:%S}.profile'.format(datetime.now())
 
             with utils.profile(filename):
@@ -213,28 +207,28 @@ class Framework(
 
         return with_profiler_wrapper
 
-    def with_request_cache(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
+    def with_request_cache[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
         @wraps(fn)
         def with_request_cache_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
             self.clear_request_cache()
             return fn(*args, **kwargs)
 
         return with_request_cache_wrapper
 
-    def with_print_exceptions(
+    def with_print_exceptions[**P, T](
         self,
-        fn: Callable[_P, _T]
-    ) -> Callable[_P, _T]:
+        fn: Callable[P, T]
+    ) -> Callable[P, T]:
 
         @wraps(fn)
         def with_print_exceptions_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
             try:
                 return fn(*args, **kwargs)
             except Exception:

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-02-26 13:35+0100\n"
+"POT-Creation-Date: 2026-03-25 10:15+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -215,9 +215,6 @@ msgstr "Formulaires et candidatures"
 
 msgid "Publications"
 msgstr "Publications"
-
-msgid "Official Documents"
-msgstr "Documents officiels"
 
 msgid "Reservations"
 msgstr "Réservations"
@@ -669,8 +666,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -735,9 +732,6 @@ msgstr "Aucune image téléchargée pour le moment"
 
 msgid "This album does not contain any images yet."
 msgstr "Cet album ne contient pas encore d'images."
-
-msgid "Cannot display"
-msgstr "Impossible d'afficher"
 
 msgid "No photo albums defined yet."
 msgstr "Aucun album photo défini pour le moment."
@@ -1149,6 +1143,15 @@ msgstr "Parlement"
 msgid "Parliamentary Group"
 msgstr "Groupe parlementaire"
 
+msgid "Number"
+msgstr "Numéro"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "Status"
+msgstr "Statut"
+
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time. All information on this page has "
@@ -1395,8 +1398,8 @@ msgstr "Bonjour"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Votre adresse e-mail vient d'être utilisée pour créer un compte sur "
-"${homepage}."
+"Votre adresse e-mail vient d'être utilisée pour créer un compte sur $"
+"{homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Pour activer votre compte, cliquer sur confirmer ci-dessous:"
@@ -1485,8 +1488,8 @@ msgstr "Nouveau message du client dans le ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -1495,9 +1498,9 @@ msgid "visit the request page"
 msgstr "visitez la page de la demande"
 
 msgid ""
-"This is the notification for customer messages on reservations for ${request."
-"app.org.title}. If you no longer want to receive this e-mail please contact "
-"an administrator so they can remove you from the recipients list."
+"This is the notification for customer messages on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
 "Ceci est une notification concernant les messages clients relatifs aux "
 "réservations pour ${request.app.org.title}. Si vous ne souhaitez plus "
@@ -1602,14 +1605,14 @@ msgid "New note in Ticket ${link}"
 msgstr "Nouvelle note dans le billet ${link}"
 
 msgid ""
-"This is the notification for notes on reservations for ${request.app.org."
-"title}. If you no longer want to receive this e-mail please contact an "
-"administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit de la notification de notes sur les réservations pour ${request."
-"app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez "
-"contacter un administrateur afin qu'il puisse vous retirer de la liste des "
-"destinataires."
+"Il s'agit de la notification de notes sur les réservations pour $"
+"{request.app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, "
+"veuillez contacter un administrateur afin qu'il puisse vous retirer de la "
+"liste des destinataires."
 
 msgid "Pending approval"
 msgstr "En attente d'approbation"
@@ -1634,8 +1637,8 @@ msgid ""
 "no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Ceci est une notification pour les nouvelles réservations de "
-"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"Ceci est une notification pour les nouvelles réservations de $"
+"{organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
 
@@ -1735,8 +1738,8 @@ msgid ""
 "you no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit d'une notification concernant les réservations rejetées pour "
-"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"Il s'agit d'une notification concernant les réservations rejetées pour $"
+"{organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
 
@@ -2065,9 +2068,6 @@ msgstr "Il s'agit d'un événement importé"
 msgid "General information about the event calendar"
 msgstr "Informations générales sur le calendrier des événements"
 
-msgid "Date"
-msgstr "Date"
-
 msgid "Export these events"
 msgstr "Exporter ces événements"
 
@@ -2097,9 +2097,6 @@ msgstr "Numéro de personnel"
 
 msgid "Contract number"
 msgstr "Numéro de contrat"
-
-msgid "Party"
-msgstr "Parti"
 
 msgid "Private address"
 msgstr "Adresse privée"
@@ -2202,14 +2199,8 @@ msgstr "Exporter une vCard de cette personne"
 msgid "Information"
 msgstr "Information"
 
-msgid "Number"
-msgstr "Numéro"
-
 msgid "Business Type"
 msgstr "Type d'activité"
-
-msgid "Status"
-msgstr "Statut"
 
 msgid "Submission/publication date"
 msgstr "Date de soumission/publication"
@@ -2823,6 +2814,9 @@ msgstr "Étiquette de carte journalière CFF"
 msgid "Publications Label"
 msgstr "Étiquette de publications"
 
+msgid "Official Documents"
+msgstr "Documents officiels"
+
 msgid "Hide Publications on Homepage"
 msgstr "Masquer les publications sur la page d'accueil"
 
@@ -2910,6 +2904,12 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Cannot display"
+#~ msgstr "Impossible d'afficher"
+
+#~ msgid "Party"
+#~ msgstr "Parti"
 
 #~ msgid "Parties"
 #~ msgstr "Partis"

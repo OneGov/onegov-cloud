@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-12-22 16:12+0100\n"
+"POT-Creation-Date: 2026-03-25 09:46+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -107,8 +107,8 @@ msgstr "Schlagworte"
 
 #, python-format
 msgid ""
-"Links to the whole memorial (if there is one linked to the "
-"${assembly_type}), but opens it on the chosen page number"
+"Links to the whole memorial (if there is one linked to the $"
+"{assembly_type}), but opens it on the chosen page number"
 msgstr ""
 "Verlinkt das gesamte Memorial (sofern eines auf der ${assembly_type} "
 "hochgeladen ist), öffnet es aber auf der angegebenen Seitennummer"
@@ -205,6 +205,8 @@ msgstr "Der Titel der Versammlungen."
 msgid "Assembly settings"
 msgstr "Einstellungen für Versammlungen"
 
+#.
+#. Keywords
 msgid "Assembly"
 msgstr "Landsgemeinde"
 
@@ -473,6 +475,7 @@ msgstr "Neue ${assembly}"
 msgid "Open Data"
 msgstr "Open Data"
 
+#. Description
 #, python-format
 msgid "Results from the ${title}, structured as json"
 msgstr "Resultate der ${title}, strukturiert als JSON"

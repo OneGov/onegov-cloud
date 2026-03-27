@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-02-19 15:13+0100\n"
+"POT-Creation-Date: 2026-03-25 11:20+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -196,6 +196,8 @@ msgstr "Newsletter quotidienne ${time}"
 msgid "${org} OneGov Cloud Status"
 msgstr "Statut du OneGov Cloud de ${org}"
 
+#. get the resource titles and ids
+#.
 msgid "General"
 msgstr "Général"
 
@@ -897,24 +899,45 @@ msgstr "Jeunesse"
 msgid "Elderly"
 msgstr "Âgées"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Mo"
 msgstr "Lu"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Tu"
 msgstr "Ma"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "We"
 msgstr "Me"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Th"
 msgstr "Je"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Fr"
 msgstr "Ve"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Sa"
 msgstr "Sa"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Su"
 msgstr "Di"
 
@@ -1033,6 +1056,9 @@ msgstr "Test"
 
 msgid "Do not actually import the events."
 msgstr "Les événements ne sont pas sauvegardés."
+
+msgid "Created"
+msgstr "Créé"
 
 msgid "Expected header line with the following columns:"
 msgstr "La première ligne doit avoir les noms de colonne suivants:"
@@ -1334,6 +1360,9 @@ msgstr "Remarque de clôture"
 msgid "Closing remark at the end of the newsletter"
 msgstr "Remarque de clôture à la fin de la lettre d'informations"
 
+#.
+#. FIXME: A plural form of News would probably be better, for now this label
+#. seems good enough
 msgid "Latest news"
 msgstr "Dernières nouvelles"
 
@@ -1644,6 +1673,7 @@ msgstr "Groupe(s) parlementaire(s)"
 msgid "Participations"
 msgstr "Auteur / Participants"
 
+#. type:ignore[union-attr]
 msgid "No active parliamentary groups"
 msgstr "Aucun groupe parlementaire actif"
 
@@ -2689,6 +2719,13 @@ msgstr ""
 "Format non valide. Veuillez définir les thèmes et les sous-thèmes selon "
 "l'exemple."
 
+#, python-format
+msgid ""
+"Invalid format. Please define subtopic(s) for '${topic}' or remove the ':'."
+msgstr ""
+"Format incorrect. Veuillez définir un ou plusieurs sous-sujets pour '$"
+"{topic}' ou supprimer le ':'."
+
 msgid ""
 "Invalid format. Only topics and subtopics are allowed - no deeper structures "
 "supported."
@@ -3071,9 +3108,6 @@ msgstr "Email actuel"
 msgid "New E-Mail"
 msgstr "Email nouveau"
 
-msgid "The users e-mail address (a.k.a. username)"
-msgstr "L'adresse e-mail de l'utilisateur (alias le nom d'utilisateur)"
-
 msgid "Confirm action via your second factor"
 msgstr "Confirmez l'action via votre deuxième facteur"
 
@@ -3100,6 +3134,9 @@ msgstr "Yubikey incorrecte."
 
 msgid "Invalid or expired TOTP provided."
 msgstr "TOTP fourni non valide ou expiré."
+
+msgid "The users e-mail address (a.k.a. username)"
+msgstr "L'adresse e-mail de l'utilisateur (alias le nom d'utilisateur)"
 
 msgid "Send Activation E-Mail with Instructions"
 msgstr "Envoyer un e-mail d'activation avec des directives"
@@ -3422,6 +3459,12 @@ msgstr "Lien de ressource externe"
 msgid "New external resource"
 msgstr "Nouvelle ressource externe"
 
+#.
+#. FIXME: Why are we using ResouceLayout and not ResourcesLayout? this is a
+#. weird hack, if you want to be able to use the ResourceLayout with
+#. ResourceCollection, then make it work in the Layout, not by patching the
+#. collection...
+#. type:ignore
 msgid "Export All"
 msgstr "Exporter tout"
 
@@ -3538,6 +3581,10 @@ msgstr "Test"
 msgid "Copy"
 msgstr "Copie"
 
+#, python-format
+msgid "Do you really want to delete \"${title}\"?"
+msgstr "Voulez-vous vraiment supprimer «${title}»?"
+
 msgid "Delete newsletter"
 msgstr "Supprimer la newsletter"
 
@@ -3588,10 +3635,6 @@ msgstr "Exporter l'exécution de la facture au format PDF"
 
 msgid "Directory"
 msgstr "Dossier"
-
-#, python-format
-msgid "Do you really want to delete \"${title}\"?"
-msgstr "Voulez-vous vraiment supprimer «${title}»?"
 
 msgid "All entries will be deleted as well!"
 msgstr "Toutes les entrées seront également supprimées !"
@@ -3680,6 +3723,7 @@ msgstr "Entrées du répertoire"
 msgid "Through URL only (not listed)"
 msgstr "Via URL uniquement (non répertorié)"
 
+#. allowing mtan restricted models makes only sense if we can deliver SMS
 msgid "Only by privileged users or after submitting a mTAN"
 msgstr ""
 "Uniquement par les utilisateurs privilégiés ou après avoir soumis un mTAN"
@@ -3839,6 +3883,8 @@ msgstr "Voulez-vous vraiment supprimer cette note?"
 msgid "Delete Note"
 msgstr "Supprimer la note"
 
+#. clarify the intent of this particular flag on the news, as the effect is not
+#. entirely the same (news may be shown on the homepage anyway)
 msgid "Always visible on homepage"
 msgstr "Toujours visible sur la page d'accueil"
 
@@ -4243,6 +4289,8 @@ msgstr ""
 "supprimez d'abord toutes les sous-pages, ou demandez à un administrateur de "
 "le faire pour vous."
 
+#. Modification for the footer left on all pages
+#.
 msgid "Source"
 msgstr "Source"
 
@@ -4251,9 +4299,6 @@ msgstr "Sujet"
 
 msgid "Owner"
 msgstr "Propriétaire"
-
-msgid "Created"
-msgstr "Créé"
 
 msgid "Reaction Time"
 msgstr "Temps de réaction"
@@ -4276,6 +4321,8 @@ msgstr "Quantité"
 msgid "VAT"
 msgstr "TVA"
 
+#. credit card
+#.
 msgid "Payment"
 msgstr "Paiement"
 
@@ -6090,8 +6137,9 @@ msgstr "mTAN"
 msgid "Identicon"
 msgstr "Identicon"
 
-msgid "Not a valid color."
-msgstr "Couleur non valide."
+#. messages not translated by wtforms
+msgid "Not a valid choice"
+msgstr "Choix invalide"
 
 msgid "CSRF failed."
 msgstr ""
@@ -6108,9 +6156,11 @@ msgstr ""
 "Jeton CSRF expiré. Actualisez la page. Si le problème persiste, déconnectez-"
 "vous, reconnectez-vous et réessayez."
 
-msgid "Not a valid choice"
-msgstr "Choix invalide"
+#. messages defined in wtforms-components
+msgid "Not a valid color."
+msgstr "Couleur non valide."
 
+#. Roles in plural form are not defined as translatable texts anywhere
 msgid "Admins"
 msgstr "Admins"
 
@@ -6233,6 +6283,9 @@ msgstr ""
 msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
+#.
+#. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
@@ -6603,6 +6656,8 @@ msgstr ""
 msgid "Notification for new entries"
 msgstr "Notification pour les nouvelles entrées"
 
+#. i18n:attributes translations do not support variables, so we need to do this
+#. ourselves
 #, python-format
 msgid "Do you really want to unsubscribe \"{}\"?"
 msgstr "Voulez-vous vraiment vous désinscrire « {} » ?"
@@ -6675,6 +6730,7 @@ msgstr "Vous avez accepté l'événement ${title}"
 msgid "Your event was accepted"
 msgstr "Votre événement a été accepté"
 
+#. type:ignore[attr-defined]
 msgid "Submit an event"
 msgstr "Soumettre un événement"
 
@@ -6689,6 +6745,7 @@ msgstr ""
 "ne sont pas publiés. Il n'ont aucuns droits à être publiés et les événements "
 "déjà publiés peuvent être supprimés de la page sans notification ni motif."
 
+#. type:ignore[attr-defined]
 msgid "Add event"
 msgstr "Ajouter un événement"
 
@@ -7281,6 +7338,7 @@ msgstr "Nouvelles dates pour ${title}"
 msgid "Confirm your reservation"
 msgstr "Confirmer votre réservation"
 
+#. by default we will redirect to the created ticket
 msgid "Thank you for your reservation!"
 msgstr "Merci pour votre réservation !"
 
@@ -7761,6 +7819,10 @@ msgstr "Le ticket a déjà été fermé"
 msgid "Your message has been sent"
 msgstr "Votre message a été envoyé"
 
+#, python-format
+msgid "${count} file(s) not found: ${files}"
+msgstr "${count} fichier(s) introuvable(s) : ${files}"
+
 msgid "Zip archive created successfully"
 msgstr "L'archive Zip a été créée avec succès"
 
@@ -7794,6 +7856,7 @@ msgstr "Votre demande est actuellement en attente"
 msgid "Your request has been processed"
 msgstr "Votre demande a été traitée"
 
+#. We adjust the wording for users that do not know what a ticket is
 msgid "Request Status"
 msgstr "Status Demand"
 

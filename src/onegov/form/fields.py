@@ -174,7 +174,12 @@ class URLField(StringField):
 
         # if no scheme was given, use the default scheme
         value = valuelist[0]
-        if value and self.default_scheme and '://' not in value:
+        if (
+            isinstance(value, str)
+            and value
+            and self.default_scheme
+            and '://' not in value
+        ):
             valuelist[0] = f'{self.default_scheme}://{value}'
 
         super().process_formdata(valuelist)
@@ -1068,8 +1073,8 @@ class ColorField(StringField):
                 value = name_to_hex(value)
             return normalize_hex(value)
         except ValueError:
-            msg = self.gettext(_('Not a valid color.'))
-            raise ValueError(msg) from None
+            msg = _('Not a valid color.')
+            raise ValueError(self.gettext(msg)) from None
 
     def process_data(self, value: object) -> None:
         self.data = self.coerce(value)
