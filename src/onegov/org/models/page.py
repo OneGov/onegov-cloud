@@ -501,7 +501,7 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
         )
 
     def by_title(self, title: str) -> News | None:
-        return self.session.query(News).filter_by(title=title).first()
+        return self.subset().filter(News.title == title).first()
 
 
 class AtoZPages(AtoZ[Topic]):
