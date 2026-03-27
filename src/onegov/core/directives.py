@@ -4,8 +4,11 @@ import os.path
 
 from dectate import Action, Query, convert_dotted_name  # type:ignore[attr-defined]
 from itertools import count
+
+from morepath import render_json, Request
 from morepath.directive import HtmlAction
 from morepath.directive import isbaseclass
+from morepath.directive import JsonAction
 from morepath.directive import PredicateAction
 from morepath.directive import PredicateFallbackAction
 from morepath.directive import SettingAction
@@ -15,7 +18,7 @@ from onegov.core.utils import Bunch
 
 from typing import Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from _typeshed import StrOrBytesPath
+    from _typeshed import StrOrBytesPath, StrPath
     from collections.abc import Callable, Mapping
     from webob import Response
     from wtforms import Form
@@ -421,3 +424,43 @@ class Layout(Action):
         app_class.get_layout.register(  # type:ignore[attr-defined]
             lambda self, obj, request: layout_class(obj, request),
             model=self.model)
+
+
+def render_json_open_data(content: object, request: Request) -> Response:
+    """ Like :func:`morepath.render_json`, but adds an
+    ``Access-Control-Allow-Origin: *`` header to GET and HEAD responses,
+    making the endpoint accessible from browser scripts on any origin.
+    """
+    response = render_json(content, request)
+    if request.method in ('GET', 'HEAD'):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+class ExtendedJsonAction(JsonAction):
+    """ Extends the morepath json directive with an ``open_data`` parameter.
+
+    When ``open_data=False`` (the default), the views should not be
+    publicly accessible cross-origin.
+
+    When ``open_data=True``, the view's GET and HEAD responses
+    will include an ``Access-Control-Allow-Origin: *`` header, making it
+    usable from browser scripts on any origin.
+    """
+
+    def __init__(
+        self,
+        model: type | str,
+        render: Callable[[Any, Any], Response] | str | None = None,
+        template: StrPath | None = None,
+        load: Callable[[Any], Any] | str | None = None,
+        permission: object = None,
+        internal: bool = False,
+        open_data: bool = False,
+        **predicates: Any,
+    ) -> None:
+        if open_data and render is None:
+            render = render_json_open_data
+        super().__init__(
+            model, render, template, load, permission, internal, **predicates
+        )

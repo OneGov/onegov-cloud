@@ -38,9 +38,7 @@ from functools import cached_property, wraps
 from itsdangerous import BadSignature, Signer
 from libres.db.models import ORMBase
 from morepath import dispatch_method
-from morepath.directive import JsonAction as MorepathJsonAction
 from morepath.publish import resolve_model, get_view_name
-from morepath.view import render_json
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
 from more.content_security import NONE, SELF, UNSAFE_INLINE
@@ -102,46 +100,6 @@ if not WebassetsApp.dectate._directives[0][0].kw:
     WebassetsApp.dectate._directives[0][0].kw['over'] = excview_tween_factory
 
 
-def render_json_open_data(content: object, request: Request) -> Response:
-    """ Like :func:`morepath.render_json`, but adds an
-    ``Access-Control-Allow-Origin: *`` header to GET and HEAD responses,
-    making the endpoint accessible from browser scripts on any origin.
-    """
-    response = render_json(content, request)
-    if request.method in ('GET', 'HEAD'):
-        response.headers['Access-Control-Allow-Origin'] = '*'
-    return response
-
-
-class FrameworkJsonAction(MorepathJsonAction):
-    """ Extends the morepath json directive with an ``open_data`` parameter.
-
-    When ``open_data=True`` (the default), the view's GET and HEAD responses
-    will include an ``Access-Control-Allow-Origin: *`` header, making it
-    usable from browser scripts on any origin.
-
-    Set ``open_data=False`` for views that should not be publicly accessible
-    cross-origin.
-    """
-
-    def __init__(
-        self,
-        model: type | str,
-        render: Callable[[Any, Any], Response] | str | None = None,
-        template: StrPath | None = None,
-        load: Callable[[Any], Any] | str | None = None,
-        permission: object = None,
-        internal: bool = False,
-        open_data: bool = True,
-        **predicates: Any,
-    ) -> None:
-        if open_data and render is None:
-            render = render_json_open_data
-        super().__init__(
-            model, render, template, load, permission, internal, **predicates
-        )
-
-
 class Framework(
     TransactionApp,
     WebassetsApp,
@@ -171,7 +129,7 @@ class Framework(
     replace_setting = directive(directives.ReplaceSettingAction)
     replace_setting_section = directive(directives.ReplaceSettingSectionAction)
     layout = directive(directives.Layout)
-    json = directive(FrameworkJsonAction)  # type: ignore[assignment]
+    json = directive(directives.ExtendedJsonAction)  # type: ignore[assignment]
 
     #: sets the same-site cookie directive, (may need removal inside iframes)
     same_site_cookie_policy: str | None = 'Lax'
