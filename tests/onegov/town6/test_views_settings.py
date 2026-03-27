@@ -1,16 +1,21 @@
 from __future__ import annotations
 
-from onegov.api.models import ApiKey
 from xml.etree.ElementTree import tostring
 
+import transaction
+from onegov.api.models import ApiKey
+from onegov.core.utils import Bunch
+from onegov.org.models import News
+from onegov.org.models import Topic
+from onegov.org.models.page import TopicCollection, NewsCollection
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+
 if TYPE_CHECKING:
     from .conftest import Client
 
 
 def test_gever_settings_only_https_allowed(client: Client) -> None:
-
     client.login_admin()
     settings = client.get('/settings').click('Gever API')
     settings.form['gever_username'] = 'foo'
@@ -30,7 +35,6 @@ def test_gever_settings_only_https_allowed(client: Client) -> None:
 
 
 def test_api_keys_create_and_delete(client: Client) -> None:
-
     client.login_admin()
 
     settings = client.get('/api-keys')
@@ -121,9 +125,7 @@ def test_analytics_settings(client: Client) -> None:
     ) in settings
 
 
-
 def test_firebase_settings(client: Client) -> None:
-
     client.login_admin()
 
     # Pretend this is real data (it's completely random)
@@ -165,3 +167,46 @@ def test_resource_settings(client: Client) -> None:
     assert 'Allgemeine Informationen zu Reservationen' in page
     assert '<h1>foo</h1>' in page
     assert '<p>bar</p>' in page
+
+
+def test_migrate_links(client: Client) -> None:
+    session = client.app.session()
+    request: Any = Bunch(**{
+        'session': session,
+        'identity.role': 'member'
+    })
+    old_domain = 'foo.ch'
+
+    # create topic
+    topic = Topic(title='Foo Topic', name='foo-topic')
+    topic.text = 'Wow, https://foo.ch/abc is a great page!'
+    session.add(topic)
+
+    # add news article
+    news = News(title='Big News', name='big-news')
+    news.text = ('Big news https://foo.ch/big-news and bigger news'
+                 'can be found here https://foo.ch/bigger-news')
+    session.add(news)
+
+    transaction.commit()
+
+    assert old_domain in TopicCollection(session).by_title('Foo Topic').text
+    assert old_domain in NewsCollection(request).by_title('Big News').text
+
+    # execute migrate links test
+    client.login_admin()
+    migrate_page = client.get('/migrate-links')
+    migrate_page.form['old_domain'] = old_domain
+    migrate_page.form['test'] = True
+    result = migrate_page.form.submit()
+
+    assert old_domain in TopicCollection(session).by_title('Foo Topic').text
+    assert old_domain in NewsCollection(request).by_title('Big News').text
+
+    migrate_page = client.get('/migrate-links')
+    migrate_page.form['old_domain'] = old_domain
+    migrate_page.form['test'] = False
+    result = migrate_page.form.submit()
+
+    assert old_domain not in TopicCollection(session).by_title('Foo Topic').text
+    assert old_domain not in NewsCollection(request).by_title('Big News').text
