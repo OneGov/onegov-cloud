@@ -199,6 +199,7 @@ def test_migrate_links(client: Client) -> None:
     migrate_page.form['old_domain'] = old_domain
     migrate_page.form['test'] = True
     result = migrate_page.form.submit()
+    assert 'Total 3 Links gefunden' in result
 
     assert old_domain in TopicCollection(session).by_title('Foo Topic').text
     assert old_domain in NewsCollection(request).by_title('Big News').text
@@ -207,6 +208,7 @@ def test_migrate_links(client: Client) -> None:
     migrate_page.form['old_domain'] = old_domain
     migrate_page.form['test'] = False
     result = migrate_page.form.submit()
+    assert 'Total 3 Links gefunden' in result
 
     assert old_domain not in TopicCollection(session).by_title('Foo Topic').text
     assert old_domain not in NewsCollection(request).by_title('Big News').text
