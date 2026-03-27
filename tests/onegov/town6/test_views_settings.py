@@ -173,7 +173,7 @@ def test_migrate_links(client: Client) -> None:
     session = client.app.session()
     request: Any = Bunch(**{
         'session': session,
-        'identity.role': 'member'
+        'identity.role': 'admin'
     })
     old_domain = 'foo.ch'
 
@@ -183,8 +183,10 @@ def test_migrate_links(client: Client) -> None:
     session.add(topic)
     topic_text = topic.text
 
-    # add news article
-    news = News(title='Big News', name='big-news')
+    # add news article (must be under the seeded /news/ root)
+    from onegov.page import PageCollection
+    news_root = PageCollection(session).by_path('/news/', ensure_type='news')
+    news = News(title='Big News', name='big-news', parent=news_root)
     news.text = ('<p>Big news https://foo.ch/big-news and bigger news'
                  'can be found here https://foo.ch/bigger-news</p>')
     session.add(news)
