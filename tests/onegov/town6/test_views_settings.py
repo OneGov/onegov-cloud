@@ -211,12 +211,15 @@ def test_migrate_links(client: Client) -> None:
     migrate_page.form['old_domain'] = old_domain
     migrate_page.form['test'] = False
     result = migrate_page.form.submit().follow()
+    print(result.pyquery('.callout'))
     assert '3 Links migriert' in result
 
     topic_text_new = TopicCollection(session).by_title('Foo Topic').text
     news_text_new = NewsCollection(request).by_title('Big News').text
-    assert old_domain not in TopicCollection(session).by_title('Foo Topic').text
-    assert old_domain not in NewsCollection(request).by_title('Big News').text
+    assert (old_domain not in
+            TopicCollection(session).by_title('Foo Topic').text)
+    assert (old_domain not in
+            NewsCollection(request).by_title('Big News').text)
 
     topic_text_replaced = topic_text.replace('foo.ch', 'localhost')
     assert topic_text_replaced == topic_text_new
