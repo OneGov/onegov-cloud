@@ -179,13 +179,14 @@ def test_migrate_links(client: Client) -> None:
 
     # create topic
     topic = Topic(title='Foo Topic', name='foo-topic')
-    topic.text = 'Wow, https://foo.ch/abc is a great page!'
+    topic.text = '<p>Wow, https://foo.ch/abc is a great page!</p>'
     session.add(topic)
+    topic_text = topic.text
 
     # add news article
     news = News(title='Big News', name='big-news')
-    news.text = ('Big news https://foo.ch/big-news and bigger news'
-                 'can be found here https://foo.ch/bigger-news')
+    news.text = ('<p>Big news https://foo.ch/big-news and bigger news'
+                 'can be found here https://foo.ch/bigger-news</p>')
     session.add(news)
 
     transaction.commit()
@@ -211,5 +212,9 @@ def test_migrate_links(client: Client) -> None:
     result = migrate_page.form.submit().follow()
     assert '3 Links migriert' in result
 
+    topic_text_new = TopicCollection(session).by_title('Foo Topic').text
     assert old_domain not in TopicCollection(session).by_title('Foo Topic').text
     assert old_domain not in NewsCollection(request).by_title('Big News').text
+
+    topic_text = topic_text.replace('foo.ch', 'localhost')
+    assert topic_text == topic_text_new
