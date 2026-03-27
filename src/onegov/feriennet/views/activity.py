@@ -569,7 +569,8 @@ def view_activity_filters(
 @FeriennetApp.json(
     model=VacationActivityCollection,
     name='json',
-    permission=Public
+    permission=Public,
+    open_data=True
 )
 def view_activities_as_json(
     self: VacationActivityCollection,

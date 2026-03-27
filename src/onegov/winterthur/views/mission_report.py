@@ -177,7 +177,8 @@ def view_mission(
 @WinterthurApp.json(
     model=MissionReportCollection,
     name='json',
-    permission=Public
+    permission=Public,
+    open_data=True
 )
 def view_mission_reports_as_json(
     self: MissionReportCollection,

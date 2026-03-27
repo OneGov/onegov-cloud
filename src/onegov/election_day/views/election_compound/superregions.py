@@ -39,7 +39,8 @@ def view_election_compound_superregions(
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='by-superregion',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_compound_by_superregion(
     self: ElectionCompound,

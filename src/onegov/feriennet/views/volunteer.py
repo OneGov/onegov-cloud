@@ -134,7 +134,7 @@ def handle_remove(self: Volunteer, request: FeriennetRequest) -> Response:
 
 # Public, even though this is personal data -> the storage is limited to the
 # current browser session, which is separated from other users
-@FeriennetApp.json(model=VolunteerCart, permission=Public)
+@FeriennetApp.json(model=VolunteerCart, permission=Public, open_data=True)
 def view_cart(self: VolunteerCart, request: FeriennetRequest) -> JSON_ro:
     return list(self.for_frontend(DefaultLayout(self, request)))
 
@@ -142,7 +142,9 @@ def view_cart(self: VolunteerCart, request: FeriennetRequest) -> JSON_ro:
 @FeriennetApp.json(
     model=VolunteerCartAction,
     permission=Public,
-    request_method='POST')
+    request_method='POST',
+    open_data=False
+)
 def execute_cart_action(
     self: VolunteerCartAction,
     request: FeriennetRequest

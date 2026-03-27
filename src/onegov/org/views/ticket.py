@@ -953,7 +953,8 @@ def assign_ticket(
     model=Ticket,
     name='change-email',
     request_method='POST',
-    permission=Private
+    permission=Private,
+    open_data=False
 )
 def change_email(self: Ticket, request: OrgRequest) -> JSON_ro:
     request.assert_valid_csrf_token()

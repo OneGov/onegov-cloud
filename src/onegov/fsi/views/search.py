@@ -25,7 +25,12 @@ def fsi_search(
     return town_search(self, request)
 
 
-@FsiApp.json(model=Search, name='suggest', permission=Personal)
+@FsiApp.json(
+    model=Search,
+    name='suggest',
+    permission=Personal,
+    open_data=False
+)
 def fsi_suggestions(
     self: Search,
     request: FsiRequest

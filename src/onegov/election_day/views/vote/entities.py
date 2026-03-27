@@ -174,7 +174,8 @@ def view_vote_entities_map_tie_breaker(
 @ElectionDayApp.json(
     model=Ballot,
     name='by-entity',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_ballot_by_entity(
     self: Ballot,

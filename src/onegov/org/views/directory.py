@@ -549,7 +549,9 @@ def view_directory(
 @OrgApp.json(
     model=ExtendedDirectoryEntryCollection,
     permission=Public,
-    name='geojson')
+    name='geojson',
+    open_data=False
+)
 def view_geojson(
     self: ExtendedDirectoryEntryCollection,
     request: OrgRequest

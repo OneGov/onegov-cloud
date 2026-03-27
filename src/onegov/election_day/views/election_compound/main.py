@@ -58,7 +58,8 @@ def view_election_compound(
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='json',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_compound_json(
     self: ElectionCompound,
@@ -71,7 +72,6 @@ def view_election_compound_json(
 
     @request.after
     def add_headers(response: Response) -> None:
-        add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
     session = request.app.session()
@@ -177,7 +177,8 @@ def view_election_compound_json(
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='summary',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_compound_summary(
     self: ElectionCompound,
@@ -187,7 +188,6 @@ def view_election_compound_summary(
 
     @request.after
     def add_headers(response: Response) -> None:
-        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     return get_election_compound_summary(self, request)
