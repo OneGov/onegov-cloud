@@ -386,7 +386,7 @@ def export_occurrences(
     model=OccurrenceCollection,
     name='json',
     permission=Public,
-    open_data=True
+    open_data=False
 )
 def json_export_occurrences(
     self: OccurrenceCollection,

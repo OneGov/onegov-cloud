@@ -181,7 +181,7 @@ def view_course_event(self: Course, request: FsiRequest) -> RenderData:
     model=Course,
     permission=Personal,
     name='content-json',
-    open_data=True
+    open_data=False
 )
 def get_course_event_content(self: Course, request: FsiRequest) -> str:
     return self.description_html

@@ -51,7 +51,7 @@ def authenticated_source(request: ElectionDayRequest) -> DataSource:
     name='upload-wabsti-vote',
     request_method='POST',
     permission=Public,
-    open_data=True
+    open_data=False
 )
 def view_upload_wabsti_vote(
     self: Canton | Municipality,
@@ -151,7 +151,7 @@ def view_upload_wabsti_vote(
     name='upload-wabsti-majorz',
     request_method='POST',
     permission=Public,
-    open_data=True
+    open_data=False
 )
 def view_upload_wabsti_majorz(
     self: Canton | Municipality,
@@ -267,7 +267,7 @@ def view_upload_wabsti_majorz(
     name='upload-wabsti-proporz',
     request_method='POST',
     permission=Public,
-    open_data=True
+    open_data=False
 )
 def view_upload_wabsti_proporz(
     self: Canton | Municipality,

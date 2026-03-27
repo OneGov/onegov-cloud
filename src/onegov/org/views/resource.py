@@ -808,7 +808,7 @@ def delete_all_find_your_spot_reservations(
     model=ResourceCollection,
     permission=Public,
     name='json',
-    open_data=True
+    open_data=False
 )
 def view_resources_json(
     self: ResourceCollection,
@@ -1200,7 +1200,7 @@ def assert_visible_by_members(self: Resource, request: OrgRequest) -> None:
     model=Resource,
     name='occupancy-json',
     permission=Personal,
-    open_data=True
+    open_data=False
 )
 def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns the reservations in a fullcalendar compatible events feed.
@@ -1265,7 +1265,7 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     model=Resource,
     name='occupancy-stats',
     permission=Personal,
-    open_data=True
+    open_data=False
 )
 def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns stats for the selected date range.

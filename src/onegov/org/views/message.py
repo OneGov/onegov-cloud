@@ -73,7 +73,7 @@ class Owner(NamedTuple):
     model=MessageCollection,
     permission=Private,
     name='feed',
-    open_data=True
+    open_data=False
 )
 def view_messages_feed(
     self: MessageCollection[Message],

@@ -29,7 +29,7 @@ def fsi_search(
     model=Search,
     name='suggest',
     permission=Personal,
-    open_data=True
+    open_data=False
 )
 def fsi_suggestions(
     self: Search,

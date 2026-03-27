@@ -212,7 +212,7 @@ def view_invoices(
     name='batch-set',
     request_method='POST',
     permission=Private,
-    open_data=True
+    open_data=False
 )
 def handle_batch_set(
     self: TicketInvoiceCollection,

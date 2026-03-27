@@ -217,7 +217,7 @@ def view_api_endpoint_item(
     model=ApiEndpointItem,
     permission=Public,
     request_method='PUT',
-    open_data=True
+    open_data=False
 )
 def edit_api_endpoint_item(
     self: ApiEndpointItem[Any], request: CoreRequest
@@ -268,7 +268,7 @@ def edit_api_endpoint_item(
         endpoint.apply_changes(self.item, form)
 
 
-@ApiApp.json(model=AuthEndpoint, permission=Public, open_data=True)
+@ApiApp.json(model=AuthEndpoint, permission=Public, open_data=False)
 def get_time_restricted_token(
     self: AuthEndpoint, request: CoreRequest
 ) -> dict[str, str]:

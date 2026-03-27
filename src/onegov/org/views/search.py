@@ -102,7 +102,7 @@ def search(
     model=Search,
     name='suggest',
     permission=Public,
-    open_data=True
+    open_data=False
 )
 def suggestions(self: Search, request: OrgRequest) -> JSON_ro:
     try:

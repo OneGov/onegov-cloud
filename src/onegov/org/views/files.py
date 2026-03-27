@@ -389,7 +389,7 @@ def view_get_image_collection(
     model=GeneralFileCollection,
     permission=Private,
     name='json',
-    open_data=True
+    open_data=False
 )
 def view_get_file_collection_json(
     self: GeneralFileCollection,
@@ -411,7 +411,7 @@ def view_get_file_collection_json(
     model=ImageFileCollection,
     permission=Private,
     name='json',
-    open_data=True
+    open_data=False
 )
 def view_get_image_collection_json(
     self: BaseImageFileCollection[Any],
@@ -552,7 +552,7 @@ def view_upload_image_file(
     name='upload.json',
     request_method='POST',
     permission=Private,
-    open_data=True
+    open_data=False
 )
 def view_upload_file_by_json(
     self: FileCollection[Any],

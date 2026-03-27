@@ -550,7 +550,7 @@ def view_directory(
     model=ExtendedDirectoryEntryCollection,
     permission=Public,
     name='geojson',
-    open_data=True
+    open_data=False
 )
 def view_geojson(
     self: ExtendedDirectoryEntryCollection,

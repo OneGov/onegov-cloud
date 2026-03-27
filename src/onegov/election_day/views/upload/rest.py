@@ -56,7 +56,7 @@ def authenticate(request: ElectionDayRequest) -> None:
     name='upload',
     permission=Public,
     request_method='POST',
-    open_data=True
+    open_data=False
 )
 def view_upload_rest(
     self: Canton | Municipality,

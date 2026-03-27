@@ -129,7 +129,7 @@ def view_public_metadata(
     return render_metadata(self, request)
 
 
-@Framework.json(model=SecretMetadata, permission=Secret, open_data=True)
+@Framework.json(model=SecretMetadata, permission=Secret, open_data=False)
 def view_secret_metadata(
     self: PublicMetadata,
     request: CoreRequest

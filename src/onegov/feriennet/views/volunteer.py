@@ -143,7 +143,7 @@ def view_cart(self: VolunteerCart, request: FeriennetRequest) -> JSON_ro:
     model=VolunteerCartAction,
     permission=Public,
     request_method='POST',
-    open_data=True
+    open_data=False
 )
 def execute_cart_action(
     self: VolunteerCartAction,

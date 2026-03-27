@@ -123,7 +123,7 @@ def respond_with_error(request: OrgRequest, error: str) -> JSON_ro:
     name='reserve',
     request_method='POST',
     permission=Public,
-    open_data=True
+    open_data=False
 )
 def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
     """ Adds a single reservation to the list of reservations bound to the
@@ -243,7 +243,7 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
     model=Reservation,
     request_method='DELETE',
     permission=Public,
-    open_data=True
+    open_data=False
 )
 def delete_reservation(self: Reservation, request: OrgRequest) -> JSON_ro:
 

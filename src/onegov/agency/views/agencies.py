@@ -118,7 +118,7 @@ def view_agencies_chart(
     model=ExtendedAgencyCollection,
     name='json',
     permission=Public,
-    open_data=True
+    open_data=False
 )
 def view_agencies_json(
     self: ExtendedAgencyCollection,
