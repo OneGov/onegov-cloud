@@ -297,7 +297,7 @@ def test_view_update_external_resources(
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    manage = client.get('/').maybe_follow().click('Abstimmungen')
+    manage = client.get('/votes')
     manage = manage.click('Bildquellen aktualisieren')
     manage.form['resources'] = ['mfg', 'sa', 'bs']
     manage = manage.form.submit().follow()

@@ -297,7 +297,7 @@ def test_vote_upload(
 
     # Fallback
     client.get('/locale/en_US').follow()
-    manage = client.get('/').maybe_follow().click("Votes")
+    manage = client.get('/votes')
     manage = manage.click("Details")
     for name in names:
         name = name.replace('_', '-')
@@ -556,7 +556,7 @@ def test_view_vote_campaign_material(
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    page = client.get('/').maybe_follow().click('Abstimmungen')
+    page = client.get('/votes')
     page = page.click('Details')
 
     # Other
@@ -578,13 +578,13 @@ def test_view_vote_campaign_material(
     assert manage.click('article.pdf').content_type == 'application/pdf'
 
     # ... view
-    details = client.get('/').maybe_follow().click('Abstimmungen')
+    details = client.get('/votes')
     details = details.click('Details').click('Liste der Dokumente anzeigen')
     assert details.click('Article').content_type == 'application/pdf'
 
     # ... view (anon)
-    details = Client(swissvotes_app).get('/').maybe_follow()
-    details = details.click('Abstimmungen').click('Details')
+    anon = Client(swissvotes_app)
+    details = anon.get('/votes').click('Details')
     details = details.click('Liste der Dokumente anzeigen')
     assert 'Urheberrechtsschutz' in details
     with pytest.raises(IndexError):
@@ -655,7 +655,7 @@ def test_view_vote_search(
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    page = client.get('/').maybe_follow().click('Abstimmungen')
+    page = client.get('/votes')
     page.form['term'] = 'keyword'
     page = page.form.submit()
     page = page.click('Suchresultate in den Dokumenten zu dieser Vorlage')
