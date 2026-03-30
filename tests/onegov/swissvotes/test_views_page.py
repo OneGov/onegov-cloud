@@ -19,8 +19,7 @@ def test_view_page(swissvotes_app: TestApp) -> None:
     client = Client(swissvotes_app)
 
     home = client.get('/').maybe_follow()
-    home.click('imprint')
-    home.click('disclaimer')
+    home.click('disclaimer')  # Contains disclaimer and imprint
     home.click('data-protection')
 
     login = client.get('/auth/login')
@@ -142,7 +141,7 @@ def test_view_page_static_attachment_links(
 ) -> None:
 
     client = Client(swissvotes_app)
-    url = client.get('/').maybe_follow().click('imprint').request.url
+    url = client.get('/').maybe_follow().click('disclaimer').request.url
 
     # No attachments yet
     for name in page_attachment_urls[locale].values():
@@ -150,7 +149,7 @@ def test_view_page_static_attachment_links(
         assert view.status_code == 404
 
     session = swissvotes_app.session()
-    page = session.query(TranslatablePage).filter_by(title='imprint').one()
+    page = session.query(TranslatablePage).filter_by(title='disclaimer').one()
     page.files = list(page_attachments[locale].values())
     commit()
 

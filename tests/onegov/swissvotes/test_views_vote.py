@@ -28,7 +28,7 @@ def test_view_vote(swissvotes_app: TestApp, sample_vote: SwissVote) -> None:
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
-    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = client.get('/votes')
     page = page.click("Details")
     assert "100.1" in page
     assert "Vote DE" in page
@@ -96,7 +96,7 @@ def test_view_vote(swissvotes_app: TestApp, sample_vote: SwissVote) -> None:
     swissvotes_app.session().query(SwissVote).one()._legal_form = 3
     commit()
 
-    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = client.get('/votes')
     page = page.click("Details")
     assert "Volksinitiative" in page
     assert "Initiator" in page
@@ -204,7 +204,7 @@ def test_view_vote(swissvotes_app: TestApp, sample_vote: SwissVote) -> None:
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = client.get('/votes')
     manage = manage.click("Details").click("Abstimmung löschen")
     manage.form.submit().follow()
 
@@ -224,7 +224,7 @@ def test_view_vote_tie_breaker(
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
-    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = client.get('/votes')
     page = page.click("Details")
 
     assert (
@@ -266,7 +266,7 @@ def test_vote_upload(
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = client.get('/votes')
     manage = manage.click("Details").click("Anhänge verwalten")
     for name in names:
         manage.form[name] = Upload(
@@ -518,7 +518,7 @@ def test_view_vote_static_attachment_links(
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
-    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = client.get('/votes')
     page = page.click("Details")
 
     # No attachments yet
