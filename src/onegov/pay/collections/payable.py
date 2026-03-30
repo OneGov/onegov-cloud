@@ -6,7 +6,7 @@ from onegov.pay import Payment
 from sqlalchemy.orm import joinedload, selectinload
 
 
-from typing import overload, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import DeclarativeBase, Session
     from typing import Self
@@ -14,10 +14,7 @@ if TYPE_CHECKING:
 
 # FIXME: This should be Intersection[DeclarativeBase, Payable] once this
 #        feature gets added to typing_extensions
-_P = TypeVar('_P', bound='DeclarativeBase')
-
-
-class PayableCollection(Pagination[_P]):
+class PayableCollection[PayableT: DeclarativeBase](Pagination[PayableT]):
     """ Provides a collection of all payable models. This collection is
     meant to be read-only, so there's no add/delete methods.
 
@@ -30,9 +27,9 @@ class PayableCollection(Pagination[_P]):
 
     @overload
     def __init__(
-        self: PayableCollection[_P],
+        self: PayableCollection[PayableT],
         session: Session,
-        cls: type[_P],
+        cls: type[PayableT],
         page: int = 0
     ): ...
 
@@ -47,7 +44,7 @@ class PayableCollection(Pagination[_P]):
     def __init__(
         self,
         session: Session,
-        cls: Literal['*'] | type[_P] = '*',
+        cls: Literal['*'] | type[PayableT] = '*',
         page: int = 0
     ):
         self.session = session
@@ -59,8 +56,8 @@ class PayableCollection(Pagination[_P]):
         # of query changed from the base class Pagination
         def transform_batch_query(  # type:ignore[override]
             self,
-            query: QueryChain[_P]  # type:ignore[override]
-        ) -> QueryChain[_P]: ...
+            query: QueryChain[PayableT]  # type:ignore[override]
+        ) -> QueryChain[PayableT]: ...
 
     @property
     def classes(self) -> tuple[type[DeclarativeBase], ...]:
@@ -70,7 +67,7 @@ class PayableCollection(Pagination[_P]):
         assert Payment.registered_links is not None
         return tuple(link.cls for link in Payment.registered_links.values())
 
-    def query(self) -> QueryChain[_P]:
+    def query(self) -> QueryChain[PayableT]:
         return QueryChain(tuple(
             self.session.query(cls).options(  # type: ignore[misc]
                 joinedload(cls.payment)
@@ -86,7 +83,7 @@ class PayableCollection(Pagination[_P]):
 
         return self.cls == other.cls and self.page == other.page
 
-    def subset(self) -> QueryChain[_P]:  # type:ignore[override]
+    def subset(self) -> QueryChain[PayableT]:  # type:ignore[override]
         return self.query()
 
     @property

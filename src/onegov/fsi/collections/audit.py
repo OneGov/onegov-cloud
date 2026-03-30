@@ -14,11 +14,8 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Query, Session
-    from typing import NamedTuple, TypeVar
-    from typing import Self
+    from typing import NamedTuple, Self
     from uuid import UUID
-
-    T = TypeVar('T')
 
     class RankedSubscriptionRow(NamedTuple):
         attendee_id: UUID
@@ -197,7 +194,7 @@ class AuditCollection(
         )
         return subquery.filter(ranked.c.rownum == 1)
 
-    def filter_attendees_by_role(self, query: Query[T]) -> Query[T]:
+    def filter_attendees_by_role[T](self, query: Query[T]) -> Query[T]:
         """Filter permissions of editor, exclude external, """
         if self.auth_attendee.role == 'admin':
             if not self.organisations:

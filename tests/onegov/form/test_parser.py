@@ -1615,3 +1615,19 @@ def test_empty_fieldset_error() -> None:
         )), enable_edit_checks=True)
 
     assert e.value.field_name == 'Section 2'
+
+
+def test_nested_fieldset_error() -> None:
+    with pytest.raises(errors.NestedFieldsetError) as e:
+        parse_formcode('\n'.join((
+            "# Personal information",
+            "Last name *= ___",
+            "First name *= ___",
+            "Options *=",
+            "    (x) Private",
+            "    ( ) Business",
+            "        # Nested fieldset",
+            "        Organisation = ___",
+        )), enable_edit_checks=True)
+
+    assert e.value.line == 7

@@ -3265,16 +3265,14 @@ def check_forms(
         )
         data_to_parse.extend((x.title, x.structure) for x in directories.all())
 
-        # NOTE: the formcode for resources can be empty but causing
-        # an InvalidFormSyntax
-        # resources = (
-        #     ResourceCollection(app.libres_context)
-        #     .query()
-        #     .with_entities(Resource.title, Resource.definition)
-        # )
-        # data_to_parse.extend(
-        #     (x.title, x.definition) for x in resources.all()
-        # )
+        resources = (
+            ResourceCollection(app.libres_context)
+            .query()
+            .with_entities(Resource.title, Resource.definition)
+        )
+        data_to_parse.extend(
+            (x.title, x.definition) for x in resources.all() if x.definition
+        )
 
         click.echo(f'\nParsing formcode for "{app.org.name}"')
         count = len(data_to_parse)
@@ -3294,3 +3292,57 @@ def check_forms(
                     fg='yellow' if notok_counter > 0 else 'green')
 
     return check_formcode
+
+
+@cli.command('migrate-agency', context_settings={'singular': True})
+@pass_group_context
+def migrate_agency(
+    group_context: GroupContext
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Migrates the database from an old agency to the new agency like in the
+    upgrades.
+
+    """
+
+    def migrate_to_new_agency(request: OrgRequest, app: OrgApp) -> None:
+        context: UpgradeContext = Bunch(session=app.session())  # type:ignore
+        migrate_theme_options(context)
+        org = context.session.query(Organisation).first()
+
+        if org is None:
+            return
+
+        org.meta['homepage_structure'] = textwrap.dedent("""\
+        <row-wide bgcolor="gray">
+            <column span="12">
+                <row class="columns">
+                    <column span="4">
+                        <icon_link
+                            icon="fa-user"
+                            title="Alle Personen"
+                            link="./people"
+                            text="Personen"
+                        />
+                    </column>
+                    <column span="4">
+                        <icon_link
+                            icon="fa-briefcase"
+                            link="./organizations"
+                            title="Alle Organisationen"
+                            text="Organisationen"
+                        />
+                    </column>
+                    <column span="4">
+                        <icon_link
+                            icon="fa-folder-open"
+                            link="./organizations/pdf"
+                            title="Staatskalender"
+                            text="PDF-Ausdruck inklusive Inhaltsverzeichnis"
+                        />
+                    </column>
+                </row>
+            </column>
+        </row-wide>
+        """)
+
+    return migrate_to_new_agency

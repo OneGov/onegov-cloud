@@ -271,7 +271,8 @@ def view_vote_districts_table_tie_breaker(
 @ElectionDayApp.json(
     model=Ballot,
     name='by-district',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_ballot_by_district(
     self: Ballot,

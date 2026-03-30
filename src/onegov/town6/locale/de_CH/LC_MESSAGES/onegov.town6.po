@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-03-03 15:41+0100\n"
+"POT-Creation-Date: 2026-03-25 10:15+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -178,8 +178,8 @@ msgstr "Sa"
 msgid "Su"
 msgstr "So"
 
-msgid "Enable Ratsinformationssystem (RIS)"
-msgstr "Ratsinformationssystem (RIS) aktivieren"
+msgid "Enable RIS"
+msgstr "RIS aktivieren"
 
 msgid "Enables the RIS integration for this organisation."
 msgstr "Aktiviert die RIS-Integration für diese Organisation."
@@ -212,9 +212,6 @@ msgstr "Formulare und Gesuche"
 
 msgid "Publications"
 msgstr "Publikationen"
-
-msgid "Official Documents"
-msgstr "Amtliche Dokumente"
 
 msgid "Reservations"
 msgstr "Reservationen"
@@ -320,6 +317,9 @@ msgstr "iFrame"
 
 msgid "Homepage"
 msgstr "Startseite"
+
+msgid "Files"
+msgstr "Dateien"
 
 msgid "Chat Archive"
 msgstr "Chat-Archiv"
@@ -730,9 +730,6 @@ msgstr "Noch keine Bilder hochgeladen"
 msgid "This album does not contain any images yet."
 msgstr "Dieses Fotoalbum enthält noch keine Bilder."
 
-msgid "Cannot display"
-msgstr "Kann nicht anzeigen"
-
 msgid "No photo albums defined yet."
 msgstr "Noch keine Fotoalben erstellt."
 
@@ -762,12 +759,6 @@ msgstr "Suchbegriff"
 
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
-
-msgid "Modules"
-msgstr "Module"
-
-msgid "User manual"
-msgstr "Benutzerhandbuch"
 
 msgid "Back to the homepage"
 msgstr "Zurück zur Startseite"
@@ -1141,6 +1132,24 @@ msgstr "${count} Seiten"
 msgid "Further occurrences:"
 msgstr "Weitere Termine:"
 
+msgid "Former member or parliament"
+msgstr "Ehemaliges Parlamentsmitglied"
+
+msgid "Parliament"
+msgstr "Parlament"
+
+msgid "Parliamentary Group"
+msgstr "Fraktion"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Status"
+msgstr "Status"
+
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time. All information on this page has "
@@ -1388,8 +1397,8 @@ msgstr "Guten Tag"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Ihre E-Mail Adresse wurde soeben zur Erstellung eines Accounts auf "
-"${homepage} verwendet."
+"Ihre E-Mail Adresse wurde soeben zur Erstellung eines Accounts auf $"
+"{homepage} verwendet."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Um Ihren Account zu aktivieren, bestätigen Sie bitte die Anmeldung:"
@@ -1412,8 +1421,8 @@ msgstr "Wir wünschen Ihnen einen schönen Tag!"
 
 msgid "Your e-mail address was just used to send a login link to ${homepage}."
 msgstr ""
-"Ihre E-Mail Adresse wurde soeben zum Senden eines Anmeldelinks auf "
-"${homepage} verwendet."
+"Ihre E-Mail Adresse wurde soeben zum Senden eines Anmeldelinks auf $"
+"{homepage} verwendet."
 
 msgid "Use the token below or click on the link to complete your login."
 msgstr ""
@@ -1489,9 +1498,9 @@ msgid "visit the request page"
 msgstr "öffnen Sie die Anfrage"
 
 msgid ""
-"This is the notification for customer messages on reservations for ${request."
-"app.org.title}. If you no longer want to receive this e-mail please contact "
-"an administrator so they can remove you from the recipients list."
+"This is the notification for customer messages on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
 "Dies ist die tägliche Reservations-Übersicht für ${organisation}. Falls Sie "
 "dieses E-Mail nicht mehr bekommen möchten, melden Sie sich bitte bei einem "
@@ -1597,12 +1606,12 @@ msgid "New note in Ticket ${link}"
 msgstr "Neue Notiz in Ticket ${link}"
 
 msgid ""
-"This is the notification for notes on reservations for ${request.app.org."
-"title}. If you no longer want to receive this e-mail please contact an "
-"administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies ist die Benachrichtigung für Notizen zu Reservierungen für ${request."
-"app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
+"Dies ist die Benachrichtigung für Notizen zu Reservierungen für $"
+"{request.app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
 "kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
 "entfernen kann."
 
@@ -1629,8 +1638,8 @@ msgid ""
 "no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies ist eine Benachrichtigung zu den neuen Reservationen von "
-"${organisation}. Falls Sie diese E-Mails nicht mehr bekommen möchten, melden "
+"Dies ist eine Benachrichtigung zu den neuen Reservationen von $"
+"{organisation}. Falls Sie diese E-Mails nicht mehr bekommen möchten, melden "
 "Sie sich bitte bei einem Administrator damit dieser Sie von der "
 "Empfängerliste streichen kann."
 
@@ -1655,8 +1664,8 @@ msgstr ""
 
 msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
-"Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer "
-"${number}"
+"Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer $"
+"{number}"
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -1729,8 +1738,8 @@ msgid ""
 "you no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies ist eine Benachrichtigung über die abgelehnten Reservierungen für "
-"${Organisation}. Wenn Sie diese Benachrichtigungen nicht mehr erhalten "
+"Dies ist eine Benachrichtigung über die abgelehnten Reservierungen für $"
+"{Organisation}. Wenn Sie diese Benachrichtigungen nicht mehr erhalten "
 "möchten, kontaktieren Sie bitte einen Administrator, damit er Sie aus der "
 "Empfängerliste entfernen kann."
 
@@ -2057,9 +2066,6 @@ msgstr "Dies ist eine importierte Veranstaltung"
 msgid "General information about the event calendar"
 msgstr "Allgemeine Informationen zum Veranstaltungskalender"
 
-msgid "Date"
-msgstr "Datum"
-
 msgid "Export these events"
 msgstr "Diese Termine exportieren"
 
@@ -2068,9 +2074,6 @@ msgstr "Veranstaltung erfassen"
 
 msgid "Functions"
 msgstr "Funktionen"
-
-msgid "Parliament"
-msgstr "Parlament"
 
 msgid "in"
 msgstr "der"
@@ -2092,9 +2095,6 @@ msgstr "Personalnummer"
 
 msgid "Contract number"
 msgstr "Vertragsnummer"
-
-msgid "Party"
-msgstr "Party"
 
 msgid "Private address"
 msgstr "Privatadresse"
@@ -2196,14 +2196,8 @@ msgstr "Elektronische Visitenkarte (vCard)"
 msgid "Information"
 msgstr "Information"
 
-msgid "Number"
-msgstr "Nummer"
-
 msgid "Business Type"
 msgstr "Geschäftsart"
-
-msgid "Status"
-msgstr "Status"
 
 msgid "Submission/publication date"
 msgstr "Einreichungs-/Publikationsdatum"
@@ -2378,6 +2372,9 @@ msgstr ""
 
 msgid "Select the images that should be shown inside this album."
 msgstr "Wählen Sie die Bilder aus welche im Album angezeigt werden sollen."
+
+msgid "Confirm selection"
+msgstr "Auswahl bestätigen"
 
 msgid "This newsletter has not been sent yet."
 msgstr "Dieser Newsletter wurde noch nicht gesendet."
@@ -2806,6 +2803,9 @@ msgstr "SBB Tageskarte Label"
 msgid "Publications Label"
 msgstr "Publikationen Label"
 
+msgid "Official Documents"
+msgstr "Amtliche Dokumente"
+
 msgid "Hide Publications on Homepage"
 msgstr "Publikationen auf der Homepage ausblenden"
 
@@ -2847,6 +2847,9 @@ msgstr "Kopfzeile"
 
 msgid "Footer"
 msgstr "Fusszeile"
+
+msgid "Modules"
+msgstr "Module"
 
 msgid "Analytics"
 msgstr "Web-Statistik"
@@ -2891,5 +2894,8 @@ msgstr "Ratsinformationssystem (RIS)"
 msgid "New Note"
 msgstr "Neue Notiz"
 
-#~ msgid "Confirm selection"
-#~ msgstr "Auswahl bestätigen"
+#~ msgid "Cannot display"
+#~ msgstr "Kann nicht anzeigen"
+
+#~ msgid "Party"
+#~ msgstr "Party"

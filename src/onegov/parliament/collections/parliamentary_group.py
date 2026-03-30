@@ -6,21 +6,15 @@ from onegov.parliament.models import ParliamentaryGroup
 from sqlalchemy import or_
 
 
-from typing import Any, TYPE_CHECKING
-from typing_extensions import TypeVar
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing import Self
-
-GroupT = TypeVar(
-    'GroupT',
-    bound=ParliamentaryGroup,
-    default=Any
-)
 
 
-class ParliamentaryGroupCollection(GenericCollection[GroupT]):
+class ParliamentaryGroupCollection[GroupT: ParliamentaryGroup = Any](
+    GenericCollection[GroupT]
+):
 
     def __init__(
         self,

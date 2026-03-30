@@ -1,0 +1,12 @@
+# Error: is not present in stub
+# ================================
+# Undocumented implementation details
+cgi.FieldStorage.bufsize
+cgi.FieldStorage.read_binary
+cgi.FieldStorage.read_lines
+cgi.FieldStorage.read_lines_to_eof
+cgi.FieldStorage.read_lines_to_outerboundary
+cgi.FieldStorage.read_multi
+cgi.FieldStorage.read_single
+cgi.FieldStorage.read_urlencoded
+cgi.FieldStorage.skip_lines

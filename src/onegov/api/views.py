@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from wtforms.form import _FormErrors
 
 
-@ApiApp.json(model=ApiException, permission=Public)
+@ApiApp.json(model=ApiException, permission=Public, open_data=True)
 def handle_exception(
     self: ApiException, request: CoreRequest
 ) -> dict[str, dict[str, dict[str, Any] | str]]:
@@ -44,7 +44,8 @@ def handle_exception(
 
 @ApiApp.json(
     model=ApiEndpointCollection,
-    permission=Public
+    permission=Public,
+    open_data=True
 )
 def view_api_endpoints(
     self: ApiEndpointCollection, request: CoreRequest
@@ -64,8 +65,11 @@ def view_api_endpoints(
                     'title': endpoint.title,
                     'description': endpoint.description,
                     'data': [
-                        {'name': name}
-                        for name in getattr(endpoint, 'filters', [])
+                        {
+                            'name': name,
+                            'prompt': prompt
+                        } if prompt else {'name': name}
+                        for name, prompt in endpoint.filters.items()
                     ]
                 }
                 for endpoint in self.endpoints.values()
@@ -76,7 +80,8 @@ def view_api_endpoints(
 
 @ApiApp.json(
     model=ApiEndpoint,
-    permission=Public
+    permission=Public,
+    open_data=True
 )
 def view_api_endpoint(
     self: ApiEndpoint[Any], request: CoreRequest
@@ -143,7 +148,8 @@ def view_api_endpoint(
 
 @ApiApp.json(
     model=ApiEndpointItem,
-    permission=Public
+    permission=Public,
+    open_data=True
 )
 def view_api_endpoint_item(
     self: ApiEndpointItem[Any], request: CoreRequest
@@ -210,7 +216,8 @@ def view_api_endpoint_item(
 @ApiApp.json(
     model=ApiEndpointItem,
     permission=Public,
-    request_method='PUT'
+    request_method='PUT',
+    open_data=False
 )
 def edit_api_endpoint_item(
     self: ApiEndpointItem[Any], request: CoreRequest
@@ -261,7 +268,7 @@ def edit_api_endpoint_item(
         endpoint.apply_changes(self.item, form)
 
 
-@ApiApp.json(model=AuthEndpoint, permission=Public)
+@ApiApp.json(model=AuthEndpoint, permission=Public, open_data=False)
 def get_time_restricted_token(
     self: AuthEndpoint, request: CoreRequest
 ) -> dict[str, str]:

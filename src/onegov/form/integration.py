@@ -37,7 +37,7 @@ def get_formcode_parse_fields() -> FormcodeParseFields:
     return FormcodeParseFields()
 
 
-@FormApp.json(model=Snippets, permission=Public)
+@FormApp.json(model=Snippets, permission=Public, open_data=True)
 def view_formcode_snippets(
     self: Snippets,
     request: CoreRequest
@@ -55,9 +55,9 @@ def view_formcode_snippets(
 
 
 @FormApp.json(model=FormcodeParseFields, permission=Public,
-              request_method='GET')
+              request_method='GET', open_data=False)
 @FormApp.json(model=FormcodeParseFields, permission=Public,
-              request_method='POST')
+              request_method='POST', open_data=False)
 def view_parse_formcode(
     self: FormcodeParseFields,
     request: CoreRequest

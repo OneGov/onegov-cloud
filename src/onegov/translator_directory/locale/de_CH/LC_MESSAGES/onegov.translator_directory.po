@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-03 15:11+0100\n"
+"POT-Creation-Date: 2026-03-25 10:35+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -145,6 +145,8 @@ msgstr "Anmelden"
 msgid "Translators"
 msgstr "Übersetzer/innen"
 
+#.
+#. will be filled in on_request
 msgid "Personal Information"
 msgstr "Persönliche Informationen"
 
@@ -251,6 +253,8 @@ msgstr "Telefon Mobile"
 msgid "Availability"
 msgstr "Erreich- und Verfügbarkeit"
 
+#. will be set in on_request
+#.
 msgid "Legal"
 msgstr "Rechtliches"
 
@@ -315,6 +319,8 @@ msgstr "Referenzen"
 msgid "Admission course of the high court of the Canton of Zurich available"
 msgstr "Zulassungskurs – Obergericht ZH vorhanden"
 
+#.
+#. will be set in on_request
 msgid "Admission course"
 msgstr "Zulassungskurs"
 
@@ -361,8 +367,8 @@ msgstr "Aktueller Auszug aus dem Zentralstrafregister (PDF)"
 msgid ""
 "Maximum 6 months since issue. Online order at www.strafregister.admin.ch"
 msgstr ""
-"Max. 6 Monate seit Ausstellung. Online-Bestellung unter www.strafregister."
-"admin.ch"
+"Max. 6 Monate seit Ausstellung. Online-Bestellung unter "
+"www.strafregister.admin.ch"
 
 msgid "Certificate of Capability (PDF)"
 msgstr "Handlungsfähigkeitszeugnis (PDF)"
@@ -427,6 +433,8 @@ msgstr ""
 msgid "Yes"
 msgstr "Ja"
 
+#.
+#. noqa: N806
 msgid "No"
 msgstr "Nein"
 
@@ -479,6 +487,8 @@ msgstr "Ihre Nachricht"
 msgid "Message"
 msgstr "Nachricht"
 
+#.
+#. will be filled in on_request
 msgid "Proposed changes"
 msgstr "Vorgeschlagene Änderungen"
 
@@ -561,6 +571,9 @@ msgstr "Endzeit"
 msgid "Break time"
 msgstr "Pausenzeit, in Stunden"
 
+msgid "Pages"
+msgstr "Seiten"
+
 msgid "Case Number"
 msgstr "Geschäfts- oder Verfahrensnummer"
 
@@ -585,6 +598,9 @@ msgstr "Notizen"
 
 msgid "Please select a location"
 msgstr "Bitte wählen Sie einen Einsatzort"
+
+msgid "This field is required"
+msgstr "Das ist ein Pflichtfeld."
 
 msgid "End time must be after start time"
 msgstr "Endzeit muss nach Startzeit liegen"
@@ -793,17 +809,17 @@ msgstr "Art"
 msgid "Finanzstelle"
 msgstr "Finanzstelle"
 
-msgid "Hourly Rate"
-msgstr "Stundenansatz"
-
-msgid "Pages"
-msgstr "Seiten"
-
 msgid "Per-page rate"
 msgstr "Seitenansatz"
 
 msgid "Duration"
 msgstr "Dauer"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Hourly Rate"
+msgstr "Stundenansatz"
 
 msgid "Day hours"
 msgstr "Tagesstunden"
@@ -834,9 +850,6 @@ msgstr "nach"
 
 msgid "Meal Allowance (6+ hours)"
 msgstr "Verpflegungsentschädigung (6+ Stunden)"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Download PDF"
 msgstr "PDF herunterladen"
@@ -990,11 +1003,11 @@ msgstr "Zulassung verweigert."
 msgid "Proposed changes applied"
 msgstr "Vorgeschlagene Änderungen übernommen"
 
-msgid "Showing time reports for:"
-msgstr "Zeiterfassungen anzeigen für:"
-
 msgid "Note: Export will only include confirmed reports."
 msgstr "Hinweis: Export enthält nur bestätigte Zeiterfassungen."
+
+msgid "Written translations without page count:"
+msgstr "Schriftliche Übersetzungen ohne Seitenangabe:"
 
 msgid "No time reports found"
 msgstr "Keine Zeiterfassungen gefunden"
@@ -1005,14 +1018,11 @@ msgstr "Keine archivierten Zeiterfassungen gefunden"
 msgid "Created"
 msgstr "Erstellt"
 
-msgid "Actions"
-msgstr "Aktionen"
-
 msgid "Exported"
 msgstr "Exportiert"
 
-msgid "View Ticket"
-msgstr "Ticket anzeigen"
+msgid "Actions"
+msgstr "Aktionen"
 
 msgid "This translator is in the admission process!"
 msgstr "Dieser Übersetzer ist im Zulassungsverfahren!"
@@ -1031,6 +1041,10 @@ msgstr "Telefonischer Kontakt"
 
 msgid "Error: No custom texts found"
 msgstr "Fehler: Keine benutzerdefinierten Texte gefunden"
+
+#, python-format
+msgid "Error: No custom text found for '${key}'"
+msgstr "Fehler: Keinen benutzerdefinierten Text gefunden für '${key}'"
 
 msgid "No Finanzstelle specified"
 msgstr "Keine Finanzstelle"
@@ -1102,6 +1116,9 @@ msgstr ""
 
 msgid "Export"
 msgstr "Exportieren"
+
+msgid "Written translation without page count"
+msgstr "Schriftliche Übersetzung ohne Seitenangabe"
 
 msgid "Only pending time reports can be edited"
 msgstr "Nur ausstehende Zeiterfassungen können bearbeitet werden"

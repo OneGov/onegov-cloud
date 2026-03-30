@@ -5,17 +5,14 @@ from dogpile.cache.api import NO_VALUE
 from hashlib import blake2b
 
 
-from typing import overload, Any, TypeVar
+from typing import overload, Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from typing import Never
 
     from .cache import RedisCacheRegion
 
-    OnDirtyCallback = Callable[['BrowserSession', str], None]
-
-_T = TypeVar('_T')
+    type OnDirtyCallback = Callable[[BrowserSession, str], None]
 
 
 class Prefixed:
@@ -130,7 +127,7 @@ class BrowserSession:
     def get(self, name: str) -> Any | None: ...
 
     @overload
-    def get(self, name: str, default: _T) -> Any | _T: ...
+    def get[T](self, name: str, default: T) -> Any | T: ...
 
     def get(self, name: str, default: Any = None) -> Any:
         result = self._cache.get(name)
@@ -140,10 +137,7 @@ class BrowserSession:
 
         return result
 
-    # FIXME: What is *args for, why do we allow this? For now we set
-    #        it to Never, so we get a mypy error, if there is any code
-    #        that uses this, if no code uses it then get rid of it!
-    def __getitem__(self, name: str, *args: Never) -> Any:
+    def __getitem__(self, name: str) -> Any:
         result = self._cache.get(name)
 
         if result is NO_VALUE:

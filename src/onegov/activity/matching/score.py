@@ -8,22 +8,14 @@ from onegov.user import User
 from sqlalchemy import func
 
 
-from typing import Any, Generic, Self, TypeVar, TYPE_CHECKING
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.activity.matching.interfaces import MatchableBooking
     from sqlalchemy.orm import Session
-    BookingT = TypeVar(
-        'BookingT',
-        bound='Booking | MatchableBooking',
-        default=Any
-    )
-else:
-    BookingT = TypeVar('BookingT', bound='Booking | MatchableBooking')
 
 
-# FIXME: Switch to PEP-695/PEP-696 generic for Python 3.13
-class Scoring(Generic[BookingT]):  # noqa: UP046
+class Scoring[BookingT: Booking | MatchableBooking = Any]:
     """ Provides scoring based on a number of criteria.
 
     A criteria is a callable which takes a booking and returns a score.

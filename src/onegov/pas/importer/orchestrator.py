@@ -5,7 +5,6 @@ import logging
 import queue
 import requests
 import threading
-import urllib3
 import uuid
 from dataclasses import dataclass
 from urllib.parse import urlparse, urlunparse
@@ -32,10 +31,6 @@ log = logging.getLogger('onegov.pas.orchestrator')
 
 class APIAccessibilityError(Exception):
     """Raised when the KUB API is not accessible."""
-
-
-# Disable SSL warnings for self-signed certificates
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 @dataclass
@@ -142,20 +137,20 @@ class KubImporter:
         self,
         token: str,
         base_url: str,
-        output: OutputHandler | None = None
+        output: OutputHandler | None = None,
+        cert: tuple[str, str] | None = None
     ):
         self.token = token
         self.base_url = base_url.rstrip('/')  # Normalize
         self.output = output
 
-        # Shared requests session for connection pooling
         self.session = requests.Session()
         self.session.headers.update({
             'Authorization': f'Token {token}',
             'Accept': 'application/json'
         })
-        # Disable SSL verification for self-signed certificates
-        self.session.verify = False
+        if cert:
+            self.session.cert = cert
 
     def __enter__(self) -> Self:
         return self

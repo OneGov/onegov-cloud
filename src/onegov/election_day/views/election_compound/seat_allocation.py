@@ -21,7 +21,8 @@ if TYPE_CHECKING:
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='seat-allocation-data',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_compound_seat_allocation_data(
     self: ElectionCompound,

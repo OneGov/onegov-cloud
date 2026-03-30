@@ -549,7 +549,9 @@ def view_directory(
 @OrgApp.json(
     model=ExtendedDirectoryEntryCollection,
     permission=Public,
-    name='geojson')
+    name='geojson',
+    open_data=False
+)
 def view_geojson(
     self: ExtendedDirectoryEntryCollection,
     request: OrgRequest
@@ -1166,13 +1168,11 @@ def new_recipient(
                                        directory_id=self.directory.id)
             unsubscribe = request.link(recipient.subscription, 'unsubscribe')
 
-            title = request.translate(
-                _('Registration for notifications on new entries in the '
-                  'directory "${directory}"',
-                  mapping={
-                      'directory': self.directory.title
-                  })
-            )
+            title = request.translate(_(
+                'Registration for notifications on new entries in the '
+                'directory "${directory}"',
+                mapping={'directory': self.directory.title}
+            ))
 
             confirm_mail = render_template(
                 'mail_confirm_directory_subscription.pt',
@@ -1194,10 +1194,11 @@ def new_recipient(
                 },
             )
 
-        request.success(_((
+        request.success(_(
             "Success! We have sent a confirmation link to "
-            "${address}, if we didn't send you one already."
-        ), mapping={'address': form.address.data}))
+            "${address}, if we didn't send you one already.",
+            mapping={'address': form.address.data}
+        ))
         return request.redirect(request.link(self))
 
     return {

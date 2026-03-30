@@ -45,7 +45,8 @@ def view_election_compound_part_districts(
 @ElectionDayApp.json(
     model=ElectionCompoundPart,
     name='by-district',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_compound_part_by_district(
     self: ElectionCompoundPart,

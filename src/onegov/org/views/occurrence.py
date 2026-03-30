@@ -382,8 +382,13 @@ def export_occurrences(
     }
 
 
-@OrgApp.json(model=OccurrenceCollection, name='json', permission=Public)
-def json_export_occurences(
+@OrgApp.json(
+    model=OccurrenceCollection,
+    name='json',
+    permission=Public,
+    open_data=False
+)
+def json_export_occurrences(
     self: OccurrenceCollection,
     request: OrgRequest
 ) -> JSON_ro:
@@ -392,10 +397,6 @@ def json_export_occurences(
     This is used for the senantis.dir.eventsportlet.
 
     """
-
-    @request.after
-    def cors(response: BaseResponse) -> None:
-        response.headers.add('Access-Control-Allow-Origin', '*')
 
     query = self.for_filter(
         tags=request.params.getall('cat1'),  # type:ignore[arg-type]

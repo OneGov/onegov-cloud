@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-16 16:22+0100\n"
+"POT-Creation-Date: 2026-03-25 09:27+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -151,6 +151,9 @@ msgstr "Mot de passe"
 msgid "Markdown"
 msgstr "Markdown"
 
+msgid "Invalid input."
+msgstr "Entrée non valide."
+
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
 msgstr ""
@@ -196,9 +199,9 @@ msgid ""
 "description must be placed below the field definition (`=`) and with the "
 "same indentation."
 msgstr ""
-"Placement incorrect de la description du champ à la ligne {line}. La "
-"description du champ doit être placée sous la définition du champ (`=`) "
-"et avec la même indentation."
+"La description du champ est mal placée à la ligne {line}. La description du "
+"champ doit être placée sous la définition du champ (`=`) et avec le même "
+"niveau d'indentation."
 
 #, python-format
 msgid "The field '{label}' exists more than once."
@@ -236,6 +239,12 @@ msgstr ""
 "vide ou ajoutez des champs."
 
 #, python-format
+msgid ""
+"Nested fieldsets (`#`) are not supported, please remove line {line}."
+msgstr ""
+"Les fieldsets imbriqués (`#`) ne sont pas pris en charge, veuillez supprimer "
+"la ligne {line}."
+
 msgid ""
 "${fields}: New fields cannot be required initially. Require them in a "
 "separate migration step."
@@ -301,20 +310,17 @@ msgstr "Télécharger des fichiers supplémentaires"
 msgid "Text modules"
 msgstr "Modules de texte"
 
+msgid "Select Some Options"
+msgstr "Sélectionner quelques options"
+
 msgid "Select an Option"
 msgstr "Sélectionnez une option"
 
 msgid "No results match"
 msgstr "Aucun résultat ne correspond"
 
-msgid "Select Some Options"
-msgstr "Sélectionner quelques options"
-
 msgid "hours"
 msgstr "heures"
 
 msgid "minutes"
 msgstr "minutes"
-
-#~ msgid "Multiline"
-#~ msgstr "Multi-lignes"

@@ -316,8 +316,8 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
             ))
 
         topics = topics.filter(
-            News.publication_started == True,
-            News.publication_ended == False
+            Topic.publication_started == True,
+            Topic.publication_ended == False
         )
 
         topics = topics.order_by(desc(Topic.published_or_created))

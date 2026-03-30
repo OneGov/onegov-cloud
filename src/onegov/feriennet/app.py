@@ -359,4 +359,11 @@ def feriennet_content_security_policy() -> ContentSecurityPolicy:
     # NOTE: This one may be out of date, but until somebody complains
     #       we won't worry about it.
     policy.connect_src.add('https://stats.g.doubleclick.net')
+
+    policy.script_src.add('https://*.projuventute.ch')
+    policy.script_src.add('https://*.googletagmanager.com')
+    policy.script_src.add('https://*.analytics.google.com')
+    policy.script_src.add('https://*.google-analytics.com')
+    policy.script_src.add('https://*.usercentrics.eu')
+    policy.script_src.add('https://stats.g.doubleclick.net')
     return policy

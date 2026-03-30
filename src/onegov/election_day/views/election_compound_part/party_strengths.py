@@ -22,7 +22,8 @@ if TYPE_CHECKING:
 @ElectionDayApp.json(
     model=ElectionCompoundPart,
     name='party-strengths-data',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_compound_part_party_strengths_data(
     self: ElectionCompoundPart,

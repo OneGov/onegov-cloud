@@ -44,10 +44,14 @@ class UploadOrLinkExistingFileWidget(UploadWidget):
             input_html=input_html,
             **kwargs
         )
-        data['existing_file_label'] = field.gettext(_('Linked file'))
-        data['keep_label'] = field.gettext(_('Keep link'))
-        data['delete_label'] = field.gettext(_('Delete link'))
-        data['replace_label'] = field.gettext(_('Replace link'))
+        existing_file_label = _('Linked file')
+        keep_label = _('Keep link')
+        delete_label = _('Delete link')
+        replace_label = _('Replace link')
+        data['existing_file_label'] = field.gettext(existing_file_label)
+        data['keep_label'] = field.gettext(keep_label)
+        data['delete_label'] = field.gettext(delete_label)
+        data['replace_label'] = field.gettext(replace_label)
         if is_simple is True:
             return is_simple, data
 
@@ -147,6 +151,7 @@ class UploadOrSelectExistingFileWidget(UploadOrLinkExistingFileWidget):
             input_html=input_html,
             **kwargs
         )
+        placeholder = _('Choose existing file')
 
         # this is pretty ugly, but implementing iter_choices on the file
         # field would not clean up things significantly
@@ -156,9 +161,7 @@ class UploadOrSelectExistingFileWidget(UploadOrLinkExistingFileWidget):
                 choices=field.choices,
                 render_kw={
                     'id': f'{field.name}-select',
-                    'data_placeholder': field.gettext(
-                        _('Choose existing file')
-                    ),
+                    'data_placeholder': field.gettext(placeholder),
                     'class_': 'chosen-select'
                 }
             )

@@ -728,7 +728,8 @@ def view_find_your_spot(
 @OrgApp.json(
     model=FindYourSpotCollection,
     name='reservations',
-    permission=Public
+    permission=Public,
+    open_data=False,
 )
 def get_find_your_spot_reservations(
     self: FindYourSpotCollection,
@@ -759,7 +760,8 @@ def get_find_your_spot_reservations(
     model=FindYourSpotCollection,
     name='reservations',
     request_method='DELETE',
-    permission=Public
+    permission=Public,
+    open_data=False,
 )
 def delete_all_find_your_spot_reservations(
     self: FindYourSpotCollection,
@@ -802,7 +804,12 @@ def delete_all_find_your_spot_reservations(
     }
 
 
-@OrgApp.json(model=ResourceCollection, permission=Public, name='json')
+@OrgApp.json(
+    model=ResourceCollection,
+    permission=Public,
+    name='json',
+    open_data=False
+)
 def view_resources_json(
     self: ResourceCollection,
     request: OrgRequest
@@ -1125,7 +1132,12 @@ def predict_next_reservation(
     }
 
 
-@OrgApp.json(model=Resource, name='reservations', permission=Public)
+@OrgApp.json(
+    model=Resource,
+    name='reservations',
+    permission=Public,
+    open_data=False
+)
 def get_reservations(self: Resource, request: OrgRequest) -> RenderData:
 
     # FIXME: Maybe we should move bound_reservations to the base
@@ -1184,7 +1196,12 @@ def assert_visible_by_members(self: Resource, request: OrgRequest) -> None:
         raise exc.HTTPForbidden()
 
 
-@OrgApp.json(model=Resource, name='occupancy-json', permission=Personal)
+@OrgApp.json(
+    model=Resource,
+    name='occupancy-json',
+    permission=Personal,
+    open_data=False
+)
 def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns the reservations in a fullcalendar compatible events feed.
 
@@ -1244,7 +1261,12 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     )
 
 
-@OrgApp.json(model=Resource, name='occupancy-stats', permission=Personal)
+@OrgApp.json(
+    model=Resource,
+    name='occupancy-stats',
+    permission=Personal,
+    open_data=False
+)
 def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns stats for the selected date range.
 
@@ -1318,7 +1340,8 @@ def view_occupancy(
 @OrgApp.json(
     model=ResourceCollection,
     name='my-reservations-json',
-    permission=Public
+    permission=Public,
+    open_data=False,
 )
 def view_my_reservations_json(
     self: ResourceCollection,

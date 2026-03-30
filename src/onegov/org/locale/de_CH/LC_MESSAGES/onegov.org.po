@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-17 08:49+0100\n"
+"POT-Creation-Date: 2026-03-25 11:20+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -197,6 +197,8 @@ msgstr "Täglicher Newsletter ${time}"
 msgid "${org} OneGov Cloud Status"
 msgstr "${org} OneGov Cloud Status"
 
+#. get the resource titles and ids
+#.
 msgid "General"
 msgstr "Allgemein"
 
@@ -209,36 +211,6 @@ msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
 
 msgid "New ticket"
 msgstr "Neues Ticket"
-
-msgid "Activate/deactivate modules"
-msgstr "Module aktivieren/deaktivieren"
-
-msgid "Latest news"
-msgstr "Aktuelles"
-
-msgid "Newsletter"
-msgstr "Newsletter"
-
-msgid "Events"
-msgstr "Veranstaltungen"
-
-msgid "Directories"
-msgstr "Verzeichnisse"
-
-msgid "People"
-msgstr "Personen"
-
-msgid "Forms"
-msgstr "Formulare"
-
-msgid "Surveys"
-msgstr "Umfragen"
-
-msgid "RIS Settings"
-msgstr "Ratsinformationssystem"
-
-msgid "Modules"
-msgstr "Module"
 
 msgid "Account"
 msgstr "Konto"
@@ -273,11 +245,20 @@ msgstr "Dateien"
 msgid "Images"
 msgstr "Bilder"
 
+msgid "Payment Provider"
+msgstr "Zahlungsanbieter"
+
 msgid "Payments"
 msgstr "Zahlungen"
 
 msgid "Invoices"
 msgstr "Rechnungen"
+
+msgid "Text modules"
+msgstr "Textbausteine"
+
+msgid "Settings"
+msgstr "Einstellungen"
 
 msgid "Users"
 msgstr "Benutzer"
@@ -285,11 +266,20 @@ msgstr "Benutzer"
 msgid "User groups"
 msgstr "Benutzergruppen"
 
-msgid "Settings"
-msgstr "Einstellungen"
+msgid "RIS Settings"
+msgstr "Ratsinformationssystem"
 
 msgid "Link Check"
 msgstr "Link-Prüfung"
+
+msgid "Archived Tickets"
+msgstr "Archivierte Tickets"
+
+msgid "Forms"
+msgstr "Formulare"
+
+msgid "Surveys"
+msgstr "Umfragen"
 
 msgid "Management"
 msgstr "Verwaltung"
@@ -336,9 +326,6 @@ msgstr "Netto Betrag"
 
 msgid "Fee"
 msgstr "Gebühr"
-
-msgid "Payment Provider"
-msgstr "Zahlungsanbieter"
 
 msgid "Date Paid"
 msgstr "Datum Bezahlt"
@@ -911,24 +898,45 @@ msgstr "Jugend"
 msgid "Elderly"
 msgstr "Senioren"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Mo"
 msgstr "Mo"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Tu"
 msgstr "Di"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "We"
 msgstr "Mi"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Th"
 msgstr "Do"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Fr"
 msgstr "Fr"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Sa"
 msgstr "Sa"
 
+#. FIXME: We define a very similar constant in our forms, we should move this
+#. to onegov.org.constants and use it for both. noqa: N806
+#.
 msgid "Su"
 msgstr "So"
 
@@ -1047,6 +1055,9 @@ msgstr "Probelauf"
 
 msgid "Do not actually import the events."
 msgstr "Die Veranstaltungen werden nicht gespeichert."
+
+msgid "Created"
+msgstr "Erstellt"
 
 msgid "Expected header line with the following columns:"
 msgstr "Die erste Zeile soll folgende Spaltennamen haben:"
@@ -1350,11 +1361,20 @@ msgstr "Schlussbemerkung"
 msgid "Closing remark at the end of the newsletter"
 msgstr "Schlussbemerkung am Ende des Newsletters"
 
+#.
+#. FIXME: A plural form of News would probably be better, for now this label
+#. seems good enough
+msgid "Latest news"
+msgstr "Aktuelles"
+
 msgid "Show only lead of news"
 msgstr "Nur Einleitung der News anzeigen"
 
 msgid "Only show the lead of the news and a \"read more\"link."
 msgstr "Nur die Einleitung der News und einen \"Weiterlesen\"-Link anzeigen."
+
+msgid "Events"
+msgstr "Veranstaltungen"
 
 msgid "Publications"
 msgstr "Publikationen"
@@ -1654,6 +1674,7 @@ msgstr "Fraktion(en)"
 msgid "Participations"
 msgstr "Verfasser / Beteiligte"
 
+#. type:ignore[union-attr]
 msgid "No active parliamentary groups"
 msgstr "Keine aktiven Fraktionen"
 
@@ -1975,28 +1996,6 @@ msgstr "Link zum Logo"
 msgid "Logo (Square)"
 msgstr "Logo (Quadratisch)"
 
-msgid "Icon 16x16 PNG (Windows)"
-msgstr "Icon 16x16 PNG (Windows)"
-
-msgid "URL pointing to the icon"
-msgstr "Link zum Icon"
-
-msgid "Icon 32x32 PNG (Mac)"
-msgstr "Icon 32x32 PNG (Mac)"
-
-msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
-msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
-
-msgid "Icon SVG 20x20 (Safari)"
-msgstr "Icon SVG 20x20 (Safari)"
-
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale "
-"Grösse beträgt 1200:630px."
-
 msgid "Primary Color"
 msgstr "Primärfarbe"
 
@@ -2188,6 +2187,28 @@ msgstr "Die Breite der Kolonne muss grösser sein als 0"
 msgid "The sum of all the footer columns must be equal to 12"
 msgstr "Die Summe aller Breiten der Fusszeilenkolonnen muss 12 sein."
 
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale "
+"Grösse beträgt 1200:630px."
+
+msgid "Icon 16x16 PNG (Windows)"
+msgstr "Icon 16x16 PNG (Windows)"
+
+msgid "URL pointing to the icon"
+msgstr "Link zum Icon"
+
+msgid "Icon 32x32 PNG (Mac)"
+msgstr "Icon 32x32 PNG (Mac)"
+
+msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
+msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
+
+msgid "Icon SVG 20x20 (Safari)"
+msgstr "Icon SVG 20x20 (Safari)"
+
 msgid "Disable page references"
 msgstr "Seitenreferenzen deaktivieren"
 
@@ -2312,18 +2333,6 @@ msgstr ""
 
 msgid "The default map view. This should show the whole town"
 msgstr "Die Standard Kartenansicht. Diese sollte die ganze Gemeinde zeigen."
-
-msgid ""
-"Wherever there's an option to choose a location on a map, this will be the "
-"default view. You can change the view by dragging the map and zooming in or "
-"out. The coordinates of the center of the map and the zoom level will then "
-"be saved as the default view."
-msgstr ""
-"Überall, wo es eine Option gibt, einen Standort auf einer Karte auszuwählen, "
-"wird dies die Standardansicht sein. Sie können die Ansicht ändern, indem Sie "
-"die Karte ziehen und hinein- oder herauszoomen. Die Koordinaten des "
-"Kartenmittelpunkts und die Zoomstufe werden dann als Standardansicht "
-"gespeichert."
 
 msgid "Geo provider"
 msgstr "Geo Anbieter"
@@ -2621,6 +2630,9 @@ msgstr ""
 "Zahl sein, z.B. \"ff9000\" für Orange. Wenn Sie \"#\" als Präfix verwenden, "
 "stellen Sie sicher, den Wert in Anführungszeichen einzuschliessen."
 
+msgid "Enable newsletter"
+msgstr "Newsletter aktivieren"
+
 msgid "Allow secret content in newsletter"
 msgstr "Geheimen Inhalt im Newsletter erlauben"
 
@@ -2699,6 +2711,13 @@ msgid ""
 msgstr ""
 "Ungültiges Format. Bitte definieren Sie Themen und Unterthemen wie im "
 "Beispiel."
+
+#, python-format
+msgid ""
+"Invalid format. Please define subtopic(s) for '${topic}' or remove the ':'."
+msgstr ""
+"Ungültiges Format. Bitte definieren Sie Unterthemen für '${topic}' oder "
+"entfernen das ':'."
 
 msgid ""
 "Invalid format. Only topics and subtopics are allowed - no deeper structures "
@@ -2944,26 +2963,8 @@ msgstr ""
 "Mehrwertsteuersatz in Prozent. Der Mehrwertsteuersatz wird auf alle Preise "
 "in den Formularen angewendet."
 
-msgid "Enable newsletter"
-msgstr "Newsletter aktivieren"
-
-msgid ""
-"Enables the newsletter module for admins and show a \"Subscribe to "
-"newsletter\" option for the users on the news page."
-msgstr ""
-"Aktiviert das Newsletter-Modul für Administratoren und zeigt den Benutzern "
-"auf der Nachrichtenseite die Option \"Newsletter abonnieren\" an."
-
 msgid "Enable Citizen Login"
 msgstr "Kunden-Login aktivieren"
-
-msgid ""
-"Enables the citizen login. This will show a \"citizen login\" link in the "
-"footer, where users can view their reservations using their email-address."
-msgstr ""
-"Aktiviert den Kunden-Login. Es wird ein Link \"Kunden-Login\" in der "
-"Fußzeile angezeigt, über den Benutzer ihre Reservierungen mit ihrer E-Mail-"
-"Adresse einsehen können."
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -3094,9 +3095,6 @@ msgstr "Aktuelle E-Mail"
 msgid "New E-Mail"
 msgstr "Neue E-Mail"
 
-msgid "The users e-mail address (a.k.a. username)"
-msgstr "Die E-Mail Adresse des Benutzers (bzw. der Benutzername)"
-
 msgid "Confirm action via your second factor"
 msgstr "Aktion via 2. Login-Faktor bestätigten"
 
@@ -3121,6 +3119,9 @@ msgstr "Falscher Yubikey."
 
 msgid "Invalid or expired TOTP provided."
 msgstr "Ungültige oder abgelaufenes TOTP eingegeben."
+
+msgid "The users e-mail address (a.k.a. username)"
+msgstr "Die E-Mail Adresse des Benutzers (bzw. der Benutzername)"
 
 msgid "Send Activation E-Mail with Instructions"
 msgstr "Aktivierungs-Email mit Anmelde-Anleitung senden"
@@ -3207,6 +3208,9 @@ msgstr "Zusätzliche Dateien verknüpfen"
 
 msgid "All directories"
 msgstr "Alle Verzeichnisse"
+
+msgid "Directories"
+msgstr "Verzeichnisse"
 
 msgid "All events"
 msgstr "Alle Veranstaltungen"
@@ -3346,6 +3350,9 @@ msgstr "Befragungszeiträume"
 msgid "Survey"
 msgstr "Umfrage"
 
+msgid "People"
+msgstr "Personen"
+
 msgid "Person"
 msgstr "Person"
 
@@ -3417,9 +3424,6 @@ msgstr "Rechnung"
 msgid "Discount / Surcharge"
 msgstr "Abzug / Zuschlag"
 
-msgid "Text modules"
-msgstr "Textbausteine"
-
 msgid "Text module"
 msgstr "Textbaustein"
 
@@ -3444,6 +3448,12 @@ msgstr "Externer Reservationslink"
 msgid "New external resource"
 msgstr "Neue externe Reservation"
 
+#.
+#. FIXME: Why are we using ResouceLayout and not ResourcesLayout? this is a
+#. weird hack, if you want to be able to use the ResourceLayout with
+#. ResourceCollection, then make it work in the Layout, not by patching the
+#. collection...
+#. type:ignore
 msgid "Export All"
 msgstr "Alle Exportieren"
 
@@ -3548,6 +3558,9 @@ msgstr "Sie können importierte Veranstaltungen später wieder veröffentlichen.
 msgid "Re-publish event"
 msgstr "Veranstaltung wieder veröffentlichen"
 
+msgid "Newsletter"
+msgstr "Newsletter"
+
 msgid "New"
 msgstr "Neu"
 
@@ -3559,6 +3572,10 @@ msgstr "Test"
 
 msgid "Copy"
 msgstr "Kopieren"
+
+#, python-format
+msgid "Do you really want to delete \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich löschen?"
 
 msgid "Delete newsletter"
 msgstr "Newsletter löschen"
@@ -3610,10 +3627,6 @@ msgstr "Fakturierte Belege als PDF exportieren"
 
 msgid "Directory"
 msgstr "Verzeichnis"
-
-#, python-format
-msgid "Do you really want to delete \"${title}\"?"
-msgstr "Möchten Sie \"${title}\" wirklich löschen?"
 
 msgid "All entries will be deleted as well!"
 msgstr "Alle Einträge werden ebenfalls gelöscht!"
@@ -3702,6 +3715,7 @@ msgstr "Verzeichniseinträge"
 msgid "Through URL only (not listed)"
 msgstr "Nur wer die URL kennt (wird nicht gelistet)"
 
+#. allowing mtan restricted models makes only sense if we can deliver SMS
 msgid "Only by privileged users or after submitting a mTAN"
 msgstr "Zeitbegrenzter Zugriff nach Eingabe eines mTANs"
 
@@ -3861,6 +3875,8 @@ msgstr "Möchten Sie diese Notiz wirklich löschen?"
 msgid "Delete Note"
 msgstr "Notiz löschen"
 
+#. clarify the intent of this particular flag on the news, as the effect is not
+#. entirely the same (news may be shown on the homepage anyway)
 msgid "Always visible on homepage"
 msgstr "Immer auf der Startseite anzeigen"
 
@@ -4266,6 +4282,8 @@ msgstr ""
 "Unterseiten löschen. Um diese Seite zu löschen müssen Sie erst alle "
 "Unterseiten löschen, oder Sie wenden sich an einen Administrator."
 
+#. Modification for the footer left on all pages
+#.
 msgid "Source"
 msgstr "Herkunft"
 
@@ -4274,9 +4292,6 @@ msgstr "Betreff"
 
 msgid "Owner"
 msgstr "Zuständig"
-
-msgid "Created"
-msgstr "Erstellt"
 
 msgid "Reaction Time"
 msgstr "Reaktionszeit"
@@ -4299,6 +4314,8 @@ msgstr "Anzahl"
 msgid "VAT"
 msgstr "MwSt"
 
+#. credit card
+#.
 msgid "Payment"
 msgstr "Zahlung"
 
@@ -6104,8 +6121,9 @@ msgstr "mTAN"
 msgid "Identicon"
 msgstr "Identicon"
 
-msgid "Not a valid color."
-msgstr "Ungültige Farbe."
+#. messages not translated by wtforms
+msgid "Not a valid choice"
+msgstr "Ungültige Auswahl"
 
 msgid "CSRF failed."
 msgstr ""
@@ -6122,9 +6140,11 @@ msgstr ""
 "CSRF Token abgelaufen. Aktualisieren Sie die Seite. Falls das Problem "
 "weiterhin besteht, melden Sie sich ab, wieder an und versuchen Sie es erneut."
 
-msgid "Not a valid choice"
-msgstr "Ungültige Auswahl"
+#. messages defined in wtforms-components
+msgid "Not a valid color."
+msgstr "Ungültige Farbe."
 
+#. Roles in plural form are not defined as translatable texts anywhere
 msgid "Admins"
 msgstr "Administratoren"
 
@@ -6249,6 +6269,9 @@ msgstr ""
 msgid "Delete availability period"
 msgstr "Verfügbarkeitszeitraum löschen"
 
+#.
+#. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -6620,6 +6643,8 @@ msgstr ""
 msgid "Notification for new entries"
 msgstr "Benachrichtigung bei neuen Einträgen"
 
+#. i18n:attributes translations do not support variables, so we need to do this
+#. ourselves
 #, python-format
 msgid "Do you really want to unsubscribe \"{}\"?"
 msgstr "Möchten Sie \"{}\" wirklich abmelden?"
@@ -6692,6 +6717,7 @@ msgstr "Sie haben die Veranstaltung ${title} angenommen"
 msgid "Your event was accepted"
 msgstr "Ihre Veranstaltung wurde angenommen"
 
+#. type:ignore[attr-defined]
 msgid "Submit an event"
 msgstr "Veranstaltung erfassen"
 
@@ -6707,6 +6733,7 @@ msgstr ""
 "Veranstaltungen. Es besteht kein Publikationsrecht und bereits publizierte "
 "Veranstaltungen können jederzeit und ohne Angabe von Gründen gelöscht werden."
 
+#. type:ignore[attr-defined]
 msgid "Add event"
 msgstr "Veranstaltung hinzufügen"
 
@@ -7205,7 +7232,7 @@ msgid "Charge fees to customer"
 msgstr "Kreditkarten-Gebühren dem Kunden verrechnen"
 
 msgid "Use sandbox environment (for testing)"
-msgstr "Sandbox Umgebung verwenden (nur für Testing)"
+msgstr "Sandbox Umbegung verwenden (nur für Testing)"
 
 msgid "Customer Name"
 msgstr "Kundenname"
@@ -7299,6 +7326,7 @@ msgstr "Neue Termine für ${title}"
 msgid "Confirm your reservation"
 msgstr "Bestätigen Sie Ihre Reservation"
 
+#. by default we will redirect to the created ticket
 msgid "Thank you for your reservation!"
 msgstr "Vielen Dank für Ihre Reservation!"
 
@@ -7490,14 +7518,8 @@ msgstr "Suche Nicht Verfügbar"
 msgid "${count} Results"
 msgstr "${count} Resultate"
 
-msgid "Advanced Settings"
-msgstr "Erweiterte Einstellungen"
-
-msgid "Organisation Profile"
-msgstr "Organisationsprofil"
-
-msgid "Appearance"
-msgstr "Erscheinungsbild"
+msgid "Favicon"
+msgstr "Favicon"
 
 msgid "Header"
 msgstr "Kopfzeile"
@@ -7505,27 +7527,11 @@ msgstr "Kopfzeile"
 msgid "Footer"
 msgstr "Fusszeile"
 
-msgid "Data Retention Policy"
-msgstr "Datensparsamkeit"
-
-msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
-msgstr ""
-"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
-"unwiderruflich gelöscht werden."
-
-msgid "Access (mTAN)"
-msgstr "Zugriff (mTAN)"
+msgid "Modules"
+msgstr "Module"
 
 msgid "Analytics"
 msgstr "Web-Statistik"
-
-msgid "People directory"
-msgstr "Personenverzeichnis"
-
-msgid "Chat"
-msgstr "Chat"
 
 msgid "Holidays"
 msgstr "Feiertage / Schulferien"
@@ -7564,6 +7570,19 @@ msgstr "Diese Aktion kann nicht rückgängig gemacht werden"
 
 msgid "ApiKey deleted."
 msgstr "ApiKey gelöscht."
+
+msgid "Data Retention Policy"
+msgstr "Datensparsamkeit"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
+"unwiderruflich gelöscht werden."
+
+msgid "Chat"
+msgstr "Chat"
 
 #, python-format
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
@@ -7788,6 +7807,10 @@ msgstr "Das Ticket wurde bereits geschlossen"
 msgid "Your message has been sent"
 msgstr "Ihre Nachricht wurde gesendet"
 
+#, python-format
+msgid "${count} file(s) not found: ${files}"
+msgstr "${count} Datei(en) nicht gefunden: ${files}"
+
 msgid "Zip archive created successfully"
 msgstr "ZIP-Archiv erfolgreich generiert"
 
@@ -7822,6 +7845,7 @@ msgstr "Ihr Anliegen wird zur Zeit bearbeitet"
 msgid "Your request has been processed"
 msgstr "Ihr Anliegen wurde abgeschlossen"
 
+#. We adjust the wording for users that do not know what a ticket is
 msgid "Request Status"
 msgstr "Status Anfrage"
 
@@ -7862,9 +7886,6 @@ msgstr "Alle Benutzer"
 
 msgid "All Submitters"
 msgstr "Alle Antragsteller"
-
-msgid "Archived Tickets"
-msgstr "Archivierte Tickets"
 
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"
@@ -7916,19 +7937,6 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
-
-#~ msgid "User manual"
-#~ msgstr "Benutzerhandbuch"
-
-#~ msgid "Favicon"
-#~ msgstr "Favicon"
-
-#~ msgid ""
-#~ "Enables the newsletter module for admins and show a \"Subscribe to "
-#~ "newsletter\" option for the users on thenews page."
-#~ msgstr ""
-#~ "Aktiviert das Newsletter-Modul für Administratoren und zeigt den "
-#~ "Benutzern auf der News-Seite die Option \"Newsletter abonnieren\" an."
 
 #~ msgid "Political Parties"
 #~ msgstr "Parteien"

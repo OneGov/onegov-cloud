@@ -36,7 +36,7 @@
                                 <span>
                                     <button href="#" data-dropdown="owners" aria-controls="owners" aria-expanded="false" class="${has_owner_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'} selected-owner">
                                         <span i18n:translate class="show-for-sr">Owner:</span>
-                                        <span>${owner.text}</span>
+                                        <span>${owner}</span>
                                     </button>
                                     <ul id="owners" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
                                         <li tal:repeat="link owners">

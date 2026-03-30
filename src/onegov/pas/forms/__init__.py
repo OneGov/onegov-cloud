@@ -13,6 +13,7 @@ from onegov.pas.forms.parliamentarian_role import (
 )
 from onegov.pas.forms.parliamentarian import PASParliamentarianForm
 from onegov.pas.forms.party import PartyForm
+from onegov.pas.forms.presidential_allowance import PresidentialAllowanceForm
 from onegov.pas.forms.rate_set import RateSetForm
 from onegov.pas.forms.settlement_run import SettlementRunForm
 
@@ -29,6 +30,7 @@ __all__ = (
     'PASParliamentarianRoleForm',
     'ParliamentaryGroupForm',
     'PartyForm',
+    'PresidentialAllowanceForm',
     'RateSetForm',
     'SettlementRunForm'
 )

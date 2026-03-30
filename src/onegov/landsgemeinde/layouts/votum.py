@@ -3,12 +3,12 @@ from __future__ import annotations
 from functools import cached_property
 from onegov.core.elements import Link
 from onegov.landsgemeinde import _
+from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.layouts.default import DefaultLayout
-
+from onegov.landsgemeinde.models import Votum
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.landsgemeinde.models import Votum
     from onegov.landsgemeinde.request import LandsgemeindeRequest
 
 
@@ -49,6 +49,7 @@ class VotumCollectionLayout(DefaultLayout):
         ]
 
 
+@LandsgemeindeApp.layout(model=Votum)
 class VotumLayout(DefaultLayout):
 
     if TYPE_CHECKING:

@@ -165,7 +165,8 @@ def view_election_parties_data_as_csv(
 @ElectionDayApp.json(
     model=Election,
     name='data-list-connections',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_aggregated_connections_data(
     self: Election,
