@@ -1,0 +1,74 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <div class="panel callout">
+                    <p i18n:translate="">
+                        Flat annual allowance per § 8 of the Nebenamtsgesetz
+                        for representing the canton at events.
+                        Paid in quarterly installments via settlement runs.
+                    </p>
+                    <ul>
+                        <li>
+                            <strong i18n:translate="">President</strong>:
+                            CHF ${president_yearly} / <span i18n:translate="">Year</span>
+                            (CHF ${president_quarterly} / <span i18n:translate="">Quarter</span>)
+                        </li>
+                        <li>
+                            <strong i18n:translate="">Vice president</strong>:
+                            CHF ${vice_president_yearly} / <span i18n:translate="">Year</span>
+                            (CHF ${vice_president_quarterly} / <span i18n:translate="">Quarter</span>)
+                        </li>
+                    </ul>
+                </div>
+
+                <a class="button" href="${add_link}" i18n:translate="">
+                    Add quarterly allowance
+                </a>
+
+                <table tal:condition="allowances" class="hover stackable">
+                    <thead>
+                        <tr>
+                            <th i18n:translate="">Year</th>
+                            <th i18n:translate="">Quarter</th>
+                            <th i18n:translate="">Role</th>
+                            <th i18n:translate="">Person</th>
+                            <th i18n:translate="">Amount (CHF)</th>
+                            <th i18n:translate="">Date</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:repeat="allowance allowances">
+                            <td>${allowance.year}</td>
+                            <td>Q${allowance.quarter}</td>
+                            <td>${layout.request.translate(allowance.role_label)}</td>
+                            <td>${allowance.parliamentarian.first_name} ${allowance.parliamentarian.last_name}</td>
+                            <td>${allowance.amount}</td>
+                            <td>${layout.format_date(allowance.created, 'date')}</td>
+                            <td>
+                                <a class="delete-link"
+                                   href="${layout.csrf_protected_url(request.link(allowance))}"
+                                   data-confirm="Wirklich löschen?"
+                                   data-confirm-yes="Löschen"
+                                   data-confirm-no="Abbrechen"
+                                   ic-delete-from="${layout.csrf_protected_url(request.link(allowance))}"
+                                   redirect-after="${collection_link}"
+                                   i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p tal:condition="not allowances" i18n:translate="">
+                    No allowances have been recorded yet.
+                </p>
+            </div>
+        </div>
+    </tal:b>
+</div>

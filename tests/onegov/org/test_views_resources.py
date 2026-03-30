@@ -70,7 +70,9 @@ def test_resource_slots(client: Client) -> None:
     transaction.commit()
 
     url = '/resource/foo/slots'
-    assert client.get(url).json == []
+    response = client.get(url)
+    assert 'Access-Control-Allow-Origin' not in response.headers
+    assert response.json == []
 
     url = '/resource/foo/slots?start=2015-08-04&end=2015-08-05'
     result = client.get(url).json
@@ -259,6 +261,7 @@ def test_find_your_spot(client: Client) -> None:
 
     # with only one room in the group there should be no room filter
     find_your_spot = client.get('/find-your-spot?group=Meeting+Rooms')
+    assert 'Access-Control-Allow-Origin' not in find_your_spot.headers
     assert 'Räume' not in find_your_spot
     assert 'An Feiertagen' not in find_your_spot
     assert 'Während Schulferien' not in find_your_spot
@@ -4563,6 +4566,7 @@ def test_my_reservations_view(client: Client) -> None:
         '/resources/my-reservations-json?start=2015-08-28&end=2015-08-29'
     )
     assert reservations.status_code == 200
+    assert 'Access-Control-Allow-Origin' not in reservations.headers
 
     # accessing the PDF without a date filter is not allowed
     client.get('/resources/my-reservations-pdf', status=400)

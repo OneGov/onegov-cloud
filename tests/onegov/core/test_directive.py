@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import morepath
+
 from onegov.core.directives import query_form_class
 from onegov.core.framework import Framework
 from onegov.core.security import Secret
@@ -76,6 +78,51 @@ def test_form_directive(redis_url: str) -> None:
     assert client.post('/2', expect_errors=True).status_code == 405
     assert client.get('/3', expect_errors=True).status_code == 405
     assert client.post('/3', expect_errors=True).status_code == 403
+
+
+def test_extended_json_directive(redis_url: str) -> None:
+
+    import more.transaction
+    import more.webassets
+    import onegov.core
+
+    morepath.scan(more.transaction)
+    morepath.scan(more.webassets)
+    morepath.scan(onegov.core)
+
+    class App(Framework):
+        pass
+
+    @App.path(path='/open')
+    class OpenModel:
+        pass
+
+    @App.path(path='/closed')
+    class ClosedModel:
+        pass
+
+    @App.json(model=OpenModel, open_data=True)
+    def view_open(self: OpenModel, request: CoreRequest) -> dict[str, str]:
+        return {}
+
+    @App.json(model=ClosedModel, open_data=False)
+    def view_closed(self: ClosedModel, request: CoreRequest) -> dict[str, str]:
+        return {}
+
+    App.commit()
+
+    app = App()
+    app.namespace = 'test'
+    app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/test')
+
+    client = Client(app)
+
+    response = client.get('/open')
+    assert response.headers.get('Access-Control-Allow-Origin') == '*'
+
+    response = client.get('/closed')
+    assert 'Access-Control-Allow-Origin' not in response.headers
 
 
 def test_query_form_class(redis_url: str) -> None:

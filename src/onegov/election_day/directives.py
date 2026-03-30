@@ -139,20 +139,29 @@ def render_pdf(content: dict[str, Any], request: CoreRequest) -> Response:
 def render_json(content: dict[str, Any], request: CoreRequest) -> Response:
     data = content.get('data', {})
     name = content.get('name', 'data')
-    return Response(
+    response = Response(
         json.dumps_bytes(data, sort_keys=True, indent=2),
         content_type='application/json; charset=utf-8',
-        content_disposition=f'inline; filename={name}.json')
+        content_disposition=f'inline; filename={name}.json',
+    )
+    if request.method in ('GET', 'HEAD'):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+
+    return response
 
 
 def render_csv(content: dict[str, Any], request: CoreRequest) -> Response:
     data = content.get('data', {})
     name = content.get('name', 'data')
-    return Response(
+    response = Response(
         convert_list_of_dicts_to_csv(data),
         content_type='text/csv',
-        content_disposition=f'inline; filename={name}.csv'
+        content_disposition=f'inline; filename={name}.csv',
     )
+    if request.method in ('GET', 'HEAD'):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+
+    return response
 
 
 class SvgFileViewAction(ViewAction):

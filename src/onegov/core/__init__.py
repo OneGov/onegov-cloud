@@ -7,7 +7,7 @@
 #
 from __future__ import annotations
 
-__version__ = '2026.16'
+__version__ = '2026.18'
 
 # The module levels used for dependency tests and to have a well defined
 # onegov core upgrade order.

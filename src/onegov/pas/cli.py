@@ -3,8 +3,6 @@ from __future__ import annotations
 import click
 import transaction
 import logging
-import requests
-import urllib3
 import warnings
 from onegov.core.cli import command_group
 from onegov.pas.collections.parliamentarian import PASParliamentarianCollection
@@ -32,9 +30,6 @@ if TYPE_CHECKING:
 log = logging.getLogger('onegov.org.cli')
 
 cli = command_group()
-
-# Disable SSL warnings for self-signed certificates
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Try to suppress Fontconfig error messages
 warnings.filterwarnings('ignore', message='.*Fontconfig error.*')
@@ -143,51 +138,26 @@ def update_account_single_cli(email: str, dry_run: bool) -> Processor:
     return do_update_account
 
 
-@cli.command('check-api')
-@click.option('--url', default='',
-              help='API endpoint to check')
-@click.option('--token', default='', help='Authorization token')
-def check_api(url: str, token: str) -> None:
-    """ Check if the KuB API is reachable.
-
-    Example:
-        onegov-pas check-api --token "your-token-here"
-    """
-    # Disable SSL warnings (self signed)
-    urllib3.disable_warnings(
-        urllib3.exceptions.InsecureRequestWarning)
-    headers = {
-        'Authorization': f'Token {token}',
-        'Accept': 'application/json'
-    }
-
-    try:
-        response = requests.get(
-            url, headers=headers, verify=False, timeout=10  # nosec: B501
-        )
-        click.echo(f'Status Code: {response.status_code}')
-        click.echo(f'Response: {response.text}')
-
-        if response.status_code == 200:
-            click.echo('✓ API is reachable')
-        else:
-            click.echo('✗ API returned non-200 status')
-
-    except requests.exceptions.RequestException as e:
-        click.echo(f'✗ Failed to reach API: {e}')
-
-
 @cli.command('import-kub-data')
-@click.option('--token', required=True, help='Authorization token for KUB API')
-@click.option('--base-url', help='Base URL for the KUB API, ending in /api/v2')
+@click.option('--token', required=True,
+              help='Authorization token for KUB API')
+@click.option('--base-url',
+              help='Base URL for the KUB API, ending in /api/v2')
+@click.option('--cert-dir', required=True,
+              type=click.Path(exists=True, file_okay=False),
+              help='Directory containing .crt and .key files')
 @click.option('--update-custom/--no-update-custom', default=True,
-              help='Update parliamentarians with custom field data after '
-                   'import (default: enabled)')
+              help='Update parliamentarians with custom field data '
+                   'after import (default: enabled)')
 @click.option('--max-workers', default=3, type=int,
-              help='Maximum number of concurrent workers for custom data '
-                   'update (default: 3)')
+              help='Maximum number of concurrent workers for '
+                   'custom data update (default: 3)')
 def import_kub_data(
-    token: str, base_url: str, update_custom: bool, max_workers: int
+    token: str,
+    base_url: str,
+    cert_dir: str,
+    update_custom: bool,
+    max_workers: int,
 ) -> Processor:
     """
     Import data from the KUB API endpoints.
@@ -217,8 +187,13 @@ def import_kub_data(
         db_handler = DatabaseOutputHandler()
         output_handler = CompositeOutputHandler(click_handler, db_handler)
 
+        from onegov.pas.cronjobs import _resolve_cert
+        cert = _resolve_cert(cert_dir)
+
         try:
-            with KubImporter(token, base_url, output_handler) as importer:
+            with KubImporter(
+                token, base_url, output_handler, cert=cert
+            ) as importer:
                 combined_results, import_log_id = importer.run_full_sync(
                     request, app, 'cli', update_custom, max_workers
                 )
@@ -256,13 +231,21 @@ def import_kub_data(
 
 
 @cli.command('update-custom-data')
-@click.option('--token', required=True, help='Authorization token for KUB API')
+@click.option('--token', required=True,
+              help='Authorization token for KUB API')
 @click.option('--base-url', required=True,
               help='Base URL for the KUB API, ending in /api/v2')
+@click.option('--cert-dir', required=True,
+              type=click.Path(exists=True, file_okay=False),
+              help='Directory containing .crt and .key files')
 @click.option('--max-workers', default=3, type=int,
-              help='Maximum number of concurrent workers (default: 3)')
+              help='Maximum number of concurrent workers '
+                   '(default: 3)')
 def update_custom_data(
-    token: str, base_url: str, max_workers: int
+    token: str,
+    base_url: str,
+    cert_dir: str,
+    max_workers: int,
 ) -> Processor:
     """
     Update parliamentarians with customFields data which
@@ -290,8 +273,13 @@ def update_custom_data(
         db_handler = DatabaseOutputHandler()
         output_handler = CompositeOutputHandler(click_handler, db_handler)
 
+        from onegov.pas.cronjobs import _resolve_cert
+        cert = _resolve_cert(cert_dir)
+
         try:
-            with KubImporter(token, base_url, output_handler) as importer:
+            with KubImporter(
+                token, base_url, output_handler, cert=cert
+            ) as importer:
                 updated_count, error_count, _output_messages = (
                     importer.update_custom_data(
                         request, app, max_workers

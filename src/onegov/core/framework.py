@@ -129,6 +129,7 @@ class Framework(
     replace_setting = directive(directives.ReplaceSettingAction)
     replace_setting_section = directive(directives.ReplaceSettingSectionAction)
     layout = directive(directives.Layout)
+    json = directive(directives.ExtendedJsonAction)  # type: ignore[assignment]
 
     #: sets the same-site cookie directive, (may need removal inside iframes)
     same_site_cookie_policy: str | None = 'Lax'

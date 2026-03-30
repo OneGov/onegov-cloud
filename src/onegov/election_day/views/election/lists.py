@@ -22,7 +22,8 @@ if TYPE_CHECKING:
 @ElectionDayApp.json(
     model=Election,
     name='lists-data',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_lists_data(
     self: Election,

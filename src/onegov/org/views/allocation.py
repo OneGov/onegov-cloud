@@ -54,7 +54,7 @@ if TYPE_CHECKING:
     )
 
 
-@OrgApp.json(model=Resource, name='slots', permission=Public)
+@OrgApp.json(model=Resource, name='slots', permission=Public, open_data=False)
 def view_allocations_json(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns the allocations in a fullcalendar compatible events feed.
 

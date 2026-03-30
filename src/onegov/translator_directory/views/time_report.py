@@ -427,7 +427,7 @@ def generate_accounting_export_rows(
             LOHNART_COMPENSATION,
             '0',
             '',
-            'VWG Entschädigung Dolmetscher',
+            f'VWG Entschädigung Dolmetscher {date_str}',
             duration_hours_str,
             '1',
             effective_rate_str,
@@ -464,7 +464,7 @@ def generate_accounting_export_rows(
                 LOHNART_EXPENSES,
                 '0',
                 '',
-                'VWG Reisespesen Dolmetscher',
+                f'VWG Reisespesen Dolmetscher {date_str}',
                 str(report.travel_compensation),
                 '1',
                 '0',
@@ -501,7 +501,7 @@ def generate_accounting_export_rows(
                 LOHNART_EXPENSES,
                 '0',
                 '',
-                'VWG Reisespesen Dolmetscher',  # Verpflegung
+                f'VWG Reisespesen Dolmetscher {date_str}',  # Verpflegung
                 str(report.meal_allowance),
                 '1',
                 '0',
