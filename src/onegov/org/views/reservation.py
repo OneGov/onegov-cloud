@@ -1235,26 +1235,40 @@ def reject_reservation(
     view_ticket: ReservationTicket | None = None
 ) -> Response | None:
 
+    def respond() -> Response | None:
+        # return none on intercooler js requests
+        if not request.headers.get('X-IC-Request'):
+            if view_ticket is not None:
+                return request.redirect(request.link(view_ticket))
+            return request.redirect(request.link(self))
+        return None
+
     token = self.token
     resource = request.app.libres_resources.by_reservation(self)
     assert resource is not None
     reservation_id_str = request.params.get('reservation-id')
-    if isinstance(reservation_id_str, str) and reservation_id_str.isdigit():
-        reservation_id = int(reservation_id_str)
-    else:
-        reservation_id = 0
-
     all_reservations: list[Reservation] = (
         resource.scheduler.reservations_by_token(token)  # type:ignore
         .order_by(Reservation.start).all()
     )
-
     targeted: Sequence[Reservation]
-    targeted = tuple(r for r in all_reservations if r.id == reservation_id)
-    targeted = targeted or all_reservations
-    excluded = tuple(r for r in all_reservations if r.id not in {
-        r.id for r in targeted
-    })
+    if reservation_id_str is not None:
+        if not (
+            isinstance(reservation_id_str, str)
+            and reservation_id_str.isdigit()
+        ):
+            raise exc.HTTPBadRequest()
+
+        reservation_id = int(reservation_id_str)
+        targeted = tuple(r for r in all_reservations if r.id == reservation_id)
+        if not targeted:
+            request.warning(_('The targeted reservation no longer exists'))
+            return respond()
+    else:
+        targeted = all_reservations
+
+    targeted_ids = {r.id for r in targeted}
+    excluded = tuple(r for r in all_reservations if r.id not in targeted_ids)
 
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
@@ -1277,12 +1291,7 @@ def reject_reservation(
             'to be refunded before the reservation can be rejected'
         ))
 
-        if not request.headers.get('X-IC-Request'):
-            if view_ticket is not None:
-                return request.redirect(request.link(view_ticket))
-            return request.redirect(request.link(self))
-
-        return None
+        return respond()
 
     savepoint = transaction.savepoint()
     ReservationMessage.create(targeted, ticket, request, 'rejected')
@@ -1441,12 +1450,7 @@ def reject_reservation(
             'but the payment is no longer open.'
         ))
 
-    # return none on intercooler js requests
-    if not request.headers.get('X-IC-Request'):
-        if view_ticket is not None:
-            return request.redirect(request.link(view_ticket))
-        return request.redirect(request.link(self))
-    return None
+    return respond()
 
 
 @OrgApp.view(
