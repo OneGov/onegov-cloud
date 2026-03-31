@@ -97,7 +97,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         if self.organisations_multiple:
             it = iter(self.organisations_multiple)
             parts.extend(
-                f'{item} - {next(it).lstrip("-")}' for item in it
+                f'{org} - {sub.lstrip("-")}' for org, sub in zip(it, it)
             )
             return parts
 
