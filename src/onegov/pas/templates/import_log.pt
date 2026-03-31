@@ -42,6 +42,13 @@
                    role="tab"
                    i18n:translate="">Logs</a>
             </li>
+            <li class="tabs-title" role="presentation"
+                tal:condition="python: log.details and log.details.get('user_sync')">
+                <a href="#panel-user-sync"
+                   aria-controls="panel-user-sync"
+                   role="tab"
+                   i18n:translate="">User Account Sync</a>
+            </li>
             <li class="tabs-title" role="presentation">
                 <a href="#panel-json"
                    aria-controls="panel-json"
@@ -119,6 +126,33 @@
                 <div tal:condition="not summary and not processed_logs">
                     <p i18n:translate="">No log data available</p>
                 </div>
+            </div>
+
+            <!-- User Account Sync Tab -->
+            <div class="tabs-panel" id="panel-user-sync" role="tabpanel"
+                 tal:condition="python: log.details and log.details.get('user_sync')">
+                <tal:block tal:define="sync python: log.details.get('user_sync', {})">
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4 i18n:translate="">Synced</h4>
+                            <p class="status-text" tal:content="sync.get('synced', 0)"></p>
+                        </div>
+                        <div class="summary-card">
+                            <h4 i18n:translate="">Skipped</h4>
+                            <p class="status-text" tal:content="sync.get('skipped', 0)"></p>
+                        </div>
+                        <div class="summary-card">
+                            <h4 i18n:translate="">Created</h4>
+                            <p class="status-text" tal:content="python: len(sync.get('created', []))"></p>
+                        </div>
+                    </div>
+                    <div tal:condition="python: sync.get('created')" style="margin-top: 20px;">
+                        <h4 i18n:translate="">New accounts</h4>
+                        <ul>
+                            <li tal:repeat="email python: sync.get('created', [])" tal:content="email"></li>
+                        </ul>
+                    </div>
+                </tal:block>
             </div>
 
             <!-- Raw JSON Tab -->

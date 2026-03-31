@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import logging
 from datetime import date
+from email_validator import EmailNotValidError, validate_email
 from onegov.core.utils import toggle
 from onegov.core.crypto import random_password
 from onegov.parliament.collections import ParliamentarianCollection
 from onegov.pas.models import PASParliamentarian
 from onegov.user import UserCollection
+from sqlalchemy.orm import selectinload
 
 log = logging.getLogger('onegov.pas.collections.parliamentarian')
 
@@ -73,6 +75,26 @@ class PASParliamentarianCollection(
             (membership.end is None or membership.end >= today)
             for membership in item.commission_memberships
         )
+
+    def _representatives_by_email(
+        self,
+        parliamentarians: list[PASParliamentarian],
+    ) -> dict[str, PASParliamentarian]:
+        """Pick one parliamentarian per unique email,
+        prioritizing commission presidents."""
+
+        by_email: dict[str, PASParliamentarian] = {}
+        for parl in parliamentarians:
+            if not parl.email_primary:
+                continue
+            key = parl.email_primary.lower()
+            existing = by_email.get(key)
+            if existing is None or (
+                self._is_current_commission_president(parl)
+                and not self._is_current_commission_president(existing)
+            ):
+                by_email[key] = parl
+        return by_email
 
     def update_user(
         self,
@@ -143,6 +165,8 @@ class PASParliamentarianCollection(
                  else 'parliamentarian'
             )
             log.info(f'Creating user {new_email} with role {role}')
+            # NOTE: Explicitly mark them as inactive *first*. Only in the SSO
+            # login via on_ensure_user callback we finally set active to True.
             new_user_obj = users.add(
                 new_email, random_password(16), role=role,
                 realname=item.title,
@@ -188,3 +212,58 @@ class PASParliamentarianCollection(
                 log.info(f'Deactivating user {user.username}')
                 user.active = False
                 user.logout_all_sessions(self.app)
+
+    def sync_user_accounts(self) -> dict[str, Any]:
+        """Sync user accounts for all parliamentarians.
+
+        Groups by email, picks one representative per email
+        to avoid role conflicts. Prioritizes commission
+        presidents.
+
+        Returns dict with 'synced', 'skipped', and
+        'created' (list of new user emails).
+        """
+
+        parliamentarians = (
+            self.query()
+            .options(selectinload(self.model_class.commission_memberships))
+            .all()
+        )
+
+        # We use username.lower() to avoid potential
+        # onegov.user.errors.ExistingUserError
+        users_cache = {
+            user.username.lower(): user
+            for user in UserCollection(self.session).query()
+        }
+
+        representatives = self._representatives_by_email(parliamentarians)
+
+        synced = 0
+        skipped = 0
+        created: list[str] = []
+        for parl in representatives.values():
+            email = parl.email_primary
+            assert email is not None
+            try:
+                validate_email(email, check_deliverability=False)
+            except EmailNotValidError as e:
+                log.warning(
+                    f'Skipping {parl.title} '
+                    f'with invalid email {email}: {e}'
+                )
+                skipped += 1
+                continue
+
+            is_new = email.lower() not in users_cache
+            self.update_user(parl, email, users_cache)
+            if is_new:
+                created.append(email)
+            synced += 1
+
+        self.session.flush()
+        return {
+            'synced': synced,
+            'skipped': skipped,
+            'created': created,
+        }
