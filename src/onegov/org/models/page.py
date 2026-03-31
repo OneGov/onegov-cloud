@@ -374,6 +374,9 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
             '/aktuelles/', ensure_type='news'
         )
 
+    def __clipboard_object__(self, request: CoreRequest) -> News | None:
+        return self.root
+
     @property
     def access(self) -> str:
         return self.root.access if self.root else 'public'
