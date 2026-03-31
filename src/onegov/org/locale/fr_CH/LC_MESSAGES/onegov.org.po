@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-25 11:20+0100\n"
+"POT-Creation-Date: 2026-03-31 12:57+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -7385,6 +7385,9 @@ msgid ""
 msgstr ""
 "Le message suivant sera envoyé à ${adresse} et sera enregistré pour des "
 "références futures."
+
+msgid "The targeted reservation no longer exists"
+msgstr "La réservation n'existe plus ou a déjà été refusée"
 
 msgid ""
 "The payment associated with this reservation needs to be refunded before the "
