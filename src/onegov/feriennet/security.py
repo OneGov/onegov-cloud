@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from onegov.activity import Activity, ActivityCollection, Booking, Occasion
+from onegov.activity import Activity, ActivityCollection
+from onegov.activity import Attendee, Booking, Occasion
 from onegov.core.security import Public, Private, Personal
 from onegov.core.security.roles import (
     get_roles_setting as get_roles_setting_base)
@@ -233,6 +234,21 @@ def has_personal_permission_booking(
     permission: type[Personal]
 ) -> bool:
     """ Ensure that logged in users may only change their own bookings. """
+
+    if identity.role == 'admin':
+        return True
+
+    return model.username == identity.userid
+
+
+@FeriennetApp.permission_rule(model=Attendee, permission=Personal)
+def has_personal_permission_attendee(
+    app: FeriennetApp,
+    identity: Identity,
+    model: Attendee,
+    permission: type[Personal]
+) -> bool:
+    """ Ensure that logged in users may only change their own attendees. """
 
     if identity.role == 'admin':
         return True
