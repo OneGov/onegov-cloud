@@ -50,6 +50,12 @@ from onegov.pas.views.abschlussliste import (
 )
 from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
         generate_fibu_export_rows)
+from onegov.pas.collections.presidential_allowance import (
+    PresidentialAllowanceCollection,
+)
+from onegov.pas.models.presidential_allowance import (
+    LOHNART_ALLOWANCE_TEXT,
+)
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -657,6 +663,26 @@ def generate_settlement_pdf(
         assert len(totals) > 0
     else:
         raise ValueError(f'Unsupported entity type: {entity_type}')
+
+    allowances = (
+        PresidentialAllowanceCollection(
+            request.session,
+            settlement_run_id=settlement_run.id,
+        )
+        .query()
+        .all()
+    )
+    for a in allowances:
+        settlement_data.append(
+            (
+                settlement_run.end,
+                a.parliamentarian,
+                LOHNART_ALLOWANCE_TEXT,
+                Decimal('0'),
+                Decimal(str(a.amount)),
+                Decimal(str(a.amount)),
+            )
+        )
 
     html = _generate_settlement_html(
         settlement_data=settlement_data,

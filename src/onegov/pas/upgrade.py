@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 # pragma: exclude file
 from __future__ import annotations
 
-from sqlalchemy import Boolean, Column, Text, UUID
+from sqlalchemy import Boolean, Column, Text, UUID, text
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 
@@ -142,3 +142,42 @@ def drop_active_column_from_pas_settlements(context: UpgradeContext) -> None:
     if context.has_table('pas_settlements'):
         if context.has_column('pas_settlements', 'active'):
             context.operations.drop_column('pas_settlements', 'active')
+
+
+@upgrade_task('Tie allowances to settlement runs, drop quarter')
+def tie_allowances_to_settlement_runs(
+    context: UpgradeContext,
+) -> None:
+    table = 'pas_presidential_allowances'
+    if not context.has_table(table):
+        return
+
+    # Delete orphan rows that have no settlement run
+    if context.has_column(table, 'settlement_run_id'):
+        context.session.execute(
+            text(
+                f'DELETE FROM {table}'
+                f' WHERE settlement_run_id IS NULL'
+            )
+        )
+
+    # Drop the old unique constraint
+    if context.has_column(table, 'quarter'):
+        context.operations.drop_constraint(
+            'pas_presidential_allowances_year_quarter_role_key',
+            table,
+        )
+
+    # Drop year and quarter columns
+    if context.has_column(table, 'year'):
+        context.operations.drop_column(table, 'year')
+    if context.has_column(table, 'quarter'):
+        context.operations.drop_column(table, 'quarter')
+
+    # Make settlement_run_id non-nullable
+    if context.has_column(table, 'settlement_run_id'):
+        context.operations.alter_column(
+            table,
+            'settlement_run_id',
+            nullable=False,
+        )

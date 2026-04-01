@@ -300,13 +300,11 @@ def get_rate_set(
 @PasApp.path(
     model=PresidentialAllowanceCollection,
     path='/presidential-allowances',
-    converters={'year': int},
 )
 def get_presidential_allowances(
     app: PasApp,
-    year: int | None = None,
 ) -> PresidentialAllowanceCollection:
-    return PresidentialAllowanceCollection(app.session(), year)
+    return PresidentialAllowanceCollection(app.session())
 
 
 @PasApp.path(

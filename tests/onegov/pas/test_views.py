@@ -994,6 +994,7 @@ def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
     assert 'Präsidialzulagen' in settings
 
     # Step 2: Create parliamentarians with president/VP roles
+    # and settlement runs
     session = client.app.session()
     parliamentarians = PASParliamentarianCollection(client.app)
     president = parliamentarians.add(
@@ -1017,47 +1018,84 @@ def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
         parliamentarian_id=vice.id,
         role='vice_president',
     ))
+
+    run1 = SettlementRun(
+        name='Q1 2026',
+        start=datetime.date(2026, 1, 1),
+        end=datetime.date(2026, 3, 31),
+        active=True,
+        closed=False,
+    )
+    run2 = SettlementRun(
+        name='Q2 2026',
+        start=datetime.date(2026, 4, 1),
+        end=datetime.date(2026, 6, 30),
+        active=True,
+        closed=False,
+    )
+    session.add(run1)
+    session.add(run2)
+    session.flush()
+    run1_id = str(run1.id)
+    run2_id = str(run2.id)
     transaction.commit()
 
-    # Step 3: Single dropdown with both roles
-    current_year = datetime.date.today().year
     pres_value = f'{president_id}:president'
     vice_value = f'{vice_id}:vice_president'
 
-    # Submit Q1 for president
+    # Submit allowance for president on run1
     page = client.get('/presidential-allowances/new')
-    assert 'Quartalszulage hinzufügen' in page
-    page.form['year'] = current_year
-    page.form['quarter'] = 1
+    assert 'Zulage hinzufügen' in page
+    page.form['settlement_run'] = run1_id
     page.form['recipient'] = pres_value
     page = page.form.submit().follow()
-    assert 'Quartalszulage hinzugefügt' in page
+    assert 'Zulage hinzugefügt' in page
     assert 'Hans Präsident' in page
-    assert 'Q1' in page
+    assert 'Q1 2026' in page
 
-    # Submit Q1 for vice president
+    # Submit allowance for vice president on run1
     page = client.get('/presidential-allowances/new')
-    page.form['year'] = current_year
-    page.form['quarter'] = 1
+    page.form['settlement_run'] = run1_id
     page.form['recipient'] = vice_value
     page = page.form.submit().follow()
-    assert 'Quartalszulage hinzugefügt' in page
+    assert 'Zulage hinzugefügt' in page
     assert 'Lisa Vizepräsidentin' in page
 
-    # Submit Q2-Q4 for both roles
-    for q in (2, 3, 4):
-        for val in (pres_value, vice_value):
-            page = client.get('/presidential-allowances/new')
-            page.form['year'] = current_year
-            page.form['quarter'] = q
-            page.form['recipient'] = val
-            page = page.form.submit().follow()
-            assert 'Quartalszulage hinzugefügt' in page
+    # Fill run1 to max (4): add 2 more on run1
+    for val in (pres_value, vice_value):
+        page = client.get('/presidential-allowances/new')
+        page.form['settlement_run'] = run1_id
+        page.form['recipient'] = val
+        page = page.form.submit().follow()
+        assert 'Zulage hinzugefügt' in page
 
-    # Step 4: Yearly limit reached — 5th entry should fail
+    # 5th allowance on run1 should fail (max 4 per run)
     page = client.get('/presidential-allowances/new')
-    page.form['year'] = current_year
-    page.form['quarter'] = 1
+    page.form['settlement_run'] = run1_id
+    page.form['recipient'] = pres_value
+    result = page.form.submit()
+    assert result.status_code == 200
+    assert 'Maximum' in result
+
+    # But adding on run2 still works
+    page = client.get('/presidential-allowances/new')
+    page.form['settlement_run'] = run2_id
+    page.form['recipient'] = pres_value
+    page = page.form.submit().follow()
+    assert 'Zulage hinzugefügt' in page
+
+    # Fill up yearly limit for president (20k = 4 × 5000)
+    # Already have 3 president allowances (2 on run1, 1 on run2)
+    # Need 1 more to hit limit
+    page = client.get('/presidential-allowances/new')
+    page.form['settlement_run'] = run2_id
+    page.form['recipient'] = pres_value
+    page = page.form.submit().follow()
+    assert 'Zulage hinzugefügt' in page
+
+    # 5th president allowance should fail (yearly limit)
+    page = client.get('/presidential-allowances/new')
+    page.form['settlement_run'] = run2_id
     page.form['recipient'] = pres_value
     result = page.form.submit()
     assert result.status_code == 200
