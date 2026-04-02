@@ -35,33 +35,33 @@ def get_global_tools(request: AgencyRequest) -> Iterator[Link | LinkGroup]:
 
 def get_modules(request: AgencyRequest) -> LinkGroup:
     links = []
-
-    links.append(
-        Link(
-            _('Agencies'),
-            request.class_link(
-                ExtendedAgencyCollection),
-            attrs={'class': 'agencies'}
+    if request.is_logged_in:
+        links.append(
+            Link(
+                _('Agencies'),
+                request.class_link(
+                    ExtendedAgencyCollection),
+                attrs={'class': 'agencies'}
+            )
         )
-    )
 
-    links.append(
-        Link(
-            _('People'),
-            request.class_link(
-                ExtendedPersonCollection),
-            attrs={'class': 'people'}
+        links.append(
+            Link(
+                _('People'),
+                request.class_link(
+                    ExtendedPersonCollection),
+                attrs={'class': 'people'}
+            )
         )
-    )
 
-    links.append(
-        Link(
-            _('Forms'),
-            request.class_link(
-                FormCollection),
-            attrs={'class': 'forms'}
+        links.append(
+            Link(
+                _('Forms'),
+                request.class_link(
+                    FormCollection),
+                attrs={'class': 'forms'}
+            )
         )
-    )
 
     return LinkGroup(_('Modules'), classes=('modules', ), links=links)
 

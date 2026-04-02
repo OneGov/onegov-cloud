@@ -246,12 +246,12 @@ def get_global_tools(
                 )
             )
 
-        links.append(
-            Link(
-                _('User groups'), request.class_link(UserGroupCollection),
-                attrs={'class': 'users'}
+            links.append(
+                Link(
+                    _('User groups'), request.class_link(UserGroupCollection),
+                    attrs={'class': 'users'}
+                )
             )
-        )
 
         if request.is_admin:
             links.append(
