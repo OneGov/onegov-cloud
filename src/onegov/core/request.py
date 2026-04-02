@@ -621,15 +621,10 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         template using the messages should call :meth:`consume_messages`.
 
         """
-        if not self.browser_session.has('messages'):
-            self.browser_session.messages = [Message(text, type)]
-        else:
-            # this is a bit akward, but I don't see an easy way for this atm.
-            # (otoh, usually there's going to be one message only)
-            self.browser_session.messages = [
-                *self.browser_session.messages,
-                Message(text, type)
-            ]
+        self.browser_session.messages = [
+            *self.browser_session.get('messages', ()),
+            Message(text, type)
+        ]
 
     def consume_messages(self) -> Iterator[Message]:
         """ Returns the messages, removing them from the session in the

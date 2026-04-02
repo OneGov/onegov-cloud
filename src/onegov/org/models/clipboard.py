@@ -32,7 +32,10 @@ class Clipboard:
         if not self.url:
             return None
 
-        return self.request.app.object_by_path(self.url)
+        obj = self.request.app.object_by_path(self.url)
+        if hasattr(obj, '__clipboard_object__'):
+            return obj.__clipboard_object__(self.request)
+        return obj
 
     def clear(self) -> None:
         if self.request.browser_session.has('clipboard_url'):

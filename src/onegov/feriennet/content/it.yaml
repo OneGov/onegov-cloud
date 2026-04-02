@@ -126,33 +126,63 @@ organisation:
       Lasciapassare vacanze: 17.7.-20.8.2017
     facebook_url: https://de-de.facebook.com/ProJuventute.ch
     homepage_structure: |
+      <slider height-d="100vh" height-m="55vw" />
       <row>
-        <column span="8">
-          <slider />
-          <news />
-        </column>
-        <column span="4">
-          <registration />
-
-          <panel>
-            <links>
-                <link url="./people"
-                    description="Persone">
-                    Team
-                </link>
-                <link url="./form/kontakt"
-                    description="Richieste">
-                    Contatto
-                </link>
-                <link url="./news"
-                    description="Novità">
-                    Attualità
-                </link>
-                <link url="./photoalbums"
-                    description="Impressioni">
-                    Foto
-                </link>
-            </links>
-          </panel>
-        </column>
+          <column span="12">
+              <row>
+                  <column span="12">
+                      <title>Attività</title>
+                      <activities/>
+                  </column>
+              </row>
+          </column>
       </row>
+      <row-wide bgcolor="gray">
+          <column span="12">
+              <row>
+                  <column span="12">
+                      <homepage-tiles show-title="True"/>
+                  </column>
+              </row>
+          </column>
+      </row-wide>
+      <row-wide bgcolor="primary">
+          <row
+              class="columns small-up-1 medium-up-2 large-up-3 align-center">
+              <column class="cell">
+                  <icon_link
+                      icon="fa-envelope"
+                      title="Contatto"
+                      link="/form/kontakt"
+                      text="Avete domande o dubbi?"
+                  />
+              </column>
+              <column class="cell">
+                  <icon_link
+                      icon="fa-images"
+                      link="/photoalbums"
+                      title="Album fotografici"
+                      text="Immagini delle attività"
+                  />
+              </column>
+              <column class="cell">
+                  <icon_link
+                      icon="fa-child"
+                      link="/activities/volunteer"
+                      title="Aiutare"
+                      text="Date una mano"
+                  />
+              </column>
+          </row>
+      </row-wide>
+
+      <row-wide>
+          <column span="12">
+              <row>
+                  <column span="12">
+                      <title>Notizie</title>
+                      <news />
+                  </column>
+              </row>
+          </column>
+      </row-wide>
