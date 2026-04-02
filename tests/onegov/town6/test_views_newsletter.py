@@ -322,8 +322,10 @@ def test_newsletter_signup(client: Client) -> None:
 
 def test_newsletter_signup_for_categories(client: Client) -> None:
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    page = client.get('/newsletter-settings')
     page.form['newsletter_categories'] = """
     - News
     - Aktivitäten:
@@ -381,7 +383,7 @@ def test_newsletter_signup_for_categories(client: Client) -> None:
 def test_newsletter_rfc8058(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -436,7 +438,7 @@ def test_newsletter_rfc8058(client: Client) -> None:
 
 def test_newsletter_subscribers_and_edit_bar(client: Client) -> None:
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -470,7 +472,7 @@ def test_newsletter_subscribers_and_edit_bar(client: Client) -> None:
 def test_newsletter_subscribers_management(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -536,10 +538,13 @@ def test_newsletter_creation_limited_to_logged_in_users(
 
     # enable the newsletter
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    page = client.get('/newsletter-settings')
     page.form['newsletter_categories'] = ''
     page.form.submit().follow()
+
 
     admin = client.spawn()
     admin.login_admin()
@@ -564,8 +569,11 @@ def test_newsletter_creation_limited_to_logged_in_users(
 def test_newsletter_send(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    page = client.get('/newsletter-settings')
+    page.form['newsletter_categories'] = ''
     page.form.submit().follow()
     client.logout()
 

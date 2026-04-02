@@ -31,7 +31,7 @@ def test_views(client_with_fts: Client[TestApp]) -> None:
 
     # add assembly
     with freeze_time('2023-05-07 9:30'):
-        page = page.click('Landsgemeinde')
+        page = page.click('Landsgemeinde', index=1)
         page.form['date'] = '2023-05-07'
         page.form['state'] = 'ongoing'
         page.form['overview'] = '<p>Lorem ipsum</p>'

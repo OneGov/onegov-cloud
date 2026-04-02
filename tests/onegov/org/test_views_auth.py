@@ -805,7 +805,8 @@ def test_citizen_login(client: Client) -> None:
 
     # let's enable it
     admin.login_admin()
-    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings = admin.get('/').click('Einstellungen').click(
+        'Module aktivieren/deaktivieren', index=1)
     settings.form['citizen_login_enabled'].checked = True
     settings.form.submit().follow()
 
@@ -873,7 +874,8 @@ def test_citizen_login_via_confirm_url(client: Client) -> None:
 
     # let's enable it
     admin.login_admin()
-    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings = admin.get('/').click('Einstellungen').click(
+        'Module aktivieren/deaktivieren', index=1)
     settings.form['citizen_login_enabled'].checked = True
     settings.form.submit().follow()
 
