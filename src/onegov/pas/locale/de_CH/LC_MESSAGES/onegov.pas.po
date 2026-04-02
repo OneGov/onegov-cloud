@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-04-01 16:39+0200\n"
+"POT-Creation-Date: 2026-03-31 16:45+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -658,6 +658,9 @@ msgstr "Mitgliedschaften"
 msgid "Logs"
 msgstr "Protokolle"
 
+msgid "User Account Sync"
+msgstr "Benutzerkonto-Synchronisation"
+
 msgid "Raw JSON"
 msgstr "JSON Rohdaten"
 
@@ -690,6 +693,18 @@ msgstr "Info"
 
 msgid "No log data available"
 msgstr "Keine Log-Daten verfügbar"
+
+msgid "Synced"
+msgstr "Synchronisiert"
+
+msgid "Skipped"
+msgstr "Übersprungen"
+
+msgid "Created"
+msgstr "Erstellt"
+
+msgid "New accounts"
+msgstr "Neue Konten"
 
 msgid "Last import:"
 msgstr "Letzter Import:"
@@ -1117,7 +1132,6 @@ msgstr ""
 
 #~ msgid "President: ${name} (CHF ${amount})"
 #~ msgstr "Präsident/in: ${name} (CHF ${amount})"
-
 #~ msgid "Vice president: ${name} (CHF ${amount})"
 #~ msgstr "Vizepräsident/in: ${name} (CHF ${amount})"
 
