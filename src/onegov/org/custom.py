@@ -45,7 +45,7 @@ def get_modules(request: OrgRequest) -> LinkGroup:
         links.append(
             Link(
                 _('Activate/deactivate modules'), request.link(
-                    request.app.org, 'settings'
+                    request.app.org, 'module-activation-settings'
                 ), attrs={'class': 'settings'}
             )
         )

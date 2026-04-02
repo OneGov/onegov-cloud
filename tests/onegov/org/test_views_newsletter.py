@@ -27,7 +27,7 @@ def test_newsletter_disabled(client: Client) -> None:
     assert anon.get('/newsletters', expect_errors=True).status_code == 404
     assert client.get('/newsletters').status_code == 200
 
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -85,7 +85,7 @@ def test_unsubscribe_link(client: Client) -> None:
 def test_newsletters_crud(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -140,7 +140,7 @@ def test_newsletters_crud(client: Client) -> None:
 def test_newsletter_signup(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/test_newsletter_signup')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -548,8 +548,10 @@ def test_newsletter_send(client: Client) -> None:
 def test_newsletter_send_with_categories(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    page = client.get('/newsletter-settings')
     page.form['newsletter_categories'] = """
     - News
     - Aktivitäten:
@@ -759,7 +761,7 @@ def test_newsletter_test_delivery(client: Client) -> None:
 def test_newsletter_copy_paste(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -767,7 +769,7 @@ def test_newsletter_copy_paste(client: Client) -> None:
     client.login_editor()
 
     newsletters = client.get('/newsletters')
-    new = newsletters.click('Newsletter')
+    new = newsletters.click('Newsletter', index=1)
     new.form['title'] = 'Original Newsletter'
     new.form['lead'] = 'This is the original content'
     newsletter = new.form.submit().follow()

@@ -229,7 +229,7 @@ def test_view_pages_cache(client: Client[TestApp]) -> None:
     # add assembly
     client.login_admin()
     page = client.get('/').click('Archiv')
-    page = page.click('Landsgemeinde')
+    page = page.click('Landsgemeinde', index=1)
     page.form['date'] = '2023-05-07'
     page.form['state'] = 'completed'
     page.form['overview'] = 'Lorem'

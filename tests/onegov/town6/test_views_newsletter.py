@@ -66,7 +66,7 @@ def test_newsletter_disabled(client: Client) -> None:
     assert anon.get('/newsletters', expect_errors=True).status_code == 404
     assert client.get('/newsletters').status_code == 200
 
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -124,7 +124,7 @@ def test_unsubscribe_link(client: Client) -> None:
 def test_newsletters_crud(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -264,7 +264,7 @@ def test_newsletter_secret_private_content(client: Client) -> None:
 def test_newsletter_signup(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/test_newsletter_signup')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
