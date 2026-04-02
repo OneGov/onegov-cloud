@@ -3,7 +3,8 @@ from __future__ import annotations
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
-from onegov.core.elements import Link
+from onegov.core.elements import Link, LinkGroup
+from onegov.form.collection import FormCollection
 from onegov.core.utils import Bunch
 from onegov.org.custom import get_global_tools as get_global_tools_base
 from onegov.town6.layout import DefaultLayout
@@ -14,7 +15,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.agency.request import AgencyRequest
-    from onegov.core.elements import LinkGroup
     from onegov.town6.layout import NavigationEntry
 
 
@@ -31,6 +31,39 @@ def get_global_tools(request: AgencyRequest) -> Iterator[Link | LinkGroup]:
             ))
 
         yield item
+
+
+def get_modules(request: AgencyRequest) -> LinkGroup:
+    links = []
+
+    links.append(
+        Link(
+            _('Agencies'),
+            request.class_link(
+                ExtendedAgencyCollection),
+            attrs={'class': 'agencies'}
+        )
+    )
+
+    links.append(
+        Link(
+            _('People'),
+            request.class_link(
+                ExtendedPersonCollection),
+            attrs={'class': 'people'}
+        )
+    )
+
+    links.append(
+        Link(
+            _('Forms'),
+            request.class_link(
+                FormCollection),
+            attrs={'class': 'forms'}
+        )
+    )
+
+    return LinkGroup(_('Modules'), classes=('modules', ), links=links)
 
 
 def get_top_navigation(request: AgencyRequest) -> Iterator[NavigationEntry]:

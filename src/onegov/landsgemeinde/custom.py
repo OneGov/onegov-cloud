@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from onegov.chat import TextModuleCollection
 from onegov.core.elements import Link
 from onegov.core.utils import Bunch
 from onegov.landsgemeinde import _
@@ -59,11 +58,6 @@ def get_global_tools(
                         attrs={'class': 'images'}
                     ),
                     Link(
-                        _('Text modules'),
-                        request.class_link(TextModuleCollection),
-                        attrs={'class': 'text-modules'}
-                    ),
-                    Link(
                         _('Users'), request.class_link(UserCollection),
                         attrs={'class': 'user'}
                     ),
@@ -72,12 +66,32 @@ def get_global_tools(
                         request.link(request.app.org, 'settings'),
                         attrs={'class': 'settings'}
                     ),
-                    Link(
-                        _('People'), request.class_link(PersonCollection),
-                        attrs={'class': 'people'}
-                    ),
                 )
             )
+
+
+def get_modules(request: LandsgemeindeRequest) -> LinkGroup:
+    links = []
+
+    links.append(
+        Link(
+            _('Assemblies'),
+            request.class_link(
+                AssemblyCollection),
+            attrs={'class': 'assemblies'}
+        )
+    )
+
+    links.append(
+        Link(
+            _('People'),
+            request.class_link(
+                PersonCollection),
+            attrs={'class': 'people'}
+        )
+    )
+
+    return LinkGroup(_('Modules'), classes=('modules', ), links=links)
 
 
 def get_top_navigation(

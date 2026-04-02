@@ -105,7 +105,7 @@ $settings-icon: '\f1de';
         display: flex;
         justify-content: space-between;
         min-height: $globals-height;
-        padding: .5rem;
+        padding: .5rem 0;
 
         @include breakpoint(small only) {
             &.centered {
@@ -214,6 +214,8 @@ $settings-icon: '\f1de';
     .events::before { @include icon('\f073'); }
     .news::before { @include icon('\f1ea'); }
     .newsletter::before { @include icon('\f0e0'); }
+    .agencies::before { @include icon-bold('\f0b1'); }
+    .assemblies::before { @include icon-bold('\f0c0'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;

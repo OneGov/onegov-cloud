@@ -5,6 +5,7 @@ from onegov.agency.api import MembershipApiEndpoint
 from onegov.agency.api import PersonApiEndpoint
 from onegov.agency.custom import get_global_tools
 from onegov.agency.custom import get_top_navigation
+from onegov.agency.custom import get_modules
 from onegov.agency.forms import UserGroupForm
 from onegov.agency.initial_content import create_new_organisation
 from onegov.agency.pdf import AgencyPdfAr, AgencyPdfBs, AgencyPdfLu
@@ -153,6 +154,7 @@ def get_template_variables(request: AgencyRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
+        'modules': get_modules(request)
     }
 
 

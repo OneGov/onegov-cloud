@@ -40,97 +40,89 @@ def get_template_variables(request: OrgRequest) -> dict[str, Any]:
 
 def get_modules(request: OrgRequest) -> LinkGroup:
     links = []
-    # Modules
-    links.append(
-        Link(
-            _('Activate/deactivate modules'), request.link(
-                request.app.org, 'settings'
-            ), attrs={'class': 'settings'}
-        )
-    )
-
-    links.append(
-        Link(
-            _('Latest news'),
-            request.class_link(News, {'absorb': ''}),
-            attrs={'class': 'news'}
-        )
-    )
-
-    if request.app.org.show_newsletter:
+    if request.is_logged_in:
+        # Modules
         links.append(
             Link(
-                _('Newsletter'),
-                request.class_link(
-                    NewsletterCollection),
-                attrs={'class': 'newsletter'}
+                _('Activate/deactivate modules'), request.link(
+                    request.app.org, 'settings'
+                ), attrs={'class': 'settings'}
             )
         )
 
-    links.append(
-        Link(
-            _('Events'),
-            request.class_link(
-                OccurrenceCollection),
-            attrs={'class': 'events'}
-        )
-    )
-
-    links.append(
-        Link(
-            _('Reservations'),
-            request.class_link(
-                ResourceCollection),
-            attrs={'class': 'reservations'}
-        )
-    )
-
-    links.append(
-        Link(
-            _('Directories'),
-            request.class_link(
-                DirectoryCollection),
-            attrs={'class': 'directories'}
-        )
-    )
-
-    links.append(
-        Link(
-            _('People'),
-            request.class_link(
-                PersonCollection),
-            attrs={'class': 'people'}
-        )
-    )
-
-    links.append(
-        Link(
-            _('Forms'),
-            request.class_link(
-                FormCollection),
-            attrs={'class': 'forms'}
-        )
-    )
-
-    links.append(
-        Link(
-            _('Surveys'),
-            request.class_link(
-                SurveyCollection),
-            attrs={'class': 'surveys'}
-        )
-    )
-
-    # ToDo: Add Chat links
-
-    if request.is_admin and request.app.org.ris_enabled:
         links.append(
             Link(
-                _('RIS Settings'),
-                request.link(request.app.org, 'ris-overview'),
-                attrs={'class': 'ris-settings'}
-            ),
+                _('Latest news'),
+                request.class_link(News, {'absorb': ''}),
+                attrs={'class': 'news'}
+            )
         )
+
+        if request.app.org.show_newsletter:
+            links.append(
+                Link(
+                    _('Newsletter'),
+                    request.class_link(
+                        NewsletterCollection),
+                    attrs={'class': 'newsletter'}
+                )
+            )
+
+        links.append(
+            Link(
+                _('Events'),
+                request.class_link(
+                    OccurrenceCollection),
+                attrs={'class': 'events'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Reservations'),
+                request.class_link(
+                    ResourceCollection),
+                attrs={'class': 'reservations'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Directories'),
+                request.class_link(
+                    DirectoryCollection),
+                attrs={'class': 'directories'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('People'),
+                request.class_link(
+                    PersonCollection),
+                attrs={'class': 'people'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Forms'),
+                request.class_link(
+                    FormCollection),
+                attrs={'class': 'forms'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Surveys'),
+                request.class_link(
+                    SurveyCollection),
+                attrs={'class': 'surveys'}
+            )
+        )
+
+    # ToDo: Add Chat links
 
     return LinkGroup(_('Modules'), classes=('modules', ), links=links)
 

@@ -3280,7 +3280,7 @@ msgid ""
 "code city"
 msgstr ""
 "QR-Rechnungen erfordern die Angabe des Begünstigten in der Form: Name, "
-"Straße, Code Stadt"
+"Strasse, Code Stadt"
 
 msgid "Feriennet"
 msgstr "Feriennet"

@@ -13,6 +13,7 @@ from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
 from onegov.org.app import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.town6.custom import get_modules
 from onegov.org.models.directory import ExtendedDirectory
 from onegov.town6.api import (
     EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint,
@@ -94,7 +95,8 @@ def get_template_directory() -> str:
 @TownApp.template_variables()
 def get_template_variables(request: TownRequest) -> RenderData:
     return {
-        'global_tools': tuple(get_global_tools(request))
+        'global_tools': tuple(get_global_tools(request)),
+        'modules': get_modules(request)
     }
 
 
