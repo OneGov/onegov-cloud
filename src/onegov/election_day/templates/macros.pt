@@ -873,13 +873,14 @@
 
 <metal:ballot-result-bar define-macro="ballot-result-bar">
     <div class="ballot-result-bar" tal:condition="layout.has_results and ballot">
+        <h2>${ballot.title}</h2>
         <ul class="percentages flex-container justify-between align-center">
             <li>
-                <span i18n:translate="">${layout.label('Yeas')}</span><br/>
+                <span i18n:translate="">${yeas_label|None or layout.label('Yeas')}</span><br/>
                 <span class="accepted" >${'{0:.2f}'.format(ballot.yeas_percentage)}%</span>
             </li>
             <li>
-                <span i18n:translate="">${layout.label('Nays')}</span><br/>
+                <span i18n:translate="">${nays_label|None or layout.label('Nays')}</span><br/>
                 <span class="rejected" >${'{0:.2f}'.format(ballot.nays_percentage)}%</span>
             </li>
         </ul>
@@ -1381,8 +1382,17 @@
         </tal:b>
     </h1>
 
+    <metal metal:use-macro="layout.macros['ballot-result-bar']" tal:define="ballot vote.proposal"/>
+    <ta:block tal:condition="vote.counter_proposal|None">
+        <metal metal:use-macro="layout.macros['ballot-result-bar']" tal:define="ballot vote.counter_proposal"/>
+    </ta:block>
+    <tal:block tal:condition="vote.tie_breaker|None">
+        <metal metal:use-macro="layout.macros['ballot-result-bar']" tal:define="ballot vote.tie_breaker;
+                                                                                yeas_label 'in favor of the proposal';
+                                                                                nays_label 'in favor of the counter proposal'"/>
+    </tal:block>
+
     <div class="clearfix"></div>
-    <metal metal:use-macro="layout.macros['ballot-result-bar']" />
     <tal:block tal:condition="not: layout.has_results and ballot">
         <hr>
     </tal:block>
