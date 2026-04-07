@@ -163,7 +163,6 @@ class SearchApp(morepath.App):
                      WHERE cfgname = LOWER(:locale)
                        AND nspname = :schema
                 )
-                FROM pg_ts_config
             """), {'locale': locale, 'schema': schema}).scalar():
                 # configuration already exists
                 if dict_created:
