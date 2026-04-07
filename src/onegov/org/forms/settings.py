@@ -94,6 +94,16 @@ class OrganisationProfileSettingsForm(Form):
         _('E-Mail Reply Address (Reply-To)'), [InputRequired()],
         description=_('Replies to automated e-mails go to this address.'))
 
+    locales = RadioField(
+        label=_('Languages'),
+        choices=(
+            ('de_CH', _('German')),
+            ('fr_CH', _('French')),
+            ('it_CH', _('Italian'))
+        ),
+        validators=[InputRequired()]
+    )
+
 
 class AppearanceSettingsForm(Form):
 
@@ -148,16 +158,6 @@ class AppearanceSettingsForm(Form):
     font_family_sans_serif = ChosenSelectField(
         label=_('Default Font Family'),
         choices=[],
-        validators=[InputRequired()]
-    )
-
-    locales = RadioField(
-        label=_('Languages'),
-        choices=(
-            ('de_CH', _('German')),
-            ('fr_CH', _('French')),
-            ('it_CH', _('Italian'))
-        ),
         validators=[InputRequired()]
     )
 

@@ -671,7 +671,7 @@ def test_mtan_access_limit(client: Client, smsdir: str) -> None:
         client.login_admin()
 
         # set a rate limit
-        settings_page = client.get('/module-settings')
+        settings_page = client.get('/access-settings')
         settings_page.form['mtan_session_duration_seconds'] = '86400'
         settings_page.form['mtan_access_window_requests'] = '1'
         settings_page.form['mtan_access_window_seconds'] = '3600'
