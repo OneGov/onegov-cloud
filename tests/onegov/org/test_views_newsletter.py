@@ -140,7 +140,7 @@ def test_newsletters_crud(client: Client) -> None:
 def test_newsletter_signup(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/test_newsletter_signup')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
