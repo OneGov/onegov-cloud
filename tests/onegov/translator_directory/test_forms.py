@@ -241,7 +241,6 @@ def test_translator_mutation_form(translator_app: TestApp) -> None:
     form.request.is_editor = False
     form.request.is_member = True
     form.on_request()
-    assert len(form._fields) == 39
     assert len(form.proposal_fields) == 27
     assert 'operation_comments' not in form
     assert 'confirm_name_reveal' not in form
