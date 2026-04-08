@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 
 from decimal import Decimal
-from onegov.activity import BookingPeriod
 from onegov.activity.models import Activity, Attendee, Booking, Occasion
 from onegov.user import User
 from sqlalchemy import func
@@ -12,6 +11,7 @@ from sqlalchemy import func
 from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from onegov.activity import BookingPeriod
     from onegov.activity.matching.interfaces import MatchableBooking
     from sqlalchemy.orm import Session
 

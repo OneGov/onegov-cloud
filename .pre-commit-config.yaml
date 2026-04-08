@@ -17,7 +17,7 @@ repos:
         exclude: .pre-commit-config.yaml
       - id: pt_structure
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.6
+    rev: v0.15.9
     hooks:
       - id: ruff-check
         args: [ "--fix" ]
@@ -29,7 +29,7 @@ repos:
         additional_dependencies:
         - flake8-type-checking>=3.0.0
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v17.4.0
+    rev: v17.6.0
     hooks:
     - id: stylelint
       files: '^src/.*\.scss'
@@ -37,7 +37,7 @@ repos:
         - stylelint@16.19.1
         - stylelint-config-standard-scss@15.0.0
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.0.3
+    rev: v10.2.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
