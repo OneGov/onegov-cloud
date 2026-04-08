@@ -394,7 +394,6 @@ class ResourceBaseForm(Form):
             if self.request.view_name.endswith('new-daypass'):
                 self.delete_field('default_view')
                 self.delete_field('kaba_components')
-                self.delete_field('parent_id')
                 return
 
         # NOTE: For now we only allow parent resources for rooms
