@@ -42,13 +42,13 @@ class Scoring[BookingT: Booking | MatchableBooking = Any]:
         cls,
         settings: dict[str, Any],
         session: Session,
-        period: BookingPeriod
+        period: BookingPeriod | None = None
     ) -> Self:
 
         scoring = cls()
 
         # always prefer groups
-        if period.with_group_code:
+        if (period and period.with_group_code) or not period:
             scoring.criteria.append(PreferGroups.from_session(session))  # type: ignore[arg-type]
 
         if settings.get('prefer_in_age_bracket'):
