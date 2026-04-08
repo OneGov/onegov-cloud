@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 
 from decimal import Decimal
+from onegov.activity import BookingPeriod
 from onegov.activity.models import Activity, Attendee, Booking, Occasion
 from onegov.user import User
 from sqlalchemy import func
@@ -40,13 +41,15 @@ class Scoring[BookingT: Booking | MatchableBooking = Any]:
     def from_settings(
         cls,
         settings: dict[str, Any],
-        session: Session
+        session: Session,
+        period: BookingPeriod
     ) -> Self:
 
         scoring = cls()
 
         # always prefer groups
-        scoring.criteria.append(PreferGroups.from_session(session))  # type: ignore[arg-type]
+        if period.with_group_code:
+            scoring.criteria.append(PreferGroups.from_session(session))  # type: ignore[arg-type]
 
         if settings.get('prefer_in_age_bracket'):
             scoring.criteria.append(
