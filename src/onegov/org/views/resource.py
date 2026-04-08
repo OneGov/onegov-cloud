@@ -191,9 +191,11 @@ class ResourceGroup(NamedTuple):
         for group, items in grouped.items():
             entries: dict[str, Any] = {}
             group_has_find_your_spot = False
+            rooms: dict[tuple[UUID, str], Resource] = {}
             for item in items:
                 is_room = isinstance(item, Resource) and item.type == 'room'
                 if is_room:
+                    rooms[item.id, item.subgroup or ''] = item  # type: ignore
                     group_has_find_your_spot = True
 
                 if subgroup_name := getattr(item, 'subgroup', None):
@@ -212,12 +214,36 @@ class ResourceGroup(NamedTuple):
                         title = f'{title} '
                     entries[title] = item
 
+            # sorts parents before their children in the same subgroup
+            def subgroup_sort_key(item: Any) -> tuple[str, ...]:
+                key = [item.title]
+                if isinstance(item, Resource):
+                    seen = {item.id}
+                    while (
+                        item.parent_id is not None
+                        # avoid infinite loop when there is a cycle
+                        and item.parent_id not in seen
+                        and (parent := rooms.get((  # noqa: B023
+                            item.parent_id,
+                            item.subgroup or ''
+                        ))) is not None
+                    ):
+                        item = parent
+                        seen.add(item.id)
+                        key.append(item.title)
+                return tuple(reversed(key))
+
+            def group_sort_key(item: tuple[str, Any]) -> tuple[str, ...]:
+                if isinstance(item[1], Resource):
+                    return subgroup_sort_key(item[1])
+                return (item[0],)
+
             result.append(cls(
                 title=group,
                 entries=[
                     ResourceSubgroup(
                         title=subgroup,
-                        entries=sorted(entry[1], key=attrgetter('title')),
+                        entries=sorted(entry[1], key=subgroup_sort_key),
                         find_your_spot=FindYourSpotCollection(
                             request.app.libres_context,
                             group=None if group == default_group else group,
@@ -226,7 +252,7 @@ class ResourceGroup(NamedTuple):
                     ) if isinstance(entry, tuple) else entry
                     for subgroup, entry in sorted(
                         entries.items(),
-                        key=itemgetter(0)
+                        key=group_sort_key
                     )
                 ],
                 find_your_spot=FindYourSpotCollection(
