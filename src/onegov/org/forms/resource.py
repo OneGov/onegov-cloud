@@ -8,6 +8,7 @@ from onegov.form import parse_formcode
 from onegov.form import Form
 from onegov.form.errors import FormError
 from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import TreeSelectField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.filters import as_float
 from onegov.form.validators import ValidFormDefinition
@@ -21,6 +22,9 @@ from onegov.org.forms.reservation import (
     RESERVED_FIELDS, ExportToExcelWorksheets)
 from onegov.org.forms.util import WEEKDAYS
 from onegov.org.kaba import KabaApiError, KabaClient
+from onegov.reservation import Resource
+from sqlalchemy import func
+from uuid import UUID
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
 from wtforms.fields import EmailField
@@ -37,8 +41,8 @@ from wtforms.validators import ValidationError
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from markupsafe import Markup
+    from onegov.form.fields import TreeSelectNode
     from onegov.org.request import OrgRequest
-    from onegov.reservation import Resource
     from wtforms import Field
 
 
@@ -51,6 +55,18 @@ def coerce_component_tuple(value: Any) -> tuple[str, str] | None:
 
     site_id, component = value
     return site_id, component
+
+
+def coerce_uuid(value: object) -> UUID | None:
+    if isinstance(value, UUID):
+        return value
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise TypeError('Value needs to be a UUID, str or None')
+    if value in ('', 'None'):
+        return None
+    return UUID(value)
 
 
 class ComponentSelectWidget(ChosenSelectWidget):
@@ -90,6 +106,19 @@ class ResourceBaseForm(Form):
     subgroup = StringField(
         label=_('Subgroup'),
         description=_('Used to group the resource in the overview')
+    )
+
+    parent_id = TreeSelectField(
+        label=_('Parent Resource'),
+        description=_(
+            "Reservations on parent resources will block reservations "
+            "on this resource and vice versa. They will also show up "
+            "in each other's occupancy views. This will not be used for "
+            "grouping resources, however the parent resource will be "
+            "listed directly before its children if in the same group "
+            "regardless of title."
+        ),
+        coerce=coerce_uuid
     )
 
     text = HtmlField(
@@ -353,15 +382,97 @@ class ResourceBaseForm(Form):
 
     def on_request(self) -> None:
         if hasattr(self.model, 'type'):
+            if self.model.type != 'room':
+                self.delete_field('parent_id')
             if self.model.type == 'daypass':
                 self.delete_field('default_view')
                 self.delete_field('kaba_components')
                 return
         else:
+            if not self.request.view_name.endswith('new-room'):
+                self.delete_field('parent_id')
             if self.request.view_name.endswith('new-daypass'):
                 self.delete_field('default_view')
                 self.delete_field('kaba_components')
+                self.delete_field('parent_id')
                 return
+
+        # NOTE: For now we only allow parent resources for rooms
+        if 'parent_id' in self:
+            default_group = self.request.translate(_('General'))
+            query = self.request.app.libres_resources.query().with_entities(
+                Resource.id,
+                Resource.parent_id,
+                Resource.title,
+                func.coalesce(func.nullif(Resource.group, ''), default_group),
+                Resource.subgroup,
+            ).order_by(
+                func.coalesce(func.nullif(Resource.group, ''), default_group),
+                func.coalesce(
+                    func.nullif(Resource.subgroup, ''),
+                    Resource.title
+                ),
+                Resource.title
+            ).filter(Resource.type == 'room')
+            if isinstance(self.model, Resource):
+                query = query.filter(Resource.id != self.model.id)
+                pruned_parent_ids = {self.model.id}
+            else:
+                pruned_parent_ids = set()
+
+            choices: list[TreeSelectNode] = []
+            current_group: TreeSelectNode | None = None
+            current_group_choices: list[TreeSelectNode] = []
+            current_subgroup: TreeSelectNode | None = None
+            current_subgroup_choices: list[TreeSelectNode] = []
+            for resource_id, parent_id, title, group, subgroup in query:
+                entry: TreeSelectNode = {
+                    'name': title,
+                    'value': str(resource_id),
+                    'children': ()
+                }
+                # NOTE: This avoids circular references between resources
+                #       a parent resource should not appoint one of its
+                #       descendants as a parent.
+                if parent_id in pruned_parent_ids:
+                    pruned_parent_ids.add(resource_id)
+                    entry['disabled'] = True
+
+                if current_group is None or current_group['name'] != group:
+                    current_group_choices = []
+                    current_group = {
+                        'name': group,
+                        'value': group,
+                        'children': current_group_choices,
+                        'isGroupSelectable': False
+                    }
+                    choices.append(current_group)
+                    current_subgroup = None
+
+                if not subgroup:
+                    current_subgroup = None
+                elif (
+                    current_subgroup is None
+                    or current_subgroup['name'] != subgroup
+                ):
+                    current_subgroup_choices = []
+                    current_subgroup = {
+                        'name': subgroup,
+                        'value': f'{group}__{subgroup}',
+                        'children': current_subgroup_choices,
+                        'isGroupSelectable': False
+                    }
+                    current_group_choices.append(current_subgroup)
+
+                if current_subgroup is not None:
+                    current_subgroup_choices.append(entry)
+                else:
+                    current_group_choices.append(entry)
+
+            if choices:
+                self.parent_id.set_choices(choices)
+            else:
+                self.delete_field('parent_id')
 
         clients = KabaClient.from_app(self.request.app)
         if not clients:

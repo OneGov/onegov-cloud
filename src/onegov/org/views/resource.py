@@ -12,6 +12,7 @@ from datetime import date as date_t, datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import islice
 from libres.db.models import ReservationBlocker
+from libres.modules import rasterizer
 from libres.modules.errors import LibresError
 from math import isclose
 from morepath.request import Response
@@ -36,7 +37,8 @@ from onegov.org.models.ticket import ReservationTicket
 from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.org.views.utils import assert_citizen_logged_in
-from onegov.reservation import ResourceCollection, Resource, Reservation
+from onegov.reservation import Allocation, Reservation
+from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketInvoice
 from operator import attrgetter, itemgetter
 from purl import URL
@@ -55,7 +57,6 @@ if TYPE_CHECKING:
     from libres.db.scheduler import Scheduler
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
-    from onegov.reservation import Allocation
     from sedate.types import DateLike
     from sqlalchemy.orm import Query
     from typing import TypedDict
@@ -435,11 +436,17 @@ def view_find_your_spot(
         }
         for room in rooms:
             room.bind_to_libres_context(request.app.libres_context)
-            for allocation in request.exclude_invisible(
-                room.scheduler.search_allocations(
+            scheduler = room.scheduler
+            allocations = request.exclude_invisible(
+                scheduler.search_allocations(
                     start, end, days=form.weekdays.data, strict=True
                 )
-            ):
+            )
+            reserved, blocked = scheduler.reserved_slots_by_range(
+                min(a._start for a in allocations),
+                max(a._end for a in allocations),
+            )
+            for allocation in allocations:
                 # FIXME: libres isn't super careful about polymorphism yet
                 #        whenever we clean that up we can make Scheduler
                 #        generic and bind our subclass, so we don't have to
@@ -461,7 +468,20 @@ def view_find_your_spot(
                 )
 
                 if not allocation.partly_available:
-                    quota_left = allocation.quota_left
+                    quota_used = max(
+                        (
+                            allocation.quota
+                            if slot in blocked
+                            else reserved.get(slot, 0)
+                            for slot, __ in rasterizer.iterate_span(
+                                allocation._start,
+                                allocation._end,
+                                rasterizer.MIN_RASTER
+                            )
+                        ),
+                        default=0
+                    )
+                    quota_left = max(0, allocation.quota - quota_used)
                     availability = (
                         allocation.display_end() - allocation.display_start()
                     ) / duration * 100.0
@@ -496,10 +516,20 @@ def view_find_your_spot(
 
                     target_slot_end = target_slot_start + duration
 
-                    free = allocation.free_slots(
-                        target_slot_start,
-                        target_slot_end
-                    )
+                    free = [
+                        slot
+                        for slot in allocation.all_slots(
+                            target_slot_start,
+                            target_slot_end
+                        )
+                        if not any(
+                            s in reserved or s in blocked
+                            for s, __ in rasterizer.iterate_span(
+                                *slot,
+                                rasterizer.MIN_RASTER
+                            )
+                        )
+                    ]
                     if not free:
                         if (
                             allocation.display_start() <= target_slot_start
@@ -573,10 +603,20 @@ def view_find_your_spot(
                     slots.append(spot_infos[0])
                     added_slots += 1
 
-                free = allocation.free_slots(
-                    target_start,
-                    target_end
-                )
+                free = [
+                    slot
+                    for slot in allocation.all_slots(
+                        target_start,
+                        target_end
+                    )
+                    if not any(
+                        s in reserved or s in blocked
+                        for s, __ in rasterizer.iterate_span(
+                            *slot,
+                            rasterizer.MIN_RASTER
+                        )
+                    )
+                ]
                 if not free:
                     continue
 
@@ -589,7 +629,17 @@ def view_find_your_spot(
                         # span, as long as it overlaps with our target
                         # so people can reserve a slot that's slightly
                         # outside their selected range if they want
-                        allocation.free_slots(),
+                        [
+                            slot
+                            for slot in allocation.all_slots()
+                            if not any(
+                                s in reserved or s in blocked
+                                for s, __ in rasterizer.iterate_span(
+                                    *slot,
+                                    rasterizer.MIN_RASTER
+                                )
+                            )
+                        ],
                         duration,
                         adjustable=True
                     )
@@ -645,15 +695,27 @@ def view_find_your_spot(
                     auto_reserve != 'for_every_room'
                     or len(skipped) == len(date_room_slots)
                 ):
-                    # date already fully reserved
+                    # date already fully reserved, but we still add
+                    # ourselves to the list of reserved rooms, since
+                    # we implicitly are reserved through the other room
                     continue
-
                 for room_id, slots in date_room_slots.items():
                     if (
                         auto_reserve == 'for_every_room'
                         and room_id in skipped
                     ):
                         # already fully reserved
+                        continue
+
+                    if not reserved_dates.get(date, set()).isdisjoint(
+                        request.app.get_blocking_resource_ids(room_id)
+                    ):
+                        # we already reserved another room that blocks us
+                        # since parent rooms are usually sorted before
+                        # child rooms, this ensures we first try to
+                        # reserve the entire thing and then fall back
+                        # to individual subrooms
+                        reserved_dates[date].add(room_id)
                         continue
 
                     for slot in slots:
@@ -1216,10 +1278,14 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     if not (start and end):
         return ()
 
+    scheduler = self.scheduler
+
     # get all reservations and tickets
     query: Query[tuple[Reservation, Ticket, *tuple[str, ...]]]
     query = self.reservations_with_tickets_query(  # type:ignore[attr-defined]
-        start, end, exclude_pending=False
+        start, end,
+        exclude_pending=False,
+        only_managed=False
     ).with_entities(Reservation, Ticket)
     query = query.options(undefer(Reservation.data))
     if self.occupancy_fields:
@@ -1232,31 +1298,33 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
         ))
 
     # get all blockers
-    blockers = self.scheduler.managed_blockers()
+    blockers = scheduler.visible_blockers()
     blockers = blockers.filter(start <= ReservationBlocker.start)
     blockers = blockers.filter(ReservationBlocker.end <= end)
 
+    blocking_resources = self.blocking_resources()
     return *(
         res.as_dict()
         for res in utils.ReservationEventInfo.from_reservations(
             request,
             self,
-            query
+            query,
+            blocking_resources
         )
     ), *(
         blk.as_dict()
         for blk in utils.BlockerEventInfo.from_blockers(
             request,
             self,
-            blockers
+            blockers,
+            blocking_resources
         )
     ), *(
         av.as_dict()
         for av in utils.AvailabilityEventInfo.from_allocations(
             request,
-            self,
             # get all all master allocations
-            self.scheduler.allocations_in_range(start, end)  # type: ignore[arg-type]
+            scheduler.allocations_in_range(start, end)  # type: ignore[arg-type]
         )
     )
 
@@ -1278,9 +1346,10 @@ def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
     if not (start and end):
         raise exc.HTTPBadRequest()
 
+    scheduler = self.scheduler
     accepted = func.coalesce(Reservation.data['accepted'] == True, False)
     stats = dict(
-        self.scheduler.managed_reservations()
+        scheduler.visible_reservations()
         .filter(Reservation.status == 'approved')
         .filter(or_(
             and_(
@@ -1303,7 +1372,7 @@ def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
         'range': layout.format_date_range(start.date(), end.date()),
         'count': stats.get(True, 0) + stats.get(False, 0),
         'pending': stats.get(False, 0),
-        'utilization': 100.0 - self.scheduler.availability(start, end),
+        'utilization': 100.0 - scheduler.availability(start, end),
     }
 
 

@@ -751,6 +751,7 @@ def test_directory_migration_for_select(session: Session) -> None:
     assert migration.possible
 
     migration.execute()
+    zoo = zoo  # undo narrowing
     assert zoo.values['general_landscapes'] == []
     assert zoo.values['general_animals'] == []
 

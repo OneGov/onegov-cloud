@@ -36,6 +36,7 @@ def test_coordinates_field() -> None:
         }).encode('ascii')
     ).decode('ascii')])
 
+    field = field  # undo narrowing
     assert field.data.lat == 47.05183585
     assert field.data.lon == 8.30576869173879
     assert field.data.zoom == 10
@@ -54,6 +55,7 @@ def test_coordinates_field() -> None:
         'zoom': None
     })
 
+    field = field  # undo narrowing
     assert field.data.lat == 47.05183585
     assert field.data.lon == 8.30576869173879
     assert field.data.zoom is None

@@ -22,5 +22,7 @@ def libres_context(session_manager: SessionManager) -> Iterator[Context]:
     registry = create_default_registry()
 
     yield LibresIntegration.libres_context_from_session_manager(
-        registry, session_manager
+        registry,
+        session_manager,
+        lambda resource: ()
     )
