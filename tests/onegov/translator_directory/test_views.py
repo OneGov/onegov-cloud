@@ -579,6 +579,20 @@ def test_view_search_translator(client: Client) -> None:
     assert 'Hugentobler'.upper() not in page
 
 
+def test_member_sees_operation_comments(client: Client) -> None:
+    translators = TranslatorCollection(client.app)
+    data = copy.deepcopy(translator_data)
+    data['operation_comments'] = 'Nur Familienrecht'
+    translator = translators.add(**data)
+    translator_id = translator.id.hex
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    assert 'Nur Familienrecht' in page
+    assert 'Besondere Hinweise' in page
+
+
 def test_view_export_translators(client: Client) -> None:
     session = client.app.session()
     languages = create_languages(session)
