@@ -81,63 +81,63 @@ def test_generic_widgets() -> None:
         'style': 'max-width: none'
     }
 
-    columns = list(row.iterchildren())  # type: ignore[unreachable]
+    columns = list(row.iterchildren())
     assert columns[0].tag == 'div'
-    assert columns[0].attrib == {
+    assert columns[0].attrib == {  # type: ignore[comparison-overlap]
         'class': 'small-12 medium-1 columns my-first-column'
     }
     assert columns[1].tag == 'div'
-    assert columns[1].attrib == {
+    assert columns[1].attrib == {  # type: ignore[comparison-overlap]
         'class': 'small-12 medium-1 columns my-second-column'
     }
     assert columns[2].tag == 'div'
-    assert columns[2].attrib == {
+    assert columns[2].attrib == {  # type: ignore[comparison-overlap]
         'class': 'small-12 medium-1 columns my-third-column'
     }
     assert columns[3].tag == 'div'
-    assert columns[3].attrib == {
+    assert columns[3].attrib == {  # type: ignore[comparison-overlap]
         'class': 'small-12 medium-1 columns my-fourth-column'
     }
     assert columns[4].tag == 'div'
-    assert columns[4].attrib == {
+    assert columns[4].attrib == {  # type: ignore[comparison-overlap]
         'class': 'small-12 medium-1 columns my-fifth-column'
     }
 
     h1 = next(columns[0].iterchildren())
     assert h1.tag == 'h1'
-    assert h1.attrib == {
+    assert h1.attrib == {  # type: ignore[comparison-overlap]
         'class': 'my-first-header'
     }
 
     h2 = next(h1.iterchildren())
     assert h2.tag == 'h2'
-    assert h2.attrib == {
+    assert h2.attrib == {  # type: ignore[comparison-overlap]
         'class': 'my-second-header'
     }
 
     h3 = next(h2.iterchildren())
     assert h3.tag == 'h3'
-    assert h3.attrib == {
+    assert h3.attrib == {  # type: ignore[comparison-overlap]
         'class': 'my-third-header'
     }
     assert h3.text == 'Title'
 
     hr = next(columns[1].iterchildren())
     assert hr.tag == 'hr'
-    assert hr.attrib == {
+    assert hr.attrib == {  # type: ignore[comparison-overlap]
         'class': 'my-hr'
     }
 
     logo = next(columns[2].iterchildren())
     assert logo.tag == 'img'
-    assert logo.attrib == {
+    assert logo.attrib == {  # type: ignore[comparison-overlap]
         'class': 'my-logo',
         'src': 'logo.svg'
     }
 
     text = next(columns[3].iterchildren())
     assert text.tag == 'p'
-    assert text.attrib == {
+    assert text.attrib == {  # type: ignore[comparison-overlap]
         'class': 'my-text'
     }
     assert text.text == 'Lorem'

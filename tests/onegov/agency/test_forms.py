@@ -265,7 +265,7 @@ def test_move_agency_form(session: Session) -> None:
     assert model.parent_id == 10
 
     # update with rename
-    agency_a_2_2 = agencies.add(title="a.2", parent=agency_a_2)  # type: ignore[unreachable]
+    agency_a_2_2 = agencies.add(title="a.2", parent=agency_a_2)
     form = MoveAgencyForm(DummyPostData({'parent_id': agency_a_2.parent_id}))
     form.request = DummyRequest(session, permissions=all_permissions)
     form.update_model(agency_a_2_2)

@@ -41,7 +41,7 @@ def test_transitions(session: Session) -> None:
     assert ticket2.state == 'pending'
     assert ticket.user == user
 
-    ticket.accept_ticket(user)  # type: ignore[unreachable]  # idempotent..
+    ticket.accept_ticket(user)  # idempotent..
     assert ticket2.state == 'pending'
     assert ticket.user == user
 
@@ -104,7 +104,7 @@ def test_process_time(session: Session) -> None:
         ticket.accept_ticket(user)
 
         assert ticket.reaction_time == 10
-        assert ticket.process_time is None  # type: ignore[unreachable]
+        assert ticket.process_time is None
         assert ticket.current_process_time == 0
         assert ticket.last_state_change == utcnow()
 

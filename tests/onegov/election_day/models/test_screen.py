@@ -89,8 +89,8 @@ def test_screen(session: Session) -> None:
     assert screen.election is None
     assert screen.election_compound == election_compound
     assert screen.model == election_compound
-    assert screen.screen_type.categories == ('generic', 'election_compound')  # type: ignore[comparison-overlap]
-    assert screen.last_modified == datetime(2020, 1, 4, 4, tzinfo=timezone.utc)  # type: ignore[unreachable]
+    assert screen.screen_type.categories == ('generic', 'election_compound')
+    assert screen.last_modified == datetime(2020, 1, 4, 4, tzinfo=timezone.utc)
 
     election_compound_part = ElectionCompoundPart(
         election_compound, 'domain', 'segment'

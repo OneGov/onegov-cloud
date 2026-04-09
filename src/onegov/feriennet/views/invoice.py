@@ -311,7 +311,7 @@ def handle_donation(
         if donation:
             amount = f'{donation.amount:.2f}'
 
-            for key, value in form.amount.choices:  # type:ignore[misc,str-unpack]
+            for key, value in form.amount.choices:  # type:ignore[misc]
                 if key == amount:
                     form.amount.data = amount
                     break

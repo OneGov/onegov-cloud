@@ -438,7 +438,7 @@ def import_elections_internal(
             principal_obj = create_principal(principal, municipality)
             session.add(election)
             session.flush()
-            errors = function_mapping[election_type](
+            errors = function_mapping[election_type](  # type: ignore[operator]
                 election, principal_obj, BytesIO(csv_file.read()), mimetype,
             )
             assert election.title is not None

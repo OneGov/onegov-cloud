@@ -480,7 +480,7 @@ def test_session_manager_sharing(postgres_dsn: str) -> None:
     session.add(test)
     transaction.commit()
 
-    assert session.query(Test).one().session_manager.__repr__.__self__ is mgr
+    assert session.query(Test).one().session_manager.__repr__.__self__ is mgr  # type: ignore[attr-defined]
     mgr.dispose()
 
 
@@ -1687,7 +1687,7 @@ def test_orm_cache(postgres_dsn: str, redis_url: str) -> None:
 
     assert app.request_cache == {}
     assert app.secret_document == 2
-    assert app2.first_document.title == 'Public'  # type: ignore[unreachable]
+    assert app2.first_document.title == 'Public'
     assert app.untitled_documents == []
     assert len(app.documents) == 2
 

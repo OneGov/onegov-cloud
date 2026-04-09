@@ -192,7 +192,7 @@ def test_cli_broadcast(
     assert broadcast.call_count == 2
     assert broadcast.call_args[0][1] == 'foo-baz'
     assert broadcast.call_args[0][2] == 'one'
-    assert broadcast.call_args[0][3] == {'a': 'b'}  # type: ignore[unreachable]
+    assert broadcast.call_args[0][3] == {'a': 'b'}
     assert '{"a": "b"} sent to foo-baz-one' in result.output
 
     result = runner.invoke(cli, [
@@ -254,7 +254,7 @@ def test_cli_listen(
     assert register.call_count == 2
     assert register.call_args[0][1] == 'foo-baz'
     assert register.call_args[0][2] == 'one'
-    assert 'Listing on wss://govikon.org/ws @ foo-baz-one' in result.output  # type: ignore[unreachable]
+    assert 'Listing on wss://govikon.org/ws @ foo-baz-one' in result.output
 
     result = runner.invoke(cli, [
         '--config', cfg_path,

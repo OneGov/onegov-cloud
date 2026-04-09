@@ -161,7 +161,7 @@ def test_ballot_answer_simple(session: Session) -> None:
     for result in vote.proposal.results:
         result.counted = True
     assert vote.proposal.answer == 'accepted'
-    assert vote.answer == 'accepted'  # type: ignore[unreachable]
+    assert vote.answer == 'accepted'
 
     # if there are as many nays as yeas, we default to 'rejected' - in reality
     # this is very unlikely to happen
