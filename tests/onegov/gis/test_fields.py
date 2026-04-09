@@ -36,12 +36,13 @@ def test_coordinates_field() -> None:
         }).encode('ascii')
     ).decode('ascii')])
 
+    field = field  # undo narrowing
     assert field.data.lat == 47.05183585
-    assert field.data.lon == 8.30576869173879  # type: ignore[unreachable]
+    assert field.data.lon == 8.30576869173879
     assert field.data.zoom == 10
 
     # which again holds true for the rendered field
-    coordinate = json.loads(b64decode(value.search(field()).group(1)))
+    coordinate = json.loads(b64decode(value.search(field()).group(1)))  # type: ignore[union-attr]
 
     assert coordinate.lat == 47.05183585
     assert coordinate.lon == 8.30576869173879
@@ -54,6 +55,7 @@ def test_coordinates_field() -> None:
         'zoom': None
     })
 
+    field = field  # undo narrowing
     assert field.data.lat == 47.05183585
     assert field.data.lon == 8.30576869173879
     assert field.data.zoom is None

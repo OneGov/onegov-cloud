@@ -17,6 +17,7 @@ from onegov.file import MultiAssociatedFiles
 from onegov.form import parse_form
 from onegov.pay import InvoiceItemMeta, Price, process_payment
 from sedate import align_date_to_day, utcnow
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from uuid import uuid4, UUID
 
@@ -25,7 +26,7 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     # type gets shadowed by type in model, so we use Type as an alias
     from builtins import type as type_t
-    from collections.abc import Sequence
+    from collections.abc import Collection, Sequence
     from libres.context.core import Context
     from libres.db.scheduler import Scheduler
     from onegov.form import Form
@@ -33,6 +34,7 @@ if TYPE_CHECKING:
     from onegov.pay import (
         InvoiceDiscountMeta, Payment, PaymentError, PaymentProvider)
     from onegov.pay.types import PaymentMethod
+    from sqlalchemy.orm import Session
 
     type DeadlineUnit = Literal['d', 'h']
 
@@ -42,6 +44,7 @@ if TYPE_CHECKING:
     #       created a subclass
     class _OurScheduler(Scheduler):
         name: UUID  # type:ignore[assignment]
+        blocking_names: Collection[UUID]  # type:ignore[assignment]
 
 
 @lru_cache(maxsize=1)
@@ -81,6 +84,11 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
+    )
+
+    #: the id of the parent resource (optional)
+    parent_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey('resources.id', ondelete='SET NULL')
     )
 
     #: a nice id for the url, readable by humans
@@ -248,6 +256,36 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         self.date = allocations[0].start.date()
 
+    def blocking_resource_ids(
+        self,
+        libres_context: Context | None = None
+    ) -> set[UUID]:
+        assert self.id, 'the id needs to be set'
+        if libres_context is None:
+            assert hasattr(
+                self, 'libres_context'
+            ), 'not bound to libres context'
+            libres_context = self.libres_context
+
+        return libres_context.get_service('get_blocking_resource_ids')(self.id)
+
+    def blocking_resources(self) -> dict[UUID, Resource]:
+        resource_ids = self.blocking_resource_ids()
+        if not resource_ids:
+            return {}
+        session: Session = self.libres_context.get_service(
+            'session_provider'
+        ).session()
+        blocking_resources = {
+            resource.id: resource
+            for resource in session.query(Resource).filter(
+                Resource.id.in_(resource_ids)
+            )
+        }
+        for resource in blocking_resources.values():
+            resource.bind_to_libres_context(self.libres_context)
+        return blocking_resources
+
     def get_scheduler(self, libres_context: Context) -> _OurScheduler:
         assert self.id, 'the id needs to be set'
         assert self.timezone, 'the timezone needs to be set'
@@ -258,6 +296,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
             libres_context,
             self.id,  # type:ignore[arg-type]
             self.timezone,
+            blocking_names=self.blocking_resource_ids(libres_context),  # type:ignore[arg-type]
             **extra_scheduler_arguments()
         )
 

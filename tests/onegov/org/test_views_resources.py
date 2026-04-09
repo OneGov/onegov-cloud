@@ -255,7 +255,7 @@ def test_find_your_spot(client: Client) -> None:
 
     resources = client.get('/resources')
     new = resources.click('Raum')
-    new.form['title'] = 'Meeting 1'
+    new.form['title'] = 'Grand Meeting Room'
     new.form['group'] = 'Meeting Rooms'
     new.form.submit().follow()
 
@@ -266,8 +266,16 @@ def test_find_your_spot(client: Client) -> None:
     assert 'An Feiertagen' not in find_your_spot
     assert 'Während Schulferien' not in find_your_spot
 
+    resources = client.get('/resources')
+    new = resources.click('Raum')
+    new.form['title'] = 'Meeting 1'
+    new.form['group'] = 'Meeting Rooms'
+    new.form.select('parent_id', text='Grand Meeting Room')
+    new.form.submit().follow()
+
     new.form['title'] = 'Meeting 2'
     new.form['group'] = 'Meeting Rooms'
+    new.form.select('parent_id', text='Grand Meeting Room')
     new.form.submit().follow()
 
     find_your_spot = client.get('/find-your-spot?group=Meeting+Rooms')
@@ -339,6 +347,20 @@ def test_find_your_spot(client: Client) -> None:
     # create a blocked and an unblocked allocation
     transaction.begin()
 
+    scheduler_parent = (
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
+        .by_name('grand-meeting-room')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler_parent.allocate(
+        dates=(
+            (datetime(2020, 1, 1), datetime(2020, 1, 1)),
+            (datetime(2020, 1, 2), datetime(2020, 1, 2)),
+        ),
+        whole_day=True,
+        partly_available=True
+    )
+
     scheduler_1 = (
         ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
         .by_name('meeting-1')
@@ -385,7 +407,7 @@ def test_find_your_spot(client: Client) -> None:
     ).json
     assert len(result['reservations']) == 1
     reservation = result['reservations'][0]
-    assert reservation['resource'] == 'meeting-1'
+    assert reservation['resource'] == 'grand-meeting-room'
     assert reservation['date'].startswith('2020-01-01')
     assert reservation['time'] == '07:00 - 08:00'
 
@@ -397,7 +419,7 @@ def test_find_your_spot(client: Client) -> None:
     ).json
     assert len(result['reservations']) == 1
     reservation = result['reservations'][0]
-    assert reservation['resource'] == 'meeting-1'
+    assert reservation['resource'] == 'grand-meeting-room'
     assert reservation['date'].startswith('2020-01-01')
     assert reservation['time'] == '07:00 - 08:00'
 
@@ -408,11 +430,17 @@ def test_find_your_spot(client: Client) -> None:
         '/find-your-spot/reservations?group=Meeting+Rooms'
     ).json
     assert len(result['reservations']) == 5
-    for idx, reservation in enumerate(result['reservations'][:-1]):
-        assert reservation['resource'] == 'meeting-1'
+    # the first two go to the grand meeting room
+    for idx, reservation in enumerate(result['reservations'][:2]):
+        assert reservation['resource'] == 'grand-meeting-room'
         assert reservation['date'].startswith(f'2020-01-0{idx+1}')
         assert reservation['time'] == '07:00 - 08:00'
-    # the final reservation only works for the other room
+    # the next two go to the first partition
+    for idx, reservation in enumerate(result['reservations'][2:4]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+3}')
+        assert reservation['time'] == '07:00 - 08:00'
+    # the final reservation only works for the the second partition
     reservation = result['reservations'][-1]
     assert reservation['resource'] == 'meeting-2'
     assert reservation['date'].startswith('2020-01-05')
@@ -425,11 +453,17 @@ def test_find_your_spot(client: Client) -> None:
         '/find-your-spot/reservations?group=Meeting+Rooms'
     ).json
     assert len(result['reservations']) == 5
-    for idx, reservation in enumerate(result['reservations'][:-1]):
-        assert reservation['resource'] == 'meeting-1'
+    # the first two go to the grand meeting room
+    for idx, reservation in enumerate(result['reservations'][:2]):
+        assert reservation['resource'] == 'grand-meeting-room'
         assert reservation['date'].startswith(f'2020-01-0{idx+1}')
         assert reservation['time'] == '07:00 - 08:00'
-    # the final reservation only works for the other room
+    # the next two go to the first partition
+    for idx, reservation in enumerate(result['reservations'][2:4]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+3}')
+        assert reservation['time'] == '07:00 - 08:00'
+    # the final reservation only works for the the second partition
     reservation = result['reservations'][-1]
     assert reservation['resource'] == 'meeting-2'
     assert reservation['date'].startswith('2020-01-05')
@@ -441,16 +475,24 @@ def test_find_your_spot(client: Client) -> None:
     result = client.get(
         '/find-your-spot/reservations?group=Meeting+Rooms'
     ).json
-    assert len(result['reservations']) == 8
-    for idx, reservation in enumerate(result['reservations'][::2]):
-        assert reservation['resource'] == 'meeting-1'
+    assert len(result['reservations']) == 6
+    # the first two days go into the grand meeting room
+    for idx, reservation in enumerate(result['reservations'][:2]):
+        assert reservation['resource'] == 'grand-meeting-room'
         assert reservation['date'].startswith(f'2020-01-0{idx+1}')
         assert reservation['time'] == '07:00 - 08:00'
 
-    for idx, reservation in enumerate(result['reservations'][1:-1:2]):
-        assert reservation['resource'] == 'meeting-2'
-        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+    # the third and fourth day go the first partition
+    for idx, reservation in enumerate(result['reservations'][2::2]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+3}')
         assert reservation['time'] == '07:00 - 08:00'
+
+    # the third and fifth day go the second partition
+    reservation = result['reservations'][-3]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-03')
+    assert reservation['time'] == '07:00 - 08:00'
     reservation = result['reservations'][-1]
     assert reservation['resource'] == 'meeting-2'
     assert reservation['date'].startswith('2020-01-05')
@@ -462,16 +504,24 @@ def test_find_your_spot(client: Client) -> None:
     result = client.get(
         '/find-your-spot/reservations?group=Meeting+Rooms'
     ).json
-    assert len(result['reservations']) == 8
-    for idx, reservation in enumerate(result['reservations'][::2]):
-        assert reservation['resource'] == 'meeting-1'
+    assert len(result['reservations']) == 6
+    # the first two days go into the grand meeting room
+    for idx, reservation in enumerate(result['reservations'][:2]):
+        assert reservation['resource'] == 'grand-meeting-room'
         assert reservation['date'].startswith(f'2020-01-0{idx+1}')
         assert reservation['time'] == '07:00 - 08:00'
 
-    for idx, reservation in enumerate(result['reservations'][1:-1:2]):
-        assert reservation['resource'] == 'meeting-2'
-        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+    # the third and fourth day go the first partition
+    for idx, reservation in enumerate(result['reservations'][2::2]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+3}')
         assert reservation['time'] == '07:00 - 08:00'
+
+    # the third and fifth day go the second partition
+    reservation = result['reservations'][-3]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-03')
+    assert reservation['time'] == '07:00 - 08:00'
     reservation = result['reservations'][-1]
     assert reservation['resource'] == 'meeting-2'
     assert reservation['date'].startswith('2020-01-05')

@@ -37,44 +37,44 @@ def test_transitions(session: Session) -> None:
 
     ticket.accept_ticket(user)
     # undo mypy narrowing of state
-    ticket2 = ticket
-    assert ticket2.state == 'pending'
+    ticket = ticket
+    assert ticket.state == 'pending'
     assert ticket.user == user
 
-    ticket.accept_ticket(user)  # type: ignore[unreachable]  # idempotent..
-    assert ticket2.state == 'pending'
+    ticket.accept_ticket(user)  # idempotent..
+    assert ticket.state == 'pending'
     assert ticket.user == user
 
     with pytest.raises(InvalidStateChange):
         ticket.accept_ticket(User())  # ..unless it's another user
 
     ticket.reopen_ticket(user)  # idempotent as well -> would lead to no change
-    assert ticket2.state == 'pending'
+    assert ticket.state == 'pending'
     assert ticket.user == user
 
     # undo mypy narrowing of state
-    ticket2 = ticket
+    ticket = ticket
     ticket.close_ticket()
-    assert ticket2.state == 'closed'
+    assert ticket.state == 'closed'
     assert ticket.user == user
 
     ticket.close_ticket()  # idempotent
-    assert ticket2.state == 'closed'
+    assert ticket.state == 'closed'
     assert ticket.user == user
 
     with pytest.raises(InvalidStateChange):
         ticket.accept_ticket(user)
 
     # undo mypy narrowing of state
-    ticket2 = ticket
+    ticket = ticket
     another_user = User()
     ticket.reopen_ticket(another_user)
-    assert ticket2.state == 'pending'
-    assert ticket2.user is another_user
+    assert ticket.state == 'pending'
+    assert ticket.user is another_user
 
     ticket.reopen_ticket(another_user)  # idempotent..
-    assert ticket2.state == 'pending'
-    assert ticket2.user is another_user
+    assert ticket.state == 'pending'
+    assert ticket.user is another_user
 
     with pytest.raises(InvalidStateChange):
         ticket.reopen_ticket(user)  # ..unless it's another user
@@ -103,8 +103,9 @@ def test_process_time(session: Session) -> None:
 
         ticket.accept_ticket(user)
 
+        ticket = ticket  # undo narrowing
         assert ticket.reaction_time == 10
-        assert ticket.process_time is None  # type: ignore[unreachable]
+        assert ticket.process_time is None
         assert ticket.current_process_time == 0
         assert ticket.last_state_change == utcnow()
 
@@ -117,6 +118,7 @@ def test_process_time(session: Session) -> None:
 
         ticket.close_ticket()
 
+        ticket = ticket  # undo narrowing
         assert ticket.reaction_time == 10
         assert ticket.process_time == 10
         assert ticket.current_process_time == 10

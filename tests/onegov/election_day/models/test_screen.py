@@ -84,13 +84,14 @@ def test_screen(session: Session) -> None:
         screen.type = 'election_compound'
         session.flush()
 
+    screen = screen  # undo narrowing
     assert screen.type == 'election_compound'
     assert screen.vote is None
     assert screen.election is None
     assert screen.election_compound == election_compound
     assert screen.model == election_compound
-    assert screen.screen_type.categories == ('generic', 'election_compound')  # type: ignore[comparison-overlap]
-    assert screen.last_modified == datetime(2020, 1, 4, 4, tzinfo=timezone.utc)  # type: ignore[unreachable]
+    assert screen.screen_type.categories == ('generic', 'election_compound')
+    assert screen.last_modified == datetime(2020, 1, 4, 4, tzinfo=timezone.utc)
 
     election_compound_part = ElectionCompoundPart(
         election_compound, 'domain', 'segment'
@@ -99,6 +100,7 @@ def test_screen(session: Session) -> None:
     screen.domain = 'domain'
     screen.domain_segment = 'segment'
 
+    screen = screen  # undo narrowing
     assert screen.type == 'election_compound_part'
     assert screen.vote is None
     assert screen.election is None
@@ -121,6 +123,7 @@ def test_screen(session: Session) -> None:
         screen.type = 'simple_vote'
         session.flush()
 
+    screen = screen  # undo narrowing
     assert screen.type == 'simple_vote'
     assert screen.vote == vote
     assert screen.election is None
@@ -134,6 +137,7 @@ def test_screen(session: Session) -> None:
         screen.type = 'complex_vote'
         session.flush()
 
+    screen = screen  # undo narrowing
     assert screen.type == 'complex_vote'
     assert screen.vote == vote
     assert screen.election is None

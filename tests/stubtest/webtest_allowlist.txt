@@ -17,7 +17,6 @@ webtest.utils
 # quite accurate, but necessary for inferred covariance with
 # PEP-695 auto-variance
 webtest.app.TestApp.app
-webtest.TestApp.app
 
 # error: variable differs from runtime type
 # =========================================
@@ -25,4 +24,3 @@ webtest.TestApp.app
 # normal use of WebTest, so it seems more pragmatic to treat
 # it as always non-`None`
 webtest.response.TestResponse.request
-webtest.TestResponse.request

@@ -118,19 +118,20 @@ def test_votes_default(swissvotes_app: TestApp) -> None:
         sort_by=13,  # type: ignore[arg-type]
         sort_order=14  # type: ignore[arg-type]
     )
-    assert votes.page == 2
-    assert votes.from_date == 3
-    assert votes.to_date == 4
-    assert votes.legal_form == 5  # type: ignore[comparison-overlap]
-    assert votes.result == 6  # type: ignore[unreachable]
-    assert votes.policy_area == 7
-    assert votes.term == 8
-    assert votes.full_text == 9
-    assert votes.position_federal_council == 10
-    assert votes.position_national_council == 11
-    assert votes.position_council_of_states == 12
-    assert votes.sort_by == 13
-    assert votes.sort_order == 14
+    if not TYPE_CHECKING:
+        assert votes.page == 2
+        assert votes.from_date == 3
+        assert votes.to_date == 4
+        assert votes.legal_form == 5
+        assert votes.result == 6
+        assert votes.policy_area == 7
+        assert votes.term == 8
+        assert votes.full_text == 9
+        assert votes.position_federal_council == 10
+        assert votes.position_national_council == 11
+        assert votes.position_council_of_states == 12
+        assert votes.sort_by == 13
+        assert votes.sort_order == 14
 
     votes = votes.default()
     assert votes.page == 0

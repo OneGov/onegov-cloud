@@ -189,10 +189,11 @@ def test_cli_broadcast(
     assert connect.call_args[0][0] == 'wss://govikon.org/ws'
     assert authenticate.call_count == 2
     assert authenticate.call_args[0][1] == 'not-so-secret-token'
+    broadcast = broadcast  # undo narrowing
     assert broadcast.call_count == 2
     assert broadcast.call_args[0][1] == 'foo-baz'
     assert broadcast.call_args[0][2] == 'one'
-    assert broadcast.call_args[0][3] == {'a': 'b'}  # type: ignore[unreachable]
+    assert broadcast.call_args[0][3] == {'a': 'b'}
     assert '{"a": "b"} sent to foo-baz-one' in result.output
 
     result = runner.invoke(cli, [
@@ -207,13 +208,12 @@ def test_cli_broadcast(
     assert connect.call_args[0][0] == websocket_config['url']
     assert authenticate.call_count == 3
     assert authenticate.call_args[0][1] == 'super-super-secret-token'
-    # NOTE: undo mypy narrowing of call_args
-    broadcast2 = broadcast
-    assert broadcast2.call_count == 3
-    assert broadcast2.call_args[0][1] == 'foo-bar'
-    assert broadcast2.call_args[0][2]
-    assert broadcast2.call_args[0][3] == {'a': 'b'}
-    assert f'foo-bar-{broadcast2.call_args[0][2]}' in result.output
+    broadcast = broadcast  # undo narrowing
+    assert broadcast.call_count == 3
+    assert broadcast.call_args[0][1] == 'foo-bar'
+    assert broadcast.call_args[0][2]
+    assert broadcast.call_args[0][3] == {'a': 'b'}
+    assert f'foo-bar-{broadcast.call_args[0][2]}' in result.output
 
 
 @patch('onegov.websockets.cli.connect')
@@ -251,10 +251,11 @@ def test_cli_listen(
     assert result.exit_code == 0
     assert connect.call_count == 2
     assert connect.call_args[0][0] == 'wss://govikon.org/ws'
+    register = register  # undo narrowing
     assert register.call_count == 2
     assert register.call_args[0][1] == 'foo-baz'
     assert register.call_args[0][2] == 'one'
-    assert 'Listing on wss://govikon.org/ws @ foo-baz-one' in result.output  # type: ignore[unreachable]
+    assert 'Listing on wss://govikon.org/ws @ foo-baz-one' in result.output
 
     result = runner.invoke(cli, [
         '--config', cfg_path,
@@ -265,9 +266,8 @@ def test_cli_listen(
     assert result.exit_code == 0
     assert connect.call_count == 3
     assert connect.call_args[0][0] == websocket_config['url']
-    # NOTE: undo mypy narrowing of call_args
-    register2 = register
-    assert register2.call_count == 3
-    assert register2.call_args[0][1] == 'foo-bar'
-    assert register2.call_args[0][2]
-    assert f'foo-bar-{register2.call_args[0][2]}' in result.output
+    register = register  # undo narrowing
+    assert register.call_count == 3
+    assert register.call_args[0][1] == 'foo-bar'
+    assert register.call_args[0][2]
+    assert f'foo-bar-{register.call_args[0][2]}' in result.output

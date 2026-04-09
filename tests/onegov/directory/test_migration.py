@@ -751,8 +751,9 @@ def test_directory_migration_for_select(session: Session) -> None:
     assert migration.possible
 
     migration.execute()
+    zoo = zoo  # undo narrowing
     assert zoo.values['general_landscapes'] == []
-    assert zoo.values['general_animals'] == []  # type: ignore[unreachable]
+    assert zoo.values['general_animals'] == []
 
     # type change checkbox -> radio not possible
     new_structure = """

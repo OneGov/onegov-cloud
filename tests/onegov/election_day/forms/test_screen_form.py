@@ -236,13 +236,14 @@ def test_screen_form_update_apply(session: Session) -> None:
     form.update_model(model)
     session.flush()
     session.expire(model)
+    model = model   # undo narrowing
     assert model.type == 'election_compound_part'
     assert model.vote_id is None
     assert model.election_id is None
     assert model.election_compound_id == compound.id
     assert model.election_compound_part == part
     assert model.domain == 'domain'
-    assert model.domain_segment == 'segment'  # type: ignore[unreachable]
+    assert model.domain_segment == 'segment'
     form = ScreenForm()
     form.apply_model(model)
     # undo mypy narrowing

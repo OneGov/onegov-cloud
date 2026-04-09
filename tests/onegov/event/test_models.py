@@ -165,8 +165,9 @@ def test_event_image(test_app: TestApp, path: str) -> None:
 
     event.set_image(BytesIO(content), 'file.png')
     session.flush()
+    event = event   # undo narrowing
     assert event.image is not None
-    assert event.image.reference.file.read() == content  # type: ignore[unreachable]
+    assert event.image.reference.file.read() == content
 
     with open(f'{path}/event.jpg', 'rb') as file:
         content = file.read()

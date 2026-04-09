@@ -42,7 +42,7 @@ def handle_logout_request(
     # redirect binding to be used
     supported_bindings = [BINDING_HTTP_REDIRECT]
     success = False
-    if logout_req.message.name_id == name_id and name_id:
+    if name_id and logout_req.message.name_id == name_id:
         try:
             if conn.local_logout(name_id):
                 status = success_status_factory()

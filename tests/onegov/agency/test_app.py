@@ -106,8 +106,9 @@ def test_app_root_pdf(agency_app: AgencyApp) -> None:
     assert agency_app.root_pdf_exists is False
 
     agency_app.root_pdf = BytesIO(b'PDF')
+    agency_app = agency_app  # undo narrowing
     assert agency_app.root_pdf == b'PDF'
-    assert agency_app.root_pdf_exists is True  # type: ignore[unreachable]
+    assert agency_app.root_pdf_exists is True
 
 
 def test_app_pdf_class(agency_app: AgencyApp) -> None:
@@ -120,7 +121,8 @@ def test_app_pdf_class(agency_app: AgencyApp) -> None:
     assert agency_app.pdf_class == AgencyPdfAr
 
     agency_app.org.meta['pdf_layout'] = 'zg'
-    assert agency_app.pdf_class == AgencyPdfZg  # type: ignore[comparison-overlap]
+    agency_app = agency_app  # undo narrowing
+    assert agency_app.pdf_class == AgencyPdfZg
 
     agency_app.org.meta['pdf_layout'] = ''
     assert agency_app.pdf_class == AgencyPdfDefault

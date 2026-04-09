@@ -435,12 +435,13 @@ def test_search_form(swissvotes_app: TestApp) -> None:
 
     form.apply_model(votes)
 
+    form = form  # undo narrowing
     assert form.from_date.data == date(2010, 1, 1)
     assert form.to_date.data == date(2010, 12, 31)
     assert form.legal_form.data == [1, 2]
     assert form.result.data == [0]
     assert form.policy_area.data == ['6', '7.75', '10.103.1035']
-    assert form.term.data == 'term'  # type: ignore[unreachable]
+    assert form.term.data == 'term'
     assert form.full_text.data == 0
     assert form.position_federal_council.data == [2, 3]
     assert form.position_national_council.data == [3]

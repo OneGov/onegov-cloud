@@ -69,9 +69,10 @@ def test_resource_highlight_allocations(libres_context: Context) -> None:
 
     resource.highlight_allocations(allocations)
 
+    resource = resource  # undo narrowing
     assert resource.date == date(2015, 8, 5)
     assert resource.highlights_min == allocations[0].id
-    assert resource.highlights_min == allocations[-1].id  # type: ignore[unreachable]
+    assert resource.highlights_min == allocations[-1].id
 
 
 def test_resource_form_definition(libres_context: Context) -> None:

@@ -40,10 +40,12 @@ def test_settings(client: Client) -> None:
 
     settings = client.get('/general-settings')
     assert "Ungültige Farbe." not in settings.text
+    # undo narrowing
+    client = client
     # Form was populated with user_options default before submitting
     assert client.app.font_family == HELVETICA
 
-    settings.form['logo_url'] = 'https://seantis.ch/logo.img'  # type: ignore[unreachable]
+    settings.form['logo_url'] = 'https://seantis.ch/logo.img'
     settings.form['reply_to'] = 'info@govikon.ch'
     settings.form['custom_css'] = 'h1 { text-decoration: underline; }'
     settings.form.submit()
