@@ -367,13 +367,30 @@ def view_find_your_spot(
     form.action += '#results'
     room_slots: dict[date_t, RoomSlots] | None = None
     missing_dates: dict[date_t, list[Resource] | None] | None = None
-    rooms = sorted(
-        request.exclude_invisible(self.query()),
-        key=attrgetter('title')
-    )
+    rooms = request.exclude_invisible(self.query())
     if not rooms:
         # we'll treat categories without rooms as non-existant
         raise exc.HTTPNotFound()
+
+    # NOTE: We make sure to sort parent rooms before their children
+    #       so they get picked first when auto-reserving
+    rooms_dict = {room.id: room for room in rooms}
+
+    def sort_key(item: Resource) -> tuple[str, ...]:
+        key = [item.title]
+        seen = {item.id}
+        while (
+            item.parent_id is not None
+            # avoid infinite loop when there is a cycle
+            and item.parent_id not in seen
+            and (parent := rooms_dict.get(item.parent_id)) is not None
+        ):
+            item = parent
+            seen.add(item.id)
+            key.append(item.title)
+        return tuple(reversed(key))
+
+    rooms.sort(key=sort_key)
 
     form.apply_rooms(rooms)
     if form.submitted(request):
@@ -724,9 +741,7 @@ def view_find_your_spot(
                     auto_reserve != 'for_every_room'
                     or len(skipped) == len(date_room_slots)
                 ):
-                    # date already fully reserved, but we still add
-                    # ourselves to the list of reserved rooms, since
-                    # we implicitly are reserved through the other room
+                    # date already fully reserved
                     continue
                 for room_id, slots in date_room_slots.items():
                     if (
@@ -743,7 +758,9 @@ def view_find_your_spot(
                         # since parent rooms are usually sorted before
                         # child rooms, this ensures we first try to
                         # reserve the entire thing and then fall back
-                        # to individual subrooms
+                        # to individual subrooms, but we still add
+                        # ourselves to the list of reserved rooms, since
+                        # we implicitly are reserved through the other room
                         reserved_dates[date].add(room_id)
                         continue
 

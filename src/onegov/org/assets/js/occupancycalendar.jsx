@@ -608,7 +608,7 @@ oc.setupViewNavigation = function(calendar, element, views, stats_url, pdf_url) 
                                     })}%</p>
                                 </div>
                             ),
-                            wrapper.get(0)
+                            new_wrapper.get(0)
                         );
                         oc.showPopup(calendar, stats_btn, new_wrapper);
                     });
