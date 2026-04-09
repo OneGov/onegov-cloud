@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import cached_property
 from markupsafe import Markup, escape
 
-from onegov.activity import Activity, Attendee
+from onegov.activity import Activity, Attendee, OccasionNeed, Volunteer
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
 from onegov.core.orm import as_selectable_from_path
@@ -93,6 +93,9 @@ class NotificationTemplateSendForm(Form):
                 'Users with attenedees that have an occasion on their '
                 'wish- or booking-list'
             )),
+            (('volunteers', _(
+                'Volunteers'
+            )))
         ],
         default='by_role'
     )
@@ -120,6 +123,21 @@ class NotificationTemplateSendForm(Form):
             ('inactive', _('Inactive users')),
         ],
         default=['active'],
+        depends_on=(
+            'send_to', '!volunteers',
+            )
+    )
+
+    volunteer_state = RadioField(
+        label=_('State'),
+        choices=[
+            ('all', _('All')),
+            ('open', _('Open')),
+            ('contacted', _('Contacted')),
+            ('confirmed', _('Confirmed')),
+        ],
+        depends_on=('send_to', 'volunteers'),
+        default='all',
     )
 
     no_spam = BooleanField(
@@ -174,6 +192,9 @@ class NotificationTemplateSendForm(Form):
 
         elif self.send_to.data == 'with_no_wishes_or_bookings':
             recipients = self.recipients_with_no_wishes_or_bookings()
+
+        elif self.send_to.data == 'volunteers':
+            recipients = self.recipients_volunteers(self.volunteer_state.data)
 
         else:
             raise NotImplementedError
@@ -324,6 +345,19 @@ class NotificationTemplateSendForm(Form):
         organisers = {username for username, in uq}
 
         return attendees | organisers
+
+    def recipients_volunteers(self, state: str) -> set[str]:
+        query = (
+            self.request.session.query(distinct(Volunteer.email))
+            .join(OccasionNeed)
+            .join(Occasion)
+            .filter(Occasion.period_id == self.period.id)
+        )
+
+        if state != 'all':
+            query = query.filter(Volunteer.state == state)
+
+        return {v for v, in query}
 
     @property
     def occasion_choices(self) -> Iterator[tuple[str, Markup]]:
