@@ -209,7 +209,7 @@ def test_views(client_with_fts: Client[TestApp]) -> None:
     # delete agenda item
     with freeze_time('2023-05-07 9:37'):
         page.click('Löschen')
-        page = page.click('Landsgemeinde', index=1)
+        page = page.click('Landsgemeinde', index=2)
     assert '<p>Lorem ipsum dolor sit amet</p>' in page
     assert 'A. consectetur adipiscing' not in page
     assert_last_modified()
