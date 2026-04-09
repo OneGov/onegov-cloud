@@ -236,6 +236,7 @@ def test_screen_form_update_apply(session: Session) -> None:
     form.update_model(model)
     session.flush()
     session.expire(model)
+    model = model   # undo narrowing
     assert model.type == 'election_compound_part'
     assert model.vote_id is None
     assert model.election_id is None

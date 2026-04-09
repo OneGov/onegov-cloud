@@ -58,7 +58,8 @@ def test_layout() -> None:
 
     layout = DefaultLayout(MockModel(), MockRequest())  # type: ignore[arg-type]
     layout.request.app = 'test'  # type: ignore[assignment]
-    assert layout.app == 'test'  # type: ignore[comparison-overlap]
+    if not TYPE_CHECKING:
+        assert layout.app == 'test'  # type: ignore[comparison-overlap]
 
     layout = DefaultLayout(MockModel(), MockRequest())  # type: ignore[arg-type]
     layout.request.path_info = '/'

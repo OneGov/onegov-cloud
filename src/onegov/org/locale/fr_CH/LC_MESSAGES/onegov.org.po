@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-25 11:20+0100\n"
+"POT-Creation-Date: 2026-04-08 16:32+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -196,8 +196,8 @@ msgstr "Newsletter quotidienne ${time}"
 msgid "${org} OneGov Cloud Status"
 msgstr "Statut du OneGov Cloud de ${org}"
 
-#. get the resource titles and ids
 #.
+#. get the resource titles and ids
 msgid "General"
 msgstr "Général"
 
@@ -1750,6 +1750,22 @@ msgstr "Utilisé pour grouper la ressource dans la vue d'ensemble"
 
 msgid "Subgroup"
 msgstr "Sous-groupe"
+
+msgid "Parent Resource"
+msgstr "Ressource supérieure"
+
+msgid ""
+"Reservations on parent resources will block reservations on this resource "
+"and vice versa. They will also show up in each other's occupancy views. This "
+"will not be used for grouping resources, however the parent resource will be "
+"listed directly before its children if in the same group regardless of title."
+msgstr ""
+"Les réservations effectuées sur une super-ressource bloqueront les "
+"réservations sur cette ressource, et inversement. Elles apparaîtront "
+"également dans les vues d'occupation de chacune d'entre elles. Cette "
+"fonctionnalité ne servira pas à regrouper les ressources ; toutefois, la "
+"super-ressource sera répertoriée juste avant ses sous-ressources si elles "
+"appartiennent au même groupe, quel que soit leur titre."
 
 msgid "Additional information for confirmed reservations"
 msgstr "Informations supplémentaires pour les réservations confirmées"
@@ -7385,6 +7401,9 @@ msgid ""
 msgstr ""
 "Le message suivant sera envoyé à ${adresse} et sera enregistré pour des "
 "références futures."
+
+msgid "The targeted reservation no longer exists"
+msgstr "La réservation n'existe plus ou a déjà été refusée"
 
 msgid ""
 "The payment associated with this reservation needs to be refunded before the "

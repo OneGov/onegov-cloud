@@ -151,7 +151,7 @@ def get_parameter[T, ParamT: (int, bool, list[Any])](
     if type_ is bool:
         try:
             result = request.params[name].lower().strip()  # type:ignore
-            return result in ('true', '1') if result else default  # type: ignore[return-value]
+            return result in ('true', '1') if result else default
         except Exception:
             return default
 
@@ -165,7 +165,7 @@ def get_parameter[T, ParamT: (int, bool, list[Any])](
         try:
             result = request.params[name].split(',')  # type:ignore
             result = [item.strip() for item in result if item.strip()]
-            return result if result else default  # type: ignore[return-value]
+            return result if result else default
         except Exception:
             return default
 

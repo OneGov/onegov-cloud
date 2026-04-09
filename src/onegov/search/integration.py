@@ -136,12 +136,13 @@ class SearchApp(morepath.App):
                     dict_name = 'german_unaccent'
                 else:
                     try:
-                        connection.execute(text("""
-                            CREATE TEXT SEARCH DICTIONARY german_unaccent (
-                                template = unaccent,
-                                rules = 'german'
-                            )
-                        """))
+                        with connection.begin_nested():
+                            connection.execute(text("""
+                                CREATE TEXT SEARCH DICTIONARY german_unaccent (
+                                    template = unaccent,
+                                    rules = 'german'
+                                )
+                            """))
                     except Exception:
                         index_log.exception(
                             'Failed to create german_unaccent dictionary '

@@ -10,7 +10,7 @@ from libres.db.models.types.json_type import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.reservation import LibresIntegration
 from onegov.reservation import Resource
-from sqlalchemy import text, Column, Enum, Text
+from sqlalchemy import text, Column, Enum, ForeignKey, Text, UUID
 
 
 from typing import TYPE_CHECKING
@@ -216,3 +216,37 @@ def make_allocation_and_reservation_type_not_nullable(
              WHERE type IS NULL;
         """))
         context.operations.alter_column('reservations', 'type', nullable=False)
+
+
+@upgrade_task('Add resource parent_id column')
+def add_resource_parent_id_column(context: UpgradeContext) -> None:
+    if (
+        context.has_table('resources')
+        and not context.has_column('resources', 'parent_id')
+    ):
+        context.operations.add_column(
+            'resources',
+            Column(
+                'parent_id',
+                UUID(as_uuid=True),
+                ForeignKey('resources.id', ondelete='SET NULL'),
+                nullable=True
+            )
+        )
+
+
+@upgrade_task('Add additional indeces to reserved_slots')
+def add_reserved_slots_indeces(context: UpgradeContext) -> None:
+    context.operations.create_index(
+        'ix_reserved_slots_source_type',
+        'reserved_slots',
+        columns=['source_type'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'start_end_tsrange_ix',
+        'reserved_slots',
+        columns=[text('tsrange(start, "end")')],
+        postgresql_using='gist',
+        if_not_exists=True
+    )
