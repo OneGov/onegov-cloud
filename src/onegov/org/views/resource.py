@@ -736,13 +736,13 @@ def view_find_your_spot(
                 ) else room_slots.items()
             ):
                 skipped = skipped_due_to_existing_reservation[date]
-                reserved_dates[date] = set()
+                reserved_dates[date] = skipped.copy()
+                blocked_rooms = skipped.copy()
                 if skipped and (
                     auto_reserve != 'for_every_room'
                     or len(skipped) == len(date_room_slots)
                 ):
                     # date already fully reserved
-                    reserved_dates[date] = skipped
                     continue
 
                 for room_id, slots in date_room_slots.items():
@@ -751,10 +751,9 @@ def view_find_your_spot(
                         and room_id in skipped
                     ):
                         # already fully reserved
-                        reserved_dates[date].add(room_id)
                         continue
 
-                    if not reserved_dates[date].isdisjoint(
+                    if not blocked_rooms.isdisjoint(
                         request.app.get_blocking_resource_ids(room_id)
                     ):
                         # we already reserved another room that blocks us
@@ -765,7 +764,9 @@ def view_find_your_spot(
                         # if we didn't skip due to existing reservations
                         # we add ourselves to the list of reserved rooms
                         # since we implicitly are reserved through the other
-                        # room
+                        # room, but we don't add to the set of blocked
+                        # rooms, since we otherwise might block rooms
+                        # we're not supposed to block
                         reserved_dates[date].add(room_id)
                         continue
 
@@ -796,6 +797,7 @@ def view_find_your_spot(
                         # no slot reserved, move on to the next room
                         continue
 
+                    blocked_rooms.add(room_id)
                     reserved_dates[date].add(room_id)
 
                     # since we managed to reserve a slot and we're not
