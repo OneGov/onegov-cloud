@@ -37,11 +37,11 @@ def test_coordinates_field() -> None:
     ).decode('ascii')])
 
     assert field.data.lat == 47.05183585
-    assert field.data.lon == 8.30576869173879
+    assert field.data.lon == 8.30576869173879  # type: ignore[unreachable]
     assert field.data.zoom == 10
 
     # which again holds true for the rendered field
-    coordinate = json.loads(b64decode(value.search(field()).group(1)))  # type: ignore[union-attr]
+    coordinate = json.loads(b64decode(value.search(field()).group(1)))
 
     assert coordinate.lat == 47.05183585
     assert coordinate.lon == 8.30576869173879

@@ -85,11 +85,11 @@ def test_translator_model(translator_app: TestApp) -> None:
     )
 
     translator.expertise_professional_guilds_other = ['Psychologie']
-    assert translator.expertise_professional_guilds_all == (
+    assert translator.expertise_professional_guilds_all == (  # type: ignore[comparison-overlap]
         'economy', 'art_leisure', 'Psychologie'
     )
 
-    translator.expertise_professional_guilds = []
+    translator.expertise_professional_guilds = []  # type: ignore[unreachable]
     assert translator.expertise_professional_guilds_all == ('Psychologie', )
 
 
@@ -117,14 +117,14 @@ def test_translator_user(session: Session) -> None:
     session.expire_all()
     assert translator.user == user_a
     assert user_a.translator == translator  # type: ignore[attr-defined]
-    assert user_b.translator is None  # type: ignore[attr-defined]
+    assert user_b.translator is None  # type: ignore[unreachable]
 
     translator.email = 'b@example.org'
     session.flush()
     session.expire_all()
     assert translator.user == user_b
-    assert user_a.translator is None  # type: ignore[attr-defined]
-    assert user_b.translator == translator  # type: ignore[attr-defined]
+    assert user_a.translator is None
+    assert user_b.translator == translator
 
     session.delete(user_b)
     session.flush()
@@ -137,7 +137,7 @@ def test_translator_user(session: Session) -> None:
     session.flush()
     session.expire_all()
     assert translator.user == user
-    assert user.translator == translator  # type: ignore[attr-defined]
+    assert user.translator == translator
 
     session.delete(translator)
     session.flush()
@@ -390,7 +390,7 @@ def test_translator_mutation(session: Session) -> None:
     assert translator.gender == 'M'
     assert translator.date_of_birth == date(1970, 1, 1)
     assert translator.nationalities == 'nationalities'  # type: ignore[comparison-overlap]
-    assert translator.coordinates == Coordinates(1, 2)
+    assert translator.coordinates == Coordinates(1, 2)  # type: ignore[unreachable]
     assert translator.address == 'Street and house number'
     assert translator.zip_code == '8000'
     assert translator.city == 'City'
@@ -473,11 +473,11 @@ def test_accreditation(translator_app: TestApp) -> None:
         # undo mypy narrowing
         translator = translator
         assert ticket.handler.state == 'granted'
-        assert translator.state == 'published'
+        assert translator.state == 'published'  # type: ignore[unreachable]
         assert translator.date_of_decision == today().date()
         assert session.query(Translator).count() == 1
 
-    with freeze_time('2025-01-01') as today:
+    with freeze_time('2025-01-01') as today:  # type: ignore[unreachable]
         accreditation.refuse()
         assert ticket.handler.state == 'refused'
         assert session.query(Translator).count() == 0

@@ -94,7 +94,7 @@ def test_models(session: Session, assembly: Assembly) -> None:
     agenda_item.start_time = time(11, 10, 7)
     votum.start_time = time(12, 11, 5)
     assert agenda_item.calculated_timestamp == '1h9m2s'
-    assert votum.calculated_timestamp == '2h10m'
+    assert votum.calculated_timestamp == '2h10m'  # type: ignore[unreachable]
 
     assembly.start_time = None
     assert agenda_item.calculated_timestamp is None

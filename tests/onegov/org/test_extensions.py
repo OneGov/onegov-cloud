@@ -377,7 +377,7 @@ def test_contact_extension(org_app: TestOrgApp) -> None:
         "https://www.apple.com"
     )
 
-    assert topic.contact_html == (
+    assert topic.contact_html == (  # type: ignore[unreachable]
         '<p><span class="title">'
         'Steve Jobs</span></p>'
         '<p><a href="mailto:steve@apple.com">steve@apple.com</a><br>'
@@ -439,7 +439,7 @@ def test_contact_extension_with_top_level_domain_agency(
         "https://custom.longdomain"
     )
     # undo mypy narrowing
-    topic = topic
+    topic = topic  # type: ignore[unreachable]
     html = topic.contact_html
     assert html is not None
     assert '<a href="mailto:hello@website.ag"' not in html

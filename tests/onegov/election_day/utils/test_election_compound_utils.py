@@ -704,7 +704,7 @@ def test_election_compound_utils_parties(
     deltas = get_party_results_deltas(election_compound, years, parties)
     assert deltas[1]['2014'][0][2] == 43062  # type: ignore[comparison-overlap]
 
-    data = get_party_results_data(election_compound, False)
+    data = get_party_results_data(election_compound, False)  # type: ignore[unreachable]
     assert isinstance(data, dict)
     assert data['results'][0]['value']['back'] == 13.8
 

@@ -61,11 +61,11 @@ def test_layout() -> None:
     layout.request.app = 'test'  # type: ignore[assignment]
     assert layout.app == 'test'  # type: ignore[comparison-overlap]
 
-    layout = DefaultLayout(MockModel(), MockRequest())  # type: ignore[arg-type]
+    layout = DefaultLayout(MockModel(), MockRequest())  # type: ignore[unreachable]
     layout.request.path_info = '/'
     assert layout.page_id == 'page-root'
 
-    layout = DefaultLayout(MockModel(), MockRequest())  # type: ignore[arg-type]
+    layout = DefaultLayout(MockModel(), MockRequest())
     layout.request.path_info = '/foo/bar/'
     assert layout.page_id == 'page-foo-bar'
 

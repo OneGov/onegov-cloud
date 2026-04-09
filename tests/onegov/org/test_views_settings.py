@@ -43,7 +43,7 @@ def test_settings(client: Client) -> None:
     # Form was populated with user_options default before submitting
     assert client.app.font_family == HELVETICA
 
-    settings.form['logo_url'] = 'https://seantis.ch/logo.img'
+    settings.form['logo_url'] = 'https://seantis.ch/logo.img'  # type: ignore[unreachable]
     settings.form['reply_to'] = 'info@govikon.ch'
     settings.form['custom_css'] = 'h1 { text-decoration: underline; }'
     settings.form.submit()

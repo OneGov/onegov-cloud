@@ -1473,7 +1473,7 @@ def test_from_ical(session: Session) -> None:
     assert event.filter_keywords == None
 
     # default keywords
-    events.from_ical('\n'.join([
+    events.from_ical('\n'.join([  # type: ignore[unreachable]
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
         'PRODID:-//OneGov//onegov.event//',
