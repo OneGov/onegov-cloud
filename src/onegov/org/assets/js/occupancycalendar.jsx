@@ -98,6 +98,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
             allDaySlot: false,
             height: 'auto',
             events: ocOptions.feed,
+            slotEventOverlap: false,
             slotMinTime: ocOptions.minTime,
             slotMaxTime: ocOptions.maxTime,
             snapDuration: '00:15',
@@ -186,17 +187,17 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
             // we only allow to add blockers in the future
             var keys = Object.keys(oc.overlappingEvents);
             if (
-                keys.length === 1
-                && oc.overlappingEvents[keys[0]].extendedProps.blockable
-                && oc.overlappingEvents[keys[0]].extendedProps.blockurl
-                && info.start >= Date.now()
+                keys.length === 1 &&
+                oc.overlappingEvents[keys[0]].extendedProps.blockable &&
+                oc.overlappingEvents[keys[0]].extendedProps.blockurl &&
+                info.start >= Date.now()
             ) {
                 return true;
             } else {
                 oc.overlappingEvents = {};
                 return false;
             }
-        }
+        };
         // add blockers on selection
         fcOptions.select = function(info) {
             if (oc.popupOpen) {
@@ -220,7 +221,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
                 wholeDay = true;
             }
             oc.showBlockerPopup(view.calendar, $(view.calendar.el).find('.event-' + event.id).get(0) || view.calendar.el, start, end, wholeDay, event);
-        }
+        };
 
         // edit blocker reason on click
         fcOptions.eventClick = function(info) {
@@ -234,7 +235,12 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         };
 
         // edit events on drag&drop, resize
-        fcOptions.eventOverlap = function(stillEvent, _movingEvent) {
+        fcOptions.eventOverlap = function(stillEvent, movingEvent) {
+            if (stillEvent.extendedProps.resource !== movingEvent.extendedProps.resource) {
+                // NOTE: This doesn't take into account the hierarchy, so it is a little bit
+                //       too permissive right now. But the backend still covers us.
+                return true;
+            }
             return stillEvent.display === 'background';
         };
 
@@ -264,7 +270,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
     // add id to class names so we can easily find the element
     fcOptions.eventClassNames = function(info) {
         return 'event-' + info.event.id;
-    }
+    };
 
     // render additional content lines
     fcOptions.eventContent = function(info, h) {
@@ -272,20 +278,12 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         if (event.display === 'background') {
             return null;
         }
-        if (event.extendedProps.kind === 'blocker') {
-            return h('div', {title: event.title}, [
-                event.title,
-                h('div', {class: 'delete-blocker', title: locale('Delete')}, [
-                    h('i', {class: 'fa fas fa-times'})
-                ])
-            ]);
-        }
         var lines = event.title.split('\n');
         var attrs = {class: 'fc-title'};
         // truncate title when it doesn't fit
         if (info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
             attrs.title = event.title;
-            var max_lines = Math.max(1, Math.floor(moment(event.end).diff(moment(event.start), 'minutes') / 30));
+            var max_lines = Math.max(1, Math.floor(moment(event.end).diff(moment(event.start), 'minutes') / 27));
             lines = lines.slice(0, max_lines);
         } else if (info.view.type === 'multiMonthYear') {
             attrs.title = event.title;
@@ -297,7 +295,25 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
             }
             content.push(lines[i]);
         }
-        return h('div', {class: 'fc-content'}, h('span', attrs, content));
+        if (event.extendedProps.kind === 'blocker') {
+            content[0] = h('div', {class: 'fc-blocker-reason'}, content[0]);
+            content.splice(1, 1); // remove the first <br> tag
+            if (event.extendedProps.deleteurl) {
+                content.unshift(h('div', {class: 'delete-blocker', title: locale('Delete')}, [
+                    h('i', {class: 'fa fas fa-times'})
+                ]));
+            }
+            return h('div', {class: 'fc-blocker-title', title: event.title}, content);
+        }
+        return h(
+            'div',
+            {class: 'fc-content'},
+            h(
+                'div',
+                {class: 'fc-reservation-title'},
+                h('span', attrs, content)
+            )
+        );
     };
 
     fcOptions.eventDidMount = function(info) {
@@ -334,7 +350,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
             // unless the event ends on the hour
             var end = moment(event.end);
             end = end.minutes() === 0 ? end.format('HH:mm') : end.startOf('hour').add(1, 'hour').format('HH:mm');
-            end = end == '00:00' ? '24:00' : end;
+            end = end === '00:00' ? '24:00' : end;
             if (end > maxTime) {
                 maxTime = end;
                 changed = true;
@@ -345,7 +361,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
             this.setOption('slotMinTime', minTime);
             this.setOption('slotMaxTime', maxTime);
         }
-    }
+    };
 
     // history handling
     oc.setupHistory(options);
@@ -575,26 +591,26 @@ oc.setupViewNavigation = function(calendar, element, views, stats_url, pdf_url) 
                     url.query.end = state.end;
                     $(this).closest('.popup').popup('hide');
                     $.ajax(url.toString()).done(function(data) {
-                        var wrapper = $('<div class="reservation-actions">');
+                        var new_wrapper = $('<div class="reservation-actions">');
                         ReactDOM.render(
                             (
-                            <div>
-                                <h3>{locale("Reservations")}</h3>
-                                <p>{data.range}</p>
-                                <h3>{locale("Count")}</h3>
-                                <p>{data.count} {data.pending && (
-                                    <span>({data.pending} {locale("pending approval")})</span>
-                                )}</p>
-                                <h3>{locale("Utilization")}</h3>
-                                <p>{data.utilization.toLocaleString(lang, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                })}%</p>
-                            </div>
+                                <div>
+                                    <h3>{locale("Reservations")}</h3>
+                                    <p>{data.range}</p>
+                                    <h3>{locale("Count")}</h3>
+                                    <p>{data.count} {data.pending && (
+                                        <span>({data.pending} {locale("pending approval")})</span>
+                                    )}</p>
+                                    <h3>{locale("Utilization")}</h3>
+                                    <p>{data.utilization.toLocaleString(lang, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    })}%</p>
+                                </div>
                             ),
-                            wrapper.get(0)
+                            new_wrapper.get(0)
                         );
-                        oc.showPopup(calendar, stats_btn, wrapper);
+                        oc.showPopup(calendar, stats_btn, new_wrapper);
                     });
                 }
             );
@@ -716,12 +732,12 @@ oc.edit_blocker = function(calendar, event, url, reason) {
 // popup handler implementation
 oc.showBlockerPopup = function(calendar, element, start, end, wholeDay, event) {
     var wrapper = $('<div class="reservation-actions">');
-    var form = $('<div class="reservation-form">').appendTo(wrapper);
+    var form_el = $('<div class="reservation-form">').appendTo(wrapper);
 
     // Render the blocker form
     var form = oc.BlockerForm.render(
         calendar,
-        form.get(0),
+        form_el.get(0),
         start,
         end,
         wholeDay,
@@ -759,7 +775,7 @@ oc.showBlockerEditPopup = function(calendar, element, event) {
                 calendar,
                 event,
                 event.extendedProps.seturl,
-                state.reason,
+                state.reason
             );
             $(this).closest('.popup').popup('hide');
         }
@@ -974,7 +990,6 @@ oc.setupResourceSwitch = function(options, resourcesUrl, active) {
         $.getJSON(resourcesUrl, setup);
     });
 };
-
 
 /*
     Allows to fine-adjust the reservation blocker before adding it.
@@ -1222,7 +1237,6 @@ oc.BlockerForm.render = function(calendar, element, start, end, wholeDay, event,
     );
 };
 
-
 /*
     Allows to change the properties of an existing blocker.
 */
@@ -1290,7 +1304,7 @@ oc.BlockerEditForm = React.createClass({
 oc.BlockerEditForm.render = function(element, event, onSubmit) {
     ReactDOM.render(
         <oc.BlockerEditForm
-            reason={event.title}
+            reason={event.extendedProps.reason}
             onSubmit={onSubmit}
         />,
         element);
@@ -1303,7 +1317,7 @@ oc.ExportForm = React.createClass({
     getInitialState: function() {
         var state = {
             start: this.props.start.format('YYYY-MM-DD'),
-            end: this.props.end.format('YYYY-MM-DD'),
+            end: this.props.end.format('YYYY-MM-DD')
         };
         if (this.props.accepted) {
             state.accepted = true;

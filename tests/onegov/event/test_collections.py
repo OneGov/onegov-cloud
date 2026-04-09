@@ -1470,7 +1470,8 @@ def test_from_ical(session: Session) -> None:
     transaction.commit()
     event = events.query().one()
     assert sorted(event.tags) == ['Sport']
-    assert event.filter_keywords == None
+    if not TYPE_CHECKING:
+        assert event.filter_keywords is None
 
     # default keywords
     events.from_ical('\n'.join([

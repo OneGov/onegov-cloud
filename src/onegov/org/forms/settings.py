@@ -900,7 +900,7 @@ class AnalyticsSettingsForm(Form):
 
             # NOTE: In order to get an OR we need to use the AND
             #       of all the choices it can't be instead.
-            dependency = FieldDependency(*(  # type: ignore[misc]
+            dependency = FieldDependency(*(  # type: ignore
                 arg
                 for name, _ in choices
                 if name not in providers

@@ -480,7 +480,7 @@ def test_session_manager_sharing(postgres_dsn: str) -> None:
     session.add(test)
     transaction.commit()
 
-    assert session.query(Test).one().session_manager.__repr__.__self__ is mgr  # type: ignore[attr-defined]
+    assert session.query(Test).one().session_manager.__repr__.__self__ is mgr
     mgr.dispose()
 
 
@@ -1666,9 +1666,9 @@ def test_orm_cache(postgres_dsn: str, redis_url: str) -> None:
 
     assert app.secret_document is None
     # NOTE: Undo mypy narrowing for app.first_document
-    app2 = app
-    assert app2.first_document is not None
-    assert app2.first_document.title == 'Public'
+    app = app
+    assert app.first_document is not None
+    assert app.first_document.title == 'Public'
     assert app.untitled_documents == []
     assert app.documents[0].title == 'Public'
 
@@ -1685,9 +1685,12 @@ def test_orm_cache(postgres_dsn: str, redis_url: str) -> None:
     app.session().add(Document(id=2, title='Secret', body='Geheim'))
     transaction.commit()
 
+    # NOTE: Undo mypy narrowing for app.first_document
+    app = app
     assert app.request_cache == {}
     assert app.secret_document == 2
-    assert app2.first_document.title == 'Public'
+    assert app.first_document is not None
+    assert app.first_document.title == 'Public'
     assert app.untitled_documents == []
     assert len(app.documents) == 2
 

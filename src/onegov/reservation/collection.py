@@ -28,6 +28,9 @@ class ResourceCollection:
     """ Manages a list of resources.
 
     """
+
+    session: Session
+
     def __init__(self, libres_context: Context):
         assert hasattr(libres_context, 'get_service'), """
             The ResourceCollection expected the libres_contex, not the session.

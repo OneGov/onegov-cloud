@@ -31,7 +31,7 @@ from onegov.pay import InvoiceItemMeta, Price
 from onegov.reservation import Resource
 from onegov.ticket import Ticket, TicketCollection, TicketPermission
 from onegov.user import Auth, User, UserGroup
-from operator import add, attrgetter
+from operator import add
 from sqlalchemy import case, nullsfirst
 from webob.exc import HTTPBadRequest
 
@@ -436,58 +436,50 @@ class ReservationInfo:
 
 class AllocationEventInfo:
 
-    __slots__ = ('resource', 'allocation', 'availability', 'request',
-                 'translate')
+    __slots__ = ('resource', 'allocation', 'availability',
+                 'partitions', 'request', 'translate')
 
     def __init__(
         self,
         resource: Resource,
         allocation: Allocation,
         availability: float,
+        partitions: Sequence[tuple[float, bool]],
         request: OrgRequest
     ) -> None:
 
         self.resource = resource
         self.allocation = allocation
         self.availability = availability
+        self.partitions = partitions
         self.request = request
         self.translate = request.translate
 
     @classmethod
-    def from_allocations(
+    def from_resource_by_range(
         cls,
         request: OrgRequest,
         resource: Resource,
-        allocations: Iterable[Allocation]
+        start: datetime,
+        end: datetime
     ) -> list[Self]:
 
-        events = []
-
         scheduler = resource.scheduler
-        allocations = request.exclude_invisible(allocations)
-
-        for key, group in groupby(allocations, key=attrgetter('_start')):
-            grouped = tuple(group)
-            if len(grouped) == 1 and grouped[0].partly_available:
-                # in this case we might need to normalize the availability
-                availability = grouped[0].normalized_availability
-            else:
-                availability = scheduler.queries.availability_by_allocations(
-                    grouped
-                )
-
-            for allocation in grouped:
-                if allocation.is_master:
-                    events.append(  # noqa: PERF401
-                        cls(
-                            resource,
-                            allocation,
-                            availability,
-                            request
-                        )
-                    )
-
-        return events
+        allocations = scheduler.allocations_with_availability_by_range(
+            start,
+            end
+        )
+        return [
+            cls(
+                resource,
+                allocation,  # type: ignore[arg-type]
+                availability,
+                partitions,
+                request
+            )
+            for allocation, availability, partitions in allocations
+            if request.is_visible(allocation)
+        ]
 
     @property
     def event_start(self) -> str:
@@ -682,7 +674,7 @@ class AllocationEventInfo:
             'partlyAvailable': self.allocation.partly_available,
             'quota': self.allocation.quota,
             'quotaLeft': self.quota_left,
-            'partitions': self.allocation.availability_partitions(),
+            'partitions': self.partitions,
             'actions': [
                 link(self.request)
                 for link in self.event_actions
@@ -694,16 +686,14 @@ class AllocationEventInfo:
 
 class AvailabilityEventInfo:
 
-    __slots__ = ('resource', 'allocation', 'request', 'translate')
+    __slots__ = ('allocation', 'request', 'translate')
 
     def __init__(
         self,
-        resource: Resource,
         allocation: Allocation,
         request: OrgRequest
     ) -> None:
 
-        self.resource = resource
         self.allocation = allocation
         self.request = request
         self.translate = request.translate
@@ -712,12 +702,11 @@ class AvailabilityEventInfo:
     def from_allocations(
         cls,
         request: OrgRequest,
-        resource: Resource,
         allocations: Iterable[Allocation]
     ) -> list[Self]:
 
         return [
-            cls(resource, allocation, request)
+            cls(allocation, request)
             for allocation in allocations
             if allocation.is_master
         ]
@@ -760,23 +749,37 @@ class AvailabilityEventInfo:
                 abs_tol=.005
             ),
             'wholeDay': self.allocation.whole_day,
+            # NOTE: We can switch to `resourceId`if we decide to include
+            #       premium features
+            'resource': str(self.allocation.mirror_of),
             'kind': 'allocation',
         }
 
 
 class BlockerEventInfo:
 
-    __slots__ = ('resource', 'blocker', 'request', 'translate')
+    __slots__ = (
+        'resource',
+        'blocker',
+        'css_classes',
+        'include_title',
+        'request',
+        'translate'
+    )
 
     def __init__(
         self,
         resource: Resource,
         blocker: ReservationBlocker,
-        request: OrgRequest
+        request: OrgRequest,
+        css_classes: Collection[str] = (),
+        include_title: bool = False
     ) -> None:
 
         self.resource = resource
         self.blocker = blocker
+        self.css_classes = css_classes
+        self.include_title = include_title
         self.request = request
         self.translate = request.translate
 
@@ -785,11 +788,21 @@ class BlockerEventInfo:
         cls,
         request: OrgRequest,
         resource: Resource,
-        blockers: Iterable[ReservationBlocker]
+        blockers: Iterable[ReservationBlocker],
+        blocking_resources: dict[UUID, Resource]
     ) -> list[Self]:
 
+        include_title = len(blocking_resources) > 0
         return [
-            cls(resource, blocker, request)
+            cls(
+                res := blocking_resources.get(blocker.resource, resource),
+                blocker,
+                request,
+                css_classes=() if res is resource else (
+                    'event-blocking-resource',
+                ),
+                include_title=include_title
+            )
             for blocker in blockers
         ]
 
@@ -816,20 +829,24 @@ class BlockerEventInfo:
     def as_dict(self) -> dict[str, Any]:
         is_manager = self.request.is_manager
         editable = self.editable
+        title = reason = self.title
+        if self.include_title:
+            title = f'{title}\n{self.resource.title}'
         return {
             'id': f'blocker-{self.blocker.id}',
             'start': self.event_start,
             'end': self.event_end,
-            'title': self.title,
+            'title': title,
             'editable': editable,
-            'classNames': 'event-blocker',
+            'classNames': ['event-blocker', *self.css_classes],
             'display': 'block',
             # extended properties
+            'reason': reason,
             'editurl': self.request.csrf_protected_url(self.request.link(
                 self.blocker,
                 name='adjust',
                 query_params={'blocker-id': str(self.blocker.id)}
-            )) if is_manager else None,
+            )) if editable and is_manager else None,
             'deleteurl': self.request.csrf_protected_url(self.request.link(
                 self.blocker
             )) if editable and is_manager else None,
@@ -838,6 +855,9 @@ class BlockerEventInfo:
                 name='set-reason',
                 query_params={'blocker-id': str(self.blocker.id)}
             )) if is_manager else None,
+            # NOTE: We can switch to `resourceId`if we decide to include
+            #       premium features
+            'resource': str(self.resource.id),
             'kind': 'blocker',
         }
 
@@ -863,6 +883,8 @@ class ReservationEventInfo:
         'reservation',
         'ticket',
         'extra',
+        'css_classes',
+        'include_title',
         'request',
         'translate'
     )
@@ -874,12 +896,16 @@ class ReservationEventInfo:
         ticket: Ticket,
         extra: Sequence[str],
         request: OrgRequest,
+        css_classes: Collection[str] = (),
+        include_title: bool = False,
     ) -> None:
 
         self.resource = resource
         self.reservation = reservation
         self.ticket = ticket
         self.extra = extra
+        self.css_classes = css_classes
+        self.include_title = include_title
         self.request = request
         self.translate = request.translate
 
@@ -888,16 +914,22 @@ class ReservationEventInfo:
         cls,
         request: OrgRequest,
         resource: Resource,
-        reservations: Iterable[tuple[Reservation, Ticket, *tuple[str, ...]]]
+        reservations: Iterable[tuple[Reservation, Ticket, *tuple[str, ...]]],
+        blocking_resources: dict[UUID, Resource]
     ) -> list[Self]:
 
+        include_title = len(blocking_resources) > 0
         return [
             cls(
-                resource,
+                res := blocking_resources.get(reservation.resource, resource),
                 reservation,
                 ticket,
                 extra,
-                request
+                request,
+                css_classes=() if res is resource else (
+                    'event-blocking-resource',
+                ),
+                include_title=include_title
             )
             for reservation, ticket, *extra in reservations
         ]
@@ -944,6 +976,7 @@ class ReservationEventInfo:
             self.ticket.tag or self.reservation.email,
             *self.extra,
             self.reservation.email if self.ticket.tag else '',
+            self.resource.title if self.include_title else '',
             self.event_time,
             f'{self.translate(_("Quota"))}: {self.quota}'
             if getattr(self.resource, 'show_quota', False) else '',
@@ -957,6 +990,8 @@ class ReservationEventInfo:
             yield 'event-accepted'
         else:
             yield 'event-pending'
+
+        yield from self.css_classes
 
     @property
     def color(self) -> str | None:
@@ -1005,6 +1040,9 @@ class ReservationEventInfo:
                 name='adjust-reservation',
                 query_params={'reservation-id': str(self.reservation.id)}
             )) if is_manager else None,
+            # NOTE: We can switch to `resourceId`if we decide to include
+            #       premium features
+            'resource': str(self.resource.id),
             'kind': 'reservation',
         }
 

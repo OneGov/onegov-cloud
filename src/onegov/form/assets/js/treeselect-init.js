@@ -12,10 +12,12 @@ $(document).ready(function() {
             saveScrollPosition: true,
             emptyText: $(select).data('no_results_text') || '',
             placeholder: $(select).data('placeholder') || '',
-            showTags: true,
+            showTags: select.multiple,
             searchable: true,
             clearable: true,
-            isGroupedValue: true,
+            expandSelected: true,
+            isGroupedValue: select.multiple,
+            grouped: select.multiple,
             inputCallback: function(value) {
                 $(select).val(value);
             },
