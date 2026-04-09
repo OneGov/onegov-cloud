@@ -194,7 +194,7 @@ class NotificationTemplateSendForm(Form):
             recipients = self.recipients_with_no_wishes_or_bookings()
 
         elif self.send_to.data == 'volunteers':
-            recipients = self.recipients_volunteers(self.volunteer_state.data)
+            return self.recipients_volunteers(self.volunteer_state.data)
 
         else:
             raise NotImplementedError
