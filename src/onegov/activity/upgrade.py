@@ -831,6 +831,6 @@ def add_on_update_cascade_to_username_fks(context: UpgradeContext) -> None:
 @upgrade_task('Add group code to periods')
 def add_group_code_to_periods(context: UpgradeContext) -> None:
     if not context.has_column('periods', 'with_group_code'):
-        context.operations.add_column('periods', Column(
+        context.add_column_with_defaults('periods', Column(
             'with_group_code', Boolean, nullable=True
         ), default=True)
