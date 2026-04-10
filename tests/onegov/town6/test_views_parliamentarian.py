@@ -20,7 +20,7 @@ def test_parliamentarians(client: Client) -> None:
     settings = client.get('/module-activation-settings')
     settings.form['ris_enabled'] = True
     settings.form.submit()
-    
+
     settings = client.get('/ris-settings')
     settings.form['ris_interest_tie_categories'] = 'Work; Leisure and Fun;'
     settings.form.submit()
