@@ -1,8 +1,94 @@
 # Changes
 
+## 2026.19
+
+`2026-04-10` | [1a8da1014a...9226adf192](https://github.com/OneGov/onegov-cloud/compare/1a8da1014a^...9226adf192)
+
+### Core
+
+##### Avoids a potential race condition for messages tied to a session
+
+`Bugfix` | [ONEGOV-CLOUD-5DM](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-5DM) | [0f65411221](https://github.com/onegov/onegov-cloud/commit/0f654112219f10d9cdccc5ee13328112eeaeda3f)
+
+### Feriennet
+
+##### Update homepage structure for new instances
+
+`Feature` | [1a8da1014a](https://github.com/onegov/onegov-cloud/commit/1a8da1014a39e64b5f59e31f730aed1504b990bf)
+
+##### Make group code optional
+
+Create option to activate and deactivate group codes in the period form
+
+`Feature` | [PRO-931](https://linear.app/projuventute/issue/PRO-931) | [a24cbd1d52](https://github.com/onegov/onegov-cloud/commit/a24cbd1d529f0baa758f3f4b6e53a4fdbee4825b)
+
+##### Volunteers as recipients
+
+Add volunteers with different states as options for message recipients
+
+`Feature` | [PRO-1421](https://linear.app/projuventute/issue/PRO-1421) | [9226adf192](https://github.com/onegov/onegov-cloud/commit/9226adf192e86e0d2f02d2cb1e01e64945266524)
+
+##### Fixes potential crash in personal attendee views
+
+This also makes the `Personal` access restriction on `Attendee` more
+robust by baking it into the security rules.
+
+`Bugfix` | [ONEGOV-CLOUD-5DN](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-5DN) | [0a198f0d52](https://github.com/onegov/onegov-cloud/commit/0a198f0d5281d400f1254877309ea7ef1f050e82)
+
+### Org
+
+##### Adds an optional parent resource to reservation resources
+
+Parent resources will be blocked by children and vice versa, but the
+children don't block each other.
+
+`Feature` | [OGC-2580](https://linear.app/onegovcloud/issue/OGC-2580) | [ea165dbeae](https://github.com/onegov/onegov-cloud/commit/ea165dbeae1af7d3f702eddaecb6b234e612ec24)
+
+##### Improves robustness of `reject` view for reservations
+
+Previously it was possible to accidentally reject all reservations if
+a link was clicked multiple times or the ticket was opened in multiple
+tabs.
+
+`Bugfix` | [OGC-3072](https://linear.app/onegovcloud/issue/OGC-3072) | [d1fdb2ca8f](https://github.com/onegov/onegov-cloud/commit/d1fdb2ca8ff9806ba15941a2e5c559049267d744)
+
+##### Fixes copy paste on views that make use of `NewsCollection`
+
+`Bugfix` | [ONEGOV-CLOUD-482](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-482) | [916f5bec09](https://github.com/onegov/onegov-cloud/commit/916f5bec09c90abf8f497a27256b3bc2d36656f4)
+
+### Pas
+
+##### Refactor `hourly_user_account_sync` to run directly after import.
+
+`Feature` | [66696474ab](https://github.com/onegov/onegov-cloud/commit/66696474aba458a8a43963a5388ddd663bad9392)
+
+##### Make import more resilient if 0 records fetched.
+
+`Bugfix` | [7650a01981](https://github.com/onegov/onegov-cloud/commit/7650a0198179423809fd11ccc980440fa1f40f37)
+
+### Town6
+
+##### Fixes rendering of person organisations in search results
+
+`Bugfix` | [OGC-3074](https://linear.app/onegovcloud/issue/OGC-3074) | [dee62b0f5f](https://github.com/onegov/onegov-cloud/commit/dee62b0f5f21f26b7a10660465d30f70d8c806e4)
+
+### Translator Direcory
+
+##### `operation_comments` is now member visible.
+
+`Feature` | [OGC-3065](https://linear.app/onegovcloud/issue/OGC-3065) | [1da4c06a3c](https://github.com/onegov/onegov-cloud/commit/1da4c06a3cbdc0b8ca747ad9911e21611f82c36c)
+
+##### Adds a view test for `operation_comments`.
+
+`Feature` | [OGC-3065](https://linear.app/onegovcloud/issue/OGC-3065) | [0dac70f4c5](https://github.com/onegov/onegov-cloud/commit/0dac70f4c5a8b84f76c2e143390e348abfbf22e0)
+
+## swi
+
+`2026-03-30` | [b2808d3bc1...59f3a504ba](https://github.com/OneGov/onegov-cloud/compare/b2808d3bc1^...59f3a504ba)
+
 ## 2026.18
 
-`2026-03-27` | [4a8cf6ef55...cc96802ae1](https://github.com/OneGov/onegov-cloud/compare/4a8cf6ef55^...cc96802ae1)
+`2026-03-27` | [4a8cf6ef55...72b3b75960](https://github.com/OneGov/onegov-cloud/compare/4a8cf6ef55^...72b3b75960)
 
 ### Core
 
@@ -1960,18 +2046,4 @@ value) would be incorrectly applied.
 No automatic translation for custom tags
 
 `Bugfix` | [OGC-2646](https://linear.app/onegovcloud/issue/OGC-2646) | [87b7579b78](https://github.com/onegov/onegov-cloud/commit/87b7579b78461abd9a18faea6a0d9d6451d869ff)
-
-## 2025.54
-
-`2025-09-30` | [71f05ef6f4...c64c9d7060](https://github.com/OneGov/onegov-cloud/compare/71f05ef6f4^...c64c9d7060)
-
-## 2025.53
-
-`2025-09-30` | [bfc3672deb...34dd4cdab5](https://github.com/OneGov/onegov-cloud/compare/bfc3672deb^...34dd4cdab5)
-
-### Pas
-
-##### Adds custom user management and minor fixes.
-
-`Feature` | [8166891e79](https://github.com/onegov/onegov-cloud/commit/8166891e79beea53a496a6a91c860b385312a26b)
 
