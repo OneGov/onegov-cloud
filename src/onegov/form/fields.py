@@ -67,7 +67,6 @@ if TYPE_CHECKING:
         FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
     from typing import NotRequired, TypedDict, Self
     from webob.request import _FieldStorageWithFile
-    from wtforms.fields.choices import _Choice
     from wtforms.form import BaseForm
     from wtforms.meta import (
         _MultiDictLikeWithGetlist, _SupportsGettextAndNgettext, DefaultMeta)
@@ -795,6 +794,8 @@ class PhoneNumberField(TelField):
 
 class _TreeSelectMixin(_TreeSelectMixinBase):
 
+    widget: TreeSelectWidget
+
     def __init__(
         self,
         label: str | None = None,
@@ -855,9 +856,13 @@ class _TreeSelectMixin(_TreeSelectMixinBase):
     def flatten_choices(
         self,
         choices: Iterable[TreeSelectNode]
-    ) -> Iterator[_Choice]:
+    ) -> Iterator[tuple[str, str]]:
+        multiple = self.widget.multiple
         for choice in choices:
-            yield choice['value'], choice['name']
+            if not choice.get('disabled', False) and (
+                multiple or choice.get('isGroupSelectable', True)
+            ):
+                yield choice['value'], choice['name']
             yield from self.flatten_choices(choice['children'])
 
     def set_choices(self, choices: Iterable[TreeSelectNode]) -> None:
@@ -866,6 +871,9 @@ class _TreeSelectMixin(_TreeSelectMixinBase):
 
         self.render_kw['data-choices'] = json.dumps(choices)
         self.choices = list(self.flatten_choices(choices))
+        if not self.widget.multiple:
+            # NOTE: Add a blank choice so the field can be cleared
+            self.choices.insert(0, ('', ''))
 
 
 class TreeSelectField(_TreeSelectMixin, SelectField):

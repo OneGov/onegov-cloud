@@ -39,6 +39,7 @@ from onegov.ticket import TicketCollection, TicketInvoice
 from onegov.user import Auth
 from onegov.user.collections import TANCollection
 from purl import URL
+from sqlalchemy import and_, or_
 from uuid import uuid4
 from webob import exc, Response
 from wtforms import HiddenField
@@ -147,6 +148,7 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
 
     quota = int(quota_str)
     whole_day = request.params.get('whole_day') == '1'
+    consider_blocking = request.params.get('consider_blocking') == '1'
 
     if self.partly_available:
         if self.whole_day and whole_day:
@@ -223,10 +225,11 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
         return respond_with_error(request, err)
 
     # ...otherwise, try to reserve
+    scheduler = resource.scheduler
     try:
         # Todo: This entry created remained after a reservation
         # and the session id got lost
-        resource.scheduler.reserve(
+        scheduler.reserve(
             email='0xdeadbeef@example.org',  # will be set later
             dates=(start, end),
             quota=quota,
@@ -235,8 +238,36 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
         )
     except LibresError as e:
         return respond_with_error(request, utils.get_libres_error(e, request))
-    else:
-        return respond_with_success(request)
+
+    if consider_blocking and scheduler.blocking_names:
+        blocking_resources = resource.blocking_resources()
+        # Remove all the temporary reservations that would overlap this one
+        for reservation in scheduler.session.query(Reservation).filter(
+            Reservation.resource.in_(blocking_resources)
+        ).filter(Reservation.status != 'approved').filter(
+            or_(
+                and_(
+                    Reservation.start <= start,
+                    start < Reservation.end
+                ),
+                and_(
+                    start <= Reservation.start,
+                    Reservation.start < end
+                )
+            )
+        ):
+            blocking_resource = blocking_resources[reservation.resource]
+            # we ignore reservations from different sessions
+            session_id = blocking_resource.bound_session_id(request)  # type: ignore[attr-defined]
+            if reservation.session_id != session_id:
+                continue
+
+            blocking_resource.scheduler.remove_reservation(
+                reservation.token,
+                reservation.id
+            )
+
+    return respond_with_success(request)
 
 
 @OrgApp.json(
@@ -1235,26 +1266,40 @@ def reject_reservation(
     view_ticket: ReservationTicket | None = None
 ) -> Response | None:
 
+    def respond() -> Response | None:
+        # return none on intercooler js requests
+        if not request.headers.get('X-IC-Request'):
+            if view_ticket is not None:
+                return request.redirect(request.link(view_ticket))
+            return request.redirect(request.link(self))
+        return None
+
     token = self.token
     resource = request.app.libres_resources.by_reservation(self)
     assert resource is not None
     reservation_id_str = request.params.get('reservation-id')
-    if isinstance(reservation_id_str, str) and reservation_id_str.isdigit():
-        reservation_id = int(reservation_id_str)
-    else:
-        reservation_id = 0
-
     all_reservations: list[Reservation] = (
         resource.scheduler.reservations_by_token(token)  # type:ignore
         .order_by(Reservation.start).all()
     )
-
     targeted: Sequence[Reservation]
-    targeted = tuple(r for r in all_reservations if r.id == reservation_id)
-    targeted = targeted or all_reservations
-    excluded = tuple(r for r in all_reservations if r.id not in {
-        r.id for r in targeted
-    })
+    if reservation_id_str is not None:
+        if not (
+            isinstance(reservation_id_str, str)
+            and reservation_id_str.isdigit()
+        ):
+            raise exc.HTTPBadRequest()
+
+        reservation_id = int(reservation_id_str)
+        targeted = tuple(r for r in all_reservations if r.id == reservation_id)
+        if not targeted:
+            request.warning(_('The targeted reservation no longer exists'))
+            return respond()
+    else:
+        targeted = all_reservations
+
+    targeted_ids = {r.id for r in targeted}
+    excluded = tuple(r for r in all_reservations if r.id not in targeted_ids)
 
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
@@ -1277,12 +1322,7 @@ def reject_reservation(
             'to be refunded before the reservation can be rejected'
         ))
 
-        if not request.headers.get('X-IC-Request'):
-            if view_ticket is not None:
-                return request.redirect(request.link(view_ticket))
-            return request.redirect(request.link(self))
-
-        return None
+        return respond()
 
     savepoint = transaction.savepoint()
     ReservationMessage.create(targeted, ticket, request, 'rejected')
@@ -1441,12 +1481,7 @@ def reject_reservation(
             'but the payment is no longer open.'
         ))
 
-    # return none on intercooler js requests
-    if not request.headers.get('X-IC-Request'):
-        if view_ticket is not None:
-            return request.redirect(request.link(view_ticket))
-        return request.redirect(request.link(self))
-    return None
+    return respond()
 
 
 @OrgApp.view(

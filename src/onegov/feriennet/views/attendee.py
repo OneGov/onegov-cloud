@@ -7,6 +7,7 @@ from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.forms import AttendeeForm, AttendeeLimitForm
 from onegov.feriennet.layout import BookingCollectionLayout
 from onegov.org.elements import Link
+from webob.exc import HTTPForbidden
 
 
 from typing import TYPE_CHECKING
@@ -14,6 +15,14 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.feriennet.request import FeriennetRequest
     from webob import Response
+
+
+def assert_has_access_to_attendee(
+    self: Attendee,
+    request: FeriennetRequest
+) -> None:
+    if not request.is_admin and self.username != request.current_username:
+        raise HTTPForbidden()
 
 
 @FeriennetApp.form(
@@ -27,8 +36,7 @@ def edit_attendee(
     form: AttendeeForm
 ) -> RenderData | Response:
 
-    # note: attendees are added in the views/occasion.py file
-    assert request.is_admin or self.username == request.current_username
+    assert_has_access_to_attendee(self, request)
 
     bookings = BookingCollection(request.session)
     bookings = bookings.for_username(self.username)
@@ -67,7 +75,7 @@ def edit_attendee_limit(
     form: AttendeeLimitForm
 ) -> RenderData | Response:
 
-    assert request.is_admin or self.username == request.current_username
+    assert_has_access_to_attendee(self, request)
 
     bookings = BookingCollection(request.session)
     bookings = bookings.for_username(self.username)
@@ -106,6 +114,7 @@ def delete_attendee(
 ) -> None:
 
     request.assert_valid_csrf_token()
+    assert_has_access_to_attendee(self, request)
 
     attendees = AttendeeCollection(
         request.session

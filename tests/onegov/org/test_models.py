@@ -51,6 +51,29 @@ def test_clipboard(org_app: TestOrgApp) -> None:
     assert clipboard.url is None
 
 
+def test_clipboard_news_collection(org_app: TestOrgApp) -> None:
+
+    request = OrgRequest(environ={
+        'PATH_INFO': '/',
+        'SERVER_NAME': '',
+        'SERVER_PORT': '',
+        'SERVER_PROTOCOL': 'https',
+        'wsgi.url_scheme': 'https'
+    }, app=org_app)
+
+    news = NewsCollection(request)
+    root = news.root
+    assert root is not None
+    clipboard = Clipboard.from_url(request, request.link(news))
+    assert clipboard.get_object() == root
+
+    clipboard.store_in_session()
+    assert clipboard.from_session(clipboard.request).get_object() == root
+
+    clipboard.clear()
+    assert clipboard.from_session(clipboard.request).get_object() is None
+
+
 def test_news(session: Session) -> None:
 
     request: Any = Bunch(**{

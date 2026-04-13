@@ -40,6 +40,8 @@ def test_settings(client: Client) -> None:
 
     settings = client.get('/general-settings')
     assert "Ungültige Farbe." not in settings.text
+    # undo narrowing
+    client = client
     # Form was populated with user_options default before submitting
     assert client.app.font_family == HELVETICA
 

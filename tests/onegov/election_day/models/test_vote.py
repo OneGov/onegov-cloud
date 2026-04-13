@@ -160,6 +160,8 @@ def test_ballot_answer_simple(session: Session) -> None:
     # set results to counted
     for result in vote.proposal.results:
         result.counted = True
+
+    vote = vote  # undo narrowing
     assert vote.proposal.answer == 'accepted'
     assert vote.answer == 'accepted'
 
