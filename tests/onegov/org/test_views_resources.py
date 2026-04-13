@@ -4595,7 +4595,7 @@ def test_my_reservations_view(client: Client) -> None:
     admin = client.spawn()
     admin.login_admin()
     settings = admin.get('/').click(
-        'Module aktivieren/deaktivieren', index=1)
+        'Module aktivieren/deaktivieren')
     settings.form['citizen_login_enabled'].checked = True
     settings.form.submit().follow()
 
