@@ -40,7 +40,7 @@ def get_template_variables(request: OrgRequest) -> dict[str, Any]:
 
 def get_modules(request: OrgRequest) -> LinkGroup:
     links = []
-    if request.is_logged_in:
+    if request.is_admin:
         # Modules
         links.append(
             Link(
@@ -50,6 +50,7 @@ def get_modules(request: OrgRequest) -> LinkGroup:
             )
         )
 
+    if request.is_logged_in:
         links.append(
             Link(
                 _('Latest news'),
@@ -122,8 +123,6 @@ def get_modules(request: OrgRequest) -> LinkGroup:
             )
         )
 
-    # ToDo: Add Chat links
-
     return LinkGroup(_('Modules'), classes=('modules', ), links=links)
 
 
@@ -186,7 +185,7 @@ def get_global_tools(
                     Auth.from_request_path(request), name='register'
                 ), attrs={'class': 'register'})
 
-    # Managementrequest.link(
+    # Management dropdown
     if request.is_manager:
         links = []
 
@@ -262,7 +261,6 @@ def get_global_tools(
                 )
             )
 
-        if request.is_admin:
             links.append(
                 Link(
                     _('Link Check'),
