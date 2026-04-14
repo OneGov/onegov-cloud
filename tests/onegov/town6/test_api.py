@@ -13,6 +13,7 @@ from onegov.org.models.parliament import (
 from onegov.org.models.political_business import PoliticalBusiness
 from onegov.people import Person
 from onegov.reservation import ResourceCollection
+from onegov.town6.api import apply_api_ordering
 from sedate import utcnow
 
 from typing import Any, TYPE_CHECKING
@@ -92,6 +93,26 @@ def test_api_people_endpoint(client: Client, town_app: TestTownApp) -> None:
     assert item_data['salutation'] == 'Herr'
     assert item_data['political_party'] == 'FDP'
     assert 'modified' in item_data
+
+
+def test_apply_api_ordering_replaces_existing_order(
+    town_app: TestTownApp,
+) -> None:
+    session = town_app.session()
+    session.add(Person(
+        first_name='Zoe',
+        last_name='Zulu',
+    ))
+    session.add(Person(
+        first_name='Anna',
+        last_name='Alpha',
+    ))
+    transaction.commit()
+
+    query = session.query(Person).order_by(Person.last_name.desc())
+    ordered = apply_api_ordering(query, Person.last_name)
+
+    assert [person.last_name for person in ordered] == ['Alpha', 'Zulu']
 
 
 def test_api_meetings_endpoint(
@@ -335,6 +356,25 @@ def test_api_forms_paginates_external_links_and_hides_invisible_items(
     client.get(f'/api/forms/{hidden_external.id.hex}', status=404)
 
 
+def test_api_forms_endpoint_lists_mtan_items_but_hides_details(
+    client: Client, town_app: TestTownApp
+) -> None:
+    session = town_app.session()
+    form = FormCollection(session).definitions.add(
+        'API Form mTAN',
+        'E-Mail *= @@@',
+        type='custom',
+    )
+    form.access = 'mtan'  # type:ignore[attr-defined]
+    transaction.commit()
+
+    items = api_items(client, '/api/forms')
+    titles = {api_item_data(item)['title'] for item in items}
+
+    assert 'API Form mTAN' in titles
+    client.get(f'/api/forms/{form.id}', status=404)
+
+
 def test_api_resources_paginates_external_links_and_hides_invisible_items(
     client: Client, town_app: TestTownApp
 ) -> None:
@@ -386,6 +426,24 @@ def test_api_resources_paginates_external_links_and_hides_invisible_items(
 
     client.get(f'/api/resources/{hidden_resource.id.hex}', status=404)
     client.get(f'/api/resources/{hidden_external.id.hex}', status=404)
+
+
+def test_api_resources_endpoint_lists_mtan_items_but_hides_details(
+    client: Client, town_app: TestTownApp
+) -> None:
+    resource = ResourceCollection(town_app.libres_context).add(
+        title='API Resource mTAN',
+        timezone='Europe/Zurich',
+        type='room',
+        meta={'access': 'mtan'},
+    )
+    transaction.commit()
+
+    items = api_items(client, '/api/resources')
+    titles = {api_item_data(item)['title'] for item in items}
+
+    assert 'API Resource mTAN' in titles
+    client.get(f'/api/resources/{resource.id.hex}', status=404)
 
 
 def test_api_people_endpoint_hides_unpublished_entries(
@@ -471,3 +529,24 @@ def test_api_political_businesses_endpoint_hides_private_entries(
         f'/api/political_businesses/{hidden_business.id.hex}',
         status=404,
     )
+
+
+def test_api_political_businesses_endpoint_lists_mtan_items_but_hides_details(
+    client: Client, town_app: TestTownApp
+) -> None:
+    session = town_app.session()
+    business = PoliticalBusiness(
+        title='mTAN Business',
+        number='2024.012',
+        political_business_type='motion',
+        status='pendent_legislative',
+    )
+    business.access = 'mtan'
+    session.add(business)
+    transaction.commit()
+
+    items = api_items(client, '/api/political_businesses')
+    titles = {api_item_data(item)['title'] for item in items}
+
+    assert 'mTAN Business' in titles
+    client.get(f'/api/political_businesses/{business.id.hex}', status=404)

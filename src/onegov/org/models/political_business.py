@@ -6,7 +6,7 @@ from sqlalchemy import Column, Date, Enum, ForeignKey, Text
 from sqlalchemy import Table
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
-from uuid import uuid4
+from uuid import UUID as UUIDType, uuid4
 
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import Base
@@ -330,6 +330,21 @@ class PoliticalBusinessCollection(
 
     def query(self) -> Query[PoliticalBusiness]:
         query = super().query()
+        role = getattr(self.request.identity, 'role', 'anonymous')
+        available_accesses = {
+            'admin': (),
+            'editor': (),
+            'member': ('member', 'mtan', 'public'),
+        }.get(role, ('mtan', 'public'))
+
+        if available_accesses:
+            query = query.filter(or_(
+                *(
+                    PoliticalBusiness.meta['access'].astext == access
+                    for access in available_accesses
+                ),
+                PoliticalBusiness.meta['access'].is_(None)
+            ))
 
         if self.term:
             language = self.request.locale
@@ -370,6 +385,18 @@ class PoliticalBusinessCollection(
 
     def subset(self) -> Query[PoliticalBusiness]:
         return self.query()
+
+    def by_id(self, id: str | int | uuid.UUID) -> PoliticalBusiness | None:
+        normalized_id = id
+        if isinstance(id, str):
+            try:
+                normalized_id = UUIDType(id)
+            except ValueError:
+                normalized_id = id
+
+        return self.query().filter(
+            self.primary_key == normalized_id
+        ).first()
 
     def page_by_index(self, index: int) -> Self:
         return self.__class__(

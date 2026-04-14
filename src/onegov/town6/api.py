@@ -31,24 +31,19 @@ from sqlalchemy import or_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.inspection import inspect as sa_inspect
 
-from typing import Any, Generic, Self, TypeAlias
+from typing import Any, Generic, Self, TypeAlias, TypeVar
 from typing import TYPE_CHECKING
+T = TypeVar('T')
+
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Sequence
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
     from onegov.event.models import Occurrence
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
-    from typing import Protocol, TypeVar
     from onegov.core.collection import PKType
     from sqlalchemy.orm import Query
-
-    T = TypeVar('T')
-
-    class SupportsQueryAndById(Protocol[T]):
-        def query(self) -> Query[T]: ...
-        def by_id(self, id: PKType) -> T | None: ...
 
 
 def get_geo_location(item: ContentMixin) -> dict[str, Any]:
@@ -90,7 +85,7 @@ def apply_visibility_filters(
     model_class: Any,
 ) -> Query[T]:
     accesses = available_accesses(request)
-    if accesses and hasattr(model_class, 'access'):
+    if accesses and hasattr(model_class, 'meta'):
         query = query.filter(or_(
             *(
                 model_class.meta['access'].astext == access
@@ -112,77 +107,120 @@ def apply_visibility_filters(
     return query
 
 
-class FilteredCollection(Generic[T]):
+def apply_api_ordering(
+    query: Query[T],
+    order_by: Any | None,
+) -> Query[T]:
+    if order_by is None:
+        return query
+    return query.order_by(None).order_by(order_by)
 
-    def __init__(
-        self,
-        request: TownRequest,
-        collection: Any,
-        model_class: type[T],
-        query_transform: Callable[[Query[T]], Query[T]],
-    ) -> None:
-        self.request = request
-        self.collection = collection
-        self.model_class = model_class
-        self.query_transform = query_transform
 
-    def query(self) -> Query[T]:
-        return self.query_transform(self.collection.query())
+def filtered_query(
+    request: TownRequest,
+    query: Query[T],
+    model_class: type[T],
+    *,
+    order_by: Any | None = None,
+) -> Query[T]:
+    query = apply_visibility_filters(request, query, model_class)
+    return apply_api_ordering(query, order_by)
 
-    def by_id(self, id: PKType) -> T | None:
+
+def normalize_id(id: PKType) -> PKType:
+    if isinstance(id, str):
         try:
-            if callable(getattr(self.collection, 'by_id', None)):
-                item = self.collection.by_id(id)
-                if item is not None:
-                    return item if self.request.is_visible(item) else None
+            return UUID(id)
+        except ValueError:
+            return id
+    return id
 
-            primary_key = sa_inspect(self.model_class).primary_key[0]
-            return self.query().filter(
-                primary_key == self._normalize_id(id)
-            ).first()
-        except SQLAlchemyError:
-            return None
 
-    @staticmethod
-    def _normalize_id(id: PKType) -> PKType:
-        if isinstance(id, str):
-            try:
-                return UUID(id)
-            except ValueError:
-                return id
-        return id
+def access_for_item(item: object) -> str | None:
+    access = getattr(item, 'access', None)
+    if isinstance(access, str):
+        return access
+
+    meta = getattr(item, 'meta', None)
+    if isinstance(meta, dict):
+        access = meta.get('access')
+        if isinstance(access, str):
+            return access
+
+    return None
+
+
+def has_api_detail_access(request: TownRequest, item: object) -> bool:
+    if role_for_request(request) in MANAGER_ROLES:
+        return True
+
+    return request.is_visible(item) and access_for_item(item) != 'mtan'
 
 
 class PaginatedCollection(Pagination[T], Generic[T]):
 
     def __init__(
         self,
-        collection: SupportsQueryAndById[T],
+        request: TownRequest,
+        collection: Any,
+        model_class: type[T],
         page: int = 0,
         batch_size: int = API_BATCH_SIZE,
+        *,
+        order_by: Any | None = None,
     ) -> None:
+        self.request = request
         self.collection = collection
+        self.model_class = model_class
+        self.order_by = order_by
         self.page = page
         self.batch_size = batch_size
 
     def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, self.__class__)
-            and self.collection is other.collection
+            and self.request is other.request
+            and self.collection == other.collection
+            and self.model_class is other.model_class
+            and self.order_by == other.order_by
             and self.page == other.page
         )
 
     def by_id(self, id: PKType) -> T | None:
-        return self.collection.by_id(id)
+        try:
+            normalized_id = normalize_id(id)
+            by_id = getattr(self.collection, 'by_id', None)
+            if callable(by_id):
+                item = by_id(normalized_id)
+                if item is not None:
+                    return item
+
+            primary_key = sa_inspect(self.model_class).primary_key[0]
+            return filtered_query(
+                self.request,
+                self.collection.query(),
+                self.model_class,
+                order_by=self.order_by,
+            ).filter(primary_key == normalized_id).first()
+        except SQLAlchemyError:
+            return None
 
     def subset(self) -> Query[T]:
-        return self.collection.query()
+        return filtered_query(
+            self.request,
+            self.collection.query(),
+            self.model_class,
+            order_by=self.order_by,
+        )
 
     def page_by_index(self, index: int) -> PaginatedCollection[T]:
         return self.__class__(
+            self.request,
             self.collection,
+            self.model_class,
             page=index,
             batch_size=self.batch_size,
+            order_by=self.order_by,
         )
 
     @property
@@ -194,10 +232,12 @@ class PaginatedSumCollection(Pagination[T], Generic[T]):
 
     def __init__(
         self,
-        collections: Sequence[SupportsQueryAndById[T]],
+        request: TownRequest,
+        collections: Sequence[tuple[Any, type[T], Any | None]],
         page: int = 0,
         batch_size: int = API_BATCH_SIZE,
     ) -> None:
+        self.request = request
         self.collections = tuple(collections)
         self.page = page
         self.batch_size = batch_size
@@ -205,15 +245,34 @@ class PaginatedSumCollection(Pagination[T], Generic[T]):
     def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, self.__class__)
+            and self.request is other.request
             and self.collections == other.collections
             and self.page == other.page
         )
 
     def by_id(self, id: PKType) -> T | None:
-        for collection in self.collections:
-            item = collection.by_id(id)
-            if item is not None:
-                return item
+        normalized_id = normalize_id(id)
+
+        for collection, model_class, order_by in self.collections:
+            try:
+                by_id = getattr(collection, 'by_id', None)
+                if callable(by_id):
+                    item = by_id(normalized_id)
+                    if item is not None:
+                        return item
+
+                primary_key = sa_inspect(model_class).primary_key[0]
+                item = filtered_query(
+                    self.request,
+                    collection.query(),
+                    model_class,
+                    order_by=order_by,
+                ).filter(primary_key == normalized_id).first()
+                if item is not None:
+                    return item
+            except SQLAlchemyError:
+                continue
+
         return None
 
     def subset(self) -> Query[T]:
@@ -222,10 +281,21 @@ class PaginatedSumCollection(Pagination[T], Generic[T]):
         )
 
     @cached_property
+    def cached_subset(self) -> Query[T]:
+        raise NotImplementedError(
+            'PaginatedSumCollection does not expose a single cached subset'
+        )
+
+    @cached_property
     def counts(self) -> tuple[int, ...]:
         return tuple(
-            collection.query().order_by(None).count()
-            for collection in self.collections
+            filtered_query(
+                self.request,
+                collection.query(),
+                model_class,
+                order_by=order_by,
+            ).order_by(None).count()
+            for collection, model_class, order_by in self.collections
         )
 
     @cached_property
@@ -238,14 +308,23 @@ class PaginatedSumCollection(Pagination[T], Generic[T]):
         remaining = self.batch_size
         items: list[T] = []
 
-        for collection, count in zip(self.collections, self.counts):
+        for (
+            collection,
+            model_class,
+            order_by,
+        ), count in zip(self.collections, self.counts):
             if remaining <= 0:
                 break
             if offset >= count:
                 offset -= count
                 continue
 
-            query = collection.query().offset(offset).limit(remaining)
+            query = filtered_query(
+                self.request,
+                collection.query(),
+                model_class,
+                order_by=order_by,
+            ).offset(offset).limit(remaining)
             batch = tuple(query)
             items.extend(batch)
             remaining -= len(batch)
@@ -255,6 +334,7 @@ class PaginatedSumCollection(Pagination[T], Generic[T]):
 
     def page_by_index(self, index: int) -> PaginatedSumCollection[T]:
         return self.__class__(
+            self.request,
             self.collections,
             page=index,
             batch_size=self.batch_size,
@@ -265,20 +345,18 @@ class PaginatedSumCollection(Pagination[T], Generic[T]):
         return self.page
 
 
-def visible_collection(
-    request: TownRequest,
-    collection: Any,
-    model_class: type[T],
-    *,
-    order_by: Any | None = None,
-) -> FilteredCollection[T]:
-    def transform(query: Query[T]) -> Query[T]:
-        query = apply_visibility_filters(request, query, model_class)
-        if order_by is not None:
-            query = query.order_by(order_by)
-        return query
+class TownApiEndpoint(ApiEndpoint[T], Generic[T]):
 
-    return FilteredCollection(request, collection, model_class, transform)
+    def by_id(self, id: PKType) -> T | None:
+        try:
+            item = self.collection.by_id(id)
+        except SQLAlchemyError:
+            return None
+
+        if item is None:
+            return None
+
+        return item if has_api_detail_access(self.request, item) else None
 
 
 class EventApiEndpoint(ApiEndpoint['Occurrence']):
@@ -331,7 +409,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
         }
 
 
-class NewsApiEndpoint(ApiEndpoint[News]):
+class NewsApiEndpoint(TownApiEndpoint[News]):
     app: TownApp
     endpoint = 'news'
     filters = set()
@@ -378,7 +456,7 @@ class NewsApiEndpoint(ApiEndpoint[News]):
         }
 
 
-class TopicApiEndpoint(ApiEndpoint[Topic]):
+class TopicApiEndpoint(TownApiEndpoint[Topic]):
     request: TownRequest
     app: TownApp
     endpoint = 'topics'
@@ -547,7 +625,7 @@ FormOrExternalLink: TypeAlias = FormDefinition | ExternalFormLink
 ResourceOrExternalLink: TypeAlias = Resource | ExternalResourceLink
 
 
-class FormApiEndpoint(ApiEndpoint[FormOrExternalLink]):
+class FormApiEndpoint(TownApiEndpoint[FormOrExternalLink]):
     app: TownApp
     endpoint = 'forms'
 
@@ -558,28 +636,24 @@ class FormApiEndpoint(ApiEndpoint[FormOrExternalLink]):
     @property
     def collection(self) -> Any:
         return PaginatedSumCollection(
+            self.request,
             (
-                visible_collection(
-                    self.request,
+                (
                     FormCollection(self.session).definitions,
                     FormDefinition,
-                    order_by=FormDefinition.order,
+                    FormDefinition.order,
                 ),
-                visible_collection(
-                    self.request,
+                (
                     ExternalLinkCollection.for_model(
                         self.session, FormCollection
                     ),
                     ExternalFormLink,
-                    order_by=ExternalFormLink.order,
+                    ExternalFormLink.order,
                 ),
             ),
             page=self.page or 0,
             batch_size=API_BATCH_SIZE,
         )
-
-    def by_id(self, id: PKType) -> FormOrExternalLink | None:
-        return self.collection.by_id(id)
 
     def item_data(self, item: FormOrExternalLink) -> dict[str, Any]:
         if isinstance(item, ExternalFormLink):
@@ -604,7 +678,7 @@ class FormApiEndpoint(ApiEndpoint[FormOrExternalLink]):
         return {'html': item}
 
 
-class ResourceApiEndpoint(ApiEndpoint[ResourceOrExternalLink]):
+class ResourceApiEndpoint(TownApiEndpoint[ResourceOrExternalLink]):
     app: TownApp
     endpoint = 'resources'
 
@@ -615,28 +689,24 @@ class ResourceApiEndpoint(ApiEndpoint[ResourceOrExternalLink]):
     @property
     def collection(self) -> Any:
         return PaginatedSumCollection(
+            self.request,
             (
-                visible_collection(
-                    self.request,
+                (
                     ResourceCollection(self.app.libres_context),
                     Resource,
-                    order_by=Resource.title,
+                    Resource.title,
                 ),
-                visible_collection(
-                    self.request,
+                (
                     ExternalLinkCollection.for_model(
                         self.session, ResourceCollection
                     ),
                     ExternalResourceLink,
-                    order_by=ExternalResourceLink.order,
+                    ExternalResourceLink.order,
                 ),
             ),
             page=self.page or 0,
             batch_size=API_BATCH_SIZE,
         )
-
-    def by_id(self, id: PKType) -> ResourceOrExternalLink | None:
-        return self.collection.by_id(id)
 
     def item_data(
         self, item: ResourceOrExternalLink
@@ -665,7 +735,7 @@ class ResourceApiEndpoint(ApiEndpoint[ResourceOrExternalLink]):
         return {'html': item}
 
 
-class PersonApiEndpoint(ApiEndpoint[Person]):
+class PersonApiEndpoint(TownApiEndpoint[Person]):
     app: TownApp
     endpoint = 'people'
 
@@ -699,11 +769,9 @@ class PersonApiEndpoint(ApiEndpoint[Person]):
     @property
     def collection(self) -> Any:
         return PaginatedCollection(
-            visible_collection(
-                self.request,
-                PersonCollection(self.session),
-                Person,
-            ),
+            self.request,
+            PersonCollection(self.session),
+            Person,
             page=self.page or 0,
             batch_size=API_BATCH_SIZE,
         )
@@ -728,7 +796,7 @@ class PersonApiEndpoint(ApiEndpoint[Person]):
         return result
 
 
-class MeetingApiEndpoint(ApiEndpoint[Meeting]):
+class MeetingApiEndpoint(TownApiEndpoint[Meeting]):
     app: TownApp
     endpoint = 'meetings'
 
@@ -739,11 +807,9 @@ class MeetingApiEndpoint(ApiEndpoint[Meeting]):
     @property
     def collection(self) -> Any:
         return PaginatedCollection(
-            visible_collection(
-                self.request,
-                MeetingCollection(self.session),
-                Meeting,
-            ),
+            self.request,
+            MeetingCollection(self.session),
+            Meeting,
             page=self.page or 0,
             batch_size=API_BATCH_SIZE,
         )
@@ -769,7 +835,7 @@ class MeetingApiEndpoint(ApiEndpoint[Meeting]):
         return {'html': item}
 
 
-class PoliticalBusinessApiEndpoint(ApiEndpoint[PoliticalBusiness]):
+class PoliticalBusinessApiEndpoint(TownApiEndpoint[PoliticalBusiness]):
     app: TownApp
     endpoint = 'political_businesses'
 
@@ -779,15 +845,12 @@ class PoliticalBusinessApiEndpoint(ApiEndpoint[PoliticalBusiness]):
 
     @property
     def collection(self) -> Any:
-        return PaginatedCollection(
-            visible_collection(
-                self.request,
-                PoliticalBusinessCollection(self.request),
-                PoliticalBusiness,
-            ),
+        result = PoliticalBusinessCollection(
+            self.request,
             page=self.page or 0,
-            batch_size=API_BATCH_SIZE,
         )
+        result.batch_size = API_BATCH_SIZE
+        return result
 
     def item_data(self, item: PoliticalBusiness) -> dict[str, Any]:
         return {
@@ -816,7 +879,9 @@ class RISParliamentarianApiEndpoint(ApiEndpoint[RISParliamentarian]):
     @property
     def collection(self) -> Any:
         return PaginatedCollection(
+            self.request,
             RISParliamentarianCollection(self.session),
+            RISParliamentarian,
             page=self.page or 0,
             batch_size=API_BATCH_SIZE,
         )
@@ -848,7 +913,9 @@ class RISCommissionApiEndpoint(ApiEndpoint[RISCommission]):
     @property
     def collection(self) -> Any:
         return PaginatedCollection(
+            self.request,
             RISCommissionCollection(self.session),
+            RISCommission,
             page=self.page or 0,
             batch_size=API_BATCH_SIZE,
         )
@@ -874,7 +941,9 @@ class RISParliamentaryGroupApiEndpoint(ApiEndpoint[RISParliamentaryGroup]):
     @property
     def collection(self) -> Any:
         return PaginatedCollection(
+            self.request,
             RISParliamentaryGroupCollection(self.session),
+            RISParliamentaryGroup,
             page=self.page or 0,
             batch_size=API_BATCH_SIZE,
         )
