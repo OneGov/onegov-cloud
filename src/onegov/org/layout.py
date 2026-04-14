@@ -1936,15 +1936,22 @@ class TicketLayout(DefaultLayout):
                     )
 
             elif self.model.state == 'closed':
-                links.append(Link(
-                    text=_('Reopen ticket'),
-                    url=self.request.link(self.model, 'reopen'),
-                    attrs={'class': ('ticket-button', 'ticket-reopen')}
-                ))
-                links.append(Link(
-                    text=_('Archive ticket'),
-                    url=self.request.link(self.model, 'archive'),
-                    attrs={'class': ('ticket-button', 'ticket-archive')})
+                if self.model.handler_code != 'TRP':
+                    links.append(
+                        Link(
+                            text=_('Reopen ticket'),
+                            url=self.request.link(self.model, 'reopen'),
+                            attrs={
+                                'class': ('ticket-button', 'ticket-reopen')
+                            },
+                        )
+                    )
+                links.append(
+                    Link(
+                        text=_('Archive ticket'),
+                        url=self.request.link(self.model, 'archive'),
+                        attrs={'class': ('ticket-button', 'ticket-archive')},
+                    )
                 )
             elif self.model.state == 'archived':
                 links.append(Link(
