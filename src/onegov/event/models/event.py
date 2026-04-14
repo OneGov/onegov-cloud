@@ -127,6 +127,9 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     #: Whether the event is marked for external publication (syndication)
     syndicate: dict_property[bool] = meta_property(default=False)
 
+    #: Whether the event is highlighted (featured)
+    highlight: dict_property[bool] = meta_property(default=False)
+
     #: The associated image
     image = associated(
         EventFile, 'image', 'one-to-one', uselist=False, backref_suffix='image'

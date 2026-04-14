@@ -125,14 +125,19 @@ def event_form(
 
     if request.is_manager:
 
-        class WithSyndicate(form):  # type:ignore[misc,valid-type]
+        class WithManagerFields(form):  # type:ignore[misc,valid-type]
             syndicate = BooleanField(
                 label=_('Syndicate'),
                 description=_('Publish this event externally'),
                 default=False,
             )
+            highlight = BooleanField(
+                label=_('Highlight'),
+                description=_('Mark as highlighted event'),
+                default=False,
+            )
 
-        form = WithSyndicate
+        form = WithManagerFields
         return AccessExtension().extend_form(form, request)
 
     return form

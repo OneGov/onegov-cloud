@@ -118,6 +118,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         locations: Sequence[str] | None = None,
         sources: Sequence[str] | None = None,
         syndicate: bool | None = None,
+        highlight: bool | None = None,
         only_public: bool = False,
         search_widget: OccurenceSearchWidget | None = None,
         event_filter_configuration: dict[str, Any] | None = None,
@@ -134,6 +135,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self.locations = locations if locations else []
         self.sources = sources if sources else []
         self.syndicate = syndicate
+        self.highlight = highlight
         self.only_public = only_public
         self.search_widget = search_widget
         self.event_filter_configuration = event_filter_configuration or {}
@@ -170,6 +172,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             locations=self.locations,
             sources=self.sources,
             syndicate=self.syndicate,
+            highlight=self.highlight,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -242,6 +245,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             locations=self.locations,
             sources=self.sources,
             syndicate=self.syndicate,
+            highlight=self.highlight,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -281,6 +285,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             locations=self.locations,
             sources=self.sources,
             syndicate=self.syndicate,
+            highlight=self.highlight,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -301,6 +306,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         sources: Sequence[str] | None = None,
         source: str | None = None,
         syndicate: bool | MissingType | None = MISSING,
+        highlight: bool | MissingType | None = MISSING,
     ) -> Self:
         """ Returns a new instance of the collection with the given filters
         and copies the current filters if not specified.
@@ -348,6 +354,9 @@ class OccurrenceCollection(Pagination[Occurrence]):
         if syndicate is MISSING:
             syndicate = self.syndicate
 
+        if highlight is MISSING:
+            highlight = self.highlight
+
         return self.__class__(
             self.session,
             page=0,
@@ -360,6 +369,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             locations=locations,
             sources=sources,
             syndicate=syndicate,
+            highlight=highlight,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -379,6 +389,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             locations=self.locations,
             sources=self.sources,
             syndicate=self.syndicate,
+            highlight=self.highlight,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -618,6 +629,17 @@ class OccurrenceCollection(Pagination[Occurrence]):
                     or_(
                         Event.meta['syndicate'] == None,
                         Event.meta['syndicate'].astext != 'true',
+                    )
+                )
+
+        if self.highlight is not None:
+            if self.highlight:
+                query = query.filter(Event.meta['highlight'].astext == 'true')
+            else:
+                query = query.filter(
+                    or_(
+                        Event.meta['highlight'] == None,
+                        Event.meta['highlight'].astext != 'true',
                     )
                 )
 

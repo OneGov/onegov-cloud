@@ -68,6 +68,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
             'locations': 'Can be specified multiple times',
             'sources': sorted(collection.used_sources),
             'syndicate': ('true', 'false'),
+            'highlight': ('true', 'false'),
         }
 
         filter_type = self.app.org.event_filter_type
@@ -169,6 +170,12 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
                     result = result.for_filter(
                         syndicate=False
                     )
+            elif key == 'highlight':
+                hl = self.scalarize_value(key, values)
+                if hl and hl.lower() == 'true':
+                    result = result.for_filter(highlight=True)
+                elif hl and hl.lower() == 'false':
+                    result = result.for_filter(highlight=False)
             else:
                 filter_keywords[key] = values
 
@@ -211,6 +218,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
             data.update(item.event.filter_keywords)
 
         data['syndicate'] = item.event.syndicate or False
+        data['highlight'] = item.event.highlight or False
         data['created'] = item.created.isoformat()
         data['modified'] = get_modified_iso_format(item)
         return data

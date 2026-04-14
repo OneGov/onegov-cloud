@@ -54,6 +54,7 @@ def test_view_api(
     assert filters(endpoints.queries[0]).keys() == {
         'start',
         'end',
+        'highlight',
         'locations',
         'sources',
         'syndicate',
@@ -74,17 +75,19 @@ def test_view_api(
 
     events_page = client.get('/events')
     filter_settings = events_page.click('Konfigurieren')
-    filter_settings.form['definition'] = """
+    filter_settings.form[
+        'definition'
+    ] = """
         Altersgruppe =
             [ ] Kind
             [ ] Jugend
             [ ] Familie
             [ ] Alter
 
-        Highlight =
+        Empfehlung =
             [ ] Ja
     """
-    filter_settings.form['keyword_fields'].value = 'Altersgruppe\nHighlight'
+    filter_settings.form['keyword_fields'].value = 'Altersgruppe\nEmpfehlung'
     filter_settings.form.submit().follow()
 
     endpoints = collection('/api')
@@ -92,11 +95,12 @@ def test_view_api(
     assert event_fiters.keys() == {
         'start',
         'end',
+        'highlight',
         'locations',
         'sources',
         'syndicate',
         'altersgruppe',
-        'highlight',
+        'empfehlung',
     }
     assert event_fiters['altersgruppe'] == [
         'Kind',
@@ -104,7 +108,7 @@ def test_view_api(
         'Familie',
         'Alter'
     ]
-    assert event_fiters['highlight'] == ['Ja']
+    assert event_fiters['empfehlung'] == ['Ja']
     # Configure tags and filters
     settings = client.get('/event-settings')
     settings.form['event_filter_type'] = 'tags_and_filters'
@@ -114,12 +118,13 @@ def test_view_api(
     assert filters(endpoints.queries[0]).keys() == {
         'start',
         'end',
+        'highlight',
         'locations',
         'sources',
         'syndicate',
         'tags',
         'altersgruppe',
-        'highlight',
+        'empfehlung',
     }
 
     # Events
@@ -252,6 +257,49 @@ def test_api_syndicate_filter(
 
     gym = collection(events['Gemeinsames Turnen']).items[0]
     assert data(gym)['syndicate'] is False
+
+    # --- highlight filter ---
+    # no events are highlighted by default
+    assert not collection('/api/events?highlight=true').items
+
+    # all events returned for highlight=false
+    assert {
+        item.data[0].value
+        for item in collection('/api/events?highlight=false').items
+    } == all_titles
+
+    # mark one event as highlighted via the edit form
+    events_page = client.get('/events')
+    event_page = events_page.click('Fussballturnier')
+    edit_page = event_page.click('Bearbeiten')
+    edit_page.form['highlight'] = True
+    edit_page.form.submit()
+
+    # highlight=true returns only the highlighted event
+    assert {
+        item.data[0].value
+        for item in collection('/api/events?highlight=true').items
+    } == {'Fussballturnier'}
+
+    # highlight=false excludes the highlighted event
+    assert {
+        item.data[0].value
+        for item in collection('/api/events?highlight=false').items
+    } == all_titles - {'Fussballturnier'}
+
+    # highlight is exposed in item data
+    events = {
+        item.data[0].value: item.href
+        for item in collection('/api/events').items
+    }
+    football = collection(events['Fussballturnier']).items[0]
+    assert data(football)['highlight'] is True
+
+    gym = collection(events['Gemeinsames Turnen']).items[0]
+    assert data(gym)['highlight'] is False
+
+    # both filters can be combined
+    assert not collection('/api/events?syndicate=true&highlight=true').items
 
 
 # TODO: Test directory API
