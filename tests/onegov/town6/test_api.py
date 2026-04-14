@@ -37,7 +37,7 @@ def test_view_api(
         return {x.name: x.value for x in item.data}
 
     def filters(item: Any) -> dict[str, Any]:
-        return {x.name: x.prompt for x in item.data}
+        return {x.name: x.values or x.prompt for x in item.data}
 
     def links(item: Any) -> dict[str, str]:
         return {x.rel: x.href for x in item.links}
@@ -96,12 +96,13 @@ def test_view_api(
         'altersgruppe',
         'highlight',
     }
-    assert event_fiters['altersgruppe'] == (
-        "One of 'Kind', 'Jugend', 'Familie', 'Alter'"
-        " (Can be specified multiple times)"
-    )
-    assert event_fiters['highlight'] == "Either 'Ja' or left unspecified"
-
+    assert event_fiters['altersgruppe'] == [
+        'Kind',
+        'Jugend',
+        'Familie',
+        'Alter'
+    ]
+    assert event_fiters['highlight'] == ['Ja']
     # Configure tags and filters
     settings = client.get('/event-settings')
     settings.form['event_filter_type'] = 'tags_and_filters'

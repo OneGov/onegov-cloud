@@ -66,7 +66,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
                 '(ISO-8601 encoded date: YYYY-MM-DD, defaults to today)',
             'end': 'Latest event date (ISO-8601 encoded date: YYYY-MM-DD)',
             'locations': 'Can be specified multiple times',
-            'sources': collection.used_sources
+            'sources': sorted(collection.used_sources)
         }
 
         filter_type = self.app.org.event_filter_type
@@ -78,7 +78,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
                     self.request.translate(_(tag))
                     for tag in used_tags
                 }
-            filters['tags'] = used_tags
+            filters['tags'] = sorted(used_tags)
 
         filters.update(
             (name, choices)

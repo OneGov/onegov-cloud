@@ -76,7 +76,7 @@ def view_api_endpoints(
                             # NOTE: This is a custom extension of
                             #       Collection+JSON, that is a little
                             #       bit more machine-readable.
-                            'values': sorted(prompt)
+                            'values': list(prompt)
                         }
                         for name, prompt in endpoint.filters.items()
                     ]
