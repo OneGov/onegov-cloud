@@ -1936,7 +1936,7 @@ class TicketLayout(DefaultLayout):
                     )
 
             elif self.model.state == 'closed':
-                if self.model.handler_code != 'TRP':
+                if self.model.handler.reopenable:
                     links.append(
                         Link(
                             text=_('Reopen ticket'),

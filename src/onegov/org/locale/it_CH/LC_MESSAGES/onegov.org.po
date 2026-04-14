@@ -7740,8 +7740,8 @@ msgstr "Il biglietto non può essere chiuso perché non è in sospeso"
 msgid "You have closed ticket ${number}"
 msgstr "Hai chiuso il biglietto ${number}"
 
-msgid "Time report tickets cannot be reopened"
-msgstr "I ticket dei rapporti di tempo non possono essere riaperti"
+msgid "This ticket cannot be reopened"
+msgstr "Questo ticket non può essere riaperto"
 
 msgid "The ticket cannot be re-opened because it's not closed"
 msgstr "Il biglietto non può essere riaperto perché non è chiuso"
