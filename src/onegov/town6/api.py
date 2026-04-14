@@ -63,10 +63,11 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
         collection = self._base_collection
         filters: dict[str, Collection[str] | str | None] = {
             'start': 'Earliest event date '
-                '(ISO-8601 encoded date: YYYY-MM-DD, defaults to today)',
+            '(ISO-8601 encoded date: YYYY-MM-DD, defaults to today)',
             'end': 'Latest event date (ISO-8601 encoded date: YYYY-MM-DD)',
             'locations': 'Can be specified multiple times',
-            'sources': sorted(collection.used_sources)
+            'sources': sorted(collection.used_sources),
+            'syndicate': ('true', 'false'),
         }
 
         filter_type = self.app.org.event_filter_type
@@ -160,6 +161,14 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
                 result = result.for_filter(sources=values)
             elif key == 'locations':
                 result = result.for_filter(locations=values)
+            elif key == 'syndicate':
+                syn = self.scalarize_value(key, values)
+                if syn and syn.lower() == 'true':
+                    result = result.for_filter(syndicate=True)
+                elif syn and syn.lower() == 'false':
+                    result = result.for_filter(
+                        syndicate=False
+                    )
             else:
                 filter_keywords[key] = values
 
@@ -201,6 +210,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
         if filter_type in ('filters', 'tags_and_filters'):
             data.update(item.event.filter_keywords)
 
+        data['syndicate'] = item.event.syndicate or False
         data['created'] = item.created.isoformat()
         data['modified'] = get_modified_iso_format(item)
         return data

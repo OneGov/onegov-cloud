@@ -56,6 +56,7 @@ def test_view_api(
         'end',
         'locations',
         'sources',
+        'syndicate',
         'tags',
     }
     # Additional endpoints
@@ -93,6 +94,7 @@ def test_view_api(
         'end',
         'locations',
         'sources',
+        'syndicate',
         'altersgruppe',
         'highlight',
     }
@@ -114,6 +116,7 @@ def test_view_api(
         'end',
         'locations',
         'sources',
+        'syndicate',
         'tags',
         'altersgruppe',
         'highlight',
@@ -187,5 +190,68 @@ def test_view_api(
         data(item)['title']
         for item in collection('/api/topics').items
     } == {'Organisation', 'Themen', 'Kontakt'}
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.broadcast')
+@patch('onegov.websockets.integration.authenticate')
+def test_api_syndicate_filter(
+    authenticate: MagicMock,
+    broadcast: MagicMock,
+    connect: MagicMock,
+    client: Client[AgencyApp],
+) -> None:
+
+    client.login_admin()
+
+    def collection(url: str) -> Collection:
+        return Collection.from_json(client.get(url).body)
+
+    def data(item: Any) -> dict[str, Any]:
+        return {x.name: x.value for x in item.data}
+
+    all_titles = {
+        item.data[0].value for item in collection('/api/events').items
+    }
+    assert len(all_titles) == 4
+
+    # no events are syndicated by default
+    assert not collection('/api/events?syndicate=true').items
+
+    # all events returned for syndicate=false
+    assert {
+        item.data[0].value
+        for item in collection('/api/events?syndicate=false').items
+    } == all_titles
+
+    # mark one event for syndication via the edit form
+    events_page = client.get('/events')
+    event_page = events_page.click('150 Jahre Govikon')
+    edit_page = event_page.click('Bearbeiten')
+    edit_page.form['syndicate'] = True
+    edit_page.form.submit()
+
+    # syndicate=true returns only the marked event
+    assert {
+        item.data[0].value
+        for item in collection('/api/events?syndicate=true').items
+    } == {'150 Jahre Govikon'}
+
+    # syndicate=false excludes the marked event
+    assert {
+        item.data[0].value
+        for item in collection('/api/events?syndicate=false').items
+    } == all_titles - {'150 Jahre Govikon'}
+
+    # syndicate is exposed in item data
+    events = {
+        item.data[0].value: item.href
+        for item in collection('/api/events').items
+    }
+    celebration = collection(events['150 Jahre Govikon']).items[0]
+    assert data(celebration)['syndicate'] is True
+
+    gym = collection(events['Gemeinsames Turnen']).items[0]
+    assert data(gym)['syndicate'] is False
+
 
 # TODO: Test directory API

@@ -117,6 +117,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         filter_keywords: Mapping[str, list[str] | str] | None = None,
         locations: Sequence[str] | None = None,
         sources: Sequence[str] | None = None,
+        syndicate: bool | None = None,
         only_public: bool = False,
         search_widget: OccurenceSearchWidget | None = None,
         event_filter_configuration: dict[str, Any] | None = None,
@@ -132,6 +133,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self.filter_keywords = filter_keywords or {}
         self.locations = locations if locations else []
         self.sources = sources if sources else []
+        self.syndicate = syndicate
         self.only_public = only_public
         self.search_widget = search_widget
         self.event_filter_configuration = event_filter_configuration or {}
@@ -167,6 +169,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             filter_keywords=self.filter_keywords,
             locations=self.locations,
             sources=self.sources,
+            syndicate=self.syndicate,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -238,6 +241,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             filter_keywords=keywords,
             locations=self.locations,
             sources=self.sources,
+            syndicate=self.syndicate,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -276,6 +280,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             filter_keywords=parameters,
             locations=self.locations,
             sources=self.sources,
+            syndicate=self.syndicate,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -295,6 +300,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         location: str | None = None,
         sources: Sequence[str] | None = None,
         source: str | None = None,
+        syndicate: bool | MissingType | None = MISSING,
     ) -> Self:
         """ Returns a new instance of the collection with the given filters
         and copies the current filters if not specified.
@@ -339,6 +345,9 @@ class OccurrenceCollection(Pagination[Occurrence]):
             else:
                 sources.append(source)
 
+        if syndicate is MISSING:
+            syndicate = self.syndicate
+
         return self.__class__(
             self.session,
             page=0,
@@ -350,6 +359,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             filter_keywords=self.filter_keywords,
             locations=locations,
             sources=sources,
+            syndicate=syndicate,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -368,6 +378,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             filter_keywords=None,
             locations=self.locations,
             sources=self.sources,
+            syndicate=self.syndicate,
             only_public=self.only_public,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
@@ -598,6 +609,17 @@ class OccurrenceCollection(Pagination[Occurrence]):
                 Event.source.astext.startswith(f'{source}-')
                 for source in self.sources
             )))
+
+        if self.syndicate is not None:
+            if self.syndicate:
+                query = query.filter(Event.meta['syndicate'].astext == 'true')
+            else:
+                query = query.filter(
+                    or_(
+                        Event.meta['syndicate'] == None,
+                        Event.meta['syndicate'].astext != 'true',
+                    )
+                )
 
         if self.range == 'past':
             # reverse order for past events: most recent event on top

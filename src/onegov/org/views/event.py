@@ -22,6 +22,7 @@ from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import utcnow
+from wtforms.fields import BooleanField
 from uuid import UUID, uuid4
 from webob import exc
 
@@ -123,6 +124,15 @@ def event_form(
             form.tags = None
 
     if request.is_manager:
+
+        class WithSyndicate(form):  # type:ignore[misc,valid-type]
+            syndicate = BooleanField(
+                label=_('Syndicate'),
+                description=_('Publish this event externally'),
+                default=False,
+            )
+
+        form = WithSyndicate
         return AccessExtension().extend_form(form, request)
 
     return form
