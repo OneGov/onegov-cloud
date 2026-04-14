@@ -7,6 +7,7 @@ from onegov.api.models import ApiInvalidParamException
 from onegov.core.converters import extended_date_decode
 from onegov.event.collections import OccurrenceCollection
 from onegov.gis import Coordinates
+from onegov.org.forms.event import TAGS
 from onegov.org.models.directory import (
     ExtendedDirectory, ExtendedDirectoryEntry,
     ExtendedDirectoryEntryCollection)
@@ -58,23 +59,31 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
     endpoint = 'events'
 
     @cached_property
-    def filters(self) -> Mapping[str, str | None]:
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
         collection = self._base_collection
-        filters = {
+        filters: dict[str, Collection[str] | str | None] = {
             'start': 'Earliest event date '
                 '(ISO-8601 encoded date: YYYY-MM-DD, defaults to today)',
             'end': 'Latest event date (ISO-8601 encoded date: YYYY-MM-DD)',
             'locations': 'Can be specified multiple times',
-            'sources': format_multiple_choice_prompt(collection.used_sources)
+            'sources': collection.used_sources
         }
 
         filter_type = self.app.org.event_filter_type
         if filter_type in ('tags', 'tags_and_filters'):
-            filters['tags'] = format_multiple_choice_prompt(
-                collection.used_tags)
+            used_tags = collection.used_tags
+            if not self.app.custom_event_tags:
+                # built-in tags need to be translated
+                used_tags = {
+                    self.request.translate(_(tag))
+                    for tag in used_tags
+                }
+            filters['tags'] = used_tags
 
-        for name, __, choices in collection.available_filters():
-            filters[name] = format_multiple_choice_prompt(choices)
+        filters.update(
+            (name, choices)
+            for name, __, choices in collection.available_filters()
+        )
         return filters
 
     @property
@@ -135,6 +144,17 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
                 value = self.get_date_filter(key, values)
                 result = result.for_filter(end=value)
             elif key == 'tags':
+                if not self.app.custom_event_tags:
+                    # built-in tags are translated and need to be
+                    # transformed back to the stored tag name
+                    translated_to_orginal = {
+                        self.request.translate(tag): str(tag)
+                        for tag in TAGS
+                    }
+                    values = [
+                        translated_to_orginal.get(value, value)
+                        for value in values
+                    ]
                 result = result.for_filter(tags=values)
             elif key == 'sources':
                 result = result.for_filter(sources=values)
@@ -172,7 +192,11 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
 
         filter_type = self.app.org.event_filter_type
         if filter_type in ('tags', 'tags_and_filters'):
-            data['tags'] = item.event.tags
+            tags = item.event.tags
+            if not self.app.custom_event_tags:
+                # built-in tags need to be translated
+                tags = [self.request.translate(_(tag)) for tag in tags]
+            data['tags'] = tags
 
         if filter_type in ('filters', 'tags_and_filters'):
             data.update(item.event.filter_keywords)
