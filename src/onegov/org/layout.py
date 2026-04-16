@@ -1777,7 +1777,7 @@ class ArchivedTicketsLayout(DefaultLayout):
             Link(_('Homepage'), self.homepage_url),
             Link(_('Tickets'), self.request.class_link(
                 TicketCollection,
-                {'handler': self.model.handler_code, 'state': 'open'}
+                {'handler': self.model.handler, 'state': 'open'}
             )),
             Link(_('Archived Tickets'), '#')
         ]

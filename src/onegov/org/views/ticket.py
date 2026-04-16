@@ -1743,7 +1743,8 @@ def view_tickets(
         Link(
             _('Archived Tickets'),
             request.class_link(
-                ArchivedTicketCollection, {'handler': 'ALL'}),
+                ArchivedTicketCollection, {
+                    'handler': self.handler, 'group': self.group}),
             attrs={'class': 'ticket-archive'}
         ),
         Link(
