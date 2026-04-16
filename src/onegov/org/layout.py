@@ -1775,8 +1775,11 @@ class ArchivedTicketsLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), '#'),
-            Link(_('Archived Tickets'), self.request.link(self))
+            Link(_('Tickets'), self.request.class_link(
+                TicketCollection,
+                {'handler': self.model.handler_code, 'state': 'open'}
+            )),
+            Link(_('Archived Tickets'), '#')
         ]
 
     @cached_property
