@@ -338,7 +338,7 @@ def playwright(
         #       since it patches the event loop with greenlets to
         #       run the coroutines synchronously. So sending websocket
         #       messages will fail, unless we send them on a separate
-        #       thread
+        #       thread, the same is true for the CLI commands.
         def run_in_thread[T](
             main: Coroutine[Any, Any, T],
             *,
@@ -364,6 +364,10 @@ def playwright(
 
         monkeysession.setattr(
             'onegov.websockets.integration.run',
+            run_in_thread
+        )
+        monkeysession.setattr(
+            'onegov.websockets.cli.run',
             run_in_thread
         )
         yield playwright

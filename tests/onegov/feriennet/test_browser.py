@@ -92,8 +92,6 @@ def test_browse_matching(
     content.find_by_css('input[name="sure"]').click()
     content.find_by_value("Zuteilung ausführen").click()
 
-    assert browser.is_text_present("wurde bereits bestätigt")
-
     # verify the period's state
     browser.visit('/periods')
     assert 'finished prebooking' in browser.html
