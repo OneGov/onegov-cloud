@@ -48,7 +48,7 @@ $new-registration-window: '\f067';
 $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
 $new-datatrans-icon: '\f09d';
-$new-stripe-connect-icon: '\f1f5';
+$new-stripe-connect-icon: '\f09d';
 $new-worldline-saferpay-icon: '\f09d';
 $new-user-icon: '\f234';
 $new-text-module-icon: '\f249';
@@ -84,8 +84,12 @@ $settings-icon: '\f1de';
     padding-top: 1px;
     position: relative;
 
-    .is-dropdown-submenu-parent > a {
-        color: $white !important;
+    .is-dropdown-submenu-parent {
+        padding-right: .5rem;
+
+        > a {
+            color: $white !important;
+        }
     }
 
     a {
@@ -101,16 +105,12 @@ $settings-icon: '\f1de';
         display: flex;
         justify-content: space-between;
         min-height: $globals-height;
-        padding: .5rem;
+        padding: .5rem 0;
 
         @include breakpoint(small only) {
             &.centered {
                 justify-content: center;
             }
-        }
-
-        .global-tools-menu {
-            flex-grow: 1;
         }
 
         > ul {
@@ -119,19 +119,29 @@ $settings-icon: '\f1de';
                 flex-direction: row-reverse;
             }
 
+            > li:hover {
+                background-color: $oil;
+                border-radius: .7rem;
+            }
+
             > li {
+
+                &.is-active {
+                    background-color: $oil;
+                    border-radius: .7rem;
+                }
 
                 > a {
                     color: $white;
                     height: 100%;
                     line-height: $globals-height;
-                    padding: 0 1rem;
                     white-space: nowrap;
+                    padding-top: 0;
+                    padding-bottom: 0;
                     @include breakpoint(medium up) {
                         align-items: center;
                         display: flex;
                         justify-content: flex-end;
-                        padding-right: 0;
                     }
 
                     &:hover {
@@ -150,6 +160,8 @@ $settings-icon: '\f1de';
     .is-accordion-submenu {
 
         z-index: 1000;
+        border-radius: .7rem;
+        box-shadow: 0 0 17px 0 rgba(0,0,0,0.07);
 
         a {
             color: $body-font-color;
@@ -183,6 +195,8 @@ $settings-icon: '\f1de';
     .images::before { @include icon('\f03e'); }
     .files::before { @include icon("\f15c"); }
     .settings::before { @include icon-bold('\f1de'); }
+    .modules::before { @include icon-bold('\f009'); }
+    .docs::before { @include icon-bold('\f518'); }
     .timeline::before { @include icon('\f017'); }
     .no-tickets::before { @include icon('\f145'); }
     .link-check::before { @include icon-bold('\f0fa'); }
@@ -194,6 +208,14 @@ $settings-icon: '\f1de';
     .citizen-login::before { @include icon-bold("\f2f6"); }
     .citizen-tickets::before { @include icon-bold('\f3ff'); }
     .citizen-reservations::before { @include icon('\f073'); }
+    .reservations::before { @include icon('\f133'); }
+    .directories::before { @include icon-bold('\f03a'); }
+    .people::before { @include icon-bold('\f0c0'); }
+    .events::before { @include icon('\f073'); }
+    .news::before { @include icon('\f1ea'); }
+    .newsletter::before { @include icon('\f0e0'); }
+    .agencies::before { @include icon-bold('\f0b1'); }
+    .assemblies::before { @include icon-bold('\f0c0'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -228,6 +250,10 @@ $settings-icon: '\f1de';
     .secondary.with-count::before {
         background-color: $secondary-color;
         color: $body-font-color;
+    }
+
+    .docs .fa-external-link-alt {
+        display: none;
     }
 }
 

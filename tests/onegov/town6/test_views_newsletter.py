@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 def test_show_newsletter(client: Client) -> None:
     client.login_admin().follow()
 
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page = page.form.submit().follow()
 
@@ -39,14 +39,14 @@ def test_show_newsletter(client: Client) -> None:
     page = client.get('/news')
     assert "Newsletter" in page.text
 
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = False
     page = page.form.submit().follow()
 
     page = client.get('/')
     assert "Newsletter" not in page.text
 
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page = page.form.submit().follow()
 
@@ -66,7 +66,7 @@ def test_newsletter_disabled(client: Client) -> None:
     assert anon.get('/newsletters', expect_errors=True).status_code == 404
     assert client.get('/newsletters').status_code == 200
 
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -124,7 +124,7 @@ def test_unsubscribe_link(client: Client) -> None:
 def test_newsletters_crud(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -179,8 +179,11 @@ def test_newsletters_crud(client: Client) -> None:
 
 def test_newsletter_secret_private_content(client: Client) -> None:
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
+    page.form.submit().follow()
+
+    page = client.get('/newsletter-settings')
     page.form['secret_content_allowed'] = False
     page.form.submit().follow()
     client.logout()
@@ -233,8 +236,10 @@ def test_newsletter_secret_private_content(client: Client) -> None:
 
     # enable setting for secret content
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    page = client.get('/newsletter-settings')
     page.form['secret_content_allowed'] = True
     page.form.submit().follow()
     client.logout()
@@ -264,7 +269,7 @@ def test_newsletter_secret_private_content(client: Client) -> None:
 def test_newsletter_signup(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -322,8 +327,10 @@ def test_newsletter_signup(client: Client) -> None:
 
 def test_newsletter_signup_for_categories(client: Client) -> None:
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    page = client.get('/newsletter-settings')
     page.form['newsletter_categories'] = """
     - News
     - Aktivitäten:
@@ -381,7 +388,7 @@ def test_newsletter_signup_for_categories(client: Client) -> None:
 def test_newsletter_rfc8058(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -436,7 +443,7 @@ def test_newsletter_rfc8058(client: Client) -> None:
 
 def test_newsletter_subscribers_and_edit_bar(client: Client) -> None:
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -470,7 +477,7 @@ def test_newsletter_subscribers_and_edit_bar(client: Client) -> None:
 def test_newsletter_subscribers_management(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
@@ -536,10 +543,13 @@ def test_newsletter_creation_limited_to_logged_in_users(
 
     # enable the newsletter
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    page = client.get('/newsletter-settings')
     page.form['newsletter_categories'] = ''
     page.form.submit().follow()
+
 
     admin = client.spawn()
     admin.login_admin()
@@ -564,8 +574,11 @@ def test_newsletter_creation_limited_to_logged_in_users(
 def test_newsletter_send(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    page = client.get('/newsletter-settings')
+    page.form['newsletter_categories'] = ''
     page.form.submit().follow()
     client.logout()
 
@@ -674,8 +687,10 @@ def test_newsletter_send(client: Client) -> None:
 def test_newsletter_send_with_categories(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    page = client.get('/newsletter-settings')
     page.form['newsletter_categories'] = """
       - News
       - Aktivitäten:
@@ -974,8 +989,10 @@ def test_admin_receives_email_notification_on_unsubscription(
     client.login_admin()
 
     # newsletter settings no admin notification
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    page = client.get('/newsletter-settings')
     page.form['notify_on_unsubscription'] = []
     page.form.submit().follow()
 
@@ -1014,8 +1031,10 @@ def test_admin_receives_email_notification_on_unsubscription(
     assert len(os.listdir(client.app.maildir)) == 1  # no new email
 
     # newsletter settings enable admin notification
-    page = client.get('/newsletter-settings')
+    page = client.get('/module-activation-settings')
     page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    page = client.get('/newsletter-settings')
     page.form['notify_on_unsubscription'].select_multiple(texts=[
         'admin@example.org'])
     page.form.submit().follow()

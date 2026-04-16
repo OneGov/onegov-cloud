@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-03-25 10:15+0100\n"
+"POT-Creation-Date: 2026-04-16 09:07+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,6 +26,9 @@ msgstr "Le mie chat"
 
 msgid "Archived Chats"
 msgstr "Chat archiviate"
+
+msgid "RIS Settings"
+msgstr "Impostazioni RIS"
 
 msgid "Name"
 msgstr "Nome"
@@ -175,12 +178,6 @@ msgstr "Sa"
 msgid "Su"
 msgstr "Do"
 
-msgid "Enable RIS"
-msgstr "Attiva RIS"
-
-msgid "Enables the RIS integration for this organisation."
-msgstr "Attiva l'integrazione RIS per questa organizzazione."
-
 msgid "URL path for the RIS main page"
 msgstr "Percorso URL per la pagina principale RIS"
 
@@ -198,6 +195,12 @@ msgstr ""
 "Inserisci un elenco di categorie per i legami di interesse. Ogni categoria "
 "deve essere separata da un punto e virgola. Esempio: Testo Cat 1; Testo Cat "
 "2; Testo Cat 3"
+
+msgid "Enable Ratsinformationssystem (RIS)"
+msgstr "Abilita il sistema di informazione del consiglio (RIS)"
+
+msgid "Enables the RIS integration for this organisation."
+msgstr "Attiva l'integrazione RIS per questa organizzazione."
 
 msgid "All events"
 msgstr "Tutti gli eventi"
@@ -323,9 +326,6 @@ msgstr "Archivio chat"
 
 msgid "Meetings"
 msgstr "Riunioni"
-
-msgid "RIS Settings"
-msgstr "Impostazioni RIS"
 
 msgid "Meeting"
 msgstr "Riunione"
@@ -1396,8 +1396,8 @@ msgstr "Ciao!"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su $"
-"{homepage}."
+"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su "
+"${homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Per attivare il tuo account, fai clic su conferma qui di seguito:"
@@ -1495,9 +1495,9 @@ msgid "visit the request page"
 msgstr "visita la pagina di richiesta"
 
 msgid ""
-"This is the notification for customer messages on reservations for $"
-"{request.app.org.title}. If you no longer want to receive this e-mail please "
-"contact an administrator so they can remove you from the recipients list."
+"This is the notification for customer messages on reservations for ${request."
+"app.org.title}. If you no longer want to receive this e-mail please contact "
+"an administrator so they can remove you from the recipients list."
 msgstr ""
 "Questa è la notifica relativa ai messaggi dei clienti sulle prenotazioni per "
 "${request.app.org.title}. Se non desideri più ricevere questa e-mail, "
@@ -1603,13 +1603,13 @@ msgid "New note in Ticket ${link}"
 msgstr "Nuova nota nel ticket ${link}"
 
 msgid ""
-"This is the notification for notes on reservations for $"
-"{request.app.org.title}. If you no longer want to receive this e-mail please "
-"contact an administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
 msgstr ""
-"Questa è la notifica per le note sulle prenotazioni per $"
-"{request.app.org.title}. Se non si desidera più ricevere questo messaggio di "
-"posta elettronica si prega di contattare un amministratore in modo che possa "
+"Questa è la notifica per le note sulle prenotazioni per ${request.app.org."
+"title}. Se non si desidera più ricevere questo messaggio di posta "
+"elettronica si prega di contattare un amministratore in modo che possa "
 "rimuovervi dall'elenco dei destinatari lista"
 
 msgid "Pending approval"
@@ -2302,8 +2302,8 @@ msgstr "ore"
 
 msgid "Reservations can only be made at most ${n} ${unit} in advance."
 msgstr ""
-"Le prenotazioni possono essere effettuate solo con un anticipo massimo di $"
-"{n} ${unit}."
+"Le prenotazioni possono essere effettuate solo con un anticipo massimo di "
+"${n} ${unit}."
 
 msgid ""
 "Reservations must be made at least ${n1} ${unit1} and at most ${n2} ${unit2} "
@@ -2369,10 +2369,6 @@ msgid "Select the images that should be shown inside this album."
 msgstr ""
 "Seleziona le immagini che dovrebbero essere mostrate all'interno di questo "
 "album."
-
-#, fuzzy
-msgid "Confirm selection"
-msgstr "Conferma"
 
 msgid "This newsletter has not been sent yet."
 msgstr "Questa newsletter non è stata ancora inviata."
@@ -2785,36 +2781,6 @@ msgstr "Nuovo destinatario"
 msgid "Edit Recipient"
 msgstr "Modifica il destinatario"
 
-msgid "Online Counter Label"
-msgstr "Etichetta Banco online"
-
-msgid "Hide Online Counter on Homepage"
-msgstr "Nascondi Banco online nella pagina iniziale"
-
-msgid "Reservations Label"
-msgstr "Etichetta Prenotazioni"
-
-msgid "Hide Reservations on Homepage"
-msgstr "Nascondi Prenotazioni nella pagina iniziale"
-
-msgid "SBB Daypass Label"
-msgstr "Etichetta Pass giornaliero SBB"
-
-msgid "Publications Label"
-msgstr "Etichetta Pubblicazioni"
-
-msgid "Official Documents"
-msgstr "Documenti ufficiali"
-
-msgid "Hide Publications on Homepage"
-msgstr "Nascondi Pubblicazioni nella pagina iniziale"
-
-msgid "E-Move Label"
-msgstr "Etichetta E-Trasloco"
-
-msgid "E-Move Url"
-msgstr "URL E-Trasloco"
-
 msgid "News and Events"
 msgstr "Voci e eventi"
 
@@ -2833,45 +2799,20 @@ msgstr "Mostra il piè di pagina su tutte le pagine ma per gli amministratori"
 msgid "Partner display"
 msgstr "Visualizzazione dei partner"
 
-msgid "Favicon"
-msgstr "Favicon"
+msgid "Organisation Profile"
+msgstr "Profilo dell'organizzazione"
 
-msgid "Social Media"
-msgstr "Social media"
+msgid "Tickets"
+msgstr "Biglietti"
 
-msgid "Chat"
-msgstr "Chat"
+msgid "Appearance"
+msgstr "Aspetto"
 
 msgid "Header"
 msgstr "Intestazione"
 
 msgid "Footer"
 msgstr "Piè di pagina"
-
-msgid "Modules"
-msgstr "Moduli"
-
-msgid "Analytics"
-msgstr "Analitica"
-
-msgid "Holidays"
-msgstr "Festività / Vacanze scolastiche"
-
-msgid "Tickets"
-msgstr "Biglietti"
-
-#, fuzzy
-msgid "Newsletter"
-msgstr "Abbonamento alla newsletter"
-
-msgid "Link Migration"
-msgstr "Migrazione dei link"
-
-msgid "Resources"
-msgstr "Prenotazioni"
-
-msgid "OneGov API"
-msgstr "API OneGov"
 
 msgid "Data Retention Policy"
 msgstr "Politica di Conservazione dei Dati"
@@ -2883,8 +2824,33 @@ msgstr ""
 "Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
 "irrevocabilmente cancellati."
 
-msgid "Push Notification Overview"
-msgstr "Panoramica delle notifiche push"
+msgid "Access (mTAN)"
+msgstr "Accesso (mTAN)"
+
+msgid "Holidays"
+msgstr "Festività / Vacanze scolastiche"
+
+msgid "Analytics"
+msgstr "Analitica"
+
+msgid "Optional modules"
+msgstr "Moduli opzionali"
+
+msgid "Modules"
+msgstr "Moduli"
+
+#, fuzzy
+msgid "Newsletter"
+msgstr "Abbonamento alla newsletter"
+
+msgid "Resources"
+msgstr "Prenotazioni"
+
+msgid "People directory"
+msgstr "Directory delle persone"
+
+msgid "Chat"
+msgstr "Chat"
 
 msgid "Ratsinformationssystem"
 msgstr "Sistema di informazione sui ratti"
@@ -2892,8 +2858,69 @@ msgstr "Sistema di informazione sui ratti"
 msgid "Ratsinformationssystem (RIS)"
 msgstr "Sistema di informazione sui ratti (RIS)"
 
+msgid "Advanced Settings"
+msgstr "Impostazioni avanzate"
+
+msgid "OneGov API"
+msgstr "API OneGov"
+
+msgid "Firebase (App)"
+msgstr "Firebase (App)"
+
+msgid "Push Notification Overview"
+msgstr "Panoramica delle notifiche push"
+
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Activate/deactivate modules"
+#~ msgstr "Attiva/disattiva moduli"
+
+#~ msgid "Enable RIS"
+#~ msgstr "Attiva RIS"
+
+#, fuzzy
+#~ msgid "Confirm selection"
+#~ msgstr "Conferma"
+
+#~ msgid "Online Counter Label"
+#~ msgstr "Etichetta Banco online"
+
+#~ msgid "Hide Online Counter on Homepage"
+#~ msgstr "Nascondi Banco online nella pagina iniziale"
+
+#~ msgid "Reservations Label"
+#~ msgstr "Etichetta Prenotazioni"
+
+#~ msgid "Hide Reservations on Homepage"
+#~ msgstr "Nascondi Prenotazioni nella pagina iniziale"
+
+#~ msgid "SBB Daypass Label"
+#~ msgstr "Etichetta Pass giornaliero SBB"
+
+#~ msgid "Publications Label"
+#~ msgstr "Etichetta Pubblicazioni"
+
+#~ msgid "Official Documents"
+#~ msgstr "Documenti ufficiali"
+
+#~ msgid "Hide Publications on Homepage"
+#~ msgstr "Nascondi Pubblicazioni nella pagina iniziale"
+
+#~ msgid "E-Move Label"
+#~ msgstr "Etichetta E-Trasloco"
+
+#~ msgid "E-Move Url"
+#~ msgstr "URL E-Trasloco"
+
+#~ msgid "Favicon"
+#~ msgstr "Favicon"
+
+#~ msgid "Social Media"
+#~ msgstr "Social media"
+
+#~ msgid "Link Migration"
+#~ msgstr "Migrazione dei link"
 
 #~ msgid "Cannot display"
 #~ msgstr "Impossibile visualizzare"

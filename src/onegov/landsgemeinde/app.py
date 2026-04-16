@@ -4,7 +4,7 @@ from onegov.core.framework import current_language_tween_factory
 from onegov.core.framework import transaction_tween_factory
 from onegov.core.utils import module_path
 from onegov.landsgemeinde.content import create_new_organisation
-from onegov.landsgemeinde.custom import get_global_tools
+from onegov.landsgemeinde.custom import get_global_tools, get_modules
 from onegov.landsgemeinde.custom import get_top_navigation
 from onegov.landsgemeinde.theme import LandsgemeindeTheme
 from onegov.town6 import TownApp
@@ -43,6 +43,7 @@ def get_template_variables(request: LandsgemeindeRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
+        'modules': get_modules(request)
     }
 
 
