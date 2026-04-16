@@ -1,131 +1,331 @@
 from __future__ import annotations
 
 import json
-from os import environ, system
-from datetime import datetime
 import re
 import shutil
 import time
-from contextlib import suppress
-from http.client import RemoteDisconnected
+
+from datetime import datetime
+from os import environ, system
 from onegov.core.utils import module_path
-from selenium.webdriver import ActionChains, Keys
-from time import sleep
 
 
-from typing import cast, Any, ParamSpec, Self, TYPE_CHECKING
+from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterator
     from datetime import date
-    from selenium.webdriver import Chrome
-    from splinter import Browser
-else:
-    Browser = object
-
-P = ParamSpec('P')
+    from playwright.sync_api import (
+        Browser, ConsoleMessage, ElementHandle, JSHandle, Locator, Page)
 
 
 with open(module_path('tests.shared', 'drop_file.js')) as f:
     JS_DROP_FILE = f.read()
 
 
-class InjectedBrowserExtension(Browser):
-    """ Offers methods to inject an extended browser into the Splinter browser
-    class hierarchy. All methods not related to spawning/cloning a new browser
-    instance are provided by :class:`ExtendedBrowser`.
+def _fill_locator(locator: Locator, value: str) -> None:
+    """Fill a locator, handling file inputs and tab/newline key sequences."""
+    input_type = locator.get_attribute('type')
+    if input_type == 'file':
+        assert locator.is_visible()
+        assert locator.is_enabled()
+        locator.set_input_files(value)
+    elif '\t' in value:
+        assert locator.is_visible()
+        assert locator.is_enabled()
+        # NOTE: We need to enter keys individually so tab completion in
+        #       chosen select still works. This is a little fragile, since
+        #       pressing Enter could result in the form being submitted
+        #       in single line fields.
+        for part in re.split(r'(\t|\n)', value):
+            if part == '\t':
+                locator.press('Tab')
+            elif part == '\n':
+                locator.press('Enter')
+            else:
+                locator.press_sequentially(part)
+    else:
+        locator.fill(value)
 
+
+class PlaywrightElement:
+    """
+    Wraps a single Playwright Locator to provide a Splinter-like element API.
     """
 
-    driver: Chrome
-    clones: list[Self]
-    spawn_parameters: tuple[
-        type[Self],
-        Callable[..., Browser],
-        tuple[Any, ...],
-        dict[str, Any]
-    ]
+    def __init__(self, locator: Locator) -> None:
+        self._locator = locator
 
-    @classmethod
-    def spawn(
-        cls,
-        browser_factory: Callable[P, Browser],
-        *args: P.args,
-        **kwargs: P.kwargs
-    ) -> Self:
-        """ Takes a Splinter browser factory together with the arguments
-        meant for the factory and returns a new browser with the current class
-        injected into the class hierarchy.
+    def __getitem__(self, key: str) -> str | None:
+        return self._locator.get_attribute(key)
 
-        """
+    def click(self) -> None:
+        self._locator.click()
 
-        browser: Browser
+    def fill(self, value: str) -> None:
+        _fill_locator(self._locator, value)
 
-        # spawning Chrome on Travis is rather flaky and succeeds less than
-        # 50% of the time for unknown reasons
-        for _ in range(10):
-            with suppress(Exception):
-                browser = browser_factory(*args, **kwargs)
-                break
-            sleep(0.5)
+    def select(self, value: str) -> None:
+        self._locator.select_option(value)
+
+    @property
+    def text(self) -> str:
+        return self._locator.text_content() or ''
+
+    @property
+    def value(self) -> str:
+        try:
+            return self._locator.input_value()
+        except Exception:
+            return self._locator.get_attribute('value') or ''
+
+    @value.setter
+    def value(self, value: str) -> None:
+        self.fill(value)
+
+    @property
+    def checked(self) -> bool:
+        return self._locator.is_checked()
+
+    def is_visible(self) -> bool:
+        return self._locator.is_visible()
+
+    def scroll_to(self) -> None:
+        self._locator.scroll_into_view_if_needed()
+
+    def mouse_over(self) -> None:
+        self._locator.hover()
+
+    def find_by_value(self, value: str) -> PlaywrightElementList:
+        return PlaywrightElementList(
+            self._locator.locator(f'[value="{value}"]')
+        )
+
+    def find_by_text(self, text: str) -> PlaywrightElementList:
+        return PlaywrightElementList(
+            self._locator.get_by_text(text, exact=True)
+        )
+
+    def find_by_css(self, css: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self._locator.locator(css))
+
+    def find_by_tag(self, tag: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self._locator.locator(tag))
+
+    def find_by_name(self, name: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self._locator.locator(f'[name="{name}"]'))
+
+    def find_by_id(self, element_id: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self._locator.locator(f'#{element_id}'))
+
+    def find_by_xpath(self, xpath: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self._locator.locator(f'xpath={xpath}'))
+
+
+class PlaywrightElementList:
+    """Wraps a Playwright Locator as a Splinter-like ElementList.
+
+    Proxies most calls to the first matched element, and supports indexing
+    to access individual elements.
+    """
+
+    def __init__(self, locator: Locator) -> None:
+        self._locator = locator
+
+    def __len__(self) -> int:
+        return self._locator.count()
+
+    def __bool__(self) -> bool:
+        return self._locator.count() > 0
+
+    def __iter__(self) -> Iterator[PlaywrightElement]:
+        for i in range(self._locator.count()):
+            yield PlaywrightElement(self._locator.nth(i))
+
+    @overload
+    def __getitem__(self, index: int) -> PlaywrightElement: ...
+    @overload
+    def __getitem__(self, index: str) -> str | None: ...
+
+    def __getitem__(self, index: int | str) -> PlaywrightElement | str | None:
+        if isinstance(index, int):
+            return PlaywrightElement(self._locator.nth(index))
+        return self._locator.first.get_attribute(index)
+
+    @property
+    def first(self) -> PlaywrightElement:
+        return PlaywrightElement(self._locator.first)
+
+    def click(self) -> None:
+        self._locator.first.click()
+
+    def fill(self, value: str) -> None:
+        _fill_locator(self._locator.first, value)
+
+    def select(self, value: str) -> None:
+        self._locator.first.select_option(value)
+
+    @property
+    def text(self) -> str:
+        return self._locator.first.text_content() or ''
+
+    @property
+    def value(self) -> str:
+        try:
+            return self._locator.first.input_value()
+        except Exception:
+            return self._locator.first.get_attribute('value') or ''
+
+    @value.setter
+    def value(self, value: str) -> None:
+        self.fill(value)
+
+    @property
+    def checked(self) -> bool:
+        return self._locator.first.is_checked()
+
+    def is_visible(self) -> bool:
+        return self._locator.first.is_visible()
+
+    def scroll_to(self) -> None:
+        self._locator.first.scroll_into_view_if_needed()
+
+    def mouse_over(self) -> None:
+        self._locator.first.hover()
+
+    def find_by_value(self, value: str) -> PlaywrightElementList:
+        return PlaywrightElementList(
+            self._locator.first.locator(f'[value="{value}"]')
+        )
+
+    def find_by_text(self, text: str) -> PlaywrightElementList:
+        return PlaywrightElementList(
+            self._locator.first.get_by_text(text, exact=True)
+        )
+
+    def find_by_css(self, css: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self._locator.first.locator(css))
+
+    def find_by_tag(self, tag: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self._locator.first.locator(tag))
+
+    def find_by_name(self, name: str) -> PlaywrightElementList:
+        return PlaywrightElementList(
+            self._locator.first.locator(f'[name="{name}"]')
+        )
+
+    def find_by_id(self, element_id: str) -> PlaywrightElementList:
+        return PlaywrightElementList(
+            self._locator.first.locator(f'#{element_id}')
+        )
+
+    def find_by_xpath(self, xpath: str) -> PlaywrightElementList:
+        return PlaywrightElementList(
+            self._locator.first.locator(f'xpath={xpath}')
+        )
+
+
+class FindLinks:
+    """Provides Splinter-compatible browser.links.find_by_*() methods."""
+
+    def __init__(self, page: Page) -> None:
+        self.page = page
+
+    def find_by_href(self, href: str) -> PlaywrightElementList:
+        return PlaywrightElementList(
+            self.page.locator(f'//a[@href="{href}"]')
+        )
+
+    def find_by_partial_href(self, href: str) -> PlaywrightElementList:
+        return PlaywrightElementList(
+            self.page.locator(f'//a[contains(@href, "{href}")]')
+        )
+
+    def find_by_text(self, text: str) -> PlaywrightElementList:
+        return PlaywrightElementList(
+            self.page.get_by_role('link', name=text, exact=True)
+        )
+
+    def find_by_partial_text(self, text: str) -> PlaywrightElementList:
+        return PlaywrightElementList(
+            self.page.get_by_role('link', name=text, exact=False)
+        )
+
+
+class ExtendedBrowser:
+    """Playwright-based browser providing OneGov-specific test helpers."""
+
+    def __init__(
+        self,
+        browser: Browser,
+        baseurl: str | None = None,
+        wait_time: float = 2.0,
+    ) -> None:
+        self.baseurl = baseurl
+
+        self.browser = browser
+        self.context = browser.new_context()
+        self._spawned_contexts = [self.context]
+
+        self.page = page = self.context.new_page()
+        self._links = FindLinks(page)
+
+        self.wait_time = wait_time
+
+        self._console_messages: list[tuple[str, str]] = []
+        self._page_errors: list[str] = []
+        page.on('console', self._on_console)
+        page.on('pageerror', self._on_pageerror)
+
+    @property
+    def wait_time(self) -> float:
+        return self._wait_time
+
+    @wait_time.setter
+    def wait_time(self, wait_time: float) -> None:
+        self._wait_time = wait_time
+        self.context.set_default_timeout(int(wait_time * 1000))
+
+    def _on_console(self, msg: ConsoleMessage) -> None:
+        if msg.type == 'error':
+            level = 'SEVERE'
+        elif msg.type == 'warning':
+            level = 'WARNING'
         else:
-            browser = browser_factory(*args, **kwargs)
+            return  # ignore info/log/debug
 
-        class LeechedExtendedBrowser(cls, browser.__class__):  # type: ignore
+        location = msg.location
+        url = location.get('url', '') if location else ''
+        text = msg.text
+        formatted = f"{url} - {text}" if url else text
 
-            clones: list[Self] = []
+        self._console_messages.append((level, formatted))
 
-            def quit(self) -> None:
-                for clone in self.clones:
-                    with suppress(RemoteDisconnected):
-                        clone.quit()
+    def _on_pageerror(self, exc: Exception) -> None:
+        self._page_errors.append(str(exc))
 
-                with suppress(RemoteDisconnected):
-                    super().quit()
+    def _clear_console(self) -> None:
+        self._console_messages.clear()
+        self._page_errors.clear()
 
-        browser = cast('Self', browser)
-        browser.spawn_parameters = cls, browser_factory, args, kwargs
-        browser.__class__ = LeechedExtendedBrowser
-        return browser
-
-    def clone(self) -> Self:
-        """ Returns an independent instance of the current browser (all state
-        is reset on the new instance).
-
-        """
-
-        cls, browser_factory, args, kwargs = self.spawn_parameters
-        browser = cls.spawn(browser_factory, *args, **kwargs)
-
-        self.clones.append(browser)
-
-        for key, value in self.clone_parameters.items():
-            setattr(browser, key, value)
-
-        return browser
+    def spawn(self) -> ExtendedBrowser:
+        """Spawn a new browser instance with its own context"""
+        instance = ExtendedBrowser(self.browser, self.baseurl)
+        instance._spawned_contexts = self._spawned_contexts
+        self._spawned_contexts.append(instance.context)
+        return instance
 
     @property
-    def clone_parameters(self) -> dict[str, Any]:
-        """ Returns a dictionary of values that need to be applied to the new
-        browser instance after it is cloned.
-
-        """
-        return {}
-
-
-class ExtendedBrowser(InjectedBrowserExtension):
-    """ Extends Splinter's browser with OneGov specific methods.
-
-    """
-
-    # Prefix appended to urls without http prefix.
-    baseurl: str | None = None
+    def links(self) -> FindLinks:
+        return self._links
 
     @property
-    def clone_parameters(self) -> dict[str, Any]:
-        return {
-            'baseurl': self.baseurl
-        }
+    def html(self) -> str:
+        return self.page.content()
+
+    @property
+    def url(self) -> str:
+        return self.page.url
 
     def visit(
         self,
@@ -134,15 +334,16 @@ class ExtendedBrowser(InjectedBrowserExtension):
         expected_errors: list[dict[str, Any]] | None = None,
         ignore_all_console_errors: bool = False
     ) -> None:
-        """ Overrides the default visit method to provided baseurl support.
-            halt_on_fail keeps the browser window open for some minutes
-            before failing the test.
-            Use expected_errors as filters to pass the test.
-         """
+        """Navigate to *url* and optionally check for console errors.
+
+        If *url* is relative and ``self.baseurl`` is set the two are joined.
+        """
+        self._clear_console()
         if self.baseurl and not url.startswith('http'):
             url = self.baseurl.rstrip('/') + url
-
-        super().visit(url)
+        # NOTE: Since application startup can take a while we use a different
+        #       timeout for page navigation, that's a little higher.
+        self.page.goto(url, timeout=30000)
         if not ignore_all_console_errors:
             self.fail_on_console_errors(sleep_before_fail, expected_errors)
 
@@ -152,14 +353,11 @@ class ExtendedBrowser(InjectedBrowserExtension):
         password: str,
         to: str | None = None
     ) -> None:
-        """ Login a user through the usualy /auth/login path. """
-
         url = '/auth/login' + (to and ('/?to=' + to) or '')
-
         self.visit(url)
-        self.fill('username', username)
-        self.fill('password', password)
-        self.find_by_css('form input[type="submit"]').first.click()
+        self.page.fill('input[name="username"]', username)
+        self.page.fill('input[name="password"]', password)
+        self.page.click('form input[type="submit"]')
 
     def login_admin(self, to: str | None = None) -> None:
         self.login('admin@example.org', 'hunter2', to)
@@ -173,109 +371,214 @@ class ExtendedBrowser(InjectedBrowserExtension):
     def logout(self) -> None:
         self.visit('/auth/logout')
 
+    def fill(self, name: str, value: Any) -> None:
+        """Fill the first form field with the given *name* attribute."""
+        # File input
+        file_input = self.page.locator(f'input[type="file"][name="{name}"]')
+        if file_input.count() > 0:
+            file_input.first.set_input_files(value)
+            return
+
+        # Checkbox
+        checkbox = self.page.locator(
+            f'input[type="checkbox"][name="{name}"]'
+        )
+        if checkbox.count() > 0:
+            if value:
+                checkbox.first.check()
+            else:
+                checkbox.first.uncheck()
+            return
+
+        # Radio button
+        radio = self.page.locator(
+            f'input[type="radio"][name="{name}"]'
+        )
+        if radio.count() > 0:
+            radio.locator(f'[value="{value}"]').check()
+            return
+
+        # Select element
+        select_el = self.page.locator(f'select[name="{name}"]')
+        if select_el.count() > 0:
+            select_el.first.select_option(str(value))
+            return
+
+        # Text-like input or textarea
+        field = self.page.locator(
+            f'input[name="{name}"],textarea[name="{name}"]'
+        ).first
+        if isinstance(value, dict):
+            value = json.dumps(value, indent=2)
+        else:
+            value = str(value)
+        _fill_locator(field, value)
+
+    def fill_form(self, data: dict[str, Any]) -> None:
+        """Fill multiple form fields given a ``{name: value}`` mapping."""
+        for name, value in data.items():
+            self.fill(name, value)
+
+    def choose(self, name: str, value: str) -> None:
+        """Select a radio button identified by *name* and *value*."""
+        self.page.locator(
+            f'input[type="radio"][name="{name}"][value="{value}"]'
+        ).check()
+
+    def find_by_css(self, css: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self.page.locator(css))
+
+    def find_by_value(self, value: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self.page.locator(f'[value="{value}"]'))
+
+    def find_by_text(self, text: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self.page.get_by_text(text, exact=True))
+
+    def find_by_tag(self, tag: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self.page.locator(tag))
+
+    def find_by_name(self, name: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self.page.locator(f'[name="{name}"]'))
+
+    def find_by_id(self, element_id: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self.page.locator(f'#{element_id}'))
+
+    def find_by_xpath(self, xpath: str) -> PlaywrightElementList:
+        return PlaywrightElementList(self.page.locator(f'xpath={xpath}'))
+
+    def is_text_present(
+        self,
+        text: str,
+        wait_time: float | None = None
+    ) -> bool:
+        if wait_time is None:
+            wait_time = self.wait_time
+        try:
+            self.page.get_by_text(text, exact=False).first.wait_for(
+                timeout=int(wait_time * 1000)
+            )
+            return True
+        except Exception:
+            return False
+
+    def is_element_present_by_css(
+        self,
+        css: str,
+        wait_time: float | None = None
+    ) -> bool:
+        if wait_time is None:
+            wait_time = self.wait_time
+        try:
+            self.page.locator(css).first.wait_for(
+                timeout=int(wait_time * 1000)
+            )
+            return True
+        except Exception:
+            return False
+
+    def is_element_present_by_id(self, element_id: str) -> bool:
+        return self.page.locator(f'#{element_id}').count() > 0
+
+    def is_element_present_by_name(self, name: str) -> bool:
+        return self.page.locator(f'[name={name}]').count() > 0
+
+    def is_element_present_by_xpath(
+        self,
+        xpath: str,
+        wait_time: float | None = None
+    ) -> bool:
+        if wait_time is None:
+            wait_time = self.wait_time
+        try:
+            self.page.locator(f'xpath={xpath}').first.wait_for(
+                timeout=int(wait_time * 1000)
+            )
+            return True
+        except Exception:
+            return False
+
+    def execute_script(self, script: str, *args: Any) -> Any:
+        """Execute *script* in the browser, optionally passing *args*.
+
+        Arguments are mapped to ``arguments[0]``, ``arguments[1]``, … inside
+        the script, matching Selenium's convention.
+        """
+        if args:
+            wrapped = f"(args) => {{ var arguments = args; {script} }}"
+            return self.page.evaluate(wrapped, list(args))
+        return self.page.evaluate(f"() => {{ {script} }}")
+
+    def evaluate_script(self, expression: str) -> Any:
+        return self.page.evaluate(expression)
+
     def wait_for_js_variable(
         self,
         variable: str,
         timeout: float = 10.0
     ) -> None:
-        """ Wait until the given javascript variable is no longer undefined """
-
-        time_budget = timeout
-        interval = 0.1
-
-        def undefined() -> bool:
-            try:
-                return self.evaluate_script(f'{variable} == undefined')
-            except Exception as exception:
-                if 'not defined' in str(exception):
-                    return True
-                raise exception
-
-        while time_budget > 0 and undefined():
-            time.sleep(interval)
-            time_budget -= interval
-
-        if time_budget <= 0:
-            raise RuntimeError("Timeout reached")
+        """Block until the named JavaScript variable is defined."""
+        self.page.wait_for_function(
+            f'() => typeof {variable} !== "undefined"',
+            timeout=int(timeout * 1000)
+        )
 
     def wait_for(
         self,
         condition: Callable[[], bool],
         timeout: float = 10.0
     ) -> bool:
-        """Wait until the condition is satisfied or timeout is reached."""
-
+        """Poll *condition* until it returns ``True`` or *timeout* elapses."""
         if not callable(condition):
             raise ValueError("The condition must be a callable object.")
 
-        time_budget = timeout
-        interval = 0.1
-
-        while time_budget > 0:
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
             if condition():
                 return True
-
-            time.sleep(interval)
-            time_budget -= interval
-
+            time.sleep(0.05)
         raise TimeoutError("Timeout reached")
 
-    def interact_with_ace_editor(self, content: str | dict[str, Any]) -> None:
-        # I actually tried setting the value with js, (would be much simpler)
-        # while this die made text appear in the ace editor field,  it wasn't
-        # actually truly set, probably due to some intricacies of ace.
-        # So we just type it out letter by letter.
-
+    def interact_with_ace_editor(
+        self,
+        content: str | dict[str, Any],
+        name: str | None = None
+    ) -> None:
+        """Type *content* into the Ace editor widget on the current page."""
         if isinstance(content, dict):
             content = json.dumps(content, indent=2)
 
-        editor_element = self.find_by_css('.ace_editor')
-        editor_element.click()
+        self.page.locator(
+            f'{f".field-{name} " if name else ''}.ace_editor'
+        ).click()
 
-        # Clear existing content (Ctrl+A, Delete)
-        actions = ActionChains(self.driver)
-        actions.key_down(Keys.CONTROL).send_keys('a').key_up(
-            Keys.CONTROL
-        ).send_keys(Keys.DELETE).perform()
+        # Clear existing content
+        self.page.keyboard.press('Control+a')
+        self.page.keyboard.press('Delete')
         time.sleep(0.1)
 
         ends_with_brace = content.rstrip().endswith('}')
-        # Type the content - but if it ends with a closing brace,
-        # omit the last character
         typing_content = content[:-1] if ends_with_brace else content
-        actions = ActionChains(self.driver)
-        actions.send_keys(typing_content).perform()
+        self.page.keyboard.type(typing_content)
 
-        # If we omitted the closing brace, add it now and immediately press
-        # Backspace to remove any auto-inserted closing brace
         if ends_with_brace:
-            actions = ActionChains(self.driver)
-            actions.send_keys('}').perform()
+            self.page.keyboard.type('}')
             time.sleep(0.1)
+            # Remove the auto-inserted closing brace from the editor
+            self.page.keyboard.press('Backspace')
 
-            # Press Backspace to remove the auto-inserted second closing brace
-            actions = ActionChains(self.driver)
-            actions.send_keys(Keys.BACKSPACE).perform()
-
-        # Click somewhere else to ensure the editor loses focus and updates
-        self.find_by_tag('body').click()
+        # Blur the editor to trigger any change handlers
+        self.page.locator('body').click()
 
     def set_datetime_element(
-        self, selector: str, date_or_time: datetime | date
+        self,
+        selector: str,
+        date_or_time: datetime | date
     ) -> None:
-        """ Sets the date and time on a datetime-local field directly by
-        setting its value.
-        """
-
-        # The way we have determined this pattern is inspecting the DOM
-        # element of the datetime picker and seeing what kind of format it
-        # expects:
-        # document.getElementById('publication_start').value;
+        """Set the value of a datetime-local or date input via JavaScript."""
         if isinstance(date_or_time, datetime):
-            date_or_time_s = date_or_time.strftime("%Y-%m-%dT%H:%M")
+            value = date_or_time.strftime("%Y-%m-%dT%H:%M")
         else:
-            # Many oneogv forms use a date widget with no time, support that:
-            date_or_time_s = date_or_time.strftime("%Y-%m-%d")
+            value = date_or_time.strftime("%Y-%m-%d")
 
         script = """
             function setDateTimeDirect(selector, dateTimeString) {
@@ -297,21 +600,49 @@ class ExtendedBrowser(InjectedBrowserExtension):
             }
             setDateTimeDirect(arguments[0], arguments[1]);
         """
-
-        self.execute_script(script, selector, date_or_time_s)
+        self.execute_script(script, selector, value)
 
     def scroll_to_css(self, css: str) -> None:
-        """ Scrolls to the first element matching the given css expression. """
-
+        """Scroll the first element matching *css* into view."""
         self.execute_script(
-            'document.querySelector("{}").scrollIntoView()'.format(css))
+            f'document.querySelector("{css}").scrollIntoView()'
+        )
 
     def drop_file(self, selector: str, path: StrPath) -> None:
-        # https://gist.github.com/z41/c11f8a4072e9f67e5755d4a1a72c8f02
-        dropzone = self.find_by_css(selector)[0]._element  # type: ignore[attr-defined]
+        """Simulate dropping *path* onto the element matched by *selector*.
 
-        input = self.driver.execute_script(JS_DROP_FILE, dropzone)
-        input.send_keys(str(path))
+        Uses the same JS helper as the legacy Selenium implementation
+        (drop_file.js) which creates a hidden file input, then uses
+        Playwright's set_input_files to trigger the drag/drop events.
+        """
+        # Obtain an ElementHandle so we can pass it directly into JS.
+        element: ElementHandle | None = (
+            self.page.locator(selector).first.element_handle()
+        )
+        if element is None:
+            raise RuntimeError(
+                f"drop_file: no element found for selector {selector!r}"
+            )
+
+        # Wrap drop_file.js so the element is passed as arguments[0].
+        # Use a regular (non-arrow) anonymous function to make the local
+        # ``arguments`` variable shadow the built-in safely.
+        wrapped_js = (
+            "(function(dropzone) {"
+            "    var arguments = [dropzone, undefined, undefined];"
+            f"   {JS_DROP_FILE}"
+            "})"
+        )
+
+        file_input_handle: JSHandle = self.page.evaluate_handle(
+            wrapped_js, element
+        )
+
+        file_input: ElementHandle | None = file_input_handle.as_element()
+        if file_input is None:
+            raise RuntimeError("drop_file: JS did not return an element")
+
+        file_input.set_input_files(str(path))
 
     @property
     def failsafe_filters(self) -> list[dict[str, Any]]:
@@ -323,6 +654,10 @@ class ExtendedBrowser(InjectedBrowserExtension):
             dict(level='WARNING', rgxp="facebook"),
             dict(level='WARNING', rgxp="Third-party cookie will be blocked"),
             dict(level='WARNING', rgxp=re.escape('react-with-addons.js')),
+            dict(
+                level='WARNING',
+                rgxp=re.escape('https://web.cmp.usercentrics.eu')
+            ),
             dict(level='SEVERE', rgxp=re.escape("api.mapbox.com")),
         ]
 
@@ -335,26 +670,37 @@ class ExtendedBrowser(InjectedBrowserExtension):
         filters = expected_errors + self.failsafe_filters
         error_msgs = self.get_console_log(filters)
         if error_msgs and environ.get('SHOW_BROWSER') == '1':
-            sleep(sleep_before)
+            time.sleep(sleep_before)
         assert not error_msgs, error_msgs
 
     def get_console_log(
         self,
         filters: list[dict[str, Any]] | None = None
     ) -> list[dict[str, Any]]:
-        """
-        Get the browsers console log.
-        Filter the message by using filters. The filter excludes the entry
-        if all criteria apply.
-        Filters have the form of the message itself excep for the rgxp key:
+        """Return console errors/warnings, optionally applying *filters*.
 
-        {'source': 'security', 'level': 'SEVERE'}
-        {'level': 'WARNING'}
-        {'level': 'SEVERE', 'rgxp': 'Content Security Policy'}
-
-        Use a regex expression to filter by the message of the error
+        Each filter is a dict whose keys narrow down which messages to exclude.
+        Supported keys: ``level`` (``'SEVERE'``/``'WARNING'``), ``rgxp``
+        (regex matched against the message text), and ``source`` (ignored –
+        Playwright does not expose the same source categories as ChromeDevTools
+        via Selenium, so the rgxp/level constraints are sufficient).
         """
-        messages = self.driver.get_log('browser')
+        messages: list[dict[str, Any]] = []
+
+        for level, text in self._console_messages:
+            messages.append({
+                'level': level,
+                'source': 'console-api',
+                'message': text,
+            })
+
+        for error_text in self._page_errors:
+            messages.append({
+                'level': 'SEVERE',
+                'source': 'javascript',
+                'message': error_text,
+            })
+
         if not messages:
             return []
 
@@ -363,13 +709,19 @@ class ExtendedBrowser(InjectedBrowserExtension):
         def apply_filter(fil: dict[str, Any], item: dict[str, Any]) -> bool:
             checks = []
             for k, v in fil.items():
-                if k == 'rgxp':
-                    checks.append(
-                        re.search(v, item['message']) and True or False
-                    )
+                if k == 'source':
+                    # Playwright does not separate console messages by source
+                    # category (network / security / console-api) the same way
+                    # Selenium/CDP does. Skip the source check so the rgxp and
+                    # level constraints still take effect.
+                    pass
+                elif k == 'rgxp':
+                    checks.append(bool(re.search(v, item['message'])))
                 else:
                     checks.append(item.get(k) == v)
-            return all(checks)
+            # A filter with only a ``source`` key has no remaining checks and
+            # should not match anything.
+            return bool(checks) and all(checks)
 
         def include(item: dict[str, Any]) -> bool:
             for fil in filters:
@@ -383,17 +735,20 @@ class ExtendedBrowser(InjectedBrowserExtension):
         self,
         filters: list[dict[str, Any]] | None = None
     ) -> str:
-        console_log = self.get_console_log(filters)
-        return "\n".join(
-            (f"{i['level']}: {i['message']}" for i in console_log)
-        )
+        log = self.get_console_log(filters)
+        return '\n'.join(f"{i['level']}: {i['message']}" for i in log)
 
 
-def screen_shot(name: str, browser: Browser, open_file: bool = True) -> None:
-    file = browser.screenshot(f'/tmp/{name}.png', full=True)
+def screen_shot(
+    name: str,
+    browser: ExtendedBrowser,
+    open_file: bool = True
+) -> None:
+    file = f'/tmp/{name}.png'
+    browser.page.screenshot(path=file, full_page=True)
     if not open_file:
         return
-    programs = ('xviewer', )
+    programs = ('xviewer',)
     for p in programs:
         if shutil.which(p):
             system(f'{p} {file} &')

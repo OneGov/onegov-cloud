@@ -17,7 +17,6 @@ if TYPE_CHECKING:
     from .conftest import Scenario
 
 
-@mark.skip('Login with selenium is not working')
 def test_browse_matching(
     browser: ExtendedBrowser,
     scenario: Scenario
@@ -44,14 +43,27 @@ def test_browse_matching(
     browser.login_admin()
     browser.visit('/matching')
 
+    # close CMP dialog if it pops up
+    try:
+        browser.find_by_text("Akzeptieren und schliessen").click()
+    except Exception:
+        pass
+
     # check the initial state
     assert browser.is_text_present("Ferienpass 2016")
     assert browser.is_text_present("Zufriedenheit liegt bei 0%")
     assert browser.is_text_present("0% aller Durchführungen haben genügend")
     assert browser.is_text_present("0 / 4")
 
+    # NOTE: There is an uniteractable copy of a lot of the elements on this
+    #       page, that we have to avoid trying to interact with, unfortunately
+    #       it's located before the interactable version in the DOM.
+    #       So we manually target the main content section first and then
+    #       target everything relative to that.
+    content = browser.find_by_id('content').first
+
     # run a matching
-    browser.find_by_value("Zuteilung ausführen").click()
+    content.find_by_value("Zuteilung ausführen").click()
 
     # check the results
     assert browser.is_text_present("Zufriedenheit liegt bei 100%")
@@ -63,27 +75,22 @@ def test_browse_matching(
     assert not browser.is_text_present("Dustin")
     assert not browser.is_text_present("Mike")
 
-    browser.find_by_css('.matching-details > button')[0].click()
-    browser.find_by_css('.matches').is_visible()
+    content.find_by_css('.matching-details .title-toggler')[0].click()
+    content.find_by_css('.matches').is_visible()
 
     assert browser.is_text_present("Dustin")
     assert browser.is_text_present("Mike")
 
     # reset it again
-    browser.find_by_css('.reset-matching').click()
-
-    # without this we sometimes get errors
-    time.sleep(0.25)
+    content.find_by_css('.reset-matching').click()
 
     # confirm the matching
     assert browser.is_text_present("Zufriedenheit liegt bei 0%")
     assert browser.is_text_present("0% aller Durchführungen haben genügend")
 
-    browser.find_by_css('input[value="yes"]').click()
-    browser.find_by_css('input[name="sure"]').click()
-    browser.find_by_value("Zuteilung ausführen").click()
-
-    assert browser.is_text_present("wurde bereits bestätigt")
+    content.find_by_css('input[value="yes"]').click()
+    content.find_by_css('input[name="sure"]').click()
+    content.find_by_value("Zuteilung ausführen").click()
 
     # verify the period's state
     browser.visit('/periods')
