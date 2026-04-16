@@ -1804,7 +1804,6 @@ def view_archived_tickets(
     owner = next((o for o in owners if o.active), None)
     submitter = next((s for s in submitters if s.active), None)
     layout = layout or ArchivedTicketsLayout(self, request)
-    layout.breadcrumbs[-1] = Link(_('Archived Tickets'), request.link(self))
 
     def action_link(ticket: Ticket) -> str:
         return ''

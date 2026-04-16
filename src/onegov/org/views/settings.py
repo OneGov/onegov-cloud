@@ -342,7 +342,7 @@ def handle_analytics_settings(
 @OrgApp.form(
     model=Organisation, name='module-activation-settings', template='form.pt',
     permission=Secret, form=ModuleActivationSettingsForm,
-    setting=_('Activate/deactivate modules'), order=0,
+    setting=_('Optional modules'), order=0,
     icon='far fa-th-large',
     category=_('Modules')
 )

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-10 10:52+0200\n"
+"POT-Creation-Date: 2026-04-16 09:08+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -3012,8 +3012,9 @@ msgid ""
 "Enables the newsletter module for admins and show a \"Subscribe to "
 "newsletter\" option for the users on the news page."
 msgstr ""
-"Active le module de newsletter pour les administrateurs et affiche une option"
-" \"S'abonner à la newsletter\" pour les utilisateurs sur la page des actualités."
+"Active le module de newsletter pour les administrateurs et affiche une "
+"option \"S'abonner à la newsletter\" pour les utilisateurs sur la page des "
+"actualités."
 
 msgid "Enable Citizen Login"
 msgstr "Activer la connexion des clients"
@@ -3416,6 +3417,9 @@ msgstr "Voulez-vous vraiment supprimer cette personne ?"
 
 msgid "Delete person"
 msgstr "Supprimer la personne"
+
+msgid "Archived Tickets"
+msgstr "Tickets archivés"
 
 msgid "Delete archived tickets"
 msgstr "Supprimer les tickets archivés"
@@ -7608,6 +7612,9 @@ msgstr "Accès (mTAN)"
 msgid "Analytics"
 msgstr "Analytics"
 
+msgid "Optional modules"
+msgstr "Modules optionnels"
+
 msgid "People directory"
 msgstr "Annuaire des personnes"
 
@@ -7954,9 +7961,6 @@ msgstr "Tous les utilisateurs"
 
 msgid "All Submitters"
 msgstr "Tous les auteurs"
-
-msgid "Archived Tickets"
-msgstr "Tickets archivés"
 
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"

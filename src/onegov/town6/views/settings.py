@@ -304,7 +304,7 @@ def town_handle_analytics_settings(
 @TownApp.form(
     model=Organisation, name='module-activation-settings', template='form.pt',
     permission=Secret, form=ModuleActivationSettingsForm,
-    setting=_('Activate/deactivate modules'), order=0, icon='far fa-th-large',
+    setting=_('Optional modules'), order=0, icon='far fa-th-large',
     category=_('Modules')
 )
 def town_handle_module_activation_settings(

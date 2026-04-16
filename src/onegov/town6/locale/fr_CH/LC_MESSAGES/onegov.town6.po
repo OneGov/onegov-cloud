@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-03-25 10:15+0100\n"
+"POT-Creation-Date: 2026-04-16 09:07+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -33,6 +33,9 @@ msgstr "Mes chats"
 
 msgid "Archived Chats"
 msgstr "Chats archivés"
+
+msgid "RIS Settings"
+msgstr "Paramètres RIS"
 
 msgid "Name"
 msgstr "Nom"
@@ -179,12 +182,6 @@ msgstr "Sa"
 msgid "Su"
 msgstr "Di"
 
-msgid "Enable RIS"
-msgstr "Activer RIS"
-
-msgid "Enables the RIS integration for this organisation."
-msgstr "Active l'intégration RIS pour cette organisation."
-
 msgid "URL path for the RIS main page"
 msgstr "Chemin URL pour la page principale RIS"
 
@@ -203,6 +200,12 @@ msgstr ""
 "Saisissez une liste de catégories pour les liens d'intérêt. Chaque catégorie "
 "doit être séparée par un point-virgule. Exemple : Cat 1 texte ; Cat 2 "
 "texte ; Cat 3 texte"
+
+msgid "Enable Ratsinformationssystem (RIS)"
+msgstr "Activer le système d'information du conseil (RIS)"
+
+msgid "Enables the RIS integration for this organisation."
+msgstr "Active l'intégration RIS pour cette organisation."
 
 msgid "All events"
 msgstr "Tous les événements"
@@ -328,9 +331,6 @@ msgstr "Archives des chats"
 
 msgid "Meetings"
 msgstr "Réunions"
-
-msgid "RIS Settings"
-msgstr "Paramètres RIS"
 
 msgid "Meeting"
 msgstr "Réunion"
@@ -666,8 +666,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -1398,8 +1398,8 @@ msgstr "Bonjour"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Votre adresse e-mail vient d'être utilisée pour créer un compte sur $"
-"{homepage}."
+"Votre adresse e-mail vient d'être utilisée pour créer un compte sur "
+"${homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Pour activer votre compte, cliquer sur confirmer ci-dessous:"
@@ -1498,9 +1498,9 @@ msgid "visit the request page"
 msgstr "visitez la page de la demande"
 
 msgid ""
-"This is the notification for customer messages on reservations for $"
-"{request.app.org.title}. If you no longer want to receive this e-mail please "
-"contact an administrator so they can remove you from the recipients list."
+"This is the notification for customer messages on reservations for ${request."
+"app.org.title}. If you no longer want to receive this e-mail please contact "
+"an administrator so they can remove you from the recipients list."
 msgstr ""
 "Ceci est une notification concernant les messages clients relatifs aux "
 "réservations pour ${request.app.org.title}. Si vous ne souhaitez plus "
@@ -1605,14 +1605,14 @@ msgid "New note in Ticket ${link}"
 msgstr "Nouvelle note dans le billet ${link}"
 
 msgid ""
-"This is the notification for notes on reservations for $"
-"{request.app.org.title}. If you no longer want to receive this e-mail please "
-"contact an administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit de la notification de notes sur les réservations pour $"
-"{request.app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, "
-"veuillez contacter un administrateur afin qu'il puisse vous retirer de la "
-"liste des destinataires."
+"Il s'agit de la notification de notes sur les réservations pour ${request."
+"app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez "
+"contacter un administrateur afin qu'il puisse vous retirer de la liste des "
+"destinataires."
 
 msgid "Pending approval"
 msgstr "En attente d'approbation"
@@ -1637,8 +1637,8 @@ msgid ""
 "no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Ceci est une notification pour les nouvelles réservations de $"
-"{organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"Ceci est une notification pour les nouvelles réservations de "
+"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
 
@@ -1738,8 +1738,8 @@ msgid ""
 "you no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit d'une notification concernant les réservations rejetées pour $"
-"{organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"Il s'agit d'une notification concernant les réservations rejetées pour "
+"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
 
@@ -2381,9 +2381,6 @@ msgstr ""
 msgid "Select the images that should be shown inside this album."
 msgstr "Sélectionnez les images qui devraient être affichées dans cet album."
 
-msgid "Confirm selection"
-msgstr "Confirmer la sélection"
-
 msgid "This newsletter has not been sent yet."
 msgstr "Ce bulletin d'information n'a pas encore été envoyé."
 
@@ -2796,36 +2793,6 @@ msgstr "Nouveau destinataire"
 msgid "Edit Recipient"
 msgstr "Éditer le destinataire"
 
-msgid "Online Counter Label"
-msgstr "Étiquette de comptoir en ligne"
-
-msgid "Hide Online Counter on Homepage"
-msgstr "Masquer le comptoir en ligne sur la page d'accueil"
-
-msgid "Reservations Label"
-msgstr "Étiquette de réservations"
-
-msgid "Hide Reservations on Homepage"
-msgstr "Masquer les réservations sur la page d'accueil"
-
-msgid "SBB Daypass Label"
-msgstr "Étiquette de carte journalière CFF"
-
-msgid "Publications Label"
-msgstr "Étiquette de publications"
-
-msgid "Official Documents"
-msgstr "Documents officiels"
-
-msgid "Hide Publications on Homepage"
-msgstr "Masquer les publications sur la page d'accueil"
-
-msgid "E-Move Label"
-msgstr "Étiquette de eDéménagement"
-
-msgid "E-Move Url"
-msgstr "Url de eDéménagement"
-
 msgid "News and Events"
 msgstr "Nouvelles et événements"
 
@@ -2844,44 +2811,20 @@ msgstr "Affiche le pied de page sur toutes les pages sauf pour les admins"
 msgid "Partner display"
 msgstr "Affichage partenaires"
 
-msgid "Favicon"
-msgstr "Favicon"
+msgid "Organisation Profile"
+msgstr "Profil de l'organisation"
 
-msgid "Social Media"
-msgstr "Réseaux sociaux"
+msgid "Tickets"
+msgstr "Tickets"
 
-msgid "Chat"
-msgstr "Discussion"
+msgid "Appearance"
+msgstr "Apparence"
 
 msgid "Header"
 msgstr "En-tête"
 
 msgid "Footer"
 msgstr "Bas de page"
-
-msgid "Modules"
-msgstr "Modules"
-
-msgid "Analytics"
-msgstr "Analytics"
-
-msgid "Holidays"
-msgstr "Jours fériés / Vacances scolaires"
-
-msgid "Tickets"
-msgstr "Tickets"
-
-msgid "Newsletter"
-msgstr "Newsletter"
-
-msgid "Link Migration"
-msgstr "Migration des liens"
-
-msgid "Resources"
-msgstr "Reservations"
-
-msgid "OneGov API"
-msgstr "API OneGov"
 
 msgid "Data Retention Policy"
 msgstr "Politique de Conservation des Données"
@@ -2893,8 +2836,32 @@ msgstr ""
 "Procédez avec prudence. Les billets et les données qu'ils contiennent "
 "peuvent être irrévocablement supprimés."
 
-msgid "Push Notification Overview"
-msgstr "Vue d'ensemble des notifications push"
+msgid "Access (mTAN)"
+msgstr "Accès (mTAN)"
+
+msgid "Holidays"
+msgstr "Jours fériés / Vacances scolaires"
+
+msgid "Analytics"
+msgstr "Analytics"
+
+msgid "Optional modules"
+msgstr "Modules optionnels"
+
+msgid "Modules"
+msgstr "Modules"
+
+msgid "Newsletter"
+msgstr "Newsletter"
+
+msgid "Resources"
+msgstr "Reservations"
+
+msgid "People directory"
+msgstr "Annuaire"
+
+msgid "Chat"
+msgstr "Discussion"
 
 msgid "Ratsinformationssystem"
 msgstr "Ratsinformationssystem"
@@ -2902,8 +2869,68 @@ msgstr "Ratsinformationssystem"
 msgid "Ratsinformationssystem (RIS)"
 msgstr "Ratsinformationssystem (RIS)"
 
+msgid "Advanced Settings"
+msgstr "Paramètres avancés"
+
+msgid "OneGov API"
+msgstr "API OneGov"
+
+msgid "Firebase (App)"
+msgstr "Firebase (App)"
+
+msgid "Push Notification Overview"
+msgstr "Vue d'ensemble des notifications push"
+
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Activate/deactivate modules"
+#~ msgstr "Activer/désactiver les modules"
+
+#~ msgid "Enable RIS"
+#~ msgstr "Activer RIS"
+
+#~ msgid "Confirm selection"
+#~ msgstr "Confirmer la sélection"
+
+#~ msgid "Online Counter Label"
+#~ msgstr "Étiquette de comptoir en ligne"
+
+#~ msgid "Hide Online Counter on Homepage"
+#~ msgstr "Masquer le comptoir en ligne sur la page d'accueil"
+
+#~ msgid "Reservations Label"
+#~ msgstr "Étiquette de réservations"
+
+#~ msgid "Hide Reservations on Homepage"
+#~ msgstr "Masquer les réservations sur la page d'accueil"
+
+#~ msgid "SBB Daypass Label"
+#~ msgstr "Étiquette de carte journalière CFF"
+
+#~ msgid "Publications Label"
+#~ msgstr "Étiquette de publications"
+
+#~ msgid "Official Documents"
+#~ msgstr "Documents officiels"
+
+#~ msgid "Hide Publications on Homepage"
+#~ msgstr "Masquer les publications sur la page d'accueil"
+
+#~ msgid "E-Move Label"
+#~ msgstr "Étiquette de eDéménagement"
+
+#~ msgid "E-Move Url"
+#~ msgstr "Url de eDéménagement"
+
+#~ msgid "Favicon"
+#~ msgstr "Favicon"
+
+#~ msgid "Social Media"
+#~ msgstr "Réseaux sociaux"
+
+#~ msgid "Link Migration"
+#~ msgstr "Migration des liens"
 
 #~ msgid "Cannot display"
 #~ msgstr "Impossible d'afficher"

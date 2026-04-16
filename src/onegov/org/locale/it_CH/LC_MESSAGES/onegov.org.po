@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-04-10 10:52+0200\n"
+"POT-Creation-Date: 2026-04-16 09:08+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2373,7 +2373,6 @@ msgstr ""
 "centro della mappa e il livello di zoom verranno quindi salvati come "
 "visualizzazione predefinita."
 
-
 msgid "Geo provider"
 msgstr "Fornitore di dati geografici"
 
@@ -3024,8 +3023,8 @@ msgid ""
 "footer, where users can view their reservations using their email-address."
 msgstr ""
 "Abilita l'accesso del cliente. Questo mostrerà un link \"accesso del "
-"cliente\" nel piè di pagina, dove gli utenti possono visualizzare le loro"
-" prenotazioni utilizzando il loro indirizzo email."
+"cliente\" nel piè di pagina, dove gli utenti possono visualizzare le loro "
+"prenotazioni utilizzando il loro indirizzo email."
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -3410,6 +3409,9 @@ msgstr "Vuoi davvero eliminare questa persona?"
 
 msgid "Delete person"
 msgstr "Elimina persona"
+
+msgid "Archived Tickets"
+msgstr "Biglietto archiviati"
 
 msgid "Delete archived tickets"
 msgstr "Cancellare i biglietti archiviati"
@@ -7573,6 +7575,9 @@ msgstr "Accesso (mTAN)"
 msgid "Analytics"
 msgstr "Analitica"
 
+msgid "Optional modules"
+msgstr "Moduli opzionali"
+
 msgid "People directory"
 msgstr "Elenco persone"
 
@@ -7915,9 +7920,6 @@ msgstr "Tutti gli utenti"
 
 msgid "All Submitters"
 msgstr "Tutti i mittenti"
-
-msgid "Archived Tickets"
-msgstr "Biglietto archiviati"
 
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"

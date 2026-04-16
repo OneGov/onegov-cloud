@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-10 10:52+0200\n"
+"POT-Creation-Date: 2026-04-16 09:08+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2365,8 +2365,8 @@ msgstr ""
 "Wo immer es eine Option gibt, einen Standort auf einer Karte auszuwählen, "
 "wird dies die Standardansicht sein. Sie können die Ansicht ändern, indem Sie "
 "die Karte ziehen und hinein- oder herauszoomen. Die Koordinaten des "
-"Kartenmittelpunkts und die Zoomstufe werden dann als Standardansicht
-"gespeichert."
+"Kartenmittelpunkts und die Zoomstufe werden dann als "
+"Standardansichtgespeichert."
 
 msgid "Geo provider"
 msgstr "Geo Anbieter"
@@ -3404,6 +3404,9 @@ msgstr "Möchten Sie die Person wirklich löschen?"
 
 msgid "Delete person"
 msgstr "Person löschen"
+
+msgid "Archived Tickets"
+msgstr "Archivierte Tickets"
 
 msgid "Delete archived tickets"
 msgstr "Archivierte Tickets löschen"
@@ -7598,6 +7601,9 @@ msgstr "Zugang (mTAN)"
 msgid "Analytics"
 msgstr "Web-Statistik"
 
+msgid "Optional modules"
+msgstr "Optionale Module"
+
 msgid "People directory"
 msgstr "Personenverzeichnis"
 
@@ -7944,9 +7950,6 @@ msgstr "Alle Benutzer"
 
 msgid "All Submitters"
 msgstr "Alle Antragsteller"
-
-msgid "Archived Tickets"
-msgstr "Archivierte Tickets"
 
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"

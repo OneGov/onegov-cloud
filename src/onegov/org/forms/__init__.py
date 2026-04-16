@@ -41,13 +41,13 @@ from onegov.org.forms.resource import ResourceExportForm
 from onegov.org.forms.resource import ResourceForm
 from onegov.org.forms.resource_recipient import ResourceRecipientForm
 from onegov.org.forms.search import SearchForm
+from onegov.org.forms.settings import AccessSettingsForm
 from onegov.org.forms.settings import AnalyticsSettingsForm
-from onegov.org.forms.settings import FooterSettingsForm
 from onegov.org.forms.settings import AppearanceSettingsForm
+from onegov.org.forms.settings import FooterSettingsForm
 from onegov.org.forms.settings import HolidaySettingsForm
 from onegov.org.forms.settings import HomepageSettingsForm
 from onegov.org.forms.settings import MapSettingsForm
-from onegov.org.forms.settings import AccessSettingsForm
 from onegov.org.forms.signup import SignupForm
 from onegov.org.forms.survey_submission import SurveySubmissionWindowForm
 from onegov.org.forms.text_module import TextModuleForm
@@ -65,13 +65,15 @@ from onegov.org.forms.userprofile import UserProfileForm
 
 
 __all__ = (
+    'AccessSettingsForm',
     'AddReservationForm',
     'AllocationRuleForm',
     'AnalyticsSettingsForm',
+    'AppearanceSettingsForm',
     'ChangeUsernameForm',
     'CitizenLoginForm',
-    'ConfirmCitizenLoginForm',
     'CommissionForm',
+    'ConfirmCitizenLoginForm',
     'DateRangeForm',
     'DaypassAllocationEditForm',
     'DaypassAllocationForm',
@@ -80,18 +82,17 @@ __all__ = (
     'EventForm',
     'EventImportForm',
     'ExportForm',
+    'ExtendedInternalTicketChatMessageForm',
     'FindYourSpotForm',
     'FooterSettingsForm',
     'FormDefinitionForm',
     'FormRegistrationWindowForm',
     'FormSubmissionsExport',
-    'AppearanceSettingsForm',
     'HolidaySettingsForm',
     'HomepageSettingsForm',
     'IframeForm',
     'ImageSetForm',
     'InternalTicketChatMessageForm',
-    'ExtendedInternalTicketChatMessageForm',
     'KabaEditForm',
     'LinkForm',
     'ManageUserForm',
@@ -99,11 +100,10 @@ __all__ = (
     'ManualInvoiceItemForm',
     'MapSettingsForm',
     'MeetingForm',
-    'AccessSettingsForm',
+    'NewUserForm',
     'NewsletterForm',
     'NewsletterSendForm',
     'NewsletterTestForm',
-    'NewUserForm',
     'PageForm',
     'ParliamentarianForm',
     'ParliamentarianRoleForm',
