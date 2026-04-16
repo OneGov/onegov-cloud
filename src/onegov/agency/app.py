@@ -13,7 +13,6 @@ from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
 from onegov.agency.request import AgencyRequest
 from onegov.agency.theme import AgencyTheme
-from onegov.api import ApiApp
 from onegov.core import utils
 from onegov.town6 import TownApp
 from onegov.town6.app import get_editor_asset as editor_assets
@@ -35,7 +34,7 @@ if TYPE_CHECKING:
     from onegov.org.models import Organisation
 
 
-class AgencyApp(TownApp, ApiApp):
+class AgencyApp(TownApp):
 
     request_class = AgencyRequest
 
