@@ -252,9 +252,7 @@
             <tal:block metal:use-macro="layout.macros['assembly-title']" tal:define="assembly result"/>
         </h5>
     </a>
-    <div tal:condition="request.get_layout(result)">
-        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
-    </div>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_landsgemeinde_assemblies>
 
 <metal:search_result_landsgemeinde_agenda_items define-macro="search_result_landsgemeinde_agenda_items" i18n:domain="onegov.landsgemeinde">
@@ -268,9 +266,7 @@
             <tal:block metal:use-macro="layout.macros['assembly-title']" tal:define="assembly result.assembly"/>
         </p>
     </a>
-    <div tal:condition="request.get_layout(result)">
-        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
-    </div>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_landsgemeinde_agenda_items>
 
 <metal:search_result_landsgemeinde_vota define-macro="search_result_landsgemeinde_vota" i18n:domain="onegov.landsgemeinde">
@@ -284,9 +280,7 @@
             <tal:block metal:use-macro="layout.macros['assembly-title']" tal:define="assembly result.agenda_item.assembly"/>
         </p>
     </a>
-    <div tal:condition="request.get_layout(result.agenda_item)">
-        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result.agenda_item)" />
-    </div>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result.agenda_item)" />
 </metal:search_result_landsgemeinde_vota>
 
 <metal:search_result_files define-macro="search_result_files" i18n:domain="onegov.landsgemeinde">
@@ -308,21 +302,19 @@
             <tal:block metal:use-macro="layout.macros['agenda-item-title']"/>
         </p>
     </a>
-    <div tal:condition="request.get_layout(result)">
-        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
-    </div>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_files>
 
 <metal:search_breadcrumbs define-macro="search_breadcrumbs" i18n:domain="onegov.town6">
-    <tal:b tal:condition="layout and len(layout.breadcrumbs) > 1" tal:define="links layout.breadcrumbs">
+    <div tal:condition="result_layout and len(result_layout.breadcrumbs) > 1" tal:define="links result_layout.breadcrumbs">
         <ul class="breadcrumbs search-breadcrumbs">
             <tal:b repeat="link links">
                 <li class="breadcrumb-item">
-                    ${link(layout).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
+                    ${link(result_layout).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
                 </li>
             </tal:b>
         </ul>
-    </tal:b>
+    </div>
 </metal:search_breadcrumbs>
 
 <metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.landsgemeinde">

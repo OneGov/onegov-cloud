@@ -402,7 +402,7 @@ def test_holidays() -> None:
     assert date(2000, 1, 2) not in o.holidays
     assert date(2000, 1, 3) not in o.holidays
 
-    assert len(o.holidays.all(2000)) == 8
+    assert len(o.holidays.all(2000)) == 10
 
     o.holiday_settings['cantons'] = ['AR', 'ZG']
 
@@ -410,7 +410,7 @@ def test_holidays() -> None:
     assert date(2000, 1, 2) in o.holidays
     assert date(2000, 1, 3) not in o.holidays
 
-    assert len(o.holidays.all(2000)) == 13
+    assert len(o.holidays.all(2000)) == 15
 
     o.holiday_settings['other'] = [[1, 3, 'Fooyears day']]
 
@@ -418,7 +418,7 @@ def test_holidays() -> None:
     assert date(2000, 1, 2) in o.holidays
     assert date(2000, 1, 3) in o.holidays
 
-    assert len(o.holidays.all(2000)) == 14
+    assert len(o.holidays.all(2000)) == 16
 
 
 def test_cascade_delete(session: Session) -> None:

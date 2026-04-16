@@ -746,6 +746,10 @@ def reopen_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
     user = request.current_user
     assert user is not None
 
+    if not self.handler.reopenable:
+        request.alert(_('This ticket cannot be reopened'))
+        return morepath.redirect(request.link(self))
+
     was_closed = self.state == 'closed'
 
     try:

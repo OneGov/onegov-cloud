@@ -1715,6 +1715,9 @@ class PersonCollectionLayout(DefaultLayout):
 @OrgApp.layout(model=Person)
 class PersonLayout(DefaultLayout):
 
+    model: Person
+    request: OrgRequest
+
     @cached_property
     def collection(self) -> PersonCollection:
         return PersonCollection(self.request.session)
@@ -1726,6 +1729,47 @@ class PersonLayout(DefaultLayout):
             Link(_('People'), self.request.link(self.collection)),
             Link(_(self.model.title), self.request.link(self.model))
         ]
+
+    @cached_property
+    def organisation_texts(self) -> list[str]:
+        excluded = self.request.app.org.excluded_person_fields(self.request)
+        if 'organisation' in excluded:
+            return []
+        person = self.model
+        parts: list[str] = []
+        if person.organisations_multiple:
+            parent_org: str | None = None
+            suborgs: list[str] = []
+
+            def add_part() -> None:
+                if parent_org is None:
+                    return
+
+                if suborgs:
+                    parts.append(f'{parent_org} - {", ".join(suborgs)}')
+                else:
+                    parts.append(parent_org)
+
+            for org in person.organisations_multiple:
+                if org.startswith('-'):
+                    suborgs.append(org.lstrip('-'))
+                elif parent_org is None:
+                    parent_org = org
+                    suborgs = []
+                else:
+                    add_part()
+                    parent_org = org
+                    suborgs = []
+            add_part()  # add final part
+            return parts
+
+        if person.organisation and person.sub_organisation:
+            parts.append(f'{person.organisation} - {person.sub_organisation}')
+        elif person.organisation:
+            parts.append(person.organisation)
+        elif person.sub_organisation:
+            parts.append(person.sub_organisation)
+        return parts
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
@@ -1896,15 +1940,22 @@ class TicketLayout(DefaultLayout):
                     )
 
             elif self.model.state == 'closed':
-                links.append(Link(
-                    text=_('Reopen ticket'),
-                    url=self.request.link(self.model, 'reopen'),
-                    attrs={'class': ('ticket-button', 'ticket-reopen')}
-                ))
-                links.append(Link(
-                    text=_('Archive ticket'),
-                    url=self.request.link(self.model, 'archive'),
-                    attrs={'class': ('ticket-button', 'ticket-archive')})
+                if self.model.handler.reopenable:
+                    links.append(
+                        Link(
+                            text=_('Reopen ticket'),
+                            url=self.request.link(self.model, 'reopen'),
+                            attrs={
+                                'class': ('ticket-button', 'ticket-reopen')
+                            },
+                        )
+                    )
+                links.append(
+                    Link(
+                        text=_('Archive ticket'),
+                        url=self.request.link(self.model, 'archive'),
+                        attrs={'class': ('ticket-button', 'ticket-archive')},
+                    )
                 )
             elif self.model.state == 'archived':
                 links.append(Link(

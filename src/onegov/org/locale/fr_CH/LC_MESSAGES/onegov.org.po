@@ -7821,6 +7821,9 @@ msgstr "Le ticket ne peut pas être clôturé car il est en attente"
 msgid "You have closed ticket ${number}"
 msgstr "Vous avez clôturé ${number} ticket(s)"
 
+msgid "This ticket cannot be reopened"
+msgstr "Ce ticket ne peut pas être réouvert"
+
 msgid "The ticket cannot be re-opened because it's not closed"
 msgstr "Le ticket ne peut pas être réouvert car il n'est pas clôturé"
 

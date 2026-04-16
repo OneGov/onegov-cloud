@@ -11,6 +11,7 @@ from sqlalchemy import func
 from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from onegov.activity import BookingPeriod
     from onegov.activity.matching.interfaces import MatchableBooking
     from sqlalchemy.orm import Session
 
@@ -40,13 +41,15 @@ class Scoring[BookingT: Booking | MatchableBooking = Any]:
     def from_settings(
         cls,
         settings: dict[str, Any],
-        session: Session
+        session: Session,
+        period: BookingPeriod | None = None
     ) -> Self:
 
         scoring = cls()
 
         # always prefer groups
-        scoring.criteria.append(PreferGroups.from_session(session))  # type: ignore[arg-type]
+        if (period and period.with_group_code) or not period:
+            scoring.criteria.append(PreferGroups.from_session(session))  # type: ignore[arg-type]
 
         if settings.get('prefer_in_age_bracket'):
             scoring.criteria.append(

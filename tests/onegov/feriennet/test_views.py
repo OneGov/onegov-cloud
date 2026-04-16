@@ -3871,7 +3871,6 @@ def test_send_message_to_different_recipients(
 
     # Create notification
     client.login_admin()
-    page = client.get('/usermanagement')
     page = client.get('/notifications')
     page = page.click('Neue Mitteilungs-Vorlage')
     page.form['subject'] = 'with_no_wishes_or_bookings'
@@ -3897,7 +3896,82 @@ def test_send_message_to_different_recipients(
     page.form['no_spam'] = 'y'
     page.form.submit()
 
-    # Sue shouldn't get a message since the has an activity
+    # Sue shouldn't get a message since she has an activity
     assert len(os.listdir(client.app.maildir)) == 2
-    message = client.get_email(0)
+    message = client.get_email(1)
     assert message['To'] != 'sue@example.org'
+
+
+def test_send_message_to_volunteer(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
+    scenario.add_period(title="2026", confirmed=True, finalized=False)
+    scenario.add_activity(title="Photography", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_need(
+        name="Begleiter", number=NumericRange(1, 3), accept_signups=True)
+
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/feriennet-settings')
+    page.form['volunteers'] = 'enabled'
+    page.form.submit()
+
+    scenario.add_volunteer(
+        first_name='Mia',
+        last_name='P',
+        address='street',
+        zip_code='12',
+        place='some place',
+        birth_date=date(2019, 1, 1),
+        email='mia@test.com',
+        phone='041 322 22 22',
+        state='open'
+    )
+    scenario.add_volunteer(
+        first_name='Emilia',
+        last_name='P',
+        address='street',
+        zip_code='12',
+        place='some place',
+        birth_date=date(2019, 1, 1),
+        email='emilia@test.com',
+        phone='041 322 22 22',
+        state='contacted'
+    )
+    scenario.add_volunteer(
+        first_name='Roy',
+        last_name='P',
+        address='street',
+        zip_code='12',
+        place='some place',
+        birth_date=date(2019, 1, 1),
+        email='roy@test.com',
+        phone='041 322 22 22',
+        state='confirmed'
+    )
+
+    scenario.commit()
+
+    page = client.get('/notifications')
+    page = page.click('Neue Mitteilungs-Vorlage')
+    page.form['subject'] = 'test_volunteers'
+    page.form['text'] = 'test'
+    page.form.submit()
+
+    # Send message to confirmed volunteers
+    page = client.get('/notifications')
+    page = page.click('Vorlage verwenden')
+    page.form['send_to'] = 'volunteers'
+    page.form['volunteer_state'] = 'confirmed'
+    page.form['no_spam'] = 'y'
+    page.form.submit()
+
+    # Only Roy should get a message
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+    assert message['To'] == 'roy@test.com'

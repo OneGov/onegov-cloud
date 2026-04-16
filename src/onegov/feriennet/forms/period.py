@@ -96,6 +96,15 @@ class PeriodForm(Form):
         depends_on=('confirmable', '!y')
     )
 
+    with_group_code = BooleanField(
+        label=_('With group codes'),
+        description=(
+            'Whether the period should support group codes. Bookings with a '
+            'group code are preferred in the matching process.'
+        ),
+        default=True
+    )
+
     finalizable = BooleanField(
         label=_('With billing'),
         default=True

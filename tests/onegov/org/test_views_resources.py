@@ -4275,20 +4275,20 @@ def test_allocation_rules_with_holidays(client: Client) -> None:
     page.form['on_holidays'] = 'no'
     page = page.form.submit().follow()
 
-    assert 'Verfügbarkeitszeitraum aktiv, 352 Verfügbarkeiten erstellt' in page
-    assert count_allocations() == 352
+    assert 'Verfügbarkeitszeitraum aktiv, 350 Verfügbarkeiten erstellt' in page
+    assert count_allocations() == 350
 
     # running the cronjob on an ordinary day will not change anything
     with freeze_time('2019-01-31 22:00:00'):
         run_cronjob()
 
-    assert count_allocations() == 352
+    assert count_allocations() == 350
 
     # only run at the end of the year does it work
     with freeze_time('2019-12-31 22:00:00'):
         run_cronjob()
 
-    assert count_allocations() == 705
+    assert count_allocations() == 701
 
 
 def test_allocation_rules_with_school_holidays(client: Client) -> None:

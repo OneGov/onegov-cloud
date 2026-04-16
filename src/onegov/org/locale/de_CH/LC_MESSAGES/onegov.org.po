@@ -7809,6 +7809,9 @@ msgstr ""
 msgid "You have closed ticket ${number}"
 msgstr "Sie haben das Ticket ${number} abgeschlossen"
 
+msgid "This ticket cannot be reopened"
+msgstr "Dieses Ticket kann nicht wieder geöffnet werden"
+
 msgid "The ticket cannot be re-opened because it's not closed"
 msgstr ""
 "Das Ticket kann nicht wieder geöffnet werden da es nicht geschlossen ist"
