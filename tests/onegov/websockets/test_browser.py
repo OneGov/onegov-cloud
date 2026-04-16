@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import pytest
+import asyncio
+import threading
 
 from onegov.websockets.client import authenticate
 from onegov.websockets.client import broadcast
@@ -14,8 +15,11 @@ if TYPE_CHECKING:
     from .conftest import WebsocketBrowser
 
 
-@pytest.mark.asyncio
-async def test_browser_integration(browser: WebsocketBrowser) -> None:
+def test_browser_integration(browser: WebsocketBrowser) -> None:
+    # Playwright's sync API runs its event loop via greenlets on the main
+    # thread, which marks an asyncio loop as "running" in the thread-local.
+    # To avoid conflicts with asyncio.Runner we run the async websocket
+    # operations in a separate thread with its own event loop.
 
     WebsocketsRoot.html = f"""
         <!doctype html>
@@ -43,13 +47,30 @@ async def test_browser_integration(browser: WebsocketBrowser) -> None:
     assert 'websockets.bundle.js' in browser.html
     browser.wait_for_js_variable('domLoaded')
 
-    async with connect(browser.websocket_server_url) as manage:
-        await authenticate(manage, 'super-super-secret-token')
+    errors: list[BaseException] = []
 
-        response = await status(manage)
-        assert response is not None
-        assert response['connections'].get('schema-two') == 1
+    async def ws_operations() -> None:
+        async with connect(browser.websocket_server_url) as manage:
+            await authenticate(manage, 'super-super-secret-token')
 
-        await broadcast(manage, 'schema', 'two', {'schema': 'two'})
-        await broadcast(manage, 'schema', 'one', {'schema': 'one'})
-        browser.wait_for_js_variable('messageReceived')
+            response = await status(manage)
+            assert response is not None
+            assert response['connections'].get('schema-two') == 1
+
+            await broadcast(manage, 'schema', 'two', {'schema': 'two'})
+            await broadcast(manage, 'schema', 'one', {'schema': 'one'})
+
+    def run_in_thread() -> None:
+        try:
+            asyncio.run(ws_operations())
+        except BaseException as exc:
+            errors.append(exc)
+
+    t = threading.Thread(target=run_in_thread, daemon=True)
+    t.start()
+    t.join(timeout=10)
+
+    if errors:
+        raise errors[0]
+
+    browser.wait_for_js_variable('messageReceived')

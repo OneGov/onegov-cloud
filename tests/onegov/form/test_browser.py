@@ -86,7 +86,7 @@ def test_formcode_format(browser: ExtendedBrowser) -> None:
 def test_formcode_select_empty_checkbox(browser: ExtendedBrowser) -> None:
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
-    browser.driver.execute_script("""
+    browser.execute_script("""
         var watcher = formcodeWatcherRegistry.new();
         var el = document.querySelector('#container');
 
@@ -117,7 +117,7 @@ def test_formcode_select_empty_checkbox(browser: ExtendedBrowser) -> None:
 def test_formcode_select_empty_radio(browser: ExtendedBrowser) -> None:
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
-    browser.driver.execute_script("""
+    browser.execute_script("""
         var watcher = formcodeWatcherRegistry.new();
         var el = document.querySelector('#container');
 
@@ -148,7 +148,7 @@ def test_formcode_select_prefilled(
 
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
-    browser.driver.execute_script(f"""
+    browser.execute_script(f"""
         var watcher = formcodeWatcherRegistry.new();
         var el = document.querySelector('#container');
         document.querySelector('textarea').value='A'
@@ -169,7 +169,7 @@ def test_formcode_keep_selection(
 
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
-    browser.driver.execute_script(f"""
+    browser.execute_script(f"""
         var watcher = document.watcher = formcodeWatcherRegistry.new();
         var el = document.querySelector('#container');
         document.querySelector('textarea').value='A'
@@ -180,12 +180,12 @@ def test_formcode_keep_selection(
     """)
 
     assert len(browser.find_by_css('.formcode-select input:checked')) == 0
-    browser.driver.execute_script("document.watcher.update('A = ___');")
+    browser.execute_script("document.watcher.update('A = ___');")
 
     sleep(0.1)
 
     assert len(browser.find_by_css('.formcode-select input:checked')) == 1
-    browser.driver.execute_script("document.watcher.update('C = ___');")
+    browser.execute_script("document.watcher.update('C = ___');")
 
     sleep(0.1)
 

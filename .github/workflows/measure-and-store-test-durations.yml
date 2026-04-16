@@ -53,13 +53,6 @@ jobs:
           unzip \
           xdg-utils
 
-    - name: Install Chrome
-      uses: browser-actions/setup-chrome@v1
-      with:
-        # FIXME: OGC-1857
-        chrome-version: 127
-        install-chromedriver: true
-
     - name: Checkout repo
       uses: actions/checkout@v6
 
@@ -70,6 +63,7 @@ jobs:
         uv pip install pytest-split pytest-xdist
         # TEMPORARY: editable build so we don't need a path-fix in codecov
         uv pip install -e .[test]
+        playwright install chromium
       env:
         # NOTE: Suppress uv warning
         UV_LINK_MODE: copy

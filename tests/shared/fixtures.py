@@ -5,7 +5,6 @@ import os
 import platform
 import port_for
 import pytest
-import re
 import shutil
 import tempfile
 import transaction
@@ -22,26 +21,24 @@ from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
 from onegov.websockets.server import main
 from pathlib import Path
+from playwright.sync_api import sync_playwright
 from pytest_localserver.smtp import Server as SmtpServer  # type: ignore[import-untyped]
 from pytest_redis.factories.proc import redis_proc
 from redis import Redis
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from shutil import which
-from splinter import Browser
 from sqlalchemy import create_engine, exc, text
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared.browser import ExtendedBrowser
 from tests.shared.postgresql import Postgresql
 from threading import Thread
 from uuid import uuid4
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.os_manager import ChromeType
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from asyncio import AbstractEventLoop
+    from collections.abc import Callable, Coroutine, Iterator
+    from playwright.sync_api import Browser, Playwright
     from pytest_redis.executor import RedisExecutor
     from sqlalchemy.orm import Session
 
@@ -333,64 +330,68 @@ def long_lived_filestorage() -> TempFS:
 
 
 @pytest.fixture(scope="session")
-def webdriver() -> str:
-    return 'chrome'
+def playwright(
+    monkeysession: pytest.MonkeyPatch
+) -> Iterator[Playwright]:
+    with sync_playwright() as playwright:
+        # NOTE: The sync API cannot be used together with asyncio
+        #       since it patches the event loop with greenlets to
+        #       run the coroutines synchronously. So sending websocket
+        #       messages will fail, unless we send them on a separate
+        #       thread
+        def run_in_thread[T](
+            main: Coroutine[Any, Any, T],
+            *,
+            debug: bool | None = None,
+            loop_factory: Callable[[], AbstractEventLoop] | None = None
+        ) -> T:
+            results: list[T] = []
+            errors: list[BaseException] = []
+            def runner() -> None:
+                try:
+                    results.append(
+                        run(main, debug=debug, loop_factory=loop_factory)
+                    )
+                except BaseException as exc:
+                    errors.append(exc)
+
+            thread = Thread(target=runner, daemon=True)
+            thread.start()
+            thread.join(timeout=10)
+            if errors:
+                raise errors[0]
+            return results[0]
+
+        monkeysession.setattr(
+            'onegov.websockets.integration.run',
+            run_in_thread
+        )
+        yield playwright
 
 
 @pytest.fixture(scope="session")
-def webdriver_options() -> Options:
-    options = Options()
-    options.add_argument('--no-sandbox')
+def playwright_browser(playwright: Playwright) -> Iterator[Browser]:
+    """Launch a Chromium browser once per test session.
 
-    if os.environ.get('SHOW_BROWSER') != '1':
-        options.add_argument('--headless')
-
-    return options
-
-
-@pytest.fixture(scope="session")
-def webdriver_executable_path() -> str | None:
-    if os.environ.get('SKIP_DRIVER_MANAGER') == '1':
-        return None
-
-    pattern = r'\d+\.\d+\.\d+'
-    stdout = os.popen(
-        'google-chrome --version || google-chrome-stable --version'
-    ).read()
-    version = re.search(pattern, stdout)
-    if version:
-        driver = ChromeType.GOOGLE
-    else:
-        driver = ChromeType.CHROMIUM
-    return ChromeDriverManager(chrome_type=driver).install()
-
-
-@pytest.fixture(scope="session")
-def browser_extension() -> type[ExtendedBrowser]:
-    return ExtendedBrowser
+    Set the environment variable ``SHOW_BROWSER=1`` to run in headed mode.
+    """
+    headless = os.environ.get('SHOW_BROWSER') != '1'
+    browser = playwright.chromium.launch(headless=headless)
+    yield browser
+    browser.close()
 
 
 @pytest.fixture(scope="function")
-def browser(
-    webdriver: str,
-    webdriver_options: Options,
-    webdriver_executable_path: str | None,
-    browser_extension: type[ExtendedBrowser]
-) -> Iterator[ExtendedBrowser]:
+def browser(playwright_browser: Browser) -> Iterator[ExtendedBrowser]:
+    """Provide a fresh :class:`ExtendedBrowser` for each test.
 
-    config = {
-        'service': Service(
-            executable_path=webdriver_executable_path,
-
-            # preselect a port as selenium picks it in a way that triggers the
-            # macos firewall to display a confirmation dialog
-            port=port_for.select_random()
-        ),
-        'options': webdriver_options,
-    }
-
-    with browser_extension.spawn(Browser, webdriver, **config) as browser:
-        yield browser
+    Each test gets its own browser context (fresh cookies / storage), but
+    reuses the session-level browser process for speed.
+    """
+    wrapped = ExtendedBrowser(playwright_browser)
+    yield wrapped
+    for context in wrapped._spawned_contexts:
+        context.close()
 
 
 @pytest.fixture(scope="function")

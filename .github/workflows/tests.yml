@@ -149,13 +149,6 @@ jobs:
           unzip \
           xdg-utils
 
-    - name: Install Chrome
-      uses: browser-actions/setup-chrome@v1
-      with:
-        # FIXME: OGC-1857
-        chrome-version: 127
-        install-chromedriver: true
-
     - name: Checkout repo
       uses: actions/checkout@v6
 
@@ -179,6 +172,7 @@ jobs:
         # TEMPORARY: editable build so we don't need a path-fix in codecov
         uv pip compile setup.cfg -U \
         | uv pip install -e .[test] -r /dev/stdin
+        playwright install chromium
       env:
         # NOTE: Suppress uv warning
         UV_LINK_MODE: copy

@@ -100,13 +100,6 @@ jobs:
           unzip \
           xdg-utils
 
-    - name: Install Chrome
-      uses: browser-actions/setup-chrome@v1
-      with:
-        # FIXME: Unpin once selenium works with newer version
-        chrome-version: 127
-        install-chromedriver: true
-
     - name: Checkout repo
       uses: actions/checkout@v6
 
@@ -129,6 +122,7 @@ jobs:
         uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
         # TEMPORARY: editable build so we don't need a path-fix in codecov
         uv pip install -e .[test]
+        playwright install chromium
 
     - name: Prepare test environment
       run: |
