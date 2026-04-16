@@ -63,7 +63,6 @@ jobs:
         uv pip install pytest-split pytest-xdist
         # TEMPORARY: editable build so we don't need a path-fix in codecov
         uv pip install -e .[test]
-        playwright install chromium
       env:
         # NOTE: Suppress uv warning
         UV_LINK_MODE: copy
@@ -84,6 +83,7 @@ jobs:
         chown test .test_durations
         # NOTE: Avoid dubious ownership error when commiting
         git config --global --add safe.directory $PWD
+        run-as "$(id -u test)":test /app/bin/playwright install chromium
 
     - name: Measure test durations
       run: |
