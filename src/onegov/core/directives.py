@@ -291,32 +291,12 @@ class StaticDirectoryAction(Action):
         staticdirectory_registry.paths.append(path)
 
 
-class TemplateVariablesRegistry:
-
-    __slots__ = ('callbacks',)
-
-    def __init__(self) -> None:
-        self.callbacks: list[Callable[[CoreRequest], dict[str, Any]]] = []
-
-    def get_variables(
-        self,
-        request: CoreRequest,
-        base: dict[str, Any] | None = None
-    ) -> dict[str, Any]:
-        base = base or {}
-
-        for callback in self.callbacks:
-            base.update(callback(request))
-
-        return base
-
-
 class TemplateVariablesAction(Action):
     """ Registers a set of global template variables for chameleon templates.
 
-    Only exists once per application. Template variables with conflicting
-    keys defined in child applications override the keys with the same
-    name in the parent application. Non-conflicting keys are kept individually.
+    Only exists once per application. Template variables defined in child
+    applications completely replace the variables defined by the parent
+    application.
 
     Example::
 
@@ -329,28 +309,29 @@ class TemplateVariablesAction(Action):
     """
 
     config = {
-        'templatevariables_registry': TemplateVariablesRegistry
+        'setting_registry': SettingRegistry
     }
-    counter: ClassVar = count(1)
+
+    depends = [SettingAction]
 
     def __init__(self) -> None:
-        # XXX I would expect this to work with a static name (and it does in
-        # tests), but in real world usage the same name leads to overriden
-        # paths
-        self.name = next(self.counter)
+        self.section = 'templatevariables'
 
     def identifier(  # type:ignore[override]
         self,
-        templatevariables_registry: TemplateVariablesRegistry
-    ) -> int:
-        return self.name
+        setting_registry: SettingRegistry
+    ) -> str:
+        return self.section
 
     def perform(  # type:ignore[override]
         self,
         func: Callable[[CoreRequest], dict[str, Any]],
-        templatevariables_registry: TemplateVariablesRegistry
+        setting_registry: SettingRegistry
     ) -> None:
-        templatevariables_registry.callbacks.append(func)
+
+        section = SettingSection()
+        setattr(setting_registry, self.section, section)
+        section.get_variables = func
 
 
 class ReplaceSettingSectionAction(Action):

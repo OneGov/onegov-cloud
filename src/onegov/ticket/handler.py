@@ -251,6 +251,15 @@ class Handler:
         return False
 
     @property
+    def reopenable(self) -> bool:
+        """Whether or not this ticket can be reopened once closed.
+
+        By default, all tickets can be reopened. Handlers may override
+        this to prevent reopening for specific ticket types.
+        """
+        return True
+
+    @property
     def reply_to(self) -> str | None:
         """ An optional email address which will be used as a Reply-To
         in mails instead of any global setting.

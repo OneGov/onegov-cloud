@@ -113,8 +113,9 @@ def get_default_vars(
     if suppress_global_variables:
         return default
     else:
-        return request.app.config.templatevariables_registry.get_variables(
-            request, default)
+        default.update(
+            request.app.settings.templatevariables.get_variables(request))
+        return default
 
 
 class TemplateLoader(PageTemplateLoader):

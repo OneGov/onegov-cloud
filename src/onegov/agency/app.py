@@ -5,6 +5,7 @@ from onegov.agency.api import MembershipApiEndpoint
 from onegov.agency.api import PersonApiEndpoint
 from onegov.agency.custom import get_global_tools
 from onegov.agency.custom import get_top_navigation
+from onegov.agency.custom import get_modules
 from onegov.agency.forms import UserGroupForm
 from onegov.agency.initial_content import create_new_organisation
 from onegov.agency.pdf import AgencyPdfAr, AgencyPdfBs, AgencyPdfLu
@@ -12,7 +13,6 @@ from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
 from onegov.agency.request import AgencyRequest
 from onegov.agency.theme import AgencyTheme
-from onegov.api import ApiApp
 from onegov.core import utils
 from onegov.town6 import TownApp
 from onegov.town6.app import get_editor_asset as editor_assets
@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from onegov.org.models import Organisation
 
 
-class AgencyApp(TownApp, ApiApp):
+class AgencyApp(TownApp):
 
     request_class = AgencyRequest
 
@@ -153,6 +153,7 @@ def get_template_variables(request: AgencyRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
+        'modules': get_modules(request)
     }
 
 

@@ -25,6 +25,14 @@ morepath\.(app\.)?App\.verify_identity
 morepath\.(app\.)?App\.dump_json
 morepath\.(app\.)?App\.link_prefix
 
+# Error: is inconsistent
+# ======================
+# dispatch_methods generate custom code for efficiency, but we use
+# a descriptor to simulate the semantics, which looks different than
+# the generated function
+morepath\.(app\.)?App\._permits
+morepath\.(app\.)?App\.get_view
+
 # Error: is not present at runtime
 # ======================
 # These __getattr__ need to be there so mypy is aware that these objects

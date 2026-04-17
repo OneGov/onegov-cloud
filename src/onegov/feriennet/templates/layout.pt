@@ -94,25 +94,26 @@
         <main>
             <header id="header" tal:define="header_options request.app.org.header_options or {}">
                 <div id="sticky-header-area">
-                    <div id="globals" class="globals" tal:define="toolbox global_tools|False" tal:condition="request.is_logged_in">
+                    <div id="globals" class="globals" tal:define="toolbox global_tools|False;" tal:condition="request.is_logged_in">
                         <div class="grid-container">
                         <div class="grid-x grid-padding-x">
                             <div class="cell small-12">
                                 <div class="global-header-flex ${'' if toolbox else 'centered'}">
+                                    <div></div>
                                     <ul tal:condition="toolbox" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
-                                    <li tal:repeat="tool toolbox">
-                                        <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
-                                        <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
-                                        <ul id="${dropdown_id}" data-dropdown-content class="vertical menu">
-                                            <li tal:repeat="link tool.links">
+                                        <li tal:repeat="tool toolbox">
+                                            <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
+                                                <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
+                                                <ul id="${dropdown_id}" data-dropdown-content class="vertical menu">
+                                                    <li tal:repeat="link tool.links">
+                                                        <tal:b replace="link(layout)" />
+                                                    </li>
+                                                </ul>
+                                            </tal:b>
+                                            <tal:b condition="tool.url|tool.id|nothing" define="link tool">
                                                 <tal:b replace="link(layout)" />
-                                            </li>
-                                        </ul>
-                                        </tal:b>
-                                        <tal:b condition="tool.url|tool.id|nothing" define="link tool">
-                                        <tal:b replace="link(layout)" />
-                                        </tal:b>
-                                    </li>
+                                            </tal:b>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>

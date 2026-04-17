@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-03-31 12:57+0200\n"
+"POT-Creation-Date: 2026-04-16 09:08+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -198,8 +198,8 @@ msgstr "Newsletter giornaliera ${time}"
 msgid "${org} OneGov Cloud Status"
 msgstr "${org} OneGov Cloud Status"
 
-#. get the resource titles and ids
 #.
+#. get the resource titles and ids
 msgid "General"
 msgstr "Generale"
 
@@ -212,6 +212,36 @@ msgstr "È stato creato un ticket dalla loro chat"
 
 msgid "New ticket"
 msgstr "Nuovo biglietto"
+
+msgid "Activate/deactivate modules"
+msgstr "Attiva/disattiva moduli"
+
+#.
+#. FIXME: A plural form of News would probably be better, for now this label
+#. seems good enough
+msgid "Latest news"
+msgstr "Ultime notizie"
+
+msgid "Newsletter"
+msgstr "Abbonamento alla newsletter"
+
+msgid "Events"
+msgstr "Evento"
+
+msgid "Directories"
+msgstr "Cartelle"
+
+msgid "People"
+msgstr "Persone"
+
+msgid "Forms"
+msgstr "Moduli"
+
+msgid "Surveys"
+msgstr "Sondaggi"
+
+msgid "Modules"
+msgstr "Moduli"
 
 msgid "Account"
 msgstr "Conto"
@@ -246,20 +276,11 @@ msgstr "File"
 msgid "Images"
 msgstr "Immagini"
 
-msgid "Payment Provider"
-msgstr "Elaboratore dei pagamenti"
-
 msgid "Payments"
 msgstr "Pagamenti"
 
 msgid "Invoices"
 msgstr "Fatture"
-
-msgid "Text modules"
-msgstr "Moduli di testo"
-
-msgid "Settings"
-msgstr "Impostazioni"
 
 msgid "Users"
 msgstr "Utenti"
@@ -267,20 +288,11 @@ msgstr "Utenti"
 msgid "User groups"
 msgstr "Gruppi di utenti"
 
-msgid "RIS Settings"
-msgstr "Impostazioni RIS"
+msgid "Settings"
+msgstr "Impostazioni"
 
 msgid "Link Check"
 msgstr "Controllo del collegamento"
-
-msgid "Archived Tickets"
-msgstr "Biglietto archiviati"
-
-msgid "Forms"
-msgstr "Moduli"
-
-msgid "Surveys"
-msgstr "Sondaggi"
 
 msgid "Management"
 msgstr "Gestione"
@@ -327,6 +339,9 @@ msgstr "Importo netto"
 
 msgid "Fee"
 msgstr "Tariffa"
+
+msgid "Payment Provider"
+msgstr "Elaboratore dei pagamenti"
 
 msgid "Date Paid"
 msgstr "Data di pagamento"
@@ -1222,22 +1237,22 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number of attendees ($"
-"{claimed_spots})"
+"The limit cannot be lower than the already confirmed number of attendees "
+"(${claimed_spots})"
 msgstr ""
-"Il limite non può essere inferiore numero di partecipanti già confermato ($"
-"{claimed_spots})"
+"Il limite non può essere inferiore numero di partecipanti già confermato "
+"(${claimed_spots})"
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number attendees ($"
-"{claimed_spots}) and the number of pending requests (${pending_requests}). "
+"The limit cannot be lower than the already confirmed number attendees "
+"(${claimed_spots}) and the number of pending requests (${pending_requests}). "
 "Either enable the waiting list, process the pending requests or increase the "
 "limit. "
 msgstr ""
 "Il limite non può essere inferiore al numero di partecipanti già confermato "
-"(${claimed_spots}) e al numero di richieste in sospeso ($"
-"{pending_requests}). Abilita la lista d'attesa, elabora le richieste in "
+"(${claimed_spots}) e al numero di richieste in sospeso "
+"(${pending_requests}). Abilita la lista d'attesa, elabora le richieste in "
 "sospeso o aumenta il limite. "
 
 msgid "The end date must be later than the start date"
@@ -1363,20 +1378,11 @@ msgstr "Osservazione finale"
 msgid "Closing remark at the end of the newsletter"
 msgstr "Osservazione finale alla fine della newsletter"
 
-#.
-#. FIXME: A plural form of News would probably be better, for now this label
-#. seems good enough
-msgid "Latest news"
-msgstr "Ultime notizie"
-
 msgid "Show only lead of news"
 msgstr "Mostra solo l'estratto delle notizie"
 
 msgid "Only show the lead of the news and a \"read more\"link."
 msgstr "Mostra solo l'estratto delle notizie e un link \"leggi di più\"."
-
-msgid "Events"
-msgstr "Evento"
 
 msgid "Publications"
 msgstr "Pubblicazioni"
@@ -1754,6 +1760,22 @@ msgstr "Utilizzato per raggruppare la risorsa nella panoramica"
 msgid "Subgroup"
 msgstr "Sottogruppo"
 
+msgid "Parent Resource"
+msgstr "Risorsa superiore"
+
+msgid ""
+"Reservations on parent resources will block reservations on this resource "
+"and vice versa. They will also show up in each other's occupancy views. This "
+"will not be used for grouping resources, however the parent resource will be "
+"listed directly before its children if in the same group regardless of title."
+msgstr ""
+"Le prenotazioni sulle risorse superiori bloccheranno quelle su questa "
+"risorsa e viceversa. Inoltre, appariranno nelle rispettive visualizzazioni "
+"di occupazione. Ciò non verrà utilizzato per raggruppare le risorse; "
+"tuttavia, la risorsa principale verrà elencata immediatamente prima delle "
+"risorse subordinate se appartenenti allo stesso gruppo, indipendentemente "
+"dal titolo."
+
 msgid "Additional information for confirmed reservations"
 msgstr "Informazioni aggiuntive per prenotazioni confermate"
 
@@ -1988,21 +2010,6 @@ msgstr "Prenotazioni"
 msgid "Please add at least one notification."
 msgstr "Aggiungere almeno una notifica."
 
-msgid "Logo"
-msgstr "Logo"
-
-msgid "URL pointing to the logo"
-msgstr "URL che punta al logo"
-
-msgid "Logo (Square)"
-msgstr "Logo (quadrato)"
-
-msgid "Primary Color"
-msgstr "Colore primario"
-
-msgid "Default Font Family"
-msgstr "Famiglia di font predefinita"
-
 msgid "Languages"
 msgstr "Lingue"
 
@@ -2014,6 +2021,43 @@ msgstr "Francese"
 
 msgid "Italian"
 msgstr "Italiano"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "URL pointing to the logo"
+msgstr "URL che punta al logo"
+
+msgid "Logo (Square)"
+msgstr "Logo (quadrato)"
+
+msgid "Icon 16x16 PNG (Windows)"
+msgstr "Icona 16x16 PNG (Windows)"
+
+msgid "URL pointing to the icon"
+msgstr "URL che punta all'icona"
+
+msgid "Icon 32x32 PNG (Mac)"
+msgstr "Icona 32x32 PNG (Mac)"
+
+msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
+msgstr "Icona 57x57 PNG (iPhone, iPod, iPad)"
+
+msgid "Icon SVG 20x20 (Safari)"
+msgstr "Icona SVG 20x20 (Safari)"
+
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Immagine di anteprima dei social media predefinita per le anteprime dei "
+"collegamenti avanzati. La dimensione ottimale è 1200x630 px."
+
+msgid "Primary Color"
+msgstr "Colore primario"
+
+msgid "Default Font Family"
+msgstr "Famiglia di font predefinita"
 
 msgid "Additional CSS"
 msgstr "CSS aggiuntivo"
@@ -2190,28 +2234,6 @@ msgstr "La larghezza della colonna deve essere maggiore di 0"
 msgid "The sum of all the footer columns must be equal to 12"
 msgstr "La somma di tutte le colonne del piè di pagina deve essere pari a 12"
 
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Immagine di anteprima dei social media predefinita per le anteprime dei "
-"collegamenti avanzati. La dimensione ottimale è 1200x630 px."
-
-msgid "Icon 16x16 PNG (Windows)"
-msgstr "Icona 16x16 PNG (Windows)"
-
-msgid "URL pointing to the icon"
-msgstr "URL che punta all'icona"
-
-msgid "Icon 32x32 PNG (Mac)"
-msgstr "Icona 32x32 PNG (Mac)"
-
-msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
-msgstr "Icona 57x57 PNG (iPhone, iPod, iPad)"
-
-msgid "Icon SVG 20x20 (Safari)"
-msgstr "Icona SVG 20x20 (Safari)"
-
 msgid "Disable page references"
 msgstr "Disabilita i riferimenti alle pagine"
 
@@ -2338,6 +2360,18 @@ msgid "The default map view. This should show the whole town"
 msgstr ""
 "La visualizzazione predefinita della mappa. Questo dovrebbe mostrare "
 "l'intera città"
+
+msgid ""
+"Wherever there's an option to choose a location on a map, this will be the "
+"default view. You can change the view by dragging the map and zooming in or "
+"out. The coordinates of the center of the map and the zoom level will then "
+"be saved as the default view."
+msgstr ""
+"Dovunque ci sia un'opzione per scegliere una posizione su una mappa, questa "
+"sarà la visualizzazione predefinita. È possibile modificare la "
+"visualizzazione trascinando la mappa e zoomando in o out. Le coordinate del "
+"centro della mappa e il livello di zoom verranno quindi salvati come "
+"visualizzazione predefinita."
 
 msgid "Geo provider"
 msgstr "Fornitore di dati geografici"
@@ -2638,10 +2672,6 @@ msgid ""
 msgstr ""
 "Colore non valido \"{color}\", deve essere un codice esadecimale di 3 o 6 "
 "cifre, ad esempio \"ff9000\" per l'arancione. Se si usa il prefisso "
-
-# ", assicurarsi di racchiudere il valore tra virgolette."
-msgid "Enable newsletter"
-msgstr "Attiva la newsletter"
 
 msgid "Allow secret content in newsletter"
 msgstr "Consentire contenuti segreti nella newsletter"
@@ -2974,8 +3004,27 @@ msgstr ""
 "Si tratta del tasso di IVA in percentuale. Il tasso di IVA si applicherà a "
 "tutti i prezzi nei moduli."
 
+# ", assicurarsi di racchiudere il valore tra virgolette."
+msgid "Enable newsletter"
+msgstr "Attiva la newsletter"
+
+msgid ""
+"Enables the newsletter module for admins and show a \"Subscribe to "
+"newsletter\" option for the users on the news page."
+msgstr ""
+"Abilita il modulo newsletter per gli amministratori e mostra un'opzione "
+"\"Iscriviti alla newsletter\" per gli utenti sulla pagina delle notizie."
+
 msgid "Enable Citizen Login"
 msgstr "Abilitare l'accesso del cliente"
+
+msgid ""
+"Enables the citizen login. This will show a \"citizen login\" link in the "
+"footer, where users can view their reservations using their email-address."
+msgstr ""
+"Abilita l'accesso del cliente. Questo mostrerà un link \"accesso del "
+"cliente\" nel piè di pagina, dove gli utenti possono visualizzare le loro "
+"prenotazioni utilizzando il loro indirizzo email."
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -3216,9 +3265,6 @@ msgstr "Collegare file aggiuntivi"
 msgid "All directories"
 msgstr "Tutte le cartelle"
 
-msgid "Directories"
-msgstr "Cartelle"
-
 msgid "All events"
 msgstr "Tutti gli eventi"
 
@@ -3355,9 +3401,6 @@ msgstr "Finestre di invio"
 msgid "Survey"
 msgstr "Sondaggio"
 
-msgid "People"
-msgstr "Persone"
-
 msgid "Person"
 msgstr "Persona"
 
@@ -3366,6 +3409,9 @@ msgstr "Vuoi davvero eliminare questa persona?"
 
 msgid "Delete person"
 msgstr "Elimina persona"
+
+msgid "Archived Tickets"
+msgstr "Biglietto archiviati"
 
 msgid "Delete archived tickets"
 msgstr "Cancellare i biglietti archiviati"
@@ -3428,6 +3474,9 @@ msgstr "Fattura"
 
 msgid "Discount / Surcharge"
 msgstr "Deduzione / Supplemento"
+
+msgid "Text modules"
+msgstr "Moduli di testo"
 
 msgid "Text module"
 msgstr "Modulo di testo"
@@ -3559,9 +3608,6 @@ msgstr "Puoi ripubblicare un evento importato in un secondo momento."
 
 msgid "Re-publish event"
 msgstr "Ripubblica l'evento"
-
-msgid "Newsletter"
-msgstr "Abbonamento alla newsletter"
 
 msgid "New"
 msgstr "Nuovo"
@@ -4100,8 +4146,8 @@ msgstr "Rifiuta tutto con messaggio"
 msgid "Add reservation"
 msgstr "Aggiungi prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -4280,8 +4326,8 @@ msgstr ""
 "eliminare le pagine con sottopagine. Per eliminare questa pagina, elimina "
 "prima tutte le sottopagine o chiedi a un amministratore di farlo per te."
 
-#. Modification for the footer left on all pages
 #.
+#. Modification for the footer left on all pages
 msgid "Source"
 msgstr "Fonte"
 
@@ -4312,8 +4358,8 @@ msgstr "Quantità"
 msgid "VAT"
 msgstr "IVA"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Pagamento"
 
@@ -4638,6 +4684,9 @@ msgstr "Migrazione dei link"
 
 msgid "Straight to ..."
 msgstr "Direttamente a ..."
+
+msgid "User manual"
+msgstr "Manuale utente"
 
 msgid "Back to the homepage"
 msgstr "Torna alla pagina principale"
@@ -5018,8 +5067,8 @@ msgstr "Ciao!"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su $"
-"{homepage}."
+"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su "
+"${homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Per attivare il tuo account, fai clic su conferma qui di seguito:"
@@ -5112,9 +5161,9 @@ msgid "Have a great day!"
 msgstr "Ti auguro una buona giornata!"
 
 msgid ""
-"This is the notification for customer messages on reservations for $"
-"{request.app.org.title}. If you no longer want to receive this e-mail please "
-"contact an administrator so they can remove you from the recipients list."
+"This is the notification for customer messages on reservations for ${request."
+"app.org.title}. If you no longer want to receive this e-mail please contact "
+"an administrator so they can remove you from the recipients list."
 msgstr ""
 "Questa è la notifica relativa ai messaggi dei clienti sulle prenotazioni per "
 "${request.app.org.title}. Se non desideri più ricevere questa e-mail, "
@@ -5243,13 +5292,13 @@ msgid "New note in Ticket ${link}"
 msgstr "Nuova nota nel ticket ${link}"
 
 msgid ""
-"This is the notification for notes on reservations for $"
-"{request.app.org.title}. If you no longer want to receive this e-mail please "
-"contact an administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
 msgstr ""
-"Questa è la notifica per le note sulle prenotazioni per $"
-"{request.app.org.title}. Se non si desidera più ricevere questo messaggio di "
-"posta elettronica si prega di contattare un amministratore in modo che possa "
+"Questa è la notifica per le note sulle prenotazioni per ${request.app.org."
+"title}. Se non si desidera più ricevere questo messaggio di posta "
+"elettronica si prega di contattare un amministratore in modo che possa "
 "rimuovervi dall'elenco dei destinatari lista"
 
 msgid "Pending approval"
@@ -5819,8 +5868,8 @@ msgstr "ore"
 #, python-format
 msgid "Reservations can only be made at most ${n} ${unit} in advance."
 msgstr ""
-"Le prenotazioni possono essere effettuate solo con un anticipo massimo di $"
-"{n} ${unit}."
+"Le prenotazioni possono essere effettuate solo con un anticipo massimo di "
+"${n} ${unit}."
 
 msgid ""
 "Reservations must be made at least ${n1} ${unit1} and at most ${n2} ${unit2} "
@@ -6286,8 +6335,8 @@ msgid ""
 "Availability period updated. ${deleted} allocations removed, ${updated} "
 "allocations adjusted and ${created} new allocations created."
 msgstr ""
-"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, $"
-"{updated} allocazioni modificate e ${created} nuove allocazioni create."
+"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, "
+"${updated} allocazioni modificate e ${created} nuove allocazioni create."
 
 msgid "Availability period not found"
 msgstr "Periodo di disponibilità non trovato"
@@ -6382,8 +6431,8 @@ msgid ""
 "A password reset link has been sent to ${email}, provided an active account "
 "exists for this email address."
 msgstr ""
-"Il collegamento per reimpostare la password è stato inviato all'indirizzo $"
-"{email} (se si tratta di un account attivo esistente)."
+"Il collegamento per reimpostare la password è stato inviato all'indirizzo "
+"${email} (se si tratta di un account attivo esistente)."
 
 msgid "Password changed."
 msgstr "Password modificata."
@@ -6498,11 +6547,11 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Cannot convert field \"${field}\" from type \"${old_type}\" to \"${new_type}"
-"\"."
+"Cannot convert field \"${field}\" from type \"${old_type}\" to "
+"\"${new_type}\"."
 msgstr ""
-"Impossibile convertire il campo \"${field}\" dal tipo \"${old_type}\" a \"$"
-"{new_type}\"."
+"Impossibile convertire il campo \"${field}\" dal tipo \"${old_type}\" a "
+"\"${new_type}\"."
 
 msgid "The directory was deleted"
 msgstr "La cartella è stata cancellata"
@@ -6601,11 +6650,11 @@ msgstr "Nuovo destinatario"
 
 #, python-format
 msgid ""
-"Registration for notifications on new entries in the directory \"${directory}"
-"\""
+"Registration for notifications on new entries in the directory "
+"\"${directory}\""
 msgstr ""
-"Registrazione per le notifiche sui nuovi elementi nella cartella \"$"
-"{directory}\""
+"Registrazione per le notifiche sui nuovi elementi nella cartella "
+"\"${directory}\""
 
 #, python-format
 msgid ""
@@ -7319,8 +7368,8 @@ msgid ""
 "Failed to create visits using the dormakaba API for site ID ${site_id} "
 "please make sure your credentials are still valid."
 msgstr ""
-"Impossibile creare visite con l'API di dormakaba per l'ID del sito $"
-"{site_id}. Assicurarsi che le credenziali siano ancora valide."
+"Impossibile creare visite con l'API di dormakaba per l'ID del sito "
+"${site_id}. Assicurarsi che le credenziali siano ancora valide."
 
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
@@ -7495,8 +7544,14 @@ msgstr "Ricerca non disponibile"
 msgid "${count} Results"
 msgstr "${count} risultati"
 
-msgid "Favicon"
-msgstr "Favicon"
+msgid "Advanced Settings"
+msgstr "Impostazioni avanzate"
+
+msgid "Organisation Profile"
+msgstr "Profilo dell'organizzazione"
+
+msgid "Appearance"
+msgstr "Aspetto"
 
 msgid "Header"
 msgstr "Intestazione"
@@ -7504,11 +7559,30 @@ msgstr "Intestazione"
 msgid "Footer"
 msgstr "Piè di pagina"
 
-msgid "Modules"
-msgstr "Moduli"
+msgid "Data Retention Policy"
+msgstr "Politica di Conservazione dei Dati"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
+"irrevocabilmente cancellati."
+
+msgid "Access (mTAN)"
+msgstr "Accesso (mTAN)"
 
 msgid "Analytics"
 msgstr "Analitica"
+
+msgid "Optional modules"
+msgstr "Moduli opzionali"
+
+msgid "People directory"
+msgstr "Elenco persone"
+
+msgid "Chat"
+msgstr "Chat"
 
 msgid "Holidays"
 msgstr "Festività / Vacanze scolastiche"
@@ -7534,8 +7608,8 @@ msgstr "Totale di ${number} collegamenti trovati."
 msgid ""
 "Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
-"Migra i collegamenti dal dominio specificato al dominio corrente \"${domain}"
-"\"."
+"Migra i collegamenti dal dominio specificato al dominio corrente "
+"\"${domain}\"."
 
 msgid "OneGov API"
 msgstr "API OneGov"
@@ -7548,19 +7622,6 @@ msgstr "Questa azione non può essere annullata."
 
 msgid "ApiKey deleted."
 msgstr "Chiave API eliminata."
-
-msgid "Data Retention Policy"
-msgstr "Politica di Conservazione dei Dati"
-
-msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
-msgstr ""
-"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
-"irrevocabilmente cancellati."
-
-msgid "Chat"
-msgstr "Chat"
 
 #, python-format
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
@@ -7724,6 +7785,9 @@ msgstr "Il biglietto non può essere chiuso perché non è in sospeso"
 msgid "You have closed ticket ${number}"
 msgstr "Hai chiuso il biglietto ${number}"
 
+msgid "This ticket cannot be reopened"
+msgstr "Questo ticket non può essere riaperto"
+
 msgid "The ticket cannot be re-opened because it's not closed"
 msgstr "Il biglietto non può essere riaperto perché non è chiuso"
 
@@ -7839,8 +7903,8 @@ msgstr "Si è verificato un errore durante il caricamento su Gever."
 
 #, python-format
 msgid ""
-"Encountered an error while uploading to Gever. Response status code is $"
-"{status}."
+"Encountered an error while uploading to Gever. Response status code is "
+"${status}."
 msgstr ""
 "Si è verificato un errore durante il caricamento su Gever.Il codice di stato "
 "della risposta è ${status}."
@@ -7910,6 +7974,12 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "RIS Settings"
+#~ msgstr "Impostazioni RIS"
+
+#~ msgid "Favicon"
+#~ msgstr "Favicon"
 
 #~ msgid "Analytics Code"
 #~ msgstr "Codice Analytics"

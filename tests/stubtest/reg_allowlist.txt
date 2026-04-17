@@ -2,7 +2,6 @@
 # ======================
 # this method gets auto generated when the class is initalized
 # as such stubtest can't know it's there
-reg.Dispatch.call
 reg.dispatch.Dispatch.call
 # Error: failed to find stubs
 # ======================

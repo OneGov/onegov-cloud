@@ -68,10 +68,10 @@ def handle_matches(
         deferred_acceptance_from_database(
             session=request.session,
             period_id=self.period_id,
-            score_function=form.scoring(request.session))
+            score_function=form.scoring(request))
 
         self.period = self.period.materialize(request.session)
-        self.period.scoring = form.scoring(request.session)
+        self.period.scoring = form.scoring(request)
 
         if form.confirm_period:
             self.period.confirm()
