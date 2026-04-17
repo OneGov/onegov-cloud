@@ -2337,24 +2337,16 @@ def test_time_report_workflow(
     )
     assert (
         'Eine Zeiterfassung wurde für Sie eingereicht und wird nun '
-        'geprüft.' in mail_to_translator['TextBody']
-    )
-    assert (
-        'Bitte sorgfältig überprüfen und Unstimmigkeiten umgehend melden'
+        'durch unsere interne Kontrollstelle geprüft:'
         in mail_to_translator['TextBody']
     )
-
-    translator_link_match = re.search(
-        r'<a href="([^"]+)">Zeiterfassung anzeigen</a>',
-        mail_to_translator['HtmlBody'],
+    assert (
+        'Sobald die Kontrolle abgeschlossen ist, werden Sie wieder '
+        'informiert.' in mail_to_translator['TextBody']
     )
-    assert translator_link_match is not None
-    translator_status_link = translator_link_match.group(1)
-    assert '/status' in translator_status_link
-    assert accountant_email in mail_to_translator['TextBody']
 
     client.login_translator()
-    status_page = client.get(translator_status_link)
+    status_page = client.get(ticket_link + '/status')
     assert status_page.status_code == 200
     assert 'TRP-' in status_page
 
