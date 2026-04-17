@@ -44,7 +44,7 @@ def test_people_view(client: Client) -> None:
     people = client.get('/people')
     assert 'Keine Personen' in people
 
-    new_person = people.click('Person')
+    new_person = people.click('Person', index=1)
     new_person.form['academic_title'] = 'Dr.'
     new_person.form['first_name'] = 'Flash'
     new_person.form['last_name'] = 'Gordon'
@@ -99,12 +99,12 @@ def test_with_people(client: Client) -> None:
 
     people = client.get('/people')
 
-    new_person = people.click('Person')
+    new_person = people.click('Person', index=1)
     new_person.form['first_name'] = 'Flash'
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
 
-    new_person = people.click('Person')
+    new_person = people.click('Person', index=1)
     new_person.form['first_name'] = 'Merciless'
     new_person.form['last_name'] = 'Ming'
     new_person.form.submit()
@@ -166,7 +166,7 @@ def test_people_view_organisation_filter(client: Client) -> None:
         sub_org: str
     ) -> None:
         people = client.get('/people')
-        new_person = people.click('Person')
+        new_person = people.click('Person', index=1)
         new_person.form['first_name'] = first_name
         new_person.form['last_name'] = last_name
         new_person.form['function'] = function
@@ -327,7 +327,7 @@ def test_delete_linked_person_issue_149(client: Client) -> None:
 
     people = client.get('/people')
 
-    new_person = people.click('Person')
+    new_person = people.click('Person', index=1)
     new_person.form['first_name'] = 'Flash'
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()

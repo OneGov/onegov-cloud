@@ -207,7 +207,8 @@ def actions_by_booking(
     if not period:
         return actions
 
-    if period.wishlist_phase or booking.state in ('accepted', 'open'):
+    if period.with_group_code and (
+        period.wishlist_phase or booking.state in ('accepted', 'open')):
         if period.wishlist_phase or period.booking_phase:
             if not booking.group_code:
                 actions.append(

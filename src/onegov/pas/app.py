@@ -148,6 +148,9 @@ def get_ensure_user_callback() -> EnsureUserCallback:
             log.info(f'SAML2: no existing user for {username}')
             return None
 
+        # The `hourly_kub_data_import` has run in the background created users
+        # for parliamentarians and set these roles via
+        # `PasParliamentarianCollection.sync_user_accounts()`.
         parliamentarian_roles = {'parliamentarian', 'commission_president'}
         if user.role not in parliamentarian_roles:
             log.info(

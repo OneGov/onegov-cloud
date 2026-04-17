@@ -73,11 +73,16 @@ def test_general_settings(client: Client) -> None:
     page = client.get('/topics/themen')
     assert 'class="header-image"' not in page
 
-    settings = client.get('/general-settings')
+    # Appearance settings
+    settings = client.get('/appearance-settings')
     settings.form['standard_image'] = 'standard_image.png'
     settings.form['page_image_position'] = 'header'
-    settings.form['reply_to'] = 'info@govikon.ch'
     settings.form['custom_css'] = 'h2 { text-decoration: underline; }'
+    page = settings.form.submit().follow()
+
+    # Organisation settings
+    settings = client.get('/organisation-settings')
+    settings.form['reply_to'] = 'info@govikon.ch'
     page = settings.form.submit().follow()
 
     assert '<style>h2 { text-decoration: underline; }</style>' in page
@@ -155,7 +160,7 @@ def test_firebase_settings(client: Client) -> None:
 def test_resource_settings(client: Client) -> None:
     client.login_admin()
 
-    settings = client.get('/settings').click('Reservationen')
+    settings = client.get('/settings').click('Reservationen', index=1)
     settings.form['resource_header_html'] = '<h1>foo</h1>'
     settings.form['resource_footer_html'] = '<p>bar</p>'
     assert ('Ihre Änderungen wurden gespeichert' in

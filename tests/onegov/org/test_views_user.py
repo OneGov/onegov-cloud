@@ -279,7 +279,7 @@ def test_filters(client: Client) -> None:
     assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
 
     # test active filter via Menu user
-    users = client.get('/').click('Benutzer', index=1)
+    users = client.get('/').click('Benutzer', index=2)
     assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
     assert 'arno' in users
     assert 'beno' not in users

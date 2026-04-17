@@ -435,6 +435,7 @@ def test_search_form(swissvotes_app: TestApp) -> None:
 
     form.apply_model(votes)
 
+    form = form  # undo narrowing
     assert form.from_date.data == date(2010, 1, 1)
     assert form.to_date.data == date(2010, 12, 31)
     assert form.legal_form.data == [1, 2]

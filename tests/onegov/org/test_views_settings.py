@@ -12,43 +12,48 @@ if TYPE_CHECKING:
 
 def test_settings(client: Client) -> None:
     assert client.get(
-        '/general-settings', expect_errors=True
+        '/organisation-settings', expect_errors=True
     ).status_code == 403
 
     client.login_admin()
 
-    # general settings
-    settings = client.get('/general-settings')
+    # organisation settings
+    settings = client.get('/organisation-settings')
+    document = settings.pyquery
+    assert document.find('input[name=name]').val() == 'Govikon'
+    settings.form['reply_to'] = 'info@govikon.ch'
+    settings = settings.form.submit()
+
+    # appearance settings
+    settings = client.get('/appearance-settings')
     assert client.app.font_family is None
     document = settings.pyquery
 
-    assert document.find('input[name=name]').val() == 'Govikon'
     assert document.find('input[name=primary_color]').val() == '#006fba'
     # is not defined in org/content, but on the form as default and in the UI
     assert document.find(
         'select[name=font_family_sans_serif]').val() == HELVETICA
 
     settings.form['primary_color'] = '#xxx'
-    settings.form['reply_to'] = 'info@govikon.ch'
     settings = settings.form.submit()
 
     assert "Ungültige Farbe." in settings.text
 
     settings.form['primary_color'] = '#ccddee'
-    settings.form['reply_to'] = 'info@govikon.ch'
     settings.form.submit()
 
-    settings = client.get('/general-settings')
+    settings = client.get('/appearance-settings')
     assert "Ungültige Farbe." not in settings.text
+    # undo narrowing
+    client = client
     # Form was populated with user_options default before submitting
     assert client.app.font_family == HELVETICA
 
     settings.form['logo_url'] = 'https://seantis.ch/logo.img'
-    settings.form['reply_to'] = 'info@govikon.ch'
     settings.form['custom_css'] = 'h1 { text-decoration: underline; }'
     settings.form.submit()
 
-    settings = client.get('/general-settings')
+    settings = client.get('/appearance-settings')
     assert '<img src="https://seantis.ch/logo.img"' in settings.text
     assert '<style>h1 { text-decoration: underline; }</style>' in settings.text
 
@@ -173,21 +178,21 @@ def test_switch_languages(client: Client) -> None:
 
     client.login_admin()
 
-    page = client.get('/general-settings')
+    page = client.get('/organisation-settings')
     assert 'Deutsch' in page
     assert 'Allemand' not in page
 
     page.form['locales'] = 'fr_CH'
     page.form.submit().follow()
 
-    page = client.get('/general-settings')
+    page = client.get('/organisation-settings')
     assert 'Allemand' in page
     assert 'Deutsch' not in page
 
     page.form['locales'] = 'it_CH'
     page.form.submit().follow()
 
-    page = client.get('/general-settings')
+    page = client.get('/organisation-settings')
     assert 'Tedesco' in page
     assert 'Allemand' not in page
     assert 'Deutsch' not in page

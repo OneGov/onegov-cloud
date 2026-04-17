@@ -1294,7 +1294,7 @@ def test_edit_page_people_function_is_displayed(client: Client) -> None:
     client.login_admin()
 
     people = client.get('/people')
-    new_person = people.click('Person')
+    new_person = people.click('Person', index=1)
     new_person.form['first_name'] = 'Berry'
     new_person.form['last_name'] = 'Boolean'
     new_person.form.submit()
@@ -1310,7 +1310,7 @@ def test_edit_page_people_function_is_displayed(client: Client) -> None:
     assert option.attr('data-show') is None
 
     people = client.get('/people')
-    new_person = people.click('Person')
+    new_person = people.click('Person', index=1)
     new_person.form['first_name'] = 'John'
     new_person.form['last_name'] = 'Doe'
     new_person.form['function'] = 'President'

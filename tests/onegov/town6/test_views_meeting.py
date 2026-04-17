@@ -23,7 +23,7 @@ def test_meetings(client: Client) -> None:
     assert client.get('/meetings/new', status=404)
 
     # enable ris
-    settings = client.get('/ris-enable')
+    settings = client.get('/module-activation-settings')
     settings.form['ris_enabled'] = True
     settings.form.submit()
 

@@ -5,14 +5,12 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x">
             <div class="small-12 cell">
-                <form action="${action}" method="POST" enctype="multipart/form-data">
+                <form id="main-form" action="${action}" method="POST" enctype="multipart/form-data">
                     <div class="panel">
                         <p i18n:translate="">
                             Select the images that should be shown inside this album.
                         </p>
                     </div>
-
-                    <input type="submit" value="Confirm selection" class="button" i18n:attributes="value" />
 
                     <tal:b tal:repeat="group images">
                         <h3 i18n:translate="">${group['group']}</h3>
@@ -35,8 +33,6 @@
                             Select the images that should be shown inside this album.
                         </p>
                     </div>
-
-                    <input type="submit" value="Confirm selection" class="button" i18n:attributes="value" />
 
                 </form>
                 <tal:b condition="not:images">
