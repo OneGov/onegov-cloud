@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-04-13 16:58+0200\n"
+"POT-Creation-Date: 2026-04-17 15:19+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -6690,6 +6690,18 @@ msgstr "Sono interessate un totale di ${number} sottopagine."
 #, python-format
 msgid "${count} links will be replaced by this action."
 msgstr "${count} collegamenti saranno sostituiti da questa operazione."
+
+msgid "Syndicate"
+msgstr "Pubblicare esternamente"
+
+msgid "Publish this event externally"
+msgstr "Pubblicare questo evento esternamente"
+
+msgid "Highlight"
+msgstr "In evidenza"
+
+msgid "Mark as highlighted event"
+msgstr "Contrassegnare come evento in evidenza"
 
 msgid "The event submitter has not yet completed his submission"
 msgstr "Il presentatore dell'evento non ha ancora completato la sua iscrizione"

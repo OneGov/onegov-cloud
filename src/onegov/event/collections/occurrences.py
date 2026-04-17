@@ -622,26 +622,10 @@ class OccurrenceCollection(Pagination[Occurrence]):
             )))
 
         if self.syndicate is not None:
-            if self.syndicate:
-                query = query.filter(Event.meta['syndicate'].astext == 'true')
-            else:
-                query = query.filter(
-                    or_(
-                        Event.meta['syndicate'] == None,
-                        Event.meta['syndicate'].astext != 'true',
-                    )
-                )
+            query = query.filter(Event.syndicate.is_(self.syndicate))
 
         if self.highlight is not None:
-            if self.highlight:
-                query = query.filter(Event.meta['highlight'].astext == 'true')
-            else:
-                query = query.filter(
-                    or_(
-                        Event.meta['highlight'] == None,
-                        Event.meta['highlight'].astext != 'true',
-                    )
-                )
+            query = query.filter(Event.highlight.is_(self.highlight))
 
         if self.range == 'past':
             # reverse order for past events: most recent event on top

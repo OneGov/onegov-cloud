@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-13 16:58+0200\n"
+"POT-Creation-Date: 2026-04-17 15:19+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -6728,6 +6728,18 @@ msgstr "Au total, 5 sous-pages sont concernées."
 #, python-format
 msgid "${count} links will be replaced by this action."
 msgstr "${count} liens seront remplacés par cette action."
+
+msgid "Syndicate"
+msgstr "Publier en externe"
+
+msgid "Publish this event externally"
+msgstr "Publier cet événement en externe"
+
+msgid "Highlight"
+msgstr "Mise en avant"
+
+msgid "Mark as highlighted event"
+msgstr "Marquer comme événement mis en avant"
 
 msgid "The event submitter has not yet completed his submission"
 msgstr "L'auteur de l'événement n'a pas encore terminé sa soumission."
