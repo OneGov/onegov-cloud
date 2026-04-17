@@ -82,14 +82,32 @@
           </div>
           <div class="globals">
             <div class="row">
-              <div class="columns small-12">
-                  <div class="global-header" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
-                      <h4 tal:condition="header_options['left_header_name']|nothing"><a
-                              href="${header_options.get('left_header_url', '#')}"
-                              style="color:${color or '#fff'}; font-size: ${rem_size}rem">
-                              ${header_options['left_header_name']}
-                      </a></h4>
-                  </div>
+              <div class="columns small-12 medium-8">
+                <ul tal:condition="request.is_logged_in" tal:condition="modules.links" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
+                    <li>
+                        <a href="#" data-dropdown="modules-dropdown" class="dropdown modules" i18n:translate>Modules</a>
+                        <ul id="modules-dropdown" data-dropdown-content class="f-dropdown disable-scroll">
+                            <li tal:repeat="link modules.links">
+                                <tal:b replace="link(layout)" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a class="docs" href="https://docs.admin.digital/" i18n:translate>User manual</a>
+                    </li>
+                </ul>
+                <div class="global-header" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
+                    <h4 tal:condition="header_options['left_header_name']|nothing"><a
+                            href="${header_options.get('left_header_url', '#')}"
+                            style="color:${color or '#fff'}; font-size: ${rem_size}rem">
+                            ${header_options['left_header_name']}
+                    </a></h4>
+                </div>
+
+              </div>
+              <div class="columns small-12 medium-4">
+                <div></div>
+
                 <ul tal:condition="global_tools|nothing">
                   <li tal:repeat="tool global_tools">
                     <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">

@@ -53,13 +53,6 @@ jobs:
           unzip \
           xdg-utils
 
-    - name: Install Chrome
-      uses: browser-actions/setup-chrome@v1
-      with:
-        # FIXME: OGC-1857
-        chrome-version: 127
-        install-chromedriver: true
-
     - name: Checkout repo
       uses: actions/checkout@v6
 
@@ -90,6 +83,7 @@ jobs:
         chown test .test_durations
         # NOTE: Avoid dubious ownership error when commiting
         git config --global --add safe.directory $PWD
+        run-as "$(id -u test)":test /app/bin/playwright install chromium
 
     - name: Measure test durations
       run: |

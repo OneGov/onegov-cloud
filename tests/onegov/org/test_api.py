@@ -9,8 +9,8 @@ from unittest.mock import patch
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from .conftest import Client
     from onegov.agency import AgencyApp
-    from tests.shared.client import Client
     from unittest.mock import MagicMock
 
 
@@ -25,7 +25,7 @@ def test_view_api(
     authenticate: MagicMock,
     broadcast: MagicMock,
     connect: MagicMock,
-    client: Client[AgencyApp]
+    client: Client
 ) -> None:
 
     client.login_admin()  # prevent rate limit

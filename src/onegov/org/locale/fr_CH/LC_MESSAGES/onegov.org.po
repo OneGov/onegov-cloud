@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-17 15:19+0200\n"
+"POT-Creation-Date: 2026-04-16 09:08+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -211,6 +211,36 @@ msgstr "Un ticket a été créé à partir de votre chat"
 msgid "New ticket"
 msgstr "Nouveau billet"
 
+msgid "Activate/deactivate modules"
+msgstr "Activer/désactiver les modules"
+
+#.
+#. FIXME: A plural form of News would probably be better, for now this label
+#. seems good enough
+msgid "Latest news"
+msgstr "Dernières nouvelles"
+
+msgid "Newsletter"
+msgstr "Newsletter"
+
+msgid "Events"
+msgstr "Événements"
+
+msgid "Directories"
+msgstr "Répertoires"
+
+msgid "People"
+msgstr "Personnes"
+
+msgid "Forms"
+msgstr "Formulaires"
+
+msgid "Surveys"
+msgstr "Enquêtes"
+
+msgid "Modules"
+msgstr "Modules"
+
 msgid "Account"
 msgstr "Compte"
 
@@ -244,20 +274,11 @@ msgstr "Fichiers"
 msgid "Images"
 msgstr "Images"
 
-msgid "Payment Provider"
-msgstr "Opérateur de paiement"
-
 msgid "Payments"
 msgstr "Paiements"
 
 msgid "Invoices"
 msgstr "Factures"
-
-msgid "Text modules"
-msgstr "Modules de texte"
-
-msgid "Settings"
-msgstr "Paramètres"
 
 msgid "Users"
 msgstr "Utilisateurs"
@@ -265,20 +286,11 @@ msgstr "Utilisateurs"
 msgid "User groups"
 msgstr "Groupes d'utilisateurs"
 
-msgid "RIS Settings"
-msgstr "Paramètres RIS"
+msgid "Settings"
+msgstr "Paramètres"
 
 msgid "Link Check"
 msgstr "Vérification du lien"
-
-msgid "Archived Tickets"
-msgstr "Tickets archivés"
-
-msgid "Forms"
-msgstr "Formulaires"
-
-msgid "Surveys"
-msgstr "Enquêtes"
 
 msgid "Management"
 msgstr "Gestion"
@@ -325,6 +337,9 @@ msgstr "Montant net"
 
 msgid "Fee"
 msgstr "Tarif"
+
+msgid "Payment Provider"
+msgstr "Opérateur de paiement"
 
 msgid "Date Paid"
 msgstr "Date de paiement"
@@ -1360,21 +1375,12 @@ msgstr "Remarque de clôture"
 msgid "Closing remark at the end of the newsletter"
 msgstr "Remarque de clôture à la fin de la lettre d'informations"
 
-#.
-#. FIXME: A plural form of News would probably be better, for now this label
-#. seems good enough
-msgid "Latest news"
-msgstr "Dernières nouvelles"
-
 msgid "Show only lead of news"
 msgstr "Afficher uniquement l'accroche des nouvelles"
 
 msgid "Only show the lead of the news and a \"read more\"link."
 msgstr ""
 "Afficher uniquement l'accroche des nouvelles et un lien \"lire la suite\"."
-
-msgid "Events"
-msgstr "Événements"
 
 msgid "Publications"
 msgstr "Publications"
@@ -2004,21 +2010,6 @@ msgstr "Reservations"
 msgid "Please add at least one notification."
 msgstr "Veuillez ajouter au moins une notification."
 
-msgid "Logo"
-msgstr "Logo"
-
-msgid "URL pointing to the logo"
-msgstr "URL pointant vers le logo"
-
-msgid "Logo (Square)"
-msgstr "Logo (carré)"
-
-msgid "Primary Color"
-msgstr "Couleur primaire"
-
-msgid "Default Font Family"
-msgstr "Famille de police principale"
-
 msgid "Languages"
 msgstr "Langues"
 
@@ -2030,6 +2021,43 @@ msgstr "Français"
 
 msgid "Italian"
 msgstr "Italien"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "URL pointing to the logo"
+msgstr "URL pointant vers le logo"
+
+msgid "Logo (Square)"
+msgstr "Logo (carré)"
+
+msgid "Icon 16x16 PNG (Windows)"
+msgstr "Icône 16x16 PNG (Windows)"
+
+msgid "URL pointing to the icon"
+msgstr "URL pointant vers le Favicon"
+
+msgid "Icon 32x32 PNG (Mac)"
+msgstr "Icône 32x32 PNG (Mac)"
+
+msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
+msgstr "Icône 57x57 PNG (iPhone, iPod, iPad)"
+
+msgid "Icon SVG 20x20 (Safari)"
+msgstr "Icône SVG 20x20 (Safari)"
+
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Image par défaut de l'aperçu des médias sociaux pour les aperçus de liens "
+"riches. La taille optimale est de 1200:630 px."
+
+msgid "Primary Color"
+msgstr "Couleur primaire"
+
+msgid "Default Font Family"
+msgstr "Famille de police principale"
 
 msgid "Additional CSS"
 msgstr "CSS additionnel"
@@ -2204,28 +2232,6 @@ msgstr "La largeur de la colonne doit être supérieure à 0"
 msgid "The sum of all the footer columns must be equal to 12"
 msgstr "La somme de toutes les colonnes de bas de page doit être égale à 12"
 
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Image par défaut de l'aperçu des médias sociaux pour les aperçus de liens "
-"riches. La taille optimale est de 1200:630 px."
-
-msgid "Icon 16x16 PNG (Windows)"
-msgstr "Icône 16x16 PNG (Windows)"
-
-msgid "URL pointing to the icon"
-msgstr "URL pointant vers le Favicon"
-
-msgid "Icon 32x32 PNG (Mac)"
-msgstr "Icône 32x32 PNG (Mac)"
-
-msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
-msgstr "Icône 57x57 PNG (iPhone, iPod, iPad)"
-
-msgid "Icon SVG 20x20 (Safari)"
-msgstr "Icône SVG 20x20 (Safari)"
-
 msgid "Disable page references"
 msgstr "Désactiver les références de page"
 
@@ -2352,6 +2358,17 @@ msgstr ""
 
 msgid "The default map view. This should show the whole town"
 msgstr "La vue par défaut de la carte. Cela devrait montrer la ville entière"
+
+msgid ""
+"Wherever there's an option to choose a location on a map, this will be the "
+"default view. You can change the view by dragging the map and zooming in or "
+"out. The coordinates of the center of the map and the zoom level will then "
+"be saved as the default view."
+msgstr ""
+"Chaque fois qu'il y a une option pour choisir un emplacement sur une carte, "
+"ce sera la vue par défaut. Vous pouvez changer la vue en faisant glisser la "
+"carte et en zoomant. Les coordonnées du centre de la carte et le niveau de "
+"zoom seront alors enregistrés comme vue par défaut."
 
 msgid "Geo provider"
 msgstr "Fournisseur de geo"
@@ -2652,9 +2669,6 @@ msgstr ""
 "Couleur non valide \"${color}\", doit être un code hexadécimal à 3 ou 6 "
 "chiffres, par exemple \"ff9000\" pour l'orange. Si vous utilisez un préfixe "
 "\"#\", veillez à mettre la valeur entre guillemets."
-
-msgid "Enable newsletter"
-msgstr "Activer la newsletter"
 
 msgid "Allow secret content in newsletter"
 msgstr "Autoriser le contenu secret dans la newsletter"
@@ -2991,8 +3005,27 @@ msgstr ""
 "Il s'agit du taux de TVA en pourcentage. Le taux de TVA s'appliquera à tous "
 "les prix dans les formulaires."
 
+msgid "Enable newsletter"
+msgstr "Activer la newsletter"
+
+msgid ""
+"Enables the newsletter module for admins and show a \"Subscribe to "
+"newsletter\" option for the users on the news page."
+msgstr ""
+"Active le module de newsletter pour les administrateurs et affiche une "
+"option \"S'abonner à la newsletter\" pour les utilisateurs sur la page des "
+"actualités."
+
 msgid "Enable Citizen Login"
 msgstr "Activer la connexion des clients"
+
+msgid ""
+"Enables the citizen login. This will show a \"citizen login\" link in the "
+"footer, where users can view their reservations using their email-address."
+msgstr ""
+"Active la connexion des clients. Cela affichera un lien \"connexion client\" "
+"dans le pied de page, où les utilisateurs peuvent voir leurs réservations en "
+"utilisant leur adresse e-mail."
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -3240,9 +3273,6 @@ msgstr "Lier des fichiers supplémentaires"
 msgid "All directories"
 msgstr "Tous les dossiers"
 
-msgid "Directories"
-msgstr "Répertoires"
-
 msgid "All events"
 msgstr "Tous les événements"
 
@@ -3379,9 +3409,6 @@ msgstr "Fenêtres de soumission"
 msgid "Survey"
 msgstr "Sondage"
 
-msgid "People"
-msgstr "Personnes"
-
 msgid "Person"
 msgstr "Personne"
 
@@ -3390,6 +3417,9 @@ msgstr "Voulez-vous vraiment supprimer cette personne ?"
 
 msgid "Delete person"
 msgstr "Supprimer la personne"
+
+msgid "Archived Tickets"
+msgstr "Tickets archivés"
 
 msgid "Delete archived tickets"
 msgstr "Supprimer les tickets archivés"
@@ -3450,6 +3480,9 @@ msgstr "Facture"
 
 msgid "Discount / Surcharge"
 msgstr "Remis / Supplément"
+
+msgid "Text modules"
+msgstr "Modules de texte"
 
 msgid "Text module"
 msgstr "Module de texte"
@@ -3581,9 +3614,6 @@ msgstr "Vous pouvez republier un événement importé plus tard."
 
 msgid "Re-publish event"
 msgstr "Republier l'événement"
-
-msgid "Newsletter"
-msgstr "Newsletter"
 
 msgid "New"
 msgstr "Nouveau"
@@ -4668,6 +4698,9 @@ msgstr "Ignorez la navigation"
 
 msgid "Straight to ..."
 msgstr "Directement à ..."
+
+msgid "User manual"
+msgstr "Manuel d'utilisation"
 
 msgid "Back to the homepage"
 msgstr "Retour à la page d'accueil"
@@ -7560,8 +7593,14 @@ msgstr "Recherche non disponible"
 msgid "${count} Results"
 msgstr "${count} résultats"
 
-msgid "Favicon"
-msgstr "Favicon"
+msgid "Advanced Settings"
+msgstr "Paramètres avancés"
+
+msgid "Organisation Profile"
+msgstr "Profil de l'organisation"
+
+msgid "Appearance"
+msgstr "Apparence"
 
 msgid "Header"
 msgstr "En-tête"
@@ -7569,11 +7608,30 @@ msgstr "En-tête"
 msgid "Footer"
 msgstr "Bas de page"
 
-msgid "Modules"
-msgstr "Modules"
+msgid "Data Retention Policy"
+msgstr "Politique de Conservation des Données"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procédez avec prudence. Les billets et les données qu'ils contiennent "
+"peuvent être irrévocablement supprimés."
+
+msgid "Access (mTAN)"
+msgstr "Accès (mTAN)"
 
 msgid "Analytics"
 msgstr "Analytics"
+
+msgid "Optional modules"
+msgstr "Modules optionnels"
+
+msgid "People directory"
+msgstr "Annuaire des personnes"
+
+msgid "Chat"
+msgstr "Discussion"
 
 msgid "Holidays"
 msgstr "Jours fériés / Vacances scolaires"
@@ -7612,19 +7670,6 @@ msgstr "Cette action ne peut pas être annulée."
 
 msgid "ApiKey deleted."
 msgstr "Clé API supprimée."
-
-msgid "Data Retention Policy"
-msgstr "Politique de Conservation des Données"
-
-msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
-msgstr ""
-"Procédez avec prudence. Les billets et les données qu'ils contiennent "
-"peuvent être irrévocablement supprimés."
-
-msgid "Chat"
-msgstr "Discussion"
 
 #, python-format
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
@@ -7982,6 +8027,12 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "RIS Settings"
+#~ msgstr "Paramètres RIS"
+
+#~ msgid "Favicon"
+#~ msgstr "Favicon"
 
 #~ msgid ""
 #~ "The \"Always send email notifications for new ticket messages\" setting "

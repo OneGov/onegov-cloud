@@ -30,7 +30,7 @@ def test_view_images(client: Client) -> None:
     img_url = images_page.pyquery('.image-container a').attr('href')
 
     # Test Open Graph meta properties
-    social_media = client.get('/social-media-settings')
+    social_media = client.get('/appearance-settings')
 
     social_media.form['og_logo_default'] = img_url
     social_media.form.submit().follow()

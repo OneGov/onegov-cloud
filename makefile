@@ -8,6 +8,9 @@ install: ensure_uv
 	# enable pre-commit
 	prek install -f
 
+	# install chromium for playwright
+	playwright install chromium
+
 	# ensure required folder structure
 	mkdir -p ./profiles
 

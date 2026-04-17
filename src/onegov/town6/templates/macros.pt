@@ -3485,3 +3485,19 @@
         </tfoot>
     </table>
 </metal:invoice_items>
+
+<metal:globals-left define-macro="globals-left">
+    <ul tal:condition="modules" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
+        <li>
+            <a href="#" data-dropdown="modules-dropdown" class="dropdown modules" i18n:translate>Modules</a>
+            <ul id="modules-dropdown" data-dropdown-content class="vertical menu">
+                <li tal:repeat="link modules.links">
+                    <tal:b replace="link(layout)" />
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a class="docs" href="https://docs.admin.digital/" i18n:translate>User manual</a>
+        </li>
+    </ul>
+</metal:globals-left>
