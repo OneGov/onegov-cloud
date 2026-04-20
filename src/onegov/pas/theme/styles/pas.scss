@@ -14,6 +14,10 @@ $import-logs-icon: '\f1da';
 $user-management-icon: '\f0c0';
 
 .globals {
+    .global-header-flex {
+        justify-content: flex-end;
+    }
+
     .attendences::before { @include icon-bold($attendence-icon); }
     .attendances::before { @include icon-bold($attendence-icon); }
     .changes::before { @include icon-bold($change-icon); }
