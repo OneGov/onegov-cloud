@@ -96,12 +96,12 @@ footer {
         .main-projects {
             @media #{$medium-up} {
                 border-right: 1px solid $white;
+                width: 260px;
             }
 
             img {
                 max-height: 3rem;
-
-                    margin-right: 1rem;
+                margin-right: 1rem;
             }
         }
 
@@ -117,6 +117,7 @@ footer {
 
             img {
                 max-height: 4rem;
+                margin-left: -.8rem;
             }
         }
 
