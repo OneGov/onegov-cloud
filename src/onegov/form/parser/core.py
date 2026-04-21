@@ -1398,10 +1398,6 @@ class IndentStack(list[int]):
         except ValueError:
             return False
 
-    @property
-    def options(self) -> list[int]:
-        return self[1::2]
-
     def handle_indent(
         self,
         line: int,  # for error messages
