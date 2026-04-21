@@ -99,7 +99,6 @@
                         <div class="grid-x grid-padding-x">
                             <div class="cell small-12">
                                 <div class="global-header-flex ${'' if toolbox else 'centered'}">
-                                    <div></div>
                                     <ul tal:condition="toolbox" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
                                         <li tal:repeat="tool toolbox">
                                             <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
