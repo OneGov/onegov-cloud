@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-03-26 15:38+0100\n"
+"POT-Creation-Date: 2026-04-13 16:07+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -249,6 +249,9 @@ msgstr "Die Aktualisierung der Metadaten kann einige Zeit in Anspruch nehmen."
 
 msgid "Metadata"
 msgstr "Metadaten"
+
+msgid "back"
+msgstr "zurück"
 
 msgid "Votes"
 msgstr "Abstimmungen"
@@ -1643,6 +1646,9 @@ msgstr "Mehr Kontext?"
 
 msgid "Subscribe to the APS newsletter"
 msgstr "APS-Newsletter abonnieren"
+
+msgid "E-mail address"
+msgstr "E-Mail-Adresse"
 
 msgid "Main projects"
 msgstr "Hauptprojekte"

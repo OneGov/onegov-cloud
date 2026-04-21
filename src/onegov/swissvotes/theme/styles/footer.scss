@@ -100,8 +100,8 @@ footer {
             }
 
             img {
-                max-height: 3rem;
                 margin-right: 1rem;
+                max-height: 3rem;
             }
         }
 
@@ -113,6 +113,16 @@ footer {
         .supported-by {
             @media #{$small-only} {
                 border-top: 1px solid $white;
+            }
+
+            @media #{$medium-up} {
+                .row {
+                    padding-bottom: 0;
+                }
+
+                p {
+                    margin-bottom: 1rem;
+                }
             }
 
             img {

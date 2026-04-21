@@ -38,37 +38,24 @@
 <body id="${layout.page_id}" tal:attributes="layout.custom_body_attributes|{}">
     <header>
         <div class="nav-header">
-            <div class="top-header">
-                <nav class="top-bar show-for-medium-up" data-topbar="" role="navigation" data-options="is_hover: false">
-                    <section class="top-bar-section">
-                    </section>
-
-                    <section class="top-bar-section">
-                        <!-- Right Nav Section -->
-                        <div metal:use-macro="layout.macros['lang_navigation']"></div>
-                    </section>
-                </nav>
-            </div>
-
             <div class="main-header">
                 <div class="row row-wide show-for-medium-up">
                     <div class="columns medium-2">
                         <a href="${layout.homepage_url}">
                             <img class="logo" id="white_logo" src="${layout.static_path}/images/Swissvotes/weiss/Logo_swissvotes_weiss.svg" height="100" alt="année politique suisse">
                             <img class="logo" id="red_logo" src="${layout.static_path}/images/Swissvotes/rot/Logo_swissvotes_rot.svg" height="100" alt="année politique suisse">
-                            </a>
-                            <div class="project-by">
-                                <span i18n:translate>A project by</span><br/>
-                                <a href="https://anneepolitique.swiss">
-                                    <img class="logo-small" id="white_logo" src="${layout.static_path}/images/APS/weiss/Logo_annee-politique-suisse_weiss.svg" height="100" alt="année politique suisse">
-                                    <img class="logo-small" id="red_logo" src="${layout.static_path}/images/APS/rot/Logo_annee-politique-suisse_rot.svg" height="100" alt="année politique suisse">
-                                </a>
-                            </div>
+                        </a>
                     </div>
-                    <div class="columns small-12 medium-8">
+                    <div class="columns small-12 medium-8 main-nav">
                         <div metal:use-macro="layout.macros['top_navigation']"></div>
                     </div>
-                    <div class="columns medium-2">
+                    <div class="columns medium-2 language-nav">
+                        <nav class="top-bar show-for-medium-up" data-topbar="" role="navigation" data-options="is_hover: false">
+                            <section class="top-bar-section">
+                                <!-- Right Nav Section -->
+                                <div metal:use-macro="layout.macros['lang_navigation']"></div>
+                            </section>
+                        </nav>
                     </div>
                 </div>
                 <div class="row show-for-small-only">
@@ -102,11 +89,21 @@
                     </div>
                 </div>
             </div>
-            <div class="row row-wide title-header">
-                <div class="columns small-12">
+            <div class="row row-wide show-for-medium-up title-header">
+                <div class="columns small-2">
+                    <div class="project-by">
+                        <span i18n:translate>A project by</span><br/>
+                        <a href="https://anneepolitique.swiss">
+                            <img class="logo-small" id="white_logo" src="${layout.static_path}/images/APS/weiss/Logo_annee-politique-suisse_weiss.svg" height="100" alt="année politique suisse">
+                            <img class="logo-small" id="red_logo" src="${layout.static_path}/images/APS/rot/Logo_annee-politique-suisse_rot.svg" height="100" alt="année politique suisse">
+                        </a>
+                    </div>
+                </div>
+                <div class="columns small-12 medium-8">
                     <h1><span class="main-title"><div metal:define-slot="main-title"></div></span>
                     <span class="sub-title"><div metal:define-slot="sub-title"></div></span></h1>
                 </div>
+                <div class="columns small-12 medium-2 show-for-medium-up"></div>
             </div>
 
         </div>
@@ -153,7 +150,7 @@
                 <a href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/APS/rot/Logo_annee-politique-suisse_rot.svg" height="100" alt="année politique suisse"></a>
                 </p>
                 <p>
-                <b>Année politique suisse</b><br />
+                <b>Année Politique Suisse</b><br />
                     Universität Bern<br />
                     Institut für Politikwissenschaft<br />
                     Fabrikstrasse 8<br />
@@ -170,7 +167,7 @@
                         <form action="https://unibe.us16.list-manage.com/subscribe/post?u=3b0c6ec97512f826fa5d002e1&amp;id=ea265c0d71&amp;f_id=0018c0e3f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank">
                             <div id="mc_embed_signup_scroll">
                                 <div class="mc-field-group">
-                                    <input type="email" name="EMAIL" class="required email" id="mce-EMAIL" required="" placeholder="E-Mail-Adresse">
+                                    <input type="email" name="EMAIL" class="required email" id="mce-EMAIL" required="" i18n:attributes="placeholder" placeholder="E-mail address">
                                 </div>
                                 <div class="optionalParent">
                                     <div class="clear foot">
@@ -201,15 +198,15 @@
                         <p><span i18n:translate>Main projects</span><br><span i18n:translate>by Année Politique Suisse</span></p>
                     </div>
                     <div class="columns small-12">
-                        <a href="${layout.homepage_url}"><img src="${layout.static_path}/images/Swissvotes/weiss/Logo_swissvotes_weiss.svg" height="100" alt="Swissvotes Logo"></a>
-                        <a href="https://parteienatlas.swiss"><img src="${layout.static_path}/images/Parteienatlas/weiss/Logo_parteienatlas_weiss.svg" height="100" alt="Parteienatlas Logo"></a>
+                        <a href="https://www.politchronik.swiss/"><img src="${layout.static_path}/images/Politchronik/weiss/Logo_politchronik_weiss.svg" height="100" alt="Politchronik Logo"></a>
+                        <a href="${'https://anneepolitique.swiss/fr/projekte/parteienatlas/' if request.locale == 'fr_CH' else 'https://anneepolitique.swiss/de/projekte/parteienatlas/'}"><img src="${layout.static_path}/images/Parteienatlas/weiss/Logo_parteienatlas_weiss.svg" height="100" alt="Parteienatlas Logo"></a>
                     </div>
                 </div>
             </div>
             <div class="columns small-12 medium-6 large-4 supported-by">
                 <div class="row">
                     <div class="columns small-12">
-                        <p i18n:translate>Supported by</p>
+                        <p><span i18n:translate>Supported by</span><br><br></p>
                     </div>
                     <div class="columns small-12">
                         <img src="${layout.static_path}/images/sagw.svg" height="100" alt="SAGW Logo"></img>
