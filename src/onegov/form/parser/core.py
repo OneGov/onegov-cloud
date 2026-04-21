@@ -1480,6 +1480,7 @@ def translate_to_yaml(
                 raise errors.NestedFieldsetError(line=ix + 1)
             yield '- "{}":'.format(escape_double(line.lstrip('# ').rstrip()))
             expect_nested = False
+            indent_stack.clear()
             continue
 
         # fields are nested lists of dictionaries

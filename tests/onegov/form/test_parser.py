@@ -1320,6 +1320,25 @@ def test_indentation_error_for_identifier() -> None:
     with pytest.raises(errors.InvalidIndentSyntax):
         parse_formcode(text, enable_edit_checks=True)
 
+    # NOTE: Although a little weird, this is allowed, since each fieldset
+    #       opens its own dictionary in the generated YAML text, so the
+    #       indentation levels no longer need to necessarily match the
+    #       ones from the previous fieldset
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+        # New fieldset
+            Auswahl 2 =
+                (x) A
+                ( ) B
+                ( ) C
+        """
+    )
+    parse_formcode(text, enable_edit_checks=True)
+
 
 def test_indentation_error_for_identifier_2() -> None:
     text = dedent(
