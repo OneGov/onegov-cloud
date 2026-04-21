@@ -258,7 +258,9 @@ def notify_admins_finalized(
     """Send email notification to all admins if for one specific commission,"""
     admin_emails = [
         user.username
-        for user in request.session.query(User).filter_by(role='admin')
+        for user in request.session.query(User).filter_by(
+            role='admin', active=True
+        )
         if user.username and '@' in user.username
     ]
 
