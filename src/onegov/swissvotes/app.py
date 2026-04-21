@@ -177,6 +177,7 @@ def get_frameworks_asset() -> Iterator[str]:
     yield 'foundation.dropdown.js'
     yield 'foundation.orbit.js'
     yield 'foundation.topbar.js'
+    yield 'foundation.tooltip.js'
     yield 'intercooler.js'
     yield 'underscore.js'
     yield 'sortable.js'

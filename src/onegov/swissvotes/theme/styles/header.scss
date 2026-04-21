@@ -171,6 +171,7 @@ header {
                 a {
                     font-size: .88rem !important;
                     padding: .5rem 1rem !important;
+                    padding-bottom: .3rem !important;
                 }
 
                 &:not(.has-form) a:not(.button) {
@@ -558,7 +559,6 @@ header {
                 border-right: 0;
                 border-top: 0;
                 padding: 0;
-                padding-bottom: .5rem;
 
                 a {
                     border-bottom: 3px solid transparent;

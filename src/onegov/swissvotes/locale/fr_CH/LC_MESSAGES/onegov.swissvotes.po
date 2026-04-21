@@ -1648,11 +1648,11 @@ msgstr ""
 "Cette page Web est mieux vue avec un navigateur moderne. Envisagez "
 "d’utiliser Chrome, Firefox ou Edge. <dynamic element>"
 
-msgid "Want more context?"
+msgid "Would you like more context?"
 msgstr "Vous souhaitez en savoir plus ?"
 
-msgid "Subscribe to the APS newsletter"
-msgstr "Abonnez-vous à la newsletter APS"
+msgid "Subscribe to our newsletter."
+msgstr "Abonnez-vous à notre infolettre."
 
 msgid "E-mail address"
 msgstr "Adresse e-mail"

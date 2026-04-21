@@ -57,6 +57,25 @@ main {
 }
 
 /*
+    Button
+*/
+.button.secondary {
+    background-color: $gray-dark;
+    color: $black;
+
+    &:hover {
+        background-color: darken($gray-dark, 10%);
+        color: $black;
+    }
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    border: 2px solid $primary-color !important;
+    accent-color: $primary-color !important;
+}
+
+/*
     Rounded corners for panels.
 */
 .panel {
