@@ -11,5 +11,5 @@ if TYPE_CHECKING:
 def test_view_home(swissvotes_app: TestApp) -> None:
     client = Client(swissvotes_app)
     home = client.get('/').maybe_follow()
-    assert '<h1><span class="main-title">home</span>' in home
+    assert '<h1><span class="main-title">Startseite</span>' in home
     assert home.request.url.endswith('page/home')
