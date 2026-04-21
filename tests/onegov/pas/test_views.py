@@ -45,12 +45,6 @@ def add_rate_set(
     page.form['study_intercantonal_president_hour'] = 1
     page.form['commission_intercantonal_member_halfday'] = 1
     page.form['study_intercantonal_member_hour'] = 1
-    page.form['commission_official_president_halfday'] = 1
-    page.form['commission_official_president_fullday'] = 1
-    page.form['study_official_president_halfhour'] = 1
-    page.form['commission_official_vice_president_halfday'] = 1
-    page.form['commission_official_vice_president_fullday'] = 1
-    page.form['study_official_member_halfhour'] = 1
     page.form['shortest_all_president_halfhour'] = 1
     page.form['shortest_all_member_halfhour'] = 1
     page = page.form.submit().follow()
