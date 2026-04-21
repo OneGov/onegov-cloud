@@ -1392,9 +1392,11 @@ class IndentStack(list[int]):
         super().__init__()
         self.enable_edit_checks = enable_edit_checks
 
-    @property
-    def identifiers(self) -> list[int]:
-        return self[::2]
+    def is_identifier(self, indent: int) -> bool:
+        try:
+            return self.index(indent) % 2 == 0
+        except ValueError:
+            return False
 
     @property
     def options(self) -> list[int]:
@@ -1505,16 +1507,15 @@ def translate_to_yaml(
         # help descriptions following a field
         parse_result = try_parse(ELEMENTS.help_identifier, line)
         if parse_result is not None:
-            if enable_edit_checks and not indent_stack:
-                raise errors.InvalidCommentLocationSyntax(line=ix + 1)
+            if enable_edit_checks:
+                if not indent_stack:
+                    raise errors.InvalidCommentLocationSyntax(line=ix + 1)
 
-            # check for a valid indentation level
-            if (enable_edit_checks and
-                    len_indent not in indent_stack.identifiers):
-                raise errors.InvalidCommentIndentSyntax(line=ix + 1)
+                if not indent_stack.is_identifier(len_indent):
+                    raise errors.InvalidCommentIndentSyntax(line=ix + 1)
 
-            if enable_edit_checks and expect_option:
-                raise errors.InvalidCommentLocationSyntax(line=ix + 1)
+                if expect_option:
+                    raise errors.InvalidCommentLocationSyntax(line=ix + 1)
 
             yield '{indent}"{identifier}": \'{message}\''.format(
                 indent=indent + 2 * ' ',
