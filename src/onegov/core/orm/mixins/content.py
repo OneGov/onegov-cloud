@@ -5,6 +5,7 @@ from onegov.core.orm.types import MarkupText
 from sqlalchemy import func, type_coerce
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, Mapped
+from onegov.core.orm.types import JSON
 
 
 from typing import overload, Any, Protocol, TYPE_CHECKING
