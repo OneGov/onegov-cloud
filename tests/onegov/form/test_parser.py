@@ -4,16 +4,8 @@ import pytest
 
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
-
-from wtforms import Field
-
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
-from onegov.form.errors import (
-    InvalidIndentSyntax,
-    InvalidCommentIndentSyntax,
-    InvalidCommentLocationSyntax,
-)
 from onegov.form.fields import (
     DateTimeLocalField,
     MultiCheckboxField,
@@ -41,12 +33,12 @@ from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import Regexp
 
-from typing import TYPE_CHECKING, Any
 
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from pyparsing import ParserElement, ParseResults
-
     from onegov.form.types import Validator
+    from wtforms import Field
 
 
 def parse(expr: ParserElement, text: str) -> ParseResults:
@@ -1241,7 +1233,7 @@ def test_indentation_error(
     )
 
     if shall_raise:
-        with pytest.raises(InvalidIndentSyntax) as excinfo:
+        with pytest.raises(errors.InvalidIndentSyntax) as excinfo:
             parse_formcode(text, enable_edit_checks=edit_checks)
 
         assert excinfo.value.line == 6
@@ -1295,7 +1287,21 @@ def test_indentation_error_for_identifier() -> None:
         """
     )
 
-    with pytest.raises(InvalidIndentSyntax):
+    with pytest.raises(errors.InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+    # wrong indent
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+            Bemerkungen = ___
+        """
+    )
+
+    with pytest.raises(errors.InvalidIndentSyntax):
         parse_formcode(text, enable_edit_checks=True)
 
     text = dedent(
@@ -1311,7 +1317,7 @@ def test_indentation_error_for_identifier() -> None:
         """
     )
 
-    with pytest.raises(InvalidIndentSyntax):
+    with pytest.raises(errors.InvalidIndentSyntax):
         parse_formcode(text, enable_edit_checks=True)
 
 
@@ -1346,6 +1352,50 @@ def test_indentation_error_for_identifier_2() -> None:
     assert parse_formcode(text, enable_edit_checks=True)
 
 
+def test_indentation_error_for_checkbox() -> None:
+    text = dedent(
+        """
+        (x) A
+        """
+    )
+    with pytest.raises(errors.InvalidFormSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        Auswahl =
+        (x) A
+        """
+    )
+    with pytest.raises(errors.InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+                (x) 1
+                ( ) 2
+        """
+    )
+    with pytest.raises(errors.InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+
+def test_error_mixed_checkboxes() -> None:
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            [ ] B
+        """
+    )
+    with pytest.raises(errors.MixedTypeError):
+        parse_formcode(text, enable_edit_checks=True)
+
+
 def test_help_indentation_error() -> None:
     text = dedent(
         """
@@ -1365,7 +1415,7 @@ def test_help_indentation_error() -> None:
             << Name of the contact person >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
         assert excinfo.value.line == 2
 
@@ -1378,7 +1428,7 @@ def test_help_indentation_error() -> None:
             << Name of the contact person >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
         assert excinfo.value.line == 5
 
@@ -1394,7 +1444,7 @@ def test_help_indentation_error() -> None:
             ( ) I DONT accept the Terms of Use / User Agreement
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 7
 
@@ -1409,7 +1459,7 @@ def test_help_indentation_error() -> None:
             << Please select all your preferred sports >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 7
 
@@ -1425,7 +1475,7 @@ def test_help_indentation_error() -> None:
             << Please enter your name >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 8
 
@@ -1448,7 +1498,7 @@ def test_help_indentation_error() -> None:
             << Please enter your name >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 14
 
@@ -1475,7 +1525,7 @@ def test_help_indentation_error() -> None:
                     << badly indented >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 18
 
@@ -1499,7 +1549,7 @@ def test_help_indentation_error() -> None:
                 << Please enter your name >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 14
 
@@ -1537,7 +1587,7 @@ def test_help_location_error() -> None:
         Email *= @@@
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentLocationSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentLocationSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 2
 
@@ -1551,7 +1601,7 @@ def test_help_location_error() -> None:
             ( ) I accept the Terms of Use / User Agreement
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentLocationSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentLocationSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 5
 
@@ -1566,7 +1616,7 @@ def test_help_location_error() -> None:
             ( ) I accept the Terms of Use / User Agreement
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentLocationSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentLocationSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 6
 

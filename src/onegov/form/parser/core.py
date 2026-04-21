@@ -1378,6 +1378,65 @@ def validate_indent(indent: str) -> bool:
     return True
 
 
+class IndentStack(list[int]):
+    """ Handles the indentation logic for formcode.
+
+    Identifiers are always followed by options and vice versa, so we can
+    handle these in the same stack and apply logic based on the current
+    size of the stack.
+
+    """
+    @property
+    def identifiers(self) -> list[int]:
+        return self[::2]
+
+    @property
+    def options(self) -> list[int]:
+        return self[1::2]
+
+    def handle_indent(
+        self,
+        line: int,  # for error messages
+        indent: int,
+        *,
+        is_option: bool = False,
+        enable_edit_checks: bool = True
+    ) -> None:
+        if not enable_edit_checks:
+            return
+
+        if not self:
+            # the first indentation cannot be an option
+            if is_option:
+                raise errors.InvalidIndentSyntax(line=line)
+            self.append(indent)
+            return
+
+        previous_indent = self[-1]
+        if previous_indent < indent:
+            # add new level
+            expect_option = len(self) % 2 == 1
+            if is_option is not expect_option:
+                raise errors.InvalidIndentSyntax(line=line)
+            self.append(indent)
+            return
+
+        if previous_indent > indent:
+            while len(self) > 1:
+                self.pop()
+                previous_indent = self[-1]
+                if previous_indent == indent:
+                    break
+            else:
+                # the desired indentation matches no previous
+                # indentation
+                raise errors.InvalidIndentSyntax(line=line)
+
+        expect_option = len(self) % 2 == 0
+        if is_option is not expect_option:
+            raise errors.InvalidIndentSyntax(line=line)
+
+
 def translate_to_yaml(
     text: str,
     enable_edit_checks: bool = False
@@ -1394,8 +1453,7 @@ def translate_to_yaml(
     expect_nested = False
     actual_fields = 0
     ix = 0
-    identifier_indent_stack: list[int] = []
-    option_indent_stack: list[int] = []
+    indent_stack = IndentStack()
     expect_option = False
 
     def escape_single(text: str) -> str:
@@ -1403,33 +1461,6 @@ def translate_to_yaml(
 
     def escape_double(text: str) -> str:
         return text.replace('"', '\\"')
-
-    def handle_indent_stack(
-        stack: list[int],
-        ix: int,
-        current_indent: int,
-        enable_edit_checks: bool = False,
-    ) -> list[int]:
-        """ Handle indentation changes and return updated stack. """
-        if not enable_edit_checks:
-            return stack  # skip stack handling
-
-        previous_indent = stack[-1] if stack else -1
-
-        if previous_indent < current_indent:
-            # add new level
-            stack.append(current_indent)
-            return stack
-
-        elif previous_indent > current_indent:
-            # pop back last level
-            if current_indent not in stack:
-                raise errors.InvalidIndentSyntax(line=ix + 1)
-            return stack[:stack.index(current_indent) + 1]
-
-        else:
-            # same level, nothing to do
-            return stack
 
     for ix, line in lines:
         len_indent = len(line) - len(line.lstrip())
@@ -1462,20 +1493,22 @@ def translate_to_yaml(
             expect_nested = len(indent) > 4
             actual_fields += 1
 
-            identifier_indent_stack = handle_indent_stack(
-                identifier_indent_stack, ix, len_indent, enable_edit_checks
+            indent_stack.handle_indent(
+                ix + 1,
+                len_indent,
+                enable_edit_checks=enable_edit_checks
             )
             continue
 
         # help descriptions following a field
         parse_result = try_parse(ELEMENTS.help_identifier, line)
         if parse_result is not None:
-            if enable_edit_checks and not identifier_indent_stack:
+            if enable_edit_checks and not indent_stack:
                 raise errors.InvalidCommentLocationSyntax(line=ix + 1)
 
             # check for a valid indentation level
             if (enable_edit_checks and
-                    len_indent not in identifier_indent_stack):
+                    len_indent not in indent_stack.identifiers):
                 raise errors.InvalidCommentIndentSyntax(line=ix + 1)
 
             if enable_edit_checks and expect_option:
@@ -1486,8 +1519,10 @@ def translate_to_yaml(
                 identifier='field_help',
                 message=escape_single(parse_result.message)
             )
-            identifier_indent_stack = handle_indent_stack(
-                identifier_indent_stack, ix, len_indent, enable_edit_checks
+            indent_stack.handle_indent(
+                ix + 1,
+                len_indent,
+                enable_edit_checks=enable_edit_checks
             )
             continue
 
@@ -1504,12 +1539,11 @@ def translate_to_yaml(
                 definition=escape_single(line.strip())
             )
 
-            # check for a valid indentation level
-            if enable_edit_checks and len_indent in identifier_indent_stack:
-                raise errors.InvalidIndentSyntax(line=ix + 1)
-
-            option_indent_stack = handle_indent_stack(
-                option_indent_stack, ix, len_indent, enable_edit_checks
+            indent_stack.handle_indent(
+                ix + 1,
+                len_indent,
+                is_option=True,
+                enable_edit_checks=enable_edit_checks
             )
             expect_option = False
             continue
@@ -1529,11 +1563,10 @@ def translate_to_yaml(
             expect_nested = True
             actual_fields += 1
 
-            if enable_edit_checks and len_indent in option_indent_stack:
-                raise errors.InvalidIndentSyntax(line=ix + 1)
-
-            identifier_indent_stack = handle_indent_stack(
-                identifier_indent_stack, ix, len_indent, enable_edit_checks
+            indent_stack.handle_indent(
+                ix + 1,
+                len_indent,
+                enable_edit_checks=enable_edit_checks
             )
             expect_option = True
             continue
