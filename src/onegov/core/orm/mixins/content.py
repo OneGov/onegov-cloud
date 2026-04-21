@@ -338,12 +338,14 @@ class dict_property[T](hybrid_property[T]):  # noqa: N801
         elif issubclass(self.value_type, int):
             expr = expr.as_integer()
             coerced = True
-        if coerced:
-            default = (
-                self.default() if callable(self.default) else self.default
+        default = (
+            self.default() if callable(self.default) else self.default
+        )
+        if default is not None:
+            expr = func.coalesce(
+                expr,
+                default if coerced else type_coerce(default, JSON)
             )
-            if default is not None:
-                expr = func.coalesce(expr, default)
         return expr
 
     def __set_name__(self, owner: type[object], name: str) -> None:
