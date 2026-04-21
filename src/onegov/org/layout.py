@@ -645,9 +645,12 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     def format_date_range(
         self,
-        start: date | datetime,
-        end: date | datetime
+        start: date | datetime | None,
+        end: date | datetime | None
     ) -> str:
+
+        if start is None and end is None:
+            return ''
 
         if start == end:
             return self.format_date(start, 'date')
