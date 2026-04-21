@@ -1386,6 +1386,12 @@ class IndentStack(list[int]):
     size of the stack.
 
     """
+    __slots__ = ('enable_edit_checks', )
+
+    def __init__(self, *, enable_edit_checks: bool = False) -> None:
+        super().__init__()
+        self.enable_edit_checks = enable_edit_checks
+
     @property
     def identifiers(self) -> list[int]:
         return self[::2]
@@ -1399,10 +1405,9 @@ class IndentStack(list[int]):
         line: int,  # for error messages
         indent: int,
         *,
-        is_option: bool = False,
-        enable_edit_checks: bool = True
+        is_option: bool = False
     ) -> None:
-        if not enable_edit_checks:
+        if not self.enable_edit_checks:
             return
 
         if not self:
@@ -1453,7 +1458,7 @@ def translate_to_yaml(
     expect_nested = False
     actual_fields = 0
     ix = 0
-    indent_stack = IndentStack()
+    indent_stack = IndentStack(enable_edit_checks=enable_edit_checks)
     expect_option = False
 
     def escape_single(text: str) -> str:
@@ -1493,11 +1498,7 @@ def translate_to_yaml(
             expect_nested = len(indent) > 4
             actual_fields += 1
 
-            indent_stack.handle_indent(
-                ix + 1,
-                len_indent,
-                enable_edit_checks=enable_edit_checks
-            )
+            indent_stack.handle_indent(ix + 1, len_indent)
             continue
 
         # help descriptions following a field
@@ -1519,11 +1520,7 @@ def translate_to_yaml(
                 identifier='field_help',
                 message=escape_single(parse_result.message)
             )
-            indent_stack.handle_indent(
-                ix + 1,
-                len_indent,
-                enable_edit_checks=enable_edit_checks
-            )
+            indent_stack.handle_indent(ix + 1, len_indent)
             continue
 
         # checkboxes/radios come without identifier
@@ -1539,12 +1536,7 @@ def translate_to_yaml(
                 definition=escape_single(line.strip())
             )
 
-            indent_stack.handle_indent(
-                ix + 1,
-                len_indent,
-                is_option=True,
-                enable_edit_checks=enable_edit_checks
-            )
+            indent_stack.handle_indent(ix + 1, len_indent, is_option=True)
             expect_option = False
             continue
 
@@ -1563,11 +1555,7 @@ def translate_to_yaml(
             expect_nested = True
             actual_fields += 1
 
-            indent_stack.handle_indent(
-                ix + 1,
-                len_indent,
-                enable_edit_checks=enable_edit_checks
-            )
+            indent_stack.handle_indent(ix + 1, len_indent)
             expect_option = True
             continue
 
