@@ -34,10 +34,9 @@ from wtforms.validators import Optional
 from wtforms.validators import Regexp
 
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pyparsing import ParserElement, ParseResults
-    from onegov.form.types import Validator
     from wtforms import Field
 
 
@@ -45,10 +44,10 @@ def parse(expr: ParserElement, text: str) -> ParseResults:
     return expr.parse_string(text)
 
 
-def find_validator(
-    field: Field | FileField,
-    cls: type
-) -> Validator[Any, Any] | None:
+def find_validator[T](
+    field: Field,
+    cls: type[T]
+) -> T | None:
     return next((v for v in field.validators if isinstance(v, cls)), None)
 
 

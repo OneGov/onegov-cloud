@@ -1507,15 +1507,16 @@ def translate_to_yaml(
         # help descriptions following a field
         parse_result = try_parse(ELEMENTS.help_identifier, line)
         if parse_result is not None:
-            if enable_edit_checks:
-                if not indent_stack:
-                    raise errors.InvalidCommentLocationSyntax(line=ix + 1)
-
-                if not indent_stack.is_identifier(len_indent):
-                    raise errors.InvalidCommentIndentSyntax(line=ix + 1)
-
-                if expect_option:
-                    raise errors.InvalidCommentLocationSyntax(line=ix + 1)
+            if enable_edit_checks and (
+                # a help text cannot occur when we expect an option next
+                expect_option
+                # a help text cannot occur directly after a fieldset starts
+                or not indent_stack
+                # a help text cannot occur if we don't have an identifier
+                # on the same indentation level
+                or not indent_stack.is_identifier(len_indent)
+            ):
+                raise errors.InvalidCommentLocationSyntax(line=ix + 1)
 
             yield '{indent}"{identifier}": \'{message}\''.format(
                 indent=indent + 2 * ' ',
