@@ -3346,3 +3346,313 @@ def migrate_agency(
         """)
 
     return migrate_to_new_agency
+
+
+@cli.command(name='get-resources-campos')
+@click.argument('option_file', type=click.File('rb'))
+def get_resources_and_forms_campos(
+    option_file: IO[bytes]
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Get the resources and forms from the option file. """
+
+    def print_resources(request: OrgRequest, app: OrgApp) -> None:
+        book = load_workbook(option_file)
+        sheet = book['Blatt 1']
+
+        resources_in_db = ResourceCollection(app.libres_context)
+        for resource in resources_in_db.query():
+            click.secho(resource.title, fg='green')
+
+        resources: set[str] = set()
+        for index, row in enumerate(sheet.rows):
+            if index <= 1:
+                continue
+            for i, cell in enumerate(row):
+                value = str(cell.value)
+                if i == 0:  # Resource Name
+                    resource_name = value
+                    resources.add(resource_name)
+
+        for resource in resources:
+            click.secho(resource, fg='blue')
+
+    return print_resources
+
+
+@cli.command(name='get-resource-fields')
+def get_resource_fields(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Get form fields of the resources. """
+
+    def print_resources(request: OrgRequest, app: OrgApp) -> None:
+
+        resources_in_db = ResourceCollection(app.libres_context)
+        for resource in resources_in_db.query().order_by(Resource.title):
+            click.secho(resource.title, fg='green')
+            definition = resource.definition
+            if definition == None:
+                continue
+            # process definition line by line
+            counter = -1
+            rf: list[str] = []
+            for line in definition.splitlines():
+                if line == '' or line is None:
+                    continue
+                if any(ch in line for ch in ['#', '<<']):
+                    continue
+                if '=' in line:
+                    counter += 1
+                    rf.append(line.split('=')[0])
+                else:
+                    rf[counter] = rf[counter] + line
+
+            for field in rf:
+                click.secho(f'  {field}', fg='blue')
+
+    return print_resources
+
+
+@cli.command(name='import-reservations-campos',
+             context_settings={'singular': True})
+@click.argument('reservation_file', type=click.File('rb'))
+@click.argument('mapping_yaml', type=click.File('rb'))
+@click.option('--dry-run', is_flag=True, default=False)
+def import_reservations_campos(
+    reservation_file: IO[bytes],
+    mapping_yaml: IO[bytes],
+    dry_run: bool,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Imports reservations from a Excel file (needs to be .xlsx).
+    Creates no resources or allocations, so the availabilty periods need to
+    be set in the resource settings.
+    """
+
+    def import_reservations(request: OrgRequest, app: OrgApp) -> None:
+
+        class Reservation(TypedDict):
+            state: str
+            fields: dict[str, Any]
+            start: datetime | None
+            end: datetime | None
+
+        yaml_file = mapping_yaml.read()
+        yaml_dict = yaml.safe_load(yaml_file)
+        resource_map = yaml_dict.get('resources', {})
+        fields = yaml_dict.get('fields', {})
+        # res_show = json.dumps(resource_map, indent=4, default=str)
+        # click.secho(f'Resources: {res_show}', fg='green')
+
+        book = load_workbook(reservation_file)
+        sheet = book['Blatt 1']
+
+        reservations: dict[
+            str, list[Reservation]] = {}
+        for index, row in enumerate(sheet.rows):
+            if index == 0:  # Skip the first row, it's the header
+                continue
+
+            reservation: Reservation = {
+                'state': '',
+                'fields': {},
+                'start': None,
+                'end': None
+            }
+            row_empty: bool = True
+            id = ''
+            resource_name = ''
+
+            for i, cell in enumerate(row):
+                value = cell.value
+                if i == 0:  # Resource
+                    if value is None:
+                        continue
+                    row_empty = False
+                    resource_name = str(value)
+                elif i == 1:
+                    reservation['start'] = datetime.strptime(
+                        str(value), '%d.%m.%Y %H:%M:%S')
+                elif i == 3:
+                    times = str(value).split(' bis ')
+                    if reservation['start']:
+                        reservation['end'] = datetime.combine(
+                            reservation['start'],
+                            datetime.strptime(times[1], '%H:%M').time())
+                elif i == 8:
+                    reservation['state'] = str(value)
+                elif i == 22:
+                    if value is None:
+                        value = 'info@seantis.ch'
+                    reservation['fields']['email'] = value
+                elif i in fields:
+                    value = str(value or '')
+                    key = fields[i]
+                    if reservation['fields'].get(key) is None or '':
+                        reservation['fields'][key] = value
+                    elif value not in reservation['fields'][key]:
+                        reservation['fields'][key] += f' {value}'
+
+            if not row_empty:
+                if resource_name not in reservations:
+                    reservations[resource_name] = []
+
+                reservations[resource_name].append(reservation)
+
+        res_show = json.dumps(reservations, indent=4, default=str)
+        click.secho(f'Reservations: {res_show}', fg='green')
+
+    #     # Create reservations
+        if not dry_run:
+            resources = ResourceCollection(app.libres_context)
+            for resource_name in reservations.keys():
+
+                real_resource_name = resource_map.get(resource_name, '')
+                if not real_resource_name:
+                    click.echo(
+                        f'Resource {resource_name} not found in the mapping '
+                        'file'
+                    )
+                    continue
+                real_resource_name = real_resource_name.get('name', '')
+                resource = resources.by_name(real_resource_name.lower())
+
+                if not resource:
+                    click.echo(
+                        f'Resource {resource} not found in the database'
+                    )
+                    continue
+
+                click.echo(
+                    f'Importing reservations for {resource.title}'
+                )
+                scheduler = resource.scheduler
+
+                for reservation in reservations[resource_name]:
+                    found_conflict = False
+                    session_id = uuid4()
+                    email = reservation['fields'].get('email')
+                    start = reservation['start']
+                    end = reservation['end']
+                    if not email or not start or not end:
+                        click.secho(
+                            f'{id}: Missing email, start or end date for '
+                            f'reservation, skipping reservation', fg='red')
+                        continue
+
+                    try:
+                        token_uuid = scheduler.reserve(
+                            email=str(email),
+                            dates=(start, end),
+                            session_id=session_id,
+                            single_token_per_session=True,
+                            data={'accepted': True}
+                        )
+                        token = token_uuid.hex
+                    except InvalidEmailAddress:
+                        click.secho(f'{id}: {email} is an invalid e-mail '
+                                    'address')
+                    except AlreadyReservedError:
+                        found_conflict = True
+                        click.secho(
+                            f'{id}: Booking conflict in {resource.title} '
+                            f'at {start} - {end}', fg='red')
+                    except TimerangeTooLong:
+                        click.secho(
+                            f'{id}: Timerange too long: {start} - {end}',
+                            fg='yellow')
+                        rules = resource.content['rules']
+                        relevant_rules = []
+                        for rule in rules:
+                            rule = rule['options']
+                            if rule['start'] <= start.date(
+                            ) and rule['end'] >= end.date(
+                            ) and start.weekday(
+                            ) not in rule['except_for'] and start.time(
+                            ) <= rule['start_time'] and end.time(
+                            ) >= rule['end_time']:
+                                relevant_rules.append(rule)
+                        for i, rule in enumerate(relevant_rules):
+                            start = datetime.combine(
+                                start.date(), rule['start_time'])
+                            end = datetime.combine(
+                                end.date(), rule['end_time'])
+                            click.secho(
+                                f'{id}: Trying to reserve {resource.title}'
+                                f' at {start} - {end} with rule {i+1}',
+                                fg='cyan')
+                            try:
+                                token_uuid = scheduler.reserve(
+                                    email=str(email),
+                                    dates=(start, end),
+                                    session_id=session_id,
+                                    single_token_per_session=True,
+                                    data={'accepted': True}
+                                )
+                                token = token_uuid.hex
+                            except Exception as e:
+                                click.secho(
+                                    f'{id}: Error reserving '
+                                    f'{resource.title} at {start} - {end} '
+                                    f'- {e}', fg='red')
+                                found_conflict = True
+                        if not relevant_rules:
+                            click.secho(
+                                f'{id}: No rules found for '
+                                f'{resource.title} at {start}', fg='red')
+                    except Exception as e:
+                        click.secho(
+                            f'{id}: Error {e} reserving {resource.title} '
+                            f'at {start} - {end} outside of availability'
+                            'period', fg='red')
+                        continue
+
+                    if found_conflict:
+                        continue
+
+                    # assert resource.form_class is not None
+                    # forms = FormCollection(app.session())
+
+                    # form_data = {}
+                    # for key, value in reservation['fields'].items():
+                    #     form_data[key] = str(value)
+
+                    # form = resource.form_class(data=form_data)
+
+                    # if not form.validate():
+                    #     form_data_show = json.dumps(
+                    #         form_data, indent=4, default=str)
+                    #     click.secho(f'{id}: {form_data_show} failed the form '
+                    #         f'check with {form.errors}', fg='red')
+                    #     continue
+
+                    # submission = forms.submissions.add_external(
+                    #     form=form,
+                    #     state='pending',
+                    #     id=token_uuid
+                    # )
+
+                    # scheduler.queries.confirm_reservations_for_session(
+                    #     session_id)
+                    # scheduler.approve_reservations(token_uuid)
+
+                    # forms.submissions.complete_submission(submission)
+
+                    # users = UserCollection(app.session())
+                    # user = users.query().filter(
+                    #     User.username == 'info@seantis.ch').first()
+
+                    # if not user:
+                    #     abort('info@seantis.ch not found in users')
+
+                    # with forms.session.no_autoflush:
+                    #     ticket = TicketCollection(request.session).open_ticket(
+                    #         handler_code='RSV', handler_id=token
+                    #     )
+                    #     ticket.accept_ticket(user)
+                    #     if reservation['state'] != 'unbestätigt':
+                    #         ticket.close_ticket()
+
+                    # click.secho(f'{id}: Sucessfully imported reservation '
+                    #             f'at {start} - {end}',
+                    #             fg='green')
+
+    return import_reservations
