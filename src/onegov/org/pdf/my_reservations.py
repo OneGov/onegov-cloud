@@ -97,7 +97,7 @@ class MyReservationsPdf(OrgPdf):
             self.story.append(PageBreak())
             if first:
                 first = False
-                self.h1('Appendix')
+                self.h1(_('Appendix'))
             else:
                 self.spacer()
             self.h2(resource.title)

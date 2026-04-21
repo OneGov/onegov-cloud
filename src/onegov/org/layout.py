@@ -645,9 +645,12 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     def format_date_range(
         self,
-        start: date | datetime,
-        end: date | datetime
+        start: date | datetime | None,
+        end: date | datetime | None
     ) -> str:
+
+        if start is None and end is None:
+            return ''
 
         if start == end:
             return self.format_date(start, 'date')
@@ -1819,7 +1822,11 @@ class ArchivedTicketsLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), '#')
+            Link(_('Tickets'), self.request.class_link(
+                TicketCollection,
+                {'handler': self.model.handler, 'state': 'open'}
+            )),
+            Link(_('Archived Tickets'), '#')
         ]
 
     @cached_property
@@ -1936,15 +1943,22 @@ class TicketLayout(DefaultLayout):
                     )
 
             elif self.model.state == 'closed':
-                links.append(Link(
-                    text=_('Reopen ticket'),
-                    url=self.request.link(self.model, 'reopen'),
-                    attrs={'class': ('ticket-button', 'ticket-reopen')}
-                ))
-                links.append(Link(
-                    text=_('Archive ticket'),
-                    url=self.request.link(self.model, 'archive'),
-                    attrs={'class': ('ticket-button', 'ticket-archive')})
+                if self.model.handler.reopenable:
+                    links.append(
+                        Link(
+                            text=_('Reopen ticket'),
+                            url=self.request.link(self.model, 'reopen'),
+                            attrs={
+                                'class': ('ticket-button', 'ticket-reopen')
+                            },
+                        )
+                    )
+                links.append(
+                    Link(
+                        text=_('Archive ticket'),
+                        url=self.request.link(self.model, 'archive'),
+                        attrs={'class': ('ticket-button', 'ticket-archive')},
+                    )
                 )
             elif self.model.state == 'archived':
                 links.append(Link(

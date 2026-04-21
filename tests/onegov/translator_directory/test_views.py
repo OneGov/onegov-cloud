@@ -21,6 +21,7 @@ from onegov.translator_directory.models.translator import Translator
 from os.path import basename
 from onegov.file import FileCollection
 from onegov.file import File
+from onegov.ticket import Ticket
 from tests.onegov.translator_directory.shared import iter_block_items
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
@@ -2255,6 +2256,112 @@ def test_time_reports_finanzstelle_filtering(client: Client) -> None:
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
+def test_admin_in_group_sees_trp_tickets(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    """Admin who is group member (not accountant) should see TRP tickets
+    only of that group.
+
+    """
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Group',
+        last_name='Translator',
+        admission='certified',
+        email='grouptranslator@example.org',
+        drive_distance=0.0,
+    ).id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='finanzstelle_admin_group')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    other_group = user_group_collection.add(name='finanzstelle_other_group')
+    other_group.meta = {
+        'finanzstelle': 'polizei',
+        'accountant_emails': ['accountant@example.org'],
+    }
+    admin_user = (
+        session.query(User).filter_by(username='admin@example.org').one()
+    )
+    admin_user.groups = [user_group]
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-11'
+    page.form['start_time'] = '09:00'
+    page.form['end_date'] = '2025-01-11'
+    page.form['end_time'] = '10:00'
+    page.form['case_number'] = 'CASE-ADMIN-GROUP-001'
+    page = page.form.submit().follow()
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
+    page.form['finanzstelle'] = 'polizei'
+    page.form['start_date'] = '2025-01-11'
+    page.form['start_time'] = '11:00'
+    page.form['end_date'] = '2025-01-11'
+    page.form['end_time'] = '12:00'
+    page.form['case_number'] = 'CASE-ADMIN-GROUP-002'
+    page.form['is_urgent'] = False
+    page.form['notes'] = 'Other group test'
+    page = page.form.submit().follow()
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    group_report = (
+        session.query(TranslatorTimeReport)
+        .filter_by(case_number='CASE-ADMIN-GROUP-001')
+        .one()
+    )
+    other_report = (
+        session.query(TranslatorTimeReport)
+        .filter_by(case_number='CASE-ADMIN-GROUP-002')
+        .one()
+    )
+    group_ticket = (
+        session.query(Ticket)
+        .filter(Ticket.handler_code == 'TRP')
+        .filter(
+            Ticket.handler_data['handler_data']['time_report_id'].astext
+            == str(group_report.id)
+        )
+        .one()
+    )
+    other_ticket = (
+        session.query(Ticket)
+        .filter(Ticket.handler_code == 'TRP')
+        .filter(
+            Ticket.handler_data['handler_data']['time_report_id'].astext
+            == str(other_report.id)
+        )
+        .one()
+    )
+
+    client.login_admin()
+    page = client.get('/tickets/ALL/open')
+    assert group_ticket.number in page
+    assert 'TRANSLATOR, Group' in page
+    assert other_ticket.number not in page
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
 def test_time_report_workflow(
     broadcast: MagicMock,
     authenticate: MagicMock,
@@ -2337,24 +2444,16 @@ def test_time_report_workflow(
     )
     assert (
         'Eine Zeiterfassung wurde für Sie eingereicht und wird nun '
-        'geprüft.' in mail_to_translator['TextBody']
-    )
-    assert (
-        'Bitte sorgfältig überprüfen und Unstimmigkeiten umgehend melden'
+        'durch unsere interne Kontrollstelle geprüft:'
         in mail_to_translator['TextBody']
     )
-
-    translator_link_match = re.search(
-        r'<a href="([^"]+)">Zeiterfassung anzeigen</a>',
-        mail_to_translator['HtmlBody'],
+    assert (
+        'Sobald die Kontrolle abgeschlossen ist, werden Sie wieder '
+        'informiert.' in mail_to_translator['TextBody']
     )
-    assert translator_link_match is not None
-    translator_status_link = translator_link_match.group(1)
-    assert '/status' in translator_status_link
-    assert accountant_email in mail_to_translator['TextBody']
 
     client.login_translator()
-    status_page = client.get(translator_status_link)
+    status_page = client.get(ticket_link + '/status')
     assert status_page.status_code == 200
     assert 'TRP-' in status_page
 

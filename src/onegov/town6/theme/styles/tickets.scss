@@ -116,6 +116,7 @@ $cht-handler-icon: '\f086';
 $pending-ticket-icon: $accept-ticket-icon-hover;
 $my-ticket-icon: '\f2bd';
 $ticket-archive-icon: '\f1c6';
+$block-icon: '\f036';
 
 $closed-ticket-icon: $close-ticket-icon-hover;
 $all-ticket-icon: '\f055';
@@ -369,6 +370,13 @@ tr.ticket:hover {
 .ticket-archive {
     &::before {
         @include icon($ticket-archive-icon);
+        margin-right: 1ex;
+    }
+}
+
+.text-modules {
+    &::before {
+        @include icon-bold($block-icon);
         margin-right: 1ex;
     }
 }

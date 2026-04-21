@@ -120,6 +120,27 @@ class AttendenceLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link] | None:
+        if self.model.bulk_edit_id:
+            name = (
+                'edit-plenary-bulk-attendences'
+                if self.model.type == 'plenary'
+                else 'edit-commission-bulk-attendences'
+            )
+            if self.request.is_admin or (
+                self.request.is_parliamentarian
+                and self.request.current_parliamentarian
+                and str(self.request.current_parliamentarian.id)
+                == str(self.model.parliamentarian_id)
+            ):
+                return [
+                    Link(
+                        text=_('Edit bulk'),
+                        url=self.request.link(self.model, name),
+                        attrs={'class': 'edit-link'},
+                    )
+                ]
+            return None
+
         if self.request.is_admin:
             return [
                 Link(

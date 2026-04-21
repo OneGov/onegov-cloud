@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-from itertools import groupby
-from operator import attrgetter
+from collections import defaultdict
 import uuid
-
-from more_itertools import flatten
 
 from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
@@ -50,41 +47,23 @@ def view_attendences(
 
     layout = AttendenceCollectionLayout(self, request)
 
-    # Apply role-based filtering, then re-sort for bulk edit grouping
-    filtered_attendences = self.view_for_parliamentarian(request)
-    bulk_edit_attendences = sorted(
-        filtered_attendences,
-        key=lambda x: (str(x.bulk_edit_id) if x.bulk_edit_id else '',
-                      x.created or x.modified),
-        reverse=True
+    attendences = self.query_for_current_user(request)
+
+    groups: dict[str, list[Attendence]] = defaultdict(list)
+    for a in attendences:
+        if a.bulk_edit_id:
+            groups[str(a.bulk_edit_id)].append(a)
+
+    bulk_edit_groups = sorted(
+        groups.values(),
+        key=lambda g: max(a.modified or a.created for a in g),
+        reverse=True,
     )
-
-    bulk_edit_groups = [
-        sorted(group, key=attrgetter('created', 'modified'), reverse=True)
-        for bulk_edit_id, group in groupby(
-            bulk_edit_attendences, key=attrgetter('bulk_edit_id'))
-    ]
-
-    non_null_groups = [g for g in bulk_edit_groups if getattr(
-        g[0], 'bulk_edit_id', None) is not None]
-    null_groups = [g for g in bulk_edit_groups if getattr(
-        g[0], 'bulk_edit_id', None) is None]
-
-    non_null_groups.sort(
-        key=lambda group: max(  # type: ignore
-            (attendence.modified or attendence.created
-             for attendence in group),
-            default=None
-        ),
-        reverse=True
-    )
-
-    bulk_edit_groups = non_null_groups + null_groups
 
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
-        'attendences': list(flatten(bulk_edit_groups)),
+        'attendences': attendences,
         'title': layout.title,
         'bulk_edit_groups': bulk_edit_groups
     }
@@ -290,7 +269,7 @@ def edit_plenary_bulk_attendence(
                 request.alert(error)
                 return {
                     'layout': AttendenceCollectionLayout(self, request),
-                    'title': _('Edit plenary session'),
+                    'title': _('Edit bulk: plenary session'),
                     'form': form,
                     'form_width': 'large'
                 }
@@ -366,7 +345,7 @@ def edit_plenary_bulk_attendence(
 
     return {
         'layout': layout,
-        'title': _('Edit plenary session'),
+        'title': _('Edit bulk: plenary session'),
         'form': form,
         'form_width': 'large'
     }
@@ -387,7 +366,7 @@ def edit_commission_bulk_attendence(
     request.include('custom')
 
     type_label = request.translate(self.type_label)
-    title = _('Edit ${type}', mapping={'type': type_label})
+    title = _('Edit bulk: ${type}', mapping={'type': type_label})
 
     if form.submitted(request):
         if form.date.data:
@@ -616,6 +595,14 @@ def edit_attendence(
     form: AttendenceForm
 ) -> RenderData | Response:
 
+    if self.bulk_edit_id:
+        name = (
+            'edit-plenary-bulk-attendences'
+            if self.type == 'plenary'
+            else 'edit-commission-bulk-attendences'
+        )
+        return request.redirect(request.link(self, name))
+
     if form.submitted(request):
         if form.date.data:
             if error := validate_attendance_date(
@@ -681,6 +668,10 @@ def delete_attendence(
 ) -> None:
 
     request.assert_valid_csrf_token()
+
+    if self.bulk_edit_id:
+        request.alert(_('Cannot delete individual bulk attendance.'))
+        return
 
     # Check if attendance is in a closed settlement run
     settlement_run = request.session.query(SettlementRun).filter(

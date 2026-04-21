@@ -1425,13 +1425,22 @@ def get_commissions(
 @OrgApp.path(
     model=RISCommission,
     path='/commission/{id}',
-    converters={'id': UUID}
+    converters={'id': UUID, 'active_members': bool}
 )
 def get_commission(
     app: OrgApp,
-    id: UUID
+    id: UUID,
+    active_members: bool | None = None
 ) -> RISCommission | None:
-    return RISCommissionCollection(app.session()).by_id(id)
+    # NOTE: This ensures the parameter is only in generated URLs if we
+    #       look for inactive members, if it were always there by default
+    #       it would be a bit of a bother.
+    if active_members is True:
+        active_members = None
+    comission = RISCommissionCollection(app.session()).by_id(id)
+    if comission is not None:
+        comission.active_members = active_members
+    return comission
 
 
 @OrgApp.path(

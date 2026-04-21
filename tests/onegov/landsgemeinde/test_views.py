@@ -31,7 +31,7 @@ def test_views(client_with_fts: Client[TestApp]) -> None:
 
     # add assembly
     with freeze_time('2023-05-07 9:30'):
-        page = page.click('Landsgemeinde')
+        page = page.click('Landsgemeinde', index=1)
         page.form['date'] = '2023-05-07'
         page.form['state'] = 'ongoing'
         page.form['overview'] = '<p>Lorem ipsum</p>'
@@ -209,7 +209,7 @@ def test_views(client_with_fts: Client[TestApp]) -> None:
     # delete agenda item
     with freeze_time('2023-05-07 9:37'):
         page.click('Löschen')
-        page = page.click('Landsgemeinde', index=1)
+        page = page.click('Landsgemeinde', index=2)
     assert '<p>Lorem ipsum dolor sit amet</p>' in page
     assert 'A. consectetur adipiscing' not in page
     assert_last_modified()
@@ -229,7 +229,7 @@ def test_view_pages_cache(client: Client[TestApp]) -> None:
     # add assembly
     client.login_admin()
     page = client.get('/').click('Archiv')
-    page = page.click('Landsgemeinde')
+    page = page.click('Landsgemeinde', index=1)
     page.form['date'] = '2023-05-07'
     page.form['state'] = 'completed'
     page.form['overview'] = 'Lorem'

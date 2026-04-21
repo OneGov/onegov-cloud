@@ -28,7 +28,7 @@ def test_ticker(browser: WebsocketBrowser, assembly: Assembly) -> None:
         'event': 'refresh',
         'assembly': '2023-05-06'
     })
-    assert 'Lorem ipsum' not in browser.html
+    assert not browser.is_text_present('Lorem ipsum')
     assert 'Adipiscing elit' not in browser.html
 
     # ... correct date
@@ -36,7 +36,7 @@ def test_ticker(browser: WebsocketBrowser, assembly: Assembly) -> None:
         'event': 'refresh',
         'assembly': '2023-05-07'
     })
-    assert 'Lorem ipsum' in browser.html
+    assert browser.is_text_present('Lorem ipsum')
     assert 'Adipiscing elit' in browser.html
 
     # update
@@ -52,7 +52,7 @@ def test_ticker(browser: WebsocketBrowser, assembly: Assembly) -> None:
         'node': 'agenda-item-2',
         'content': 'Consectetur'
     })
-    assert 'Lorem ipsum' in browser.html
+    assert browser.is_text_present('Lorem ipsum')
     assert 'Dolor sit amet' not in browser.html
     assert 'Adipiscing elit' in browser.html
     assert 'Eiusmod tempor' not in browser.html
@@ -65,7 +65,7 @@ def test_ticker(browser: WebsocketBrowser, assembly: Assembly) -> None:
         'node': 'agenda-item-2',
         'content': 'Consectetur'
     })
-    assert 'Lorem ipsum' in browser.html
+    assert browser.is_text_present('Lorem ipsum')
     assert 'Dolor sit amet' not in browser.html
     assert 'Adipiscing elit' in browser.html
     assert 'Eiusmod tempor' not in browser.html

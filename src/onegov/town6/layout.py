@@ -257,7 +257,7 @@ class DefaultLayout(OrgDefaultLayout, Layout):
     @cached_property
     def ris_overview_url(self) -> str:
         if self.request.is_logged_in:
-            return self.request.link(self.request.app.org, 'ris-settings')
+            return self.request.link(self.request.app.org, 'ris-overview')
 
         if self.request.app.org.ris_main_url:
             return self.request.link(
