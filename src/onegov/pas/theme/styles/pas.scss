@@ -511,6 +511,18 @@ ul#parliamentarian_id {
     overflow-wrap: break-word;
 }
 
+.bulk-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    margin-left: 6px;
+    border: 1px solid #d0d0d0;
+    border-radius: 999px;
+    font-size: 0.7em;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    vertical-align: middle;
+}
+
 .abschluss-badge {
     display: inline-block;
     padding: 4px 16px;

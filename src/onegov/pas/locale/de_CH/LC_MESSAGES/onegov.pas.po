@@ -56,8 +56,8 @@ msgid "Attendance date must be within a settlement run."
 msgstr "Anwesenheitsdatum muss innerhalb eines Abrechnungslaufs liegen."
 
 #, python-format
-msgid "Abschluss set for ${name}"
-msgstr "Abschluss gesetzt für ${name}"
+msgid "PAS: Abschluss set for ${name}"
+msgstr "PAS: Abschluss gesetzt für ${name}"
 
 msgid "Abschluss Notification"
 msgstr "Abschluss Benachrichtigung"

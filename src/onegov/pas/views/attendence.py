@@ -27,6 +27,7 @@ from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
 from onegov.pas.models import Change
 from onegov.pas.models import SettlementRun
+from onegov.pas.models.attendence import TYPES
 from onegov.pas.models.commission_membership import PASCommissionMembership
 
 
@@ -81,12 +82,51 @@ def view_attendences(
 
     bulk_edit_groups = non_null_groups + null_groups
 
+    attendences_sorted = sorted(
+        filtered_attendences,
+        key=lambda a: a.created or a.modified,
+        reverse=True,
+    )
+
+    type_filters = [
+        Link(
+            text=request.translate(_('All')),
+            active=self.type is None,
+            url=request.link(self.for_filter(
+                settlement_run_id=self.settlement_run_id,
+                date_from=self.date_from,
+                date_to=self.date_to,
+                type=None,
+                parliamentarian_id=self.parliamentarian_id,
+                commission_id=self.commission_id,
+                party_id=self.party_id,
+            )),
+        )
+    ]
+    for key, label in TYPES.items():
+        if not request.is_admin and key == 'plenary':
+            continue
+        type_filters.append(Link(
+            text=request.translate(label),
+            active=self.type == key,
+            url=request.link(self.for_filter(
+                settlement_run_id=self.settlement_run_id,
+                date_from=self.date_from,
+                date_to=self.date_to,
+                type=key,
+                parliamentarian_id=self.parliamentarian_id,
+                commission_id=self.commission_id,
+                party_id=self.party_id,
+            )),
+        ))
+
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
-        'attendences': list(flatten(bulk_edit_groups)),
+        'attendences': attendences_sorted,
         'title': layout.title,
-        'bulk_edit_groups': bulk_edit_groups
+        'bulk_edit_groups': bulk_edit_groups,
+        'filters': {'type': type_filters},
     }
 
 

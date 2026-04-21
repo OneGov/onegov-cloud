@@ -9,7 +9,8 @@ from onegov.core.security import Private
 from onegov.pas.collections import (
     AttendenceCollection,
     PASCommissionCollection,
-    PASParliamentarianCollection
+    PASParliamentarianCollection,
+    SettlementRunCollection,
 )
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
@@ -549,5 +550,64 @@ def test_view_files_collection(
 
     page = client.get('/files')
     assert page.status_code == 200
+
+
+def test_parliamentarian_self_bookings_show_in_list(
+    client: Client[TestPasApp],
+) -> None:
+    """Parliamentarian creates commission/shortest/study via form,
+    all three must appear in /attendences list."""
+    session = client.app.session()
+
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='Test Commission')
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parliamentarian = parliamentarians.add(
+        first_name='Parla',
+        last_name='Mentarian',
+        email_primary='parla.mentarian@example.org',
+    )
+
+    session.add(PASCommissionMembership(
+        parliamentarian_id=parliamentarian.id,
+        commission_id=commission.id,
+        role='member',
+        start=date(2020, 1, 1),
+    ))
+
+    SettlementRunCollection(session).add(
+        name='Active Run',
+        start=date(2020, 1, 1),
+        end=date(2099, 12, 31),
+        active=True,
+    )
+
+    user = UserCollection(session).by_username(
+        'parla.mentarian@example.org')
+    assert user is not None
+    user.password = 'test'
+    user.role = 'parliamentarian'
+    user.active = True
+    transaction.commit()
+
+    client.login('parla.mentarian@example.org', 'test')
+
+    for a_type in ('commission', 'shortest', 'study'):
+        page = client.get('/attendences/new')
+        page.form['date'] = date.today().isoformat()
+        page.form['duration'] = '2.0'
+        page.form['type'] = a_type
+        page.form['parliamentarian_id'].select(text='Parla Mentarian')
+        page.form['commission_id'].select(text='Test Commission')
+        assert page.form.submit().maybe_follow().status_code == 200
+
+    list_page = client.get('/attendences')
+    for label in ('Kommissionsitzung', 'Kürzestsitzung', 'Aktenstudium'):
+        assert label in list_page, f'{label} missing\n\n{list_page}'
+
+    filtered = client.get('/attendences?type=study')
+    assert 'Aktenstudium' in filtered
+    assert 'Kürzestsitzung' not in filtered.pyquery('table.attendences').text()
 
     # TODO: Check disallow edit files for non admin
