@@ -13,6 +13,18 @@ $import-icon: '\f56f';
 $import-logs-icon: '\f1da';
 $user-management-icon: '\f0c0';
 
+.footer-content {
+    text-align: left;
+
+    > .medium-4.cell:empty {
+        display: none;
+    }
+
+    .footer-links {
+        text-align: left;
+    }
+}
+
 .globals {
     .global-header-flex {
         justify-content: flex-end;
