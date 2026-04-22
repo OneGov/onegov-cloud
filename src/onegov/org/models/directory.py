@@ -25,7 +25,7 @@ from onegov.org.observer import observes
 from onegov.org.utils import narrowest_access
 from onegov.pay import Price
 from onegov.ticket import Ticket
-from sqlalchemy import and_, or_, func
+from sqlalchemy import and_, or_, func, text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.attributes import set_committed_value
 
@@ -649,11 +649,11 @@ class ExtendedDirectoryEntryCollection(
         counts: dict[str, dict[str, int]] = {}
         for item, count in self.apply_common_filters(
             self.session.query(
-                func.skeys(ExtendedDirectoryEntry),
-                func.count()
+                func.skeys(ExtendedDirectoryEntry._keywords),
+                func.count(text('1'))
             )
-            .filter_by(directory_id=self.directory.id)
-            .group_by(func.skeys(ExtendedDirectoryEntry))
+            .filter(ExtendedDirectoryEntry.directory_id == self.directory.id)
+            .group_by(func.skeys(ExtendedDirectoryEntry._keywords))
         ):
             parts = item.split(':', 1)
             if len(parts) != 2:

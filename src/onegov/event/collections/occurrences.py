@@ -423,7 +423,11 @@ class OccurrenceCollection(Pagination[Occurrence]):
         """
         if 'tag_counts' in self.__dict__:
             # if we already cached the tag_counts we can just use those
-            return set(self.tag_counts)
+            return {
+                tag
+                for tag, count in self.tag_counts.items()
+                if count
+            }
 
         query = self.apply_common_filters(
             self.session.query(func.skeys(Occurrence._tags)).join(Event)
