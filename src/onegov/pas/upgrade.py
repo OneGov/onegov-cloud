@@ -181,3 +181,17 @@ def tie_allowances_to_settlement_runs(
             'settlement_run_id',
             nullable=False,
         )
+
+
+@upgrade_task('Add indexes to par_attendence')
+def add_indexes_to_par_attendence(context: UpgradeContext) -> None:
+    if not context.has_table('par_attendence'):
+        return
+
+    for col in ('date', 'parliamentarian_id', 'commission_id', 'type'):
+        context.operations.create_index(
+            f'ix_par_attendence_{col}',
+            'par_attendence',
+            [col],
+            if_not_exists=True,
+        )

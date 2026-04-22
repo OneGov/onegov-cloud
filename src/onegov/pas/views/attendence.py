@@ -51,7 +51,6 @@ def view_attendences(
     self: AttendenceCollection,
     request: PasRequest
 ) -> RenderData:
-
     layout = AttendenceCollectionLayout(self, request)
 
     # Apply role-based filtering, then re-sort for bulk edit grouping
