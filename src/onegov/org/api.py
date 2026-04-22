@@ -41,18 +41,6 @@ def get_modified_iso_format(item: TimestampMixin) -> str:
     return item.last_change.isoformat()
 
 
-def format_multiple_choice_prompt(
-    choices: Collection[str] | None
-) -> str | None:
-    if not choices:
-        return None
-    if len(choices) == 1:
-        choice, = choices
-        return f'Either {choice!r} or left unspecified'
-    formatted_choices = ', '.join(f'{choice!r}' for choice in choices)
-    return f'One of {formatted_choices} (Can be specified multiple times)'
-
-
 class EventApiEndpoint(ApiEndpoint['Occurrence']):
     app: OrgApp
     endpoint = 'events'
@@ -100,10 +88,16 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
     #       step is sufficient for determining the filters.
     @cached_property
     def _base_collection(self) -> OccurrenceCollection:
+        role = getattr(self.request.identity, 'role', 'anonymous')
+        available_accesses = {
+            'admin': (),  # can see everything
+            'editor': (),  # can see everything
+            'member': ('member', 'mtan', 'public')
+        }.get(role, ('mtan', 'public'))
         result = OccurrenceCollection(
             self.session,
             page=self.page or 0,
-            only_public=True
+            available_accesses=available_accesses
         )
 
         filter_type = self.app.org.event_filter_type
@@ -200,7 +194,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
             data['tags'] = tags
 
         if filter_type in ('filters', 'tags_and_filters'):
-            data.update(item.event.filter_keywords)
+            data.update(item.event.filter_keywords_ordered())
 
         data['created'] = item.created.isoformat()
         data['modified'] = get_modified_iso_format(item)

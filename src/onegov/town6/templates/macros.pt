@@ -1475,7 +1475,7 @@
         <tal:b condition="event.filter_keywords and show_filters">
             <dt i18n:translate>Filters</dt>
             <dd>
-                <ul tal:repeat="filter event.filter_keywords.items()" class="no-margin-bottom">
+                <ul tal:repeat="filter event.filter_keywords_ordered().items()" class="no-margin-bottom">
                     <li tal:condition="filter[1]">
                         <span>${filter[0].title()}:</span>
                         <span tal:define="tags ', '.join(f for f in filter[1])" tal:condition="isinstance (filter[1], list)" i18n:translate>${tags}</span>
@@ -3487,7 +3487,7 @@
 </metal:invoice_items>
 
 <metal:globals-left define-macro="globals-left">
-    <ul tal:condition="modules" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
+    <ul tal:condition="modules and modules.links|nothing" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
         <li>
             <a href="#" data-dropdown="modules-dropdown" class="dropdown modules" i18n:translate>Modules</a>
             <ul id="modules-dropdown" data-dropdown-content class="vertical menu">

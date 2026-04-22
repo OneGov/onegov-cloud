@@ -27,11 +27,7 @@
                                 </span>
                             </div>
                             <span class="list-lead preview">
-                                ${layout.format_date(role.start, 'date')}
-                                <tal:b tal:condition="role.end">
-                                -
-                                ${layout.format_date(role.end, 'date')}
-                                </tal:b>
+                                ${layout.format_date_range(role.start, role.end)}
                             </span>
                         </li>
                     </ul>
@@ -50,10 +46,7 @@
                                 </span>
                             </div>
                             <span class="list-lead preview">
-                                ${layout.format_date(membership.start, 'date')}
-                                <tal:b tal:condition="membership.end">
-                                    ${layout.format_date(membership.end, 'date')}
-                                </tal:b>
+                                ${layout.format_date_range(membership.start, membership.end)}
                             </span>
                         </li>
                     </ul>

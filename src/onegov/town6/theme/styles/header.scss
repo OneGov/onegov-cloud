@@ -119,6 +119,10 @@ $settings-icon: '\f1de';
                 flex-direction: row-reverse;
             }
 
+            &:only-child {
+                margin-left: auto;
+            }
+
             > li:hover {
                 background-color: $oil;
                 border-radius: .7rem;

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-16 09:08+0200\n"
+"POT-Creation-Date: 2026-04-21 13:23+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -23,6 +23,18 @@ msgstr "Matomo"
 
 msgid "Siteimprove"
 msgstr "Siteimprove"
+
+msgid "Events"
+msgstr "Veranstaltungen"
+
+#.
+#. FIXME: A plural form of News would probably be better, for now this label
+#. seems good enough
+msgid "Latest news"
+msgstr "Aktuelles"
+
+msgid "Topics"
+msgstr "Themen"
 
 msgid "Important information regarding online payments"
 msgstr "Wichtige Information bezüglich Online-Zahlungen"
@@ -215,17 +227,8 @@ msgstr "Neues Ticket"
 msgid "Activate/deactivate modules"
 msgstr "Module aktivieren/deaktivieren"
 
-#.
-#. FIXME: A plural form of News would probably be better, for now this label
-#. seems good enough
-msgid "Latest news"
-msgstr "Aktuelles"
-
 msgid "Newsletter"
 msgstr "Newsletter"
-
-msgid "Events"
-msgstr "Veranstaltungen"
 
 msgid "Directories"
 msgstr "Verzeichnisse"
@@ -2902,9 +2905,6 @@ msgstr "Dauer vom archivierten Zustand bis zum automatischen Löschen"
 msgid "Firebase adminsdk credentials (JSON)"
 msgstr "Firebase adminsdk Zugangsdaten (JSON)"
 
-msgid "Topics"
-msgstr "Themen"
-
 msgid "Defines the firebase topic id"
 msgstr "Definiert die Firebase-Topic-ID"
 
@@ -4332,6 +4332,9 @@ msgstr ""
 #. Modification for the footer left on all pages
 msgid "Source"
 msgstr "Herkunft"
+
+msgid "Appendix"
+msgstr "Anhang"
 
 msgid "Subject"
 msgstr "Betreff"

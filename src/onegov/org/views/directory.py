@@ -459,39 +459,11 @@ def get_filters(
                 rounded=singular
             )
             for value in values
-            if keyword_counts.get(  # type:ignore[union-attr]
-                keyword, {}).get(value, 0)
+            if keyword_counts is None
+            or keyword_counts.get(keyword, {}).get(value, 0)
         )))
 
     return filters
-
-
-def keyword_count(
-    request: OrgRequest,
-    collection: ExtendedDirectoryEntryCollection
-) -> dict[str, dict[str, int]]:
-
-    self = collection
-    keywords = tuple(
-        as_internal_id(k)
-        for k in self.directory.configuration.keywords or ()
-    )
-    fields = {f.id: f for f in self.directory.fields if f.id in keywords}
-    counts: dict[str, dict[str, int]] = {}
-
-    # NOTE: The counting can get incredibly expensive with many entries
-    #       so we should skip it when we know we can skip it
-    if not fields:
-        return counts
-
-    # FIXME: This is incredibly slow. We need to think of a better way.
-    for model in request.exclude_invisible(self.without_keywords().query()):
-        for entry in model.keywords:
-            field_id, value = entry.split(':', 1)
-            if field_id in fields:
-                f_count = counts.setdefault(field_id, defaultdict(int))
-                f_count[value] += 1
-    return counts
 
 
 @OrgApp.html(
@@ -515,7 +487,14 @@ def view_directory(
             e.number = i + 1
         else:
             e.number = None
-    keyword_counts = keyword_count(request, self)
+    # HACK: Makes sure keyword counts are accurate, it would be more robust
+    #       if we attached the request in the path configuration or do what
+    #       we did in events and allow leaking a bit of access extension
+    #       logic into the base class. Although for directory entries it can
+    #       be a little bit more complex, since they also have to take
+    #       publication status into account.
+    self.request = request
+    keyword_counts = self.keyword_counts()
     filters = get_filters(request, self, keyword_counts)
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     if request.is_manager:
@@ -984,7 +963,14 @@ def view_export(
 
         return request.redirect(url.as_string())
 
-    filters = get_filters(request, self, keyword_count(request, self),
+    # HACK: Makes sure keyword counts are accurate, it would be more robust
+    #       if we attached the request in the path configuration or do what
+    #       we did in events and allow leaking a bit of access extension
+    #       logic into the base class. Although for directory entries it can
+    #       be a little bit more complex, since they also have to take
+    #       publication status into account.
+    self.request = request
+    filters = get_filters(request, self, self.keyword_counts(),
                           view_name='+export')
 
     if filters:

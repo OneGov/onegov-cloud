@@ -395,6 +395,9 @@ msgstr "Massenbuchung Plenarsitzung"
 msgid "Commission session (bulk)"
 msgstr "Massenbuchung Kommissionssitzung"
 
+msgid "Edit bulk"
+msgstr "Massenbuchung bearbeiten"
+
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -589,11 +592,14 @@ msgstr "Dauer"
 msgid "No meeting defined yet."
 msgstr "Noch keine Sitzung erfasst."
 
-msgid "Bulk edits"
-msgstr "Massenbuchungen"
+msgid "Session date"
+msgstr "Sitzungsdatum"
 
 msgid "edited"
 msgstr "bearbeitet"
+
+msgid "Bulk edits"
+msgstr "Massenbuchungen"
 
 msgid "Timestamp"
 msgstr "Zeitpunkt"
@@ -908,8 +914,8 @@ msgstr "Sitzung hinzugefügt"
 msgid "You do not have permission to edit plenary sessions."
 msgstr "Sie haben keine Berechtigung, Plenarsitzungen zu bearbeiten."
 
-msgid "Edit plenary session"
-msgstr "Plenarsitzung bearbeiten"
+msgid "Edit bulk: plenary session"
+msgstr "Massenbuchung: Plenarsitzung bearbeiten"
 
 msgid "Edited attendences"
 msgstr "Anwesenheiten bearbeitet"
@@ -924,8 +930,8 @@ msgid "Delete Attendencess"
 msgstr "Anwesenheiten löschen"
 
 #, python-format
-msgid "Edit ${type}"
-msgstr "${type} bearbeiten"
+msgid "Edit bulk: ${type}"
+msgstr "Massenbuchung: ${type} bearbeiten"
 
 #, python-format
 msgid "Cannot edit attendance - abschluss already set for: ${names}"
@@ -949,6 +955,9 @@ msgstr ""
 
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
+
+msgid "Cannot delete individual bulk attendance."
+msgstr "Einzelne Massenbuchung kann nicht gelöscht werden."
 
 msgid "Cannot delete attendance in closed settlement run."
 msgstr ""
@@ -1104,6 +1113,33 @@ msgstr "Rate"
 
 msgid "Add allowance"
 msgstr "Zulage hinzufügen"
+
+#~ msgid "Edit plenary session"
+#~ msgstr "Plenarsitzung bearbeiten"
+
+#, python-format
+#~ msgid "Edit ${type}"
+#~ msgstr "${type} bearbeiten"
+
+#~ msgid "User Account Sync"
+#~ msgstr "Benutzerkonto-Synchronisation"
+
+#~ msgid "Synced"
+#~ msgstr "Synchronisiert"
+
+#~ msgid "Skipped"
+#~ msgstr "Übersprungen"
+
+#~ msgid "Created"
+#~ msgstr "Erstellt"
+
+#~ msgid "New accounts"
+#~ msgstr "Neue Konten"
+
+#~ msgid "President: ${name} (CHF ${amount})"
+#~ msgstr "Präsident/in: ${name} (CHF ${amount})"
+#~ msgid "Vice president: ${name} (CHF ${amount})"
+#~ msgstr "Vizepräsident/in: ${name} (CHF ${amount})"
 
 msgid "Allowance added"
 msgstr "Zulage hinzugefügt"
