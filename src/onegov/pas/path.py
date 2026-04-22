@@ -81,14 +81,9 @@ def get_attendence(
     return AttendenceCollection(app.session()).by_id(id)
 
 
-@PasApp.path(
-    model=ChangeCollection,
-    path='/changes'
-)
-def get_changes(
-    app: PasApp
-) -> ChangeCollection:
-    return ChangeCollection(app.session())
+@PasApp.path(model=ChangeCollection, path='/changes')
+def get_changes(app: PasApp, page: int = 0) -> ChangeCollection:
+    return ChangeCollection(app.session(), page=page)
 
 
 @PasApp.path(
