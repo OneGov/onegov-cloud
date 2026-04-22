@@ -108,15 +108,17 @@ def generate_parliamentarian_settlement_pdf(
         <html>
         <head><meta charset="utf-8"></head>
         <body>
-            <div class="first-line">
-                Staatskanzlei, Seestrasse 2, 6300 Zug
-            </div>
-            <div class="address">
-                {parliamentarian.formal_greeting.split()[0]}<br>
-                {parliamentarian.first_name} {parliamentarian.last_name}<br>
-                {parliamentarian.shipping_address}<br>
-                {parliamentarian.shipping_address_zip_code}
-                {parliamentarian.shipping_address_city}
+            <div class="address-block">
+                <div class="first-line">
+                    Staatskanzlei, Seestrasse 2, 6300 Zug
+                </div>
+                <div class="address">
+                    {parliamentarian.formal_greeting.split()[0]}<br>
+                    {parliamentarian.first_name} {parliamentarian.last_name}<br>
+                    {parliamentarian.shipping_address}<br>
+                    {parliamentarian.shipping_address_zip_code}
+                    {parliamentarian.shipping_address_city}
+                </div>
             </div>
 
             <div class="date">
