@@ -67,7 +67,7 @@ class FilterItem(NamedTuple):
     keyword: str
     value: str
 
-    def __composite_values(self) -> tuple[str, str]:
+    def __composite_values__(self) -> tuple[str, str]:
         return self
 
 

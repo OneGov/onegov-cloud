@@ -251,11 +251,17 @@ def test_occurrence_collection(session: Session) -> None:
 
 
 def test_occurrence_collection_query(session: Session) -> None:
-    config = {'keywords': ['Filter'], 'order': []}
-    definition = """Filter *=
-    ( ) Filter A
-    ( ) Filter B
-    ( ) Filter C
+    config = {'keywords': ['Filter 1', 'Filter 2'], 'order': []}
+    definition = """
+    Filter 1 *=
+        ( ) A
+        ( ) B
+        ( ) C
+
+    Filter 2 *=
+        [ ] A
+        [ ] B
+        [ ] C
     """
     fields = tuple(flatten_fieldsets(parse_formcode(definition)))
 
@@ -266,7 +272,10 @@ def test_occurrence_collection_query(session: Session) -> None:
         timezone='Europe/Zurich',
         location='Squirrel Park',
         tags=['fun', 'park', 'animals'],
-        filter_keywords={'filter': ['Filter A', 'Filter B']},
+        filter_keywords={
+            'filter_1': 'A',
+            'filter_2': ['A', 'B']
+        },
         source='fetch-school-squirrel-park-visit',
         recurrence=(
             'RRULE:FREQ=WEEKLY;'
@@ -283,7 +292,10 @@ def test_occurrence_collection_query(session: Session) -> None:
         timezone='Europe/Zurich',
         location='Squirrel Park Visitor Center',
         tags=['history'],
-        filter_keywords={'filter': 'Filter C'},
+        filter_keywords={
+            'filter_1': 'B',
+            'filter_2': ['B', 'C']
+        },
         source='fetch-council-squirrel-park-visitor-center'
     )
     event.submit()
@@ -299,20 +311,37 @@ def test_occurrence_collection_query(session: Session) -> None:
     assert query(outdated=True).count() == 5
 
     assert query(
-        outdated=True, filter_keywords={'Filter': 'Filter A'}
+        outdated=True, filter_keywords={'Filter 1': 'A'}
     ).count() == 4
     assert query(
-        outdated=True, filter_keywords={'Filter': 'Filter B'}
-    ).count() == 4
-    assert query(
-        outdated=True, filter_keywords={'Filter': 'Filter C'}
+        outdated=True, filter_keywords={'Filter 1': 'B'}
     ).count() == 1
     assert query(
-        outdated=True, filter_keywords={'Filter': ['Filter A', 'Filter B']}
+        outdated=True, filter_keywords={'Filter 1': 'C'}
+    ).count() == 0
+    # multiple values for the same keyword are OR'd together
+    assert query(
+        outdated=True, filter_keywords={'Filter 1': ['A', 'B']}
+    ).count() == 5
+    assert query(
+        outdated=True, filter_keywords={'Filter 2': 'A'}
     ).count() == 4
     assert query(
-        outdated=True, filter_keywords={'Filter': ['Filter A', 'Filter C']}
+        outdated=True, filter_keywords={'Filter 2': 'B'}
     ).count() == 5
+    assert query(
+        outdated=True, filter_keywords={'Filter 2': 'C'}
+    ).count() == 1
+    # multiple keywords are AND'ed together
+    assert query(
+        outdated=True, filter_keywords={'Filter 1': 'A', 'Filter 2': 'B'}
+    ).count() == 4
+    assert query(
+        outdated=True, filter_keywords={'Filter 1': 'B', 'Filter 2': 'B'}
+    ).count() == 1
+    assert query(
+        outdated=True, filter_keywords={'Filter 1': 'C', 'Filter 2': 'B'}
+    ).count() == 0
 
     assert query(outdated=True, tags=['animals']).count() == 4
     assert query(outdated=True, tags=['park']).count() == 4
@@ -467,42 +496,42 @@ def test_occurrence_collection_for_toggled_keyword_value(
 
     config = {'keywords': ['Filter'], 'order': []}
     definition = """Filter *=
-    ( ) Filter A
-    ( ) Filter B
-    ( ) Filter C
+    ( ) A
+    ( ) B
+    ( ) C
     """
 
     fields = tuple(flatten_fieldsets(parse_formcode(definition)))
     occurrences = OccurrenceCollection(
         session=session,
-        filter_keywords={'filter': ['Filter A']}
+        filter_keywords={'filter': ['A']}
     )
     occurrences.set_event_filter_configuration(config)
     occurrences.set_event_filter_fields(fields)
 
     occurrences = occurrences.for_toggled_keyword_value(
         'filter',
-        'Filter B',
+        'B',
         singular=True
     )
     assert occurrences.filter_keywords.dict_of_lists() == {
-        'filter': ['Filter B']
+        'filter': ['B']
     }
 
     occurrences = occurrences.for_toggled_keyword_value(
         'filter',
-        'Filter B',
+        'B',
         singular=True
     )
     assert not occurrences.filter_keywords
 
     occurrences = occurrences.for_toggled_keyword_value(
         'filter',
-        'Filter C',
+        'C',
         singular=True
     )
     assert occurrences.filter_keywords.dict_of_lists() == {
-        'filter': ['Filter C']
+        'filter': ['C']
     }
 
     occurrences = occurrences.for_toggled_keyword_value(
@@ -511,7 +540,7 @@ def test_occurrence_collection_for_toggled_keyword_value(
         singular=False
     )
     assert occurrences.filter_keywords.dict_of_lists() == {
-        'filter': ['Filter C', 'Filter X']
+        'filter': ['C', 'Filter X']
     }
     occurrences = occurrences.for_toggled_keyword_value(
         'filter',
@@ -519,7 +548,7 @@ def test_occurrence_collection_for_toggled_keyword_value(
         singular=False
     )
     assert occurrences.filter_keywords.dict_of_lists() == {
-        'filter': ['Filter C']
+        'filter': ['C']
     }
 
 
@@ -541,7 +570,7 @@ def test_occurrence_collection_for_filter(session: Session) -> None:
         tags=['month-6'],
         locations=['Bar'],
         sources=['External'],
-        filter_keywords={'filter': ['Filter A']}
+        filter_keywords={'filter': ['A']}
     )
     occurrences = occurrences.for_filter()
     assert occurrences.range is None
@@ -770,9 +799,9 @@ def test_occurrence_collection_used_tags_tag_counts(session: Session) -> None:
 def test_occurrence_collection_keyword_counts(session: Session) -> None:
     config = {'keywords': ['Filter'], 'order': []}
     definition = """Filter *=
-    ( ) Filter A
-    ( ) Filter B
-    ( ) Filter C
+    ( ) A
+    ( ) B
+    ( ) C
     """
     fields = tuple(flatten_fieldsets(parse_formcode(definition)))
     year = date.today().year
@@ -789,7 +818,7 @@ def test_occurrence_collection_keyword_counts(session: Session) -> None:
             'description': 'Liebe Dampferfreunde!'
         },
         location='Luzern am Quai',
-        filter_keywords={'filter': ['Filter A', 'Filter B']},
+        filter_keywords={'filter': ['A', 'B']},
         recurrence=f'RDATE:{next.strftime("%Y%m%d")}T000000Z',
     )
     event.submit()
@@ -802,8 +831,8 @@ def test_occurrence_collection_keyword_counts(session: Session) -> None:
 
     assert occurrences.keyword_counts() == {
         'filter': {
-            'Filter A': 2,
-            'Filter B': 2
+            'A': 2,
+            'B': 2
         }
     }
 

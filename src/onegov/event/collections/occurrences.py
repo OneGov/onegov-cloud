@@ -631,18 +631,18 @@ class OccurrenceCollection(Pagination[Occurrence]):
             self.filter_keywords
             and (keywords := self.valid_keywords(self.filter_keywords))
         ):
-            query = query.filter(
-                self.session.query(EventFilterValue)
-                .filter(EventFilterValue.event_id == Occurrence.event_id)
-                .filter(or_(*(
-                    and_(
-                        EventFilterValue.keyword == keyword,
-                        EventFilterValue.value == value
-                    )
-                    for keyword, value in keywords.items()
-                )))
-                .exists()
-            )
+            # FIXME: This is a little inefficient for many keywords
+            #        we could try to do an aggregated subquery, where
+            #        we then can apply each keyword condition, instead
+            #        of having multiple EXISTS subqueries
+            for keyword, values in keywords.dict_of_lists().items():
+                query = query.filter(
+                    self.session.query(EventFilterValue)
+                    .filter(EventFilterValue.event_id == Occurrence.event_id)
+                    .filter(EventFilterValue.keyword == keyword)
+                    .filter(EventFilterValue.value.in_(values))
+                    .exists()
+                )
 
         if self.locations:
             query = query.filter(
