@@ -5,7 +5,6 @@ from collections import defaultdict
 from datetime import date, timedelta, datetime
 
 
-import sqlalchemy
 from dateutil.relativedelta import relativedelta
 from enum import Enum
 from functools import cached_property
@@ -15,20 +14,23 @@ from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
 from sqlalchemy import distinct, func
-from sqlalchemy import or_, and_
+from sqlalchemy import and_, or_, text
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import undefer
+from webob.multidict import MultiDict
 
 from onegov.core.collection import Pagination
 from onegov.core.utils import toggle
 from onegov.event.models import Event
+from onegov.event.models import EventFilterValue
 from onegov.event.models import Occurrence
 from onegov.form import as_internal_id
 
 
 from typing import assert_never
+from typing import cast
 from typing import Any
 from typing import Literal
 from typing import Self
@@ -36,6 +38,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable
+    from collections.abc import Collection
     from collections.abc import Iterable
     from collections.abc import Mapping
     from collections.abc import Sequence
@@ -57,6 +60,7 @@ if TYPE_CHECKING:
         ) -> Query[Occurrence]: ...
 
     type MissingType = Literal[_Sentinel.MISSING]
+    type LaxMultiDict = MultiDict[str, str] | Mapping[str, list[str] | str]
 
 DateRange = Literal[
     'today',
@@ -96,6 +100,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     """
 
+    filter_keywords: MultiDict[str, str]
     date_ranges: tuple[DateRange, ...] = (
         'today',
         'tomorrow',
@@ -114,14 +119,23 @@ class OccurrenceCollection(Pagination[Occurrence]):
         end: date | None = None,
         outdated: bool = False,
         tags: Sequence[str] | None = None,
-        filter_keywords: Mapping[str, list[str] | str] | None = None,
+        filter_keywords: LaxMultiDict | None = None,
         locations: Sequence[str] | None = None,
         sources: Sequence[str] | None = None,
-        only_public: bool = False,
+        available_accesses: Collection[str] = (),
         search_widget: OccurenceSearchWidget | None = None,
         event_filter_configuration: dict[str, Any] | None = None,
         event_filter_fields: Sequence[ParsedField] | None = None,
     ) -> None:
+
+        if filter_keywords is None:
+            filter_keywords = MultiDict()
+        elif not isinstance(filter_keywords, MultiDict):
+            filter_keywords = MultiDict(
+                (key, value)
+                for key, values in filter_keywords.items()
+                for value in (values if isinstance(values, list) else [values])
+            )
 
         super().__init__(page=page)
         self.session = session
@@ -129,10 +143,10 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated
         self.tags = tags if tags else []
-        self.filter_keywords = filter_keywords or {}
+        self.filter_keywords = cast('MultiDict[str, str]', filter_keywords)
         self.locations = locations if locations else []
         self.sources = sources if sources else []
-        self.only_public = only_public
+        self.available_accesses = available_accesses
         self.search_widget = search_widget
         self.event_filter_configuration = event_filter_configuration or {}
         self.event_filter_fields = event_filter_fields or ()
@@ -167,7 +181,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             filter_keywords=self.filter_keywords,
             locations=self.locations,
             sources=self.sources,
-            only_public=self.only_public,
+            available_accesses=self.available_accesses,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
             event_filter_fields=self.event_filter_fields,
@@ -235,10 +249,14 @@ class OccurrenceCollection(Pagination[Occurrence]):
             end=self.end,
             outdated=self.outdated,
             tags=self.tags,
-            filter_keywords=keywords,
+            filter_keywords=MultiDict(
+                (keyword, value)
+                for keyword, values in keywords.items()
+                for value in values
+            ),
             locations=self.locations,
             sources=self.sources,
-            only_public=self.only_public,
+            available_accesses=self.available_accesses,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
             event_filter_fields=self.event_filter_fields,
@@ -251,7 +269,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         singular: bool = False,
     ) -> Self:
 
-        parameters = dict(self.filter_keywords)
+        parameters = self.filter_keywords.dict_of_lists()
 
         collection = set(parameters.get(keyword, []))
 
@@ -273,10 +291,14 @@ class OccurrenceCollection(Pagination[Occurrence]):
             end=self.end,
             outdated=self.outdated,
             tags=self.tags,
-            filter_keywords=parameters,
+            filter_keywords=MultiDict(
+                (key, value)
+                for key, values in parameters.items()
+                for value in values
+            ),
             locations=self.locations,
             sources=self.sources,
-            only_public=self.only_public,
+            available_accesses=self.available_accesses,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
             event_filter_fields=self.event_filter_fields,
@@ -350,7 +372,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             filter_keywords=self.filter_keywords,
             locations=locations,
             sources=sources,
-            only_public=self.only_public,
+            available_accesses=self.available_accesses,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
             event_filter_fields=self.event_filter_fields,
@@ -368,7 +390,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             filter_keywords=None,
             locations=self.locations,
             sources=self.sources,
-            only_public=self.only_public,
+            available_accesses=self.available_accesses,
             search_widget=self.search_widget,
             event_filter_configuration=self.event_filter_configuration,
             event_filter_fields=self.event_filter_fields,
@@ -388,11 +410,29 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         return sorted({
             '-'.join(source.split('-', 2)[:2])
-            for source, in self.session.query(
+            for source, in self.apply_common_filters(self.session.query(
                 distinct(Event.meta['source'].astext)
-            )
+            ))
             if source
         })
+
+    @cached_property
+    def used_tags(self) -> set[str]:
+        """ Returns a list of all the tags used by all future occurrences.
+
+        """
+        if 'tag_counts' in self.__dict__:
+            # if we already cached the tag_counts we can just use those
+            return {
+                tag
+                for tag, count in self.tag_counts.items()
+                if count
+            }
+
+        query = self.apply_common_filters(
+            self.session.query(func.skeys(Occurrence._tags)).join(Event)
+        )
+        return {key for key, in query.distinct()}
 
     @cached_property
     def tag_counts(self) -> dict[str, int]:
@@ -401,16 +441,14 @@ class OccurrenceCollection(Pagination[Occurrence]):
         existence as value.
 
         """
-        counts: dict[str, int] = defaultdict(int)
-
-        base = self.session.query(Occurrence._tags.keys())
-        base = base.filter(func.DATE(Occurrence.end) >= date.today())
-
-        for keys, in base:
-            for tag in keys:
-                counts[tag] += 1
-
-        return counts
+        return defaultdict(int, self.apply_common_filters(
+            self.session.query(
+                func.skeys(Occurrence._tags),
+                func.count(text('1'))
+            )
+            .join(Event)
+            .group_by(func.skeys(Occurrence._tags))
+        ))
 
     def set_event_filter_configuration(
         self,
@@ -426,20 +464,20 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         self.event_filter_fields = fields or ()
 
-    def valid_keywords[T](
+    def valid_keywords(
         self,
-        parameters: Mapping[str, T]
-    ) -> dict[str, T]:
+        parameters: MultiDict[str, str]
+    ) -> MultiDict[str, str]:
 
         valid_keywords = {
             as_internal_id(kw)
             for kw in self.event_filter_configuration.get('keywords') or ()
         }
-        return {
-            k_id: v
+        return MultiDict(
+            (k_id, v)
             for k, v in parameters.items()
             if (k_id := as_internal_id(k)) in valid_keywords
-        }
+        )
 
     def available_filters(
         self,
@@ -484,43 +522,40 @@ class OccurrenceCollection(Pagination[Occurrence]):
             for k in keywords if hasattr((f := fields[k]), 'choices')
         )
 
-    @cached_property
-    def used_tags(self) -> set[str]:
-        """ Returns a list of all the tags used by all future occurrences.
-
-        """
-
-        query = self.session.query(
-            sqlalchemy.func.skeys(Occurrence._tags),
-        ).filter(func.DATE(Occurrence.end) >= date.today())
-        return {key[0] for key in query.distinct()}
-
-    def query(self) -> Query[Occurrence]:
-        """ Queries occurrences with the set parameters.
-
-        Finds occurrences which:
-        * are between start and end date
-        * have any of the tags
-        * have any of the locations (exact word)
-
-        Start and end date are assumed to be dates only and therefore without
-        a timezone - we search for the given date in the timezone of the
-        occurrence.
-
-        In case of a search widget request the query will filter for events
-        containing the text search term in e.g. title
-
-        """
-
-        query = (
-            self.session.query(Occurrence).join(Event)
-            .options(contains_eager(Occurrence.event).joinedload(Event.image))
+    def keyword_counts(self) -> dict[str, dict[str, int]]:
+        valid_keywords = {
+            as_internal_id(kw)
+            for kw in self.event_filter_configuration.get('keywords') or ()
+        }
+        query = self.apply_common_filters(
+            self.session.query(Occurrence).join(Event).join(
+                EventFilterValue, and_(
+                    EventFilterValue.event_id == Occurrence.event_id,
+                    EventFilterValue.keyword.in_(valid_keywords)
+                )
+            )
+            .group_by(EventFilterValue.keyword, EventFilterValue.value)
+            .with_entities(
+                EventFilterValue.keyword,
+                EventFilterValue.value,
+                func.count(text('1')),
+            )
         )
+        counts: dict[str, dict[str, int]] = {}
+        for keyword, value, count in query:
+            counts.setdefault(keyword, {})[value] = count
+        return counts
 
-        if self.only_public:
+    def apply_common_filters[T](self, query: Query[T]) -> Query[T]:
+        """ Applies filters that are common to multiple queries.
+        """
+        if self.available_accesses:
             query = query.filter(or_(
-                Event.meta['access'].astext == 'public',
-                Event.meta['access'].astext == None
+                *(
+                    Event.meta['access'].astext == access
+                    for access in self.available_accesses
+                ),
+                Event.meta['access'].is_(None)
             ))
 
         if self.start is not None or self.outdated is False:
@@ -563,25 +598,51 @@ class OccurrenceCollection(Pagination[Occurrence]):
                 )
 
             query = query.filter(or_(*expressions))
+        return query
+
+    def query(self) -> Query[Occurrence]:
+        """ Queries occurrences with the set parameters.
+
+        Finds occurrences which:
+        * are between start and end date
+        * have any of the tags
+        * have any of the locations (exact word)
+
+        Start and end date are assumed to be dates only and therefore without
+        a timezone - we search for the given date in the timezone of the
+        occurrence.
+
+        In case of a search widget request the query will filter for events
+        containing the text search term in e.g. title
+
+        """
+
+        query = self.apply_common_filters(
+            self.session.query(Occurrence).join(Event)
+            .options(contains_eager(Occurrence.event).joinedload(Event.image))
+        )
 
         if self.tags:
             query = query.filter(
                 Occurrence._tags.has_any(array(self.tags))
             )
 
-        if self.filter_keywords:
-            keywords = self.valid_keywords(self.filter_keywords)
-
-            values = [val for sublist in keywords.values() for val in sublist]
-            values.sort()
-
-            value_filters = [
-                Event.filter_keywords[keyword].has_any(array(values))
-                for keyword in keywords.keys()
-            ]
-
-            if value_filters:
-                query = query.filter(and_(*value_filters))
+        if (
+            self.filter_keywords
+            and (keywords := self.valid_keywords(self.filter_keywords))
+        ):
+            # FIXME: This is a little inefficient for many keywords
+            #        we could try to do an aggregated subquery, where
+            #        we then can apply each keyword condition, instead
+            #        of having multiple EXISTS subqueries
+            for keyword, values in keywords.dict_of_lists().items():
+                query = query.filter(
+                    self.session.query(EventFilterValue)
+                    .filter(EventFilterValue.event_id == Occurrence.event_id)
+                    .filter(EventFilterValue.keyword == keyword)
+                    .filter(EventFilterValue.value.in_(values))
+                    .exists()
+                )
 
         if self.locations:
             query = query.filter(
