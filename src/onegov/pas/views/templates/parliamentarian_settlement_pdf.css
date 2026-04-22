@@ -1,6 +1,7 @@
 @page {
     size: A4;
-    margin: 5.5cm 0.75cm 2cm 3cm;  /* top right bottom left. This has to fit "Couvert C6"*/
+     /* If the address doesn't fit in the "Couvert C6", change these values:*/
+    margin: 6.0cm 0.75cm 2cm 3cm;  /* top right bottom left. */
     @top-right {
         content: "Staatskanzlei";
         font-family: Helvetica, Arial, sans-serif;
