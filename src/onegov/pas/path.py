@@ -58,6 +58,16 @@ def get_attendences(
     parliamentarian_id: str | None = None,
     commission_id: str | None = None
 ) -> AttendenceCollection:
+    if settlement_run_id == 'all':
+        settlement_run_id = None
+    elif settlement_run_id is None:
+        latest = (
+            SettlementRunCollection(request.session, active=True)
+            .query()
+            .first()
+        )
+        if latest:
+            settlement_run_id = str(latest.id)
     return AttendenceCollection(
         session=request.session,
         settlement_run_id=settlement_run_id,

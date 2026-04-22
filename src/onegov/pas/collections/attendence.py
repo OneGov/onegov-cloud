@@ -49,7 +49,7 @@ class AttendenceCollection(GenericCollection[Attendence]):
 
         # Eagerly load related data to prevent N+1 queries
         query = query.options(
-            joinedload(Attendence.parliamentarian).joinedload(PASParliamentarian.roles),
+            joinedload(Attendence.parliamentarian),
             joinedload(Attendence.commission)
         )
 

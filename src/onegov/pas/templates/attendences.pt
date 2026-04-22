@@ -36,7 +36,11 @@
             </div>
             <div class="medium-5 cell" tal:define="has_filters filters|nothing; has_bulk_edits python:any(group and group[0].bulk_edit_id for group in bulk_edit_groups)" tal:condition="python:has_filters or has_bulk_edits">
                 <div class="sidebar-wrapper">
-                    <div class="side-panel" tal:condition="filters|nothing">
+                    <div class="side-panel" tal:condition="python: filters.get('settlement_run')">
+                        <h3 i18n:translate>Settlement run</h3>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['settlement_run']" />
+                    </div>
+                    <div class="side-panel" tal:condition="python: filters.get('type')">
                         <h3 i18n:translate>Filters</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['type']" />
                     </div>

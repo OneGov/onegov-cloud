@@ -10,8 +10,11 @@ from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import (AttendenceCollection,
-                                    PASParliamentarianCollection)
+from onegov.pas.collections import (
+    AttendenceCollection,
+    PASParliamentarianCollection,
+    SettlementRunCollection,
+)
 from onegov.pas.custom import (
     validate_attendance_date,
     has_user_set_abschluss_for_settlement_run,
@@ -120,8 +123,44 @@ def view_attendences(
             )),
         ))
 
-    # Edit links: bulk entries must always link to the bulk edit form
-    # so they stay grouped and are never edited individually.
+    settlement_runs = SettlementRunCollection(request.session).query().all()
+    run_filters = [
+        Link(
+            text=request.translate(_('All')),
+            active=self.settlement_run_id is None,
+            url=request.link(
+                self.for_filter(
+                    settlement_run_id='all',
+                    date_from=self.date_from,
+                    date_to=self.date_to,
+                    type=self.type,
+                    parliamentarian_id=self.parliamentarian_id,
+                    commission_id=self.commission_id,
+                    party_id=self.party_id,
+                )
+            ),
+        )
+    ]
+    for run in settlement_runs:
+        run_id = str(run.id)
+        run_filters.append(
+            Link(
+                text=run.name,
+                active=self.settlement_run_id == run_id,
+                url=request.link(
+                    self.for_filter(
+                        settlement_run_id=run_id,
+                        date_from=self.date_from,
+                        date_to=self.date_to,
+                        type=self.type,
+                        parliamentarian_id=(self.parliamentarian_id),
+                        commission_id=self.commission_id,
+                        party_id=self.party_id,
+                    )
+                ),
+            )
+        )
+
     edit_links: dict[uuid.UUID, str] = {}
     for a in attendences_sorted:
         if a.bulk_edit_id:
@@ -141,7 +180,10 @@ def view_attendences(
         'edit_links': edit_links,
         'title': layout.title,
         'bulk_edit_groups': bulk_edit_groups,
-        'filters': {'type': type_filters},
+        'filters': {
+            'settlement_run': run_filters,
+            'type': type_filters,
+        },
     }
 
 
