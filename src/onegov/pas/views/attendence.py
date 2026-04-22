@@ -120,10 +120,25 @@ def view_attendences(
             )),
         ))
 
+    # Edit links: bulk entries must always link to the bulk edit form
+    # so they stay grouped and are never edited individually.
+    edit_links: dict[str, str] = {}
+    for a in attendences_sorted:
+        if a.bulk_edit_id:
+            name = (
+                'edit-plenary-bulk-attendences'
+                if a.type == 'plenary'
+                else 'edit-commission-bulk-attendences'
+            )
+            edit_links[a.id] = request.link(a, name)
+        else:
+            edit_links[a.id] = request.link(a)
+
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
         'attendences': attendences_sorted,
+        'edit_links': edit_links,
         'title': layout.title,
         'bulk_edit_groups': bulk_edit_groups,
         'filters': {'type': type_filters},
