@@ -3,8 +3,8 @@ from __future__ import annotations
 from itertools import groupby
 from operator import attrgetter
 import uuid
+from datetime import datetime
 
-from more_itertools import flatten
 
 from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
@@ -84,7 +84,7 @@ def view_attendences(
 
     attendences_sorted = sorted(
         filtered_attendences,
-        key=lambda a: a.created or a.modified,
+        key=lambda a: a.created or a.modified or datetime.min,
         reverse=True,
     )
 
@@ -122,7 +122,7 @@ def view_attendences(
 
     # Edit links: bulk entries must always link to the bulk edit form
     # so they stay grouped and are never edited individually.
-    edit_links: dict[str, str] = {}
+    edit_links: dict[uuid.UUID, str] = {}
     for a in attendences_sorted:
         if a.bulk_edit_id:
             name = (

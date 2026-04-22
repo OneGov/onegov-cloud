@@ -102,7 +102,16 @@ def generate_parliamentarian_settlement_pdf(
         .filter(PresidentialAllowance.parliamentarian_id == parliamentarian.id)
         .all()
     )
-    allowance_total = Decimal(sum(a.amount for a in allowances))
+    cola_multiplier = Decimal(
+        str(1 + (rate_set.cost_of_living_adjustment / 100))
+    )
+    allowance_total = (
+        Decimal(sum(a.amount for a in allowances)) * cola_multiplier
+    )
+    full_name = (
+        f'{parliamentarian.first_name} '
+        f'{parliamentarian.last_name}'
+    )
     html = f"""
         <!DOCTYPE html>
         <html>
@@ -114,7 +123,7 @@ def generate_parliamentarian_settlement_pdf(
                 </div>
                 <div class="address">
                     {parliamentarian.formal_greeting.split()[0]}<br>
-                    {parliamentarian.first_name} {parliamentarian.last_name}<br>
+                    {full_name}<br>
                     {parliamentarian.shipping_address}<br>
                     {parliamentarian.shipping_address_zip_code}
                     {parliamentarian.shipping_address_city}

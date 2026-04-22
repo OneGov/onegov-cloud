@@ -274,9 +274,8 @@ def view_settlement_run(
         session, self.start, self.end
     )
 
-    # Get parliamentarians active during settlement run period with settlements
     parliamentarians = get_parliamentarians_with_settlements(
-        session, self.start, self.end
+        session, self.start, self.end, settlement_run_id=self.id
     )
 
     # Get commission closure status for the control list
@@ -672,17 +671,24 @@ def generate_settlement_pdf(
         .query()
         .all()
     )
-    for a in allowances:
-        settlement_data.append(
-            (
-                settlement_run.end,
-                a.parliamentarian,
-                LOHNART_ALLOWANCE_TEXT,
-                Decimal('0'),
-                Decimal(str(a.amount)),
-                Decimal(str(a.amount)),
-            )
+    if allowances:
+        rate_set = get_current_rate_set(request.session, settlement_run)
+        cola_multiplier = Decimal(
+            str(1 + (rate_set.cost_of_living_adjustment / 100))
         )
+        for a in allowances:
+            base = Decimal(str(a.amount))
+            with_cola = base * cola_multiplier
+            settlement_data.append(
+                (
+                    settlement_run.end,
+                    a.parliamentarian,
+                    LOHNART_ALLOWANCE_TEXT,
+                    Decimal('0'),
+                    base,
+                    with_cola,
+                )
+            )
 
     html = _generate_settlement_html(
         settlement_data=settlement_data,

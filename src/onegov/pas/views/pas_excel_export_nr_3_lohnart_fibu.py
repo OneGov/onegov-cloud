@@ -161,7 +161,9 @@ def generate_fibu_export_rows(
             '',
             '',
             '',
-            Decimal(str(allowance.amount)),
+            round_to_five_rappen(
+                Decimal(str(allowance.amount)) * cola_multiplier
+            ),
             '',
             '',
             '',
