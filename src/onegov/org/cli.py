@@ -3458,7 +3458,6 @@ def import_reservations_campos(
                 'end': None
             }
             row_empty: bool = True
-            id = ''
             resource_name = ''
 
             for i, cell in enumerate(row):
@@ -3479,7 +3478,7 @@ def import_reservations_campos(
                             datetime.strptime(times[1], '%H:%M').time())
                 elif i == 8:
                     reservation['state'] = str(value)
-                elif i == 22:
+                elif i == 17:
                     if value is None:
                         value = 'info@seantis.ch'
                     reservation['fields']['email'] = value
@@ -3512,7 +3511,6 @@ def import_reservations_campos(
                         'file'
                     )
                     continue
-                real_resource_name = real_resource_name.get('name', '')
                 resource = resources.by_name(real_resource_name.lower())
 
                 if not resource:
@@ -3526,12 +3524,16 @@ def import_reservations_campos(
                 )
                 scheduler = resource.scheduler
 
-                for reservation in reservations[resource_name]:
+                for id, reservation in enumerate(reservations[resource_name]):
+                    id += 1
                     found_conflict = False
                     session_id = uuid4()
                     email = reservation['fields'].get('email')
                     start = reservation['start']
                     end = reservation['end']
+                    click.secho(f'Trying to import ${start} -'
+                                ' ${end} with email ${email}',
+                                fg='cyan')
                     if not email or not start or not end:
                         click.secho(
                             f'{id}: Missing email, start or end date for '
@@ -3548,8 +3550,9 @@ def import_reservations_campos(
                         )
                         token = token_uuid.hex
                     except InvalidEmailAddress:
+                        found_conflict = True
                         click.secho(f'{id}: {email} is an invalid e-mail '
-                                    'address')
+                                    'address', fg='red')
                     except AlreadyReservedError:
                         found_conflict = True
                         click.secho(
@@ -3601,58 +3604,51 @@ def import_reservations_campos(
                     except Exception as e:
                         click.secho(
                             f'{id}: Error {e} reserving {resource.title} '
-                            f'at {start} - {end} outside of availability'
+                            f'at {start} - {end} outside of availability '
                             'period', fg='red')
                         continue
 
                     if found_conflict:
                         continue
 
-                    # assert resource.form_class is not None
-                    # forms = FormCollection(app.session())
+                    assert resource.form_class is not None
+                    forms = FormCollection(app.session())
 
-                    # form_data = {}
-                    # for key, value in reservation['fields'].items():
-                    #     form_data[key] = str(value)
+                    form_data = {}
+                    for key, value in reservation['fields'].items():
+                        form_data[key] = str(value)
 
-                    # form = resource.form_class(data=form_data)
+                    form = resource.form_class(data=form_data)
 
-                    # if not form.validate():
-                    #     form_data_show = json.dumps(
-                    #         form_data, indent=4, default=str)
-                    #     click.secho(f'{id}: {form_data_show} failed the form '
-                    #         f'check with {form.errors}', fg='red')
-                    #     continue
+                    submission = forms.submissions.add_external(
+                        form=form,
+                        state='pending',
+                        id=token_uuid
+                    )
 
-                    # submission = forms.submissions.add_external(
-                    #     form=form,
-                    #     state='pending',
-                    #     id=token_uuid
-                    # )
+                    scheduler.queries.confirm_reservations_for_session(
+                        session_id)
+                    scheduler.approve_reservations(token_uuid)
 
-                    # scheduler.queries.confirm_reservations_for_session(
-                    #     session_id)
-                    # scheduler.approve_reservations(token_uuid)
+                    forms.submissions.complete_submission(submission)
 
-                    # forms.submissions.complete_submission(submission)
+                    users = UserCollection(app.session())
+                    user = users.query().filter(
+                        User.username == 'info@seantis.ch').first()
 
-                    # users = UserCollection(app.session())
-                    # user = users.query().filter(
-                    #     User.username == 'info@seantis.ch').first()
+                    if not user:
+                        abort('info@seantis.ch not found in users')
 
-                    # if not user:
-                    #     abort('info@seantis.ch not found in users')
+                    with forms.session.no_autoflush:
+                        ticket = TicketCollection(request.session).open_ticket(
+                            handler_code='RSV', handler_id=token
+                        )
+                        ticket.accept_ticket(user)
+                        if reservation['state'] != 'unbestätigt':
+                            ticket.close_ticket()
 
-                    # with forms.session.no_autoflush:
-                    #     ticket = TicketCollection(request.session).open_ticket(
-                    #         handler_code='RSV', handler_id=token
-                    #     )
-                    #     ticket.accept_ticket(user)
-                    #     if reservation['state'] != 'unbestätigt':
-                    #         ticket.close_ticket()
-
-                    # click.secho(f'{id}: Sucessfully imported reservation '
-                    #             f'at {start} - {end}',
-                    #             fg='green')
+                    click.secho(f'{id}: Sucessfully imported reservation '
+                                f'at {start} - {end}',
+                                fg='green')
 
     return import_reservations
