@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime
 import json
-import os
 import transaction
 
 from onegov.pas.collections.commission import PASCommissionCollection
