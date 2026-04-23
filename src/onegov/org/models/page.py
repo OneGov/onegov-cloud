@@ -368,6 +368,9 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
             term=self.term
         )
 
+    def by_title(self, title: str) -> Topic | None:
+        return self.subset().filter(Topic.title == title).first()
+
 
 class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
     """
@@ -556,6 +559,9 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
                 'page': self.page
             }
         )
+
+    def by_title(self, title: str) -> News | None:
+        return self.subset().filter(News.title == title).first()
 
 
 class AtoZPages(AtoZ[Topic]):

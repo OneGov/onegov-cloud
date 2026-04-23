@@ -1,16 +1,21 @@
 from __future__ import annotations
 
-from onegov.api.models import ApiKey
 from xml.etree.ElementTree import tostring
 
+import transaction
+from onegov.api.models import ApiKey
+from onegov.core.utils import Bunch
+from onegov.org.models import News
+from onegov.org.models import Topic
+from onegov.org.models.page import TopicCollection, NewsCollection
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+
 if TYPE_CHECKING:
     from .conftest import Client
 
 
 def test_gever_settings_only_https_allowed(client: Client) -> None:
-
     client.login_admin()
     settings = client.get('/settings').click('Gever API')
     settings.form['gever_username'] = 'foo'
@@ -30,7 +35,6 @@ def test_gever_settings_only_https_allowed(client: Client) -> None:
 
 
 def test_api_keys_create_and_delete(client: Client) -> None:
-
     client.login_admin()
 
     settings = client.get('/api-keys')
@@ -126,9 +130,7 @@ def test_analytics_settings(client: Client) -> None:
     ) in settings
 
 
-
 def test_firebase_settings(client: Client) -> None:
-
     client.login_admin()
 
     # Pretend this is real data (it's completely random)
@@ -170,3 +172,69 @@ def test_resource_settings(client: Client) -> None:
     assert 'Allgemeine Informationen zu Reservationen' in page
     assert '<h1>foo</h1>' in page
     assert '<p>bar</p>' in page
+
+
+def test_migrate_links(client: Client) -> None:
+    session = client.app.session()
+    request: Any = Bunch(**{
+        'session': session,
+        'identity.role': 'admin'
+    })
+    old_domain = 'foo.ch'
+
+    # create topic
+    topic = Topic(title='Foo Topic', name='foo-topic')
+    topic.text = '<p>Wow, https://foo.ch/abc is a great page!</p>'
+    session.add(topic)
+    topic_text = str(topic.text)
+
+    # add news article (must be under the seeded /news/ root)
+    from onegov.page import PageCollection
+    news_root = PageCollection(session).by_path('/news/', ensure_type='news')
+    assert isinstance(news_root, News)
+    news = News(title='Big News', name='big-news', parent=news_root)
+    news.text = ('<p>Big news https://foo.ch/big-news and bigger news'
+                 'can be found here https://foo.ch/bigger-news</p>')
+    session.add(news)
+    news_text = str(news.text)
+
+    transaction.commit()
+
+    def get_topic_text() -> str:
+        t = TopicCollection(session).by_title('Foo Topic')
+        assert t is not None and t.text is not None
+        return str(t.text)
+
+    def get_news_text() -> str:
+        n = NewsCollection(request).by_title('Big News')
+        assert n is not None and n.text is not None
+        return str(n.text)
+
+    assert old_domain in get_topic_text()
+    assert old_domain in get_news_text()
+
+    # execute migrate links test
+    client.login_admin()
+    migrate_page = client.get('/migrate-links')
+    migrate_page.form['old_domain'] = old_domain
+    migrate_page.form['test'] = True
+    result = migrate_page.form.submit()
+    assert 'Total 3 Links gefunden' in result
+
+    assert old_domain in get_topic_text()
+    assert old_domain in get_news_text()
+
+    # execute migrate links
+    migrate_page = client.get('/migrate-links')
+    migrate_page.form['old_domain'] = old_domain
+    migrate_page.form['test'] = False
+    result = migrate_page.form.submit().follow()
+    assert '3 Links migriert' in result
+
+    topic_text_new = get_topic_text()
+    news_text_new = get_news_text()
+    assert old_domain not in topic_text_new
+    assert old_domain not in news_text_new
+
+    assert topic_text.replace('foo.ch', 'localhost') == topic_text_new
+    assert news_text.replace('foo.ch', 'localhost') == news_text_new
