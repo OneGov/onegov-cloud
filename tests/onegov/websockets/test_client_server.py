@@ -9,6 +9,7 @@ from onegov.websockets.client import authenticate
 from onegov.websockets.client import broadcast
 from onegov.websockets.client import register
 from onegov.websockets.client import status
+from tests.shared.asyncio import run_in_separate_thread
 from websockets import connect
 
 
@@ -17,7 +18,8 @@ if TYPE_CHECKING:
     from tests.shared.fixtures import WebsocketThread
 
 
-@pytest.mark.asyncio
+
+@run_in_separate_thread
 async def test_server_invalid(websocket_server: WebsocketThread) -> None:
     await sleep(0.1)
 
@@ -131,7 +133,7 @@ async def test_server_invalid(websocket_server: WebsocketThread) -> None:
     # ... nothing to test here
 
 
-@pytest.mark.asyncio
+@run_in_separate_thread
 async def test_client_invalid(websocket_server: WebsocketThread) -> None:
     await sleep(0.1)
 
@@ -166,8 +168,8 @@ async def test_client_invalid(websocket_server: WebsocketThread) -> None:
             await broadcast(websocket, 'schema', 'channel', '')
 
 
-@pytest.mark.asyncio
 @pytest.mark.skip(reason='This test seems to be flaky')
+@run_in_separate_thread
 async def test_manage(websocket_server: WebsocketThread) -> None:
     async with connect(websocket_server.url) as manage:
         await authenticate(manage, 'super-super-secret-token')
