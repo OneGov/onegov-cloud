@@ -230,7 +230,8 @@ class PASParliamentarianForm(NamedFileForm):
     def update_model(self, model: PASParliamentarian) -> None:
         app = cast('PasApp', self.request.app)
         parliamentarians = PASParliamentarianCollection(app)
-        parliamentarians.update_user(model, self.email_primary.data)
+        if model.zg_username:
+            parliamentarians.update_user(model, model.zg_username)
 
         for field_name, field in self._fields.items():
             if field_name in ('csrf_token', 'picture'):

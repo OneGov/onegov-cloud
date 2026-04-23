@@ -3,15 +3,16 @@ from __future__ import annotations
 import logging
 
 from onegov.core.utils import module_path
+from onegov.org.models import Organisation
 from onegov.pas.content import create_new_organisation
 from onegov.pas.custom import get_global_tools
 from onegov.pas.custom import get_top_navigation
+from onegov.pas.models import PASParliamentarian
 from onegov.pas.request import PasRequest
 from onegov.pas.theme import PasTheme
 from onegov.town6 import TownApp
 from onegov.town6.app import get_i18n_localedirs as get_i18n_localedirs_base
 from purl import URL
-from onegov.org.models import Organisation
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -151,8 +152,20 @@ def get_ensure_user_callback() -> EnsureUserCallback:
         if role != 'member':
             return True
 
+        if not user and source_id:
+            session = request.session
+            parliamentarian = (
+                session.query(PASParliamentarian)
+                .filter_by(zg_username=source_id)
+                .first()
+            )
+            if parliamentarian:
+                user = parliamentarian.user
         if not user:
-            log.info(f'SAML2: no existing user for {username}')
+            log.info(
+                f'SAML2: no user for username={username!r} '
+                f'source_id={source_id!r}'
+            )
             return None
 
         # The `hourly_kub_data_import` has run in the background created users
