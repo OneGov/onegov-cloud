@@ -29,7 +29,8 @@ class AttendenceCollection(GenericCollection[Attendence]):
         type: str | None = None,
         parliamentarian_id: str | None = None,
         commission_id: str | None = None,
-        party_id: str | None = None,  # New parameter
+        party_id: str | None = None,
+        plenary_date: date | None = None,
     ):
         super().__init__(session)
         self.settlement_run_id = settlement_run_id
@@ -39,6 +40,7 @@ class AttendenceCollection(GenericCollection[Attendence]):
         self.parliamentarian_id = parliamentarian_id
         self.commission_id = commission_id
         self.party_id = party_id
+        self.plenary_date = plenary_date
 
     @property
     def model_class(self) -> type[Attendence]:
@@ -78,6 +80,11 @@ class AttendenceCollection(GenericCollection[Attendence]):
             query = query.filter(
                 Attendence.commission_id == self.commission_id
             )
+        if self.plenary_date:
+            query = query.filter(
+                Attendence.type == 'plenary',
+                Attendence.date == self.plenary_date,
+            )
 
         # Check for any overlap in party membership period
         if self.party_id:
@@ -107,7 +114,8 @@ class AttendenceCollection(GenericCollection[Attendence]):
         type: str | None = None,
         parliamentarian_id: str | None = None,
         commission_id: str | None = None,
-        party_id: str | None = None,  # New parameter
+        party_id: str | None = None,
+        plenary_date: date | None = None,
     ) -> Self:
         return self.__class__(
             self.session,
@@ -118,6 +126,7 @@ class AttendenceCollection(GenericCollection[Attendence]):
             parliamentarian_id=parliamentarian_id,
             commission_id=commission_id,
             party_id=party_id,
+            plenary_date=plenary_date,
         )
 
     def by_party(
@@ -126,11 +135,6 @@ class AttendenceCollection(GenericCollection[Attendence]):
         start_date: date,
         end_date: date
     ) -> Self:
-        """
-        Filter attendances by party membership during a period.
-        Returns attendances where the parliamentarian belonged to the party
-        at any point during the period.
-        """
         return self.for_filter(
             settlement_run_id=self.settlement_run_id,
             date_from=start_date,
@@ -139,11 +143,12 @@ class AttendenceCollection(GenericCollection[Attendence]):
             parliamentarian_id=self.parliamentarian_id,
             commission_id=self.commission_id,
             party_id=party_id,
+            plenary_date=self.plenary_date,
         )
 
-    def for_parliamentarian(self, parliamentarian_id: str) -> Self:
-        """Returns attendances for a specific parliamentarian only,
-        preserving the current type/date/settlement filters."""
+    def for_parliamentarian(
+        self, parliamentarian_id: str
+    ) -> Self:
         return self.for_filter(
             settlement_run_id=self.settlement_run_id,
             date_from=self.date_from,
@@ -152,6 +157,7 @@ class AttendenceCollection(GenericCollection[Attendence]):
             parliamentarian_id=parliamentarian_id,
             commission_id=self.commission_id,
             party_id=self.party_id,
+            plenary_date=self.plenary_date,
         )
 
     def for_commission_president(

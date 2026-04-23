@@ -4,6 +4,7 @@ from collections import defaultdict
 import uuid
 from datetime import datetime
 
+from sqlalchemy import distinct
 
 from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
@@ -74,33 +75,41 @@ def view_attendences(
         Link(
             text=request.translate(_('All')),
             active=self.type is None,
-            url=request.link(self.for_filter(
-                settlement_run_id=self.settlement_run_id,
-                date_from=self.date_from,
-                date_to=self.date_to,
-                type=None,
-                parliamentarian_id=self.parliamentarian_id,
-                commission_id=self.commission_id,
-                party_id=self.party_id,
-            )),
+            url=request.link(
+                self.for_filter(
+                    settlement_run_id=self.settlement_run_id,
+                    date_from=self.date_from,
+                    date_to=self.date_to,
+                    type=None,
+                    parliamentarian_id=self.parliamentarian_id,
+                    commission_id=self.commission_id,
+                    party_id=self.party_id,
+                    plenary_date=self.plenary_date,
+                )
+            ),
         )
     ]
     for key, label in TYPES.items():
         if not request.is_admin and key == 'plenary':
             continue
-        type_filters.append(Link(
-            text=request.translate(label),
-            active=self.type == key,
-            url=request.link(self.for_filter(
-                settlement_run_id=self.settlement_run_id,
-                date_from=self.date_from,
-                date_to=self.date_to,
-                type=key,
-                parliamentarian_id=self.parliamentarian_id,
-                commission_id=self.commission_id,
-                party_id=self.party_id,
-            )),
-        ))
+        type_filters.append(
+            Link(
+                text=request.translate(label),
+                active=self.type == key,
+                url=request.link(
+                    self.for_filter(
+                        settlement_run_id=self.settlement_run_id,
+                        date_from=self.date_from,
+                        date_to=self.date_to,
+                        type=key,
+                        parliamentarian_id=self.parliamentarian_id,
+                        commission_id=self.commission_id,
+                        party_id=self.party_id,
+                        plenary_date=self.plenary_date,
+                    )
+                ),
+            )
+        )
 
     settlement_runs = (
         SettlementRunCollection(request.session).query().all()
@@ -118,6 +127,7 @@ def view_attendences(
                     parliamentarian_id=self.parliamentarian_id,
                     commission_id=self.commission_id,
                     party_id=self.party_id,
+                    plenary_date=self.plenary_date,
                 )
             ),
         )
@@ -137,10 +147,57 @@ def view_attendences(
                         parliamentarian_id=self.parliamentarian_id,
                         commission_id=self.commission_id,
                         party_id=self.party_id,
+                        plenary_date=self.plenary_date,
                     )
                 ),
             )
         )
+
+    plenary_filters: list[Link] = []
+    if request.is_admin:
+        plenary_dates = (
+            request.session.query(distinct(Attendence.date))
+            .filter(Attendence.type == 'plenary')
+            .order_by(Attendence.date.desc())
+            .all()
+        )
+        plenary_filters = [
+            Link(
+                text=request.translate(_('All')),
+                active=self.plenary_date is None,
+                url=request.link(
+                    self.for_filter(
+                        settlement_run_id=self.settlement_run_id,
+                        date_from=self.date_from,
+                        date_to=self.date_to,
+                        type=self.type,
+                        parliamentarian_id=(self.parliamentarian_id),
+                        commission_id=self.commission_id,
+                        party_id=self.party_id,
+                        plenary_date=None,
+                    )
+                ),
+            )
+        ]
+        for (d,) in plenary_dates:
+            plenary_filters.append(
+                Link(
+                    text=layout.format_date(d, 'date'),
+                    active=self.plenary_date == d,
+                    url=request.link(
+                        self.for_filter(
+                            settlement_run_id=(self.settlement_run_id),
+                            date_from=self.date_from,
+                            date_to=self.date_to,
+                            type=self.type,
+                            parliamentarian_id=(self.parliamentarian_id),
+                            commission_id=(self.commission_id),
+                            party_id=self.party_id,
+                            plenary_date=d,
+                        )
+                    ),
+                )
+            )
 
     edit_links: dict[uuid.UUID, str] = {}
     for a in attendences_sorted:
@@ -165,6 +222,7 @@ def view_attendences(
         'filters': {
             'settlement_run': run_filters,
             'type': type_filters,
+            'plenary_session': plenary_filters,
         },
     }
 

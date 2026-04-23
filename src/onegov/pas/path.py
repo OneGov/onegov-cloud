@@ -46,7 +46,8 @@ if TYPE_CHECKING:
         'date_to': date,
         'type': str,
         'parliamentarian_id': str,
-        'commission_id': str
+        'commission_id': str,
+        'plenary_date': date,
     }
 )
 def get_attendences(
@@ -56,7 +57,8 @@ def get_attendences(
     date_to: date | None = None,
     type: str | None = None,
     parliamentarian_id: str | None = None,
-    commission_id: str | None = None
+    commission_id: str | None = None,
+    plenary_date: date | None = None,
 ) -> AttendenceCollection:
     if settlement_run_id == 'all':
         settlement_run_id = None
@@ -75,7 +77,8 @@ def get_attendences(
         date_to=date_to,
         type=type,
         parliamentarian_id=parliamentarian_id,
-        commission_id=commission_id
+        commission_id=commission_id,
+        plenary_date=plenary_date,
     )
 
 
