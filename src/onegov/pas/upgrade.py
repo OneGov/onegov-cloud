@@ -144,6 +144,7 @@ def drop_active_column_from_pas_settlements(context: UpgradeContext) -> None:
             context.operations.drop_column('pas_settlements', 'active')
 
 
+<<<<<<< ogc-2951-go-live-pas
 @upgrade_task('Tie allowances to settlement runs, drop quarter')
 def tie_allowances_to_settlement_runs(
     context: UpgradeContext,
@@ -195,3 +196,15 @@ def add_indexes_to_par_attendence(context: UpgradeContext) -> None:
             [col],
             if_not_exists=True,
         )
+=======
+@upgrade_task('Add zg_username column to par_parliamentarians')
+def add_zg_username_column(context: UpgradeContext) -> None:
+    if context.has_table('par_parliamentarians'):
+        if not context.has_column(
+            'par_parliamentarians', 'zg_username'
+        ):
+            context.operations.add_column(
+                'par_parliamentarians',
+                Column('zg_username', Text, nullable=True)
+            )
+>>>>>>> master
