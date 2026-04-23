@@ -98,9 +98,10 @@ class PeriodForm(Form):
 
     with_group_code = BooleanField(
         label=_('With group codes'),
-        description=(
-            'Whether the period should support group codes. Bookings with a '
-            'group code are preferred in the matching process.'
+        description=_(
+            'Attendees can get group codes via the link "invite a companion" '
+            'in their booking. Bookings with a group code are preferred in '
+            'the matching process.'
         ),
         default=True
     )
