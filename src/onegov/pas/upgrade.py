@@ -142,3 +142,15 @@ def drop_active_column_from_pas_settlements(context: UpgradeContext) -> None:
     if context.has_table('pas_settlements'):
         if context.has_column('pas_settlements', 'active'):
             context.operations.drop_column('pas_settlements', 'active')
+
+
+@upgrade_task('Add zg_username column to par_parliamentarians')
+def add_zg_username_column(context: UpgradeContext) -> None:
+    if context.has_table('par_parliamentarians'):
+        if not context.has_column(
+            'par_parliamentarians', 'zg_username'
+        ):
+            context.operations.add_column(
+                'par_parliamentarians',
+                Column('zg_username', Text, nullable=True)
+            )
