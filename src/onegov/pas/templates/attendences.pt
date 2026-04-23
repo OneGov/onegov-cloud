@@ -13,7 +13,7 @@
                             <th i18n:translate>Duration</th>
                             <th i18n:translate>Parliamentarian</th>
                             <th i18n:translate>Type</th>
-                            <th></th>
+                            <th tal:condition="can_edit_attendences"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -33,12 +33,12 @@
                                           class="bulk-badge"
                                           tal:attributes="style string:background-color: hsl(${hue}, 45%, 90%);; color: hsl(${hue}, 50%, 28%);; border-color: hsl(${hue}, 40%, 75%)">Massenbuchung</span>
                                 </tal:b></td>
-                            <td><a href="${edit_links[attendence.id]}"><i class="fa fa-edit"></i></a></td>
+                            <td tal:condition="can_edit_attendences"><a href="${edit_links[attendence.id]}"><i class="fa fa-edit"></i></a></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="medium-5 cell" tal:define="has_filters filters|nothing; has_bulk_edits python:any(group and group[0].bulk_edit_id for group in bulk_edit_groups)" tal:condition="python:has_filters or has_bulk_edits">
+            <div class="medium-5 cell" tal:define="has_filters filters|nothing; has_bulk_edits python:can_edit_attendences and any(group and group[0].bulk_edit_id for group in bulk_edit_groups)" tal:condition="python:has_filters or has_bulk_edits">
                 <div class="sidebar-wrapper">
                     <div class="side-panel" tal:condition="python: filters.get('settlement_run')">
                         <h3 i18n:translate>Settlement run</h3>
@@ -48,7 +48,7 @@
                         <h3 i18n:translate>Filters</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['type']" />
                     </div>
-                    <div class="side-panel" tal:condition="python:any(group and group[0].bulk_edit_id for group in bulk_edit_groups)">
+                    <div class="side-panel" tal:condition="python:can_edit_attendences and any(group and group[0].bulk_edit_id for group in bulk_edit_groups)">
                         <h3 i18n:translate>Bulk edits</h3>
                         <ul class="more-list">
                             <tal:b tal:repeat="group bulk_edit_groups">

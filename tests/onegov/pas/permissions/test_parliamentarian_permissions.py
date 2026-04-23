@@ -610,4 +610,34 @@ def test_parliamentarian_self_bookings_show_in_list(
     assert 'Aktenstudium' in filtered
     assert 'Kürzestsitzung' not in filtered.pyquery('table.attendences').text()
 
-    # TODO: Check disallow edit files for non admin
+    assert 'fa-edit' not in list_page
+
+
+def test_parliamentarian_sees_add_link_but_not_bulk(
+    client: Client[TestPasApp],
+) -> None:
+    """Parliamentarian sees 'New Attendence' in editbar but not
+    bulk options, and no edit icons on rows."""
+    session = client.app.session()
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parliamentarians.add(
+        first_name='Eva',
+        last_name='Editbar',
+        email_primary='eva.editbar@example.org',
+    )
+
+    user = UserCollection(session).by_username(
+        'eva.editbar@example.org')
+    assert user is not None
+    user.password = 'test'
+    user.role = 'parliamentarian'
+    user.active = True
+    transaction.commit()
+
+    client.login('eva.editbar@example.org', 'test')
+
+    page = client.get('/attendences')
+    editbar = page.pyquery('.edit-bar').text()
+    assert 'Sitzung' in editbar
+    assert 'Massenbuchung' not in editbar

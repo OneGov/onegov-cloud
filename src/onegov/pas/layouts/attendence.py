@@ -29,30 +29,32 @@ class AttendenceCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[LinkGroup] | None:
-        if not self.request.is_admin:
-            return None
+        links = [
+            Link(
+                text=_('New Attendence'),
+                url=self.request.link(self.model, 'new'),
+                attrs={'class': 'new-attendence'},
+            ),
+        ]
+        if self.request.is_admin:
+            links.extend([
+                Link(
+                    text=_('Plenary session (bulk)'),
+                    url=self.request.link(self.model, 'new-bulk'),
+                    attrs={'class': 'new-attendence'},
+                ),
+                Link(
+                    text=_('Commission session (bulk)'),
+                    url=self.request.link(
+                        self.model, 'new-commission-bulk'
+                    ),
+                    attrs={'class': 'new-attendence'},
+                ),
+            ])
         return [
             LinkGroup(
                 title=_('Add'),
-                links=[
-                    Link(
-                        text=_('New Attendence'),
-                        url=self.request.link(self.model, 'new'),
-                        attrs={'class': 'new-attendence'},
-                    ),
-                    Link(
-                        text=_('Plenary session (bulk)'),
-                        url=self.request.link(self.model, 'new-bulk'),
-                        attrs={'class': 'new-attendence'},
-                    ),
-                    Link(
-                        text=_('Commission session (bulk)'),
-                        url=self.request.link(
-                            self.model, 'new-commission-bulk'
-                        ),
-                        attrs={'class': 'new-attendence'},
-                    ),
-                ],
+                links=links,
             ),
         ]
 

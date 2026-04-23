@@ -161,6 +161,7 @@ def view_attendences(
         'edit_links': edit_links,
         'title': layout.title,
         'bulk_edit_groups': bulk_edit_groups,
+        'can_edit_attendences': request.is_admin,
         'filters': {
             'settlement_run': run_filters,
             'type': type_filters,
@@ -180,10 +181,6 @@ def add_attendence(
     form: AttendenceAddForm
 ) -> RenderData | Response:
     request.include('custom')
-
-    if not request.is_admin:
-        request.alert(_('Only admins can add attendance records.'))
-        return request.redirect(request.class_link(AttendenceCollection))
 
     if form.submitted(request):
         if form.date.data:
@@ -231,7 +228,9 @@ def add_bulk_attendence(
     request.include('custom')
 
     if not request.is_admin:
-        request.alert(_('Only admins can add attendance records.'))
+        request.alert(
+            _('Only admins can add bulk attendance records.')
+        )
         return request.redirect(request.class_link(AttendenceCollection))
 
     title = _('New commission session (bulk)')
