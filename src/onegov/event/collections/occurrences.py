@@ -22,11 +22,14 @@ from sqlalchemy.orm import undefer
 from webob.multidict import MultiDict
 
 from onegov.core.collection import Pagination
+from onegov.core.orm import SessionManager
 from onegov.core.utils import toggle
 from onegov.event.models import Event
 from onegov.event.models import EventFilterValue
 from onegov.event.models import Occurrence
 from onegov.form import as_internal_id
+from onegov.search import SearchIndex
+from onegov.search.utils import language_from_locale
 
 
 from typing import assert_never
@@ -114,6 +117,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self,
         session: Session,
         page: int = 0,
+        term: str | None = None,
         range: DateRange | None = None,
         start: date | None = None,
         end: date | None = None,
@@ -139,6 +143,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         super().__init__(page=page)
         self.session = session
+        self.term = term
         self.range = range if range in self.date_ranges else None
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated
@@ -150,6 +155,10 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self.search_widget = search_widget
         self.event_filter_configuration = event_filter_configuration or {}
         self.event_filter_fields = event_filter_fields or ()
+
+    @property
+    def q(self) -> str | None:
+        return self.term
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and self.page == other.page
@@ -173,6 +182,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         return self.__class__(
             self.session,
             page=index,
+            term=self.term,
             range=self.range,
             start=self.start,
             end=self.end,
@@ -244,6 +254,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         return self.__class__(
             self.session,
             page=0,
+            term=self.term,
             range=self.range,
             start=self.start,
             end=self.end,
@@ -286,6 +297,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         return self.__class__(
             self.session,
             page=0,
+            term=self.term,
             range=self.range,
             start=self.start,
             end=self.end,
@@ -307,6 +319,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
     def for_filter(
         self,
         *,
+        term: str | MissingType | None = MISSING,
         range: DateRange | None = None,
         start: date | MissingType | None = MISSING,
         end: date | MissingType | None = MISSING,
@@ -326,6 +339,8 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         Adds or removes a single tag/location if given.
         """
+        if term is MISSING:
+            term = self.term
         if range in self.date_ranges:
             start = None
             end = None
@@ -364,6 +379,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         return self.__class__(
             self.session,
             page=0,
+            term=term,
             range=range,
             start=start,
             end=end,
@@ -382,6 +398,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         return self.__class__(
             self.session,
             page=self.page,
+            term=self.term,
             range=self.range,
             start=self.start,
             end=self.end,
@@ -410,9 +427,11 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         return sorted({
             '-'.join(source.split('-', 2)[:2])
-            for source, in self.apply_common_filters(self.session.query(
-                distinct(Event.meta['source'].astext)
-            ))
+            for source, in self.apply_common_filters(
+                self.session.query(Occurrence)
+                .join(Event)
+                .with_entities(distinct(Event.meta['source'].astext))
+            )
             if source
         })
 
@@ -621,6 +640,25 @@ class OccurrenceCollection(Pagination[Occurrence]):
             self.session.query(Occurrence).join(Event)
             .options(contains_eager(Occurrence.event).joinedload(Event.image))
         )
+
+        if self.term:
+            session_manager = SessionManager.get_active()
+            if session_manager is not None:
+                language = session_manager.current_locale
+                if language_from_locale(language) == 'simple':
+                    language = 'simple'
+            else:
+                language = 'simple'
+            query = query.join(
+                SearchIndex,
+                and_(
+                    SearchIndex.owner_id_uuid == Occurrence.event_id,
+                    SearchIndex.owner_tablename == 'events'
+                )
+            )
+            query = query.filter(SearchIndex.data_vector.op('@@')(
+                func.websearch_to_tsquery(language, self.term)
+            ))
 
         if self.tags:
             query = query.filter(
