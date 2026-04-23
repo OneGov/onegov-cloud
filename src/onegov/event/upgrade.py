@@ -11,6 +11,9 @@ from onegov.event import EventCollection
 from sqlalchemy import text, Column
 
 
+from typing import Any
+
+
 @upgrade_task('Add coordinates column')
 def add_coordinates_column(context: UpgradeContext) -> None:
     for table in ('events', 'event_occurrences'):
@@ -57,3 +60,47 @@ def add_meta_data_and_content_columns_to_occurrences(
 
     if not context.has_column(table, 'content'):
         context.operations.add_column(table, Column('content', JSON()))
+
+
+@upgrade_task('Migrate filter_keywords column in events')
+def migrate_filter_keywords_column(context: UpgradeContext) -> None:
+    data: list[dict[str, Any]] = []
+    # first retrieve all the stored keywords and normalize them
+    for event_id, keywords in context.session.execute(text("""
+        SELECT id, "content"->'filter_keywords' AS filter_keywords
+        FROM events
+        WHERE "content" ? 'filter_keywords'
+    """)):
+        if not keywords:
+            continue
+
+        for keyword, values in keywords.items():
+            if isinstance(values, str):
+                values = [values]
+            for value in values:
+                if value is None:
+                    continue
+                data.append({
+                    'event_id': event_id,
+                    'keyword': keyword,
+                    'value': value
+                })
+
+    # then perform a bulk-insert into the new table
+    if data:
+        context.session.execute(text("""
+            INSERT INTO event_filter_values ("event_id", "keyword", "value")
+            VALUES (:event_id, :keyword, :value)
+        """), data)
+
+    # then remove the redundant data from the events/occurrence tables
+    context.session.execute(text("""
+        UPDATE events
+        SET content = content - 'filter_keywords'
+        WHERE "content" ? 'filter_keywords'
+    """))
+    context.session.execute(text("""
+        UPDATE event_occurrences
+        SET content = content - 'filter_keywords'
+        WHERE "content" ? 'filter_keywords'
+    """))

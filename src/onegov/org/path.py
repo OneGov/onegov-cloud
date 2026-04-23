@@ -785,6 +785,12 @@ def get_occurrences(
     else:
         search_widget = None
 
+    role = getattr(request.identity, 'role', 'anonymous')
+    available_accesses = {
+        'admin': (),  # can see everything
+        'editor': (),  # can see everything
+        'member': ('member', 'mtan', 'public')
+    }.get(role, ('mtan', 'public'))
     return OccurrenceCollection(
         app.session(),
         page=page,
@@ -794,7 +800,7 @@ def get_occurrences(
         tags=tags,
         filter_keywords=filter_keywords,
         locations=locations,
-        only_public=(not request.is_manager),
+        available_accesses=available_accesses,
         search_widget=search_widget,
     )
 

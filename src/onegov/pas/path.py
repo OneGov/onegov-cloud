@@ -58,6 +58,16 @@ def get_attendences(
     parliamentarian_id: str | None = None,
     commission_id: str | None = None
 ) -> AttendenceCollection:
+    if settlement_run_id == 'all':
+        settlement_run_id = None
+    elif settlement_run_id is None:
+        latest = (
+            SettlementRunCollection(request.session, active=True)
+            .query()
+            .first()
+        )
+        if latest:
+            settlement_run_id = str(latest.id)
     return AttendenceCollection(
         session=request.session,
         settlement_run_id=settlement_run_id,
@@ -81,14 +91,9 @@ def get_attendence(
     return AttendenceCollection(app.session()).by_id(id)
 
 
-@PasApp.path(
-    model=ChangeCollection,
-    path='/changes'
-)
-def get_changes(
-    app: PasApp
-) -> ChangeCollection:
-    return ChangeCollection(app.session())
+@PasApp.path(model=ChangeCollection, path='/changes')
+def get_changes(app: PasApp, page: int = 0) -> ChangeCollection:
+    return ChangeCollection(app.session(), page=page)
 
 
 @PasApp.path(
@@ -300,13 +305,11 @@ def get_rate_set(
 @PasApp.path(
     model=PresidentialAllowanceCollection,
     path='/presidential-allowances',
-    converters={'year': int},
 )
 def get_presidential_allowances(
     app: PasApp,
-    year: int | None = None,
 ) -> PresidentialAllowanceCollection:
-    return PresidentialAllowanceCollection(app.session(), year)
+    return PresidentialAllowanceCollection(app.session())
 
 
 @PasApp.path(

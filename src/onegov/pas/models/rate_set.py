@@ -68,24 +68,6 @@ class RateSet(Base, ContentMixin, TimestampMixin):
 
     )
 
-    commission_official_president_halfday: dict_property[int] = (
-        content_property(default=0)
-    )
-
-    commission_official_president_fullday: dict_property[int] = (
-        content_property(default=0)
-
-    )
-
-    commission_official_vice_president_halfday: dict_property[int] = (
-        content_property(default=0)
-    )
-
-    commission_official_vice_president_fullday: dict_property[int] = (
-        content_property(default=0)
-
-    )
-
     shortest_all_president_halfhour: dict_property[int] = (
         content_property(default=0)
     )
@@ -108,13 +90,5 @@ class RateSet(Base, ContentMixin, TimestampMixin):
     )
 
     study_intercantonal_member_hour: dict_property[int] = (
-        content_property(default=0)
-    )
-
-    study_official_president_halfhour: dict_property[int] = (
-        content_property(default=0)
-    )
-
-    study_official_member_halfhour: dict_property[int] = (
         content_property(default=0)
     )

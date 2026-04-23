@@ -21,11 +21,9 @@ class PresidentialAllowanceCollection(
     def __init__(
         self,
         session: Session,
-        year: int | None = None,
         settlement_run_id: UUID | None = None,
     ):
         super().__init__(session)
-        self.year = year
         self.settlement_run_id = settlement_run_id
 
     @property
@@ -38,19 +36,17 @@ class PresidentialAllowanceCollection(
             .query()
             .options(
                 joinedload(PresidentialAllowance.parliamentarian),
+                joinedload(PresidentialAllowance.settlement_run),
             )
         )
-        if self.year is not None:
-            query = query.filter(PresidentialAllowance.year == self.year)
         if self.settlement_run_id is not None:
             query = query.filter(
                 PresidentialAllowance.settlement_run_id
                 == self.settlement_run_id
             )
         return query.order_by(
-            PresidentialAllowance.year.desc(),
-            PresidentialAllowance.quarter,
             PresidentialAllowance.role,
+            PresidentialAllowance.created,
         )
 
     def for_settlement_run(

@@ -106,8 +106,6 @@
 
               </div>
               <div class="columns small-12 medium-4">
-                <div></div>
-
                 <ul tal:condition="global_tools|nothing">
                   <li tal:repeat="tool global_tools">
                     <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
