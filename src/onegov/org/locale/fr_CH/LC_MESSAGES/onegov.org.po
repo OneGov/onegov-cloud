@@ -6765,6 +6765,18 @@ msgstr "Au total, 5 sous-pages sont concernées."
 msgid "${count} links will be replaced by this action."
 msgstr "${count} liens seront remplacés par cette action."
 
+msgid "Syndicate"
+msgstr "Publier en externe"
+
+msgid "Publish this event externally"
+msgstr "Publier cet événement en externe"
+
+msgid "Highlight"
+msgstr "Mise en avant"
+
+msgid "Mark as highlighted event"
+msgstr "Marquer comme événement mis en avant"
+
 msgid "The event submitter has not yet completed his submission"
 msgstr "L'auteur de l'événement n'a pas encore terminé sa soumission."
 

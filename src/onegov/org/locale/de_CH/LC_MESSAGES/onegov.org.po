@@ -6752,6 +6752,18 @@ msgstr "Insgesamt ${number} Unterseiten sind betroffen."
 msgid "${count} links will be replaced by this action."
 msgstr "${count} Links werden nach dieser Aktion ersetzt."
 
+msgid "Syndicate"
+msgstr "Extern publizieren"
+
+msgid "Publish this event externally"
+msgstr "Veranstaltung extern publizieren"
+
+msgid "Highlight"
+msgstr "Highlight"
+
+msgid "Mark as highlighted event"
+msgstr "Als Highlight markieren"
+
 msgid "The event submitter has not yet completed his submission"
 msgstr "Der/die Antragsteller/in hat ihren Antrag noch nicht abgeschlosesen"
 

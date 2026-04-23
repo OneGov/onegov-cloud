@@ -10,6 +10,7 @@ from unittest.mock import patch
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from .conftest import Client
+    from onegov.agency import AgencyApp
     from unittest.mock import MagicMock
 
 
@@ -53,8 +54,10 @@ def test_view_api(
     assert filters(endpoints.queries[0]).keys() == {
         'start',
         'end',
+        'highlight',
         'locations',
         'sources',
+        'syndicate',
         'tags',
     }
     # Additional endpoints
@@ -72,17 +75,19 @@ def test_view_api(
 
     events_page = client.get('/events')
     filter_settings = events_page.click('Konfigurieren')
-    filter_settings.form['definition'] = """
+    filter_settings.form[
+        'definition'
+    ] = """
         Altersgruppe =
             [ ] Kind
             [ ] Jugend
             [ ] Familie
             [ ] Alter
 
-        Highlight =
+        Empfehlung =
             [ ] Ja
     """
-    filter_settings.form['keyword_fields'].value = 'Altersgruppe\nHighlight'
+    filter_settings.form['keyword_fields'].value = 'Altersgruppe\nEmpfehlung'
     filter_settings.form.submit().follow()
 
     endpoints = collection('/api')
@@ -90,10 +95,12 @@ def test_view_api(
     assert event_fiters.keys() == {
         'start',
         'end',
+        'highlight',
         'locations',
         'sources',
+        'syndicate',
         'altersgruppe',
-        'highlight',
+        'empfehlung',
     }
     assert event_fiters['altersgruppe'] == [
         'Kind',
@@ -101,7 +108,7 @@ def test_view_api(
         'Familie',
         'Alter'
     ]
-    assert event_fiters['highlight'] == ['Ja']
+    assert event_fiters['empfehlung'] == ['Ja']
     # Configure tags and filters
     settings = client.get('/event-settings')
     settings.form['event_filter_type'] = 'tags_and_filters'
@@ -111,11 +118,13 @@ def test_view_api(
     assert filters(endpoints.queries[0]).keys() == {
         'start',
         'end',
+        'highlight',
         'locations',
         'sources',
+        'syndicate',
         'tags',
         'altersgruppe',
-        'highlight',
+        'empfehlung',
     }
 
     # Events
@@ -191,6 +200,112 @@ def test_view_api(
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.broadcast')
 @patch('onegov.websockets.integration.authenticate')
+def test_api_syndicate_filter(
+    authenticate: MagicMock,
+    broadcast: MagicMock,
+    connect: MagicMock,
+    client: Client[AgencyApp],
+) -> None:
+
+    client.login_admin()
+
+    def collection(url: str) -> Collection:
+        return Collection.from_json(client.get(url).body)
+
+    def data(item: Any) -> dict[str, Any]:
+        return {x.name: x.value for x in item.data}
+
+    all_titles = {
+        item.data[0].value for item in collection('/api/events').items
+    }
+    assert len(all_titles) == 4
+
+    # no events are syndicated by default
+    assert not collection('/api/events?syndicate=true').items
+
+    # all events returned for syndicate=false
+    assert {
+        item.data[0].value
+        for item in collection('/api/events?syndicate=false').items
+    } == all_titles
+
+    # mark one event for syndication via the edit form
+    events_page = client.get('/events')
+    event_page = events_page.click('150 Jahre Govikon')
+    edit_page = event_page.click('Bearbeiten')
+    edit_page.form['syndicate'] = True
+    edit_page.form.submit()
+
+    # syndicate=true returns only the marked event
+    assert {
+        item.data[0].value
+        for item in collection('/api/events?syndicate=true').items
+    } == {'150 Jahre Govikon'}
+
+    # syndicate=false excludes the marked event
+    assert {
+        item.data[0].value
+        for item in collection('/api/events?syndicate=false').items
+    } == all_titles - {'150 Jahre Govikon'}
+
+    # syndicate is exposed in item data
+    events = {
+        item.data[0].value: item.href
+        for item in collection('/api/events').items
+    }
+    celebration = collection(events['150 Jahre Govikon']).items[0]
+    assert data(celebration)['syndicate'] is True
+
+    gym = collection(events['Gemeinsames Turnen']).items[0]
+    assert data(gym)['syndicate'] is False
+
+    # --- highlight filter ---
+    # no events are highlighted by default
+    assert not collection('/api/events?highlight=true').items
+
+    # all events returned for highlight=false
+    assert {
+        item.data[0].value
+        for item in collection('/api/events?highlight=false').items
+    } == all_titles
+
+    # mark one event as highlighted via the edit form
+    events_page = client.get('/events')
+    event_page = events_page.click('Fussballturnier')
+    edit_page = event_page.click('Bearbeiten')
+    edit_page.form['highlight'] = True
+    edit_page.form.submit()
+
+    # highlight=true returns only the highlighted event
+    assert {
+        item.data[0].value
+        for item in collection('/api/events?highlight=true').items
+    } == {'Fussballturnier'}
+
+    # highlight=false excludes the highlighted event
+    assert {
+        item.data[0].value
+        for item in collection('/api/events?highlight=false').items
+    } == all_titles - {'Fussballturnier'}
+
+    # highlight is exposed in item data
+    events = {
+        item.data[0].value: item.href
+        for item in collection('/api/events').items
+    }
+    football = collection(events['Fussballturnier']).items[0]
+    assert data(football)['highlight'] is True
+
+    gym = collection(events['Gemeinsames Turnen']).items[0]
+    assert data(gym)['highlight'] is False
+
+    # both filters can be combined
+    assert not collection('/api/events?syndicate=true&highlight=true').items
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.broadcast')
+@patch('onegov.websockets.integration.authenticate')
 def test_view_api_search(
     authenticate: MagicMock,
     broadcast: MagicMock,
@@ -228,6 +343,8 @@ def test_view_api_search(
         'end',
         'locations',
         'sources',
+        'syndicate',
+        'highlight',
         'tags',
     }
     assert endpoints.queries[1].rel == 'news'

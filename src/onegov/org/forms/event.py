@@ -692,6 +692,7 @@ class EventConfigurationForm(Form):
                 require_title_fields=False,
                 reserved_fields={name for name, _ in
                                  get_fields_from_class(EventForm)}
+                | {'syndicate', 'highlight'}
             )
         ],
         render_kw={'rows': 32, 'data-editor': 'form'})

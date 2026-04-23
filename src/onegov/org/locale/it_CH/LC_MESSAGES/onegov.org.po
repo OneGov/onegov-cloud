@@ -6727,6 +6727,18 @@ msgstr "Sono interessate un totale di ${number} sottopagine."
 msgid "${count} links will be replaced by this action."
 msgstr "${count} collegamenti saranno sostituiti da questa operazione."
 
+msgid "Syndicate"
+msgstr "Pubblicare esternamente"
+
+msgid "Publish this event externally"
+msgstr "Pubblicare questo evento esternamente"
+
+msgid "Highlight"
+msgstr "In evidenza"
+
+msgid "Mark as highlighted event"
+msgstr "Contrassegnare come evento in evidenza"
+
 msgid "The event submitter has not yet completed his submission"
 msgstr "Il presentatore dell'evento non ha ancora completato la sua iscrizione"
 
