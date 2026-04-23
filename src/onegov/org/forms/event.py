@@ -434,8 +434,6 @@ class EventForm(Form):
 
             if filter_keywords:
                 model.filter_keywords = filter_keywords
-                for occ in model.occurrences:
-                    occ.filter_keywords = filter_keywords
 
     def process_obj(self, model: Event) -> None:  # type:ignore[override]
         """ Stores the page values on the form. """
@@ -477,12 +475,17 @@ class EventForm(Form):
             keywords = model.filter_keywords
 
             for field in self.request.app.org.event_filter_fields:
-                form_field = getattr(self, field.id, None)
-
-                if form_field is None:
+                if field.id not in self:
                     continue
 
-                form_field.data = keywords.get(field.id, None)
+                form_field = self[field.id]
+                if not form_field.raw_data:
+                    # HACK: This is to get around the fact that we don't know
+                    #       whether the field expects a list of values or a
+                    #       single value, so we exploit the fact, that the
+                    #       field handles that for us when processing formdata
+                    form_field.raw_data = valuelist = keywords.getall(field.id)
+                    form_field.process_formdata(valuelist)
 
     @cached_property
     def parsed_dates(self) -> list[date]:

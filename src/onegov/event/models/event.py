@@ -26,6 +26,10 @@ from sedate import to_timezone, utcnow
 from sqlalchemy import and_
 from sqlalchemy import desc
 from sqlalchemy import Enum
+from sqlalchemy import ForeignKey
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.associationproxy import AssociationProxy
+from sqlalchemy.orm import composite
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
@@ -39,6 +43,7 @@ from uuid import UUID
 
 from typing import IO
 from typing import Literal
+from typing import NamedTuple
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -56,6 +61,28 @@ type EventState = Literal[
 
 class EventFile(File):
     __mapper_args__ = {'polymorphic_identity': 'eventfile'}
+
+
+class FilterItem(NamedTuple):
+    keyword: str
+    value: str
+
+    def __composite_values__(self) -> tuple[str, str]:
+        return self
+
+
+class EventFilterValue(Base):
+
+    __tablename__ = 'event_filter_values'
+
+    event_id: Mapped[UUID] = mapped_column(
+        ForeignKey('events.id', ondelete='CASCADE'),
+        primary_key=True
+    )
+
+    keyword: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[str] = mapped_column(primary_key=True)
+    item = composite(FilterItem, keyword, value)
 
 
 class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
@@ -138,6 +165,21 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     #: The associated PDF
     pdf = associated(
         EventFile, 'pdf', 'one-to-one', uselist=False, backref_suffix='pdf'
+    )
+
+    #: The associated filter keywords
+    filter_keyword_objects: Mapped[list[EventFilterValue]] = relationship(
+        cascade='all, delete-orphan',
+        lazy='selectin'
+    )
+
+    #: The associated filter keywords as a simple list of key-value tuples
+    filter_keyword_list: AssociationProxy[
+        list[tuple[str, str]]
+    ] = association_proxy(
+        'filter_keyword_objects',
+        'item',
+        creator=lambda item: EventFilterValue(keyword=item[0], value=item[1])
     )
 
     def set_image(
@@ -415,7 +457,6 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
             name=name,
             location=self.location,
             tags=self.tags,
-            filter_keywords=self.filter_keywords,
             start=start,
             end=end,
             timezone=self.timezone,
@@ -468,9 +509,6 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
             if session := object_session(self):
                 session.add(occ)
             self.occurrences.append(occ)
-
-        for occ in self.occurrences:
-            occ.filter_keywords = self.filter_keywords
 
     def submit(self) -> None:
         """ Submit the event. """

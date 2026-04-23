@@ -196,6 +196,7 @@ def test_view_api(
         for item in collection('/api/topics').items
     } == {'Organisation', 'Themen', 'Kontakt'}
 
+
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.broadcast')
 @patch('onegov.websockets.integration.authenticate')
@@ -301,5 +302,81 @@ def test_api_syndicate_filter(
     # both filters can be combined
     assert not collection('/api/events?syndicate=true&highlight=true').items
 
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.broadcast')
+@patch('onegov.websockets.integration.authenticate')
+def test_view_api_search(
+    authenticate: MagicMock,
+    broadcast: MagicMock,
+    connect: MagicMock,
+    client_with_fts: Client
+) -> None:
+
+    client = client_with_fts
+    client.login_admin()  # prevent rate limit
+
+    def collection(url: str) -> Collection:
+        return Collection.from_json(client.get(url).body)
+
+    def data(item: Any) -> dict[str, Any]:
+        return {x.name: x.value for x in item.data}
+
+    def filters(item: Any) -> dict[str, Any]:
+        return {x.name: x.values or x.prompt for x in item.data}
+
+    def links(item: Any) -> dict[str, str]:
+        return {x.rel: x.href for x in item.links}
+
+    def template(item: Any) -> set[str]:
+        return {x.name for x in item.template.data}
+
+    endpoints = collection('/api')
+    assert len(endpoints.queries) == 3
+
+    # Endpoints with query hints
+    assert endpoints.queries[0].rel == 'events'
+    assert endpoints.queries[0].href == 'http://localhost/api/events?page=0'
+    assert filters(endpoints.queries[0]).keys() == {
+        'search',
+        'start',
+        'end',
+        'locations',
+        'sources',
+        'tags',
+    }
+    assert endpoints.queries[1].rel == 'news'
+    assert endpoints.queries[1].href == 'http://localhost/api/news?page=0'
+    assert filters(endpoints.queries[1]).keys() == {'search'}
+    assert endpoints.queries[2].rel == 'topics'
+    assert endpoints.queries[2].href == 'http://localhost/api/topics?page=0'
+    assert filters(endpoints.queries[2]).keys() == {'search'}
+
+    # Events
+    assert {
+        item.data[0].value
+        for item in collection(
+            '/api/events?search=Sportanlage').items
+    } == {'150 Jahre Govikon', 'Fussballturnier'}
+
+    # News
+    # TODO: Test with custom content and get rid of implicit dependency
+    #       on initial content.
+    assert {
+        item.data[0].value
+        for item in collection(
+            '/api/news?search=Webseite').items
+    } == {'Wir haben eine neue Webseite!'}
+    assert not collection('/api/news?search=Bogus').items
+
+    # Topics
+    # TODO: Test with custom content and get rid of implicit dependency
+    #       on initial content.
+    assert {
+        item.data[0].value
+        for item in collection(
+            '/api/topics?search=Kontakt').items
+    } == {'Kontakt'}
+    assert not collection('/api/topics?search=Bogus').items
 
 # TODO: Test directory API

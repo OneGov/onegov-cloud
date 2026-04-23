@@ -161,13 +161,10 @@ class AttendenceCollection(GenericCollection[Attendence]):
             (Attendence.commission_id.in_(active_commission_ids))
         )
 
-    def view_for_parliamentarian(
+    def query_for_current_user(
         self, request: PasRequest
     ) -> list[Attendence]:
-        """
-        Returns filtered attendances based on user role and permissions.
-        This encapsulates the filtering logic previously in the view.
-        """
+        """Returns attendances filtered by the current user's role."""
         user = request.current_user
 
         if not request.is_parliamentarian:

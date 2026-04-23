@@ -9,7 +9,7 @@
                 <table tal:condition="python:len(attendences) > 0" class="attendences hover">
                     <thead>
                         <tr>
-                            <th i18n:translate>Date</th>
+                            <th i18n:translate>Session date</th>
                             <th i18n:translate>Duration</th>
                             <th i18n:translate>Parliamentarian</th>
                             <th i18n:translate>Type</th>
@@ -18,13 +18,19 @@
                     </thead>
                     <tbody>
                         <tr tal:repeat="attendence attendences">
-                            <td>${layout.format_date(attendence.date, 'date')}</td>
+                            <td>${layout.format_date(attendence.date, 'date')}
+                                <tal:b tal:condition="attendence.modified"><br>
+                                    <small class="muted"><tal:b i18n:translate>edited</tal:b>: ${layout.format_date(attendence.modified, 'date')}</small>
+                                </tal:b>
+                            </td>
                             <td>${(attendence.duration/60)} h</td>
                             <td>${attendence.parliamentarian.title}</td>
                             <td>${attendence.type_label}
                                 <tal:block tal:condition="attendence.commission"><br>
                                     <i>${attendence.commission.title}</i></tal:block></td>
-                            <td><a href="${request.link(attendence)}"><i class="fa fa-edit"></i></a></td>
+                            <td tal:condition="not:attendence.bulk_edit_id"><a href="${request.link(attendence)}"><i class="fa fa-edit"></i></a></td>
+                            <td tal:condition="attendence.bulk_edit_id"
+                                tal:define="bulk_name python:'edit-plenary-bulk-attendences' if attendence.type == 'plenary' else 'edit-commission-bulk-attendences'"><a href="${request.link(attendence, bulk_name)}"><i class="fa fa-edit"></i></a></td>
                         </tr>
                     </tbody>
                 </table>
