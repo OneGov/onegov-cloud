@@ -343,6 +343,8 @@ def test_view_api_search(
         'end',
         'locations',
         'sources',
+        'syndicate',
+        'highlight',
         'tags',
     }
     assert endpoints.queries[1].rel == 'news'
