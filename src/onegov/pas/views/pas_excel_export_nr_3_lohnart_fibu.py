@@ -33,15 +33,15 @@ if TYPE_CHECKING:
 
 
 NEW_LOHNART_MAPPING = {
-    'plenary': {'nr': '2405', 'text': 'Plenarsitzungen'},
+    'plenary': {'nr': '2405', 'text': 'Plenarsitzung KR'},
     'commission': {
         'nr': '2410',
-        'text': 'Kommissionsitzungen'
+        'text': 'Kommissionsitzung KR'
     },
-    'study': {'nr': '2421', 'text': 'Aktenstudium'},
+    'study': {'nr': '2421', 'text': 'Aktenstudium KR'},
     'shortest': {
-        'nr': '2410',
-        'text': 'Kommissionsitzungen'
+        'nr': '2415',
+        'text': 'Kürzesitzung KR'
     }
 }
 

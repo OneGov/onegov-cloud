@@ -34,7 +34,7 @@ ALLOWANCE_ROLES: dict[str, str] = {
 # FiBu account for presidential allowances
 # (amtliche Missionen Kantonsratspräsidiums)
 FIBU_KONTO_ALLOWANCE = '3000.30'
-LOHNART_ALLOWANCE_NR = '2400'
+LOHNART_ALLOWANCE_NR = '2411'
 LOHNART_ALLOWANCE_TEXT = 'Jahreszulage KR-Präsidium'
 
 

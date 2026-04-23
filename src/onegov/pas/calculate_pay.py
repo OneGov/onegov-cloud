@@ -59,6 +59,7 @@ def calculate_rate(
                 )
 
         else:  # intercantonal
+            assert commission_type == 'intercantonal'
             # Per half day rates
             rate = (
                 rate_set.commission_intercantonal_president_halfday
