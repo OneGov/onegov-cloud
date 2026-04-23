@@ -18,7 +18,6 @@ if TYPE_CHECKING:
     from tests.shared.fixtures import WebsocketThread
 
 
-
 @run_in_separate_thread
 async def test_server_invalid(websocket_server: WebsocketThread) -> None:
     await sleep(0.1)
