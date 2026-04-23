@@ -87,10 +87,11 @@ def migrate_filter_keywords_column(context: UpgradeContext) -> None:
                 })
 
     # then perform a bulk-insert into the new table
-    context.session.execute(text("""
-        INSERT INTO event_filter_values ("event_id", "keyword", "value")
-        VALUES (:event_id, :keyword, :value)
-    """), data)
+    if data:
+        context.session.execute(text("""
+            INSERT INTO event_filter_values ("event_id", "keyword", "value")
+            VALUES (:event_id, :keyword, :value)
+        """), data)
 
     # then remove the redundant data from the events/occurrence tables
     context.session.execute(text("""
