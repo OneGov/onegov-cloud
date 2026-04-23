@@ -99,7 +99,10 @@ def get_abschlussliste_data(
         return []
 
     parliamentarians = get_parliamentarians_with_settlements(
-        session, settlement_run.start, settlement_run.end
+        session,
+        settlement_run.start,
+        settlement_run.end,
+        settlement_run_id=settlement_run.id,
     )
 
     # Get bulk party lookup to avoid N+1 queries
@@ -418,7 +421,9 @@ def generate_buchungen_abrechnungslauf_xlsx(
                 'booking_type': LOHNART_ALLOWANCE_TEXT,
                 'value': Decimal('0'),
                 'chf': Decimal(str(allowance.amount)),
-                'chf_with_cola': Decimal(str(allowance.amount)),
+                'chf_with_cola': (
+                    Decimal(str(allowance.amount)) * cola_multiplier
+                ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP),
             }
         )
 

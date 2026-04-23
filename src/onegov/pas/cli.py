@@ -4,8 +4,12 @@ import click
 import transaction
 import logging
 import warnings
+from datetime import date
 from onegov.core.cli import command_group
+from onegov.org.mail import send_transactional_html_mail
+from onegov.pas import _
 from onegov.pas.collections.parliamentarian import PASParliamentarianCollection
+from onegov.pas.models import Attendence
 from onegov.pas.excel_header_constants import (
     commission_expected_headers_variant_1,
     commission_expected_headers_variant_2,
@@ -136,6 +140,61 @@ def update_account_single_cli(email: str, dry_run: bool) -> Processor:
             click.secho('Dry run - changes aborted', fg='yellow')
 
     return do_update_account
+
+
+@cli.command('test-abschluss-mail')
+@click.option(
+    '--to', 'recipient', required=True, help='Recipient email address'
+)
+def test_abschluss_mail(recipient: str) -> Processor:
+    """Send a sample abschluss notification email for visual inspection.
+
+    Queues the mail. Flush via:
+        onegov-core sendmail --queue local_smtp
+    Inspect in smtp4dev UI.
+
+    Example:
+        onegov-pas --select '/onegov_pas/zug' test-abschluss-mail \
+            --to dev@example.org
+    """
+
+    def send(request: PasRequest, app: PasApp) -> None:
+        attendence = request.session.query(Attendence).first()
+        if attendence is None:
+            click.secho(
+                'No Attendence in DB - need at least one for model ref.',
+                fg='red',
+            )
+            return
+
+        today = date.today()
+        send_transactional_html_mail(
+            request=request,
+            template='mail_abschluss_notification.pt',
+            subject=_(
+                'PAS: Abschluss set for ${name}',
+                mapping={'name': 'Max Muster (TEST)'},
+            ),
+            receivers=[recipient],
+            content={
+                'model': attendence,
+                'title': request.translate(_('Abschluss Notification')),
+                'parliamentarian_name': 'Max Muster (TEST)',
+                'commission_name': 'Test Kommission',
+                'attendance_date': today,
+                'user_name': 'CLI Tester',
+                'settlement_run_name': 'TEST-RUN',
+                'settlement_run_start': today,
+                'settlement_run_end': today,
+            },
+        )
+        click.secho(f'Mail queued for {recipient}.', fg='green')
+        click.echo(
+            'Flush queue:  onegov-core sendmail --queue local_smtp\n'
+            'Inspect:      http://localhost:5000 (smtp4dev UI)'
+        )
+
+    return send
 
 
 @cli.command('import-kub-data')

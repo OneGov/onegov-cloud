@@ -58,30 +58,14 @@ def calculate_rate(
                     additional_periods * additional_per_30min
                 )
 
-        elif commission_type == 'intercantonal':
+        else:  # intercantonal
+            assert commission_type == 'intercantonal'
             # Per half day rates
             rate = (
                 rate_set.commission_intercantonal_president_halfday
                 if is_president
                 else rate_set.commission_intercantonal_member_halfday
             )
-
-        else:  # official
-            # Has both half day and full day rates
-            # todo: What is the way to determine if it is full day?
-            is_full_day = duration_minutes > 240  # more than 4 hours
-            if is_president:
-                rate = (
-                    rate_set.commission_official_president_fullday
-                    if is_full_day
-                    else rate_set.commission_official_president_halfday
-                )
-            else:
-                rate = (
-                    rate_set.commission_official_vice_president_fullday
-                    if is_full_day
-                    else rate_set.commission_official_vice_president_halfday
-                )
 
         return Decimal(str(rate))
 
@@ -98,7 +82,7 @@ def calculate_rate(
             ) // 30  # round up to next 30min
             return Decimal(str(rate_per_30min * periods))
 
-        elif commission_type == 'intercantonal':
+        else:  # intercantonal
             rate_per_hour = (
                 rate_set.study_intercantonal_president_hour
                 if is_president
@@ -108,17 +92,6 @@ def calculate_rate(
                 duration_minutes + 59
             ) // 60  # round up to next hour
             return Decimal(str(rate_per_hour * periods))
-
-        else:  # official
-            rate_per_30min = (
-                rate_set.study_official_president_halfhour
-                if is_president
-                else rate_set.study_official_member_halfhour
-            )
-            periods = (
-                duration_minutes + 29
-            ) // 30  # round up to next 30min
-            return Decimal(str(rate_per_30min * periods))
 
     elif attendence_type == 'shortest':
         # Shortest meetings are per 30min

@@ -54,7 +54,7 @@ class Attendence(Base, TimestampMixin):
     )
 
     #: The date
-    date: Mapped[datetime.date]
+    date: Mapped[datetime.date] = mapped_column(index=True)
 
     #: The duration in minutes
     duration: Mapped[int]
@@ -86,6 +86,7 @@ class Attendence(Base, TimestampMixin):
     #: The id of the parliamentarian
     parliamentarian_id: Mapped[UUID] = mapped_column(
         ForeignKey('par_parliamentarians.id'),
+        index=True,
     )
 
     #: The parliamentarian
@@ -96,6 +97,7 @@ class Attendence(Base, TimestampMixin):
     #: the id of the commission
     commission_id: Mapped[UUID | None] = mapped_column(
         ForeignKey('par_commissions.id'),
+        index=True,
     )
 
     #: the related commission (which may have any number of memberships)

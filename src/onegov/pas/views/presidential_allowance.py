@@ -21,6 +21,7 @@ from onegov.pas.models.presidential_allowance import (
     VICE_PRESIDENT_YEARLY_ALLOWANCE,
     PresidentialAllowance,
 )
+from uuid import UUID
 
 from typing import TYPE_CHECKING
 
@@ -69,23 +70,18 @@ def add_presidential_allowance(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        year = form.year.data
-        quarter = form.quarter.data
-        settlement_run = form.current_settlement_run
-        run_id = settlement_run.id if settlement_run else None
+        run_id = UUID(form.settlement_run.data)
         parl_id, role = form.parsed_recipient
         amount = QUARTERLY_AMOUNTS[role]
 
         self.add(
-            year=year,
-            quarter=quarter,
             role=role,
             amount=amount,
             parliamentarian_id=parl_id,
             settlement_run_id=run_id,
         )
 
-        request.success(_('Quarterly allowance added'))
+        request.success(_('Allowance added'))
         return request.redirect(request.link(self))
 
     layout = PresidentialAllowanceFormLayout(self, request)

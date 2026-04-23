@@ -49,7 +49,7 @@ class AttendenceCollection(GenericCollection[Attendence]):
 
         # Eagerly load related data to prevent N+1 queries
         query = query.options(
-            joinedload(Attendence.parliamentarian).joinedload(PASParliamentarian.roles),
+            joinedload(Attendence.parliamentarian),
             joinedload(Attendence.commission)
         )
 
@@ -142,8 +142,17 @@ class AttendenceCollection(GenericCollection[Attendence]):
         )
 
     def for_parliamentarian(self, parliamentarian_id: str) -> Self:
-        """Returns attendances for a specific parliamentarian only."""
-        return self.for_filter(parliamentarian_id=parliamentarian_id)
+        """Returns attendances for a specific parliamentarian only,
+        preserving the current type/date/settlement filters."""
+        return self.for_filter(
+            settlement_run_id=self.settlement_run_id,
+            date_from=self.date_from,
+            date_to=self.date_to,
+            type=self.type,
+            parliamentarian_id=parliamentarian_id,
+            commission_id=self.commission_id,
+            party_id=self.party_id,
+        )
 
     def for_commission_president(
         self,

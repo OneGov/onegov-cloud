@@ -57,20 +57,6 @@
                             <td>CHF ${rate_set.study_intercantonal_member_hour}.- <span i18n:translate="">per 1h</span></td>
                         </tr>
                         <tr>
-                            <th rowspan="2" i18n:translate="">official mission</th>
-                            <td i18n:translate="">President</td>
-                            <td>CHF ${rate_set.commission_official_president_halfday}.- <span i18n:translate="">half-day</span></td>
-                            <td>CHF ${rate_set.commission_official_president_fullday}.- <span i18n:translate="">full-day</span></td>
-                            <td>CHF ${rate_set.study_official_president_halfhour}.- <span i18n:translate="">per 1/2h</span></td>
-                        </tr>
-                        <tr>
-                            <td i18n:translate="">Vice president</td>
-                            <td>CHF ${rate_set.commission_official_vice_president_halfday}.- <span i18n:translate="">half-day</span></td>
-                            <td>CHF ${rate_set.commission_official_vice_president_fullday}.- <span i18n:translate="">full-day</span></td>
-                            <td>CHF ${rate_set.study_official_member_halfhour}.- <span i18n:translate="">per 1/2h</span></td>
-                        </tr>
-
-                        <tr>
                             <th rowspan="2" i18n:translate="">Shortest meeting</th>
                             <td i18n:translate="">President</td>
                             <td colspan="2">CHF ${rate_set.shortest_all_president_halfhour}.- <span i18n:translate="">per 1/2h</span></td>
