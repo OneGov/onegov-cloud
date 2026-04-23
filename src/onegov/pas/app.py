@@ -141,6 +141,13 @@ def get_ensure_user_callback() -> EnsureUserCallback:
         force_role: bool,
         force_active: bool,
     ) -> User | Literal[True] | None:
+        log.info(
+            f'SAML2 on_ensure_user: username={username!r}, '
+            f'source={source!r}, source_id={source_id!r}, '
+            f'role={role!r}, realname={realname!r}, '
+            f'user_found={user is not None}'
+        )
+
         if role != 'member':
             return True
 
