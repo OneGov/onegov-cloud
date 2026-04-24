@@ -92,13 +92,13 @@ def update_accounts_cli(dry_run: bool) -> Processor:
 
         parliamentarians = PASParliamentarianCollection(app)
         for parliamentarian in parliamentarians.query():
-            if not parliamentarian.email_primary:
+            if not parliamentarian.zg_username:
                 click.echo(
-                    f'Skipping {parliamentarian.title}, no primary email.'
+                    f'Skipping {parliamentarian.title}, no zg_username.'
                 )
                 continue
             parliamentarians.update_user(
-                parliamentarian, parliamentarian.email_primary
+                parliamentarian, parliamentarian.zg_username
             )
 
         if dry_run:
@@ -108,10 +108,12 @@ def update_accounts_cli(dry_run: bool) -> Processor:
 
 
 @cli.command(name='update-account-single', context_settings={'singular': True})
-@click.option('--email', required=True, help='Email of the parliamentarian')
+@click.option(
+    '--username', required=True, help='zg_username of the parliamentarian'
+)
 @click.option('--dry-run/-no-dry-run', default=False)
-def update_account_single_cli(email: str, dry_run: bool) -> Processor:
-    """Updates user account for a single parliamentarian by email."""
+def update_account_single_cli(username: str, dry_run: bool) -> Processor:
+    """Updates user account for a single parliamentarian."""
 
     def do_update_account(request: PasRequest, app: PasApp) -> None:
         from onegov.pas.models import PASParliamentarian
@@ -119,21 +121,19 @@ def update_account_single_cli(email: str, dry_run: bool) -> Processor:
         parliamentarians = PASParliamentarianCollection(app)
         parliamentarian = (
             parliamentarians.query()
-            .filter(PASParliamentarian.email_primary == email)
+            .filter(PASParliamentarian.zg_username == username)
             .first()
         )
 
         if not parliamentarian:
-            click.secho(f'No parliamentarian found: {email}', fg='red')
+            click.secho(f'No parliamentarian found: {username}', fg='red')
             transaction.abort()
             return
 
         parliamentarians.update_user(
-            parliamentarian, parliamentarian.email_primary
+            parliamentarian, parliamentarian.zg_username
         )
-        click.secho(
-            f'Updated account for parliamentarian: {email}', fg='green'
-        )
+        click.secho(f'Updated account for: {username}', fg='green')
 
         if dry_run:
             transaction.abort()

@@ -23,13 +23,12 @@ if TYPE_CHECKING:
     from ..conftest import TestPasApp
 
 """
-  1. Own attendance: Parliamentarians can edit their own attendance
-  2. Other's attendance: Parliamentarians CANNOT edit other parliamentarian's
-     attendance
-  3. Commission president powers: Can edit their commission members' attendance
-  4. Commission boundaries: Cannot edit attendance from other commissions
-  5. Personal details: Cannot view other parliamentarians' personal info
-
+Tests cross-user access boundaries:
+  - Parliamentarians CANNOT edit/view other parliamentarian's attendance
+  - Commission presidents can add attendance for their members
+  - Commission presidents CANNOT add for other commission's members
+  - Parliamentarians CANNOT view other parliamentarians' personal info
+  - Attendance list filtered to own records (admins see all)
 """
 
 
@@ -63,14 +62,16 @@ def create_parliamentarian_with_user(
     session = client.app.session()
     parliamentarians = PASParliamentarianCollection(client.app)
 
+    zg_username = email.split('@')[0].replace('.', '')
     parl = parliamentarians.add(
         first_name=first_name,
         last_name=last_name,
-        email_primary=email
+        email_primary=email,
+        zg_username=zg_username,
     )
 
     users = UserCollection(session)
-    user = users.by_username(email)
+    user = users.by_username(zg_username)
     assert user is not None
     user.role = role
     user.password = password
@@ -171,7 +172,7 @@ def test_parliamentarian_cannot_edit_other_attendance(
     attendance_id_b = attendance_b.id
     transaction.commit()
 
-    client.login('alice.parl@example.org', 'test')
+    client.login('aliceparl', 'test')
 
     page = client.get(
         f'/attendence/{attendance_id_b}/edit', expect_errors=True
@@ -207,7 +208,7 @@ def test_commission_president_can_edit_member_attendance(
     attendance_id = member_attendance.id
     transaction.commit()
 
-    client.login('president.leader@example.org', 'test')
+    client.login('presidentleader', 'test')
 
     page = client.get(f'/attendence/{attendance_id}/edit')
     assert page.status_code == 200
@@ -240,7 +241,7 @@ def test_commission_president_cannot_edit_other_commission_attendance(
     attendance_id = education_attendance.id
     transaction.commit()
 
-    client.login('finance.president@example.org', 'test')
+    client.login('financepresident', 'test')
 
     page = client.get(f'/attendence/{attendance_id}/edit', expect_errors=True)
     assert page.status_code in (403, 302)
@@ -262,7 +263,7 @@ def test_parliamentarian_cannot_view_other_parliamentarian_details(
     parl_b_id = parl_b.id
     transaction.commit()
 
-    client.login('alice.parl@example.org', 'test')
+    client.login('aliceparl', 'test')
 
     # expect alice to be able to viwe their own attendence
     page = client.get(f'/parliamentarian/{parl_a_id}')
@@ -292,7 +293,7 @@ def test_attendance_collection_shows_only_own_records(
 
     transaction.commit()
 
-    client.login('alice.parl@example.org', 'test')
+    client.login('aliceparl', 'test')
     page = client.get('/attendences')
     assert page.status_code == 200
 
@@ -355,7 +356,7 @@ def test_parliamentarian_cannot_add_attendance_for_others(
     parl_b_id = parl_b.id
     transaction.commit()
 
-    client.login('alice.parl@example.org', 'test')
+    client.login('aliceparl', 'test')
 
     form_page = client.get('/attendences/new')
     assert form_page.status_code == 200
@@ -390,7 +391,7 @@ def test_parliamentarian_can_only_see_self_in_dropdown(
 
     transaction.commit()
 
-    client.login('alice.parl@example.org', 'test')
+    client.login('aliceparl', 'test')
 
     page = client.get('/attendences/new')
     assert page.status_code == 200
@@ -425,7 +426,7 @@ def test_commission_president_can_add_for_commission_members(
     commission_id = commission.id
     transaction.commit()
 
-    client.login('president.leader@example.org', 'test')
+    client.login('presidentleader', 'test')
 
     form_page = client.get('/attendences/new')
     assert form_page.status_code == 200
@@ -484,7 +485,7 @@ def test_commission_president_cannot_add_for_other_commission_members(
     education_member_id = education_member.id
     transaction.commit()
 
-    client.login('finance.president@example.org', 'test')
+    client.login('financepresident', 'test')
 
     form_page = client.get('/attendences/new')
     assert form_page.status_code == 200
