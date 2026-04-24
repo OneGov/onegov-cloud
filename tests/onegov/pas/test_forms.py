@@ -102,7 +102,8 @@ def test_attendence_forms(session: Session, dummy_admin_request: Any) -> None:
     parliamentarian = parliamentarians.add(
         first_name='a',
         last_name='b',
-        email_primary='test-user@example.com'
+        email_primary='test-user@example.com',
+        zg_username='zgtestuser',
     )
     parliamentarians.add(first_name='p', last_name='q')
 
