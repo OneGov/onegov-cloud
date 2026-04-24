@@ -45,6 +45,12 @@ class PASParliamentarianForm(NamedFileForm):
         fieldset=_('Basic properties'),
     )
 
+    # FIXME: temporary — remove once KUB sync is sole source
+    zg_username = StringField(
+        label=_('ZG Username'),
+        fieldset=_('Basic properties'),
+    )
+
     gender = TranslatedSelectField(
         label=_('Gender'),
         fieldset=_('Basic properties'),
