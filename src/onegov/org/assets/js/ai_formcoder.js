@@ -6,23 +6,9 @@
     var TOOLBAR_SELECTOR = '.formcode-ace-editor-toolbar';
     var LOADING_CLASS = 'formcoder-loading';
 
+    // FIXME: form.action is used as a URL string variable for fetch().
     function setFormAction(form) {
-        try {
-            var path = window.location.pathname.replace((/\/$/), '');
-            if ((/\/form\/[^^\/]+(\/edit)?$/).test(path) || (/\/form\/[^^\/]+$/).test(path)) {
-                path = path.replace((/\/form\/[^^\/]+(\/edit)?$/), '/forms');
-            } else {
-                path = path.replace((/\/new$/), '').replace((/\/edit$/), '');
-                path = path.replace((/\/form$/), '/forms');
-                var m = path.match((/^(.*\/forms)(\/.*)?$/));
-                if (m) {
-                    path = m[1];
-                }
-            }
-            form.action = path + '/formcoder';
-        } catch (e) {
-            /* eslint-disable-next-line no-empty */
-        }
+        form.action = '/forms/formcoder';
     }
 
     function trySetTextAreaValue(aceEl, text) {
