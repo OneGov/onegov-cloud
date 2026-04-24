@@ -23,13 +23,12 @@ if TYPE_CHECKING:
     from ..conftest import TestPasApp
 
 """
-  1. Own attendance: Parliamentarians can edit their own attendance
-  2. Other's attendance: Parliamentarians CANNOT edit other parliamentarian's
-     attendance
-  3. Commission president powers: Can edit their commission members' attendance
-  4. Commission boundaries: Cannot edit attendance from other commissions
-  5. Personal details: Cannot view other parliamentarians' personal info
-
+Tests cross-user access boundaries:
+  - Parliamentarians CANNOT edit/view other parliamentarian's attendance
+  - Commission presidents can add attendance for their members
+  - Commission presidents CANNOT add for other commission's members
+  - Parliamentarians CANNOT view other parliamentarians' personal info
+  - Attendance list filtered to own records (admins see all)
 """
 
 
