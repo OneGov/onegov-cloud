@@ -47,7 +47,7 @@
                                                         <h3 i18n:translate>Needs</h3>
                                                         <ul class="dense needs">
                                                             <tal:b repeat="need occasion.needs">
-                                                                <li tal:condition="need.accept_signups" tal:condition="wants_more_volunteers(need)">
+                                                                <li tal:condition="need.accept_signups and wants_more_volunteers(need)">
                                                                     <span>${need.name}</span>
 
                                                                     <a class="button narrow" data-need="${need.id.hex}" data-error-container="#error-for-${occasion.id.hex}">

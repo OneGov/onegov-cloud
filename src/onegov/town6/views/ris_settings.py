@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 @TownApp.html(
     model=Organisation,
-    name='ris-settings',
+    name='ris-overview',
     template='ris_settings.pt',
     permission=Private
 )

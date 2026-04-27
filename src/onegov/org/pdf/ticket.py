@@ -46,39 +46,7 @@ class TicketQrCode(QrCode):
     _border = 0
 
 
-class TicketPdf(OrgPdf):
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        qr_payload = kwargs.pop('qr_payload', None)
-        super().__init__(*args, **kwargs)
-        self.doc.qr_payload = qr_payload  # type:ignore[attr-defined]
-
-    @staticmethod
-    def page_fn_header_and_footer_qr(
-        canvas: Canvas,
-        doc: Template
-    ) -> None:
-
-        assert hasattr(doc, 'qr_payload')
-        OrgPdf.page_fn_header_and_footer(canvas, doc)
-        height = 2 * cm
-        width = height
-        canvas.saveState()
-        # 0/0 is bottom left
-        image = ImageReader(TicketQrCode.from_payload(doc.qr_payload))
-        canvas.drawImage(
-            image,
-            x=doc.pagesize[0] - doc.rightMargin - width,
-            y=doc.pagesize[1] - doc.topMargin - height,
-            width=width,
-            height=height,
-            mask='auto')
-        canvas.restoreState()
-
-    @property
-    def page_fn(self) -> Callable[[Canvas, Template], None]:
-        """ First page the same as later except Qr-Code. """
-        return self.page_fn_header_and_footer_qr
+class TicketBasePdf(OrgPdf):
 
     def ticket_summary(self, html: str | None, linkify: bool = True) -> None:
         """A copy of the mini_html adapted for ticket summary.
@@ -170,57 +138,11 @@ class TicketPdf(OrgPdf):
                 ]
                 self.table(items, 'even')
 
-    def ticket_metadata(self, ticket: Ticket, layout: TicketLayout) -> None:
-        handler = ticket.handler
-        group = handler.group or ticket.group
-        created_dt = layout.to_timezone(ticket.created, layout.timezone)
-        created = layout.format_date(created_dt, 'datetime')
-
-        if hasattr(ticket, 'reference_group'):
-            subject = ticket.reference_group(layout.request)
-        else:
-            subject = ticket.title
-
-        submitter = ticket_submitter(ticket)
-        ticket_state = self.translate(TICKET_STATES[ticket.state])
-        owner = ticket.user.username if ticket.user else ''
-
-        def seconds(time: float | None) -> str:
-            return layout.format_seconds(time) if time else ''
-
-        meta_fields = {
-            'submitter_name': _('Name'),
-            'submitter_address': _('Address'),
-            'submitter_phone': _('Phone')
-        }
-
-        # pep572 still a cool thing
-        submitter_meta = [
-            [text, layout.linkify(value)]
-            for field, text in meta_fields.items()
-            if (value := getattr(handler, field))
-        ]
-
-        data = [
-            [_('Subject'), subject],
-            [_('Submitter'), submitter],
-            *submitter_meta,
-            [_('State'), ticket_state],
-            [_('Group'), group],
-            [_('Owner'), owner],
-            [_('Created'), created],
-            [_('Reaction Time'), seconds(ticket.reaction_time)],
-            [_('Process Time'), seconds(ticket.process_time)],
-        ]
-
-        # In case of imported events..
-        event_source = handler.data.get('source')
-        if event_source and layout.request.is_manager:
-            data.append([self.translate(_('Event Source')), event_source])
-
-        self.table(data, 'even')
-
-    def ticket_invoice(self, ticket: Ticket, layout: TicketLayout) -> None:
+    def ticket_invoice(
+        self,
+        ticket: Ticket,
+        layout: TicketLayout
+    ) -> None:
         invoice = ticket.invoice
         if not invoice:
             return
@@ -376,6 +298,91 @@ class TicketPdf(OrgPdf):
             [_('Source'), self.translate(PAYMENT_SOURCES[price.source])],
             [_('Fee'), f'{layout.format_number(price.fee)}'],
         ], 'even')
+
+
+class TicketPdf(TicketBasePdf):
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        qr_payload = kwargs.pop('qr_payload', None)
+        super().__init__(*args, **kwargs)
+        self.doc.qr_payload = qr_payload  # type:ignore[attr-defined]
+
+    @staticmethod
+    def page_fn_header_and_footer_qr(
+        canvas: Canvas,
+        doc: Template
+    ) -> None:
+
+        assert hasattr(doc, 'qr_payload')
+        OrgPdf.page_fn_header_and_footer(canvas, doc)
+        height = 2 * cm
+        width = height
+        canvas.saveState()
+        # 0/0 is bottom left
+        image = ImageReader(TicketQrCode.from_payload(doc.qr_payload))
+        canvas.drawImage(
+            image,
+            x=doc.pagesize[0] - doc.rightMargin - width,
+            y=doc.pagesize[1] - doc.topMargin - height,
+            width=width,
+            height=height,
+            mask='auto')
+        canvas.restoreState()
+
+    @property
+    def page_fn(self) -> Callable[[Canvas, Template], None]:
+        """ First page the same as later except Qr-Code. """
+        return self.page_fn_header_and_footer_qr
+
+    def ticket_metadata(self, ticket: Ticket, layout: TicketLayout) -> None:
+        handler = ticket.handler
+        group = handler.group or ticket.group
+        created_dt = layout.to_timezone(ticket.created, layout.timezone)
+        created = layout.format_date(created_dt, 'datetime')
+
+        if hasattr(ticket, 'reference_group'):
+            subject = ticket.reference_group(layout.request)
+        else:
+            subject = ticket.title
+
+        submitter = ticket_submitter(ticket)
+        ticket_state = self.translate(TICKET_STATES[ticket.state])
+        owner = ticket.user.username if ticket.user else ''
+
+        def seconds(time: float | None) -> str:
+            return layout.format_seconds(time) if time else ''
+
+        meta_fields = {
+            'submitter_name': _('Name'),
+            'submitter_address': _('Address'),
+            'submitter_phone': _('Phone')
+        }
+
+        # pep572 still a cool thing
+        submitter_meta = [
+            [text, layout.linkify(value)]
+            for field, text in meta_fields.items()
+            if (value := getattr(handler, field))
+        ]
+
+        data = [
+            [_('Subject'), subject],
+            [_('Submitter'), submitter],
+            *submitter_meta,
+            [_('State'), ticket_state],
+            [_('Group'), group],
+            [_('Owner'), owner],
+            [_('Created'), created],
+            [_('Reaction Time'), seconds(ticket.reaction_time)],
+            [_('Process Time'), seconds(ticket.process_time)],
+        ]
+
+        # In case of imported events..
+        event_source = handler.data.get('source')
+        if event_source and layout.request.is_manager:
+            data.append([self.translate(_('Event Source')), event_source])
+
+        self.table(data, 'even')
 
     def ticket_timeline(self, msg_feed: Mapping[str, Any] | None) -> None:
         """Will parse the timeline from view_messages_feed """

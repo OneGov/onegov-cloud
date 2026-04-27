@@ -11,7 +11,7 @@ from wtforms.fields import BooleanField, RadioField
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from sqlalchemy.orm import Session
+    from onegov.feriennet.request import FeriennetRequest
 
 
 class MatchForm(Form):
@@ -41,11 +41,13 @@ class MatchForm(Form):
         depends_on=('confirm', 'yes')
     )
 
-    def scoring(self, session: Session) -> Scoring:
+    def scoring(self, request: FeriennetRequest) -> Scoring:
+        session = request.session
         scoring = Scoring()
 
-        # always prefer groups
-        scoring.criteria.append(PreferGroups.from_session(session))
+        if request.app.active_period and (
+            request.app.active_period.with_group_code):
+            scoring.criteria.append(PreferGroups.from_session(session))
 
         if self.prefer_organiser.data:
             scoring.criteria.append(

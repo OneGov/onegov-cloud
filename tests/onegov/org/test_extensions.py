@@ -371,6 +371,8 @@ def test_contact_extension(org_app: TestOrgApp) -> None:
 
     form.populate_obj(topic)
 
+    topic = topic  # undo narrowing
+
     assert topic.contact == (
         "Steve Jobs\n"
         "steve@apple.com\n"
@@ -433,13 +435,12 @@ def test_contact_extension_with_top_level_domain_agency(
 
     form.populate_obj(topic)
 
+    topic = topic  # undo narrowing
     assert topic.contact == (
         "longdomain GmbH\n"
         "hello@website.agency\n"
         "https://custom.longdomain"
     )
-    # undo mypy narrowing
-    topic = topic
     html = topic.contact_html
     assert html is not None
     assert '<a href="mailto:hello@website.ag"' not in html

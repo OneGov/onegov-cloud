@@ -51,6 +51,29 @@ def test_clipboard(org_app: TestOrgApp) -> None:
     assert clipboard.url is None
 
 
+def test_clipboard_news_collection(org_app: TestOrgApp) -> None:
+
+    request = OrgRequest(environ={
+        'PATH_INFO': '/',
+        'SERVER_NAME': '',
+        'SERVER_PORT': '',
+        'SERVER_PROTOCOL': 'https',
+        'wsgi.url_scheme': 'https'
+    }, app=org_app)
+
+    news = NewsCollection(request)
+    root = news.root
+    assert root is not None
+    clipboard = Clipboard.from_url(request, request.link(news))
+    assert clipboard.get_object() == root
+
+    clipboard.store_in_session()
+    assert clipboard.from_session(clipboard.request).get_object() == root
+
+    clipboard.clear()
+    assert clipboard.from_session(clipboard.request).get_object() is None
+
+
 def test_news(session: Session) -> None:
 
     request: Any = Bunch(**{
@@ -379,7 +402,7 @@ def test_holidays() -> None:
     assert date(2000, 1, 2) not in o.holidays
     assert date(2000, 1, 3) not in o.holidays
 
-    assert len(o.holidays.all(2000)) == 8
+    assert len(o.holidays.all(2000)) == 10
 
     o.holiday_settings['cantons'] = ['AR', 'ZG']
 
@@ -387,7 +410,7 @@ def test_holidays() -> None:
     assert date(2000, 1, 2) in o.holidays
     assert date(2000, 1, 3) not in o.holidays
 
-    assert len(o.holidays.all(2000)) == 13
+    assert len(o.holidays.all(2000)) == 15
 
     o.holiday_settings['other'] = [[1, 3, 'Fooyears day']]
 
@@ -395,7 +418,7 @@ def test_holidays() -> None:
     assert date(2000, 1, 2) in o.holidays
     assert date(2000, 1, 3) in o.holidays
 
-    assert len(o.holidays.all(2000)) == 14
+    assert len(o.holidays.all(2000)) == 16
 
 
 def test_cascade_delete(session: Session) -> None:

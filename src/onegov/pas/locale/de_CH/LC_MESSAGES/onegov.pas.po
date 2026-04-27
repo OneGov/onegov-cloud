@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-03-25 10:06+0100\n"
+"POT-Creation-Date: 2026-04-23 14:40+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -10,6 +10,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "PAS: Abschluss set for ${name}"
+msgstr "PAS: Abschluss gesetzt für ${name}"
+
+msgid "Abschluss Notification"
+msgstr "Abschluss Benachrichtigung"
 
 msgid "User"
 msgstr "Benutzer"
@@ -49,19 +56,10 @@ msgstr "Profil"
 
 msgid "Cannot create attendance in closed settlement run."
 msgstr ""
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt "
-"werden.Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt "
-"werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
 
 msgid "Attendance date must be within a settlement run."
 msgstr "Anwesenheitsdatum muss innerhalb eines Abrechnungslaufs liegen."
-
-#, python-format
-msgid "Abschluss set for ${name}"
-msgstr "Abschluss gesetzt für ${name}"
-
-msgid "Abschluss Notification"
-msgstr "Abschluss Benachrichtigung"
 
 msgid "No within an active settlement run."
 msgstr "Nicht in einem aktiven Abrechungslauf"
@@ -146,8 +144,7 @@ msgstr "JSON-Schema validieren"
 msgid "Check if the uploaded JSON files match the expected structure."
 msgstr ""
 "Überprüft ob die hochgeladenen JSON-Dateien der erwarteten Struktur "
-"entsprechen.Überprüft ob die hochgeladenen JSON-Dateien der erwarteten "
-"Struktur entsprechen."
+"entsprechen."
 
 #. type: ignore[attr-defined]
 #, python-format
@@ -288,6 +285,24 @@ msgstr "Portrait"
 msgid "Description"
 msgstr "Beschreibung"
 
+msgid "Settlement run"
+msgstr "Abrechnungslauf"
+
+msgid "Recipient"
+msgstr "Empfänger/in"
+
+#, python-format
+msgid "Maximum of ${max} allowances per settlement run reached."
+msgstr "Maximum von ${max} Zulagen pro Abrechnungslauf erreicht."
+
+#, python-format
+msgid ""
+"Yearly limit for ${role} is CHF ${limit}. Already allocated: CHF "
+"${existing}. Remaining: CHF ${remaining}."
+msgstr ""
+"Jahreslimite für ${role} ist CHF ${limit}. Bereits vergeben: CHF "
+"${existing}. Verbleibend: CHF ${remaining}."
+
 msgid "Year"
 msgstr "Jahr"
 
@@ -330,18 +345,6 @@ msgstr "interkantonale Kommission"
 msgid "per 1h"
 msgstr "pro 1h"
 
-msgid "official mission"
-msgstr "amtliche Mission"
-
-msgid "full-day"
-msgstr "Ganztag"
-
-msgid "Vice president"
-msgstr "Vize-Präsident:in"
-
-msgid "Vice president: File study"
-msgstr "Vize-Präsident:in: Aktenstudium"
-
 #, python-format
 msgid "Rate set for ${year} alredy exists"
 msgstr "Sätze für ${year} bereits erfasst"
@@ -366,9 +369,6 @@ msgstr "Kommissionspräsident:in"
 msgid "Homepage"
 msgstr "Startseite"
 
-msgid "Add"
-msgstr "Hinzufügen"
-
 msgid "New Attendence"
 msgstr "Sitzung"
 
@@ -377,6 +377,12 @@ msgstr "Massenbuchung Plenarsitzung"
 
 msgid "Commission session (bulk)"
 msgstr "Massenbuchung Kommissionssitzung"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Edit bulk"
+msgstr "Massenbuchung bearbeiten"
 
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -501,6 +507,12 @@ msgstr "Möchten Sie diese Partei wirklich löschen?"
 msgid "Delete party"
 msgstr "Partei löschen"
 
+msgid "Presidential allowances"
+msgstr "Präsidialzulagen"
+
+msgid "Add allowance"
+msgstr "Zulage hinzufügen"
+
 msgid "Rate sets"
 msgstr "Sätze"
 
@@ -515,9 +527,6 @@ msgstr "Satz löschen"
 
 msgid "Settlement runs"
 msgstr "Abrechnungsläufe"
-
-msgid "Settlement run"
-msgstr "Abrechnungslauf"
 
 msgid "Do you really want to delete this settlement run?"
 msgstr "Möchten Sie diesen Abrechnungslauf wirklich löschen?"
@@ -560,17 +569,26 @@ msgstr "Automatisch"
 msgid "upload"
 msgstr "Auf App hochgeladen"
 
+msgid "Vice president"
+msgstr "Vize-Präsident:in"
+
 msgid "Duration"
 msgstr "Dauer"
 
 msgid "No meeting defined yet."
 msgstr "Noch keine Sitzung erfasst."
 
-msgid "Bulk edits"
-msgstr "Massenbuchungen"
+msgid "Session date"
+msgstr "Sitzungsdatum"
 
 msgid "edited"
 msgstr "bearbeitet"
+
+msgid "Filters"
+msgstr "Filter"
+
+msgid "Bulk edits"
+msgstr "Massenbuchungen"
 
 msgid "Timestamp"
 msgstr "Zeitpunkt"
@@ -595,9 +613,6 @@ msgstr "Funktion"
 
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
-
-msgid "Filters"
-msgstr "Filter"
 
 msgid "Please correct the errors below:"
 msgstr "Bitte korrigieren Sie die nachstehenden Fehler:"
@@ -628,6 +643,9 @@ msgstr "Mitgliedschaften"
 
 msgid "Logs"
 msgstr "Protokolle"
+
+msgid "User Account Sync"
+msgstr "Benutzerkonto-Synchronisation"
 
 msgid "Raw JSON"
 msgstr "JSON Rohdaten"
@@ -661,6 +679,18 @@ msgstr "Info"
 
 msgid "No log data available"
 msgstr "Keine Log-Daten verfügbar"
+
+msgid "Synced"
+msgstr "Synchronisiert"
+
+msgid "Skipped"
+msgstr "Übersprungen"
+
+msgid "Created"
+msgstr "Erstellt"
+
+msgid "New accounts"
+msgstr "Neue Konten"
 
 msgid "Last import:"
 msgstr "Letzter Import:"
@@ -706,8 +736,8 @@ msgid "Hello!"
 msgstr "Hallo!"
 
 msgid ""
-"${user_name} has closed commission ${commission_name} for settlement run $"
-"{settlement_run_name}."
+"${user_name} has closed commission ${commission_name} for settlement run "
+"${settlement_run_name}."
 msgstr ""
 "${user_name} hat den Abschluss der Kommission ${commission_name} für den "
 "Abrechnungslauf ${settlement_run_name} gesetzt."
@@ -731,6 +761,9 @@ msgstr ""
 "${parliamentarian_name} kann für den Zeitraum ${start} – ${end} keine neuen "
 "Kommissions-Anwesenheiten mehr hinzufügen."
 
+msgid "ZG Username"
+msgstr "ZG Benutzername"
+
 msgid "Roles"
 msgstr "Rollen"
 
@@ -748,6 +781,34 @@ msgstr "Noch keine Fraktionen erfasst."
 
 msgid "No parties defined yet."
 msgstr "Noch keine Parteien erfasst."
+
+msgid ""
+"Flat annual allowance per § 8 of the Nebenamtsgesetz for representing the "
+"canton at events. Paid via settlement runs (max. 4 per run)."
+msgstr ""
+"Pauschale Jahreszulage gemäss § 8 Nebenamtsgesetz für die Vertretung des "
+"Kantons an Anlässen. Auszahlung über Abrechnungsläufe (max. 4 pro Lauf)."
+
+msgid "Installment"
+msgstr "Rate"
+
+msgid "Person"
+msgstr "Person"
+
+msgid "Amount (CHF)"
+msgstr "Betrag (CHF)"
+
+msgid "Wirklich löschen?"
+msgstr "Wirklich löschen?"
+
+msgid "Löschen"
+msgstr "Löschen"
+
+msgid "Abbrechen"
+msgstr "Abbrechen"
+
+msgid "No allowances have been recorded yet."
+msgstr "Es wurden noch keine Zulagen erfasst."
 
 msgid "Amount"
 msgstr "Betrag"
@@ -815,25 +876,17 @@ msgstr "Noch keine Abrechnungsläufe erfasst"
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
 
-msgid "Cannot book attendance - abschluss already set for this settlement run"
-msgstr ""
-"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für diesen "
-"Abrechnungslauf"
-
 msgid "Added a new attendence"
 msgstr "Neue Anwesenheit hinzugefügt"
 
 msgid "New"
 msgstr "Neu"
 
+msgid "Only admins can add bulk attendance records."
+msgstr "Nur Administratoren können Massenanwesenheiten erfassen."
+
 msgid "New commission session (bulk)"
 msgstr "Neue Massenbuchung Kommissionssitzung"
-
-#, python-format
-msgid "Cannot book attendance - abschluss already set for: ${names}"
-msgstr ""
-"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für: $"
-"{names}"
 
 msgid "No parliamentarians selected"
 msgstr "Keine Parlamentarier:innen ausgewählt"
@@ -844,8 +897,8 @@ msgstr "Sitzung hinzugefügt"
 msgid "You do not have permission to edit plenary sessions."
 msgstr "Sie haben keine Berechtigung, Plenarsitzungen zu bearbeiten."
 
-msgid "Edit plenary session"
-msgstr "Plenarsitzung bearbeiten"
+msgid "Edit bulk: plenary session"
+msgstr "Massenbuchung: Plenarsitzung bearbeiten"
 
 msgid "Edited attendences"
 msgstr "Anwesenheiten bearbeitet"
@@ -859,15 +912,12 @@ msgstr "Möchten Sie diese Massenbuchung wirklich löschen?"
 msgid "Delete Attendencess"
 msgstr "Anwesenheiten löschen"
 
-#, python-format
-msgid "Edit ${type}"
-msgstr "${type} bearbeiten"
+msgid "Only admins can edit attendance records."
+msgstr "Nur Administratoren können Anwesenheiten bearbeiten."
 
 #, python-format
-msgid "Cannot edit attendance - abschluss already set for: ${names}"
-msgstr ""
-"Anwesenheit kann nicht bearbeitet werden - Abschluss bereits gesetzt für: $"
-"{names}"
+msgid "Edit bulk: ${type}"
+msgstr "Massenbuchung: ${type} bearbeiten"
 
 msgid "You do not have permission to add plenary sessions."
 msgstr "Sie haben keine Berechtigung, Plenarsitzungen hinzuzufügen."
@@ -878,19 +928,19 @@ msgstr "Neue Plenarsitzung"
 msgid "Added plenary session"
 msgstr "Plenarsitzung hinzugefügt"
 
-msgid "Cannot edit attendance - abschluss already set for this settlement run"
-msgstr ""
-"Anwesenheit kann nicht bearbeitet werden - Abschluss bereits gesetzt für "
-"diesen Abrechnungslauf"
-
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
 
+msgid "Only admins can delete attendance records."
+msgstr "Nur Administratoren können Anwesenheiten löschen."
+
+msgid "Cannot delete individual bulk attendance."
+msgstr "Einzelne Massenbuchung kann nicht gelöscht werden."
+
 msgid "Cannot delete attendance in closed settlement run."
 msgstr ""
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht gelöscht "
-"werden.Anwesenheit in geschlossenem Abrechnungslauf kann nicht gelöscht "
-"werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht gelöscht werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht gelöscht werden."
 
 #, python-format
 msgid "Deleted ${count} attendeces"
@@ -905,11 +955,14 @@ msgstr "Neue:r Parlamentarier:in"
 msgid "New commission meeting"
 msgstr "Neue Kommissionsitzung"
 
+#, python-format
+msgid "Cannot book attendance - abschluss already set for: ${names}"
+msgstr ""
+"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für: "
+"${names}"
+
 msgid "Added commission meeting"
 msgstr "Kommissionsitzung hinzugefügt"
-
-msgid "Data Import (JSON)"
-msgstr "Import (JSON)"
 
 msgid "Overview"
 msgstr "Übersicht"
@@ -951,6 +1004,9 @@ msgstr "Partei hinzugefügt"
 
 msgid "New party"
 msgstr "Neue Partei"
+
+msgid "Allowance added"
+msgstr "Zulage hinzugefügt"
 
 msgid "Added a new rate set"
 msgstr "Neue Sätze hinzugefügt"
@@ -1030,59 +1086,69 @@ msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
 
-msgid "Presidential allowances"
-msgstr "Präsidialzulagen"
+#~ msgid "Quarter"
+#~ msgstr "Quartal"
 
-msgid "Flat annual allowance per § 8 of the Nebenamtsgesetz for representing the canton at events. Paid in quarterly installments via settlement runs."
-msgstr "Pauschale Jahreszulage gemäss § 8 Nebenamtsgesetz für die Vertretung des Kantons an Anlässen. Auszahlung in vierteljährlichen Raten über Abrechnungsläufe."
+#, python-format
+#~ msgid "Allowance for Q${quarter} ${year} already exists for this role"
+#~ msgstr "Zulage für Q${quarter} ${year} existiert bereits für diese Rolle"
 
-msgid "Year"
-msgstr "Jahr"
+#~ msgid "official mission"
+#~ msgstr "amtliche Mission"
 
-msgid "Add quarterly allowance"
-msgstr "Quartalszulage hinzufügen"
+#~ msgid "full-day"
+#~ msgstr "Ganztag"
 
-msgid "Quarterly allowance added"
-msgstr "Quartalszulage hinzugefügt"
+#~ msgid "Vice president: File study"
+#~ msgstr "Vize-Präsident:in: Aktenstudium"
 
-msgid "No president or vice president found"
-msgstr "Kein Präsident oder Vizepräsident gefunden"
+#~ msgid "Add quarterly allowance"
+#~ msgstr "Quartalszulage hinzufügen"
 
-msgid "Allowance for Q${quarter} ${year} already exists for this role"
-msgstr "Zulage für Q${quarter} ${year} existiert bereits für diese Rolle"
+#~ msgid ""
+#~ "Flat annual allowance per § 8 of the Nebenamtsgesetz for representing the "
+#~ "canton at events. Paid in quarterly installments via settlement runs."
+#~ msgstr ""
+#~ "Pauschale Jahreszulage gemäss § 8 Nebenamtsgesetz für die Vertretung des "
+#~ "Kantons an Anlässen. Auszahlung in vierteljährlichen Raten über "
+#~ "Abrechnungsläufe."
 
-msgid "Yearly limit for ${role} is CHF ${limit}. Already allocated: CHF ${existing}. Remaining: CHF ${remaining}."
-msgstr "Jahreslimite für ${role} ist CHF ${limit}. Bereits vergeben: CHF ${existing}. Verbleibend: CHF ${remaining}."
+#~ msgid ""
+#~ "Cannot book attendance - abschluss already set for this settlement run"
+#~ msgstr ""
+#~ "Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für "
+#~ "diesen Abrechnungslauf"
 
-msgid "Recipient"
-msgstr "Empfänger/in"
+#, python-format
+#~ msgid "Cannot edit attendance - abschluss already set for: ${names}"
+#~ msgstr ""
+#~ "Anwesenheit kann nicht bearbeitet werden - Abschluss bereits gesetzt für: "
+#~ "${names}"
 
-msgid "President: ${name} (CHF ${amount})"
-msgstr "Präsident/in: ${name} (CHF ${amount})"
+#~ msgid ""
+#~ "Cannot edit attendance - abschluss already set for this settlement run"
+#~ msgstr ""
+#~ "Anwesenheit kann nicht bearbeitet werden - Abschluss bereits gesetzt für "
+#~ "diesen Abrechnungslauf"
 
-msgid "Vice president: ${name} (CHF ${amount})"
-msgstr "Vizepräsident/in: ${name} (CHF ${amount})"
+#~ msgid "Data Import (JSON)"
+#~ msgstr "Import (JSON)"
 
-msgid "No allowances have been recorded yet."
-msgstr "Es wurden noch keine Zulagen erfasst."
+#~ msgid "Quarterly allowance added"
+#~ msgstr "Quartalszulage hinzugefügt"
 
-msgid "Quarter"
-msgstr "Quartal"
+#~ msgid "Edit plenary session"
+#~ msgstr "Plenarsitzung bearbeiten"
 
-msgid "Amount (CHF)"
-msgstr "Betrag (CHF)"
+#, python-format
+#~ msgid "Edit ${type}"
+#~ msgstr "${type} bearbeiten"
 
-msgid "Date"
-msgstr "Datum"
+#~ msgid "President: ${name} (CHF ${amount})"
+#~ msgstr "Präsident/in: ${name} (CHF ${amount})"
 
-#~ msgid "Commission meeting (bulk)"
-#~ msgstr "Massenbuchung Kommissionssitzung"
+#~ msgid "Vice president: ${name} (CHF ${amount})"
+#~ msgstr "Vizepräsident/in: ${name} (CHF ${amount})"
 
-#~ msgid "New commission session"
-#~ msgstr "Neue Kommissionssitzung"
-
-#~ msgid "Added commission session"
-#~ msgstr "Kommissionssitzung hinzugefügt"
-
-#~ msgid "Edit commission session"
-#~ msgstr "Kommissionssitzung bearbeiten"
+#~ msgid "No president or vice president found"
+#~ msgstr "Kein Präsident oder Vizepräsident gefunden"

@@ -34,12 +34,6 @@ def view_dashboard(
             'link': request.class_link(PASCommissionCollection),
             'icon': 'fa-user-friends'
         },
-        {
-            'name': 'pas-import',
-            'title': _('Data Import (JSON)'),
-            'link': request.link(self, 'pas-import'),
-            'icon': 'fa-file-import',
-        }
     ]
 
     return {

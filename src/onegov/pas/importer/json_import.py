@@ -122,6 +122,7 @@ class PeopleImporter(DataImporter):
         'officialName': 'last_name',
         'title': 'academic_title',
         'salutation': 'salutation',
+        'username': 'zg_username',
     }
 
     def bulk_import(self, people_data: Sequence[PersonData]) -> tuple[

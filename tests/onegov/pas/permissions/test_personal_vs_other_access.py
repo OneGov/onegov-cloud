@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 import transaction
 
 from datetime import date, timedelta
@@ -150,27 +151,6 @@ def setup_two_separate_commissions(
     return commission1, commission2
 
 
-def test_parliamentarian_can_edit_own_attendance(
-    client: Client[TestPasApp]
-) -> None:
-    """Parliamentarians should be able to edit their own attendance"""
-    session = client.app.session()
-
-    parl_a, _ = create_parliamentarian_with_user(
-        client, 'Alice', 'Parliamentarian', 'alice.parl@example.org'
-    )
-
-    attendance_a = create_attendance_for_parliamentarian(session, parl_a.id)
-    attendance_id_a = attendance_a.id
-    transaction.commit()
-
-    client.login('alice.parl@example.org', 'test')
-
-    page = client.get(f'/attendence/{attendance_id_a}/edit')
-    assert page.status_code == 200
-    assert 'form' in page
-
-
 def test_parliamentarian_cannot_edit_other_attendance(
     client: Client[TestPasApp]
 ) -> None:
@@ -202,6 +182,7 @@ def test_parliamentarian_cannot_edit_other_attendance(
     assert page.status_code in (403, 302)
 
 
+@pytest.mark.skip(reason='Requirements changed: only admins edit attendance')
 def test_commission_president_can_edit_member_attendance(
     client: Client[TestPasApp]
 ) -> None:

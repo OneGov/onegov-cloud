@@ -2,17 +2,11 @@
 # =============================
 # This is hack to get around Field.__new__ not being able to return
 # UnboundField
-wtforms.Field.__get__
-wtforms.fields.Field.__get__
 wtforms.fields.core.Field.__get__
 # Since DefaultMeta can contain arbitrary values we added __getattr__
 # to let mypy know that arbitrary attribute access is possible
 wtforms.meta.DefaultMeta.__getattr__
 # The API intends for these to be settable
-wtforms.Flags.__delattr__
-wtforms.Flags.__setattr__
-wtforms.fields.Flags.__delattr__
-wtforms.fields.Flags.__setattr__
 wtforms.fields.core.Flags.__delattr__
 wtforms.fields.core.Flags.__setattr__
 
@@ -25,22 +19,11 @@ wtforms.fields.core.Flags.__setattr__
 # it will always be there and on the class it depends, so maybe this
 # should use a dummy descriptor? For now we just pretend it's set.
 # The behavior is documented in FormMeta, so I think it's fine.
-wtforms.Form._unbound_fields
 wtforms.form.Form._unbound_fields
 
 # widget is both used as a ClassVar and instance variable and does
 # not necessarily reflect an upper bound on Widget, so we always use
 # our Widget Protocol definition that's contravariant on Self
-wtforms.Field.widget
-wtforms.FormField.widget
-wtforms.SelectField.widget
-wtforms.SelectMultipleField.widget
-wtforms.TextAreaField.widget
-wtforms.fields.Field.widget
-wtforms.fields.FormField.widget
-wtforms.fields.SelectField.widget
-wtforms.fields.SelectMultipleField.widget
-wtforms.fields.TextAreaField.widget
 wtforms.fields.choices.SelectField.widget
 wtforms.fields.choices.SelectMultipleField.widget
 wtforms.fields.core.Field.widget

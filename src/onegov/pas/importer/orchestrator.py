@@ -599,6 +599,24 @@ class KubImporter:
             if self.output:
                 self.output.info('Fetching people data...')
             people_raw = self._fetch_api_data_with_pagination('people')
+            if not people_raw:
+                error_msg = 'Fetched 0 people records — aborting import'
+                log.warning(error_msg)
+                import_log.details.update(
+                    {'error': error_msg, 'status': 'failed'}
+                )
+                flag_modified(import_log, 'details')
+                import_log.status = 'failed'
+                if self.output:
+                    self.output.error(error_msg)
+                request.session.flush()
+                return (
+                    {},
+                    people_data,
+                    organization_data,
+                    membership_data,
+                    import_log_id,
+                )
             if self.output:
                 self.output.success(
                     f'Fetched {len(people_raw)} people records'

@@ -134,7 +134,7 @@ def test_vcard(session: Session) -> None:
     assert "NOTE;CHARSET=utf-8:Has bad vision." in vcard
     assert "END:VCARD" in vcard
 
-    vcard = person.memberships[0].vcard()  # type: ignore[union-attr]
+    vcard = person.memberships[0].vcard()
     assert "BEGIN:VCARD" in vcard
     assert "VERSION:3.0" in vcard
     assert "ADR;CHARSET=utf-8:;;Fakestreet 1;Kappel am Albis;;1234;" in vcard

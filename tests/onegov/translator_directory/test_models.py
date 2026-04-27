@@ -85,11 +85,13 @@ def test_translator_model(translator_app: TestApp) -> None:
     )
 
     translator.expertise_professional_guilds_other = ['Psychologie']
+    translator = translator  # undo narrowing
     assert translator.expertise_professional_guilds_all == (
         'economy', 'art_leisure', 'Psychologie'
     )
 
     translator.expertise_professional_guilds = []
+    translator = translator  # undo narrowing
     assert translator.expertise_professional_guilds_all == ('Psychologie', )
 
 
@@ -116,12 +118,14 @@ def test_translator_user(session: Session) -> None:
     session.flush()
     session.expire_all()
     assert translator.user == user_a
+    user_a, user_b = user_a, user_b  # undo narrowing
     assert user_a.translator == translator  # type: ignore[attr-defined]
     assert user_b.translator is None  # type: ignore[attr-defined]
 
     translator.email = 'b@example.org'
     session.flush()
     session.expire_all()
+    user_a, user_b = user_a, user_b  # undo narrowing
     assert translator.user == user_b
     assert user_a.translator is None  # type: ignore[attr-defined]
     assert user_b.translator == translator  # type: ignore[attr-defined]
@@ -389,7 +393,8 @@ def test_translator_mutation(session: Session) -> None:
     assert translator.self_employed is False
     assert translator.gender == 'M'
     assert translator.date_of_birth == date(1970, 1, 1)
-    assert translator.nationalities == 'nationalities'  # type: ignore[comparison-overlap]
+    if not TYPE_CHECKING:
+        assert translator.nationalities == 'nationalities'
     assert translator.coordinates == Coordinates(1, 2)
     assert translator.address == 'Street and house number'
     assert translator.zip_code == '8000'
@@ -471,7 +476,7 @@ def test_accreditation(translator_app: TestApp) -> None:
     with freeze_time('2026-01-01') as today:
         accreditation.grant()
         # undo mypy narrowing
-        translator = translator
+        translator, ticket = translator, ticket
         assert ticket.handler.state == 'granted'
         assert translator.state == 'published'
         assert translator.date_of_decision == today().date()

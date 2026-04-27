@@ -74,14 +74,46 @@ def add_commission(
 
 
 def view_commission(
-    self: Commission,
+    self: RISCommission,
     request: TownRequest,
     layout: RISCommissionLayout | PASCommissionLayout
 ) -> RenderData | Response:
+    filters = {}
+    filters['active'] = [
+        Link(
+            text=request.translate(_('Active')),
+            active=self.active_members is not False,
+            url=request.class_link(RISCommission, {'id': self.id})
+        ),
+        Link(
+            text=request.translate(_('Inactive')),
+            active=self.active_members is False,
+            url=request.class_link(RISCommission, {
+                'id': self.id,
+                'active_members': False
+            })
+        ),
+    ]
+
+    active_members = self.active_members
+    if active_members is None:
+        active_members = True
 
     return {
         'layout': layout,
         'commission': self,
+        'memberships': sorted(
+            (
+                membership
+                for membership in self.memberships
+                if membership.active is active_members
+            ),
+            key=lambda m: (
+                m.parliamentarian.last_name,
+                m.parliamentarian.first_name
+            )
+        ),
+        'filters': filters,
         'title': layout.title,
     }
 

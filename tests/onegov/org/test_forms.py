@@ -434,7 +434,7 @@ def test_find_your_spot_form_single_room() -> None:
     assert form.start_time.data == time(8, 0)
     assert form.end_time.data == time(9, 0)
     assert not form.rooms
-    assert 'for_every_room' not in (  # type: ignore[misc]
+    assert 'for_every_room' not in (  # type: ignore
         value
         for value, _label in form.auto_reserve_available_slots.choices
     )
@@ -962,7 +962,7 @@ def test_ticket_assignment_form(session: Session) -> None:
     form.request = request
     form.on_request()
 
-    assert sorted(name for id_, name in form.user.choices) == ['a', 'e']  # type: ignore[misc]
+    assert sorted(name for id_, name in form.user.choices) == ['a', 'e']  # type: ignore
     assert form.username == 'a'
 
 

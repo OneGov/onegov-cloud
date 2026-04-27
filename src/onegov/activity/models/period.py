@@ -214,6 +214,7 @@ class _BookinPeriodMeta(NamedTuple):
     active: bool
     confirmed: bool
     confirmable: bool
+    with_group_code: bool
     finalized: bool
     finalizable: bool
     archived: bool
@@ -286,6 +287,9 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
     # legacy reasons (even though it doesn't sound sane to have an
     # unconfirmable period that is confirmed).
     confirmable: Mapped[bool] = mapped_column(default=True)
+
+    #: Groups can be used to get better scoring for matching.
+    with_group_code: Mapped[bool] = mapped_column(default=True)
 
     #: A finalized period may not have any change in bookings anymore
     finalized: Mapped[bool] = mapped_column(default=False)
@@ -564,7 +568,8 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
         assert session is not None
         return Scoring.from_settings(
             settings=self.data.get('match-settings', {}),
-            session=session
+            session=session,
+            period=self
         )
 
     @scoring.setter

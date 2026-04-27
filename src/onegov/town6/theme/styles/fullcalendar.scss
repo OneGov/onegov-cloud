@@ -37,10 +37,17 @@
 
             & .fc-event-main {
                 position: relative;
-                padding: 2px 4px !important;
-                padding-right: 20px !important;
-                font-weight: bold;
                 font-size: .875rem;
+
+                .fc-blocker-title {
+                    margin: 2px 4px;
+                    overflow: hidden;
+                }
+
+                .fc-blocker-reason {
+                    font-weight: bold;
+                    overflow: hidden;
+                }
             }
 
             & .delete-blocker {
@@ -54,8 +61,16 @@
                 &:hover {
                     opacity: .75;
                 }
+
+                + .fc-blocker-reason {
+                    margin-right: 16px;
+                }
             }
         }
+    }
+
+    .fc-event.event-blocking-resource {
+        opacity: .75;
     }
 
     .fc-event, .fc-event-main {
@@ -65,12 +80,17 @@
     .fc-event .fc-content {
         position: relative;
         z-index: 2;
-        padding: 2px 4px;
+        overflow: hidden;
         border-top-right-radius: 1.2rem;
-        white-space: nowrap;
 
-        &::first-line {
-            font-weight: bold;
+        .fc-reservation-title {
+            margin: 2px 4px;
+            white-space: nowrap;
+            overflow: hidden;
+
+            &::first-line {
+                font-weight: bold;
+            }
         }
     }
 

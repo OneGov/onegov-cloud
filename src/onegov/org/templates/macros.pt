@@ -1090,7 +1090,9 @@
         </tal:b>
 
         <dt i18n:translate>Title</dt>
-        <dd>${event.title}</dd>
+        <dd>
+            <tal:b condition="event.highlight|nothing"><i class="fa fa-star" aria-hidden="true"></i> </tal:b>${event.title}
+        </dd>
 
         <dt i18n:translate>Description</dt>
         <dd tal:content="escape(event.description).replace('\n', Markup('<br>'))" />
@@ -1158,7 +1160,7 @@
         <tal:b condition="event.filter_keywords and show_filters">
             <dt i18n:translate>Filters</dt>
             <dd>
-                <ul tal:repeat="filter event.filter_keywords.items()" class="no-margin-bottom">
+                <ul tal:repeat="filter event.filter_keywords_ordered().items()" class="no-margin-bottom">
                     <li tal:condition="filter[1]">
                         <span>${filter[0].title()}:</span>
                         <span tal:define="tags ', '.join(f for f in filter[1])" tal:condition="isinstance (filter[1], list)" i18n:translate>${tags}</span>
@@ -1257,7 +1259,7 @@
         </div>
         <div class="large-9 medium-8 small-7 columns calendar-text-column">
             <h3>
-                <a tal:attributes="href request.link(occurrence) if use_links else None">${occurrence.title}</a>
+                <tal:b condition="occurrence.event.highlight|nothing"><i class="fa fa-star" aria-hidden="true"></i> </tal:b><a tal:attributes="href request.link(occurrence) if use_links else None">${occurrence.title}</a>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
             </h3>
             <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>

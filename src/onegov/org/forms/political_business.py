@@ -246,7 +246,7 @@ class PoliticalBusinessForm(Form):
                     render_kw['data-no_results_text'])
 
                 field.form.participant_type.meta = self.meta
-                field.form.participant_type.choices = [  # type: ignore[misc]
+                field.form.participant_type.choices = [  # type:ignore
                     (value, self.request.translate(label) if label else label)
                     for value, label in field.form.participant_type.choices
                 ]

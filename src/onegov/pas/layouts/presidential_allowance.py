@@ -43,7 +43,7 @@ class PresidentialAllowanceCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Add quarterly allowance'),
+                            text=_('Add allowance'),
                             url=self.request.link(
                                 self.model, 'new'
                             ),
@@ -71,7 +71,7 @@ class PresidentialAllowanceFormLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _('Add quarterly allowance')
+        return _('Add allowance')
 
     @cached_property
     def og_description(self) -> str:

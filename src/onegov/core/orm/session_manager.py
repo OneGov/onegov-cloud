@@ -289,6 +289,7 @@ class SessionManager:
 
         self._ignore_bulk_updates = False
         self._ignore_bulk_deletes = False
+        self._change_signals_disabled = False
 
         self.on_schema_init = Signal()
         self.on_transaction_join = Signal()
@@ -383,6 +384,16 @@ class SessionManager:
         finally:
             self._ignore_bulk_deletes = previous_state
 
+    @contextmanager
+    def disable_change_signals(self) -> Iterator[Self]:
+        """ Disables the insert/update/delete signals temporarily. """
+        previous_state = self._change_signals_disabled
+        self._change_signals_disabled = True
+        try:
+            yield self
+        finally:
+            self._change_signals_disabled = previous_state
+
     def register_engine(self, engine: Engine) -> None:
         """ Takes the given engine and registers it with the schema
         switching mechanism. Maybe used to register external engines with
@@ -468,6 +479,9 @@ class SessionManager:
             orm_execution_state: ORMExecuteState
         ) -> Result[Any] | None:
             if not orm_execution_state.is_orm_statement:
+                return None
+
+            if self._change_signals_disabled:
                 return None
 
             stmt = orm_execution_state.statement
@@ -557,6 +571,9 @@ class SessionManager:
             session: Session,
             flush_context: Any
         ) -> None:
+            if self._change_signals_disabled:
+                return None
+
             if self.on_insert.receivers:
                 for obj in session.new:
                     self.on_insert.send(self.current_schema, obj=obj)

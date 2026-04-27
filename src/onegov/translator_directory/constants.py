@@ -34,7 +34,8 @@ member_can_see = (
     'expertise_interpreting_types',
     'expertise_professional_guilds',
     'expertise_professional_guilds_other',
-    'expertise_professional_guilds_all'
+    'expertise_professional_guilds_all',
+    'operation_comments'
 )
 
 editor_can_see = (
@@ -43,8 +44,7 @@ editor_can_see = (
     'bank_name',
     'bank_address',
     'account_owner',
-    'iban',
-    'operation_comments'
+    'iban'
 )
 
 translator_can_see = (

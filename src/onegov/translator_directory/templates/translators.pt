@@ -29,6 +29,10 @@
                             <th i18n:translate="">Written languages</th>
                             <th i18n:translate="">Spoken languages</th>
                             <th class="drive-distance" i18n:translate="">Drive distance</th>
+                            <!--! Line breaks in column headers are intentional:
+                                 they prevent wide headings from stretching
+                                 columns and keep the table within the layout.
+                            -->
                             <th>Arbeitssprache<br/>Kommunikations-<br/>überwachung</th>
                             <th tal:condition="layout.show('operation_comments')">Besondere<br/>Hinweise<br/>Einsatz-<br/>möglichkeiten</th>
                             <th i18n:translate="">Phone numbers</th>

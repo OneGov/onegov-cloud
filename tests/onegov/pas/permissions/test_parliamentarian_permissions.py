@@ -7,9 +7,9 @@ from datetime import date
 from morepath import Identity
 from onegov.core.security import Private
 from onegov.pas.collections import (
-    AttendenceCollection,
     PASCommissionCollection,
-    PASParliamentarianCollection
+    PASParliamentarianCollection,
+    SettlementRunCollection,
 )
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
@@ -109,143 +109,6 @@ def test_view_dashboard_as_commission_president(
     # Should be able to access dashboard
     page = client.get('/pas-settings')
     assert page.status_code == 200
-
-
-def test_view_attendence_as_parliamentarian(
-    client: Client[TestPasApp]
-) -> None:
-    """Parliamentarians should be able to view individual attendences and
-    create new ones"""
-    session = client.app.session()
-
-    # Create parliamentarian
-    parliamentarians = PASParliamentarianCollection(client.app)
-    parliamentarian = parliamentarians.add(
-        first_name='Bob',
-        last_name='Viewer', email_primary='bob.viewer@example.org'
-    )
-
-    # Set correct password for the created user
-    users = UserCollection(session)
-    user = users.by_username('bob.viewer@example.org')
-    assert user is not None
-    user.password = 'test'
-    user.active = True
-
-    # Create commission and add parliamentarian to it
-    commissions = PASCommissionCollection(session)
-    commission = commissions.add(name='Test Commission')
-    membership = PASCommissionMembership(
-        parliamentarian_id=parliamentarian.id,
-        commission_id=commission.id,
-        role='member',
-    )
-    session.add(membership)
-
-    # Create attendence
-    attendences = AttendenceCollection(session)
-    attendence = attendences.add(
-        parliamentarian_id=parliamentarian.id,
-        type='commission',
-        date=date.today(),
-        duration=120,
-        commission_id=commission.id,
-    )
-
-    # Get the attendence ID before committing
-    attendence_id = attendence.id
-    transaction.commit()
-
-    client.login('bob.viewer@example.org', 'test')
-    # Should be able to view their own
-    page = client.get(f'/attendence/{attendence_id}')
-    assert page.status_code == 200
-
-    # Should be able to access new attendance form
-    # (that's the whole point of the app, really)
-    page = client.get('/attendences/new')
-    assert page.status_code == 200
-
-    # Check if it's actually a form page (most important test)
-    assert 'form' in page
-    assert 'submit' in page
-
-    # Should be able to edit their own attendance
-    page = client.get(f'/attendence/{attendence_id}/edit').maybe_follow()
-    assert page.status_code == 200
-
-    # Fill out and submit the form
-    page.form['date'] = '2024-01-15'
-    page.form['duration'] = '3.5'
-    page.form['type'] = 'study'
-    page.form['parliamentarian_id'].select(text='Bob Viewer')
-
-    # Submit the form
-    page = page.form.submit().maybe_follow()
-    assert page.status_code == 200
-
-
-def test_parliamentarian_cannot_edit_others_attendence(
-    client: Client[TestPasApp]
-) -> None:
-    """Parliamentarians should not be able to change parliamentarian_id
-    when editing their own attendance"""
-    session = client.app.session()
-
-    # Create commission
-    commissions = PASCommissionCollection(session)
-    commission = commissions.add(name='Test Commission')
-
-    parliamentarians = PASParliamentarianCollection(client.app)
-    alice = parliamentarians.add(
-        first_name='Alice',
-        last_name='One',
-        email_primary='alice.one@example.org',
-    )
-    bob = parliamentarians.add(
-        first_name='Bob', last_name='Two', email_primary='bob.two@example.org'
-    )
-
-    # Add alice to commission
-    alice_membership = PASCommissionMembership(
-        parliamentarian_id=alice.id, commission_id=commission.id, role='member'
-    )
-    session.add(alice_membership)
-
-    users = UserCollection(session)
-    alice_user = users.by_username('alice.one@example.org')
-    assert alice_user is not None
-    alice_user.password = 'test'
-    alice_user.role = 'parliamentarian'
-    alice_user.active = True
-
-    attendences = AttendenceCollection(session)
-    alice_attendence = attendences.add(
-        parliamentarian_id=alice.id,
-        type='commission',
-        date=date.today(),
-        duration=120,
-        commission_id=commission.id,
-    )
-
-    alice_attendence_id = alice_attendence.id
-    bob_id = str(bob.id)
-    transaction.commit()
-
-    client.login('alice.one@example.org', 'test')
-
-    page = client.get(f'/attendence/{alice_attendence_id}/edit')
-    assert page.status_code == 200
-
-    page.form['date'] = '2024-01-15'
-    page.form['duration'] = '3.5'
-    page.form['type'] = 'commission'
-
-    page.form['parliamentarian_id'].force_value(bob_id)
-
-    page = page.form.submit()
-
-    assert 'Sie können nur Ihre eigene Anwesenheit bearbeiten' in page
 
 
 def test_commission_president_has_private_access_to_commission(
@@ -550,4 +413,93 @@ def test_view_files_collection(
     page = client.get('/files')
     assert page.status_code == 200
 
-    # TODO: Check disallow edit files for non admin
+
+def test_parliamentarian_self_bookings_show_in_list(
+    client: Client[TestPasApp],
+) -> None:
+    """Parliamentarian creates commission/shortest/study via form,
+    all three must appear in /attendences list."""
+    session = client.app.session()
+
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='Test Commission')
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parliamentarian = parliamentarians.add(
+        first_name='Parla',
+        last_name='Mentarian',
+        email_primary='parla.mentarian@example.org',
+    )
+
+    session.add(PASCommissionMembership(
+        parliamentarian_id=parliamentarian.id,
+        commission_id=commission.id,
+        role='member',
+        start=date(2020, 1, 1),
+    ))
+
+    SettlementRunCollection(session).add(
+        name='Active Run',
+        start=date(2020, 1, 1),
+        end=date(2099, 12, 31),
+        active=True,
+    )
+
+    user = UserCollection(session).by_username(
+        'parla.mentarian@example.org')
+    assert user is not None
+    user.password = 'test'
+    user.role = 'parliamentarian'
+    user.active = True
+    transaction.commit()
+
+    client.login('parla.mentarian@example.org', 'test')
+
+    for a_type in ('commission', 'shortest', 'study'):
+        page = client.get('/attendences/new')
+        page.form['date'] = date.today().isoformat()
+        page.form['duration'] = '2.0'
+        page.form['type'] = a_type
+        page.form['parliamentarian_id'].select(text='Parla Mentarian')
+        page.form['commission_id'].select(text='Test Commission')
+        assert page.form.submit().maybe_follow().status_code == 200
+
+    list_page = client.get('/attendences')
+    for label in ('Kommissionsitzung', 'Kürzestsitzung', 'Aktenstudium'):
+        assert label in list_page, f'{label} missing\n\n{list_page}'
+
+    filtered = client.get('/attendences?type=study')
+    assert 'Aktenstudium' in filtered
+    assert 'Kürzestsitzung' not in filtered.pyquery('table.attendences').text()
+
+    assert 'fa-edit' not in list_page
+
+
+def test_parliamentarian_sees_add_link_but_not_bulk(
+    client: Client[TestPasApp],
+) -> None:
+    """Parliamentarian sees 'New Attendence' in editbar but not
+    bulk options, and no edit icons on rows."""
+    session = client.app.session()
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parliamentarians.add(
+        first_name='Eva',
+        last_name='Editbar',
+        email_primary='eva.editbar@example.org',
+    )
+
+    user = UserCollection(session).by_username(
+        'eva.editbar@example.org')
+    assert user is not None
+    user.password = 'test'
+    user.role = 'parliamentarian'
+    user.active = True
+    transaction.commit()
+
+    client.login('eva.editbar@example.org', 'test')
+
+    page = client.get('/attendences')
+    editbar = page.pyquery('.edit-bar').text()
+    assert 'Sitzung' in editbar
+    assert 'Massenbuchung' not in editbar

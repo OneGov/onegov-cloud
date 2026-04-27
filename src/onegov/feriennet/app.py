@@ -61,6 +61,7 @@ class FeriennetApp(TownApp):
                 BookingPeriod.active,
                 BookingPeriod.confirmed,
                 BookingPeriod.confirmable,
+                BookingPeriod.with_group_code,
                 BookingPeriod.finalized,
                 BookingPeriod.finalizable,
                 BookingPeriod.archived,

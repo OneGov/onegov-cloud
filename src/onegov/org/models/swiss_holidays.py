@@ -212,11 +212,11 @@ class SwissHolidays:
         yield easter(year), (_('Ostern'), )
 
         # Good Friday is celebrated if we have a canton other than TI, VS
-        if self._cantons > {'TI', 'VS'}:
+        if self._cantons - {'TI', 'VS'}:
             yield easter(year) - rd(days=2), (_('Karfreitag'), )
 
         # Easter Monday is celebrated if we have a canton other than VS
-        if self._cantons > {'VS'}:
+        if self._cantons - {'VS'}:
             yield easter(year) + rd(weekday=MO), (_('Ostermontag'), )
 
         if self._cantons & {

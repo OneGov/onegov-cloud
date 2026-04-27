@@ -1,7 +1,6 @@
 """ The onegov org collection of images uploaded to the site. """
 from __future__ import annotations
 
-from collections import defaultdict
 from datetime import date
 from markupsafe import Markup
 from morepath import redirect
@@ -9,7 +8,6 @@ from morepath.request import Response
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
-from onegov.form import as_internal_id
 from onegov.form.errors import (InvalidFormSyntax, MixedTypeError,
                                 DuplicateLabelError)
 from onegov.org import _, OrgApp
@@ -46,7 +44,6 @@ def get_filters(
 ) -> list[Filter]:
 
     filters = []
-    empty = ()
 
     radio_fields = {
         f.id for f in request.app.org.event_filter_fields if f.type == 'radio'
@@ -60,10 +57,11 @@ def get_filters(
         return f'{value} ({count})'
 
     for keyword, title, values in self.available_filters(sort_choices=False):
-        filters.append(Filter(title=title, tags=tuple(
+        selected = self.filter_keywords.getall(keyword)
+        options = tuple(
             CoreLink(
                 text=link_title(keyword, value),
-                active=value in self.filter_keywords.get(keyword, empty),
+                active=value in selected,
                 url=request.link(
                     self.for_toggled_keyword_value(
                         keyword,
@@ -74,53 +72,12 @@ def get_filters(
                 ),
                 rounded=keyword in radio_fields
             ) for value in values if get_count(keyword, value)
-        )))
+        )
+        if not options:
+            continue
+        filters.append(Filter(title=title, tags=options))
 
     return filters
-
-
-def keyword_count(
-    request: OrgRequest,
-    collection: OccurrenceCollection
-) -> dict[str, dict[str, int]]:
-
-    self = collection
-
-    filter_config = request.app.org.event_filter_configuration
-    keywords = tuple(
-        as_internal_id(keyword)
-        for keyword in filter_config.get('keywords', set())
-    )
-
-    fields = {
-        field.id: field
-        for field in request.app.org.event_filter_fields
-        if field.id in keywords
-    }
-
-    counts: dict[str, dict[str, int]] = {}
-
-    # NOTE: The counting can get incredibly expensive with many entries
-    #       so we should skip it when we know we can skip it
-    if not fields:
-        return counts
-
-    # FIXME: This is incredibly slow. We need to think of a better way.
-    for model in self.without_keywords_and_tags().query():
-        if not request.is_visible(model):
-            continue
-
-        for keyword, values in model.filter_keywords.items() if (
-                model.filter_keywords) else ():
-            if keyword in fields:
-                if not isinstance(values, list):
-                    values = [values]
-
-                for value in values:
-                    f_count = counts.setdefault(keyword, defaultdict(int))
-                    f_count[value] += 1
-
-    return counts
 
 
 @OrgApp.html(model=OccurrenceCollection, template='occurrences.pt',
@@ -153,7 +110,7 @@ def view_occurrences(
         self.set_event_filter_configuration(filter_config)
         self.set_event_filter_fields(request.app.org.event_filter_fields)
 
-        keyword_counts = keyword_count(request, self)
+        keyword_counts = self.keyword_counts()
         filters = get_filters(request, self, keyword_counts)
 
     if filter_type in ('tags', 'tags_and_filters'):

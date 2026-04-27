@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from collections.abc import Sequence
     from onegov.agency.models import ExtendedAgency
+    from onegov.agency.models import ExtendedPerson
     from onegov.agency.request import AgencyRequest
     from onegov.core.elements import Trait
 
@@ -41,6 +42,9 @@ class PageLayout(TownPageLayout):
 
 
 class PersonLayout(TownPersonLayout):
+    model: ExtendedPerson
+    request: AgencyRequest
+
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):

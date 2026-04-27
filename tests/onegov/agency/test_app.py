@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from io import BytesIO
-from onegov.agency.custom import get_global_tools
+from onegov.agency.custom import (
+    get_global_tools, get_top_navigation, get_modules
+)
 from onegov.agency.pdf import AgencyPdfAr
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
@@ -10,11 +12,13 @@ from onegov.core.elements import LinkGroup
 from onegov.core.utils import Bunch
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, Iterator
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.agency import AgencyApp
     from typing import TypeAlias
+    from onegov.town6.layout import NavigationEntry
 
     TextLinkGroup: TypeAlias = dict[str, list['TextLinkGroup | str | None']]
 
@@ -54,7 +58,7 @@ class DummyRequest:
 
 def test_app_custom(agency_app: AgencyApp) -> None:
     def as_text(
-        items: Iterable[Link | LinkGroup]
+        items: Iterable[Link | LinkGroup] | list[LinkGroup]
     ) -> list[TextLinkGroup | str | None]:
         result: list[TextLinkGroup | str | None] = []
         for item in items:
@@ -64,41 +68,55 @@ def test_app_custom(agency_app: AgencyApp) -> None:
                 result.append({item.title: as_text(item.links)})
         return result
 
+    def as_text_nav(
+        items: Iterator[NavigationEntry]
+    ) -> list[str | None]:
+        result: list[str | None] = []
+        for item in items:
+            result.append(item[1].text)
+        return result
+
+
     request: Any = DummyRequest()
     request.app = agency_app
 
-    # assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
+    assert as_text_nav(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == ['Login']
+    assert as_text([get_modules(request)]) == [{'Modules': []}]
 
     request.is_logged_in = True
     request.current_username = 'Peter'
-    # assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
+    assert as_text_nav(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
         {'Account': ['User Profile', 'Logout']}
     ]
+    assert as_text([get_modules(request)]) == [{'Modules': [
+        'Agencies', 'People', 'Forms']}]
 
     request.is_manager = True
-    # assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
+    assert as_text_nav(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
         {'Account': ['User Profile', 'Logout']},
         {'Management': ['Overview', 'Timeline', 'Files', 'Images', 'Payments',
-                        'Invoices', 'Text modules', 'Archived Tickets',
-                        'Forms', 'Surveys', 'Hidden contents']},
+                        'Invoices', 'Hidden contents']},
         {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
                      'Closed Tickets']}
     ]
+    assert as_text([get_modules(request)]) == [{'Modules': [
+        'Agencies', 'People', 'Forms']}]
 
     request.is_admin = True
-    # assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
+    assert as_text_nav(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
         {'Account': ['User Profile', 'Logout']},
         {'Management': ['Overview', 'Timeline', 'Files', 'Images', 'Payments',
-                        'Invoices', 'Text modules', 'Settings', 'Users',
-                        'User groups', 'Link Check', 'Archived Tickets',
-                        'Forms', 'Surveys', 'Hidden contents']},
+                        'Invoices', 'Users', 'User groups', 'Settings',
+                        'Link Check', 'Hidden contents']},
         {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
                      'Closed Tickets']}
     ]
+    assert as_text([get_modules(request)]) == [{'Modules': [
+        'Agencies', 'People', 'Forms']}]
 
 
 def test_app_root_pdf(agency_app: AgencyApp) -> None:
@@ -106,6 +124,7 @@ def test_app_root_pdf(agency_app: AgencyApp) -> None:
     assert agency_app.root_pdf_exists is False
 
     agency_app.root_pdf = BytesIO(b'PDF')
+    agency_app = agency_app  # undo narrowing
     assert agency_app.root_pdf == b'PDF'
     assert agency_app.root_pdf_exists is True
 
@@ -120,6 +139,7 @@ def test_app_pdf_class(agency_app: AgencyApp) -> None:
     assert agency_app.pdf_class == AgencyPdfAr
 
     agency_app.org.meta['pdf_layout'] = 'zg'
+    agency_app = agency_app  # undo narrowing
     assert agency_app.pdf_class == AgencyPdfZg
 
     agency_app.org.meta['pdf_layout'] = ''

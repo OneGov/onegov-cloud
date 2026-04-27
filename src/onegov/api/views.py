@@ -65,10 +65,19 @@ def view_api_endpoints(
                     'title': endpoint.title,
                     'description': endpoint.description,
                     'data': [
-                        {
+                        {'name': name} if not prompt else {
                             'name': name,
                             'prompt': prompt
-                        } if prompt else {'name': name}
+                        } if isinstance(prompt, str) else {
+                            'name': name,
+                            'prompt': 'One of the given values '
+                                      '(Can be specified multiple '
+                                      'times or left unspecified)',
+                            # NOTE: This is a custom extension of
+                            #       Collection+JSON, that is a little
+                            #       bit more machine-readable.
+                            'values': list(prompt)
+                        }
                         for name, prompt in endpoint.filters.items()
                     ]
                 }

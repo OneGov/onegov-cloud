@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from markupsafe import escape, Markup
 from onegov.core.orm.types import MarkupText
-from sqlalchemy import type_coerce
+from sqlalchemy import func, type_coerce
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, Mapped
+from onegov.core.orm.types import JSON
 
 
 from typing import overload, Any, Protocol, TYPE_CHECKING
@@ -323,16 +324,29 @@ class dict_property[T](hybrid_property[T]):  # noqa: N801
     def _default_expr(self, owner: type[Any]) -> ColumnElement[T]:
         column: ColumnElement[dict[str, Any]] = getattr(owner, self.attribute)
         expr = column[self.key]
+        coerced = False
         if self.value_type is None:
             pass
         elif issubclass(self.value_type, str):
             expr = expr.as_string()
+            coerced = True
         elif issubclass(self.value_type, bool):
             expr = expr.as_boolean()
+            coerced = True
         elif issubclass(self.value_type, float):
             expr = expr.as_float()
+            coerced = True
         elif issubclass(self.value_type, int):
             expr = expr.as_integer()
+            coerced = True
+        default = (
+            self.default() if callable(self.default) else self.default
+        )
+        if default is not None:
+            expr = func.coalesce(
+                expr,
+                default if coerced else type_coerce(default, JSON)
+            )
         return expr
 
     def __set_name__(self, owner: type[object], name: str) -> None:

@@ -53,6 +53,9 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
                         passive_deletes='all')
     )
 
+    #: The ZG username from KUB (e.g. 'zgache')
+    zg_username: Mapped[str | None]
+
     if TYPE_CHECKING:
         roles: Mapped[list[PASParliamentarianRole]]  # type: ignore[assignment]
 
