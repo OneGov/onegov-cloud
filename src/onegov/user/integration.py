@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from functools import cached_property
     from onegov.core.cache import RedisCacheRegion
     from onegov.core.request import CoreRequest
+    from onegov.core import cache as cache_module
     from onegov.user import User
     from onegov.user.auth.provider import (
         IntegratedAuthenticationProvider, OauthProvider,
@@ -85,6 +86,11 @@ class UserApp(WebassetsApp):
         def session(self) -> Callable[[], Session]: ...
         @property
         def cache(self) -> RedisCacheRegion: ...
+        def get_cache(
+            self,
+            name: str,
+            expiration_time: float
+        ) -> cache_module.RedisCacheRegion: ...
 
     auto_login_provider: AuthenticationProvider | None
 
@@ -117,6 +123,24 @@ class UserApp(WebassetsApp):
         """
 
         return None
+
+    def configure_login_rate_limit(self, **cfg: Any) -> None:
+        limit_cfg = cfg.get('login_rate_limit', {})
+        # (max attempts, window in seconds) per IP address
+        self.ip_login_rate_limit: tuple[int, int] = (
+            limit_cfg.get('ip_requests', 20),
+            limit_cfg.get('ip_expiration', 5 * 60),
+        )
+        # (max consecutive failures, lockout duration in seconds) per account
+        self.account_login_lockout: tuple[int, int] = (
+            limit_cfg.get('account_attempts', 10),
+            limit_cfg.get('account_lockout', 15 * 60),
+        )
+
+    @property
+    def login_rate_limit_cache(self) -> cache_module.RedisCacheRegion:
+        _limit, expiration = self.ip_login_rate_limit
+        return self.get_cache('login_rate_limits', expiration)
 
     def configure_authentication_providers(self, **cfg: Any) -> None:
         providers_cfg = cfg.get('authentication_providers', {})

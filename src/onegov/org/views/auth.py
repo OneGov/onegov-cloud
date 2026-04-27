@@ -19,10 +19,12 @@ from onegov.user.auth.provider import OauthProvider
 from onegov.user.auth.second_factor import MTANFactor
 from onegov.user.auth.second_factor import TOTPFactor
 from onegov.user.collections import TANCollection
+from onegov.user.errors import AccountLockedError
 from onegov.user.errors import AlreadyActivatedError
 from onegov.user.errors import ExistingUserError
 from onegov.user.errors import ExpiredSignupLinkError
 from onegov.user.errors import InvalidActivationTokenError
+from onegov.user.errors import RateLimitError
 from onegov.user.errors import UnknownUserError
 from onegov.user.forms import LoginForm
 from onegov.user.forms import MTANForm
@@ -95,7 +97,22 @@ def handle_login(
             form.username.data,
             request
         )
-        response = self.login_to(request=request, **form.login_data)
+        try:
+            response = self.login_to(request=request, **form.login_data)
+        except AccountLockedError as e:
+            request.alert(_(
+                'This account is locked. Try again in '
+                '${minutes} minutes.',
+                mapping={'minutes': e.minutes_remaining}
+            ))
+            response = None
+        except RateLimitError:
+            request.alert(
+                _('Too many login attempts. Please try again later.'))
+            response = None
+        else:
+            if not response:
+                request.alert(_('Wrong e-mail address, password or yubikey.'))
 
         if response:
             # HACK: It might be a good idea to move these messages to
@@ -111,8 +128,6 @@ def handle_login(
                 request.success(_('You have been logged in.'))
 
             return response
-
-        request.alert(_('Wrong e-mail address, password or yubikey.'))
 
     layout = layout or DefaultLayout(self, request)
     request.include('scroll-to-username')

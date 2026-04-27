@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import morepath
 
+from datetime import datetime
 from itsdangerous import URLSafeSerializer, BadData
 from itsdangerous.encoding import base64_encode, base64_decode
 from secrets import token_bytes
@@ -9,7 +10,9 @@ from onegov.core.utils import relative_url
 from onegov.user import log
 from onegov.user.auth.second_factor import SECOND_FACTORS
 from onegov.user.collections import UserCollection
+from onegov.user.errors import AccountLockedError
 from onegov.user.errors import ExpiredSignupLinkError
+from onegov.user.errors import RateLimitError
 from sedate import utcnow
 from webob import Response
 
@@ -205,6 +208,45 @@ class Auth:
 
         from onegov.user.integration import UserApp  # circular import
 
+        # IP-based rate limit: block the attempt before any expensive work
+        if isinstance(self.app, UserApp):
+            ip_limit, ip_window = self.app.ip_login_rate_limit
+            cache = self.app.login_rate_limit_cache
+            count, ts = cache.get_or_create(
+                client, creator=lambda: (0, utcnow())
+            )
+            if (utcnow() - ts).total_seconds() < ip_window:
+                count += 1
+            else:
+                ts = utcnow()
+                count = 1
+            cache.set(client, (count, ts))
+            if count > ip_limit:
+                log.info(f'IP rate limit exceeded for {client} ({username})')
+                raise RateLimitError()
+
+        # Look up user by username only (fast) for account-level lockout check
+        candidate = self.users.by_username(username)
+
+        if candidate is not None and isinstance(self.app, UserApp):
+            threshold, lockout_secs = self.app.account_login_lockout
+            attempts = candidate.failed_login_attempts or 0
+            if attempts >= threshold:
+                failed_at_str = candidate.failed_login_at
+                if failed_at_str:
+                    failed_at = datetime.fromisoformat(failed_at_str)
+                    elapsed = (
+                        utcnow().replace(tzinfo=None) - failed_at
+                    ).total_seconds()
+                    if elapsed < lockout_secs:
+                        remaining = int((lockout_secs - elapsed) / 60) + 1
+                        log.info(
+                            f'Account locked out for {username} '
+                            f'({attempts} failed attempts, '
+                            f'{remaining} min remaining)'
+                        )
+                        raise AccountLockedError(remaining)
+
         user = None
         source = None
 
@@ -227,6 +269,13 @@ class Auth:
 
         def fail() -> None:
             log.info(f'Failed login by {client} ({username})')
+            if candidate is not None:
+                candidate.failed_login_attempts = (
+                    (candidate.failed_login_attempts or 0) + 1
+                )
+                candidate.failed_login_at = (
+                    utcnow().replace(tzinfo=None).isoformat()
+                )
             return None
 
         if user is None:
@@ -264,6 +313,11 @@ class Auth:
         # set to NULL
         if user.source != source:
             return fail()  # type:ignore[func-returns-value]
+
+        # successful login: clear any lockout counters
+        if candidate is not None and candidate.failed_login_attempts:
+            candidate.failed_login_attempts = None
+            candidate.failed_login_at = None
 
         log.info(f'Successful login by {client} ({username})')
         return user

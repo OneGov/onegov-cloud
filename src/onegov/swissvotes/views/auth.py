@@ -13,6 +13,8 @@ from onegov.swissvotes.layouts import MailLayout
 from onegov.user import Auth
 from onegov.user import UserCollection
 from onegov.user.auth.second_factor import TOTPFactor
+from onegov.user.errors import AccountLockedError
+from onegov.user.errors import RateLimitError
 from onegov.user.forms import LoginForm
 from onegov.user.forms import PasswordResetForm
 from onegov.user.forms import RequestPasswordResetForm
@@ -45,8 +47,21 @@ def handle_login(
 
     if form.submitted(request):
         self.to = relative_url(layout.homepage_url)
-        response = self.login_to(request=request, **form.login_data)
-        form.error_message = _('Wrong username or password')  # type:ignore
+        try:
+            response = self.login_to(request=request, **form.login_data)
+        except AccountLockedError as e:
+            form.error_message = _(  # type:ignore
+                'This account is locked. Try again in ${minutes} minutes.',
+                mapping={'minutes': e.minutes_remaining}
+            )
+            response = None
+        except RateLimitError:
+            form.error_message = _(  # type:ignore
+                'Too many login attempts. Please try again later.'
+            )
+            response = None
+        # else:
+        #     form.error_message = _('Wrong username or password')  # type:ignore
     else:
         response = None
 

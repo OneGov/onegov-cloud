@@ -35,3 +35,18 @@ class InsecurePasswordError(OnegovUserError):
 
     def __init__(self) -> None:
         pass
+
+
+class RateLimitError(OnegovUserError):
+    """ Raised when the IP-based login rate limit is exceeded. """
+
+    def __init__(self) -> None:
+        pass
+
+
+class AccountLockedError(OnegovUserError):
+    """ Raised when an account is temporarily locked due to too many
+    failed login attempts. """
+
+    def __init__(self, minutes_remaining: int) -> None:
+        self.minutes_remaining = minutes_remaining

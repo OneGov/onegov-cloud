@@ -319,6 +319,12 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the phone number of this user
     phone_number: dict_property[str | None] = data_property()
 
+    #: consecutive failed login attempts (reset on success)
+    failed_login_attempts: dict_property[int | None] = data_property()
+
+    #: UTC timestamp (naive ISO string) of the last failed login attempt
+    failed_login_at: dict_property[str | None] = data_property()
+
     def cleanup_sessions(self, app: Framework) -> None:
         """ Removes stored sessions not valid anymore. """
 
