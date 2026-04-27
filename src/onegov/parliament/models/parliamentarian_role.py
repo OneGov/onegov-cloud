@@ -39,6 +39,7 @@ type ParliamentaryGroupRole = Literal[
     'none',
     'member',
     'vote_counter',
+    'vice_president',
     'president',
 ]
 
@@ -59,7 +60,7 @@ PARTY_ROLES: dict[PartyRole, str] = {
     'president': _('President'),
 }
 
-PARLIAMENTARY_GROUP_ROLES: dict[PartyRole, str] = {
+PARLIAMENTARY_GROUP_ROLES: dict[ParliamentaryGroupRole, str] = {
     'none': _('none'),
     'member': _('Member'),
     'vote_counter': _('Vote counter'),
