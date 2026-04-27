@@ -3,6 +3,8 @@ from __future__ import annotations
 from xml.etree.ElementTree import tostring
 
 import transaction
+from markupsafe import Markup
+
 from onegov.api.models import ApiKey
 from onegov.core.utils import Bunch
 from onegov.org.models import News
@@ -179,36 +181,41 @@ def test_migrate_links(client: Client) -> None:
 
     # create topic
     topic = Topic(title='Foo Topic', name='foo-topic')
-    topic.text = '<p>Wow, https://foo.ch/abc is a great page!</p>'
+    topic.text = Markup('<p>Wow, https://foo.ch/abc is a great page!</p>')
     session.add(topic)
-    topic_text = str(topic.text)
+    topic_text = topic.text
 
     # add news article (must be under the seeded /news/ root)
     from onegov.page import PageCollection
     news_root = PageCollection(session).by_path('/news/', ensure_type='news')
     assert isinstance(news_root, News)
     news = News(title='Big News', name='big-news', parent=news_root)
-    news.text = ('<p>Big news https://foo.ch/big-news and bigger news'
-                 'can be found here https://foo.ch/bigger-news</p>')
+    news.text = Markup(
+        '<p><a href="https://foo.ch/big-news">Big news</a> and '
+        '<a href="https://foo.ch/bigger-news">bigger news</a> can be found '
+        'here</p>'
+    )
     session.add(news)
-    news_text = str(news.text)
+    news_text = news.text
 
     transaction.commit()
 
-    def get_topic_text() -> str:
+    def get_topic_text() -> Markup:
         t = TopicCollection(session).by_title('Foo Topic')
         assert t is not None and t.text is not None
-        return str(t.text)
+        assert '&lt;p&gt;' not in t.text  # verify p tag not escaped
+        return t.text
 
-    def get_news_text() -> str:
+    def get_news_text() -> Markup:
         n = NewsCollection(request).by_title('Big News')
         assert n is not None and n.text is not None
-        return str(n.text)
+        assert '&lt;p&gt;' not in n.text  # verify p tag not escaped
+        return n.text
 
     assert old_domain in get_topic_text()
     assert old_domain in get_news_text()
 
-    # execute migrate links test
+    # execute migrate links as test
     client.login_admin()
     migrate_page = client.get('/migrate-links')
     migrate_page.form['old_domain'] = old_domain
