@@ -186,7 +186,8 @@ def test_migrate_links(client: Client) -> None:
 
     # create topic
     topic = Topic(title='Foo Topic', name='foo-topic')
-    topic.text = Markup('<p>Wow, https://foo.ch/abc is a great page!</p>')
+    topic.text = Markup('<p>Wow, <a href="https://foo.ch/abc">foo</a> is a '
+                        'great page!</p>')
     session.add(topic)
     topic_text = topic.text
 
@@ -196,7 +197,7 @@ def test_migrate_links(client: Client) -> None:
     assert isinstance(news_root, News)
     news = News(title='Big News', name='big-news', parent=news_root)
     news.text = Markup(
-        '<p><a href="https://foo.ch/big-news">Big news</a> and '
+        '<p>Big news https://foo.ch/big-news and '
         '<a href="https://foo.ch/bigger-news">bigger news</a> can be found '
         'here</p>'
     )
@@ -205,16 +206,26 @@ def test_migrate_links(client: Client) -> None:
 
     transaction.commit()
 
+    def verify_tags_in_text(text: Markup) -> None:
+        # verify p tag not escaped
+        assert '<p>' in text
+        assert '&lt;p&gt;' not in text
+
+        # verify a tag not escaped
+        assert '<a href="' in text
+        assert '</a>' in text
+        assert '&lt;a&gt;' not in text
+
     def get_topic_text() -> Markup:
         t = TopicCollection(request).by_title('Foo Topic')
         assert t is not None and t.text is not None
-        assert '&lt;p&gt;' not in t.text  # verify p tag not escaped
+        verify_tags_in_text(t.text)
         return t.text
 
     def get_news_text() -> Markup:
         n = NewsCollection(request).by_title('Big News')
         assert n is not None and n.text is not None
-        assert '&lt;p&gt;' not in n.text  # verify p tag not escaped
+        verify_tags_in_text(n.text)
         return n.text
 
     assert old_domain in get_topic_text()
