@@ -9,7 +9,9 @@ from onegov.core import Framework
 from onegov.core.security.identity_policy import IdentityPolicy
 from onegov.core.utils import Bunch
 from onegov.user import Auth, User, UserCollection, UserApp
+from onegov.user.errors import AccountLockedError
 from onegov.user.errors import ExpiredSignupLinkError
+from onegov.user.errors import RateLimitError
 from sedate import utcnow
 from unittest.mock import patch
 from webtest import TestApp as Client
@@ -394,3 +396,187 @@ def test_last_login_timestamp(session: Session, redis_url: str) -> None:
     assert user is not None
     assert user.last_login is not None
     assert user.last_login > first_login
+
+
+def _make_rate_limit_app(
+    postgres_dsn: str,
+    redis_url: str,
+    app_id: str,
+    ip_requests: int = 1000,
+    ip_expiration: int = 300,
+    account_attempts: int = 1000,
+    account_lockout: int = 300,
+) -> tuple[Any, Any]:
+    """Return a configured (Framework+UserApp, session) pair.
+
+    The app owns its session so all reads/writes share one connection.
+    Each test uses a unique app_id to namespace the Redis rate-limit cache.
+    """
+
+    class App(Framework, UserApp):
+        pass
+
+    @App.identity_policy()
+    def get_identity_policy() -> IdentityPolicy:
+        return IdentityPolicy()
+
+    App.commit()
+
+    app = App()
+    app.namespace = 'test'
+    app.configure_application(
+        dsn=postgres_dsn,
+        identity_secure=False,
+        redis_url=redis_url,
+        login_rate_limit={
+            'ip_requests': ip_requests,
+            'ip_expiration': ip_expiration,
+            'account_attempts': account_attempts,
+            'account_lockout': account_lockout,
+        },
+    )
+    app.set_application_id(app_id)
+    return app, app.session()
+
+
+def test_ip_rate_limit(postgres_dsn: str, redis_url: str) -> None:
+    app, session = _make_rate_limit_app(
+        postgres_dsn, redis_url,
+        app_id='test/ip-rate-limit',
+        ip_requests=2,
+        ip_expiration=300,
+        account_attempts=1000,
+    )
+    UserCollection(session).add('alice@example.org', 'correct', 'member')
+    transaction.commit()
+
+    auth = Auth(app)
+    request: Any = None
+
+    # two wrong-password attempts
+    assert auth.authenticate(
+        request=request, username='alice@example.org',
+        password='wrong', client='1.2.3.4') is None
+    assert auth.authenticate(
+        request=request, username='alice@example.org',
+        password='wrong', client='1.2.3.4') is None
+
+    # third attempt from same IP hits the limit
+    with pytest.raises(RateLimitError):
+        auth.authenticate(
+            request=request, username='alice@example.org',
+            password='wrong', client='1.2.3.4')
+
+    # correct password is also blocked while the IP is rate-limited
+    with pytest.raises(RateLimitError):
+        auth.authenticate(
+            request=request, username='alice@example.org',
+            password='correct', client='1.2.3.4')
+
+    # a different IP is unaffected
+    assert auth.authenticate(
+        request=request, username='alice@example.org',
+        password='correct', client='9.9.9.9') is not None
+
+
+def test_account_lockout(postgres_dsn: str, redis_url: str) -> None:
+    app, session = _make_rate_limit_app(
+        postgres_dsn, redis_url,
+        app_id='test/account-lockout',
+        ip_requests=1000,
+        account_attempts=3,
+        account_lockout=900,  # 15 min → minutes_remaining should be 15
+    )
+    UserCollection(session).add('bob@example.org', 'correct', 'member')
+    transaction.commit()
+
+    auth = Auth(app)
+    request: Any = None
+
+    # three wrong-password attempts
+    for _ in range(3):
+        assert auth.authenticate(
+            request=request, username='bob@example.org',
+            password='wrong', client='1.2.3.4') is None
+
+    # fourth attempt locks account
+    with pytest.raises(AccountLockedError) as exc_info:
+        auth.authenticate(
+            request=request, username='bob@example.org',
+            password='wrong', client='1.2.3.4')
+    assert exc_info.value.minutes_remaining == 15
+
+    # correct password is also rejected
+    with pytest.raises(AccountLockedError):
+        auth.authenticate(
+            request=request, username='bob@example.org',
+            password='correct', client='1.2.3.4')
+
+
+def test_account_lockout_resets_on_success(
+    postgres_dsn: str, redis_url: str
+) -> None:
+    app, session = _make_rate_limit_app(
+        postgres_dsn, redis_url,
+        app_id='test/lockout-reset',
+        ip_requests=1000,
+        account_attempts=3,
+        account_lockout=900,
+    )
+    UserCollection(session).add('carol@example.org', 'correct', 'member')
+    transaction.commit()
+
+    auth = Auth(app)
+    request: Any = None
+
+    # two failed attempts — not yet locked
+    for _ in range(2):
+        auth.authenticate(
+            request=request, username='carol@example.org',
+            password='wrong', client='1.2.3.4')
+        transaction.commit()
+
+    user = UserCollection(session).by_username('carol@example.org')
+    assert user is not None
+    assert user.failed_login_attempts == 2
+
+    # successful login clears the counters
+    assert auth.authenticate(
+        request=request, username='carol@example.org',
+        password='correct', client='1.2.3.4') is not None
+    transaction.commit()
+
+    user = UserCollection(session).by_username('carol@example.org')
+    assert user is not None
+    assert not user.failed_login_attempts
+
+
+def test_account_lockout_expires(postgres_dsn: str, redis_url: str) -> None:
+    app, session = _make_rate_limit_app(
+        postgres_dsn, redis_url,
+        app_id='test/lockout-expires',
+        ip_requests=1000,
+        account_attempts=3,
+        account_lockout=300,
+    )
+    user = UserCollection(session).add('dan@example.org', 'correct', 'member')
+    # simulate 3 failed attempts from 301 seconds ago
+    user.failed_login_attempts = 3
+    user.failed_login_at = (
+        utcnow().replace(tzinfo=None) - timedelta(seconds=301)
+    ).isoformat()
+    transaction.commit()
+
+    auth = Auth(app)
+    request: Any = None
+
+    # lockout has expired — correct password works again
+    result = auth.authenticate(
+        request=request, username='dan@example.org',
+        password='correct', client='1.2.3.4')
+    assert result is not None
+    transaction.commit()
+
+    user = UserCollection(session).by_username('dan@example.org')
+    assert user is not None
+    assert not user.failed_login_attempts
