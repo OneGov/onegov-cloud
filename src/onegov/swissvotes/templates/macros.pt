@@ -8,20 +8,12 @@
     <metal:navigation define-macro="top_navigation">
         <div class="main-navigation" tal:define="links top_navigation|layout.top_navigation">
             <nav class="top-bar" data-topbar role="navigation" tal:condition="links">
-                <ul class="title-area">
-                    <!--! this section needs to be included (even though it's empty),
-                    or the responsive menu bar icon won't be rendered -->
-                    <li class="name" style="width: 0;"></li>
-                    <li class="toggle-topbar menu-icon">
-                        <a href="#"><span>Menu</span></a>
-                    </li>
-                </ul>
                 <section class="top-bar-section">
                     <ul class="left" data-sortable data-sortable-url="${layout.move_page_url_template}">
                         <tal:block repeat="link links">
                             <li tal:attributes="data-sortable-id link.sortable_id|None;
                                                 class python: 'draggable' if getattr(link, 'sortable_id', None) else None">
-                                <tal:b replace="link(layout)" />
+                                <a href="${link.attrs['href']}">${link.text}</a>
                             </li>
                         </tal:block>
                     </ul>
@@ -30,6 +22,37 @@
             <div class="clearfix"></div>
         </div>
     </metal:navigation>
+
+    <metal:navigation define-macro="mobile_top_navigation">
+        <div class="main-navigation" tal:define="links top_navigation|layout.top_navigation">
+            <nav role="navigation" tal:condition="links">
+                    <ul>
+                        <tal:block repeat="link links">
+                            <li>
+                                <a href="${link.attrs['href']}">${link.text}</a>
+                            </li>
+                        </tal:block>
+                    </ul>
+            </nav>
+            <div class="clearfix"></div>
+        </div>
+    </metal:navigation>
+
+    <metal:navigation define-macro="lang_navigation">
+        <ul class="right" tal:define="current_locale_title [title for locale, lang, title, href in layout.locales if locale == request.locale][0]">
+            <li class="has-dropdown"><a class="">${current_locale_title} <i class="fa fa-chevron-right"></i><i class="fa fa-chevron-down rotate"></i></a>
+                <ul class="dropdown">
+                    <tal:block tal:repeat="(locale, lang, title, href) layout.locales">
+                        <li tal:condition="request.locale != locale">
+                            <a rel="alternate" href="${href}" lang="${lang}" hreflang="${lang}">${title}</a>
+                        </li>
+                    </tal:block>
+                </ul>
+            </li>
+        </ul>
+    </metal:navigation>
+
+
 
     <metal:editbar define-macro="editbar">
         <div class="row" tal:condition="layout.editbar_links">

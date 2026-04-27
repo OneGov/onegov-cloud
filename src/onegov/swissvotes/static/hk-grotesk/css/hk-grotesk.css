@@ -1,0 +1,95 @@
+/* HK Grotesk – Black */
+@font-face {
+    font-family: 'HK Grotesk';
+    font-weight: 900;
+    font-style: normal;
+    src: url(../fonts/HKGrotesk-Black.otf) format("opentype");
+}
+
+/* HK Grotesk – ExtraBold */
+@font-face {
+    font-family: 'HK Grotesk';
+    font-weight: 800;
+    font-style: normal;
+    src: url(../fonts/HKGrotesk-ExtraBold.otf) format("opentype");
+}
+
+/* HK Grotesk – Bold */
+@font-face {
+    font-family: 'HK Grotesk';
+    font-weight: 700;
+    font-style: normal;
+    src: url(../fonts/HKGrotesk-Bold.otf) format("opentype");
+}
+
+/* HK Grotesk – Bold Italic */
+@font-face {
+    font-family: 'HK Grotesk';
+    font-weight: 700;
+    font-style: italic;
+    src: url(../fonts/HKGrotesk-BoldItalic.otf) format("opentype");
+}
+
+/* HK Grotesk – SemiBold */
+@font-face {
+    font-family: 'HK Grotesk';
+    font-weight: 600;
+    font-style: normal;
+    src: url(../fonts/HKGrotesk-SemiBold.otf) format("opentype");
+}
+
+/* HK Grotesk – SemiBold Italic */
+@font-face {
+    font-family: 'HK Grotesk';
+    font-weight: 600;
+    font-style: italic;
+    src: url(../fonts/HKGrotesk-SemiBoldItalic.otf) format("opentype");
+}
+
+/* HK Grotesk – Medium */
+@font-face {
+    font-family: 'HK Grotesk';
+    font-weight: 500;
+    font-style: normal;
+    src: url(../fonts/HKGrotesk-Medium.otf) format("opentype");
+}
+
+/* HK Grotesk – Medium Italic */
+@font-face {
+    font-family: 'HK Grotesk';
+    font-weight: 500;
+    font-style: italic;
+    src: url(../fonts/HKGrotesk-MediumItalic.otf) format("opentype");
+}
+
+/* HK Grotesk – Regular */
+@font-face {
+    font-family: 'HK Grotesk';
+    font-weight: 400;
+    font-style: normal;
+    src: url(../fonts/HKGrotesk-Regular.otf) format("opentype");
+}
+
+/* HK Grotesk – Regular Italic */
+@font-face {
+    font-family: 'HK Grotesk';
+    font-weight: 400;
+    font-style: italic;
+    src: url(../fonts/HKGrotesk-Italic.otf) format("opentype");
+}
+
+/* HK Grotesk – Light */
+@font-face {
+    font-family: 'HK Grotesk';
+    font-weight: 300;
+    font-style: normal;
+    src: url(../fonts/HKGrotesk-Light.otf) format("opentype");
+}
+
+/* HK Grotesk – Light Italic */
+@font-face {
+    font-family: 'HK Grotesk';
+    font-weight: 300;
+    font-style: italic;
+    src: url(../fonts/HKGrotesk-LightItalic.otf) format("opentype");
+}

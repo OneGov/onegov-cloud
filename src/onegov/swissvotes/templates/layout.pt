@@ -27,7 +27,7 @@
     -->
 
     <link rel="stylesheet" type="text/css" href="${layout.static_path}/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="${layout.static_path}/apercu/css/apercu.css">
+    <link rel="stylesheet" type="text/css" href="${layout.static_path}/hk-grotesk/css/hk-grotesk.css">
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="apple-touch-icon" sizes="57x57" href="${layout.static_path}/images/apple-icon-57x57.png">
     <link rel="icon" type="image/png" sizes="16x16" href="${layout.static_path}/images/favicon-16x16.png">
@@ -35,36 +35,79 @@
     <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/7.54.0/bundle.min.js" integrity="sha384-EmlJLN9Q0yu0/2UUCIYnEM88jpQ7xUhtNI2ZeXb/ci3cwoAoIQl350N4PQPlMbP5" crossorigin="anonymous"></script>
     <script tal:condition="layout.app.sentry_dsn" src="${layout.sentry_init_path}"></script>
 </head>
-<body tal:attributes="layout.custom_body_attributes|{}">
+<body id="${layout.page_id}" tal:attributes="layout.custom_body_attributes|{}">
     <header>
-        <div class="languages">
-            <div class="row">
-                <nav role="navigation" class="right">
-                    <ul class="inline-list">
-                        <tal:block tal:repeat="(locale, lang, title, href) layout.locales">
-                            <li tal:condition="request.locale != locale">
-                                <a rel="alternate" href="${href}" lang="${lang}" hreflang="${lang}">${lang}</a>
-                            </li>
-                        </tal:block>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-        <div class="title">
-            <div class="row">
-                <div class="columns small-12 small-only-text-center">
-                    <a href="${layout.homepage_url}"><img src="${layout.static_path}/images/logo.svg" height="100" alt="Swissvotes"></a>
-                    <a href="http://unibe.ch"><img class="right hide-for-small" src="${layout.static_path}/images/logo_unibe.svg" height="100" alt="Universität Basel"></a>
-                    <a href="https://anneepolitique.swiss"><img class="right hide-for-small" src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
-                    <div class="clearfix"></div>
+        <div class="nav-header">
+            <div class="main-header">
+                <div class="row row-wide show-for-medium-up">
+                    <div class="columns medium-2">
+                        <a href="${layout.homepage_url}">
+                            <img class="logo" id="white_logo" src="${layout.static_path}/images/Swissvotes/weiss/Logo_swissvotes_weiss.svg" height="100" alt="année politique suisse">
+                            <img class="logo" id="red_logo" src="${layout.static_path}/images/Swissvotes/rot/Logo_swissvotes_rot.svg" height="100" alt="année politique suisse">
+                        </a>
+                    </div>
+                    <div class="columns small-12 medium-8 main-nav">
+                        <div metal:use-macro="layout.macros['top_navigation']"></div>
+                    </div>
+                    <div class="columns medium-2 language-nav">
+                        <nav class="top-bar show-for-medium-up" data-topbar="" role="navigation" data-options="is_hover: false">
+                            <section class="top-bar-section">
+                                <!-- Right Nav Section -->
+                                <div metal:use-macro="layout.macros['lang_navigation']"></div>
+                            </section>
+                        </nav>
+                    </div>
+                </div>
+                <div class="row show-for-small-only">
+                    <div class="columns medium-12 mobile-header">
+                            <a class="logo" href="${layout.homepage_url}"><img src="${layout.static_path}/images/Swissvotes/weiss/Logo_swissvotes_weiss.svg" height="100" alt="année politique suisse"></a>
+                            <div class="project-by">
+                                <span i18n:translate>A project by</span><br/>
+                                <a href="https://anneepolitique.swiss">
+                                    <img class="logo-small" src="${layout.static_path}/images/APS/weiss/Logo_annee-politique-suisse_weiss.svg" height="100" alt="année politique suisse">
+                                </a>
+                            </div>
+                            <a class="button" href="#" data-reveal-id="mobileMenu"><i class="fa fa-bars"></i></a>
+
+                            <div id="mobileMenu" class="reveal-modal why" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+                            <div class="menu">
+                                <a class="close-reveal-modal button" aria-label="Close"><i class="fa fa-times"></i></a>
+                                <div metal:use-macro="layout.macros['mobile_top_navigation']"></div>
+                                <div class="top-header-menu">
+                                    <nav class="top-bar" data-topbar="" role="navigation" data-options="is_hover: false">
+                                        <section class="top-bar-section">
+                                        </section>
+                                    </nav>
+
+                                    <nav class="top-bar" data-topbar="" role="navigation" data-options="is_hover: false">
+                                        <section class="top-bar-section">
+                                            <div metal:use-macro="layout.macros['lang_navigation']"></div>
+                                        </section>
+                                    </nav>
+                                </div>
+                            </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="columns small-12">
-                <div metal:use-macro="layout.macros['top_navigation']"></div>
+            <div class="row row-wide show-for-medium-up title-header">
+                <div class="columns small-2">
+                    <div class="project-by">
+                        <span i18n:translate>A project by</span><br/>
+                        <a href="https://anneepolitique.swiss">
+                            <img class="logo-small" id="white_logo" src="${layout.static_path}/images/APS/weiss/Logo_annee-politique-suisse_weiss.svg" height="100" alt="année politique suisse">
+                            <img class="logo-small" id="red_logo" src="${layout.static_path}/images/APS/rot/Logo_annee-politique-suisse_rot.svg" height="100" alt="année politique suisse">
+                        </a>
+                    </div>
+                </div>
+                <div class="columns small-12 medium-8">
+                    <h1><span class="main-title"><div metal:define-slot="main-title"></div></span>
+                    <span class="sub-title"><div metal:define-slot="sub-title"></div></span></h1>
+                </div>
+                <div class="columns small-12 medium-2 show-for-medium-up"></div>
             </div>
+
         </div>
+
         <div class="row">
             <div class="columns small-12">
                 <div metal:use-macro="layout.macros['editbar']"></div>
@@ -76,7 +119,6 @@
             </div>
         </div>
     </header>
-
     <main class="row">
         <div class="columns small-12">
             <div class="row">
@@ -101,26 +143,97 @@
     </main>
 
     <footer>
-        <div class="row">
-            <div class="columns small-12">
-                <div class="links">
-                     <div class="row">
-                        <div class="small-12 medium-4 columns small-only-text-center">
-                            <tal:block replace="layout.disclaimer_link(layout)" />
-                        </div>
-                        <div class="small-12 medium-4 columns text-center">
-                            <tal:block replace="layout.imprint_link(layout)" />
-                        </div>
-                        <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
-                            <tal:block replace="layout.data_protection_link(layout)" />
-                        </div>
+        <div class="row row-wide top-part">
+            <div class="columns small-12 medium-3">
+                <p>
+                    <span i18n:translate>A project by</span><br/>
+                <a href="https://anneepolitique.swiss"><img src="${layout.static_path}/images/APS/rot/Logo_annee-politique-suisse_rot.svg" height="100" alt="année politique suisse"></a>
+                </p>
+                <p>
+                <b>Année Politique Suisse</b><br />
+                    Universität Bern<br />
+                    Institut für Politikwissenschaft<br />
+                    Fabrikstrasse 8<br />
+                    3012 Bern
+                </p>
+                <p>
+                    T <a href="tel:+41316318411">+41 31 631 84 11</a><br />
+                    M <a href="mailto:info@anneepolitique.swiss">info@anneepolitique.swiss</a>
+                </p>
+            </div>
+            <div class="columns small-12 medium-6 newsletter">
+                <label for="mce-EMAIL"><span i18n:translate>Would you like more context?</span><br/><span i18n:translate>Subscribe to our newsletter.</span></label>
+                    <div id="mc_embed_signup">
+                        <form action="https://unibe.us16.list-manage.com/subscribe/post?u=3b0c6ec97512f826fa5d002e1&amp;id=ea265c0d71&amp;f_id=0018c0e3f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank">
+                            <div id="mc_embed_signup_scroll">
+                                <div class="mc-field-group">
+                                    <input type="email" name="EMAIL" class="required email" id="mce-EMAIL" required="" i18n:attributes="placeholder" placeholder="E-mail address">
+                                </div>
+                                <div class="optionalParent">
+                                    <div class="clear foot">
+                                        <button class="submit-newsletter" type="submit">
+                                            <span aria-hidden="true" class="fa fa-arrow-right"></span>
+                                            <span class="show-for-sr">subscribe</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="mce-responses" class="clear foot">
+                                <div class="response" id="mce-error-response" style="display: none;"></div>
+                                <div class="response" id="mce-success-response" style="display: none;"></div>
+                            </div>
+                            <div aria-hidden="true" style="position: absolute; left: -5000px;">
+                                /* real people should not fill this in and expect good things - do not remove this or risk form bot signups */
+                                <input type="text" name="b_3b0c6ec97512f826fa5d002e1_ea265c0d71" tabindex="-1" value="">
+                            </div>
+                        </form>
                     </div>
-                     <div class="row">
-                        <div class="small-12 columns small-only-text-center medium-text-right manage-links">
-                            <a tal:condition="layout.logout_url" href="${layout.logout_url}" i18n:translate>Logout</a>
-                        </div>
+            </div>
+            <div class="columns small-12 medium-3 show-for-medium-up"></div>
+        </div>
+        <div class="row row-wide bottom-part">
+            <div class="columns small-12 medium-3 main-projects">
+                <div class="row">
+                    <div class="columns small-12">
+                        <p><span i18n:translate>Main projects</span><br><span i18n:translate>by Année Politique Suisse</span></p>
+                    </div>
+                    <div class="columns small-12">
+                        <a href="https://www.politchronik.swiss/"><img src="${layout.static_path}/images/Politchronik/weiss/Logo_politchronik_weiss.svg" height="100" alt="Politchronik Logo"></a>
+                        <a href="${'https://anneepolitique.swiss/fr/projekte/parteienatlas/' if request.locale == 'fr_CH' else 'https://anneepolitique.swiss/de/projekte/parteienatlas/'}"><img src="${layout.static_path}/images/Parteienatlas/weiss/Logo_parteienatlas_weiss.svg" height="100" alt="Parteienatlas Logo"></a>
                     </div>
                 </div>
+            </div>
+            <div class="columns small-12 medium-6 large-4 supported-by">
+                <div class="row">
+                    <div class="columns small-12">
+                        <p><span i18n:translate>Supported by</span><br><br></p>
+                    </div>
+                    <div class="columns small-12">
+                        <img src="${layout.static_path}/images/sagw.svg" height="100" alt="SAGW Logo"></img>
+                        <a href="https://www.unibe.ch/">
+                        <img src="${layout.static_path}/images/unibern.svg" height="100" alt="Universität Bern Logo"></img>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="columns small-12 medium-5"></div>
+        </div>
+        <div class="row row-wide bottom-part copyright-social">
+            <div class="columns small-12 medium-6">
+                <div class="copyright">
+                    <span>Copyright APS 2024</span>
+                    <tal:block replace="layout.data_protection_link(layout)" />
+                    <tal:block replace="layout.disclaimer_link(layout)" />
+                    <a tal:condition="layout.logout_url" href="${layout.logout_url}" i18n:translate>Logout</a>
+                </div>
+            </div>
+            <div class="columns small-12 medium-6 social-media-links">
+                    <span i18n:translate>Follow us</span>
+                    <a href="https://mstdn.social/@swissvotes" title="Mastodon" target="_blank"><img src="${layout.static_path}/images/Icons/mastodon.svg" alt="Mastodon"></a>
+                    <a href="https://www.instagram.com/annee_politique_suisse" title="Instagram" target="_blank"><img src="${layout.static_path}/images/Icons/instagram.svg" alt="Instagram"></a>
+                    <a href="https://www.facebook.com/anneepolitiquesuisse" title="Facebook" target="_blank"><img src="${layout.static_path}/images/Icons/facebook.svg" alt="Facebook"></a>
+                    <a href="https://ch.linkedin.com/company/ann%C3%A9e-politique-suisse" title="LinkedIn" target="_blank"><img src="${layout.static_path}/images/Icons/linkedIn.svg" alt="LinkedIn"></a>
+                    <a href="https://bsky.app/profile/anneepolitique.bsky.social" title="Bluesky" target="_blank"><img src="${layout.static_path}/images/Icons/blueSky.svg" alt="Bluesky"></a>
             </div>
         </div>
     </footer>

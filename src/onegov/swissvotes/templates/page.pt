@@ -1,7 +1,9 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.swissvotes">
     <tal:block metal:fill-slot="title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="main-title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="sub-title">${layout.sub_title|None}</tal:block>
     <tal:block metal:fill-slot="content">
-        <h2>${layout.title}</h2>
+
         <div class="page-content">
             <div class="row" tal:condition="slides">
                 <div class="columns small-12 show-for-small-only">

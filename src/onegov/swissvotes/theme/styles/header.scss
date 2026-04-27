@@ -1,58 +1,250 @@
 header {
     margin-bottom: .75rem;
 
-    .languages {
-        background-color: $primary-color;
+    a {
+        text-decoration: none;
+    }
 
-        ul {
-            margin: 0 .9375rem;
-        }
-
+    .top-header,
+    .main-header {
         li {
-            font-size: .875rem;
-            padding: .5rem 0;
-        }
+            border-bottom: 3px solid transparent;
+            transition: all linear .2s;
 
-        a {
-            color: $white;
+            &:hover {
+                border-bottom: 3px solid $primary-color;
+                transition: all linear .2s;
+
+                a {
+                    color: $primary-color !important;
+                }
+            }
+
+            a {
+                color: $primary-color;
+                font-weight: normal;
+                text-decoration: none;
+
+                :hover {
+                    color: $primary-color !important;
+                }
+            }
         }
     }
 
-    .title {
-        img {
-            margin: 1.75rem 0;
+    .main-header {
+        border-bottom: 1px solid $primary-color;
 
-            &.right {
-                margin-left: 1rem;
+        .logo {
+            max-width: 150px;
+            margin: 1rem 0;
+        }
+
+        .project-by {
+
+            span {
+                color: $primary-color;
+                margin-left: 11px;
+                font-size: .8rem;
+            }
+
+            .logo-small {
+                max-width: 80px;
+                margin-left: 6px;
+                margin-top: -0.3rem;
             }
         }
 
-    }
 
-    .main-navigation {
-        background-color: $topbar-bg-color;
-        margin-bottom: .1rem;
-        min-height: 3rem;
+        .row.show-for-medium-up {
+            @media #{$medium-up} {
+                display: flex !important;
+            }
+        }
 
-        .top-bar {
+        .main-navigation {
+            background-color: transparent;
+            min-height: 3rem;
+
+            .top-bar-section {
+                display: flex;
+                justify-content: center;
+            }
+
             &.expanded {
                 box-shadow: none;
             }
 
             ul li {
+                background-color: transparent;
+
                 a {
-                    color: $body-font-color;
-                    font-size: .8rem;
-                    font-weight: normal;
-                    text-transform: uppercase;
+                    background-color: transparent !important;
+                    color: $primary-color;
+                    font-size: 1rem;
+                    font-weight: bold;
 
                     @media #{$medium-up} {
                         padding: .1rem 1.2rem !important;
 
+                    }
+                }
+            }
+        }
+
+        .title-header {
+            border-top: 1px solid $primary-color;
+            padding: 1.5rem 0;
+            display: flex;
+            align-items: center;
+
+            h1 {
+                color: $primary-color;
+                font-weight: bold;
+                margin: 0;
+                text-align: center;
+            }
+
+            .main-title {
+                display: block;
+                padding-top: .5rem;
+            }
+
+            .sub-title {
+                font-size: 2rem;
+                font-weight: normal;
+            }
+        }
+
+        .show-for-small-only {
+            background: $primary-color;
+
+            .mobile-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .project-by {
+                    flex-grow: 2;
+
+                    span {
+                        color: $white;
+                    }
+                }
+
+
+                .logo img {
+                    height: 5rem;
+                }
+
+                .button {
+                    background-color: $white;
+                    margin-bottom: 0;
+                    padding: .8rem 1rem;
+                    border-radius: .2rem;
+
+                    i {
+                        color: $primary-color;
+                    }
+                }
+
+                * {
+                    color: $white;
+                }
+            }
+        }
+
+        .main-nav {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .language-nav {
+            padding-right: 0;
+
+            li {
+                border-bottom: 3px solid transparent;
+                font-size: .875rem;
+                padding: 0 !important;
+
+                a {
+                    font-size: .88rem !important;
+                    padding: .5rem 1rem !important;
+                    padding-bottom: .3rem !important;
+                }
+
+                &:not(.has-form) a:not(.button) {
+                    line-height: inherit;
+                }
+            }
+
+            .has-dropdown {
+                border: 1px solid $primary-color;
+                border-right: 0;
+                border-top: 0;
+                padding: 0;
+                padding-bottom: .5rem;
+
+                a {
+                    border-bottom: 3px solid transparent;
+                    transition: all linear .2s;
+
+                    &:hover {
+                        border-bottom: 3px solid $primary-color;
+                    }
+                }
+
+                .dropdown {
+                    border: 1px solid $primary-color;
+                    border-right: 0;
+                    margin-left: -.8px;
+
+                    li {
+                        border-bottom: 3px solid transparent;
+                        padding: 0 !important;
+
                         &:hover {
-                            @include primary-color-background;
+                            border-bottom: 3px solid $primary-color;
                         }
                     }
+                }
+            }
+
+            .top-bar-section {
+
+                .right,
+                .right .dropdown {
+                    border-top: 0 !important;
+                    margin-right: 0;
+
+                }
+            }
+        }
+    }
+
+
+    .top-bar {
+        background-color: transparent;
+        height: auto;
+
+        .top-bar-section {
+            li {
+                background-color: transparent !important;
+            }
+
+            a {
+                background-color: transparent !important;
+                color: $primary-color;
+                font-weight: normal;
+            }
+
+            .dropdown {
+                background-color: $white;
+
+                a {
+                    color: $primary-color !important;
+                    font-weight: normal;
                 }
             }
         }
@@ -61,7 +253,6 @@ header {
     .edit-bar {
         background-color: $editbar-bg-color;
         margin-bottom: 2px;
-        margin-top: -2px;
 
         .border {
             border-bottom: 1px dashed $iron;
@@ -102,7 +293,7 @@ header {
             }
         }
 
-        > a {
+        >a {
             margin-bottom: 0;
         }
 
@@ -117,12 +308,29 @@ header {
             width: 15px;
         }
 
-        .delete-icon::before { @include icon('\f014'); }
-        .edit-icon::before { @include icon('\f040'); }
-        .export-icon::before { @include icon('\f019'); }
-        .page-icon::before { @include icon('\f0f6'); }
-        .upload-icon::before { @include icon('\f0ee'); }
-        .update-icon::before { @include icon('\f021'); }
+        .delete-icon::before {
+            @include icon('\f014');
+        }
+
+        .edit-icon::before {
+            @include icon('\f040');
+        }
+
+        .export-icon::before {
+            @include icon('\f019');
+        }
+
+        .page-icon::before {
+            @include icon('\f0f6');
+        }
+
+        .upload-icon::before {
+            @include icon('\f0ee');
+        }
+
+        .update-icon::before {
+            @include icon('\f021');
+        }
     }
 
     .breadcrumbs {
@@ -156,7 +364,7 @@ header {
                 float: none;
                 padding-left: 0;
 
-                + li {
+                +li {
                     margin-top: .5rem;
                 }
 
@@ -173,13 +381,227 @@ header {
     }
 }
 
+#mobileMenu {
+    background: $primary-color;
+
+    .menu {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 3.75rem);
+
+        ul {
+            list-style: none;
+
+            li {
+                color: $white;
+            }
+        }
+
+        * {
+            color: $white;
+            text-decoration: none;
+        }
+
+        .button {
+            background-color: $white;
+            margin-bottom: 0;
+            position: relative;
+            padding: .8rem 1rem;
+            height: fit-content;
+            width: fit-content;
+            align-self: flex-end;
+            top: auto;
+            font-size: 1rem;
+            right: auto;
+            border-radius: .2rem;
+
+            i {
+                color: $primary-color;
+            }
+        }
+
+        .main-navigation {
+
+            ul {
+                margin-left: -1.875rem;
+                margin-right: -1.875rem;
+                margin-top: 3rem;
+
+                li {
+                    border-bottom: 1px solid $white;
+                    padding: 1.875rem;
+                    padding-bottom: 1rem;
+                    padding-top: 1.5rem;
+                    font-size: 2rem;
+                    font-weight: bold;
+
+                    &:first-child {
+                        border-top: 1px solid $white;
+                    }
+                }
+            }
+        }
+
+        .top-header-menu {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            flex-grow: 2;
+
+            .fa-chevron-down {
+                display: none;
+            }
+
+            .fa-chevron-right {
+                display: block;
+            }
+
+
+            .back.js-generated {
+                h5 {
+                    &::after {
+                        @include icon('\f053');
+                    }
+                }
+
+                a {
+                    opacity: 0;
+                }
+            }
+
+            .dropdown,
+            .has-dropdown {
+                border: 0;
+
+                i {
+                    float: inline-end;
+                    margin-left: .5rem;
+                    margin-top: .2rem;
+                }
+            }
+
+            ul {
+                margin-left: 0;
+                margin-bottom: 0;
+            }
+
+            .top-bar {
+                height: fit-content;
+                background-color: transparent;
+
+                * {
+                    background-color: transparent !important;
+                }
+
+                li a {
+                    padding-left: 0;
+                }
+            }
+        }
+    }
+}
+
+
+.top-bar-section .has-dropdown>a::after {
+    border: 0;
+}
 
 @media print {
+
     .languages,
-    .title .columns:not(:first-child),
+    .main-header .columns:not(:first-child),
     .main-navigation,
     .top-bar,
     .breadcrumbs {
         display: none;
+    }
+}
+
+#white_logo,
+.fa-chevron-right {
+    display: none;
+}
+
+#red_logo {
+    display: block;
+}
+
+#page-page-home {
+
+    .project-by span {
+        color: $white;
+    }
+
+    #white_logo {
+        display: block;
+    }
+
+    #red_logo {
+        display: none;
+    }
+
+    .top-header,
+    .main-header,
+    .dropdown:not(.right-side) {
+        background: $primary-color;
+
+        a {
+            color: $white !important;
+        }
+
+        li:hover {
+            border-bottom: 3px solid $white;
+        }
+
+        .language-nav {
+            .has-dropdown {
+                border: 1px solid $white;
+                border-right: 0;
+                border-top: 0;
+                padding: 0;
+
+                a {
+                    border-bottom: 3px solid transparent;
+                    transition: all linear .2s;
+
+                    &:hover {
+                        border-bottom: 3px solid $white;
+                    }
+                }
+
+                .dropdown {
+                    border: 1px solid $white;
+                    border-right: 0;
+                    margin-left: -.8px;
+
+                    li {
+                        border-bottom: 3px solid transparent;
+                        padding: 0 !important;
+
+                        &:hover {
+                            border-bottom: 3px solid $white;
+                        }
+                    }
+                }
+            }
+
+            .top-bar-section {
+
+                .right,
+                .right .dropdown {
+                    border-top: 0 !important;
+                    margin-right: 0;
+
+                }
+            }
+        }
+    }
+
+    .title-header {
+        border-top: 1px solid $white;
+
+        h1 {
+            color: $white;
+        }
     }
 }

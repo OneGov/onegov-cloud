@@ -1,16 +1,175 @@
 footer {
-    background-color: $primary-color;
-    color: $white;
-    font-size: .75rem;
-    margin-top: 3.5rem;
-    padding: 2.5rem 0 3.5rem;
+    margin-top: 2rem;
 
-    .links {
-        padding: .5em 1.2rem;
+    .top-part {
+        border-top: 1px solid $primary-color;
+
+        > .columns {
+            padding: 2rem .9375rem;
+            border-bottom: 1px solid $primary-color;
+        }
+
+        @media #{$medium-up} {
+            display: flex;
+            align-items: end;
+        }
+
+        * {
+            color: $primary-color;
+            font-size: .88rem;
+        }
+
+        a {
+            text-decoration: underline;
+        }
+
+        label {
+            margin-bottom: .5rem;
+        }
+
+        img {
+            max-height: 5rem;
+            margin-left: -.3rem;
+        }
+
+        input {
+            border: 0;
+            border-bottom: 1px solid $primary-color;
+            box-shadow: none;
+            padding-left: 0;
+            font-size: 1.2rem;
+
+            &:focus {
+                border-bottom: 2px solid $primary-color;
+                background: $white;
+            }
+
+            &::placeholder {
+                color: $primary-color !important;
+                font-size: 1.2rem;
+            }
+        }
+
+        #mc_embed_signup_scroll {
+            display: flex;
+
+            .mc-field-group {
+                flex: 1;
+            }
+        }
+
+        .submit-newsletter {
+            border: 1px solid $primary-color;
+            border-radius: .15rem;
+            padding: 1rem 1.2rem;
+            transition: all .2s ease-in-out;
+            margin-top: -.9rem;
+            margin-left: -.1rem;
+
+            span {
+                color: $white;
+            }
+
+            &:hover {
+                background-color: $white;
+                transition: all .2s ease-in-out;
+
+                span {
+                    color: $primary-color;
+                }
+            }
+        }
     }
 
-    a {
-        color: $white;
+    .bottom-part {
+        * {
+            font-size: .75rem;
+            color: $white;
+        }
+
+        background-color: $primary-color;
+
+        a {
+            color: $white;
+        }
+
+        .main-projects {
+            @media #{$medium-up} {
+                border-right: 1px solid $white;
+                width: 260px;
+            }
+
+            img {
+                margin-right: 1rem;
+                max-height: 3rem;
+            }
+        }
+
+        .main-projects,
+        .supported-by {
+            font-weight: bold;
+        }
+
+        .supported-by {
+            @media #{$small-only} {
+                border-top: 1px solid $white;
+            }
+
+            @media #{$medium-up} {
+                .row {
+                    padding-bottom: 0;
+                }
+
+                p {
+                    margin-bottom: 1rem;
+                }
+            }
+
+            img {
+                max-height: 4rem;
+                margin-left: -.8rem;
+            }
+        }
+
+        > .columns > * {
+            padding: 1rem 0;
+        }
+
+        &.copyright-social {
+
+            span,
+            a {
+                margin-right: 1rem;
+            }
+
+            > .columns {
+                border-top: 1px solid $white;
+                padding-right: 0;
+
+                & > div {
+                    align-items: center;
+                    display: flex;
+                }
+
+                &.social-media-links {
+                    font-weight: bold;
+                    padding: 0;
+                    display: flex;
+                    justify-content: end;
+
+                    a {
+                        background: $white;
+                        color: $primary-color;
+                        height: 3.2rem;
+                        width: 3.2rem;
+                        margin-right: 0;
+                        border-left: 1px solid $primary-color;
+                        display: flex;
+                        padding: .5rem;
+                    }
+                }
+            }
+        }
     }
 }
 

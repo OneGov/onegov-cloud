@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-10-08 08:58+0200\n"
+"POT-Creation-Date: 2026-04-13 16:07+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -150,14 +150,17 @@ msgstr "Quelle"
 msgid "eMuseum.ch"
 msgstr "eMuseum.ch"
 
+msgid "Plakatsammlung Basel"
+msgstr "Plakatsammlung Basel"
+
 msgid "Social Archives"
 msgstr "Sozialarchiv"
 
-msgid "Basel Poster Collection"
-msgstr "Plakatsammlung Basel"
-
 msgid "No eMuseum API key available."
 msgstr "Kein eMuseum API Schlüssel verfügbar."
+
+msgid "No Plakatsammlung API key available."
+msgstr "Kein Plakatsammlung API Key verfügbar."
 
 msgid "Title"
 msgstr "Titel"
@@ -246,6 +249,9 @@ msgstr "Die Aktualisierung der Metadaten kann einige Zeit in Anspruch nehmen."
 
 msgid "Metadata"
 msgstr "Metadaten"
+
+msgid "back"
+msgstr "zurück"
 
 msgid "Votes"
 msgstr "Abstimmungen"
@@ -1495,6 +1501,9 @@ msgstr "Italienisch"
 msgid "Rhaeto-Romanic"
 msgstr "Rätoromanisch"
 
+msgid "English"
+msgstr "Englisch"
+
 msgid "Other"
 msgstr "Anderes"
 
@@ -1622,6 +1631,9 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
+msgid "A project by"
+msgstr "Ein Projekt von"
+
 msgid ""
 "This webpage is best viewed with a modern Browser. Consider to use Chrome, "
 "Firefox or Edge. <dynamic element>"
@@ -1629,8 +1641,29 @@ msgstr ""
 "Diese Webseite wird am besten mit einem modernen Browser angezeigt. Erwägen "
 "Sie, Chrome, Firefox oder Edge zu verwenden. <dynamic element>"
 
+msgid "Would you like more context?"
+msgstr "Möchten Sie mehr Kontext?"
+
+msgid "Subscribe to our newsletter."
+msgstr "Abonnieren Sie unseren Newsletter."
+
+msgid "E-mail address"
+msgstr "E-Mail-Adresse"
+
+msgid "Main projects"
+msgstr "Hauptprojekte"
+
+msgid "by Année Politique Suisse"
+msgstr "von Année Politique Suisse"
+
+msgid "Supported by"
+msgstr "Unterstützt durch"
+
 msgid "Logout"
 msgstr "Abmelden"
+
+msgid "Follow us"
+msgstr "Folge uns"
 
 msgid "Forgot your password?"
 msgstr "Passwort vergessen?"
@@ -2025,6 +2058,7 @@ msgstr "Stimm&shy;beteiligung"
 msgid "Search results in the documents on this vote"
 msgstr "Suchresultate in den Dokumenten zu dieser Vorlage"
 
+#. type:ignore
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
 
@@ -2047,6 +2081,7 @@ msgstr ""
 msgid "Password changed."
 msgstr "Passwort geändert."
 
+#. type:ignore[attr-defined]
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Ungültige E-Mail oder abgelaufener Link."
 
@@ -2077,6 +2112,9 @@ msgstr "Seite nicht gefunden"
 
 msgid "The page you are looking for could not be found."
 msgstr "Die angeforderte Seite konnte nicht gefunden werden."
+
+msgid "The database on Swiss referendums"
+msgstr "Die Datenbank zu den Schweizer Volksabstimmungen"
 
 msgid "Page added."
 msgstr "Seite hinzugefügt."
@@ -2210,11 +2248,21 @@ msgstr ""
 msgid "Some external resources could not be updated: ${failed}"
 msgstr "Einige externe Quellen konnten nicht aktualisiert werden: ${failed}"
 
+#, python-format
+msgid "Details ${details}"
+msgstr "Details ${details}"
+
 msgid "All votes deleted"
 msgstr "Alle Abstimmungen gelöscht"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
+
+#~ msgid "APS-Newsletter abonnieren"
+#~ msgstr "Subscribe to the APS newsletter"
+
+#~ msgid "Basel Poster Collection"
+#~ msgstr "Plakatsammlung Basel"
 
 #~ msgid "Technical report"
 #~ msgstr "Technischer Bericht"

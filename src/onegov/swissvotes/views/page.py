@@ -177,6 +177,10 @@ def view_page(
     if self.show_timeline:
         request.include('mastodon')
 
+    if self.id == 'home':
+        layout.title = _('Homepage')
+        layout.sub_title = _('The database on Swiss referendums')
+
     return {
         'layout': layout,
         'files': file_urls,

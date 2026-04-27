@@ -24,6 +24,7 @@ h4,
 h5,
 h6 {
     @include prefix(hyphens, auto);
+    color: $body-font-color;
 }
 
 /*
@@ -56,6 +57,25 @@ main {
 }
 
 /*
+    Button
+*/
+.button.secondary {
+    background-color: $gray-dark;
+    color: $black;
+
+    &:hover {
+        background-color: darken($gray-dark, 10%);
+        color: $black;
+    }
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    border: 2px solid $primary-color !important;
+    accent-color: $primary-color !important;
+}
+
+/*
     Rounded corners for panels.
 */
 .panel {
@@ -76,12 +96,9 @@ main {
 /*
     Links
 */
-a,
-a:active,
-a:focus {
-    color: #428bca;
+a {
+    color: $primary-color;
 }
-
 
 /*
     Print Styles
@@ -249,7 +266,7 @@ h2 small {
     SVG
 */
 svg text {
-    font-family: "Apercu", Helvetica, Roboto, Arial, sans-serif !important;
+    font-family: "HK Grotesk", Helvetica, Roboto, Arial, sans-serif !important;
 }
 
 #patrons {
@@ -420,3 +437,32 @@ $modal-padding-md: 70px;
         }
     }
 }
+
+.has-dropdown {
+
+    .rotate {
+        -moz-transition: all 200ms linear;
+        -webkit-transition: all 200ms linear;
+        transition: all 200ms linear;
+    }
+
+    &.hover .rotate {
+        -moz-transform: rotate(180deg);
+        -ms-transform: rotate(180deg);
+        -webkit-transform: rotate(180deg);
+        transform: rotate(180deg);
+    }
+}
+
+.newsletter label span {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+// .right-off-canvas-menu {
+//     width: 100%;
+// }
+
+// .move-left > .inner-wrap {
+//     transform: translate3d(-100%, 0, 0);
+// }
