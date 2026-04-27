@@ -206,7 +206,7 @@ def test_migrate_links(client: Client) -> None:
     transaction.commit()
 
     def get_topic_text() -> Markup:
-        t = TopicCollection(session).by_title('Foo Topic')
+        t = TopicCollection(request).by_title('Foo Topic')
         assert t is not None and t.text is not None
         assert '&lt;p&gt;' not in t.text  # verify p tag not escaped
         return t.text
