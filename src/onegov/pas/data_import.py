@@ -353,6 +353,10 @@ def import_commissions_excel(
         'mitglied': 'member',
         'gast': 'guest',
         'erweitertes mitglied': 'extended_member',
+        'vizepräsident': 'member',
+        'vizepräsidentin': 'member',
+        'vize-präsident': 'member',
+        'vize-präsidentin': 'member',
         'präsident': 'president',
         'präsidentin': 'president',
     }
