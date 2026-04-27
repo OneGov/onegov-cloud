@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-21 13:23+0200\n"
+"POT-Creation-Date: 2026-04-27 17:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -4343,21 +4343,6 @@ msgstr "Source"
 msgid "Appendix"
 msgstr "Annexe"
 
-msgid "Subject"
-msgstr "Sujet"
-
-msgid "Owner"
-msgstr "Propriétaire"
-
-msgid "Reaction Time"
-msgstr "Temps de réaction"
-
-msgid "Process Time"
-msgstr "Temps de traitement"
-
-msgid "Event Source"
-msgstr "Source d'événement"
-
 msgid "Total"
 msgstr "Total"
 
@@ -4377,6 +4362,21 @@ msgstr "Paiement"
 
 msgid "Total Amount"
 msgstr "Montant total"
+
+msgid "Subject"
+msgstr "Sujet"
+
+msgid "Owner"
+msgstr "Propriétaire"
+
+msgid "Reaction Time"
+msgstr "Temps de réaction"
+
+msgid "Process Time"
+msgstr "Temps de traitement"
+
+msgid "Event Source"
+msgstr "Source d'événement"
 
 msgid ""
 "The record behind this ticket was removed. The following information is a "
@@ -7171,6 +7171,9 @@ msgstr "Cette semaine"
 
 msgid "o'clock"
 msgstr "h"
+
+msgid "Edit Event Filter Configuration"
+msgstr "Modifier la configuration du filtre d'événements"
 
 msgid "Event Export"
 msgstr "Exporter un événement"
