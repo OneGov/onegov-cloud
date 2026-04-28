@@ -80,6 +80,41 @@ def test_login(client: Client) -> None:
     assert links.text() == 'Anmelden'
 
 
+def test_login_ip_rate_limit(client: Client) -> None:
+    client.app.ip_login_rate_limit = (2, 300)
+
+    login_page = client.get('/auth/login')
+
+    for _ in range(2):
+        login_page.form['username'] = 'admin@example.org'
+        login_page.form['password'] = 'wrong'
+        login_page = login_page.form.submit()
+        assert 'Too many login attempts' not in login_page.text
+
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'wrong'
+    login_page = login_page.form.submit()
+    assert 'Too many login attempts. Please try again later.' in login_page.text
+
+
+def test_login_account_lockout(client: Client) -> None:
+    client.app.account_login_lockout = (3, 900)
+
+    login_page = client.get('/auth/login')
+
+    for _ in range(3):
+        login_page.form['username'] = 'admin@example.org'
+        login_page.form['password'] = 'wrong'
+        login_page = login_page.form.submit()
+        assert 'This account is locked' not in login_page.text
+
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'wrong'
+    login_page = login_page.form.submit()
+    assert 'This account is locked.' in login_page.text
+    assert 'minutes' in login_page.text
+
+
 def test_login_setup_mtan(client: Client, smsdir: str) -> None:
     client.app.mtan_second_factor_enabled = True
     client.app.mtan_automatic_setup = True
