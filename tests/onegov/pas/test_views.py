@@ -123,7 +123,6 @@ def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
     page.form['email_primary'] = 'first.last@example.org'
     page = page.form.submit().follow()
     assert 'First Last' in page
-    assert ' Das Parlamentsmitglied wurde automatisch für den' in page
 
     page = page.click('Bearbeiten')
     page.form['gender'] = 'female'
@@ -235,7 +234,7 @@ def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
     assert '1 Resultat' in client.get('/search?q=aa')
     assert '1 Resultat' in client.get('/search?q=bb')
     assert '1 Resultat' in client.get('/search?q=cc')
-    assert '2 Resultate' in client.get('/search?q=first')
+    assert '1 Resultat' in client.get('/search?q=first')
     assert '1 Resultat' in client.get('/search?q=Q1')
 
     # Delete
@@ -719,7 +718,8 @@ def test_fetch_commissions_parliamentarians_json(
     parl_president = parliamentarians.add(
         first_name='Alice',
         last_name='President',
-        email_primary='alice.president@example.org'
+        email_primary='alice.president@example.org',
+        zg_username='zgalice',
     )
 
     # Add president to Commission A (using the ID we saved earlier)
@@ -732,7 +732,7 @@ def test_fetch_commissions_parliamentarians_json(
 
     # Create and configure user
     users = UserCollection(session)
-    user = users.by_username('alice.president@example.org')
+    user = users.by_username('zgalice')
     assert user is not None
     user.role = 'commission_president'
     user.password = 'test'
@@ -741,7 +741,7 @@ def test_fetch_commissions_parliamentarians_json(
     transaction.commit()
 
     # Login as commission president
-    client.login('alice.president@example.org', 'test')
+    client.login('zgalice', 'test')
 
     # Commission president should only see Commission A
     # (where they're president)
@@ -908,11 +908,13 @@ def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
         first_name='Hans',
         last_name='Präsident',
         email_primary='hans.praesident@example.org',
+        zg_username='zghans',
     )
     vice = parliamentarians.add(
         first_name='Lisa',
         last_name='Vizepräsidentin',
         email_primary='lisa.vize@example.org',
+        zg_username='zglisa',
     )
     session.flush()
     president_id = str(president.id)

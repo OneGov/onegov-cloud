@@ -36,7 +36,8 @@ def test_view_dashboard_as_parliamentarian(client: Client[TestPasApp]) -> None:
     parliamentarian = parliamentarians.add(
         first_name='Pia',
         last_name='Parliamentarian',
-        email_primary='pia.parliamentarian@example.org'
+        email_primary='pia.parliamentarian@example.org',
+        zg_username='zgpia',
     )
 
     # Add commission membership
@@ -50,7 +51,7 @@ def test_view_dashboard_as_parliamentarian(client: Client[TestPasApp]) -> None:
 
     # Set correct password and role for the created user
     users = UserCollection(session)
-    user = users.by_username('pia.parliamentarian@example.org')
+    user = users.by_username('zgpia')
     assert user is not None
     user.password = 'test'
     user.role = 'parliamentarian'
@@ -59,7 +60,7 @@ def test_view_dashboard_as_parliamentarian(client: Client[TestPasApp]) -> None:
     transaction.commit()
 
     # Login as parliamentarian
-    client.login('pia.parliamentarian@example.org', 'test')
+    client.login('zgpia', 'test')
 
     # Should be able to access dashboard
     page = client.get('/pas-settings')
@@ -81,7 +82,8 @@ def test_view_dashboard_as_commission_president(
     parliamentarian = parliamentarians.add(
         first_name='Peter',
         last_name='President',
-        email_primary='peter.president@example.org'
+        email_primary='peter.president@example.org',
+        zg_username='zgpeter',
     )
 
     # Make them commission president
@@ -94,7 +96,7 @@ def test_view_dashboard_as_commission_president(
 
     # Update user role to commission_president
     users = UserCollection(session)
-    user = users.by_username('peter.president@example.org')
+    user = users.by_username('zgpeter')
     assert user is not None
     user.role = 'commission_president'
     user.password = 'test'
@@ -103,7 +105,7 @@ def test_view_dashboard_as_commission_president(
     transaction.commit()
 
     # Login as commission president
-    page = client.login('peter.president@example.org', 'test')
+    page = client.login('zgpeter', 'test')
     assert 'falsches Passwort' not in page
 
     # Should be able to access dashboard
@@ -126,7 +128,8 @@ def test_commission_president_has_private_access_to_commission(
     parliamentarian = parliamentarians.add(
         first_name='Emma',
         last_name='President',
-        email_primary='emma.president@example.org'
+        email_primary='emma.president@example.org',
+        zg_username='zgemma',
     )
 
     # Make them commission president
@@ -139,7 +142,7 @@ def test_commission_president_has_private_access_to_commission(
 
     # Update user role to commission_president
     users = UserCollection(session)
-    user = users.by_username('emma.president@example.org')
+    user = users.by_username('zgemma')
     assert user is not None
     user.role = 'commission_president'
     user.password = 'test'
@@ -151,7 +154,7 @@ def test_commission_president_has_private_access_to_commission(
     transaction.commit()
 
     # Login as commission president
-    client.login('emma.president@example.org', 'test')
+    client.login('zgemma', 'test')
 
     # Should have private access to commission
     page = client.get(f'/commission/{commission_id}')
@@ -174,7 +177,8 @@ def test_commission_president_private_access_permission_rule(
     parliamentarian = parliamentarians.add(
         first_name='Frank',
         last_name='President',
-        email_primary='frank.president@example.org'
+        email_primary='frank.president@example.org',
+        zg_username='zgfrank',
     )
 
     # Make them commission president
@@ -187,7 +191,7 @@ def test_commission_president_private_access_permission_rule(
 
     # Update user role to commission_president
     users = UserCollection(session)
-    user = users.by_username('frank.president@example.org')
+    user = users.by_username('zgfrank')
     assert user is not None
     user.role = 'commission_president'
 
@@ -196,7 +200,7 @@ def test_commission_president_private_access_permission_rule(
     # Test permission rule with president identity
     identity = Identity(
         uid='foo',
-        userid='frank.president@example.org',
+        userid='zgfrank',
         role='commission_president',
         application_id=client.app.application_id,
         groupids=frozenset()
@@ -229,7 +233,8 @@ def test_parliamentarian_no_private_access_to_commission(
     parliamentarian = parliamentarians.add(
         first_name='Mary',
         last_name='Member',
-        email_primary='mary.member@example.org'
+        email_primary='mary.member@example.org',
+        zg_username='zgmary',
     )
 
     # Make them regular commission member
@@ -242,7 +247,7 @@ def test_parliamentarian_no_private_access_to_commission(
 
     # Update user role to parliamentarian
     users = UserCollection(session)
-    user = users.by_username('mary.member@example.org')
+    user = users.by_username('zgmary')
     assert user is not None
     user.role = 'parliamentarian'
 
@@ -251,7 +256,7 @@ def test_parliamentarian_no_private_access_to_commission(
     # Test permission rule with parliamentarian identity
     identity = Identity(
         uid='foo',
-        userid='mary.member@example.org',
+        userid='zgmary',
         groupids=frozenset(),
         role='parliamentarian',
         application_id=client.app.application_id
@@ -280,7 +285,8 @@ def test_commission_president_no_access_to_different_commission(
     parliamentarian = parliamentarians.add(
         first_name='George',
         last_name='President',
-        email_primary='george.president@example.org'
+        email_primary='george.president@example.org',
+        zg_username='zggeorge',
     )
 
     # Make them president of finance commission only
@@ -293,7 +299,7 @@ def test_commission_president_no_access_to_different_commission(
 
     # Update user role to commission_president
     users = UserCollection(session)
-    user = users.by_username('george.president@example.org')
+    user = users.by_username('zggeorge')
     assert user is not None
     user.role = 'commission_president'
 
@@ -302,7 +308,7 @@ def test_commission_president_no_access_to_different_commission(
     # Test permission rule with president identity
     identity = Identity(
         uid='foo',
-        userid='george.president@example.org',
+        userid='zggeorge',
         groupids=frozenset(),
         role='commission_president',
         application_id=client.app.application_id
@@ -365,14 +371,17 @@ def test_commission_president_with_no_parliamentarian_record(
     ) is False
 
 
-@pytest.mark.parametrize('role,user_email', [
-    ('parliamentarian', 'files.parliamentarian@example.org'),
-    ('commission_president', 'files.president@example.org'),
+@pytest.mark.parametrize('role,user_email,zg_user', [
+    ('parliamentarian', 'files.parliamentarian@example.org',
+     'zgfilesparl'),
+    ('commission_president', 'files.president@example.org',
+     'zgfilespres'),
 ])
 def test_view_files_collection(
     client: Client[TestPasApp],
     role: str,
-    user_email: str
+    user_email: str,
+    zg_user: str,
 ) -> None:
     """Parliamentarians and commission presidents should be able to access
     the files collection"""
@@ -383,7 +392,8 @@ def test_view_files_collection(
     parliamentarian = parliamentarians.add(
         first_name='Files',
         last_name='Viewer',
-        email_primary=user_email
+        email_primary=user_email,
+        zg_username=zg_user,
     )
 
     if role == 'commission_president':
@@ -400,7 +410,7 @@ def test_view_files_collection(
 
     # Set user role and password
     users = UserCollection(session)
-    user = users.by_username(user_email)
+    user = users.by_username(zg_user)
     assert user is not None
     user.role = role
     user.password = 'test'
@@ -408,7 +418,7 @@ def test_view_files_collection(
     transaction.commit()
 
     # Login as user
-    client.login(user_email, 'test')
+    client.login(zg_user, 'test')
 
     page = client.get('/files')
     assert page.status_code == 200
@@ -429,6 +439,7 @@ def test_parliamentarian_self_bookings_show_in_list(
         first_name='Parla',
         last_name='Mentarian',
         email_primary='parla.mentarian@example.org',
+        zg_username='zgparla',
     )
 
     session.add(PASCommissionMembership(
@@ -445,15 +456,14 @@ def test_parliamentarian_self_bookings_show_in_list(
         active=True,
     )
 
-    user = UserCollection(session).by_username(
-        'parla.mentarian@example.org')
+    user = UserCollection(session).by_username('zgparla')
     assert user is not None
     user.password = 'test'
     user.role = 'parliamentarian'
     user.active = True
     transaction.commit()
 
-    client.login('parla.mentarian@example.org', 'test')
+    client.login('zgparla', 'test')
 
     for a_type in ('commission', 'shortest', 'study'):
         page = client.get('/attendences/new')
@@ -487,17 +497,17 @@ def test_parliamentarian_sees_add_link_but_not_bulk(
         first_name='Eva',
         last_name='Editbar',
         email_primary='eva.editbar@example.org',
+        zg_username='zgeva',
     )
 
-    user = UserCollection(session).by_username(
-        'eva.editbar@example.org')
+    user = UserCollection(session).by_username('zgeva')
     assert user is not None
     user.password = 'test'
     user.role = 'parliamentarian'
     user.active = True
     transaction.commit()
 
-    client.login('eva.editbar@example.org', 'test')
+    client.login('zgeva', 'test')
 
     page = client.get('/attendences')
     editbar = page.pyquery('.edit-bar').text()

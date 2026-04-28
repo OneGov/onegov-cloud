@@ -47,7 +47,7 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
 
     # the user account related to this parliamentarian
     user: Mapped[User] = relationship(
-        primaryjoin='foreign(PASParliamentarian.email_primary) == '
+        primaryjoin='foreign(PASParliamentarian.zg_username) == '
                     'User.username',
         backref=backref('parliamentarian', uselist=False,
                         passive_deletes='all')
