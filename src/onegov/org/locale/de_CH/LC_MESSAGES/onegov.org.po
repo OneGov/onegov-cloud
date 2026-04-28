@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-27 17:28+0200\n"
+"POT-Creation-Date: 2026-04-27 15:01-0400\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -4348,8 +4348,8 @@ msgstr "Anzahl"
 msgid "VAT"
 msgstr "MwSt"
 
-#.
 #. credit card
+#.
 msgid "Payment"
 msgstr "Zahlung"
 
@@ -5164,8 +5164,8 @@ msgstr "Neue Kunden Nachricht in Ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -6322,8 +6322,8 @@ msgid "Delete availability period"
 msgstr "Verfügbarkeitszeitraum löschen"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -6388,6 +6388,16 @@ msgstr ""
 msgid "Topics A-Z"
 msgstr "Themen A-Z"
 
+#, python-format
+msgid "This account is locked. Try again in ${minutes} minutes."
+msgstr ""
+
+msgid "Too many login attempts. Please try again later."
+msgstr ""
+
+msgid "Wrong e-mail address, password or yubikey."
+msgstr "Falsche E-Mail Adresse, falsches Passwort oder falscher Yubikey."
+
 msgid "Your userprofile is incomplete. Please update it before you continue."
 msgstr ""
 "Ihr Benutzerprofil ist unvollständig. Bitte vervollständigen Sie es bevor "
@@ -6395,9 +6405,6 @@ msgstr ""
 
 msgid "You have been logged in."
 msgstr "Sie wurden angemeldet."
-
-msgid "Wrong e-mail address, password or yubikey."
-msgstr "Falsche E-Mail Adresse, falsches Passwort oder falscher Yubikey."
 
 #, python-format
 msgid "Login to ${org}"

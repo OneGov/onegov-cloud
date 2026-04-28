@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-04-27 17:28+0200\n"
+"POT-Creation-Date: 2026-04-27 15:01-0400\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4346,8 +4346,8 @@ msgstr "Quantità"
 msgid "VAT"
 msgstr "IVA"
 
-#.
 #. credit card
+#.
 msgid "Payment"
 msgstr "Pagamento"
 
@@ -5151,8 +5151,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -6311,8 +6311,8 @@ msgid "Delete availability period"
 msgstr "Elimina il periodo di disponibilità"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
@@ -6374,14 +6374,21 @@ msgstr "La disponibilità è stata eliminata, insieme a ${n} allocazioni"
 msgid "Topics A-Z"
 msgstr "Argomenti A-Z"
 
+#, python-format
+msgid "This account is locked. Try again in ${minutes} minutes."
+msgstr ""
+
+msgid "Too many login attempts. Please try again later."
+msgstr ""
+
+msgid "Wrong e-mail address, password or yubikey."
+msgstr "Indirizzo e-mail, password o Yubikey errati."
+
 msgid "Your userprofile is incomplete. Please update it before you continue."
 msgstr "Il tuo profilo utente è incompleto. Aggiornalo prima di proseguire."
 
 msgid "You have been logged in."
 msgstr "Hai effettuato l'accesso."
-
-msgid "Wrong e-mail address, password or yubikey."
-msgstr "Indirizzo e-mail, password o Yubikey errati."
 
 #, python-format
 msgid "Login to ${org}"
