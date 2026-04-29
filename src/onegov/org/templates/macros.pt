@@ -1090,7 +1090,9 @@
         </tal:b>
 
         <dt i18n:translate>Title</dt>
-        <dd>${event.title}</dd>
+        <dd>
+            <tal:b condition="event.highlight|nothing"><i class="fa fa-star" aria-hidden="true"></i> </tal:b>${event.title}
+        </dd>
 
         <dt i18n:translate>Description</dt>
         <dd tal:content="escape(event.description).replace('\n', Markup('<br>'))" />
@@ -1257,7 +1259,7 @@
         </div>
         <div class="large-9 medium-8 small-7 columns calendar-text-column">
             <h3>
-                <a tal:attributes="href request.link(occurrence) if use_links else None">${occurrence.title}</a>
+                <tal:b condition="occurrence.event.highlight|nothing"><i class="fa fa-star" aria-hidden="true"></i> </tal:b><a tal:attributes="href request.link(occurrence) if use_links else None">${occurrence.title}</a>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
             </h3>
             <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>

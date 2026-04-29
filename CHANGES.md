@@ -1,8 +1,44 @@
 # Changes
 
+## 2026.24
+
+`2026-04-24` | [5482237bcd...7be5be95d6](https://github.com/OneGov/onegov-cloud/compare/5482237bcd^...7be5be95d6)
+
+### Api
+
+##### New filters.
+
+Includes also OGC-3085 which is similar.
+
+`Feature` | [OGC-3086](https://linear.app/onegovcloud/issue/OGC-3086) | [7be5be95d6](https://github.com/onegov/onegov-cloud/commit/7be5be95d66ad56cc667e8bbbc9811a7c95fabf6)
+
+### Feriennet
+
+##### Fix bug where hidden needs are displayed
+
+`Bugfix` | [PRO-1530](https://linear.app/projuventute/issue/PRO-1530) | [5482237bcd](https://github.com/onegov/onegov-cloud/commit/5482237bcd942170bd6a495e4b24b6e93346d8b0)
+
+##### Add translations for group code
+
+`Bugfix` | [PRO-931](https://linear.app/projuventute/issue/PRO-931) | [eeee14f0ef](https://github.com/onegov/onegov-cloud/commit/eeee14f0efe716b8089d84677ad8fc1b120fd1d8)
+
+### Pas
+
+##### Add missing filter for plenary session.
+
+`Bugfix` | [70af86f00d](https://github.com/onegov/onegov-cloud/commit/70af86f00dc43aacb3db061892be2ca156fae95b)
+
+##### Show `zg_username` on parliamentarian.
+
+`Bugfix` | [b32b7fd8c6](https://github.com/onegov/onegov-cloud/commit/b32b7fd8c6e806c7f6b4f8355068c8a87b292d51)
+
+## swi
+
+`2026-04-23` | [b2808d3bc1...aa61b72930](https://github.com/OneGov/onegov-cloud/compare/b2808d3bc1^...aa61b72930)
+
 ## 2026.23
 
-`2026-04-23` | [415f877415...6f0b2e7340](https://github.com/OneGov/onegov-cloud/compare/415f877415^...6f0b2e7340)
+`2026-04-23` | [415f877415...ef4ba26201](https://github.com/OneGov/onegov-cloud/compare/415f877415^...ef4ba26201)
 
 ### Api
 
@@ -1819,82 +1855,4 @@ They got replaced with relationships to meeting items
 ##### Adds validation against a list of commonly used passwords
 
 `Feature` | [OGC-2737](https://linear.app/onegovcloud/issue/OGC-2737) | [a048ece0af](https://github.com/onegov/onegov-cloud/commit/a048ece0afad0cffeb90d246c6a33c9733361e75)
-
-## 2025.61
-
-`2025-11-03` | [93a5f5203e...c79c709d87](https://github.com/OneGov/onegov-cloud/compare/93a5f5203e^...c79c709d87)
-
-### Feriennet
-
-##### Update banners.
-
-`Feature` | [PRO-1437](https://linear.app/projuventute/issue/PRO-1437) | [ec5e2ff043](https://github.com/onegov/onegov-cloud/commit/ec5e2ff043644e0577e03e764e3c3c5dec59c03e)
-
-### File
-
-##### Adds `X-Content-Type-Options: nosniff` header to uploaded files
-
-`Feature` | [OGC-2750](https://linear.app/onegovcloud/issue/OGC-2750) | [44b9456cba](https://github.com/onegov/onegov-cloud/commit/44b9456cbac23dc726941fcaf1c13485f238acf7)
-
-##### Switches to `Content-Disposition: attachment` for most uploads
-
-There's only really a small list of content types we want to serve
-inline, such as images, videos and PDF files, we continue to serve
-them inline and serve everything else as attachments.
-
-`Bugfix` | [OGC-2733](https://linear.app/onegovcloud/issue/OGC-2733) | [8eb56af3c1](https://github.com/onegov/onegov-cloud/commit/8eb56af3c1b2642a30a499dd04ecf27bae752960)
-
-### Org
-
-##### Adds a my reservations PDF to the ticket list for RSV tickets
-
-`Feature` | [OGC-2756](https://linear.app/onegovcloud/issue/OGC-2756) | [5ac8e0bd32](https://github.com/onegov/onegov-cloud/commit/5ac8e0bd323f51be7e3a970472562d9ce2fb8a7e)
-
-##### Invalidates related TANs after authentication
-
-This also decreases the validity period of mTANs used as a second factor
-
-`Bugfix` | [OGC-2749](https://linear.app/onegovcloud/issue/OGC-2749) | [bb3782adb9](https://github.com/onegov/onegov-cloud/commit/bb3782adb99a2af293213e2cc1ebc7e5a32e710c)
-
-##### Fixes crash in `file-links` template macro
-
-`Bugfix` | [54e794bac3](https://github.com/onegov/onegov-cloud/commit/54e794bac36555d9adc1ba36e971a814984f2b06)
-
-##### Uses a more sensible column as the `fts_id` for `ExternalLink`
-
-`Bugfix` | [e7210a3096](https://github.com/onegov/onegov-cloud/commit/e7210a309647df9fade4e4ea8269b27b7befb2af)
-
-##### Fixes invisible partitions in reservation calendar
-
-`Bugfix` | [OGC-2764](https://linear.app/onegovcloud/issue/OGC-2764) | [c07ac95a1d](https://github.com/onegov/onegov-cloud/commit/c07ac95a1ddfb6a2eaa1be97a79bcbdde362635f)
-
-### Search
-
-##### Integrates indexer into transaction workflow with a data manager
-
-This also refactors some code that relied on the old indexer behavior
-
-`Feature` | [OGC-2759](https://linear.app/onegovcloud/issue/OGC-2759) | [24b68fba31](https://github.com/onegov/onegov-cloud/commit/24b68fba316962aa50edfb6870599eaa48efa6e4)
-
-### Town6
-
-##### Fixes empty links still rendered due to `populate_obj`.
-
-`Bugfix` | [OGC-2761](https://linear.app/onegovcloud/issue/OGC-2761) | [835976629e](https://github.com/onegov/onegov-cloud/commit/835976629e8bebedf5fb67493e164e1b6b306a1c)
-
-### User
-
-##### Raises minimum password length from 8 to 10
-
-`Feature` | [OGC-2736](https://linear.app/onegovcloud/issue/OGC-2736) | [2948b7da2e](https://github.com/onegov/onegov-cloud/commit/2948b7da2eb63a367f541cd38dd075f83e6d535d)
-
-## 2025.60
-
-`2025-10-24` | [7136036d60...4b63568190](https://github.com/OneGov/onegov-cloud/compare/7136036d60^...4b63568190)
-
-### Search
-
-##### Only processes indexer queue on the main thread
-
-`Bugfix` | [7136036d60](https://github.com/onegov/onegov-cloud/commit/7136036d60d622f20ab80d98d309bc81481d45e3)
 

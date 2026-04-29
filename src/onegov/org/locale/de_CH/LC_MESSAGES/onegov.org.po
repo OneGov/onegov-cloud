@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-21 13:23+0200\n"
+"POT-Creation-Date: 2026-04-27 17:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -4336,21 +4336,6 @@ msgstr "Herkunft"
 msgid "Appendix"
 msgstr "Anhang"
 
-msgid "Subject"
-msgstr "Betreff"
-
-msgid "Owner"
-msgstr "Zuständig"
-
-msgid "Reaction Time"
-msgstr "Reaktionszeit"
-
-msgid "Process Time"
-msgstr "Bearbeitungszeit"
-
-msgid "Event Source"
-msgstr "Quelle Veranstaltung"
-
 msgid "Total"
 msgstr "Total"
 
@@ -4370,6 +4355,21 @@ msgstr "Zahlung"
 
 msgid "Total Amount"
 msgstr "Totalbetrag"
+
+msgid "Subject"
+msgstr "Betreff"
+
+msgid "Owner"
+msgstr "Zuständig"
+
+msgid "Reaction Time"
+msgstr "Reaktionszeit"
+
+msgid "Process Time"
+msgstr "Bearbeitungszeit"
+
+msgid "Event Source"
+msgstr "Quelle Veranstaltung"
 
 msgid ""
 "The record behind this ticket was removed. The following information is a "
@@ -6752,6 +6752,18 @@ msgstr "Insgesamt ${number} Unterseiten sind betroffen."
 msgid "${count} links will be replaced by this action."
 msgstr "${count} Links werden nach dieser Aktion ersetzt."
 
+msgid "Syndicate"
+msgstr "Extern publizieren"
+
+msgid "Publish this event externally"
+msgstr "Veranstaltung extern publizieren"
+
+msgid "Highlight"
+msgstr "Highlight"
+
+msgid "Mark as highlighted event"
+msgstr "Als Highlight markieren"
+
 msgid "The event submitter has not yet completed his submission"
 msgstr "Der/die Antragsteller/in hat ihren Antrag noch nicht abgeschlosesen"
 
@@ -7147,6 +7159,9 @@ msgstr "Diese Woche"
 
 msgid "o'clock"
 msgstr "Uhr"
+
+msgid "Edit Event Filter Configuration"
+msgstr "Filterkonfiguration für Veranstaltungen bearbeiten"
 
 msgid "Event Export"
 msgstr "Veranstaltungs-Export"

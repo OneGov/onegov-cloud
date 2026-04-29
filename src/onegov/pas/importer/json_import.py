@@ -1564,27 +1564,20 @@ class MembershipImporter(DataImporter):
         """Map a role text to a CommissionMembership role enum value."""
         role_text = role_text.lower().strip()
 
+        if 'vizepräsident' in role_text or 'vize-präsident' in role_text:
+            return 'member'
         if 'präsident' in role_text:
             return 'president'
-        if 'erweitert' in role_text:  # Check specific terms first
+        if 'erweitert' in role_text:
             return 'extended_member'
         if 'gast' in role_text:
             return 'guest'
-        # Default to 'member' if none of the above match
         return 'member'
 
     def _map_to_parliamentarian_role(self, role_text: str) -> Role:
         """Map a role text to a parliamentarian role enum value."""
         role_text = role_text.lower().strip()
 
-        # Order matters: check more specific roles first
-        if 'präsident' in role_text:
-            return 'president'
-        if any(
-            term in role_text for term in ['stimmenzähler', 'vote counter']
-        ):
-            return 'vote_counter'
-        # 'vizepräsident' maps to 'member' as per model/data
         if any(
             term in role_text
             for term in [
@@ -1593,8 +1586,13 @@ class MembershipImporter(DataImporter):
                 'vize präsident',
             ]
         ):
-            return 'member'
-        # Default to 'member' if none of the specific roles match
+            return 'vice_president'
+        if 'präsident' in role_text:
+            return 'president'
+        if any(
+            term in role_text for term in ['stimmenzähler', 'vote counter']
+        ):
+            return 'vote_counter'
         return 'member'
 
     def _map_to_parliamentary_group_role(
@@ -1603,14 +1601,6 @@ class MembershipImporter(DataImporter):
         """Map a role text to a ParliamentaryGroupRole enum value."""
         role_text = role_text.lower().strip()
 
-        # Order matters: check more specific roles first
-        if 'präsident' in role_text:
-            return 'president'
-        if any(
-            term in role_text for term in ['stimmenzähler', 'vote counter']
-        ):
-            return 'vote_counter'
-        # 'vizepräsident' maps to 'member' as per model/data
         if any(
             term in role_text
             for term in [
@@ -1620,11 +1610,14 @@ class MembershipImporter(DataImporter):
             ]
         ):
             return 'member'
-        # Check for 'mitglied' explicitly if needed, else covered by default
+        if 'präsident' in role_text:
+            return 'president'
+        if any(
+            term in role_text for term in ['stimmenzähler', 'vote counter']
+        ):
+            return 'vote_counter'
         if 'mitglied' in role_text:
             return 'member'
-
-        # Default to 'none' if no specific role is identified
         return 'none'
 
     @classmethod

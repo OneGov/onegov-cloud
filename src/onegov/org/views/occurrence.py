@@ -274,7 +274,7 @@ def handle_edit_event_filters(
 
     return {
         'layout': layout,
-        'title': 'Edit Event Filter Configuration',
+        'title': _('Edit Event Filter Configuration'),
         'form': form,
         'form_width': 'large',
         'migration': None,

@@ -151,6 +151,12 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     #: would only be possible with deeper changes to the Event model.
     access: dict_property[str] = meta_property(default='public')
 
+    #: Whether the event is marked for external publication (syndication)
+    syndicate: dict_property[bool] = meta_property(default=False)
+
+    #: Whether the event is highlighted (featured)
+    highlight: dict_property[bool] = meta_property(default=False)
+
     #: The associated image
     image = associated(
         EventFile, 'image', 'one-to-one', uselist=False, backref_suffix='image'

@@ -40,6 +40,7 @@ def test_commission_president_can_access_files(
         first_name='Paula',
         last_name='President',
         email_primary='paula.president@example.org',
+        zg_username='zgpaula',
     )
     commissions = PASCommissionCollection(session)
     commission = commissions.add(name='Test Commission')
@@ -51,13 +52,13 @@ def test_commission_president_can_access_files(
         )
     )
     users = UserCollection(session)
-    user = users.by_username('paula.president@example.org')
+    user = users.by_username('zgpaula')
     assert user is not None
     user.role = 'commission_president'
     user.password = 'test'
     transaction.commit()
 
-    client.login('paula.president@example.org', 'test')
+    client.login('zgpaula', 'test')
 
     assert client.get('/files').status_int == 200
     assert (client.get(f'/storage/{file_id}/details').status_int

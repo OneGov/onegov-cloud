@@ -48,6 +48,10 @@
                         <h3 i18n:translate>Filters</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['type']" />
                     </div>
+                    <div class="side-panel" tal:condition="python: filters.get('plenary_session')">
+                        <h3 i18n:translate>Plenary session</h3>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['plenary_session']" />
+                    </div>
                     <div class="side-panel" tal:condition="python:can_edit_attendences and any(group and group[0].bulk_edit_id for group in bulk_edit_groups)">
                         <h3 i18n:translate>Bulk edits</h3>
                         <ul class="more-list">
