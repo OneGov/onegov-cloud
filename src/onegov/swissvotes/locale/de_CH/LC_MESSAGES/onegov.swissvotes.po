@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-04-13 16:07+0200\n"
+"POT-Creation-Date: 2026-04-29 11:01+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1650,8 +1650,8 @@ msgstr "Abonnieren Sie unseren Newsletter."
 msgid "E-mail address"
 msgstr "E-Mail-Adresse"
 
-msgid "Main projects"
-msgstr "Hauptprojekte"
+msgid "Other main projects"
+msgstr "Andere Hauptprojekte"
 
 msgid "by Année Politique Suisse"
 msgstr "von Année Politique Suisse"
@@ -2257,6 +2257,9 @@ msgstr "Alle Abstimmungen gelöscht"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
+
+#~ msgid "Main projects"
+#~ msgstr "Hauptprojekte"
 
 #~ msgid "APS-Newsletter abonnieren"
 #~ msgstr "Subscribe to the APS newsletter"

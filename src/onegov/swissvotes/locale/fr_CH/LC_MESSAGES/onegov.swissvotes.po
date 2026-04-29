@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-04-13 16:07+0200\n"
+"POT-Creation-Date: 2026-04-29 11:01+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1657,8 +1657,8 @@ msgstr "Abonnez-vous à notre infolettre."
 msgid "E-mail address"
 msgstr "Adresse e-mail"
 
-msgid "Main projects"
-msgstr "Projets principaux"
+msgid "Other main projects"
+msgstr "Autres projets principaux"
 
 msgid "by Année Politique Suisse"
 msgstr "d'Année Politique Suisse"
@@ -2259,6 +2259,9 @@ msgstr "Toutes les votations ont été supprimées"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Voulez-vous vraiment supprimer l'ensemble des votations?!"
+
+#~ msgid "Main projects"
+#~ msgstr "Projets principaux"
 
 #~ msgid "Basel Poster Collection"
 #~ msgstr "Lien Plakatsammlung Basel"

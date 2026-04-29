@@ -195,7 +195,7 @@
             <div class="columns small-12 medium-3 main-projects">
                 <div class="row">
                     <div class="columns small-12">
-                        <p><span i18n:translate>Main projects</span><br><span i18n:translate>by Année Politique Suisse</span></p>
+                        <p><span i18n:translate>Other main projects</span><br><span i18n:translate>by Année Politique Suisse</span></p>
                     </div>
                     <div class="columns small-12">
                         <a href="https://www.politchronik.swiss/"><img src="${layout.static_path}/images/Politchronik/weiss/Logo_politchronik_weiss.svg" height="100" alt="Politchronik Logo"></a>
