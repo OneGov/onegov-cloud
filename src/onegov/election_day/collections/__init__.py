@@ -3,6 +3,8 @@ from __future__ import annotations
 from onegov.election_day.collections.archived_results import \
     ArchivedResultCollection
 from onegov.election_day.collections.archived_results import \
+    MunicipalityArchivedResultCollection
+from onegov.election_day.collections.archived_results import \
     SearchableArchivedResultCollection
 from onegov.election_day.collections.ballots import BallotCollection
 from onegov.election_day.collections.candidates import CandidateCollection
@@ -34,6 +36,7 @@ __all__ = [
     'ElectionCompoundCollection',
     'EmailSubscriberCollection',
     'ListCollection',
+    'MunicipalityArchivedResultCollection',
     'NotificationCollection',
     'ScreenCollection',
     'SearchableArchivedResultCollection',

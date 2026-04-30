@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+from morepath import redirect
+
 from fs.errors import ResourceNotFound
 from morepath.request import Response
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.collections import (
+    MunicipalityArchivedResultCollection
+)
+from onegov.election_day.models import MunicipalityRedirect
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.forms import ArchiveSearchFormElection
 from onegov.election_day.forms import ArchiveSearchFormVote
@@ -11,6 +17,7 @@ from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts.archive import ArchiveLayout
 from onegov.election_day.models import Principal
 from onegov.election_day.security import MaybePublic
+from onegov.core.security import Public
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_summaries
 from webob.exc import HTTPNotFound
@@ -21,6 +28,21 @@ if TYPE_CHECKING:
     from onegov.core.types import JSON_ro
     from onegov.core.types import RenderData
     from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response as webob_Response
+
+
+@ElectionDayApp.view(model=MunicipalityRedirect, permission=Public)
+def view_municipality_redirect(
+    self: MunicipalityRedirect,
+    request: ElectionDayRequest
+) -> webob_Response:
+    return redirect(
+        request.link(
+            MunicipalityArchivedResultCollection(
+                request.session, self.municipality
+            )
+        )
+    )
 
 
 @ElectionDayApp.html(
@@ -44,6 +66,27 @@ def view_archive(
         'layout': layout,
         'date': self.date,
         'archive_items': self.group_items(results, request),
+    }
+
+
+@ElectionDayApp.html(
+    model=MunicipalityArchivedResultCollection,
+    template='archive.pt',
+    permission=MaybePublic
+)
+def view_archive_municipality(
+    self: MunicipalityArchivedResultCollection,
+    request: ElectionDayRequest
+) -> RenderData:
+    layout = DefaultLayout(self, request)
+    results, _ = self.by_municipality(self.municipality)
+
+    return {
+        'layout': layout,
+        'date': None,
+        'archive_items': self.group_items(results, request),
+        'municipality': self.municipality,
+        'municipality_invalid': not self.is_valid_municipality(),
     }
 
 

@@ -12,6 +12,7 @@ from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionResult
 from onegov.election_day.models import Vote
 from onegov.election_day.utils import replace_url
 from sedate import as_datetime
@@ -302,6 +303,8 @@ class ArchivedResultCollection:
         result.counted_entities, result.total_entities = item.progress
         result.has_results = item.has_results
         result.meta = result.meta or {}
+        if 'domain_segment' in (item.meta or {}):
+            result.meta['domain_segment'] = item.meta['domain_segment']
 
         if isinstance(item, Election):
             result.type = 'election'
@@ -425,6 +428,50 @@ class ArchivedResultCollection:
 
         self.session.delete(item)
         self.session.flush()
+
+
+class MunicipalityArchivedResultCollection(ArchivedResultCollection):
+
+    def __init__(self, session: Session, municipality: str = ''):
+        super().__init__(session)
+        self.municipality = municipality.lower()
+        self.municipalities = [
+            name[0].lower().split(' (')[0] for name in
+                self.session.query(ElectionResult.name)
+                .distinct()
+                .order_by(ElectionResult.name)
+            if name[0]
+        ]
+
+    def is_valid_municipality(self) -> bool:
+        return True if self.municipality in self.municipalities else False
+
+    def by_municipality(
+        self,
+        municipality: str
+    ) -> tuple[list[ArchivedResult], datetime | None]:
+        """ Returns the results for a given municipality. """
+
+        query = self.query()
+        query = query.filter(ArchivedResult.domain == 'municipality')
+        query = query.filter(ArchivedResult.type.in_(['election', 'vote']))
+        query = query.filter(
+            func.lower(ArchivedResult.meta['domain_segment'].astext)
+            == municipality.lower()
+        )
+        query = query.order_by(
+            ArchivedResult.date,
+            ArchivedResult.domain,
+            ArchivedResult.name,
+            ArchivedResult.shortcode,
+            ArchivedResult.title
+        )
+        result = query.all()
+
+        last_modifieds = [r.last_modified for r in result if r.last_modified]
+        last_modified = max(last_modifieds) if last_modifieds else None
+
+        return result, last_modified
 
 
 class SearchableArchivedResultCollection(

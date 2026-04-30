@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from onegov.core.converters import extended_date_converter
 from onegov.core.i18n import SiteLocale
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import BallotCollection
@@ -12,6 +13,10 @@ from onegov.election_day.collections import ElectionCollection
 from onegov.election_day.collections import ElectionCompoundCollection
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import ListCollection
+from onegov.election_day.collections import (
+    MunicipalityArchivedResultCollection
+)
+from onegov.election_day.models import MunicipalityRedirect
 from onegov.election_day.collections import ScreenCollection
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.collections import SmsSubscriberCollection
@@ -329,6 +334,28 @@ def get_archive_by_year(
     date: str
 ) -> ArchivedResultCollection:
     return ArchivedResultCollection(app.session(), date)
+
+
+@ElectionDayApp.path(
+    model=MunicipalityArchivedResultCollection,
+    path='/municipality/{municipality}'
+)
+def get_archive_by_municipality(
+    app: ElectionDayApp,
+    municipality: str
+) -> MunicipalityArchivedResultCollection:
+    return MunicipalityArchivedResultCollection(app.session(), municipality)
+
+
+@ElectionDayApp.path(
+    model=MunicipalityRedirect,
+    path='/gemeinde/{municipality}'
+)
+def get_municipality_redirect(
+    app: ElectionDayApp,
+    municipality: str
+) -> MunicipalityRedirect:
+    return MunicipalityRedirect(municipality)
 
 
 @ElectionDayApp.path(

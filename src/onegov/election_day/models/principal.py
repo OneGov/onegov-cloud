@@ -693,3 +693,8 @@ class Municipality(Principal, msgpack.Serializable, tag=51, keys=(
         if value == 'entities':
             return _('Quarters') if self.has_quarters else _('Municipalities')
         return ''
+
+
+class MunicipalityRedirect:
+    def __init__(self, municipality: str) -> None:
+        self.municipality = municipality
