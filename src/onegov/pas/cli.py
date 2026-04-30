@@ -289,6 +289,40 @@ def import_kub_data(
     return cli_wrapper
 
 
+@cli.command('sync-user-accounts', context_settings={'singular': True})
+@click.option('--dry-run/--no-dry-run', default=False)
+def sync_user_accounts_cli(dry_run: bool) -> Processor:
+    """Sync user accounts for all parliamentarians.
+
+    Example:
+        onegov-pas --select '/onegov_pas/zug' sync-user-accounts
+        onegov-pas --select '/onegov_pas/zug' sync-user-accounts \
+            --dry-run
+    """
+
+    def do_sync(request: PasRequest, app: PasApp) -> None:
+        collection = PASParliamentarianCollection(app)
+        result = collection.sync_user_accounts()
+
+        synced = result.get('synced', 0)
+        skipped = result.get('skipped', 0)
+        created = result.get('created', [])
+
+        click.echo(
+            f'Synced: {synced}, Skipped: {skipped}, '
+            f'Created: {len(created)}'
+        )
+        if created:
+            for username in created:
+                click.echo(f'  New account: {username}')
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Dry run - changes aborted', fg='yellow')
+
+    return do_sync
+
+
 @cli.command('update-custom-data')
 @click.option('--token', required=True,
               help='Authorization token for KUB API')
