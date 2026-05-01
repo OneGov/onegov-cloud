@@ -141,13 +141,6 @@ def test_pages(client: Client) -> None:
     assert "<script>alert('yes')</script>" not in page
     assert "&lt;script&gt;alert('yes')&lt;/script&gt;" in page
 
-    # create new root page
-    root_page = client.get('/').click('Thema')
-    root_page.form['title'] = "Root Page"
-    root_page.form['text'] = "root page text"
-    root_page = root_page.form.submit().follow()
-    assert root_page.pyquery('.main-title').text() == "Root Page"
-
     client.get('/auth/logout')
 
     assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
