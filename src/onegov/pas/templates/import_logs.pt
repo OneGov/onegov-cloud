@@ -23,6 +23,19 @@
             </div>
         </div>
 
+        <div class="row" tal:condition="python: len(user_filters) > 1">
+            <div class="columns small-12 medium-4 large-3">
+                <label i18n:translate="">User</label>
+                <select id="user-filter" style="max-width: 300px;">
+                    <tal:b tal:repeat="uf user_filters">
+                        <option tal:attributes="value uf['url'];
+                                                selected python: 'selected' if uf['active'] else None"
+                                tal:content="uf['text']"></option>
+                    </tal:b>
+                </select>
+            </div>
+        </div>
+
         <table class="inline-table clickable-rows">
             <thead>
                 <tr>

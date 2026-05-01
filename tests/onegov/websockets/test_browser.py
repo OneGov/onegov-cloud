@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import asyncio
-import threading
-
 from onegov.websockets.client import authenticate
 from onegov.websockets.client import broadcast
 from onegov.websockets.client import status
 from tests.onegov.websockets.conftest import WebsocketsRoot
+from tests.shared.asyncio import run_in_separate_thread
 from websockets import connect
 
 
@@ -47,8 +45,7 @@ def test_browser_integration(browser: WebsocketBrowser) -> None:
     assert 'websockets.bundle.js' in browser.html
     browser.wait_for_js_variable('domLoaded')
 
-    errors: list[BaseException] = []
-
+    @run_in_separate_thread
     async def ws_operations() -> None:
         async with connect(browser.websocket_server_url) as manage:
             await authenticate(manage, 'super-super-secret-token')
@@ -60,17 +57,6 @@ def test_browser_integration(browser: WebsocketBrowser) -> None:
             await broadcast(manage, 'schema', 'two', {'schema': 'two'})
             await broadcast(manage, 'schema', 'one', {'schema': 'one'})
 
-    def run_in_thread() -> None:
-        try:
-            asyncio.run(ws_operations())
-        except BaseException as exc:
-            errors.append(exc)
-
-    t = threading.Thread(target=run_in_thread, daemon=True)
-    t.start()
-    t.join(timeout=10)
-
-    if errors:
-        raise errors[0]
+    ws_operations()
 
     browser.wait_for_js_variable('messageReceived')

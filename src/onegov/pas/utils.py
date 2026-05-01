@@ -7,6 +7,9 @@ from onegov.pas.models.commission_membership import PASCommissionMembership
 from onegov.pas.models.party import Party
 from onegov.pas.models.parliamentarian import PASParliamentarian
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
+from onegov.pas.models.presidential_allowance import (
+    PresidentialAllowance,
+)
 from decimal import Decimal, ROUND_HALF_UP
 from babel.numbers import format_decimal
 from datetime import date
@@ -83,11 +86,13 @@ def is_commission_president(
 def get_parliamentarians_with_settlements(
     session: Session,
     start_date: date,
-    end_date: date
+    end_date: date,
+    settlement_run_id: UUID | None = None,
 ) -> list[PASParliamentarian]:
     """
-    Get all parliamentarians who were active and had settlements during the
-    specified period.
+    Get all parliamentarians who were active and had settlements
+    (attendances or presidential allowances) during the specified
+    period.
     """
 
     active_parliamentarians = session.query(PASParliamentarian).filter(
@@ -104,7 +109,6 @@ def get_parliamentarians_with_settlements(
         PASParliamentarian.first_name
     ).all()
 
-    # Get all parliamentarians with attendances in one query
     parliamentarians_with_attendances = {
         pid[0] for pid in
         session.query(Attendence.parliamentarian_id).filter(
@@ -113,11 +117,21 @@ def get_parliamentarians_with_settlements(
         ).distinct()
     }
 
-    # Filter the active parliamentarians to only those with attendances
-    return [
-        p for p in active_parliamentarians
-        if p.id in parliamentarians_with_attendances
-    ]
+    parliamentarians_with_allowances: set[UUID] = set()
+    if settlement_run_id:
+        parliamentarians_with_allowances = {
+            pid[0]
+            for pid in session.query(PresidentialAllowance.parliamentarian_id)
+            .filter(
+                PresidentialAllowance.settlement_run_id == settlement_run_id
+            )
+            .distinct()
+        }
+
+    eligible = (
+        parliamentarians_with_attendances | parliamentarians_with_allowances
+    )
+    return [p for p in active_parliamentarians if p.id in eligible]
 
 
 def get_parties_with_settlements(

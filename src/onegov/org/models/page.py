@@ -26,7 +26,8 @@ from onegov.org.models.extensions import SidebarLinksExtension
 from onegov.org.models.traitinfo import TraitInfo
 from onegov.org.observer import observes
 from onegov.page import Page, PageCollection
-from onegov.search import SearchableContent
+from onegov.search import SearchableContent, SearchIndex
+from onegov.search.utils import language_from_locale
 from sedate import replace_timezone
 from sqlalchemy import desc, func, or_, and_
 from sqlalchemy.dialects.postgresql import array
@@ -38,7 +39,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.org.models import PushNotification
     from onegov.org.request import OrgRequest
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.orm import Query
     from typing import Self
 
 
@@ -299,26 +300,57 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
 
     def __init__(
         self,
-        session: Session,
+        request: OrgRequest,
         page: int = 0,
-        only_public: bool = False,
+        term: str | None = None,
     ):
-        self.session = session
+        self.request = request
+        self.session = request.session
         self.page = page
-        self.only_public = only_public
+        self.term = term
+
+    @property
+    def q(self) -> str | None:
+        return self.term
 
     def subset(self) -> Query[Topic]:
         topics = self.session.query(Topic)
-        if self.only_public:
+
+        role = getattr(self.request.identity, 'role', 'anonymous')
+        available_accesses = {
+            'admin': (),  # can see everything
+            'editor': (),  # can see everything
+            'member': ('member', 'mtan', 'public')
+        }.get(role, ('mtan', 'public'))
+        if available_accesses:
             topics = topics.filter(or_(
-                Topic.meta['access'].astext == 'public',
+                *(
+                    Topic.meta['access'].astext == access
+                    for access in available_accesses
+                ),
                 Topic.meta['access'].is_(None)
             ))
 
-        topics = topics.filter(
-            Topic.publication_started == True,
-            Topic.publication_ended == False
-        )
+        if role not in ('admin', 'editor'):
+            topics = topics.filter(
+                Topic.publication_started == True,
+                Topic.publication_ended == False
+            )
+
+        if self.term:
+            language = self.request.locale
+            if language_from_locale(language) == 'simple':
+                language = 'simple'
+            topics = topics.join(
+                SearchIndex,
+                and_(
+                    SearchIndex.owner_id_int == Topic.id,
+                    SearchIndex.owner_type == 'Topic'
+                )
+            )
+            topics = topics.filter(SearchIndex.data_vector.op('@@')(
+                func.websearch_to_tsquery(language, self.term)
+            ))
 
         topics = topics.order_by(desc(Topic.published_or_created))
         topics = topics.options(undefer(Topic.created))
@@ -331,8 +363,9 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
 
     def page_by_index(self, index: int) -> Self:
         return self.__class__(
-            self.session,
-            page=index
+            self.request,
+            page=index,
+            term=self.term
         )
 
 
@@ -352,6 +385,7 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
         self,
         request: CoreRequest,
         page: int = 0,
+        term: str | None = None,
         filter_years: list[int] | None = None,
         filter_tags: list[str] | None = None,
         root: News | None = None,
@@ -360,10 +394,15 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
         self.request = request
         self.session = request.session
         self.page = page
+        self.term = term
         self.filter_years = filter_years or []
         self.filter_tags = filter_tags or []
         if root is not None:
             self.root = root
+
+    @property
+    def q(self) -> str | None:
+        return self.term
 
     @cached_property
     def root(self) -> News | None:
@@ -408,6 +447,21 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
                 News.publication_ended == False
             )
 
+        if self.term:
+            language = self.request.locale
+            if language_from_locale(language) == 'simple':
+                language = 'simple'
+            news = news.join(
+                SearchIndex,
+                and_(
+                    SearchIndex.owner_id_int == News.id,
+                    SearchIndex.owner_type == 'News'
+                )
+            )
+            news = news.filter(SearchIndex.data_vector.op('@@')(
+                func.websearch_to_tsquery(language, self.term)
+            ))
+
         if self.filter_years:
             news = news.filter(or_(*(
                 and_(
@@ -451,6 +505,7 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
         return self.__class__(
             self.request,
             page=index,
+            term=self.term,
             filter_years=sorted(self.filter_years),
             filter_tags=sorted(self.filter_tags),
         )
@@ -460,6 +515,7 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
         years = sorted(years_ - {year} if year in years_ else years_ | {year})
         return self.__class__(
             self.request,
+            term=self.term,
             filter_years=years,
             filter_tags=sorted(self.filter_tags),
         )
@@ -469,6 +525,7 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
         tags = sorted(tags_ - {tag} if tag in tags_ else tags_ | {tag})
         return self.__class__(
             self.request,
+            term=self.term,
             filter_years=sorted(self.filter_years),
             filter_tags=tags,
         )

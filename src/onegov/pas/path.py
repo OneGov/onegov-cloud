@@ -46,7 +46,8 @@ if TYPE_CHECKING:
         'date_to': date,
         'type': str,
         'parliamentarian_id': str,
-        'commission_id': str
+        'commission_id': str,
+        'plenary_date': date,
     }
 )
 def get_attendences(
@@ -56,8 +57,19 @@ def get_attendences(
     date_to: date | None = None,
     type: str | None = None,
     parliamentarian_id: str | None = None,
-    commission_id: str | None = None
+    commission_id: str | None = None,
+    plenary_date: date | None = None,
 ) -> AttendenceCollection:
+    if settlement_run_id == 'all':
+        settlement_run_id = None
+    elif settlement_run_id is None:
+        latest = (
+            SettlementRunCollection(request.session, active=True)
+            .query()
+            .first()
+        )
+        if latest:
+            settlement_run_id = str(latest.id)
     return AttendenceCollection(
         session=request.session,
         settlement_run_id=settlement_run_id,
@@ -65,7 +77,8 @@ def get_attendences(
         date_to=date_to,
         type=type,
         parliamentarian_id=parliamentarian_id,
-        commission_id=commission_id
+        commission_id=commission_id,
+        plenary_date=plenary_date,
     )
 
 
@@ -81,14 +94,9 @@ def get_attendence(
     return AttendenceCollection(app.session()).by_id(id)
 
 
-@PasApp.path(
-    model=ChangeCollection,
-    path='/changes'
-)
-def get_changes(
-    app: PasApp
-) -> ChangeCollection:
-    return ChangeCollection(app.session())
+@PasApp.path(model=ChangeCollection, path='/changes')
+def get_changes(app: PasApp, page: int = 0) -> ChangeCollection:
+    return ChangeCollection(app.session(), page=page)
 
 
 @PasApp.path(
@@ -300,13 +308,11 @@ def get_rate_set(
 @PasApp.path(
     model=PresidentialAllowanceCollection,
     path='/presidential-allowances',
-    converters={'year': int},
 )
 def get_presidential_allowances(
     app: PasApp,
-    year: int | None = None,
 ) -> PresidentialAllowanceCollection:
-    return PresidentialAllowanceCollection(app.session(), year)
+    return PresidentialAllowanceCollection(app.session())
 
 
 @PasApp.path(
@@ -442,10 +448,10 @@ def get_settlement_run_export_all(
     path='/import-logs'
 )
 def get_import_logs(
-    request: TownRequest
+    request: TownRequest, user_id: str | None = None
 ) -> ImportLogCollection:
     """ Returns the collection of import logs. """
-    return ImportLogCollection(request.session)
+    return ImportLogCollection(request.session, user_id=user_id)
 
 
 @PasApp.path(

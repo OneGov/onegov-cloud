@@ -3,6 +3,7 @@ from __future__ import annotations
 import morepath
 
 from collections import defaultdict
+from webob.multidict import MultiDict
 
 
 from typing import TYPE_CHECKING
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
 
 
 def keywords_encode(
-    keywords: HasKeywords | Mapping[str, Sequence[str]]
+    keywords: HasKeywords | Mapping[str, Sequence[str]] | MultiDict[str, str]
 ) -> str:
     """ Takes a dictionary of keywords and encodes them into a somewhat
     readable url query format.
@@ -45,6 +46,9 @@ def keywords_encode(
     if hasattr(keywords, 'keywords'):
         keywords = keywords.keywords
 
+    if isinstance(keywords, MultiDict):
+        keywords = keywords.dict_of_lists()
+
     def escape(s: str) -> str:
         return s.replace('+', '++')
 
@@ -71,5 +75,5 @@ def keywords_decode(text: str) -> dict[str, list[str]] | None:
 
 keywords_converter = morepath.Converter(
     decode=keywords_decode,
-    encode=keywords_encode  # type:ignore[arg-type]
+    encode=keywords_encode  # type: ignore[arg-type]
 )

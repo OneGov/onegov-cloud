@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from onegov.org.models import PoliticalBusiness
     from onegov.org.models import PoliticalBusinessParticipation
     from sqlalchemy.orm import Query, Session
+    from sqlalchemy.sql import ColumnElement
 
 
 class RISCommission(Commission, ORMSearchable):
@@ -41,6 +42,15 @@ class RISCommission(Commission, ORMSearchable):
         'name': {'type': 'text', 'weight': 'A'},
         'description': {'type': 'text', 'weight': 'B'}
     }
+
+    if TYPE_CHECKING:
+        # NOTE: This is for filtering for active/inactive members, we don't
+        #       really want to store this in the database
+        active_members: bool | None
+        # NOTE: Our memberships should always be RISCommissionMembership
+        memberships: Mapped[list[RISCommissionMembership]]  # type: ignore[assignment]
+    else:
+        active_members = None
 
     @property
     def fts_suggestion(self) -> str:
@@ -66,6 +76,15 @@ class RISCommissionMembership(CommissionMembership):
         'polymorphic_identity': 'ris_commission_membership'
     }
 
+    @hybrid_property
+    def active(self) -> bool:
+        return self.end is None or self.end >= utcnow().date()
+
+    @active.inplace.expression
+    @classmethod
+    def _active_expression(cls) -> ColumnElement[bool]:
+        return or_(cls.end.is_(None), cls.end >= utcnow().date())
+
 
 class RISCommissionMembershipCollection(
     CommissionMembershipCollection[RISCommissionMembership]
@@ -87,17 +106,9 @@ class RISCommissionMembershipCollection(
         query = super().query()
 
         if self.active is not None:
-            if self.active:
-                query = query.filter(
-                    or_(
-                        RISCommissionMembership.end.is_(None),
-                        RISCommissionMembership.end >= utcnow()
-                    )
-                )
-            else:
-                query = query.filter(
-                    RISCommissionMembership.end < utcnow()
-                )
+            query = query.filter(
+                RISCommissionMembership.active.is_(self.active)
+            )
 
         return query
 
@@ -161,8 +172,9 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
 
         return False
 
-    @active.expression  # type:ignore[no-redef]
-    def active(cls):
+    @active.inplace.expression
+    @classmethod
+    def _active_expression(cls) -> ColumnElement[bool]:
 
         return or_(
             exists().where(

@@ -153,6 +153,7 @@ jobs:
           --only-rerun ".*ReferenceError: [$] is not defined" \
           --only-rerun "FileNotFoundError:" \
           --only-rerun "Bad response: 404 Not Found" \
+          --only-rerun "playwright[.]_impl[.]_errors[.]TimeoutError" \
           --junit-xml=/tmp/junit.xml \
           -o junit_family=legacy \
           --cov \

@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     handleLogFilters();
     handleImportButton();
+    handleUserFilter();
 });
 
 function handleLogFilters() {
@@ -40,6 +41,16 @@ function handleLogFilters() {
             });
         });
     });
+}
+
+
+function handleUserFilter() {
+    var select = document.getElementById('user-filter');
+    if (select) {
+        select.addEventListener('change', function () {
+            window.location.href = this.value;
+        });
+    }
 }
 
 

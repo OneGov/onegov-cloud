@@ -229,7 +229,7 @@ def test_pages_person_link_extension(client: Client) -> None:
 
     # add person
     people_page = client.get('/people')
-    new_person_page = people_page.click('Person')
+    new_person_page = people_page.click('Person', index=1)
     assert "Neue Person" in new_person_page
 
     new_person_page.form['first_name'] = 'Franz'

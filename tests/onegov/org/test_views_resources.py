@@ -171,7 +171,7 @@ def test_resources_person_link_extension(client: Client) -> None:
 
     # add person
     people_page = client.get('/people')
-    new_person_page = people_page.click('Person')
+    new_person_page = people_page.click('Person', index=1)
     assert "Neue Person" in new_person_page
 
     new_person_page.form['first_name'] = 'Franz'
@@ -4594,7 +4594,8 @@ def test_my_reservations_view(client: Client) -> None:
     # let's enable it
     admin = client.spawn()
     admin.login_admin()
-    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings = admin.get('/').click(
+        'Module aktivieren/deaktivieren')
     settings.form['citizen_login_enabled'].checked = True
     settings.form.submit().follow()
 

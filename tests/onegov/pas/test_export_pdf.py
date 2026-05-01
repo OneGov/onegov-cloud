@@ -203,22 +203,16 @@ def test_commission_export_one_member_one_president(session: Session) -> None:
         rate_set.shortest_all_member_halfhour = 26
         rate_set.study_normal_member_halfhour = 26
         rate_set.plenary_none_president_halfday = 307
-        rate_set.study_official_member_halfhour = 84
         rate_set.shortest_all_president_halfhour = 26
         rate_set.study_intercantonal_member_hour = 86
         rate_set.study_normal_president_halfhour = 43
         rate_set.commission_normal_member_initial = 104
-        rate_set.study_official_president_halfhour = 84
         rate_set.study_intercantonal_president_hour = 86
         rate_set.commission_normal_member_additional = 26
         rate_set.commission_normal_president_initial = 104
-        rate_set.commission_official_president_fullday = 369
-        rate_set.commission_official_president_halfday = 184
         rate_set.commission_normal_president_additional = 26
         rate_set.commission_intercantonal_member_halfday = 147
         rate_set.commission_intercantonal_president_halfday = 246
-        rate_set.commission_official_vice_president_fullday = 369
-        rate_set.commission_official_vice_president_halfday = 184
         session.add(rate_set)
 
         # Create commission

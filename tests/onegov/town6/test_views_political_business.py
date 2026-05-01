@@ -17,7 +17,7 @@ def test_political_businesses(client_with_fts: Client) -> None:
     assert client.get('/political-businesses/new', status=404)
 
     # enable ris
-    settings = client.get('/ris-enable')
+    settings = client.get('/module-activation-settings')
     settings.form['ris_enabled'] = True
     settings.form.submit()
 

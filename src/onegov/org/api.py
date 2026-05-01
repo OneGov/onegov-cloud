@@ -7,24 +7,27 @@ from onegov.api.models import ApiInvalidParamException
 from onegov.core.converters import extended_date_decode
 from onegov.event.collections import OccurrenceCollection
 from onegov.gis import Coordinates
-from onegov.org.forms.event import TAGS
+from onegov.org import _
 from onegov.org.models.directory import (
     ExtendedDirectory, ExtendedDirectoryEntry,
     ExtendedDirectoryEntryCollection)
 from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
-from onegov.town6 import _
+from onegov.search import SearchIndex
+from onegov.search.utils import language_from_locale
+from sqlalchemy import and_, func
 from sqlalchemy.exc import SQLAlchemyError
 
 
 from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
-    from onegov.town6.app import TownApp
-    from onegov.town6.request import TownRequest
-    from onegov.event.models import Occurrence
     from onegov.core.collection import PKType
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
+    from onegov.event.models import Occurrence
+    from onegov.org.app import OrgApp
+    from onegov.org.request import OrgRequest
+    from sqlalchemy.orm import Query
 
 
 def get_geo_location(item: ContentMixin) -> dict[str, Any]:
@@ -42,32 +45,25 @@ def get_modified_iso_format(item: TimestampMixin) -> str:
     return item.last_change.isoformat()
 
 
-def format_multiple_choice_prompt(
-    choices: Collection[str] | None
-) -> str | None:
-    if not choices:
-        return None
-    if len(choices) == 1:
-        choice, = choices
-        return f'Either {choice!r} or left unspecified'
-    formatted_choices = ', '.join(f'{choice!r}' for choice in choices)
-    return f'One of {formatted_choices} (Can be specified multiple times)'
-
-
 class EventApiEndpoint(ApiEndpoint['Occurrence']):
-    app: TownApp
+    app: OrgApp
     endpoint = 'events'
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
         collection = self._base_collection
         filters: dict[str, Collection[str] | str | None] = {
+            'search': 'Performs a full-text search for the given term',
             'start': 'Earliest event date '
-                '(ISO-8601 encoded date: YYYY-MM-DD, defaults to today)',
+            '(ISO-8601 encoded date: YYYY-MM-DD, defaults to today)',
             'end': 'Latest event date (ISO-8601 encoded date: YYYY-MM-DD)',
             'locations': 'Can be specified multiple times',
-            'sources': sorted(collection.used_sources)
+            'sources': sorted(collection.used_sources),
+            'syndicate': ('true', 'false'),
+            'highlight': ('true', 'false'),
         }
+        if not self.app.fts_search_enabled:
+            del filters['search']
 
         filter_type = self.app.org.event_filter_type
         if filter_type in ('tags', 'tags_and_filters'):
@@ -101,10 +97,16 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
     #       step is sufficient for determining the filters.
     @cached_property
     def _base_collection(self) -> OccurrenceCollection:
+        role = getattr(self.request.identity, 'role', 'anonymous')
+        available_accesses = {
+            'admin': (),  # can see everything
+            'editor': (),  # can see everything
+            'member': ('member', 'mtan', 'public')
+        }.get(role, ('mtan', 'public'))
         result = OccurrenceCollection(
             self.session,
             page=self.page or 0,
-            only_public=True
+            available_accesses=available_accesses
         )
 
         filter_type = self.app.org.event_filter_type
@@ -134,7 +136,10 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
         filter_keywords = {}
         for key, values in self.extra_parameters.items():
             self.assert_valid_filter(key)
-            if key == 'start':
+            if key == 'search':
+                term = self.scalarize_value(key, values)
+                result = result.for_filter(term=term)
+            elif key == 'start':
                 value = self.get_date_filter(key, values)
                 result = result.for_filter(
                     start=value,
@@ -145,6 +150,8 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
                 result = result.for_filter(end=value)
             elif key == 'tags':
                 if not self.app.custom_event_tags:
+                    # FIXME: circular import
+                    from onegov.org.forms.event import TAGS
                     # built-in tags are translated and need to be
                     # transformed back to the stored tag name
                     translated_to_orginal = {
@@ -160,12 +167,27 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
                 result = result.for_filter(sources=values)
             elif key == 'locations':
                 result = result.for_filter(locations=values)
+            elif key == 'syndicate':
+                syn = self.scalarize_value(key, values)
+                if syn and syn.lower() == 'true':
+                    result = result.for_filter(syndicate=True)
+                elif syn and syn.lower() == 'false':
+                    result = result.for_filter(
+                        syndicate=False
+                    )
+            elif key == 'highlight':
+                hl = self.scalarize_value(key, values)
+                if hl and hl.lower() == 'true':
+                    result = result.for_filter(highlight=True)
+                elif hl and hl.lower() == 'false':
+                    result = result.for_filter(highlight=False)
             else:
                 filter_keywords[key] = values
 
         if filter_keywords:
             result = result.for_keywords(**filter_keywords)
 
+        result.page = self.page or 0
         result.batch_size = self.batch_size
         return result
 
@@ -199,8 +221,10 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
             data['tags'] = tags
 
         if filter_type in ('filters', 'tags_and_filters'):
-            data.update(item.event.filter_keywords)
+            data.update(item.event.filter_keywords_ordered())
 
+        data['syndicate'] = item.event.syndicate or False
+        data['highlight'] = item.event.highlight or False
         data['created'] = item.created.isoformat()
         data['modified'] = get_modified_iso_format(item)
         return data
@@ -214,8 +238,15 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
 
 
 class NewsApiEndpoint(ApiEndpoint[News]):
-    app: TownApp
+    app: OrgApp
+    request: OrgRequest
     endpoint = 'news'
+
+    @cached_property
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
+        if self.app.fts_search_enabled:
+            return {'search': 'Performs a full-text search for the given term'}
+        return {}
 
     @property
     def title(self) -> str:
@@ -227,6 +258,10 @@ class NewsApiEndpoint(ApiEndpoint[News]):
             self.request,
             page=self.page or 0,
         )
+        for key, values in self.extra_parameters.items():
+            self.assert_valid_filter(key)
+            if key == 'search':
+                result.term = self.scalarize_value(key, values)
         result.batch_size = 25
         return result
 
@@ -240,8 +275,7 @@ class NewsApiEndpoint(ApiEndpoint[News]):
             publication_end = item.publication_end.isoformat()
         else:
             publication_end = None
-
-        return {
+        data = {
             'title': item.title,
             'lead': item.lead,
             'text': item.text,
@@ -251,6 +285,10 @@ class NewsApiEndpoint(ApiEndpoint[News]):
             'created': item.created.isoformat(),
             'modified': get_modified_iso_format(item),
         }
+        if item.access == 'mtan' and not self.request.is_manager:
+            # remove the part that should not be public
+            del data['text']
+        return data
 
     def item_links(self, item: News) -> dict[str, Any]:
         return {
@@ -260,9 +298,15 @@ class NewsApiEndpoint(ApiEndpoint[News]):
 
 
 class TopicApiEndpoint(ApiEndpoint[Topic]):
-    request: TownRequest
-    app: TownApp
+    request: OrgRequest
+    app: OrgApp
     endpoint = 'topics'
+
+    @cached_property
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
+        if self.app.fts_search_enabled:
+            return {'search': 'Performs a full-text search for the given term'}
+        return {}
 
     @property
     def title(self) -> str:
@@ -271,10 +315,13 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
     @property
     def collection(self) -> Any:
         result = TopicCollection(
-            self.session,
-            page=self.page or 0,
-            only_public=True
+            self.request,
+            page=self.page or 0
         )
+        for key, values in self.extra_parameters.items():
+            self.assert_valid_filter(key)
+            if key == 'search':
+                result.term = self.scalarize_value(key, values)
         result.batch_size = 25
         return result
 
@@ -289,7 +336,7 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
         else:
             publication_end = None
 
-        return {
+        data = {
             'title': item.title,
             'lead': item.lead,
             'text': item.text,
@@ -298,6 +345,10 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
             'created': item.created.isoformat(),
             'modified': get_modified_iso_format(item),
         }
+        if item.access == 'mtan' and not self.request.is_manager:
+            # remove the part that should not be public
+            del data['text']
+        return data
 
     def item_links(self, item: Topic) -> dict[str, Any]:
         return {
@@ -309,14 +360,50 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
         }
 
 
+# NOTE: The only thing we make use of is `adapt` to inject fulltext search
+class DummyDirectorySearchWidget:
+    name: str
+    search_query: Query[ExtendedDirectoryEntry]
+
+    def __init__(self, request: OrgRequest, term: str | None) -> None:
+        self.request = request
+        self.term = term
+
+    def adapt[T](self, query: Query[T]) -> Query[T]:
+        if self.term:
+            language = self.request.locale
+            if language_from_locale(language) == 'simple':
+                language = 'simple'
+            query = query.join(
+                SearchIndex,
+                and_(
+                    SearchIndex.owner_id_uuid == ExtendedDirectoryEntry.id,
+                    SearchIndex.owner_type == 'ExtendedDirectoryEntry'
+                )
+            )
+            query = query.filter(SearchIndex.data_vector.op('@@')(
+                func.websearch_to_tsquery(language, self.term)
+            ))
+        return query
+
+    def html(self, layout: Any) -> Any:
+        raise NotImplementedError()
+
+
 class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
-    request: TownRequest
-    app: TownApp
+    request: OrgRequest
+    app: OrgApp
     endpoint: str
+
+    @cached_property
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
+        if self.app.fts_search_enabled:
+            return {'search': 'Performs a full-text search for the given term'}
+        return {}
 
     def __init__(
         self,
-        request: TownRequest,
+        request: OrgRequest,
         name: str,
         extra_parameters: dict[str, list[str]] | None = None,
         page: int | None = None,
@@ -346,6 +433,14 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
             page=self.page or 0,
             published_only=True
         )
+        for key, values in self.extra_parameters.items():
+            self.assert_valid_filter(key)
+            if key == 'search':
+                term = self.scalarize_value(key, values)
+                result.search_widget = DummyDirectorySearchWidget(
+                    self.request,
+                    term
+                )
         result.batch_size = 25
         return result
 
@@ -366,9 +461,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
 
         return self.__class__(self.request, self.endpoint, filters)
 
-    def by_id(
-            self, id: PKType
-              ) -> ExtendedDirectoryEntry | None:
+    def by_id(self, id: PKType) -> ExtendedDirectoryEntry | None:
         """ Return the item with the given ID from the collection. """
 
         try:

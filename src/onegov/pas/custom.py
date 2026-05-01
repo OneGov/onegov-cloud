@@ -258,7 +258,9 @@ def notify_admins_finalized(
     """Send email notification to all admins if for one specific commission,"""
     admin_emails = [
         user.username
-        for user in request.session.query(User).filter_by(role='admin')
+        for user in request.session.query(User).filter_by(
+            role='admin', active=True
+        )
         if user.username and '@' in user.username
     ]
 
@@ -291,7 +293,8 @@ def notify_admins_finalized(
         request=request,
         template='mail_abschluss_notification.pt',
         subject=_(
-            'Abschluss set for ${name}', mapping={'name': parliamentarian_name}
+            'PAS: Abschluss set for ${name}',
+            mapping={'name': parliamentarian_name},
         ),
         receivers=admin_emails,
         content={

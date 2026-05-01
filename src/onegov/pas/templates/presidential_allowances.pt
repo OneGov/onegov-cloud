@@ -9,31 +9,30 @@
                     <p i18n:translate="">
                         Flat annual allowance per § 8 of the Nebenamtsgesetz
                         for representing the canton at events.
-                        Paid in quarterly installments via settlement runs.
+                        Paid via settlement runs (max. 4 per run).
                     </p>
                     <ul>
                         <li>
                             <strong i18n:translate="">President</strong>:
                             CHF ${president_yearly} / <span i18n:translate="">Year</span>
-                            (CHF ${president_quarterly} / <span i18n:translate="">Quarter</span>)
+                            (CHF ${president_quarterly} / <span i18n:translate="">Installment</span>)
                         </li>
                         <li>
                             <strong i18n:translate="">Vice president</strong>:
                             CHF ${vice_president_yearly} / <span i18n:translate="">Year</span>
-                            (CHF ${vice_president_quarterly} / <span i18n:translate="">Quarter</span>)
+                            (CHF ${vice_president_quarterly} / <span i18n:translate="">Installment</span>)
                         </li>
                     </ul>
                 </div>
 
                 <a class="button" href="${add_link}" i18n:translate="">
-                    Add quarterly allowance
+                    Add allowance
                 </a>
 
                 <table tal:condition="allowances" class="hover stackable">
                     <thead>
                         <tr>
-                            <th i18n:translate="">Year</th>
-                            <th i18n:translate="">Quarter</th>
+                            <th i18n:translate="">Settlement run</th>
                             <th i18n:translate="">Role</th>
                             <th i18n:translate="">Person</th>
                             <th i18n:translate="">Amount (CHF)</th>
@@ -43,8 +42,7 @@
                     </thead>
                     <tbody>
                         <tr tal:repeat="allowance allowances">
-                            <td>${allowance.year}</td>
-                            <td>Q${allowance.quarter}</td>
+                            <td>${allowance.settlement_run.name}</td>
                             <td>${layout.request.translate(allowance.role_label)}</td>
                             <td>${allowance.parliamentarian.first_name} ${allowance.parliamentarian.last_name}</td>
                             <td>${allowance.amount}</td>

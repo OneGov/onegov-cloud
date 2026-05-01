@@ -93,12 +93,6 @@ def view_pas_settings(
                 'icon': 'fa-award',
             },
             {
-                'name': 'import',
-                'title': _('Data Import (JSON)'),
-                'link': request.link(request.app.org, 'import'),
-                'icon': 'fa-file-import'
-            },
-            {
                 'name': 'import-logs',
                 'title': _('Import History'),
                 'link': request.class_link(ImportLogCollection),

@@ -13,7 +13,23 @@ $import-icon: '\f56f';
 $import-logs-icon: '\f1da';
 $user-management-icon: '\f0c0';
 
+.footer-content {
+    text-align: left;
+
+    > .medium-4.cell:empty {
+        display: none;
+    }
+
+    .footer-links {
+        text-align: left;
+    }
+}
+
 .globals {
+    .global-header-flex {
+        justify-content: flex-end;
+    }
+
     .attendences::before { @include icon-bold($attendence-icon); }
     .attendances::before { @include icon-bold($attendence-icon); }
     .changes::before { @include icon-bold($change-icon); }
@@ -493,6 +509,18 @@ ul#parliamentarian_id {
     flex: 1;
     line-height: 1.4;
     overflow-wrap: break-word;
+}
+
+.bulk-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    margin-left: 6px;
+    border: 1px solid #d0d0d0;
+    border-radius: 999px;
+    font-size: 0.7em;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    vertical-align: middle;
 }
 
 .abschluss-badge {

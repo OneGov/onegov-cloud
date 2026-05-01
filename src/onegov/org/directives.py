@@ -66,6 +66,7 @@ if TYPE_CHECKING:
         title: str
         order: int
         icon: str
+        category: str
 
     class BoardletConfig(TypedDict):
         cls: type[_Boardlet]
@@ -212,43 +213,6 @@ class EventSearchWidgetAction(Action):
         assert hasattr(cls, 'adapt')
 
         event_search_widget_registry[self.name] = cls
-
-
-class SettingsView(Action):
-    """ Registers a settings view. """
-
-    config = {
-        'settings_view_registry': dict
-    }
-
-    def __init__(
-        self,
-        name: str,
-        title: str,
-        order: int = 0,
-        icon: str = 'fa-cogs'
-    ) -> None:
-
-        self.name = name
-        self.setting: SettingsDict = {
-            'name': name,
-            'title': title,
-            'order': order,
-            'icon': icon
-        }
-
-    def identifier(  # type:ignore[override]
-        self,
-        settings_view_registry: dict[str, SettingsDict]
-    ) -> str:
-        return self.name
-
-    def perform(  # type:ignore[override]
-        self,
-        func: Any,
-        settings_view_registry: dict[str, SettingsDict]
-    ) -> None:
-        settings_view_registry[self.name] = self.setting
 
 
 class Boardlet(Action):

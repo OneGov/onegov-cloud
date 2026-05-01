@@ -4,8 +4,12 @@ import click
 import transaction
 import logging
 import warnings
+from datetime import date
 from onegov.core.cli import command_group
+from onegov.org.mail import send_transactional_html_mail
+from onegov.pas import _
 from onegov.pas.collections.parliamentarian import PASParliamentarianCollection
+from onegov.pas.models import Attendence
 from onegov.pas.excel_header_constants import (
     commission_expected_headers_variant_1,
     commission_expected_headers_variant_2,
@@ -88,13 +92,13 @@ def update_accounts_cli(dry_run: bool) -> Processor:
 
         parliamentarians = PASParliamentarianCollection(app)
         for parliamentarian in parliamentarians.query():
-            if not parliamentarian.email_primary:
+            if not parliamentarian.zg_username:
                 click.echo(
-                    f'Skipping {parliamentarian.title}, no primary email.'
+                    f'Skipping {parliamentarian.title}, no zg_username.'
                 )
                 continue
             parliamentarians.update_user(
-                parliamentarian, parliamentarian.email_primary
+                parliamentarian, parliamentarian.zg_username
             )
 
         if dry_run:
@@ -104,10 +108,12 @@ def update_accounts_cli(dry_run: bool) -> Processor:
 
 
 @cli.command(name='update-account-single', context_settings={'singular': True})
-@click.option('--email', required=True, help='Email of the parliamentarian')
+@click.option(
+    '--username', required=True, help='zg_username of the parliamentarian'
+)
 @click.option('--dry-run/-no-dry-run', default=False)
-def update_account_single_cli(email: str, dry_run: bool) -> Processor:
-    """Updates user account for a single parliamentarian by email."""
+def update_account_single_cli(username: str, dry_run: bool) -> Processor:
+    """Updates user account for a single parliamentarian."""
 
     def do_update_account(request: PasRequest, app: PasApp) -> None:
         from onegov.pas.models import PASParliamentarian
@@ -115,27 +121,80 @@ def update_account_single_cli(email: str, dry_run: bool) -> Processor:
         parliamentarians = PASParliamentarianCollection(app)
         parliamentarian = (
             parliamentarians.query()
-            .filter(PASParliamentarian.email_primary == email)
+            .filter(PASParliamentarian.zg_username == username)
             .first()
         )
 
         if not parliamentarian:
-            click.secho(f'No parliamentarian found: {email}', fg='red')
+            click.secho(f'No parliamentarian found: {username}', fg='red')
             transaction.abort()
             return
 
         parliamentarians.update_user(
-            parliamentarian, parliamentarian.email_primary
+            parliamentarian, parliamentarian.zg_username
         )
-        click.secho(
-            f'Updated account for parliamentarian: {email}', fg='green'
-        )
+        click.secho(f'Updated account for: {username}', fg='green')
 
         if dry_run:
             transaction.abort()
             click.secho('Dry run - changes aborted', fg='yellow')
 
     return do_update_account
+
+
+@cli.command('test-abschluss-mail')
+@click.option(
+    '--to', 'recipient', required=True, help='Recipient email address'
+)
+def test_abschluss_mail(recipient: str) -> Processor:
+    """Send a sample abschluss notification email for visual inspection.
+
+    Queues the mail. Flush via:
+        onegov-core sendmail --queue local_smtp
+    Inspect in smtp4dev UI.
+
+    Example:
+        onegov-pas --select '/onegov_pas/zug' test-abschluss-mail \
+            --to dev@example.org
+    """
+
+    def send(request: PasRequest, app: PasApp) -> None:
+        attendence = request.session.query(Attendence).first()
+        if attendence is None:
+            click.secho(
+                'No Attendence in DB - need at least one for model ref.',
+                fg='red',
+            )
+            return
+
+        today = date.today()
+        send_transactional_html_mail(
+            request=request,
+            template='mail_abschluss_notification.pt',
+            subject=_(
+                'PAS: Abschluss set for ${name}',
+                mapping={'name': 'Max Muster (TEST)'},
+            ),
+            receivers=[recipient],
+            content={
+                'model': attendence,
+                'title': request.translate(_('Abschluss Notification')),
+                'parliamentarian_name': 'Max Muster (TEST)',
+                'commission_name': 'Test Kommission',
+                'attendance_date': today,
+                'user_name': 'CLI Tester',
+                'settlement_run_name': 'TEST-RUN',
+                'settlement_run_start': today,
+                'settlement_run_end': today,
+            },
+        )
+        click.secho(f'Mail queued for {recipient}.', fg='green')
+        click.echo(
+            'Flush queue:  onegov-core sendmail --queue local_smtp\n'
+            'Inspect:      http://localhost:5000 (smtp4dev UI)'
+        )
+
+    return send
 
 
 @cli.command('import-kub-data')
@@ -228,6 +287,40 @@ def import_kub_data(
             raise
 
     return cli_wrapper
+
+
+@cli.command('sync-user-accounts', context_settings={'singular': True})
+@click.option('--dry-run/--no-dry-run', default=False)
+def sync_user_accounts_cli(dry_run: bool) -> Processor:
+    """Sync user accounts for all parliamentarians.
+
+    Example:
+        onegov-pas --select '/onegov_pas/zug' sync-user-accounts
+        onegov-pas --select '/onegov_pas/zug' sync-user-accounts \
+            --dry-run
+    """
+
+    def do_sync(request: PasRequest, app: PasApp) -> None:
+        collection = PASParliamentarianCollection(app)
+        result = collection.sync_user_accounts()
+
+        synced = result.get('synced', 0)
+        skipped = result.get('skipped', 0)
+        created = result.get('created', [])
+
+        click.echo(
+            f'Synced: {synced}, Skipped: {skipped}, '
+            f'Created: {len(created)}'
+        )
+        if created:
+            for username in created:
+                click.echo(f'  New account: {username}')
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Dry run - changes aborted', fg='yellow')
+
+    return do_sync
 
 
 @cli.command('update-custom-data')
