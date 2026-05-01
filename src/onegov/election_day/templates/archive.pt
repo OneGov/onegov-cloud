@@ -20,7 +20,10 @@
         <div class="homepage" data-domain="${layout.principal.domain}" data-date="${date}">
 
             <tal:block condition="municipality_invalid|False">
-                <h2 i18n:translate="">Invalid municipality name.</h2>
+                <h2 i18n:translate="">
+                    Invalid municipality name
+                    <span tal:replace="municipality.title()" i18n:name="municipality"/>.
+                </h2>
             </tal:block>
 
             <tal:block condition="not:municipality_invalid|False">
