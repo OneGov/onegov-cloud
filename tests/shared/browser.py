@@ -654,10 +654,7 @@ class ExtendedBrowser:
             dict(level='WARNING', rgxp="facebook"),
             dict(level='WARNING', rgxp="Third-party cookie will be blocked"),
             dict(level='WARNING', rgxp=re.escape('react-with-addons.js')),
-            dict(
-                level='WARNING',
-                rgxp=re.escape('https://web.cmp.usercentrics.eu')
-            ),
+            dict(rgxp=re.escape('https://web.cmp.usercentrics.eu')),
             dict(level='SEVERE', rgxp=re.escape("api.mapbox.com")),
         ]
 
