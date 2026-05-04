@@ -303,7 +303,8 @@ class ArchivedResultCollection:
         result.counted_entities, result.total_entities = item.progress
         result.has_results = item.has_results
         result.meta = result.meta or {}
-        if 'domain_segment' in (item.meta or {}):
+        # tschupre
+        if item.domain == 'municipality' and 'domain_segment' in (item.meta or {}):
             result.meta['domain_segment'] = item.meta['domain_segment']
 
         if isinstance(item, Election):
@@ -442,13 +443,14 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
                 .order_by(ElectionResult.name)
             if name[0]
         ]
+        print('*** tschupre valid municipalities:', self.municipalities)
 
     def is_valid_municipality(self) -> bool:
+        print('*** tschupre valid municipality:', self.municipality)
         return True if self.municipality in self.municipalities else False
 
     def by_municipality(
         self,
-        municipality: str
     ) -> tuple[list[ArchivedResult], datetime | None]:
         """ Returns the results for a given municipality. """
 
@@ -456,8 +458,9 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
         query = query.filter(ArchivedResult.domain == 'municipality')
         query = query.filter(ArchivedResult.type.in_(['election', 'vote']))
         query = query.filter(
-            func.lower(ArchivedResult.meta['domain_segment'].astext)
-            == municipality.lower()
+            func.lower(func.split_part(
+                ArchivedResult.meta['domain_segment'].astext, ' (', 1
+            )) == self.municipality
         )
         query = query.order_by(
             ArchivedResult.date,

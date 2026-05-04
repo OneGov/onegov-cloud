@@ -79,7 +79,7 @@ def view_archive_municipality(
     request: ElectionDayRequest
 ) -> RenderData:
     layout = DefaultLayout(self, request)
-    results, _ = self.by_municipality(self.municipality)
+    results, _ = self.by_municipality()
 
     return {
         'layout': layout,
