@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-01 10:53-0400\n"
+"POT-Creation-Date: 2026-05-04 05:53-0400\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -117,8 +117,9 @@ msgstr ""
 "Non è possibile importare le informazioni sull'elezione. L'anno ${year} non "
 "esiste."
 
-msgid "Domain not supported"
-msgstr "Livello non supportato"
+#, python-format
+msgid "Domain not supported: ${doi_type} (supported: CH, CT, BZ, MU, AN)"
+msgstr ""
 
 msgid "Changing types is not supported"
 msgstr "l cambiamento di tipi non è supportato"
@@ -666,6 +667,9 @@ msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Risultati del partito"
+
+msgid "Delivery"
+msgstr "Transmissione"
 
 msgid "Proposal / Results"
 msgstr "Oggetto della votazione / Risultati"
@@ -1947,3 +1951,6 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
+
+#~ msgid "Domain not supported"
+#~ msgstr "Livello non supportato"

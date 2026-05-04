@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-01 10:53-0400\n"
+"POT-Creation-Date: 2026-05-04 05:53-0400\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -118,8 +118,9 @@ msgstr ""
 "Betg stà pussaivel da importar las infurmaziuns da l'elecziun. L'onn ${year} "
 "n'exista betg."
 
-msgid "Domain not supported"
-msgstr "Domain betg supportà"
+#, python-format
+msgid "Domain not supported: ${doi_type} (supported: CH, CT, BZ, MU, AN)"
+msgstr ""
 
 msgid "Changing types is not supported"
 msgstr "La midada da tipas na vegn betg sustegnida"
@@ -678,6 +679,9 @@ msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Resultats da las partidas"
+
+msgid "Delivery"
+msgstr "Furniziun"
 
 msgid "Proposal / Results"
 msgstr "Project da votaziun / Resultats"
@@ -1970,3 +1974,6 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid "Domain not supported"
+#~ msgstr "Domain betg supportà"
