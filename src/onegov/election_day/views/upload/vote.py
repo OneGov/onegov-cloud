@@ -5,6 +5,7 @@ import transaction
 
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.formats import import_ech
 from onegov.election_day.formats import import_vote_internal
 from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.forms import UploadVoteForm
@@ -58,6 +59,19 @@ def view_upload(
                     form.proposal.file,
                     form.proposal.data['mimetype']
                 )
+            elif form.file_format.data == 'xml':
+                assert form.xml.file is not None
+                assert request.app.default_locale is not None
+                errors, updated, _ = import_ech(
+                    principal,
+                    form.xml.file,
+                    session,
+                    request.app.default_locale
+                )
+                archive = ArchivedResultCollection(session)
+                for update in updated:
+                    archive.update(update, request)
+
             elif form.file_format.data == 'wabsti_c':
                 assert form.sg_geschaefte.data is not None
                 assert form.sg_geschaefte.file is not None
