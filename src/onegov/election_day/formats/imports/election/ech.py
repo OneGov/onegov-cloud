@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from onegov.election_day import _
+from onegov.election_day import log
 from onegov.election_day.formats.imports.common import convert_ech_domain
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -16,10 +17,9 @@ from onegov.election_day.models import ListConnection
 from onegov.election_day.models import ListPanachageResult
 from onegov.election_day.models import ListResult
 from onegov.election_day.models import ProporzElection
-from xsdata_ech.e_ch_0155_5_0 import ListRelationType
-from xsdata_ech.e_ch_0155_5_0 import SexType
-from xsdata_ech.e_ch_0155_5_0 import TypeOfElectionType
-from xsdata_ech.e_ch_0252_1_0 import VoterTypeType as VoterTypeTypeV1
+from xsdata_ech.e_ch_0155_5_2 import ListRelationType
+from xsdata_ech.e_ch_0155_5_2 import SexType
+from xsdata_ech.e_ch_0155_5_2 import TypeOfElectionType
 from xsdata_ech.e_ch_0252_2_0 import VoterTypeType as VoterTypeTypeV2
 
 from typing import TYPE_CHECKING
@@ -36,9 +36,9 @@ if TYPE_CHECKING:
     from xsdata_ech.e_ch_0252_2_0 import EventElectionInformationDeliveryType
     from xsdata_ech.e_ch_0252_2_0 import EventElectionResultDeliveryType
 
-    type MajoralElected = ElectedType.MajoralElection.ElectedCandidate
+    type MajorityElected = ElectedType.MajorityElection.ElectedCandidate
     type ProportionalElected = (
-        ElectedType.ProportionalElection.ListType.ElectedCandidate)
+        ElectedType.ProportionalElection.List.ElectedCandidate)
 
 
 election_class = {
@@ -61,13 +61,15 @@ def import_elections_ech(
 ) -> ECHImportResultType:
     """ Imports all elections in a given eCH-0252 delivery.
 
-    Deletes elections on the same day not appearing in the delivery.
+    Deletes elections only when the delivery action is 3 (recall).
 
     :return:
         A tuple consisting of a list with errors, a set with updated
         elections, and a set with deleted elections.
 
     """
+
+    log.info('eCH-0252 import started')
 
     polling_day = None
     compounds: list[ElectionCompound] = []
@@ -91,6 +93,17 @@ def import_elections_ech(
             default_locale,
         )
 
+    if information_delivery:
+        log.info(
+            'eCH information delivery: polling_day=%s, '
+            '%d compound(s), %d election(s), %d deleted, %d error(s)',
+            polling_day,
+            len(compounds),
+            len(elections),
+            len(deleted),
+            len(errors),
+        )
+
     # process election, candidate and list results
     result_delivery = delivery.election_result_delivery
     if result_delivery:
@@ -112,6 +125,13 @@ def import_elections_ech(
         import_result_delivery(
             principal, result_delivery, session, polling_day, elections, errors
         )
+
+    log.info(
+        'eCH-0252 import finished: %d error(s), %d updated, %d deleted',
+        len(errors),
+        len(compounds) + len(elections),
+        len(deleted),
+    )
 
     return (
         list(errors), compounds + elections, deleted
@@ -163,8 +183,14 @@ def import_information_delivery(
     for association in delivery.election_association:
         identification = association.election_association_id
         assert identification
-        name = association.election_association_name
-        assert name
+        assert association.election_association_description
+        title_translations = {}
+        for desc in association.election_association_description:
+            assert desc.language
+            locale = f'{desc.language.lower()}_CH'
+            title_translations[locale] = (
+                desc.election_association_description
+            )
 
         # get or create compound
         compound = None
@@ -178,10 +204,15 @@ def import_information_delivery(
                 external_id=identification,
                 date=polling_day,
                 domain='canton',
-                title_translations={default_locale: name}
+                title_translations=title_translations
             )
             session.add(compound)
         compounds[identification] = compound
+        log.info(
+            'eCH compound: id=%s, titles=%s',
+            identification,
+            title_translations,
+        )
 
     # process elections
     elections: dict[str, Election] = {}
@@ -193,9 +224,17 @@ def import_information_delivery(
             group.domain_of_influence, principal, entities
         )
         if not supported:
+            doi = group.domain_of_influence
+            doi_value = getattr(
+                doi.domain_of_influence_type, 'value', None
+            )
             errors.add(
                 FileImportError(
-                    _('Domain not supported'),
+                    _(
+                        'Domain not supported: ${doi_type}'
+                        ' (supported: CH, CT, BZ, MU, AN)',
+                        mapping={'doi_type': doi_value}
+                    ),
                     filename=group.election_group_identification
                 )
             )
@@ -254,6 +293,20 @@ def import_information_delivery(
             if info.election_position is not None:
                 election.shortcode = str(info.election_position)
             election.number_of_mandates = info.number_of_mandates or 0
+            election_type = (
+                'proporz' if isinstance(election, ProporzElection)
+                else 'majorz'
+            )
+            log.info(
+                'eCH election: id=%s, type=%s, domain=%s, '
+                'mandates=%d, titles=%s, candidates=%d',
+                identification,
+                election_type,
+                domain,
+                info.number_of_mandates or 0,
+                title_translations,
+                len(information.candidate),
+            )
             compound_id = information.referenced_election_association_id
             if compound_id:
                 compound = compounds[compound_id]
@@ -363,15 +416,11 @@ def import_information_delivery(
                 connection.parent = parent
             election.list_connections = list(connections.values())
 
-    # delete obsolete compounds and elections
+    # delete obsolete compounds (but not standalone elections)
     deleted: set[ElectionCompound | Election] = set()
     deleted.update({
         compound for compound in existing_compounds
         if compound not in compounds.values()
-    })
-    deleted.update({
-        election for election in existing_elections
-        if election not in elections.values()
     })
 
     return (
@@ -425,6 +474,13 @@ def import_result_delivery(
                 )
                 continue
 
+            log.info(
+                'eCH result delivery: election=%s, '
+                'counting_circles=%d',
+                identification,
+                len(result.counting_circle_result or []),
+            )
+
             # get candidates and lists
             candidates = {c.candidate_id: c for c in election.candidates}
             lists = {}
@@ -438,8 +494,10 @@ def import_result_delivery(
             election_results = {}
             assert result.counting_circle_result
             for circle in result.counting_circle_result:
-                assert circle.counting_circle_id is not None
-                entity_id = int(circle.counting_circle_id)
+                assert circle.counting_circle.counting_circle_id is not None
+                entity_id = int(
+                    circle.counting_circle.counting_circle_id
+                )
                 entity_id = 0 if entity_id in EXPATS else entity_id
                 if entity_id == 0:
                     election.has_expats = True
@@ -455,11 +513,22 @@ def import_result_delivery(
                     entity_id, entities, election, principal
                 )
 
-                election_result.counted = circle.fully_counted_true or False
+                result_data = circle.result_data
+                is_counted = (
+                    result_data.is_fully_counted if result_data else False
+                )
+                election_result.counted = is_counted
+                log.debug(
+                    'eCH counting circle: entity_id=%d, name=%s, '
+                    'counted=%s',
+                    entity_id,
+                    name,
+                    is_counted,
+                )
                 election_result.name = name
                 election_result.district = district
                 election_result.superregion = superregion
-                if not circle.fully_counted_true:
+                if not is_counted or not result_data:
                     election_result.eligible_voters = 0
                     election_result.received_ballots = 0
                     election_result.blank_ballots = 0
@@ -467,46 +536,46 @@ def import_result_delivery(
                     election_result.invalid_votes = 0
                     election_result.blank_votes = 0
                 else:
-                    assert circle.count_of_voters_information
+                    assert result_data.count_of_voters_information
                     election_result.eligible_voters = (
-                        circle
+                        result_data
                         .count_of_voters_information
                         .count_of_voters_total or 0)
                     expats = [
                         subtotal.count_of_voters
                         for subtotal
-                        in circle.count_of_voters_information.subtotal_info
+                        in (result_data
+                            .count_of_voters_information.subtotal_info)
                         if (
-                            subtotal.voter_type in (
-                                VoterTypeTypeV1.VALUE_2,
-                                VoterTypeTypeV2.VALUE_2
-                            )
+                            subtotal.voter_type
+                            == VoterTypeTypeV2.VALUE_2
                             and subtotal.sex is None
                         )
                     ]
                     election_result.expats = expats[0] if expats else None
                     election_result.received_ballots = (
-                        circle.count_of_received_ballots or 0)
+                        result_data.count_of_received_ballots or 0)
                     election_result.blank_ballots = (
-                        circle.count_of_blank_ballots or 0)
+                        result_data.count_of_blank_ballots or 0)
                     election_result.invalid_ballots = (
-                        circle.count_of_invalid_ballots or 0)
-                    assert circle.election_result
-                    if circle.election_result.majoral_election:
-                        import_majoral_election_result(
+                        result_data.count_of_invalid_ballots or 0)
+                    assert result_data.election_result
+                    if result_data.election_result.majority_election:
+                        import_majority_election_result(
                             session,
                             candidates,
                             election_result,
-                            circle.election_result.majoral_election,
+                            result_data.election_result.majority_election,
                             errors
                         )
-                    if circle.election_result.proportional_election:
+                    if result_data.election_result.proportional_election:
                         import_proportional_election_result(
                             session,
                             candidates,
                             lists,
                             election_result,
-                            circle.election_result.proportional_election,
+                            result_data.election_result
+                            .proportional_election,
                             errors
                         )
 
@@ -537,6 +606,14 @@ def import_result_delivery(
             election.results = list(election_results.values())
             counted = all(result.counted for result in election.results)
             election.status = 'final' if counted else 'interim'
+            log.info(
+                'eCH election results: election=%s, status=%s, '
+                '%d result(s), %d counted',
+                identification,
+                election.status,
+                len(election.results),
+                sum(1 for r in election.results if r.counted),
+            )
             election.last_result_change = election.timestamp()
 
             # Aggregate candidate panachage to list panachage
@@ -564,15 +641,18 @@ def import_result_delivery(
             election.absolute_majority = None
             for candidate in candidates.values():
                 candidate.elected = False
-            elected_candidates: list[MajoralElected | ProportionalElected] = []
+            elected_candidates: list[
+                MajorityElected | ProportionalElected
+            ] = []
 
             if result.elected:
-                if result.elected.majoral_election:
-                    majoral = result.elected.majoral_election
-                    elected_candidates = (
-                        majoral.elected_candidate)  # type:ignore[assignment]
+                if result.elected.majority_election:
+                    majority = result.elected.majority_election
+                    elected_candidates = list(
+                        majority.elected_candidate
+                    )
 
-                    absolute_majority = majoral.absolute_majority
+                    absolute_majority = majority.absolute_majority
                     if absolute_majority is not None:
                         election.majority_type = 'absolute'
                     election.absolute_majority = absolute_majority
@@ -589,42 +669,57 @@ def import_result_delivery(
                         )
                         elected_candidates.extend(list_v.elected_candidate)
 
+            if elected_candidates:
+                log.info(
+                    'eCH elected candidates: election=%s, count=%d',
+                    identification,
+                    len(elected_candidates),
+                )
+
             for elected in elected_candidates:
-                candidate_id = elected.candidate_identification or ''
+                candidate_id = getattr(
+                    elected, 'candidate_identification', None
+                ) or getattr(
+                    getattr(elected, 'candidate_or_write_in_candidate', None),
+                    'candidate_identification', None
+                ) or ''
                 e_candidate = get_candidate(candidates, candidate_id, errors)
                 if e_candidate:
                     e_candidate.elected = True
 
 
-def import_majoral_election_result(
+def import_majority_election_result(
     session: Session,
     candidates: dict[str, Candidate],
     election_result: ElectionResult,
-    majoral_election: ElectionResultType.MajoralElection,
+    majority_election: ElectionResultType.MajorityElection,
     errors: set[FileImportError]
 ) -> None:
-    """ Helper function to import election results specific to majoral
+    """ Helper function to import election results specific to majority
     elections.
 
     """
     election_result.invalid_votes = (
-        majoral_election.count_of_invalid_votes_total or 0)
+        majority_election.count_of_invalid_votes_total or 0)
     election_result.blank_votes = (
-        majoral_election.count_of_blank_votes_total or 0)
+        majority_election.count_of_blank_votes_total or 0)
 
     existing_candidate_results = {
         result.candidate.candidate_id: result
         for result in election_result.candidate_results
     }
     candidate_results = {}
-    for result in majoral_election.candidate_result:
-        candidate_id = result.candidate_identification or ''
+    for result in majority_election.candidate_result:
+        candidate_id = (
+            result.candidate_or_write_in_candidate
+            .candidate_identification or ''
+        )
         candidate = get_candidate(candidates, candidate_id, errors)
         if not candidate:
             return
         candidate_result = existing_candidate_results.get(candidate_id)
         if not candidate_result:
-            candidate_result = CandidateResult(candidate_id=candidate.id)
+            candidate_result = CandidateResult(candidate=candidate)
             session.add(candidate_result)
         candidate_results[candidate_id] = candidate_result
         candidate_result.votes = result.count_of_votes_total or 0
@@ -647,7 +742,8 @@ def import_proportional_election_result(
     election_result.invalid_votes = 0
     election_result.blank_votes = (
         proportional_election
-        .count_of_empty_votes_of_changed_ballots_without_list_designation or 0)
+        .count_of_blank_votes_of_changed_ballots_without_list_designation
+        or 0)
 
     existing_candidate_results = {
         result.candidate.candidate_id: result
@@ -670,7 +766,7 @@ def import_proportional_election_result(
             return
         list_result = existing_list_results.get(list_id)
         if not list_result:
-            list_result = ListResult(list_id=list_.id)
+            list_result = ListResult(list=list_)
             session.add(list_result)
         list_results[list_id] = list_result
         list_result.votes = l_result.count_of_candidate_votes or 0
@@ -683,7 +779,7 @@ def import_proportional_election_result(
                 return
             candidate_result = existing_candidate_results.get(candidate_id)
             if not candidate_result:
-                candidate_result = CandidateResult(candidate_id=candidate.id)
+                candidate_result = CandidateResult(candidate=candidate)
                 session.add(candidate_result)
             candidate_results[candidate_id] = candidate_result
             candidate_result.votes = (

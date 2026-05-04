@@ -35,6 +35,7 @@ from onegov.election_day.models import Vote
 from onegov.pdf import Pdf
 from onegov.user import User
 from tests.onegov.election_day.common import create_principal
+from tests.onegov.election_day.common import get_fixture_path
 from tests.onegov.election_day.common import get_tar_file_path
 from tests.shared.utils import create_app
 
@@ -765,21 +766,32 @@ def import_mulitple_ech(
     assert '.' not in dataset_name, 'Remove file ending from dataset_name'
 
     loaded = {}
-    tar_fp = get_tar_file_path('multiple', principal, 'ech')
+    fixture_dir = get_fixture_path('multiple', principal)
+    xml_path = os.path.join(fixture_dir, f'{dataset_name}.xml')
 
-    with tarfile.open(tar_fp, 'r:gz') as f:
-        members = f.getmembers()
-        names = [fn.split('.')[0] for fn in f.getnames()]
+    if os.path.exists(xml_path):
+        with open(xml_path, 'rb') as f:
+            xml_file = f.read()
 
-        for name, member in zip(names, members):
-            if dataset_name and dataset_name != name:
-                continue
+        principal_obj = create_principal(principal)
+        loaded[dataset_name] = import_ech(
+            principal_obj, BytesIO(xml_file), session, 'de_CH'
+        )
+    else:
+        tar_fp = get_tar_file_path('multiple', principal, 'ech')
+        with tarfile.open(tar_fp, 'r:gz') as f:
+            members = f.getmembers()
+            names = [fn.split('.')[0] for fn in f.getnames()]
 
-            xml_file = f.extractfile(member).read()  # type: ignore[union-attr]
-            principal_obj = create_principal(principal)
-            loaded[name] = import_ech(
-                principal_obj, BytesIO(xml_file), session, 'de_CH'
-            )
+            for name, member in zip(names, members):
+                if dataset_name and dataset_name != name:
+                    continue
+
+                xml_file = f.extractfile(member).read()  # type:ignore
+                principal_obj = create_principal(principal)
+                loaded[name] = import_ech(
+                    principal_obj, BytesIO(xml_file), session, 'de_CH'
+                )
 
     assert loaded, 'Nothing was loaded'
     return loaded

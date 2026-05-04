@@ -982,9 +982,9 @@ class PdfGenerator:
                 entities_map = self.renderer.get_entities_map(
                     ballot, 'pdf', locale
                 )
-                assert entities_map is not None
-                pdf.pdf(entities_map, 0.8)
-                pdf.pagebreak()
+                if entities_map is not None:
+                    pdf.pdf(entities_map, 0.8)
+                    pdf.pagebreak()
 
             # Districts
             if layout.has_districts:
@@ -1018,9 +1018,9 @@ class PdfGenerator:
                     districts_map = self.renderer.get_districts_map(
                         ballot, 'pdf', locale
                     )
-                    assert districts_map is not None
-                    pdf.pdf(districts_map, 0.8)
-                    pdf.pagebreak()
+                    if districts_map is not None:
+                        pdf.pdf(districts_map, 0.8)
+                        pdf.pagebreak()
 
             # Statistics
             subtitle(_('Statistics'))
