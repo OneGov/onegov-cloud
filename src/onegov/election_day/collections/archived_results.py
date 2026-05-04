@@ -179,7 +179,12 @@ class ArchivedResultCollection:
                 lambda j: groupbydict(
                     (item for item in j if item.url not in compounded),
                     lambda k: 'vote'
-                    if k.type in ('vote', 'complex_vote') else 'election'
+                    if k.type in ('vote', 'complex_vote') else 'election',
+                    lambda k: (k.meta or {}).get('domain_segment') or '',
+                    lambda k: groupbydict(
+                        k,
+                        lambda m: (m.meta or {}).get('domain_segment') or '',
+                    )
                 )
             )
         )
