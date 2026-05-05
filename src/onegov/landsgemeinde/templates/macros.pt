@@ -193,7 +193,8 @@
         <div class="agenda-item-tags">
             <span tal:repeat="tag agenda_item.resolution_tags" class="blank-label">${tag}</span>
         </div>
-
+            <br>
+            <h3 tal:condition="agenda_item.vota" i18n:translate="">Motions / Vota</h3>
         <div class="agenda-item-vota">
             <tal:block tal:repeat="votum reversed(agenda_item.vota)">
                 <div class="ticker-item ticker-votum ${votum.state}" tal:condition="votum.person_name or votum.person_details or votum.text or votum.motion or votum.statement_of_reasons">
