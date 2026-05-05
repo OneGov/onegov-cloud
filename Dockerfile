@@ -4,10 +4,10 @@ FROM ubuntu:noble
 RUN sed -i 's+http://archive.ubuntu.com+http://ch.archive.ubuntu.com+g' /etc/apt/sources.list
 
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt -qq update \
-    && apt -qq install -y software-properties-common gpg-agent \
+RUN apt update \
+    && apt install -y software-properties-common gpg-agent \
     && add-apt-repository ppa:deadsnakes/ppa -y \
-    && apt -qq install -y --no-install-recommends \
+    && apt install -y --no-install-recommends \
     apt-utils \
     aria2 \
     build-essential \
