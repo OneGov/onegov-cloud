@@ -27,11 +27,11 @@ from sqlalchemy.sql.expression import case
 from time import mktime
 from time import strptime
 
-
 from typing import overload
 from typing import Any
 from typing import Literal
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable
@@ -181,10 +181,10 @@ class ArchivedResultCollection:
                     lambda k: 'vote'
                     if k.type in ('vote', 'complex_vote') else 'election',
                     lambda k: (k.meta or {}).get('domain_segment') or '',
-                    lambda k: groupbydict(
-                        k,
-                        lambda m: (m.meta or {}).get('domain_segment') or '',
-                    )
+                    # lambda k: groupbydict(
+                    #     k,
+                    #     lambda m: (m.meta or {}).get('domain_segment') or '',
+                    # )
                 )
             )
         )
@@ -310,7 +310,9 @@ class ArchivedResultCollection:
         result.meta = result.meta or {}
         # tschupre
         if item.domain == 'municipality' and 'domain_segment' in (item.meta or {}):
-            result.meta['domain_segment'] = item.meta['domain_segment']
+            segment = item.meta['domain_segment']
+            segment = segment.split(' (')[0]  # get rid of e.g. ` (SG)`
+            result.meta['domain_segment'] = segment
 
         if isinstance(item, Election):
             result.type = 'election'
@@ -436,16 +438,32 @@ class ArchivedResultCollection:
         self.session.flush()
 
 
+class MunicipalArchivedResultCollection(ArchivedResultCollection):
+
+    """ Provides all municipal (`kommunal`) archived results for a given date. """
+
+    def by_date(
+        self,
+        date_: date | None = None
+    ) -> tuple[list[ArchivedResult], datetime | None]:
+        items, last_modified = super().by_date(date_)
+        results = [i for i in items if i.domain == 'municipality']
+        for result in results:
+            print('*** tschupre result', result.title)
+        print('*** tschupre len result', len(results))
+        return results, last_modified
+
+
 class MunicipalityArchivedResultCollection(ArchivedResultCollection):
 
     def __init__(self, session: Session, municipality: str = ''):
         super().__init__(session)
         self.municipality = municipality.lower()
         self.municipalities = [
-            name[0].lower().split(' (')[0] for name in
-                self.session.query(ElectionResult.name)
-                .distinct()
-                .order_by(ElectionResult.name)
+            self.sanitize_municipality(name[0]) for name in
+            self.session.query(ElectionResult.name)
+            .distinct()
+            .order_by(ElectionResult.name)
             if name[0]
         ]
         print('*** tschupre valid municipalities:', self.municipalities)
@@ -454,18 +472,32 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
         print('*** tschupre valid municipality:', self.municipality)
         return True if self.municipality in self.municipalities else False
 
+    def sanitize_municipality(self, municipality: str) -> str:
+        """
+        Removes ` (SG), replaces ` ` by `-` and removes `.`
+        from municipality or domain segment.
+        """
+        if '(' in municipality:
+            municipality = municipality.split(' (')[0]
+        return municipality.replace(' ', '-').replace('.', '').lower()
+
+    def for_municipality(self, municipality: str) -> Self:
+        municipality = self.sanitize_municipality(municipality)
+        return self.__class__(self.session, municipality)
+
     def by_municipality(
         self,
+        municipality: str = None
     ) -> tuple[list[ArchivedResult], datetime | None]:
         """ Returns the results for a given municipality. """
+        municipality = municipality if municipality else self.municipality
 
         query = self.query()
         query = query.filter(ArchivedResult.domain == 'municipality')
         query = query.filter(ArchivedResult.type.in_(['election', 'vote']))
+        # TODO: Fix filter below for st-gallen
         query = query.filter(
-            func.lower(func.split_part(
-                ArchivedResult.meta['domain_segment'].astext, ' (', 1
-            )) == self.municipality
+            func.lower(ArchivedResult.meta['domain_segment'].astext) == municipality
         )
         query = query.order_by(
             ArchivedResult.date,

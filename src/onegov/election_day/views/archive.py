@@ -6,6 +6,7 @@ from fs.errors import ResourceNotFound
 from morepath.request import Response
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.collections import MunicipalArchivedResultCollection
 from onegov.election_day.collections import (
     MunicipalityArchivedResultCollection
 )
@@ -66,6 +67,29 @@ def view_archive(
         'layout': layout,
         'date': self.date,
         'archive_items': self.group_items(results, request),
+        'municipal_view': False,
+        'show_communal_nav': True,
+    }
+
+
+@ElectionDayApp.html(
+    model=MunicipalArchivedResultCollection,
+    template='archive.pt',
+    permission=MaybePublic
+)
+def view_archive_municipal(
+    self: MunicipalArchivedResultCollection,
+    request: ElectionDayRequest
+) -> RenderData:
+    layout = DefaultLayout(self, request)
+    results, _ = self.by_date()
+
+    return {
+        'layout': layout,
+        'date': self.date,
+        'archive_items': self.group_items(results, request),
+        'municipal_view': True,
+        'show_communal_nav': False,
     }
 
 
@@ -87,6 +111,8 @@ def view_archive_municipality(
         'archive_items': self.group_items(results, request),
         'municipality': self.municipality,
         'municipality_invalid': not self.is_valid_municipality(),
+        'municipal_view': True,
+        'show_communal_nav': False,
     }
 
 
@@ -144,6 +170,8 @@ def view_principal(
         'layout': layout,
         'archive_items': archive.group_items(current, request),
         'date': None,
+        'municipal_view': False,
+        'show_communal_nav': True,
     }
 
 
