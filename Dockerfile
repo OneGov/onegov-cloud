@@ -5,8 +5,6 @@ RUN sed -i 's+http://archive.ubuntu.com+http://ch.archive.ubuntu.com+g' /etc/apt
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt -qq update \
-    && apt -qq install -y software-properties-common gpg-agent \
-    && add-apt-repository ppa:deadsnakes/ppa -y \
     && apt -qq install -y --no-install-recommends \
     apt-utils \
     aria2 \
@@ -25,15 +23,21 @@ RUN apt -qq update \
     libcurl4-openssl-dev \
     libev-dev \
     libev4 \
+    libbz2-dev \
+    libffi-dev \
     libffi8 \
     libkrb5-dev \
+    liblzma-dev \
     libmagic1 \
     libnss-wrapper \
     libpoppler-cpp-dev \
     libpoppler-cpp0v5 \
     libpq-dev \
+    libreadline-dev \
     libreadline8 \
+    libsqlite3-dev \
     libsqlite3-0 \
+    libssl-dev \
     libxmlsec1 \
     libxmlsec1-openssl \
     libxt-dev \
@@ -41,13 +45,20 @@ RUN apt -qq update \
     openssl \
     pkg-config \
     python3-pip \
-    python3.14 \
-    python3.14-dev \
-    python3.14-venv \
     tzdata \
     weasyprint \
     xmlsec1 \
+    zlib1g-dev \
     zip
+
+# Build Python 3.14 from source
+RUN curl -sSL https://www.python.org/ftp/python/3.14.0/Python-3.14.0.tgz | tar xz -C /tmp \
+    && cd /tmp/Python-3.14.0 \
+    && ./configure --enable-optimizations --prefix=/usr/local \
+    && make -j$(nproc) \
+    && make install \
+    && ln -sf /usr/local/bin/python3.14 /usr/local/bin/python3.14 \
+    && rm -rf /tmp/Python-3.14.0
 
 # copy root files
 COPY docker/root /
