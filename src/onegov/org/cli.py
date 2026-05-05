@@ -671,12 +671,6 @@ def fetch(
                 assert remote_session.info['schema'] == remote_schema
 
                 query = remote_session.query(Event)
-                query = query.filter(
-                    or_(
-                        Event.meta['source'].astext.is_(None),
-                        Event.meta['source'].astext == ''
-                    )
-                )
                 if tag:
                     query = query.filter(Event._tags.has_any(array(tag)))
                 if location:
