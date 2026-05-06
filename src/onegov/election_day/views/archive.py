@@ -103,9 +103,6 @@ def view_archive_municipality(
     layout = DefaultLayout(self, request)
     results, _ = self.by_municipality()
 
-    if not self.is_valid_municipality():
-        raise HTTPNotFound()
-
     return {
         'layout': layout,
         'date': None,

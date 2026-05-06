@@ -39,12 +39,18 @@
                         Elections and votes on <tal:block tal:content="layout.format_date(date, 'date_long')" i18n:name='date'/>
                     </a>
                 </h2>
-                <h3 tal:condition="municipal_view">
+                <h3 tal:condition="municipal_view or municipality_view">
                     <span i18n:translate="">Municipal Elections and Votes</span>
+                    <span tal:condition="municipality_view">${municipality.title()}</span>
                 </h3>
 
                 <div tal:repeat="domain archive_items[date]" class="domain-${domain}">
-                    <h4 tal:condition="municipal_view">${domain}</h4>
+                    <h4 tal:condition="municipal_view">
+                        <a href="${request.link(layout.municipality_archive.for_municipality(domain))}">
+                            <span>${domain}</span>
+                        </a>
+                    </h4>
+
                     <div tal:repeat="type archive_items[date][domain]" class="type-${type}">
 
                         <h3 tal:condition="type == 'election' and domain == 'federation'">
@@ -68,7 +74,7 @@
                             </span>
                         </h3>
 
-                        <tal:block tal:condition="type == 'election' and domain == 'municipality'">
+                        <tal:block tal:condition="type == 'election' and domain == 'municipality' and not municipality_view">
                             <h3>
                                 <tal:block>
                                     <span i18n:translate="">Municipal Elections and Votes</span>

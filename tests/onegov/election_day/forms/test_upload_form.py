@@ -60,11 +60,11 @@ def test_upload_election_form(session: Session) -> None:
     # Test if wabsti_c is added when data sources are available
     form_majorz = UploadMajorzElectionForm()
     assert sorted(f[0] for f in form_majorz.file_format.choices) == [
-        'internal'
+        'internal', 'xml'
     ]
     form_proporz = UploadProporzElectionForm()
     assert sorted(f[0] for f in form_proporz.file_format.choices) == [
-        'internal'
+        'internal', 'xml'
     ]
 
     session.add(election)
@@ -77,11 +77,11 @@ def test_upload_election_form(session: Session) -> None:
 
     form_majorz.adjust(principal, election)
     assert sorted(f[0] for f in form_majorz.file_format.choices) == [
-        'internal', 'wabsti_c'
+        'internal', 'wabsti_c', 'xml'
     ]
     form_proporz.adjust(principal, session.query(Election).one())
     assert sorted(f[0] for f in form_proporz.file_format.choices) == [
-        'internal', 'wabsti_c'
+        'internal', 'wabsti_c', 'xml'
     ]
 
     # Test required fields (majorz)

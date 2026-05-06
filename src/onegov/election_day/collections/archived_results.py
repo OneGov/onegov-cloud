@@ -183,6 +183,10 @@ class ArchivedResultCollection:
                     #     k,
                     #     lambda m: (m.meta or {}).get('domain_segment') or '',
                     # )
+                    lambda k: (
+                        1 if k.type in ('vote', 'complex_vote') else 0,
+                        (k.meta or {}).get('domain_segment') or '',
+                    ),
                 )
             )
         )
