@@ -59,6 +59,7 @@ def view_upload(
                     form.proposal.file,
                     form.proposal.data['mimetype']
                 )
+
             elif form.file_format.data == 'xml':
                 assert form.xml.file is not None
                 assert request.app.default_locale is not None

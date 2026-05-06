@@ -12,7 +12,6 @@ from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
-from onegov.election_day.models import ElectionResult
 from onegov.election_day.models import Vote
 from onegov.election_day.utils import replace_url
 from sedate import as_datetime
@@ -307,11 +306,14 @@ class ArchivedResultCollection:
         result.counted_entities, result.total_entities = item.progress
         result.has_results = item.has_results
         result.meta = result.meta or {}
-        if (item.domain == 'municipality' and
-                'domain_segment' in (item.meta or {})):
-            segment = item.meta['domain_segment']
-            segment = segment.split(' (')[0]  # get rid of e.g. ` (SG)`
-            result.meta['domain_segment'] = segment
+        if item.domain == 'municipality':
+            segment = (item.meta or {}).get('domain_segment') or (
+                item.results[0].name if isinstance(item, Election)
+                and item.results else None
+            )
+            if segment:
+                # get rid of e.g. ` (SG)` at the end of the segment
+                result.meta['domain_segment'] = segment.split(' (')[0]
 
         if isinstance(item, Election):
             result.type = 'election'
@@ -484,17 +486,19 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
         super().__init__(session)
         self.municipality = municipality.lower()
         self.municipalities = [
-            self.sanitize_municipality(name[0]) for name in
-            self.session.query(ElectionResult.name)
+            self.sanitize_municipality(row[0]) for row in
+            self.session.query(
+                ArchivedResult.meta['domain_segment'].astext
+            )
+            .filter(ArchivedResult.domain == 'municipality')
             .distinct()
-            .order_by(ElectionResult.name)
-            if name[0]
+            if row[0]
         ]
         print('*** tschupre valid municipalities:', self.municipalities)
 
     def is_valid_municipality(self) -> bool:
         print('*** tschupre valid municipality:', self.municipality)
-        return True if self.municipality in self.municipalities else False
+        return self.municipality in self.municipalities
 
     def sanitize_municipality(self, municipality: str) -> str:
         """

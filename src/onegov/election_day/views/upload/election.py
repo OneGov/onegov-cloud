@@ -6,6 +6,7 @@ import transaction
 
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.formats import import_ech
 from onegov.election_day.formats import import_election_internal_majorz
 from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.formats import import_election_wabstic_majorz
@@ -67,6 +68,7 @@ def view_upload_majorz_election(
     status = 'open'
     last_change = self.last_result_change
     if form.submitted(request):
+        session = request.session
         principal = request.app.principal
         if not principal.is_year_available(self.date.year, map_required=False):
             errors = [unsupported_year_error(self.date.year)]
@@ -80,6 +82,20 @@ def view_upload_majorz_election(
                     form.results.file,
                     form.results.data['mimetype']
                 )
+
+            elif form.file_format.data == 'xml':
+                assert form.xml.file is not None
+                assert request.app.default_locale is not None
+                errors, updated, _ = import_ech(
+                    principal,
+                    form.xml.file,
+                    session,
+                    request.app.default_locale
+                )
+                archive = ArchivedResultCollection(session)
+                for update in updated:
+                    archive.update(update, request)
+
             elif form.file_format.data == 'wabsti_c':
                 source: DataSourceItem
                 for source in self.data_sources:

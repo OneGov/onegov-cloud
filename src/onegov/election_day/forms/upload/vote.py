@@ -25,7 +25,7 @@ class UploadVoteForm(Form):
         _('File format'),
         choices=[
             ('internal', 'OneGov Cloud'),
-            ('xml', 'eCH-0252')
+            ('xml', 'eCH-0252'),
         ],
         validators=[
             InputRequired()
