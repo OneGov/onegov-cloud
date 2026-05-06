@@ -19,6 +19,7 @@ import yaml
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from io import BytesIO
+from libres.db.models import ReservedSlot
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
                                    TimerangeTooLong)
 from markupsafe import Markup
@@ -77,8 +78,8 @@ from onegov.org.models import (
     RISParliamentaryGroupCollection,
 )
 from onegov.page.collection import PageCollection
-from onegov.reservation import ResourceCollection
-from onegov.ticket import TicketCollection
+from onegov.reservation import Reservation, ResourceCollection
+from onegov.ticket import Ticket, TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
 from onegov.town6.upgrade import migrate_theme_options
 from onegov.user.models import TAN
@@ -3348,37 +3349,6 @@ def migrate_agency(
     return migrate_to_new_agency
 
 
-@cli.command(name='get-resources-campos')
-@click.argument('option_file', type=click.File('rb'))
-def get_resources_and_forms_campos(
-    option_file: IO[bytes]
-) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Get the resources and forms from the option file. """
-
-    def print_resources(request: OrgRequest, app: OrgApp) -> None:
-        book = load_workbook(option_file)
-        sheet = book['Blatt 1']
-
-        resources_in_db = ResourceCollection(app.libres_context)
-        for resource in resources_in_db.query():
-            click.secho(resource.title, fg='green')
-
-        resources: set[str] = set()
-        for index, row in enumerate(sheet.rows):
-            if index <= 1:
-                continue
-            for i, cell in enumerate(row):
-                value = str(cell.value)
-                if i == 0:  # Resource Name
-                    resource_name = value
-                    resources.add(resource_name)
-
-        for resource in resources:
-            click.secho(resource, fg='blue')
-
-    return print_resources
-
-
 @cli.command(name='get-resource-fields')
 def get_resource_fields(
 ) -> Callable[[OrgRequest, OrgApp], None]:
@@ -3438,7 +3408,7 @@ def import_reservations_campos(
         yaml_file = mapping_yaml.read()
         yaml_dict = yaml.safe_load(yaml_file)
         resource_map = yaml_dict.get('resources', {})
-        fields = yaml_dict.get('fields', {})
+        shared_fields = yaml_dict.get('shared_fields', {})
         # res_show = json.dumps(resource_map, indent=4, default=str)
         # click.secho(f'Resources: {res_show}', fg='green')
 
@@ -3447,6 +3417,8 @@ def import_reservations_campos(
 
         reservations: dict[
             str, list[Reservation]] = {}
+
+        # Iterate through the reservations in the excel file
         for index, row in enumerate(sheet.rows):
             if index == 0:  # Skip the first row, it's the header
                 continue
@@ -3459,6 +3431,7 @@ def import_reservations_campos(
             }
             row_empty: bool = True
             resource_name = ''
+            import_fields: dict[int, str] = {}
 
             for i, cell in enumerate(row):
                 value = cell.value
@@ -3467,6 +3440,8 @@ def import_reservations_campos(
                         continue
                     row_empty = False
                     resource_name = str(value)
+                    import_fields = resource_map.get(resource_name, {}
+                                                     ).get('fields', {})
                 elif i == 1:
                     reservation['start'] = datetime.strptime(
                         str(value), '%d.%m.%Y %H:%M:%S')
@@ -3480,15 +3455,18 @@ def import_reservations_campos(
                     reservation['state'] = str(value)
                 elif i == 17:
                     if value is None:
-                        value = 'info@seantis.ch'
+                        value = 'raumreservationen@huenenberg.ch'
                     reservation['fields']['email'] = value
-                elif i in fields:
+                elif i in shared_fields:
                     value = str(value or '')
-                    key = fields[i]
+                    key = shared_fields[i]
                     if reservation['fields'].get(key) is None or '':
                         reservation['fields'][key] = value
                     elif value not in reservation['fields'][key]:
                         reservation['fields'][key] += f' {value}'
+                elif i in import_fields:
+                    key = import_fields[i]
+                    reservation['fields'][key] = value
 
             if not row_empty:
                 if resource_name not in reservations:
@@ -3499,7 +3477,7 @@ def import_reservations_campos(
         res_show = json.dumps(reservations, indent=4, default=str)
         click.secho(f'Reservations: {res_show}', fg='green')
 
-    #     # Create reservations
+        # Create reservations
         if not dry_run:
             resources = ResourceCollection(app.libres_context)
             for resource_name in reservations.keys():
@@ -3511,6 +3489,8 @@ def import_reservations_campos(
                         'file'
                     )
                     continue
+
+                real_resource_name = real_resource_name.get('name', '')
                 resource = resources.by_name(real_resource_name.lower())
 
                 if not resource:
@@ -3519,9 +3499,7 @@ def import_reservations_campos(
                     )
                     continue
 
-                click.echo(
-                    f'Importing reservations for {resource.title}'
-                )
+                click.echo(f'Importing reservations for {resource.title}')
                 scheduler = resource.scheduler
 
                 for id, reservation in enumerate(reservations[resource_name]):
@@ -3532,7 +3510,7 @@ def import_reservations_campos(
                     start = reservation['start']
                     end = reservation['end']
                     click.secho(f'Trying to import ${start} -'
-                                ' ${end} with email ${email}',
+                                f' ${end} with email ${email}',
                                 fg='cyan')
                     if not email or not start or not end:
                         click.secho(
@@ -3601,6 +3579,7 @@ def import_reservations_campos(
                             click.secho(
                                 f'{id}: No rules found for '
                                 f'{resource.title} at {start}', fg='red')
+                            found_conflict = True
                     except Exception as e:
                         click.secho(
                             f'{id}: Error {e} reserving {resource.title} '
@@ -3615,8 +3594,10 @@ def import_reservations_campos(
                     forms = FormCollection(app.session())
 
                     form_data = {}
+                    form_fields = list(resource.form_class()._fields.keys())
                     for key, value in reservation['fields'].items():
-                        form_data[key] = str(value)
+                        if key in form_fields:
+                            form_data[key] = str(value)
 
                     form = resource.form_class(data=form_data)
 
@@ -3648,7 +3629,94 @@ def import_reservations_campos(
                             ticket.close_ticket()
 
                     click.secho(f'{id}: Sucessfully imported reservation '
-                                f'at {start} - {end}',
+                                f'${ticket.number} at {start} - {end}',
                                 fg='green')
 
     return import_reservations
+
+
+@cli.command(name='delete-reservations-and-tickets',
+             context_settings={'singular': True})
+@click.option('--dry-run', is_flag=True, default=False)
+def delete_reservations(
+    dry_run: bool,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Deletes all reservations and all tickets with reservation handler
+
+    Example:
+    .. code-block:: bash
+
+        onegov-org --select '/foo/bar' delete-reservations-and-tickets
+    """
+
+    def delete_reservations(request: OrgRequest, app: OrgApp) -> None:
+        tickets = TicketCollection(request.session)
+
+        reservation_count = 0
+        ticket_count = 0
+
+        # Delete all reservations from all resources
+        click.echo('Deleting reservations...')
+
+        reservations = request.session.query(Reservation)
+        for reservation in reservations:
+            try:
+                request.session.delete(reservation)
+                reservation_count += 1
+                click.secho(
+                    f'  Deleted reservation {reservation.id}',
+                    fg='green' if not dry_run else 'yellow'
+                )
+            except Exception as e:
+                click.secho(f'Error deleting reservations: {e}', fg='red')
+
+        # Delete all Reserved Slots
+        reserved_slots = request.session.query(ReservedSlot)
+        for slot in reserved_slots:
+            try:
+                request.session.delete(slot)
+                click.secho(
+                    '  Deleted reserved slot',
+                    fg='green' if not dry_run else 'yellow'
+                )
+            except Exception as e:
+                click.secho(f'Error deleting reserved slot: {e}', fg='red')
+
+        # Delete all tickets with reservation handler (RSV)
+        click.echo('Deleting tickets...')
+        rsv_tickets = tickets.query().filter(
+            Ticket.handler_code == 'RSV'
+        ).all()
+
+        submissions = request.session.query(FormSubmission)
+        for submission in submissions:
+            if submission.created > datetime.now() - timedelta(hours=1):
+                if not dry_run:
+                    request.session.delete(submission)
+                click.secho(
+                    f'  Deleted form submission {submission.id} ',
+                    fg='green' if not dry_run else 'yellow'
+                )
+
+        for ticket in rsv_tickets:
+            if not dry_run:
+                request.session.delete(ticket)
+            ticket_count += 1
+            click.secho(
+                f'Deleted ticket #{ticket.number} '
+                f'(handler: {ticket.handler_code})',
+                fg='green' if not dry_run else 'yellow'
+            )
+
+        if not dry_run:
+            transaction.commit()
+
+        click.echo('')
+        mode = '(DRY RUN)' if dry_run else ''
+        click.secho(
+            f'Summary: {reservation_count} reservations and {ticket_count} '
+            f'tickets deleted {mode}',
+            fg='yellow' if dry_run else 'green'
+        )
+
+    return delete_reservations

@@ -10,6 +10,20 @@
             "request": "launch",
             "program": "venv/bin/onegov-server",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Onegov CLI - import-reservations-campos",
+            "type": "python",
+            "request": "launch",
+            "program": "venv/bin/onegov-org",
+            "args": [
+                "--select",
+                "/onegov_town6_without_yubikey/huenenberg",
+                "import-reservations-campos",
+                "../../temp/huenenberg campos/Test.xlsx",
+                "../../temp/huenenberg campos/mapping.yaml"
+            ],
+            "console": "integratedTerminal"
         }
     ]
 }
