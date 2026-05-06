@@ -99,7 +99,6 @@ def groupbydict[T1](
     sortfunc: Callable[[T1], Any] | None = None,
     groupfunc: Callable[[Iterable[T1]], Any] = list
 ) -> dict[Any, Any]:
-
     return OrderedDict(
         (key, groupfunc(group))
         for key, group in groupby(
@@ -308,8 +307,8 @@ class ArchivedResultCollection:
         result.counted_entities, result.total_entities = item.progress
         result.has_results = item.has_results
         result.meta = result.meta or {}
-        # tschupre
-        if item.domain == 'municipality' and 'domain_segment' in (item.meta or {}):
+        if (item.domain == 'municipality' and
+                'domain_segment' in (item.meta or {})):
             segment = item.meta['domain_segment']
             segment = segment.split(' (')[0]  # get rid of e.g. ` (SG)`
             result.meta['domain_segment'] = segment
@@ -364,7 +363,7 @@ class ArchivedResultCollection:
                 )
                 result.yeas_percentage_tie_breaker = (
                     ballot.yeas_percentage
-                    )
+                )
 
         if add_result:
             self.session.add(result)
@@ -440,7 +439,9 @@ class ArchivedResultCollection:
 
 class MunicipalArchivedResultCollection(ArchivedResultCollection):
 
-    """ Provides all municipal (`kommunal`) archived results for a given date. """
+    """
+    Provides all municipal (`kommunal`) archived results for a given date.
+    """
 
     def by_date(
         self,
@@ -448,10 +449,33 @@ class MunicipalArchivedResultCollection(ArchivedResultCollection):
     ) -> tuple[list[ArchivedResult], datetime | None]:
         items, last_modified = super().by_date(date_)
         results = [i for i in items if i.domain == 'municipality']
-        for result in results:
-            print('*** tschupre result', result.title)
-        print('*** tschupre len result', len(results))
         return results, last_modified
+
+    def group_items(
+        self,
+        items: Collection[ArchivedResult],
+        request: ElectionDayRequest
+    ) -> dict[date, dict[str | None, dict[str, list[ArchivedResult]]]] | None:
+        if not items:
+            return None
+
+        print('*** tschupre municipal group items len items', len(items))
+
+        return groupbydict(
+            items,
+            lambda i: i.date,
+            lambda i: -(as_datetime(i.date).timestamp() or 0),
+            lambda i: groupbydict(
+                i,
+                lambda j: (j.meta or {}).get('domain_segment') or '',
+                lambda j: (j.meta or {}).get('domain_segment') or '',
+                lambda j: groupbydict(
+                    j,
+                    lambda k: 'vote'
+                    if k.type in ('vote', 'complex_vote') else 'election',
+                )
+            )
+        )
 
 
 class MunicipalityArchivedResultCollection(ArchivedResultCollection):
@@ -491,13 +515,16 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
     ) -> tuple[list[ArchivedResult], datetime | None]:
         """ Returns the results for a given municipality. """
         municipality = municipality if municipality else self.municipality
+        print('*** tschupre by municipality:', municipality)
 
         query = self.query()
         query = query.filter(ArchivedResult.domain == 'municipality')
         query = query.filter(ArchivedResult.type.in_(['election', 'vote']))
         # TODO: Fix filter below for st-gallen
         query = query.filter(
-            func.lower(ArchivedResult.meta['domain_segment'].astext) == municipality
+            func.lower(
+                ArchivedResult.meta['domain_segment'].astext
+            ) == municipality
         )
         query = query.order_by(
             ArchivedResult.date,
@@ -518,7 +545,6 @@ class SearchableArchivedResultCollection(
     ArchivedResultCollection,
     Pagination[ArchivedResult]
 ):
-
     page: int
 
     def __init__(

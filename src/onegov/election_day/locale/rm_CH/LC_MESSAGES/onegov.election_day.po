@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-04 05:53-0400\n"
+"POT-Creation-Date: 2026-05-06 11:08-0400\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -905,9 +905,6 @@ msgstr "Archiv"
 msgid "Elections &amp; Votes"
 msgstr "Elecziuns &amp; votaziuns"
 
-msgid "Invalid municipality name ${municipality}."
-msgstr "Nagin num da vischnanca nunvalaivel: ${municipality}."
-
 msgid "There are no elections or votes defined yet."
 msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
 
@@ -927,8 +924,11 @@ msgstr "Elecziuns regionalas"
 msgid "Cantonal Elections"
 msgstr "Elecziuns chantunalas"
 
-msgid "Communal Elections"
-msgstr "Elecziuns communalas"
+msgid "Municipal Elections and Votes"
+msgstr "Elecziuns e votaziuns communalas"
+
+msgid "All municipal election and vote results"
+msgstr "Tut ils resultats da las elecziuns e votaziuns communalas"
 
 msgid "Federal Votes"
 msgstr "Votaziuns federalas"
@@ -938,9 +938,6 @@ msgstr "Votaziuns regiunalas"
 
 msgid "Cantonal Votes"
 msgstr "Votaziuns chantunalas"
-
-msgid "Communal Votes"
-msgstr "Votaziuns communalas"
 
 msgid "Counted"
 msgstr "Dumbrà ora"
@@ -1974,6 +1971,3 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
-
-#~ msgid "Domain not supported"
-#~ msgstr "Domain betg supportà"

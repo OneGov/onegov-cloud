@@ -67,7 +67,6 @@ def view_archive(
         'layout': layout,
         'date': self.date,
         'archive_items': self.group_items(results, request),
-        'municipal_view': False,
         'show_communal_nav': True,
     }
 
@@ -89,7 +88,6 @@ def view_archive_municipal(
         'date': self.date,
         'archive_items': self.group_items(results, request),
         'municipal_view': True,
-        'show_communal_nav': False,
     }
 
 
@@ -105,14 +103,15 @@ def view_archive_municipality(
     layout = DefaultLayout(self, request)
     results, _ = self.by_municipality()
 
+    if not self.is_valid_municipality():
+        raise HTTPNotFound()
+
     return {
         'layout': layout,
         'date': None,
         'archive_items': self.group_items(results, request),
         'municipality': self.municipality,
-        'municipality_invalid': not self.is_valid_municipality(),
-        'municipal_view': True,
-        'show_communal_nav': False,
+        'municipality_view': True,
     }
 
 
@@ -170,7 +169,6 @@ def view_principal(
         'layout': layout,
         'archive_items': archive.group_items(current, request),
         'date': None,
-        'municipal_view': False,
         'show_communal_nav': True,
     }
 

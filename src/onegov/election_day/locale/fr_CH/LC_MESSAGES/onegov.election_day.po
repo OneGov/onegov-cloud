@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-04 05:53-0400\n"
+"POT-Creation-Date: 2026-05-06 11:35-0400\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -898,15 +898,15 @@ msgstr "Archive"
 msgid "Elections &amp; Votes"
 msgstr "Elections et votations: données ouvertes"
 
-msgid "Invalid municipality name ${municipality}."
-msgstr "Nom de commune non valide ${municipality}."
-
 msgid "There are no elections or votes defined yet."
 msgstr "Il n'y a pas de élections ou votations définis actuellement."
 
 #, python-format
 msgid "Elections and votes on ${date}"
 msgstr "Elections et votes sur ${date}"
+
+msgid "Municipal Elections and Votes"
+msgstr "Élections et votations communales"
 
 msgid "Federal Elections"
 msgstr "Elections fédéraux"
@@ -920,8 +920,8 @@ msgstr "Elections régionales"
 msgid "Cantonal Elections"
 msgstr "Elections cantonaux"
 
-msgid "Communal Elections"
-msgstr "Elections communales"
+msgid "All municipal election and vote results"
+msgstr "Tous les résultats des élections et votations communales"
 
 msgid "Federal Votes"
 msgstr "Votations fédérales"
@@ -931,9 +931,6 @@ msgstr "Votations régionales"
 
 msgid "Cantonal Votes"
 msgstr "Votations cantonales"
-
-msgid "Communal Votes"
-msgstr "Votations communales"
 
 msgid "Counted"
 msgstr "Compté"
@@ -1967,6 +1964,3 @@ msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
-
-#~ msgid "Domain not supported"
-#~ msgstr "Domaine non pris en charge."

@@ -7,9 +7,11 @@ from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.election_day import _
-from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.collections import MunicipalArchivedResultCollection
-from onegov.election_day.collections import MunicipalityArchivedResultCollection
+from onegov.election_day.collections import (
+    ArchivedResultCollection,
+    MunicipalArchivedResultCollection,
+    MunicipalityArchivedResultCollection
+)
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.collections import VoteCollection
 from onegov.user import Auth
@@ -163,10 +165,6 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def municipal_archive(self) -> MunicipalArchivedResultCollection:
         return MunicipalArchivedResultCollection(self.request.session)
-
-    @cached_property
-    def municipality_archive(self) -> MunicipalityArchivedResultCollection:
-        return MunicipalityArchivedResultCollection(self.request.session)
 
     def municipality_archive_link(self, municipality: str) -> str:
         return self.request.class_link(

@@ -1,8 +1,9 @@
 <div metal:use-macro="layout.base"
      i18n:domain="onegov.election_day"
      tal:define="communal_instance layout.principal.domain == 'municipality';
-                 show_communal_nav show_communal_nav | python:True;
-                 municipal_view municipal_view | python:False">
+                 show_communal_nav show_communal_nav | python:False;
+                 municipal_view municipal_view | python:False;
+                 municipality_view municipality_view | python:False;">
     <tal:block metal:fill-slot="title">
         <tal:block condition="date">
             <tal:block i18n:translate="">Archive</tal:block> ${date} -
@@ -38,7 +39,12 @@
                         Elections and votes on <tal:block tal:content="layout.format_date(date, 'date_long')" i18n:name='date'/>
                     </a>
                 </h2>
+                <h3 tal:condition="municipal_view">
+                    <span i18n:translate="">Municipal Elections and Votes</span>
+                </h3>
+
                 <div tal:repeat="domain archive_items[date]" class="domain-${domain}">
+                    <h4 tal:condition="municipal_view">${domain}</h4>
                     <div tal:repeat="type archive_items[date][domain]" class="type-${type}">
 
                         <h3 tal:condition="type == 'election' and domain == 'federation'">
@@ -64,25 +70,17 @@
 
                         <tal:block tal:condition="type == 'election' and domain == 'municipality'">
                             <h3>
-                                <tal:block tal:condition="show_communal_nav and not municipal_view">
-                                    <a href="${request.link(layout.municipal_archive.for_date(date))}" i18n:translate="">Communal Elections</a>
+                                <tal:block>
+                                    <span i18n:translate="">Municipal Elections and Votes</span>
+                                    <span tal:condition="municipal_view or municipality_view">${municipality.title()}</span>
                                 </tal:block>
-                                <tal:block tal:condition="show_communal_nav and municipal_view">
-                                    <a href="${request.link(layout.municipal_archive.for_date(date))}" i18n:translate="">Communal Elections</a>
-                                </tal:block>
-                                <tal:block tal:condition="not show_communal_nav" i18n:translate="">Communal Elections</tal:block>
                                 <span class="visually-hidden">
                                     <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}
                                 </span>
                             </h3>
-                            <p tal:condition="show_communal_nav and not municipal_view">
+                            <p tal:condition="show_communal_nav">
                                 <a href="${request.link(layout.municipal_archive.for_date(date))}" i18n:translate="">
-                                    View all communal election results
-                                </a>
-                            </p>
-                            <p tal:condition="show_communal_nav and municipal_view">
-                                <a href="${request.link(layout.archive.for_date(date))}" i18n:translate="">
-                                    View all results for this date
+                                    All municipal election and vote results
                                 </a>
                             </p>
                         </tal:block>
@@ -108,38 +106,11 @@
                             </span>
                         </h3>
 
-                        <tal:block tal:condition="type == 'vote' and domain == 'municipality'">
-                            <h3>
-                                <tal:block tal:condition="show_communal_nav and not municipal_view">
-                                    <a href="${request.link(layout.municipal_archive.for_date(date))}" i18n:translate="">Communal Votes</a>
-                                </tal:block>
-                                <tal:block tal:condition="show_communal_nav and municipal_view">
-                                    <a href="${request.link(layout.municipal_archive.for_date(date))}" i18n:translate="">Communal Votes</a>
-                                </tal:block>
-                                <tal:block tal:condition="not show_communal_nav">
-                                    <a href="${request.link(layout.municipal_archive.for_date(date))}" i18n:translate="">Communal Votes</a>
-                                </tal:block>
-                                <span class="visually-hidden">
-                                    <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}
-                                </span>
-                            </h3>
-                            <p tal:condition="show_communal_nav and not municipal_view">
-                                <a href="${request.link(layout.municipal_archive.for_date(date))}" i18n:translate="">
-                                    View all communal vote results 1
-                                </a>
-                            </p>
-                            <p tal:condition="show_communal_nav and municipal_view">
-                                <a href="${request.link(layout.archive.for_date(date))}" i18n:translate="">
-                                    View all results for this date 2
-                                </a>
-                            </p>
-                        </tal:block>
-
-                        <table class="overview election tablesaw" data-tablesaw-mode="stack" tal:condition="type == 'election' and (domain != 'municipality' or municipal_view)">
+                        <table class="overview election tablesaw" data-tablesaw-mode="stack" tal:condition="type == 'election' and (domain != 'municipality' or municipal_view or municipality_view)">
                             <thead>
                                 <tr>
                                     <th i18n:translate="">Election</th>
-                                    <th i18n:translate="" class="right-aligned" tal:condition="not: communal_instance">Counted</th>
+                                    <th i18n:translate="" class="right-aligned" tal:condition="not: communal_instance or municipal_view or municipality_view">Counted</th>
                                     <th i18n:translate="" class="right-aligned">Updated</th>
                                 </tr>
                             </thead>
@@ -151,7 +122,7 @@
                                             <span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/>
                                         </a>
                                     </th>
-                                    <td class="right-aligned" tal:condition="election.has_results and not communal_instance">
+                                    <td class="right-aligned" tal:condition="election.has_results and not communal_instance and not municipal_view and not municipality_view">
                                         <div metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" />
                                     </td>
                                     <td style="min-width: 25%;" i18n:translate="" colspan="2" class="right-aligned" tal:condition="not election.has_results">
@@ -164,7 +135,7 @@
                             </tbody>
                         </table>
 
-                        <table class="overview vote tablesaw" data-tablesaw-mode="stack" tal:condition="type in ('vote', 'complex_vote') and (domain != 'municipality' or municipal_view)"
+                        <table class="overview vote tablesaw" data-tablesaw-mode="stack" tal:condition="type in ('vote', 'complex_vote') and (domain != 'municipality' or municipal_view or municipality_view)"
                             tal:define="votes_started any(item.has_results for item in archive_items[date][domain][type])"
                         >
                             <thead>
@@ -176,7 +147,7 @@
                                     </tal:block>
                                     <th i18n:translate="" class="right-aligned" tal:condition="votes_started">Yes %</th>
                                     <th i18n:translate="" class="right-aligned" tal:condition="votes_started">No %</th>
-                                    <th i18n:translate="" class="right-aligned" tal:condition="votes_started and not communal_instance">Counted</th>
+                                    <th i18n:translate="" class="right-aligned" tal:condition="votes_started and not communal_instance and not municipal_view and not municipality_view">Counted</th>
                                     <th i18n:translate="" class="right-aligned" tal:condition="votes_started">Updated</th>
                                 </tr>
                             </thead>
@@ -217,7 +188,7 @@
                                                     <td class="right-aligned" tal:condition="vote.has_results"></td>
                                                 </tal:block>
                                             </tal:block>
-                                            <td class="right-aligned" tal:condition="vote.has_results and not communal_instance" >
+                                            <td class="right-aligned" tal:condition="vote.has_results and not communal_instance and not municipality_view" >
                                                 <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
                                             </td>
                                             <td class="right-aligned" tal:condition="vote.has_results">
@@ -295,7 +266,7 @@
                                             <td class="right-aligned" tal:condition="vote.has_results">
                                                 ${layout.format_number(vote.display_nays_percentage(request))}
                                             </td>
-                                            <td class="right-aligned" tal:condition="vote.has_results and not communal_instance" >
+                                            <td class="right-aligned" tal:condition="vote.has_results and not communal_instance and not municipal_view and not municipality_view" >
                                                 <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
                                             </td>
                                             <td class="right-aligned" tal:condition="vote.has_results">
