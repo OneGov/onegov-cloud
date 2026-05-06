@@ -4101,14 +4101,30 @@ class HomepageLayout(DefaultLayout):
                     self.request.link(self.model, 'sort'),
                     attrs={'class': ('sort-link')}
                 ),
-                Link(
-                    _('Add'),
-                    self.request.link(Editor('new-root', self.model, 'page')),
-                    attrs={'class': ('new-page')},
-                    classes=(
-                        'new-page',
-                        'show-new-content-placeholder'
-                    ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=(
+                        Link(
+                            _('Topic'),
+                            self.request.link(
+                                Editor('new-root', self.model, 'page')),
+                            attrs={'class': ('new-page')},
+                            classes=(
+                                'new-page',
+                                'show-new-content-placeholder'
+                            ),
+                        ),
+                        Link(
+                            _('Link'),
+                            self.request.link(
+                                Editor('new-root', self.model, 'link')),
+                            attrs={'class': 'new-root-link'},
+                            classes=(
+                                'new-root-link',
+                                'show-new-content-placeholder'
+                            )
+                        )
+                    )
                 ),
             ]
         return None

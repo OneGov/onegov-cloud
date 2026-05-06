@@ -570,6 +570,7 @@ $editbar-fg-color-active: $white;
     .new-form::before { @include icon($new-form-icon); }
     .new-document-form::before { @include icon-bold($new-document-form-icon); }
     .new-link::before { @include icon-bold($new-link-icon); }
+    .new-root-link::before { @include icon-bold($new-link-icon); }
     .new-iframe::before { @include icon-bold($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }
     .new-newsletter::before { @include icon($new-newsletter-icon); }
