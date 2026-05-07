@@ -10,6 +10,13 @@ if TYPE_CHECKING:
     from .conftest import TestApp
 
 
+def test_inline_event_search(client: Client[TestApp]) -> None:
+    resp = client.get(
+        '/events?search=inline' '&search_query={"term"%3A"natur"}'
+    )
+    assert resp.status_int == 200
+
+
 def test_search_excluding_image(client_with_fts: Client[TestApp]) -> None:
 
     client = client_with_fts

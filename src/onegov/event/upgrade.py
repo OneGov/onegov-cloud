@@ -75,6 +75,8 @@ def migrate_filter_keywords_column(context: UpgradeContext) -> None:
             continue
 
         for keyword, values in keywords.items():
+            if values is None:
+                continue
             if isinstance(values, str):
                 values = [values]
             for value in values:

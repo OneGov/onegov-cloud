@@ -171,30 +171,34 @@ def test_views(client_with_fts: Client[TestApp]) -> None:
     assert 'abgeschlossen' in page
     assert 'geplant' not in page
 
+    # cycle votum: completed → draft (no cascade to parent states)
     state_url = page.pyquery('.votum a[ic-post-to]').attr['ic-post-to']
     client_with_fts.post(state_url)
     page = client_with_fts.get('/assembly/2023-05-07/states')
     assert 'Entwurf' in page
-    assert 'laufend' not in page
-    assert 'abgeschlossen' not in page
+    assert 'abgeschlossen' in page  # agenda item + assembly stay completed
 
+    # cycle agenda item: completed → draft (no cascade to assembly)
     ai_url = page.pyquery('.agenda-item a[ic-post-to]').attr['ic-post-to']
     client_with_fts.post(ai_url)
     page = client_with_fts.get('/assembly/2023-05-07/states')
-    assert 'geplant' in page
-    assert 'Entwurf' in page  # Votum state shouldn't change
+    assert 'Entwurf' in page  # agenda item and votum are draft
+    assert 'abgeschlossen' in page  # assembly stays completed
 
+    # cycle agenda item: draft → scheduled
     ai_url = page.pyquery('.agenda-item a[ic-post-to]').attr['ic-post-to']
     client_with_fts.post(ai_url)
     page = client_with_fts.get('/assembly/2023-05-07/states')
-    assert 'laufend' in page
-    assert 'Entwurf' in page  # Votum state still shouldn't change
+    assert 'geplant' in page  # agenda item is scheduled
+    assert 'Entwurf' in page  # votum still draft
+    assert 'abgeschlossen' in page  # assembly still completed
 
+    # cycle assembly: completed → draft
     assembly_url = page.pyquery('.assembly a[ic-post-to]').attr['ic-post-to']
     client_with_fts.post(assembly_url)
     page = client_with_fts.get('/assembly/2023-05-07/states')
-    assert 'abgeschlossen' in page
-    assert 'geplant' not in page
+    assert 'Entwurf' in page  # assembly cascades draft to children
+    assert 'abgeschlossen' not in page
     assert 'laufend' not in page
 
     # delete votum
