@@ -884,7 +884,8 @@ class MembershipImporter(DataImporter):
         [g.id for g in self.parliamentary_group_map.values() if g.id]
 
         existing_commission_memberships_map: dict[
-            tuple[UUID | None, UUID | None], PASCommissionMembership
+            tuple[UUID | None, UUID | None, date | None],
+            PASCommissionMembership,
         ] = {}
         if parliamentarian_ids and commission_ids:
             existing_cms = (
@@ -898,7 +899,7 @@ class MembershipImporter(DataImporter):
                 .all()
             )
             existing_commission_memberships_map = {
-                (cm.parliamentarian_id, cm.commission_id): cm
+                (cm.parliamentarian_id, cm.commission_id, cm.start): cm
                 for cm in existing_cms
             }
             self.logger.debug(
@@ -1020,7 +1021,17 @@ class MembershipImporter(DataImporter):
                         )
                         continue
 
-                    membership_key = (parliamentarian.id, commission.id)
+                    start_val = membership.get('start')
+                    start_date = self.parse_date(
+                        str(start_val)
+                        if start_val and not isinstance(start_val, bool)
+                        else None
+                    )
+                    membership_key = (
+                        parliamentarian.id,
+                        commission.id,
+                        start_date,
+                    )
                     existing_membership = (
                         existing_commission_memberships_map.get(membership_key)
                     )
@@ -1053,7 +1064,11 @@ class MembershipImporter(DataImporter):
                             # duplicates within the same import run if data is
                             # redundant
                             if parliamentarian.id and commission.id:
-                                new_key = (parliamentarian.id, commission.id)
+                                new_key = (
+                                    parliamentarian.id,
+                                    commission.id,
+                                    membership_obj.start,
+                                )
                                 existing_commission_memberships_map[
                                     new_key
                                 ] = membership_obj
