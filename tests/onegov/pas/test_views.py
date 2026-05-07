@@ -823,6 +823,81 @@ def test_settlement_run_complete_translation(
     assert '✓ Complete' not in page
 
 
+def test_commission_president_bulk_add(
+    client: Client[TestPasApp],
+) -> None:
+    session = client.app.session()
+    session.add(
+        SettlementRun(
+            name='Q1 2024',
+            start=datetime.date(2024, 1, 1),
+            end=datetime.date(2024, 12, 31),
+            active=True,
+            closed=False,
+        )
+    )
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    bob = parliamentarians.add(
+        first_name='Bob',
+        last_name='Member',
+        email_primary='bob.member@example.org',
+        zg_username='zgbob',
+    )
+    alice = parliamentarians.add(
+        first_name='Alice',
+        last_name='President',
+        email_primary='alice.president@example.org',
+        zg_username='zgalice',
+    )
+
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='Finanzkommission')
+
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=bob.id,
+            commission_id=commission.id,
+            role='member',
+        )
+    )
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=alice.id,
+            commission_id=commission.id,
+            role='president',
+        )
+    )
+
+    commission_id = str(commission.id)
+    bob_id = str(bob.id)
+    alice_id = str(alice.id)
+
+    users = UserCollection(session)
+    president_user = users.by_username('zgalice')
+    assert president_user is not None
+    president_user.role = 'commission_president'
+    president_user.password = 'test'
+    president_user.active = True
+    transaction.commit()
+
+    client.login('zgalice', 'test')
+
+    page = client.get('/attendences')
+    assert 'Massenbuchung Kommissionssitzung' in page
+
+    page = client.get('/attendences/new-commission-bulk')
+    assert page.status_code == 200
+    page.form['date'] = '2024-06-01'
+    page.form['type'] = 'commission'
+    page.form['duration'] = '2'
+    page.form['commission_id'] = commission_id
+    page.form['abschluss'] = False
+    page.form['parliamentarian_id'] = [bob_id, alice_id]
+    page = page.form.submit().maybe_follow()
+    assert page.status_code == 200
+
+
 def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
     client.login_admin()
 
