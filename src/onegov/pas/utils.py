@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from onegov.pas.collections import AttendenceCollection
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import PASCommission
 from onegov.pas.models.commission_membership import PASCommissionMembership
@@ -20,9 +19,39 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.pas.models import SettlementRun
     from onegov.pas.models.attendence import Attendence
-    from onegov.town6.request import TownRequest
     from onegov.user import User
     from sqlalchemy.orm import Session
+
+
+def _is_kantonsrat_role(
+    role: PASParliamentarianRole,
+) -> bool:
+    """A Kantonsrat role has meta.org_type == 'Kantonsrat' (set
+    by the KUB importer). Falls back to the legacy heuristic
+    (all of party_id, parliamentary_group_id, and
+    additional_information being NULL) for rows imported before
+    org_type was persisted.
+    """
+    org_type = role.meta.get('org_type')
+    if org_type is not None:
+        return org_type == 'Kantonsrat'
+    return (
+        role.party_id is None
+        and role.parliamentary_group_id is None
+        and role.additional_information is None
+    )
+
+
+def is_active_kantonsrat_member(
+    parliamentarian: PASParliamentarian,
+    reference_date: date | None = None,
+) -> bool:
+    if reference_date is None:
+        reference_date = date.today()
+    return any(
+        _is_kantonsrat_role(r) and (r.end is None or r.end >= reference_date)
+        for r in parliamentarian.roles
+    )
 
 
 def format_swiss_number(value: Decimal | int) -> str:
@@ -247,90 +276,3 @@ def get_commissions_with_memberships(
         .order_by(PASCommission.name)
         .all()
     )
-
-
-# FIXME: Should these two functions be a CLI command instead? Maybe switch
-#        to `click.echo` from `print` depending on the answer.
-def debug_party_export(
-    settlement_run: SettlementRun,
-    request: TownRequest,
-    party: Party
-) -> None:
-    """Debug function to trace party export data retrieval"""
-    session = request.session
-
-    # 1. Check basic party info
-    print(f'Party ID: {party.id}, Name: {party.name}')  # noqa: T201
-
-    # 2. Check date range
-    print(f'Date range: {settlement_run.start} to {settlement_run.end}')  # noqa: T201
-
-    # 3. Get all attendances without party filter first
-    base_attendances = (
-        AttendenceCollection(session)
-        .query()
-        .filter(
-            Attendence.date >= settlement_run.start,
-            Attendence.date <= settlement_run.end
-        )
-        .all()
-    )
-    print(f'Total attendances in date range: {len(base_attendances)}')  # noqa: T201
-
-    # 4. Check parliamentarian roles
-    for attendance in base_attendances:
-        parl = attendance.parliamentarian
-        print(f'\nParliamentarian: {parl.first_name} {parl.last_name}')  # noqa: T201
-        print(f'Attendance date: {attendance.date}')  # noqa: T201
-
-        roles = session.query(PASParliamentarianRole).filter(
-            PASParliamentarianRole.parliamentarian_id == parl.id,
-            PASParliamentarianRole.party_id == party.id,
-            ).all()
-
-        print('Roles:')  # noqa: T201
-        for role in roles:
-            print(f'- Start: {role.start}, End: {role.end}')  # noqa: T201
-
-        # Check if this attendance should be included
-        should_include = any(
-            (role.start is None or role.start <= attendance.date) and
-            (role.end is None or role.end >= attendance.date)
-            for role in roles
-        )
-        print(f'Should include: {should_include}')  # noqa: T201
-
-    # 5. Try the actual party filter
-    party_attendances = (
-        AttendenceCollection(session)
-        .by_party(
-            party_id=str(party.id),
-            start_date=settlement_run.start,
-            end_date=settlement_run.end
-        )
-        .query()
-        .all()
-    )
-    print(f'\nFinal filtered attendances: {len(party_attendances)}')  # noqa: T201
-
-
-def debug_party_export2(
-    request: TownRequest,
-    party: Party
-) -> None:
-    session = request.session
-    print(f'Party ID: {party.id}')  # noqa: T201
-
-    # Check roles directly
-    all_roles = session.query(PASParliamentarianRole).filter(
-        PASParliamentarianRole.party_id == party.id
-    ).all()
-    print(f'\nTotal roles for party: {len(all_roles)}')  # noqa: T201
-    for role in all_roles:
-        print(f'Role: {role.party_id} -> {role.parliamentarian_id}')  # noqa: T201
-
-    # Check all parties
-    all_parties = session.query(Party).all()
-    print('\nAll parties:')  # noqa: T201
-    for p in all_parties:
-        print(f'ID: {p.id}, Name: {p.name}')  # noqa: T201

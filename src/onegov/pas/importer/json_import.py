@@ -1110,6 +1110,7 @@ class MembershipImporter(DataImporter):
                             party_role=('member' if party else 'none'),
                             start_date=start_date_str,
                             end_date=end_date_str,
+                            org_type=org_type_title,
                         )
                         if updated:
                             parliamentarian_roles_to_update.append(
@@ -1133,6 +1134,7 @@ class MembershipImporter(DataImporter):
                             party_role=('member' if party else 'none'),
                             start_date=start_date_str,
                             end_date=end_date_str,
+                            org_type=org_type_title,
                         )
                         if role_obj:
                             parliamentarian_roles_to_create.append(role_obj)
@@ -1186,6 +1188,7 @@ class MembershipImporter(DataImporter):
                             role=role,
                             start_date=start_date_str,
                             end_date=end_date_str,
+                            org_type=org_type_title,
                         )
                         if updated:
                             parliamentarian_roles_to_update.append(
@@ -1202,6 +1205,7 @@ class MembershipImporter(DataImporter):
                             role=role,
                             start_date=start_date_str,
                             end_date=end_date_str,
+                            org_type=org_type_title,
                         )
                         if role_obj:
                             parliamentarian_roles_to_create.append(role_obj)
@@ -1256,6 +1260,7 @@ class MembershipImporter(DataImporter):
                             additional_information=additional_info,
                             start_date=start_date_str,
                             end_date=end_date_str,
+                            org_type=org_type_title,
                         )
                         if updated:
                             parliamentarian_roles_to_update.append(
@@ -1273,6 +1278,7 @@ class MembershipImporter(DataImporter):
                             additional_information=additional_info,
                             start_date=start_date_str,
                             end_date=end_date_str,
+                            org_type=org_type_title,
                         )
                         if role_obj:
                             parliamentarian_roles_to_create.append(role_obj)
@@ -1470,6 +1476,7 @@ class MembershipImporter(DataImporter):
         additional_information: str | None = None,
         start_date: str | None = None,
         end_date: str | None = None,
+        org_type: str | None = None,
     ) -> PASParliamentarianRole | None:
         try:
             # Ensure parliamentarian has an ID
@@ -1481,6 +1488,10 @@ class MembershipImporter(DataImporter):
                     f'{parliamentarian.last_name}'
                 )
                 return None
+
+            meta: dict[str, str] = {}
+            if org_type:
+                meta['org_type'] = org_type
 
             assert parliamentarian.id is not None
             return PASParliamentarianRole(
@@ -1494,6 +1505,7 @@ class MembershipImporter(DataImporter):
                 additional_information=additional_information,
                 start=self.parse_date(start_date),
                 end=self.parse_date(end_date),
+                meta=meta,
             )
         except Exception:
             self.logger.exception(
@@ -1512,6 +1524,7 @@ class MembershipImporter(DataImporter):
         additional_information: str | None = None,
         start_date: str | None = None,
         end_date: str | None = None,
+        org_type: str | None = None,
     ) -> bool:
         """
         Updates an existing ParliamentarianRole object.
@@ -1554,6 +1567,9 @@ class MembershipImporter(DataImporter):
             changed = True
         if role_obj.end != new_end:
             role_obj.end = new_end
+            changed = True
+        if org_type and role_obj.meta.get('org_type') != org_type:
+            role_obj.meta['org_type'] = org_type
             changed = True
 
         return changed
