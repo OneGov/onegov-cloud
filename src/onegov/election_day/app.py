@@ -215,7 +215,7 @@ def override_language_tween_factory(
         """
 
         locale = request.params.get('locale')
-        if locale in app.locales:
+        if isinstance(locale, str) and locale in app.locales:
             request.locale = locale
 
         return handler(request)
