@@ -3427,7 +3427,7 @@ def import_reservations_campos(
             # if index == 0:  # Skip the first row, it's the header
             #     continue
             # For now only one
-            if index < 1:
+            if index < 2:
                 continue
 
             reservation: Reservation = {
@@ -3458,6 +3458,7 @@ def import_reservations_campos(
                     import_fields = resource_in_map.get('fields', {})
                     click.secho(f'Searching for: {resource_name}', fg='green')
                 elif i == 1:
+                    click.secho(f'Parsing date: {value}', fg='blue')
                     reservation['start'] = datetime.strptime(
                         str(value), '%d.%m.%Y %H:%M:%S')
                 elif i == 3:
@@ -3481,6 +3482,8 @@ def import_reservations_campos(
                     elif value not in reservation['fields'].get(key, ''):
                         reservation['fields'][key] += f' {value}'
                 elif i in import_fields:
+                    if value is None or value == "":
+                        continue
                     key = import_fields[i]
                     if reservation['fields'].get(key) is None or '':
                         reservation['fields'][key] = value
