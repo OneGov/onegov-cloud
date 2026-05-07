@@ -43,7 +43,7 @@ if TYPE_CHECKING:
         def namespace(self) -> str: ...
 
 
-AUTHENTICATION_PROVIDERS = {}
+AUTHENTICATION_PROVIDERS: dict[str, type[AuthenticationProvider]] = {}
 
 
 class Conclusion:
