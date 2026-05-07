@@ -74,12 +74,9 @@
                             </span>
                         </h3>
 
-                        <tal:block tal:condition="type == 'election' and domain == 'municipality' and not municipality_view">
-                            <h3>
-                                <tal:block>
-                                    <span i18n:translate="">Municipal Elections and Votes</span>
-                                    <span tal:condition="municipal_view">${municipality_name}</span>
-                                </tal:block>
+                        <tal:block tal:condition="domain == 'municipality' and not municipality_view and repeat.type.start">
+                            <h3 tal:condition="not municipal_view">
+                                <span i18n:translate="">Municipal Elections and Votes</span>
                                 <span class="visually-hidden">
                                     <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}
                                 </span>

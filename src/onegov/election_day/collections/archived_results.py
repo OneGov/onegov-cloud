@@ -497,7 +497,10 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
     def is_valid_municipality(self) -> bool:
         return self.municipality in self.municipality_mapping
 
-    def get_municipality_name(self, municipality: str = None) -> str | None:
+    def get_municipality_name(
+        self,
+        municipality: str | None = None
+    ) -> str | None:
         municipality = municipality or self.municipality
         if municipality not in self.municipality_mapping:
             return None
@@ -517,7 +520,7 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
 
     def by_municipality(
         self,
-        municipality: str = None
+        municipality: str | None = None
     ) -> tuple[list[ArchivedResult], datetime | None]:
         """ Returns the results for a given municipality. """
 
