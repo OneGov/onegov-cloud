@@ -17,7 +17,7 @@ import transaction
 import yaml
 
 from collections import defaultdict
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from io import BytesIO
 from libres.db.models import ReservedSlot
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
@@ -1222,8 +1222,10 @@ def import_reservations(
                 resource = resources.by_name(real_resource_name.lower())
 
                 if not resource:
-                    click.echo(
-                        f'Resource {resource} not found in the database'
+                    click.secho(
+                        f'Resource {real_resource_name} '
+                        f'not found in the database',
+                        fg='red'
                     )
                     continue
 
@@ -3418,9 +3420,14 @@ def import_reservations_campos(
         reservations: dict[
             str, list[Reservation]] = {}
 
+        resources_not_found = []
+
         # Iterate through the reservations in the excel file
         for index, row in enumerate(sheet.rows):
-            if index == 0:  # Skip the first row, it's the header
+            # if index == 0:  # Skip the first row, it's the header
+            #     continue
+            # For now only one
+            if index < 1:
                 continue
 
             reservation: Reservation = {
@@ -3440,8 +3447,16 @@ def import_reservations_campos(
                         continue
                     row_empty = False
                     resource_name = str(value)
-                    import_fields = resource_map.get(resource_name, {}
-                                                     ).get('fields', {})
+                    resource_in_map = resource_map.get(resource_name, {})
+                    if not resource_in_map:
+                        click.secho(
+                            f'Resource {resource_name} not found in the '
+                            f'mapping file', fg='red')
+                        resources_not_found.append(resource_name)
+                        row_empty = True
+                        continue
+                    import_fields = resource_in_map.get('fields', {})
+                    click.secho(f'Searching for: {resource_name}', fg='green')
                 elif i == 1:
                     reservation['start'] = datetime.strptime(
                         str(value), '%d.%m.%Y %H:%M:%S')
@@ -3457,16 +3472,20 @@ def import_reservations_campos(
                     if value is None:
                         value = 'raumreservationen@huenenberg.ch'
                     reservation['fields']['email'] = value
-                elif i in shared_fields:
-                    value = str(value or '')
+                elif not row_empty and i in shared_fields:
+                    if value is None or value == "":
+                        continue
                     key = shared_fields[i]
+                    if reservation['fields'].get(key) is None or '':
+                        reservation['fields'][key] = value
+                    elif value not in reservation['fields'].get(key, ''):
+                        reservation['fields'][key] += f' {value}'
+                elif i in import_fields:
+                    key = import_fields[i]
                     if reservation['fields'].get(key) is None or '':
                         reservation['fields'][key] = value
                     elif value not in reservation['fields'][key]:
                         reservation['fields'][key] += f' {value}'
-                elif i in import_fields:
-                    key = import_fields[i]
-                    reservation['fields'][key] = value
 
             if not row_empty:
                 if resource_name not in reservations:
@@ -3494,8 +3513,10 @@ def import_reservations_campos(
                 resource = resources.by_name(real_resource_name.lower())
 
                 if not resource:
-                    click.echo(
-                        f'Resource {resource} not found in the database'
+                    click.secho(
+                        f'Resource {real_resource_name} '
+                        f'not found in the database',
+                        fg='red'
                     )
                     continue
 
@@ -3601,6 +3622,13 @@ def import_reservations_campos(
 
                     form = resource.form_class(data=form_data)
 
+                    if not form.validate():
+                        form_data_show = json.dumps(
+                            form_data, indent=4, default=str)
+                        click.secho(f'{id}: {form_data_show} failed the form '
+                            f'check with {form.errors}', fg='red')
+                        continue
+
                     submission = forms.submissions.add_external(
                         form=form,
                         state='pending',
@@ -3625,12 +3653,19 @@ def import_reservations_campos(
                             handler_code='RSV', handler_id=token
                         )
                         ticket.accept_ticket(user)
-                        if reservation['state'] != 'unbestätigt':
+                        if reservation['state'] != 'Provisorisch':
                             ticket.close_ticket()
 
                     click.secho(f'{id}: Sucessfully imported reservation '
                                 f'${ticket.number} at {start} - {end}',
                                 fg='green')
+
+        click.secho(
+            'Following resources were not found in the mapping:',
+            fg='yellow'
+        )
+        for r in resources_not_found:
+            click.secho(r, fg='yellow')
 
     return import_reservations
 
@@ -3688,16 +3723,6 @@ def delete_reservations(
             Ticket.handler_code == 'RSV'
         ).all()
 
-        submissions = request.session.query(FormSubmission)
-        for submission in submissions:
-            if submission.created > datetime.now() - timedelta(hours=1):
-                if not dry_run:
-                    request.session.delete(submission)
-                click.secho(
-                    f'  Deleted form submission {submission.id} ',
-                    fg='green' if not dry_run else 'yellow'
-                )
-
         for ticket in rsv_tickets:
             if not dry_run:
                 request.session.delete(ticket)
@@ -3707,6 +3732,18 @@ def delete_reservations(
                 f'(handler: {ticket.handler_code})',
                 fg='green' if not dry_run else 'yellow'
             )
+
+        # Delete Submissions
+        submissions = request.session.query(FormSubmission)
+        for submission in submissions:
+            if submission.created > (
+                datetime.now(timezone.utc) - timedelta(hours=1)):
+                if not dry_run:
+                    request.session.delete(submission)
+                click.secho(
+                    f'  Deleted form submission {submission.id} ',
+                    fg='green' if not dry_run else 'yellow'
+                )
 
         if not dry_run:
             transaction.commit()
