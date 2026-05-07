@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from freezegun import freeze_time
+from onegov.core.utils import module_path
+from tests.onegov.election_day.common import import_ech_from_file
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_complex_vote
 from tests.onegov.election_day.common import upload_vote
@@ -233,3 +235,53 @@ def test_views_vote_embedded_widgets(election_day_app_zg: TestApp) -> None:
         'vote-header-widget',
     ):
         client.get(f'/vote/complex-vote/{url}').maybe_follow()
+
+
+def test_views_vote_municipal_and_municipality(
+    election_day_app_sg: TestApp
+) -> None:
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+    login(client)
+
+    import_ech_from_file(
+        client,
+        module_path(
+            'tests.onegov.election_day',
+            'fixtures/multiple/sg/vote-result-delivery_20250518.xml'
+        )
+    )
+
+    page = client.get('/')
+
+    assert 'Urnengang vom 18. Mai 2025' in page
+    assert 'Kantonale Abstimmungen' in page
+    assert 'Finanzausgleichsgesetz' in page
+    assert 'Kommunale Wahlen und Abstimmungen' in page
+    assert 'Alle kommunalen Wahl- und Abstimmungsergebnisse' in page
+    assert '/archive/2025-05-18/municipal' in page
+
+    # verify municipal results
+    municipal_page = page.click(
+        'Alle kommunalen Wahl- und Abstimmungsergebnisse')
+    assert 'Urnengang vom 18. Mai 2025' in page
+    assert 'Kommunale Wahlen und Abstimmungen' in page
+    for municipality in (
+        'Au', 'Balgach', 'Gaiserwald', 'Gossau', 'Mosnang',
+        'Niederhelfenschwil', 'Rheineck', 'St. Gallen',
+        'St. Margrethen', 'Wattwil'
+    ):
+        assert municipality in municipal_page
+
+    # verify municipality detail page
+    balgach_page = municipal_page.click('Balgach')
+    assert 'Urnengang vom 18. Mai 2025' in balgach_page
+    assert 'Kommunale Wahlen und Abstimmungen' in balgach_page
+    assert 'Balgach' in balgach_page
+    assert 'Abstimmung' in balgach_page
+    assert 'Hochwasserschutzprojekte Wolfsbach' in balgach_page
+    assert 'angenommen' in balgach_page
+    assert '74.15' in balgach_page
+    assert 'Hochwasserschutzprojekt Dorfbach ' in balgach_page
+    assert '75.15' in balgach_page
+    assert balgach_page.click('Dorfbach').maybe_follow().status_code == 200

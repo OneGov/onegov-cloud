@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from freezegun import freeze_time
+from onegov.core.utils import module_path
 from onegov.election_day.layouts import ElectionLayout
+from tests.onegov.election_day.common import import_ech_from_file
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import MAJORZ_HEADER
 from tests.onegov.election_day.common import upload_majorz_election
@@ -1013,3 +1015,52 @@ def test_views_election_embedded_widgets(election_day_app_gr: TestApp) -> None:
     upload_majorz_election(client)
     for tab_name in ElectionLayout.tabs_with_embedded_tables:
         client.get(f'/election/majorz-election/{tab_name}-table')
+
+
+def test_views_election_municipal_and_municipality(
+    election_day_app_sg: TestApp
+) -> None:
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+    login(client)
+
+    fixtures = 'fixtures/multiple/sg'
+    import_ech_from_file(
+        client,
+        module_path(
+            'tests.onegov.election_day',
+            f'{fixtures}/majority-election-info-delivery_20250518.xml'
+        )
+    )
+    import_ech_from_file(
+        client,
+        module_path(
+            'tests.onegov.election_day',
+            f'{fixtures}/majority-election-result-delivery_20250518.xml'
+        ),
+        create=False,
+    )
+
+    page = client.get('/')
+    assert 'Urnengang vom 18. Mai 2025' in page
+    assert 'Kommunale Wahlen und Abstimmungen' in page
+    assert 'Alle kommunalen Wahl- und Abstimmungsergebnisse' in page
+    assert '/archive/2025-05-18/municipal' in page
+
+    # verify municipal archive lists municipalities
+    municipal_page = page.click(
+        'Alle kommunalen Wahl- und Abstimmungsergebnisse')
+    assert 'Urnengang vom 18. Mai 2025' in page
+    assert 'Kommunale Wahlen und Abstimmungen' in municipal_page
+    for municipality in ('Gaiserwald', 'Goldach', 'St. Margrethen'):
+        assert municipality in municipal_page
+
+    # verify municipality detail page
+    goldach_page = municipal_page.click('Goldach')
+    assert 'Urnengang vom 18. Mai 2025' in goldach_page
+    assert 'Kommunale Wahlen und Abstimmungen' in goldach_page
+    assert 'Goldach' in goldach_page
+    assert 'Wahl' in goldach_page
+    assert 'Wahl Schulpräsidium' in goldach_page
+    assert (goldach_page.click('Schulpräsidium').
+            maybe_follow().status_code == 200)

@@ -67,6 +67,19 @@ def test_upload_vote_submit(election_day_app_zg: TestApp) -> None:
 
         assert import_.called
 
+    # ech xml
+    with patch(
+        'onegov.election_day.views.upload.vote.import_ech'
+    ) as import_:
+        import_.return_value = ([], [], [])
+
+        xml = b'<?xml version="1.0" encoding="utf-8"?><delivery/>'
+        upload = client.get('/vote/vote/upload')
+        upload.form['file_format'] = 'xml'
+        upload.form['xml'] = Upload('data.xml', xml, 'text/xml')
+        upload = upload.form.submit()
+
+        assert import_.called
 
 def test_upload_vote_invalidate_cache(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)

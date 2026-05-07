@@ -751,7 +751,7 @@ def import_votes_internal(
     return loaded_votes
 
 
-def import_mulitple_ech(
+def import_multiple_ech(
     principal: str,
     session: Session,
     dataset_name: str
@@ -1082,7 +1082,7 @@ def import_test_datasets(session: Session) -> ImportTestDatasets:
 
         elif api_format == 'ech':
             assert dataset_name is not None
-            items = import_mulitple_ech(
+            items = import_multiple_ech(
                 principal=principal,
                 session=session,
                 dataset_name=dataset_name
