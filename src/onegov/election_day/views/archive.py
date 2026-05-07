@@ -107,7 +107,7 @@ def view_archive_municipality(
         'layout': layout,
         'date': None,
         'archive_items': self.group_items(results, request),
-        'municipality': self.municipality,
+        'municipality_name': self.get_municipality_name(),
         'municipality_view': True,
     }
 

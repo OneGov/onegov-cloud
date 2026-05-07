@@ -41,7 +41,7 @@
                 </h2>
                 <h3 tal:condition="municipal_view or municipality_view">
                     <span i18n:translate="">Municipal Elections and Votes</span>
-                    <span tal:condition="municipality_view">${municipality.title()}</span>
+                    <span tal:condition="municipality_view">${municipality_name}</span>
                 </h3>
 
                 <div tal:repeat="domain archive_items[date]" class="domain-${domain}">
@@ -78,7 +78,7 @@
                             <h3>
                                 <tal:block>
                                     <span i18n:translate="">Municipal Elections and Votes</span>
-                                    <span tal:condition="municipal_view or municipality_view">${municipality.title()}</span>
+                                    <span tal:condition="municipal_view">${municipality_name}</span>
                                 </tal:block>
                                 <span class="visually-hidden">
                                     <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}

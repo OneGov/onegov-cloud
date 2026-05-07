@@ -178,11 +178,6 @@ class ArchivedResultCollection:
                     (item for item in j if item.url not in compounded),
                     lambda k: 'vote'
                     if k.type in ('vote', 'complex_vote') else 'election',
-                    lambda k: (k.meta or {}).get('domain_segment') or '',
-                    # lambda k: groupbydict(
-                    #     k,
-                    #     lambda m: (m.meta or {}).get('domain_segment') or '',
-                    # )
                     lambda k: (
                         1 if k.type in ('vote', 'complex_vote') else 0,
                         (k.meta or {}).get('domain_segment') or '',
@@ -465,8 +460,6 @@ class MunicipalArchivedResultCollection(ArchivedResultCollection):
         if not items:
             return None
 
-        print('*** tschupre municipal group items len items', len(items))
-
         return groupbydict(
             items,
             lambda i: i.date,
@@ -488,30 +481,35 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
 
     def __init__(self, session: Session, municipality: str = ''):
         super().__init__(session)
-        self.municipality = municipality.lower()
-        self.municipalities = [
-            self.sanitize_municipality(row[0]) for row in
+        self.municipality = self.sanitize_municipality(municipality)
+
+        # sanitized municipality: municipality name
+        self.municipality_mapping = {
+            self.sanitize_municipality(row[0]): row[0] for row in
             self.session.query(
                 ArchivedResult.meta['domain_segment'].astext
             )
             .filter(ArchivedResult.domain == 'municipality')
             .distinct()
             if row[0]
-        ]
-        print('*** tschupre valid municipalities:', self.municipalities)
+        }
 
     def is_valid_municipality(self) -> bool:
-        print('*** tschupre valid municipality:', self.municipality)
-        return self.municipality in self.municipalities
+        return self.municipality in self.municipality_mapping
+
+    def get_municipality_name(self, municipality: str = None) -> str | None:
+        municipality = municipality or self.municipality
+        if municipality not in self.municipality_mapping:
+            return None
+        return self.municipality_mapping[municipality]
 
     def sanitize_municipality(self, municipality: str) -> str:
         """
-        Removes ` (SG), replaces ` ` by `-` and removes `.`
-        from municipality or domain segment.
+        Removes ` (SG)`, removes spaces and `.` from municipality.
         """
         if '(' in municipality:
             municipality = municipality.split(' (')[0]
-        return municipality.replace(' ', '-').replace('.', '').lower()
+        return municipality.replace(' ', '').replace('.', '').lower()
 
     def for_municipality(self, municipality: str) -> Self:
         municipality = self.sanitize_municipality(municipality)
@@ -522,17 +520,17 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
         municipality: str = None
     ) -> tuple[list[ArchivedResult], datetime | None]:
         """ Returns the results for a given municipality. """
-        municipality = municipality if municipality else self.municipality
-        print('*** tschupre by municipality:', municipality)
+
+        municipality = municipality or self.municipality
 
         query = self.query()
         query = query.filter(ArchivedResult.domain == 'municipality')
-        query = query.filter(ArchivedResult.type.in_(['election', 'vote']))
-        # TODO: Fix filter below for st-gallen
         query = query.filter(
-            func.lower(
-                ArchivedResult.meta['domain_segment'].astext
-            ) == municipality
+            ArchivedResult.type.in_(['election', 'vote', 'complex_vote'])
+        )
+        query = query.filter(
+            ArchivedResult.meta['domain_segment'].astext
+             == self.municipality_mapping[municipality]
         )
         query = query.order_by(
             ArchivedResult.date,
