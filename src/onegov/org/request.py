@@ -142,14 +142,15 @@ class OrgRequest(CoreRequest):
         Use this instead of asserting current_user is not None. Raises for
         both anonymous requests and cases where a logged-in identity has no
         corresponding user record. In the latter case a Sentry warning with
-        the username is captured to aid debugging.
+        the identity uid is captured to aid debugging.
         """
         user = self.current_user
         if user is None:
             if self.is_logged_in:
+                uid = getattr(self.identity, 'uid', 'unknown')
                 sentry_sdk.capture_message(
                     f'current_user is None despite valid identity'
-                    f': {self.current_username}',
+                    f': {uid}',
                     level='warning',
                 )
             raise HTTPForbidden()

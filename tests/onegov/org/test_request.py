@@ -20,7 +20,7 @@ def test_get_current_user_raises_when_none() -> None:
     request = MagicMock()
     request.current_user = None
     request.is_logged_in = True
-    request.current_username = 'stale@example.com'
+    request.identity.uid = 'abc123'
 
     from onegov.org.request import OrgRequest
     with patch('onegov.org.request.sentry_sdk') as mock_sentry:
@@ -29,7 +29,7 @@ def test_get_current_user_raises_when_none() -> None:
 
         mock_sentry.capture_message.assert_called_once_with(
             'current_user is None despite valid identity'
-            ': stale@example.com',
+            ': abc123',
             level='warning',
         )
 
