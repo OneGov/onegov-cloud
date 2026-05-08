@@ -1,0 +1,33 @@
+from __future__ import annotations
+
+from unittest.mock import MagicMock, patch
+from webob.exc import HTTPForbidden
+
+
+def test_get_current_user_returns_user() -> None:
+    user = MagicMock()
+    request = MagicMock()
+    request.current_user = user
+
+    from onegov.org.request import OrgRequest
+    result = OrgRequest.get_current_user(request)
+
+    assert result is user
+
+
+def test_get_current_user_raises_when_none() -> None:
+    request = MagicMock()
+    request.current_user = None
+    request.current_username = 'stale@example.com'
+
+    from onegov.org.request import OrgRequest
+    with patch('onegov.org.request.sentry_sdk') as mock_sentry:
+        import pytest
+        with pytest.raises(HTTPForbidden):
+            OrgRequest.get_current_user(request)
+
+        mock_sentry.capture_message.assert_called_once_with(
+            'current_user is None despite valid identity',
+            level='warning',
+            extras={'username': 'stale@example.com'},
+        )
