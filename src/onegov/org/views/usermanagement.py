@@ -325,7 +325,7 @@ def handle_change_username(
         old_username = self.username
         form.populate_obj(self)
         request.success(_(
-            'Succesfully changed ${old_username} to ${new_username}',
+            'Successfully changed ${old_username} to ${new_username}',
             mapping={
                 'old_username': old_username,
                 'new_username': form.new_username.data
