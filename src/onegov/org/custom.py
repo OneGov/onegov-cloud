@@ -281,8 +281,8 @@ def get_global_tools(
         yield LinkGroup(_('Management'), classes=('management', ), links=links)
 
     # Tickets
-    if (request.is_manager or request.is_supporter) \
-            and request.current_user is not None:
+    if request.is_manager or request.is_supporter:
+        user = request.get_current_user()
         ticket_count = request.app.ticket_count
         screen_count = ticket_count.open or ticket_count.pending
 
@@ -295,7 +295,7 @@ def get_global_tools(
                     TicketCollection, {
                         'handler': 'ALL',
                         'state': 'unfinished',
-                        'owner': request.current_user.id.hex
+                        'owner': user.id.hex
                     },
                 ),
                 attrs={
