@@ -153,16 +153,15 @@ def get_personal_tools(
     # for logged-in users show the number of open bookings
     if request.is_logged_in:
         session = request.session
-        username = request.current_username
-        if username is None or request.current_user is None:
-            return
+        user = request.get_current_user()
+        username = user.username
 
         period = request.app.active_period
         periods = request.app.periods
 
         if not period or period.finalizable:
             invoices = request.app.invoice_collection(
-                user_id=request.current_user.id)
+                user_id=user.id)
 
             unpaid = invoices.unpaid_count(excluded_period_ids={
                 p.id for p in periods if not p.finalized})
