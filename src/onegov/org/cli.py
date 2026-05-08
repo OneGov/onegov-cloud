@@ -3663,6 +3663,8 @@ def import_reservations_campos(
                                 f'${ticket.number} at {start} - {end}',
                                 fg='green')
 
+                transaction.commit()
+
         click.secho(
             'Following resources were not found in the mapping:',
             fg='yellow'
