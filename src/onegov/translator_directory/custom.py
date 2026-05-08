@@ -147,8 +147,7 @@ def get_global_tools(
 
         # Tickets
         if request.is_admin or request.is_editor:
-            if request.current_user is None:
-                return
+            user = request.get_current_user()
             if request.is_accountant:
                 ticket_count = get_accountant_ticket_count(request)
             else:
@@ -170,7 +169,7 @@ def get_global_tools(
                             TicketCollection, {
                                 'handler': 'ALL',
                                 'state': 'unfinished',
-                                'owner': request.current_user.id.hex
+                                'owner': user.id.hex
                             },
                         ),
                         attrs={

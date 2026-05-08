@@ -52,6 +52,9 @@ class DummyRequest:
     def include(self, asset: object) -> None:
         pass
 
+    def get_current_user(self) -> object:
+        return self.current_user
+
     def exclude_invisible(self, items: object) -> None:
         pass
 
