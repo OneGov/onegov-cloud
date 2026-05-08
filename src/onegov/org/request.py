@@ -144,7 +144,7 @@ class OrgRequest(CoreRequest):
         """
         user = self.current_user
         if user is None:
-            if self.identity is not None:
+            if self.is_logged_in:
                 sentry_sdk.capture_message(
                     f'current_user is None despite valid identity'
                     f': {self.current_username}',
