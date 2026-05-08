@@ -1094,3 +1094,67 @@ def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
     result = page.form.submit()
     assert result.status_code == 200
     assert 'CHF 20000' in result
+
+
+def test_abschluss_email_uses_commission_name(
+    client: Client[TestPasApp],
+) -> None:
+    client.login_admin()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    add_rate_set(settings, [])
+
+    session = client.app.session()
+    session.add(
+        SettlementRun(
+            name='Q1 2024',
+            start=datetime.date(2024, 1, 1),
+            end=datetime.date(2024, 12, 31),
+            active=True,
+            closed=False,
+        )
+    )
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parl = parliamentarians.add(
+        first_name='Max',
+        last_name='Muster',
+        email_primary='max.muster@example.org',
+    )
+
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='Finanzkommission')
+
+    PASCommissionMembershipCollection(session).add(
+        commission_id=commission.id,
+        parliamentarian_id=parl.id,
+        role='member',
+        start=datetime.date(2024, 1, 1),
+    )
+
+    session.flush()
+    transaction.commit()
+
+    # Create attendance without abschluss first
+    page = (
+        client.get('/')
+        .follow()
+        .click('Anwesenheiten')
+        .click(href='new', index=0)
+    )
+    page.form['date'] = '2024-06-15'
+    page.form['duration'] = '2'
+    page.form['type'] = 'commission'
+    page.form['commission_id'].select(text='Finanzkommission')
+    page.form['parliamentarian_id'].select(text='Max Muster')
+    page.form['abschluss'] = False
+    page = page.form.submit().follow()
+
+    # Now edit to set abschluss — this triggers the email
+    page = page.click('Bearbeiten')
+    page.form['abschluss'] = True
+    page.form.submit().follow()
+
+    email = client.get_email(0)
+    assert email['Subject'] == ('PAS: Abschluss gesetzt für Finanzkommission')
+    assert 'Finanzkommission' in email['HtmlBody']
+    assert 'Max Muster' in email['HtmlBody']
