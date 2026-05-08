@@ -883,6 +883,7 @@ class SessionManager:
                             base.metadata.create_all(
                                 conn, tables=missing, checkfirst=False
                             )
+                            existing_tables.update(t.name for t in missing)
 
                         declared_classes.update(
                             base.registry._class_registry.values()
