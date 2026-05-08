@@ -11,6 +11,8 @@ from onegov.feriennet.layout import VolunteerLayout
 from onegov.feriennet.models import VacationActivity
 from onegov.feriennet.models import VolunteerCart
 from onegov.feriennet.models import VolunteerCartAction
+from onegov.org.models import TicketMessage
+from onegov.ticket import TicketCollection
 from operator import attrgetter
 from uuid import uuid4
 
@@ -191,6 +193,11 @@ def submit_volunteer(
                 })
 
         cart.clear()
+        with request.session.no_autoflush:
+            ticket = TicketCollection(request.session).open_ticket(
+                handler_code='VOL', handler_id=token.hex
+            )
+            TicketMessage.create(ticket, request, 'opened', 'external')
         complete = True
 
     return {

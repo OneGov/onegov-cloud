@@ -1130,3 +1130,38 @@
         </a>
     </div>
 </metal:banner>
+
+
+<metal:volunteer_submissions define-macro="volunteer_submissions" i18n:domain="onegov.feriennet">
+    <h2>Volunteer</h2>
+    <dl>
+        <dt i18n:translate>First Name</dt>
+        <dd>John</dd>
+        <dt i18n:translate>Last Name</dt>
+        <dd>Doe</dd>
+        <dt i18n:translate>Age</dt>
+        <dd>30</dd>
+        <dt i18n:translate>Location</dt>
+        <dd>Meggen</dd>
+        <dt i18n:translate>Phone</dt>
+        <dd><a href="tel:+41791234567">+41 79 123 45 67</a></dd>
+        <dt i18n:translate>Organisation</dt>
+        <dd>Text</dd>
+    </dl>
+
+    <h2>Subscriptions</h2>
+    <div class="grid-x grid-padding-x ">
+        <div tal:repeat="subscription subscriptions" class="cell small-12 medium-6">
+        <div class="cell card subpage-cards">
+            <div class="card-section">
+                <h3>Tanzen</h3>
+                <p>Fahrer:in, 0 von 1-5 <br>
+                    Mi. 29. April 08:00 - Fr. 1. Mai 08:00</p>
+                <a href="#" i18n:translate>Accept</a>
+                <a href="#" i18n:translate>Decline</a>
+
+            </div>
+        </div></div>
+</div>
+
+</metal:volunteer_submissions>
