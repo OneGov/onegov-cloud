@@ -25,9 +25,8 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
     if request.is_logged_in and request.app.org.meta.get(
         'enable_chat', 'disabled') == 'people_chat':
         chat_staff = request.app.org.meta.get('chat_staff', [])
-        if request.current_user is None:
-            return
-        if request.current_user.id.hex in chat_staff:
+        user = request.get_current_user()
+        if user.id.hex in chat_staff:
             yield LinkGroup(_('Chats'), classes=('chats', ), links=(
                 Link(
                     _('My Chats'), request.link(
