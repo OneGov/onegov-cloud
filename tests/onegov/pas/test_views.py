@@ -3,6 +3,8 @@ from __future__ import annotations
 import datetime
 import json
 import transaction
+import zipfile
+from io import BytesIO
 
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import PASParliamentaryGroupCollection
@@ -1158,3 +1160,119 @@ def test_abschluss_email_uses_commission_name(
     assert email['Subject'] == ('PAS: Abschluss gesetzt für Finanzkommission')
     assert 'Finanzkommission' in email['HtmlBody']
     assert 'Max Muster' in email['HtmlBody']
+
+
+def test_parliamentarian_pdf_zip_download(
+    client: Client[TestPasApp],
+) -> None:
+    client.login_admin()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    add_rate_set(settings, [])
+
+    session = client.app.session()
+    session.add(
+        SettlementRun(
+            name='Q1 2024',
+            start=datetime.date(2024, 1, 1),
+            end=datetime.date(2024, 12, 31),
+            active=True,
+            closed=False,
+        )
+    )
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    alice = parliamentarians.add(
+        first_name='Alice',
+        last_name='Aaberg',
+        email_primary='alice@example.org',
+    )
+    bob = parliamentarians.add(
+        first_name='Bob',
+        last_name='Baumann',
+        email_primary='bob@example.org',
+    )
+
+    parties = PartyCollection(session)
+    party = parties.add(name='TestPartei')
+
+    session.add(
+        PASParliamentarianRole(
+            parliamentarian_id=alice.id,
+            role='member',
+            party=party,
+            start=datetime.date(2024, 1, 1),
+        )
+    )
+    session.add(
+        PASParliamentarianRole(
+            parliamentarian_id=bob.id,
+            role='member',
+            party=party,
+            start=datetime.date(2024, 1, 1),
+        )
+    )
+
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='TestKommission')
+
+    PASCommissionMembershipCollection(session).add(
+        commission_id=commission.id,
+        parliamentarian_id=alice.id,
+        role='member',
+        start=datetime.date(2024, 1, 1),
+    )
+    PASCommissionMembershipCollection(session).add(
+        commission_id=commission.id,
+        parliamentarian_id=bob.id,
+        role='member',
+        start=datetime.date(2024, 1, 1),
+    )
+
+    session.flush()
+
+    # Add attendances for both
+    from onegov.pas.models import Attendence
+
+    session.add(
+        Attendence(
+            parliamentarian=alice,
+            commission=commission,
+            date=datetime.date(2024, 3, 10),
+            duration=120,
+            type='commission',
+        )
+    )
+    session.add(
+        Attendence(
+            parliamentarian=bob,
+            commission=commission,
+            date=datetime.date(2024, 3, 10),
+            duration=120,
+            type='commission',
+        )
+    )
+    session.flush()
+    transaction.commit()
+
+    # Navigate to settlement run and find ZIP link
+    page = settings.click('Abrechnungsläufe')
+    page = page.click('Q1 2024')
+    assert 'Alle Parlamentarier:innen (ZIP)' in page
+
+    resp = page.click(href='all-parliamentarians-zip')
+    assert resp.status_code == 200
+    assert resp.content_type == 'application/zip'
+    assert resp.content_disposition is not None
+    assert '.zip' in resp.content_disposition
+
+    zf = zipfile.ZipFile(BytesIO(resp.body))
+    names = zf.namelist()
+    assert len(names) == 2
+    assert all(n.endswith('.pdf') for n in names)
+    assert any('Aaberg' in n for n in names)
+    assert any('Baumann' in n for n in names)
+
+    for name in names:
+        pdf_bytes = zf.read(name)
+        assert len(pdf_bytes) > 0
+        assert pdf_bytes[:4] == b'%PDF'
