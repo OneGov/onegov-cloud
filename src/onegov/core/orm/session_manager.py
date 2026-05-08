@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from functools import lru_cache
 from onegov.core import log
 from onegov.core.custom import json
-from sqlalchemy import create_engine, event, select, text
+from sqlalchemy import create_engine, event, inspect, select, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm.query import Query
@@ -870,9 +870,19 @@ class SessionManager:
 
             try:
                 with engine.begin() as conn:
+                    existing_tables = set(
+                        inspect(conn).get_table_names(schema=schema)
+                    )
                     for base in self.bases:
                         base.metadata.schema = schema
-                        base.metadata.create_all(conn)
+                        missing = [
+                            t for t in base.metadata.sorted_tables
+                            if t.name not in existing_tables
+                        ]
+                        if missing:
+                            base.metadata.create_all(
+                                conn, tables=missing, checkfirst=False
+                            )
 
                         declared_classes.update(
                             base.registry._class_registry.values()
