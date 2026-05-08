@@ -19,6 +19,7 @@ def test_get_current_user_returns_user() -> None:
 def test_get_current_user_raises_when_none() -> None:
     request = MagicMock()
     request.current_user = None
+    request.is_logged_in = True
     request.current_username = 'stale@example.com'
 
     from onegov.org.request import OrgRequest
@@ -36,7 +37,7 @@ def test_get_current_user_raises_when_none() -> None:
 def test_get_current_user_no_sentry_for_anonymous() -> None:
     request = MagicMock()
     request.current_user = None
-    request.identity = None
+    request.is_logged_in = False
 
     from onegov.org.request import OrgRequest
     with patch('onegov.org.request.sentry_sdk') as mock_sentry:
