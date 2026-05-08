@@ -170,12 +170,6 @@ class DefaultLayout(ChameleonLayout):
     def municipality_archive(self) -> MunicipalityArchivedResultCollection:
         return MunicipalityArchivedResultCollection(self.request.session)
 
-    def municipality_archive_link(self, municipality: str) -> str:
-        return self.request.class_link(
-            MunicipalityArchivedResultCollection,
-            variables={'municipality': municipality}
-        )
-
     @cached_property
     def archive_search_link(self) -> str:
         return self.request.class_link(

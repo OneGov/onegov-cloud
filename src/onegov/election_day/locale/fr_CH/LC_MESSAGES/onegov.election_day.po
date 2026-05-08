@@ -119,7 +119,7 @@ msgstr ""
 
 #, python-format
 msgid "Domain not supported: ${doi_type} (supported: CH, CT, BZ, MU, AN)"
-msgstr ""
+msgstr "Domaine non pris en charge : ${doi_type} (pris en charge : CH, CT, BZ, MU, AN)"
 
 msgid "Changing types is not supported"
 msgstr "Le changement de types n'est pas pris en charge"

@@ -120,7 +120,7 @@ msgstr ""
 
 #, python-format
 msgid "Domain not supported: ${doi_type} (supported: CH, CT, BZ, MU, AN)"
-msgstr ""
+msgstr "Domain minga supportada: ${doi_type} (sustegnì: CH, CT, BZ, MU, AN)"
 
 msgid "Changing types is not supported"
 msgstr "La midada da tipas na vegn betg sustegnida"
